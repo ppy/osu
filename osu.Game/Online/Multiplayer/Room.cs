@@ -2,11 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Game.IO.Serialization.Converters;
 using osu.Game.Online.Multiplayer.GameTypes;
 using osu.Game.Online.Multiplayer.RoomStatuses;
 using osu.Game.Users;
@@ -17,90 +17,86 @@ namespace osu.Game.Online.Multiplayer
     {
         [Cached]
         [JsonProperty("id")]
-        public Bindable<int?> RoomID { get; private set; } = new Bindable<int?>();
+        public readonly Bindable<int?> RoomID = new Bindable<int?>();
 
         [Cached]
         [JsonProperty("name")]
-        public Bindable<string> Name { get; private set; } = new Bindable<string>();
+        public readonly Bindable<string> Name = new Bindable<string>();
 
         [Cached]
         [JsonProperty("host")]
-        public Bindable<User> Host { get; private set; } = new Bindable<User>();
+        public readonly Bindable<User> Host = new Bindable<User>();
 
         [Cached]
         [JsonProperty("playlist")]
-        public BindableList<PlaylistItem> Playlist { get; private set; } = new BindableList<PlaylistItem>();
-
-        [Cached]
-        [JsonIgnore]
-        public Bindable<PlaylistItem> CurrentItem { get; private set; } = new Bindable<PlaylistItem>();
+        public readonly BindableList<PlaylistItem> Playlist = new BindableList<PlaylistItem>();
 
         [Cached]
         [JsonProperty("channel_id")]
-        public Bindable<int> ChannelId { get; private set; } = new Bindable<int>();
+        public readonly Bindable<int> ChannelId = new Bindable<int>();
 
         [Cached]
         [JsonIgnore]
-        public Bindable<TimeSpan> Duration { get; private set; } = new Bindable<TimeSpan>(TimeSpan.FromMinutes(30));
+        public readonly Bindable<RoomCategory> Category = new Bindable<RoomCategory>();
 
-        [Cached]
-        [JsonIgnore]
-        public Bindable<int?> MaxAttempts { get; private set; } = new Bindable<int?>();
-
-        [Cached]
-        [JsonIgnore]
-        public Bindable<RoomStatus> Status { get; private set; } = new Bindable<RoomStatus>(new RoomStatusOpen());
-
-        [Cached]
-        [JsonIgnore]
-        public Bindable<RoomAvailability> Availability { get; private set; } = new Bindable<RoomAvailability>();
-
-        [Cached]
-        [JsonIgnore]
-        public Bindable<GameType> Type { get; private set; } = new Bindable<GameType>(new GameTypeTimeshift());
-
-        [Cached]
-        [JsonIgnore]
-        public Bindable<int?> MaxParticipants { get; private set; } = new Bindable<int?>();
-
-        [Cached]
-        [JsonIgnore]
-        public Bindable<IEnumerable<User>> Participants { get; private set; } = new Bindable<IEnumerable<User>>(Enumerable.Empty<User>());
-
-        [Cached]
-        public Bindable<int> ParticipantCount { get; private set; } = new Bindable<int>();
-
-        public Room()
+        // Todo: osu-framework bug (https://github.com/ppy/osu-framework/issues/4106)
+        [JsonProperty("category")]
+        [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
+        private RoomCategory category
         {
-            Playlist.ItemsAdded += updateCurrent;
-            Playlist.ItemsRemoved += updateCurrent;
-            updateCurrent(Playlist);
+            get => Category.Value;
+            set => Category.Value = value;
         }
 
-        private void updateCurrent(IEnumerable<PlaylistItem> playlist)
-        {
-            CurrentItem.Value = playlist.FirstOrDefault();
-        }
+        [Cached]
+        [JsonIgnore]
+        public readonly Bindable<TimeSpan?> Duration = new Bindable<TimeSpan?>();
 
-        // todo: TEMPORARY
+        [Cached]
+        [JsonIgnore]
+        public readonly Bindable<int?> MaxAttempts = new Bindable<int?>();
+
+        [Cached]
+        [JsonIgnore]
+        public readonly Bindable<RoomStatus> Status = new Bindable<RoomStatus>(new RoomStatusOpen());
+
+        [Cached]
+        [JsonIgnore]
+        public readonly Bindable<RoomAvailability> Availability = new Bindable<RoomAvailability>();
+
+        [Cached]
+        [JsonIgnore]
+        public readonly Bindable<GameType> Type = new Bindable<GameType>(new GameTypeTimeshift());
+
+        [Cached]
+        [JsonIgnore]
+        public readonly Bindable<int?> MaxParticipants = new Bindable<int?>();
+
+        [Cached]
+        [JsonProperty("recent_participants")]
+        public readonly BindableList<User> RecentParticipants = new BindableList<User>();
+
+        [Cached]
         [JsonProperty("participant_count")]
-        private int? participantCount
-        {
-            get => ParticipantCount.Value;
-            set => ParticipantCount.Value = value ?? 0;
-        }
+        public readonly Bindable<int> ParticipantCount = new Bindable<int>();
 
         [JsonProperty("duration")]
-        private int duration
+        private int? duration
         {
-            get => (int)Duration.Value.TotalMinutes;
-            set => Duration.Value = TimeSpan.FromMinutes(value);
+            get => (int?)Duration.Value?.TotalMinutes;
+            set
+            {
+                if (value == null)
+                    Duration.Value = null;
+                else
+                    Duration.Value = TimeSpan.FromMinutes(value.Value);
+            }
         }
 
         // Only supports retrieval for now
         [Cached]
         [JsonProperty("ends_at")]
-        public Bindable<DateTimeOffset> EndDate { get; private set; } = new Bindable<DateTimeOffset>();
+        public readonly Bindable<DateTimeOffset?> EndDate = new Bindable<DateTimeOffset?>();
 
         // Todo: Find a better way to do this (https://github.com/ppy/osu-framework/issues/1930)
         [JsonProperty("max_attempts", DefaultValueHandling = DefaultValueHandling.Ignore)]
@@ -114,7 +110,21 @@ namespace osu.Game.Online.Multiplayer
         /// The position of this <see cref="Room"/> in the list. This is not read from or written to the API.
         /// </summary>
         [JsonIgnore]
-        public Bindable<int> Position { get; private set; } = new Bindable<int>(-1);
+        public readonly Bindable<int> Position = new Bindable<int>(-1);
+
+        /// <summary>
+        /// Create a copy of this room without online information.
+        /// Should be used to create a local copy of a room for submitting in the future.
+        /// </summary>
+        public Room CreateCopy()
+        {
+            var copy = new Room();
+
+            copy.CopyFrom(this);
+            copy.RoomID.Value = null;
+
+            return copy;
+        }
 
         public void CopyFrom(Room other)
         {
@@ -130,19 +140,24 @@ namespace osu.Game.Online.Multiplayer
             Type.Value = other.Type.Value;
             MaxParticipants.Value = other.MaxParticipants.Value;
             ParticipantCount.Value = other.ParticipantCount.Value;
-            Participants.Value = other.Participants.Value.ToArray();
             EndDate.Value = other.EndDate.Value;
 
-            if (DateTimeOffset.Now >= EndDate.Value)
+            if (EndDate.Value != null && DateTimeOffset.Now >= EndDate.Value)
                 Status.Value = new RoomStatusEnded();
 
-            // Todo: Temporary, should only remove/add new items (requires framework changes)
-            if (Playlist.Count == 0)
+            if (!Playlist.SequenceEqual(other.Playlist))
+            {
+                Playlist.Clear();
                 Playlist.AddRange(other.Playlist);
-            else if (other.Playlist.Count > 0)
-                Playlist.First().ID = other.Playlist.First().ID;
+            }
 
-            Position = other.Position;
+            if (!RecentParticipants.SequenceEqual(other.RecentParticipants))
+            {
+                RecentParticipants.Clear();
+                RecentParticipants.AddRange(other.RecentParticipants);
+            }
+
+            Position.Value = other.Position.Value;
         }
 
         public bool ShouldSerializeRoomID() => false;

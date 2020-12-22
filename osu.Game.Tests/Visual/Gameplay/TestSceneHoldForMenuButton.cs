@@ -13,9 +13,11 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [Description("'Hold to Quit' UI element")]
-    public class TestSceneHoldForMenuButton : ManualInputManagerTestScene
+    public class TestSceneHoldForMenuButton : OsuManualInputManagerTestScene
     {
         private bool exitAction;
+
+        protected override double TimePerAction => 100; // required for the early exit test, since hold-to-confirm delay is 200ms
 
         [BackgroundDependencyLoader]
         private void load()

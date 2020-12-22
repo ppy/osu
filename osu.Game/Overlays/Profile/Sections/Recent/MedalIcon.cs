@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Overlays.Profile.Sections.Recent
 {
+    [LongRunningLoad]
     public class MedalIcon : Container
     {
         private readonly string slug;
@@ -22,8 +23,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
 
             Child = sprite = new Sprite
             {
-                Height = 40,
-                Width = 40,
+                RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             };

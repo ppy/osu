@@ -61,7 +61,10 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"failtimes")]
         private BeatmapMetrics metrics { get; set; }
 
-        public BeatmapInfo ToBeatmap(RulesetStore rulesets)
+        [JsonProperty(@"max_combo")]
+        private int? maxCombo { get; set; }
+
+        public virtual BeatmapInfo ToBeatmap(RulesetStore rulesets)
         {
             var set = BeatmapSet?.ToBeatmapSet(rulesets);
 
@@ -72,10 +75,12 @@ namespace osu.Game.Online.API.Requests.Responses
                 StarDifficulty = starDifficulty,
                 OnlineBeatmapID = OnlineBeatmapID,
                 Version = version,
+                // this is actually an incorrect mapping (Length is calculated as drain length in lazer's import process, see BeatmapManager.calculateLength).
                 Length = TimeSpan.FromSeconds(length).TotalMilliseconds,
                 Status = Status,
                 BeatmapSet = set,
                 Metrics = metrics,
+                MaxCombo = maxCombo,
                 BaseDifficulty = new BeatmapDifficulty
                 {
                     DrainRate = drainRate,

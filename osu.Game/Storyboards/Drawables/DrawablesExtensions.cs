@@ -12,19 +12,19 @@ namespace osu.Game.Storyboards.Drawables
         /// Adjusts <see cref="Drawable.Blending"/> after a delay.
         /// </summary>
         /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
-        public static TransformSequence<T> TransformBlendingMode<T>(this T drawable, BlendingMode newValue, double delay = 0)
+        public static TransformSequence<T> TransformBlendingMode<T>(this T drawable, BlendingParameters newValue, double delay = 0)
             where T : Drawable
-            => drawable.TransformTo(drawable.PopulateTransform(new TransformBlendingMode(), newValue, delay));
+            => drawable.TransformTo(drawable.PopulateTransform(new TransformBlendingParameters(), newValue, delay));
     }
 
-    public class TransformBlendingMode : Transform<BlendingMode, Drawable>
+    public class TransformBlendingParameters : Transform<BlendingParameters, Drawable>
     {
-        private BlendingMode valueAt(double time)
+        private BlendingParameters valueAt(double time)
             => time < EndTime ? StartValue : EndValue;
 
         public override string TargetMember => nameof(Drawable.Blending);
 
         protected override void Apply(Drawable d, double time) => d.Blending = valueAt(time);
-        protected override void ReadIntoStartValue(Drawable d) => StartValue = d.Blending.Mode;
+        protected override void ReadIntoStartValue(Drawable d) => StartValue = d.Blending;
     }
 }

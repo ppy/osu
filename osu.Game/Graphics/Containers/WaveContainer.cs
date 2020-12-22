@@ -159,8 +159,15 @@ namespace osu.Game.Graphics.Containers
                 Height = Parent.Parent.DrawSize.Y * 1.5f;
             }
 
-            protected override void PopIn() => this.MoveToY(FinalPosition, APPEAR_DURATION, easing_show);
-            protected override void PopOut() => this.MoveToY(Parent.Parent.DrawSize.Y, DISAPPEAR_DURATION, easing_hide);
+            protected override void PopIn() => Schedule(() => this.MoveToY(FinalPosition, APPEAR_DURATION, easing_show));
+
+            protected override void PopOut()
+            {
+                double duration = IsLoaded ? DISAPPEAR_DURATION : 0;
+
+                // scheduling is required as parent may not be present at the time this is called.
+                Schedule(() => this.MoveToY(Parent.Parent.DrawSize.Y, duration, easing_hide));
+            }
         }
     }
 }

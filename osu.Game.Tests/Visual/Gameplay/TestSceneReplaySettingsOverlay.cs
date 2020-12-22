@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.PlayerSettings;
@@ -20,6 +21,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
+                State = { Value = Visibility.Visible }
             });
 
             Add(container = new ExampleContainer());
@@ -46,7 +48,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private class ExampleContainer : PlayerSettingsGroup
         {
-            protected override string Title => @"example";
+            public ExampleContainer()
+                : base("example")
+            {
+            }
         }
     }
 }

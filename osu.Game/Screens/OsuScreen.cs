@@ -1,8 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore.Internal;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -14,7 +14,6 @@ using osu.Game.Rulesets;
 using osu.Game.Screens.Menu;
 using osu.Game.Overlays;
 using osu.Game.Users;
-using osu.Game.Online.API;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Screens
@@ -23,14 +22,14 @@ namespace osu.Game.Screens
     {
         /// <summary>
         /// The amount of negative padding that should be applied to game background content which touches both the left and right sides of the screen.
-        /// This allows for the game content to be pushed byt he options/notification overlays without causing black areas to appear.
+        /// This allows for the game content to be pushed by the options/notification overlays without causing black areas to appear.
         /// </summary>
         public const float HORIZONTAL_OVERFLOW_PADDING = 50;
 
         /// <summary>
         /// A user-facing title for this screen.
         /// </summary>
-        public virtual string Title => GetType().ShortDisplayName();
+        public virtual string Title => GetType().Name;
 
         public string Description => Title;
 
@@ -44,37 +43,31 @@ namespace osu.Game.Screens
         public virtual bool HideOverlaysOnEnter => false;
 
         /// <summary>
-        /// Whether overlays should be able to be opened once this screen is entered or resumed.
+        /// The initial overlay activation mode to use when this screen is entered for the first time.
         /// </summary>
-        public virtual OverlayActivation InitialOverlayActivationMode => OverlayActivation.All;
+        protected virtual OverlayActivation InitialOverlayActivationMode => OverlayActivation.All;
+
+        protected readonly Bindable<OverlayActivation> OverlayActivationMode;
+
+        IBindable<OverlayActivation> IOsuScreen.OverlayActivationMode => OverlayActivationMode;
 
         public virtual bool CursorVisible => true;
 
         protected new OsuGameBase Game => base.Game as OsuGameBase;
 
         /// <summary>
-        /// The <see cref="UserActivity"/> to set the user's activity automatically to when this screen is entered
-        /// <para>This <see cref="Activity"/> will be automatically set to <see cref="InitialActivity"/> for this screen on entering unless
-        /// <see cref="Activity"/> is manually set before.</para>
+        /// The <see cref="UserActivity"/> to set the user's activity automatically to when this screen is entered.
+        /// <para>This <see cref="Activity"/> will be automatically set to <see cref="InitialActivity"/> for this screen on entering for the first time
+        /// unless <see cref="Activity"/> is manually set before.</para>
         /// </summary>
         protected virtual UserActivity InitialActivity => null;
-
-        private UserActivity activity;
 
         /// <summary>
         /// The current <see cref="UserActivity"/> for this screen.
         /// </summary>
-        protected UserActivity Activity
-        {
-            get => activity;
-            set
-            {
-                if (value == activity) return;
+        protected readonly Bindable<UserActivity> Activity = new Bindable<UserActivity>();
 
-                activity = value;
-                updateActivity();
-            }
-        }
+        IBindable<UserActivity> IOsuScreen.Activity => Activity;
 
         /// <summary>
         /// Whether to disallow changes to game-wise Beatmap/Ruleset bindables for this screen (and all children).
@@ -87,21 +80,38 @@ namespace osu.Game.Screens
 
         public virtual float BackgroundParallaxAmount => 1;
 
+        public virtual bool AllowRateAdjustments => true;
+
         public Bindable<WorkingBeatmap> Beatmap { get; private set; }
 
         public Bindable<RulesetInfo> Ruleset { get; private set; }
 
         public Bindable<IReadOnlyList<Mod>> Mods { get; private set; }
 
+        private OsuScreenDependencies screenDependencies;
+
+        internal void CreateLeasedDependencies(IReadOnlyDependencyContainer dependencies) => createDependencies(dependencies);
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            var screenDependencies = new OsuScreenDependencies(DisallowExternalBeatmapRulesetChanges, parent);
+            if (screenDependencies == null)
+            {
+                if (DisallowExternalBeatmapRulesetChanges)
+                    throw new InvalidOperationException($"Screens that specify {nameof(DisallowExternalBeatmapRulesetChanges)} must be pushed immediately.");
+
+                createDependencies(parent);
+            }
+
+            return base.CreateChildDependencies(screenDependencies);
+        }
+
+        private void createDependencies(IReadOnlyDependencyContainer dependencies)
+        {
+            screenDependencies = new OsuScreenDependencies(DisallowExternalBeatmapRulesetChanges, dependencies);
 
             Beatmap = screenDependencies.Beatmap;
             Ruleset = screenDependencies.Ruleset;
             Mods = screenDependencies.Mods;
-
-            return base.CreateChildDependencies(screenDependencies);
         }
 
         protected BackgroundScreen Background => backgroundStack?.CurrentScreen as BackgroundScreen;
@@ -114,19 +124,20 @@ namespace osu.Game.Screens
         [Resolved(canBeNull: true)]
         private OsuLogo logo { get; set; }
 
-        [Resolved(canBeNull: true)]
-        private IAPIProvider api { get; set; }
-
         protected OsuScreen()
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
+
+            OverlayActivationMode = new Bindable<OverlayActivation>(InitialOverlayActivationMode);
         }
 
         [BackgroundDependencyLoader(true)]
         private void load(OsuGame osu, AudioManager audio)
         {
             sampleExit = audio.Samples.Get(@"UI/screen-back");
+
+            Activity.Value ??= InitialActivity;
         }
 
         public override void OnResuming(IScreen last)
@@ -134,8 +145,6 @@ namespace osu.Game.Screens
             if (PlayResumeSound)
                 sampleExit?.Play();
             applyArrivingDefaults(true);
-
-            updateActivity();
 
             base.OnResuming(last);
         }
@@ -153,9 +162,6 @@ namespace osu.Game.Screens
 
             backgroundStack?.Push(localBackground = CreateBackground());
 
-            if (activity == null)
-                Activity = InitialActivity;
-
             base.OnEntering(last);
         }
 
@@ -171,12 +177,6 @@ namespace osu.Game.Screens
                 backgroundStack?.Exit();
 
             return false;
-        }
-
-        private void updateActivity()
-        {
-            if (api != null)
-                api.Activity.Value = activity;
         }
 
         /// <summary>
@@ -241,5 +241,7 @@ namespace osu.Game.Screens
         /// Note that the instance created may not be the used instance if it matches the BackgroundMode equality clause.
         /// </summary>
         protected virtual BackgroundScreen CreateBackground() => null;
+
+        public virtual bool OnBackButton() => false;
     }
 }

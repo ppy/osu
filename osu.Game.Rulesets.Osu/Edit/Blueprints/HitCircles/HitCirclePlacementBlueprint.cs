@@ -5,7 +5,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components;
 using osu.Game.Rulesets.Osu.Objects;
-using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles
 {
@@ -13,31 +13,42 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles
     {
         public new HitCircle HitObject => (HitCircle)base.HitObject;
 
+        private readonly HitCirclePiece circlePiece;
+
         public HitCirclePlacementBlueprint()
             : base(new HitCircle())
         {
-            InternalChild = new HitCirclePiece(HitObject);
+            InternalChild = circlePiece = new HitCirclePiece();
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            // Fixes a 1-frame position discrepancy due to the first mouse move event happening in the next frame
-            HitObject.Position = Parent?.ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position) ?? Vector2.Zero;
+            BeginPlacement();
         }
 
-        protected override bool OnClick(ClickEvent e)
+        protected override void Update()
         {
-            HitObject.StartTime = EditorClock.CurrentTime;
-            EndPlacement();
-            return true;
+            base.Update();
+
+            circlePiece.UpdateFrom(HitObject);
         }
 
-        protected override bool OnMouseMove(MouseMoveEvent e)
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
-            HitObject.Position = e.MousePosition;
-            return true;
+            if (e.Button == MouseButton.Left)
+            {
+                EndPlacement(true);
+                return true;
+            }
+
+            return base.OnMouseDown(e);
+        }
+
+        public override void UpdateTimeAndPosition(SnapResult result)
+        {
+            base.UpdateTimeAndPosition(result);
+            HitObject.Position = ToLocalSpace(result.ScreenSpacePosition);
         }
     }
 }

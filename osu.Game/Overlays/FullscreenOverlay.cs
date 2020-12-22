@@ -6,24 +6,32 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public abstract class FullscreenOverlay : WaveOverlayContainer, IOnlineComponent
+    public abstract class FullscreenOverlay<T> : WaveOverlayContainer, INamedOverlayComponent
+        where T : OverlayHeader
     {
+        public virtual string IconTexture => Header?.Title.IconTexture ?? string.Empty;
+        public virtual string Title => Header?.Title.Title ?? string.Empty;
+        public virtual string Description => Header?.Title.Description ?? string.Empty;
+
+        public T Header { get; }
+
         [Resolved]
         protected IAPIProvider API { get; private set; }
 
-        protected FullscreenOverlay()
+        [Cached]
+        protected readonly OverlayColourProvider ColourProvider;
+
+        protected FullscreenOverlay(OverlayColourScheme colourScheme, T header)
         {
-            Waves.FirstWaveColour = OsuColour.Gray(0.4f);
-            Waves.SecondWaveColour = OsuColour.Gray(0.3f);
-            Waves.ThirdWaveColour = OsuColour.Gray(0.2f);
-            Waves.FourthWaveColour = OsuColour.Gray(0.1f);
+            Header = header;
+
+            ColourProvider = new OverlayColourProvider(colourScheme);
 
             RelativeSizeAxes = Axes.Both;
             RelativePositionAxes = Axes.Both;
@@ -39,6 +47,15 @@ namespace osu.Game.Overlays
                 Type = EdgeEffectType.Shadow,
                 Radius = 10
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Waves.FirstWaveColour = ColourProvider.Light4;
+            Waves.SecondWaveColour = ColourProvider.Light3;
+            Waves.ThirdWaveColour = ColourProvider.Dark4;
+            Waves.FourthWaveColour = ColourProvider.Dark3;
         }
 
         public override void Show()
@@ -67,22 +84,6 @@ namespace osu.Game.Overlays
         }
 
         protected virtual void PopOutComplete()
-        {
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            API.Register(this);
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            API?.Unregister(this);
-        }
-
-        public virtual void APIStateChanged(IAPIProvider api, APIState state)
         {
         }
     }

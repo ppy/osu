@@ -3,6 +3,7 @@
 
 using osu.Game.Beatmaps;
 using osu.Game.Replays;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Replays
 {
@@ -31,8 +32,16 @@ namespace osu.Game.Rulesets.Replays
         #region Constants
 
         // Shared amongst all modes
-        protected const double KEY_UP_DELAY = 50;
+        public const double KEY_UP_DELAY = 50;
 
         #endregion
+
+        protected virtual HitObject GetNextObject(int currentIndex)
+        {
+            if (currentIndex >= Beatmap.HitObjects.Count - 1)
+                return null;
+
+            return Beatmap.HitObjects[currentIndex + 1];
+        }
     }
 }

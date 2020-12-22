@@ -14,7 +14,7 @@ namespace osu.Game.Online.Chat
 {
     public class Channel
     {
-        public readonly int MaxHistory = 300;
+        public const int MAX_HISTORY = 300;
 
         /// <summary>
         /// Contains every joined user except the current logged in user. Currently only returned for PM channels.
@@ -22,7 +22,7 @@ namespace osu.Game.Online.Chat
         public readonly ObservableCollection<User> Users = new ObservableCollection<User>();
 
         [JsonProperty(@"users")]
-        private long[] userIds
+        private int[] userIds
         {
             set
             {
@@ -35,6 +35,11 @@ namespace osu.Game.Online.Chat
         /// Contains all the messages send in the channel.
         /// </summary>
         public readonly SortedList<Message> Messages = new SortedList<Message>(Comparer<Message>.Default);
+
+        /// <summary>
+        /// Contains all the messages that weren't read by the user.
+        /// </summary>
+        public IEnumerable<Message> UnreadMessages => Messages.Where(m => LastReadId < m.Id);
 
         /// <summary>
         /// Contains all the messages that are still pending for submission to the server.
@@ -56,7 +61,7 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public event Action<Message> MessageRemoved;
 
-        public bool ReadOnly => false; //todo not yet used.
+        public bool ReadOnly => false; // todo: not yet used.
 
         public override string ToString() => Name;
 
@@ -75,12 +80,14 @@ namespace osu.Game.Online.Chat
         [JsonProperty(@"last_message_id")]
         public long? LastMessageId;
 
+        [JsonProperty(@"last_read_id")]
+        public long? LastReadId;
+
         /// <summary>
-        /// Signalles if the current user joined this channel or not. Defaults to false.
+        /// Signals if the current user joined this channel or not. Defaults to false.
+        /// Note that this does not guarantee a join has completed. Check Id > 0 for confirmation.
         /// </summary>
         public Bindable<bool> Joined = new Bindable<bool>();
-
-        public const int MAX_HISTORY = 300;
 
         [JsonConstructor]
         public Channel()
@@ -162,8 +169,8 @@ namespace osu.Game.Online.Chat
         {
             // never purge local echos
             int messageCount = Messages.Count - pendingMessages.Count;
-            if (messageCount > MaxHistory)
-                Messages.RemoveRange(0, messageCount - MaxHistory);
+            if (messageCount > MAX_HISTORY)
+                Messages.RemoveRange(0, messageCount - MAX_HISTORY);
         }
     }
 }

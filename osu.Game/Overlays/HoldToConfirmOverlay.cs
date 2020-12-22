@@ -51,7 +51,7 @@ namespace osu.Game.Overlays
 
         protected override void Dispose(bool isDisposing)
         {
-            audio.Tracks.RemoveAdjustment(AdjustableProperty.Volume, audioVolume);
+            audio?.Tracks.RemoveAdjustment(AdjustableProperty.Volume, audioVolume);
             base.Dispose(isDisposing);
         }
     }

@@ -32,6 +32,13 @@ namespace osu.Game.Overlays.Toolbar
                     Action = stateContainer.ToggleVisibility;
                     overlayState.BindTo(stateContainer.State);
                 }
+
+                if (stateContainer is INamedOverlayComponent named)
+                {
+                    TooltipMain = named.Title;
+                    TooltipSub = named.Description;
+                    SetIcon(named.IconTexture);
+                }
             }
         }
 
@@ -41,7 +48,7 @@ namespace osu.Game.Overlays.Toolbar
             {
                 RelativeSizeAxes = Axes.Both,
                 Colour = OsuColour.Gray(150).Opacity(180),
-                Blending = BlendingMode.Additive,
+                Blending = BlendingParameters.Additive,
                 Depth = 2,
                 Alpha = 0,
             });

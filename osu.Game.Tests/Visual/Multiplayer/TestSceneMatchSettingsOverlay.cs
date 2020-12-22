@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -12,27 +11,20 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi;
-using osu.Game.Screens.Multi.Match.Components;
+using osu.Game.Screens.Multi.Timeshift;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMatchSettingsOverlay : MultiplayerTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(MatchSettingsOverlay)
-        };
-
         [Cached(Type = typeof(IRoomManager))]
         private TestRoomManager roomManager = new TestRoomManager();
 
         private TestRoomSettings settings;
 
         [SetUp]
-        public void Setup() => Schedule(() =>
+        public new void Setup() => Schedule(() =>
         {
-            Room = new Room();
-
             settings = new TestRoomSettings
             {
                 RelativeSizeAxes = Axes.Both,
@@ -56,7 +48,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("set name", () => Room.Name.Value = "Room name");
             AddAssert("button disabled", () => !settings.ApplyButton.Enabled.Value);
 
-            AddStep("set beatmap", () => Room.Playlist.Add(new PlaylistItem { Beatmap = CreateBeatmap(Ruleset.Value).BeatmapInfo }));
+            AddStep("set beatmap", () => Room.Playlist.Add(new PlaylistItem { Beatmap = { Value = CreateBeatmap(Ruleset.Value).BeatmapInfo } }));
             AddAssert("button enabled", () => settings.ApplyButton.Enabled.Value);
 
             AddStep("clear name", () => Room.Name.Value = "");
@@ -75,6 +67,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 settings.NameField.Current.Value = expected_name;
                 settings.DurationField.Current.Value = expectedDuration;
+                Room.Playlist.Add(new PlaylistItem { Beatmap = { Value = CreateBeatmap(Ruleset.Value).BeatmapInfo } });
 
                 roomManager.CreateRequested = r =>
                 {
@@ -95,6 +88,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("setup", () =>
             {
+                Room.Name.Value = "Test Room";
+                Room.Playlist.Add(new PlaylistItem { Beatmap = { Value = CreateBeatmap(Ruleset.Value).BeatmapInfo } });
+
                 fail = true;
                 roomManager.CreateRequested = _ => !fail;
             });
@@ -113,14 +109,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("error not displayed", () => !settings.ErrorText.IsPresent);
         }
 
-        private class TestRoomSettings : MatchSettingsOverlay
+        private class TestRoomSettings : TimeshiftMatchSettingsOverlay
         {
-            public TriangleButton ApplyButton => Settings.ApplyButton;
+            public TriangleButton ApplyButton => ((MatchSettings)Settings).ApplyButton;
 
-            public OsuTextBox NameField => Settings.NameField;
-            public OsuDropdown<TimeSpan> DurationField => Settings.DurationField;
+            public OsuTextBox NameField => ((MatchSettings)Settings).NameField;
+            public OsuDropdown<TimeSpan> DurationField => ((MatchSettings)Settings).DurationField;
 
-            public OsuSpriteText ErrorText => Settings.ErrorText;
+            public OsuSpriteText ErrorText => ((MatchSettings)Settings).ErrorText;
         }
 
         private class TestRoomManager : IRoomManager
@@ -135,7 +131,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 remove { }
             }
 
-            public IBindableList<Room> Rooms { get; } = null;
+            public IBindable<bool> InitialRoomsReceived { get; } = new Bindable<bool>(true);
+
+            public IBindableList<Room> Rooms => null;
 
             public void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
             {

@@ -6,7 +6,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Timing;
 using osu.Game.Graphics;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
 
@@ -18,11 +17,11 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
     public class SummaryTimeline : BottomBarContainer
     {
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, IAdjustableClock adjustableClock)
+        private void load(OsuColour colours)
         {
             Children = new Drawable[]
             {
-                new MarkerPart(adjustableClock) { RelativeSizeAxes = Axes.Both },
+                new MarkerPart { RelativeSizeAxes = Axes.Both },
                 new ControlPointPart
                 {
                     Anchor = Anchor.Centre,

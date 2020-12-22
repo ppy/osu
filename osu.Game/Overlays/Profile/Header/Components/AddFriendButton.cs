@@ -50,9 +50,11 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 }
             };
 
+            // todo: when friending/unfriending is implemented, the APIAccess.Friends list should be updated accordingly.
+
             User.BindValueChanged(user => updateFollowers(user.NewValue), true);
         }
 
-        private void updateFollowers(User user) => followerText.Text = user?.FollowerCount?.Length > 0 ? user.FollowerCount[0].ToString("#,##0") : "0";
+        private void updateFollowers(User user) => followerText.Text = user?.FollowerCount.ToString("#,##0");
     }
 }

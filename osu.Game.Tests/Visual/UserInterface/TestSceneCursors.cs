@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -17,7 +17,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneCursors : ManualInputManagerTestScene
+    public class TestSceneCursors : OsuManualInputManagerTestScene
     {
         private readonly MenuCursorContainer menuCursorContainer;
         private readonly CustomCursorBox[] cursorBoxes = new CustomCursorBox[6];
@@ -249,7 +249,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Size = new Vector2(50);
                     Masking = true;
 
-                    Blending = BlendingMode.Additive;
+                    Blending = BlendingParameters.Additive;
                     Alpha = 0.5f;
 
                     Child = new Box { RelativeSizeAxes = Axes.Both };

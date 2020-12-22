@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
@@ -32,10 +31,7 @@ namespace osu.Game.Screens.Multi
         protected BindableList<PlaylistItem> Playlist { get; private set; }
 
         [Resolved(typeof(Room))]
-        protected Bindable<PlaylistItem> CurrentItem { get; private set; }
-
-        [Resolved(typeof(Room))]
-        protected Bindable<IEnumerable<User>> Participants { get; private set; }
+        protected BindableList<User> RecentParticipants { get; private set; }
 
         [Resolved(typeof(Room))]
         protected Bindable<int> ParticipantCount { get; private set; }
@@ -44,12 +40,12 @@ namespace osu.Game.Screens.Multi
         protected Bindable<int?> MaxParticipants { get; private set; }
 
         [Resolved(typeof(Room))]
-        protected Bindable<DateTimeOffset> EndDate { get; private set; }
+        protected Bindable<DateTimeOffset?> EndDate { get; private set; }
 
         [Resolved(typeof(Room))]
         protected Bindable<RoomAvailability> Availability { get; private set; }
 
         [Resolved(typeof(Room))]
-        protected Bindable<TimeSpan> Duration { get; private set; }
+        protected Bindable<TimeSpan?> Duration { get; private set; }
     }
 }

@@ -14,14 +14,10 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
     {
         protected override string Header => "Devices";
 
-        private AudioManager audio;
-        private SettingsDropdown<string> dropdown;
+        [Resolved]
+        private AudioManager audio { get; set; }
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
-        {
-            this.audio = audio;
-        }
+        private SettingsDropdown<string> dropdown;
 
         protected override void Dispose(bool isDisposing)
         {
@@ -60,12 +56,15 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
             Children = new Drawable[]
             {
-                dropdown = new AudioDeviceSettingsDropdown()
+                dropdown = new AudioDeviceSettingsDropdown
+                {
+                    Keywords = new[] { "speaker", "headphone", "output" }
+                }
             };
 
             updateItems();
 
-            dropdown.Bindable = audio.AudioDevice;
+            dropdown.Current = audio.AudioDevice;
 
             audio.OnNewDevice += onDeviceChanged;
             audio.OnLostDevice += onDeviceChanged;

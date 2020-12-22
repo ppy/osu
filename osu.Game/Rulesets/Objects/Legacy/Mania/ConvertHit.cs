@@ -8,10 +8,8 @@ namespace osu.Game.Rulesets.Objects.Legacy.Mania
     /// <summary>
     /// Legacy osu!mania Hit-type, used for parsing Beatmaps.
     /// </summary>
-    internal sealed class ConvertHit : HitObject, IHasXPosition
+    internal sealed class ConvertHit : ConvertHitObject, IHasXPosition
     {
         public float X { get; set; }
-
-        protected override HitWindows CreateHitWindows() => null;
     }
 }

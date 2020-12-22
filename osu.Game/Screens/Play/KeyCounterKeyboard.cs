@@ -18,14 +18,19 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (e.Key == Key) IsLit = true;
+            if (e.Key == Key)
+            {
+                IsLit = true;
+                Increment();
+            }
+
             return base.OnKeyDown(e);
         }
 
-        protected override bool OnKeyUp(KeyUpEvent e)
+        protected override void OnKeyUp(KeyUpEvent e)
         {
             if (e.Key == Key) IsLit = false;
-            return base.OnKeyUp(e);
+            base.OnKeyUp(e);
         }
     }
 }
