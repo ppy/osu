@@ -22,14 +22,17 @@ using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Database;
+using osu.Game.IO;
 using osu.Game.IO.Archives;
 
 namespace osu.Game.Skinning
 {
     [ExcludeFromDynamicCompile]
-    public class SkinManager : ArchiveModelManager<SkinInfo, SkinFileInfo>, ISkinSource
+    public class SkinManager : ArchiveModelManager<SkinInfo, SkinFileInfo>, ISkinSource, IStorageResourceProvider
     {
         private readonly AudioManager audio;
+
+        private readonly GameHost host;
 
         private readonly IResourceStore<byte[]> legacyDefaultResources;
 
@@ -42,10 +45,12 @@ namespace osu.Game.Skinning
 
         protected override string ImportFromStablePath => "Skins";
 
-        public SkinManager(Storage storage, DatabaseContextFactory contextFactory, IIpcHost importHost, AudioManager audio, IResourceStore<byte[]> legacyDefaultResources)
-            : base(storage, contextFactory, new SkinStore(contextFactory, storage), importHost)
+        public SkinManager(Storage storage, DatabaseContextFactory contextFactory, GameHost host, AudioManager audio, IResourceStore<byte[]> legacyDefaultResources)
+            : base(storage, contextFactory, new SkinStore(contextFactory, storage), host)
         {
             this.audio = audio;
+            this.host = host;
+
             this.legacyDefaultResources = legacyDefaultResources;
 
             CurrentSkinInfo.ValueChanged += skin => CurrentSkin.Value = GetSkin(skin.NewValue);
@@ -148,9 +153,9 @@ namespace osu.Game.Skinning
                 return new DefaultSkin();
 
             if (skinInfo == DefaultLegacySkin.Info)
-                return new DefaultLegacySkin(legacyDefaultResources, audio);
+                return new DefaultLegacySkin(legacyDefaultResources, this);
 
-            return new LegacySkin(skinInfo, Files.Store, audio);
+            return new LegacySkin(skinInfo, this);
         }
 
         /// <summary>
@@ -169,5 +174,13 @@ namespace osu.Game.Skinning
         public SampleChannel GetSample(ISampleInfo sampleInfo) => CurrentSkin.Value.GetSample(sampleInfo);
 
         public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => CurrentSkin.Value.GetConfig<TLookup, TValue>(lookup);
+
+        #region IResourceStorageProvider
+
+        AudioManager IStorageResourceProvider.AudioManager => audio;
+        IResourceStore<byte[]> IStorageResourceProvider.Files => Files.Store;
+        IResourceStore<TextureUpload> IStorageResourceProvider.CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host.CreateTextureLoaderStore(underlyingStore);
+
+        #endregion
     }
 }
