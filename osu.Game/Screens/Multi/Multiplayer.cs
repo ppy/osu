@@ -22,6 +22,7 @@ using osu.Game.Screens.Multi.Lounge;
 using osu.Game.Screens.Multi.Lounge.Components;
 using osu.Game.Screens.Multi.Match;
 using osu.Game.Users;
+using osuTK;
 
 namespace osu.Game.Screens.Multi
 {
@@ -131,6 +132,12 @@ namespace osu.Game.Screens.Multi
                     {
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
+                        Size = new Vector2(150, Header.HEIGHT - 20),
+                        Margin = new MarginPadding
+                        {
+                            Top = 10,
+                            Right = 10 + HORIZONTAL_OVERFLOW_PADDING,
+                        },
                         Action = () => OpenNewRoom()
                     },
                     RoomManager = CreateRoomManager()
