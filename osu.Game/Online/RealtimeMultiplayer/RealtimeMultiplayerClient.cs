@@ -122,7 +122,7 @@ namespace osu.Game.Online.RealtimeMultiplayer
         protected override Task<MultiplayerRoom> JoinRoom(long roomId)
         {
             if (!isConnected.Value)
-                return Task.FromCanceled<MultiplayerRoom>(CancellationToken.None);
+                return Task.FromCanceled<MultiplayerRoom>(new CancellationToken(true));
 
             return connection.InvokeAsync<MultiplayerRoom>(nameof(IMultiplayerServer.JoinRoom), roomId);
         }
