@@ -397,18 +397,13 @@ namespace osu.Game
 
         public virtual async Task Import(params ImportTask[] tasks)
         {
-            var importTasks = new List<Task>();
-
-            foreach (var extension in tasks.Select(t => Path.GetExtension(t.Path)).Distinct())
+            var extensions = tasks.Select(t => Path.GetExtension(t.Path).ToLowerInvariant()).Distinct();
+            await Task.WhenAll(extensions.Select(ext =>
             {
-                var importList = tasks.Where(t => t.Path.EndsWith(extension, StringComparison.OrdinalIgnoreCase));
-                var importer = fileImporters.FirstOrDefault(i => i.HandledExtensions.Contains(extension));
+                var imports = tasks.Where(t => t.Path.EndsWith(ext, StringComparison.OrdinalIgnoreCase));
 
-                if (importer != null)
-                    importTasks.Add(importer.Import(importList.ToArray()));
-            }
-
-            await Task.WhenAll(importTasks);
+                return fileImporters.FirstOrDefault(i => i.HandledExtensions.Contains(ext))?.Import(imports.ToArray()) ?? Task.CompletedTask;
+            }));
         }
 
         public IEnumerable<string> HandledExtensions => fileImporters.SelectMany(i => i.HandledExtensions);
