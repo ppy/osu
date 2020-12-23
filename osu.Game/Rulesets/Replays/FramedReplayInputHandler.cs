@@ -123,9 +123,7 @@ namespace osu.Game.Rulesets.Replays
             // if we have a next frame, check if it is before or at the current time in playback, and advance time to it if so.
             if (next != null)
             {
-                int compare = time.CompareTo(next.Time);
-
-                if (compare == 0 || compare == currentDirection)
+                if (currentDirection == 1 ? next.Time <= time : time <= next.Time)
                 {
                     currentFrameIndex = clampedNextFrameIndex;
                     return CurrentTime = CurrentFrame.Time;
@@ -164,12 +162,15 @@ namespace osu.Game.Rulesets.Replays
             if (!CurrentTime.HasValue)
             {
                 currentDirection = 1;
+                return;
             }
-            else
-            {
-                currentDirection = time.CompareTo(CurrentTime);
-                if (currentDirection == 0) currentDirection = 1;
-            }
+
+            var newDirection = CurrentTime <= time ? 1 : -1;
+
+            if (currentDirection == newDirection) return;
+
+            currentFrameIndex = clampedNextFrameIndex;
+            currentDirection = newDirection;
         }
     }
 }
