@@ -75,6 +75,16 @@ namespace osu.Game.Online.RealtimeMultiplayer
         // Todo: This is temporary, until the multiplayer server returns the item id on match start or otherwise.
         private int playlistItemId;
 
+        protected StatefulMultiplayerClient()
+        {
+            IsConnected.BindValueChanged(connected =>
+            {
+                // clean up local room state on server disconnect.
+                if (!connected.NewValue)
+                    LeaveRoom();
+            });
+        }
+
         /// <summary>
         /// Joins the <see cref="MultiplayerRoom"/> for a given API <see cref="Room"/>.
         /// </summary>
