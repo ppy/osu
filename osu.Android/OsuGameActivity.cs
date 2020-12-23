@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
@@ -16,10 +17,10 @@ namespace osu.Android
 {
     [Activity(Theme = "@android:style/Theme.NoTitleBar", MainLauncher = true, ScreenOrientation = ScreenOrientation.FullUser, SupportsPictureInPicture = false, ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize, HardwareAccelerated = false, LaunchMode = LaunchMode.SingleInstance)]
     [IntentFilter(new[] { Intent.ActionDefault, Intent.ActionSend }, Categories = new[] { Intent.CategoryDefault }, DataPathPatterns = new[] { ".*\\.osz", ".*\\.osk" }, DataMimeType = "application/*")]
-    [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryBrowsable, Intent.CategoryDefault }, DataScheme = osu_url_scheme)]
+    [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryBrowsable, Intent.CategoryDefault }, DataSchemes = new[] { "osu", "osump" })]
     public class OsuGameActivity : AndroidGameActivity
     {
-        private const string osu_url_scheme = "osu";
+        private static readonly string[] osu_url_schemes = { "osu", "osump" };
 
         private OsuGameAndroid game;
 
@@ -52,8 +53,8 @@ namespace osu.Android
                 case Intent.ActionDefault:
                     if (intent.Scheme == ContentResolver.SchemeContent)
                         handleImportFromUri(intent.Data);
-                    else if (intent.Scheme == osu_url_scheme)
-                        Task.Run(() => game.HandleLink(intent.DataString));
+                    else if (osu_url_schemes.Contains(intent.Scheme))
+                        game.HandleLink(intent.DataString);
                     break;
 
                 case Intent.ActionSend:
