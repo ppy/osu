@@ -58,20 +58,18 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             {
                 if (!connected.NewValue)
                 {
-                    startedEvent.Set();
-
                     // messaging to the user about this disconnect will be provided by the RealtimeMatchSubScreen.
-                    Schedule(() => PerformExit(false));
+                    failAndBail();
                 }
             }, true);
 
-            client.ChangeState(MultiplayerUserState.Loaded);
+            client.ChangeState(MultiplayerUserState.Loaded)
+                  .ContinueWith(task => failAndBail(task.Exception?.Message ?? "Server error"), TaskContinuationOptions.NotOnRanToCompletion);
 
             if (!startedEvent.Wait(TimeSpan.FromSeconds(30)))
             {
-                Logger.Log("Failed to start the multiplayer match in time.", LoggingTarget.Runtime, LogLevel.Important);
-
-                Schedule(() => PerformExit(false));
+                failAndBail("Failed to start the multiplayer match in time.");
+                return;
             }
 
             Debug.Assert(client.Room != null);
@@ -80,6 +78,15 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
 
             // todo: this should be implemented via a custom HUD implementation, and correctly masked to the main content area.
             LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(ScoreProcessor, userIds), HUDOverlay.Add);
+        }
+
+        private void failAndBail(string message = null)
+        {
+            if (!string.IsNullOrEmpty(message))
+                Logger.Log(message, LoggingTarget.Runtime, LogLevel.Important);
+
+            startedEvent.Set();
+            Schedule(() => PerformExit(false));
         }
 
         protected override void Update()
