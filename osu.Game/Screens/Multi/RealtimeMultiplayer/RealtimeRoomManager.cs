@@ -43,6 +43,8 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
 
         public override void JoinRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
         {
+            // this is done here as a pre-check to avoid clicking on already closed rooms in the lounge from triggering a server join.
+            // should probably be done at a higher level, but due to the current structure of things this is the easiest place for now.
             if (room.Status.Value is RoomStatusEnded)
             {
                 onError?.Invoke("Cannot join an ended room.");
