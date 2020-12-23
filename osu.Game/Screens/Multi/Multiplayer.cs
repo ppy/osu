@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
-using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -198,8 +197,6 @@ namespace osu.Game.Screens.Multi
         {
             this.FadeIn();
             waves.Show();
-
-            beginHandlingTrack();
         }
 
         public override void OnResuming(IScreen last)
@@ -209,8 +206,6 @@ namespace osu.Game.Screens.Multi
 
             base.OnResuming(last);
 
-            beginHandlingTrack();
-
             UpdatePollingRate(isIdle.Value);
         }
 
@@ -218,8 +213,6 @@ namespace osu.Game.Screens.Multi
         {
             this.ScaleTo(1.1f, 250, Easing.InSine);
             this.FadeOut(250);
-
-            endHandlingTrack();
 
             UpdatePollingRate(isIdle.Value);
         }
@@ -234,8 +227,6 @@ namespace osu.Game.Screens.Multi
 
             if (screenStack.CurrentScreen != null)
                 loungeSubScreen.MakeCurrent();
-
-            endHandlingTrack();
 
             base.OnExiting(next);
             return false;
@@ -275,17 +266,6 @@ namespace osu.Game.Screens.Multi
         /// <returns>The created <see cref="Room"/>.</returns>
         protected virtual Room CreateNewRoom() => new Room { Name = { Value = $"{api.LocalUser}'s awesome room" } };
 
-        private void beginHandlingTrack()
-        {
-            Beatmap.BindValueChanged(updateTrack, true);
-        }
-
-        private void endHandlingTrack()
-        {
-            cancelLooping();
-            Beatmap.ValueChanged -= updateTrack;
-        }
-
         private void screenPushed(IScreen lastScreen, IScreen newScreen)
         {
             subScreenChanged(lastScreen, newScreen);
@@ -322,42 +302,9 @@ namespace osu.Game.Screens.Multi
 
             UpdatePollingRate(isIdle.Value);
             createButton.FadeTo(newScreen is LoungeSubScreen ? 1 : 0, 200);
-
-            updateTrack();
         }
 
         protected IScreen CurrentSubScreen => screenStack.CurrentScreen;
-
-        private void updateTrack(ValueChangedEvent<WorkingBeatmap> _ = null)
-        {
-            if (screenStack.CurrentScreen is RoomSubScreen)
-            {
-                var track = Beatmap.Value?.Track;
-
-                if (track != null)
-                {
-                    track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
-                    track.Looping = true;
-
-                    music?.EnsurePlayingSomething();
-                }
-            }
-            else
-            {
-                cancelLooping();
-            }
-        }
-
-        private void cancelLooping()
-        {
-            var track = Beatmap?.Value?.Track;
-
-            if (track != null)
-            {
-                track.Looping = false;
-                track.RestartPoint = 0;
-            }
-        }
 
         protected abstract RoomManager CreateRoomManager();
 

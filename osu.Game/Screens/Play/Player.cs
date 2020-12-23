@@ -386,7 +386,7 @@ namespace osu.Game.Screens.Play
                         if (!this.IsCurrentScreen()) return;
 
                         fadeOut(true);
-                        PerformImmediateExit();
+                        PerformExit(true);
                     },
                 },
                 failAnimation = new FailAnimation(DrawableRuleset) { OnComplete = onFailComplete, },
@@ -458,20 +458,30 @@ namespace osu.Game.Screens.Play
             return playable;
         }
 
-        protected void PerformImmediateExit()
+        /// <summary>
+        /// Exits the <see cref="Player"/>.
+        /// </summary>
+        /// <param name="userRequested">
+        /// Whether the exit is requested by the user, or a higher-level game component.
+        /// Pausing is allowed only in the former case.
+        /// </param>
+        protected void PerformExit(bool userRequested)
         {
             // if a restart has been requested, cancel any pending completion (user has shown intent to restart).
             completionProgressDelegate?.Cancel();
 
             ValidForResume = false;
 
-            performUserRequestedExit();
+            if (!this.IsCurrentScreen()) return;
+
+            if (userRequested)
+                performUserRequestedExit();
+            else
+                this.Exit();
         }
 
         private void performUserRequestedExit()
         {
-            if (!this.IsCurrentScreen()) return;
-
             if (ValidForResume && HasFailed && !FailOverlay.IsPresent)
             {
                 failAnimation.FinishTransforms(true);
@@ -498,7 +508,7 @@ namespace osu.Game.Screens.Play
             RestartRequested?.Invoke();
 
             if (this.IsCurrentScreen())
-                PerformImmediateExit();
+                PerformExit(true);
             else
                 this.MakeCurrent();
         }
