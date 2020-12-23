@@ -36,6 +36,10 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             Size = new Vector2(CatchHitObject.OBJECT_RADIUS * 2);
         }
 
+        protected virtual void OnApply()
+        {
+        }
+
         public void Apply(CaughtObjectEntry entry)
         {
             Entry = entry;
@@ -45,6 +49,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
             Scale = Vector2.Divide(Entry.DisplaySize, Size) * 0.5f;
             Rotation = Entry.DisplayRotation;
+
+            OnApply();
         }
 
         protected override void FreeAfterUse()

@@ -11,11 +11,23 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
     /// </summary>
     public class DrawableCaughtFruit : DrawableCaughtObject, IHasFruitState
     {
-        public Bindable<FruitVisualRepresentation> VisualRepresentation => Entry.VisualRepresentation;
+        public Bindable<FruitVisualRepresentation> VisualRepresentation { get; } = new Bindable<FruitVisualRepresentation>();
 
         public DrawableCaughtFruit()
             : base(CatchSkinComponents.Fruit, _ => new FruitPiece())
         {
+        }
+
+        protected override void OnApply()
+        {
+            base.OnApply();
+            VisualRepresentation.BindTo(Entry.VisualRepresentation);
+        }
+
+        protected override void FreeAfterUse()
+        {
+            VisualRepresentation.UnbindFrom(Entry.VisualRepresentation);
+            base.FreeAfterUse();
         }
     }
 }
