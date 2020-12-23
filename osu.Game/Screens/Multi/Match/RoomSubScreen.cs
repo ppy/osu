@@ -41,27 +41,24 @@ namespace osu.Game.Screens.Multi.Match
 
             managerUpdated = beatmapManager.ItemUpdated.GetBoundCopy();
             managerUpdated.BindValueChanged(beatmapUpdated);
-
-            if (music != null)
-                music.TrackChanged += applyToTrack;
         }
 
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
-            applyToTrack();
+            beginHandlingTrack();
         }
 
         public override void OnSuspending(IScreen next)
         {
-            resetTrack();
+            endHandlingTrack();
             base.OnSuspending(next);
         }
 
         public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
-            applyToTrack();
+            beginHandlingTrack();
         }
 
         public override bool OnExiting(IScreen next)
@@ -69,7 +66,7 @@ namespace osu.Game.Screens.Multi.Match
             RoomManager?.PartRoom();
             Mods.Value = Array.Empty<Mod>();
 
-            resetTrack();
+            endHandlingTrack();
 
             return base.OnExiting(next);
         }
@@ -98,7 +95,18 @@ namespace osu.Game.Screens.Multi.Match
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
         }
 
-        private void applyToTrack(WorkingBeatmap _ = default, TrackChangeDirection __ = default)
+        private void beginHandlingTrack()
+        {
+            Beatmap.BindValueChanged(applyLoopingToTrack, true);
+        }
+
+        private void endHandlingTrack()
+        {
+            Beatmap.ValueChanged -= applyLoopingToTrack;
+            cancelTrackLooping();
+        }
+
+        private void applyLoopingToTrack(ValueChangedEvent<WorkingBeatmap> _ = null)
         {
             if (!this.IsCurrentScreen())
                 return;
@@ -114,7 +122,7 @@ namespace osu.Game.Screens.Multi.Match
             }
         }
 
-        private void resetTrack()
+        private void cancelTrackLooping()
         {
             var track = Beatmap?.Value?.Track;
 
