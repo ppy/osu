@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API;
@@ -74,6 +75,19 @@ namespace osu.Game.Online.RealtimeMultiplayer
 
         // Todo: This is temporary, until the multiplayer server returns the item id on match start or otherwise.
         private int playlistItemId;
+
+        protected StatefulMultiplayerClient()
+        {
+            IsConnected.BindValueChanged(connected =>
+            {
+                // clean up local room state on server disconnect.
+                if (!connected.NewValue)
+                {
+                    Logger.Log("Connection to multiplayer server was lost.", LoggingTarget.Runtime, LogLevel.Important);
+                    LeaveRoom();
+                }
+            });
+        }
 
         /// <summary>
         /// Joins the <see cref="MultiplayerRoom"/> for a given API <see cref="Room"/>.
