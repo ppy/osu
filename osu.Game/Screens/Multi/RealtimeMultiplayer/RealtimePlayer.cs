@@ -56,8 +56,8 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
                 }
             }, true);
 
-            client.ChangeState(MultiplayerUserState.Loaded).ContinueWith(task =>
-                failAndBail(task.Exception?.Message ?? "Server error"), TaskContinuationOptions.NotOnRanToCompletion);
+            client.ChangeState(MultiplayerUserState.Loaded)
+                  .ContinueWith(task => failAndBail(task.Exception?.Message ?? "Server error"), TaskContinuationOptions.NotOnRanToCompletion);
 
             if (!startedEvent.Wait(TimeSpan.FromSeconds(30)))
                 failAndBail("Failed to start the multiplayer match in time.");

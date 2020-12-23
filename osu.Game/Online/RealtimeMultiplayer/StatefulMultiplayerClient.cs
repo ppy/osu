@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+
 // See the LICENCE file in the repository root for full licence text.
 
 #nullable enable
@@ -14,6 +14,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -84,7 +85,7 @@ namespace osu.Game.Online.RealtimeMultiplayer
                 if (!connected.NewValue)
                 {
                     Logger.Log("Connection to multiplayer server was lost.", LoggingTarget.Runtime, LogLevel.Important);
-                    LeaveRoom();
+                    LeaveRoom().FireAndForget();
                 }
             });
         }
