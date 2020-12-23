@@ -128,18 +128,18 @@ namespace osu.Game.Screens.Multi
                         }
                     },
                     new Header(screenStack),
-                    createButton = new CreateRoomButton
+                    createButton = CreateNewMultiplayerGameButton().With(button =>
                     {
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
-                        Size = new Vector2(150, Header.HEIGHT - 20),
-                        Margin = new MarginPadding
+                        button.Anchor = Anchor.TopRight;
+                        button.Origin = Anchor.TopRight;
+                        button.Size = new Vector2(150, Header.HEIGHT - 20);
+                        button.Margin = new MarginPadding
                         {
                             Top = 10,
                             Right = 10 + HORIZONTAL_OVERFLOW_PADDING,
-                        },
-                        Action = () => OpenNewRoom()
-                    },
+                        };
+                        button.Action = () => OpenNewRoom();
+                    }),
                     RoomManager = CreateRoomManager()
                 }
             };
@@ -314,6 +314,8 @@ namespace osu.Game.Screens.Multi
         protected abstract RoomManager CreateRoomManager();
 
         protected abstract LoungeSubScreen CreateLounge();
+
+        protected abstract OsuButton CreateNewMultiplayerGameButton();
 
         private class MultiplayerWaveContainer : WaveContainer
         {
