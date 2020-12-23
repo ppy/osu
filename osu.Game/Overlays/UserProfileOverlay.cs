@@ -25,74 +25,24 @@ namespace osu.Game.Overlays
         private GetUserRequest userReq;
         private readonly ProfileHeader header;
         private readonly ProfileSectionsContainer sectionsContainer;
-        private readonly ProfileTabControl tabs;
+        private readonly ProfileSectionTabControl tabs;
 
         public const float CONTENT_X_MARGIN = 70;
 
         public UserProfileOverlay()
             : base(OverlayColourScheme.Pink, new ProfileHeader())
         {
-        }
-
-        public void ShowUser(int userId) => ShowUser(new User { Id = userId });
-
-        public void ShowUser(User user, bool fetchOnline = true)
-        {
-            if (user == User.SYSTEM_USER)
-                return;
-
-            Show();
-
-            if (user.Id == Header?.User.Value?.Id)
-                return;
-
-            if (sectionsContainer != null)
-                sectionsContainer.ExpandableHeader = null;
-
-            userReq?.Cancel();
-            Clear();
-            lastSection = null;
-
-            sections = !user.IsBot
-                ? new ProfileSection[]
+            Children = new Drawable[]
+            {
+                new Box
                 {
-                    //new AboutSection(),
-                    new RecentSection(),
-                    new RanksSection(),
-                    //new MedalsSection(),
-                    new HistoricalSection(),
-                    new BeatmapsSection(),
-                    new KudosuSection()
-                }
-                : Array.Empty<ProfileSection>();
-
-            tabs = new ProfileSectionTabControl
-            {
-                RelativeSizeAxes = Axes.X,
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre,
-            };
-
-            Add(new Box
-            {
-                RelativeSizeAxes = Axes.Both,
-                Colour = ColourProvider.Background6
-            });
-
-            Add(sectionsContainer = new ProfileSectionsContainer
-            {
-                ExpandableHeader = Header,
-                FixedHeader = tabs,
-                HeaderBackground = new Box
-                {
-                    // this is only visible as the ProfileTabControl background
-                    Colour = ColourProvider.Background5,
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = ColourProvider.Background6
                 },
                 sectionsContainer = new ProfileSectionsContainer
                 {
                     ExpandableHeader = header = new ProfileHeader(),
-                    FixedHeader = tabs = new ProfileTabControl
+                    FixedHeader = tabs = new ProfileSectionTabControl
                     {
                         RelativeSizeAxes = Axes.X,
                         Anchor = Anchor.TopCentre,
@@ -101,7 +51,8 @@ namespace osu.Game.Overlays
                     },
                     HeaderBackground = new Box
                     {
-                        Colour = OsuColour.Gray(34),
+                        // this is only visible as the ProfileTabControl background
+                        Colour = ColourProvider.Background5,
                         RelativeSizeAxes = Axes.Both
                     },
                 }
@@ -134,11 +85,12 @@ namespace osu.Game.Overlays
             };
         }
 
-        public void ShowUser(long userId) => ShowUser(new User { Id = userId });
+        public void ShowUser(int userId) => ShowUser(new User { Id = userId });
 
         public void ShowUser(User user, bool fetchOnline = true)
         {
-            if (user == User.SYSTEM_USER) return;
+            if (user == User.SYSTEM_USER)
+                return;
 
             Show();
 
@@ -148,16 +100,18 @@ namespace osu.Game.Overlays
             userReq?.Cancel();
             lastSection = null;
 
-            sections = new ProfileSection[]
-            {
-                //new AboutSection(),
-                new RecentSection(),
-                new RanksSection(),
-                //new MedalsSection(),
-                new HistoricalSection(),
-                new BeatmapsSection(),
-                new KudosuSection()
-            };
+            sections = !user.IsBot
+                ? new ProfileSection[]
+                {
+                    //new AboutSection(),
+                    new RecentSection(),
+                    new RanksSection(),
+                    //new MedalsSection(),
+                    new HistoricalSection(),
+                    new BeatmapsSection(),
+                    new KudosuSection()
+                }
+                : Array.Empty<ProfileSection>();
 
             sectionsContainer.Clear();
             tabs.Clear();

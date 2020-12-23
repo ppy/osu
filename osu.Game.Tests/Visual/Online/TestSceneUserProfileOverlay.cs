@@ -7,7 +7,6 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Profile;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
@@ -17,7 +16,7 @@ namespace osu.Game.Tests.Visual.Online
     {
         protected override bool UseOnlineAPI => true;
 
-        private readonly TestUserProfileOverlay profile;
+        private readonly UserProfileOverlay profile;
 
         [Resolved]
         private IAPIProvider api { get; set; }
