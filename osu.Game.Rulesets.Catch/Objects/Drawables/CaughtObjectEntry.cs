@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         /// <summary>
         /// 1 or -1 representing visual mirroring of the caught object.
         /// </summary>
-        public int MirrorDirection;
+        public int MirrorDirection = 1;
 
         public CaughtObjectEntry(CaughtObjectState state, Vector2 positionInStack, IHasCatchObjectState source)
         {
