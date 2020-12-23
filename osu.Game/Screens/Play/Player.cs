@@ -135,7 +135,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public Player(PlayerConfiguration configuration = null)
         {
-            this.Configuration = configuration ??= new PlayerConfiguration();
+            Configuration = configuration ?? new PlayerConfiguration();
         }
 
         private GameplayBeatmap gameplayBeatmap;
