@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 var destination = e.MousePosition;
 
                 FlashlightPosition = Interpolation.ValueAt(
-                    Math.Clamp(Clock.ElapsedFrameTime, 0, follow_delay), position, destination, 0, follow_delay, Easing.Out);
+                    Math.Clamp(Math.Abs(Clock.ElapsedFrameTime), 0, follow_delay), position, destination, 0, follow_delay, Easing.Out);
 
                 return base.OnMouseMove(e);
             }
