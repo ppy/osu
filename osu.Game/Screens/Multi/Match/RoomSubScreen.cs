@@ -41,6 +41,37 @@ namespace osu.Game.Screens.Multi.Match
 
             managerUpdated = beatmapManager.ItemUpdated.GetBoundCopy();
             managerUpdated.BindValueChanged(beatmapUpdated);
+
+            if (music != null)
+                music.TrackChanged += applyToTrack;
+        }
+
+        public override void OnEntering(IScreen last)
+        {
+            base.OnEntering(last);
+            applyToTrack();
+        }
+
+        public override void OnSuspending(IScreen next)
+        {
+            resetTrack();
+            base.OnSuspending(next);
+        }
+
+        public override void OnResuming(IScreen last)
+        {
+            base.OnResuming(last);
+            applyToTrack();
+        }
+
+        public override bool OnExiting(IScreen next)
+        {
+            RoomManager?.PartRoom();
+            Mods.Value = Array.Empty<Mod>();
+
+            resetTrack();
+
+            return base.OnExiting(next);
         }
 
         private void selectedItemChanged()
@@ -65,54 +96,25 @@ namespace osu.Game.Screens.Multi.Match
             var localBeatmap = beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == beatmap.OnlineBeatmapID);
 
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
-            if (this.IsCurrentScreen())
-                applyTrackLooping();
         }
 
-        public override void OnEntering(IScreen last)
+        private void applyToTrack(WorkingBeatmap _ = default, TrackChangeDirection __ = default)
         {
-            base.OnEntering(last);
+            if (!this.IsCurrentScreen())
+                return;
 
-            music?.EnsurePlayingSomething();
-            applyTrackLooping();
-        }
-
-        public override void OnSuspending(IScreen next)
-        {
-            cancelTrackLooping();
-            base.OnSuspending(next);
-        }
-
-        public override void OnResuming(IScreen last)
-        {
-            base.OnResuming(last);
-
-            music?.EnsurePlayingSomething();
-            applyTrackLooping();
-        }
-
-        public override bool OnExiting(IScreen next)
-        {
-            RoomManager?.PartRoom();
-            Mods.Value = Array.Empty<Mod>();
-
-            cancelTrackLooping();
-
-            return base.OnExiting(next);
-        }
-
-        private void applyTrackLooping()
-        {
             var track = Beatmap.Value?.Track;
 
             if (track != null)
             {
                 track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
                 track.Looping = true;
+
+                music?.EnsurePlayingSomething();
             }
         }
 
-        private void cancelTrackLooping()
+        private void resetTrack()
         {
             var track = Beatmap?.Value?.Track;
 
