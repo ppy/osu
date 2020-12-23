@@ -19,7 +19,11 @@ namespace osu.Game.Online.RealtimeMultiplayer
 {
     public class RealtimeMultiplayerClient : StatefulMultiplayerClient
     {
+#if DEBUG
+        private const string endpoint = "https://dev.ppy.sh/multiplayer";
+#else
         private const string endpoint = "https://spectator.ppy.sh/multiplayer";
+#endif
 
         public override IBindable<bool> IsConnected => isConnected;
 

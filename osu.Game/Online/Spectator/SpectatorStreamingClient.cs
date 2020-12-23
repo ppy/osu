@@ -104,7 +104,11 @@ namespace osu.Game.Online.Spectator
             }
         }
 
+#if DEBUG
+        private const string endpoint = "https://dev.ppy.sh/spectator";
+#else
         private const string endpoint = "https://spectator.ppy.sh/spectator";
+#endif
 
         protected virtual async Task Connect()
         {
