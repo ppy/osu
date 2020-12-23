@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Online.Multiplayer;
@@ -30,6 +31,8 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
         private readonly TaskCompletionSource<bool> resultsReady = new TaskCompletionSource<bool>();
         private readonly ManualResetEventSlim startedEvent = new ManualResetEventSlim();
 
+        private IBindable<bool> isConnected;
+
         public RealtimePlayer(PlaylistItem playlistItem)
             : base(playlistItem, false)
         {
@@ -43,6 +46,15 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
 
             client.MatchStarted += onMatchStarted;
             client.ResultsReady += onResultsReady;
+
+            isConnected = client.IsConnected.GetBoundCopy();
+            isConnected.BindValueChanged(connected =>
+            {
+                if (!connected.NewValue)
+                    // messaging to the user about this disconnect will be provided by the RealtimeMatchSubScreen.
+                    Schedule(this.Exit);
+            }, true);
+
             client.ChangeState(MultiplayerUserState.Loaded);
 
             if (!startedEvent.Wait(TimeSpan.FromSeconds(30)))
