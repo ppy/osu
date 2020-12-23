@@ -59,11 +59,5 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
             base.FreeAfterUse();
         }
-
-        protected override void Update()
-        {
-            Console.WriteLine($"StartTime = {HitObject.StartTime}");
-            base.Update();
-        }
     }
 }
