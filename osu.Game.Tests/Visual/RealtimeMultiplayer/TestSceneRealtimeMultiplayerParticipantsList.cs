@@ -6,6 +6,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Online.RealtimeMultiplayer;
 using osu.Game.Screens.Multi.RealtimeMultiplayer.Participants;
 using osu.Game.Users;
@@ -13,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.RealtimeMultiplayer
 {
-    public class TestSceneParticipantsList : RealtimeMultiplayerTestScene
+    public class TestSceneRealtimeMultiplayerParticipantsList : RealtimeMultiplayerTestScene
     {
         [SetUp]
         public new void Setup() => Schedule(() =>
@@ -65,13 +66,13 @@ namespace osu.Game.Tests.Visual.RealtimeMultiplayer
         [Test]
         public void TestToggleReadyState()
         {
-            AddAssert("ready mark invisible", () => !this.ChildrenOfType<ReadyMark>().Single().IsPresent);
+            AddAssert("ready mark invisible", () => !this.ChildrenOfType<StateDisplay>().Single().IsPresent);
 
             AddStep("make user ready", () => Client.ChangeState(MultiplayerUserState.Ready));
-            AddUntilStep("ready mark visible", () => this.ChildrenOfType<ReadyMark>().Single().IsPresent);
+            AddUntilStep("ready mark visible", () => this.ChildrenOfType<StateDisplay>().Single().IsPresent);
 
             AddStep("make user idle", () => Client.ChangeState(MultiplayerUserState.Idle));
-            AddUntilStep("ready mark invisible", () => !this.ChildrenOfType<ReadyMark>().Single().IsPresent);
+            AddUntilStep("ready mark invisible", () => !this.ChildrenOfType<StateDisplay>().Single().IsPresent);
         }
 
         [Test]
@@ -104,11 +105,11 @@ namespace osu.Game.Tests.Visual.RealtimeMultiplayer
                     {
                         Id = i,
                         Username = $"User {i}",
+                        CurrentModeRank = RNG.Next(1, 100000),
                         CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
                     });
 
-                    if (i % 2 == 0)
-                        Client.ChangeUserState(i, MultiplayerUserState.Ready);
+                    Client.ChangeUserState(i, (MultiplayerUserState)RNG.Next(0, (int)MultiplayerUserState.Results + 1));
                 }
             });
         }

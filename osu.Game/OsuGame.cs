@@ -81,6 +81,9 @@ namespace osu.Game
         private BeatmapSetOverlay beatmapSetOverlay;
 
         [Cached]
+        private readonly DifficultyRecommender difficultyRecommender = new DifficultyRecommender();
+
+        [Cached]
         private readonly ScreenshotManager screenshotManager = new ScreenshotManager();
 
         protected SentryLogger SentryLogger;
@@ -335,15 +338,17 @@ namespace osu.Game
         /// The user should have already requested this interactively.
         /// </summary>
         /// <param name="beatmap">The beatmap to select.</param>
-        /// <param name="difficultyCriteria">
-        /// Optional predicate used to try and find a difficulty to select.
-        /// If omitted, this will try to present the first beatmap from the current ruleset.
-        /// In case of failure the first difficulty of the set will be presented, ignoring the predicate.
-        /// </param>
+        /// <param name="difficultyCriteria">Optional predicate used to narrow the set of difficulties to select from when presenting.</param>
+        /// <remarks>
+        /// Among items satisfying the predicate, the order of preference is:
+        /// <list type="bullet">
+        /// <item>beatmap with recommended difficulty, as provided by <see cref="DifficultyRecommender"/>,</item>
+        /// <item>first beatmap from the current ruleset,</item>
+        /// <item>first beatmap from any ruleset.</item>
+        /// </list>
+        /// </remarks>
         public void PresentBeatmap(BeatmapSetInfo beatmap, Predicate<BeatmapInfo> difficultyCriteria = null)
         {
-            difficultyCriteria ??= b => b.Ruleset.Equals(Ruleset.Value);
-
             var databasedSet = beatmap.OnlineBeatmapSetID != null
                 ? BeatmapManager.QueryBeatmapSet(s => s.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID)
                 : BeatmapManager.QueryBeatmapSet(s => s.Hash == beatmap.Hash);
@@ -361,16 +366,23 @@ namespace osu.Game
                     menuScreen.LoadToSolo();
 
                 // we might even already be at the song
-                if (Beatmap.Value.BeatmapSetInfo.Hash == databasedSet.Hash && difficultyCriteria(Beatmap.Value.BeatmapInfo))
-                {
+                if (Beatmap.Value.BeatmapSetInfo.Hash == databasedSet.Hash && (difficultyCriteria?.Invoke(Beatmap.Value.BeatmapInfo) ?? true))
                     return;
-                }
 
-                // Find first beatmap that matches our predicate.
-                var first = databasedSet.Beatmaps.Find(difficultyCriteria) ?? databasedSet.Beatmaps.First();
+                // Find beatmaps that match our predicate.
+                var beatmaps = databasedSet.Beatmaps.Where(b => difficultyCriteria?.Invoke(b) ?? true).ToList();
 
-                Ruleset.Value = first.Ruleset;
-                Beatmap.Value = BeatmapManager.GetWorkingBeatmap(first);
+                // Use all beatmaps if predicate matched nothing
+                if (beatmaps.Count == 0)
+                    beatmaps = databasedSet.Beatmaps;
+
+                // Prefer recommended beatmap if recommendations are available, else fallback to a sane selection.
+                var selection = difficultyRecommender.GetRecommendedBeatmap(beatmaps)
+                                ?? beatmaps.FirstOrDefault(b => b.Ruleset.Equals(Ruleset.Value))
+                                ?? beatmaps.First();
+
+                Ruleset.Value = selection.Ruleset;
+                Beatmap.Value = BeatmapManager.GetWorkingBeatmap(selection);
             }, validScreens: new[] { typeof(PlaySongSelect) });
         }
 
@@ -629,6 +641,8 @@ namespace osu.Game
                 PostNotification = n => notifications.Post(n),
                 GetStableStorage = GetStorageForStableInstall
             }, Add, true);
+
+            loadComponentSingleFile(difficultyRecommender, Add);
 
             loadComponentSingleFile(screenshotManager, Add);
 
