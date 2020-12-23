@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
 
                 client.ChangeSettings(item: item).ContinueWith(t =>
                 {
-                    return Schedule(() =>
+                    Schedule(() =>
                     {
                         loadingLayer.Hide();
 
