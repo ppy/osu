@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             base.OnResuming(last);
 
             if (client.Room != null)
-                client.ChangeState(MultiplayerUserState.Idle).FireAndForget(true);
+                client.ChangeState(MultiplayerUserState.Idle).CatchUnobservedExceptions(true);
         }
 
         protected override void UpdatePollingRate(bool isIdle)

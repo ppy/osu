@@ -177,7 +177,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer.Participants
                         if (Room.Host?.UserID != api.LocalUser.Value.Id)
                             return;
 
-                        Client.TransferHost(targetUser).FireAndForget(true);
+                        Client.TransferHost(targetUser).CatchUnobservedExceptions(true);
                     })
                 };
             }

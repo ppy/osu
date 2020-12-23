@@ -85,7 +85,7 @@ namespace osu.Game.Online.RealtimeMultiplayer
                 if (!connected.NewValue)
                 {
                     Logger.Log("Connection to multiplayer server was lost.", LoggingTarget.Runtime, LogLevel.Important);
-                    LeaveRoom().FireAndForget();
+                    LeaveRoom().CatchUnobservedExceptions();
                 }
             });
         }
