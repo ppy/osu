@@ -14,7 +14,7 @@ namespace osu.Game.Extensions
         /// </summary>
         /// <param name="task">The task.</param>
         /// <param name="logOnError">Whether errors should be logged as important, or silently ignored.</param>
-        public static void FireAndForget(this Task task, bool logOnError = false)
+        public static void CatchUnobservedExceptions(this Task task, bool logOnError = false)
         {
             task.ContinueWith(t =>
             {

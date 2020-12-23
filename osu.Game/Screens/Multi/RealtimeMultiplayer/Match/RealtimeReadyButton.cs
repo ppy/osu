@@ -106,13 +106,13 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer.Match
                 return;
 
             if (localUser.State == MultiplayerUserState.Idle)
-                Client.ChangeState(MultiplayerUserState.Ready).FireAndForget(true);
+                Client.ChangeState(MultiplayerUserState.Ready).CatchUnobservedExceptions(true);
             else
             {
                 if (Room?.Host?.Equals(localUser) == true)
-                    Client.StartMatch().FireAndForget(true);
+                    Client.StartMatch().CatchUnobservedExceptions(true);
                 else
-                    Client.ChangeState(MultiplayerUserState.Idle).FireAndForget(true);
+                    Client.ChangeState(MultiplayerUserState.Idle).CatchUnobservedExceptions(true);
             }
         }
 
