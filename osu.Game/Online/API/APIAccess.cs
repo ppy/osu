@@ -26,9 +26,15 @@ namespace osu.Game.Online.API
 
         private readonly OAuth authentication;
 
+#if DEBUG
+        public string Endpoint => @"https://dev.ppy.sh";
+        private const string client_secret = @"3LP2mhUrV89xxzD1YKNndXHEhWWCRLPNKioZ9ymT";
+#else
         public string Endpoint => @"https://osu.ppy.sh";
-        private const string client_id = @"5";
         private const string client_secret = @"FGc9GAtyHzeQDshWP5Ah7dega8hJACAJpQtw6OXk";
+#endif
+
+        private const string client_id = @"5";
 
         private readonly Queue<APIRequest> queue = new Queue<APIRequest>();
 
