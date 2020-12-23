@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Multiplayer.RoomStatuses;
 using osu.Game.Online.RealtimeMultiplayer;
 using osu.Game.Screens.Multi.Components;
 
@@ -41,7 +42,15 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             => base.CreateRoom(room, r => joinMultiplayerRoom(r, onSuccess, onError), onError);
 
         public override void JoinRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
-            => base.JoinRoom(room, r => joinMultiplayerRoom(r, onSuccess, onError), onError);
+        {
+            if (room.Status.Value is RoomStatusEnded)
+            {
+                onError?.Invoke("Cannot join an ended room.");
+                return;
+            }
+
+            base.JoinRoom(room, r => joinMultiplayerRoom(r, onSuccess, onError), onError);
+        }
 
         public override void PartRoom()
         {
