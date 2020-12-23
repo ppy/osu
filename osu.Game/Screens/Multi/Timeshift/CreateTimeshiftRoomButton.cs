@@ -4,9 +4,9 @@
 using osu.Framework.Allocation;
 using osu.Game.Screens.Multi.Match.Components;
 
-namespace osu.Game.Screens.Multi
+namespace osu.Game.Screens.Multi.Timeshift
 {
-    public class CreateRoomButton : PurpleTriangleButton
+    public class CreateTimeshiftRoomButton : PurpleTriangleButton
     {
         [BackgroundDependencyLoader]
         private void load()
