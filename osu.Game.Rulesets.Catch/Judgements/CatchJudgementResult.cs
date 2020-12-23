@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using JetBrains.Annotations;
-using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
@@ -20,8 +19,6 @@ namespace osu.Game.Rulesets.Catch.Judgements
         /// Whether the catcher was hyper dashing prior to this judgement.
         /// </summary>
         public bool CatcherHyperDash;
-
-        public CaughtObjectEntry CaughtObjectEntry;
 
         public CatchJudgementResult([NotNull] HitObject hitObject, [NotNull] Judgement judgement)
             : base(hitObject, judgement)

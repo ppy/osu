@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -52,6 +53,8 @@ namespace osu.Game.Rulesets.Catch.UI
         private CatcherTrailDisplay trails;
 
         protected readonly CaughtObjectContainer CaughtObjectContainer;
+
+        private readonly Dictionary<CatchHitObject, CaughtObjectEntry> caughtEntryMap = new Dictionary<CatchHitObject, CaughtObjectEntry>();
 
         public CatcherAnimationState CurrentState { get; private set; }
 
@@ -220,9 +223,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 var objectRadius = palpableObject.DisplaySize.X / 2;
                 var positionInStack = CaughtObjectContainer.GetPositionInStack(catchPosition, objectRadius);
 
-                var caughtObjectEntry = createCaughtObjectEntry(palpableObject, Time.Current, positionInStack);
-                catchResult.CaughtObjectEntry = caughtObjectEntry;
-                CaughtObjectContainer.Add(caughtObjectEntry);
+                addCaughtObject(palpableObject, Time.Current, positionInStack);
 
                 if (hitLighting.Value)
                     addLighting(hitObject, positionInStack.X, drawableObject.AccentColour.Value);
@@ -264,12 +265,16 @@ namespace osu.Game.Rulesets.Catch.UI
                     SetHyperDashState();
             }
 
-            if (catchResult.CaughtObjectEntry != null)
-                CaughtObjectContainer.Remove(catchResult.CaughtObjectEntry);
+            removeCaughtObject(drawableObject.HitObject);
 
             double time = result.TimeAbsolute;
 
             hitExplosionContainer.RemoveAll(d => d.LifetimeStart >= time);
+        }
+
+        public void OnHitObjectRemoved(CatchHitObject hitObject)
+        {
+            removeCaughtObject(hitObject);
         }
 
         /// <summary>
@@ -468,23 +473,39 @@ namespace osu.Game.Rulesets.Catch.UI
             hitExplosionContainer.Add(hitExplosion);
         }
 
-        private CaughtObjectEntry createCaughtObjectEntry(DrawablePalpableCatchHitObject hitObject, double time, Vector2 positionInStack)
+        private void addCaughtObject(DrawablePalpableCatchHitObject hitObject, double time, Vector2 positionInStack)
         {
+            CaughtObjectEntry entry;
+
             if (hitObject.HitObject is Droplet)
             {
                 // droplet explodes immediately
-                return new CaughtObjectEntry(CaughtObjectState.Dropped, positionInStack, hitObject)
+                entry = new CaughtObjectEntry(CaughtObjectState.Dropped, positionInStack, hitObject)
                 {
                     LifetimeStart = time,
                     ApplyTransforms = applyExplodeTransforms,
                     DropPosition = CaughtObjectContainer.GetDropPosition(positionInStack)
                 };
             }
-
-            return new CaughtObjectEntry(CaughtObjectState.Stacked, positionInStack, hitObject)
+            else
             {
-                LifetimeStart = time,
-            };
+                entry = new CaughtObjectEntry(CaughtObjectState.Stacked, positionInStack, hitObject)
+                {
+                    LifetimeStart = time,
+                };
+            }
+
+            caughtEntryMap[hitObject.HitObject] = entry;
+            CaughtObjectContainer.Add(entry);
+        }
+
+        private void removeCaughtObject(CatchHitObject hitObject)
+        {
+            if (!caughtEntryMap.TryGetValue(hitObject, out var entry))
+                return;
+
+            CaughtObjectContainer.Remove(entry);
+            caughtEntryMap.Remove(hitObject);
         }
 
         private void applyDropTransforms(DrawableCaughtObject d)
