@@ -179,6 +179,26 @@ namespace osu.Game.Rulesets.UI
         }
 
         /// <summary>
+        /// Invoked when a <see cref="HitObjectLifetimeEntry"/> is added to this <see cref="Playfield"/>.
+        /// </summary>
+        /// <remarks>
+        /// This is also invoked for nested hit objects while <see cref="OnHitObjectAdded"/> is not.
+        /// </remarks>
+        protected virtual void OnHitObjectLifetimeEntryAdded(HitObjectLifetimeEntry entry)
+        {
+        }
+
+        /// <summary>
+        /// Invoked when a <see cref="HitObjectLifetimeEntry"/> is removed from this <see cref="Playfield"/>.
+        /// </summary>
+        /// <remarks>
+        /// This is also invoked for nested hit objects while <see cref="OnHitObjectRemoved"/> is not.
+        /// </remarks>
+        protected virtual void OnHitObjectLifetimeEntryRemoved(HitObjectLifetimeEntry entry)
+        {
+        }
+
+        /// <summary>
         /// Invoked before a new <see cref="DrawableHitObject"/> is added to this <see cref="Playfield"/>.
         /// It is invoked only once even if the drawable is pooled and used multiple times for different <see cref="HitObject"/>s.
         /// </summary>
@@ -258,11 +278,10 @@ namespace osu.Game.Rulesets.UI
         /// <param name="hitObject"></param>
         public virtual void Add(HitObject hitObject)
         {
-            var entry = CreateLifetimeEntry(hitObject);
-            lifetimeEntryMap[entry.HitObject] = entry;
+            var entry = addHitObjectEntry(hitObject);
 
             HitObjectContainer.Add(entry);
-            OnHitObjectAdded(entry.HitObject);
+            OnHitObjectAdded(hitObject);
         }
 
         /// <summary>
@@ -272,7 +291,7 @@ namespace osu.Game.Rulesets.UI
         /// <returns>Whether the <see cref="HitObject"/> was successfully removed.</returns>
         public virtual bool Remove(HitObject hitObject)
         {
-            if (lifetimeEntryMap.Remove(hitObject, out var entry))
+            if (removeHitObjectEntry(hitObject, out var entry))
             {
                 HitObjectContainer.Remove(entry);
                 OnHitObjectRemoved(hitObject);
@@ -285,6 +304,39 @@ namespace osu.Game.Rulesets.UI
                 removedFromNested = nestedPlayfields.Value.Any(p => p.Remove(hitObject));
 
             return removedFromNested;
+        }
+
+        private HitObjectLifetimeEntry addHitObjectEntry(HitObject hitObject)
+        {
+            if (lifetimeEntryMap.TryGetValue(hitObject, out var entry))
+                return entry;
+
+            hitObject.RemoveNestedHitObjects += removeNestedHitObjects;
+
+            entry = CreateLifetimeEntry(hitObject);
+            lifetimeEntryMap[hitObject] = entry;
+
+            OnHitObjectLifetimeEntryAdded(entry);
+
+            return entry;
+        }
+
+        private bool removeHitObjectEntry(HitObject hitObject, out HitObjectLifetimeEntry entry)
+        {
+            if (!lifetimeEntryMap.Remove(hitObject, out entry))
+                return false;
+
+            hitObject.RemoveNestedHitObjects -= removeNestedHitObjects;
+
+            OnHitObjectLifetimeEntryRemoved(entry);
+
+            return true;
+        }
+
+        private void removeNestedHitObjects(HitObject hitObject)
+        {
+            foreach (var nestedHitObject in hitObject.NestedHitObjects)
+                removeHitObjectEntry(nestedHitObject, out _);
         }
 
         /// <summary>
@@ -363,8 +415,7 @@ namespace osu.Game.Rulesets.UI
                         m.ApplyToDrawableHitObjects(dho.Yield());
                 }
 
-                if (!lifetimeEntryMap.TryGetValue(hitObject, out var entry))
-                    lifetimeEntryMap[hitObject] = entry = CreateLifetimeEntry(hitObject);
+                var entry = addHitObjectEntry(hitObject);
 
                 dho.ParentHitObject = parent;
                 dho.Apply(hitObject, entry);
