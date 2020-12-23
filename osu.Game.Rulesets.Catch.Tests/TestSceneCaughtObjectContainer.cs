@@ -139,11 +139,37 @@ namespace osu.Game.Rulesets.Catch.Tests
             checkDroppedObjects(0);
         }
 
+        [Test]
+        public void TestDropPositionIsCorrect()
+        {
+            stackFruit();
+            AddStep("move stack position", () => caughtObjectContainer.X = 200);
+            dropAll();
+            AddAssert("object position is correct", () => droppedObjectContainer[0].X == 200);
+            seekTime(-1);
+            AddStep("move stack position", () => caughtObjectContainer.X = 0);
+            seekTime(0);
+            AddAssert("object position is correct", () => droppedObjectContainer[0].X == 200);
+        }
+
+        [Test]
+        public void TestDroppedObjectIsMirrored()
+        {
+            stackFruit();
+            AddStep("mirror stack", () => caughtObjectContainer.Scale *= new Vector2(-1, 1));
+            dropAll();
+            AddAssert("object is mirrored", () => droppedObjectContainer[0].Scale.X < 0);
+            seekTime(-1);
+            AddStep("mirror stack", () => caughtObjectContainer.Scale *= new Vector2(-1, 1));
+            seekTime(0);
+            AddAssert("object is mirrored", () => droppedObjectContainer[0].Scale.X < 0);
+        }
+
         private void stackFruit() => AddStep("stack fruit", () => caughtObjectContainer.Add(lastEntry = createEntry()));
 
         private void addDroplet() => AddStep("add droplet", () => caughtObjectContainer.Add(lastEntry = createEntry(true)));
 
-        private void dropAll() => AddStep("drop all", () => caughtObjectContainer.DropStackedObjects(applyDropTransforms, 1));
+        private void dropAll() => AddStep("drop all", () => caughtObjectContainer.DropStackedObjects(applyDropTransforms, Math.Sign(caughtObjectContainer.Scale.X)));
 
         private void seekTime(double time) => AddStep($"seek time to {time}", () => clock.Seek(time));
 
