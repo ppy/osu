@@ -16,8 +16,11 @@ namespace osu.Android
 {
     [Activity(Theme = "@android:style/Theme.NoTitleBar", MainLauncher = true, ScreenOrientation = ScreenOrientation.FullUser, SupportsPictureInPicture = false, ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize, HardwareAccelerated = false)]
     [IntentFilter(new[] { Intent.ActionDefault, Intent.ActionSend }, Categories = new[] { Intent.CategoryDefault }, DataPathPatterns = new[] { ".*\\.osz", ".*\\.osk" }, DataMimeType = "application/*")]
+    [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryBrowsable, Intent.CategoryDefault }, DataScheme = osu_url_scheme)]
     public class OsuGameActivity : AndroidGameActivity
     {
+        private const string osu_url_scheme = "osu";
+
         private OsuGameAndroid game;
 
         protected override Framework.Game CreateGame() => game = new OsuGameAndroid(this);
@@ -49,6 +52,8 @@ namespace osu.Android
                 case Intent.ActionDefault:
                     if (intent.Scheme == ContentResolver.SchemeContent)
                         handleImportFromUri(intent.Data);
+                    else if (intent.Scheme == osu_url_scheme)
+                        Task.Run(() => game.HandleLink(intent.DataString));
                     break;
 
                 case Intent.ActionSend:
