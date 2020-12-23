@@ -161,8 +161,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 onSuccess?.Invoke(room);
             }
 
-            public bool CanJoinRoom(Room room) => true;
-
             public void JoinRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null) => onSuccess?.Invoke(room);
 
             public void PartRoom()
