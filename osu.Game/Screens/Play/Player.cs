@@ -386,7 +386,7 @@ namespace osu.Game.Screens.Play
                         if (!this.IsCurrentScreen()) return;
 
                         fadeOut(true);
-                        performImmediateExit();
+                        PerformImmediateExit();
                     },
                 },
                 failAnimation = new FailAnimation(DrawableRuleset) { OnComplete = onFailComplete, },
@@ -458,7 +458,7 @@ namespace osu.Game.Screens.Play
             return playable;
         }
 
-        private void performImmediateExit()
+        protected void PerformImmediateExit()
         {
             // if a restart has been requested, cancel any pending completion (user has shown intent to restart).
             completionProgressDelegate?.Cancel();
@@ -498,7 +498,7 @@ namespace osu.Game.Screens.Play
             RestartRequested?.Invoke();
 
             if (this.IsCurrentScreen())
-                performImmediateExit();
+                PerformImmediateExit();
             else
                 this.MakeCurrent();
         }
