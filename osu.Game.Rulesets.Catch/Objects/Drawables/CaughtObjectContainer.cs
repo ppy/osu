@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             if (entry.State != CaughtObjectState.Stacked) return;
 
             // `DropStackedObjects` may be called before lifetime update.
-            if (entry.StartTime <= Time.Current)
+            if (entry.LifetimeStart <= Time.Current)
                 aliveStackedObjects.Add(entry);
 
             var dropEntry = new CaughtObjectEntry(CaughtObjectState.Dropped, entry.PositionInStack, entry)
@@ -134,7 +134,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             if (entry.State == CaughtObjectState.Stacked)
                 aliveStackedObjects.Add(entry);
 
-            var drawable = getPooledDrawable(entry.ObjectType);
+            var drawable = getPooledDrawable(entry.HitObject);
             drawable.Apply(entry);
 
             addDrawable(entry, drawable);
@@ -203,17 +203,17 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             drawableMap.Remove(entry);
         }
 
-        private DrawableCaughtObject getPooledDrawable(CatchObjectType type)
+        private DrawableCaughtObject getPooledDrawable(CatchHitObject hitObject)
         {
-            switch (type)
+            switch (hitObject)
             {
-                case CatchObjectType.Fruit:
+                case Fruit _:
                     return caughtFruitPool.Get();
 
-                case CatchObjectType.Banana:
+                case Banana _:
                     return caughtBananaPool.Get();
 
-                case CatchObjectType.Droplet:
+                case Droplet _:
                     return caughtDropletPool.Get();
 
                 default:

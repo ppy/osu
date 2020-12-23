@@ -15,9 +15,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         public readonly Vector2 PositionInStack;
 
-        public CatchObjectType ObjectType { get; }
-
-        public double StartTime { get; }
+        public CatchHitObject HitObject { get; }
 
         public Bindable<Color4> AccentColour { get; } = new Bindable<Color4>();
 
@@ -36,8 +34,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             State = state;
             PositionInStack = positionInStack;
 
-            ObjectType = source.ObjectType;
-            StartTime = source.StartTime;
+            HitObject = source.HitObject;
             AccentColour.Value = source.AccentColour.Value;
             HyperDash.Value = source.HyperDash.Value;
             DisplaySize = source.DisplaySize;

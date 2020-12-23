@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
+using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Tests.Visual;
 using osuTK;
@@ -179,8 +180,15 @@ namespace osu.Game.Rulesets.Catch.Tests
             var positionInStack = caughtObjectContainer.GetPositionInStack(Vector2.Zero, 500);
             return new CaughtObjectEntry(state, positionInStack, new TestCatchObjectState
             {
-                StartTime = clock.CurrentTime,
-                ObjectType = !droplet ? CatchObjectType.Fruit : CatchObjectType.Droplet
+                HitObject = !droplet
+                    ? (CatchHitObject)new Fruit
+                    {
+                        StartTime = clock.CurrentTime
+                    }
+                    : new Droplet
+                    {
+                        StartTime = clock.CurrentTime
+                    },
             })
             {
                 LifetimeStart = clock.CurrentTime,
@@ -190,8 +198,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private class TestCatchObjectState : IHasCatchObjectState
         {
-            public CatchObjectType ObjectType { get; set; }
-            public double StartTime { get; set; }
+            public CatchHitObject HitObject { get; set; }
             public Bindable<Color4> AccentColour { get; } = new Bindable<Color4>(Colour4.Green);
             public Bindable<bool> HyperDash { get; } = new Bindable<bool>();
             public Vector2 DisplaySize => new Vector2(500);

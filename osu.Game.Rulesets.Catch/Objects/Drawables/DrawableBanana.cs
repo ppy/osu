@@ -11,8 +11,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     public class DrawableBanana : DrawablePalpableCatchHitObject
     {
-        public override CatchObjectType ObjectType => CatchObjectType.Banana;
-
         public DrawableBanana()
             : this(null)
         {

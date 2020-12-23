@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
         protected override void Update()
         {
             if (BorderPiece != null)
-                BorderPiece.Alpha = (float)Math.Clamp((ObjectState.StartTime - Time.Current) / 500, 0, 1);
+                BorderPiece.Alpha = (float)Math.Clamp((ObjectState.HitObject.StartTime - Time.Current) / 500, 0, 1);
         }
     }
 }

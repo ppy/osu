@@ -16,9 +16,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
     {
         public new PalpableCatchHitObject HitObject => (PalpableCatchHitObject)base.HitObject;
 
-        public abstract CatchObjectType ObjectType { get; }
-
-        double IHasCatchObjectState.StartTime => HitObject.StartTime;
+        CatchHitObject IHasCatchObjectState.HitObject => HitObject;
 
         Bindable<Color4> IHasCatchObjectState.AccentColour => AccentColour;
 

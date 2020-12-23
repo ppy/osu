@@ -19,8 +19,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
     {
         public CaughtObjectEntry Entry { get; private set; }
 
-        public CatchObjectType ObjectType => Entry.ObjectType;
-        public double StartTime => Entry.StartTime;
+        public CatchHitObject HitObject => Entry.HitObject;
         public Bindable<Color4> AccentColour { get; } = new Bindable<Color4>();
         public Bindable<bool> HyperDash { get; } = new Bindable<bool>();
         public Vector2 DisplaySize => Entry.DisplaySize;
@@ -59,6 +58,12 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             Entry = null;
 
             base.FreeAfterUse();
+        }
+
+        protected override void Update()
+        {
+            Console.WriteLine($"StartTime = {HitObject.StartTime}");
+            base.Update();
         }
     }
 }
