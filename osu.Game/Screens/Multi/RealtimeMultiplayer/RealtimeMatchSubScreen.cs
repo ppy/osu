@@ -4,8 +4,10 @@
 using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.RealtimeMultiplayer;
@@ -33,6 +35,8 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
         private StatefulMultiplayerClient client { get; set; }
 
         private RealtimeMatchSettingsOverlay settingsOverlay;
+
+        private IBindable<bool> isConnected;
 
         public RealtimeMatchSubScreen(Room room)
         {
@@ -173,6 +177,16 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             Playlist.BindCollectionChanged(onPlaylistChanged, true);
 
             client.LoadRequested += onLoadRequested;
+
+            isConnected = client.IsConnected.GetBoundCopy();
+            isConnected.BindValueChanged(connected =>
+            {
+                if (!connected.NewValue)
+                {
+                    Logger.Log("Connection to multiplayer server was lost.", LoggingTarget.Runtime, LogLevel.Important);
+                    Schedule(this.Exit);
+                }
+            }, true);
         }
 
         public override bool OnBackButton()
