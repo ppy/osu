@@ -115,6 +115,11 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             return position;
         }
 
+        public Vector2 GetDropPosition(Vector2 positionInStack)
+        {
+            return StackedObjectContainer.ToSpaceOfOtherDrawable(positionInStack, droppedObjectTarget);
+        }
+
         public void DropStackedObjects(Action<DrawableCaughtObject> applyTransforms)
         {
             dropStackedObjects(Clock.CurrentTime, applyTransforms);
@@ -160,6 +165,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
                 dropEntry.LifetimeStart = time;
                 dropEntry.ApplyTransforms = applyTransforms;
+                dropEntry.DropPosition = GetDropPosition(entry.PositionInStack);
             }
 
             aliveStackedObjects.Clear();
@@ -174,7 +180,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             }
             else
             {
-                drawable.Position = StackedObjectContainer.ToSpaceOfOtherDrawable(entry.PositionInStack, droppedObjectTarget);
+                drawable.Position = entry.DropPosition;
                 droppedObjectTarget.Add(drawable);
             }
 

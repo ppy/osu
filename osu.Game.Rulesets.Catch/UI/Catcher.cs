@@ -476,7 +476,8 @@ namespace osu.Game.Rulesets.Catch.UI
                 return new CaughtObjectEntry(CaughtObjectState.Dropped, positionInStack, hitObject)
                 {
                     LifetimeStart = time,
-                    ApplyTransforms = applyExplodeTransforms
+                    ApplyTransforms = applyExplodeTransforms,
+                    DropPosition = CaughtObjectContainer.GetDropPosition(positionInStack)
                 };
             }
 

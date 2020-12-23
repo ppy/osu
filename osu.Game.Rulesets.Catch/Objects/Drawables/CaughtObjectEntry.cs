@@ -29,6 +29,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         public Action<DrawableCaughtObject> ApplyTransforms;
 
+        public Vector2 DropPosition;
+
         public CaughtObjectEntry(CaughtObjectState state, Vector2 positionInStack, IHasCatchObjectState source)
         {
             State = state;
