@@ -51,21 +51,25 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             {
                 if (!connected.NewValue)
                 {
-                    startedEvent.Set();
-
                     // messaging to the user about this disconnect will be provided by the RealtimeMatchSubScreen.
-                    Schedule(PerformImmediateExit);
+                    failAndBail();
                 }
             }, true);
 
-            client.ChangeState(MultiplayerUserState.Loaded);
+            client.ChangeState(MultiplayerUserState.Loaded).ContinueWith(task =>
+                failAndBail(task.Exception?.Message ?? "Server error"), TaskContinuationOptions.NotOnRanToCompletion);
 
             if (!startedEvent.Wait(TimeSpan.FromSeconds(30)))
-            {
-                Logger.Log("Failed to start the multiplayer match in time.", LoggingTarget.Runtime, LogLevel.Important);
+                failAndBail("Failed to start the multiplayer match in time.");
+        }
 
-                Schedule(PerformImmediateExit);
-            }
+        private void failAndBail(string message = null)
+        {
+            if (!string.IsNullOrEmpty(message))
+                Logger.Log(message, LoggingTarget.Runtime, LogLevel.Important);
+
+            startedEvent.Set();
+            Schedule(PerformImmediateExit);
         }
 
         private void onMatchStarted() => startedEvent.Set();
