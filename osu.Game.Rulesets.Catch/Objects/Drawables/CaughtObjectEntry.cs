@@ -11,8 +11,14 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     public class CaughtObjectEntry : LifetimeEntry, IHasFruitState
     {
+        /// <summary>
+        /// Whether this caught object is stacked or dropped.
+        /// </summary>
         public readonly CaughtObjectState State;
 
+        /// <summary>
+        /// The position of this object in relative to the catcher.
+        /// </summary>
         public readonly Vector2 PositionInStack;
 
         public CatchHitObject HitObject { get; }
@@ -27,10 +33,20 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         public Bindable<FruitVisualRepresentation> VisualRepresentation { get; } = new Bindable<FruitVisualRepresentation>();
 
+        /// <summary>
+        /// The action invoked to drawable representation of this caught object when dropped.
+        /// </summary>
         public Action<DrawableCaughtObject> ApplyTransforms;
 
+        /// <summary>
+        /// The initial position of the object when dropped.
+        /// </summary>
         public Vector2 DropPosition;
-        public float DropDirection;
+
+        /// <summary>
+        /// 1 or -1 representing visual mirroring of the caught object.
+        /// </summary>
+        public int MirrorDirection;
 
         public CaughtObjectEntry(CaughtObjectState state, Vector2 positionInStack, IHasCatchObjectState source)
         {

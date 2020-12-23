@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private void addDroplet() => AddStep("add droplet", () => caughtObjectContainer.Add(lastEntry = createEntry(true)));
 
-        private void dropAll() => AddStep("drop all", () => caughtObjectContainer.DropStackedObjects(applyDropTransforms));
+        private void dropAll() => AddStep("drop all", () => caughtObjectContainer.DropStackedObjects(applyDropTransforms, 1));
 
         private void seekTime(double time) => AddStep($"seek time to {time}", () => clock.Seek(time));
 

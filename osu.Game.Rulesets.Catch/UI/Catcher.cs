@@ -219,7 +219,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             if (result.IsHit)
             {
-                var catchPosition = new Vector2((palpableObject.X - X) * Scale.X, 0);
+                var catchPosition = new Vector2((palpableObject.X - X) * stackMirrorDirection, 0);
                 var objectRadius = palpableObject.DisplaySize.X / 2;
                 var positionInStack = CaughtObjectContainer.GetPositionInStack(catchPosition, objectRadius);
 
@@ -319,6 +319,12 @@ namespace osu.Game.Rulesets.Catch.UI
             X = position;
         }
 
+        /// <summary>
+        /// 1 or -1 to denote whether the stacked objects on the catcher plate should be visually mirrored.
+        /// Currently, it is same as catcher sprite mirroring.
+        /// </summary>
+        private int stackMirrorDirection => Math.Sign(Scale.X);
+
         public bool OnPressed(CatchAction action)
         {
             switch (action)
@@ -362,7 +368,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// </summary>
         public void Drop()
         {
-            CaughtObjectContainer.DropStackedObjects(applyDropTransforms);
+            CaughtObjectContainer.DropStackedObjects(applyDropTransforms, stackMirrorDirection);
         }
 
         /// <summary>
@@ -370,7 +376,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// </summary>
         public void Explode()
         {
-            CaughtObjectContainer.DropStackedObjects(applyExplodeTransforms);
+            CaughtObjectContainer.DropStackedObjects(applyExplodeTransforms, stackMirrorDirection);
         }
 
         private void runHyperDashStateTransition(bool hyperDashing)
@@ -482,18 +488,17 @@ namespace osu.Game.Rulesets.Catch.UI
                 // droplet explodes immediately
                 entry = new CaughtObjectEntry(CaughtObjectState.Dropped, positionInStack, hitObject)
                 {
-                    LifetimeStart = time,
                     ApplyTransforms = applyExplodeTransforms,
-                    DropPosition = CaughtObjectContainer.GetDropPosition(positionInStack)
+                    DropPosition = CaughtObjectContainer.GetCurrentDropPosition(positionInStack),
                 };
             }
             else
             {
-                entry = new CaughtObjectEntry(CaughtObjectState.Stacked, positionInStack, hitObject)
-                {
-                    LifetimeStart = time,
-                };
+                entry = new CaughtObjectEntry(CaughtObjectState.Stacked, positionInStack, hitObject);
             }
+
+            entry.LifetimeStart = time;
+            entry.MirrorDirection = stackMirrorDirection;
 
             caughtEntryMap[hitObject.HitObject] = entry;
             CaughtObjectContainer.Add(entry);
@@ -516,10 +521,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private void applyExplodeTransforms(DrawableCaughtObject d)
         {
-            if (d.Entry.DropDirection == 0)
-                d.Entry.DropDirection = Scale.X;
-
-            var xMovement = d.Entry.PositionInStack.X * d.Entry.DropDirection * 6;
+            var xMovement = d.Entry.PositionInStack.X * d.Entry.MirrorDirection * 6;
             d.MoveToY(d.Y - 50, 250, Easing.OutSine).Then().MoveToY(d.Y + 50, 500, Easing.InSine);
             d.MoveToX(d.X + xMovement, 1000);
             d.FadeOut(750);
