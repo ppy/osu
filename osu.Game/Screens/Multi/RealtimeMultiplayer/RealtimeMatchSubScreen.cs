@@ -7,7 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.RealtimeMultiplayer;
@@ -18,6 +17,7 @@ using osu.Game.Screens.Multi.RealtimeMultiplayer.Match;
 using osu.Game.Screens.Multi.RealtimeMultiplayer.Participants;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
+using ParticipantsList = osu.Game.Screens.Multi.RealtimeMultiplayer.Participants.ParticipantsList;
 
 namespace osu.Game.Screens.Multi.RealtimeMultiplayer
 {
@@ -106,7 +106,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
                                                                     new Drawable[] { new ParticipantsListHeader() },
                                                                     new Drawable[]
                                                                     {
-                                                                        new Participants.ParticipantsList
+                                                                        new ParticipantsList
                                                                         {
                                                                             RelativeSizeAxes = Axes.Both
                                                                         },
@@ -182,10 +182,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             isConnected.BindValueChanged(connected =>
             {
                 if (!connected.NewValue)
-                {
-                    Logger.Log("Connection to multiplayer server was lost.", LoggingTarget.Runtime, LogLevel.Important);
                     Schedule(this.Exit);
-                }
             }, true);
         }
 
