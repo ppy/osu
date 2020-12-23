@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
                     startedEvent.Set();
 
                     // messaging to the user about this disconnect will be provided by the RealtimeMatchSubScreen.
-                    Schedule(PerformImmediateExit);
+                    Schedule(() => PerformExit(false));
                 }
             }, true);
 
@@ -71,7 +71,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             {
                 Logger.Log("Failed to start the multiplayer match in time.", LoggingTarget.Runtime, LogLevel.Important);
 
-                Schedule(PerformImmediateExit);
+                Schedule(() => PerformExit(false));
             }
 
             Debug.Assert(client.Room != null);
