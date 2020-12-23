@@ -12,6 +12,7 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.RealtimeMultiplayer;
 using osu.Game.Scoring;
 using osu.Game.Screens.Multi.Play;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Multi.RealtimeMultiplayer
@@ -31,7 +32,11 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
         private readonly ManualResetEventSlim startedEvent = new ManualResetEventSlim();
 
         public RealtimePlayer(PlaylistItem playlistItem)
-            : base(playlistItem, false)
+            : base(playlistItem, new PlayerConfiguration
+            {
+                AllowPause = false,
+                AllowRestart = false,
+            })
         {
         }
 

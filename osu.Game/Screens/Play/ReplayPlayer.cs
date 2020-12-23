@@ -16,8 +16,8 @@ namespace osu.Game.Screens.Play
         // Disallow replays from failing. (see https://github.com/ppy/osu/issues/6108)
         protected override bool CheckModsAllowFailure() => false;
 
-        public ReplayPlayer(Score score, bool allowPause = true, bool showResults = true)
-            : base(allowPause, showResults)
+        public ReplayPlayer(Score score, PlayerConfiguration configuration = null)
+            : base(configuration)
         {
             Score = score;
         }
