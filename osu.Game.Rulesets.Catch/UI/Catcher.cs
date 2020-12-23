@@ -516,7 +516,10 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private void applyExplodeTransforms(DrawableCaughtObject d)
         {
-            var xMovement = d.Entry.PositionInStack.X * Scale.X * 6;
+            if (d.Entry.DropDirection == 0)
+                d.Entry.DropDirection = Scale.X;
+
+            var xMovement = d.Entry.PositionInStack.X * d.Entry.DropDirection * 6;
             d.MoveToY(d.Y - 50, 250, Easing.OutSine).Then().MoveToY(d.Y + 50, 500, Easing.InSine);
             d.MoveToX(d.X + xMovement, 1000);
             d.FadeOut(750);
