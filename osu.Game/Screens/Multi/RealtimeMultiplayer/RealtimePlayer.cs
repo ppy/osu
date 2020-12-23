@@ -8,8 +8,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Logging;
-using osu.Framework.Screens;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.RealtimeMultiplayer;
 using osu.Game.Scoring;
@@ -31,6 +31,8 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
         [Resolved]
         private StatefulMultiplayerClient client { get; set; }
 
+        private IBindable<bool> isConnected;
+
         private readonly TaskCompletionSource<bool> resultsReady = new TaskCompletionSource<bool>();
         private readonly ManualResetEventSlim startedEvent = new ManualResetEventSlim();
 
@@ -50,17 +52,26 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
 
             client.MatchStarted += onMatchStarted;
             client.ResultsReady += onResultsReady;
+
+            isConnected = client.IsConnected.GetBoundCopy();
+            isConnected.BindValueChanged(connected =>
+            {
+                if (!connected.NewValue)
+                {
+                    startedEvent.Set();
+
+                    // messaging to the user about this disconnect will be provided by the RealtimeMatchSubScreen.
+                    Schedule(() => PerformExit(false));
+                }
+            }, true);
+
             client.ChangeState(MultiplayerUserState.Loaded);
 
             if (!startedEvent.Wait(TimeSpan.FromSeconds(30)))
             {
                 Logger.Log("Failed to start the multiplayer match in time.", LoggingTarget.Runtime, LogLevel.Important);
 
-                Schedule(() =>
-                {
-                    ValidForResume = false;
-                    this.Exit();
-                });
+                Schedule(() => PerformExit(false));
             }
 
             Debug.Assert(client.Room != null);

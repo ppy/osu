@@ -130,7 +130,11 @@ namespace osu.Game.Online.RealtimeMultiplayer
         public override async Task LeaveRoom()
         {
             if (!isConnected.Value)
+            {
+                // even if not connected, make sure the local room state can be cleaned up.
+                await base.LeaveRoom();
                 return;
+            }
 
             if (Room == null)
                 return;

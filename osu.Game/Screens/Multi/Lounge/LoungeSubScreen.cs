@@ -184,7 +184,7 @@ namespace osu.Game.Screens.Multi.Lounge
         /// <summary>
         /// Push a room as a new subscreen.
         /// </summary>
-        public void Open(Room room)
+        public virtual void Open(Room room)
         {
             // Handles the case where a room is clicked 3 times in quick succession
             if (!this.IsCurrentScreen())
