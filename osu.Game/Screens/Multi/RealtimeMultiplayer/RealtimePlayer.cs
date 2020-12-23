@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
                 Logger.Log(message, LoggingTarget.Runtime, LogLevel.Important);
 
             startedEvent.Set();
-            Schedule(PerformImmediateExit);
+            Schedule(() => PerformExit(false));
         }
 
         protected override void Update()
