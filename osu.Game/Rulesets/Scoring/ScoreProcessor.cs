@@ -193,7 +193,7 @@ namespace osu.Game.Rulesets.Scoring
         private void updateScore()
         {
             if (rollingMaxBaseScore != 0)
-                Accuracy.Value = baseScore / rollingMaxBaseScore;
+                Accuracy.Value = calculateAccuracyRatio(baseScore, true);
 
             TotalScore.Value = getScore(Mode.Value);
         }
@@ -233,13 +233,13 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         /// <summary>
-        /// Given a minimal set of inputs, return the computed score and accuracy for the tracked beatmap / mods combination, at the current point in time.
+        /// Given a minimal set of inputs, return the computed score for the tracked beatmap / mods combination, at the current point in time.
         /// </summary>
         /// <param name="mode">The <see cref="ScoringMode"/> to compute the total score in.</param>
         /// <param name="maxCombo">The maximum combo achievable in the beatmap.</param>
         /// <param name="statistics">Statistics to be used for calculating accuracy, bonus score, etc.</param>
-        /// <returns>The computed score and accuracy for provided inputs.</returns>
-        public (double score, double accuracy) GetScoreAndAccuracy(ScoringMode mode, int maxCombo, Dictionary<HitResult, int> statistics)
+        /// <returns>The computed score for provided inputs.</returns>
+        public double GetImmediateScore(ScoringMode mode, int maxCombo, Dictionary<HitResult, int> statistics)
         {
             // calculate base score from statistics pairs
             int computedBaseScore = 0;
@@ -252,12 +252,7 @@ namespace osu.Game.Rulesets.Scoring
                 computedBaseScore += Judgement.ToNumericResult(pair.Key) * pair.Value;
             }
 
-            double pointInTimeAccuracy = calculateAccuracyRatio(computedBaseScore, true);
-            double comboRatio = calculateComboRatio(maxCombo);
-
-            double score = GetScore(mode, maxAchievableCombo, calculateAccuracyRatio(computedBaseScore), comboRatio, scoreResultCounts);
-
-            return (score, pointInTimeAccuracy);
+            return GetScore(mode, maxAchievableCombo, calculateAccuracyRatio(computedBaseScore), calculateComboRatio(maxCombo), scoreResultCounts);
         }
 
         /// <summary>
