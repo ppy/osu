@@ -51,6 +51,8 @@ namespace osu.Game.Screens.Multi.Timeshift
             return new Room { Name = { Value = $"{API.LocalUser}'s awesome playlist" } };
         }
 
+        protected override string ScreenTitle => "Playlists";
+
         protected override RoomManager CreateRoomManager() => new TimeshiftRoomManager();
 
         protected override LoungeSubScreen CreateLounge() => new TimeshiftLoungeSubScreen();
