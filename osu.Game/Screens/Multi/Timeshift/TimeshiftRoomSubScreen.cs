@@ -15,7 +15,6 @@ using osu.Game.Screens.Multi.Match;
 using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Screens.Multi.Play;
 using osu.Game.Screens.Multi.Ranking;
-using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
 using osu.Game.Users;
 using Footer = osu.Game.Screens.Multi.Match.Components.Footer;
@@ -220,12 +219,9 @@ namespace osu.Game.Screens.Multi.Timeshift
             }, true);
         }
 
-        private void onStart()
+        private void onStart() => StartPlay(() => new TimeshiftPlayer(SelectedItem.Value)
         {
-            multiplayer?.Push(new PlayerLoader(() => new TimeshiftPlayer(SelectedItem.Value)
-            {
-                Exited = () => leaderboard.RefreshScores()
-            }));
-        }
+            Exited = () => leaderboard.RefreshScores()
+        });
     }
 }
