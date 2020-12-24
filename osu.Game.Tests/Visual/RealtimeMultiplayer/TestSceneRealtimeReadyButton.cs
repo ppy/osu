@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.RealtimeMultiplayer;
@@ -122,6 +123,36 @@ namespace osu.Game.Tests.Visual.RealtimeMultiplayer
 
             addClickButtonStep();
             AddAssert("match not started", () => Client.Room?.Users[0].State == MultiplayerUserState.Idle);
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestManyUsersChangingState(bool isHost)
+        {
+            const int users = 10;
+            AddStep("setup", () =>
+            {
+                Client.TransferHost(Client.Room?.Users[0].UserID ?? 0);
+                for (int i = 0; i < users; i++)
+                    Client.AddUser(new User { Id = i, Username = "Another user" });
+            });
+
+            if (!isHost)
+                AddStep("transfer host", () => Client.TransferHost(2));
+
+            addClickButtonStep();
+
+            AddRepeatStep("change user ready state", () =>
+            {
+                Client.ChangeUserState(RNG.Next(0, users), RNG.NextBool() ? MultiplayerUserState.Ready : MultiplayerUserState.Idle);
+            }, 20);
+
+            AddRepeatStep("ready all users", () =>
+            {
+                var nextUnready = Client.Room?.Users.FirstOrDefault(c => c.State == MultiplayerUserState.Idle);
+                if (nextUnready != null)
+                    Client.ChangeUserState(nextUnready.UserID, MultiplayerUserState.Ready);
+            }, users);
         }
 
         private void addClickButtonStep() => AddStep("click button", () =>
