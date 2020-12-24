@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Multi
         private OsuGameBase game { get; set; }
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        protected IAPIProvider API { get; private set; }
 
         [Resolved(CanBeNull = true)]
         private OsuLogo logo { get; set; }
@@ -127,7 +127,7 @@ namespace osu.Game.Screens.Multi
                             screenStack = new MultiplayerSubScreenStack { RelativeSizeAxes = Axes.Both }
                         }
                     },
-                    new Header(screenStack),
+                    new Header(ScreenTitle, screenStack),
                     createButton = CreateNewMultiplayerGameButton().With(button =>
                     {
                         button.Anchor = Anchor.TopRight;
@@ -155,7 +155,7 @@ namespace osu.Game.Screens.Multi
         [BackgroundDependencyLoader(true)]
         private void load(IdleTracker idleTracker)
         {
-            apiState.BindTo(api.State);
+            apiState.BindTo(API.State);
             apiState.BindValueChanged(onlineStateChanged, true);
 
             if (idleTracker != null)
@@ -275,7 +275,7 @@ namespace osu.Game.Screens.Multi
         /// Creates a new room.
         /// </summary>
         /// <returns>The created <see cref="Room"/>.</returns>
-        protected virtual Room CreateNewRoom() => new Room { Name = { Value = $"{api.LocalUser}'s awesome room" } };
+        protected abstract Room CreateNewRoom();
 
         private void screenPushed(IScreen lastScreen, IScreen newScreen)
         {
@@ -316,6 +316,8 @@ namespace osu.Game.Screens.Multi
         }
 
         protected IScreen CurrentSubScreen => screenStack.CurrentScreen;
+
+        protected abstract string ScreenTitle { get; }
 
         protected abstract RoomManager CreateRoomManager();
 

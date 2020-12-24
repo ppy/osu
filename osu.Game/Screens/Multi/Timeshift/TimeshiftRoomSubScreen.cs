@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Multi.Timeshift
     {
         public override string Title { get; }
 
-        public override string ShortTitle => "room";
+        public override string ShortTitle => "playlist";
 
         [Resolved(typeof(Room), nameof(Room.RoomID))]
         private Bindable<int?> roomId { get; set; }
@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Multi.Timeshift
 
         public TimeshiftRoomSubScreen(Room room)
         {
-            Title = room.RoomID.Value == null ? "New room" : room.Name.Value;
+            Title = room.RoomID.Value == null ? "New playlist" : room.Name.Value;
             Activity.Value = new UserActivity.InLobby(room);
         }
 

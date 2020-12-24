@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
         {
             Triangles.TriangleScale = 1.5f;
 
-            Text = "Create match";
+            Text = "Create room";
 
             ((IBindable<bool>)Enabled).BindTo(multiplayerClient.IsConnected);
         }
