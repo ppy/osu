@@ -19,8 +19,6 @@ namespace osu.Game.Online.RealtimeMultiplayer
 {
     public class RealtimeMultiplayerClient : StatefulMultiplayerClient
     {
-        private const string endpoint = "https://spectator.ppy.sh/multiplayer";
-
         public override IBindable<bool> IsConnected => isConnected;
 
         private readonly Bindable<bool> isConnected = new Bindable<bool>();
@@ -30,6 +28,13 @@ namespace osu.Game.Online.RealtimeMultiplayer
         private IAPIProvider api { get; set; } = null!;
 
         private HubConnection? connection;
+
+        private readonly string endpoint;
+
+        public RealtimeMultiplayerClient(EndpointConfiguration endpoints)
+        {
+            endpoint = endpoints.MultiplayerEndpointUrl;
+        }
 
         [BackgroundDependencyLoader]
         private void load()

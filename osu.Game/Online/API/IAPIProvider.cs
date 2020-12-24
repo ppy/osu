@@ -46,7 +46,12 @@ namespace osu.Game.Online.API
         /// <summary>
         /// The URL endpoint for this API. Does not include a trailing slash.
         /// </summary>
-        string Endpoint { get; }
+        string APIEndpointUrl { get; }
+
+        /// <summary>
+        /// The root URL of of the website, excluding the trailing slash.
+        /// </summary>
+        string WebsiteRootUrl { get; }
 
         /// <summary>
         /// The current connection state of the API.
