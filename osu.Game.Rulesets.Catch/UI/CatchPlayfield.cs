@@ -9,7 +9,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
@@ -80,12 +79,6 @@ namespace osu.Game.Rulesets.Catch.UI
         protected override void OnNewDrawableHitObject(DrawableHitObject d)
         {
             ((DrawableCatchHitObject)d).CheckPosition = checkIfWeCanCatch;
-        }
-
-        protected override void OnHitObjectRemoved(HitObject hitObject)
-        {
-            base.OnHitObjectRemoved(hitObject);
-            CatcherArea.MovableCatcher.OnHitObjectRemoved((CatchHitObject)hitObject);
         }
 
         private bool checkIfWeCanCatch(CatchHitObject obj) => CatcherArea.MovableCatcher.CanCatch(obj);

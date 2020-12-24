@@ -17,13 +17,11 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
     [Cached(typeof(IHasCatchObjectState))]
     public abstract class DrawableCaughtObject : SkinnableDrawable, IHasCatchObjectState
     {
-        public CaughtObjectEntry Entry { get; private set; }
-
-        public CatchHitObject HitObject => Entry.HitObject;
+        public CatchHitObject HitObject { get; private set; }
         public Bindable<Color4> AccentColour { get; } = new Bindable<Color4>();
         public Bindable<bool> HyperDash { get; } = new Bindable<bool>();
-        public Vector2 DisplaySize => Entry.DisplaySize;
-        public float DisplayRotation => Entry.DisplayRotation;
+        public Vector2 DisplaySize => Size * Scale;
+        public float DisplayRotation => Rotation;
 
         public override bool RemoveCompletedTransforms => false;
 
@@ -36,21 +34,17 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             Size = new Vector2(CatchHitObject.OBJECT_RADIUS * 2);
         }
 
-        protected virtual void OnApply()
+        public virtual void Apply(CaughtObjectEntry entry)
         {
-        }
+            HitObject = entry.HitObject;
 
-        public void Apply(CaughtObjectEntry entry)
-        {
-            Entry = entry;
+            AccentColour.Value = entry.AccentColour;
+            HyperDash.Value = entry.HyperDash;
 
-            AccentColour.BindTo(Entry.AccentColour);
-            HyperDash.BindTo(Entry.HyperDash);
+            Scale = Vector2.Divide(entry.DisplaySize, Size) * 0.5f;
+            Rotation = entry.DisplayRotation;
 
-            Scale = Vector2.Divide(Entry.DisplaySize, Size) * 0.5f;
-            Rotation = Entry.DisplayRotation;
-
-            OnApply();
+            entry.ApplyTransforms(this);
         }
 
         protected override void FreeAfterUse()
@@ -58,10 +52,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             ClearTransforms();
             Alpha = 1;
 
-            HyperDash.UnbindFrom(Entry.HyperDash);
-            AccentColour.UnbindFrom(Entry.AccentColour);
-
-            Entry = null;
+            HitObject = null;
 
             base.FreeAfterUse();
         }

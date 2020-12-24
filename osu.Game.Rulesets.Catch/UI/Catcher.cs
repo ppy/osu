@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -53,8 +53,6 @@ namespace osu.Game.Rulesets.Catch.UI
         private CatcherTrailDisplay trails;
 
         protected readonly CaughtObjectContainer CaughtObjectContainer;
-
-        private readonly Dictionary<CatchHitObject, CaughtObjectEntry> caughtEntryMap = new Dictionary<CatchHitObject, CaughtObjectEntry>();
 
         public CatcherAnimationState CurrentState { get; private set; }
 
@@ -223,7 +221,8 @@ namespace osu.Game.Rulesets.Catch.UI
                 var objectRadius = palpableObject.DisplaySize.X / 2;
                 var positionInStack = CaughtObjectContainer.GetPositionInStack(catchPosition, objectRadius);
 
-                addCaughtObject(palpableObject, Time.Current, positionInStack);
+                Debug.Assert(catchResult.CaughtObjectEntry == null);
+                catchResult.CaughtObjectEntry = placeCaughtObject(palpableObject, positionInStack);
 
                 if (hitLighting.Value)
                     addLighting(hitObject, positionInStack.X, drawableObject.AccentColour.Value);
@@ -265,16 +264,15 @@ namespace osu.Game.Rulesets.Catch.UI
                     SetHyperDashState();
             }
 
-            removeCaughtObject(drawableObject.HitObject);
+            if (catchResult.CaughtObjectEntry != null)
+            {
+                removeCaughtObject(catchResult.CaughtObjectEntry);
+                catchResult.CaughtObjectEntry = null;
+            }
 
             double time = result.TimeAbsolute;
 
             hitExplosionContainer.RemoveAll(d => d.LifetimeStart >= time);
-        }
-
-        public void OnHitObjectRemoved(CatchHitObject hitObject)
-        {
-            removeCaughtObject(hitObject);
         }
 
         /// <summary>
@@ -366,18 +364,12 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <summary>
         /// Drop any fruit off the plate.
         /// </summary>
-        public void Drop()
-        {
-            CaughtObjectContainer.DropStackedObjects(applyDropTransforms, stackMirrorDirection);
-        }
+        public void Drop() => CaughtObjectContainer.DropStackedObjects(DroppedObjectAnimation.Drop, stackMirrorDirection);
 
         /// <summary>
         /// Explode all fruit off the plate.
         /// </summary>
-        public void Explode()
-        {
-            CaughtObjectContainer.DropStackedObjects(applyExplodeTransforms, stackMirrorDirection);
-        }
+        public void Explode() => CaughtObjectContainer.DropStackedObjects(DroppedObjectAnimation.Explode, stackMirrorDirection);
 
         private void runHyperDashStateTransition(bool hyperDashing)
         {
@@ -469,6 +461,21 @@ namespace osu.Game.Rulesets.Catch.UI
             updateCatcher();
         }
 
+        private CaughtObjectEntry placeCaughtObject(DrawablePalpableCatchHitObject source, Vector2 positionInStack)
+        {
+            var entry = source.HitObject is Droplet
+                ? CaughtObjectContainer.AddDropObject(source, positionInStack, DroppedObjectAnimation.Explode, stackMirrorDirection)
+                : CaughtObjectContainer.AddStackObject(source, positionInStack);
+
+            return entry;
+        }
+
+        private void removeCaughtObject(CaughtObjectEntry entry)
+        {
+            bool removed = CaughtObjectContainer.RemoveEntry(entry);
+            Debug.Assert(removed);
+        }
+
         private void addLighting(CatchHitObject hitObject, float x, Color4 colour)
         {
             HitExplosion hitExplosion = hitExplosionPool.Get();
@@ -477,54 +484,6 @@ namespace osu.Game.Rulesets.Catch.UI
             hitExplosion.Scale = new Vector2(hitObject.Scale);
             hitExplosion.ObjectColour = colour;
             hitExplosionContainer.Add(hitExplosion);
-        }
-
-        private void addCaughtObject(DrawablePalpableCatchHitObject hitObject, double time, Vector2 positionInStack)
-        {
-            CaughtObjectEntry entry;
-
-            if (hitObject.HitObject is Droplet)
-            {
-                // droplet explodes immediately
-                entry = new CaughtObjectEntry(CaughtObjectState.Dropped, positionInStack, hitObject)
-                {
-                    ApplyTransforms = applyExplodeTransforms,
-                    DropPosition = CaughtObjectContainer.GetCurrentDropPosition(positionInStack),
-                };
-            }
-            else
-            {
-                entry = new CaughtObjectEntry(CaughtObjectState.Stacked, positionInStack, hitObject);
-            }
-
-            entry.LifetimeStart = time;
-            entry.MirrorDirection = stackMirrorDirection;
-
-            caughtEntryMap[hitObject.HitObject] = entry;
-            CaughtObjectContainer.Add(entry);
-        }
-
-        private void removeCaughtObject(CatchHitObject hitObject)
-        {
-            if (!caughtEntryMap.TryGetValue(hitObject, out var entry))
-                return;
-
-            CaughtObjectContainer.Remove(entry);
-            caughtEntryMap.Remove(hitObject);
-        }
-
-        private void applyDropTransforms(DrawableCaughtObject d)
-        {
-            d.MoveToY(d.Y + 75, 750, Easing.InSine);
-            d.FadeOut(750);
-        }
-
-        private void applyExplodeTransforms(DrawableCaughtObject d)
-        {
-            var xMovement = d.Entry.PositionInStack.X * d.Entry.MirrorDirection * 6;
-            d.MoveToY(d.Y - 50, 250, Easing.OutSine).Then().MoveToY(d.Y + 50, 500, Easing.InSine);
-            d.MoveToX(d.X + xMovement, 1000);
-            d.FadeOut(750);
         }
     }
 }

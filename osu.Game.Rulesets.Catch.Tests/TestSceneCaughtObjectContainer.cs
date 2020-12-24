@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             dropAll();
             checkStackedObjects(0);
             checkDroppedObjects(2);
-            seekTime(1000);
+            seekTime(10000);
             checkDroppedObjects(0);
         }
 
@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             checkDroppedObjects(0);
             seekTime(0);
             checkDroppedObjects(1);
-            seekTime(1000);
+            seekTime(10000);
             checkDroppedObjects(0);
         }
 
@@ -95,18 +95,18 @@ namespace osu.Game.Rulesets.Catch.Tests
         public void TestStackedAndDroppedObjectLifetime()
         {
             stackFruit();
-            seekTime(1000);
+            seekTime(10000);
             dropAll();
-            seekTime(2000);
+            seekTime(20000);
             checkDroppedObjects(0);
-            seekTime(1000);
+            seekTime(10000);
             checkDroppedObjects(1);
-            seekTime(999);
+            seekTime(9999);
             checkDroppedObjects(0);
             checkStackedObjects(1);
             seekTime(-1);
             checkStackedObjects(0);
-            seekTime(1000);
+            seekTime(10000);
             checkStackedObjects(0);
             checkDroppedObjects(1);
         }
@@ -115,9 +115,9 @@ namespace osu.Game.Rulesets.Catch.Tests
         public void TestStackedObjectRemovalAlsoRemovesDroppedObject()
         {
             stackFruit();
-            seekTime(1000);
+            seekTime(10000);
             dropAll();
-            AddStep("remove stacked object", () => caughtObjectContainer.Remove(lastEntry));
+            AddStep("remove stacked object", () => caughtObjectContainer.RemoveEntry(lastEntry));
             checkDroppedObjects(0);
             seekTime(0);
             checkStackedObjects(0);
@@ -128,13 +128,13 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             stackFruit();
             stackFruit();
-            seekTime(1000);
+            seekTime(10000);
             stackFruit();
             seekTime(0);
             checkStackedObjects(2);
             dropAll();
             checkDroppedObjects(2);
-            seekTime(1000);
+            seekTime(10000);
             checkStackedObjects(1);
             checkDroppedObjects(0);
         }
@@ -165,11 +165,11 @@ namespace osu.Game.Rulesets.Catch.Tests
             AddAssert("object is mirrored", () => droppedObjectContainer[0].Scale.X < 0);
         }
 
-        private void stackFruit() => AddStep("stack fruit", () => caughtObjectContainer.Add(lastEntry = createEntry()));
+        private void stackFruit() => AddStep("stack fruit", () => addCaughtObject());
 
-        private void addDroplet() => AddStep("add droplet", () => caughtObjectContainer.Add(lastEntry = createEntry(true)));
+        private void addDroplet() => AddStep("add droplet", () => addCaughtObject(true));
 
-        private void dropAll() => AddStep("drop all", () => caughtObjectContainer.DropStackedObjects(applyDropTransforms, Math.Sign(caughtObjectContainer.Scale.X)));
+        private void dropAll() => AddStep("drop all", () => caughtObjectContainer.DropStackedObjects(DroppedObjectAnimation.Drop, Math.Sign(caughtObjectContainer.Scale.X)));
 
         private void seekTime(double time) => AddStep($"seek time to {time}", () => clock.Seek(time));
 
@@ -187,39 +187,17 @@ namespace osu.Game.Rulesets.Catch.Tests
                        droppedObjectContainer.All(d => d.IsPresent);
             });
 
-        private void applyDropTransforms(DrawableCaughtObject d)
+        private void addCaughtObject(bool droplet = false)
         {
-            d.FadeTo(0.5f);
-            d.FadeOut(750);
-        }
-
-        private void applyExplodingTransforms(DrawableCaughtObject d)
-        {
-            d.FadeTo(0.5f);
-            d.MoveToY(d.Y - 50, 250, Easing.OutSine).Then()
-             .MoveToY(d.Y + 50, 500, Easing.InSine);
-        }
-
-        private CaughtObjectEntry createEntry(bool droplet = false)
-        {
-            var state = !droplet ? CaughtObjectState.Stacked : CaughtObjectState.Dropped;
             var positionInStack = caughtObjectContainer.GetPositionInStack(Vector2.Zero, 500);
-            return new CaughtObjectEntry(state, positionInStack, new TestCatchObjectState
+            var objectState = new TestCatchObjectState
             {
-                HitObject = !droplet
-                    ? (CatchHitObject)new Fruit
-                    {
-                        StartTime = clock.CurrentTime
-                    }
-                    : new Droplet
-                    {
-                        StartTime = clock.CurrentTime
-                    },
-            })
-            {
-                LifetimeStart = clock.CurrentTime,
-                ApplyTransforms = !droplet ? (Action<DrawableCaughtObject>)null : applyExplodingTransforms
+                HitObject = !droplet ? (PalpableCatchHitObject)new Fruit() : new Droplet()
             };
+
+            lastEntry = droplet
+                ? caughtObjectContainer.AddDropObject(objectState, positionInStack, DroppedObjectAnimation.Explode, 1)
+                : caughtObjectContainer.AddStackObject(objectState, positionInStack);
         }
 
         private class TestCatchObjectState : IHasCatchObjectState

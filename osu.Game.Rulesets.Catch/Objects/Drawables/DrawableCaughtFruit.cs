@@ -18,16 +18,11 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         {
         }
 
-        protected override void OnApply()
+        public override void Apply(CaughtObjectEntry entry)
         {
-            base.OnApply();
-            VisualRepresentation.BindTo(Entry.VisualRepresentation);
-        }
+            base.Apply(entry);
 
-        protected override void FreeAfterUse()
-        {
-            VisualRepresentation.UnbindFrom(Entry.VisualRepresentation);
-            base.FreeAfterUse();
+            VisualRepresentation.Value = entry.VisualRepresentation;
         }
     }
 }
