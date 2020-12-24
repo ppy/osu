@@ -3,6 +3,7 @@
 
 using osu.Framework.Logging;
 using osu.Framework.Screens;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Multi.Components;
 using osu.Game.Screens.Multi.Lounge;
 using osu.Game.Screens.Multi.Match;
@@ -47,5 +48,7 @@ namespace osu.Game.Screens.Multi.Timeshift
         protected override RoomManager CreateRoomManager() => new TimeshiftRoomManager();
 
         protected override LoungeSubScreen CreateLounge() => new TimeshiftLoungeSubScreen();
+
+        protected override OsuButton CreateNewMultiplayerGameButton() => new CreateTimeshiftRoomButton();
     }
 }
