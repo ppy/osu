@@ -7,6 +7,7 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Online.API;
@@ -105,13 +106,13 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer.Match
                 return;
 
             if (localUser.State == MultiplayerUserState.Idle)
-                Client.ChangeState(MultiplayerUserState.Ready);
+                Client.ChangeState(MultiplayerUserState.Ready).CatchUnobservedExceptions(true);
             else
             {
                 if (Room?.Host?.Equals(localUser) == true)
-                    Client.StartMatch();
+                    Client.StartMatch().CatchUnobservedExceptions(true);
                 else
-                    Client.ChangeState(MultiplayerUserState.Idle);
+                    Client.ChangeState(MultiplayerUserState.Idle).CatchUnobservedExceptions(true);
             }
         }
 

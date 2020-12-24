@@ -7,7 +7,9 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Logging;
+using osu.Game.Extensions;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.RoomStatuses;
 using osu.Game.Online.RealtimeMultiplayer;
@@ -43,6 +45,12 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
 
         public override void JoinRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
         {
+            if (!multiplayerClient.IsConnected.Value)
+            {
+                onError?.Invoke("Not currently connected to the multiplayer server.");
+                return;
+            }
+
             // this is done here as a pre-check to avoid clicking on already closed rooms in the lounge from triggering a server join.
             // should probably be done at a higher level, but due to the current structure of things this is the easiest place for now.
             if (room.Status.Value is RoomStatusEnded)
@@ -62,7 +70,8 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             var joinedRoom = JoinedRoom.Value;
 
             base.PartRoom();
-            multiplayerClient.LeaveRoom();
+
+            multiplayerClient.LeaveRoom().CatchUnobservedExceptions();
 
             // Todo: This is not the way to do this. Basically when we're the only participant and the room closes, there's no way to know if this is actually the case.
             // This is delayed one frame because upon exiting the match subscreen, multiplayer updates the polling rate and messes with polling.
@@ -77,15 +86,21 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
         {
             Debug.Assert(room.RoomID.Value != null);
 
-            var joinTask = multiplayerClient.JoinRoom(room);
-            joinTask.ContinueWith(_ => Schedule(() => onSuccess?.Invoke(room)), TaskContinuationOptions.OnlyOnRanToCompletion);
-            joinTask.ContinueWith(t =>
+            multiplayerClient.JoinRoom(room).ContinueWith(t =>
             {
-                PartRoom();
-                if (t.Exception != null)
-                    Logger.Error(t.Exception, "Failed to join multiplayer room.");
-                Schedule(() => onError?.Invoke(t.Exception?.ToString() ?? string.Empty));
-            }, TaskContinuationOptions.NotOnRanToCompletion);
+                if (t.IsCompletedSuccessfully)
+                    Schedule(() => onSuccess?.Invoke(room));
+                else
+                {
+                    const string message = "Failed to join multiplayer room.";
+
+                    if (t.Exception != null)
+                        Logger.Error(t.Exception, message);
+
+                    PartRoom();
+                    Schedule(() => onError?.Invoke(t.Exception?.AsSingular().Message ?? message));
+                }
+            });
         }
 
         private void updatePolling()

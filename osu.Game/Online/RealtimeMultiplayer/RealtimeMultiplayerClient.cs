@@ -122,7 +122,7 @@ namespace osu.Game.Online.RealtimeMultiplayer
         protected override Task<MultiplayerRoom> JoinRoom(long roomId)
         {
             if (!isConnected.Value)
-                return Task.FromCanceled<MultiplayerRoom>(CancellationToken.None);
+                return Task.FromCanceled<MultiplayerRoom>(new CancellationToken(true));
 
             return connection.InvokeAsync<MultiplayerRoom>(nameof(IMultiplayerServer.JoinRoom), roomId);
         }
@@ -130,7 +130,11 @@ namespace osu.Game.Online.RealtimeMultiplayer
         public override async Task LeaveRoom()
         {
             if (!isConnected.Value)
+            {
+                // even if not connected, make sure the local room state can be cleaned up.
+                await base.LeaveRoom();
                 return;
+            }
 
             if (Room == null)
                 return;

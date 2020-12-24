@@ -5,15 +5,18 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Logging;
-using osu.Framework.Screens;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.RealtimeMultiplayer;
 using osu.Game.Scoring;
 using osu.Game.Screens.Multi.Play;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Ranking;
+using osuTK;
 
 namespace osu.Game.Screens.Multi.RealtimeMultiplayer
 {
@@ -28,16 +31,29 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
         [Resolved]
         private StatefulMultiplayerClient client { get; set; }
 
+        private IBindable<bool> isConnected;
+
         private readonly TaskCompletionSource<bool> resultsReady = new TaskCompletionSource<bool>();
         private readonly ManualResetEventSlim startedEvent = new ManualResetEventSlim();
 
-        public RealtimePlayer(PlaylistItem playlistItem)
+        [CanBeNull]
+        private MultiplayerGameplayLeaderboard leaderboard;
+
+        private readonly int[] userIds;
+
+        /// <summary>
+        /// Construct a multiplayer player.
+        /// </summary>
+        /// <param name="playlistItem">The playlist item to be played.</param>
+        /// <param name="userIds">The users which are participating in this game.</param>
+        public RealtimePlayer(PlaylistItem playlistItem, int[] userIds)
             : base(playlistItem, new PlayerConfiguration
             {
                 AllowPause = false,
                 AllowRestart = false,
             })
         {
+            this.userIds = userIds;
         }
 
         [BackgroundDependencyLoader]
@@ -48,18 +64,57 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
 
             client.MatchStarted += onMatchStarted;
             client.ResultsReady += onResultsReady;
-            client.ChangeState(MultiplayerUserState.Loaded);
+
+            isConnected = client.IsConnected.GetBoundCopy();
+            isConnected.BindValueChanged(connected =>
+            {
+                if (!connected.NewValue)
+                {
+                    // messaging to the user about this disconnect will be provided by the RealtimeMatchSubScreen.
+                    failAndBail();
+                }
+            }, true);
+
+            client.ChangeState(MultiplayerUserState.Loaded)
+                  .ContinueWith(task => failAndBail(task.Exception?.Message ?? "Server error"), TaskContinuationOptions.NotOnRanToCompletion);
 
             if (!startedEvent.Wait(TimeSpan.FromSeconds(30)))
             {
-                Logger.Log("Failed to start the multiplayer match in time.", LoggingTarget.Runtime, LogLevel.Important);
-
-                Schedule(() =>
-                {
-                    ValidForResume = false;
-                    this.Exit();
-                });
+                failAndBail("Failed to start the multiplayer match in time.");
+                return;
             }
+
+            Debug.Assert(client.Room != null);
+
+            // todo: this should be implemented via a custom HUD implementation, and correctly masked to the main content area.
+            LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(ScoreProcessor, userIds), HUDOverlay.Add);
+        }
+
+        private void failAndBail(string message = null)
+        {
+            if (!string.IsNullOrEmpty(message))
+                Logger.Log(message, LoggingTarget.Runtime, LogLevel.Important);
+
+            startedEvent.Set();
+            Schedule(() => PerformExit(false));
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            adjustLeaderboardPosition();
+        }
+
+        private void adjustLeaderboardPosition()
+        {
+            if (leaderboard == null)
+                return;
+
+            const float padding = 44; // enough margin to avoid the hit error display.
+
+            leaderboard.Position = new Vector2(
+                padding,
+                padding + HUDOverlay.TopScoringElementsHeight);
         }
 
         private void onMatchStarted() => startedEvent.Set();

@@ -58,14 +58,17 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
 
                 client.ChangeSettings(item: item).ContinueWith(t =>
                 {
-                    return Schedule(() =>
+                    Schedule(() =>
                     {
                         loadingLayer.Hide();
 
                         if (t.IsCompletedSuccessfully)
                             this.Exit();
                         else
+                        {
                             Logger.Log($"Could not use current beatmap ({t.Exception?.Message})", level: LogLevel.Important);
+                            Carousel.AllowSelection = true;
+                        }
                     });
                 });
             }

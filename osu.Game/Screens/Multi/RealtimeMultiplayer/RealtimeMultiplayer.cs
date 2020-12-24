@@ -4,6 +4,8 @@
 using osu.Framework.Allocation;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
+using osu.Game.Extensions;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.RealtimeMultiplayer;
 using osu.Game.Screens.Multi.Components;
@@ -21,7 +23,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             base.OnResuming(last);
 
             if (client.Room != null)
-                client.ChangeState(MultiplayerUserState.Idle);
+                client.ChangeState(MultiplayerUserState.Idle).CatchUnobservedExceptions(true);
         }
 
         protected override void UpdatePollingRate(bool isIdle)
@@ -63,5 +65,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
         protected override RoomManager CreateRoomManager() => new RealtimeRoomManager();
 
         protected override LoungeSubScreen CreateLounge() => new RealtimeLoungeSubScreen();
+
+        protected override OsuButton CreateNewMultiplayerGameButton() => new CreateRealtimeMatchButton();
     }
 }
