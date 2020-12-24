@@ -29,9 +29,15 @@ namespace osu.Game.Online.Spectator
     public class SpectatorStreamingClient : Component, ISpectatorClient
     {
         /// <summary>
-        /// The maximum milliseconds between frame bundle sends.
+        /// The minimum milliseconds between frame bundle sends.
         /// </summary>
-        public const double TIME_BETWEEN_SENDS = 200;
+        public const double MIN_TIME_BETWEEN_SENDS = 200;
+
+        /// <summary>
+        /// The maximum milliseconds between frame bundle sends.
+        /// A frame bundle will always be sent at least once after this duration elapsees.
+        /// </summary>
+        public const double MAX_TIME_BETWEEN_SENDS = 1000;
 
         private HubConnection connection;
 
@@ -292,7 +298,10 @@ namespace osu.Game.Online.Spectator
         {
             base.Update();
 
-            if (pendingFrames.Count > 0 && Time.Current - lastSendTime > TIME_BETWEEN_SENDS)
+            double timeSinceLastSend = Time.Current - lastSendTime;
+
+            if ((pendingFrames.Count > 0 && timeSinceLastSend > MIN_TIME_BETWEEN_SENDS)
+                || (currentScore != null && timeSinceLastSend > MAX_TIME_BETWEEN_SENDS))
                 purgePendingFrames();
         }
 

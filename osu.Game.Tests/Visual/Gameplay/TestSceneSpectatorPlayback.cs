@@ -184,7 +184,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
         }
 
-        private double latency = SpectatorStreamingClient.TIME_BETWEEN_SENDS;
+        private double latency = SpectatorStreamingClient.MIN_TIME_BETWEEN_SENDS;
 
         protected override void Update()
         {
