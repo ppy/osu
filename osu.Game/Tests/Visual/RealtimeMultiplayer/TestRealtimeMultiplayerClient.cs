@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.RealtimeMultiplayer
         public void RemoveUser(User user)
         {
             Debug.Assert(Room != null);
-            ((IMultiplayerClient)this).UserLeft(Room.Users.Single(u => u.User == user));
+            ((IMultiplayerClient)this).UserLeft(new MultiplayerRoomUser(user.Id));
 
             Schedule(() =>
             {
