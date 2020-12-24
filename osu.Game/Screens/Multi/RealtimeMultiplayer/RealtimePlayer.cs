@@ -13,6 +13,7 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.RealtimeMultiplayer;
 using osu.Game.Scoring;
 using osu.Game.Screens.Multi.Play;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Ranking;
 using osuTK;
@@ -47,7 +48,11 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
         /// <param name="playlistItem">The playlist item to be played.</param>
         /// <param name="userIds">The users which are participating in this game.</param>
         public RealtimePlayer(PlaylistItem playlistItem, int[] userIds)
-            : base(playlistItem, false)
+            : base(playlistItem, new PlayerConfiguration
+            {
+                AllowPause = false,
+                AllowRestart = false,
+            })
         {
             this.userIds = userIds;
         }

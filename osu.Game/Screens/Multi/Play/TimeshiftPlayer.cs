@@ -37,8 +37,8 @@ namespace osu.Game.Screens.Multi.Play
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
 
-        public TimeshiftPlayer(PlaylistItem playlistItem, bool allowPause = true)
-            : base(allowPause)
+        public TimeshiftPlayer(PlaylistItem playlistItem, PlayerConfiguration configuration = null)
+            : base(configuration)
         {
             PlaylistItem = playlistItem;
         }
