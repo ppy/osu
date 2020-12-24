@@ -122,8 +122,8 @@ namespace osu.Game.Screens.Play.HUD
                 if (LastHeader == null)
                     return;
 
-                (score.Value, accuracy.Value) = processor.GetScoreAndAccuracy(mode, LastHeader.MaxCombo, LastHeader.Statistics);
-
+                score.Value = processor.GetImmediateScore(mode, LastHeader.MaxCombo, LastHeader.Statistics);
+                accuracy.Value = LastHeader.Accuracy;
                 currentCombo.Value = LastHeader.Combo;
             }
         }
