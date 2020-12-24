@@ -11,8 +11,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -74,6 +76,19 @@ namespace osu.Game.Online.RealtimeMultiplayer
 
         // Todo: This is temporary, until the multiplayer server returns the item id on match start or otherwise.
         private int playlistItemId;
+
+        protected StatefulMultiplayerClient()
+        {
+            IsConnected.BindValueChanged(connected =>
+            {
+                // clean up local room state on server disconnect.
+                if (!connected.NewValue)
+                {
+                    Logger.Log("Connection to multiplayer server was lost.", LoggingTarget.Runtime, LogLevel.Important);
+                    LeaveRoom().CatchUnobservedExceptions();
+                }
+            });
+        }
 
         /// <summary>
         /// Joins the <see cref="MultiplayerRoom"/> for a given API <see cref="Room"/>.
@@ -354,7 +369,6 @@ namespace osu.Game.Online.RealtimeMultiplayer
             if (Room == null)
                 return;
 
-            // Update a few properties of the room instantaneously.
             Schedule(() =>
             {
                 if (Room == null)
@@ -362,6 +376,7 @@ namespace osu.Game.Online.RealtimeMultiplayer
 
                 Debug.Assert(apiRoom != null);
 
+                // Update a few properties of the room instantaneously.
                 Room.Settings = settings;
                 apiRoom.Name.Value = Room.Settings.Name;
 
@@ -370,12 +385,12 @@ namespace osu.Game.Online.RealtimeMultiplayer
                 apiRoom.Playlist.Clear();
 
                 RoomChanged?.Invoke();
+
+                var req = new GetBeatmapSetRequest(settings.BeatmapID, BeatmapSetLookupType.BeatmapId);
+                req.Success += res => updatePlaylist(settings, res);
+
+                api.Queue(req);
             });
-
-            var req = new GetBeatmapSetRequest(settings.BeatmapID, BeatmapSetLookupType.BeatmapId);
-            req.Success += res => updatePlaylist(settings, res);
-
-            api.Queue(req);
         }
 
         private void updatePlaylist(MultiplayerRoomSettings settings, APIBeatmapSet onlineSet)
