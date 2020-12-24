@@ -86,7 +86,6 @@ namespace osu.Game.Overlays
         }
 
         public void ShowListing()
-
         {
             Current.Value = null;
             Show();
