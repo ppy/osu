@@ -3,16 +3,17 @@
 
 using System;
 using System.Diagnostics;
-using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.RealtimeMultiplayer;
 using osu.Game.Scoring;
 using osu.Game.Screens.Multi.Play;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Ranking;
 using osuTK;
@@ -33,12 +34,13 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
         private IBindable<bool> isConnected;
 
         private readonly TaskCompletionSource<bool> resultsReady = new TaskCompletionSource<bool>();
-        private readonly ManualResetEventSlim startedEvent = new ManualResetEventSlim();
 
         [CanBeNull]
         private MultiplayerGameplayLeaderboard leaderboard;
 
         private readonly int[] userIds;
+
+        private LoadingLayer loadingDisplay;
 
         /// <summary>
         /// Construct a multiplayer player.
@@ -46,7 +48,11 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
         /// <param name="playlistItem">The playlist item to be played.</param>
         /// <param name="userIds">The users which are participating in this game.</param>
         public RealtimePlayer(PlaylistItem playlistItem, int[] userIds)
-            : base(playlistItem, false)
+            : base(playlistItem, new PlayerConfiguration
+            {
+                AllowPause = false,
+                AllowRestart = false,
+            })
         {
             this.userIds = userIds;
         }
@@ -60,6 +66,12 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             client.MatchStarted += onMatchStarted;
             client.ResultsReady += onResultsReady;
 
+            ScoreProcessor.HasCompleted.BindValueChanged(completed =>
+            {
+                // wait for server to tell us that results are ready (see SubmitScore implementation)
+                loadingDisplay.Show();
+            });
+
             isConnected = client.IsConnected.GetBoundCopy();
             isConnected.BindValueChanged(connected =>
             {
@@ -70,19 +82,20 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
                 }
             }, true);
 
-            client.ChangeState(MultiplayerUserState.Loaded)
-                  .ContinueWith(task => failAndBail(task.Exception?.Message ?? "Server error"), TaskContinuationOptions.NotOnRanToCompletion);
-
-            if (!startedEvent.Wait(TimeSpan.FromSeconds(30)))
-            {
-                failAndBail("Failed to start the multiplayer match in time.");
-                return;
-            }
-
             Debug.Assert(client.Room != null);
 
             // todo: this should be implemented via a custom HUD implementation, and correctly masked to the main content area.
             LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(ScoreProcessor, userIds), HUDOverlay.Add);
+
+            HUDOverlay.Add(loadingDisplay = new LoadingLayer(DrawableRuleset) { Depth = float.MaxValue });
+        }
+
+        protected override void StartGameplay()
+        {
+            // block base call, but let the server know we are ready to start.
+            loadingDisplay.Show();
+
+            client.ChangeState(MultiplayerUserState.Loaded).ContinueWith(task => failAndBail(task.Exception?.Message ?? "Server error"), TaskContinuationOptions.NotOnRanToCompletion);
         }
 
         private void failAndBail(string message = null)
@@ -90,7 +103,6 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             if (!string.IsNullOrEmpty(message))
                 Logger.Log(message, LoggingTarget.Runtime, LogLevel.Important);
 
-            startedEvent.Set();
             Schedule(() => PerformExit(false));
         }
 
@@ -112,7 +124,11 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
                 padding + HUDOverlay.TopScoringElementsHeight);
         }
 
-        private void onMatchStarted() => startedEvent.Set();
+        private void onMatchStarted() => Scheduler.Add(() =>
+        {
+            loadingDisplay.Hide();
+            base.StartGameplay();
+        });
 
         private void onResultsReady() => resultsReady.SetResult(true);
 
@@ -122,9 +138,9 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
 
             await client.ChangeState(MultiplayerUserState.FinishedPlay);
 
-            // Await up to 30 seconds for results to become available (3 api request timeouts).
+            // Await up to 60 seconds for results to become available (6 api request timeouts).
             // This is arbitrary just to not leave the player in an essentially deadlocked state if any connection issues occur.
-            await Task.WhenAny(resultsReady.Task, Task.Delay(TimeSpan.FromSeconds(30)));
+            await Task.WhenAny(resultsReady.Task, Task.Delay(TimeSpan.FromSeconds(60)));
         }
 
         protected override ResultsScreen CreateResults(ScoreInfo score)
