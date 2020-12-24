@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -199,7 +200,14 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
 
         private void onPlaylistChanged(object sender, NotifyCollectionChangedEventArgs e) => SelectedItem.Value = Playlist.FirstOrDefault();
 
-        private void onLoadRequested() => multiplayer?.Push(new PlayerLoader(() => new RealtimePlayer(SelectedItem.Value)));
+        private void onLoadRequested()
+        {
+            Debug.Assert(client.Room != null);
+
+            int[] userIds = client.Room.Users.Where(u => u.State >= MultiplayerUserState.WaitingForLoad).Select(u => u.UserID).ToArray();
+
+            multiplayer?.Push(new PlayerLoader(() => new RealtimePlayer(SelectedItem.Value, userIds)));
+        }
 
         protected override void Dispose(bool isDisposing)
         {
