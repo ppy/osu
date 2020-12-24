@@ -4,6 +4,8 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Screens;
 using osu.Game.Audio;
@@ -11,6 +13,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.Multi.Match
 {
@@ -21,6 +24,8 @@ namespace osu.Game.Screens.Multi.Match
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
+        private SampleChannel sampleStart;
+
         [Resolved(typeof(Room), nameof(Room.Playlist))]
         protected BindableList<PlaylistItem> Playlist { get; private set; }
 
@@ -30,7 +35,16 @@ namespace osu.Game.Screens.Multi.Match
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
 
+        [Resolved(canBeNull: true)]
+        protected Multiplayer Multiplayer { get; private set; }
+
         private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            sampleStart = audio.Samples.Get(@"SongSelect/confirm-selection");
+        }
 
         protected override void LoadComplete()
         {
@@ -69,6 +83,12 @@ namespace osu.Game.Screens.Multi.Match
             endHandlingTrack();
 
             return base.OnExiting(next);
+        }
+
+        protected void StartPlay(Func<Player> player)
+        {
+            sampleStart?.Play();
+            Multiplayer?.Push(new PlayerLoader(player));
         }
 
         private void selectedItemChanged()

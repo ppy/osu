@@ -16,7 +16,6 @@ using osu.Game.Screens.Multi.Match;
 using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Screens.Multi.RealtimeMultiplayer.Match;
 using osu.Game.Screens.Multi.RealtimeMultiplayer.Participants;
-using osu.Game.Screens.Play;
 using osu.Game.Users;
 using ParticipantsList = osu.Game.Screens.Multi.RealtimeMultiplayer.Participants.ParticipantsList;
 
@@ -28,9 +27,6 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
         public override string Title { get; }
 
         public override string ShortTitle => "match";
-
-        [Resolved(canBeNull: true)]
-        private Multiplayer multiplayer { get; set; }
 
         [Resolved]
         private StatefulMultiplayerClient client { get; set; }
@@ -206,7 +202,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
 
             int[] userIds = client.Room.Users.Where(u => u.State >= MultiplayerUserState.WaitingForLoad).Select(u => u.UserID).ToArray();
 
-            multiplayer?.Push(new PlayerLoader(() => new RealtimePlayer(SelectedItem.Value, userIds)));
+            StartPlay(() => new RealtimePlayer(SelectedItem.Value, userIds));
         }
 
         protected override void Dispose(bool isDisposing)
