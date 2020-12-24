@@ -107,11 +107,11 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer.Match
 
         private void playSound()
         {
-            if (sampleReadyCount != null)
-            {
-                sampleReadyCount.Frequency.Value = 0.77f + countReady * 0.06f;
-                sampleReadyCount.Play();
-            }
+            if (sampleReadyCount == null)
+                return;
+
+            sampleReadyCount.Frequency.Value = 0.77f + countReady * 0.06f;
+            sampleReadyCount.Play();
         }
 
         private void updateButtonColour(bool green)
