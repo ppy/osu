@@ -369,7 +369,6 @@ namespace osu.Game.Online.RealtimeMultiplayer
             if (Room == null)
                 return;
 
-            // Update a few properties of the room instantaneously.
             Schedule(() =>
             {
                 if (Room == null)
@@ -377,6 +376,7 @@ namespace osu.Game.Online.RealtimeMultiplayer
 
                 Debug.Assert(apiRoom != null);
 
+                // Update a few properties of the room instantaneously.
                 Room.Settings = settings;
                 apiRoom.Name.Value = Room.Settings.Name;
 
@@ -385,12 +385,12 @@ namespace osu.Game.Online.RealtimeMultiplayer
                 apiRoom.Playlist.Clear();
 
                 RoomChanged?.Invoke();
+
+                var req = new GetBeatmapSetRequest(settings.BeatmapID, BeatmapSetLookupType.BeatmapId);
+                req.Success += res => updatePlaylist(settings, res);
+
+                api.Queue(req);
             });
-
-            var req = new GetBeatmapSetRequest(settings.BeatmapID, BeatmapSetLookupType.BeatmapId);
-            req.Success += res => updatePlaylist(settings, res);
-
-            api.Queue(req);
         }
 
         private void updatePlaylist(MultiplayerRoomSettings settings, APIBeatmapSet onlineSet)
