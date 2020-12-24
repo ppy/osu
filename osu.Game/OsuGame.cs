@@ -294,7 +294,7 @@ namespace osu.Game
         public void OpenUrlExternally(string url) => waitForReady(() => externalLinkOpener, _ =>
         {
             if (url.StartsWith('/'))
-                url = $"{API.Endpoint}{url}";
+                url = $"{API.APIEndpointUrl}{url}";
 
             externalLinkOpener.OpenUrlExternally(url);
         });

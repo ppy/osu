@@ -33,7 +33,7 @@ namespace osu.Game.Online.RealtimeMultiplayer
 
         public RealtimeMultiplayerClient(EndpointConfiguration endpoints)
         {
-            endpoint = endpoints.MultiplayerEndpoint;
+            endpoint = endpoints.MultiplayerEndpointUrl;
         }
 
         [BackgroundDependencyLoader]
