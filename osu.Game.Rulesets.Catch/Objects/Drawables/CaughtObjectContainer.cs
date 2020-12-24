@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             {
                 float diff = (displayRadius + radius_div_2) / allowance;
 
-                position.X += (StatelessRNG.NextSingle(randomSeed, iteration + 2) - 0.5f) * diff * 2;
+                position.X += (StatelessRNG.NextSingle(randomSeed, iteration * 2) - 0.5f) * diff * 2;
                 position.Y -= StatelessRNG.NextSingle(randomSeed, iteration * 2 + 1) * diff;
 
                 iteration++;
