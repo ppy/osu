@@ -62,6 +62,8 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             return room;
         }
 
+        protected override string ScreenTitle => "Multiplayer";
+
         protected override RoomManager CreateRoomManager() => new RealtimeRoomManager();
 
         protected override LoungeSubScreen CreateLounge() => new RealtimeLoungeSubScreen();

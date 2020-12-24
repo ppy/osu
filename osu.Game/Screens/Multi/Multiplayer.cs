@@ -127,7 +127,7 @@ namespace osu.Game.Screens.Multi
                             screenStack = new MultiplayerSubScreenStack { RelativeSizeAxes = Axes.Both }
                         }
                     },
-                    new Header(screenStack),
+                    new Header(ScreenTitle, screenStack),
                     createButton = CreateNewMultiplayerGameButton().With(button =>
                     {
                         button.Anchor = Anchor.TopRight;
@@ -310,6 +310,8 @@ namespace osu.Game.Screens.Multi
         }
 
         protected IScreen CurrentSubScreen => screenStack.CurrentScreen;
+
+        protected abstract string ScreenTitle { get; }
 
         protected abstract RoomManager CreateRoomManager();
 
