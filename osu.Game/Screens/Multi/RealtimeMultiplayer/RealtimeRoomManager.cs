@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Logging;
 using osu.Game.Extensions;
 using osu.Game.Online.Multiplayer;
@@ -91,11 +92,13 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
                     Schedule(() => onSuccess?.Invoke(room));
                 else
                 {
+                    const string message = "Failed to join multiplayer room.";
+
                     if (t.Exception != null)
-                        Logger.Error(t.Exception, "Failed to join multiplayer room.");
+                        Logger.Error(t.Exception, message);
 
                     PartRoom();
-                    Schedule(() => onError?.Invoke(t.Exception?.ToString() ?? string.Empty));
+                    Schedule(() => onError?.Invoke(t.Exception?.AsSingular().Message ?? message));
                 }
             });
         }
