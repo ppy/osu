@@ -4,7 +4,6 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
@@ -35,7 +34,6 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
 
         private readonly TaskCompletionSource<bool> resultsReady = new TaskCompletionSource<bool>();
 
-        [CanBeNull]
         private MultiplayerGameplayLeaderboard leaderboard;
 
         private readonly int[] userIds;
@@ -61,6 +59,11 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
         [BackgroundDependencyLoader]
         private void load()
         {
+            // todo: this should be implemented via a custom HUD implementation, and correctly masked to the main content area.
+            LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(ScoreProcessor, userIds), HUDOverlay.Add);
+
+            HUDOverlay.Add(loadingDisplay = new LoadingLayer(DrawableRuleset) { Depth = float.MaxValue });
+
             if (Token == null)
                 return; // Todo: Somehow handle token retrieval failure.
 
@@ -84,11 +87,6 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             }, true);
 
             Debug.Assert(client.Room != null);
-
-            // todo: this should be implemented via a custom HUD implementation, and correctly masked to the main content area.
-            LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(ScoreProcessor, userIds), HUDOverlay.Add);
-
-            HUDOverlay.Add(loadingDisplay = new LoadingLayer(DrawableRuleset) { Depth = float.MaxValue });
         }
 
         protected override void StartGameplay()
@@ -115,9 +113,6 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
 
         private void adjustLeaderboardPosition()
         {
-            if (leaderboard == null)
-                return;
-
             const float padding = 44; // enough margin to avoid the hit error display.
 
             leaderboard.Position = new Vector2(
