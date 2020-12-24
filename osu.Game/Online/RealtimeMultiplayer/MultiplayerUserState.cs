@@ -6,16 +6,6 @@ namespace osu.Game.Online.RealtimeMultiplayer
     public enum MultiplayerUserState
     {
         /// <summary>
-        /// The user has not downloaded the beatmap yet.
-        /// </summary>
-        BeatmapNotDownloaded,
-
-        /// <summary>
-        /// The user is downloading the beatmap.
-        /// </summary>
-        DownloadingBeatmap,
-
-        /// <summary>
         /// The user is idle and waiting for something to happen (or watching the match but not participating).
         /// </summary>
         Idle,
@@ -65,5 +55,15 @@ namespace osu.Game.Online.RealtimeMultiplayer
         /// The user is currently viewing results. This is a reserved state, and is set by the server.
         /// </summary>
         Results,
+
+        /// <summary>
+        /// The user has not downloaded the beatmap yet.
+        /// </summary>
+        BeatmapNotDownloaded,
+
+        /// <summary>
+        /// The user is downloading the beatmap.
+        /// </summary>
+        DownloadingBeatmap,
     }
 }
