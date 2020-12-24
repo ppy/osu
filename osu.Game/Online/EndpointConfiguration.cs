@@ -9,9 +9,14 @@ namespace osu.Game.Online
     public class EndpointConfiguration
     {
         /// <summary>
+        /// The base URL for the website.
+        /// </summary>
+        public string WebsiteRootUrl { get; set; }
+
+        /// <summary>
         /// The endpoint for the main (osu-web) API.
         /// </summary>
-        public string APIEndpoint { get; set; }
+        public string APIEndpointUrl { get; set; }
 
         /// <summary>
         /// The OAuth client secret.
@@ -23,8 +28,14 @@ namespace osu.Game.Online
         /// </summary>
         public string APIClientID { get; set; }
 
-        public string SpectatorEndpoint { get; set; }
+        /// <summary>
+        /// The endpoint for the SignalR spectator server.
+        /// </summary>
+        public string SpectatorEndpointUrl { get; set; }
 
-        public string MultiplayerEndpoint { get; set; }
+        /// <summary>
+        /// The endpoint for the SignalR multiplayer server.
+        /// </summary>
+        public string MultiplayerEndpointUrl { get; set; }
     }
 }
