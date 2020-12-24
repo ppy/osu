@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
 
         protected override Room CreateNewRoom()
         {
-            var room = base.CreateNewRoom();
+            var room = new Room { Name = { Value = $"{API.LocalUser}'s awesome room" } };
             room.Category.Value = RoomCategory.Realtime;
             return room;
         }

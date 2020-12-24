@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Multi.Timeshift
         {
             Triangles.TriangleScale = 1.5f;
 
-            Text = "Create room";
+            Text = "Create playlist";
         }
     }
 }
