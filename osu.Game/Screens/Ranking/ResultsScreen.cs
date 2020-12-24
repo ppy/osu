@@ -164,18 +164,15 @@ namespace osu.Game.Screens.Ranking
             {
                 buttons.Add(new RetryButton { Width = 300 });
 
-                if (player?.Configuration.AllowRestart == true)
+                AddInternal(new HotkeyRetryOverlay
                 {
-                    AddInternal(new HotkeyRetryOverlay
+                    Action = () =>
                     {
-                        Action = () =>
-                        {
-                            if (!this.IsCurrentScreen()) return;
+                        if (!this.IsCurrentScreen()) return;
 
-                            player?.Restart();
-                        },
-                    });
-                }
+                        player?.Restart();
+                    },
+                });
             }
         }
 
