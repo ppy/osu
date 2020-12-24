@@ -15,6 +15,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
+using osu.Game.Online.API;
 using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Overlays.BeatmapSet.Buttons;
 using osu.Game.Rulesets;
@@ -39,6 +40,9 @@ namespace osu.Game.Overlays.BeatmapSet
         public Details Details;
 
         public bool DownloadButtonsVisible => downloadButtonsContainer.Any();
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
         public BeatmapRulesetSelector RulesetSelector => beatmapSetHeader.RulesetSelector;
         public readonly BeatmapPicker Picker;
@@ -213,7 +217,7 @@ namespace osu.Game.Overlays.BeatmapSet
             Picker.Beatmap.ValueChanged += b =>
             {
                 Details.Beatmap = b.NewValue;
-                externalLink.Link = $@"https://osu.ppy.sh/beatmapsets/{BeatmapSet.Value?.OnlineBeatmapSetID}#{b.NewValue?.Ruleset.ShortName}/{b.NewValue?.OnlineBeatmapID}";
+                externalLink.Link = $@"{api.WebsiteRootUrl}/beatmapsets/{BeatmapSet.Value?.OnlineBeatmapSetID}#{b.NewValue?.Ruleset.ShortName}/{b.NewValue?.OnlineBeatmapID}";
             };
         }
 
