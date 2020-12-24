@@ -74,7 +74,11 @@ namespace osu.Game.Rulesets.Osu.Tests
             private readonly bool userHasCustomColours;
 
             public ExposedPlayer(bool userHasCustomColours)
-                : base(false, false)
+                : base(new PlayerConfiguration
+                {
+                    AllowPause = false,
+                    ShowResults = false,
+                })
             {
                 this.userHasCustomColours = userHasCustomColours;
             }

@@ -55,8 +55,6 @@ namespace osu.Game.Tests.Visual.RealtimeMultiplayer
                     }
                 }
             };
-
-            Client.AddUser(API.LocalUser.Value);
         });
 
         [Test]

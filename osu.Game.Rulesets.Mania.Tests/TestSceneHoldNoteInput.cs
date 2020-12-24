@@ -355,7 +355,11 @@ namespace osu.Game.Rulesets.Mania.Tests
             protected override bool PauseOnFocusLost => false;
 
             public ScoreAccessibleReplayPlayer(Score score)
-                : base(score, false, false)
+                : base(score, new PlayerConfiguration
+                {
+                    AllowPause = false,
+                    ShowResults = false,
+                })
             {
             }
         }
