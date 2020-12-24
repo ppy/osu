@@ -202,6 +202,11 @@ namespace osu.Game.Screens.Multi
         {
             this.FadeIn();
             waves.Show();
+
+            if (loungeSubScreen.IsCurrentScreen())
+                loungeSubScreen.OnEntering(last);
+            else
+                loungeSubScreen.MakeCurrent();
         }
 
         public override void OnResuming(IScreen last)
@@ -209,6 +214,7 @@ namespace osu.Game.Screens.Multi
             this.FadeIn(250);
             this.ScaleTo(1, 250, Easing.OutSine);
 
+            screenStack.CurrentScreen?.OnResuming(last);
             base.OnResuming(last);
 
             UpdatePollingRate(isIdle.Value);
@@ -218,6 +224,8 @@ namespace osu.Game.Screens.Multi
         {
             this.ScaleTo(1.1f, 250, Easing.InSine);
             this.FadeOut(250);
+
+            screenStack.CurrentScreen?.OnSuspending(next);
 
             UpdatePollingRate(isIdle.Value);
         }
@@ -230,9 +238,7 @@ namespace osu.Game.Screens.Multi
 
             this.Delay(WaveContainer.DISAPPEAR_DURATION).FadeOut();
 
-            if (screenStack.CurrentScreen != null)
-                loungeSubScreen.MakeCurrent();
-
+            screenStack.CurrentScreen?.OnExiting(next);
             base.OnExiting(next);
             return false;
         }
