@@ -133,7 +133,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
 
             await client.ChangeState(MultiplayerUserState.FinishedPlay);
 
-            // Await up to 30 seconds for results to become available (3 api request timeouts).
+            // Await up to 60 seconds for results to become available (6 api request timeouts).
             // This is arbitrary just to not leave the player in an essentially deadlocked state if any connection issues occur.
             await Task.WhenAny(resultsReady.Task, Task.Delay(TimeSpan.FromSeconds(60)));
         }
