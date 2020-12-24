@@ -52,19 +52,19 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("add player 2", () => createLeaderboardScore(player2Score, new User { Username = "Player 2" }));
             AddStep("add player 3", () => createLeaderboardScore(player3Score, new User { Username = "Player 3" }));
 
-            AddAssert("is player 2 position #1", () => leaderboard.CheckPositionByUsername("Player 2", 1));
-            AddAssert("is player position #2", () => leaderboard.CheckPositionByUsername("You", 2));
-            AddAssert("is player 3 position #3", () => leaderboard.CheckPositionByUsername("Player 3", 3));
+            AddUntilStep("is player 2 position #1", () => leaderboard.CheckPositionByUsername("Player 2", 1));
+            AddUntilStep("is player position #2", () => leaderboard.CheckPositionByUsername("You", 2));
+            AddUntilStep("is player 3 position #3", () => leaderboard.CheckPositionByUsername("Player 3", 3));
 
             AddStep("set score above player 3", () => player2Score.Value = playerScore.Value - 500);
-            AddAssert("is player position #1", () => leaderboard.CheckPositionByUsername("You", 1));
-            AddAssert("is player 2 position #2", () => leaderboard.CheckPositionByUsername("Player 2", 2));
-            AddAssert("is player 3 position #3", () => leaderboard.CheckPositionByUsername("Player 3", 3));
+            AddUntilStep("is player position #1", () => leaderboard.CheckPositionByUsername("You", 1));
+            AddUntilStep("is player 2 position #2", () => leaderboard.CheckPositionByUsername("Player 2", 2));
+            AddUntilStep("is player 3 position #3", () => leaderboard.CheckPositionByUsername("Player 3", 3));
 
             AddStep("set score below players", () => player2Score.Value = playerScore.Value - 123456);
-            AddAssert("is player position #1", () => leaderboard.CheckPositionByUsername("You", 1));
-            AddAssert("is player 3 position #2", () => leaderboard.CheckPositionByUsername("Player 3", 2));
-            AddAssert("is player 2 position #3", () => leaderboard.CheckPositionByUsername("Player 2", 3));
+            AddUntilStep("is player position #1", () => leaderboard.CheckPositionByUsername("You", 1));
+            AddUntilStep("is player 3 position #2", () => leaderboard.CheckPositionByUsername("Player 3", 2));
+            AddUntilStep("is player 2 position #3", () => leaderboard.CheckPositionByUsername("Player 2", 3));
         }
 
         [Test]
