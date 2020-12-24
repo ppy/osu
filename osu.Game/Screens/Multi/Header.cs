@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Multi
     {
         public const float HEIGHT = 80;
 
-        public Header(ScreenStack stack)
+        public Header(string mainTitle, ScreenStack stack)
         {
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Multi
                     Padding = new MarginPadding { Left = WaveOverlayContainer.WIDTH_PADDING + OsuScreen.HORIZONTAL_OVERFLOW_PADDING },
                     Children = new Drawable[]
                     {
-                        title = new MultiHeaderTitle
+                        title = new MultiHeaderTitle(mainTitle)
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.BottomLeft,
@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Multi
                 set => pageTitle.Text = value.ShortTitle.Titleize();
             }
 
-            public MultiHeaderTitle()
+            public MultiHeaderTitle(string mainTitle)
             {
                 AutoSizeAxes = Axes.Both;
 
@@ -98,7 +98,7 @@ namespace osu.Game.Screens.Multi
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 Font = OsuFont.GetFont(size: 24),
-                                Text = "Multiplayer"
+                                Text = mainTitle
                             },
                             dot = new OsuSpriteText
                             {

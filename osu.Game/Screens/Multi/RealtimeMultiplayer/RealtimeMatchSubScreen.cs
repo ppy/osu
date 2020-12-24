@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
     {
         public override string Title { get; }
 
-        public override string ShortTitle => "match";
+        public override string ShortTitle => "room";
 
         [Resolved]
         private StatefulMultiplayerClient client { get; set; }
@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
 
         public RealtimeMatchSubScreen(Room room)
         {
-            Title = room.RoomID.Value == null ? "New match" : room.Name.Value;
+            Title = room.RoomID.Value == null ? "New room" : room.Name.Value;
             Activity.Value = new UserActivity.InLobby(room);
         }
 

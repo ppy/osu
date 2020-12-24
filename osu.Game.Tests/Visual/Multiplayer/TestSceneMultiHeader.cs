@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Children = new Drawable[]
             {
                 screenStack,
-                new Header(screenStack)
+                new Header("Multiplayer", screenStack)
             };
 
             AddStep("push multi screen", () => screenStack.CurrentScreen.Push(new TestMultiplayerSubScreen(++index)));
