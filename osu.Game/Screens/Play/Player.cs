@@ -381,6 +381,9 @@ namespace osu.Game.Screens.Play
                 }
             };
 
+            if (!Configuration.AllowSkippingIntro)
+                skipOverlay.Expire();
+
             if (Configuration.AllowRestart)
             {
                 container.Add(new HotkeyRetryOverlay
