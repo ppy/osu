@@ -52,6 +52,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             {
                 AllowPause = false,
                 AllowRestart = false,
+                AllowSkippingIntro = false,
             })
         {
             this.userIds = userIds;
