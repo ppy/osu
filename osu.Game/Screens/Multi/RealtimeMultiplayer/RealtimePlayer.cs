@@ -3,7 +3,6 @@
 
 using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -39,9 +38,17 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
         [CanBeNull]
         private MultiplayerGameplayLeaderboard leaderboard;
 
-        public RealtimePlayer(PlaylistItem playlistItem)
+        private readonly int[] userIds;
+
+        /// <summary>
+        /// Construct a multiplayer player.
+        /// </summary>
+        /// <param name="playlistItem">The playlist item to be played.</param>
+        /// <param name="userIds">The users which are participating in this game.</param>
+        public RealtimePlayer(PlaylistItem playlistItem, int[] userIds)
             : base(playlistItem, false)
         {
+            this.userIds = userIds;
         }
 
         [BackgroundDependencyLoader]
@@ -73,8 +80,6 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             }
 
             Debug.Assert(client.Room != null);
-
-            int[] userIds = client.Room.Users.Where(u => u.State >= MultiplayerUserState.WaitingForLoad).Select(u => u.UserID).ToArray();
 
             // todo: this should be implemented via a custom HUD implementation, and correctly masked to the main content area.
             LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(ScoreProcessor, userIds), HUDOverlay.Add);
