@@ -539,6 +539,8 @@ namespace osu.Game.Screens.Play
 
             ValidForResume = false;
 
+            DrawableRuleset.EndRecording();
+
             if (!showResults) return;
 
             scoreSubmissionTask ??= Task.Run(async () =>

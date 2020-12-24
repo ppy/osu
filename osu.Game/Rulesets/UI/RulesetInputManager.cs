@@ -30,12 +30,21 @@ namespace osu.Game.Rulesets.UI
         {
             set
             {
-                if (recorder != null)
-                    throw new InvalidOperationException("Cannot attach more than one recorder");
+                if (value == null)
+                {
+                    if (recorder == null) return;
 
-                recorder = value;
+                    KeyBindingContainer.Remove(recorder);
+                    recorder.Dispose();
+                }
+                else
+                {
+                    if (recorder != null)
+                        throw new InvalidOperationException("Cannot attach more than one recorder");
 
-                KeyBindingContainer.Add(recorder);
+                    recorder = value;
+                    KeyBindingContainer.Add(recorder);
+                }
             }
         }
 

@@ -55,7 +55,9 @@ namespace osu.Game.Rulesets.UI
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
+
             spectatorStreaming?.EndPlaying();
+            spectatorStreaming = null;
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)

@@ -268,6 +268,12 @@ namespace osu.Game.Rulesets.UI
             return false;
         }
 
+        public override void EndRecording()
+        {
+            if ((KeyBindingInputManager is IHasRecordingHandler recordingInputManager))
+                recordingInputManager.Recorder = null;
+        }
+
         public sealed override void SetRecordTarget(Score score)
         {
             if (!(KeyBindingInputManager is IHasRecordingHandler recordingInputManager))
@@ -518,6 +524,11 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <param name="score">The target to be recorded to.</param>
         public abstract void SetRecordTarget(Score score);
+
+        /// <summary>
+        /// End recording of gameplay, if any recording is active.
+        /// </summary>
+        public abstract void EndRecording();
 
         /// <summary>
         /// Invoked when the interactive user requests resuming from a paused state.
