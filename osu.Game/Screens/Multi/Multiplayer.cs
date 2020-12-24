@@ -21,7 +21,6 @@ using osu.Game.Screens.Multi.Components;
 using osu.Game.Screens.Multi.Lounge;
 using osu.Game.Screens.Multi.Lounge.Components;
 using osu.Game.Screens.Multi.Match;
-using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Users;
 using osuTK;
 
@@ -129,12 +128,18 @@ namespace osu.Game.Screens.Multi
                         }
                     },
                     new Header(screenStack),
-                    createButton = new CreateRoomButton
+                    createButton = CreateNewMultiplayerGameButton().With(button =>
                     {
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
-                        Action = () => OpenNewRoom()
-                    },
+                        button.Anchor = Anchor.TopRight;
+                        button.Origin = Anchor.TopRight;
+                        button.Size = new Vector2(150, Header.HEIGHT - 20);
+                        button.Margin = new MarginPadding
+                        {
+                            Top = 10,
+                            Right = 10 + HORIZONTAL_OVERFLOW_PADDING,
+                        };
+                        button.Action = () => OpenNewRoom();
+                    }),
                     RoomManager = CreateRoomManager()
                 }
             };
@@ -310,6 +315,8 @@ namespace osu.Game.Screens.Multi
 
         protected abstract LoungeSubScreen CreateLounge();
 
+        protected abstract OsuButton CreateNewMultiplayerGameButton();
+
         private class MultiplayerWaveContainer : WaveContainer
         {
             protected override bool StartHidden => true;
@@ -330,27 +337,6 @@ namespace osu.Game.Screens.Multi
             private class BackgroundSprite : UpdateableBeatmapBackgroundSprite
             {
                 protected override double TransformDuration => 200;
-            }
-        }
-
-        public class CreateRoomButton : PurpleTriangleButton
-        {
-            public CreateRoomButton()
-            {
-                Size = new Vector2(150, Header.HEIGHT - 20);
-                Margin = new MarginPadding
-                {
-                    Top = 10,
-                    Right = 10 + HORIZONTAL_OVERFLOW_PADDING,
-                };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                Triangles.TriangleScale = 1.5f;
-
-                Text = "Create room";
             }
         }
     }
