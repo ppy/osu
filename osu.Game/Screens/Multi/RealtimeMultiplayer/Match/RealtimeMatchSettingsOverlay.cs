@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -299,7 +300,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer.Match
                         if (t.IsCompletedSuccessfully)
                             onSuccess(currentRoom.Value);
                         else
-                            onError(t.Exception?.Message ?? "Error changing settings.");
+                            onError(t.Exception?.AsSingular().Message ?? "Error changing settings.");
                     }));
                 }
                 else
