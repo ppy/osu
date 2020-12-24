@@ -15,6 +15,11 @@ namespace osu.Game.Online.Spectator
     public class FrameHeader
     {
         /// <summary>
+        /// The current accuracy of the score.
+        /// </summary>
+        public double Accuracy { get; set; }
+
+        /// <summary>
         /// The current combo of the score.
         /// </summary>
         public int Combo { get; set; }
@@ -42,16 +47,18 @@ namespace osu.Game.Online.Spectator
         {
             Combo = score.Combo;
             MaxCombo = score.MaxCombo;
+            Accuracy = score.Accuracy;
 
             // copy for safety
             Statistics = new Dictionary<HitResult, int>(score.Statistics);
         }
 
         [JsonConstructor]
-        public FrameHeader(int combo, int maxCombo, Dictionary<HitResult, int> statistics, DateTimeOffset receivedTime)
+        public FrameHeader(int combo, int maxCombo, double accuracy, Dictionary<HitResult, int> statistics, DateTimeOffset receivedTime)
         {
             Combo = combo;
             MaxCombo = maxCombo;
+            Accuracy = accuracy;
             Statistics = statistics;
             ReceivedTime = receivedTime;
         }

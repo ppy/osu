@@ -734,9 +734,6 @@ namespace osu.Game.Screens.Play
 
             storyboardReplacesBackground.Value = Beatmap.Value.Storyboard.ReplacesBackground && Beatmap.Value.Storyboard.HasDrawable;
 
-            GameplayClockContainer.Restart();
-            GameplayClockContainer.FadeInFromZero(750, Easing.OutQuint);
-
             foreach (var mod in Mods.Value.OfType<IApplicableToPlayer>())
                 mod.ApplyToPlayer(this);
 
@@ -751,6 +748,21 @@ namespace osu.Game.Screens.Play
                 mod.ApplyToTrack(musicController.CurrentTrack);
 
             updateGameplayState();
+
+            GameplayClockContainer.FadeInFromZero(750, Easing.OutQuint);
+            StartGameplay();
+        }
+
+        /// <summary>
+        /// Called to trigger the starting of the gameplay clock and underlying gameplay.
+        /// This will be called on entering the player screen once. A derived class may block the first call to this to delay the start of gameplay.
+        /// </summary>
+        protected virtual void StartGameplay()
+        {
+            if (GameplayClockContainer.GameplayClock.IsRunning)
+                throw new InvalidOperationException($"{nameof(StartGameplay)} should not be called when the gameplay clock is already running");
+
+            GameplayClockContainer.Restart();
         }
 
         public override void OnSuspending(IScreen next)
