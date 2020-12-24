@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Database;
+using osu.Game.Online;
 using osu.Game.Online.Spectator;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Osu.Scoring;
@@ -87,6 +88,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             private readonly int totalUsers;
 
             public TestMultiplayerStreaming(int totalUsers)
+                : base(new DevelopmentEndpointConfiguration())
             {
                 this.totalUsers = totalUsers;
             }

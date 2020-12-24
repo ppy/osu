@@ -81,6 +81,13 @@ namespace osu.Game.Online.Spectator
         /// </summary>
         public event Action<int, SpectatorState> OnUserFinishedPlaying;
 
+        private readonly string endpoint;
+
+        public SpectatorStreamingClient(EndpointConfiguration endpoints)
+        {
+            endpoint = endpoints.SpectatorEndpoint;
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -103,12 +110,6 @@ namespace osu.Game.Online.Spectator
                     break;
             }
         }
-
-#if DEBUG
-        private const string endpoint = "https://dev.ppy.sh/spectator";
-#else
-        private const string endpoint = "https://spectator.ppy.sh/spectator";
-#endif
 
         protected virtual async Task Connect()
         {

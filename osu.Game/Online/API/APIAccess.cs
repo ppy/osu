@@ -26,17 +26,9 @@ namespace osu.Game.Online.API
 
         private readonly OAuth authentication;
 
-#if DEBUG
-        public string Endpoint => @"https://dev.ppy.sh";
-        private const string client_secret = @"3LP2mhUrV89xxzD1YKNndXHEhWWCRLPNKioZ9ymT";
-#else
-        public string Endpoint => @"https://osu.ppy.sh";
-        private const string client_secret = @"FGc9GAtyHzeQDshWP5Ah7dega8hJACAJpQtw6OXk";
-#endif
-
-        private const string client_id = @"5";
-
         private readonly Queue<APIRequest> queue = new Queue<APIRequest>();
+
+        public string Endpoint { get; }
 
         /// <summary>
         /// The username/email provided by the user when initiating a login.
@@ -61,11 +53,13 @@ namespace osu.Game.Online.API
 
         private readonly Logger log;
 
-        public APIAccess(OsuConfigManager config)
+        public APIAccess(OsuConfigManager config, EndpointConfiguration endpointConfiguration)
         {
             this.config = config;
 
-            authentication = new OAuth(client_id, client_secret, Endpoint);
+            Endpoint = endpointConfiguration.APIEndpoint;
+
+            authentication = new OAuth(endpointConfiguration.APIClientID, endpointConfiguration.APIClientSecret, Endpoint);
             log = Logger.GetLogger(LoggingTarget.Network);
 
             ProvidedUsername = config.Get<string>(OsuSetting.Username);
