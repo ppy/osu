@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -30,7 +31,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer.Participants
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        private ReadyMark readyMark;
+        private StateDisplay userStateDisplay;
         private SpriteIcon crown;
 
         public ParticipantPanel(MultiplayerRoomUser user)
@@ -122,12 +123,11 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer.Participants
                                     }
                                 }
                             },
-                            readyMark = new ReadyMark
+                            userStateDisplay = new StateDisplay
                             {
                                 Anchor = Anchor.CentreRight,
                                 Origin = Anchor.CentreRight,
                                 Margin = new MarginPadding { Right = 10 },
-                                Alpha = 0
                             }
                         }
                     }
@@ -144,10 +144,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer.Participants
 
             const double fade_time = 50;
 
-            if (User.State == MultiplayerUserState.Ready)
-                readyMark.FadeIn(fade_time);
-            else
-                readyMark.FadeOut(fade_time);
+            userStateDisplay.Status = User.State;
 
             if (Room.Host?.Equals(User) == true)
                 crown.FadeIn(fade_time);
@@ -180,7 +177,7 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer.Participants
                         if (Room.Host?.UserID != api.LocalUser.Value.Id)
                             return;
 
-                        Client.TransferHost(targetUser);
+                        Client.TransferHost(targetUser).CatchUnobservedExceptions(true);
                     })
                 };
             }

@@ -8,7 +8,9 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
+using osu.Game.Extensions;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Multiplayer.RoomStatuses;
 using osu.Game.Online.RealtimeMultiplayer;
 using osu.Game.Screens.Multi.Components;
 
@@ -41,7 +43,23 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             => base.CreateRoom(room, r => joinMultiplayerRoom(r, onSuccess, onError), onError);
 
         public override void JoinRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
-            => base.JoinRoom(room, r => joinMultiplayerRoom(r, onSuccess, onError), onError);
+        {
+            if (!multiplayerClient.IsConnected.Value)
+            {
+                onError?.Invoke("Not currently connected to the multiplayer server.");
+                return;
+            }
+
+            // this is done here as a pre-check to avoid clicking on already closed rooms in the lounge from triggering a server join.
+            // should probably be done at a higher level, but due to the current structure of things this is the easiest place for now.
+            if (room.Status.Value is RoomStatusEnded)
+            {
+                onError?.Invoke("Cannot join an ended room.");
+                return;
+            }
+
+            base.JoinRoom(room, r => joinMultiplayerRoom(r, onSuccess, onError), onError);
+        }
 
         public override void PartRoom()
         {
@@ -51,7 +69,8 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
             var joinedRoom = JoinedRoom.Value;
 
             base.PartRoom();
-            multiplayerClient.LeaveRoom();
+
+            multiplayerClient.LeaveRoom().CatchUnobservedExceptions();
 
             // Todo: This is not the way to do this. Basically when we're the only participant and the room closes, there's no way to know if this is actually the case.
             // This is delayed one frame because upon exiting the match subscreen, multiplayer updates the polling rate and messes with polling.
@@ -66,15 +85,19 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
         {
             Debug.Assert(room.RoomID.Value != null);
 
-            var joinTask = multiplayerClient.JoinRoom(room);
-            joinTask.ContinueWith(_ => Schedule(() => onSuccess?.Invoke(room)), TaskContinuationOptions.OnlyOnRanToCompletion);
-            joinTask.ContinueWith(t =>
+            multiplayerClient.JoinRoom(room).ContinueWith(t =>
             {
-                PartRoom();
-                if (t.Exception != null)
-                    Logger.Error(t.Exception, "Failed to join multiplayer room.");
-                Schedule(() => onError?.Invoke(t.Exception?.ToString() ?? string.Empty));
-            }, TaskContinuationOptions.NotOnRanToCompletion);
+                if (t.IsCompletedSuccessfully)
+                    Schedule(() => onSuccess?.Invoke(room));
+                else
+                {
+                    if (t.Exception != null)
+                        Logger.Error(t.Exception, "Failed to join multiplayer room.");
+
+                    PartRoom();
+                    Schedule(() => onError?.Invoke(t.Exception?.ToString() ?? string.Empty));
+                }
+            });
         }
 
         private void updatePolling()
