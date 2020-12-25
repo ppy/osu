@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public class ParticipantInfo : MultiplayerComposite
+    public class ParticipantInfo : OnlinePlayComposite
     {
         public ParticipantInfo()
         {

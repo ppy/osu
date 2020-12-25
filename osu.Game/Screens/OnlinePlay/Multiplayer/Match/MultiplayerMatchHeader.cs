@@ -19,7 +19,7 @@ using OsuFont = osu.Game.Graphics.OsuFont;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
-    public class MultiplayerMatchHeader : MultiplayerComposite
+    public class MultiplayerMatchHeader : OnlinePlayComposite
     {
         public const float HEIGHT = 50;
 

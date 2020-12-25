@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public class BeatmapTypeInfo : MultiplayerComposite
+    public class BeatmapTypeInfo : OnlinePlayComposite
     {
         private LinkFlowContainer beatmapAuthor;
 

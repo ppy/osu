@@ -338,7 +338,7 @@ namespace osu.Game.Screens.OnlinePlay
             }
         }
 
-        private class HeaderBackgroundSprite : MultiplayerBackgroundSprite
+        private class HeaderBackgroundSprite : OnlinePlayBackgroundSprite
         {
             protected override UpdateableBeatmapBackgroundSprite CreateBackgroundSprite() => new BackgroundSprite { RelativeSizeAxes = Axes.Both };
 

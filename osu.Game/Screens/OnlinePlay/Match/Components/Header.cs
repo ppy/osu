@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
-    public class Header : MultiplayerComposite
+    public class Header : OnlinePlayComposite
     {
         public const float HEIGHT = 50;
 

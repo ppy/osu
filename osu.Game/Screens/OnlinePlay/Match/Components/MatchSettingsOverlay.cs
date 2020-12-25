@@ -17,7 +17,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
         protected const float TRANSITION_DURATION = 350;
         protected const float FIELD_PADDING = 45;
 
-        protected MultiplayerComposite Settings { get; set; }
+        protected OnlinePlayComposite Settings { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()

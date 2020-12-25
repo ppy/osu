@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public class ParticipantsList : MultiplayerComposite
+    public class ParticipantsList : OnlinePlayComposite
     {
         public const float TILE_SIZE = 35;
 

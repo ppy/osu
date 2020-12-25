@@ -10,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public class ModeTypeInfo : MultiplayerComposite
+    public class ModeTypeInfo : OnlinePlayComposite
     {
         private const float height = 30;
         private const float transition_duration = 100;

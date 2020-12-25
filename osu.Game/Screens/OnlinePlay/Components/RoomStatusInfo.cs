@@ -13,7 +13,7 @@ using osu.Game.Online.Rooms.RoomStatuses;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public class RoomStatusInfo : MultiplayerComposite
+    public class RoomStatusInfo : OnlinePlayComposite
     {
         public RoomStatusInfo()
         {

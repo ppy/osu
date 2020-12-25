@@ -10,7 +10,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Screens.OnlinePlay
 {
-    public class MultiplayerComposite : CompositeDrawable
+    public class OnlinePlayComposite : CompositeDrawable
     {
         [Resolved(typeof(Room))]
         protected Bindable<int?> RoomID { get; private set; }

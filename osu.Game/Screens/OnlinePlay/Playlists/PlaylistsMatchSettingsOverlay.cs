@@ -36,7 +36,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             };
         }
 
-        protected class MatchSettings : MultiplayerComposite
+        protected class MatchSettings : OnlinePlayComposite
         {
             private const float disabled_alpha = 0.2f;
 
