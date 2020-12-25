@@ -10,7 +10,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Online.Rooms;
 
-namespace osu.Game.Screens.Multi.Components
+namespace osu.Game.Screens.OnlinePlay.Components
 {
     public class DrawableGameType : CircularContainer, IHasTooltip
     {

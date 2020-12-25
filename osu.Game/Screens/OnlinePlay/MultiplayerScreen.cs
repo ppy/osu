@@ -17,14 +17,14 @@ using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Screens.Menu;
-using osu.Game.Screens.Multi.Components;
-using osu.Game.Screens.Multi.Lounge;
-using osu.Game.Screens.Multi.Lounge.Components;
-using osu.Game.Screens.Multi.Match;
+using osu.Game.Screens.OnlinePlay.Components;
+using osu.Game.Screens.OnlinePlay.Lounge;
+using osu.Game.Screens.OnlinePlay.Lounge.Components;
+using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Users;
 using osuTK;
 
-namespace osu.Game.Screens.Multi
+namespace osu.Game.Screens.OnlinePlay
 {
     [Cached]
     public abstract class MultiplayerScreen : OsuScreen

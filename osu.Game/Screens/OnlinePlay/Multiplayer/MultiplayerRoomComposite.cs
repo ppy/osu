@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Game.Online.Multiplayer;
 
-namespace osu.Game.Screens.Multi.Multiplayer
+namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
     public abstract class MultiplayerRoomComposite : MultiplayerComposite
     {

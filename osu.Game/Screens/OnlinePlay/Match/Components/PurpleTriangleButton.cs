@@ -5,7 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Graphics.UserInterface;
 
-namespace osu.Game.Screens.Multi.Match.Components
+namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
     public class PurpleTriangleButton : TriangleButton
     {

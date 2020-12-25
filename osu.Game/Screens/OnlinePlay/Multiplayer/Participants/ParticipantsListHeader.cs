@@ -3,9 +3,9 @@
 
 using osu.Framework.Allocation;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Screens.Multi.Components;
+using osu.Game.Screens.OnlinePlay.Components;
 
-namespace osu.Game.Screens.Multi.Multiplayer.Participants
+namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 {
     public class ParticipantsListHeader : OverlinedHeader
     {

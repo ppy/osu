@@ -9,7 +9,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osuTK;
 
-namespace osu.Game.Screens.Multi.Multiplayer.Participants
+namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 {
     public class ParticipantsList : MultiplayerRoomComposite
     {

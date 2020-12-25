@@ -3,9 +3,9 @@
 
 using osu.Game.Online.Rooms;
 using osu.Game.Scoring;
-using osu.Game.Screens.Multi.Playlists;
+using osu.Game.Screens.OnlinePlay.Playlists;
 
-namespace osu.Game.Screens.Multi.Multiplayer
+namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
     public class MultiplayerResultsScreen : PlaylistsResultsScreen
     {

@@ -11,11 +11,11 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Rooms;
-using osu.Game.Screens.Multi.Components;
+using osu.Game.Screens.OnlinePlay.Components;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Multi.Match.Components
+namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
     public class RoomAvailabilityPicker : DisableableTabControl<RoomAvailability>
     {

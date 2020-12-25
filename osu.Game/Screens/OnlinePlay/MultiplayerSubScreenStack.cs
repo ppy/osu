@@ -3,7 +3,7 @@
 
 using osu.Framework.Screens;
 
-namespace osu.Game.Screens.Multi
+namespace osu.Game.Screens.OnlinePlay
 {
     public class MultiplayerSubScreenStack : OsuScreenStack
     {

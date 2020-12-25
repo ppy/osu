@@ -13,7 +13,7 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.Select;
 
-namespace osu.Game.Screens.Multi.Multiplayer
+namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
     public class MultiplayerMatchSongSelect : SongSelect, IMultiplayerSubScreen
     {

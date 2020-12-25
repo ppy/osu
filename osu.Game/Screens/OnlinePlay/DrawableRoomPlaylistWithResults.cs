@@ -13,7 +13,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Rooms;
 
-namespace osu.Game.Screens.Multi
+namespace osu.Game.Screens.OnlinePlay
 {
     public class DrawableRoomPlaylistWithResults : DrawableRoomPlaylist
     {

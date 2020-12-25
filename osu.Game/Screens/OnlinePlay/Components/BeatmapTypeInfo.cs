@@ -9,7 +9,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osuTK;
 
-namespace osu.Game.Screens.Multi.Components
+namespace osu.Game.Screens.OnlinePlay.Components
 {
     public class BeatmapTypeInfo : MultiplayerComposite
     {

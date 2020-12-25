@@ -10,7 +10,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Online.Rooms;
 
-namespace osu.Game.Screens.Multi.Match.Components
+namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
     public class MatchLeaderboard : Leaderboard<MatchLeaderboardScope, APIUserScoreAggregate>
     {

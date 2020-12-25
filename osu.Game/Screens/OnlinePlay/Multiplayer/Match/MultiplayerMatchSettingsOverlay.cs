@@ -18,10 +18,10 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
-using osu.Game.Screens.Multi.Match.Components;
+using osu.Game.Screens.OnlinePlay.Match.Components;
 using osuTK;
 
-namespace osu.Game.Screens.Multi.Multiplayer.Match
+namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
     public class MultiplayerMatchSettingsOverlay : MatchSettingsOverlay
     {

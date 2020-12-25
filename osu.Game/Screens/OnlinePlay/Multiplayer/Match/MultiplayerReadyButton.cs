@@ -15,10 +15,10 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
-using osu.Game.Screens.Multi.Components;
+using osu.Game.Screens.OnlinePlay.Components;
 using osuTK;
 
-namespace osu.Game.Screens.Multi.Multiplayer.Match
+namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
     public class MultiplayerReadyButton : MultiplayerRoomComposite
     {

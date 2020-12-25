@@ -6,7 +6,7 @@ using osu.Framework.Bindables;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Rooms;
 
-namespace osu.Game.Screens.Multi.Match.Components
+namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
     public class MatchChatDisplay : StandAloneChatDisplay
     {

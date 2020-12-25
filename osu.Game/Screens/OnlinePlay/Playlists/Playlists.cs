@@ -5,11 +5,11 @@ using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Rooms;
-using osu.Game.Screens.Multi.Components;
-using osu.Game.Screens.Multi.Lounge;
-using osu.Game.Screens.Multi.Match;
+using osu.Game.Screens.OnlinePlay.Components;
+using osu.Game.Screens.OnlinePlay.Lounge;
+using osu.Game.Screens.OnlinePlay.Match;
 
-namespace osu.Game.Screens.Multi.Playlists
+namespace osu.Game.Screens.OnlinePlay.Playlists
 {
     public class Playlists : MultiplayerScreen
     {

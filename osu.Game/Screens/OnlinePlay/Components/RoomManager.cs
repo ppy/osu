@@ -15,7 +15,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 
-namespace osu.Game.Screens.Multi.Components
+namespace osu.Game.Screens.OnlinePlay.Components
 {
     public abstract class RoomManager : CompositeDrawable, IRoomManager
     {

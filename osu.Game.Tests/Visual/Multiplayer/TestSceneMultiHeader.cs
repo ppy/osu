@@ -5,7 +5,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Screens;
-using osu.Game.Screens.Multi;
+using osu.Game.Screens.OnlinePlay;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {

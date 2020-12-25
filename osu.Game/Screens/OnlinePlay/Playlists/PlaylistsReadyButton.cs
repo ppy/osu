@@ -6,9 +6,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Graphics;
 using osu.Game.Online.Rooms;
-using osu.Game.Screens.Multi.Components;
+using osu.Game.Screens.OnlinePlay.Components;
 
-namespace osu.Game.Screens.Multi.Playlists
+namespace osu.Game.Screens.OnlinePlay.Playlists
 {
     public class PlaylistsReadyButton : ReadyButton
     {

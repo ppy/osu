@@ -5,7 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 
-namespace osu.Game.Screens.Multi
+namespace osu.Game.Screens.OnlinePlay
 {
     public abstract class MultiplayerSubScreen : OsuScreen, IMultiplayerSubScreen
     {

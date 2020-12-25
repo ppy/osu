@@ -11,7 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Rooms;
 
-namespace osu.Game.Screens.Multi.Components
+namespace osu.Game.Screens.OnlinePlay.Components
 {
     public abstract class ReadyButton : TriangleButton
     {

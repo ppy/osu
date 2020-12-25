@@ -15,7 +15,7 @@ using osu.Game.Overlays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play;
 
-namespace osu.Game.Screens.Multi.Match
+namespace osu.Game.Screens.OnlinePlay.Match
 {
     [Cached(typeof(IPreviewTrackOwner))]
     public abstract class RoomSubScreen : MultiplayerSubScreen, IPreviewTrackOwner

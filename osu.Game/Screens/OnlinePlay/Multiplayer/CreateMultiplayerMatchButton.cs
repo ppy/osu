@@ -4,9 +4,9 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Screens.Multi.Match.Components;
+using osu.Game.Screens.OnlinePlay.Match.Components;
 
-namespace osu.Game.Screens.Multi.Multiplayer
+namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
     public class CreateMultiplayerMatchButton : PurpleTriangleButton
     {

@@ -8,7 +8,7 @@ using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 
-namespace osu.Game.Screens.Multi.Components
+namespace osu.Game.Screens.OnlinePlay.Components
 {
     public abstract class RoomPollingComponent : PollingComponent
     {

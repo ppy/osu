@@ -10,14 +10,14 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
-using osu.Game.Screens.Multi.Components;
-using osu.Game.Screens.Multi.Match;
-using osu.Game.Screens.Multi.Match.Components;
+using osu.Game.Screens.OnlinePlay.Components;
+using osu.Game.Screens.OnlinePlay.Match;
+using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.Select;
 using osu.Game.Users;
-using Footer = osu.Game.Screens.Multi.Match.Components.Footer;
+using Footer = osu.Game.Screens.OnlinePlay.Match.Components.Footer;
 
-namespace osu.Game.Screens.Multi.Playlists
+namespace osu.Game.Screens.OnlinePlay.Playlists
 {
     public class PlaylistsRoomSubScreen : RoomSubScreen
     {

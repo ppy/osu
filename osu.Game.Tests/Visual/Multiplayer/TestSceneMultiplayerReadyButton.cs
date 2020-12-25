@@ -12,7 +12,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
-using osu.Game.Screens.Multi.Multiplayer.Match;
+using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Tests.Resources;
 using osu.Game.Users;
 using osuTK;

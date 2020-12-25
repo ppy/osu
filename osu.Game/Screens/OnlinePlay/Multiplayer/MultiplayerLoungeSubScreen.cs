@@ -5,11 +5,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Logging;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
-using osu.Game.Screens.Multi.Lounge;
-using osu.Game.Screens.Multi.Lounge.Components;
-using osu.Game.Screens.Multi.Match;
+using osu.Game.Screens.OnlinePlay.Lounge;
+using osu.Game.Screens.OnlinePlay.Lounge.Components;
+using osu.Game.Screens.OnlinePlay.Match;
 
-namespace osu.Game.Screens.Multi.Multiplayer
+namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
     public class MultiplayerLoungeSubScreen : LoungeSubScreen
     {

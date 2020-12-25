@@ -2,9 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Game.Screens.Multi.Match.Components;
+using osu.Game.Screens.OnlinePlay.Match.Components;
 
-namespace osu.Game.Screens.Multi.Playlists
+namespace osu.Game.Screens.OnlinePlay.Playlists
 {
     public class CreatePlaylistsRoomButton : PurpleTriangleButton
     {

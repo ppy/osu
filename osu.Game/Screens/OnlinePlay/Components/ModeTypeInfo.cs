@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps.Drawables;
 using osuTK;
 
-namespace osu.Game.Screens.Multi.Components
+namespace osu.Game.Screens.OnlinePlay.Components
 {
     public class ModeTypeInfo : MultiplayerComposite
     {

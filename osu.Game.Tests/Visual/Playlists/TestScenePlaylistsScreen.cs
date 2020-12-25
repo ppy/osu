@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
         public TestScenePlaylistsScreen()
         {
-            var multi = new Screens.Multi.Playlists.Playlists();
+            var multi = new Screens.OnlinePlay.Playlists.Playlists();
 
             AddStep("show", () => LoadScreen(multi));
             AddUntilStep("wait for loaded", () => multi.IsLoaded);

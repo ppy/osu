@@ -12,7 +12,7 @@ using osu.Game.Users;
 using osu.Game.Users.Drawables;
 using osuTK;
 
-namespace osu.Game.Screens.Multi.Components
+namespace osu.Game.Screens.OnlinePlay.Components
 {
     public class ParticipantsList : MultiplayerComposite
     {
