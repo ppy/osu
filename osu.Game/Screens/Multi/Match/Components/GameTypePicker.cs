@@ -8,8 +8,8 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
-using osu.Game.Online.Multiplayer;
-using osu.Game.Online.Multiplayer.GameTypes;
+using osu.Game.Online.Rooms;
+using osu.Game.Online.Rooms.GameTypes;
 using osu.Game.Screens.Multi.Components;
 using osuTK;
 
@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             AddItem(new GameTypeVersus());
             AddItem(new GameTypeTagTeam());
             AddItem(new GameTypeTeamVersus());
-            AddItem(new GameTypeTimeshift());
+            AddItem(new GameTypePlaylists());
         }
 
         private class GameTypePickerItem : DisableableTabItem

@@ -15,9 +15,9 @@ using osu.Framework.Threading;
 using osu.Game.Extensions;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
-using osu.Game.Online.Multiplayer;
 using osuTK;
 using osu.Game.Graphics.Cursor;
+using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.Multi.Lounge.Components
 {
