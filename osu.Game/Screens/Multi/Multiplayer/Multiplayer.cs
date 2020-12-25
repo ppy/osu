@@ -28,37 +28,37 @@ namespace osu.Game.Screens.Multi.Multiplayer
 
         protected override void UpdatePollingRate(bool isIdle)
         {
-            var playlistsManager = (MultiplayerRoomManager)RoomManager;
+            var multiplayerRoomManager = (MultiplayerRoomManager)RoomManager;
 
             if (!this.IsCurrentScreen())
             {
-                playlistsManager.TimeBetweenListingPolls.Value = 0;
-                playlistsManager.TimeBetweenSelectionPolls.Value = 0;
+                multiplayerRoomManager.TimeBetweenListingPolls.Value = 0;
+                multiplayerRoomManager.TimeBetweenSelectionPolls.Value = 0;
             }
             else
             {
                 switch (CurrentSubScreen)
                 {
                     case LoungeSubScreen _:
-                        playlistsManager.TimeBetweenListingPolls.Value = isIdle ? 120000 : 15000;
-                        playlistsManager.TimeBetweenSelectionPolls.Value = isIdle ? 120000 : 15000;
+                        multiplayerRoomManager.TimeBetweenListingPolls.Value = isIdle ? 120000 : 15000;
+                        multiplayerRoomManager.TimeBetweenSelectionPolls.Value = isIdle ? 120000 : 15000;
                         break;
 
                     // Don't poll inside the match or anywhere else.
                     default:
-                        playlistsManager.TimeBetweenListingPolls.Value = 0;
-                        playlistsManager.TimeBetweenSelectionPolls.Value = 0;
+                        multiplayerRoomManager.TimeBetweenListingPolls.Value = 0;
+                        multiplayerRoomManager.TimeBetweenSelectionPolls.Value = 0;
                         break;
                 }
             }
 
-            Logger.Log($"Polling adjusted (listing: {playlistsManager.TimeBetweenListingPolls.Value}, selection: {playlistsManager.TimeBetweenSelectionPolls.Value})");
+            Logger.Log($"Polling adjusted (listing: {multiplayerRoomManager.TimeBetweenListingPolls.Value}, selection: {multiplayerRoomManager.TimeBetweenSelectionPolls.Value})");
         }
 
         protected override Room CreateNewRoom()
         {
             var room = new Room { Name = { Value = $"{API.LocalUser}'s awesome room" } };
-            room.Category.Value = RoomCategory.Multiplayer;
+            room.Category.Value = RoomCategory.Realtime;
             return room;
         }
 
