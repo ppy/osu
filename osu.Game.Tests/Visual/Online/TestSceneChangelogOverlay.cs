@@ -109,19 +109,43 @@ namespace osu.Game.Tests.Visual.Online
                         Category = "osu!",
                         Title = "Fix thing",
                         MessageHtml = "Additional info goes here.",
+                        Repository = "osu",
+                        GithubPullRequestId = 11100,
+                        GithubUser = new APIChangelogUser
+                        {
+                            OsuUsername = "smoogipoo",
+                            UserId = 1040328
+                        }
                     },
                     new APIChangelogEntry
                     {
                         Type = ChangelogEntryType.Add,
                         Category = "osu!",
                         Title = "Add thing",
-                        Major = true
+                        Major = true,
+                        Repository = "ppy/osu-framework",
+                        GithubPullRequestId = 4444,
+                        GithubUser = new APIChangelogUser
+                        {
+                            DisplayName = "frenzibyte",
+                            GithubUrl = "https://github.com/frenzibyte"
+                        }
                     },
                     new APIChangelogEntry
                     {
                         Type = ChangelogEntryType.Misc,
                         Category = "Code quality",
-                        Title = "Clean up thing"
+                        Title = "Clean up thing",
+                        GithubUser = new APIChangelogUser
+                        {
+                            DisplayName = "some dude"
+                        }
+                    },
+                    new APIChangelogEntry
+                    {
+                        Type = ChangelogEntryType.Misc,
+                        Category = "Code quality",
+                        Title = "Clean up another thing"
                     }
                 }
             });
