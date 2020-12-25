@@ -124,7 +124,7 @@ namespace osu.Game.Screens.OnlinePlay
                                     }
                                 }
                             },
-                            screenStack = new MultiplayerSubScreenStack { RelativeSizeAxes = Axes.Both }
+                            screenStack = new OnlinePlaySubScreenStack { RelativeSizeAxes = Axes.Both }
                         }
                     },
                     new Header(ScreenTitle, screenStack),
