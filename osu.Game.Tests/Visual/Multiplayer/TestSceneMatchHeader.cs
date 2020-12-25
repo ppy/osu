@@ -11,7 +11,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMatchHeader : MultiplayerTestScene
+    public class TestSceneMatchHeader : RoomTestScene
     {
         public TestSceneMatchHeader()
         {

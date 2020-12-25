@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMatchBeatmapDetailArea : MultiplayerTestScene
+    public class TestSceneMatchBeatmapDetailArea : RoomTestScene
     {
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }

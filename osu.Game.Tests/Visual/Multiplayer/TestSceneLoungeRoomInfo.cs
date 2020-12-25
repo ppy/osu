@@ -10,7 +10,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneLoungeRoomInfo : MultiplayerTestScene
+    public class TestSceneLoungeRoomInfo : RoomTestScene
     {
         [SetUp]
         public new void Setup() => Schedule(() =>
