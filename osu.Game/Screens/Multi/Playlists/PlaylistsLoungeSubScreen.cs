@@ -6,12 +6,12 @@ using osu.Game.Screens.Multi.Lounge;
 using osu.Game.Screens.Multi.Lounge.Components;
 using osu.Game.Screens.Multi.Match;
 
-namespace osu.Game.Screens.Multi.Timeshift
+namespace osu.Game.Screens.Multi.Playlists
 {
-    public class TimeshiftLoungeSubScreen : LoungeSubScreen
+    public class PlaylistsLoungeSubScreen : LoungeSubScreen
     {
-        protected override FilterControl CreateFilterControl() => new TimeshiftFilterControl();
+        protected override FilterControl CreateFilterControl() => new PlaylistsFilterControl();
 
-        protected override RoomSubScreen CreateRoomSubScreen(Room room) => new TimeshiftRoomSubScreen(room);
+        protected override RoomSubScreen CreateRoomSubScreen(Room room) => new PlaylistsRoomSubScreen(room);
     }
 }

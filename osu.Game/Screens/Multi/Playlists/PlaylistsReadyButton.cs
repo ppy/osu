@@ -8,14 +8,14 @@ using osu.Game.Graphics;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Components;
 
-namespace osu.Game.Screens.Multi.Timeshift
+namespace osu.Game.Screens.Multi.Playlists
 {
-    public class TimeshiftReadyButton : ReadyButton
+    public class PlaylistsReadyButton : ReadyButton
     {
         [Resolved(typeof(Room), nameof(Room.EndDate))]
         private Bindable<DateTimeOffset?> endDate { get; set; }
 
-        public TimeshiftReadyButton()
+        public PlaylistsReadyButton()
         {
             Text = "Start";
         }

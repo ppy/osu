@@ -11,7 +11,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi;
-using osu.Game.Screens.Multi.Timeshift;
+using osu.Game.Screens.Multi.Playlists;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -109,7 +109,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("error not displayed", () => !settings.ErrorText.IsPresent);
         }
 
-        private class TestRoomSettings : TimeshiftMatchSettingsOverlay
+        private class TestRoomSettings : PlaylistsMatchSettingsOverlay
         {
             public TriangleButton ApplyButton => ((MatchSettings)Settings).ApplyButton;
 

@@ -10,11 +10,11 @@ using osu.Framework.Testing;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Multi.Lounge;
 using osu.Game.Screens.Multi.Lounge.Components;
-using osu.Game.Screens.Multi.Timeshift;
+using osu.Game.Screens.Multi.Playlists;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneTimeshiftLoungeSubScreen : RoomManagerTestScene
+    public class TestScenePlaylistsLoungeSubScreen : RoomManagerTestScene
     {
         private LoungeSubScreen loungeScreen;
 
@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             base.SetUpSteps();
 
-            AddStep("push screen", () => LoadScreen(loungeScreen = new TimeshiftLoungeSubScreen
+            AddStep("push screen", () => LoadScreen(loungeScreen = new PlaylistsLoungeSubScreen
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

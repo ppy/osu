@@ -26,7 +26,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneTimeshiftResultsScreen : ScreenTestScene
+    public class TestScenePlaylistsResultsScreen : ScreenTestScene
     {
         private const int scores_per_result = 10;
 
@@ -360,7 +360,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             };
         }
 
-        private class TestResultsScreen : TimeshiftResultsScreen
+        private class TestResultsScreen : PlaylistsResultsScreen
         {
             public new LoadingSpinner LeftSpinner => base.LeftSpinner;
             public new LoadingSpinner CentreSpinner => base.CentreSpinner;

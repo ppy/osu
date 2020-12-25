@@ -8,7 +8,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneTimeshiftParticipantsList : MultiplayerTestScene
+    public class TestScenePlaylistsParticipantsList : MultiplayerTestScene
     {
         [SetUp]
         public new void Setup() => Schedule(() =>

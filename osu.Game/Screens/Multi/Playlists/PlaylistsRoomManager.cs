@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Game.Screens.Multi.Components;
 
-namespace osu.Game.Screens.Multi.Timeshift
+namespace osu.Game.Screens.Multi.Playlists
 {
-    public class TimeshiftRoomManager : RoomManager
+    public class PlaylistsRoomManager : RoomManager
     {
         public readonly Bindable<double> TimeBetweenListingPolls = new Bindable<double>();
         public readonly Bindable<double> TimeBetweenSelectionPolls = new Bindable<double>();
