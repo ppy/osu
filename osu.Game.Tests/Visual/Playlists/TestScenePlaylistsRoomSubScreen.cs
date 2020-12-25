@@ -12,7 +12,7 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Multi;
@@ -24,7 +24,7 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Playlists
 {
-    public class TestScenePlaylistsRoomSubScreen : MultiplayerTestScene
+    public class TestScenePlaylistsRoomSubScreen : RoomTestScene
     {
         protected override bool UseOnlineAPI => true;
 

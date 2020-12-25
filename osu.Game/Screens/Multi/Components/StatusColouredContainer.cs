@@ -6,7 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
-using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.Multi.Components
 {

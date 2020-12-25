@@ -8,8 +8,8 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
-using osu.Game.Online.Multiplayer;
-using osu.Game.Online.Multiplayer.RoomStatuses;
+using osu.Game.Online.Rooms;
+using osu.Game.Online.Rooms.RoomStatuses;
 
 namespace osu.Game.Screens.Multi.Components
 {

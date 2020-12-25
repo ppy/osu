@@ -3,7 +3,7 @@
 
 using System;
 using osu.Framework.Bindables;
-using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Rooms;
 using osu.Game.Screens.Multi;
 
 namespace osu.Game.Tests.Visual.Multiplayer

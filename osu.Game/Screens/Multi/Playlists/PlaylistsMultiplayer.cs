@@ -4,14 +4,14 @@
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Rooms;
 using osu.Game.Screens.Multi.Components;
 using osu.Game.Screens.Multi.Lounge;
 using osu.Game.Screens.Multi.Match;
 
 namespace osu.Game.Screens.Multi.Playlists
 {
-    public class PlaylistsMultiplayer : Multiplayer
+    public class PlaylistsMultiplayer : MultiplayerScreen
     {
         protected override void UpdatePollingRate(bool isIdle)
         {

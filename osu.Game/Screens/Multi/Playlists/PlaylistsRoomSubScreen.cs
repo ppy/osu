@@ -9,7 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Online.API;
-using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Rooms;
 using osu.Game.Screens.Multi.Components;
 using osu.Game.Screens.Multi.Match;
 using osu.Game.Screens.Multi.Match.Components;
@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Multi.Playlists
         private Bindable<int?> roomId { get; set; }
 
         [Resolved(canBeNull: true)]
-        private Multiplayer multiplayer { get; set; }
+        private MultiplayerScreen multiplayer { get; set; }
 
         private MatchSettingsOverlay settingsOverlay;
         private MatchLeaderboard leaderboard;
