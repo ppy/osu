@@ -10,7 +10,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Screens.Multi.Lounge.Components;
 using osu.Game.Screens.Multi.Match;

@@ -8,7 +8,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Playlists
 {
-    public class TestScenePlaylistsParticipantsList : MultiplayerTestScene
+    public class TestScenePlaylistsParticipantsList : RoomTestScene
     {
         [SetUp]
         public new void Setup() => Schedule(() =>

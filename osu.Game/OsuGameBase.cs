@@ -31,7 +31,7 @@ using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Online;
-using osu.Game.Online.RealtimeMultiplayer;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
 using osu.Game.Resources;
@@ -219,7 +219,7 @@ namespace osu.Game
             dependencies.CacheAs(API ??= new APIAccess(LocalConfig, endpoints));
 
             dependencies.CacheAs(spectatorStreaming = new SpectatorStreamingClient(endpoints));
-            dependencies.CacheAs(multiplayerClient = new RealtimeMultiplayerClient(endpoints));
+            dependencies.CacheAs(multiplayerClient = new MultiplayerClient(endpoints));
 
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 

@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.Multi.Components
 {

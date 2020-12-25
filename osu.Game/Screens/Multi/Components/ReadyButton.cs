@@ -9,7 +9,7 @@ using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.Multi.Components
 {

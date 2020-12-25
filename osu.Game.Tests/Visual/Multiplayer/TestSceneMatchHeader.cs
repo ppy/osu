@@ -3,7 +3,7 @@
 
 using NUnit.Framework;
 using osu.Game.Beatmaps;
-using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Multi.Match.Components;

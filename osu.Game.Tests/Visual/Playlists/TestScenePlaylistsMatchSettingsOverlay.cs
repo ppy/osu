@@ -9,13 +9,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Rooms;
 using osu.Game.Screens.Multi;
 using osu.Game.Screens.Multi.Playlists;
 
 namespace osu.Game.Tests.Visual.Playlists
 {
-    public class TestScenePlaylistsMatchSettingsOverlay : MultiplayerTestScene
+    public class TestScenePlaylistsMatchSettingsOverlay : RoomTestScene
     {
         [Cached(Type = typeof(IRoomManager))]
         private TestRoomManager roomManager = new TestRoomManager();
