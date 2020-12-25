@@ -84,7 +84,7 @@ namespace osu.Game.Overlays.Changelog
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreRight,
                                 Size = new Vector2(10),
-                                Icon = entry.Type == ChangelogEntryType.Fix ? FontAwesome.Solid.Check : FontAwesome.Solid.Plus,
+                                Icon = getIconForChangelogEntry(entry.Type),
                                 Colour = entryColour.Opacity(0.5f),
                                 Margin = new MarginPadding { Right = 5 },
                             },
@@ -183,6 +183,25 @@ namespace osu.Game.Overlays.Changelog
                         ChangelogEntries.Add(message);
                     }
                 }
+            }
+        }
+
+        private static IconUsage getIconForChangelogEntry(ChangelogEntryType entryType)
+        {
+            // compare: https://github.com/ppy/osu-web/blob/master/resources/assets/coffee/react/_components/changelog-entry.coffee#L8-L11
+            switch (entryType)
+            {
+                case ChangelogEntryType.Add:
+                    return FontAwesome.Solid.Plus;
+
+                case ChangelogEntryType.Fix:
+                    return FontAwesome.Solid.Check;
+
+                case ChangelogEntryType.Misc:
+                    return FontAwesome.Regular.Circle;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(entryType), $"Unrecognised entry type {entryType}");
             }
         }
 

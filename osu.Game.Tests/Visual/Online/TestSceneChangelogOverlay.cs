@@ -105,9 +105,23 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     new APIChangelogEntry
                     {
-                        Category = "Test",
-                        Title = "Title",
-                        MessageHtml = "Message",
+                        Type = ChangelogEntryType.Fix,
+                        Category = "osu!",
+                        Title = "Fix thing",
+                        MessageHtml = "Additional info goes here.",
+                    },
+                    new APIChangelogEntry
+                    {
+                        Type = ChangelogEntryType.Add,
+                        Category = "osu!",
+                        Title = "Add thing",
+                        Major = true
+                    },
+                    new APIChangelogEntry
+                    {
+                        Type = ChangelogEntryType.Misc,
+                        Category = "Code quality",
+                        Title = "Clean up thing"
                     }
                 }
             });
