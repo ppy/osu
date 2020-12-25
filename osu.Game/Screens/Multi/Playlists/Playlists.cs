@@ -11,7 +11,7 @@ using osu.Game.Screens.Multi.Match;
 
 namespace osu.Game.Screens.Multi.Playlists
 {
-    public class PlaylistsMultiplayer : MultiplayerScreen
+    public class Playlists : MultiplayerScreen
     {
         protected override void UpdatePollingRate(bool isIdle)
         {
