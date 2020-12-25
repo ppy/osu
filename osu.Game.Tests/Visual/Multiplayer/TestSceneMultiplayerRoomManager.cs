@@ -9,7 +9,7 @@ using osu.Game.Online.Rooms;
 namespace osu.Game.Tests.Visual.Multiplayer
 {
     [HeadlessTest]
-    public class TestSceneMultiplayerRoomManager : MultiplayerTestScene
+    public class TestSceneMultiplayerRoomManager : RoomTestScene
     {
         private TestMultiplayerRoomContainer roomContainer;
         private TestMultiplayerRoomManager roomManager => roomContainer.RoomManager;
