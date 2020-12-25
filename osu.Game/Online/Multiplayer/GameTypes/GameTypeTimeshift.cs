@@ -8,9 +8,9 @@ using osuTK;
 
 namespace osu.Game.Online.Multiplayer.GameTypes
 {
-    public class GameTypeTimeshift : GameType
+    public class GameTypePlaylists : GameType
     {
-        public override string Name => "Timeshift";
+        public override string Name => "Playlists";
 
         public override Drawable GetIcon(OsuColour colours, float size) => new SpriteIcon
         {

@@ -19,9 +19,9 @@ using osu.Game.Overlays;
 using osu.Game.Screens.Multi.Match.Components;
 using osuTK;
 
-namespace osu.Game.Screens.Multi.Timeshift
+namespace osu.Game.Screens.Multi.Playlists
 {
-    public class TimeshiftMatchSettingsOverlay : MatchSettingsOverlay
+    public class PlaylistsMatchSettingsOverlay : MatchSettingsOverlay
     {
         public Action EditPlaylist;
 

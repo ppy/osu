@@ -17,14 +17,14 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Multi;
 using osu.Game.Screens.Multi.Match.Components;
-using osu.Game.Screens.Multi.Timeshift;
+using osu.Game.Screens.Multi.Playlists;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Users;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneTimeshiftRoomSubScreen : MultiplayerTestScene
+    public class TestScenePlaylistsRoomSubScreen : MultiplayerTestScene
     {
         protected override bool UseOnlineAPI => true;
 
@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private BeatmapManager manager;
         private RulesetStore rulesets;
 
-        private TestTimeshiftRoomSubScreen match;
+        private TestPlaylistsRoomSubScreen match;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [SetUpSteps]
         public void SetupSteps()
         {
-            AddStep("load match", () => LoadScreen(match = new TestTimeshiftRoomSubScreen(Room)));
+            AddStep("load match", () => LoadScreen(match = new TestPlaylistsRoomSubScreen(Room)));
             AddUntilStep("wait for load", () => match.IsCurrentScreen());
         }
 
@@ -120,7 +120,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("create room", () =>
             {
-                InputManager.MoveMouseTo(match.ChildrenOfType<TimeshiftMatchSettingsOverlay.CreateRoomButton>().Single());
+                InputManager.MoveMouseTo(match.ChildrenOfType<PlaylistsMatchSettingsOverlay.CreateRoomButton>().Single());
                 InputManager.Click(MouseButton.Left);
             });
 
@@ -131,13 +131,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("match has original beatmap", () => match.Beatmap.Value.Beatmap.BeatmapInfo.BaseDifficulty.CircleSize != 1);
         }
 
-        private class TestTimeshiftRoomSubScreen : TimeshiftRoomSubScreen
+        private class TestPlaylistsRoomSubScreen : PlaylistsRoomSubScreen
         {
             public new Bindable<PlaylistItem> SelectedItem => base.SelectedItem;
 
             public new Bindable<WorkingBeatmap> Beatmap => base.Beatmap;
 
-            public TestTimeshiftRoomSubScreen(Room room)
+            public TestPlaylistsRoomSubScreen(Room room)
                 : base(room)
             {
             }

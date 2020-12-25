@@ -20,7 +20,7 @@ using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Multi.Play
 {
-    public class TimeshiftPlayer : Player
+    public class PlaylistsPlayer : Player
     {
         public Action Exited;
 
@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Multi.Play
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
 
-        public TimeshiftPlayer(PlaylistItem playlistItem, PlayerConfiguration configuration = null)
+        public PlaylistsPlayer(PlaylistItem playlistItem, PlayerConfiguration configuration = null)
             : base(configuration)
         {
             PlaylistItem = playlistItem;
@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Multi.Play
 
             bool failed = false;
 
-            // Sanity checks to ensure that TimeshiftPlayer matches the settings for the current PlaylistItem
+            // Sanity checks to ensure that PlaylistsPlayer matches the settings for the current PlaylistItem
             if (Beatmap.Value.BeatmapInfo.OnlineBeatmapID != PlaylistItem.Beatmap.Value.OnlineBeatmapID)
                 throw new InvalidOperationException("Current Beatmap does not match PlaylistItem's Beatmap");
 
@@ -94,7 +94,7 @@ namespace osu.Game.Screens.Multi.Play
         protected override ResultsScreen CreateResults(ScoreInfo score)
         {
             Debug.Assert(RoomId.Value != null);
-            return new TimeshiftResultsScreen(score, RoomId.Value.Value, PlaylistItem, true);
+            return new PlaylistsResultsScreen(score, RoomId.Value.Value, PlaylistItem, true);
         }
 
         protected override Score CreateScore()

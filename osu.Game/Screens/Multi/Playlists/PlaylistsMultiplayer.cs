@@ -1,34 +1,21 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
-using osu.Game.Extensions;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Online.RealtimeMultiplayer;
 using osu.Game.Screens.Multi.Components;
 using osu.Game.Screens.Multi.Lounge;
+using osu.Game.Screens.Multi.Match;
 
-namespace osu.Game.Screens.Multi.RealtimeMultiplayer
+namespace osu.Game.Screens.Multi.Playlists
 {
-    public class RealtimeMultiplayer : Multiplayer
+    public class PlaylistsMultiplayer : Multiplayer
     {
-        [Resolved]
-        private StatefulMultiplayerClient client { get; set; }
-
-        public override void OnResuming(IScreen last)
-        {
-            base.OnResuming(last);
-
-            if (client.Room != null)
-                client.ChangeState(MultiplayerUserState.Idle).CatchUnobservedExceptions(true);
-        }
-
         protected override void UpdatePollingRate(bool isIdle)
         {
-            var playlistsManager = (RealtimeRoomManager)RoomManager;
+            var playlistsManager = (PlaylistsRoomManager)RoomManager;
 
             if (!this.IsCurrentScreen())
             {
@@ -44,7 +31,11 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
                         playlistsManager.TimeBetweenSelectionPolls.Value = isIdle ? 120000 : 15000;
                         break;
 
-                    // Don't poll inside the match or anywhere else.
+                    case RoomSubScreen _:
+                        playlistsManager.TimeBetweenListingPolls.Value = 0;
+                        playlistsManager.TimeBetweenSelectionPolls.Value = isIdle ? 30000 : 5000;
+                        break;
+
                     default:
                         playlistsManager.TimeBetweenListingPolls.Value = 0;
                         playlistsManager.TimeBetweenSelectionPolls.Value = 0;
@@ -57,17 +48,15 @@ namespace osu.Game.Screens.Multi.RealtimeMultiplayer
 
         protected override Room CreateNewRoom()
         {
-            var room = new Room { Name = { Value = $"{API.LocalUser}'s awesome room" } };
-            room.Category.Value = RoomCategory.Realtime;
-            return room;
+            return new Room { Name = { Value = $"{API.LocalUser}'s awesome playlist" } };
         }
 
-        protected override string ScreenTitle => "Multiplayer";
+        protected override string ScreenTitle => "Playlists";
 
-        protected override RoomManager CreateRoomManager() => new RealtimeRoomManager();
+        protected override RoomManager CreateRoomManager() => new PlaylistsRoomManager();
 
-        protected override LoungeSubScreen CreateLounge() => new RealtimeLoungeSubScreen();
+        protected override LoungeSubScreen CreateLounge() => new PlaylistsLoungeSubScreen();
 
-        protected override OsuButton CreateNewMultiplayerGameButton() => new CreateRealtimeMatchButton();
+        protected override OsuButton CreateNewMultiplayerGameButton() => new CreatePlaylistsRoomButton();
     }
 }

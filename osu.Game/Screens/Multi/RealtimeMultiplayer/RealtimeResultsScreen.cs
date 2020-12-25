@@ -7,7 +7,7 @@ using osu.Game.Screens.Multi.Ranking;
 
 namespace osu.Game.Screens.Multi.RealtimeMultiplayer
 {
-    public class RealtimeResultsScreen : TimeshiftResultsScreen
+    public class RealtimeResultsScreen : PlaylistsResultsScreen
     {
         public RealtimeResultsScreen(ScoreInfo score, int roomId, PlaylistItem playlistItem)
             : base(score, roomId, playlistItem, false, false)

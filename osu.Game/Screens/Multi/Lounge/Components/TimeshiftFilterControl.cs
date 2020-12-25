@@ -7,13 +7,13 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Multi.Lounge.Components
 {
-    public class TimeshiftFilterControl : FilterControl
+    public class PlaylistsFilterControl : FilterControl
     {
-        private readonly Dropdown<TimeshiftCategory> dropdown;
+        private readonly Dropdown<PlaylistsCategory> dropdown;
 
-        public TimeshiftFilterControl()
+        public PlaylistsFilterControl()
         {
-            AddInternal(dropdown = new SlimEnumDropdown<TimeshiftCategory>
+            AddInternal(dropdown = new SlimEnumDropdown<PlaylistsCategory>
             {
                 Anchor = Anchor.BottomRight,
                 Origin = Anchor.TopRight,
@@ -37,11 +37,11 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
             switch (dropdown.Current.Value)
             {
-                case TimeshiftCategory.Normal:
+                case PlaylistsCategory.Normal:
                     criteria.Category = "normal";
                     break;
 
-                case TimeshiftCategory.Spotlight:
+                case PlaylistsCategory.Spotlight:
                     criteria.Category = "spotlight";
                     break;
             }
@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             return criteria;
         }
 
-        private enum TimeshiftCategory
+        private enum PlaylistsCategory
         {
             Any,
             Normal,

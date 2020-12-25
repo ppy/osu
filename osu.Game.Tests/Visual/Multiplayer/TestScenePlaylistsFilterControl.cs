@@ -6,11 +6,11 @@ using osu.Game.Screens.Multi.Lounge.Components;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneTimeshiftFilterControl : OsuTestScene
+    public class TestScenePlaylistsFilterControl : OsuTestScene
     {
-        public TestSceneTimeshiftFilterControl()
+        public TestScenePlaylistsFilterControl()
         {
-            Child = new TimeshiftFilterControl
+            Child = new PlaylistsFilterControl
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

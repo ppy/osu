@@ -19,9 +19,9 @@ using osu.Game.Screens.Select;
 using osu.Game.Users;
 using Footer = osu.Game.Screens.Multi.Match.Components.Footer;
 
-namespace osu.Game.Screens.Multi.Timeshift
+namespace osu.Game.Screens.Multi.Playlists
 {
-    public class TimeshiftRoomSubScreen : RoomSubScreen
+    public class PlaylistsRoomSubScreen : RoomSubScreen
     {
         public override string Title { get; }
 
@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Multi.Timeshift
 
         private OverlinedHeader participantsHeader;
 
-        public TimeshiftRoomSubScreen(Room room)
+        public PlaylistsRoomSubScreen(Room room)
         {
             Title = room.RoomID.Value == null ? "New playlist" : room.Name.Value;
             Activity.Value = new UserActivity.InLobby(room);
@@ -126,7 +126,7 @@ namespace osu.Game.Screens.Multi.Timeshift
                                                                             RequestShowResults = item =>
                                                                             {
                                                                                 Debug.Assert(roomId.Value != null);
-                                                                                multiplayer?.Push(new TimeshiftResultsScreen(null, roomId.Value.Value, item, false));
+                                                                                multiplayer?.Push(new PlaylistsResultsScreen(null, roomId.Value.Value, item, false));
                                                                             }
                                                                         }
                                                                     },
@@ -188,7 +188,7 @@ namespace osu.Game.Screens.Multi.Timeshift
                         new Dimension(GridSizeMode.AutoSize),
                     }
                 },
-                settingsOverlay = new TimeshiftMatchSettingsOverlay
+                settingsOverlay = new PlaylistsMatchSettingsOverlay
                 {
                     RelativeSizeAxes = Axes.Both,
                     EditPlaylist = () => this.Push(new MatchSongSelect()),
@@ -219,7 +219,7 @@ namespace osu.Game.Screens.Multi.Timeshift
             }, true);
         }
 
-        private void onStart() => StartPlay(() => new TimeshiftPlayer(SelectedItem.Value)
+        private void onStart() => StartPlay(() => new PlaylistsPlayer(SelectedItem.Value)
         {
             Exited = () => leaderboard.RefreshScores()
         });

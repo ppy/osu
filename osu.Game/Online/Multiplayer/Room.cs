@@ -66,7 +66,7 @@ namespace osu.Game.Online.Multiplayer
 
         [Cached]
         [JsonIgnore]
-        public readonly Bindable<GameType> Type = new Bindable<GameType>(new GameTypeTimeshift());
+        public readonly Bindable<GameType> Type = new Bindable<GameType>(new GameTypePlaylists());
 
         [Cached]
         [JsonIgnore]

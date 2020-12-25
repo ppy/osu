@@ -17,7 +17,7 @@ using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Multi.Ranking
 {
-    public class TimeshiftResultsScreen : ResultsScreen
+    public class PlaylistsResultsScreen : ResultsScreen
     {
         private readonly int roomId;
         private readonly PlaylistItem playlistItem;
@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Multi.Ranking
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        public TimeshiftResultsScreen(ScoreInfo score, int roomId, PlaylistItem playlistItem, bool allowRetry, bool allowWatchingReplay = true)
+        public PlaylistsResultsScreen(ScoreInfo score, int roomId, PlaylistItem playlistItem, bool allowRetry, bool allowWatchingReplay = true)
             : base(score, allowRetry, allowWatchingReplay)
         {
             this.roomId = roomId;
