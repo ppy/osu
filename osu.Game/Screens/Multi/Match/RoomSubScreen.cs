@@ -10,7 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Screens;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
-using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play;
@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Multi.Match
         private BeatmapManager beatmapManager { get; set; }
 
         [Resolved(canBeNull: true)]
-        protected Multiplayer Multiplayer { get; private set; }
+        protected MultiplayerScreen Multiplayer { get; private set; }
 
         private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
 

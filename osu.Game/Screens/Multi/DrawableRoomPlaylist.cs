@@ -7,7 +7,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
-using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Rooms;
 using osuTK;
 
 namespace osu.Game.Screens.Multi

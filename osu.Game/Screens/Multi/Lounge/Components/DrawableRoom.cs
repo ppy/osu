@@ -17,12 +17,12 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Components;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.Multi.Lounge.Components
 {
@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         private CachedModelDependencyContainer<Room> dependencies;
 
         [Resolved(canBeNull: true)]
-        private Multiplayer multiplayer { get; set; }
+        private MultiplayerScreen multiplayer { get; set; }
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -228,7 +228,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
         private class RoomName : OsuSpriteText
         {
-            [Resolved(typeof(Room), nameof(Online.Multiplayer.Room.Name))]
+            [Resolved(typeof(Room), nameof(Online.Rooms.Room.Name))]
             private Bindable<string> name { get; set; }
 
             [BackgroundDependencyLoader]

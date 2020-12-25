@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Menu
         public Action OnSolo;
         public Action OnSettings;
         public Action OnMultiplayer;
-        public Action OnTimeshift;
+        public Action OnPlaylists;
 
         public const float BUTTON_WIDTH = 140f;
         public const float WEDGE_WIDTH = 20;
@@ -125,7 +125,7 @@ namespace osu.Game.Screens.Menu
         {
             buttonsPlay.Add(new Button(@"solo", @"button-solo-select", FontAwesome.Solid.User, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
             buttonsPlay.Add(new Button(@"multi", @"button-generic-select", FontAwesome.Solid.Users, new Color4(94, 63, 186, 255), onMultiplayer, 0, Key.M));
-            buttonsPlay.Add(new Button(@"playlists", @"button-generic-select", OsuIcon.Charts, new Color4(94, 63, 186, 255), onTimeshift, 0, Key.L));
+            buttonsPlay.Add(new Button(@"playlists", @"button-generic-select", OsuIcon.Charts, new Color4(94, 63, 186, 255), onPlaylists, 0, Key.L));
             buttonsPlay.ForEach(b => b.VisibleState = ButtonSystemState.Play);
 
             buttonsTopLevel.Add(new Button(@"play", @"button-play-select", OsuIcon.Logo, new Color4(102, 68, 204, 255), () => State = ButtonSystemState.Play, WEDGE_WIDTH, Key.P));
@@ -175,7 +175,7 @@ namespace osu.Game.Screens.Menu
             OnMultiplayer?.Invoke();
         }
 
-        private void onTimeshift()
+        private void onPlaylists()
         {
             if (!api.IsLoggedIn)
             {
@@ -193,7 +193,7 @@ namespace osu.Game.Screens.Menu
                 return;
             }
 
-            OnTimeshift?.Invoke();
+            OnPlaylists?.Invoke();
         }
 
         private void updateIdleState(bool isIdle)

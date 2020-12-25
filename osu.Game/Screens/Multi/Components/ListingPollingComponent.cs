@@ -4,7 +4,7 @@
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Rooms;
 using osu.Game.Screens.Multi.Lounge.Components;
 
 namespace osu.Game.Screens.Multi.Components
