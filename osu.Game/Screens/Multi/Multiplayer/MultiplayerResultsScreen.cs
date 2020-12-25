@@ -3,7 +3,7 @@
 
 using osu.Game.Online.Rooms;
 using osu.Game.Scoring;
-using osu.Game.Screens.Multi.Ranking;
+using osu.Game.Screens.Multi.Playlists;
 
 namespace osu.Game.Screens.Multi.Multiplayer
 {

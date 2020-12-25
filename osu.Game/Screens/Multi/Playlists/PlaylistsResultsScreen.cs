@@ -15,7 +15,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 
-namespace osu.Game.Screens.Multi.Ranking
+namespace osu.Game.Screens.Multi.Playlists
 {
     public class PlaylistsResultsScreen : ResultsScreen
     {
