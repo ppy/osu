@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMatchLeaderboard : MultiplayerTestScene
+    public class TestSceneMatchLeaderboard : RoomTestScene
     {
         protected override bool UseOnlineAPI => true;
 
