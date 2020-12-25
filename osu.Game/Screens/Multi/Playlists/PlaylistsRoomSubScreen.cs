@@ -13,7 +13,6 @@ using osu.Game.Online.Rooms;
 using osu.Game.Screens.Multi.Components;
 using osu.Game.Screens.Multi.Match;
 using osu.Game.Screens.Multi.Match.Components;
-using osu.Game.Screens.Multi.Ranking;
 using osu.Game.Screens.Select;
 using osu.Game.Users;
 using Footer = osu.Game.Screens.Multi.Match.Components.Footer;
