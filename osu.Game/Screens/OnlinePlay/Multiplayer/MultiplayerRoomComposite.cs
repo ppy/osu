@@ -7,7 +7,7 @@ using osu.Game.Online.Multiplayer;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public abstract class MultiplayerRoomComposite : MultiplayerComposite
+    public abstract class MultiplayerRoomComposite : OnlinePlayComposite
     {
         [CanBeNull]
         protected MultiplayerRoom Room => Client.Room;

@@ -12,7 +12,7 @@ using osu.Game.Online.Chat;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public class BeatmapTitle : MultiplayerComposite
+    public class BeatmapTitle : OnlinePlayComposite
     {
         private readonly LinkFlowContainer textFlow;
 

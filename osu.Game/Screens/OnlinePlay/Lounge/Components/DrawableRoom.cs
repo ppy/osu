@@ -155,7 +155,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                 Width = cover_width,
                                 Masking = true,
                                 Margin = new MarginPadding { Left = stripWidth },
-                                Child = new MultiplayerBackgroundSprite(BeatmapSetCoverType.List) { RelativeSizeAxes = Axes.Both }
+                                Child = new OnlinePlayBackgroundSprite(BeatmapSetCoverType.List) { RelativeSizeAxes = Axes.Both }
                             },
                             new Container
                             {

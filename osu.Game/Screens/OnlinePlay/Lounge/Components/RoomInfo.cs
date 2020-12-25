@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public class RoomInfo : MultiplayerComposite
+    public class RoomInfo : OnlinePlayComposite
     {
         private readonly List<Drawable> statusElements = new List<Drawable>();
         private readonly OsuTextFlowContainer roomName;

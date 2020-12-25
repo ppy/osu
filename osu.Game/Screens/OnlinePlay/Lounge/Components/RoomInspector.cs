@@ -12,7 +12,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
-    public class RoomInspector : MultiplayerComposite
+    public class RoomInspector : OnlinePlayComposite
     {
         private const float transition_duration = 100;
 
