@@ -8,5 +8,11 @@ namespace osu.Game.Overlays.Changelog
     public class ChangelogUpdateStreamControl : OverlayStreamControl<APIUpdateStream>
     {
         protected override OverlayStreamItem<APIUpdateStream> CreateStreamItem(APIUpdateStream value) => new ChangelogUpdateStreamItem(value);
+
+        protected override void LoadComplete()
+        {
+            // suppress base logic of immediately selecting first item if one exists
+            // (we always want to start with no stream selected).
+        }
     }
 }
