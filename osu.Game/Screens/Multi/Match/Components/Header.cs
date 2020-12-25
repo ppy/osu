@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Multi.Match.Components
 
                 if (host.NewValue != null)
                 {
-                    hostText.AddText("hosted by ");
+                    hostText.AddText("_HostedBy_Text");
                     hostText.AddUserLink(host.NewValue, s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
                 }
             }, true);

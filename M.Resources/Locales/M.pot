@@ -13,6 +13,134 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "Language: zh_CN\n"
 
+#
+msgid "_HostedBy_Text"
+msgstr "hosted by"
+
+msgid "_Open_Multiplayer"
+msgstr ""
+
+# 新多人游戏界面
+msgid "Multiplayer"
+msgstr ""
+
+msgid "Lounge"
+msgstr ""
+
+msgid "Create room"
+msgstr ""
+
+msgid "Open Settings"
+msgstr ""
+
+msgid "Recently Ended"
+msgstr ""
+
+msgid "Participated"
+msgstr ""
+
+msgid "Owned"
+msgstr ""
+
+msgid "hosted by {0}"
+msgstr ""
+
+msgid "hosted by "
+msgstr ""
+
+msgid "{0} 人参与"
+msgstr ""
+
+msgid "Recent Participants"
+msgstr ""
+
+msgid "Playlist"
+msgstr ""
+
+msgid "Playlists"
+msgstr ""
+
+msgid "mapped by {0}"
+msgstr ""
+
+msgid "No room selected"
+msgstr ""
+
+msgid "New room"
+msgstr ""
+
+msgid "New playlist"
+msgstr ""
+
+msgid "DURATION"
+msgstr ""
+
+msgid "ROOM NAME"
+msgstr ""
+
+msgid "PLAYLIST"
+msgstr ""
+
+msgid "ROOM VISIBILITY"
+msgstr ""
+
+msgid "GAME TYPE"
+msgstr ""
+
+msgid "MAX PARTICIPANTS"
+msgstr ""
+
+msgid "PASSWORD (OPTIONAL)"
+msgstr ""
+
+msgid "Select beatmap"
+msgstr ""
+
+msgid "Edit playlist"
+msgstr ""
+
+msgid "Length: {0}"
+msgstr ""
+
+msgid "Add new playlist entry"
+msgstr ""
+
+msgid "Create"
+msgstr ""
+
+msgid "Song Selection"
+msgstr ""
+
+#msgid "Closed {0}"
+#msgstr ""
+#
+#msgid "Closing {0}"
+#msgstr ""
+#
+#msgid "Closing soon"
+#msgstr ""
+
+msgid "Any"
+msgstr ""
+
+msgid "Normal"
+msgstr ""
+
+msgid "Spotlight"
+msgstr ""
+
+msgid "Create playlist"
+msgstr ""
+
+msgid "Leaderboard"
+msgstr ""
+
+msgid "Chat"
+msgstr ""
+
+msgid "Start"
+msgstr ""
+
 # 设置界面
 msgid "设置"
 msgstr ""

@@ -7,6 +7,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 {
     public enum RoomStatusFilter
     {
+        [Description("_Open_Multiplayer")]
         Open,
 
         [Description("Recently Ended")]

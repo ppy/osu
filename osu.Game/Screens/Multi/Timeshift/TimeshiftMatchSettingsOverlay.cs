@@ -10,6 +10,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -322,7 +323,7 @@ namespace osu.Game.Screens.Multi.Timeshift
             }
 
             private void onPlaylistChanged(object sender, NotifyCollectionChangedEventArgs e) =>
-                playlistLength.Text = $"Length: {Playlist.GetTotalDuration()}";
+                playlistLength.Text = new LocalisedString("Length: {0}", Playlist.GetTotalDuration());
 
             private bool hasValidSettings => RoomID.Value == null && NameField.Text.Length > 0 && Playlist.Count > 0;
 

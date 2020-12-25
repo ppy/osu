@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
             RoomName.BindValueChanged(name =>
             {
-                roomName.Text = name.NewValue ?? "No room selected";
+                roomName.Text = name.NewValue ?? "未选择任何房间";
             }, true);
         }
     }
