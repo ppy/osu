@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [SetUp]
-        public void SetUp()
+        public void SetUp() => Schedule(() =>
         {
             requestedBuild = null;
 
@@ -72,8 +72,8 @@ namespace osu.Game.Tests.Visual.Online
                 }
             };
 
-            Schedule(() => Child = changelog = new TestChangelogOverlay());
-        }
+            Child = changelog = new TestChangelogOverlay();
+        });
 
         [Test]
         public void ShowWithNoFetch()
