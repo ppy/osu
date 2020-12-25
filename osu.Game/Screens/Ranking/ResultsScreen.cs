@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Screens;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
@@ -69,9 +70,9 @@ namespace osu.Game.Screens.Ranking
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(MfConfigManager mConfig)
         {
-            FillFlowContainer buttons;
+            this.mConfig = mConfig;
 
             InternalChild = new GridContainer
             {
@@ -240,12 +241,43 @@ namespace osu.Game.Screens.Ranking
             ((BackgroundScreenBeatmap)Background).BlurAmount.Value = BACKGROUND_BLUR;
 
             Background.FadeTo(0.5f, 250);
-            bottomPanel.FadeTo(1, 250);
+
+            bool useOriginalAnimation = mConfig.Get<bool>(MfSetting.OptUI);
+
+            switch (useOriginalAnimation)
+            {
+                case true:
+                    bottomPanel.MoveToY(bottomPanel.Height).Then()
+                               .Delay(250).FadeTo(1, 200)
+                               .MoveToY(0, 550, Easing.OutBack);
+
+                    buttons.FadeTo(0).MoveToX(200)
+                           .Then().Delay(250)
+                           .Then().MoveToX(0, 550, Easing.OutQuint).FadeIn(200);
+
+                    ScorePanelList?.MoveToY(DrawHeight)
+                                  .Then().Delay(250)
+                                  .Then().MoveToY(0, 750, Easing.OutExpo);
+                    break;
+
+                case false:
+                    bottomPanel.FadeTo(1, 250);
+                    break;
+            }
         }
 
         public override bool OnExiting(IScreen next)
         {
             Background.FadeTo(1, 250);
+            bool useOriginalAnimation = mConfig.Get<bool>(MfSetting.OptUI);
+
+            switch (useOriginalAnimation)
+            {
+                case true:
+                    bottomPanel.MoveToY(bottomPanel.Height, 250);
+                    this.FadeOut(100);
+                    break;
+            }
 
             return base.OnExiting(next);
         }
@@ -270,6 +302,8 @@ namespace osu.Game.Screens.Ranking
         }
 
         private ScorePanel detachedPanel;
+        private MfConfigManager mConfig;
+        private FillFlowContainer buttons;
 
         private void onStatisticsStateChanged(ValueChangedEvent<Visibility> state)
         {
