@@ -8,7 +8,7 @@ namespace osu.Game.Screens.Multi.Components
     public class OverlinedPlaylistHeader : OverlinedHeader
     {
         public OverlinedPlaylistHeader()
-            : base("游玩列表")
+            : base("Playlist")
         {
         }
 

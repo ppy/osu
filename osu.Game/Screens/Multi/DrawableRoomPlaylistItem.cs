@@ -112,7 +112,7 @@ namespace osu.Game.Screens.Multi
 
             if (Item.Beatmap?.Value?.Metadata?.Author != null)
             {
-                authorText.AddText("作图者：");
+                authorText.AddText("mapped by ");
                 authorText.AddUserLink(Item.Beatmap.Value?.Metadata.Author);
             }
 
@@ -298,7 +298,6 @@ namespace osu.Game.Screens.Multi
                                 RelativeSizeAxes = Axes.Both,
                                 Colour = ColourInfo.GradientHorizontal(Color4.Black, new Color4(0f, 0f, 0f, 0.9f)),
                                 Width = 0.05f,
-                                X = 0.4f,
                             },
                             new Box
                             {

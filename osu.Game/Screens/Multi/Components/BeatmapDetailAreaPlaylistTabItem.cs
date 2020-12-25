@@ -7,6 +7,6 @@ namespace osu.Game.Screens.Multi.Components
 {
     public class BeatmapDetailAreaPlaylistTabItem : BeatmapDetailAreaTabItem
     {
-        public override string Name => "游玩列表";
+        public override string Name => "Playlist";
     }
 }

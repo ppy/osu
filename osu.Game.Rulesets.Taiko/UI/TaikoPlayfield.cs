@@ -147,6 +147,32 @@ namespace osu.Game.Rulesets.Taiko.UI
                 },
                 drumRollHitContainer.CreateProxy(),
             };
+
+            RegisterPool<Hit, DrawableHit>(50);
+            RegisterPool<Hit.StrongNestedHit, DrawableHit.StrongNestedHit>(50);
+
+            RegisterPool<DrumRoll, DrawableDrumRoll>(5);
+            RegisterPool<DrumRoll.StrongNestedHit, DrawableDrumRoll.StrongNestedHit>(5);
+
+            RegisterPool<DrumRollTick, DrawableDrumRollTick>(100);
+            RegisterPool<DrumRollTick.StrongNestedHit, DrawableDrumRollTick.StrongNestedHit>(100);
+
+            RegisterPool<Swell, DrawableSwell>(5);
+            RegisterPool<SwellTick, DrawableSwellTick>(100);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            NewResult += OnNewResult;
+        }
+
+        protected override void OnNewDrawableHitObject(DrawableHitObject drawableHitObject)
+        {
+            base.OnNewDrawableHitObject(drawableHitObject);
+
+            var taikoObject = (DrawableTaikoHitObject)drawableHitObject;
+            topLevelHitContainer.Add(taikoObject.CreateProxiedContent());
         }
 
         protected override void Update()
@@ -207,9 +233,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     barLinePlayfield.Add(barLine);
                     break;
 
-                case DrawableTaikoHitObject taikoObject:
-                    h.OnNewResult += OnNewResult;
-                    topLevelHitContainer.Add(taikoObject.CreateProxiedContent());
+                case DrawableTaikoHitObject _:
                     base.Add(h);
                     break;
 
@@ -226,8 +250,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                     return barLinePlayfield.Remove(barLine);
 
                 case DrawableTaikoHitObject _:
-                    h.OnNewResult -= OnNewResult;
-                    // todo: consider tidying of proxied content if required.
                     return base.Remove(h);
 
                 default:
@@ -248,7 +270,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             {
                 case TaikoStrongJudgement _:
                     if (result.IsHit)
-                        hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongNestedHit)judgedObject).MainObject)?.VisualiseSecondHit();
+                        hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongNestedHit)judgedObject).ParentHitObject)?.VisualiseSecondHit();
                     break;
 
                 case TaikoDrumRollTickJudgement _:

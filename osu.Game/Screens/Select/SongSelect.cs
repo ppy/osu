@@ -84,8 +84,6 @@ namespace osu.Game.Screens.Select
 
         protected BeatmapCarousel Carousel { get; private set; }
 
-        private readonly DifficultyRecommender recommender = new DifficultyRecommender();
-
         private BeatmapInfoWedge beatmapInfoWedge;
         private DialogOverlay dialogOverlay;
 
@@ -109,7 +107,7 @@ namespace osu.Game.Screens.Select
         private MusicController music { get; set; }
 
         [BackgroundDependencyLoader(true)]
-        private void load(MfConfigManager config, AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, ScoreManager scores, CollectionManager collections, ManageCollectionsDialog manageCollectionsDialog)
+        private void load(MfConfigManager config, AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, ScoreManager scores, CollectionManager collections, ManageCollectionsDialog manageCollectionsDialog, DifficultyRecommender recommender)
         {
             // initial value transfer is required for FilterControl (it uses our re-cached bindables in its async load for the initial filter).
             transferRulesetValue();
@@ -127,12 +125,11 @@ namespace osu.Game.Screens.Select
                 BleedBottom = Footer.HEIGHT,
                 SelectionChanged = updateSelectedBeatmap,
                 BeatmapSetsChanged = carouselBeatmapsLoaded,
-                GetRecommendedBeatmap = recommender.GetRecommendedBeatmap,
+                GetRecommendedBeatmap = s => recommender?.GetRecommendedBeatmap(s),
             }, c => carouselContainer.Child = c);
 
             AddRangeInternal(new Drawable[]
             {
-                recommender,
                 new ResetScrollContainer(() => Carousel.ScrollToSelected())
                 {
                     RelativeSizeAxes = Axes.Y,

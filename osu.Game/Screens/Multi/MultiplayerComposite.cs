@@ -40,12 +40,12 @@ namespace osu.Game.Screens.Multi
         protected Bindable<int?> MaxParticipants { get; private set; }
 
         [Resolved(typeof(Room))]
-        protected Bindable<DateTimeOffset> EndDate { get; private set; }
+        protected Bindable<DateTimeOffset?> EndDate { get; private set; }
 
         [Resolved(typeof(Room))]
         protected Bindable<RoomAvailability> Availability { get; private set; }
 
         [Resolved(typeof(Room))]
-        protected Bindable<TimeSpan> Duration { get; private set; }
+        protected Bindable<TimeSpan?> Duration { get; private set; }
     }
 }

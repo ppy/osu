@@ -3,20 +3,27 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Components;
-using osuTK;
+using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneOverlinedParticipants : MultiplayerTestScene
+    public class TestSceneTimeshiftParticipantsList : MultiplayerTestScene
     {
-        protected override bool UseOnlineAPI => true;
-
         [SetUp]
-        public void Setup() => Schedule(() =>
+        public new void Setup() => Schedule(() =>
         {
-            Room = new Room { RoomID = { Value = 7 } };
+            Room.RoomID.Value = 7;
+
+            for (int i = 0; i < 50; i++)
+            {
+                Room.RecentParticipants.Add(new User
+                {
+                    Username = "peppy",
+                    CurrentModeRank = 1234,
+                    Id = 2
+                });
+            }
         });
 
         [Test]
@@ -28,7 +35,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Width = 500,
+                    Width = 0.2f,
                 };
             });
         }
@@ -42,7 +49,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(500)
+                    Width = 0.2f,
+                    Height = 0.2f,
                 };
             });
         }

@@ -10,12 +10,14 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
+using osu.Game.Online.API;
 using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Overlays.BeatmapSet.Buttons;
 using osu.Game.Rulesets;
@@ -41,6 +43,9 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public bool DownloadButtonsVisible => downloadButtonsContainer.Any();
 
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
         public BeatmapRulesetSelector RulesetSelector => beatmapSetHeader.RulesetSelector;
         public readonly BeatmapPicker Picker;
 
@@ -52,12 +57,11 @@ namespace osu.Game.Overlays.BeatmapSet
         [Cached(typeof(IBindable<RulesetInfo>))]
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
-        private BindableBool UseSayobot = new BindableBool();
-        private ExternalLinkButton externalLink;
+        private readonly BindableBool useSayobot = new BindableBool();
+        private readonly ExternalLinkButton externalLink;
 
         public Header()
         {
-
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Masking = true;
@@ -216,19 +220,19 @@ namespace osu.Game.Overlays.BeatmapSet
             Picker.Beatmap.ValueChanged += b =>
             {
                 Details.Beatmap = b.NewValue;
-                externalLink.Link = SelectServer(Details.Beatmap);
+                externalLink.Link = SelectServer(b.NewValue);
             };
         }
 
-        protected virtual string SelectServer(Beatmaps.BeatmapInfo b)
+        protected virtual string SelectServer(BeatmapInfo b)
         {
-            switch ( mfConfig.Get<bool>(MfSetting.UseSayobot) )
+            switch (mfConfig.Get<bool>(MfSetting.UseSayobot))
             {
                 case true:
                     return $@"https:/osu.sayobot.cn/?search={BeatmapSet.Value?.OnlineBeatmapSetID}";
 
                 case false:
-                    return $@"https://osu.ppy.sh/beatmapsets/{BeatmapSet.Value?.OnlineBeatmapSetID}#{b?.Ruleset.ShortName}/{b?.OnlineBeatmapID}";
+                    return $@"{api.WebsiteRootUrl}/beatmapsets/{BeatmapSet.Value?.OnlineBeatmapSetID}#{b?.Ruleset.ShortName}/{b?.OnlineBeatmapID}";
             }
         }
 
@@ -237,9 +241,9 @@ namespace osu.Game.Overlays.BeatmapSet
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, OsuConfigManager config, MfConfigManager mfconfig)
         {
-            this.mfConfig = mfconfig;
-            mfconfig.BindWith(MfSetting.UseSayobot, UseSayobot);
-            UseSayobot.ValueChanged += _ =>
+            mfConfig = mfconfig;
+            mfconfig.BindWith(MfSetting.UseSayobot, useSayobot);
+            useSayobot.ValueChanged += _ =>
             {
                 externalLink.Link = SelectServer(Details.Beatmap);
             };
@@ -312,7 +316,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     break;
 
                 default:
-                    downloadButtonsContainer.Child = new HeaderDownloadButton(BeatmapSet.Value, false, false ,true);
+                    downloadButtonsContainer.Child = new HeaderDownloadButton(BeatmapSet.Value, false, false, true);
                     if (BeatmapSet.Value.OnlineInfo.HasVideo)
                         downloadButtonsContainer.Add(new HeaderDownloadButton(BeatmapSet.Value, true, false));
                     if (BeatmapSet.Value.OnlineInfo.HasStoryboard || BeatmapSet.Value.OnlineInfo.HasVideo)

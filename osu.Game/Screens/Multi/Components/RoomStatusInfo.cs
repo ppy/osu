@@ -34,9 +34,9 @@ namespace osu.Game.Screens.Multi.Components
                 {
                     statusPart = new StatusPart
                     {
-                        Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 18)
+                        Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14)
                     },
-                    endDatePart = new EndDatePart { Font = OsuFont.GetFont(size: 18) }
+                    endDatePart = new EndDatePart { Font = OsuFont.GetFont(size: 14) }
                 }
             };
 
@@ -48,28 +48,35 @@ namespace osu.Game.Screens.Multi.Components
 
         private class EndDatePart : DrawableDate
         {
-            public readonly IBindable<DateTimeOffset> EndDate = new Bindable<DateTimeOffset>();
+            public readonly IBindable<DateTimeOffset?> EndDate = new Bindable<DateTimeOffset?>();
 
             public EndDatePart()
                 : base(DateTimeOffset.UtcNow)
             {
-                EndDate.BindValueChanged(date => Date = date.NewValue);
+                EndDate.BindValueChanged(date =>
+                {
+                    // If null, set a very large future date to prevent unnecessary schedules.
+                    Date = date.NewValue ?? DateTimeOffset.Now.AddYears(1);
+                }, true);
             }
 
             protected override string Format()
             {
+                if (EndDate.Value == null)
+                    return string.Empty;
+
                 var diffToNow = Date.Subtract(DateTimeOffset.Now);
 
                 if (diffToNow.TotalSeconds < -5)
-                    return $"关闭于 {base.Format()}";
+                    return $"Closed {base.Format()}";
 
                 if (diffToNow.TotalSeconds < 0)
-                    return "已关闭";
+                    return "Closed";
 
                 if (diffToNow.TotalSeconds < 5)
-                    return "即将关闭";
+                    return "Closing soon";
 
-                return $"将关闭于 {base.Format()}";
+                return $"Closing {base.Format()}";
             }
         }
 

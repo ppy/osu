@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Multi.Components
 
             if (beatmap == null)
             {
-                textFlow.AddText("未选择任何谱面", s =>
+                textFlow.AddText("No beatmap selected", s =>
                 {
                     s.Font = s.Font.With(size: TextSize);
                     s.Colour = colours.PinkLight;
@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Multi.Components
                         Text = new LocalisedString((beatmap.Value.Metadata.TitleUnicode, beatmap.Value.Metadata.Title)),
                         Font = OsuFont.GetFont(size: TextSize),
                     }
-                }, LinkAction.OpenBeatmap, beatmap.Value.OnlineBeatmapID.ToString(), "打开此谱面");
+                }, LinkAction.OpenBeatmap, beatmap.Value.OnlineBeatmapID.ToString(), "Open beatmap");
             }
         }
     }

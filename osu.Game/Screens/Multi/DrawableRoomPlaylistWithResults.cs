@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Multi
                 {
                     Icon = FontAwesome.Solid.ChartPie,
                     Action = () => RequestShowResults?.Invoke(),
-                    TooltipText = "查看排行"
+                    TooltipText = "View results"
                 });
 
             private class FilledIconButton : IconButton

@@ -103,7 +103,7 @@ namespace osu.Game.Overlays.Chat
             Colour = colours.ChatBlue.Lighten(0.7f),
         };
 
-        private void newMessagesArrived(IEnumerable<Message> newMessages)
+        private void newMessagesArrived(IEnumerable<Message> newMessages) => Schedule(() =>
         {
             if (newMessages.Min(m => m.Id) < chatLines.Max(c => c.Message.Id))
             {
@@ -155,9 +155,9 @@ namespace osu.Game.Overlays.Chat
 
             if (shouldScrollToEnd)
                 scrollToEnd();
-        }
+        });
 
-        private void pendingMessageResolved(Message existing, Message updated)
+        private void pendingMessageResolved(Message existing, Message updated) => Schedule(() =>
         {
             var found = chatLines.LastOrDefault(c => c.Message == existing);
 
@@ -169,12 +169,12 @@ namespace osu.Game.Overlays.Chat
                 found.Message = updated;
                 ChatLineFlow.Add(found);
             }
-        }
+        });
 
-        private void messageRemoved(Message removed)
+        private void messageRemoved(Message removed) => Schedule(() =>
         {
             chatLines.FirstOrDefault(c => c.Message == removed)?.FadeColour(Color4.Red, 400).FadeOut(600).Expire();
-        }
+        });
 
         private IEnumerable<ChatLine> chatLines => ChatLineFlow.Children.OfType<ChatLine>();
 

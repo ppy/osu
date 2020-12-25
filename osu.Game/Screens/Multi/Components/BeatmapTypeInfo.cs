@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Multi.Components
                         Children = new Drawable[]
                         {
                             new BeatmapTitle(),
-                            beatmapAuthor = new LinkFlowContainer(s => s.Font = s.Font.With(size: 17))
+                            beatmapAuthor = new LinkFlowContainer(s => s.Font = s.Font.With(size: 14))
                             {
                                 Anchor = Anchor.BottomLeft,
                                 Origin = Anchor.BottomLeft,
@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Multi.Components
 
             if (beatmap != null)
             {
-                beatmapAuthor.AddText("作图者：", s => s.Colour = OsuColour.Gray(0.8f));
+                beatmapAuthor.AddText("mapped by ", s => s.Colour = OsuColour.Gray(0.8f));
                 beatmapAuthor.AddUserLink(beatmap.Value.Metadata.Author);
             }
         }

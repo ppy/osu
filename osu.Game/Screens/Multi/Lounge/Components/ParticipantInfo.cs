@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -61,8 +62,8 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                     {
                         summary = new OsuSpriteText
                         {
-                            Text = "0 人参与",
-                            Font = OsuFont.GetFont(size: 16)
+                            Text = "0 participants",
+                            Font = OsuFont.GetFont(size: 14)
                         }
                     },
                 },
@@ -75,14 +76,14 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
                 if (host.NewValue != null)
                 {
-                    hostText.AddText("房主为");
-                    hostText.AddUserLink(host.NewValue, s => s.Font = s.Font.With(Typeface.Torus, size: 17, weight: FontWeight.Bold, italics: true));
+                    hostText.AddText("hosted by ");
+                    hostText.AddUserLink(host.NewValue, s => s.Font = s.Font.With(Typeface.Torus, weight: FontWeight.Bold, italics: true));
 
                     flagContainer.Child = new UpdateableFlag(host.NewValue.Country) { RelativeSizeAxes = Axes.Both };
                 }
             }, true);
 
-            ParticipantCount.BindValueChanged(count => summary.Text = $"{count.NewValue}人参与", true);
+            ParticipantCount.BindValueChanged(count => summary.Text = "participant".ToQuantity(count.NewValue), true);
         }
     }
 }

@@ -305,7 +305,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             samplesBindable.CollectionChanged -= onSamplesChanged;
 
             // Release the samples for other hitobjects to use.
-            Samples.Samples = null;
+            if (Samples != null)
+                Samples.Samples = null;
 
             if (nestedHitObjects.IsValueCreated)
             {

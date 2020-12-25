@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
@@ -28,23 +26,20 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                     LabelText = "osu！主题音乐",
                     Current = config.GetBindable<bool>(OsuSetting.MenuMusic)
                 },
-                new SettingsDropdown<IntroSequence>
+                new SettingsEnumDropdown<IntroSequence>
                 {
                     LabelText = "开场样式",
                     Current = config.GetBindable<IntroSequence>(OsuSetting.IntroSequence),
-                    Items = Enum.GetValues(typeof(IntroSequence)).Cast<IntroSequence>()
                 },
-                new SettingsDropdown<BackgroundSource>
+                new SettingsEnumDropdown<BackgroundSource>
                 {
                     LabelText = "背景来源(需要osu!supporter)",
                     Current = config.GetBindable<BackgroundSource>(OsuSetting.MenuBackgroundSource),
-                    Items = Enum.GetValues(typeof(BackgroundSource)).Cast<BackgroundSource>()
                 },
-                new SettingsDropdown<SeasonalBackgroundMode>
+                new SettingsEnumDropdown<SeasonalBackgroundMode>
                 {
                     LabelText = "季节背景",
                     Current = config.GetBindable<SeasonalBackgroundMode>(OsuSetting.SeasonalBackgroundMode),
-                    Items = Enum.GetValues(typeof(SeasonalBackgroundMode)).Cast<SeasonalBackgroundMode>()
                 }
             };
         }
