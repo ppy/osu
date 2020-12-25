@@ -240,6 +240,7 @@ namespace osu.Game.Screens.Select
                                 Font = OsuFont.GetFont(size: 24, italics: true),
                                 RelativeSizeAxes = Axes.X,
                                 Truncate = true,
+                                UseLegacyUnicode = true
                             },
                         }
                     },

@@ -30,6 +30,8 @@ using osu.Game.Database;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
+using osu.Game.Online;
+using osu.Game.Online.RealtimeMultiplayer;
 using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
 using osu.Game.Resources;
@@ -54,6 +56,8 @@ namespace osu.Game
         public const string CLIENT_STREAM_NAME = "lazer";
 
         public const int SAMPLE_CONCURRENCY = 6;
+
+        public bool UseDevelopmentServer { get; }
 
         protected OsuConfigManager LocalConfig;
         protected MfConfigManager MfConfig;
@@ -81,6 +85,7 @@ namespace osu.Game
         protected IAPIProvider API;
 
         private SpectatorStreamingClient spectatorStreaming;
+        private StatefulMultiplayerClient multiplayerClient;
 
         protected MenuCursorContainer MenuCursorContainer;
 
@@ -133,6 +138,7 @@ namespace osu.Game
 
         public OsuGameBase()
         {
+            UseDevelopmentServer = DebugUtils.IsDebugBuild;
             Name = @"osu!lazer";
         }
 
@@ -172,7 +178,7 @@ namespace osu.Game
             dependencies.Cache(largeStore);
 
             dependencies.CacheAs(this);
-            dependencies.Cache(LocalConfig);
+            dependencies.CacheAs(LocalConfig);
             dependencies.Cache(MfConfig);
 
             AddFont(Resources, @"Fonts/osuFont");
@@ -212,9 +218,12 @@ namespace osu.Game
                 }
             });
 
-            dependencies.CacheAs(API ??= new APIAccess(LocalConfig));
+            EndpointConfiguration endpoints = UseDevelopmentServer ? (EndpointConfiguration)new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
 
-            dependencies.CacheAs(spectatorStreaming = new SpectatorStreamingClient());
+            dependencies.CacheAs(API ??= new APIAccess(LocalConfig, endpoints));
+
+            dependencies.CacheAs(spectatorStreaming = new SpectatorStreamingClient(endpoints));
+            dependencies.CacheAs(multiplayerClient = new RealtimeMultiplayerClient(endpoints));
 
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 
@@ -281,6 +290,7 @@ namespace osu.Game
             if (API is APIAccess apiAccess)
                 AddInternal(apiAccess);
             AddInternal(spectatorStreaming);
+            AddInternal(multiplayerClient);
 
             AddInternal(RulesetConfigCache);
 
@@ -371,7 +381,9 @@ namespace osu.Game
             // may be non-null for certain tests
             Storage ??= host.Storage;
 
-            LocalConfig ??= new OsuConfigManager(Storage);
+            LocalConfig ??= UseDevelopmentServer
+                ? new DevelopmentOsuConfigManager(Storage)
+                : new OsuConfigManager(Storage);
 
             MfConfig ??= new MfConfigManager(Storage);
         }
@@ -403,7 +415,7 @@ namespace osu.Game
             }
         }
 
-        public async Task Import(Stream stream, string filename)
+        public virtual async Task Import(Stream stream, string filename)
         {
             var extension = Path.GetExtension(filename)?.ToLowerInvariant();
 

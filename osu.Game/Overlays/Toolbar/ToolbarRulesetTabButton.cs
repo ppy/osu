@@ -7,6 +7,7 @@ using osu.Game.Rulesets;
 using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -27,7 +28,7 @@ namespace osu.Game.Overlays.Toolbar
             var rInstance = value.CreateInstance();
 
             ruleset.TooltipMain = rInstance.Description;
-            ruleset.TooltipSub = $"来玩 {rInstance.Description}";
+            ruleset.TooltipSub = new LocalisedString("来玩{0}", rInstance.Description);
             ruleset.SetIcon(rInstance.CreateIcon());
         }
 

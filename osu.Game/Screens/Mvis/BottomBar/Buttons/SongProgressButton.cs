@@ -24,6 +24,7 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
         {
             TooltipText = "切换暂停";
             AutoSizeAxes = Axes.X;
+            SpriteText.UseLegacyUnicode = true;
         }
 
         protected override void Update()

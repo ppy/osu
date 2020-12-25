@@ -106,7 +106,7 @@ namespace osu.Game.Rulesets.Mania.UI
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.Both,
-                            Y = HIT_TARGET_POSITION + 150,
+                            Y = HIT_TARGET_POSITION + 150
                         },
                         topLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
                     }

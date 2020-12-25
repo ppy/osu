@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Mods
             Value = 5,
         };
 
-        [SettingSource("总体难度", "Override a beatmap's set OD.", LAST_SETTING_ORDER)]
+        [SettingSource("整体难度", "Override a beatmap's set OD.", LAST_SETTING_ORDER)]
         public BindableNumber<float> OverallDifficulty { get; } = new BindableFloat
         {
             Precision = 0.1f,

@@ -156,7 +156,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
                 flow.ChildrenEnumerable = new Drawable[]
                 {
-                    new OsuSpriteText { Text = "当前目录: ", Font = OsuFont.Default.With(size: DisplayPiece.HEIGHT), },
+                    new OsuSpriteText { Text = "当前目录: ", Font = OsuFont.Default.With(size: DisplayPiece.HEIGHT), UseLegacyUnicode = true},
                     new ComputerPiece(),
                 }.Concat(pathPieces);
             }
@@ -293,7 +293,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     Text = displayName ?? FallbackName,
-                    Font = OsuFont.Default.With(size: FONT_SIZE)
+                    Font = OsuFont.Default.With(size: FONT_SIZE),
+                    UseLegacyUnicode = true
                 });
             }
 

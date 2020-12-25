@@ -2,11 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Globalization;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 
 namespace osu.Game.Overlays.Toolbar
@@ -44,27 +46,24 @@ namespace osu.Game.Overlays.Toolbar
         private void updateTime()
         {
             var currentTime = DateTime.Now;
-            DrawableText.Text = currentTime.ToString("HH:mm:ss tt");
+            DrawableText.Text = currentTime.ToString(CultureInfo.CurrentCulture);
 
             var currentTick = new TimeSpan(currentTime.Ticks);
             var xE = currentTick.Subtract(launchTick);
-            string tooltipMain = "osu!已经运行了";
-
-            if (xE.Days > 0)
-                tooltipMain += $"{xE.Days}天";
+            string tooltipMainArg = "";
 
             if (xE.Hours > 0)
-                tooltipMain += $"{xE.Hours:00}:";
+                tooltipMainArg += $"{(xE.Hours + xE.Days * 24):00}:";
 
-            tooltipMain += $"{xE.Minutes:00}:{xE.Seconds:00}。";
+            tooltipMainArg += $"{xE.Minutes:00}:{xE.Seconds:00}";
 
-            TooltipMain = tooltipMain;
+            TooltipMain = new LocalisedString("osu!已经运行了 {0}。", tooltipMainArg);
 
             this.Delay(500).Schedule(updateTime);
         }
 
         private void updateBeatmapTooltip() =>
-            TooltipSub = $"你共有{beatmapManager.QueryBeatmapsMinimal(_ => true).ToList().Count}张谱面!";
+            TooltipSub = new LocalisedString("你共有{0}张谱面!", beatmapManager.QueryBeatmapsMinimal(_ => true).ToList().Count);
 
         protected override bool OnClick(ClickEvent e)
         {

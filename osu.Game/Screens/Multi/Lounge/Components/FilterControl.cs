@@ -98,7 +98,9 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             scheduledFilterUpdate = Scheduler.AddDelayed(UpdateFilter, 200);
         }
 
-        protected void UpdateFilter()
+        protected void UpdateFilter() => Scheduler.AddOnce(updateFilter);
+
+        private void updateFilter()
         {
             scheduledFilterUpdate?.Cancel();
 

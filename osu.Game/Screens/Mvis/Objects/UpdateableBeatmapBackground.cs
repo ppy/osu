@@ -163,6 +163,7 @@ namespace osu.Game.Screens.Mvis.Objects
                             Font = OsuFont.GetFont(size: 26, weight: FontWeight.SemiBold),
                             Text = new LocalisedString((beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist)),
                             Shadow = false,
+                            UseLegacyUnicode = true
                         },
                         titleText = new OsuSpriteText
                         {
@@ -170,6 +171,7 @@ namespace osu.Game.Screens.Mvis.Objects
                             Origin = Anchor.Centre,
                             Font = OsuFont.GetFont(size: 20, weight: FontWeight.SemiBold),
                             Shadow = false,
+                            UseLegacyUnicode = true
                         }
                     }
                 }.WithEffect(new BlurEffect
@@ -206,7 +208,7 @@ namespace osu.Game.Screens.Mvis.Objects
                 return newTitle;
             }
 
-            private static readonly char[] title_chars = new[]
+            private static readonly char[] title_chars =
             {
                 '(',
                 '-',

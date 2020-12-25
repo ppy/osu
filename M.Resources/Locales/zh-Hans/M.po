@@ -1,23 +1,535 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: mfosu!\n"
-"POT-Creation-Date: 2020-12-04 "
-"02:25+0800\n"
-"PO-Revision-Date: 2020-12-11 "
-"01:08+0800\n"
+"POT-Creation-Date: 2020-12-04 02:25+0800\n"
+"PO-Revision-Date: 2020-12-25 16:17+0800\n"
 "Last-Translator: \n"
 "Language-Team: MATRIX-feather\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; "
-"charset=UTF-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 2.4.2\n"
 "X-Poedit-Basepath: .\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
+#
+msgid "_HostedBy_Text"
+msgstr "房主为 "
+
+# 新多人游戏界面
+msgid "_Open_Multiplayer"
+msgstr "开放中的房间"
+
+# 新多人游戏界面
+msgid "Multiplayer"
+msgstr "多人游戏"
+
+msgid "Lounge"
+msgstr "大厅"
+
+msgid "Create room"
+msgstr "创建房间"
+
+msgid "Open Settings"
+msgstr "打开设置"
+
+msgid "Recently Ended"
+msgstr "最近结束的房间"
+
+msgid "Participated"
+msgstr "参加过的房间"
+
+msgid "Owned"
+msgstr "拥有的房间"
+
+msgid "hosted by {0}"
+msgstr "房主为 {0}"
+
+msgid "hosted by "
+msgstr "房主为 "
+
+msgid "{0} 人参与"
+msgstr ""
+
+msgid "Recent Participants"
+msgstr "最近参与"
+
+msgid "Playlist"
+msgstr "游玩列表"
+
+msgid "Playlists"
+msgstr "游玩列表"
+
+msgid "mapped by {0}"
+msgstr "作图者 {0}"
+
+msgid "No room selected"
+msgstr "未选择任何房间"
+
+msgid "New room"
+msgstr "新房间"
+
+msgid "New playlist"
+msgstr "新游玩列表"
+
+msgid "DURATION"
+msgstr "时长"
+
+msgid "ROOM NAME"
+msgstr "房间名"
+
+msgid "PLAYLIST"
+msgstr "游玩列表"
+
+msgid "ROOM VISIBILITY"
+msgstr "房间可见度"
+
+msgid "GAME TYPE"
+msgstr "游戏类型"
+
+msgid "MAX PARTICIPANTS"
+msgstr "最大参与人数"
+
+msgid "PASSWORD (OPTIONAL)"
+msgstr "密码 (可选）"
+
+msgid "Select beatmap"
+msgstr "选择谱面"
+
+msgid "Edit playlist"
+msgstr "编辑游玩列表"
+
+msgid "Length: {0}"
+msgstr "长度: {0}"
+
+msgid "Add new playlist entry"
+msgstr "添加新的游玩列表项目"
+
+msgid "Create"
+msgstr "创建"
+
+msgid "Song Selection"
+msgstr "歌曲选择"
+
+msgid "Any"
+msgstr "任意"
+
+msgid "Normal"
+msgstr "正常"
+
+msgid "Spotlight"
+msgstr ""
+
+msgid "Create playlist"
+msgstr "创建游玩列表"
+
+msgid "Leaderboard"
+msgstr "排行榜"
+
+msgid "Chat"
+msgstr "聊天"
+
+msgid "Start"
+msgstr "开始"
+
+msgid "设置"
+msgstr ""
+
+msgid "恢复为默认值"
+msgstr ""
+
+msgid "以原语言显示歌曲信息"
+msgstr ""
+
+msgid "更新"
+msgstr ""
+
+msgid "更新频道"
+msgstr ""
+
+msgid "打开osu!文件夹"
+msgstr ""
+
+msgid "数据迁移"
+msgstr ""
+
+msgid "图形"
+msgstr ""
+
+msgid "渲染"
+msgstr ""
+
+msgid "帧数限制"
+msgstr ""
+
+msgid "渲染(运行)模式"
+msgstr ""
+
+msgid "显示FPS"
+msgstr ""
+
+msgid "显示"
+msgstr ""
+
+msgid "窗口模式"
+msgstr ""
+
+msgid "界面缩放"
+msgstr ""
+
+msgid "屏幕缩放"
+msgstr ""
+
+msgid "关"
+msgstr ""
+
+msgid "所有元素"
+msgstr ""
+
+msgid "Overlay除外"
+msgstr ""
+
+msgid "仅游戏内界面"
+msgstr ""
+
+msgid "细节设置"
+msgstr ""
+
+msgid "故事版 / 背景视频"
+msgstr ""
+
+msgid "击打闪光"
+msgstr ""
+
+msgid "截图格式"
+msgstr ""
+
+msgid "PNG (无损)"
+msgstr ""
+
+msgid "JPG (适合网络传输)"
+msgstr ""
+
+msgid "在截图中显示光标"
+msgstr ""
+
+msgid "输出设备"
+msgstr ""
+
+msgid "默认"
+msgstr ""
+
+msgid "音量"
+msgstr ""
+
+msgid "整体 (失去焦点时)"
+msgstr ""
+
+msgid "音效"
+msgstr ""
+
+msgid "偏移量调整"
+msgstr ""
+
+msgid "音频偏移量"
+msgstr ""
+
+msgid "设置向导"
+msgstr ""
+
+msgid "输入"
+msgstr ""
+
+msgid "鼠标"
+msgstr ""
+
+msgid "绝对输入"
+msgstr ""
+
+msgid "光标灵敏度"
+msgstr ""
+
+msgid "将光标绝对映射至窗口中"
+msgstr ""
+
+msgid "光标边界"
+msgstr ""
+
+msgid "禁用"
+msgstr ""
+
+msgid "游戏时启用"
+msgstr ""
+
+msgid "启用"
+msgstr ""
+
+msgid "在游玩时禁用鼠标滚轮"
+msgstr ""
+
+msgid "在游玩时禁用鼠标按键"
+msgstr ""
+
+msgid "键盘"
+msgstr ""
+
+msgid "按键设置"
+msgstr ""
+
+msgid "键位设置"
+msgstr ""
+
+msgid "自定义键位!"
+msgstr ""
+
+msgid "用户界面"
+msgstr ""
+
+msgid "在拖拽时旋转光标"
+msgstr ""
+
+msgid "菜单光标大小"
+msgstr ""
+
+msgid "视差效果"
+msgstr ""
+
+msgid "\"按压以确认\"激活时间"
+msgstr ""
+
+msgid "主界面"
+msgstr ""
+
+msgid "开场语音"
+msgstr ""
+
+msgid "osu!主题音乐"
+msgstr ""
+
+msgid "开场样式"
+msgstr ""
+
+msgid "圆周"
+msgstr ""
+
+msgid "怀旧"
+msgstr ""
+
+msgid "三角"
+msgstr ""
+
+msgid "圆周(中文)"
+msgstr ""
+
+msgid "三角(中文)"
+msgstr ""
+
+msgid "略过开场"
+msgstr ""
+
+msgid "随机"
+msgstr ""
+
+msgid "背景来源(需要osu!supporter)"
+msgstr ""
+
+msgid "皮肤"
+msgstr ""
+
+msgid "谱面"
+msgstr ""
+
+msgid "季节背景"
+msgstr ""
+
+msgid "总是显示"
+msgstr ""
+
+msgid "只在对应季节显示"
+msgstr ""
+
+msgid "右键鼠标拖拽列表"
+msgstr ""
+
+msgid "显示星级，从"
+msgstr ""
+
+msgid "到"
+msgstr ""
+
+msgid "{0} 星"
+msgstr ""
+
+msgid "无限制"
+msgstr ""
+
+msgid "随机选择算法"
+msgstr ""
+
+msgid "永不重复"
+msgstr ""
+
+msgid "游戏内"
+msgstr ""
+
+msgid "在休息时段使背景变量"
+msgstr ""
+
+msgid "分数计界面显示模式"
+msgstr ""
+
+msgid "从不显示"
+msgstr ""
+
+msgid "在非游玩时段显示"
+msgstr ""
+
+msgid "显示难度分布图"
+msgstr ""
+
+msgid "即使你无法失败，也显示分数计界面"
+msgstr ""
+
+msgid "生命值低时游戏区域泛红"
+msgstr ""
+
+msgid "总是显示按键表示框"
+msgstr ""
+
+msgid "立体音效"
+msgstr ""
+
+msgid "在第一次断连时播放音效"
+msgstr ""
+
+msgid "分数计类型"
+msgstr ""
+
+msgid "不显示"
+msgstr ""
+
+msgid "误差 (左侧)"
+msgstr ""
+
+msgid "误差 (右侧)"
+msgstr ""
+
+msgid "误差 (底部)"
+msgstr ""
+
+msgid "误差 (左右侧)"
+msgstr ""
+
+msgid "颜色 (左侧)"
+msgstr ""
+
+msgid "颜色 (右侧)"
+msgstr ""
+
+msgid "颜色 (左右侧)"
+msgstr ""
+
+msgid "颜色 (底部)"
+msgstr ""
+
+msgid "分数显示模式"
+msgstr ""
+
+msgid "标准"
+msgstr ""
+
+msgid "经典"
+msgstr ""
+
+msgid "当视觉效果Mods启用时,增强第一个物件的可见度"
+msgstr ""
+
+# Ruleset翻译应当由Ruleset自己设定
+msgid "Ruleset翻译应当由Ruleset自己设定"
+msgstr ""
+
+msgid "导出已选中的皮肤"
+msgstr ""
+
+msgid "游戏内光标大小"
+msgstr ""
+
+msgid "根据谱面调整光标大小"
+msgstr ""
+
+msgid "使用谱面自带音效"
+msgstr ""
+
+msgid "使用谱面自带皮肤"
+msgstr ""
+
+msgid "网络"
+msgstr ""
+
+msgid "在打开外部链接前确认"
+msgstr ""
+
+msgid "下图时倾向于不带视频"
+msgstr ""
+
+msgid "旁观时自动下图"
+msgstr ""
+
+msgid "维护"
+msgstr ""
+
+msgid "从stable中导入谱面"
+msgstr ""
+
+msgid "删除所有谱面"
+msgstr ""
+
+msgid "从stable中导入分数"
+msgstr ""
+
+msgid "删除所有分数"
+msgstr ""
+
+msgid "从stable中导入皮肤"
+msgstr ""
+
+msgid "删除所有皮肤"
+msgstr ""
+
+msgid "从stable导入收藏夹"
+msgstr ""
+
+msgid "删除所有收藏夹"
+msgstr ""
+
+msgid "恢复所有已隐藏的谱面"
+msgstr ""
+
+msgid "恢复所有已删除的谱面"
+msgstr ""
+
+msgid "调试"
+msgstr ""
+
+msgid "在左下角显示调试日志"
+msgstr ""
+
+msgid "绕过front-to-back渲染检查"
+msgstr ""
+
+msgid "内存"
+msgstr ""
+
+msgid "清理所有缓存"
+msgstr ""
+
 # Mvis设置Section标题
 msgid "M-vis播放器"
+msgstr ""
+
+# Mvis播放器界面
+msgid "选择该谱面"
 msgstr ""
 
 # 播放器界面
@@ -28,9 +540,6 @@ msgid "请先选择一个收藏夹!"
 msgstr ""
 
 msgid "{0}首歌曲"
-msgstr ""
-
-msgid "等{0}首歌曲"
 msgstr ""
 
 msgid "收藏夹选择"
@@ -105,9 +614,8 @@ msgid "调整播放速度时也同时调整音调"
 msgstr ""
 
 msgid ""
-"请注意: 播放速度调整暂不支持故事版音频, "
-"调整故事版音频请手动前往歌曲选择添加加"
-"速/减速mod"
+"请注意: 播放速度调整暂不支持故事版音频, 调整故事版音"
+"频请手动前往歌曲选择添加加速/减速mod"
 msgstr ""
 
 msgid "夜核节拍器"
@@ -179,14 +687,20 @@ msgid "故事版"
 msgstr ""
 
 # Mf-osu 设置 - 整体
+msgid "Mf-osu自定义选项"
+msgstr ""
+
+msgid "在这里调整Mf-osu的额外设置!"
+msgstr ""
+
+# Mf-osu 设置 - 整体
 msgid "整体"
 msgstr ""
 
 msgid "启用Mf自定义UI"
 msgstr ""
 
-msgid ""
-"禁用以获得接近原版lazer提供的界面体验"
+msgid "禁用以获得接近原版lazer提供的界面体验"
 msgstr ""
 
 msgid "启用三角形粒子动画"
@@ -196,8 +710,8 @@ msgid "启用Sayobot功能"
 msgstr ""
 
 msgid ""
-"这将影响所有谱面预览、封面、和下图的功"
-"能, 但不会影响已完成或正在进行中的请求"
+"这将影响所有谱面预览、封面、和下图的功能, 但不会影响"
+"已完成或正在进行中的请求"
 msgstr ""
 
 msgid "立体音效增益"
@@ -248,9 +762,6 @@ msgstr ""
 msgid "一个神秘的按钮"
 msgstr ""
 
-msgid "关于Mf-osu"
-msgstr ""
-
 msgid "Mvis播放器"
 msgstr ""
 
@@ -271,6 +782,22 @@ msgid "刷新文件列表"
 msgstr ""
 
 msgid "导入该文件"
+msgstr ""
+
+# 杂项
+msgid "游客"
+msgstr ""
+
+msgid "输入以搜索"
+msgstr ""
+
+msgid "本地"
+msgstr ""
+
+msgid "发行版"
+msgstr ""
+
+msgid "调试版"
 msgstr ""
 
 msgid "Windowed"
@@ -309,6 +836,15 @@ msgstr "无限制"
 msgid "FRAME LIMITER"
 msgstr "帧数限制"
 
+msgid "DEBUG LOGS"
+msgstr "调试日志"
+
+msgid "visible"
+msgstr "显示"
+
+msgid "hidden"
+msgstr "隐藏"
+
 msgid "VSync"
 msgstr "垂直同步"
 
@@ -333,6 +869,25 @@ msgstr ""
 msgid "已选择的Mods"
 msgstr ""
 
+# 歌曲选择 - Mods
+msgid "游戏Mods提供了多种多样的游玩方式"
+msgstr ""
+
+msgid "有一些会对您的分数等产生影响,还有一些仅供娱乐"
+msgstr ""
+
+msgid "重置"
+msgstr ""
+
+msgid "自定义"
+msgstr ""
+
+msgid "关闭"
+msgstr ""
+
+msgid "分数倍率:"
+msgstr ""
+
 # 歌曲选择界面 - FilterControl
 msgid "分类依据"
 msgstr ""
@@ -341,6 +896,9 @@ msgid "艺术家"
 msgstr ""
 
 msgid "作图者"
+msgstr ""
+
+msgid "作图者："
 msgstr ""
 
 msgid "BPM"
@@ -421,10 +979,31 @@ msgstr ""
 msgid "撤销随机"
 msgstr ""
 
-msgid "设置"
+msgid "选项"
 msgstr ""
 
 msgid "在Mvis中打开"
+msgstr ""
+
+msgid "管理"
+msgstr ""
+
+msgid "所有难度"
+msgstr ""
+
+msgid "从"
+msgstr ""
+
+msgid "未玩过的谱面中移除"
+msgstr ""
+
+msgid "清除"
+msgstr ""
+
+msgid "所有本地成绩"
+msgstr ""
+
+msgid "该谱面"
 msgstr ""
 
 # 歌曲选择 - 杂项
@@ -445,6 +1024,300 @@ msgstr ""
 
 msgid "删除"
 msgstr ""
+
+# 收藏夹
+msgid "创建新的收藏夹"
+msgstr ""
+
+# DialogOverlay
+msgid "是否删除"
+msgstr ""
+
+msgid "是的,我确定"
+msgstr ""
+
+msgid "不是...是我点错了><!"
+msgstr ""
+
+msgid "是否要清理所有本地成绩?"
+msgstr ""
+
+msgid "是的,抹除这些黑历史"
+msgstr ""
+
+msgid "我需要再想想"
+msgstr ""
+
+msgid "你确定吗?"
+msgstr ""
+
+msgid "让我再想想> <"
+msgstr ""
+
+msgid "你将要离开osu!并在浏览器中打开以下链接:"
+msgstr ""
+
+# 用户登录
+msgid "别来无恙, {0} !"
+msgstr ""
+
+msgid "欢迎回来"
+msgstr ""
+
+msgid "在线"
+msgstr ""
+
+msgid "请勿打扰"
+msgstr ""
+
+msgid "隐身"
+msgstr ""
+
+msgid "登出"
+msgstr ""
+
+msgid "账号"
+msgstr ""
+
+msgid "用户名"
+msgstr ""
+
+msgid "密码"
+msgstr ""
+
+msgid "记住用户名"
+msgstr ""
+
+msgid "自动登录"
+msgstr ""
+
+msgid "登录"
+msgstr ""
+
+msgid "注册"
+msgstr ""
+
+msgid "正在连接至服务器..."
+msgstr ""
+
+msgid "连接失败，将尝试重新连接..."
+msgstr ""
+
+msgid "取消连接"
+msgstr ""
+
+# 用户注册
+msgid "新用户注册"
+msgstr ""
+
+msgid "让我们开始吧!"
+msgstr ""
+
+msgid "创建一个账号!"
+msgstr ""
+
+msgid "Warning! 警告！"
+msgstr ""
+
+msgid "你是{0}吗？"
+msgstr ""
+
+msgid "osu!决不允许玩家多开账号！"
+msgstr ""
+
+msgid "请注意开小号可能会导致永久封禁！"
+msgstr ""
+
+msgid "需要更多信息?请访问我们的"
+msgstr ""
+
+msgid "帮助中心"
+msgstr ""
+
+msgid "我没法登录自己的账号!"
+msgstr ""
+
+msgid "我是为别人注册的"
+msgstr ""
+
+msgid "让我们创建一个账号!"
+msgstr ""
+
+msgid "邮箱地址"
+msgstr ""
+
+msgid ""
+"这将会公开显示在你的个人界面上,请勿填写不良信息"
+msgstr ""
+
+msgid "也不要填写你自己的个人信息!"
+msgstr ""
+
+msgid "这将会用作发送通知和密码重置."
+msgstr ""
+
+msgid "请确保这些信息正确!"
+msgstr ""
+
+msgid "密码要求至少长8个字符"
+msgstr ""
+
+msgid "Something happened... but we're not sure what."
+msgstr "发生了一些意外，但我们不确定具体原因是什么..."
+
+# BeatmapSetOverlay
+msgid "提交日期 "
+msgstr ""
+
+msgid "计入排名于 "
+msgstr ""
+
+msgid "下载"
+msgstr ""
+
+msgid "不带视频"
+msgstr ""
+
+msgid "描述"
+msgstr ""
+
+msgid "流派"
+msgstr ""
+
+msgid "语言"
+msgstr ""
+
+msgid "成功率"
+msgstr ""
+
+msgid "达成于 {0}"
+msgstr ""
+
+msgid "总分"
+msgstr ""
+
+msgid "准确率"
+msgstr ""
+
+msgid "最大连击"
+msgstr ""
+
+msgid "分数"
+msgstr ""
+
+msgid "玩家"
+msgstr ""
+
+# 评论
+msgid "评论"
+msgstr ""
+
+msgid "排序方法"
+msgstr ""
+
+msgid "最新"
+msgstr ""
+
+msgid "最旧"
+msgstr ""
+
+msgid "热门"
+msgstr ""
+
+msgid "显示已删除的评论"
+msgstr ""
+
+# Toolbar
+msgid "来玩{0}"
+msgstr ""
+
+msgid "osu!已经运行了 {0}。"
+msgstr ""
+
+msgid "你共有{0}张谱面!"
+msgstr ""
+
+msgid "在这里更改osu!的设置"
+msgstr ""
+
+msgid "主页"
+msgstr ""
+
+msgid "返回主菜单"
+msgstr ""
+
+msgid "我"
+msgstr ""
+
+msgid "长得很好看(=・ω・=)"
+msgstr ""
+
+msgid "关于Mf-osu"
+msgstr ""
+
+msgid ""
+"这是基于osu!lazer的一个分支版本,祝游玩愉快(｡･ω･)ﾉﾞ"
+msgstr ""
+
+msgid "新闻"
+msgstr ""
+
+msgid "看看社区上都发生了什么"
+msgstr ""
+
+msgid "更新日志"
+msgstr ""
+
+msgid "追踪最新的开发进度!"
+msgstr ""
+
+msgid "看看谁是最强osu!玩家"
+msgstr ""
+
+msgid "看看有没有什么新的谱面"
+msgstr ""
+
+msgid "聊天"
+msgstr ""
+
+msgid "和世界各地的人实时交流"
+msgstr ""
+
+msgid "看板"
+msgstr ""
+
+msgid "在这里查看好友和其他的信息"
+msgstr ""
+
+msgid "音乐"
+msgstr ""
+
+msgid "管理当前正在播放的音乐"
+msgstr ""
+
+msgid "通知"
+msgstr ""
+
+msgid "等待着您~"
+msgstr ""
+
+#~ msgid "Open"
+#~ msgstr "打开"
+
+#~ msgid "{0} participant"
+#~ msgstr "{0} 人参与"
+
+#~ msgid "{0} participants"
+#~ msgstr "{0} 人参与"
+
+#~ msgid "Closed {0}"
+#~ msgstr "关闭于 {0}"
+
+#~ msgid "Closing {0}"
+#~ msgstr "将在 {0} 关闭"
+
+#~ msgid "Closing soon"
+#~ msgstr "即将关闭"
 
 #~ msgid "Frame Limiter"
 #~ msgstr "帧数限制"

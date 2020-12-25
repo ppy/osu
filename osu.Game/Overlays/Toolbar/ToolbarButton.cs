@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
@@ -49,13 +50,13 @@ namespace osu.Game.Overlays.Toolbar
             set => DrawableText.Text = value;
         }
 
-        public string TooltipMain
+        public LocalisedString TooltipMain
         {
             get => tooltip1.Text;
             set => tooltip1.Text = value;
         }
 
-        public string TooltipSub
+        public LocalisedString TooltipSub
         {
             get => tooltip2.Text;
             set => tooltip2.Text = value;

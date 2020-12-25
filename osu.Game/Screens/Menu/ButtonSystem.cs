@@ -42,8 +42,9 @@ namespace osu.Game.Screens.Menu
         public Action OnExit;
         public Action OnSolo;
         public Action OnSettings;
-        public Action OnMulti;
-        public Action OnChart;
+        public Action OnMultiplayer;
+        public Action OnTimeshift;
+
         public Action OnBeatmapListing;
         public Action OnMvisButton;
         public Action OnImportButton;
@@ -139,10 +140,9 @@ namespace osu.Game.Screens.Menu
             buttonsCustom.Add(new Button(@"Mvis播放器", @"button-generic-select", FontAwesome.Solid.Play, new Color4(0, 86, 73, 255), () => OnMvisButton?.Invoke()));
             buttonsCustom.Add(new Button(@"文件导入", @"button-generic-select", FontAwesome.Solid.File, new Color4(0, 86, 73, 255), () => OnImportButton?.Invoke()));
             buttonsCustom.ForEach(b => b.VisibleState = ButtonSystemState.Custom);
-
             buttonsPlay.Add(new Button(@"单人游戏", @"button-solo-select", FontAwesome.Solid.User, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
-            buttonsPlay.Add(new Button(@"多人游戏", @"button-generic-select", FontAwesome.Solid.Users, new Color4(94, 63, 186, 255), onMulti, 0, Key.M));
-            buttonsPlay.Add(new Button(@"排名", @"button-generic-select", FontAwesome.Regular.ChartBar, new Color4(80, 53, 160, 255), () => OnChart?.Invoke()));
+            buttonsPlay.Add(new Button(@"多人游戏", @"button-generic-select", FontAwesome.Solid.Users, new Color4(94, 63, 186, 255), onMultiplayer, 0, Key.M));
+            buttonsPlay.Add(new Button(@"游玩列表", @"button-generic-select", OsuIcon.Charts, new Color4(94, 63, 186, 255), onTimeshift, 0, Key.L));
             buttonsPlay.ForEach(b => b.VisibleState = ButtonSystemState.Play);
 
             buttonsP2C.Add(new Button(@"一个神秘的按钮", @"button-generic-select", FontAwesome.Solid.QuestionCircle, new Color4(0, 86, 73, 255), () => State = ButtonSystemState.Custom));
@@ -199,7 +199,7 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        private void onMulti()
+        private void onMultiplayer()
         {
             if (!api.IsLoggedIn)
             {
@@ -217,7 +217,28 @@ namespace osu.Game.Screens.Menu
                 return;
             }
 
-            OnMulti?.Invoke();
+            OnMultiplayer?.Invoke();
+        }
+
+        private void onTimeshift()
+        {
+            if (!api.IsLoggedIn)
+            {
+                notifications?.Post(new SimpleNotification
+                {
+                    Text = "You gotta be logged in to multi 'yo!",
+                    Icon = FontAwesome.Solid.Globe,
+                    Activated = () =>
+                    {
+                        loginOverlay?.Show();
+                        return true;
+                    }
+                });
+
+                return;
+            }
+
+            OnTimeshift?.Invoke();
         }
 
         private void updateIdleState(bool isIdle)

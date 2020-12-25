@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.ComponentModel;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
@@ -52,10 +51,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
         private enum TimeshiftCategory
         {
-            [Description("所有")]
             Any,
-
-            [Description("普通")]
             Normal,
             Spotlight
         }

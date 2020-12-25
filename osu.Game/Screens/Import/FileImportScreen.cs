@@ -1,4 +1,8 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -8,47 +12,36 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osuTK;
-using osu.Game.Configuration;
-using osu.Game.Overlays;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Graphics.Containers;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Import
 {
     public class FileImportScreen : OsuScreen
     {
-        private Container contentContainer;
-        private FileSelector fileSelector;
-        private Container fileSelectContainer;
-
         public override bool HideOverlaysOnEnter => true;
 
-        private readonly string[] fileExtensions = { ".osk", ".osz", ".osr" };
-        private string defaultPath;
-
-        private readonly Bindable<FileInfo> currentFile = new Bindable<FileInfo>();
-        private readonly IBindable<DirectoryInfo> currentDirectory = new Bindable<DirectoryInfo>();
+        private FileSelector fileSelector;
+        private Container contentContainer;
         private TextFlowContainer currentFileText;
-        private OsuScrollContainer fileNameScroll;
-        private readonly OverlayColourProvider overlayColourProvider = new OverlayColourProvider(OverlayColourScheme.Blue1);
+
+        private TriangleButton importButton;
+
+        private const float duration = 300;
+        private const float button_height = 50;
+        private const float button_vertical_margin = 15;
 
         [Resolved]
-        private OsuGameBase gameBase { get; set; }
+        private OsuGameBase game { get; set; }
 
         [Resolved]
-        private DialogOverlay dialogOverlay { get; set; }
+        private OsuColour colours { get; set; }
 
         [BackgroundDependencyLoader(true)]
-        private void load(Storage storage, MfConfigManager config)
+        private void load(Storage storage)
         {
-            storage.GetStorageForDirectory("imports");
-            var originalPath = storage.GetFullPath("imports", true);
-
-            defaultPath = originalPath;
-
             InternalChild = contentContainer = new Container
             {
                 Masking = true,
@@ -61,15 +54,13 @@ namespace osu.Game.Screens.Import
                 {
                     new Box
                     {
-                        Colour = overlayColourProvider.Background5,
+                        Colour = colours.GreySeafoamDark,
                         RelativeSizeAxes = Axes.Both,
                     },
-                    fileSelectContainer = new Container
+                    fileSelector = new FileSelector(validFileExtensions: game.HandledExtensions.ToArray())
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Width = 0.65f,
-                        Anchor = Anchor.TopLeft,
-                        Origin = Anchor.TopLeft,
+                        Width = 0.65f
                     },
                     new Container
                     {
@@ -77,159 +68,101 @@ namespace osu.Game.Screens.Import
                         Width = 0.35f,
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
-                        Masking = true,
-                        CornerRadius = 10,
                         Children = new Drawable[]
                         {
                             new Box
                             {
-                                Colour = overlayColourProvider.Background3,
+                                Colour = colours.GreySeafoamDarker,
                                 RelativeSizeAxes = Axes.Both
                             },
-                            fileNameScroll = new OsuScrollContainer
+                            new Container
                             {
-                                Masking = false,
                                 RelativeSizeAxes = Axes.Both,
-                                Child = currentFileText = new TextFlowContainer(t => t.Font = OsuFont.Default.With(size: 30))
+                                Padding = new MarginPadding { Bottom = button_height + button_vertical_margin * 2 },
+                                Child = new OsuScrollContainer
                                 {
-                                    AutoSizeAxes = Axes.Y,
-                                    RelativeSizeAxes = Axes.X,
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    TextAnchor = Anchor.Centre
+                                    RelativeSizeAxes = Axes.Both,
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                    Child = currentFileText = new TextFlowContainer(t => t.Font = OsuFont.Default.With(size: 30))
+                                    {
+                                        AutoSizeAxes = Axes.Y,
+                                        RelativeSizeAxes = Axes.X,
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        TextAnchor = Anchor.Centre
+                                    },
+                                    ScrollContent =
+                                    {
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                    }
                                 },
                             },
-                            new GridContainer
+                            importButton = new TriangleButton
                             {
+                                Text = "导入该文件",
                                 Anchor = Anchor.BottomCentre,
                                 Origin = Anchor.BottomCentre,
-                                AutoSizeAxes = Axes.Y,
                                 RelativeSizeAxes = Axes.X,
-                                Margin = new MarginPadding { Bottom = 15 },
-                                RowDimensions = new[]
-                                {
-                                    new Dimension(GridSizeMode.AutoSize)
-                                },
-                                Content = new[]
-                                {
-                                    new Drawable[]
-                                    {
-                                        new TriangleButton
-                                        {
-                                            Anchor = Anchor.BottomCentre,
-                                            Origin = Anchor.BottomCentre,
-                                            RelativeSizeAxes = Axes.X,
-                                            Height = 50,
-                                            Width = 0.9f,
-                                            Text = "刷新文件列表",
-                                            Action = refresh
-                                        },
-                                        new TriangleButton
-                                        {
-                                            Text = "导入该文件",
-                                            Anchor = Anchor.BottomCentre,
-                                            Origin = Anchor.BottomCentre,
-                                            RelativeSizeAxes = Axes.X,
-                                            Height = 50,
-                                            Width = 0.9f,
-                                            Action = () =>
-                                            {
-                                                var d = currentFile.Value?.FullName;
-                                                if (d != null)
-                                                    startImport(d);
-                                                else
-                                                    currentFileText.FlashColour(Color4.Red, 500);
-                                            },
-                                        }
-                                    },
-                                }
+                                Height = button_height,
+                                Width = 0.9f,
+                                Margin = new MarginPadding { Vertical = button_vertical_margin },
+                                Action = () => startImport(fileSelector.CurrentFile.Value?.FullName)
                             }
                         }
                     }
                 }
             };
 
-            fileNameScroll.ScrollContent.Anchor = Anchor.Centre;
-            fileNameScroll.ScrollContent.Origin = Anchor.Centre;
-
-            currentFile.BindValueChanged(updateFileSelectionText, true);
-            currentDirectory.BindValueChanged(_ =>
-            {
-                currentFile.Value = null;
-            });
-
-            refresh();
-        }
-
-        private void refresh()
-        {
-            //解绑
-            currentFile.UnbindBindings();
-            currentDirectory.UnbindBindings();
-
-            //清理文件选择器fileSelector
-            fileSelector?.Expire();
-
-            //创建字符串directory，赋值为当前目录或默认目录
-            var directory = currentDirectory.Value?.FullName ?? defaultPath;
-
-            //设置文件选择器
-            fileSelector = new FileSelector(initialPath: directory, validFileExtensions: fileExtensions)
-            {
-                RelativeSizeAxes = Axes.Both
-            };
-
-            //绑定
-            currentDirectory.BindTo(fileSelector.CurrentPath);
-            currentFile.BindTo(fileSelector.CurrentFile);
-
-            //添加
-            fileSelectContainer.Add(fileSelector);
-        }
-
-        private void updateFileSelectionText(ValueChangedEvent<FileInfo> v)
-        {
-            currentFileText.Text = v.NewValue?.Name ?? "请选择一个文件";
+            fileSelector.CurrentFile.BindValueChanged(fileChanged, true);
+            fileSelector.CurrentPath.BindValueChanged(directoryChanged);
         }
 
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
 
-            contentContainer.FadeOut().Then().ScaleTo(0.8f).RotateTo(-15).MoveToX(300)
-                            .Then()
-                            .ScaleTo(1, 1500, Easing.OutElastic)
-                            .FadeIn(500)
-                            .MoveToX(0, 500, Easing.OutQuint)
-                            .RotateTo(0, 500, Easing.OutQuint);
+            contentContainer.ScaleTo(0.95f).ScaleTo(1, duration, Easing.OutQuint);
+            this.FadeInFromZero(duration);
         }
 
         public override bool OnExiting(IScreen next)
         {
-            contentContainer.ScaleTo(0.8f, 500, Easing.OutExpo).RotateTo(-15, 500, Easing.OutExpo).MoveToX(300, 500, Easing.OutQuint).FadeOut(500);
-            this.FadeOut(500, Easing.OutExpo);
+            contentContainer.ScaleTo(0.95f, duration, Easing.OutQuint);
+            this.FadeOut(duration, Easing.OutQuint);
 
             return base.OnExiting(next);
         }
 
+        private void directoryChanged(ValueChangedEvent<DirectoryInfo> _)
+        {
+            // this should probably be done by the selector itself, but let's do it here for now.
+            fileSelector.CurrentFile.Value = null;
+        }
+
+        private void fileChanged(ValueChangedEvent<FileInfo> selectedFile)
+        {
+            importButton.Enabled.Value = selectedFile.NewValue != null;
+            currentFileText.Text = selectedFile.NewValue?.Name ?? "请选择一个文件";
+        }
+
         private void startImport(string path)
         {
-            //在某些特殊情况下会这样...
             if (string.IsNullOrEmpty(path))
                 return;
 
-            //如果文件被移动或删除
-            if (!File.Exists(path))
+            Task.Factory.StartNew(async () =>
             {
-                refresh();
-                currentFileText.Text = "文件不存在";
-                currentFileText.FlashColour(Color4.Red, 500);
-                return;
-            }
+                await game.Import(path);
 
-            string[] paths = { path };
-
-            Task.Factory.StartNew(() => gameBase.Import(paths), TaskCreationOptions.LongRunning);
+                // some files will be deleted after successful import, so we want to refresh the view.
+                Schedule(() =>
+                {
+                    // should probably be exposed as a refresh method.
+                    fileSelector.CurrentPath.TriggerChange();
+                });
+            }, TaskCreationOptions.LongRunning);
         }
     }
 }

@@ -7,16 +7,12 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 {
     public enum RoomStatusFilter
     {
-        [Description("开放中的房间")]
+        [Description("_Open_Multiplayer")]
         Open,
 
-        [Description("最近关闭的房间")]
+        [Description("Recently Ended")]
         Ended,
-
-        [Description("参与过的房间")]
         Participated,
-
-        [Description("拥有的房间")]
         Owned,
     }
 }

@@ -92,6 +92,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
+        private Container dragHandles;
         private FillFlowContainer buttons;
 
         public const float BORDER_RADIUS = 3;
@@ -151,6 +152,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         },
                     }
                 },
+                dragHandles = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    // ensures that the centres of all drag handles line up with the middle of the selection box border.
+                    Padding = new MarginPadding(BORDER_RADIUS / 2)
+                },
                 buttons = new FillFlowContainer
                 {
                     Y = 20,
@@ -191,7 +198,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 {
                     Anchor = Anchor.TopCentre,
                     Y = -separation,
-                    HandleDrag = e => OnRotation?.Invoke(e.Delta.X),
+                    HandleDrag = e => OnRotation?.Invoke(convertDragEventToAngleOfRotation(e)),
                     OperationStarted = operationStarted,
                     OperationEnded = operationEnded
                 }
@@ -232,7 +239,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             });
         }
 
-        private void addDragHandle(Anchor anchor) => AddInternal(new SelectionBoxDragHandle
+        private void addDragHandle(Anchor anchor) => dragHandles.Add(new SelectionBoxDragHandle
         {
             Anchor = anchor,
             HandleDrag = e => OnScale?.Invoke(e.Delta, anchor),
@@ -241,6 +248,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
         });
 
         private int activeOperations;
+
+        private float convertDragEventToAngleOfRotation(DragEvent e)
+        {
+            // Adjust coordinate system to the center of SelectionBox
+            float startAngle = MathF.Atan2(e.LastMousePosition.Y - DrawHeight / 2, e.LastMousePosition.X - DrawWidth / 2);
+            float endAngle = MathF.Atan2(e.MousePosition.Y - DrawHeight / 2, e.MousePosition.X - DrawWidth / 2);
+
+            return (endAngle - startAngle) * 180 / MathF.PI;
+        }
 
         private void operationEnded()
         {

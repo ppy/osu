@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                             AddNested(new TinyDroplet
                             {
                                 StartTime = t + lastEvent.Value.Time,
-                                X = X + Path.PositionAt(
+                                X = OriginalX + Path.PositionAt(
                                     lastEvent.Value.PathProgress + (t / sinceLastTick) * (e.PathProgress - lastEvent.Value.PathProgress)).X,
                             });
                         }
@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                         {
                             Samples = dropletSamples,
                             StartTime = e.Time,
-                            X = X + Path.PositionAt(e.PathProgress).X,
+                            X = OriginalX + Path.PositionAt(e.PathProgress).X,
                         });
                         break;
 
@@ -104,14 +104,14 @@ namespace osu.Game.Rulesets.Catch.Objects
                         {
                             Samples = this.GetNodeSamples(nodeIndex++),
                             StartTime = e.Time,
-                            X = X + Path.PositionAt(e.PathProgress).X,
+                            X = OriginalX + Path.PositionAt(e.PathProgress).X,
                         });
                         break;
                 }
             }
         }
 
-        public float EndX => X + this.CurvePositionAt(1).X;
+        public float EndX => OriginalX + this.CurvePositionAt(1).X;
 
         public double Duration
         {

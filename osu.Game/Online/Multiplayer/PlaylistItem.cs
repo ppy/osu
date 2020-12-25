@@ -64,8 +64,8 @@ namespace osu.Game.Online.Multiplayer
 
         public void MapObjects(BeatmapManager beatmaps, RulesetStore rulesets)
         {
-            Beatmap.Value = apiBeatmap.ToBeatmap(rulesets);
-            Ruleset.Value = rulesets.GetRuleset(RulesetID);
+            Beatmap.Value ??= apiBeatmap.ToBeatmap(rulesets);
+            Ruleset.Value ??= rulesets.GetRuleset(RulesetID);
 
             Ruleset rulesetInstance = Ruleset.Value.CreateInstance();
 

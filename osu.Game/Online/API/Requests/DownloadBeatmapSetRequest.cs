@@ -38,7 +38,7 @@ namespace osu.Game.Online.API.Requests
             if (useSayobot)
                 return $@"https://txy1.sayobot.cn/beatmaps/download/{Target}";
 
-            return $@"{API.Endpoint}/api/v2/{Target}";
+            return $@"{API.WebsiteRootUrl}/api/v2/{Target}";
         }
 
         protected override string Target => $@"{calcTarget()}";

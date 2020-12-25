@@ -13,9 +13,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
@@ -52,136 +50,98 @@ namespace osu.Game.Screens.Ranking
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        private Bindable<bool> optUIEnabled;
-        private FillFlowContainer buttons;
-        private OsuSpriteText texts;
-
         private StatisticsPanel statisticsPanel;
-        private BottomPanel bottomPanel;
+        private Drawable bottomPanel;
         private Container<ScorePanel> detachedPanelContainer;
 
         private bool fetchedInitialScores;
         private APIRequest nextPageRequest;
 
         private readonly bool allowRetry;
+        private readonly bool allowWatchingReplay;
 
-        protected ResultsScreen(ScoreInfo score, bool allowRetry)
+        protected ResultsScreen(ScoreInfo score, bool allowRetry, bool allowWatchingReplay = true)
         {
             Score = score;
             this.allowRetry = allowRetry;
+            this.allowWatchingReplay = allowWatchingReplay;
 
             SelectedScore.Value = score;
         }
 
         [BackgroundDependencyLoader]
-        private void load(MfConfigManager config)
+        private void load(MfConfigManager mConfig)
         {
-            optUIEnabled = config.GetBindable<bool>(MfSetting.OptUI);
+            this.mConfig = mConfig;
 
-            InternalChildren = new Drawable[]
+            InternalChild = new GridContainer
             {
-                new ParallaxContainer
+                RelativeSizeAxes = Axes.Both,
+                Content = new[]
                 {
-                    Masking = true,
-                    Child = new MfBgTriangles(0.5f, false, 5f),
-                },
-                new GridContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Content = new[]
+                    new Drawable[]
                     {
-                        new Drawable[]
+                        new VerticalScrollContainer
                         {
-                            new VerticalScrollContainer
+                            RelativeSizeAxes = Axes.Both,
+                            ScrollbarVisible = false,
+                            Child = new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                ScrollbarVisible = false,
-                                Child = new Container
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Children = new Drawable[]
-                                    {
-                                        statisticsPanel = new StatisticsPanel
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Score = { BindTarget = SelectedScore }
-                                        },
-                                        ScorePanelList = new ScorePanelList
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            SelectedScore = { BindTarget = SelectedScore },
-                                            PostExpandAction = () => statisticsPanel.ToggleVisibility()
-                                        },
-                                        detachedPanelContainer = new Container<ScorePanel>
-                                        {
-                                            RelativeSizeAxes = Axes.Both
-                                        },
-                                    }
-                                }
-                            },
-                        },
-                        new Drawable[]
-                        {
-                            bottomPanel = new BottomPanel
-                            {
-                                Anchor = Anchor.BottomLeft,
-                                Origin = Anchor.BottomLeft,
-                                RelativeSizeAxes = Axes.X,
-                                Height = TwoLayerButton.SIZE_EXTENDED.Y,
-                                Alpha = 0,
                                 Children = new Drawable[]
                                 {
-                                    new Box
+                                    statisticsPanel = new StatisticsPanel
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Colour = Color4Extensions.FromHex("#333")
+                                        Score = { BindTarget = SelectedScore }
                                     },
-                                    new Container
+                                    ScorePanelList = new ScorePanelList
                                     {
-                                        Name = "Base Container",
-                                        Anchor = Anchor.Centre,
-                                        Origin = Anchor.Centre,
-                                        AutoSizeAxes = Axes.X,
-                                        RelativeSizeAxes = Axes.Y,
-                                        Children = new Drawable[]
-                                        {
-                                            texts = new OsuSpriteText
-                                            {
-                                                Name = "Texts Fillflow",
-                                                Anchor = Anchor.Centre,
-                                                Origin = Anchor.Centre,
-                                                Margin = new MarginPadding { Top = 10 },
-                                                Y = -10,
-                                            },
-                                            buttons = new FillFlowContainer
-                                            {
-                                                Anchor = Anchor.BottomCentre,
-                                                Origin = Anchor.BottomCentre,
-                                                AutoSizeAxes = Axes.Both,
-                                                Margin = new MarginPadding { Bottom = 10f },
-                                                Spacing = new Vector2(5),
-                                                Direction = FillDirection.Horizontal,
-                                                Children = new Drawable[]
-                                                {
-                                                    new ReplayDownloadButton(null)
-                                                    {
-                                                        Score = { BindTarget = SelectedScore },
-                                                        Width = 300
-                                                    },
-                                                }
-                                            }
-                                        }
+                                        RelativeSizeAxes = Axes.Both,
+                                        SelectedScore = { BindTarget = SelectedScore },
+                                        PostExpandAction = () => statisticsPanel.ToggleVisibility()
+                                    },
+                                    detachedPanelContainer = new Container<ScorePanel>
+                                    {
+                                        RelativeSizeAxes = Axes.Both
                                     },
                                 }
                             }
-                        }
+                        },
                     },
-                    RowDimensions = new[]
+                    new[]
                     {
-                        new Dimension(),
-                        new Dimension(GridSizeMode.AutoSize)
+                        bottomPanel = new Container
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            RelativeSizeAxes = Axes.X,
+                            Height = TwoLayerButton.SIZE_EXTENDED.Y,
+                            Alpha = 0,
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = Color4Extensions.FromHex("#333")
+                                },
+                                buttons = new FillFlowContainer
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    AutoSizeAxes = Axes.Both,
+                                    Spacing = new Vector2(5),
+                                    Direction = FillDirection.Horizontal
+                                }
+                            }
+                        }
                     }
                 },
+                RowDimensions = new[]
+                {
+                    new Dimension(),
+                    new Dimension(GridSizeMode.AutoSize)
+                }
             };
 
             if (Score != null)
@@ -190,6 +150,15 @@ namespace osu.Game.Screens.Ranking
                 bool shouldFlair = player != null && !Score.Mods.Any(m => m is ModAutoplay);
 
                 ScorePanelList.AddScore(Score, shouldFlair);
+            }
+
+            if (allowWatchingReplay)
+            {
+                buttons.Add(new ReplayDownloadButton(null)
+                {
+                    Score = { BindTarget = SelectedScore },
+                    Width = 300
+                });
             }
 
             if (player != null && allowRetry)
@@ -273,13 +242,14 @@ namespace osu.Game.Screens.Ranking
 
             Background.FadeTo(0.5f, 250);
 
-            texts.Hide();
+            bool useOriginalAnimation = mConfig.Get<bool>(MfSetting.OptUI);
 
-            switch (optUIEnabled.Value)
+            switch (useOriginalAnimation)
             {
                 case true:
-                    bottomPanel.Y = TwoLayerButton.SIZE_EXTENDED.Y;
-                    bottomPanel.Delay(250).FadeTo(1, 200).MoveToY(0, 550, Easing.OutBack);
+                    bottomPanel.MoveToY(bottomPanel.Height).Then()
+                               .Delay(250).FadeTo(1, 200)
+                               .MoveToY(0, 550, Easing.OutBack);
 
                     buttons.FadeTo(0).MoveToX(200)
                            .Then().Delay(250)
@@ -299,11 +269,12 @@ namespace osu.Game.Screens.Ranking
         public override bool OnExiting(IScreen next)
         {
             Background.FadeTo(1, 250);
+            bool useOriginalAnimation = mConfig.Get<bool>(MfSetting.OptUI);
 
-            switch (optUIEnabled.Value)
+            switch (useOriginalAnimation)
             {
                 case true:
-                    bottomPanel.MoveToY(TwoLayerButton.SIZE_EXTENDED.Y, 250);
+                    bottomPanel.MoveToY(bottomPanel.Height, 250);
                     this.FadeOut(100);
                     break;
             }
@@ -331,6 +302,8 @@ namespace osu.Game.Screens.Ranking
         }
 
         private ScorePanel detachedPanel;
+        private MfConfigManager mConfig;
+        private FillFlowContainer buttons;
 
         private void onStatisticsStateChanged(ValueChangedEvent<Visibility> state)
         {

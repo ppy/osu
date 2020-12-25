@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                             RelativeSizeAxes = Axes.X,
                                             Margin = new MarginPadding { Vertical = 60 },
                                         },
-                                        participantsHeader = new OverlinedHeader("近期参与"),
+                                        participantsHeader = new OverlinedHeader("Recent Participants"),
                                         new ParticipantsDisplay(Direction.Vertical)
                                         {
                                             RelativeSizeAxes = Axes.X,

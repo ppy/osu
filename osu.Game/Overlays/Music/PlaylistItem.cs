@@ -79,13 +79,18 @@ namespace osu.Game.Overlays.Music
             text.Clear();
 
             // space after the title to put a space between the title and artist
-            titleSprites = text.AddText(title.Value + @"  ", sprite => sprite.Font = OsuFont.GetFont(size: 18, weight: FontWeight.Regular)).OfType<SpriteText>();
+            titleSprites = text.AddText(title.Value + @"  ", sprite =>
+            {
+                sprite.Font = OsuFont.GetFont(size: 18, weight: FontWeight.Regular);
+                sprite.UseLegacyUnicode = true;
+            }).OfType<SpriteText>();
 
             text.AddText(artist.Value, sprite =>
             {
                 sprite.Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold);
                 sprite.Colour = artistColour;
                 sprite.Padding = new MarginPadding { Top = 1 };
+                sprite.UseLegacyUnicode = true;
             });
         }
 

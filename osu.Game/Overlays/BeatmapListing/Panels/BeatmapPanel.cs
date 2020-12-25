@@ -152,7 +152,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
             }
             else
             {
-                foreach (var b in SetInfo.Beatmaps.OrderBy(beatmap => beatmap.StarDifficulty))
+                foreach (var b in SetInfo.Beatmaps.OrderBy(beatmap => beatmap.Ruleset.ID).ThenBy(beatmap => beatmap.StarDifficulty))
                     icons.Add(new DifficultyIcon(b));
             }
 

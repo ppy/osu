@@ -176,7 +176,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                         Spacing = new Vector2(5f),
                                         Children = new Drawable[]
                                         {
-                                            new RoomName { Font = OsuFont.GetFont(size: 17) },
+                                            new RoomName { Font = OsuFont.GetFont(size: 18) },
                                             new ParticipantInfo(),
                                         },
                                     },
@@ -187,8 +187,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
                                         Direction = FillDirection.Vertical,
-                                        Margin = new MarginPadding { Top = 0, Bottom = -1.25f },
-                                        Spacing = new Vector2(0, 0.625f),
+                                        Spacing = new Vector2(0, 5),
                                         Children = new Drawable[]
                                         {
                                             new RoomStatusInfo(),
@@ -241,9 +240,9 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
         public MenuItem[] ContextMenuItems => new MenuItem[]
         {
-            new OsuMenuItem("创建一个相同的房间", MenuItemType.Standard, () =>
+            new OsuMenuItem("Create copy", MenuItemType.Standard, () =>
             {
-                multiplayer?.CreateRoom(Room.CreateCopy());
+                multiplayer?.OpenNewRoom(Room.CreateCopy());
             })
         };
     }
