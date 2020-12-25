@@ -4,7 +4,6 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Overlays;
-using osu.Game.Screens.Multi.Playlists;
 
 namespace osu.Game.Tests.Visual.Playlists
 {
@@ -18,7 +17,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
         public TestScenePlaylistsScreen()
         {
-            var multi = new PlaylistsMultiplayer();
+            var multi = new Screens.Multi.Playlists.Playlists();
 
             AddStep("show", () => LoadScreen(multi));
             AddUntilStep("wait for loaded", () => multi.IsLoaded);

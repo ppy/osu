@@ -106,7 +106,7 @@ namespace osu.Game.Screens.Menu
                             },
                             OnSolo = onSolo,
                             OnMultiplayer = () => this.Push(new Multiplayer()),
-                            OnPlaylists = () => this.Push(new PlaylistsMultiplayer()),
+                            OnPlaylists = () => this.Push(new Playlists()),
                             OnExit = confirmAndExit,
                         }
                     }
