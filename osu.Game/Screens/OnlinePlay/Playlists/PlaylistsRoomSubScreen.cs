@@ -28,9 +28,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         [Resolved(typeof(Room), nameof(Room.RoomID))]
         private Bindable<int?> roomId { get; set; }
 
-        [Resolved(canBeNull: true)]
-        private MultiplayerScreen multiplayer { get; set; }
-
         private MatchSettingsOverlay settingsOverlay;
         private MatchLeaderboard leaderboard;
 
@@ -124,7 +121,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                             RequestShowResults = item =>
                                                                             {
                                                                                 Debug.Assert(roomId.Value != null);
-                                                                                multiplayer?.Push(new PlaylistsResultsScreen(null, roomId.Value.Value, item, false));
+                                                                                ParentScreen?.Push(new PlaylistsResultsScreen(null, roomId.Value.Value, item, false));
                                                                             }
                                                                         }
                                                                     },
