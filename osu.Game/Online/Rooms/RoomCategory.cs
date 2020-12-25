@@ -5,8 +5,9 @@ namespace osu.Game.Online.Rooms
 {
     public enum RoomCategory
     {
+        // used for osu-web deserialization so names shouldn't be changed.
         Normal,
         Spotlight,
-        Multiplayer,
+        Realtime,
     }
 }
