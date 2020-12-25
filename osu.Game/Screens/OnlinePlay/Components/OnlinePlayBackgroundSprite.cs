@@ -8,12 +8,12 @@ using osu.Game.Beatmaps.Drawables;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
-    public class MultiplayerBackgroundSprite : MultiplayerComposite
+    public class OnlinePlayBackgroundSprite : OnlinePlayComposite
     {
         private readonly BeatmapSetCoverType beatmapSetCoverType;
         private UpdateableBeatmapBackgroundSprite sprite;
 
-        public MultiplayerBackgroundSprite(BeatmapSetCoverType beatmapSetCoverType = BeatmapSetCoverType.Cover)
+        public OnlinePlayBackgroundSprite(BeatmapSetCoverType beatmapSetCoverType = BeatmapSetCoverType.Cover)
         {
             this.beatmapSetCoverType = beatmapSetCoverType;
         }
