@@ -22,7 +22,7 @@ using osu.Game.Tests.Beatmaps;
 using osu.Game.Users;
 using osuTK.Input;
 
-namespace osu.Game.Tests.Visual.Multiplayer
+namespace osu.Game.Tests.Visual.Playlists
 {
     public class TestScenePlaylistsRoomSubScreen : MultiplayerTestScene
     {

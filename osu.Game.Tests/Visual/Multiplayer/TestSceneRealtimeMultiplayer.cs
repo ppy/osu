@@ -3,9 +3,10 @@
 
 using NUnit.Framework;
 using osu.Game.Screens.Multi.Components;
+using osu.Game.Tests.Visual.RealtimeMultiplayer;
 using osu.Game.Users;
 
-namespace osu.Game.Tests.Visual.RealtimeMultiplayer
+namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneRealtimeMultiplayer : RealtimeMultiplayerTestScene
     {

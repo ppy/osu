@@ -9,10 +9,11 @@ using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Online.RealtimeMultiplayer;
 using osu.Game.Screens.Multi.RealtimeMultiplayer.Participants;
+using osu.Game.Tests.Visual.RealtimeMultiplayer;
 using osu.Game.Users;
 using osuTK;
 
-namespace osu.Game.Tests.Visual.RealtimeMultiplayer
+namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneRealtimeMultiplayerParticipantsList : RealtimeMultiplayerTestScene
     {

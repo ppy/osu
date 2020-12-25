@@ -4,7 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Game.Screens.Multi.Lounge.Components;
 
-namespace osu.Game.Tests.Visual.Multiplayer
+namespace osu.Game.Tests.Visual.Playlists
 {
     public class TestScenePlaylistsFilterControl : OsuTestScene
     {
