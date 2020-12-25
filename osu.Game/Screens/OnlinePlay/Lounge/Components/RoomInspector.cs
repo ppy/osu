@@ -7,10 +7,10 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Screens.Multi.Components;
+using osu.Game.Screens.OnlinePlay.Components;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Multi.Lounge.Components
+namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
     public class RoomInspector : MultiplayerComposite
     {

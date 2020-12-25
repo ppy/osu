@@ -11,7 +11,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Users.Drawables;
 using osuTK;
 
-namespace osu.Game.Screens.Multi.Lounge.Components
+namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
     public class ParticipantInfo : MultiplayerComposite
     {

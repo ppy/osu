@@ -11,13 +11,13 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Scoring;
-using osu.Game.Screens.Multi.Playlists;
+using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Ranking;
 using osuTK;
 
-namespace osu.Game.Screens.Multi.Multiplayer
+namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
     // Todo: The "room" part of PlaylistsPlayer should be split out into an abstract player class to be inherited instead.
     public class MultiplayerPlayer : PlaylistsPlayer

@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Online.Rooms;
-using osu.Game.Screens.Multi.Lounge.Components;
+using osu.Game.Screens.OnlinePlay.Lounge.Components;
 
-namespace osu.Game.Screens.Multi.Components
+namespace osu.Game.Screens.OnlinePlay.Components
 {
     /// <summary>
     /// A <see cref="RoomPollingComponent"/> that polls for the lounge listing.

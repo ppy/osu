@@ -10,10 +10,10 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Rooms.GameTypes;
-using osu.Game.Screens.Multi.Components;
+using osu.Game.Screens.OnlinePlay.Components;
 using osuTK;
 
-namespace osu.Game.Screens.Multi.Match.Components
+namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
     public class GameTypePicker : DisableableTabControl<GameType>
     {

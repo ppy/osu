@@ -17,7 +17,7 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 
-namespace osu.Game.Screens.Multi.Playlists
+namespace osu.Game.Screens.OnlinePlay.Playlists
 {
     public class PlaylistsPlayer : Player
     {

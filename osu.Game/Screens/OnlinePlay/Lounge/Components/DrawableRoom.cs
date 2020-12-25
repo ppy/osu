@@ -9,22 +9,22 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Multi.Components;
+using osu.Game.Online.Rooms;
+using osu.Game.Screens.OnlinePlay.Components;
 using osuTK;
 using osuTK.Graphics;
-using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.UserInterface;
-using osu.Game.Online.Rooms;
 
-namespace osu.Game.Screens.Multi.Lounge.Components
+namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
     public class DrawableRoom : OsuClickableContainer, IStateful<SelectionState>, IFilterable, IHasContextMenu
     {

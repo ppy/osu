@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Online.Rooms;
 using osu.Game.Users;
 
-namespace osu.Game.Screens.Multi
+namespace osu.Game.Screens.OnlinePlay
 {
     public class MultiplayerComposite : CompositeDrawable
     {

@@ -10,7 +10,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Online.Rooms;
 using osuTK;
 
-namespace osu.Game.Screens.Multi
+namespace osu.Game.Screens.OnlinePlay
 {
     public class DrawableRoomPlaylist : OsuRearrangeableListContainer<PlaylistItem>
     {

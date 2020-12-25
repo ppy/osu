@@ -11,7 +11,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Multiplayer;
 using osuTK;
 
-namespace osu.Game.Screens.Multi.Multiplayer.Participants
+namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 {
     public class StateDisplay : CompositeDrawable
     {

@@ -11,15 +11,15 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
-using osu.Game.Screens.Multi.Components;
-using osu.Game.Screens.Multi.Match;
-using osu.Game.Screens.Multi.Match.Components;
-using osu.Game.Screens.Multi.Multiplayer.Match;
-using osu.Game.Screens.Multi.Multiplayer.Participants;
+using osu.Game.Screens.OnlinePlay.Components;
+using osu.Game.Screens.OnlinePlay.Match;
+using osu.Game.Screens.OnlinePlay.Match.Components;
+using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
+using osu.Game.Screens.OnlinePlay.Multiplayer.Participants;
 using osu.Game.Users;
-using ParticipantsList = osu.Game.Screens.Multi.Multiplayer.Participants.ParticipantsList;
+using ParticipantsList = osu.Game.Screens.OnlinePlay.Multiplayer.Participants.ParticipantsList;
 
-namespace osu.Game.Screens.Multi.Multiplayer
+namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
     [Cached]
     public class MultiplayerMatchSubScreen : RoomSubScreen

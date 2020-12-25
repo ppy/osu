@@ -10,7 +10,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Users.Drawables;
 using osuTK;
 
-namespace osu.Game.Screens.Multi.Match.Components
+namespace osu.Game.Screens.OnlinePlay.Match.Components
 {
     public class Header : MultiplayerComposite
     {

@@ -3,9 +3,9 @@
 
 using System.Collections.Generic;
 using osu.Framework.Bindables;
-using osu.Game.Screens.Multi.Components;
+using osu.Game.Screens.OnlinePlay.Components;
 
-namespace osu.Game.Screens.Multi.Playlists
+namespace osu.Game.Screens.OnlinePlay.Playlists
 {
     public class PlaylistsRoomManager : RoomManager
     {

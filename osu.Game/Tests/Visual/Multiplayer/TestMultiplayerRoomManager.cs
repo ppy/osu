@@ -11,8 +11,8 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
-using osu.Game.Screens.Multi.Lounge.Components;
-using osu.Game.Screens.Multi.Multiplayer;
+using osu.Game.Screens.OnlinePlay.Lounge.Components;
+using osu.Game.Screens.OnlinePlay.Multiplayer;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {

@@ -13,13 +13,13 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Threading;
 using osu.Game.Extensions;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
-using osuTK;
-using osu.Game.Graphics.Cursor;
 using osu.Game.Online.Rooms;
+using osuTK;
 
-namespace osu.Game.Screens.Multi.Lounge.Components
+namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
     public class RoomsContainer : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {

@@ -3,7 +3,7 @@
 
 using System.ComponentModel;
 
-namespace osu.Game.Screens.Multi.Lounge.Components
+namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
     public enum RoomStatusFilter
     {

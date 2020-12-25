@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Humanizer;
 using osu.Framework.IO.Network;
 using osu.Game.Online.API;
-using osu.Game.Screens.Multi.Lounge.Components;
+using osu.Game.Screens.OnlinePlay.Lounge.Components;
 
 namespace osu.Game.Online.Rooms
 {

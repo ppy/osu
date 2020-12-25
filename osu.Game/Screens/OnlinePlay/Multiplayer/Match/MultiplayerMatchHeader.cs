@@ -10,14 +10,14 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
-using osu.Game.Screens.Multi.Match.Components;
+using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Users.Drawables;
 using osuTK;
 using FontWeight = osu.Game.Graphics.FontWeight;
 using OsuColour = osu.Game.Graphics.OsuColour;
 using OsuFont = osu.Game.Graphics.OsuFont;
 
-namespace osu.Game.Screens.Multi.Multiplayer.Match
+namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
     public class MultiplayerMatchHeader : MultiplayerComposite
     {

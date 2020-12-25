@@ -11,7 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Rooms.RoomStatuses;
 
-namespace osu.Game.Screens.Multi.Components
+namespace osu.Game.Screens.OnlinePlay.Components
 {
     public class RoomStatusInfo : MultiplayerComposite
     {

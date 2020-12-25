@@ -10,8 +10,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Rooms;
-using osu.Game.Screens.Multi;
-using osu.Game.Screens.Multi.Components;
+using osu.Game.Screens.OnlinePlay;
+using osu.Game.Screens.OnlinePlay.Components;
 
 namespace osu.Game.Screens.Select
 {

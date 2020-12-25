@@ -6,7 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Online.Rooms;
 
-namespace osu.Game.Screens.Multi
+namespace osu.Game.Screens.OnlinePlay
 {
     [Cached(typeof(IRoomManager))]
     public interface IRoomManager

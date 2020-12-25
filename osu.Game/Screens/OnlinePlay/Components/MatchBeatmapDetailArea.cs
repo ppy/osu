@@ -12,7 +12,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Screens.Select;
 using osuTK;
 
-namespace osu.Game.Screens.Multi.Components
+namespace osu.Game.Screens.OnlinePlay.Components
 {
     public class MatchBeatmapDetailArea : BeatmapDetailArea
     {

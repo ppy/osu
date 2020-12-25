@@ -3,7 +3,7 @@
 
 using osu.Game.Rulesets;
 
-namespace osu.Game.Screens.Multi.Lounge.Components
+namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
     public class FilterCriteria
     {

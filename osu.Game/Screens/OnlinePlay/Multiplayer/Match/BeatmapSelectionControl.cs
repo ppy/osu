@@ -9,9 +9,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Screens;
 using osu.Game.Online.API;
-using osu.Game.Screens.Multi.Match.Components;
+using osu.Game.Screens.OnlinePlay.Match.Components;
 
-namespace osu.Game.Screens.Multi.Multiplayer.Match
+namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
     public class BeatmapSelectionControl : MultiplayerComposite
     {

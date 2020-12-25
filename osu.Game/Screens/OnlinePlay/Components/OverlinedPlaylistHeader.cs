@@ -3,7 +3,7 @@
 
 using osu.Game.Online.Rooms;
 
-namespace osu.Game.Screens.Multi.Components
+namespace osu.Game.Screens.OnlinePlay.Components
 {
     public class OverlinedPlaylistHeader : OverlinedHeader
     {

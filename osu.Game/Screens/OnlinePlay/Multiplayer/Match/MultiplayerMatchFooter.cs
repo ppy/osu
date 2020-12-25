@@ -11,7 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Online.Rooms;
 using osuTK;
 
-namespace osu.Game.Screens.Multi.Multiplayer.Match
+namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
     public class MultiplayerMatchFooter : CompositeDrawable
     {

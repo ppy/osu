@@ -22,7 +22,7 @@ using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Multi.Multiplayer.Participants
+namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 {
     public class ParticipantPanel : MultiplayerRoomComposite, IHasContextMenu
     {

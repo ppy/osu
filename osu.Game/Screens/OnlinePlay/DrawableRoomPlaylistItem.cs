@@ -29,7 +29,7 @@ using osu.Game.Screens.Play.HUD;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Multi
+namespace osu.Game.Screens.OnlinePlay
 {
     public class DrawableRoomPlaylistItem : OsuRearrangeableListItem<PlaylistItem>
     {
