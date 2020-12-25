@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         Name = { Value = "Open" },
                         Status = { Value = new RoomStatusOpen() },
-                        Category = { Value = RoomCategory.Multiplayer }
+                        Category = { Value = RoomCategory.Realtime }
                     }) { MatchingFilter = true },
                 }
             };
