@@ -29,7 +29,7 @@ namespace osu.Game.Screens.OnlinePlay
     [Cached]
     public abstract class OnlinePlayScreen : OsuScreen
     {
-        public override bool CursorVisible => (screenStack.CurrentScreen as IMultiplayerSubScreen)?.CursorVisible ?? true;
+        public override bool CursorVisible => (screenStack.CurrentScreen as IOnlinePlaySubScreen)?.CursorVisible ?? true;
 
         // this is required due to PlayerLoader eventually being pushed to the main stack
         // while leases may be taken out by a subscreen.
@@ -245,7 +245,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         public override bool OnBackButton()
         {
-            if ((screenStack.CurrentScreen as IMultiplayerSubScreen)?.OnBackButton() == true)
+            if ((screenStack.CurrentScreen as IOnlinePlaySubScreen)?.OnBackButton() == true)
                 return true;
 
             if (screenStack.CurrentScreen != null && !(screenStack.CurrentScreen is LoungeSubScreen))
