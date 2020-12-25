@@ -3,7 +3,7 @@
 
 namespace osu.Game.Screens.OnlinePlay
 {
-    public interface IMultiplayerSubScreen : IOsuScreen
+    public interface IOnlinePlaySubScreen : IOsuScreen
     {
         string Title { get; }
 

@@ -15,7 +15,7 @@ using osu.Game.Screens.OnlinePlay.Components;
 
 namespace osu.Game.Screens.Select
 {
-    public class MatchSongSelect : SongSelect, IMultiplayerSubScreen
+    public class MatchSongSelect : SongSelect, IOnlinePlaySubScreen
     {
         public Action<PlaylistItem> Selected;
 

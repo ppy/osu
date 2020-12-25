@@ -61,8 +61,8 @@ namespace osu.Game.Screens.OnlinePlay
 
             breadcrumbs.Current.ValueChanged += screen =>
             {
-                if (screen.NewValue is IMultiplayerSubScreen multiScreen)
-                    title.Screen = multiScreen;
+                if (screen.NewValue is IOnlinePlaySubScreen onlineSubScreen)
+                    title.Screen = onlineSubScreen;
             };
 
             breadcrumbs.Current.TriggerChange();
@@ -75,7 +75,7 @@ namespace osu.Game.Screens.OnlinePlay
             private readonly OsuSpriteText dot;
             private readonly OsuSpriteText pageTitle;
 
-            public IMultiplayerSubScreen Screen
+            public IOnlinePlaySubScreen Screen
             {
                 set => pageTitle.Text = value.ShortTitle.Titleize();
             }

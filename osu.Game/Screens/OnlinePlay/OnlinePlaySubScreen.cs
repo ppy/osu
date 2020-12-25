@@ -7,7 +7,7 @@ using osu.Framework.Screens;
 
 namespace osu.Game.Screens.OnlinePlay
 {
-    public abstract class OnlinePlaySubScreen : OsuScreen, IMultiplayerSubScreen
+    public abstract class OnlinePlaySubScreen : OsuScreen, IOnlinePlaySubScreen
     {
         public override bool DisallowExternalBeatmapRulesetChanges => false;
 
