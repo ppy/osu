@@ -14,11 +14,12 @@ using osu.Game.Online.RealtimeMultiplayer;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Multi.RealtimeMultiplayer.Match;
 using osu.Game.Tests.Resources;
+using osu.Game.Tests.Visual.RealtimeMultiplayer;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Input;
 
-namespace osu.Game.Tests.Visual.RealtimeMultiplayer
+namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneRealtimeReadyButton : RealtimeMultiplayerTestScene
     {

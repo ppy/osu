@@ -24,7 +24,7 @@ using osu.Game.Screens.Ranking;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Users;
 
-namespace osu.Game.Tests.Visual.Multiplayer
+namespace osu.Game.Tests.Visual.Playlists
 {
     public class TestScenePlaylistsResultsScreen : ScreenTestScene
     {

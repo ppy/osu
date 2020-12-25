@@ -5,8 +5,9 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Tests.Visual.RealtimeMultiplayer;
 
-namespace osu.Game.Tests.Visual.RealtimeMultiplayer
+namespace osu.Game.Tests.Visual.Multiplayer
 {
     [HeadlessTest]
     public class TestSceneRealtimeRoomManager : MultiplayerTestScene

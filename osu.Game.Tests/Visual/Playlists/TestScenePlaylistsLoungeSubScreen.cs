@@ -11,8 +11,9 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Multi.Lounge;
 using osu.Game.Screens.Multi.Lounge.Components;
 using osu.Game.Screens.Multi.Playlists;
+using osu.Game.Tests.Visual.Multiplayer;
 
-namespace osu.Game.Tests.Visual.Multiplayer
+namespace osu.Game.Tests.Visual.Playlists
 {
     public class TestScenePlaylistsLoungeSubScreen : RoomManagerTestScene
     {

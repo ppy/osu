@@ -10,9 +10,10 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Multi.RealtimeMultiplayer;
 using osu.Game.Screens.Multi.RealtimeMultiplayer.Match;
 using osu.Game.Tests.Beatmaps;
+using osu.Game.Tests.Visual.RealtimeMultiplayer;
 using osuTK.Input;
 
-namespace osu.Game.Tests.Visual.RealtimeMultiplayer
+namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneRealtimeMatchSubScreen : RealtimeMultiplayerTestScene
     {

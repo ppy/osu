@@ -6,17 +6,17 @@ using osu.Framework.Allocation;
 using osu.Game.Overlays;
 using osu.Game.Screens.Multi.Playlists;
 
-namespace osu.Game.Tests.Visual.Multiplayer
+namespace osu.Game.Tests.Visual.Playlists
 {
     [TestFixture]
-    public class TestSceneMultiScreen : ScreenTestScene
+    public class TestScenePlaylistsScreen : ScreenTestScene
     {
         protected override bool UseOnlineAPI => true;
 
         [Cached]
         private MusicController musicController { get; set; } = new MusicController();
 
-        public TestSceneMultiScreen()
+        public TestScenePlaylistsScreen()
         {
             var multi = new PlaylistsMultiplayer();
 

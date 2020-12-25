@@ -13,9 +13,9 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi;
 using osu.Game.Screens.Multi.Playlists;
 
-namespace osu.Game.Tests.Visual.Multiplayer
+namespace osu.Game.Tests.Visual.Playlists
 {
-    public class TestSceneMatchSettingsOverlay : MultiplayerTestScene
+    public class TestScenePlaylistsMatchSettingsOverlay : MultiplayerTestScene
     {
         [Cached(Type = typeof(IRoomManager))]
         private TestRoomManager roomManager = new TestRoomManager();
