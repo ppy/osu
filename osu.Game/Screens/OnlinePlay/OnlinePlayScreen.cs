@@ -27,7 +27,7 @@ using osuTK;
 namespace osu.Game.Screens.OnlinePlay
 {
     [Cached]
-    public abstract class MultiplayerScreen : OsuScreen
+    public abstract class OnlinePlayScreen : OsuScreen
     {
         public override bool CursorVisible => (screenStack.CurrentScreen as IMultiplayerSubScreen)?.CursorVisible ?? true;
 
@@ -67,7 +67,7 @@ namespace osu.Game.Screens.OnlinePlay
         private readonly Drawable header;
         private readonly Drawable headerBackground;
 
-        protected MultiplayerScreen()
+        protected OnlinePlayScreen()
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;

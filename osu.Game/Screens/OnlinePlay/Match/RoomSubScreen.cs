@@ -36,7 +36,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         private BeatmapManager beatmapManager { get; set; }
 
         [Resolved(canBeNull: true)]
-        protected MultiplayerScreen Multiplayer { get; private set; }
+        protected OnlinePlayScreen ParentScreen { get; private set; }
 
         private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
 
@@ -88,7 +88,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         protected void StartPlay(Func<Player> player)
         {
             sampleStart?.Play();
-            Multiplayer?.Push(new PlayerLoader(player));
+            ParentScreen?.Push(new PlayerLoader(player));
         }
 
         private void selectedItemChanged()

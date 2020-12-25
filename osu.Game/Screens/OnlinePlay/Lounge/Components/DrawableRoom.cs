@@ -42,7 +42,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private CachedModelDependencyContainer<Room> dependencies;
 
         [Resolved(canBeNull: true)]
-        private MultiplayerScreen multiplayer { get; set; }
+        private OnlinePlayScreen parentScreen { get; set; }
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -242,7 +242,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             new OsuMenuItem("Create copy", MenuItemType.Standard, () =>
             {
-                multiplayer?.OpenNewRoom(Room.CreateCopy());
+                parentScreen?.OpenNewRoom(Room.CreateCopy());
             })
         };
     }
