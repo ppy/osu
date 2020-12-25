@@ -18,7 +18,7 @@ using osu.Game.Screens.Play;
 namespace osu.Game.Screens.OnlinePlay.Match
 {
     [Cached(typeof(IPreviewTrackOwner))]
-    public abstract class RoomSubScreen : MultiplayerSubScreen, IPreviewTrackOwner
+    public abstract class RoomSubScreen : OnlinePlaySubScreen, IPreviewTrackOwner
     {
         protected readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 

@@ -19,7 +19,7 @@ using osu.Game.Users;
 namespace osu.Game.Screens.OnlinePlay.Lounge
 {
     [Cached]
-    public abstract class LoungeSubScreen : MultiplayerSubScreen
+    public abstract class LoungeSubScreen : OnlinePlaySubScreen
     {
         public override string Title => "Lounge";
 

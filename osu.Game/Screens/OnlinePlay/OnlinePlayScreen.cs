@@ -295,13 +295,13 @@ namespace osu.Game.Screens.OnlinePlay
             switch (newScreen)
             {
                 case LoungeSubScreen _:
-                    header.Delay(MultiplayerSubScreen.RESUME_TRANSITION_DELAY).ResizeHeightTo(400, MultiplayerSubScreen.APPEAR_DURATION, Easing.OutQuint);
-                    headerBackground.MoveToX(0, MultiplayerSubScreen.X_MOVE_DURATION, Easing.OutQuint);
+                    header.Delay(OnlinePlaySubScreen.RESUME_TRANSITION_DELAY).ResizeHeightTo(400, OnlinePlaySubScreen.APPEAR_DURATION, Easing.OutQuint);
+                    headerBackground.MoveToX(0, OnlinePlaySubScreen.X_MOVE_DURATION, Easing.OutQuint);
                     break;
 
                 case RoomSubScreen _:
-                    header.ResizeHeightTo(135, MultiplayerSubScreen.APPEAR_DURATION, Easing.OutQuint);
-                    headerBackground.MoveToX(-MultiplayerSubScreen.X_SHIFT, MultiplayerSubScreen.X_MOVE_DURATION, Easing.OutQuint);
+                    header.ResizeHeightTo(135, OnlinePlaySubScreen.APPEAR_DURATION, Easing.OutQuint);
+                    headerBackground.MoveToX(-OnlinePlaySubScreen.X_SHIFT, OnlinePlaySubScreen.X_MOVE_DURATION, Easing.OutQuint);
                     break;
             }
 
