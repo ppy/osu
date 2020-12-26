@@ -252,11 +252,11 @@ namespace osu.Game.Scoring
         }
 
         [Serializable]
-        protected class DeserializedMod : IMod
+        protected class DeserializedMod : IMod, IEquatable<DeserializedMod>
         {
             public string Acronym { get; set; }
 
-            public bool Equals(IMod other) => Acronym == other?.Acronym;
+            public bool Equals(DeserializedMod other) => Acronym == other?.Acronym;
         }
 
         public override string ToString() => $"{User} playing {Beatmap}";

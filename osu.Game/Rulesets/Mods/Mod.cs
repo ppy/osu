@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Mods
     /// The base class for gameplay modifiers.
     /// </summary>
     [ExcludeFromDynamicCompile]
-    public abstract class Mod : IMod, IJsonSerializable
+    public abstract class Mod : IMod, IEquatable<Mod>, IJsonSerializable
     {
         /// <summary>
         /// The name of this mod.
@@ -149,6 +149,6 @@ namespace osu.Game.Rulesets.Mods
             return copy;
         }
 
-        public bool Equals(IMod other) => GetType() == other?.GetType();
+        public bool Equals(Mod other) => GetType() == other?.GetType();
     }
 }

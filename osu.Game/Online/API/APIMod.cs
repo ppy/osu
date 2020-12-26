@@ -13,7 +13,7 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Online.API
 {
-    public class APIMod : IMod
+    public class APIMod : IMod, IEquatable<APIMod>
     {
         [JsonProperty("acronym")]
         public string Acronym { get; set; }
@@ -52,7 +52,7 @@ namespace osu.Game.Online.API
             return resultMod;
         }
 
-        public bool Equals(IMod other) => Acronym == other?.Acronym;
+        public bool Equals(APIMod other) => Acronym == other?.Acronym;
 
         public override string ToString()
         {
