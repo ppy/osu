@@ -380,12 +380,12 @@ namespace osu.Game.Online.Multiplayer
 
             // at some point we probably want to replace all these schedule calls with Room.LockForUpdate.
             // for now, as this would require quite some consideration due to the number of accesses to the room instance,
-            // let's just to a schedule for the non-scheduled usages instead.
-            Schedule(() =>
+            // let's just add a manual schedule for the non-scheduled usages instead.
+            Scheduler.Add(() =>
             {
                 users = Room?.Users.ToList();
                 resetEvent.Set();
-            });
+            }, false);
 
             resetEvent.Wait(100);
 
