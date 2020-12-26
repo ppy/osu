@@ -4,8 +4,10 @@
 #nullable enable
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -108,7 +110,9 @@ namespace osu.Game.Online.Multiplayer
 
             Debug.Assert(Room != null);
 
-            await Task.WhenAll(Room.Users.Select(PopulateUser));
+            var users = getRoomUsers();
+
+            await Task.WhenAll(users.Select(PopulateUser));
 
             updateLocalRoomSettings(Room.Settings);
         }
@@ -122,13 +126,16 @@ namespace osu.Game.Online.Multiplayer
 
         public virtual Task LeaveRoom()
         {
-            if (Room == null)
-                return Task.CompletedTask;
+            Schedule(() =>
+            {
+                if (Room == null)
+                    return;
 
-            apiRoom = null;
-            Room = null;
+                apiRoom = null;
+                Room = null;
 
-            Schedule(() => RoomChanged?.Invoke());
+                RoomChanged?.Invoke();
+            });
 
             return Task.CompletedTask;
         }
@@ -359,6 +366,31 @@ namespace osu.Game.Online.Multiplayer
         /// </summary>
         /// <param name="multiplayerUser">The <see cref="MultiplayerRoomUser"/> to populate.</param>
         protected async Task PopulateUser(MultiplayerRoomUser multiplayerUser) => multiplayerUser.User ??= await userLookupCache.GetUserAsync(multiplayerUser.UserID);
+
+        /// <summary>
+        /// Retrieve a copy of users currently in the joined <see cref="Room"/> in a thread-safe manner.
+        /// This should be used whenever accessing users from outside of an Update thread context (ie. when not calling <see cref="Drawable.Schedule"/>).
+        /// </summary>
+        /// <returns>A copy of users in the current room, or null if unavailable.</returns>
+        private List<MultiplayerRoomUser>? getRoomUsers()
+        {
+            List<MultiplayerRoomUser>? users = null;
+
+            ManualResetEventSlim resetEvent = new ManualResetEventSlim();
+
+            // at some point we probably want to replace all these schedule calls with Room.LockForUpdate.
+            // for now, as this would require quite some consideration due to the number of accesses to the room instance,
+            // let's just to a schedule for the non-scheduled usages instead.
+            Schedule(() =>
+            {
+                users = Room?.Users.ToList();
+                resetEvent.Set();
+            });
+
+            resetEvent.Wait(100);
+
+            return users;
+        }
 
         /// <summary>
         /// Updates the local room settings with the given <see cref="MultiplayerRoomSettings"/>.
