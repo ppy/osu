@@ -56,9 +56,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             sampleReadyCount = audio.Samples.Get(@"SongSelect/select-difficulty");
         }
 
-        protected override void OnRoomChanged()
+        protected override void OnRoomUpdated()
         {
-            base.OnRoomChanged();
+            base.OnRoomUpdated();
 
             localUser = Room?.Users.Single(u => u.User?.Id == api.LocalUser.Value.Id);
             button.Enabled.Value = Client.Room?.State == MultiplayerRoomState.Open;
