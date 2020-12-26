@@ -70,7 +70,6 @@ namespace osu.Game.Users.Drawables
                 RelativeSizeAxes = Axes.Both,
             };
 
-            avatar.OnLoadComplete += d => d.FadeInFromZero(300, Easing.OutQuint);
             avatar.OpenOnClick.BindTo(OpenOnClick);
 
             return avatar;
