@@ -20,11 +20,12 @@ using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Tests.Visual.Multiplayer;
 using osu.Game.Tests.Visual.Online;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneMultiplayerGameplayLeaderboard : OsuTestScene
+    public class TestSceneMultiplayerGameplayLeaderboard : MultiplayerTestScene
     {
         [Cached(typeof(SpectatorStreamingClient))]
         private TestMultiplayerStreaming streamingClient = new TestMultiplayerStreaming(16);
@@ -47,7 +48,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [SetUpSteps]
-        public void SetUpSteps()
+        public override void SetUpSteps()
         {
             AddStep("create leaderboard", () =>
             {
