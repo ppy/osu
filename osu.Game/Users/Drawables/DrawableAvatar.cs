@@ -35,5 +35,11 @@ namespace osu.Game.Users.Drawables
 
             Texture ??= textures.Get(@"Online/avatar-guest");
         }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            this.FadeInFromZero(300, Easing.OutQuint);
+        }
     }
 }
