@@ -2,12 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Diagnostics;
+using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Online.API;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Scoring;
 
@@ -18,9 +22,20 @@ namespace osu.Game.Screens.Play.HUD
     {
         private readonly ScoreProcessor scoreProcessor;
 
-        private readonly int[] userIds;
-
         private readonly Dictionary<int, TrackedUserData> userScores = new Dictionary<int, TrackedUserData>();
+
+        [Resolved]
+        private SpectatorStreamingClient streamingClient { get; set; }
+
+        [Resolved]
+        private StatefulMultiplayerClient multiplayerClient { get; set; }
+
+        [Resolved]
+        private UserLookupCache userLookupCache { get; set; }
+
+        private Bindable<ScoringMode> scoringMode;
+
+        private readonly BindableList<int> playingUsers;
 
         /// <summary>
         /// Construct a new leaderboard.
@@ -33,32 +48,24 @@ namespace osu.Game.Screens.Play.HUD
             this.scoreProcessor = scoreProcessor;
 
             // todo: this will likely be passed in as User instances.
-            this.userIds = userIds;
+            playingUsers = new BindableList<int>(userIds);
         }
-
-        [Resolved]
-        private SpectatorStreamingClient streamingClient { get; set; }
-
-        [Resolved]
-        private UserLookupCache userLookupCache { get; set; }
-
-        private Bindable<ScoringMode> scoringMode;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, IAPIProvider api)
         {
             streamingClient.OnNewFrames += handleIncomingFrames;
 
-            foreach (var user in userIds)
+            foreach (var userId in playingUsers)
             {
-                streamingClient.WatchUser(user);
+                streamingClient.WatchUser(userId);
 
                 // probably won't be required in the final implementation.
-                var resolvedUser = userLookupCache.GetUserAsync(user).Result;
+                var resolvedUser = userLookupCache.GetUserAsync(userId).Result;
 
                 var trackedUser = new TrackedUserData();
 
-                userScores[user] = trackedUser;
+                userScores[userId] = trackedUser;
                 var leaderboardScore = AddPlayer(resolvedUser, resolvedUser.Id == api.LocalUser.Value.Id);
 
                 ((IBindable<double>)leaderboardScore.Accuracy).BindTo(trackedUser.Accuracy);
@@ -68,6 +75,28 @@ namespace osu.Game.Screens.Play.HUD
 
             scoringMode = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode);
             scoringMode.BindValueChanged(updateAllScores, true);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            playingUsers.BindCollectionChanged(usersChanged);
+            playingUsers.BindTo(multiplayerClient.PlayingUsers);
+        }
+
+        private void usersChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (var userId in e.OldItems.OfType<int>())
+                    {
+                        streamingClient.StopWatchingUser(userId);
+                    }
+
+                    break;
+            }
         }
 
         private void updateAllScores(ValueChangedEvent<ScoringMode> mode)
@@ -91,7 +120,7 @@ namespace osu.Game.Screens.Play.HUD
 
             if (streamingClient != null)
             {
-                foreach (var user in userIds)
+                foreach (var user in playingUsers)
                 {
                     streamingClient.StopWatchingUser(user);
                 }
