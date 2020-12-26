@@ -126,7 +126,7 @@ namespace osu.Game.Online.Multiplayer
 
         public virtual Task LeaveRoom()
         {
-            Schedule(() =>
+            Scheduler.Add(() =>
             {
                 if (Room == null)
                     return;
@@ -135,7 +135,7 @@ namespace osu.Game.Online.Multiplayer
                 Room = null;
 
                 RoomChanged?.Invoke();
-            });
+            }, false);
 
             return Task.CompletedTask;
         }
@@ -190,7 +190,7 @@ namespace osu.Game.Online.Multiplayer
             if (Room == null)
                 return Task.CompletedTask;
 
-            Schedule(() =>
+            Scheduler.Add(() =>
             {
                 if (Room == null)
                     return;
@@ -215,7 +215,7 @@ namespace osu.Game.Online.Multiplayer
                 }
 
                 RoomChanged?.Invoke();
-            });
+            }, false);
 
             return Task.CompletedTask;
         }
@@ -227,7 +227,7 @@ namespace osu.Game.Online.Multiplayer
 
             await PopulateUser(user);
 
-            Schedule(() =>
+            Scheduler.Add(() =>
             {
                 if (Room == null)
                     return;
@@ -239,7 +239,7 @@ namespace osu.Game.Online.Multiplayer
                 Room.Users.Add(user);
 
                 RoomChanged?.Invoke();
-            });
+            }, false);
         }
 
         Task IMultiplayerClient.UserLeft(MultiplayerRoomUser user)
@@ -247,7 +247,7 @@ namespace osu.Game.Online.Multiplayer
             if (Room == null)
                 return Task.CompletedTask;
 
-            Schedule(() =>
+            Scheduler.Add(() =>
             {
                 if (Room == null)
                     return;
@@ -256,7 +256,7 @@ namespace osu.Game.Online.Multiplayer
                 PlayingUsers.Remove(user.UserID);
 
                 RoomChanged?.Invoke();
-            });
+            }, false);
 
             return Task.CompletedTask;
         }
@@ -266,7 +266,7 @@ namespace osu.Game.Online.Multiplayer
             if (Room == null)
                 return Task.CompletedTask;
 
-            Schedule(() =>
+            Scheduler.Add(() =>
             {
                 if (Room == null)
                     return;
@@ -279,7 +279,7 @@ namespace osu.Game.Online.Multiplayer
                 apiRoom.Host.Value = user?.User;
 
                 RoomChanged?.Invoke();
-            });
+            }, false);
 
             return Task.CompletedTask;
         }
@@ -295,7 +295,7 @@ namespace osu.Game.Online.Multiplayer
             if (Room == null)
                 return Task.CompletedTask;
 
-            Schedule(() =>
+            Scheduler.Add(() =>
             {
                 if (Room == null)
                     return;
@@ -306,7 +306,7 @@ namespace osu.Game.Online.Multiplayer
                     PlayingUsers.Remove(userId);
 
                 RoomChanged?.Invoke();
-            });
+            }, false);
 
             return Task.CompletedTask;
         }
@@ -316,13 +316,13 @@ namespace osu.Game.Online.Multiplayer
             if (Room == null)
                 return Task.CompletedTask;
 
-            Schedule(() =>
+            Scheduler.Add(() =>
             {
                 if (Room == null)
                     return;
 
                 LoadRequested?.Invoke();
-            });
+            }, false);
 
             return Task.CompletedTask;
         }
@@ -332,7 +332,7 @@ namespace osu.Game.Online.Multiplayer
             if (Room == null)
                 return Task.CompletedTask;
 
-            Schedule(() =>
+            Scheduler.Add(() =>
             {
                 if (Room == null)
                     return;
@@ -340,7 +340,7 @@ namespace osu.Game.Online.Multiplayer
                 PlayingUsers.AddRange(Room.Users.Where(u => u.State == MultiplayerUserState.Playing).Select(u => u.UserID));
 
                 MatchStarted?.Invoke();
-            });
+            }, false);
 
             return Task.CompletedTask;
         }
@@ -350,13 +350,13 @@ namespace osu.Game.Online.Multiplayer
             if (Room == null)
                 return Task.CompletedTask;
 
-            Schedule(() =>
+            Scheduler.Add(() =>
             {
                 if (Room == null)
                     return;
 
                 ResultsReady?.Invoke();
-            });
+            }, false);
 
             return Task.CompletedTask;
         }
@@ -404,7 +404,7 @@ namespace osu.Game.Online.Multiplayer
             if (Room == null)
                 return;
 
-            Schedule(() =>
+            Scheduler.Add(() =>
             {
                 if (Room == null)
                     return;
@@ -425,7 +425,7 @@ namespace osu.Game.Online.Multiplayer
                 req.Success += res => updatePlaylist(settings, res);
 
                 api.Queue(req);
-            });
+            }, false);
         }
 
         private void updatePlaylist(MultiplayerRoomSettings settings, APIBeatmapSet onlineSet)
