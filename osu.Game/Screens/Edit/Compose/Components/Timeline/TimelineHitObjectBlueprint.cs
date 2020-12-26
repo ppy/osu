@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
     {
         private const float thickness = 5;
         private const float shadow_radius = 5;
-        private const float circle_size = 24;
+        private const float circle_size = 34;
 
         public Action<DragEvent> OnDragHandled;
 

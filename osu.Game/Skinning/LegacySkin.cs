@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
-using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -54,12 +53,12 @@ namespace osu.Game.Skinning
 
         private readonly Dictionary<int, LegacyManiaSkinConfiguration> maniaConfigurations = new Dictionary<int, LegacyManiaSkinConfiguration>();
 
-        public LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager)
-            : this(skin, new LegacySkinResourceStore<SkinFileInfo>(skin, storage), audioManager, "skin.ini")
+        public LegacySkin(SkinInfo skin, IStorageResourceProvider resources)
+            : this(skin, new LegacySkinResourceStore<SkinFileInfo>(skin, resources.Files), resources, "skin.ini")
         {
         }
 
-        protected LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager, string filename)
+        protected LegacySkin(SkinInfo skin, [CanBeNull] IResourceStore<byte[]> storage, [CanBeNull] IStorageResourceProvider resources, string filename)
             : base(skin)
         {
             using (var stream = storage?.GetStream(filename))
@@ -85,12 +84,12 @@ namespace osu.Game.Skinning
 
             if (storage != null)
             {
-                var samples = audioManager?.GetSampleStore(storage);
+                var samples = resources?.AudioManager?.GetSampleStore(storage);
                 if (samples != null)
                     samples.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
 
                 Samples = samples;
-                Textures = new TextureStore(new TextureLoaderStore(storage));
+                Textures = new TextureStore(resources?.CreateTextureLoaderStore(storage));
 
                 (storage as ResourceStore<byte[]>)?.AddExtension("ogg");
             }
@@ -168,6 +167,9 @@ namespace osu.Game.Skinning
 
                 case LegacyManiaSkinConfigurationLookups.HitPosition:
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.HitPosition));
+
+                case LegacyManiaSkinConfigurationLookups.ScorePosition:
+                    return SkinUtils.As<TValue>(new Bindable<float>(existing.ScorePosition));
 
                 case LegacyManiaSkinConfigurationLookups.LightPosition:
                     return SkinUtils.As<TValue>(new Bindable<float>(existing.LightPosition));

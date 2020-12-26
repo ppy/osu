@@ -41,6 +41,7 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
+        [Ignore("needs to be updated to not be so server dependent")]
         public void ShowWithBuild()
         {
             AddStep(@"Show with Lazer 2018.712.0", () =>
@@ -49,7 +50,7 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     Version = "2018.712.0",
                     DisplayVersion = "2018.712.0",
-                    UpdateStream = new APIUpdateStream { Id = 7, Name = OsuGameBase.CLIENT_STREAM_NAME },
+                    UpdateStream = new APIUpdateStream { Id = 5, Name = OsuGameBase.CLIENT_STREAM_NAME },
                     ChangelogEntries = new List<APIChangelogEntry>
                     {
                         new APIChangelogEntry
@@ -64,7 +65,7 @@ namespace osu.Game.Tests.Visual.Online
 
             AddUntilStep(@"wait for streams", () => changelog.Streams?.Count > 0);
             AddAssert(@"correct build displayed", () => changelog.Current.Value.Version == "2018.712.0");
-            AddAssert(@"correct stream selected", () => changelog.Header.Streams.Current.Value.Id == 7);
+            AddAssert(@"correct stream selected", () => changelog.Header.Streams.Current.Value.Id == 5);
         }
 
         [Test]

@@ -3,7 +3,7 @@
 
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osuTK.Graphics;
 

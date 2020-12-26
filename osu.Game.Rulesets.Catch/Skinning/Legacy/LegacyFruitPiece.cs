@@ -1,83 +1,45 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
-using osu.Game.Rulesets.Catch.UI;
-using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Skinning;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
-    internal class LegacyFruitPiece : CompositeDrawable
+    internal class LegacyFruitPiece : LegacyCatchHitObjectPiece
     {
-        private readonly string lookupName;
-
-        private readonly Bindable<Color4> accentColour = new Bindable<Color4>();
-        private readonly Bindable<bool> hyperDash = new Bindable<bool>();
-        private Sprite colouredSprite;
-
-        public LegacyFruitPiece(string lookupName)
-        {
-            this.lookupName = lookupName;
-            RelativeSizeAxes = Axes.Both;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(DrawableHitObject drawableObject, ISkinSource skin)
-        {
-            var drawableCatchObject = (DrawablePalpableCatchHitObject)drawableObject;
-
-            accentColour.BindTo(drawableCatchObject.AccentColour);
-            hyperDash.BindTo(drawableCatchObject.HyperDash);
-
-            InternalChildren = new Drawable[]
-            {
-                colouredSprite = new Sprite
-                {
-                    Texture = skin.GetTexture(lookupName),
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                },
-                new Sprite
-                {
-                    Texture = skin.GetTexture($"{lookupName}-overlay"),
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                },
-            };
-
-            if (hyperDash.Value)
-            {
-                var hyperDashOverlay = new Sprite
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Blending = BlendingParameters.Additive,
-                    Depth = 1,
-                    Alpha = 0.7f,
-                    Scale = new Vector2(1.2f),
-                    Texture = skin.GetTexture(lookupName),
-                    Colour = skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDashFruit)?.Value ??
-                             skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDash)?.Value ??
-                             Catcher.DEFAULT_HYPER_DASH_COLOUR,
-                };
-
-                AddInternal(hyperDashOverlay);
-            }
-        }
+        public readonly Bindable<FruitVisualRepresentation> VisualRepresentation = new Bindable<FruitVisualRepresentation>();
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            accentColour.BindValueChanged(colour => colouredSprite.Colour = LegacyColourCompatibility.DisallowZeroAlpha(colour.NewValue), true);
+            var fruitState = (IHasFruitState)ObjectState;
+            VisualRepresentation.BindTo(fruitState.VisualRepresentation);
+
+            VisualRepresentation.BindValueChanged(visual => setTexture(visual.NewValue), true);
+        }
+
+        private void setTexture(FruitVisualRepresentation visualRepresentation)
+        {
+            switch (visualRepresentation)
+            {
+                case FruitVisualRepresentation.Pear:
+                    SetTexture(Skin.GetTexture("fruit-pear"), Skin.GetTexture("fruit-pear-overlay"));
+                    break;
+
+                case FruitVisualRepresentation.Grape:
+                    SetTexture(Skin.GetTexture("fruit-grapes"), Skin.GetTexture("fruit-grapes-overlay"));
+                    break;
+
+                case FruitVisualRepresentation.Pineapple:
+                    SetTexture(Skin.GetTexture("fruit-apple"), Skin.GetTexture("fruit-apple-overlay"));
+                    break;
+
+                case FruitVisualRepresentation.Raspberry:
+                    SetTexture(Skin.GetTexture("fruit-orange"), Skin.GetTexture("fruit-orange-overlay"));
+                    break;
+            }
         }
     }
 }

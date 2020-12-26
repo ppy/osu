@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
         private readonly Bindable<BeatmapLeaderboardScope> scope = new Bindable<BeatmapLeaderboardScope>(BeatmapLeaderboardScope.Global);
-        private readonly Bindable<User> user = new Bindable<User>();
+        private readonly IBindable<User> user = new Bindable<User>();
 
         private readonly Box background;
         private readonly ScoreTable scoreTable;

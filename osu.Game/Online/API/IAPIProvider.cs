@@ -13,13 +13,19 @@ namespace osu.Game.Online.API
         /// The local user.
         /// This is not thread-safe and should be scheduled locally if consumed from a drawable component.
         /// </summary>
-        Bindable<User> LocalUser { get; }
+        IBindable<User> LocalUser { get; }
+
+        /// <summary>
+        /// The user's friends.
+        /// This is not thread-safe and should be scheduled locally if consumed from a drawable component.
+        /// </summary>
+        IBindableList<User> Friends { get; }
 
         /// <summary>
         /// The current user's activity.
         /// This is not thread-safe and should be scheduled locally if consumed from a drawable component.
         /// </summary>
-        Bindable<UserActivity> Activity { get; }
+        IBindable<UserActivity> Activity { get; }
 
         /// <summary>
         /// Retrieve the OAuth access token.
@@ -40,7 +46,12 @@ namespace osu.Game.Online.API
         /// <summary>
         /// The URL endpoint for this API. Does not include a trailing slash.
         /// </summary>
-        string Endpoint { get; }
+        string APIEndpointUrl { get; }
+
+        /// <summary>
+        /// The root URL of of the website, excluding the trailing slash.
+        /// </summary>
+        string WebsiteRootUrl { get; }
 
         /// <summary>
         /// The current connection state of the API.

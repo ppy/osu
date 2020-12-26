@@ -131,33 +131,36 @@ namespace osu.Game.Overlays.Changelog
                         t.Padding = new MarginPadding { Left = 10 };
                     });
 
-                    if (entry.GithubUser.UserId != null)
+                    if (entry.GithubUser != null)
                     {
-                        title.AddUserLink(new User
+                        if (entry.GithubUser.UserId != null)
                         {
-                            Username = entry.GithubUser.OsuUsername,
-                            Id = entry.GithubUser.UserId.Value
-                        }, t =>
+                            title.AddUserLink(new User
+                            {
+                                Username = entry.GithubUser.OsuUsername,
+                                Id = entry.GithubUser.UserId.Value
+                            }, t =>
+                            {
+                                t.Font = fontMedium;
+                                t.Colour = entryColour;
+                            });
+                        }
+                        else if (entry.GithubUser.GithubUrl != null)
                         {
-                            t.Font = fontMedium;
-                            t.Colour = entryColour;
-                        });
-                    }
-                    else if (entry.GithubUser.GithubUrl != null)
-                    {
-                        title.AddLink(entry.GithubUser.DisplayName, entry.GithubUser.GithubUrl, t =>
+                            title.AddLink(entry.GithubUser.DisplayName, entry.GithubUser.GithubUrl, t =>
+                            {
+                                t.Font = fontMedium;
+                                t.Colour = entryColour;
+                            });
+                        }
+                        else
                         {
-                            t.Font = fontMedium;
-                            t.Colour = entryColour;
-                        });
-                    }
-                    else
-                    {
-                        title.AddText(entry.GithubUser.DisplayName, t =>
-                        {
-                            t.Font = fontMedium;
-                            t.Colour = entryColour;
-                        });
+                            title.AddText(entry.GithubUser.DisplayName, t =>
+                            {
+                                t.Font = fontMedium;
+                                t.Colour = entryColour;
+                            });
+                        }
                     }
 
                     ChangelogEntries.Add(titleContainer);
