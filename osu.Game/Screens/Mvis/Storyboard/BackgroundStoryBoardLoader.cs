@@ -35,21 +35,29 @@ namespace osu.Game.Screens.Mvis.Storyboard
         private StoryboardClock storyboardClock = new StoryboardClock();
         private BackgroundStoryboard currentStoryboard;
 
-        private readonly WorkingBeatmap currentBeatmap;
+        private readonly WorkingBeatmap targetBeatmap;
 
         [Resolved]
         private MusicController music { get; set; }
 
+        [Resolved]
+        private Bindable<WorkingBeatmap> currentBeatmap { get; set; }
+
         public BackgroundStoryBoardLoader(WorkingBeatmap working)
         {
             RelativeSizeAxes = Axes.Both;
-            currentBeatmap = working;
+            targetBeatmap = working;
         }
 
         [BackgroundDependencyLoader]
         private void load(MfConfigManager config)
         {
             config.BindWith(MfSetting.MvisEnableStoryboard, enableSb);
+            currentBeatmap.BindValueChanged(v =>
+            {
+                if (v.NewValue == targetBeatmap)
+                    storyboardClock.ChangeSource(v.NewValue.Track);
+            });
         }
 
         protected override void LoadComplete()
@@ -102,8 +110,8 @@ namespace osu.Game.Screens.Mvis.Storyboard
                     updateStoryBoardAsync();
                 else
                 {
-                    StoryboardReplacesBackground.Value = currentBeatmap.Storyboard.ReplacesBackground && currentBeatmap.Storyboard.HasDrawable;
-                    NeedToHideTriangles.Value = currentBeatmap.Storyboard.HasDrawable;
+                    StoryboardReplacesBackground.Value = targetBeatmap.Storyboard.ReplacesBackground && targetBeatmap.Storyboard.HasDrawable;
+                    NeedToHideTriangles.Value = targetBeatmap.Storyboard.HasDrawable;
                 }
 
                 currentStoryboard?.FadeIn(STORYBOARD_FADEIN_DURATION, Easing.OutQuint);
@@ -137,12 +145,12 @@ namespace osu.Game.Screens.Mvis.Storyboard
                 return;
             }
 
-            if (currentBeatmap == null)
+            if (targetBeatmap == null)
                 throw new InvalidOperationException("currentBeatmap 不能为 null");
 
             Task.Run(async () =>
             {
-                var task = Task.Run(() => prepareStoryboard(currentBeatmap));
+                var task = Task.Run(() => prepareStoryboard(targetBeatmap));
 
                 await task;
             });
