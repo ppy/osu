@@ -93,6 +93,9 @@ namespace osu.Game.Screens.Play.HUD
                     foreach (var userId in e.OldItems.OfType<int>())
                     {
                         streamingClient.StopWatchingUser(userId);
+
+                        if (userScores.TryGetValue(userId, out var trackedData))
+                            trackedData.MarkUserQuit();
                     }
 
                     break;
@@ -143,11 +146,19 @@ namespace osu.Game.Screens.Play.HUD
 
             private readonly BindableInt currentCombo = new BindableInt();
 
+            public IBindable<bool> UserQuit => userQuit;
+
+            private readonly BindableBool userQuit = new BindableBool();
+
             [CanBeNull]
             public FrameHeader LastHeader;
 
+            public void MarkUserQuit() => userQuit.Value = true;
+
             public void UpdateScore(ScoreProcessor processor, ScoringMode mode)
             {
+                Debug.Assert(UserQuit.Value);
+
                 if (LastHeader == null)
                     return;
 
