@@ -71,6 +71,7 @@ namespace osu.Game.Screens.Play.HUD
                 ((IBindable<double>)leaderboardScore.Accuracy).BindTo(trackedUser.Accuracy);
                 ((IBindable<double>)leaderboardScore.TotalScore).BindTo(trackedUser.Score);
                 ((IBindable<int>)leaderboardScore.Combo).BindTo(trackedUser.CurrentCombo);
+                ((IBindable<bool>)leaderboardScore.HasQuit).BindTo(trackedUser.UserQuit);
             }
 
             scoringMode = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode);
@@ -81,8 +82,15 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
 
-            playingUsers.BindCollectionChanged(usersChanged);
+            // BindableList handles binding in a really bad way (Clear then AddRange) so we need to do this manually..
+            foreach (int userId in playingUsers)
+            {
+                if (!multiplayerClient.PlayingUsers.Contains(userId))
+                    usersChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, new[] { userId }));
+            }
+
             playingUsers.BindTo(multiplayerClient.PlayingUsers);
+            playingUsers.BindCollectionChanged(usersChanged);
         }
 
         private void usersChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -157,7 +165,7 @@ namespace osu.Game.Screens.Play.HUD
 
             public void UpdateScore(ScoreProcessor processor, ScoringMode mode)
             {
-                Debug.Assert(UserQuit.Value);
+                Debug.Assert(!UserQuit.Value);
 
                 if (LastHeader == null)
                     return;
