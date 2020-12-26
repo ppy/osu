@@ -54,6 +54,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("create leaderboard", () =>
             {
+                leaderboard?.Expire();
+
                 OsuScoreProcessor scoreProcessor;
                 Beatmap.Value = CreateWorkingBeatmap(Ruleset.Value);
 
