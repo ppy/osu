@@ -42,6 +42,9 @@ namespace osu.Game.Tournament.Screens
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
+        [Resolved]
+        private TournamentGameBase game { get; set; }
+
         [Resolved(canBeNull: true)]
         private TournamentSceneManager sceneManager { get; set; }
 
@@ -67,9 +70,6 @@ namespace osu.Game.Tournament.Screens
             this.storage = (TournamentStorage)storage;
             reload();
         }
-
-        [Resolved]
-        private Framework.Game game { get; set; }
 
         private void reload()
         {
@@ -115,12 +115,14 @@ namespace osu.Game.Tournament.Screens
                     Items = rulesets.AvailableRulesets,
                     Current = LadderInfo.Ruleset,
                 },
-                new LabelledDropdown<string>
+                new TournamentSwitcher
                 {
                     Label = "Current tournament",
                     Description = "Changes the background videos and bracket to match the selected tournament. This requires a restart to apply changes.",
                     Items = storage.ListTournaments(),
                     Current = storage.CurrentTournament,
+                    ButtonText = "Close osu!",
+                    Action = () => game.GracefullyExit()
                 },
                 resolution = new ResolutionSelector
                 {
@@ -165,7 +167,7 @@ namespace osu.Game.Tournament.Screens
 
         private class ActionableInfo : LabelledDrawable<Drawable>
         {
-            private OsuButton button;
+            protected OsuButton Button;
 
             public ActionableInfo()
                 : base(true)
@@ -174,7 +176,7 @@ namespace osu.Game.Tournament.Screens
 
             public string ButtonText
             {
-                set => button.Text = value;
+                set => Button.Text = value;
             }
 
             public string Value
@@ -211,7 +213,7 @@ namespace osu.Game.Tournament.Screens
                         Spacing = new Vector2(10, 0),
                         Children = new Drawable[]
                         {
-                            button = new TriangleButton
+                            Button = new TriangleButton
                             {
                                 Size = new Vector2(100, 40),
                                 Action = () => Action?.Invoke()
@@ -220,6 +222,34 @@ namespace osu.Game.Tournament.Screens
                     }
                 }
             };
+        }
+
+        private class TournamentSwitcher : ActionableInfo
+        {
+            private OsuDropdown<string> dropdown;
+
+            public IEnumerable<string> Items
+            {
+                get => dropdown.Items;
+                set => dropdown.Items = value;
+            }
+
+            public Bindable<string> Current
+            {
+                get => dropdown.Current;
+                set => dropdown.Current = value;
+            }
+
+            protected override Drawable CreateComponent()
+            {
+                var drawable = base.CreateComponent();
+                FlowContainer.Insert(-1, dropdown = new OsuDropdown<string>
+                {
+                    Width = 510
+                });
+
+                return drawable;
+            }
         }
 
         private class ResolutionSelector : ActionableInfo
