@@ -135,9 +135,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             };
         }
 
-        protected override void OnRoomChanged()
+        protected override void OnRoomUpdated()
         {
-            base.OnRoomChanged();
+            base.OnRoomUpdated();
 
             if (Room == null)
                 return;
