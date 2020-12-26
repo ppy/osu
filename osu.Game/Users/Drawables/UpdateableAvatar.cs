@@ -65,7 +65,7 @@ namespace osu.Game.Users.Drawables
             if (user == null && !ShowGuestOnNull)
                 return null;
 
-            var avatar = new DrawableAvatar(user)
+            var avatar = new ClickableAvatar(user)
             {
                 RelativeSizeAxes = Axes.Both,
             };
