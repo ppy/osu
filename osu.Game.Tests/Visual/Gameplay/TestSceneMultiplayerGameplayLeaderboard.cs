@@ -27,8 +27,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestSceneMultiplayerGameplayLeaderboard : MultiplayerTestScene
     {
+        private const int users = 16;
+
         [Cached(typeof(SpectatorStreamingClient))]
-        private TestMultiplayerStreaming streamingClient = new TestMultiplayerStreaming(16);
+        private TestMultiplayerStreaming streamingClient = new TestMultiplayerStreaming(users);
 
         [Cached(typeof(UserLookupCache))]
         private UserLookupCache lookupCache = new TestSceneCurrentlyPlayingDisplay.TestUserLookupCache();
@@ -59,6 +61,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 streamingClient.Start(Beatmap.Value.BeatmapInfo.OnlineBeatmapID ?? 0);
 
+                Client.PlayingUsers.Clear();
+                Client.PlayingUsers.AddRange(streamingClient.PlayingUsers);
+
                 Children = new Drawable[]
                 {
                     scoreProcessor = new OsuScoreProcessor(),
@@ -80,6 +85,12 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestScoreUpdates()
         {
             AddRepeatStep("update state", () => streamingClient.RandomlyUpdateState(), 100);
+        }
+
+        [Test]
+        public void TestUserQuit()
+        {
+            AddRepeatStep("mark user quit", () => Client.PlayingUsers.RemoveAt(0), users);
         }
 
         public class TestMultiplayerStreaming : SpectatorStreamingClient
