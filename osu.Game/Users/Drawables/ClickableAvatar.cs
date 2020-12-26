@@ -14,7 +14,7 @@ using osu.Game.Graphics.Containers;
 namespace osu.Game.Users.Drawables
 {
     [LongRunningLoad]
-    public class DrawableAvatar : Container
+    public class ClickableAvatar : Container
     {
         /// <summary>
         /// Whether to open the user's profile when clicked.
@@ -27,10 +27,11 @@ namespace osu.Game.Users.Drawables
         private OsuGame game { get; set; }
 
         /// <summary>
-        /// An avatar for specified user.
+        /// A clickable avatar for specified user, with UI sounds included.
+        /// If <see cref="OpenOnClick"/> is <c>true</c>, clicking will open the user's profile.
         /// </summary>
         /// <param name="user">The user. A null value will get a placeholder avatar.</param>
-        public DrawableAvatar(User user = null)
+        public ClickableAvatar(User user = null)
         {
             this.user = user;
         }
