@@ -5,7 +5,6 @@ using osu.Game.Beatmaps;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using System;
-using System.Collections.Generic;
 using osu.Game.Configuration;
 using System.Linq;
 
@@ -34,23 +33,19 @@ namespace osu.Game.Rulesets.Mods
         protected const int LAST_SETTING_ORDER = 2;
 
         [SettingSource("HP Drain", "Override a beatmap's set HP.", FIRST_SETTING_ORDER)]
-        public BindableNumber<float> DrainRate { get; } = new BindableFloat
+        public DifficultyTrackingBindable<float> DrainRate { get; } = new DifficultyTrackingBindable<float>
         {
             Precision = 0.1f,
             MinValue = 0,
             MaxValue = 10,
-            Default = 5,
-            Value = 5,
         };
 
         [SettingSource("Accuracy", "Override a beatmap's set OD.", LAST_SETTING_ORDER)]
-        public BindableNumber<float> OverallDifficulty { get; } = new BindableFloat
+        public DifficultyTrackingBindable<float> OverallDifficulty { get; } = new DifficultyTrackingBindable<float>
         {
             Precision = 0.1f,
             MinValue = 0,
             MaxValue = 10,
-            Default = 5,
-            Value = 5,
         };
 
         public override string SettingDescription
@@ -87,31 +82,8 @@ namespace osu.Game.Rulesets.Mods
         /// <param name="difficulty">The beatmap's initial values.</param>
         protected virtual void TransferSettings(BeatmapDifficulty difficulty)
         {
-            TransferSetting(DrainRate, difficulty.DrainRate);
-            TransferSetting(OverallDifficulty, difficulty.OverallDifficulty);
-        }
-
-        private readonly Dictionary<IBindable, bool> userChangedSettings = new Dictionary<IBindable, bool>();
-
-        /// <summary>
-        /// Transfer a setting from <see cref="BeatmapDifficulty"/> to a configuration bindable.
-        /// Only performs the transfer if the user is not currently overriding.
-        /// </summary>
-        protected void TransferSetting<T>(BindableNumber<T> bindable, T beatmapDefault)
-            where T : struct, IComparable<T>, IConvertible, IEquatable<T>
-        {
-            bindable.UnbindEvents();
-
-            userChangedSettings.TryAdd(bindable, false);
-
-            bindable.Default = beatmapDefault;
-
-            // users generally choose a difficulty setting and want it to stick across multiple beatmap changes.
-            // we only want to value transfer if the user hasn't changed the value previously.
-            if (!userChangedSettings[bindable])
-                bindable.Value = beatmapDefault;
-
-            bindable.ValueChanged += _ => userChangedSettings[bindable] = !bindable.IsDefault;
+            DrainRate.ChangeBase(difficulty.DrainRate);
+            OverallDifficulty.ChangeBase(difficulty.OverallDifficulty);
         }
 
         /// <summary>
@@ -122,6 +94,51 @@ namespace osu.Game.Rulesets.Mods
         {
             difficulty.DrainRate = DrainRate.Value;
             difficulty.OverallDifficulty = OverallDifficulty.Value;
+        }
+
+        public class DifficultyTrackingBindable<T> : BindableNumber<T>
+            where T : struct, IComparable<T>, IConvertible, IEquatable<T>
+        {
+            private bool hasBaseValue;
+
+            /// <summary>
+            /// Whether a value different from the base difficulty has been set.
+            /// </summary>
+            public bool Overriden { get; private set; }
+
+            public override T Value
+            {
+                get => base.Value;
+                set
+                {
+                    base.Value = value;
+
+                    // if there's no base value, consider any touches to this property a setting override.
+                    if (!hasBaseValue)
+                        Overriden = true;
+                }
+            }
+
+            public void ChangeBase(T newBase)
+            {
+                UnbindEvents();
+
+                Default = newBase;
+
+                // if this wasn't provided a base before, and current value matches new base,
+                // then the setting can be considered not overriden.
+                if (!hasBaseValue && IsDefault)
+                    Overriden = false;
+
+                hasBaseValue = true;
+
+                // users generally choose a difficulty setting and want it to stick across multiple beatmap changes.
+                // we only want to value transfer if the user hasn't changed the value previously.
+                if (!Overriden)
+                    Value = newBase;
+
+                ValueChanged += _ => Overriden = !IsDefault;
+            }
         }
     }
 }
