@@ -7,8 +7,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Screens.Multi;
-using osu.Game.Screens.Multi.Lounge.Components;
+using osu.Game.Screens.OnlinePlay;
+using osu.Game.Screens.OnlinePlay.Lounge.Components;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
