@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Mvis.Objects
         private const int radius = 350;
 
         [Resolved(canBeNull: true)]
-        private MfConfigManager config { get; set; }
+        private MConfigManager config { get; set; }
 
         private readonly Bindable<bool> useOsuLogoVisuals = new Bindable<bool>();
         private readonly Bindable<int> visuals = new Bindable<int>(3);
@@ -78,16 +78,16 @@ namespace osu.Game.Screens.Mvis.Objects
                 }),
             };
 
-            config.BindWith(MfSetting.MvisUseOsuLogoVisualisation, useOsuLogoVisuals);
-            config?.BindWith(MfSetting.MvisVisualizerAmount, visuals);
-            config?.BindWith(MfSetting.MvisBarWidth, barWidth);
-            config?.BindWith(MfSetting.MvisBarsPerVisual, barCount);
-            config?.BindWith(MfSetting.MvisRotation, rotation);
+            config.BindWith(MSetting.MvisUseOsuLogoVisualisation, useOsuLogoVisuals);
+            config?.BindWith(MSetting.MvisVisualizerAmount, visuals);
+            config?.BindWith(MSetting.MvisBarWidth, barWidth);
+            config?.BindWith(MSetting.MvisBarsPerVisual, barCount);
+            config?.BindWith(MSetting.MvisRotation, rotation);
 
-            config?.BindWith(MfSetting.MvisRed, red);
-            config?.BindWith(MfSetting.MvisGreen, green);
-            config?.BindWith(MfSetting.MvisBlue, blue);
-            config?.BindWith(MfSetting.MvisUseCustomColour, useCustomColour);
+            config?.BindWith(MSetting.MvisRed, red);
+            config?.BindWith(MSetting.MvisGreen, green);
+            config?.BindWith(MSetting.MvisBlue, blue);
+            config?.BindWith(MSetting.MvisUseCustomColour, useCustomColour);
 
             useOsuLogoVisuals.ValueChanged += _ => updateVisuals();
             barCount.BindValueChanged(_ => updateVisuals());

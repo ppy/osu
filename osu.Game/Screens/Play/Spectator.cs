@@ -95,9 +95,9 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, OsuConfigManager config, MfConfigManager mfConfig)
+        private void load(OsuColour colours, OsuConfigManager config, MConfigManager mfConfig)
         {
-            mfConfig.BindWith(MfSetting.UseSayobot, useSayobot);
+            mfConfig.BindWith(MSetting.UseSayobot, useSayobot);
 
             InternalChild = new Container
             {

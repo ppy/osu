@@ -11,7 +11,7 @@ namespace osu.Game.Screens.Mvis.Objects.MusicVisualizers
     public abstract class MusicBarsVisualizer : MusicAmplitudesProvider
     {
         [Resolved(canBeNull: true)]
-        private MfConfigManager config { get; set; }
+        private MConfigManager config { get; set; }
 
         private readonly Bindable<MvisBarType> type = new Bindable<MvisBarType>(MvisBarType.Rounded);
         private readonly Bindable<double> barWidthBindable = new Bindable<double>(3.0);
@@ -62,8 +62,8 @@ namespace osu.Game.Screens.Mvis.Objects.MusicVisualizers
         [BackgroundDependencyLoader]
         private void load()
         {
-            config?.BindWith(MfSetting.MvisBarType, type);
-            config?.BindWith(MfSetting.MvisBarWidth, barWidthBindable);
+            config?.BindWith(MSetting.MvisBarType, type);
+            config?.BindWith(MSetting.MvisBarWidth, barWidthBindable);
 
             barWidthBindable.BindValueChanged(width => BarWidth = (float)width.NewValue);
             type.BindValueChanged(_ => resetBars(), true);

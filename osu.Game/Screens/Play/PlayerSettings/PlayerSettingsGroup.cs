@@ -154,9 +154,9 @@ namespace osu.Game.Screens.Play.PlayerSettings
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, MfConfigManager config)
+        private void load(OsuColour colours, MConfigManager config)
         {
-            config.BindWith(MfSetting.OptUI, OptUI);
+            config.BindWith(MSetting.OptUI, OptUI);
 
             expandedColour = colours.Yellow;
 

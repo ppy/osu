@@ -26,13 +26,13 @@ namespace osu.Game.Audio
         public event Action Started;
 
         protected Track Track { get; private set; }
-        protected MfConfigManager mfConfig;
+        protected MConfigManager mfConfig;
 
         private bool hasStarted;
 
 
         [BackgroundDependencyLoader]
-        private void load(MfConfigManager mfconfig)
+        private void load(MConfigManager mfconfig)
         {
             this.mfConfig = mfconfig;
 

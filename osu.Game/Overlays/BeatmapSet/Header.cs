@@ -226,7 +226,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         protected virtual string SelectServer(BeatmapInfo b)
         {
-            switch (mfConfig.Get<bool>(MfSetting.UseSayobot))
+            switch (mfConfig.Get<bool>(MSetting.UseSayobot))
             {
                 case true:
                     return $@"https:/osu.sayobot.cn/?search={BeatmapSet.Value?.OnlineBeatmapSetID}";
@@ -236,13 +236,13 @@ namespace osu.Game.Overlays.BeatmapSet
             }
         }
 
-        private MfConfigManager mfConfig;
+        private MConfigManager mfConfig;
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider, OsuConfigManager config, MfConfigManager mfconfig)
+        private void load(OverlayColourProvider colourProvider, OsuConfigManager config, MConfigManager mfconfig)
         {
             mfConfig = mfconfig;
-            mfconfig.BindWith(MfSetting.UseSayobot, useSayobot);
+            mfconfig.BindWith(MSetting.UseSayobot, useSayobot);
             useSayobot.ValueChanged += _ =>
             {
                 externalLink.Link = SelectServer(Details.Beatmap);

@@ -174,10 +174,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, MfConfigManager mfConfig)
+        private void load(OsuConfigManager config, MConfigManager mfConfig)
         {
             config.BindWith(OsuSetting.PositionalHitSounds, userPositionalHitSounds);
-            positionGain = mfConfig.GetBindable<float>(MfSetting.SamplePlaybackGain);
+            positionGain = mfConfig.GetBindable<float>(MSetting.SamplePlaybackGain);
 
             // Explicit non-virtual function call.
             base.AddInternal(Samples = new PausableSkinnableSound());

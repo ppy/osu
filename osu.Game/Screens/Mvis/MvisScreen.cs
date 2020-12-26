@@ -128,11 +128,11 @@ namespace osu.Game.Screens.Mvis
         }
 
         [BackgroundDependencyLoader]
-        private void load(MfConfigManager config, IdleTracker idleTracker)
+        private void load(MConfigManager config, IdleTracker idleTracker)
         {
-            var iR = config.Get<float>(MfSetting.MvisInterfaceRed);
-            var iG = config.Get<float>(MfSetting.MvisInterfaceGreen);
-            var iB = config.Get<float>(MfSetting.MvisInterfaceBlue);
+            var iR = config.Get<float>(MSetting.MvisInterfaceRed);
+            var iG = config.Get<float>(MSetting.MvisInterfaceGreen);
+            var iB = config.Get<float>(MSetting.MvisInterfaceBlue);
             dependencies.Cache(colourProvider = new CustomColourProvider(iR, iG, iB));
             dependencies.Cache(collectionHelper = new CollectionHelper());
 
@@ -433,14 +433,14 @@ namespace osu.Game.Screens.Mvis
             sidebar.Add(collectionPanel = new CollectionSelectPanel());
 
             isIdle.BindTo(idleTracker.IsIdle);
-            config.BindWith(MfSetting.MvisBgBlur, bgBlur);
-            config.BindWith(MfSetting.MvisIdleBgDim, idleBgDim);
-            config.BindWith(MfSetting.MvisContentAlpha, contentAlpha);
-            config.BindWith(MfSetting.MvisShowParticles, showParticles);
-            config.BindWith(MfSetting.MvisMusicSpeed, musicSpeed);
-            config.BindWith(MfSetting.MvisAdjustMusicWithFreq, adjustFreq);
-            config.BindWith(MfSetting.MvisEnableNightcoreBeat, nightcoreBeat);
-            config.BindWith(MfSetting.MvisPlayFromCollection, playFromCollection);
+            config.BindWith(MSetting.MvisBgBlur, bgBlur);
+            config.BindWith(MSetting.MvisIdleBgDim, idleBgDim);
+            config.BindWith(MSetting.MvisContentAlpha, contentAlpha);
+            config.BindWith(MSetting.MvisShowParticles, showParticles);
+            config.BindWith(MSetting.MvisMusicSpeed, musicSpeed);
+            config.BindWith(MSetting.MvisAdjustMusicWithFreq, adjustFreq);
+            config.BindWith(MSetting.MvisEnableNightcoreBeat, nightcoreBeat);
+            config.BindWith(MSetting.MvisPlayFromCollection, playFromCollection);
         }
 
         protected override void LoadComplete()

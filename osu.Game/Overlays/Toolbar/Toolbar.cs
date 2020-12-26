@@ -44,9 +44,9 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame osuGame, Bindable<RulesetInfo> parentRuleset, MfConfigManager config)
+        private void load(OsuGame osuGame, Bindable<RulesetInfo> parentRuleset, MConfigManager config)
         {
-            optUI = config.GetBindable<bool>(MfSetting.OptUI);
+            optUI = config.GetBindable<bool>(MSetting.OptUI);
 
             Children = new Drawable[]
             {

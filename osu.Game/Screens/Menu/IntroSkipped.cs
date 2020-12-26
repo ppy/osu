@@ -21,9 +21,9 @@ namespace osu.Game.Screens.Menu
         private OsuGame game { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(MfConfigManager config)
+        private void load(MConfigManager config)
         {
-            LoadDirectToSongSelect = config.GetBindable<bool>(MfSetting.IntroLoadDirectToSongSelect);
+            LoadDirectToSongSelect = config.GetBindable<bool>(MSetting.IntroLoadDirectToSongSelect);
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)

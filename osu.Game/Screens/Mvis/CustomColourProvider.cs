@@ -49,11 +49,11 @@ namespace osu.Game.Screens.Mvis
         private readonly BindableFloat iB = new BindableFloat();
 
         [BackgroundDependencyLoader]
-        private void load(MfConfigManager config)
+        private void load(MConfigManager config)
         {
-            config.BindWith(MfSetting.MvisInterfaceRed, iR);
-            config.BindWith(MfSetting.MvisInterfaceGreen, iG);
-            config.BindWith(MfSetting.MvisInterfaceBlue, iB);
+            config.BindWith(MSetting.MvisInterfaceRed, iR);
+            config.BindWith(MSetting.MvisInterfaceGreen, iG);
+            config.BindWith(MSetting.MvisInterfaceBlue, iB);
 
             iR.BindValueChanged(_ => updateColor());
             iG.BindValueChanged(_ => updateColor());

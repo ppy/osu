@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Mvis
         private Container trianglesContainer;
 
         [BackgroundDependencyLoader]
-        private void load(MfConfigManager config)
+        private void load(MConfigManager config)
         {
             RelativeSizeAxes = Axes.Both;
             Child = trianglesContainer = new Container
@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Mvis
                     Colour = OsuColour.Gray(0.2f),
                 }
             };
-            config.BindWith(MfSetting.MvisEnableBgTriangles, enableBgTriangles);
+            config.BindWith(MSetting.MvisEnableBgTriangles, enableBgTriangles);
         }
 
         protected override void LoadComplete()

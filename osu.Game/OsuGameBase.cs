@@ -60,7 +60,7 @@ namespace osu.Game
         public bool UseDevelopmentServer { get; }
 
         protected OsuConfigManager LocalConfig;
-        protected MfConfigManager MfConfig;
+        protected MConfigManager MfConfig;
 
         protected BeatmapManager BeatmapManager;
 
@@ -385,7 +385,7 @@ namespace osu.Game
                 ? new DevelopmentOsuConfigManager(Storage)
                 : new OsuConfigManager(Storage);
 
-            MfConfig ??= new MfConfigManager(Storage);
+            MfConfig ??= new MConfigManager(Storage);
         }
 
         protected override Storage CreateStorage(GameHost host, Storage defaultStorage) => new OsuStorage(host, defaultStorage);

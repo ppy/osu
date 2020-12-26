@@ -16,14 +16,14 @@ namespace osu.Game.Screens.Select
         private BindableBool OptUIEnabled = new BindableBool();
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, MfConfigManager config)
+        private void load(OsuColour colours, MConfigManager config)
         {
             Alpha = 0;
             SelectedColour = new Color4(0, 86, 73, 255);
             DeselectedColour = SelectedColour.Opacity(0.5f);
             Text = @"在Mvis中打开";
 
-            config.BindWith(MfSetting.OptUI, OptUIEnabled);
+            config.BindWith(MSetting.OptUI, OptUIEnabled);
         }
 
         protected override void LoadComplete()

@@ -18,9 +18,9 @@ namespace osu.Game.Graphics
         public bool EnableBeatSync { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(MfConfigManager config, OsuColour colour)
+        private void load(MConfigManager config, OsuColour colour)
         {
-            config.BindWith(MfSetting.OptUI, Optui);
+            config.BindWith(MSetting.OptUI, Optui);
         }
 
         protected override void LoadComplete()

@@ -41,7 +41,7 @@ namespace osu.Game.Overlays
         public float TopBarHeight => topbarContainer.DrawHeight;
 
         [BackgroundDependencyLoader]
-        private void load(MfConfigManager config)
+        private void load(MConfigManager config)
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -144,7 +144,7 @@ namespace osu.Game.Overlays
                 }
             };
 
-            config.BindWith(MfSetting.OptUI, optUI);
+            config.BindWith(MSetting.OptUI, optUI);
 
             optUI.BindValueChanged(OnOptUIChanged);
         }

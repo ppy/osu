@@ -12,14 +12,14 @@ namespace osu.Game.Overlays.Settings.Sections.General
         protected override string Header => "故事版";
 
         [BackgroundDependencyLoader]
-        private void load(MfConfigManager config)
+        private void load(MConfigManager config)
         {
             Children = new Drawable[]
             {
                 new SettingsCheckbox
                 {
                     LabelText = "启用故事版/背景视频",
-                    Current = config.GetBindable<bool>(MfSetting.MvisEnableStoryboard),
+                    Current = config.GetBindable<bool>(MSetting.MvisEnableStoryboard),
                 }
             };
         }

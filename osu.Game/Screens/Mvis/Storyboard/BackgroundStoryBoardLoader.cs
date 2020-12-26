@@ -50,9 +50,9 @@ namespace osu.Game.Screens.Mvis.Storyboard
         }
 
         [BackgroundDependencyLoader]
-        private void load(MfConfigManager config)
+        private void load(MConfigManager config)
         {
-            config.BindWith(MfSetting.MvisEnableStoryboard, enableSb);
+            config.BindWith(MSetting.MvisEnableStoryboard, enableSb);
             currentBeatmap.BindValueChanged(v =>
             {
                 if (v.NewValue == targetBeatmap)

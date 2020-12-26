@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Mvis.Objects.MusicVisualizers.Bars
         protected virtual IEnumerable<Drawable> ColourReceptors => new[] { box };
 
         [Resolved(canBeNull: true)]
-        private MfConfigManager config { get; set; }
+        private MConfigManager config { get; set; }
 
         private readonly Bindable<bool> useCustomColour = new Bindable<bool>();
         private readonly Bindable<int> red = new Bindable<int>(0);
@@ -30,10 +30,10 @@ namespace osu.Game.Screens.Mvis.Objects.MusicVisualizers.Bars
         [BackgroundDependencyLoader]
         private void load()
         {
-            config?.BindWith(MfSetting.MvisRed, red);
-            config?.BindWith(MfSetting.MvisGreen, green);
-            config?.BindWith(MfSetting.MvisBlue, blue);
-            config?.BindWith(MfSetting.MvisUseCustomColour, useCustomColour);
+            config?.BindWith(MSetting.MvisRed, red);
+            config?.BindWith(MSetting.MvisGreen, green);
+            config?.BindWith(MSetting.MvisBlue, blue);
+            config?.BindWith(MSetting.MvisUseCustomColour, useCustomColour);
 
             red.BindValueChanged(_ => updateColour());
             green.BindValueChanged(_ => updateColour());
