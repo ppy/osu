@@ -108,8 +108,7 @@ namespace osu.Game.Online.Multiplayer
 
             Debug.Assert(Room != null);
 
-            foreach (var user in Room.Users)
-                await PopulateUser(user);
+            await Task.WhenAll(Room.Users.Select(PopulateUser));
 
             updateLocalRoomSettings(Room.Settings);
         }
