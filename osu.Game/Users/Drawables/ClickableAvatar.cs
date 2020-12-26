@@ -1,19 +1,16 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Users.Drawables
 {
-    [LongRunningLoad]
     public class ClickableAvatar : Container
     {
         /// <summary>
@@ -27,7 +24,7 @@ namespace osu.Game.Users.Drawables
         private OsuGame game { get; set; }
 
         /// <summary>
-        /// A clickable avatar for specified user, with UI sounds included.
+        /// A clickable avatar for the specified user, with UI sounds included.
         /// If <see cref="OpenOnClick"/> is <c>true</c>, clicking will open the user's profile.
         /// </summary>
         /// <param name="user">The user. A null value will get a placeholder avatar.</param>
@@ -39,27 +36,14 @@ namespace osu.Game.Users.Drawables
         [BackgroundDependencyLoader]
         private void load(LargeTextureStore textures)
         {
-            if (textures == null)
-                throw new ArgumentNullException(nameof(textures));
-
-            Texture texture = null;
-            if (user != null && user.Id > 1) texture = textures.Get($@"https://a.ppy.sh/{user.Id}");
-            texture ??= textures.Get(@"Online/avatar-guest");
-
             ClickableArea clickableArea;
             Add(clickableArea = new ClickableArea
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = new Sprite
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Texture = texture,
-                    FillMode = FillMode.Fit,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre
-                },
                 Action = openProfile
             });
+
+            LoadComponentAsync(new DrawableAvatar(user), clickableArea.Add);
 
             clickableArea.Enabled.BindTo(OpenOnClick);
         }
