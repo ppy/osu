@@ -33,7 +33,7 @@ namespace osu.Game.Online.Multiplayer
         /// <summary>
         /// Invoked when any change occurs to the multiplayer room.
         /// </summary>
-        public event Action? RoomChanged;
+        public event Action? RoomUpdated;
 
         /// <summary>
         /// Invoked when the multiplayer server requests the current beatmap to be loaded into play.
@@ -134,7 +134,7 @@ namespace osu.Game.Online.Multiplayer
                 apiRoom = null;
                 Room = null;
 
-                RoomChanged?.Invoke();
+                RoomUpdated?.Invoke();
             }, false);
 
             return Task.CompletedTask;
@@ -214,7 +214,7 @@ namespace osu.Game.Online.Multiplayer
                         break;
                 }
 
-                RoomChanged?.Invoke();
+                RoomUpdated?.Invoke();
             }, false);
 
             return Task.CompletedTask;
@@ -238,7 +238,7 @@ namespace osu.Game.Online.Multiplayer
 
                 Room.Users.Add(user);
 
-                RoomChanged?.Invoke();
+                RoomUpdated?.Invoke();
             }, false);
         }
 
@@ -255,7 +255,7 @@ namespace osu.Game.Online.Multiplayer
                 Room.Users.Remove(user);
                 PlayingUsers.Remove(user.UserID);
 
-                RoomChanged?.Invoke();
+                RoomUpdated?.Invoke();
             }, false);
 
             return Task.CompletedTask;
@@ -278,7 +278,7 @@ namespace osu.Game.Online.Multiplayer
                 Room.Host = user;
                 apiRoom.Host.Value = user?.User;
 
-                RoomChanged?.Invoke();
+                RoomUpdated?.Invoke();
             }, false);
 
             return Task.CompletedTask;
@@ -305,7 +305,7 @@ namespace osu.Game.Online.Multiplayer
                 if (state != MultiplayerUserState.Playing)
                     PlayingUsers.Remove(userId);
 
-                RoomChanged?.Invoke();
+                RoomUpdated?.Invoke();
             }, false);
 
             return Task.CompletedTask;
@@ -419,7 +419,7 @@ namespace osu.Game.Online.Multiplayer
                 // In-order for the client to not display an outdated beatmap, the playlist is forcefully cleared here.
                 apiRoom.Playlist.Clear();
 
-                RoomChanged?.Invoke();
+                RoomUpdated?.Invoke();
 
                 var req = new GetBeatmapSetRequest(settings.BeatmapID, BeatmapSetLookupType.BeatmapId);
                 req.Success += res => updatePlaylist(settings, res);
