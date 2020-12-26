@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual.Online
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
-        private TestFriendDisplay display;
+        private FriendDisplay display;
 
         [SetUp]
         public void Setup() => Schedule(() =>
@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.Online
             Child = new BasicScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = display = new TestFriendDisplay()
+                Child = display = new FriendDisplay()
             };
         });
 
@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestOnline()
         {
-            AddStep("Fetch online", () => display?.Fetch());
+            // No need to do anything, fetch is performed automatically.
         }
 
         private List<User> getUsers() => new List<User>
@@ -76,10 +76,5 @@ namespace osu.Game.Tests.Visual.Online
                 LastVisit = DateTimeOffset.Now
             }
         };
-
-        private class TestFriendDisplay : FriendDisplay
-        {
-            public void Fetch() => PerformFetch();
-        }
     }
 }
