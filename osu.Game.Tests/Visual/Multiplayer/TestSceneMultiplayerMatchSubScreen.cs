@@ -7,8 +7,8 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Osu;
-using osu.Game.Screens.Multi.Multiplayer;
-using osu.Game.Screens.Multi.Multiplayer.Match;
+using osu.Game.Screens.OnlinePlay.Multiplayer;
+using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Tests.Beatmaps;
 using osuTK.Input;
 

@@ -11,7 +11,7 @@ using osu.Framework.Screens;
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.Spectator;
-using osu.Game.Screens.Multi.Match.Components;
+using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
 using osuTK;

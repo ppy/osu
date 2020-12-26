@@ -8,9 +8,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Graphics.Containers;
-using osu.Game.Screens.Multi.Lounge;
-using osu.Game.Screens.Multi.Lounge.Components;
-using osu.Game.Screens.Multi.Playlists;
+using osu.Game.Screens.OnlinePlay.Lounge;
+using osu.Game.Screens.OnlinePlay.Lounge.Components;
+using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Tests.Visual.Multiplayer;
 
 namespace osu.Game.Tests.Visual.Playlists

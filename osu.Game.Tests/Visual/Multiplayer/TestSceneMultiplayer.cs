@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
-using osu.Game.Screens.Multi.Components;
+using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("room has 1 user", () => Client.Room?.Users.Count == 1);
         }
 
-        private class TestMultiplayer : Screens.Multi.Multiplayer.Multiplayer
+        private class TestMultiplayer : Screens.OnlinePlay.Multiplayer.Multiplayer
         {
             protected override RoomManager CreateRoomManager() => new TestMultiplayerRoomManager();
         }

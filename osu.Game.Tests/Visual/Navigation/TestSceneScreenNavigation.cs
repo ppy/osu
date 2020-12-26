@@ -107,14 +107,14 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestExitMultiWithEscape()
         {
-            PushAndConfirm(() => new Screens.Multi.Playlists.Playlists());
+            PushAndConfirm(() => new Screens.OnlinePlay.Playlists.Playlists());
             exitViaEscapeAndConfirm();
         }
 
         [Test]
         public void TestExitMultiWithBackButton()
         {
-            PushAndConfirm(() => new Screens.Multi.Playlists.Playlists());
+            PushAndConfirm(() => new Screens.OnlinePlay.Playlists.Playlists());
             exitViaBackButtonAndConfirm();
         }
 
