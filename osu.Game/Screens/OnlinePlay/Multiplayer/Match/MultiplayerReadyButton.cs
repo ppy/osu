@@ -60,7 +60,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             base.OnRoomUpdated();
 
-            localUser = Room?.Users.Single(u => u.User?.Id == api.LocalUser.Value.Id);
+            // this method is called on leaving the room, so the local user may not exist in the room any more.
+            localUser = Room?.Users.SingleOrDefault(u => u.User?.Id == api.LocalUser.Value.Id);
+
             button.Enabled.Value = Client.Room?.State == MultiplayerRoomState.Open;
             updateState();
         }
