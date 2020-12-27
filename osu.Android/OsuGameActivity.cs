@@ -17,10 +17,13 @@ using osu.Game.Database;
 
 namespace osu.Android
 {
-    [Activity(Theme = "@android:style/Theme.NoTitleBar", MainLauncher = true, ScreenOrientation = ScreenOrientation.FullUser, SupportsPictureInPicture = false, ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize, HardwareAccelerated = false)]
+    [Activity(Theme = "@android:style/Theme.NoTitleBar", MainLauncher = true, ScreenOrientation = ScreenOrientation.FullUser, SupportsPictureInPicture = false, ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize, HardwareAccelerated = false, LaunchMode = LaunchMode.SingleInstance)]
     [IntentFilter(new[] { Intent.ActionDefault, Intent.ActionSend, Intent.ActionSendMultiple }, Categories = new[] { Intent.CategoryDefault }, DataPathPatterns = new[] { ".*\\.osz", ".*\\.osk" }, DataMimeType = "application/*")]
+    [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryBrowsable, Intent.CategoryDefault }, DataSchemes = new[] { "osu", "osump" })]
     public class OsuGameActivity : AndroidGameActivity
     {
+        private static readonly string[] osu_url_schemes = { "osu", "osump" };
+
         private OsuGameAndroid game;
 
         protected override Framework.Game CreateGame() => game = new OsuGameAndroid(this);
@@ -51,7 +54,9 @@ namespace osu.Android
             {
                 case Intent.ActionDefault:
                     if (intent.Scheme == ContentResolver.SchemeContent)
-                        handleImportFromUris(intent.Data);
+                        handleImportFromUri(intent.Data);
+                    else if (osu_url_schemes.Contains(intent.Scheme))
+                        game.HandleLink(intent.DataString);
                     break;
 
                 case Intent.ActionSend:

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Threading.Tasks;
 using osu.Framework.Input.Bindings;
 using osu.Game.Input.Bindings;
 using osu.Game.Scoring;
@@ -15,8 +16,8 @@ namespace osu.Game.Screens.Play
         // Disallow replays from failing. (see https://github.com/ppy/osu/issues/6108)
         protected override bool CheckModsAllowFailure() => false;
 
-        public ReplayPlayer(Score score, bool allowPause = true, bool showResults = true)
-            : base(allowPause, showResults)
+        public ReplayPlayer(Score score, PlayerConfiguration configuration = null)
+            : base(configuration)
         {
             Score = score;
         }
@@ -26,17 +27,20 @@ namespace osu.Game.Screens.Play
             DrawableRuleset?.SetReplayScore(Score);
         }
 
-        protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score, false);
-
-        protected override ScoreInfo CreateScore()
+        protected override Score CreateScore()
         {
             var baseScore = base.CreateScore();
 
             // Since the replay score doesn't contain statistics, we'll pass them through here.
-            Score.ScoreInfo.HitEvents = baseScore.HitEvents;
+            Score.ScoreInfo.HitEvents = baseScore.ScoreInfo.HitEvents;
 
-            return Score.ScoreInfo;
+            return Score;
         }
+
+        // Don't re-import replay scores as they're already present in the database.
+        protected override Task ImportScore(Score score) => Task.CompletedTask;
+
+        protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score, false);
 
         public bool OnPressed(GlobalAction action)
         {

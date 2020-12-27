@@ -42,8 +42,8 @@ namespace osu.Game.Screens.Menu
         public Action OnBeatmapListing;
         public Action OnSolo;
         public Action OnSettings;
-        public Action OnMulti;
-        public Action OnChart;
+        public Action OnMultiplayer;
+        public Action OnPlaylists;
 
         public const float BUTTON_WIDTH = 140f;
         public const float WEDGE_WIDTH = 20;
@@ -124,8 +124,8 @@ namespace osu.Game.Screens.Menu
         private void load(AudioManager audio, IdleTracker idleTracker, GameHost host)
         {
             buttonsPlay.Add(new Button(@"solo", @"button-solo-select", FontAwesome.Solid.User, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
-            buttonsPlay.Add(new Button(@"multi", @"button-generic-select", FontAwesome.Solid.Users, new Color4(94, 63, 186, 255), onMulti, 0, Key.M));
-            buttonsPlay.Add(new Button(@"chart", @"button-generic-select", OsuIcon.Charts, new Color4(80, 53, 160, 255), () => OnChart?.Invoke()));
+            buttonsPlay.Add(new Button(@"multi", @"button-generic-select", FontAwesome.Solid.Users, new Color4(94, 63, 186, 255), onMultiplayer, 0, Key.M));
+            buttonsPlay.Add(new Button(@"playlists", @"button-generic-select", OsuIcon.Charts, new Color4(94, 63, 186, 255), onPlaylists, 0, Key.L));
             buttonsPlay.ForEach(b => b.VisibleState = ButtonSystemState.Play);
 
             buttonsTopLevel.Add(new Button(@"play", @"button-play-select", OsuIcon.Logo, new Color4(102, 68, 204, 255), () => State = ButtonSystemState.Play, WEDGE_WIDTH, Key.P));
@@ -154,7 +154,7 @@ namespace osu.Game.Screens.Menu
             sampleBack = audio.Samples.Get(@"Menu/button-back-select");
         }
 
-        private void onMulti()
+        private void onMultiplayer()
         {
             if (!api.IsLoggedIn)
             {
@@ -172,7 +172,28 @@ namespace osu.Game.Screens.Menu
                 return;
             }
 
-            OnMulti?.Invoke();
+            OnMultiplayer?.Invoke();
+        }
+
+        private void onPlaylists()
+        {
+            if (!api.IsLoggedIn)
+            {
+                notifications?.Post(new SimpleNotification
+                {
+                    Text = "You gotta be logged in to multi 'yo!",
+                    Icon = FontAwesome.Solid.Globe,
+                    Activated = () =>
+                    {
+                        loginOverlay?.Show();
+                        return true;
+                    }
+                });
+
+                return;
+            }
+
+            OnPlaylists?.Invoke();
         }
 
         private void updateIdleState(bool isIdle)

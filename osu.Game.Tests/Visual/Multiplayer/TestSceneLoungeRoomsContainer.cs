@@ -6,10 +6,10 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
-using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Osu;
-using osu.Game.Screens.Multi.Lounge.Components;
+using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osuTK.Graphics;
 using osuTK.Input;
 
