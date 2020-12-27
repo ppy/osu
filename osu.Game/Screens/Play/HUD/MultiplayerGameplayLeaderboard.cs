@@ -165,8 +165,6 @@ namespace osu.Game.Screens.Play.HUD
 
             public void UpdateScore(ScoreProcessor processor, ScoringMode mode)
             {
-                Debug.Assert(!UserQuit.Value);
-
                 if (LastHeader == null)
                     return;
 
