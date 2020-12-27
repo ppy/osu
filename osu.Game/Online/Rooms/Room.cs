@@ -131,6 +131,9 @@ namespace osu.Game.Online.Rooms
             RoomID.Value = other.RoomID.Value;
             Name.Value = other.Name.Value;
 
+            if (other.Category.Value != RoomCategory.Spotlight)
+                Category.Value = other.Category.Value;
+
             if (other.Host.Value != null && Host.Value?.Id != other.Host.Value.Id)
                 Host.Value = other.Host.Value;
 
