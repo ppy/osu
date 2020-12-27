@@ -78,6 +78,8 @@ namespace osu.Game.Screens.Play.HUD
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
+            Container avatarContainer;
+
             InternalChildren = new Drawable[]
             {
                 mainFillContainer = new Container
@@ -152,7 +154,7 @@ namespace osu.Game.Screens.Play.HUD
                                         Spacing = new Vector2(4f, 0f),
                                         Children = new Drawable[]
                                         {
-                                            new CircularContainer
+                                            avatarContainer = new CircularContainer
                                             {
                                                 Masking = true,
                                                 Anchor = Anchor.CentreLeft,
@@ -166,11 +168,7 @@ namespace osu.Game.Screens.Play.HUD
                                                         Alpha = 0.3f,
                                                         RelativeSizeAxes = Axes.Both,
                                                         Colour = colours.Gray4,
-                                                    },
-                                                    new UpdateableAvatar(User)
-                                                    {
-                                                        RelativeSizeAxes = Axes.Both,
-                                                    },
+                                                    }
                                                 }
                                             },
                                             usernameText = new OsuSpriteText
@@ -226,6 +224,8 @@ namespace osu.Game.Screens.Play.HUD
                     }
                 }
             };
+
+            LoadComponentAsync(new DrawableAvatar(User), avatarContainer.Add);
 
             TotalScore.BindValueChanged(v => scoreText.Text = v.NewValue.ToString("N0"), true);
             Accuracy.BindValueChanged(v => accuracyText.Text = v.NewValue.FormatAccuracy(), true);
