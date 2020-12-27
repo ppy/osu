@@ -231,7 +231,7 @@ namespace osu.Game.Screens.Play.HUD
             TotalScore.BindValueChanged(v => scoreText.Text = v.NewValue.ToString("N0"), true);
             Accuracy.BindValueChanged(v => accuracyText.Text = v.NewValue.FormatAccuracy(), true);
             Combo.BindValueChanged(v => comboText.Text = $"{v.NewValue}x", true);
-            HasQuit.BindValueChanged(v => updateState());
+            HasQuit.BindValueChanged(_ => updateState());
         }
 
         protected override void LoadComplete()
