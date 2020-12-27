@@ -34,6 +34,7 @@ namespace osu.Game.Screens.Play.HUD
         public BindableDouble TotalScore { get; } = new BindableDouble();
         public BindableDouble Accuracy { get; } = new BindableDouble(1);
         public BindableInt Combo { get; } = new BindableInt();
+        public BindableBool HasQuit { get; } = new BindableBool();
 
         private int? scorePosition;
 
@@ -51,7 +52,7 @@ namespace osu.Game.Screens.Play.HUD
                     positionText.Text = $"#{scorePosition.Value.FormatRank()}";
 
                 positionText.FadeTo(scorePosition.HasValue ? 1 : 0);
-                updateColour();
+                updateState();
             }
         }
 
@@ -230,20 +231,31 @@ namespace osu.Game.Screens.Play.HUD
             TotalScore.BindValueChanged(v => scoreText.Text = v.NewValue.ToString("N0"), true);
             Accuracy.BindValueChanged(v => accuracyText.Text = v.NewValue.FormatAccuracy(), true);
             Combo.BindValueChanged(v => comboText.Text = $"{v.NewValue}x", true);
+            HasQuit.BindValueChanged(_ => updateState());
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            updateColour();
+            updateState();
             FinishTransforms(true);
         }
 
         private const double panel_transition_duration = 500;
 
-        private void updateColour()
+        private void updateState()
         {
+            if (HasQuit.Value)
+            {
+                // we will probably want to display this in a better way once we have a design.
+                // and also show states other than quit.
+                mainFillContainer.ResizeWidthTo(regular_width, panel_transition_duration, Easing.OutElastic);
+                panelColour = Color4.Gray;
+                textColour = Color4.White;
+                return;
+            }
+
             if (scorePosition == 1)
             {
                 mainFillContainer.ResizeWidthTo(EXTENDED_WIDTH, panel_transition_duration, Easing.OutElastic);
