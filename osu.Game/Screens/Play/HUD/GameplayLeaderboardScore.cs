@@ -231,15 +231,7 @@ namespace osu.Game.Screens.Play.HUD
             TotalScore.BindValueChanged(v => scoreText.Text = v.NewValue.ToString("N0"), true);
             Accuracy.BindValueChanged(v => accuracyText.Text = v.NewValue.FormatAccuracy(), true);
             Combo.BindValueChanged(v => comboText.Text = $"{v.NewValue}x", true);
-            HasQuit.BindValueChanged(v =>
-            {
-                if (v.NewValue)
-                {
-                    // we will probably want to display this in a better way once we have a design.
-                    // and also show states other than quit.
-                    panelColour = Color4.Gray;
-                }
-            }, true);
+            HasQuit.BindValueChanged(v => updateColour());
         }
 
         protected override void LoadComplete()
@@ -255,7 +247,14 @@ namespace osu.Game.Screens.Play.HUD
         private void updateColour()
         {
             if (HasQuit.Value)
+            {
+                // we will probably want to display this in a better way once we have a design.
+                // and also show states other than quit.
+                mainFillContainer.ResizeWidthTo(regular_width, panel_transition_duration, Easing.OutElastic);
+                panelColour = Color4.Gray;
+                textColour = Color4.White;
                 return;
+            }
 
             if (scorePosition == 1)
             {
