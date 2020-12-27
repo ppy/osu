@@ -54,7 +54,7 @@ namespace osu.Android
             {
                 case Intent.ActionDefault:
                     if (intent.Scheme == ContentResolver.SchemeContent)
-                        handleImportFromUri(intent.Data);
+                        handleImportFromUris(intent.Data);
                     else if (osu_url_schemes.Contains(intent.Scheme))
                         game.HandleLink(intent.DataString);
                     break;
