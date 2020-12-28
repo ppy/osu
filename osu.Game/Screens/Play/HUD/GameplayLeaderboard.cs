@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -42,7 +43,7 @@ namespace osu.Game.Screens.Play.HUD
         /// Whether the player should be tracked on the leaderboard.
         /// Set to <c>true</c> for the local player or a player whose replay is currently being played.
         /// </param>
-        public ILeaderboardScore AddPlayer(User user, bool isTracked)
+        public ILeaderboardScore AddPlayer([CanBeNull] User user, bool isTracked)
         {
             var drawable = new GameplayLeaderboardScore(user, isTracked)
             {
