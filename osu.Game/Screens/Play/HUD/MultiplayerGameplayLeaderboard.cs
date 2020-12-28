@@ -80,7 +80,11 @@ namespace osu.Game.Screens.Play.HUD
         protected override void LoadComplete()
         {
             base.LoadComplete();
+            multiplayerClient.MatchStarted += onMatchStarted;
+        }
 
+        private void onMatchStarted()
+        {
             // BindableList handles binding in a really bad way (Clear then AddRange) so we need to do this manually..
             foreach (int userId in playingUsers)
             {
@@ -137,6 +141,9 @@ namespace osu.Game.Screens.Play.HUD
 
                 streamingClient.OnNewFrames -= handleIncomingFrames;
             }
+
+            if (multiplayerClient != null)
+                multiplayerClient.MatchStarted -= onMatchStarted;
         }
 
         private class TrackedUserData
