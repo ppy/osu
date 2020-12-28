@@ -72,6 +72,7 @@ namespace osu.Game.Database
             var request = new GetUsersRequest(userTasks.Keys.ToArray());
 
             // rather than queueing, we maintain our own single-threaded request stream.
+            // todo: we probably want retry logic here.
             api.Perform(request);
 
             // Create a new request task if there's still more users to query.
@@ -82,14 +83,19 @@ namespace osu.Game.Database
                     createNewTask();
             }
 
-            foreach (var user in request.Result.Users)
-            {
-                if (userTasks.TryGetValue(user.Id, out var tasks))
-                {
-                    foreach (var task in tasks)
-                        task.SetResult(user);
+            List<User> foundUsers = request.Result?.Users;
 
-                    userTasks.Remove(user.Id);
+            if (foundUsers != null)
+            {
+                foreach (var user in foundUsers)
+                {
+                    if (userTasks.TryGetValue(user.Id, out var tasks))
+                    {
+                        foreach (var task in tasks)
+                            task.SetResult(user);
+
+                        userTasks.Remove(user.Id);
+                    }
                 }
             }
 

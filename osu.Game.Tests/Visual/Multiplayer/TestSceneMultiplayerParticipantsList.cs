@@ -44,6 +44,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestAddNullUser()
+        {
+            AddAssert("one unique panel", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.User).Distinct().Count() == 1);
+
+            AddStep("add non-resolvable user", () => Client.AddNullUser(-3));
+
+            AddUntilStep("two unique panels", () => this.ChildrenOfType<ParticipantPanel>().Select(p => p.User).Distinct().Count() == 2);
+        }
+
+        [Test]
         public void TestRemoveUser()
         {
             User secondUser = null;
