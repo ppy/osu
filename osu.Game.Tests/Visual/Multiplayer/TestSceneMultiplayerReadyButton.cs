@@ -7,11 +7,14 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
+using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
+using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Tests.Resources;
 using osu.Game.Users;
@@ -26,6 +29,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private BeatmapManager beatmaps;
         private RulesetStore rulesets;
+
+        [Cached]
+        private OngoingOperationTracker gameplayStartTracker = new OngoingOperationTracker();
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -89,8 +95,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             addClickButtonStep();
             AddAssert("user is ready", () => Client.Room?.Users[0].State == MultiplayerUserState.Ready);
 
-            addClickButtonStep();
-            AddAssert("match started", () => Client.Room?.Users[0].State == MultiplayerUserState.WaitingForLoad);
+            verifyGameplayStartFlow();
         }
 
         [Test]
@@ -105,8 +110,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             addClickButtonStep();
             AddStep("make user host", () => Client.TransferHost(Client.Room?.Users[0].UserID ?? 0));
 
-            addClickButtonStep();
-            AddAssert("match started", () => Client.Room?.Users[0].State == MultiplayerUserState.WaitingForLoad);
+            verifyGameplayStartFlow();
         }
 
         [Test]
@@ -160,5 +164,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
             InputManager.MoveMouseTo(button);
             InputManager.Click(MouseButton.Left);
         });
+
+        private void verifyGameplayStartFlow()
+        {
+            addClickButtonStep();
+            AddAssert("user waiting for load", () => Client.Room?.Users[0].State == MultiplayerUserState.WaitingForLoad);
+            AddAssert("ready button disabled", () => !button.ChildrenOfType<OsuButton>().Single().Enabled.Value);
+
+            AddStep("transitioned to gameplay", () => gameplayStartTracker.EndOperation());
+            AddAssert("ready button enabled", () => button.ChildrenOfType<OsuButton>().Single().Enabled.Value);
+        }
     }
 }
