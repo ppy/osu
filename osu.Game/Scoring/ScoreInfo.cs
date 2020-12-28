@@ -256,7 +256,8 @@ namespace osu.Game.Scoring
         {
             public string Acronym { get; set; }
 
-            public bool Equals(DeserializedMod other) => Acronym == other?.Acronym;
+            bool IEquatable<IMod>.Equals(IMod other) => other is DeserializedMod them && Equals(them);
+            public bool Equals(DeserializedMod other) => ((IMod)this).Equals(other);
         }
 
         public override string ToString() => $"{User} playing {Beatmap}";
