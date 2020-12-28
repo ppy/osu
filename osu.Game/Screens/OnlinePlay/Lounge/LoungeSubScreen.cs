@@ -38,7 +38,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         [Resolved]
         private MusicController music { get; set; }
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private OngoingOperationTracker joiningRoomTracker { get; set; }
 
         [BackgroundDependencyLoader]
@@ -102,8 +102,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             initialRoomsReceived.BindTo(RoomManager.InitialRoomsReceived);
             initialRoomsReceived.BindValueChanged(_ => updateLoadingLayer());
 
-            joiningRoom.BindTo(joiningRoomTracker.InProgress);
-            joiningRoom.BindValueChanged(_ => updateLoadingLayer(), true);
+            if (joiningRoomTracker != null)
+            {
+                joiningRoom.BindTo(joiningRoomTracker.InProgress);
+                joiningRoom.BindValueChanged(_ => updateLoadingLayer(), true);
+            }
         }
 
         protected override void UpdateAfterChildren()
@@ -161,15 +164,15 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         private void joinRequested(Room room)
         {
-            joiningRoomTracker.BeginOperation();
+            joiningRoomTracker?.BeginOperation();
 
             RoomManager?.JoinRoom(room, r =>
             {
                 Open(room);
-                joiningRoomTracker.EndOperation();
+                joiningRoomTracker?.EndOperation();
             }, _ =>
             {
-                joiningRoomTracker.EndOperation();
+                joiningRoomTracker?.EndOperation();
             });
         }
 
