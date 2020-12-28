@@ -20,10 +20,9 @@ using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Tests.Visual.Multiplayer;
 using osu.Game.Tests.Visual.Online;
 
-namespace osu.Game.Tests.Visual.Gameplay
+namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMultiplayerGameplayLeaderboard : MultiplayerTestScene
     {
