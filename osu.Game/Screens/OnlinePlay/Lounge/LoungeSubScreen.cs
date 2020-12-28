@@ -26,6 +26,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         protected override UserActivity InitialActivity => new UserActivity.SearchingForLobby();
 
         private readonly IBindable<bool> initialRoomsReceived = new Bindable<bool>();
+        private readonly IBindable<bool> joiningRoom = new Bindable<bool>();
 
         private FilterControl filter;
         private Container content;
@@ -37,7 +38,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         [Resolved]
         private MusicController music { get; set; }
 
-        private bool joiningRoom;
+        [Resolved]
+        private OngoingOperationTracker joiningRoomTracker { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -98,7 +100,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             base.LoadComplete();
 
             initialRoomsReceived.BindTo(RoomManager.InitialRoomsReceived);
-            initialRoomsReceived.BindValueChanged(onInitialRoomsReceivedChanged, true);
+            initialRoomsReceived.BindValueChanged(_ => updateLoadingLayer());
+
+            joiningRoom.BindTo(joiningRoomTracker.InProgress);
+            joiningRoom.BindValueChanged(_ => updateLoadingLayer(), true);
         }
 
         protected override void UpdateAfterChildren()
@@ -156,26 +161,21 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         private void joinRequested(Room room)
         {
-            joiningRoom = true;
-            updateLoadingLayer();
+            joiningRoomTracker.BeginOperation();
 
             RoomManager?.JoinRoom(room, r =>
             {
                 Open(room);
-                joiningRoom = false;
-                updateLoadingLayer();
+                joiningRoomTracker.EndOperation();
             }, _ =>
             {
-                joiningRoom = false;
-                updateLoadingLayer();
+                joiningRoomTracker.EndOperation();
             });
         }
 
-        private void onInitialRoomsReceivedChanged(ValueChangedEvent<bool> received) => updateLoadingLayer();
-
         private void updateLoadingLayer()
         {
-            if (joiningRoom || !initialRoomsReceived.Value)
+            if (joiningRoom.Value || !initialRoomsReceived.Value)
                 loadingLayer.Show();
             else
                 loadingLayer.Hide();
