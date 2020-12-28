@@ -10,5 +10,7 @@ namespace osu.Game.Screens.Play.HUD
         BindableDouble TotalScore { get; }
         BindableDouble Accuracy { get; }
         BindableInt Combo { get; }
+
+        BindableBool HasQuit { get; }
     }
 }

@@ -17,8 +17,8 @@ using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
-using osu.Game.Screens.Multi.Multiplayer;
-using osu.Game.Screens.Multi.Playlists;
+using osu.Game.Screens.OnlinePlay.Multiplayer;
+using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Select;
 
 namespace osu.Game.Screens.Menu

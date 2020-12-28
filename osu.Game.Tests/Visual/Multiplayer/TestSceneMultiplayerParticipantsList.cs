@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Screens.Multi.Multiplayer.Participants;
+using osu.Game.Screens.OnlinePlay.Multiplayer.Participants;
 using osu.Game.Users;
 using osuTK;
 

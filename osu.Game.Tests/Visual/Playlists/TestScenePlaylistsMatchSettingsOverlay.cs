@@ -10,8 +10,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Rooms;
-using osu.Game.Screens.Multi;
-using osu.Game.Screens.Multi.Playlists;
+using osu.Game.Screens.OnlinePlay;
+using osu.Game.Screens.OnlinePlay.Playlists;
 
 namespace osu.Game.Tests.Visual.Playlists
 {
