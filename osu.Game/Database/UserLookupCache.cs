@@ -17,6 +17,12 @@ namespace osu.Game.Database
         [Resolved]
         private IAPIProvider api { get; set; }
 
+        /// <summary>
+        /// Perform an API lookup on the specified user, populating a <see cref="User"/> model.
+        /// </summary>
+        /// <param name="userId">The user to lookup.</param>
+        /// <param name="token">An optional cancellation token.</param>
+        /// <returns>The populated user, or null if the user does not exist or the request could not be satisfied.</returns>
         public Task<User> GetUserAsync(int userId, CancellationToken token = default) => GetAsync(userId, token);
 
         protected override async Task<User> ComputeValueAsync(int lookup, CancellationToken token = default)
