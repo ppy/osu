@@ -53,7 +53,7 @@ namespace osu.Game.Online.API
         }
 
         public bool Equals(IMod other) => other is APIMod them && Equals(them);
-        public bool Equals(APIMod other) => ((IMod)this).Equals(other);
+        public bool Equals(APIMod other) => Acronym == other?.Acronym;
 
         public override string ToString()
         {

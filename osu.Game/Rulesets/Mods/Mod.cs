@@ -150,6 +150,6 @@ namespace osu.Game.Rulesets.Mods
         }
 
         public bool Equals(IMod other) => other is Mod them && Equals(them);
-        public bool Equals(Mod other) => Acronym == other?.Acronym;
+        public bool Equals(Mod other) => GetType() == other?.GetType();
     }
 }
