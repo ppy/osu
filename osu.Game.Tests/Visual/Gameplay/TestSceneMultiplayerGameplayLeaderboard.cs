@@ -20,14 +20,17 @@ using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Tests.Visual.Multiplayer;
 using osu.Game.Tests.Visual.Online;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneMultiplayerGameplayLeaderboard : OsuTestScene
+    public class TestSceneMultiplayerGameplayLeaderboard : MultiplayerTestScene
     {
+        private const int users = 16;
+
         [Cached(typeof(SpectatorStreamingClient))]
-        private TestMultiplayerStreaming streamingClient = new TestMultiplayerStreaming(16);
+        private TestMultiplayerStreaming streamingClient = new TestMultiplayerStreaming(users);
 
         [Cached(typeof(UserLookupCache))]
         private UserLookupCache lookupCache = new TestSceneCurrentlyPlayingDisplay.TestUserLookupCache();
@@ -47,16 +50,21 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [SetUpSteps]
-        public void SetUpSteps()
+        public override void SetUpSteps()
         {
             AddStep("create leaderboard", () =>
             {
+                leaderboard?.Expire();
+
                 OsuScoreProcessor scoreProcessor;
                 Beatmap.Value = CreateWorkingBeatmap(Ruleset.Value);
 
                 var playable = Beatmap.Value.GetPlayableBeatmap(Ruleset.Value);
 
                 streamingClient.Start(Beatmap.Value.BeatmapInfo.OnlineBeatmapID ?? 0);
+
+                Client.PlayingUsers.Clear();
+                Client.PlayingUsers.AddRange(streamingClient.PlayingUsers);
 
                 Children = new Drawable[]
                 {
@@ -79,6 +87,12 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestScoreUpdates()
         {
             AddRepeatStep("update state", () => streamingClient.RandomlyUpdateState(), 100);
+        }
+
+        [Test]
+        public void TestUserQuit()
+        {
+            AddRepeatStep("mark user quit", () => Client.PlayingUsers.RemoveAt(0), users);
         }
 
         public class TestMultiplayerStreaming : SpectatorStreamingClient
