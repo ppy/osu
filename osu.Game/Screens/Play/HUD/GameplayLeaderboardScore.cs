@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -56,6 +57,7 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
+        [CanBeNull]
         public User User { get; }
 
         private readonly bool trackedPlayer;
@@ -68,7 +70,7 @@ namespace osu.Game.Screens.Play.HUD
         /// </summary>
         /// <param name="user">The score's player.</param>
         /// <param name="trackedPlayer">Whether the player is the local user or a replay player.</param>
-        public GameplayLeaderboardScore(User user, bool trackedPlayer)
+        public GameplayLeaderboardScore([CanBeNull] User user, bool trackedPlayer)
         {
             User = user;
             this.trackedPlayer = trackedPlayer;
@@ -180,7 +182,7 @@ namespace osu.Game.Screens.Play.HUD
                                                 Origin = Anchor.CentreLeft,
                                                 Colour = Color4.White,
                                                 Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold),
-                                                Text = User.Username,
+                                                Text = User?.Username,
                                                 Truncate = true,
                                                 Shadow = false,
                                             }
