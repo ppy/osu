@@ -31,6 +31,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Resolved]
         private StatefulMultiplayerClient client { get; set; }
 
+        [Cached]
+        private OngoingOperationTracker gameplayStartTracker = new OngoingOperationTracker();
+
         private MultiplayerMatchSettingsOverlay settingsOverlay;
 
         private IBindable<bool> isConnected;
@@ -203,6 +206,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             int[] userIds = client.Room.Users.Where(u => u.State >= MultiplayerUserState.WaitingForLoad).Select(u => u.UserID).ToArray();
 
             StartPlay(() => new MultiplayerPlayer(SelectedItem.Value, userIds));
+            gameplayStartTracker.EndOperation();
         }
 
         protected override void Dispose(bool isDisposing)

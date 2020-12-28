@@ -33,11 +33,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         [Resolved]
         private OsuColour colours { get; set; }
 
+        [Resolved]
+        private OngoingOperationTracker gameplayStartTracker { get; set; }
+
         private SampleChannel sampleReadyCount;
 
         private readonly ButtonWithTrianglesExposed button;
 
         private int countReady;
+        private IBindable<bool> gameplayStartInProgress;
 
         public MultiplayerReadyButton()
         {
@@ -54,6 +58,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         private void load(AudioManager audio)
         {
             sampleReadyCount = audio.Samples.Get(@"SongSelect/select-difficulty");
+
+            gameplayStartInProgress = gameplayStartTracker.InProgress.GetBoundCopy();
+            gameplayStartInProgress.BindValueChanged(_ => updateState());
         }
 
         protected override void OnRoomUpdated()
@@ -63,7 +70,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             // this method is called on leaving the room, so the local user may not exist in the room any more.
             localUser = Room?.Users.SingleOrDefault(u => u.User?.Id == api.LocalUser.Value.Id);
 
-            button.Enabled.Value = Client.Room?.State == MultiplayerRoomState.Open;
             updateState();
         }
 
@@ -99,6 +105,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
                     break;
             }
+
+            button.Enabled.Value = Client.Room?.State == MultiplayerRoomState.Open && !gameplayStartInProgress.Value;
 
             if (newCountReady != countReady)
             {
@@ -142,7 +150,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             else
             {
                 if (Room?.Host?.Equals(localUser) == true)
+                {
+                    gameplayStartTracker.BeginOperation();
                     Client.StartMatch().CatchUnobservedExceptions(true);
+                }
                 else
                     Client.ChangeState(MultiplayerUserState.Idle).CatchUnobservedExceptions(true);
             }
