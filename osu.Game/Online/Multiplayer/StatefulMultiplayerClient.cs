@@ -133,6 +133,7 @@ namespace osu.Game.Online.Multiplayer
 
                 apiRoom = null;
                 Room = null;
+                PlayingUsers.Clear();
 
                 RoomUpdated?.Invoke();
             }, false);
@@ -302,8 +303,7 @@ namespace osu.Game.Online.Multiplayer
 
                 Room.Users.Single(u => u.UserID == userId).State = state;
 
-                if (state != MultiplayerUserState.Playing)
-                    PlayingUsers.Remove(userId);
+                updatePlayingUsers(userId, state);
 
                 RoomUpdated?.Invoke();
             }, false);
@@ -336,8 +336,6 @@ namespace osu.Game.Online.Multiplayer
             {
                 if (Room == null)
                     return;
-
-                PlayingUsers.AddRange(Room.Users.Where(u => u.State == MultiplayerUserState.Playing).Select(u => u.UserID));
 
                 MatchStarted?.Invoke();
             }, false);
@@ -453,6 +451,18 @@ namespace osu.Game.Online.Multiplayer
 
             apiRoom.Playlist.Clear(); // Clearing should be unnecessary, but here for sanity.
             apiRoom.Playlist.Add(playlistItem);
+        }
+
+        private void updatePlayingUsers(int userId, MultiplayerUserState state)
+        {
+            bool isPlaying = state >= MultiplayerUserState.WaitingForLoad && state <= MultiplayerUserState.FinishedPlay;
+            bool wasPlaying = PlayingUsers.Contains(userId);
+
+            if (!wasPlaying && isPlaying)
+                PlayingUsers.Add(userId);
+
+            if (wasPlaying && !isPlaying)
+                PlayingUsers.Remove(userId);
         }
     }
 }
