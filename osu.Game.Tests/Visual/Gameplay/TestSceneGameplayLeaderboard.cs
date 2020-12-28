@@ -95,7 +95,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             public bool CheckPositionByUsername(string username, int? expectedPosition)
             {
-                var scoreItem = this.FirstOrDefault(i => i.User.Username == username);
+                var scoreItem = this.FirstOrDefault(i => i.User?.Username == username);
 
                 return scoreItem != null && scoreItem.ScorePosition == expectedPosition;
             }
