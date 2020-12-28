@@ -19,7 +19,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
-using osu.Game.Screens.Multi.Playlists;
+using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Ranking;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Users;

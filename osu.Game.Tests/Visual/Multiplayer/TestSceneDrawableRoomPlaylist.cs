@@ -18,7 +18,7 @@ using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Screens.Multi;
+using osu.Game.Screens.OnlinePlay;
 using osu.Game.Tests.Beatmaps;
 using osuTK;
 using osuTK.Input;

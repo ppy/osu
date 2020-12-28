@@ -9,7 +9,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Screens.Multi.Components;
+using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Tests.Beatmaps;
 using osuTK;
 
