@@ -61,7 +61,7 @@ namespace osu.Game.Online.Multiplayer
         public MultiplayerRoom? Room { get; private set; }
 
         /// <summary>
-        /// The users in the joined <see cref="Room"/> which are currently in gameplay.
+        /// The users in the joined <see cref="Room"/> which are participating in the current gameplay loop.
         /// </summary>
         public readonly BindableList<int> CurrentMatchPlayingUserIds = new BindableList<int>();
 
