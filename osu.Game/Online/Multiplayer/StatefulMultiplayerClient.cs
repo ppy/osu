@@ -61,9 +61,9 @@ namespace osu.Game.Online.Multiplayer
         public MultiplayerRoom? Room { get; private set; }
 
         /// <summary>
-        /// The users currently in gameplay.
+        /// The users in the joined <see cref="Room"/> which are currently in gameplay.
         /// </summary>
-        public readonly BindableList<int> PlayingUsers = new BindableList<int>();
+        public readonly BindableList<int> CurrentMatchPlayingUserIds = new BindableList<int>();
 
         [Resolved]
         private UserLookupCache userLookupCache { get; set; } = null!;
@@ -133,7 +133,7 @@ namespace osu.Game.Online.Multiplayer
 
                 apiRoom = null;
                 Room = null;
-                PlayingUsers.Clear();
+                CurrentMatchPlayingUserIds.Clear();
 
                 RoomUpdated?.Invoke();
             }, false);
@@ -254,7 +254,7 @@ namespace osu.Game.Online.Multiplayer
                     return;
 
                 Room.Users.Remove(user);
-                PlayingUsers.Remove(user.UserID);
+                CurrentMatchPlayingUserIds.Remove(user.UserID);
 
                 RoomUpdated?.Invoke();
             }, false);
@@ -454,22 +454,22 @@ namespace osu.Game.Online.Multiplayer
         }
 
         /// <summary>
-        /// For the provided user ID, update whether the user is included in <see cref="PlayingUsers"/>.
+        /// For the provided user ID, update whether the user is included in <see cref="CurrentMatchPlayingUserIds"/>.
         /// </summary>
         /// <param name="userId">The user's ID.</param>
         /// <param name="state">The new state of the user.</param>
         private void updateUserPlayingState(int userId, MultiplayerUserState state)
         {
-            bool wasPlaying = PlayingUsers.Contains(userId);
+            bool wasPlaying = CurrentMatchPlayingUserIds.Contains(userId);
             bool isPlaying = state >= MultiplayerUserState.WaitingForLoad && state <= MultiplayerUserState.FinishedPlay;
 
             if (isPlaying == wasPlaying)
                 return;
 
             if (isPlaying)
-                PlayingUsers.Add(userId);
+                CurrentMatchPlayingUserIds.Add(userId);
             else
-                PlayingUsers.Remove(userId);
+                CurrentMatchPlayingUserIds.Remove(userId);
         }
     }
 }

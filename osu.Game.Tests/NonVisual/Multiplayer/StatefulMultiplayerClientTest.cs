@@ -42,7 +42,7 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
         }
 
         private void checkPlayingUserCount(int expectedCount)
-            => AddAssert($"{"user".ToQuantity(expectedCount)} playing", () => Client.PlayingUsers.Count == expectedCount);
+            => AddAssert($"{"user".ToQuantity(expectedCount)} playing", () => Client.CurrentMatchPlayingUserIds.Count == expectedCount);
 
         private void changeState(int userCount, MultiplayerUserState state)
             => AddStep($"{"user".ToQuantity(userCount)} in {state}", () =>
