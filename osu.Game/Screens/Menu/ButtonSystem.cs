@@ -156,7 +156,7 @@ namespace osu.Game.Screens.Menu
 
         private void onMultiplayer()
         {
-            if (!api.IsLoggedIn || api.State.Value != APIState.Online)
+            if (api.State.Value != APIState.Online)
             {
                 notifications?.Post(new SimpleNotification
                 {
@@ -177,7 +177,7 @@ namespace osu.Game.Screens.Menu
 
         private void onPlaylists()
         {
-            if (!api.IsLoggedIn || api.State.Value != APIState.Online)
+            if (api.State.Value != APIState.Online)
             {
                 notifications?.Post(new SimpleNotification
                 {
