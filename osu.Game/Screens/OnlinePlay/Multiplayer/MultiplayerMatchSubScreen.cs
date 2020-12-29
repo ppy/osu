@@ -11,7 +11,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
-using osu.Game.Extensions;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
@@ -218,13 +217,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                   .ContinueWith(t =>
                   {
                       // if gameplay was started, the button will be unblocked on load requested.
-                      if (t.Result) return;
+                      // accessing Exception here also silences any potential errors from the antecedent task
+                      // (we still want to unblock the button if the ready-up fails).
+                      if (t.Exception == null && t.Result) return;
 
                       // gameplay was not started; unblock button.
                       gameplayStartOperation?.Dispose();
                       gameplayStartOperation = null;
-                  })
-                  .CatchUnobservedExceptions();
+                  });
         }
 
         private void onLoadRequested()
