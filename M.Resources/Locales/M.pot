@@ -20,6 +20,48 @@ msgstr "hosted by"
 msgid "_Open_Multiplayer"
 msgstr ""
 
+#v2 主菜单
+msgid "Game.Menu.ButtonSystem.solo"
+msgstr ""
+
+msgid "Game.Menu.ButtonSystem.multi"
+msgstr ""
+
+msgid "Game.Menu.ButtonSystem.playlists"
+msgstr ""
+
+msgid "Game.Menu.ButtonSystem.about-mfosu"
+msgstr ""
+
+msgid "Game.Menu.ButtonSystem.mvis"
+msgstr ""
+
+msgid "Game.Menu.ButtonSystem.file-import"
+msgstr ""
+
+msgid "Game.Menu.ButtonSystem.invoke-p2c"
+msgstr ""
+
+msgid "Game.Menu.ButtonSystem.play"
+msgstr ""
+
+msgid "Game.Menu.ButtonSystem.editor"
+msgstr ""
+
+msgid "Game.Menu.ButtonSystem.beatmaplisting"
+msgstr ""
+
+msgid "Game.Menu.ButtonSystem.exit"
+msgstr ""
+
+#v2 新多人游戏界面
+msgid "Game.Online.Rooms.GameTypes.playlists"
+msgstr ""
+
+#v2 杂项
+msgid "Game.Users.Drawables.ClickableAvatar.tooltip"
+msgstr ""
+
 # 新多人游戏界面
 msgid "Multiplayer"
 msgstr ""
@@ -741,34 +783,6 @@ msgid "打开选项菜单"
 msgstr ""
 
 msgid "更改Mf-osu的设置"
-msgstr ""
-
-# 主菜单
-msgid "游玩"
-msgstr ""
-
-msgid "osu!编辑器"
-msgstr ""
-
-msgid "谱面列表"
-msgstr ""
-
-msgid "单人游戏"
-msgstr ""
-
-msgid "多人游戏"
-msgstr ""
-
-msgid "排名"
-msgstr ""
-
-msgid "一个神秘的按钮"
-msgstr ""
-
-msgid "Mvis播放器"
-msgstr ""
-
-msgid "文件导入"
 msgstr ""
 
 # 文件导入界面

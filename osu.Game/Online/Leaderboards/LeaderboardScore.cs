@@ -89,7 +89,7 @@ namespace osu.Game.Online.Leaderboards
 
             statisticsLabels = GetStatistics(score).Select(s => new ScoreComponentLabel(s)).ToList();
 
-            DrawableAvatar innerAvatar;
+            ClickableAvatar innerAvatar;
 
             Children = new Drawable[]
             {
@@ -127,7 +127,7 @@ namespace osu.Game.Online.Leaderboards
                             Children = new[]
                             {
                                 avatar = new DelayedLoadWrapper(
-                                    innerAvatar = new DrawableAvatar(user)
+                                    innerAvatar = new ClickableAvatar(user)
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         CornerRadius = corner_radius,
