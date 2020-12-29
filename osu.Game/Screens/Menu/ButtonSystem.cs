@@ -202,11 +202,11 @@ namespace osu.Game.Screens.Menu
 
         private void onMultiplayer()
         {
-            if (!api.IsLoggedIn)
+            if (api.State.Value != APIState.Online)
             {
                 notifications?.Post(new SimpleNotification
                 {
-                    Text = "你必须登入来进行多人游戏!",
+                    Text = "Game.Menu.ButtonSystem.onMultiplayerError",
                     Icon = FontAwesome.Solid.Globe,
                     Activated = () =>
                     {
@@ -223,11 +223,11 @@ namespace osu.Game.Screens.Menu
 
         private void onPlaylists()
         {
-            if (!api.IsLoggedIn)
+            if (api.State.Value != APIState.Online)
             {
                 notifications?.Post(new SimpleNotification
                 {
-                    Text = "You gotta be logged in to multi 'yo!",
+                    Text = "Game.Menu.ButtonSystem.onPlaylistsError",
                     Icon = FontAwesome.Solid.Globe,
                     Activated = () =>
                     {
