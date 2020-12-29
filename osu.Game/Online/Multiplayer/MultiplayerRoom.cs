@@ -42,8 +42,6 @@ namespace osu.Game.Online.Multiplayer
         /// </summary>
         public MultiplayerRoomUser? Host { get; set; }
 
-        private object writeLock = new object();
-
         [JsonConstructor]
         public MultiplayerRoom(in long roomId)
         {
