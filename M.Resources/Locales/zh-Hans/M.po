@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mfosu!\n"
 "POT-Creation-Date: 2020-12-04 02:25+0800\n"
-"PO-Revision-Date: 2020-12-29 15:17+0800\n"
+"PO-Revision-Date: 2020-12-29 23:21+0800\n"
 "Last-Translator: \n"
 "Language-Team: MATRIX-feather\n"
 "Language: zh_CN\n"
@@ -54,6 +54,12 @@ msgstr "谱面列表"
 
 msgid "Game.Menu.ButtonSystem.exit"
 msgstr "退出"
+
+msgid "Game.Menu.ButtonSystem.onMultiplayerError"
+msgstr "你必须先登录才能进行多人游戏!"
+
+msgid "Game.Menu.ButtonSystem.onPlaylistsError"
+msgstr "你必须先登录才能查看游玩列表!"
 
 # v2 新多人游戏界面
 msgid "Game.Online.Rooms.GameTypes.playlists"

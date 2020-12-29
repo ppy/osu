@@ -54,6 +54,12 @@ msgstr ""
 msgid "Game.Menu.ButtonSystem.exit"
 msgstr ""
 
+msgid "Game.Menu.ButtonSystem.onMultiplayerError"
+msgstr ""
+
+msgid "Game.Menu.ButtonSystem.onPlaylistsError"
+msgstr ""
+
 #v2 新多人游戏界面
 msgid "Game.Online.Rooms.GameTypes.playlists"
 msgstr ""

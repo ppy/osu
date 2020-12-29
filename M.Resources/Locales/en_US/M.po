@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mfosu!\n"
 "POT-Creation-Date: 2020-12-04 02:25+0800\n"
-"PO-Revision-Date: 2020-12-29 15:21+0800\n"
+"PO-Revision-Date: 2020-12-29 23:21+0800\n"
 "Last-Translator: \n"
 "Language-Team: MATRIX-feather\n"
 "Language: en\n"
@@ -53,6 +53,12 @@ msgstr "beatmaplist"
 
 msgid "Game.Menu.ButtonSystem.exit"
 msgstr "exit"
+
+msgid "Game.Menu.ButtonSystem.onMultiplayerError"
+msgstr "You gotta be online to multi 'yo!"
+
+msgid "Game.Menu.ButtonSystem.onPlaylistsError"
+msgstr "You gotta be online to view playlists 'yo!"
 
 # v2 新多人游戏界面
 msgid "Game.Online.Rooms.GameTypes.playlists"
