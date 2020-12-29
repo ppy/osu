@@ -160,7 +160,7 @@ namespace osu.Game.Screens.Menu
             {
                 notifications?.Post(new SimpleNotification
                 {
-                    Text = "You gotta be logged in to multi 'yo!",
+                    Text = "You gotta be online to multi 'yo!",
                     Icon = FontAwesome.Solid.Globe,
                     Activated = () =>
                     {
@@ -181,7 +181,7 @@ namespace osu.Game.Screens.Menu
             {
                 notifications?.Post(new SimpleNotification
                 {
-                    Text = "You gotta be logged in to view playlists 'yo!",
+                    Text = "You gotta be online to view playlists 'yo!",
                     Icon = FontAwesome.Solid.Globe,
                     Activated = () =>
                     {
