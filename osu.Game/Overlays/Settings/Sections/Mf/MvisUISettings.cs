@@ -23,32 +23,32 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
         private ColourPreviewer preview;
 
         [BackgroundDependencyLoader]
-        private void load(MfConfigManager config)
+        private void load(MConfigManager config)
         {
-            config.BindWith(MfSetting.MvisInterfaceRed, iR);
-            config.BindWith(MfSetting.MvisInterfaceGreen, iG);
-            config.BindWith(MfSetting.MvisInterfaceBlue, iB);
+            config.BindWith(MSetting.MvisInterfaceRed, iR);
+            config.BindWith(MSetting.MvisInterfaceGreen, iG);
+            config.BindWith(MSetting.MvisInterfaceBlue, iB);
 
             Children = new Drawable[]
             {
                 new SettingsSlider<float>
                 {
                     LabelText = "背景模糊",
-                    Current = config.GetBindable<float>(MfSetting.MvisBgBlur),
+                    Current = config.GetBindable<float>(MSetting.MvisBgBlur),
                     DisplayAsPercentage = true,
                     KeyboardStep = 0.01f,
                 },
                 new SettingsSlider<float>
                 {
                     LabelText = "空闲时的背景亮度",
-                    Current = config.GetBindable<float>(MfSetting.MvisIdleBgDim),
+                    Current = config.GetBindable<float>(MSetting.MvisIdleBgDim),
                     DisplayAsPercentage = true,
                     KeyboardStep = 0.01f,
                 },
                 new SettingsSlider<float>
                 {
                     LabelText = "空闲时的M-vis面板不透明度",
-                    Current = config.GetBindable<float>(MfSetting.MvisContentAlpha),
+                    Current = config.GetBindable<float>(MSetting.MvisContentAlpha),
                     DisplayAsPercentage = true,
                     KeyboardStep = 0.01f,
                 },

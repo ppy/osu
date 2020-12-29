@@ -11,7 +11,7 @@ namespace osu.Game.Screens.Mvis.Objects
     public abstract class ParticlesContainer : CurrentRateContainer
     {
         [Resolved(canBeNull: true)]
-        private MfConfigManager config { get; set; }
+        private MConfigManager config { get; set; }
 
         private readonly Bindable<int> countBindable = new Bindable<int>(200);
 
@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Mvis.Objects
         [BackgroundDependencyLoader]
         private void load()
         {
-            config?.BindWith(MfSetting.MvisParticleAmount, countBindable);
+            config?.BindWith(MSetting.MvisParticleAmount, countBindable);
             countBindable.BindValueChanged(onCountChanged, true);
         }
 

@@ -122,10 +122,10 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(SessionStatics sessionStatics, MfConfigManager config)
+        private void load(SessionStatics sessionStatics, MConfigManager config)
         {
             muteWarningShownOnce = sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce);
-            config.BindWith(MfSetting.OptUI, Optui);
+            config.BindWith(MSetting.OptUI, Optui);
 
             InternalChild = (content = new LogoTrackingContainer
             {

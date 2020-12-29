@@ -31,7 +31,7 @@ using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Online;
-using osu.Game.Online.RealtimeMultiplayer;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
 using osu.Game.Resources;
@@ -60,7 +60,7 @@ namespace osu.Game
         public bool UseDevelopmentServer { get; }
 
         protected OsuConfigManager LocalConfig;
-        protected MfConfigManager MfConfig;
+        protected MConfigManager MfConfig;
 
         protected BeatmapManager BeatmapManager;
 
@@ -223,7 +223,7 @@ namespace osu.Game
             dependencies.CacheAs(API ??= new APIAccess(LocalConfig, endpoints));
 
             dependencies.CacheAs(spectatorStreaming = new SpectatorStreamingClient(endpoints));
-            dependencies.CacheAs(multiplayerClient = new RealtimeMultiplayerClient(endpoints));
+            dependencies.CacheAs(multiplayerClient = new MultiplayerClient(endpoints));
 
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 
@@ -385,7 +385,7 @@ namespace osu.Game
                 ? new DevelopmentOsuConfigManager(Storage)
                 : new OsuConfigManager(Storage);
 
-            MfConfig ??= new MfConfigManager(Storage);
+            MfConfig ??= new MConfigManager(Storage);
         }
 
         protected override Storage CreateStorage(GameHost host, Storage defaultStorage) => new OsuStorage(host, defaultStorage);

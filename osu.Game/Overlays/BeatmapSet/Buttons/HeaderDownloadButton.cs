@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, BeatmapManager beatmaps, MfConfigManager mfconfig)
+        private void load(IAPIProvider api, BeatmapManager beatmaps, MConfigManager mfconfig)
         {
             FillFlowContainer textSprites;
 
@@ -110,7 +110,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                     return;
                 }
 
-                beatmaps.Download(BeatmapSet.Value, mfconfig.Get<bool>(MfSetting.UseSayobot), noVideo, IsMini);
+                beatmaps.Download(BeatmapSet.Value, mfconfig.Get<bool>(MSetting.UseSayobot), noVideo, IsMini);
             };
 
             localUser.BindTo(api.LocalUser);

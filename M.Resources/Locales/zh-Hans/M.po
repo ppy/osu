@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mfosu!\n"
 "POT-Creation-Date: 2020-12-04 02:25+0800\n"
-"PO-Revision-Date: 2020-12-25 16:17+0800\n"
+"PO-Revision-Date: 2020-12-29 15:17+0800\n"
 "Last-Translator: \n"
 "Language-Team: MATRIX-feather\n"
 "Language: zh_CN\n"
@@ -20,6 +20,48 @@ msgstr "房主为 "
 # 新多人游戏界面
 msgid "_Open_Multiplayer"
 msgstr "开放中的房间"
+
+# v2 主菜单
+msgid "Game.Menu.ButtonSystem.solo"
+msgstr "单人游戏"
+
+msgid "Game.Menu.ButtonSystem.multi"
+msgstr "多人游戏"
+
+msgid "Game.Menu.ButtonSystem.playlists"
+msgstr "游玩列表"
+
+msgid "Game.Menu.ButtonSystem.about-mfosu"
+msgstr "关于Mf-osu"
+
+msgid "Game.Menu.ButtonSystem.mvis"
+msgstr "Mvis播放器"
+
+msgid "Game.Menu.ButtonSystem.file-import"
+msgstr "文件导入"
+
+msgid "Game.Menu.ButtonSystem.invoke-p2c"
+msgstr "最高机密"
+
+msgid "Game.Menu.ButtonSystem.play"
+msgstr "开始游戏"
+
+msgid "Game.Menu.ButtonSystem.editor"
+msgstr "osu!编辑器"
+
+msgid "Game.Menu.ButtonSystem.beatmaplisting"
+msgstr "谱面列表"
+
+msgid "Game.Menu.ButtonSystem.exit"
+msgstr "退出"
+
+# v2 新多人游戏界面
+msgid "Game.Online.Rooms.GameTypes.playlists"
+msgstr "游玩列表"
+
+# v2 杂项
+msgid "Game.Users.Drawables.ClickableAvatar.tooltip"
+msgstr "查看个人信息"
 
 # 新多人游戏界面
 msgid "Multiplayer"
@@ -738,34 +780,6 @@ msgid "打开选项菜单"
 msgstr ""
 
 msgid "更改Mf-osu的设置"
-msgstr ""
-
-# 主菜单
-msgid "游玩"
-msgstr ""
-
-msgid "osu!编辑器"
-msgstr ""
-
-msgid "谱面列表"
-msgstr ""
-
-msgid "单人游戏"
-msgstr ""
-
-msgid "多人游戏"
-msgstr ""
-
-msgid "排名"
-msgstr ""
-
-msgid "一个神秘的按钮"
-msgstr ""
-
-msgid "Mvis播放器"
-msgstr ""
-
-msgid "文件导入"
 msgstr ""
 
 # 文件导入界面

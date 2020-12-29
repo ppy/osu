@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mfosu!\n"
 "POT-Creation-Date: 2020-12-04 02:25+0800\n"
-"PO-Revision-Date: 2020-12-25 16:19+0800\n"
+"PO-Revision-Date: 2020-12-29 15:21+0800\n"
 "Last-Translator: \n"
 "Language-Team: MATRIX-feather\n"
 "Language: en\n"
@@ -19,6 +19,48 @@ msgstr "hosted by "
 
 msgid "_Open_Multiplayer"
 msgstr "Open"
+
+# v2 主菜单
+msgid "Game.Menu.ButtonSystem.solo"
+msgstr "solo"
+
+msgid "Game.Menu.ButtonSystem.multi"
+msgstr "multi"
+
+msgid "Game.Menu.ButtonSystem.playlists"
+msgstr "playlists"
+
+msgid "Game.Menu.ButtonSystem.about-mfosu"
+msgstr "about mf-osu"
+
+msgid "Game.Menu.ButtonSystem.mvis"
+msgstr "mvis player"
+
+msgid "Game.Menu.ButtonSystem.file-import"
+msgstr "file import"
+
+msgid "Game.Menu.ButtonSystem.invoke-p2c"
+msgstr "TOP SECRET"
+
+msgid "Game.Menu.ButtonSystem.play"
+msgstr "play"
+
+msgid "Game.Menu.ButtonSystem.editor"
+msgstr "editor"
+
+msgid "Game.Menu.ButtonSystem.beatmaplisting"
+msgstr "beatmaplist"
+
+msgid "Game.Menu.ButtonSystem.exit"
+msgstr "exit"
+
+# v2 新多人游戏界面
+msgid "Game.Online.Rooms.GameTypes.playlists"
+msgstr "Playlists"
+
+# v2 杂项
+msgid "Game.Users.Drawables.ClickableAvatar.tooltip"
+msgstr "view profile"
 
 # 新多人游戏界面
 msgid "Multiplayer"
@@ -751,35 +793,6 @@ msgstr "Open settings menu"
 msgid "更改Mf-osu的设置"
 msgstr "Change Mf-osu settings"
 
-# 主菜单
-msgid "游玩"
-msgstr "play"
-
-msgid "osu!编辑器"
-msgstr "osu!editor"
-
-msgid "谱面列表"
-msgstr "osu!direct"
-
-msgid "单人游戏"
-msgstr "solo"
-
-msgid "多人游戏"
-msgstr "multi"
-
-msgid "排名"
-msgstr "ranking"
-
-msgid "一个神秘的按钮"
-msgstr "TOP SECRET"
-
-# Mvis设置Section标题
-msgid "Mvis播放器"
-msgstr "Mvis Player"
-
-msgid "文件导入"
-msgstr "File import"
-
 # 文件导入界面
 msgid "计算机"
 msgstr "Computer"
@@ -1319,6 +1332,35 @@ msgstr "notifications"
 
 msgid "等待着您~"
 msgstr "waiting for 'ya"
+
+# 主菜单
+#~ msgid "游玩"
+#~ msgstr "play"
+
+#~ msgid "osu!编辑器"
+#~ msgstr "osu!editor"
+
+#~ msgid "谱面列表"
+#~ msgstr "osu!direct"
+
+#~ msgid "单人游戏"
+#~ msgstr "solo"
+
+#~ msgid "多人游戏"
+#~ msgstr "multi"
+
+#~ msgid "排名"
+#~ msgstr "ranking"
+
+#~ msgid "一个神秘的按钮"
+#~ msgstr "TOP SECRET"
+
+# Mvis设置Section标题
+#~ msgid "Mvis播放器"
+#~ msgstr "Mvis Player"
+
+#~ msgid "文件导入"
+#~ msgstr "File import"
 
 #~ msgid "等{0}首歌曲"
 #~ msgstr "...+{0} Song(s)"

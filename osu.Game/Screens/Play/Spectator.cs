@@ -30,7 +30,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Scoring;
-using osu.Game.Screens.Multi.Match.Components;
+using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Users;
 using osuTK;
 
@@ -95,9 +95,9 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, OsuConfigManager config, MfConfigManager mfConfig)
+        private void load(OsuColour colours, OsuConfigManager config, MConfigManager mfConfig)
         {
-            mfConfig.BindWith(MfSetting.UseSayobot, useSayobot);
+            mfConfig.BindWith(MSetting.UseSayobot, useSayobot);
 
             InternalChild = new Container
             {

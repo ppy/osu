@@ -118,12 +118,12 @@ namespace osu.Game.Graphics.Backgrounds
         }
 
         [BackgroundDependencyLoader]
-        private void load(ShaderManager shaders, MfConfigManager config)
+        private void load(ShaderManager shaders, MConfigManager config)
         {
             shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
 
             alphaOrig = Alpha;
-            config.BindWith(MfSetting.TrianglesEnabled, trianglesEnabled);
+            config.BindWith(MSetting.TrianglesEnabled, trianglesEnabled);
 
             trianglesEnabled.ValueChanged += _ => updateIcons();
         }

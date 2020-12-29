@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Menu
         public Action OnSolo;
         public Action OnSettings;
         public Action OnMultiplayer;
-        public Action OnTimeshift;
+        public Action OnPlaylists;
 
         public Action OnBeatmapListing;
         public Action OnMvisButton;
@@ -134,26 +134,27 @@ namespace osu.Game.Screens.Menu
         private LoginOverlay loginOverlay { get; set; }
 
         [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio, IdleTracker idleTracker, GameHost host, MfConfigManager config)
+        private void load(AudioManager audio, IdleTracker idleTracker, GameHost host, MConfigManager config)
         {
-            buttonsCustom.Add(new Button(@"关于Mf-osu", @"button-generic-select", FontAwesome.Solid.Gift, new Color4(0, 86, 73, 255), () => OnMfMenuButton?.Invoke(), WEDGE_WIDTH));
-            buttonsCustom.Add(new Button(@"Mvis播放器", @"button-generic-select", FontAwesome.Solid.Play, new Color4(0, 86, 73, 255), () => OnMvisButton?.Invoke()));
-            buttonsCustom.Add(new Button(@"文件导入", @"button-generic-select", FontAwesome.Solid.File, new Color4(0, 86, 73, 255), () => OnImportButton?.Invoke()));
+            buttonsCustom.Add(new Button(@"Game.Menu.ButtonSystem.about-mfosu", @"button-generic-select", FontAwesome.Solid.Gift, new Color4(0, 86, 73, 255), () => OnMfMenuButton?.Invoke(), WEDGE_WIDTH));
+            buttonsCustom.Add(new Button(@"Game.Menu.ButtonSystem.mvis", @"button-generic-select", FontAwesome.Solid.Play, new Color4(0, 86, 73, 255), () => OnMvisButton?.Invoke()));
+            buttonsCustom.Add(new Button(@"Game.Menu.ButtonSystem.file-import", @"button-generic-select", FontAwesome.Solid.File, new Color4(0, 86, 73, 255), () => OnImportButton?.Invoke()));
             buttonsCustom.ForEach(b => b.VisibleState = ButtonSystemState.Custom);
-            buttonsPlay.Add(new Button(@"单人游戏", @"button-solo-select", FontAwesome.Solid.User, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
-            buttonsPlay.Add(new Button(@"多人游戏", @"button-generic-select", FontAwesome.Solid.Users, new Color4(94, 63, 186, 255), onMultiplayer, 0, Key.M));
-            buttonsPlay.Add(new Button(@"游玩列表", @"button-generic-select", OsuIcon.Charts, new Color4(94, 63, 186, 255), onTimeshift, 0, Key.L));
+
+            buttonsPlay.Add(new Button(@"Game.Menu.ButtonSystem.solo", @"button-solo-select", FontAwesome.Solid.User, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
+            buttonsPlay.Add(new Button(@"Game.Menu.ButtonSystem.multi", @"button-generic-select", FontAwesome.Solid.Users, new Color4(94, 63, 186, 255), onMultiplayer, 0, Key.M));
+            buttonsPlay.Add(new Button(@"Game.Menu.ButtonSystem.playlists", @"button-generic-select", OsuIcon.Charts, new Color4(94, 63, 186, 255), onPlaylists, 0, Key.L));
             buttonsPlay.ForEach(b => b.VisibleState = ButtonSystemState.Play);
 
-            buttonsP2C.Add(new Button(@"一个神秘的按钮", @"button-generic-select", FontAwesome.Solid.QuestionCircle, new Color4(0, 86, 73, 255), () => State = ButtonSystemState.Custom));
+            buttonsP2C.Add(new Button(@"Game.Menu.ButtonSystem.invoke-p2c", @"button-generic-select", FontAwesome.Solid.QuestionCircle, new Color4(0, 86, 73, 255), () => State = ButtonSystemState.Custom));
             buttonsP2C.ForEach(b => b.VisibleState = ButtonSystemState.Play);
 
-            buttonsTopLevel.Add(new Button(@"游玩", @"button-play-select", OsuIcon.Logo, new Color4(102, 68, 204, 255), () => State = ButtonSystemState.Play, WEDGE_WIDTH, Key.P));
-            buttonsTopLevel.Add(new Button(@"osu!编辑器", @"button-generic-select", OsuIcon.EditCircle, new Color4(238, 170, 0, 255), () => OnEdit?.Invoke(), 0, Key.E));
-            buttonsTopLevel.Add(new Button(@"谱面列表", @"button-direct-select", OsuIcon.ChevronDownCircle, new Color4(165, 204, 0, 255), () => OnBeatmapListing?.Invoke(), 0, Key.D));
+            buttonsTopLevel.Add(new Button(@"Game.Menu.ButtonSystem.play", @"button-play-select", OsuIcon.Logo, new Color4(102, 68, 204, 255), () => State = ButtonSystemState.Play, WEDGE_WIDTH, Key.P));
+            buttonsTopLevel.Add(new Button(@"Game.Menu.ButtonSystem.editor", @"button-generic-select", OsuIcon.EditCircle, new Color4(238, 170, 0, 255), () => OnEdit?.Invoke(), 0, Key.E));
+            buttonsTopLevel.Add(new Button(@"Game.Menu.ButtonSystem.beatmaplisting", @"button-direct-select", OsuIcon.ChevronDownCircle, new Color4(165, 204, 0, 255), () => OnBeatmapListing?.Invoke(), 0, Key.D));
 
             if (host.CanExit)
-                buttonsTopLevel.Add(new Button(@"退出", string.Empty, OsuIcon.CrossCircle, new Color4(238, 51, 153, 255), () => OnExit?.Invoke(), 0, Key.Q));
+                buttonsTopLevel.Add(new Button(@"Game.Menu.ButtonSystem.exit", string.Empty, OsuIcon.CrossCircle, new Color4(238, 51, 153, 255), () => OnExit?.Invoke(), 0, Key.Q));
 
             buttonArea.AddRange(buttonsCustom);
             buttonArea.AddRange(buttonsPlay);
@@ -175,7 +176,7 @@ namespace osu.Game.Screens.Menu
 
             sampleBack = audio.Samples.Get(@"Menu/button-back-select");
 
-            config.BindWith(MfSetting.OptUI, optui);
+            config.BindWith(MSetting.OptUI, optui);
 
             optui.ValueChanged += _ => updateButtons();
             StateChanged += _ => updateButtons();
@@ -220,7 +221,7 @@ namespace osu.Game.Screens.Menu
             OnMultiplayer?.Invoke();
         }
 
-        private void onTimeshift()
+        private void onPlaylists()
         {
             if (!api.IsLoggedIn)
             {
@@ -238,7 +239,7 @@ namespace osu.Game.Screens.Menu
                 return;
             }
 
-            OnTimeshift?.Invoke();
+            OnPlaylists?.Invoke();
         }
 
         private void updateIdleState(bool isIdle)

@@ -103,7 +103,7 @@ namespace osu.Game.Screens.Play
         private readonly Bindable<bool> optui = new Bindable<bool>();
 
         [BackgroundDependencyLoader]
-        private void load(MfConfigManager config)
+        private void load(MConfigManager config)
         {
             var metadata = beatmap.BeatmapInfo?.Metadata ?? new BeatmapMetadata();
 
@@ -227,7 +227,7 @@ namespace osu.Game.Screens.Play
 
             Loading = true;
 
-            config.BindWith(MfSetting.OptUI, optui);
+            config.BindWith(MSetting.OptUI, optui);
             optui.ValueChanged += _ => updateVisualEffects();
 
             entryAnimation();

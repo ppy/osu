@@ -25,11 +25,11 @@ namespace osu.Game.Beatmaps.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(LargeTextureStore textures, MfConfigManager mfconfig)
+        private void load(LargeTextureStore textures, MConfigManager mfconfig)
         {
             string resource = null;
 
-            switch (mfconfig.Get<bool>(MfSetting.UseSayobot))
+            switch (mfconfig.Get<bool>(MSetting.UseSayobot))
             {
                 case true:
                     switch (type)

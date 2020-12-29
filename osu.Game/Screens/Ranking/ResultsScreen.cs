@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Ranking
         }
 
         [BackgroundDependencyLoader]
-        private void load(MfConfigManager mConfig)
+        private void load(MConfigManager mConfig)
         {
             this.mConfig = mConfig;
 
@@ -242,7 +242,7 @@ namespace osu.Game.Screens.Ranking
 
             Background.FadeTo(0.5f, 250);
 
-            bool useOriginalAnimation = mConfig.Get<bool>(MfSetting.OptUI);
+            bool useOriginalAnimation = mConfig.Get<bool>(MSetting.OptUI);
 
             switch (useOriginalAnimation)
             {
@@ -269,7 +269,7 @@ namespace osu.Game.Screens.Ranking
         public override bool OnExiting(IScreen next)
         {
             Background.FadeTo(1, 250);
-            bool useOriginalAnimation = mConfig.Get<bool>(MfSetting.OptUI);
+            bool useOriginalAnimation = mConfig.Get<bool>(MSetting.OptUI);
 
             switch (useOriginalAnimation)
             {
@@ -302,7 +302,7 @@ namespace osu.Game.Screens.Ranking
         }
 
         private ScorePanel detachedPanel;
-        private MfConfigManager mConfig;
+        private MConfigManager mConfig;
         private FillFlowContainer buttons;
 
         private void onStatisticsStateChanged(ValueChangedEvent<Visibility> state)

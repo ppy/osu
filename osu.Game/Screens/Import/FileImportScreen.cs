@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Import
         [Resolved]
         private OsuColour colours { get; set; }
 
-        [BackgroundDependencyLoader(true)]
+        [BackgroundDependencyLoader]
         private void load(Storage storage)
         {
             InternalChild = contentContainer = new Container
@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Import
                         Colour = colours.GreySeafoamDark,
                         RelativeSizeAxes = Axes.Both,
                     },
-                    fileSelector = new FileSelector(validFileExtensions: game.HandledExtensions.ToArray())
+                    fileSelector = new FileSelector(storage.GetFullPath("."), game.HandledExtensions.ToArray())
                     {
                         RelativeSizeAxes = Axes.Both,
                         Width = 0.65f
