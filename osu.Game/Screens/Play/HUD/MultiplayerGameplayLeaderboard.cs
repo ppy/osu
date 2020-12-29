@@ -84,11 +84,11 @@ namespace osu.Game.Screens.Play.HUD
             // BindableList handles binding in a really bad way (Clear then AddRange) so we need to do this manually..
             foreach (int userId in playingUsers)
             {
-                if (!multiplayerClient.PlayingUsers.Contains(userId))
+                if (!multiplayerClient.CurrentMatchPlayingUserIds.Contains(userId))
                     usersChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, new[] { userId }));
             }
 
-            playingUsers.BindTo(multiplayerClient.PlayingUsers);
+            playingUsers.BindTo(multiplayerClient.CurrentMatchPlayingUserIds);
             playingUsers.BindCollectionChanged(usersChanged);
         }
 
