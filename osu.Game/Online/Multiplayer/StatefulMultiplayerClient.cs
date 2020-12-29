@@ -65,6 +65,11 @@ namespace osu.Game.Online.Multiplayer
         /// </summary>
         public readonly BindableList<int> CurrentMatchPlayingUserIds = new BindableList<int>();
 
+        /// <summary>
+        /// The <see cref="MultiplayerRoomUser"/> corresponding to the local player, if available.
+        /// </summary>
+        public MultiplayerRoomUser? LocalUser => Room?.Users.SingleOrDefault(u => u.User?.Id == api.LocalUser.Value.Id);
+
         [Resolved]
         private UserLookupCache userLookupCache { get; set; } = null!;
 

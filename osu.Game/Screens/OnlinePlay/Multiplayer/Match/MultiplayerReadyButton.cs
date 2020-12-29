@@ -27,9 +27,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        [CanBeNull]
-        private MultiplayerRoomUser localUser;
-
         [Resolved]
         private OsuColour colours { get; set; }
 
@@ -67,14 +64,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             base.OnRoomUpdated();
 
-            // this method is called on leaving the room, so the local user may not exist in the room any more.
-            localUser = Room?.Users.SingleOrDefault(u => u.User?.Id == api.LocalUser.Value.Id);
-
             updateState();
         }
 
         private void updateState()
         {
+            var localUser = Client.LocalUser;
+
             if (localUser == null)
                 return;
 
@@ -142,6 +138,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private void onClick()
         {
+            var localUser = Client.LocalUser;
+
             if (localUser == null)
                 return;
 
