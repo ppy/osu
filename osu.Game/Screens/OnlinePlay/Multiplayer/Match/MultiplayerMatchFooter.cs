@@ -20,9 +20,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
-        public Action OnReady
+        public Action OnToggleReady
         {
-            set => readyButton.OnReady = value;
+            set => readyButton.OnToggleReady = value;
         }
 
         private readonly Drawable background;

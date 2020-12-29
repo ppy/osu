@@ -34,6 +34,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Cached]
         private OngoingOperationTracker ongoingOperationTracker = new OngoingOperationTracker();
 
+        private IDisposable toggleReadyOperation;
+
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
@@ -61,6 +63,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         Beatmap = { Value = beatmap },
                         Ruleset = { Value = beatmap.Ruleset }
                     }
+                },
+                OnToggleReady = async () =>
+                {
+                    toggleReadyOperation = ongoingOperationTracker.BeginOperation();
+
+                    bool gameplayStarted = await Client.ToggleReady();
+                    if (!gameplayStarted)
+                        toggleReadyOperation.Dispose();
                 }
             };
         });
@@ -168,15 +178,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void verifyGameplayStartFlow()
         {
-            IDisposable gameplayStartOperation = null;
-
-            AddStep("hook up tracker", () => button.OnReady = () => gameplayStartOperation = ongoingOperationTracker.BeginOperation());
-
             addClickButtonStep();
             AddAssert("user waiting for load", () => Client.Room?.Users[0].State == MultiplayerUserState.WaitingForLoad);
             AddAssert("ready button disabled", () => !button.ChildrenOfType<OsuButton>().Single().Enabled.Value);
 
-            AddStep("transitioned to gameplay", () => gameplayStartOperation.Dispose());
+            AddStep("transitioned to gameplay", () => toggleReadyOperation.Dispose());
             AddAssert("ready button enabled", () => button.ChildrenOfType<OsuButton>().Single().Enabled.Value);
         }
     }
