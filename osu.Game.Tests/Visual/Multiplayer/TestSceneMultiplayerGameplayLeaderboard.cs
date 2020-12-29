@@ -62,8 +62,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 streamingClient.Start(Beatmap.Value.BeatmapInfo.OnlineBeatmapID ?? 0);
 
-                Client.PlayingUsers.Clear();
-                Client.PlayingUsers.AddRange(streamingClient.PlayingUsers);
+                Client.CurrentMatchPlayingUserIds.Clear();
+                Client.CurrentMatchPlayingUserIds.AddRange(streamingClient.PlayingUsers);
 
                 Children = new Drawable[]
                 {
@@ -91,7 +91,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestUserQuit()
         {
-            AddRepeatStep("mark user quit", () => Client.PlayingUsers.RemoveAt(0), users);
+            AddRepeatStep("mark user quit", () => Client.CurrentMatchPlayingUserIds.RemoveAt(0), users);
         }
 
         public class TestMultiplayerStreaming : SpectatorStreamingClient
