@@ -303,7 +303,7 @@ namespace osu.Game.Online.Multiplayer
 
                 Room.Users.Single(u => u.UserID == userId).State = state;
 
-                updatePlayingUsers(userId, state);
+                updateUserPlayingState(userId, state);
 
                 RoomUpdated?.Invoke();
             }, false);
@@ -453,15 +453,22 @@ namespace osu.Game.Online.Multiplayer
             apiRoom.Playlist.Add(playlistItem);
         }
 
-        private void updatePlayingUsers(int userId, MultiplayerUserState state)
+        /// <summary>
+        /// For the provided user ID, update whether the user is included in <see cref="PlayingUsers"/>.
+        /// </summary>
+        /// <param name="userId">The user's ID.</param>
+        /// <param name="state">The new state of the user.</param>
+        private void updateUserPlayingState(int userId, MultiplayerUserState state)
         {
-            bool isPlaying = state >= MultiplayerUserState.WaitingForLoad && state <= MultiplayerUserState.FinishedPlay;
             bool wasPlaying = PlayingUsers.Contains(userId);
+            bool isPlaying = state >= MultiplayerUserState.WaitingForLoad && state <= MultiplayerUserState.FinishedPlay;
 
-            if (!wasPlaying && isPlaying)
+            if (isPlaying == wasPlaying)
+                return;
+
+            if (isPlaying)
                 PlayingUsers.Add(userId);
-
-            if (wasPlaying && !isPlaying)
+            else
                 PlayingUsers.Remove(userId);
         }
     }
