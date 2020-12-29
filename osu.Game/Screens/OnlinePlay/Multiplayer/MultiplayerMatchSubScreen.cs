@@ -203,7 +203,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             Debug.Assert(client.Room != null);
 
-            int[] userIds = client.Room.Users.Where(u => u.State >= MultiplayerUserState.WaitingForLoad).Select(u => u.UserID).ToArray();
+            int[] userIds = client.CurrentMatchPlayingUserIds.ToArray();
 
             StartPlay(() => new MultiplayerPlayer(SelectedItem.Value, userIds));
             gameplayStartTracker.EndOperation();
