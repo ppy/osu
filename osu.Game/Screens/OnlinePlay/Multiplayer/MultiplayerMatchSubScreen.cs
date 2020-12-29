@@ -162,7 +162,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                             new MultiplayerMatchFooter
                             {
                                 SelectedItem = { BindTarget = SelectedItem },
-                                OnReady = onReady
+                                OnToggleReady = onToggleReady
                             }
                         }
                     },
@@ -209,27 +209,22 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private void onPlaylistChanged(object sender, NotifyCollectionChangedEventArgs e) => SelectedItem.Value = Playlist.FirstOrDefault();
 
-        private void onReady()
+        private void onToggleReady()
         {
-            var localUser = client.LocalUser;
+            Debug.Assert(gameplayStartOperation == null);
+            gameplayStartOperation = ongoingOperationTracker.BeginOperation();
 
-            if (localUser == null)
-                return;
+            client.ToggleReady()
+                  .ContinueWith(t =>
+                  {
+                      // if gameplay was started, the button will be unblocked on load requested.
+                      if (t.Result) return;
 
-            if (localUser.State == MultiplayerUserState.Idle)
-                client.ChangeState(MultiplayerUserState.Ready).CatchUnobservedExceptions(true);
-            else
-            {
-                if (client.Room?.Host?.Equals(localUser) == true)
-                {
-                    Debug.Assert(gameplayStartOperation == null);
-                    gameplayStartOperation = ongoingOperationTracker.BeginOperation();
-
-                    client.StartMatch().CatchUnobservedExceptions(true);
-                }
-                else
-                    client.ChangeState(MultiplayerUserState.Idle).CatchUnobservedExceptions(true);
-            }
+                      // gameplay was not started; unblock button.
+                      gameplayStartOperation?.Dispose();
+                      gameplayStartOperation = null;
+                  })
+                  .CatchUnobservedExceptions();
         }
 
         private void onLoadRequested()
