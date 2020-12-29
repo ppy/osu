@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -12,7 +13,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     public class TestSceneCreateMultiplayerMatchButton : MultiplayerTestScene
     {
         [Cached]
-        private OngoingOperationTracker joiningRoomTracker = new OngoingOperationTracker();
+        private OngoingOperationTracker ongoingOperationTracker = new OngoingOperationTracker();
 
         private CreateMultiplayerMatchButton button;
 
@@ -31,12 +32,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestButtonEnableStateChanges()
         {
+            IDisposable joiningRoomOperation = null;
+
             assertButtonEnableState(true);
 
-            AddStep("begin joining room", () => joiningRoomTracker.BeginOperation());
+            AddStep("begin joining room", () => joiningRoomOperation = ongoingOperationTracker.BeginOperation());
             assertButtonEnableState(false);
 
-            AddStep("end joining room", () => joiningRoomTracker.EndOperation());
+            AddStep("end joining room", () => joiningRoomOperation.Dispose());
             assertButtonEnableState(true);
 
             AddStep("disconnect client", () => Client.Disconnect());

@@ -1,7 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -39,7 +42,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         private MusicController music { get; set; }
 
         [Resolved(CanBeNull = true)]
-        private OngoingOperationTracker joiningRoomTracker { get; set; }
+        private OngoingOperationTracker ongoingOperationTracker { get; set; }
+
+        [CanBeNull]
+        private IDisposable joiningRoomOperation { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -102,9 +108,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             initialRoomsReceived.BindTo(RoomManager.InitialRoomsReceived);
             initialRoomsReceived.BindValueChanged(_ => updateLoadingLayer());
 
-            if (joiningRoomTracker != null)
+            if (ongoingOperationTracker != null)
             {
-                joiningRoom.BindTo(joiningRoomTracker.InProgress);
+                joiningRoom.BindTo(ongoingOperationTracker.InProgress);
                 joiningRoom.BindValueChanged(_ => updateLoadingLayer(), true);
             }
         }
@@ -164,15 +170,18 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         private void joinRequested(Room room)
         {
-            joiningRoomTracker?.BeginOperation();
+            Debug.Assert(joiningRoomOperation == null);
+            joiningRoomOperation = ongoingOperationTracker?.BeginOperation();
 
             RoomManager?.JoinRoom(room, r =>
             {
                 Open(room);
-                joiningRoomTracker?.EndOperation();
+                joiningRoomOperation?.Dispose();
+                joiningRoomOperation = null;
             }, _ =>
             {
-                joiningRoomTracker?.EndOperation();
+                joiningRoomOperation?.Dispose();
+                joiningRoomOperation = null;
             });
         }
 

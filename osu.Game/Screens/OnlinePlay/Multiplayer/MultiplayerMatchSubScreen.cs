@@ -1,9 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -32,12 +34,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Resolved]
         private StatefulMultiplayerClient client { get; set; }
 
-        [Cached]
-        private OngoingOperationTracker gameplayStartTracker = new OngoingOperationTracker();
+        [Resolved]
+        private OngoingOperationTracker ongoingOperationTracker { get; set; }
 
         private MultiplayerMatchSettingsOverlay settingsOverlay;
 
         private IBindable<bool> isConnected;
+
+        [CanBeNull]
+        private IDisposable gameplayStartOperation;
 
         public MultiplayerMatchSubScreen(Room room)
         {
@@ -217,7 +222,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 if (client.Room?.Host?.Equals(localUser) == true)
                 {
-                    gameplayStartTracker.BeginOperation();
+                    Debug.Assert(gameplayStartOperation == null);
+                    gameplayStartOperation = ongoingOperationTracker.BeginOperation();
+
                     client.StartMatch().CatchUnobservedExceptions(true);
                 }
                 else
@@ -232,7 +239,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             int[] userIds = client.CurrentMatchPlayingUserIds.ToArray();
 
             StartPlay(() => new MultiplayerPlayer(SelectedItem.Value, userIds));
-            gameplayStartTracker.EndOperation();
+
+            Debug.Assert(gameplayStartOperation != null);
+
+            gameplayStartOperation.Dispose();
+            gameplayStartOperation = null;
         }
 
         protected override void Dispose(bool isDisposing)
