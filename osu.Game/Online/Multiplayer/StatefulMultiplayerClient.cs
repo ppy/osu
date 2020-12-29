@@ -61,9 +61,9 @@ namespace osu.Game.Online.Multiplayer
         public MultiplayerRoom? Room { get; private set; }
 
         /// <summary>
-        /// The users currently in gameplay.
+        /// The users in the joined <see cref="Room"/> which are participating in the current gameplay loop.
         /// </summary>
-        public readonly BindableList<int> PlayingUsers = new BindableList<int>();
+        public readonly BindableList<int> CurrentMatchPlayingUserIds = new BindableList<int>();
 
         [Resolved]
         private UserLookupCache userLookupCache { get; set; } = null!;
@@ -84,7 +84,7 @@ namespace osu.Game.Online.Multiplayer
             IsConnected.BindValueChanged(connected =>
             {
                 // clean up local room state on server disconnect.
-                if (!connected.NewValue)
+                if (!connected.NewValue && Room != null)
                 {
                     Logger.Log("Connection to multiplayer server was lost.", LoggingTarget.Runtime, LogLevel.Important);
                     LeaveRoom().CatchUnobservedExceptions();
@@ -133,6 +133,7 @@ namespace osu.Game.Online.Multiplayer
 
                 apiRoom = null;
                 Room = null;
+                CurrentMatchPlayingUserIds.Clear();
 
                 RoomUpdated?.Invoke();
             }, false);
@@ -253,7 +254,7 @@ namespace osu.Game.Online.Multiplayer
                     return;
 
                 Room.Users.Remove(user);
-                PlayingUsers.Remove(user.UserID);
+                CurrentMatchPlayingUserIds.Remove(user.UserID);
 
                 RoomUpdated?.Invoke();
             }, false);
@@ -302,8 +303,7 @@ namespace osu.Game.Online.Multiplayer
 
                 Room.Users.Single(u => u.UserID == userId).State = state;
 
-                if (state != MultiplayerUserState.Playing)
-                    PlayingUsers.Remove(userId);
+                updateUserPlayingState(userId, state);
 
                 RoomUpdated?.Invoke();
             }, false);
@@ -336,8 +336,6 @@ namespace osu.Game.Online.Multiplayer
             {
                 if (Room == null)
                     return;
-
-                PlayingUsers.AddRange(Room.Users.Where(u => u.State == MultiplayerUserState.Playing).Select(u => u.UserID));
 
                 MatchStarted?.Invoke();
             }, false);
@@ -453,6 +451,25 @@ namespace osu.Game.Online.Multiplayer
 
             apiRoom.Playlist.Clear(); // Clearing should be unnecessary, but here for sanity.
             apiRoom.Playlist.Add(playlistItem);
+        }
+
+        /// <summary>
+        /// For the provided user ID, update whether the user is included in <see cref="CurrentMatchPlayingUserIds"/>.
+        /// </summary>
+        /// <param name="userId">The user's ID.</param>
+        /// <param name="state">The new state of the user.</param>
+        private void updateUserPlayingState(int userId, MultiplayerUserState state)
+        {
+            bool wasPlaying = CurrentMatchPlayingUserIds.Contains(userId);
+            bool isPlaying = state >= MultiplayerUserState.WaitingForLoad && state <= MultiplayerUserState.FinishedPlay;
+
+            if (isPlaying == wasPlaying)
+                return;
+
+            if (isPlaying)
+                CurrentMatchPlayingUserIds.Add(userId);
+            else
+                CurrentMatchPlayingUserIds.Remove(userId);
         }
     }
 }
