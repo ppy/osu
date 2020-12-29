@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 
 namespace osu.Game.Screens.OnlinePlay
@@ -24,21 +25,26 @@ namespace osu.Game.Screens.OnlinePlay
         /// <summary>
         /// Begins tracking a new online operation.
         /// </summary>
+        /// <returns>
+        /// An <see cref="IDisposable"/> that will automatically mark the operation as ended on disposal.
+        /// </returns>
         /// <exception cref="InvalidOperationException">An operation has already been started.</exception>
-        public void BeginOperation()
+        public IDisposable BeginOperation()
         {
             if (leasedInProgress != null)
                 throw new InvalidOperationException("Cannot begin operation while another is in progress.");
 
             leasedInProgress = inProgress.BeginLease(true);
             leasedInProgress.Value = true;
+
+            return new InvokeOnDisposal(endOperation);
         }
 
         /// <summary>
         /// Ends tracking an online operation.
         /// Does nothing if an operation has not been begun yet.
         /// </summary>
-        public void EndOperation()
+        private void endOperation()
         {
             leasedInProgress?.Return();
             leasedInProgress = null;
