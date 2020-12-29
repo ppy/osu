@@ -1,15 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Diagnostics;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Online.API;
@@ -23,6 +22,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
     public class MultiplayerReadyButton : MultiplayerRoomComposite
     {
         public Bindable<PlaylistItem> SelectedItem => button.SelectedItem;
+
+        public Action OnReady
+        {
+            set => button.Action = value;
+        }
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -47,7 +51,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 RelativeSizeAxes = Axes.Both,
                 Size = Vector2.One,
                 Enabled = { Value = true },
-                Action = onClick
             };
         }
 
@@ -133,27 +136,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 button.BackgroundColour = colours.YellowDark;
                 button.Triangles.ColourDark = colours.YellowDark;
                 button.Triangles.ColourLight = colours.Yellow;
-            }
-        }
-
-        private void onClick()
-        {
-            var localUser = Client.LocalUser;
-
-            if (localUser == null)
-                return;
-
-            if (localUser.State == MultiplayerUserState.Idle)
-                Client.ChangeState(MultiplayerUserState.Ready).CatchUnobservedExceptions(true);
-            else
-            {
-                if (Room?.Host?.Equals(localUser) == true)
-                {
-                    gameplayStartTracker.BeginOperation();
-                    Client.StartMatch().CatchUnobservedExceptions(true);
-                }
-                else
-                    Client.ChangeState(MultiplayerUserState.Idle).CatchUnobservedExceptions(true);
             }
         }
 

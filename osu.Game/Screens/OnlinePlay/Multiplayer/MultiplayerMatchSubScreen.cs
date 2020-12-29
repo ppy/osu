@@ -9,6 +9,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
+using osu.Game.Extensions;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
@@ -153,7 +154,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                         },
                         new Drawable[]
                         {
-                            new MultiplayerMatchFooter { SelectedItem = { BindTarget = SelectedItem } }
+                            new MultiplayerMatchFooter
+                            {
+                                SelectedItem = { BindTarget = SelectedItem },
+                                OnReady = onReady
+                            }
                         }
                     },
                     RowDimensions = new[]
@@ -198,6 +203,27 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         }
 
         private void onPlaylistChanged(object sender, NotifyCollectionChangedEventArgs e) => SelectedItem.Value = Playlist.FirstOrDefault();
+
+        private void onReady()
+        {
+            var localUser = client.LocalUser;
+
+            if (localUser == null)
+                return;
+
+            if (localUser.State == MultiplayerUserState.Idle)
+                client.ChangeState(MultiplayerUserState.Ready).CatchUnobservedExceptions(true);
+            else
+            {
+                if (client.Room?.Host?.Equals(localUser) == true)
+                {
+                    gameplayStartTracker.BeginOperation();
+                    client.StartMatch().CatchUnobservedExceptions(true);
+                }
+                else
+                    client.ChangeState(MultiplayerUserState.Idle).CatchUnobservedExceptions(true);
+            }
+        }
 
         private void onLoadRequested()
         {
