@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -31,7 +32,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private RulesetStore rulesets;
 
         [Cached]
-        private OngoingOperationTracker gameplayStartTracker = new OngoingOperationTracker();
+        private OngoingOperationTracker ongoingOperationTracker = new OngoingOperationTracker();
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -167,11 +168,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void verifyGameplayStartFlow()
         {
+            IDisposable gameplayStartOperation = null;
+
+            AddStep("hook up tracker", () => button.OnReady = () => gameplayStartOperation = ongoingOperationTracker.BeginOperation());
+
             addClickButtonStep();
             AddAssert("user waiting for load", () => Client.Room?.Users[0].State == MultiplayerUserState.WaitingForLoad);
             AddAssert("ready button disabled", () => !button.ChildrenOfType<OsuButton>().Single().Enabled.Value);
 
-            AddStep("transitioned to gameplay", () => gameplayStartTracker.EndOperation());
+            AddStep("transitioned to gameplay", () => gameplayStartOperation.Dispose());
             AddAssert("ready button enabled", () => button.ChildrenOfType<OsuButton>().Single().Enabled.Value);
         }
     }

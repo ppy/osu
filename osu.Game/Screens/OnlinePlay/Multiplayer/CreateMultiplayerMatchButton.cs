@@ -11,13 +11,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
     public class CreateMultiplayerMatchButton : PurpleTriangleButton
     {
         private IBindable<bool> isConnected;
-        private IBindable<bool> joiningRoom;
+        private IBindable<bool> operationInProgress;
 
         [Resolved]
         private StatefulMultiplayerClient multiplayerClient { get; set; }
 
         [Resolved]
-        private OngoingOperationTracker joiningRoomTracker { get; set; }
+        private OngoingOperationTracker ongoingOperationTracker { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -29,10 +29,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             isConnected = multiplayerClient.IsConnected.GetBoundCopy();
             isConnected.BindValueChanged(_ => updateState());
 
-            joiningRoom = joiningRoomTracker.InProgress.GetBoundCopy();
-            joiningRoom.BindValueChanged(_ => updateState(), true);
+            operationInProgress = ongoingOperationTracker.InProgress.GetBoundCopy();
+            operationInProgress.BindValueChanged(_ => updateState(), true);
         }
 
-        private void updateState() => Enabled.Value = isConnected.Value && !joiningRoom.Value;
+        private void updateState() => Enabled.Value = isConnected.Value && !operationInProgress.Value;
     }
 }

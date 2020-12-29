@@ -35,14 +35,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         private OsuColour colours { get; set; }
 
         [Resolved]
-        private OngoingOperationTracker gameplayStartTracker { get; set; }
+        private OngoingOperationTracker ongoingOperationTracker { get; set; }
 
         private SampleChannel sampleReadyCount;
 
         private readonly ButtonWithTrianglesExposed button;
 
         private int countReady;
-        private IBindable<bool> gameplayStartInProgress;
+        private IBindable<bool> operationInProgress;
 
         public MultiplayerReadyButton()
         {
@@ -59,8 +59,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             sampleReadyCount = audio.Samples.Get(@"SongSelect/select-difficulty");
 
-            gameplayStartInProgress = gameplayStartTracker.InProgress.GetBoundCopy();
-            gameplayStartInProgress.BindValueChanged(_ => updateState());
+            operationInProgress = ongoingOperationTracker.InProgress.GetBoundCopy();
+            operationInProgress.BindValueChanged(_ => updateState());
         }
 
         protected override void OnRoomUpdated()
@@ -105,7 +105,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     break;
             }
 
-            button.Enabled.Value = Client.Room?.State == MultiplayerRoomState.Open && !gameplayStartInProgress.Value;
+            button.Enabled.Value = Client.Room?.State == MultiplayerRoomState.Open && !operationInProgress.Value;
 
             if (newCountReady != countReady)
             {
