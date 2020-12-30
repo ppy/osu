@@ -27,9 +27,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             Text = "Create room";
 
             isConnected = multiplayerClient.IsConnected.GetBoundCopy();
-            isConnected.BindValueChanged(_ => updateState());
-
             operationInProgress = ongoingOperationTracker.InProgress.GetBoundCopy();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            isConnected.BindValueChanged(_ => updateState());
             operationInProgress.BindValueChanged(_ => updateState(), true);
         }
 
