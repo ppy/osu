@@ -11,6 +11,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
+using osu.Game.Extensions;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
@@ -41,7 +42,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private IBindable<bool> isConnected;
 
         [CanBeNull]
-        private IDisposable gameplayStartOperation;
+        private IDisposable readyClickOperation;
 
         public MultiplayerMatchSubScreen(Room room)
         {
@@ -161,7 +162,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                             new MultiplayerMatchFooter
                             {
                                 SelectedItem = { BindTarget = SelectedItem },
-                                OnReadyClick = onToggleReady
+                                OnReadyClick = onReadyClick
                             }
                         }
                     },
@@ -208,23 +209,37 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private void onPlaylistChanged(object sender, NotifyCollectionChangedEventArgs e) => SelectedItem.Value = Playlist.FirstOrDefault();
 
-        private void onToggleReady()
+        private void onReadyClick()
         {
-            Debug.Assert(gameplayStartOperation == null);
-            gameplayStartOperation = ongoingOperationTracker.BeginOperation();
+            Debug.Assert(readyClickOperation == null);
+            readyClickOperation = ongoingOperationTracker.BeginOperation();
+
+            if (client.IsHost && client.LocalUser?.State == MultiplayerUserState.Ready)
+            {
+                client.StartMatch()
+                      .ContinueWith(t =>
+                      {
+                          // accessing Exception here silences any potential errors from the antecedent task
+                          if (t.Exception != null)
+                          {
+                              // gameplay was not started due to an exception; unblock button.
+                              endOperation();
+                          }
+
+                          // gameplay is starting, the button will be unblocked on load requested.
+                      });
+                return;
+            }
 
             client.ToggleReady()
-                  .ContinueWith(t =>
-                  {
-                      // if gameplay was started, the button will be unblocked on load requested.
-                      // accessing Exception here also silences any potential errors from the antecedent task
-                      // (we still want to unblock the button if the ready-up fails).
-                      if (t.Exception == null && t.Result) return;
+                  .ContinueWith(_ => endOperation())
+                  .CatchUnobservedExceptions();
 
-                      // gameplay was not started; unblock button.
-                      gameplayStartOperation?.Dispose();
-                      gameplayStartOperation = null;
-                  });
+            void endOperation()
+            {
+                readyClickOperation?.Dispose();
+                readyClickOperation = null;
+            }
         }
 
         private void onLoadRequested()
@@ -235,10 +250,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             StartPlay(() => new MultiplayerPlayer(SelectedItem.Value, userIds));
 
-            Debug.Assert(gameplayStartOperation != null);
+            Debug.Assert(readyClickOperation != null);
 
-            gameplayStartOperation.Dispose();
-            gameplayStartOperation = null;
+            readyClickOperation.Dispose();
+            readyClickOperation = null;
         }
 
         protected override void Dispose(bool isDisposing)

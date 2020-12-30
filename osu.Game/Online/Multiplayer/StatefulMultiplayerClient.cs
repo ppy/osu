@@ -198,30 +198,23 @@ namespace osu.Game.Online.Multiplayer
         /// <summary>
         /// Toggles the <see cref="LocalUser"/>'s ready state.
         /// </summary>
-        /// <returns><c>true</c> if this toggle triggered a gameplay start; <c>false</c> otherwise.</returns>
         /// <exception cref="InvalidOperationException">If a toggle of ready state is not valid at this time.</exception>
-        public async Task<bool> ToggleReady()
+        public async Task ToggleReady()
         {
             var localUser = LocalUser;
 
             if (localUser == null)
-                return false;
+                return;
 
             switch (localUser.State)
             {
                 case MultiplayerUserState.Idle:
                     await ChangeState(MultiplayerUserState.Ready);
-                    return false;
+                    return;
 
                 case MultiplayerUserState.Ready:
-                    if (Room?.Host?.Equals(localUser) == true)
-                    {
-                        await StartMatch();
-                        return true;
-                    }
-
                     await ChangeState(MultiplayerUserState.Idle);
-                    return false;
+                    return;
 
                 default:
                     throw new InvalidOperationException($"Cannot toggle ready when in {localUser.State}");
