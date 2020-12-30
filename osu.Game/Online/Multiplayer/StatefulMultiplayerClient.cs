@@ -70,6 +70,18 @@ namespace osu.Game.Online.Multiplayer
         /// </summary>
         public MultiplayerRoomUser? LocalUser => Room?.Users.SingleOrDefault(u => u.User?.Id == api.LocalUser.Value.Id);
 
+        /// <summary>
+        /// Whether the <see cref="LocalUser"/> is the host in <see cref="Room"/>.
+        /// </summary>
+        public bool IsHost
+        {
+            get
+            {
+                var localUser = LocalUser;
+                return localUser != null && Room?.Host != null && localUser.Equals(Room.Host);
+            }
+        }
+
         [Resolved]
         private UserLookupCache userLookupCache { get; set; } = null!;
 
