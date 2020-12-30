@@ -5,9 +5,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using Newtonsoft.Json;
-using osu.Framework.Allocation;
 
 namespace osu.Game.Online.Multiplayer
 {
@@ -42,33 +40,10 @@ namespace osu.Game.Online.Multiplayer
         /// </summary>
         public MultiplayerRoomUser? Host { get; set; }
 
-        private object writeLock = new object();
-
         [JsonConstructor]
         public MultiplayerRoom(in long roomId)
         {
             RoomID = roomId;
-        }
-
-        private object updateLock = new object();
-
-        private ManualResetEventSlim freeForWrite = new ManualResetEventSlim(true);
-
-        /// <summary>
-        /// Request a lock on this room to perform a thread-safe update.
-        /// </summary>
-        public IDisposable LockForUpdate()
-        {
-            // ReSharper disable once InconsistentlySynchronizedField
-            freeForWrite.Wait();
-
-            lock (updateLock)
-            {
-                freeForWrite.Wait();
-                freeForWrite.Reset();
-
-                return new ValueInvokeOnDisposal<MultiplayerRoom>(this, r => freeForWrite.Set());
-            }
         }
 
         public override string ToString() => $"RoomID:{RoomID} Host:{Host?.UserID} Users:{Users.Count} State:{State} Settings: [{Settings}]";
