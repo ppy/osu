@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
+using osu.Game.Configuration;
 using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Users;
@@ -30,6 +31,7 @@ namespace osu.Desktop
 
         private readonly IBindable<UserStatus> status = new Bindable<UserStatus>();
         private readonly IBindable<UserActivity> activity = new Bindable<UserActivity>();
+        private readonly Bindable<DiscordRichPresenceMode> mode = new Bindable<DiscordRichPresenceMode>();
 
         private readonly RichPresence presence = new RichPresence
         {
@@ -37,7 +39,7 @@ namespace osu.Desktop
         };
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider provider)
+        private void load(IAPIProvider provider, OsuConfigManager config)
         {
             client = new DiscordRpcClient(client_id)
             {
@@ -51,6 +53,7 @@ namespace osu.Desktop
 
             client.OnError += (_, e) => Logger.Log($"An error occurred with Discord RPC Client: {e.Code} {e.Message}", LoggingTarget.Network);
 
+            config.BindWith(OsuSetting.DiscordRichPresence, mode);
             (user = provider.LocalUser.GetBoundCopy()).BindValueChanged(u =>
             {
                 status.UnbindBindings();
@@ -63,6 +66,7 @@ namespace osu.Desktop
             ruleset.BindValueChanged(_ => updateStatus());
             status.BindValueChanged(_ => updateStatus());
             activity.BindValueChanged(_ => updateStatus());
+            mode.BindValueChanged(_ => updateStatus());
 
             client.Initialize();
         }
@@ -78,7 +82,7 @@ namespace osu.Desktop
             if (!client.IsInitialized)
                 return;
 
-            if (status.Value is UserStatusOffline)
+            if (status.Value is UserStatusOffline || mode.Value == DiscordRichPresenceMode.Disabled)
             {
                 client.ClearPresence();
                 return;
@@ -96,7 +100,10 @@ namespace osu.Desktop
             }
 
             // update user information
-            presence.Assets.LargeImageText = $"{user.Value.Username}" + (user.Value.Statistics?.Ranks.Global > 0 ? $" (rank #{user.Value.Statistics.Ranks.Global:N0})" : string.Empty);
+            if (mode.Value == DiscordRichPresenceMode.Limited)
+                presence.Assets.LargeImageText = string.Empty;
+            else
+                presence.Assets.LargeImageText = $"{user.Value.Username}" + (user.Value.Statistics?.Ranks.Global > 0 ? $" (rank #{user.Value.Statistics.Ranks.Global:N0})" : string.Empty);
 
             // update ruleset
             presence.Assets.SmallImageKey = ruleset.Value.ID <= 3 ? $"mode_{ruleset.Value.ID}" : "mode_custom";
@@ -137,7 +144,7 @@ namespace osu.Desktop
                     return edit.Beatmap.ToString();
 
                 case UserActivity.InLobby lobby:
-                    return lobby.Room.Name.Value;
+                    return mode.Value == DiscordRichPresenceMode.Limited ? string.Empty : lobby.Room.Name.Value;
             }
 
             return string.Empty;
