@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -20,30 +21,38 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
-            // Get all difficulty points
-            var difficultyPoints = beatmap.ControlPointInfo.DifficultyPoints;
-            // Get all timing points
-            var timingPoints = beatmap.ControlPointInfo.TimingPoints;
             // Get the initial BPM
-            var initialBPM = timingPoints[0].BPM;
+            var initialBPM = beatmap.ControlPointInfo.TimingPoints[0].BPM;
 
-            foreach (var difficultyPoint in difficultyPoints)
+            foreach (var group in beatmap.ControlPointInfo.Groups)
             {
-                // Set this difficulty point's speed multiplier to 1
-                difficultyPoint.SpeedMultiplier = 1;
-            }
+                // Get the timing control point of this group, if any
+                var timingControlPoints = group.ControlPoints.OfType<TimingControlPoint>().ToArray();
 
-            // Correct changes in speed caused by timing points by adding an associated difficulty point
-            foreach (var timingPoint in timingPoints)
-            {
-                // Create a new difficulty point to counteract timing point
-                DifficultyControlPoint diffControlPoint = new DifficultyControlPoint
+                // Get the difficulty control point of this group, if any
+                var difficultyControlPoints = group.ControlPoints.OfType<DifficultyControlPoint>().ToArray();
+
+                // If there is a timing control point
+                if (timingControlPoints.Any())
                 {
-                    SpeedMultiplier = initialBPM / timingPoint.BPM
-                };
+                    var timingControlPoint = timingControlPoints[0];
 
-                // Add the new control point to the beatmap
-                beatmap.ControlPointInfo.Add(timingPoint.Time, diffControlPoint);
+                    DifficultyControlPoint diffControlPoint = new DifficultyControlPoint();
+
+                    diffControlPoint.SpeedMultiplierBindable.MinValue = double.MinValue; // Uncapped minimum value
+                    diffControlPoint.SpeedMultiplierBindable.MaxValue = double.MaxValue; // Uncapped maximum value
+                    diffControlPoint.SpeedMultiplierBindable.Precision = 0.000000001d; // Arbitrary value, may need changing
+                    diffControlPoint.SpeedMultiplier = initialBPM / timingControlPoint.BPM; // Counteract BPM velocity
+
+                    group.Add(diffControlPoint);
+                }
+                // Else, there is no timing control point, but a difficulty control point
+                else if (difficultyControlPoints.Any())
+                {
+                    var diffControlPoint = difficultyControlPoints[0];
+
+                    group.Remove(diffControlPoint);
+                }
             }
         }
     }
