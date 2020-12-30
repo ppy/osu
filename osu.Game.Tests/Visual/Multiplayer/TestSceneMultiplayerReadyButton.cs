@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         Ruleset = { Value = beatmap.Ruleset }
                     }
                 },
-                OnToggleReady = async () =>
+                OnReadyClick = async () =>
                 {
                     toggleReadyOperation = ongoingOperationTracker.BeginOperation();
 

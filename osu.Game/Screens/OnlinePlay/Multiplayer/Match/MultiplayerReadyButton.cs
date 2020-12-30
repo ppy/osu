@@ -23,7 +23,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
     {
         public Bindable<PlaylistItem> SelectedItem => button.SelectedItem;
 
-        public Action OnToggleReady
+        public Action OnReadyClick
         {
             set => button.Action = value;
         }

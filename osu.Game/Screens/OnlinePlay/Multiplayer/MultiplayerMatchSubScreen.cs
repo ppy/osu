@@ -161,7 +161,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                             new MultiplayerMatchFooter
                             {
                                 SelectedItem = { BindTarget = SelectedItem },
-                                OnToggleReady = onToggleReady
+                                OnReadyClick = onToggleReady
                             }
                         }
                     },
