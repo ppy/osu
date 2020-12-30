@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -45,7 +44,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
         [BackgroundDependencyLoader]
         private void load()
         {
-            Debug.Assert(User.User != null);
+            var user = User.User;
 
             var backgroundColour = Color4Extensions.FromHex("#33413C");
 
@@ -82,7 +81,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                                 Origin = Anchor.CentreRight,
                                 RelativeSizeAxes = Axes.Both,
                                 Width = 0.75f,
-                                User = User.User,
+                                User = user,
                                 Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0), Color4.White.Opacity(0.25f))
                             },
                             new FillFlowContainer
@@ -98,28 +97,28 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                                         Origin = Anchor.CentreLeft,
                                         RelativeSizeAxes = Axes.Both,
                                         FillMode = FillMode.Fit,
-                                        User = User.User
+                                        User = user
                                     },
                                     new UpdateableFlag
                                     {
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
                                         Size = new Vector2(30, 20),
-                                        Country = User.User.Country
+                                        Country = user?.Country
                                     },
                                     new OsuSpriteText
                                     {
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
                                         Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 18),
-                                        Text = User.User.Username
+                                        Text = user?.Username
                                     },
                                     new OsuSpriteText
                                     {
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
                                         Font = OsuFont.GetFont(size: 14),
-                                        Text = User.User.CurrentModeRank != null ? $"#{User.User.CurrentModeRank}" : string.Empty
+                                        Text = user?.CurrentModeRank != null ? $"#{user.CurrentModeRank}" : string.Empty
                                     }
                                 }
                             },
