@@ -3,6 +3,7 @@
 
 using System.Linq;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Mods;
@@ -39,9 +40,9 @@ namespace osu.Game.Rulesets.Mania.Mods
 
                     DifficultyControlPoint diffControlPoint = new DifficultyControlPoint();
 
-                    diffControlPoint.SpeedMultiplierBindable.MinValue = double.MinValue; // Uncapped minimum value
+                    diffControlPoint.SpeedMultiplierBindable.MinValue = Precision.DOUBLE_EPSILON; // Uncapped minimum value
                     diffControlPoint.SpeedMultiplierBindable.MaxValue = double.MaxValue; // Uncapped maximum value
-                    diffControlPoint.SpeedMultiplierBindable.Precision = 0.000000001d; // Arbitrary value, may need changing
+                    diffControlPoint.SpeedMultiplierBindable.Precision = Precision.DOUBLE_EPSILON;
                     diffControlPoint.SpeedMultiplier = initialBPM / timingControlPoint.BPM; // Counteract BPM velocity
 
                     group.Add(diffControlPoint);
