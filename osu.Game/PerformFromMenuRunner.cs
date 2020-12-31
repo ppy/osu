@@ -73,13 +73,16 @@ namespace osu.Game
             // find closest valid target
             IScreen current = getCurrentScreen();
 
+            if (current == null)
+                return;
+
             // a dialog may be blocking the execution for now.
             if (checkForDialog(current)) return;
 
             game?.CloseAllOverlays(false);
 
             // we may already be at the target screen type.
-            if (validScreens.Contains(getCurrentScreen().GetType()) && !beatmap.Disabled)
+            if (validScreens.Contains(current.GetType()) && !beatmap.Disabled)
             {
                 complete();
                 return;
