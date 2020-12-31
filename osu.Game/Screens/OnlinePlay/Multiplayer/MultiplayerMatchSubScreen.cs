@@ -222,6 +222,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                           // accessing Exception here silences any potential errors from the antecedent task
                           if (t.Exception != null)
                           {
+                              t.CatchUnobservedExceptions(true); // will run immediately.
                               // gameplay was not started due to an exception; unblock button.
                               endOperation();
                           }
@@ -232,8 +233,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }
 
             client.ToggleReady()
-                  .ContinueWith(_ => endOperation())
-                  .CatchUnobservedExceptions();
+                  .ContinueWith(t =>
+                  {
+                      t.CatchUnobservedExceptions(true); // will run immediately.
+                      endOperation();
+                  });
 
             void endOperation()
             {
