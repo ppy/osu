@@ -84,7 +84,8 @@ namespace osu.Game
             // we may already be at the target screen type.
             if (validScreens.Contains(current.GetType()) && !beatmap.Disabled)
             {
-                complete();
+                finalAction(current);
+                Cancel();
                 return;
             }
 
@@ -137,12 +138,6 @@ namespace osu.Game
             lastEncounteredDialog = currentDialog;
             lastEncounteredDialogScreen = current;
             return true;
-        }
-
-        private void complete()
-        {
-            finalAction(getCurrentScreen());
-            Cancel();
         }
     }
 }
