@@ -7,12 +7,12 @@ using osu.Game.Rulesets.Mods;
 namespace osu.Game.Tests.NonVisual
 {
     [TestFixture]
-    public class CustomDifficultySettingTest
+    public class OverridableBindableTest
     {
         [Test]
         public void TestBaseValueChanges()
         {
-            var setting = new CustomDifficultySetting<double>(
+            var setting = new OverridableBindable<double>(
                 minValue: 1,
                 maxValue: 11,
                 defaultValue: 5);
@@ -29,7 +29,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestCustomValueSet()
         {
-            var setting = new CustomDifficultySetting<float>(
+            var setting = new OverridableBindable<float>(
                 minValue: 5,
                 maxValue: 15,
                 defaultValue: 6);

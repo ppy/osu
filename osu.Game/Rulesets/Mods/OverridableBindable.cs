@@ -6,21 +6,22 @@ using osu.Framework.Bindables;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public class CustomDifficultySetting<T>
+    public class OverridableBindable<T>
         where T : struct, IComparable<T>, IConvertible, IEquatable<T>
     {
         public Bindable<T> BaseValue => baseValue;
         public Bindable<T> CustomValue => customValue;
         public Bindable<T> FinalValue => finalValue;
 
-        public readonly Bindable<bool> HasCustomValue = new BindableBool();
+        public Bindable<bool> HasCustomValue { get; } = new BindableBool();
 
         private readonly BindableNumber<T> immutableBaseValue = new BindableNumber<T>();
-        private readonly LeasedBindable<T> baseValue;
         private readonly BindableNumber<T> customValue = new BindableNumber<T>();
         private readonly BindableNumber<T> finalValue = new BindableNumber<T>();
 
-        public CustomDifficultySetting(T? defaultValue = null, T? minValue = null, T? maxValue = null, T? precision = null)
+        private readonly LeasedBindable<T> baseValue;
+
+        public OverridableBindable(T? defaultValue = null, T? minValue = null, T? maxValue = null, T? precision = null)
         {
             if (defaultValue != null)
             {
