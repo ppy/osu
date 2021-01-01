@@ -33,7 +33,15 @@ namespace osu.Game.Rulesets.Mania.Mods
                 // Get the difficulty control point of this group, if any
                 var difficultyControlPoints = group.ControlPoints.OfType<DifficultyControlPoint>().ToArray();
 
-                // If there is a timing control point
+                // If this group has a difficulty point, remove it
+                if (difficultyControlPoints.Any())
+                {
+                    var diffControlPoint = difficultyControlPoints[0];
+
+                    group.Remove(diffControlPoint);
+                }
+
+                // If this group has a timing point, add counteracting difficulty point
                 if (timingControlPoints.Any())
                 {
                     var timingControlPoint = timingControlPoints[0];
@@ -45,14 +53,8 @@ namespace osu.Game.Rulesets.Mania.Mods
                     diffControlPoint.SpeedMultiplierBindable.Precision = Precision.DOUBLE_EPSILON;
                     diffControlPoint.SpeedMultiplier = initialBPM / timingControlPoint.BPM; // Counteract BPM velocity
 
+                    // Add the new difficulty point to this group
                     group.Add(diffControlPoint);
-                }
-                // Else, there is no timing control point, but a difficulty control point
-                else if (difficultyControlPoints.Any())
-                {
-                    var diffControlPoint = difficultyControlPoints[0];
-
-                    group.Remove(diffControlPoint);
                 }
             }
         }
