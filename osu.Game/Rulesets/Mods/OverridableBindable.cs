@@ -6,7 +6,7 @@ using osu.Framework.Bindables;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public class OverridableBindable<T>
+    public class OverridableBindable<T> : IParseable
         where T : struct, IComparable<T>, IConvertible, IEquatable<T>
     {
         public Bindable<T> BaseValue => baseValue;
@@ -45,6 +45,32 @@ namespace osu.Game.Rulesets.Mods
             baseValue = immutableBaseValue.BeginLease(false);
 
             HasCustomValue.BindValueChanged(_ => updateFinalValue(), true);
+        }
+
+        public void Parse(object input)
+        {
+            switch (input)
+            {
+                case null:
+                    HasCustomValue.Value = false;
+                    return;
+
+                case OverridableBindable<T> setting:
+                    if (setting.HasCustomValue.Value)
+                    {
+                        CustomValue.Value = setting.CustomValue.Value;
+                        HasCustomValue.Value = true;
+                    }
+                    else
+                        HasCustomValue.Value = false;
+
+                    break;
+
+                default:
+                    CustomValue.Parse(input);
+                    HasCustomValue.Value = true;
+                    break;
+            }
         }
 
         private void updateFinalValue()
