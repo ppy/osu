@@ -137,7 +137,7 @@ namespace osu.Game.Rulesets.Mods
         }
 
         /// <summary>
-        /// Copies properties of given mod into here, through changing value.
+        /// Copies mod setting values from <paramref name="them"/> into this instance.
         /// </summary>
         /// <param name="them">The mod to copy properties from.</param>
         public void CopyFrom(Mod them)
