@@ -93,7 +93,7 @@ namespace osu.Game.Tests.NonVisual
             parseAndEnsureExpected(14f, 8f);
             parseAndEnsureExpected(-5f, 2f);
 
-            void parseAndEnsureExpected(object input, object expected)
+            void parseAndEnsureExpected(object input, float expected)
             {
                 setting.HasCustomValue.Value = false;
                 setting.Parse(input);
