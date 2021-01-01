@@ -131,22 +131,31 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         public virtual Mod CreateCopy()
         {
-            var copy = (Mod)Activator.CreateInstance(GetType());
+            var result = (Mod)Activator.CreateInstance(GetType(), true);
+            result.CopyFrom(this);
+            return result;
+        }
 
-            // Copy bindable values across
+        /// <summary>
+        /// Copies properties of given mod into here, through changing value.
+        /// </summary>
+        /// <param name="them">The mod to copy properties from.</param>
+        public void CopyFrom(Mod them)
+        {
+            if (them.GetType() != GetType())
+                throw new ArgumentException($"Expected mod of type {GetType()}, got {them.GetType()}.", nameof(them));
+
             foreach (var (_, prop) in this.GetSettingsSourceProperties())
             {
-                var origBindable = prop.GetValue(this);
-                var copyBindable = prop.GetValue(copy);
+                var ourBindable = prop.GetValue(this);
+                var theirBindable = prop.GetValue(them);
 
                 // The bindables themselves are readonly, so the value must be transferred through the Bindable<T>.Value property.
-                var valueProperty = origBindable.GetType().GetProperty(nameof(Bindable<object>.Value), BindingFlags.Public | BindingFlags.Instance);
+                var valueProperty = theirBindable.GetType().GetProperty(nameof(Bindable<object>.Value), BindingFlags.Public | BindingFlags.Instance);
                 Debug.Assert(valueProperty != null);
 
-                valueProperty.SetValue(copyBindable, valueProperty.GetValue(origBindable));
+                valueProperty.SetValue(ourBindable, valueProperty.GetValue(theirBindable));
             }
-
-            return copy;
         }
 
         public bool Equals(IMod other) => GetType() == other?.GetType();
