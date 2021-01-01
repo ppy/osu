@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Mods
 
         private readonly BindableNumber<T> immutableBaseValue = new BindableNumber<T>();
         private readonly BindableNumber<T> customValue = new BindableNumber<T>();
-        private readonly BindableNumber<T> finalValue = new BindableNumber<T>();
+        private readonly BindableNumberWithCurrent<T> finalValue = new BindableNumberWithCurrent<T>();
 
         private readonly LeasedBindable<T> baseValue;
 
@@ -66,7 +66,10 @@ namespace osu.Game.Rulesets.Mods
             // therefore ensuring that FinalValue is disabled.
             baseValue = immutableBaseValue.BeginLease(false);
 
-            HasCustomValue.BindValueChanged(_ => updateFinalValue(), true);
+            HasCustomValue.BindValueChanged(c =>
+            {
+                finalValue.Current = c.NewValue ? customValue : immutableBaseValue;
+            }, true);
         }
 
         /// <summary>
@@ -105,22 +108,6 @@ namespace osu.Game.Rulesets.Mods
                     CustomValue.Parse(input);
                     HasCustomValue.Value = true;
                     break;
-            }
-        }
-
-        private void updateFinalValue()
-        {
-            if (HasCustomValue.Value)
-            {
-                finalValue.UnbindFrom(immutableBaseValue);
-                // manually re-enable before proceeding; see https://github.com/ppy/osu-framework/issues/3218
-                finalValue.Disabled = false;
-                finalValue.BindTo(customValue);
-            }
-            else
-            {
-                finalValue.UnbindFrom(customValue);
-                finalValue.BindTo(immutableBaseValue);
             }
         }
 
