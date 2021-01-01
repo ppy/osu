@@ -131,7 +131,7 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         public virtual Mod CreateCopy()
         {
-            var result = (Mod)Activator.CreateInstance(GetType(), true);
+            var result = (Mod)Activator.CreateInstance(GetType());
             result.CopyFrom(this);
             return result;
         }
@@ -151,7 +151,7 @@ namespace osu.Game.Rulesets.Mods
                 var theirBindable = prop.GetValue(them);
 
                 // The bindables themselves are readonly, so the value must be transferred through the Bindable<T>.Value property.
-                var valueProperty = theirBindable.GetType().GetProperty(nameof(Bindable<object>.Value), BindingFlags.Public | BindingFlags.Instance);
+                var valueProperty = ourBindable.GetType().GetProperty(nameof(Bindable<object>.Value), BindingFlags.Public | BindingFlags.Instance);
                 Debug.Assert(valueProperty != null);
 
                 valueProperty.SetValue(ourBindable, valueProperty.GetValue(theirBindable));
