@@ -134,7 +134,7 @@ namespace osu.Game.Rulesets.Mods
 
             // Copy bindable values across
             foreach (var (_, prop) in this.GetSettingsSourceProperties())
-                ((IParseable)prop.GetValue(this)).Parse(prop.GetValue(copy));
+                ((IParseable)prop.GetValue(copy)).Parse(prop.GetValue(this));
 
             return copy;
         }
