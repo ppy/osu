@@ -2,11 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using JetBrains.Annotations;
+using Newtonsoft.Json;
 using osu.Framework.Bindables;
+using osu.Game.IO.Serialization;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public class OverridableBindable<T> : IParseable
+    public class OverridableBindable<T> : IParseable, ISerializableOverridable
         where T : struct, IComparable<T>, IConvertible, IEquatable<T>
     {
         public Bindable<T> BaseValue => baseValue;
@@ -45,6 +48,15 @@ namespace osu.Game.Rulesets.Mods
             baseValue = immutableBaseValue.BeginLease(false);
 
             HasCustomValue.BindValueChanged(_ => updateFinalValue(), true);
+        }
+
+        /// <summary>
+        /// Parameterless constructor for serialization.
+        /// </summary>
+        [UsedImplicitly]
+        private OverridableBindable()
+            : this(null)
+        {
         }
 
         public void Parse(object input)
@@ -87,6 +99,44 @@ namespace osu.Game.Rulesets.Mods
                 finalValue.UnbindFrom(customValue);
                 finalValue.BindTo(immutableBaseValue);
             }
+        }
+
+        void ISerializableOverridable.SerializeTo(JsonWriter writer, JsonSerializer serializer)
+        {
+            if (!HasCustomValue.Value)
+            {
+                writer.WriteNull();
+                return;
+            }
+
+            serializer.Serialize(writer, customValue);
+        }
+
+        void ISerializableOverridable.DeserializeFrom(JsonReader reader, JsonSerializer serializer)
+        {
+            Parse(serializer.Deserialize(reader));
+        }
+    }
+
+    [JsonConverter(typeof(OverridableJsonConverter))]
+    internal interface ISerializableOverridable : IJsonSerializable
+    {
+        void SerializeTo(JsonWriter writer, JsonSerializer serializer);
+        void DeserializeFrom(JsonReader reader, JsonSerializer serializer);
+    }
+
+    internal class OverridableJsonConverter : JsonConverter<ISerializableOverridable>
+    {
+        public override void WriteJson(JsonWriter writer, ISerializableOverridable value, JsonSerializer serializer)
+        {
+            value.SerializeTo(writer, serializer);
+        }
+
+        public override ISerializableOverridable ReadJson(JsonReader reader, Type objectType, ISerializableOverridable existingValue, bool hasExistingValue, JsonSerializer serializer)
+        {
+            var value = existingValue ?? (ISerializableOverridable)Activator.CreateInstance(objectType, true);
+            value.DeserializeFrom(reader, serializer);
+            return value;
         }
     }
 }

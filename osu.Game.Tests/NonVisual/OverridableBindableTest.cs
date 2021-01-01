@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Bindables;
+using osu.Game.IO.Serialization;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Tests.NonVisual
@@ -126,6 +127,27 @@ namespace osu.Game.Tests.NonVisual
                 // custom value shouldn't be touched as well.
                 Assert.That(setting.CustomValue.Value, Is.EqualTo(5f));
             }
+        }
+
+        [Test]
+        public void TestSerialization()
+        {
+            var setting = new OverridableBindable<float>(
+                minValue: 0,
+                maxValue: 10,
+                defaultValue: 5);
+
+            setting.HasCustomValue.Value = true;
+
+            Assert.That(setting.Serialize().Deserialize<float>(), Is.EqualTo(5f));
+
+            var deserializedSetting = setting.Serialize().Deserialize<OverridableBindable<float>>();
+            Assert.That(deserializedSetting.HasCustomValue.Value, Is.True);
+            Assert.That(deserializedSetting.CustomValue.Value, Is.EqualTo(5f));
+
+            setting.HasCustomValue.Value = false;
+
+            Assert.That(setting.Serialize().Deserialize<float?>(), Is.Null);
         }
     }
 }
