@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mfosu!\n"
 "POT-Creation-Date: 2020-12-04 02:25+0800\n"
-"PO-Revision-Date: 2020-12-29 23:21+0800\n"
+"PO-Revision-Date: 2021-01-01 22:06+0800\n"
 "Last-Translator: \n"
 "Language-Team: MATRIX-feather\n"
 "Language: zh_CN\n"
@@ -21,44 +21,51 @@ msgstr "房主为 "
 msgid "_Open_Multiplayer"
 msgstr "开放中的房间"
 
-# v2 主菜单
-msgid "Game.Menu.ButtonSystem.solo"
-msgstr "单人游戏"
-
-msgid "Game.Menu.ButtonSystem.multi"
-msgstr "多人游戏"
-
-msgid "Game.Menu.ButtonSystem.playlists"
-msgstr "游玩列表"
-
-msgid "Game.Menu.ButtonSystem.about-mfosu"
-msgstr "关于Mf-osu"
-
-msgid "Game.Menu.ButtonSystem.mvis"
-msgstr "Mvis播放器"
-
-msgid "Game.Menu.ButtonSystem.file-import"
-msgstr "文件导入"
-
-msgid "Game.Menu.ButtonSystem.invoke-p2c"
-msgstr "最高机密"
-
-msgid "Game.Menu.ButtonSystem.play"
-msgstr "开始游戏"
-
-msgid "Game.Menu.ButtonSystem.editor"
-msgstr "osu!编辑器"
-
-msgid "Game.Menu.ButtonSystem.beatmaplisting"
-msgstr "谱面列表"
-
-msgid "Game.Menu.ButtonSystem.exit"
+# v2 通用
+msgid "generic.exit"
 msgstr "退出"
 
-msgid "Game.Menu.ButtonSystem.onMultiplayerError"
+msgid "generic.back"
+msgstr "返回"
+
+# v2 主菜单
+msgid "screen.menu.buttonSystem.solo"
+msgstr "单人游戏"
+
+msgid "screen.menu.buttonSystem.multi"
+msgstr "多人游戏"
+
+msgid "screen.menu.buttonSystem.playlists"
+msgstr "游玩列表"
+
+msgid "screen.menu.buttonSystem.about-mfosu"
+msgstr "关于Mf-osu"
+
+msgid "screen.menu.buttonSystem.mvis"
+msgstr "Mvis播放器"
+
+msgid "screen.menu.buttonSystem.file-import"
+msgstr "文件导入"
+
+msgid "screen.menu.buttonSystem.invoke-p2c"
+msgstr "最 高 机 密"
+
+msgid "screen.menu.buttonSystem.play"
+msgstr "开始游戏"
+
+msgid "screen.menu.buttonSystem.editor"
+msgstr "osu!编辑器"
+
+msgid "screen.menu.buttonSystem.beatmaplisting"
+msgstr "谱面列表"
+
+msgid "screen.menu.buttonSystem.exit"
+msgstr "退出"
+
+msgid "screen.menu.buttonSystem.onMultiplayerError"
 msgstr "你必须先登录才能进行多人游戏!"
 
-msgid "Game.Menu.ButtonSystem.onPlaylistsError"
+msgid "screen.menu.buttonSystem.onPlaylistsError"
 msgstr "你必须先登录才能查看游玩列表!"
 
 # v2 新多人游戏界面
@@ -68,6 +75,49 @@ msgstr "游玩列表"
 # v2 杂项
 msgid "Game.Users.Drawables.ClickableAvatar.tooltip"
 msgstr "查看个人信息"
+
+msgid "screen.mvis.main.openManualInBrowser"
+msgstr "在浏览器中打开食用手册"
+
+msgid "screen.mvis.main.prevOrRestart"
+msgstr "上一首/从头开始"
+
+msgid "screen.mvis.main.togglePause"
+msgstr "暂停/播放"
+
+msgid "screen.mvis.main.next"
+msgstr "下一首"
+
+msgid "screen.mvis.main.openCollection"
+msgstr "打开收藏夹"
+
+msgid "screen.mvis.main.lockChanges"
+msgstr "隐藏界面并锁定变更"
+
+msgid "screen.mvis.main.loop"
+msgstr "单曲循环"
+
+msgid "screen.mvis.main.presentBeatmap"
+msgstr "在选歌界面中查看"
+
+msgid "screen.mvis.main.openSettings"
+msgstr "打开播放器设置"
+
+msgid "screen.mvis.main.toggleLock"
+msgstr "锁定变更"
+
+msgid "screen.mvis.main.songSelect"
+msgstr "歌曲选择"
+
+# v2 Mvis播放器收藏夹界面
+msgid "screen.mvis.collections.ui.noCollectionSelected"
+msgstr "未选择收藏夹"
+
+msgid "screen.mvis.collections.ui.selectOneFirst"
+msgstr "请先选择一个!"
+
+msgid "screen.mvis.collections.ui.beatmapSetsCount"
+msgstr "{0}首歌曲"
 
 # 新多人游戏界面
 msgid "Multiplayer"
@@ -662,8 +712,8 @@ msgid "调整播放速度时也同时调整音调"
 msgstr ""
 
 msgid ""
-"请注意: 播放速度调整暂不支持故事版音频, 调整故事版音"
-"频请手动前往歌曲选择添加加速/减速mod"
+"请注意: 播放速度调整暂不支持故事版音频, 调整故事版音频请手"
+"动前往歌曲选择添加加速/减速mod"
 msgstr ""
 
 msgid "夜核节拍器"
@@ -758,8 +808,8 @@ msgid "启用Sayobot功能"
 msgstr ""
 
 msgid ""
-"这将影响所有谱面预览、封面、和下图的功能, 但不会影响"
-"已完成或正在进行中的请求"
+"这将影响所有谱面预览、封面、和下图的功能, 但不会影响已完成"
+"或正在进行中的请求"
 msgstr ""
 
 msgid "立体音效增益"
@@ -1166,8 +1216,7 @@ msgstr ""
 msgid "邮箱地址"
 msgstr ""
 
-msgid ""
-"这将会公开显示在你的个人界面上,请勿填写不良信息"
+msgid "这将会公开显示在你的个人界面上,请勿填写不良信息"
 msgstr ""
 
 msgid "也不要填写你自己的个人信息!"
@@ -1275,8 +1324,7 @@ msgstr ""
 msgid "关于Mf-osu"
 msgstr ""
 
-msgid ""
-"这是基于osu!lazer的一个分支版本,祝游玩愉快(｡･ω･)ﾉﾞ"
+msgid "这是基于osu!lazer的一个分支版本,祝游玩愉快(｡･ω･)ﾉﾞ"
 msgstr ""
 
 msgid "新闻"

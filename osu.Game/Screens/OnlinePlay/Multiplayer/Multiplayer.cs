@@ -59,7 +59,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             return room;
         }
 
-        protected override string ScreenTitle => "Multiplayer";
+        protected override string ScreenTitle => "screen.multi.multiplayer.multiplayer.screenTitle";
 
         protected override RoomManager CreateRoomManager() => new MultiplayerRoomManager();
 

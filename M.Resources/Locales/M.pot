@@ -13,92 +13,152 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "Language: zh_CN\n"
 
-#
-msgid "_HostedBy_Text"
-msgstr "hosted by"
+#v2 通用
+msgid "generic.exit"
+msgstr ""
 
-msgid "_Open_Multiplayer"
+msgid "generic.back"
 msgstr ""
 
 #v2 主菜单
-msgid "Game.Menu.ButtonSystem.solo"
+msgid "screen.menu.buttonSystem.solo"
 msgstr ""
 
-msgid "Game.Menu.ButtonSystem.multi"
+msgid "screen.menu.buttonSystem.multi"
 msgstr ""
 
-msgid "Game.Menu.ButtonSystem.playlists"
+msgid "screen.menu.buttonSystem.playlists"
 msgstr ""
 
-msgid "Game.Menu.ButtonSystem.about-mfosu"
+msgid "screen.menu.buttonSystem.about-mfosu"
 msgstr ""
 
-msgid "Game.Menu.ButtonSystem.mvis"
+msgid "screen.menu.buttonSystem.mvis"
 msgstr ""
 
-msgid "Game.Menu.ButtonSystem.file-import"
+msgid "screen.menu.buttonSystem.file-import"
 msgstr ""
 
-msgid "Game.Menu.ButtonSystem.invoke-p2c"
+msgid "screen.menu.buttonSystem.invoke-p2c"
 msgstr ""
 
-msgid "Game.Menu.ButtonSystem.play"
+msgid "screen.menu.buttonSystem.play"
 msgstr ""
 
-msgid "Game.Menu.ButtonSystem.editor"
+msgid "screen.menu.buttonSystem.editor"
 msgstr ""
 
-msgid "Game.Menu.ButtonSystem.beatmaplisting"
+msgid "screen.menu.buttonSystem.beatmaplisting"
 msgstr ""
 
-msgid "Game.Menu.ButtonSystem.exit"
+msgid "screen.menu.buttonSystem.exit"
 msgstr ""
 
-msgid "Game.Menu.ButtonSystem.onMultiplayerError"
+msgid "screen.menu.buttonSystem.onMultiplayerError"
 msgstr ""
 
-msgid "Game.Menu.ButtonSystem.onPlaylistsError"
-msgstr ""
-
-#v2 新多人游戏界面
-msgid "Game.Online.Rooms.GameTypes.playlists"
+msgid "screen.menu.buttonSystem.onPlaylistsError"
 msgstr ""
 
 #v2 杂项
-msgid "Game.Users.Drawables.ClickableAvatar.tooltip"
+msgid "game.users.drawables.clickableAvatar.tooltip"
+msgstr ""
+
+#v2 Mvis播放器 主界面
+msgid "screen.mvis.main.openManualInBrowser"
+msgstr ""
+
+msgid "screen.mvis.main.prevOrRestart"
+msgstr ""
+
+msgid "screen.mvis.main.togglePause"
+msgstr ""
+
+msgid "screen.mvis.main.next"
+msgstr ""
+
+msgid "screen.mvis.main.openCollection"
+msgstr ""
+
+msgid "screen.mvis.main.lockChanges"
+msgstr ""
+
+msgid "screen.mvis.main.loop"
+msgstr ""
+
+msgid "screen.mvis.main.presentBeatmap"
+msgstr ""
+
+msgid "screen.mvis.main.openSettings"
+msgstr ""
+
+msgid "screen.mvis.main.toggleLock"
+msgstr ""
+
+msgid "screen.mvis.main.songSelect"
+msgstr ""
+
+#v2 Mvis播放器 收藏夹界面
+msgid "screen.mvis.collections.ui.noCollectionSelected"
+msgstr ""
+
+msgid "screen.mvis.collections.ui.selectOneFirst"
+msgstr ""
+
+msgid "screen.mvis.collections.ui.beatmapSetsCount"
+msgstr ""
+
+#v2 多人游戏 房间类型
+msgid "online.rooms.gameTypes.playlists"
+msgstr ""
+
+msgid "online.rooms.gameTypes.tag"
+msgstr ""
+
+msgid "online.rooms.gameTypes.tagTeam"
+msgstr ""
+
+msgid "online.rooms.gameTypes.versus"
+msgstr ""
+
+msgid "online.rooms.gameTypes.teamVersus"
+msgstr ""
+
+#v2 多人游戏 通用
+msgid "screen.multi.generic.hostedBy"
+msgstr ""
+
+#v2 多人游戏 RoomStatusFilter
+msgid "screen.multi.lounge.components.roomStatusFilter.open"
+msgstr ""
+
+msgid "screen.multi.lounge.components.roomStatusFilter.ended"
+msgstr ""
+
+msgid "screen.multi.lounge.components.roomStatusFilter.participated"
+msgstr ""
+
+msgid "screen.multi.lounge.components.roomStatusFilter.owned"
+msgstr ""
+
+#v2 多人游戏 主界面
+msgid "screen.multi.multiplayer.multiplayer.screenTitle"
+msgstr ""
+
+msgid "screen.multi.header.pageTitle.text"
+msgstr ""
+
+msgid "screen.multi.multiplayer.createMultiplayerMatchButton.text"
+msgstr ""
+
+msgid "screen.multi.multiplayer.match.multiplayerMatchHeader.openSettingsButton.text"
+msgstr ""
+
+# {0}人参与
+msgid "screen.multi.lounge.components.participantInfo.summary.text"
 msgstr ""
 
 # 新多人游戏界面
-msgid "Multiplayer"
-msgstr ""
-
-msgid "Lounge"
-msgstr ""
-
-msgid "Create room"
-msgstr ""
-
-msgid "Open Settings"
-msgstr ""
-
-msgid "Recently Ended"
-msgstr ""
-
-msgid "Participated"
-msgstr ""
-
-msgid "Owned"
-msgstr ""
-
-msgid "hosted by {0}"
-msgstr ""
-
-msgid "hosted by "
-msgstr ""
-
-msgid "{0} 人参与"
-msgstr ""
-
 msgid "Recent Participants"
 msgstr ""
 
@@ -158,15 +218,6 @@ msgstr ""
 
 msgid "Song Selection"
 msgstr ""
-
-#msgid "Closed {0}"
-#msgstr ""
-#
-#msgid "Closing {0}"
-#msgstr ""
-#
-#msgid "Closing soon"
-#msgstr ""
 
 msgid "Any"
 msgstr ""

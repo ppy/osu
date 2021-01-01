@@ -62,7 +62,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     {
                         summary = new OsuSpriteText
                         {
-                            Text = "0 人参与",
+                            Text = new LocalisedString("screen.multi.lounge.components.participantInfo.summary.text", 0),
                             Font = OsuFont.GetFont(size: 16)
                         }
                     },
@@ -76,14 +76,14 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
                 if (host.NewValue != null)
                 {
-                    hostText.AddText("_HostedBy_Text");
+                    hostText.AddText("screen.multi.generic.hostedBy");
                     hostText.AddUserLink(host.NewValue, s => s.Font = s.Font.With(Typeface.Torus, weight: FontWeight.Bold, italics: true));
 
                     flagContainer.Child = new UpdateableFlag(host.NewValue.Country) { RelativeSizeAxes = Axes.Both };
                 }
             }, true);
 
-            ParticipantCount.BindValueChanged(count => summary.Text = new LocalisedString("{0} 人参与", count.NewValue), true);
+            ParticipantCount.BindValueChanged(count => summary.Text = new LocalisedString("screen.multi.lounge.components.participantInfo.summary.text", count.NewValue), true);
         }
     }
 }

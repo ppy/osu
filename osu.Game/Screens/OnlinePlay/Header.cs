@@ -112,7 +112,7 @@ namespace osu.Game.Screens.OnlinePlay
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 Font = OsuFont.GetFont(size: 24),
-                                Text = "Lounge"
+                                Text = "screen.multi.header.pageTitle.text"
                             }
                         }
                     },
