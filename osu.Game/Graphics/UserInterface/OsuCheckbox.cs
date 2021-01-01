@@ -18,28 +18,32 @@ namespace osu.Game.Graphics.UserInterface
         public Color4 UncheckedColor { get; set; } = Color4.White;
         public int FadeDuration { get; set; }
 
+        private string labelText;
+
         public string LabelText
         {
+            get => labelText;
             set
             {
-                if (labelText != null)
-                    labelText.Text = value;
+                labelText = value;
+                if (labelFlow != null)
+                    labelFlow.Text = value;
             }
         }
 
         public MarginPadding LabelPadding
         {
-            get => labelText?.Padding ?? new MarginPadding();
+            get => labelFlow?.Padding ?? new MarginPadding();
             set
             {
-                if (labelText != null)
-                    labelText.Padding = value;
+                if (labelFlow != null)
+                    labelFlow.Padding = value;
             }
         }
 
         protected readonly Nub Nub;
 
-        private readonly OsuTextFlowContainer labelText;
+        private readonly OsuTextFlowContainer labelFlow;
         private SampleChannel sampleChecked;
         private SampleChannel sampleUnchecked;
 
@@ -52,7 +56,7 @@ namespace osu.Game.Graphics.UserInterface
 
             Children = new Drawable[]
             {
-                labelText = new OsuTextFlowContainer
+                labelFlow = new OsuTextFlowContainer
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
@@ -69,7 +73,7 @@ namespace osu.Game.Graphics.UserInterface
 
             Nub.Current.BindTo(Current);
 
-            Current.DisabledChanged += disabled => labelText.Alpha = Nub.Alpha = disabled ? 0.3f : 1;
+            Current.DisabledChanged += disabled => labelFlow.Alpha = Nub.Alpha = disabled ? 0.3f : 1;
         }
 
         [BackgroundDependencyLoader]
