@@ -409,7 +409,7 @@ namespace osu.Game.Overlays.Mods
         private void selectedModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
             foreach (var section in ModSectionsContainer.Children)
-                section.SelectTypes(mods.NewValue.Select(m => m.GetType()).ToList());
+                section.UpdateSelectedMods(mods.NewValue);
 
             updateMods();
         }
