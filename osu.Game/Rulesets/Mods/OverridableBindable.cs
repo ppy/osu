@@ -9,13 +9,32 @@ using osu.Game.IO.Serialization;
 
 namespace osu.Game.Rulesets.Mods
 {
+    /// <summary>
+    /// A class that allows for deciding between binding to an immutable base bindable, or a mutable custom bindable.
+    /// All determined by <see cref="HasCustomValue"/>'s current value, and the final bindable bound to the determined source is exposed as <see cref="FinalValue"/>.
+    /// </summary>
+    /// <typeparam name="T">The value type for all bindables.</typeparam>
     public class OverridableBindable<T> : IParseable, ISerializableOverridable
         where T : struct, IComparable<T>, IConvertible, IEquatable<T>
     {
+        /// <summary>
+        /// The leased instance of the base bindable, <see cref="FinalValue"/> will bind to the original immutable instance of this.
+        /// </summary>
         public Bindable<T> BaseValue => baseValue;
+
+        /// <summary>
+        /// The bindable holding the custom value.
+        /// </summary>
         public Bindable<T> CustomValue => customValue;
+
+        /// <summary>
+        /// The final bindable bound to either of the two bindables according to <see cref="HasCustomValue"/>.
+        /// </summary>
         public Bindable<T> FinalValue => finalValue;
 
+        /// <summary>
+        /// Whether the final bindable should be bound to <see cref="CustomValue"/>, otherwise will be immutably bound to <see cref="BaseValue"/>.
+        /// </summary>
         public Bindable<bool> HasCustomValue { get; } = new BindableBool();
 
         private readonly BindableNumber<T> immutableBaseValue = new BindableNumber<T>();
@@ -59,6 +78,10 @@ namespace osu.Game.Rulesets.Mods
         {
         }
 
+        /// <summary>
+        /// Parses an input into <see cref="CustomValue"/> and sets <see cref="HasCustomValue"/> accordingly.
+        /// </summary>
+        /// <param name="input">The input which is to be parsed.</param>
         public void Parse(object input)
         {
             switch (input)
