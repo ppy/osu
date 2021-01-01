@@ -62,16 +62,17 @@ namespace osu.Game.Tests.NonVisual
 
             Assert.That(setting.CustomValue.Value, Is.EqualTo(8));
 
-            // finally, disable custom value to make sure we revert to base and disable changes.
+            // disable custom value to make sure we revert to base and disable changes.
             setting.HasCustomValue.Value = false;
 
             Assert.That(setting.FinalValue.Value, Is.EqualTo(11));
             Assert.That(setting.FinalValue.Disabled, Is.True);
 
-            // re-enable once more for good measure.
+            // finally, re-enable and ensure custom value inherited base.
             setting.HasCustomValue.Value = true;
 
-            Assert.That(setting.FinalValue.Value, Is.EqualTo(8));
+            Assert.That(setting.FinalValue.Value, Is.EqualTo(setting.CustomValue.Value));
+            Assert.That(setting.FinalValue.Value, Is.EqualTo(11));
             Assert.That(setting.FinalValue.Disabled, Is.False);
         }
 
@@ -93,7 +94,7 @@ namespace osu.Game.Tests.NonVisual
             parseAndEnsureExpected(14f, 8f);
             parseAndEnsureExpected(-5f, 2f);
 
-            void parseAndEnsureExpected(object input, object expected)
+            void parseAndEnsureExpected(object input, float expected)
             {
                 setting.HasCustomValue.Value = false;
                 setting.Parse(input);
@@ -148,6 +149,9 @@ namespace osu.Game.Tests.NonVisual
             setting.HasCustomValue.Value = false;
 
             Assert.That(setting.Serialize().Deserialize<float?>(), Is.Null);
+
+            deserializedSetting = setting.Serialize().Deserialize<OverridableBindable<float>>();
+            Assert.That(deserializedSetting.HasCustomValue.Value, Is.False);
         }
     }
 }
