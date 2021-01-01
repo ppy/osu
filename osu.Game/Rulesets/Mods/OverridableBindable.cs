@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Mods
         public Bindable<T> BaseValue => baseValue;
 
         /// <summary>
-        /// The bindable holding the custom value.
+        /// The bindable holding the custom value, this will revert to <see cref="BaseValue"/>'s current value when <see cref="HasCustomValue"/> is set to false.
         /// </summary>
         public Bindable<T> CustomValue => customValue;
 
@@ -69,6 +69,10 @@ namespace osu.Game.Rulesets.Mods
             HasCustomValue.BindValueChanged(c =>
             {
                 finalValue.Current = c.NewValue ? customValue : immutableBaseValue;
+
+                // inherit base value into custom value when HasCustomValue false, better UX for slider when re-enabling.
+                if (!c.NewValue)
+                    customValue.Value = baseValue.Value;
             }, true);
         }
 
@@ -94,13 +98,9 @@ namespace osu.Game.Rulesets.Mods
                     return;
 
                 case OverridableBindable<T> setting:
-                    if (setting.HasCustomValue.Value)
-                    {
+                    HasCustomValue.Value = setting.HasCustomValue.Value;
+                    if (HasCustomValue.Value)
                         CustomValue.Value = setting.CustomValue.Value;
-                        HasCustomValue.Value = true;
-                    }
-                    else
-                        HasCustomValue.Value = false;
 
                     break;
 

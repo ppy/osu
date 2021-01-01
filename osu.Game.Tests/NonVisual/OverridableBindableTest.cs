@@ -62,16 +62,17 @@ namespace osu.Game.Tests.NonVisual
 
             Assert.That(setting.CustomValue.Value, Is.EqualTo(8));
 
-            // finally, disable custom value to make sure we revert to base and disable changes.
+            // disable custom value to make sure we revert to base and disable changes.
             setting.HasCustomValue.Value = false;
 
             Assert.That(setting.FinalValue.Value, Is.EqualTo(11));
             Assert.That(setting.FinalValue.Disabled, Is.True);
 
-            // re-enable once more for good measure.
+            // finally, re-enable and ensure custom value inherited base.
             setting.HasCustomValue.Value = true;
 
-            Assert.That(setting.FinalValue.Value, Is.EqualTo(8));
+            Assert.That(setting.FinalValue.Value, Is.EqualTo(setting.CustomValue.Value));
+            Assert.That(setting.FinalValue.Value, Is.EqualTo(11));
             Assert.That(setting.FinalValue.Disabled, Is.False);
         }
 
