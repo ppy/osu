@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         [Test]
         public void TestCircleSize1() => CreateModTest(new ModTestData
         {
-            Mod = new OsuModDifficultyAdjust { CircleSize = { Value = 1 } },
+            Mod = new OsuModDifficultyAdjust { CircleSize = { HasCustomValue = { Value = true }, CustomValue = { Value = 1 } } },
             Autoplay = true,
             PassCondition = () => checkSomeHit() && checkObjectsScale(0.78f)
         });
@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         [Test]
         public void TestCircleSize10() => CreateModTest(new ModTestData
         {
-            Mod = new OsuModDifficultyAdjust { CircleSize = { Value = 10 } },
+            Mod = new OsuModDifficultyAdjust { CircleSize = { HasCustomValue = { Value = true }, CustomValue = { Value = 10 } } },
             Autoplay = true,
             PassCondition = () => checkSomeHit() && checkObjectsScale(0.15f)
         });
@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         [Test]
         public void TestApproachRate1() => CreateModTest(new ModTestData
         {
-            Mod = new OsuModDifficultyAdjust { ApproachRate = { Value = 1 } },
+            Mod = new OsuModDifficultyAdjust { ApproachRate = { HasCustomValue = { Value = true }, CustomValue = { Value = 1 } } },
             Autoplay = true,
             PassCondition = () => checkSomeHit() && checkObjectsPreempt(1680)
         });
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         [Test]
         public void TestApproachRate10() => CreateModTest(new ModTestData
         {
-            Mod = new OsuModDifficultyAdjust { ApproachRate = { Value = 10 } },
+            Mod = new OsuModDifficultyAdjust { ApproachRate = { HasCustomValue = { Value = true }, CustomValue = { Value = 10 } } },
             Autoplay = true,
             PassCondition = () => checkSomeHit() && checkObjectsPreempt(450)
         });
