@@ -148,6 +148,9 @@ namespace osu.Game.Tests.NonVisual
             setting.HasCustomValue.Value = false;
 
             Assert.That(setting.Serialize().Deserialize<float?>(), Is.Null);
+
+            deserializedSetting = setting.Serialize().Deserialize<OverridableBindable<float>>();
+            Assert.That(deserializedSetting.HasCustomValue.Value, Is.False);
         }
     }
 }
