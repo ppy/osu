@@ -28,6 +28,7 @@ namespace osu.Game.Overlays.Settings
 
         public new Bindable<T> Current
         {
+            get => base.Current;
             set => throw new InvalidOperationException("Must not change.");
         }
 
