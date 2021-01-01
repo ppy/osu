@@ -133,24 +133,24 @@ namespace osu.Game.Overlays.Mods
         public void UpdateSelectedMods(IReadOnlyList<Mod> newSelectedMods)
         {
             foreach (var button in buttons)
+                updateButtonMods(button, newSelectedMods);
+        }
+
+        private void updateButtonMods(ModButton button, IReadOnlyList<Mod> newSelectedMods)
+        {
+            foreach (var mod in newSelectedMods)
             {
-                int index = -1;
-
-                foreach (var mod in newSelectedMods)
-                {
-                    index = Array.FindIndex(button.Mods, m1 => mod.GetType() == m1.GetType());
-                    if (index < 0)
-                        continue;
-
-                    var buttonMod = button.Mods[index];
-                    buttonMod.CopyFrom(mod);
-                    button.SelectAt(index);
-                    break;
-                }
-
+                var index = Array.FindIndex(button.Mods, m1 => mod.GetType() == m1.GetType());
                 if (index < 0)
-                    button.Deselect();
+                    continue;
+
+                var buttonMod = button.Mods[index];
+                buttonMod.CopyFrom(mod);
+                button.SelectAt(index);
+                return;
             }
+
+            button.Deselect();
         }
 
         protected ModSection()
