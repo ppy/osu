@@ -2,9 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Game.Rulesets.Catch.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 {
@@ -27,7 +29,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
         private float lastDistanceMoved;
         private double lastStrainTime;
 
-        public Movement(float halfCatcherWidth)
+        public Movement(List<ModWithVisibilityAdjustment> visualMods, float halfCatcherWidth)
+            : base(visualMods)
         {
             HalfCatcherWidth = halfCatcherWidth;
         }

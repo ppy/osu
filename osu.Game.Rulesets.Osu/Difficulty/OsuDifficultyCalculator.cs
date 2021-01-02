@@ -79,10 +79,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
         }
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap) => new Skill[]
+        protected override Skill[] CreateSkills(IBeatmap beatmap, List<ModWithVisibilityAdjustment> visualMods) => new Skill[]
         {
-            new Aim(),
-            new Speed()
+            new Aim(visualMods),
+            new Speed(visualMods)
         };
 
         protected override Mod[] DifficultyAdjustmentMods => new Mod[]

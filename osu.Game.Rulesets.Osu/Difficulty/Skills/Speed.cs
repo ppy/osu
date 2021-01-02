@@ -2,8 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
 
@@ -26,6 +28,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double min_speed_bonus = 75; // ~200BPM
         private const double max_speed_bonus = 45; // ~330BPM
         private const double speed_balancing_factor = 40;
+
+        public Speed(List<ModWithVisibilityAdjustment> visualMods)
+            : base(visualMods)
+        {
+        }
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {

@@ -2,9 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Taiko.Objects;
 
@@ -38,6 +40,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         /// Length of the current mono pattern.
         /// </summary>
         private int currentMonoLength;
+
+        public Colour(List<ModWithVisibilityAdjustment> visualMods)
+            : base(visualMods)
+        {
+        }
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {
