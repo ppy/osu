@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -34,6 +35,7 @@ namespace osu.Game.Screens.Play.HUD
         public BindableDouble TotalScore { get; } = new BindableDouble();
         public BindableDouble Accuracy { get; } = new BindableDouble(1);
         public BindableInt Combo { get; } = new BindableInt();
+        public BindableBool HasQuit { get; } = new BindableBool();
 
         private int? scorePosition;
 
@@ -51,10 +53,11 @@ namespace osu.Game.Screens.Play.HUD
                     positionText.Text = $"#{scorePosition.Value.FormatRank()}";
 
                 positionText.FadeTo(scorePosition.HasValue ? 1 : 0);
-                updateColour();
+                updateState();
             }
         }
 
+        [CanBeNull]
         public User User { get; }
 
         private readonly bool trackedPlayer;
@@ -67,7 +70,7 @@ namespace osu.Game.Screens.Play.HUD
         /// </summary>
         /// <param name="user">The score's player.</param>
         /// <param name="trackedPlayer">Whether the player is the local user or a replay player.</param>
-        public GameplayLeaderboardScore(User user, bool trackedPlayer)
+        public GameplayLeaderboardScore([CanBeNull] User user, bool trackedPlayer)
         {
             User = user;
             this.trackedPlayer = trackedPlayer;
@@ -179,7 +182,7 @@ namespace osu.Game.Screens.Play.HUD
                                                 Origin = Anchor.CentreLeft,
                                                 Colour = Color4.White,
                                                 Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold),
-                                                Text = User.Username,
+                                                Text = User?.Username,
                                                 Truncate = true,
                                                 Shadow = false,
                                             }
@@ -230,20 +233,31 @@ namespace osu.Game.Screens.Play.HUD
             TotalScore.BindValueChanged(v => scoreText.Text = v.NewValue.ToString("N0"), true);
             Accuracy.BindValueChanged(v => accuracyText.Text = v.NewValue.FormatAccuracy(), true);
             Combo.BindValueChanged(v => comboText.Text = $"{v.NewValue}x", true);
+            HasQuit.BindValueChanged(_ => updateState());
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            updateColour();
+            updateState();
             FinishTransforms(true);
         }
 
         private const double panel_transition_duration = 500;
 
-        private void updateColour()
+        private void updateState()
         {
+            if (HasQuit.Value)
+            {
+                // we will probably want to display this in a better way once we have a design.
+                // and also show states other than quit.
+                mainFillContainer.ResizeWidthTo(regular_width, panel_transition_duration, Easing.OutElastic);
+                panelColour = Color4.Gray;
+                textColour = Color4.White;
+                return;
+            }
+
             if (scorePosition == 1)
             {
                 mainFillContainer.ResizeWidthTo(EXTENDED_WIDTH, panel_transition_duration, Easing.OutElastic);

@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
@@ -8,9 +9,12 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
@@ -29,6 +33,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private LoadingLayer loadingLayer;
 
+        private WorkingBeatmap initialBeatmap;
+        private RulesetInfo initialRuleset;
+        private IReadOnlyList<Mod> initialMods;
+
+        private bool itemSelected;
+
         public MultiplayerMatchSongSelect()
         {
             Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING };
@@ -38,10 +48,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private void load()
         {
             AddInternal(loadingLayer = new LoadingLayer(Carousel));
+            initialBeatmap = Beatmap.Value;
+            initialRuleset = Ruleset.Value;
+            initialMods = Mods.Value.ToList();
         }
 
         protected override bool OnStart()
         {
+            itemSelected = true;
             var item = new PlaylistItem();
 
             item.Beatmap.Value = Beatmap.Value.BeatmapInfo;
@@ -80,6 +94,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }
 
             return true;
+        }
+
+        public override bool OnExiting(IScreen next)
+        {
+            if (!itemSelected)
+            {
+                Beatmap.Value = initialBeatmap;
+                Ruleset.Value = initialRuleset;
+                Mods.Value = initialMods;
+            }
+
+            return base.OnExiting(next);
         }
 
         protected override BeatmapDetailArea CreateBeatmapDetailArea() => new PlayBeatmapDetailArea();

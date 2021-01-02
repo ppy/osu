@@ -143,7 +143,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 RoomManager =
                 {
                     TimeBetweenListingPolls = { Value = 1 },
-                    TimeBetweenSelectionPolls = { Value = 1 }
                 }
             };
 
