@@ -62,13 +62,6 @@ namespace osu.Android
                     break;
 
                 case Intent.ActionSend:
-                {
-                    var content = intent.ClipData?.GetItemAt(0);
-                    if (content != null)
-                        handleImportFromUris(content.Uri);
-                    break;
-                }
-
                 case Intent.ActionSendMultiple:
                 {
                     var uris = new List<Uri>();
