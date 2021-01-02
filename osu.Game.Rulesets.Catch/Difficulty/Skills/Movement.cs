@@ -8,7 +8,7 @@ using osu.Game.Rulesets.Difficulty.Skills;
 
 namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 {
-    public class Movement : Skill
+    public class Movement : StrainSkill
     {
         private const float absolute_player_positioning_error = 16f;
         private const float normalized_hitobject_radius = 41.0f;
@@ -18,6 +18,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
         protected override double StrainDecayBase => 0.2;
 
         protected override double DecayWeight => 0.94;
+
+        protected override int SectionLength => 750;
 
         protected readonly float HalfCatcherWidth;
 
