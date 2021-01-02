@@ -35,7 +35,17 @@ namespace osu.Game.Overlays.Settings
 
         private SpriteText labelText;
 
-        public bool ShowsDefaultIndicator = true;
+        private bool showsDefualtIndicator;
+
+        public virtual bool ShowsDefaultIndicator
+        {
+            get => showsDefualtIndicator;
+            set
+            {
+                showsDefualtIndicator = value;
+                restoreDefaultButton.UpdateState();
+            }
+        }
 
         public virtual string LabelText
         {
@@ -80,17 +90,17 @@ namespace osu.Game.Overlays.Settings
 
         public event Action SettingChanged;
 
+        private readonly RestoreDefaultValueButton restoreDefaultButton;
+
         protected SettingsItem()
         {
-            RestoreDefaultValueButton restoreDefaultButton;
-
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Padding = new MarginPadding { Right = SettingsPanel.CONTENT_MARGINS };
 
             InternalChildren = new Drawable[]
             {
-                restoreDefaultButton = new RestoreDefaultValueButton(),
+                restoreDefaultButton = new RestoreDefaultValueButton(this),
                 FlowContent = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
@@ -106,9 +116,7 @@ namespace osu.Game.Overlays.Settings
             {
                 controlWithCurrent.Current.ValueChanged += _ => SettingChanged?.Invoke();
                 controlWithCurrent.Current.DisabledChanged += _ => updateDisabled();
-
-                if (ShowsDefaultIndicator)
-                    restoreDefaultButton.Bindable = controlWithCurrent.Current;
+                restoreDefaultButton.Bindable = controlWithCurrent.Current;
             }
         }
 
@@ -139,8 +147,12 @@ namespace osu.Game.Overlays.Settings
 
             private bool hovering;
 
-            public RestoreDefaultValueButton()
+            private readonly SettingsItem<T> item;
+
+            public RestoreDefaultValueButton(SettingsItem<T> item)
             {
+                this.item = item;
+
                 RelativeSizeAxes = Axes.Y;
                 Width = SettingsPanel.CONTENT_MARGINS;
                 Alpha = 0f;
@@ -198,19 +210,16 @@ namespace osu.Game.Overlays.Settings
                 UpdateState();
             }
 
-            public void SetButtonColour(Color4 buttonColour)
-            {
-                this.buttonColour = buttonColour;
-                UpdateState();
-            }
-
             public void UpdateState()
             {
                 if (bindable == null)
                     return;
 
-                this.FadeTo(bindable.IsDefault ? 0f :
-                    hovering && !bindable.Disabled ? 1f : 0.65f, 200, Easing.OutQuint);
+                if (bindable.IsDefault || !item.ShowsDefaultIndicator)
+                    this.FadeOut(200, Easing.OutQuint);
+                else
+                    this.FadeTo(hovering && !bindable.Disabled ? 1f : 0.65f, 200, Easing.OutQuint);
+
                 this.FadeColour(bindable.Disabled ? Color4.Gray : buttonColour, 200, Easing.OutQuint);
             }
         }

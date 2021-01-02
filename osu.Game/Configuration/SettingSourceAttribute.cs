@@ -9,6 +9,7 @@ using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Settings;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Configuration
 {
@@ -53,6 +54,33 @@ namespace osu.Game.Configuration
 
                 switch (value)
                 {
+                    case OverridableBindable<float> overridable:
+                        yield return new SettingsOverridableSlider<float>(overridable)
+                        {
+                            LabelText = attr.Label,
+                            KeyboardStep = 0.1f,
+                        };
+
+                        break;
+
+                    case OverridableBindable<double> overridable:
+                        yield return new SettingsOverridableSlider<double>(overridable)
+                        {
+                            LabelText = attr.Label,
+                            KeyboardStep = 0.1f,
+                        };
+
+                        break;
+
+                    case OverridableBindable<int> overridable:
+                        yield return new SettingsOverridableSlider<int>(overridable)
+                        {
+                            LabelText = attr.Label,
+                            KeyboardStep = 0.1f,
+                        };
+
+                        break;
+
                     case BindableNumber<float> bNumber:
                         yield return new SettingsSlider<float>
                         {

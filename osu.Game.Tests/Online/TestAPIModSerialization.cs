@@ -53,19 +53,21 @@ namespace osu.Game.Tests.Online
         public void TestDeserialiseTimeRampMod()
         {
             // Create the mod with values different from default.
-            var apiMod = new APIMod(new TestModTimeRamp
+            var apiMod = new APIMod(new TestCustomizableMod
             {
-                AdjustPitch = { Value = false },
-                InitialRate = { Value = 1.25 },
-                FinalRate = { Value = 0.25 }
+                BNumber1 = { Value = 1.25d },
+                BNumber2 = { Value = -5.25f },
+                CustomSetting = { CustomValue = { Value = 3f }, HasCustomValue = { Value = true } },
             });
 
             var deserialised = JsonConvert.DeserializeObject<APIMod>(JsonConvert.SerializeObject(apiMod));
-            var converted = (TestModTimeRamp)deserialised.ToMod(new TestRuleset());
+            var converted = (TestCustomizableMod)deserialised.ToMod(new TestRuleset());
 
-            Assert.That(converted.AdjustPitch.Value, Is.EqualTo(false));
-            Assert.That(converted.InitialRate.Value, Is.EqualTo(1.25));
-            Assert.That(converted.FinalRate.Value, Is.EqualTo(0.25));
+            Assert.That(converted.BNumber1.Value, Is.EqualTo(1.25d));
+            Assert.That(converted.BNumber2.Value, Is.EqualTo(-5.25f));
+            Assert.That(converted.DontChange.HasCustomValue.Value, Is.False);
+            Assert.That(converted.CustomSetting.CustomValue.Value, Is.EqualTo(3f));
+            Assert.That(converted.CustomSetting.HasCustomValue.Value, Is.True);
         }
 
         private class TestRuleset : Ruleset
@@ -73,7 +75,7 @@ namespace osu.Game.Tests.Online
             public override IEnumerable<Mod> GetModsFor(ModType type) => new Mod[]
             {
                 new TestMod(),
-                new TestModTimeRamp(),
+                new TestCustomizableMod(),
             };
 
             public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => throw new System.NotImplementedException();
@@ -102,38 +104,23 @@ namespace osu.Game.Tests.Online
             };
         }
 
-        private class TestModTimeRamp : ModTimeRamp
+        private class TestCustomizableMod : Mod
         {
-            public override string Name => "Test Mod";
-            public override string Acronym => "TMTR";
+            public override string Name => "Test Customizable Mod";
+            public override string Acronym => "TCM";
             public override double ScoreMultiplier => 1;
 
-            [SettingSource("Initial rate", "The starting speed of the track")]
-            public override BindableNumber<double> InitialRate { get; } = new BindableDouble
-            {
-                MinValue = 1,
-                MaxValue = 2,
-                Default = 1.5,
-                Value = 1.5,
-                Precision = 0.01,
-            };
+            [SettingSource("Bindable number #1")]
+            public BindableNumber<double> BNumber1 { get; } = new BindableDouble { MinValue = 1, MaxValue = 10 };
 
-            [SettingSource("Final rate", "The speed increase to ramp towards")]
-            public override BindableNumber<double> FinalRate { get; } = new BindableDouble
-            {
-                MinValue = 0,
-                MaxValue = 1,
-                Default = 0.5,
-                Value = 0.5,
-                Precision = 0.01,
-            };
+            [SettingSource("Bindable number #2")]
+            public BindableNumber<float> BNumber2 { get; } = new BindableFloat { MinValue = -10, MaxValue = -1 };
 
-            [SettingSource("Adjust pitch", "Should pitch be adjusted with speed")]
-            public override BindableBool AdjustPitch { get; } = new BindableBool
-            {
-                Default = true,
-                Value = true
-            };
+            [SettingSource("Don't change this please")]
+            public OverridableBindable<double> DontChange { get; } = new OverridableBindable<double>(6, 6, 10);
+
+            [SettingSource("Custom difficulty setting")]
+            public OverridableBindable<float> CustomSetting { get; } = new OverridableBindable<float>(0, -5, 5);
         }
     }
 }
