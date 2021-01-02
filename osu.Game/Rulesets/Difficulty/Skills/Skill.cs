@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Difficulty.Skills
@@ -14,9 +13,9 @@ namespace osu.Game.Rulesets.Difficulty.Skills
     public abstract class Skill
     {
         /// <summary>
-        /// <see cref="DifficultyHitObject"/>s that were processed previously. They can affect the strain values of the following objects.
+        /// <see cref="DifficultyHitObject"/>s that were processed previously. They can affect the difficulty values of the following objects.
         /// </summary>
-        protected readonly LimitedCapacityStack<DifficultyHitObject> Previous = new LimitedCapacityStack<DifficultyHitObject>(2); // Contained objects not used yet
+        protected readonly Stack<DifficultyHitObject> Previous = new Stack<DifficultyHitObject>(); // Contained objects not used yet
 
         /// <summary>
         /// Visual mods for use in skill calculations.

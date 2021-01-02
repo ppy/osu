@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
@@ -38,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             if (Previous.Count > 0)
             {
-                var osuPrevious = (OsuDifficultyHitObject)Previous[0];
+                var osuPrevious = (OsuDifficultyHitObject)Previous.First();
 
                 if (osuCurrent.Angle != null && osuCurrent.Angle.Value > angle_bonus_begin)
                 {

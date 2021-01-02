@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
@@ -74,8 +75,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
         }
 
         protected override double GetPeakStrain(double offset)
-            => applyDecay(individualStrain, offset - Previous[0].BaseObject.StartTime, individual_decay_base)
-               + applyDecay(overallStrain, offset - Previous[0].BaseObject.StartTime, overall_decay_base);
+            => applyDecay(individualStrain, offset - Previous.First().BaseObject.StartTime, individual_decay_base)
+               + applyDecay(overallStrain, offset - Previous.First().BaseObject.StartTime, overall_decay_base);
 
         private double applyDecay(double value, double deltaTime, double decayBase)
             => value * Math.Pow(decayBase, deltaTime / 1000);
