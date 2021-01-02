@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Layout;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -566,6 +567,15 @@ namespace osu.Game.Screens.Select
         }
 
         #endregion
+
+        protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
+        {
+            // handles the vertical size of the carousel changing (ie. on window resize when aspect ratio has changed).
+            if ((invalidation & Invalidation.Layout) > 0)
+                itemsCache.Invalidate();
+
+            return base.OnInvalidate(invalidation, source);
+        }
 
         protected override void Update()
         {
