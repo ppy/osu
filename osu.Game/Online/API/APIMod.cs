@@ -51,7 +51,7 @@ namespace osu.Game.Online.API
                 if (!Settings.TryGetValue(property.Name.Underscore(), out object settingValue))
                     continue;
 
-                ((IBindable)property.GetValue(resultMod)).Parse(settingValue);
+                resultMod.CopyAdjustedSetting((IBindable)property.GetValue(resultMod), settingValue);
             }
 
             return resultMod;
