@@ -36,7 +36,7 @@ namespace osu.Game.Online.API
 
         public Mod ToMod(Ruleset ruleset)
         {
-            Mod resultMod = ruleset.GetAllMods().FirstOrDefault(m => m.Acronym == Acronym);
+            Mod resultMod = ruleset.GetAllMods().SingleOrDefault(m => m.Acronym == Acronym);
 
             if (resultMod == null)
                 throw new InvalidOperationException($"There is no mod in the ruleset ({ruleset.ShortName}) matching the acronym {Acronym}.");
