@@ -7,11 +7,11 @@ namespace osu.Game.Configuration
 {
     public enum DiscordRichPresenceMode
     {
-        Disabled,
+        Off,
 
         [Description("Hide identifiable information")]
         Limited,
 
-        Enabled
+        Full
     }
 }

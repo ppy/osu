@@ -138,7 +138,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.MenuBackgroundSource, BackgroundSource.Skin);
             Set(OsuSetting.SeasonalBackgroundMode, SeasonalBackgroundMode.Sometimes);
 
-            Set(OsuSetting.DiscordRichPresence, DiscordRichPresenceMode.Enabled);
+            Set(OsuSetting.DiscordRichPresence, DiscordRichPresenceMode.Full);
 
             Set(OsuSetting.EditorWaveformOpacity, 1f);
         }

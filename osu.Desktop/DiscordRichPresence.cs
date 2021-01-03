@@ -82,7 +82,7 @@ namespace osu.Desktop
             if (!client.IsInitialized)
                 return;
 
-            if (status.Value is UserStatusOffline || mode.Value == DiscordRichPresenceMode.Disabled)
+            if (status.Value is UserStatusOffline || mode.Value == DiscordRichPresenceMode.Off)
             {
                 client.ClearPresence();
                 return;
