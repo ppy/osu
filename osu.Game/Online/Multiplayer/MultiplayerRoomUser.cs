@@ -20,7 +20,7 @@ namespace osu.Game.Online.Multiplayer
         /// <summary>
         /// The availability state of the beatmap, set to <see cref="DownloadState.LocallyAvailable"/> by default.
         /// </summary>
-        public BeatmapAvailability BeatmapAvailability { get; set; } = new BeatmapAvailability(DownloadState.LocallyAvailable);
+        public BeatmapAvailability BeatmapAvailability { get; set; } = BeatmapAvailability.LocallyAvailable();
 
         public User? User { get; set; }
 
