@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         /// <param name="time">The time to retrieve the peak strain at.</param>
         /// <returns>The peak strain.</returns>
-        protected virtual double GetPeakStrain(double time) => CurrentStrain * strainDecay(time - Previous.First().StartTime);
+        protected virtual double GetPeakStrain(double time) => CurrentStrain * strainDecay(time - Previous.Peek().StartTime);
 
         /// <summary>
         /// Returns the calculated difficulty value representing all processed <see cref="DifficultyHitObject"/>s.

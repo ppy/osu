@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             if (Previous.Count > 0)
             {
-                var osuPrevious = (OsuDifficultyHitObject)Previous.First();
+                var osuPrevious = (OsuDifficultyHitObject)Previous.Peek();
 
                 if (osuCurrent.Angle != null && osuCurrent.Angle.Value > angle_bonus_begin)
                 {
