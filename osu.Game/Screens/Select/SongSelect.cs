@@ -428,7 +428,10 @@ namespace osu.Game.Screens.Select
 
         private void updateSelectedBeatmap(BeatmapInfo beatmap)
         {
-            if (beatmap == null || beatmap.Equals(beatmapNoDebounce))
+            if (beatmap == null && beatmapNoDebounce == null)
+                return;
+
+            if (beatmap?.Equals(beatmapNoDebounce) == true)
                 return;
 
             beatmapNoDebounce = beatmap;
