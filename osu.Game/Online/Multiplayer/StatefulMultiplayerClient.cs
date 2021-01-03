@@ -184,6 +184,8 @@ namespace osu.Game.Online.Multiplayer
 
         public abstract Task ChangeState(MultiplayerUserState newState);
 
+        public abstract Task ChangeBeatmapAvailability(BeatmapAvailability newBeatmapAvailability);
+
         public abstract Task StartMatch();
 
         Task IMultiplayerClient.RoomStateChanged(MultiplayerRoomState state)
@@ -304,6 +306,24 @@ namespace osu.Game.Online.Multiplayer
                 Room.Users.Single(u => u.UserID == userId).State = state;
 
                 updateUserPlayingState(userId, state);
+
+                RoomUpdated?.Invoke();
+            }, false);
+
+            return Task.CompletedTask;
+        }
+
+        Task IMultiplayerClient.UserBeatmapAvailabilityChanged(int userId, BeatmapAvailability beatmapAvailability)
+        {
+            if (Room == null)
+                return Task.CompletedTask;
+
+            Scheduler.Add(() =>
+            {
+                if (Room == null)
+                    return;
+
+                Room.Users.Single(u => u.UserID == userId).BeatmapAvailability = beatmapAvailability;
 
                 RoomUpdated?.Invoke();
             }, false);
