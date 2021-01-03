@@ -20,34 +20,16 @@ namespace osu.Game.Online.Rooms
         /// </summary>
         public readonly double? DownloadProgress;
 
-        /// <summary>
-        /// Constructs a new non-<see cref="DownloadState.Downloading"/> beatmap availability state.
-        /// </summary>
-        /// <param name="state">The beatmap availability state.</param>
-        /// <exception cref="ArgumentException">Throws if <see cref="DownloadState.Downloading"/> was specified in this constructor, as it has its own constructor (see <see cref="BeatmapAvailability(DownloadState, double)"/>.</exception>
-        public BeatmapAvailability(DownloadState state)
+        private BeatmapAvailability(DownloadState state, double? downloadProgress = null)
         {
-            if (state == DownloadState.Downloading)
-                throw new ArgumentException($"{nameof(DownloadState.Downloading)} state has its own constructor, use it instead.");
-
             State = state;
-            DownloadProgress = null;
-        }
-
-        /// <summary>
-        /// Constructs a new <see cref="DownloadState.Downloading"/>-specific beatmap availability state.
-        /// </summary>
-        /// <param name="state">The beatmap availability state (always <see cref="DownloadState.Downloading"/>).</param>
-        /// <param name="downloadProgress">The beatmap's downloading current progress.</param>
-        /// <exception cref="ArgumentException">Throws if non-<see cref="DownloadState.Downloading"/> was specified in this constructor, as they have their own constructor (see <see cref="BeatmapAvailability(DownloadState)"/>.</exception>
-        public BeatmapAvailability(DownloadState state, double downloadProgress)
-        {
-            if (state != DownloadState.Downloading)
-                throw new ArgumentException($"This is a constructor specific for {DownloadState.Downloading} state, use the regular one instead.");
-
-            State = DownloadState.Downloading;
             DownloadProgress = downloadProgress;
         }
+
+        public static BeatmapAvailability NotDownload() => new BeatmapAvailability(DownloadState.NotDownloaded);
+        public static BeatmapAvailability Downloading(double progress) => new BeatmapAvailability(DownloadState.Downloading, progress);
+        public static BeatmapAvailability Downloaded() => new BeatmapAvailability(DownloadState.Downloaded);
+        public static BeatmapAvailability LocallyAvailable() => new BeatmapAvailability(DownloadState.LocallyAvailable);
 
         public bool Equals(BeatmapAvailability other) => other != null && State == other.State && DownloadProgress == other.DownloadProgress;
 
