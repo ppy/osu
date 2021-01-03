@@ -428,7 +428,7 @@ namespace osu.Game.Screens.Select
 
         private void updateSelectedBeatmap(BeatmapInfo beatmap)
         {
-            if (beatmap?.Equals(beatmapNoDebounce) == true)
+            if (beatmap == null || beatmap.Equals(beatmapNoDebounce))
                 return;
 
             beatmapNoDebounce = beatmap;
@@ -438,7 +438,7 @@ namespace osu.Game.Screens.Select
 
         private void updateSelectedRuleset(RulesetInfo ruleset)
         {
-            if (ruleset?.Equals(rulesetNoDebounce) == true)
+            if (ruleset == null || ruleset.Equals(rulesetNoDebounce))
                 return;
 
             rulesetNoDebounce = ruleset;
