@@ -734,12 +734,6 @@ namespace osu.Game.Screens.Select
         private const float panel_padding = 5;
 
         /// <summary>
-        /// After loading, we want to invoke a selection changed event at least once.
-        /// This handles the case where this event is potentially sending a null selection.
-        /// </summary>
-        private bool sentInitialSelectionEvent;
-
-        /// <summary>
         /// Computes the target Y positions for every item in the carousel.
         /// </summary>
         /// <returns>The Y position of the currently selected item.</returns>
@@ -802,12 +796,10 @@ namespace osu.Game.Screens.Select
             {
                 bool selectionLost = selectedBeatmapSet != null && selectedBeatmapSet.State.Value != CarouselItemState.Selected;
 
-                if (selectionLost || !sentInitialSelectionEvent)
+                if (selectionLost)
                 {
                     selectedBeatmapSet = null;
                     SelectionChanged?.Invoke(null);
-
-                    sentInitialSelectionEvent = true;
                 }
             }
         }
