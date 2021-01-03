@@ -114,10 +114,10 @@ namespace osu.Game.Rulesets.Mods
             bindable.ValueChanged += _ => userChangedSettings[bindable] = !bindable.IsDefault;
         }
 
-        internal override void CopyAdjustedSetting(IBindable bindable, object value)
+        internal override void CopyAdjustedSetting(IBindable target, object source)
         {
-            userChangedSettings[bindable] = true;
-            base.CopyAdjustedSetting(bindable, value);
+            userChangedSettings[target] = true;
+            base.CopyAdjustedSetting(target, source);
         }
 
         /// <summary>
