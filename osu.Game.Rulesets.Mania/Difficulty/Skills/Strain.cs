@@ -3,13 +3,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 {
@@ -38,7 +36,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
         protected override double StrainValueOf(DifficultyHitObject current)
         {
             var maniaCurrent = (ManiaDifficultyHitObject)current;
-            var endTime = maniaCurrent.BaseObject.GetEndTime();
+            var endTime = maniaCurrent.EndTime;
             var column = maniaCurrent.BaseObject.Column;
 
             double holdFactor = 1.0; // Factor to all additional strains in case something else is held
@@ -48,7 +46,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             for (int i = 0; i < holdEndTimes.Length; ++i)
             {
                 // If there is at least one other overlapping end or note, then we get an addition, buuuuuut...
-                if (Precision.DefinitelyBigger(holdEndTimes[i], maniaCurrent.BaseObject.StartTime, 1) && Precision.DefinitelyBigger(endTime, holdEndTimes[i], 1))
+                if (Precision.DefinitelyBigger(holdEndTimes[i], maniaCurrent.StartTime, 1) && Precision.DefinitelyBigger(endTime, holdEndTimes[i], 1))
                     holdAddition = 1.0;
 
                 // ... this addition only is valid if there is _no_ other note with the same ending. Releasing multiple notes at the same time is just as easy as releasing 1
@@ -75,8 +73,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
         }
 
         protected override double GetPeakStrain(double offset)
-            => applyDecay(individualStrain, offset - Previous.Peek().BaseObject.StartTime, individual_decay_base)
-               + applyDecay(overallStrain, offset - Previous.Peek().BaseObject.StartTime, overall_decay_base);
+            => applyDecay(individualStrain, offset - Previous.Peek().StartTime, individual_decay_base)
+               + applyDecay(overallStrain, offset - Previous.Peek().StartTime, overall_decay_base);
 
         private double applyDecay(double value, double deltaTime, double decayBase)
             => value * Math.Pow(decayBase, deltaTime / 1000);

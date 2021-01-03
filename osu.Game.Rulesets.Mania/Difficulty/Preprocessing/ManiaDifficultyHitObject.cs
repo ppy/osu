@@ -11,9 +11,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Preprocessing
     {
         public new ManiaHitObject BaseObject => (ManiaHitObject)base.BaseObject;
 
+        public double EndTime { get; private set; }
+
         public ManiaDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate)
             : base(hitObject, lastObject, clockRate)
         {
+            EndTime = hitObject.GetEndTime() / clockRate;
         }
     }
 }
