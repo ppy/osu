@@ -125,6 +125,8 @@ namespace osu.Game.Screens.Select
             {
                 BeatmapSetsChanged?.Invoke();
                 BeatmapSetsLoaded = true;
+
+                itemsCache.Invalidate();
             });
         }
 
@@ -732,6 +734,12 @@ namespace osu.Game.Screens.Select
         private const float panel_padding = 5;
 
         /// <summary>
+        /// After loading, we want to invoke a selection changed event at least once.
+        /// This handles the case where this event is potentially sending a null selection.
+        /// </summary>
+        private bool sentInitialSelectionEvent;
+
+        /// <summary>
         /// Computes the target Y positions for every item in the carousel.
         /// </summary>
         /// <returns>The Y position of the currently selected item.</returns>
@@ -787,13 +795,21 @@ namespace osu.Game.Screens.Select
 
             Scroll.ScrollContent.Height = currentY;
 
-            if (BeatmapSetsLoaded && (selectedBeatmapSet == null || selectedBeatmap == null || selectedBeatmapSet.State.Value != CarouselItemState.Selected))
-            {
-                selectedBeatmapSet = null;
-                SelectionChanged?.Invoke(null);
-            }
-
             itemsCache.Validate();
+
+            // update and let external consumers know about selection loss.
+            if (BeatmapSetsLoaded)
+            {
+                bool selectionLost = selectedBeatmapSet != null && selectedBeatmapSet.State.Value != CarouselItemState.Selected;
+
+                if (selectionLost || !sentInitialSelectionEvent)
+                {
+                    selectedBeatmapSet = null;
+                    SelectionChanged?.Invoke(null);
+
+                    sentInitialSelectionEvent = true;
+                }
+            }
         }
 
         private bool firstScroll = true;
@@ -816,14 +832,13 @@ namespace osu.Game.Screens.Select
                         break;
 
                     case PendingScrollOperation.Immediate:
+
                         // in order to simplify animation logic, rather than using the animated version of ScrollTo,
                         // we take the difference in scroll height and apply to all visible panels.
                         // this avoids edge cases like when the visible panels is reduced suddenly, causing ScrollContainer
                         // to enter clamp-special-case mode where it animates completely differently to normal.
                         float scrollChange = scrollTarget.Value - Scroll.Current;
-
                         Scroll.ScrollTo(scrollTarget.Value, false);
-
                         foreach (var i in Scroll.Children)
                             i.Y += scrollChange;
                         break;
