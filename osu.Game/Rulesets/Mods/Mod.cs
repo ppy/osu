@@ -150,7 +150,17 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         /// <param name="bindable">The target bindable to apply the adjustment.</param>
         /// <param name="value">The adjustment to apply.</param>
-        internal virtual void CopyAdjustedSetting(IBindable bindable, object value) => bindable.Parse(value);
+        internal virtual void CopyAdjustedSetting(IBindable bindable, object value)
+        {
+            if (value is IBindable incoming)
+            {
+                //copy including transfer of default values.
+                bindable.BindTo(incoming);
+                bindable.UnbindFrom(incoming);
+            }
+            else
+                bindable.Parse(value);
+        }
 
         public bool Equals(IMod other) => GetType() == other?.GetType();
     }
