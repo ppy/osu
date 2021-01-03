@@ -8,7 +8,7 @@ namespace osu.Game.Online.Rooms
     /// <summary>
     /// The local availability information about a certain beatmap for the client.
     /// </summary>
-    public readonly struct BeatmapAvailability : IEquatable<BeatmapAvailability>
+    public class BeatmapAvailability : IEquatable<BeatmapAvailability>
     {
         /// <summary>
         /// The beatmap's availability state.
@@ -49,7 +49,7 @@ namespace osu.Game.Online.Rooms
             DownloadProgress = downloadProgress;
         }
 
-        public bool Equals(BeatmapAvailability other) => State == other.State && DownloadProgress == other.DownloadProgress;
+        public bool Equals(BeatmapAvailability other) => other != null && State == other.State && DownloadProgress == other.DownloadProgress;
 
         public override string ToString() => $"{string.Join(", ", State, $"{DownloadProgress:0.00%}")}";
     }
