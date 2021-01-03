@@ -31,7 +31,12 @@ namespace osu.Game.Online.API
             Acronym = mod.Acronym;
 
             foreach (var (_, property) in mod.GetSettingsSourceProperties())
-                Settings.Add(property.Name.Underscore(), property.GetValue(mod));
+            {
+                var bindable = (IBindable)property.GetValue(mod);
+
+                if (!bindable.IsDefault)
+                    Settings.Add(property.Name.Underscore(), property.GetValue(mod));
+            }
         }
 
         public Mod ToMod(Ruleset ruleset)

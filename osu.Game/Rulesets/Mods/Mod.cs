@@ -84,12 +84,10 @@ namespace osu.Game.Rulesets.Mods
 
                 foreach ((SettingSourceAttribute attr, PropertyInfo property) in this.GetOrderedSettingsSourceProperties())
                 {
-                    object bindableObj = property.GetValue(this);
+                    var bindable = (IBindable)property.GetValue(this);
 
-                    if ((bindableObj as IHasDefaultValue)?.IsDefault == true)
-                        continue;
-
-                    tooltipTexts.Add($"{attr.Label} {bindableObj}");
+                    if (!bindable.IsDefault)
+                        tooltipTexts.Add($"{attr.Label} {bindable}");
                 }
 
                 return string.Join(", ", tooltipTexts.Where(s => !string.IsNullOrEmpty(s)));
