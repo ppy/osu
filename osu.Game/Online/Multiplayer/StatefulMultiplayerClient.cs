@@ -320,10 +320,13 @@ namespace osu.Game.Online.Multiplayer
 
             Scheduler.Add(() =>
             {
-                if (Room == null)
+                var user = Room?.Users.SingleOrDefault(u => u.UserID == userId);
+
+                // we don't care whether the room doesn't exist or user isn't in joined room, just return in that point.
+                if (user == null)
                     return;
 
-                Room.Users.Single(u => u.UserID == userId).BeatmapAvailability = beatmapAvailability;
+                user.BeatmapAvailability = beatmapAvailability;
 
                 RoomUpdated?.Invoke();
             }, false);
