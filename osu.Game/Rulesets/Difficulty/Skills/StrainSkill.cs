@@ -115,7 +115,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             double difficulty = 0;
             double weight = 1;
 
-            var finalStrainPeaks = strainPeaks.Select(p => p).ToList(); // Copy list so we don't create side effects
+            var finalStrainPeaks = strainPeaks.ToList(); // Copy list so we don't create side effects
             finalStrainPeaks.Add(currentSectionPeak); // Add final peak since it never gets saved
 
             // Difficulty is the weighted sum of the highest strains from every section.
