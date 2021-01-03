@@ -5,6 +5,7 @@
 
 using System;
 using Newtonsoft.Json;
+using osu.Game.Online.Rooms;
 using osu.Game.Users;
 
 namespace osu.Game.Online.Multiplayer
@@ -15,6 +16,11 @@ namespace osu.Game.Online.Multiplayer
         public readonly int UserID;
 
         public MultiplayerUserState State { get; set; } = MultiplayerUserState.Idle;
+
+        /// <summary>
+        /// The availability state of the beatmap, set to <see cref="DownloadState.LocallyAvailable"/> by default.
+        /// </summary>
+        public BeatmapAvailability BeatmapAvailability { get; set; } = new BeatmapAvailability(DownloadState.LocallyAvailable);
 
         public User? User { get; set; }
 
