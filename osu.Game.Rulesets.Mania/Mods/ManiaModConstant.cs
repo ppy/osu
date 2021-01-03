@@ -12,8 +12,8 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModConstant : Mod, IApplicableToBeatmap
     {
-        public override string Name => "Constant";
-        public override string Acronym => "CT";
+        public override string Name => "Fixed Scroll";
+        public override string Acronym => "FS";
         public override double ScoreMultiplier => 1;
         public override string Description => "No more tricky note speed changes!";
         public override IconUsage? Icon => FontAwesome.Solid.BalanceScale;
