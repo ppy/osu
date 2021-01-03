@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
@@ -49,8 +48,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         /// </summary>
         private int notesSinceRhythmChange;
 
-        public Rhythm(List<ModWithVisibilityAdjustment> visualMods)
-            : base(visualMods)
+        public Rhythm(Mod[] mods)
+            : base(mods)
         {
         }
 

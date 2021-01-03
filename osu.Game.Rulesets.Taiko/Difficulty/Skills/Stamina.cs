@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
@@ -50,10 +49,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         /// <summary>
         /// Creates a <see cref="Stamina"/> skill.
         /// </summary>
-        /// <param name="visualMods">Visual mods for use in skill calculations.</param>
+        /// <param name="mods">Mods for use in skill calculations.</param>
         /// <param name="rightHand">Whether this instance is performing calculations for the right hand.</param>
-        public Stamina(List<ModWithVisibilityAdjustment> visualMods, bool rightHand)
-            : base(visualMods)
+        public Stamina(Mod[] mods, bool rightHand)
+            : base(mods)
         {
             hand = rightHand ? 1 : 0;
         }

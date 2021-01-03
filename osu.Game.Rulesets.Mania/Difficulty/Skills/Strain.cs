@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
@@ -25,8 +24,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
         private double individualStrain;
         private double overallStrain;
 
-        public Strain(List<ModWithVisibilityAdjustment> visualMods, int totalColumns)
-            : base(visualMods)
+        public Strain(Mod[] mods, int totalColumns)
+            : base(mods)
         {
             holdEndTimes = new double[totalColumns];
             individualStrains = new double[totalColumns];

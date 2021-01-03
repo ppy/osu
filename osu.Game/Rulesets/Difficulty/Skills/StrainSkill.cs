@@ -52,8 +52,8 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
         private readonly List<double> strainPeaks = new List<double>();
 
-        protected StrainSkill(List<ModWithVisibilityAdjustment> visualMods)
-            : base(visualMods)
+        protected StrainSkill(Mod[] mods)
+            : base(mods)
         {
         }
 

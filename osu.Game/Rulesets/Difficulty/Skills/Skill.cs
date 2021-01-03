@@ -20,13 +20,13 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Visual mods for use in skill calculations.
         /// </summary>
-        protected IReadOnlyList<ModWithVisibilityAdjustment> VisualMods => visualMods;
+        protected IReadOnlyList<Mod> Mods => mods;
 
-        private readonly List<ModWithVisibilityAdjustment> visualMods;
+        private readonly Mod[] mods;
 
-        protected Skill(List<ModWithVisibilityAdjustment> visualMods)
+        protected Skill(Mod[] mods)
         {
-            this.visualMods = visualMods;
+            this.mods = mods;
         }
 
         /// <summary>
