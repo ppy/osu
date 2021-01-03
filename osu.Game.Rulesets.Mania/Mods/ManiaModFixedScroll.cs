@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public class ManiaModConstant : Mod, IApplicableToBeatmap
+    public class ManiaModFixedScroll : Mod, IApplicableToBeatmap
     {
         public override string Name => "Fixed Scroll";
         public override string Acronym => "FS";
