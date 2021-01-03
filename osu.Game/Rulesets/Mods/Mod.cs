@@ -148,18 +148,18 @@ namespace osu.Game.Rulesets.Mods
         /// When creating copies or clones of a Mod, this method will be called to copy explicitly adjusted user settings.
         /// The base implementation will transfer the value via <see cref="Bindable{T}.Parse"/> and should be called unless replaced with custom logic.
         /// </summary>
-        /// <param name="bindable">The target bindable to apply the adjustment.</param>
-        /// <param name="value">The adjustment to apply.</param>
-        internal virtual void CopyAdjustedSetting(IBindable bindable, object value)
+        /// <param name="target">The target bindable to apply the adjustment.</param>
+        /// <param name="source">The adjustment to apply.</param>
+        internal virtual void CopyAdjustedSetting(IBindable target, object source)
         {
-            if (value is IBindable incoming)
+            if (source is IBindable sourceBindable)
             {
                 //copy including transfer of default values.
-                bindable.BindTo(incoming);
-                bindable.UnbindFrom(incoming);
+                target.BindTo(sourceBindable);
+                target.UnbindFrom(sourceBindable);
             }
             else
-                bindable.Parse(value);
+                target.Parse(source);
         }
 
         public bool Equals(IMod other) => GetType() == other?.GetType();
