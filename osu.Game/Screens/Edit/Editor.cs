@@ -483,6 +483,8 @@ namespace osu.Game.Screens.Edit
             Background.FadeColour(Color4.White, 500);
             resetTrack();
 
+            Beatmap.Value = beatmapManager.GetWorkingBeatmap(Beatmap.Value.BeatmapInfo);
+
             return base.OnExiting(next);
         }
 
