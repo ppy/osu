@@ -111,7 +111,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(1500, background.Elements[0].StartTime);
                 Assert.AreEqual(1000, background.Elements[1].StartTime);
 
-                Assert.AreEqual(1000, storyboard.FirstEventTime);
+                Assert.AreEqual(1000, storyboard.EarliestEventTime);
             }
         }
 
