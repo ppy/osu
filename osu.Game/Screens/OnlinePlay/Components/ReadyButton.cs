@@ -39,9 +39,9 @@ namespace osu.Game.Screens.OnlinePlay.Components
             SelectedItem.BindValueChanged(item => updateSelectedItem(item.NewValue), true);
         }
 
-        private void updateSelectedItem(PlaylistItem _) => updateBeatmapState();
-        private void beatmapUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> _) => updateBeatmapState();
-        private void beatmapRemoved(ValueChangedEvent<WeakReference<BeatmapSetInfo>> _) => updateBeatmapState();
+        private void updateSelectedItem(PlaylistItem _) => Scheduler.AddOnce(updateBeatmapState);
+        private void beatmapUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> _) => Scheduler.AddOnce(updateBeatmapState);
+        private void beatmapRemoved(ValueChangedEvent<WeakReference<BeatmapSetInfo>> _) => Scheduler.AddOnce(updateBeatmapState);
 
         private void updateBeatmapState()
         {
