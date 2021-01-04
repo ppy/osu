@@ -222,7 +222,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 var positionInStack = CaughtObjectContainer.GetPositionInStack(catchPosition, objectRadius);
 
                 Debug.Assert(catchResult.CaughtObjectEntry == null);
-                catchResult.CaughtObjectEntry = placeCaughtObject(palpableObject, positionInStack);
+                catchResult.CaughtObjectEntry = CaughtObjectContainer.AddCaughtObject(palpableObject, positionInStack, stackMirrorDirection);
 
                 if (hitLighting.Value)
                     addLighting(hitObject, positionInStack.X, drawableObject.AccentColour.Value);
@@ -461,18 +461,9 @@ namespace osu.Game.Rulesets.Catch.UI
             updateCatcher();
         }
 
-        private CaughtObjectEntry placeCaughtObject(DrawablePalpableCatchHitObject source, Vector2 positionInStack)
-        {
-            var entry = source.HitObject is Droplet
-                ? CaughtObjectContainer.AddDroppedObject(source, positionInStack, DroppedObjectAnimation.Explode, stackMirrorDirection)
-                : CaughtObjectContainer.AddStackedObject(source, positionInStack);
-
-            return entry;
-        }
-
         private void removeCaughtObject(CaughtObjectEntry entry)
         {
-            bool removed = CaughtObjectContainer.RemoveEntry(entry);
+            bool removed = CaughtObjectContainer.RemoveCaughtObject(entry);
             Debug.Assert(removed);
         }
 

@@ -117,7 +117,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             stackFruit();
             seekTime(10000);
             dropAll();
-            AddStep("remove stacked object", () => caughtObjectContainer.RemoveEntry(lastEntry));
+            AddStep("remove stacked object", () => caughtObjectContainer.RemoveCaughtObject(lastEntry));
             checkDroppedObjects(0);
             seekTime(0);
             checkStackedObjects(0);
@@ -195,9 +195,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 HitObject = !droplet ? (PalpableCatchHitObject)new Fruit() : new Droplet()
             };
 
-            lastEntry = droplet
-                ? caughtObjectContainer.AddDroppedObject(objectState, positionInStack, DroppedObjectAnimation.Explode, 1)
-                : caughtObjectContainer.AddStackedObject(objectState, positionInStack);
+            lastEntry = caughtObjectContainer.AddCaughtObject(objectState, positionInStack, 1);
         }
 
         private class TestCatchObjectState : IHasCatchObjectState

@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         /// <summary>
         /// The randomness used to compute position in stack.
-        /// It is incremented for each <see cref="AddStackedObject"/> or <see cref="AddDroppedObject"/> call and decremented for each <see cref="RemoveEntry"/> call to make a replay consistent.
+        /// It is incremented for each <see cref="addStackedObject"/> or <see cref="addDroppedObject"/> call and decremented for each <see cref="RemoveCaughtObject"/> call to make a replay consistent.
         /// </summary>
         private int randomSeed = 1;
 
@@ -56,51 +56,20 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         /// <summary>
         /// Add a caught object to the stack.
+        /// If the caught object is a droplet, it is dropped from the stack immediately.
         /// </summary>
         /// <param name="source">The source of the caught object.</param>
         /// <param name="positionInStack">The position of the caught object.</param>
-        /// <returns>The caught object entry of the stacked object.</returns>
-        public CaughtObjectEntry AddStackedObject(IHasCatchObjectState source, Vector2 positionInStack)
-        {
-            var delayedDropEntry = new DroppedObjectEntry(positionInStack, source);
-            var stackEntry = new StackedObjectEntry(positionInStack, delayedDropEntry, source);
-
-            addImmediateEntry(stackEntry);
-
-            // Add the stack entry to the alive object set now to make it available
-            // when `DropStackedObjects` or `GetPositionInStack` is called before `lifetimeManager.Update`.
-            aliveStackedObjects.Add(stackEntry);
-
-            randomSeed++;
-
-            return stackEntry;
-        }
-
-        /// <summary>
-        /// Immediately drop a caught object.
-        /// </summary>
-        /// <param name="source">The source of the caught object.</param>
-        /// <param name="positionInStack">The position the object dropped from.</param>
-        /// <param name="animation">The animation played on the dropped object.</param>
         /// <param name="mirrorDirection">The current direction of the stack, specified by 1 or -1.</param>
-        /// <returns>The caught object entry of the dropped object.</returns>
-        public CaughtObjectEntry AddDroppedObject(IHasCatchObjectState source, Vector2 positionInStack, DroppedObjectAnimation animation, int mirrorDirection)
+        /// <returns>The caught object entry.</returns>
+        public CaughtObjectEntry AddCaughtObject(IHasCatchObjectState source, Vector2 positionInStack, int mirrorDirection)
         {
             if (Math.Abs(mirrorDirection) != 1)
                 throw new InvalidOperationException($"{nameof(mirrorDirection)} must be either 1 or -1");
 
-            var dropEntry = new DroppedObjectEntry(positionInStack, source)
-            {
-                Animation = animation,
-                DropPosition = getCurrentDropPosition(positionInStack),
-                MirrorDirection = mirrorDirection
-            };
-
-            addImmediateEntry(dropEntry);
-
-            randomSeed++;
-
-            return dropEntry;
+            return source.HitObject is Droplet
+                ? addDroppedObject(source, positionInStack, DroppedObjectAnimation.Explode, mirrorDirection)
+                : addStackedObject(source, positionInStack);
         }
 
         /// <summary>
@@ -108,7 +77,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         /// </summary>
         /// <param name="entry">The caught object entry to remove.</param>
         /// <returns>Whether the caught object is removed.</returns>
-        public bool RemoveEntry(CaughtObjectEntry entry)
+        public bool RemoveCaughtObject(CaughtObjectEntry entry)
         {
             randomSeed--;
 
@@ -192,6 +161,52 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
                 aliveStackedObjects.Remove(stackEntry);
 
             removeDrawable(entry);
+        }
+
+        /// <summary>
+        /// Add a caught object to the stack.
+        /// </summary>
+        /// <param name="source">The source of the caught object.</param>
+        /// <param name="positionInStack">The position of the caught object.</param>
+        /// <returns>The caught object entry of the stacked object.</returns>
+        private CaughtObjectEntry addStackedObject(IHasCatchObjectState source, Vector2 positionInStack)
+        {
+            var delayedDropEntry = new DroppedObjectEntry(positionInStack, source);
+            var stackEntry = new StackedObjectEntry(positionInStack, delayedDropEntry, source);
+
+            addImmediateEntry(stackEntry);
+
+            // Add the stack entry to the alive object set now to make it available
+            // when `DropStackedObjects` or `GetPositionInStack` is called before `lifetimeManager.Update`.
+            aliveStackedObjects.Add(stackEntry);
+
+            randomSeed++;
+
+            return stackEntry;
+        }
+
+        /// <summary>
+        /// Immediately drop a caught object.
+        /// </summary>
+        /// <param name="source">The source of the caught object.</param>
+        /// <param name="positionInStack">The position the object dropped from.</param>
+        /// <param name="animation">The animation played on the dropped object.</param>
+        /// <param name="mirrorDirection">The current direction of the stack, specified by 1 or -1.</param>
+        /// <returns>The caught object entry of the dropped object.</returns>
+        private CaughtObjectEntry addDroppedObject(IHasCatchObjectState source, Vector2 positionInStack, DroppedObjectAnimation animation, int mirrorDirection)
+        {
+            var dropEntry = new DroppedObjectEntry(positionInStack, source)
+            {
+                Animation = animation,
+                DropPosition = getCurrentDropPosition(positionInStack),
+                MirrorDirection = mirrorDirection
+            };
+
+            addImmediateEntry(dropEntry);
+
+            randomSeed++;
+
+            return dropEntry;
         }
 
         private void addImmediateEntry(CaughtObjectEntry entry)
