@@ -52,7 +52,15 @@ namespace osu.Game.Screens.OnlinePlay.Components
                 return;
 
             var databasedBeatmap = beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == beatmapId && b.MD5Hash == checksum);
-            hasBeatmap = databasedBeatmap != null && !databasedBeatmap.BeatmapSet.DeletePending;
+
+            if (databasedBeatmap == null)
+                hasBeatmap = false;
+            else
+            {
+                // DeletePending isn't updated in the beatmap info query above, need to directly query the beatmap set from database as well.
+                var databasedSet = beatmaps.QueryBeatmapSet(s => s.Equals(databasedBeatmap.BeatmapSet));
+                hasBeatmap = databasedSet?.DeletePending == false;
+            }
         }
 
         protected override void Update()
