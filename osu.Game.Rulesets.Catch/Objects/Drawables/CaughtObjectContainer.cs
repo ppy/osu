@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
         /// <summary>
         /// The randomness used to compute position in stack.
-        /// It is incremented for each <see cref="AddStackObject"/> or <see cref="AddDropObject"/> call and decremented for each <see cref="RemoveEntry"/> call to make a replay consistent.
+        /// It is incremented for each <see cref="AddStackedObject"/> or <see cref="AddDroppedObject"/> call and decremented for each <see cref="RemoveEntry"/> call to make a replay consistent.
         /// </summary>
         private int randomSeed = 1;
 
@@ -57,7 +57,10 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         /// <summary>
         /// Add a caught object to the stack.
         /// </summary>
-        public CaughtObjectEntry AddStackObject(IHasCatchObjectState source, Vector2 positionInStack)
+        /// <param name="source">The source of the caught object.</param>
+        /// <param name="positionInStack">The position of the caught object.</param>
+        /// <returns>The caught object entry of the stacked object.</returns>
+        public CaughtObjectEntry AddStackedObject(IHasCatchObjectState source, Vector2 positionInStack)
         {
             var delayedDropEntry = new DroppedObjectEntry(positionInStack, source);
             var stackEntry = new StackedObjectEntry(positionInStack, delayedDropEntry, source);
@@ -76,8 +79,16 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         /// <summary>
         /// Immediately drop a caught object.
         /// </summary>
-        public CaughtObjectEntry AddDropObject(IHasCatchObjectState source, Vector2 positionInStack, DroppedObjectAnimation animation, int mirrorDirection)
+        /// <param name="source">The source of the caught object.</param>
+        /// <param name="positionInStack">The position the object dropped from.</param>
+        /// <param name="animation">The animation played on the dropped object.</param>
+        /// <param name="mirrorDirection">The current direction of the stack, specified by 1 or -1.</param>
+        /// <returns>The caught object entry of the dropped object.</returns>
+        public CaughtObjectEntry AddDroppedObject(IHasCatchObjectState source, Vector2 positionInStack, DroppedObjectAnimation animation, int mirrorDirection)
         {
+            if (Math.Abs(mirrorDirection) != 1)
+                throw new InvalidOperationException($"{nameof(mirrorDirection)} must be either 1 or -1");
+
             var dropEntry = new DroppedObjectEntry(positionInStack, source)
             {
                 Animation = animation,
@@ -93,8 +104,10 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         }
 
         /// <summary>
-        /// Remove caught objects
+        /// Remove a caught object.
         /// </summary>
+        /// <param name="entry">The caught object entry to remove.</param>
+        /// <returns>Whether the caught object is removed.</returns>
         public bool RemoveEntry(CaughtObjectEntry entry)
         {
             randomSeed--;
@@ -102,6 +115,12 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             return removeImmediateEntry(entry);
         }
 
+        /// <summary>
+        /// Compute the stacked object position.
+        /// </summary>
+        /// <param name="position">The initial position of the object.</param>
+        /// <param name="displayRadius">The size used for the collision detection in the stack.</param>
+        /// <returns>The position in the stack.</returns>
         public Vector2 GetPositionInStack(Vector2 position, float displayRadius)
         {
             const float radius_div_2 = CatchHitObject.OBJECT_RADIUS / 2;
@@ -124,8 +143,16 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
             return position;
         }
 
+        /// <summary>
+        /// Drop all stacked objects.
+        /// </summary>
+        /// <param name="animation">The animation played on the dropped objects.</param>
+        /// <param name="mirrorDirection">The current direction of the stack, specified by 1 or -1.</param>
         public void DropStackedObjects(DroppedObjectAnimation animation, int mirrorDirection)
         {
+            if (Math.Abs(mirrorDirection) != 1)
+                throw new InvalidOperationException($"{nameof(mirrorDirection)} must be either 1 or -1");
+
             double currentTime = Clock.CurrentTime;
 
             foreach (var stackEntry in aliveStackedObjects)

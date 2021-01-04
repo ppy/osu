@@ -464,8 +464,8 @@ namespace osu.Game.Rulesets.Catch.UI
         private CaughtObjectEntry placeCaughtObject(DrawablePalpableCatchHitObject source, Vector2 positionInStack)
         {
             var entry = source.HitObject is Droplet
-                ? CaughtObjectContainer.AddDropObject(source, positionInStack, DroppedObjectAnimation.Explode, stackMirrorDirection)
-                : CaughtObjectContainer.AddStackObject(source, positionInStack);
+                ? CaughtObjectContainer.AddDroppedObject(source, positionInStack, DroppedObjectAnimation.Explode, stackMirrorDirection)
+                : CaughtObjectContainer.AddStackedObject(source, positionInStack);
 
             return entry;
         }

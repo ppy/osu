@@ -196,8 +196,8 @@ namespace osu.Game.Rulesets.Catch.Tests
             };
 
             lastEntry = droplet
-                ? caughtObjectContainer.AddDropObject(objectState, positionInStack, DroppedObjectAnimation.Explode, 1)
-                : caughtObjectContainer.AddStackObject(objectState, positionInStack);
+                ? caughtObjectContainer.AddDroppedObject(objectState, positionInStack, DroppedObjectAnimation.Explode, 1)
+                : caughtObjectContainer.AddStackedObject(objectState, positionInStack);
         }
 
         private class TestCatchObjectState : IHasCatchObjectState
