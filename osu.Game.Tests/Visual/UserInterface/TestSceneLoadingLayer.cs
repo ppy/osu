@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -14,10 +15,11 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestSceneLoadingLayer : OsuTestScene
     {
-        private Drawable dimContent;
         private LoadingLayer overlay;
 
         private Container content;
+
+        private Drawable dimContent => overlay.Children.OfType<Box>().First();
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -29,14 +31,14 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Size = new Vector2(300),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Children = new[]
+                    Children = new Drawable[]
                     {
                         new Box
                         {
                             Colour = Color4.SlateGray,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        dimContent = new FillFlowContainer
+                        new FillFlowContainer
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -51,7 +53,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                                 new TriangleButton { Text = "puush me", Width = 200, Action = () => { } },
                             }
                         },
-                        overlay = new LoadingLayer(dimContent),
+                        overlay = new LoadingLayer(true),
                     }
                 },
             };

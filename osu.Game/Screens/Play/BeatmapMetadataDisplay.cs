@@ -131,7 +131,7 @@ namespace osu.Game.Screens.Play
                                     Anchor = Anchor.Centre,
                                     FillMode = FillMode.Fill,
                                 },
-                                loading = new LoadingLayer(backgroundSprite)
+                                loading = new LoadingLayer(true)
                             }
                         },
                         new OsuSpriteText
