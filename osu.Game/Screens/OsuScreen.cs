@@ -114,9 +114,14 @@ namespace osu.Game.Screens
             Mods = screenDependencies.Mods;
         }
 
-        protected BackgroundScreen Background => backgroundStack?.CurrentScreen as BackgroundScreen;
+        public void ApplyToBackground(Action<BackgroundScreen> action) => background.ApplyToBackground(action);
 
-        private BackgroundScreen localBackground;
+        /// <summary>
+        /// The background created and owned by this screen. May be null if the background didn't change.
+        /// </summary>
+        private BackgroundScreen ownedBackground;
+
+        private BackgroundScreen background;
 
         [Resolved(canBeNull: true)]
         private BackgroundScreenStack backgroundStack { get; set; }
@@ -160,7 +165,15 @@ namespace osu.Game.Screens
         {
             applyArrivingDefaults(false);
 
-            backgroundStack?.Push(localBackground = CreateBackground());
+            backgroundStack?.Push(ownedBackground = CreateBackground());
+
+            background = backgroundStack?.CurrentScreen as BackgroundScreen;
+
+            if (background != ownedBackground)
+            {
+                // background may have not been replaced, at which point we don't want to track the background lifetime.
+                ownedBackground = null;
+            }
 
             base.OnEntering(last);
         }
@@ -173,7 +186,7 @@ namespace osu.Game.Screens
             if (base.OnExiting(next))
                 return true;
 
-            if (localBackground != null && backgroundStack?.CurrentScreen == localBackground)
+            if (ownedBackground != null && backgroundStack?.CurrentScreen == ownedBackground)
                 backgroundStack?.Exit();
 
             return false;

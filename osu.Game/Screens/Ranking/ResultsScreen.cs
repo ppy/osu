@@ -18,7 +18,6 @@ using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
-using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking.Statistics;
 using osuTK;
@@ -235,15 +234,18 @@ namespace osu.Game.Screens.Ranking
         {
             base.OnEntering(last);
 
-            ((BackgroundScreenBeatmap)Background).BlurAmount.Value = BACKGROUND_BLUR;
+            ApplyToBackground(b =>
+            {
+                b.BlurAmount.Value = BACKGROUND_BLUR;
+                b.FadeTo(0.5f, 250);
+            });
 
-            Background.FadeTo(0.5f, 250);
             bottomPanel.FadeTo(1, 250);
         }
 
         public override bool OnExiting(IScreen next)
         {
-            Background.FadeTo(1, 250);
+            ApplyToBackground(b => b.FadeTo(1, 250));
 
             return base.OnExiting(next);
         }
@@ -293,7 +295,7 @@ namespace osu.Game.Screens.Ranking
                 ScorePanelList.HandleInput = false;
 
                 // Dim background.
-                Background.FadeTo(0.1f, 150);
+                ApplyToBackground(b => b.FadeTo(0.1f, 150));
 
                 detachedPanel = expandedPanel;
             }
@@ -317,7 +319,7 @@ namespace osu.Game.Screens.Ranking
                 ScorePanelList.HandleInput = true;
 
                 // Un-dim background.
-                Background.FadeTo(0.5f, 150);
+                ApplyToBackground(b => b.FadeTo(0.5f, 150));
 
                 detachedPanel = null;
             }
