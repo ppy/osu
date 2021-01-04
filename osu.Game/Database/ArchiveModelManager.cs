@@ -75,7 +75,7 @@ namespace osu.Game.Database
 
         protected readonly IDatabaseContextFactory ContextFactory;
 
-        protected readonly MutableDatabaseBackedStoreWithFileIncludes<TModel, TFileModel> ModelStore;
+        protected readonly MutableDatabaseBackedStore<TModel> ModelStore;
 
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private ArchiveImportIPCChannel ipc;
@@ -491,7 +491,7 @@ namespace osu.Game.Database
             using (ContextFactory.GetForWrite())
             {
                 // re-fetch the model on the import context.
-                var foundModel = ModelStore.ConsumableItems.SingleOrDefault(i => i.ID == item.ID);
+                var foundModel = queryModel().Include(s => s.Files).ThenInclude(f => f.FileInfo).FirstOrDefault(s => s.ID == item.ID);
 
                 if (foundModel == null || foundModel.DeletePending) return false;
 
@@ -729,6 +729,8 @@ namespace osu.Game.Database
             foreach (var f in files.OrderBy(f => f.Filename))
                 yield return f.Filename;
         }
+
+        private DbSet<TModel> queryModel() => ContextFactory.Get().Set<TModel>();
 
         protected virtual string HumanisedModelName => $"{typeof(TModel).Name.Replace("Info", "").ToLower()}";
 
