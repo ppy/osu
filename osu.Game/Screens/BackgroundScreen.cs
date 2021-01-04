@@ -34,6 +34,8 @@ namespace osu.Game.Screens
             return false;
         }
 
+        public void ApplyToBackground(Action<BackgroundScreen> action) => Schedule(() => action.Invoke(this));
+
         protected override void Update()
         {
             base.Update();
