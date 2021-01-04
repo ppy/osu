@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Framework.Statistics;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Types;
@@ -110,6 +111,8 @@ namespace osu.Game.Beatmaps
 
                 // Convert
                 IBeatmap converted = converter.Convert(cancellationSource.Token);
+
+                converted.ControlPointInfo = (ControlPointInfo)converted.ControlPointInfo.Clone();
 
                 // Apply conversion mods to the result
                 foreach (var mod in mods.OfType<IApplicableAfterBeatmapConversion>())
