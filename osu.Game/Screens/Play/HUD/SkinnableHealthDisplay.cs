@@ -5,10 +5,9 @@ using System;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 
-namespace osu.Game.Screens.Play
+namespace osu.Game.Screens.Play.HUD
 {
     public class SkinnableHealthDisplay : SkinnableDrawable, IHealthDisplay
     {
