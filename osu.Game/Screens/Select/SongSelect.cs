@@ -41,7 +41,7 @@ using System.Diagnostics;
 
 namespace osu.Game.Screens.Select
 {
-    public abstract class SongSelect : OsuScreen, IKeyBindingHandler<GlobalAction>
+    public abstract class SongSelect : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>
     {
         public static readonly float WEDGE_HEIGHT = 245;
 
@@ -75,8 +75,6 @@ namespace osu.Game.Screens.Select
 
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; }
-
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
         protected BeatmapCarousel Carousel { get; private set; }
 
