@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Humanizer;
 using JetBrains.Annotations;
+using Microsoft.EntityFrameworkCore;
 using osu.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
