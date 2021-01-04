@@ -64,9 +64,9 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 
             addImmediateEntry(stackEntry);
 
-            // `DropStackedObjects` may be called before lifetime update.
-            if (stackEntry.LifetimeStart <= Clock.CurrentTime)
-                aliveStackedObjects.Add(stackEntry);
+            // Add the stack entry to the alive object set now to make it available
+            // when `DropStackedObjects` or `GetPositionInStack` is called before `lifetimeManager.Update`.
+            aliveStackedObjects.Add(stackEntry);
 
             randomSeed++;
 
