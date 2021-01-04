@@ -124,7 +124,7 @@ namespace osu.Game.Overlays.AccountCreation
                         },
                     },
                 },
-                loadingLayer = new LoadingLayer(mainContent)
+                loadingLayer = new LoadingLayer(true)
             };
 
             textboxes = new[] { usernameTextBox, emailTextBox, passwordTextBox };
