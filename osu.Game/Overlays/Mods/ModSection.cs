@@ -130,7 +130,7 @@ namespace osu.Game.Overlays.Mods
         /// Select one or more mods in this section and deselects all other ones.
         /// </summary>
         /// <param name="modTypes">The types of <see cref="Mod"/>s which should be selected.</param>
-        public void SelectTypes(IEnumerable<Type> modTypes)
+        public void SelectTypes(IEnumerable<Type> modTypes) => Schedule(() =>
         {
             foreach (var button in buttons)
             {
@@ -141,7 +141,7 @@ namespace osu.Game.Overlays.Mods
                 else
                     button.Deselect();
             }
-        }
+        });
 
         protected ModSection()
         {
