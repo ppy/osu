@@ -9,7 +9,6 @@ namespace osu.Game.Overlays.Toolbar
 {
     public class ToolbarSocialButton : ToolbarOverlayToggleButton
     {
-
         protected override Anchor TooltipAnchor => Anchor.TopRight;
 
         public ToolbarSocialButton()
