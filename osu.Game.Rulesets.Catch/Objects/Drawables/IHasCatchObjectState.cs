@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
     /// </summary>
     public interface IHasCatchObjectState
     {
-        CatchHitObject HitObject { get; }
+        PalpableCatchHitObject HitObject { get; }
 
         Bindable<Color4> AccentColour { get; }
 

@@ -202,7 +202,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private class TestCatchObjectState : IHasCatchObjectState
         {
-            public CatchHitObject HitObject { get; set; }
+            public PalpableCatchHitObject HitObject { get; set; }
             public Bindable<Color4> AccentColour { get; } = new Bindable<Color4>(Colour4.Green);
             public Bindable<bool> HyperDash { get; } = new Bindable<bool>();
             public Vector2 DisplaySize => new Vector2(500);

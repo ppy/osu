@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
     public abstract class CaughtObjectEntry : LifetimeEntry
     {
-        public readonly CatchHitObject HitObject;
+        public readonly PalpableCatchHitObject HitObject;
 
         public readonly bool HyperDash;
 

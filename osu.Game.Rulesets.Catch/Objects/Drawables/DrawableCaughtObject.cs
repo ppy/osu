@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
     [Cached(typeof(IHasCatchObjectState))]
     public abstract class DrawableCaughtObject : SkinnableDrawable, IHasCatchObjectState
     {
-        public CatchHitObject HitObject { get; private set; }
+        public PalpableCatchHitObject HitObject { get; private set; }
         public Bindable<Color4> AccentColour { get; } = new Bindable<Color4>();
         public Bindable<bool> HyperDash { get; } = new Bindable<bool>();
         public Vector2 DisplaySize => Size * Scale;
