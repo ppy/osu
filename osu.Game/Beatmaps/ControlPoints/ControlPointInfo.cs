@@ -11,7 +11,7 @@ using osu.Framework.Lists;
 namespace osu.Game.Beatmaps.ControlPoints
 {
     [Serializable]
-    public class ControlPointInfo
+    public class ControlPointInfo : ICloneable
     {
         /// <summary>
         /// All control points grouped by time.
@@ -296,6 +296,16 @@ namespace osu.Game.Beatmaps.ControlPoints
                     difficultyPoints.Remove(typed);
                     break;
             }
+        }
+
+        public object Clone()
+        {
+            var controlPointInfo = new ControlPointInfo();
+
+            foreach (var point in AllControlPoints)
+                controlPointInfo.Add(point.Time, point.CreateCopy());
+
+            return controlPointInfo;
         }
     }
 }

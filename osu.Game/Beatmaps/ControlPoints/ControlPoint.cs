@@ -28,5 +28,22 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <param name="existing">An existing control point to compare with.</param>
         /// <returns>Whether this <see cref="ControlPoint"/> is redundant when placed alongside <paramref name="existing"/>.</returns>
         public abstract bool IsRedundant(ControlPoint existing);
+
+        /// <summary>
+        /// Create a copy of this room without online information.
+        /// Should be used to create a local copy of a room for submitting in the future.
+        /// </summary>
+        public ControlPoint CreateCopy()
+        {
+            var copy = (ControlPoint)Activator.CreateInstance(GetType());
+
+            copy.CopyFrom(this);
+
+            return copy;
+        }
+
+        public virtual void CopyFrom(ControlPoint other)
+        {
+        }
     }
 }
