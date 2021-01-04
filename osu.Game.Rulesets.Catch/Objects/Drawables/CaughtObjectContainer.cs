@@ -15,7 +15,10 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawables
 {
-    public class CaughtObjectContainer : CompositeDrawable
+    /// <summary>
+    /// Maintains the object stack on the catcher plate and objects dropped from the catcher plate.
+    /// </summary>
+    public partial class CaughtObjectContainer : CompositeDrawable
     {
         public Container<DrawableCaughtObject> StackedObjectContainer { get; }
 
@@ -297,80 +300,5 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
                     return null;
             }
         }
-
-        private class StackedObjectEntry : CaughtObjectEntry
-        {
-            /// <summary>
-            /// The position of this object in relative to the catcher.
-            /// </summary>
-            public readonly Vector2 PositionInStack;
-
-            public readonly DroppedObjectEntry DelayedDropEntry;
-
-            public StackedObjectEntry(Vector2 positionInStack, DroppedObjectEntry delayedDropEntry, IHasCatchObjectState source)
-                : base(source)
-            {
-                PositionInStack = positionInStack;
-                DelayedDropEntry = delayedDropEntry;
-            }
-
-            public override void ApplyTransforms(Drawable d)
-            {
-                d.Position = PositionInStack;
-            }
-        }
-
-        private class DroppedObjectEntry : CaughtObjectEntry
-        {
-            public DroppedObjectAnimation Animation;
-
-            /// <summary>
-            /// The initial position of the dropped object.
-            /// </summary>
-            public Vector2 DropPosition;
-
-            /// <summary>
-            /// 1 or -1 representing visual mirroring of the object.
-            /// </summary>
-            public int MirrorDirection = 1;
-
-            private readonly Vector2 positionInStack;
-
-            public DroppedObjectEntry(Vector2 positionInStack, IHasCatchObjectState source)
-                : base(source)
-            {
-                this.positionInStack = positionInStack;
-            }
-
-            public override void ApplyTransforms(Drawable d)
-            {
-                d.Position = DropPosition;
-                d.Scale *= new Vector2(MirrorDirection, 1);
-
-                using (d.BeginAbsoluteSequence(LifetimeStart))
-                {
-                    switch (Animation)
-                    {
-                        case DroppedObjectAnimation.Explode:
-                            var xMovement = positionInStack.X * MirrorDirection * 6;
-                            d.MoveToY(d.Y - 50, 250, Easing.OutSine).Then().MoveToY(d.Y + 50, 500, Easing.InSine);
-                            d.MoveToX(d.X + xMovement, 1000);
-                            d.FadeOut(750);
-                            break;
-
-                        case DroppedObjectAnimation.Drop:
-                            d.MoveToY(d.Y + 75, 750, Easing.InSine);
-                            d.FadeOut(750);
-                            break;
-                    }
-                }
-            }
-        }
-    }
-
-    public enum DroppedObjectAnimation
-    {
-        Explode,
-        Drop
     }
 }
