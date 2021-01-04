@@ -852,6 +852,39 @@ namespace osu.Game.Tests.Beatmaps.IO
             }
         }
 
+        [Test]
+        public async Task TestItemRemovedShouldPassConsumableBeatmapSet()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(ImportBeatmapTest)))
+            {
+                try
+                {
+                    var osu = LoadOsuIntoHost(host);
+                    var manager = osu.Dependencies.Get<BeatmapManager>();
+
+                    var removedQueue = new Queue<BeatmapSetInfo>();
+                    manager.ItemRemoved.BindValueChanged(evt =>
+                    {
+                        if (evt.NewValue.TryGetTarget(out var target))
+                            removedQueue.Enqueue(target);
+                    });
+
+                    var imported = await LoadOszIntoOsu(osu);
+                    deleteBeatmapSet(imported, osu);
+
+                    Assert.That(removedQueue.Count, Is.EqualTo(1));
+
+                    var removedItem = removedQueue.Single();
+                    Assert.That(removedItem.Metadata, Is.EqualTo(imported.Metadata));
+                    Assert.That(removedItem.Beatmaps, Is.EquivalentTo(imported.Beatmaps));
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
         public static async Task<BeatmapSetInfo> LoadOszIntoOsu(OsuGameBase osu, string path = null, bool virtualTrack = false)
         {
             var temp = path ?? TestResources.GetTestBeatmapForImport(virtualTrack);
