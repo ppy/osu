@@ -104,7 +104,7 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         /// <param name="modTypes">The types of <see cref="Mod"/>s which should be deselected.</param>
         /// <param name="immediate">Set to true to bypass animations and update selections immediately.</param>
-        public void DeselectTypes(IEnumerable<Type> modTypes, bool immediate = false)
+        public void DeselectTypes(IEnumerable<Type> modTypes, bool immediate = false) => Schedule(() =>
         {
             int delay = 0;
 
@@ -124,7 +124,7 @@ namespace osu.Game.Overlays.Mods
                     }
                 }
             }
-        }
+        });
 
         /// <summary>
         /// Select one or more mods in this section and deselects all other ones.
