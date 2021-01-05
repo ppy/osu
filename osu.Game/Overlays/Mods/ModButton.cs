@@ -64,41 +64,45 @@ namespace osu.Game.Overlays.Mods
             if (newIndex >= 0 && !Mods[newIndex].HasImplementation)
                 return false;
 
-            selectedIndex = newIndex;
-            Mod modAfter = SelectedMod ?? Mods[0];
-
-            if (beforeSelected != Selected)
+            Schedule(() =>
             {
-                iconsContainer.RotateTo(Selected ? 5f : 0f, 300, Easing.OutElastic);
-                iconsContainer.ScaleTo(Selected ? 1.1f : 1f, 300, Easing.OutElastic);
-            }
+                selectedIndex = newIndex;
+                Mod modAfter = SelectedMod ?? Mods[0];
 
-            if (modBefore != modAfter)
-            {
-                const float rotate_angle = 16;
-
-                foregroundIcon.RotateTo(rotate_angle * direction, mod_switch_duration, mod_switch_easing);
-                backgroundIcon.RotateTo(-rotate_angle * direction, mod_switch_duration, mod_switch_easing);
-
-                backgroundIcon.Mod = modAfter;
-
-                using (BeginDelayedSequence(mod_switch_duration, true))
+                if (beforeSelected != Selected)
                 {
-                    foregroundIcon
-                        .RotateTo(-rotate_angle * direction)
-                        .RotateTo(0f, mod_switch_duration, mod_switch_easing);
-
-                    backgroundIcon
-                        .RotateTo(rotate_angle * direction)
-                        .RotateTo(0f, mod_switch_duration, mod_switch_easing);
-
-                    Schedule(() => displayMod(modAfter));
+                    iconsContainer.RotateTo(Selected ? 5f : 0f, 300, Easing.OutElastic);
+                    iconsContainer.ScaleTo(Selected ? 1.1f : 1f, 300, Easing.OutElastic);
                 }
-            }
 
-            foregroundIcon.Selected.Value = Selected;
+                if (modBefore != modAfter)
+                {
+                    const float rotate_angle = 16;
 
-            SelectionChanged?.Invoke(SelectedMod);
+                    foregroundIcon.RotateTo(rotate_angle * direction, mod_switch_duration, mod_switch_easing);
+                    backgroundIcon.RotateTo(-rotate_angle * direction, mod_switch_duration, mod_switch_easing);
+
+                    backgroundIcon.Mod = modAfter;
+
+                    using (BeginDelayedSequence(mod_switch_duration, true))
+                    {
+                        foregroundIcon
+                            .RotateTo(-rotate_angle * direction)
+                            .RotateTo(0f, mod_switch_duration, mod_switch_easing);
+
+                        backgroundIcon
+                            .RotateTo(rotate_angle * direction)
+                            .RotateTo(0f, mod_switch_duration, mod_switch_easing);
+
+                        Schedule(() => displayMod(modAfter));
+                    }
+                }
+
+                foregroundIcon.Selected.Value = Selected;
+
+                SelectionChanged?.Invoke(SelectedMod);
+            });
+
             return true;
         }
 

@@ -104,7 +104,7 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         /// <param name="modTypes">The types of <see cref="Mod"/>s which should be deselected.</param>
         /// <param name="immediate">Set to true to bypass animations and update selections immediately.</param>
-        public void DeselectTypes(IEnumerable<Type> modTypes, bool immediate = false) => Schedule(() =>
+        public void DeselectTypes(IEnumerable<Type> modTypes, bool immediate = false)
         {
             int delay = 0;
 
@@ -124,13 +124,13 @@ namespace osu.Game.Overlays.Mods
                     }
                 }
             }
-        });
+        }
 
         /// <summary>
         /// Select one or more mods in this section and deselects all other ones.
         /// </summary>
         /// <param name="modTypes">The types of <see cref="Mod"/>s which should be selected.</param>
-        public void SelectTypes(IEnumerable<Type> modTypes) => Schedule(() =>
+        public void SelectTypes(IEnumerable<Type> modTypes)
         {
             foreach (var button in buttons)
             {
@@ -141,7 +141,7 @@ namespace osu.Game.Overlays.Mods
                 else
                     button.Deselect();
             }
-        });
+        }
 
         protected ModSection()
         {
