@@ -17,7 +17,7 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public class LoadingLayer : LoadingSpinner
     {
-        private readonly Box backgroundDimLayer;
+        protected Box BackgroundDimLayer { get; private set; }
 
         /// <summary>
         /// Construct a new loading spinner.
@@ -34,7 +34,7 @@ namespace osu.Game.Graphics.UserInterface
 
             if (dimBackground)
             {
-                AddInternal(backgroundDimLayer = new Box
+                AddInternal(BackgroundDimLayer = new Box
                 {
                     Depth = float.MaxValue,
                     Colour = Color4.Black,
@@ -65,13 +65,13 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void PopIn()
         {
-            backgroundDimLayer?.FadeTo(0.5f, TRANSITION_DURATION * 2, Easing.OutQuint);
+            BackgroundDimLayer?.FadeTo(0.5f, TRANSITION_DURATION * 2, Easing.OutQuint);
             base.PopIn();
         }
 
         protected override void PopOut()
         {
-            backgroundDimLayer?.FadeOut(TRANSITION_DURATION, Easing.OutQuint);
+            BackgroundDimLayer?.FadeOut(TRANSITION_DURATION, Easing.OutQuint);
             base.PopOut();
         }
 
