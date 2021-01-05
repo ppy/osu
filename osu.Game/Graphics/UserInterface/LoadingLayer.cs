@@ -17,7 +17,7 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public class LoadingLayer : LoadingSpinner
     {
-        protected Box BackgroundDimLayer { get; private set; }
+        protected Box BackgroundDimLayer { get; }
 
         /// <summary>
         /// Construct a new loading spinner.
