@@ -133,6 +133,15 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 },
             };
 
+            scalingSettings.ForEach(s => bindPreviewEvent(s.Current));
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            windowModeDropdown.Current.ValueChanged += _ => updateResolutionDropdown();
+
             windowModes.BindCollectionChanged((sender, args) =>
             {
                 if (windowModes.Count > 1)
@@ -140,8 +149,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 else
                     windowModeDropdown.Hide();
             }, true);
-
-            windowModeDropdown.Current.ValueChanged += _ => updateResolutionDropdown();
 
             currentDisplay.BindValueChanged(display => Schedule(() =>
             {
@@ -158,8 +165,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
                 updateResolutionDropdown();
             }), true);
-
-            scalingSettings.ForEach(s => bindPreviewEvent(s.Current));
 
             scalingMode.BindValueChanged(mode =>
             {
