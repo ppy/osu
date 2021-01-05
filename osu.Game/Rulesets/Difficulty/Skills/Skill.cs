@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         }
 
         /// <summary>
-        /// Returns the calculated difficulty value representing all processed <see cref="DifficultyHitObject"/>s.
+        /// Returns the calculated difficulty value representing all <see cref="DifficultyHitObject"/>s that have been processed up to this point.
         /// </summary>
         public abstract double DifficultyValue();
     }
