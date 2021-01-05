@@ -157,11 +157,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                         }
                                     }
                                 },
-                                loading = new LoadingLayer()
                             }
                         }
-                    }
-                }
+                    },
+                },
+                loading = new LoadingLayer()
             });
         }
 
@@ -228,7 +228,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             {
                 Scores = null;
                 notSupporterPlaceholder.Show();
+
                 loading.Hide();
+                loading.FinishTransforms();
                 return;
             }
 
@@ -241,6 +243,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             getScoresRequest.Success += scores =>
             {
                 loading.Hide();
+                loading.FinishTransforms();
+
                 Scores = scores;
 
                 if (!scores.Scores.Any())
