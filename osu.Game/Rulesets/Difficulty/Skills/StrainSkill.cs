@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         protected virtual double GetPeakStrain(double time) => CurrentStrain * strainDecay(time - Previous.Peek().StartTime);
 
         /// <summary>
-        /// Returns the calculated difficulty value representing all processed <see cref="DifficultyHitObject"/>s.
+        /// Returns the calculated difficulty value representing all <see cref="DifficultyHitObject"/>s that have been processed up to this point.
         /// </summary>
         public sealed override double DifficultyValue()
         {
