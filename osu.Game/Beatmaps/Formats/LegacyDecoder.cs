@@ -203,6 +203,13 @@ namespace osu.Game.Beatmaps.Formats
                 => base.IsRedundant(existing)
                    && existing is LegacySampleControlPoint existingSample
                    && CustomSampleBank == existingSample.CustomSampleBank;
+
+            public override void CopyFrom(ControlPoint other)
+            {
+                base.CopyFrom(other);
+
+                CustomSampleBank = ((LegacySampleControlPoint)other).CustomSampleBank;
+            }
         }
     }
 }
