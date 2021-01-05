@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
@@ -17,6 +18,7 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public class LoadingLayer : LoadingSpinner
     {
+        [CanBeNull]
         protected Box BackgroundDimLayer { get; }
 
         /// <summary>
