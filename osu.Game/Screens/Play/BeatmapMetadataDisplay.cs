@@ -53,7 +53,6 @@ namespace osu.Game.Screens.Play
         private readonly Bindable<IReadOnlyList<Mod>> mods;
         private readonly Drawable facade;
         private LoadingSpinner loading;
-        private Sprite backgroundSprite;
 
         public IBindable<IReadOnlyList<Mod>> Mods => mods;
 
@@ -123,7 +122,7 @@ namespace osu.Game.Screens.Play
                             Masking = true,
                             Children = new Drawable[]
                             {
-                                backgroundSprite = new Sprite
+                                new Sprite
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Texture = beatmap?.Background,
