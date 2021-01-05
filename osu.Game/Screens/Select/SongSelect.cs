@@ -435,13 +435,15 @@ namespace osu.Game.Screens.Select
                 return;
 
             beatmapNoDebounce = beatmap;
-
             performUpdateSelected();
         }
 
         private void updateSelectedRuleset(RulesetInfo ruleset)
         {
-            if (ruleset == null || ruleset.Equals(rulesetNoDebounce))
+            if (ruleset == null && rulesetNoDebounce == null)
+                return;
+
+            if (ruleset?.Equals(rulesetNoDebounce) == true)
                 return;
 
             rulesetNoDebounce = ruleset;
