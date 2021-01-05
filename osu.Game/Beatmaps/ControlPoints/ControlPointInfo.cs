@@ -11,7 +11,7 @@ using osu.Framework.Lists;
 namespace osu.Game.Beatmaps.ControlPoints
 {
     [Serializable]
-    public class ControlPointInfo : ICloneable
+    public class ControlPointInfo
     {
         /// <summary>
         /// All control points grouped by time.
@@ -298,7 +298,7 @@ namespace osu.Game.Beatmaps.ControlPoints
             }
         }
 
-        public object Clone()
+        public ControlPointInfo CreateCopy()
         {
             var controlPointInfo = new ControlPointInfo();
 
