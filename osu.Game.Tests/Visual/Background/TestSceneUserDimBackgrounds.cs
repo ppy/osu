@@ -323,14 +323,12 @@ namespace osu.Game.Tests.Visual.Background
 
         private class FadeAccessibleResults : ResultsScreen
         {
-            private FadeAccessibleBackground background;
-
             public FadeAccessibleResults(ScoreInfo score)
                 : base(score, true)
             {
             }
 
-            protected override BackgroundScreen CreateBackground() => background = new FadeAccessibleBackground(Beatmap.Value);
+            protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground(Beatmap.Value);
 
             public Vector2 ExpectedBackgroundBlur => new Vector2(BACKGROUND_BLUR);
         }
