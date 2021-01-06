@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -37,10 +38,12 @@ namespace osu.Game.Screens.Select.Carousel
 
         public IEnumerable<DrawableCarouselItem> DrawableBeatmaps => beatmapContainer?.Children ?? Enumerable.Empty<DrawableCarouselItem>();
 
+        [CanBeNull]
         private Container<DrawableCarouselItem> beatmapContainer;
 
         private BeatmapSetInfo beatmapSet;
 
+        [CanBeNull]
         private Task beatmapsLoadTask;
 
         [Resolved]
