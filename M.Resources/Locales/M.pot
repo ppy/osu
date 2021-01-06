@@ -128,6 +128,9 @@ msgstr ""
 msgid "screen.multi.generic.hostedBy"
 msgstr ""
 
+msgid "screen.multi.generic.lounge"
+msgstr ""
+
 #v2 多人游戏 RoomStatusFilter
 msgid "screen.multi.lounge.components.roomStatusFilter.open"
 msgstr ""
@@ -143,9 +146,6 @@ msgstr ""
 
 #v2 多人游戏 主界面
 msgid "screen.multi.multiplayer.multiplayer.screenTitle"
-msgstr ""
-
-msgid "screen.multi.header.pageTitle.text"
 msgstr ""
 
 msgid "screen.multi.multiplayer.createMultiplayerMatchButton.text"

@@ -21,7 +21,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
     [Cached]
     public abstract class LoungeSubScreen : OnlinePlaySubScreen
     {
-        public override string Title => "Lounge";
+        public override string Title => "screen.multi.generic.lounge";
 
         protected override UserActivity InitialActivity => new UserActivity.SearchingForLobby();
 

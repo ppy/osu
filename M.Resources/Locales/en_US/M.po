@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mfosu!\n"
 "POT-Creation-Date: 2020-12-04 02:25+0800\n"
-"PO-Revision-Date: 2020-12-29 23:21+0800\n"
+"PO-Revision-Date: 2021-01-06 22:20+0800\n"
 "Last-Translator: \n"
 "Language-Team: MATRIX-feather\n"
 "Language: en\n"
@@ -13,90 +13,156 @@ msgstr ""
 "X-Poedit-Basepath: .\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#
-msgid "_HostedBy_Text"
-msgstr "hosted by "
-
-msgid "_Open_Multiplayer"
-msgstr "Open"
-
-# v2 主菜单
-msgid "Game.Menu.ButtonSystem.solo"
-msgstr "solo"
-
-msgid "Game.Menu.ButtonSystem.multi"
-msgstr "multi"
-
-msgid "Game.Menu.ButtonSystem.playlists"
-msgstr "playlists"
-
-msgid "Game.Menu.ButtonSystem.about-mfosu"
-msgstr "about mf-osu"
-
-msgid "Game.Menu.ButtonSystem.mvis"
-msgstr "mvis player"
-
-msgid "Game.Menu.ButtonSystem.file-import"
-msgstr "file import"
-
-msgid "Game.Menu.ButtonSystem.invoke-p2c"
-msgstr "TOP SECRET"
-
-msgid "Game.Menu.ButtonSystem.play"
-msgstr "play"
-
-msgid "Game.Menu.ButtonSystem.editor"
-msgstr "editor"
-
-msgid "Game.Menu.ButtonSystem.beatmaplisting"
-msgstr "beatmaplist"
-
-msgid "Game.Menu.ButtonSystem.exit"
+# v2 通用
+msgid "generic.exit"
 msgstr "exit"
 
-msgid "Game.Menu.ButtonSystem.onMultiplayerError"
+msgid "generic.back"
+msgstr "back"
+
+# v2 主菜单
+msgid "screen.menu.buttonSystem.solo"
+msgstr "solo"
+
+msgid "screen.menu.buttonSystem.multi"
+msgstr "multi"
+
+msgid "screen.menu.buttonSystem.playlists"
+msgstr "playlists"
+
+msgid "screen.menu.buttonSystem.about-mfosu"
+msgstr "about mf-osu"
+
+msgid "screen.menu.buttonSystem.mvis"
+msgstr "mvis player"
+
+msgid "screen.menu.buttonSystem.file-import"
+msgstr "file import"
+
+msgid "screen.menu.buttonSystem.invoke-p2c"
+msgstr "TOP SECRET"
+
+msgid "screen.menu.buttonSystem.play"
+msgstr "play"
+
+msgid "screen.menu.buttonSystem.editor"
+msgstr "editor"
+
+msgid "screen.menu.buttonSystem.beatmaplisting"
+msgstr "beatmaplist"
+
+msgid "screen.menu.buttonSystem.exit"
+msgstr "exit"
+
+msgid "screen.menu.buttonSystem.onMultiplayerError"
 msgstr "You gotta be online to multi 'yo!"
 
-msgid "Game.Menu.ButtonSystem.onPlaylistsError"
+msgid "screen.menu.buttonSystem.onPlaylistsError"
 msgstr "You gotta be online to view playlists 'yo!"
 
-# v2 新多人游戏界面
-msgid "Game.Online.Rooms.GameTypes.playlists"
-msgstr "Playlists"
-
 # v2 杂项
-msgid "Game.Users.Drawables.ClickableAvatar.tooltip"
+msgid "game.users.drawables.clickableAvatar.tooltip"
 msgstr "view profile"
 
-# 新多人游戏界面
-msgid "Multiplayer"
-msgstr ""
+# v2 Mvis播放器 主界面
+msgid "screen.mvis.main.openManualInBrowser"
+msgstr "open manual in browser"
 
-msgid "Lounge"
-msgstr ""
+msgid "screen.mvis.main.prevOrRestart"
+msgstr "previous / restart"
 
-msgid "Create room"
-msgstr ""
+msgid "screen.mvis.main.togglePause"
+msgstr "pause / play"
 
-msgid "Open Settings"
-msgstr ""
+msgid "screen.mvis.main.next"
+msgstr "next"
 
-msgid "Recently Ended"
-msgstr ""
+msgid "screen.mvis.main.openCollection"
+msgstr "open collections"
 
-msgid "Participated"
-msgstr ""
+msgid "screen.mvis.main.lockChanges"
+msgstr "lock changes"
 
-msgid "Owned"
-msgstr ""
+msgid "screen.mvis.main.loop"
+msgstr "toggle loop"
 
-msgid "hosted by {0}"
-msgstr ""
+msgid "screen.mvis.main.presentBeatmap"
+msgstr "view in solo song select"
 
-msgid "hosted by "
-msgstr ""
+msgid "screen.mvis.main.openSettings"
+msgstr "open settings"
 
-msgid "{0} 人参与"
+msgid "screen.mvis.main.toggleLock"
+msgstr "lock changes"
+
+msgid "screen.mvis.main.songSelect"
+msgstr "song select"
+
+# v2 Mvis播放器 收藏夹界面
+msgid "screen.mvis.collections.ui.noCollectionSelected"
+msgstr "No collection selected"
+
+msgid "screen.mvis.collections.ui.selectOneFirst"
+msgstr "Select one first!"
+
+msgid "screen.mvis.collections.ui.beatmapSetsCount"
+msgstr "{0} Song(s)"
+
+# v2 新多人游戏界面
+msgid "online.rooms.gameTypes.playlists"
+msgstr "Playlists"
+
+# v2 新多人游戏界面
+msgid "online.rooms.gameTypes.tag"
+msgstr "Tag"
+
+# v2 新多人游戏界面
+msgid "online.rooms.gameTypes.tagTeam"
+msgstr "Tag Team"
+
+# v2 新多人游戏界面
+msgid "online.rooms.gameTypes.versus"
+msgstr "Versus"
+
+# v2 新多人游戏界面
+msgid "online.rooms.gameTypes.teamVersus"
+msgstr "Team Versus"
+
+# v2 多人游戏 通用
+#: osu.Game/Screens/OnlinePlay/Lounge/Components/ParticipantInfo.cs:85
+msgid "screen.multi.generic.hostedBy"
+msgstr "Hosted by "
+
+# v2 多人游戏 通用
+msgid "screen.multi.generic.lounge"
+msgstr "Lounge"
+
+# v2 多人游戏 RoomStatusFilter
+msgid "screen.multi.lounge.components.roomStatusFilter.open"
+msgstr "Open"
+
+msgid "screen.multi.lounge.components.roomStatusFilter.ended"
+msgstr "Recently Ended"
+
+msgid "screen.multi.lounge.components.roomStatusFilter.participated"
+msgstr "Participated"
+
+msgid "screen.multi.lounge.components.roomStatusFilter.owned"
+msgstr "Owned"
+
+# v2 多人游戏 主界面
+msgid "screen.multi.multiplayer.multiplayer.screenTitle"
+msgstr "Multiplayer"
+
+msgid "screen.multi.multiplayer.createMultiplayerMatchButton.text"
+msgstr "create room"
+
+msgid ""
+"screen.multi.multiplayer.match.multiplayerMatchHeader.openSettingsButton.text"
+msgstr "open settings"
+
+# {0}人参与
+msgid "screen.multi.lounge.components.participantInfo.summary.text"
 msgstr "{0} participant(s)"
 
 msgid "Recent Participants"
@@ -1338,6 +1404,19 @@ msgstr "notifications"
 
 msgid "等待着您~"
 msgstr "waiting for 'ya"
+
+#~ msgid "screen.multi.header.pageTitle.text"
+#~ msgstr "Lounge"
+
+#
+#~ msgid "_HostedBy_Text"
+#~ msgstr "hosted by "
+
+#~ msgid "_Open_Multiplayer"
+#~ msgstr "Open"
+
+#~ msgid "{0} 人参与"
+#~ msgstr "{0} participant(s)"
 
 # 主菜单
 #~ msgid "游玩"

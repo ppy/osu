@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mfosu!\n"
 "POT-Creation-Date: 2020-12-04 02:25+0800\n"
-"PO-Revision-Date: 2021-01-01 22:06+0800\n"
+"PO-Revision-Date: 2021-01-06 22:20+0800\n"
 "Last-Translator: \n"
 "Language-Team: MATRIX-feather\n"
 "Language: zh_CN\n"
@@ -12,14 +12,6 @@ msgstr ""
 "X-Generator: Poedit 2.4.2\n"
 "X-Poedit-Basepath: .\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-
-#
-msgid "_HostedBy_Text"
-msgstr "房主为 "
-
-# 新多人游戏界面
-msgid "_Open_Multiplayer"
-msgstr "开放中的房间"
 
 # v2 通用
 msgid "generic.exit"
@@ -68,12 +60,8 @@ msgstr "你必须先登录才能进行多人游戏!"
 msgid "screen.menu.buttonSystem.onPlaylistsError"
 msgstr "你必须先登录才能查看游玩列表!"
 
-# v2 新多人游戏界面
-msgid "Game.Online.Rooms.GameTypes.playlists"
-msgstr "游玩列表"
-
 # v2 杂项
-msgid "Game.Users.Drawables.ClickableAvatar.tooltip"
+msgid "game.users.drawables.clickableAvatar.tooltip"
 msgstr "查看个人信息"
 
 msgid "screen.mvis.main.openManualInBrowser"
@@ -119,36 +107,63 @@ msgstr "请先选择一个!"
 msgid "screen.mvis.collections.ui.beatmapSetsCount"
 msgstr "{0}首歌曲"
 
-# 新多人游戏界面
-msgid "Multiplayer"
-msgstr "多人游戏"
+# v2 新多人游戏界面
+msgid "online.rooms.gameTypes.playlists"
+msgstr "游玩列表"
 
-msgid "Lounge"
-msgstr "大厅"
+# v2 新多人游戏界面
+msgid "online.rooms.gameTypes.tag"
+msgstr "接力"
 
-msgid "Create room"
-msgstr "创建房间"
+# v2 新多人游戏界面
+msgid "online.rooms.gameTypes.tagTeam"
+msgstr "组队接力"
 
-msgid "Open Settings"
-msgstr "打开设置"
+# v2 新多人游戏界面
+msgid "online.rooms.gameTypes.versus"
+msgstr "对抗"
 
-msgid "Recently Ended"
-msgstr "最近结束的房间"
+# v2 新多人游戏界面
+msgid "online.rooms.gameTypes.teamVersus"
+msgstr "组队对抗"
 
-msgid "Participated"
-msgstr "参加过的房间"
-
-msgid "Owned"
-msgstr "拥有的房间"
-
-msgid "hosted by {0}"
-msgstr "房主为 {0}"
-
-msgid "hosted by "
+# v2 多人游戏 通用
+#: osu.Game/Screens/OnlinePlay/Lounge/Components/ParticipantInfo.cs:85
+msgid "screen.multi.generic.hostedBy"
 msgstr "房主为 "
 
-msgid "{0} 人参与"
-msgstr ""
+# v2 多人游戏 通用
+msgid "screen.multi.generic.lounge"
+msgstr "大厅"
+
+# v2 多人游戏 RoomStatusFilter
+msgid "screen.multi.lounge.components.roomStatusFilter.open"
+msgstr "开放中的房间"
+
+msgid "screen.multi.lounge.components.roomStatusFilter.ended"
+msgstr "已关闭的房间"
+
+msgid "screen.multi.lounge.components.roomStatusFilter.participated"
+msgstr "参与过的房间"
+
+msgid "screen.multi.lounge.components.roomStatusFilter.owned"
+msgstr "拥有的房间"
+
+# v2 多人游戏 主界面
+msgid "screen.multi.multiplayer.multiplayer.screenTitle"
+msgstr "多人游戏"
+
+msgid "screen.multi.multiplayer.createMultiplayerMatchButton.text"
+msgstr "创建房间"
+
+msgid ""
+"screen.multi.multiplayer.match.multiplayerMatchHeader."
+"openSettingsButton.text"
+msgstr "打开设置"
+
+# {0}人参与
+msgid "screen.multi.lounge.components.participantInfo.summary.text"
+msgstr "{0} 人参与"
 
 msgid "Recent Participants"
 msgstr "最近参与"
@@ -712,8 +727,8 @@ msgid "调整播放速度时也同时调整音调"
 msgstr ""
 
 msgid ""
-"请注意: 播放速度调整暂不支持故事版音频, 调整故事版音频请手"
-"动前往歌曲选择添加加速/减速mod"
+"请注意: 播放速度调整暂不支持故事版音频, 调整故事版音频请手动前往歌"
+"曲选择添加加速/减速mod"
 msgstr ""
 
 msgid "夜核节拍器"
@@ -808,8 +823,8 @@ msgid "启用Sayobot功能"
 msgstr ""
 
 msgid ""
-"这将影响所有谱面预览、封面、和下图的功能, 但不会影响已完成"
-"或正在进行中的请求"
+"这将影响所有谱面预览、封面、和下图的功能, 但不会影响已完成或正在进"
+"行中的请求"
 msgstr ""
 
 msgid "立体音效增益"
@@ -1368,6 +1383,45 @@ msgstr ""
 
 msgid "等待着您~"
 msgstr ""
+
+#~ msgid "screen.multi.header.pageTitle.text"
+#~ msgstr "大厅"
+
+#
+#~ msgid "_HostedBy_Text"
+#~ msgstr "房主为 "
+
+# 新多人游戏界面
+#~ msgid "_Open_Multiplayer"
+#~ msgstr "开放中的房间"
+
+# 新多人游戏界面
+#~ msgid "Multiplayer"
+#~ msgstr "多人游戏"
+
+#~ msgid "Lounge"
+#~ msgstr "大厅"
+
+#~ msgid "Create room"
+#~ msgstr "创建房间"
+
+#~ msgid "Open Settings"
+#~ msgstr "打开设置"
+
+#~ msgid "Recently Ended"
+#~ msgstr "最近结束的房间"
+
+#~ msgid "Participated"
+#~ msgstr "参加过的房间"
+
+#~ msgid "Owned"
+#~ msgstr "拥有的房间"
+
+#~ msgid "hosted by {0}"
+#~ msgstr "房主为 {0}"
+
+#~ msgid "hosted by "
+#~ msgstr "房主为 "
 
 #~ msgid "Open"
 #~ msgstr "打开"
