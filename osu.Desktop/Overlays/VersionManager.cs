@@ -61,7 +61,7 @@ namespace osu.Desktop.Overlays
                 }
             };
 
-            if (DebugUtils.IsDebugBuild)
+            if (!game.IsDeployedBuild)
             {
                 mainFill.AddRange(new Drawable[]
                 {
