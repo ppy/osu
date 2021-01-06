@@ -47,7 +47,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddInternal(loadingLayer = new LoadingLayer(Carousel));
+            AddInternal(loadingLayer = new LoadingLayer(true));
             initialBeatmap = Beatmap.Value;
             initialRuleset = Ruleset.Value;
             initialMods = Mods.Value.ToList();
