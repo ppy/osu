@@ -125,6 +125,7 @@ namespace osu.Game.Screens
         private BackgroundScreen background;
 
         [Resolved(canBeNull: true)]
+        [CanBeNull]
         private BackgroundScreenStack backgroundStack { get; set; }
 
         [Resolved(canBeNull: true)]
@@ -152,8 +153,11 @@ namespace osu.Game.Screens
         /// <param name="action">The operation to perform.</param>
         public void ApplyToBackground(Action<BackgroundScreen> action)
         {
+            if (backgroundStack == null)
+                throw new InvalidOperationException("Attempted to apply to background without a background stack being available.");
+
             if (background == null)
-                throw new InvalidOperationException("Attempted to apply to background before screen is pushed");
+                throw new InvalidOperationException("Attempted to apply to background before screen is pushed.");
 
             background.ApplyToBackground(action);
         }
