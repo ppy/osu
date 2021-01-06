@@ -62,7 +62,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             // todo: this should be implemented via a custom HUD implementation, and correctly masked to the main content area.
             LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(ScoreProcessor, userIds), HUDOverlay.Add);
 
-            HUDOverlay.Add(loadingDisplay = new LoadingLayer(DrawableRuleset) { Depth = float.MaxValue });
+            HUDOverlay.Add(loadingDisplay = new LoadingLayer(true) { Depth = float.MaxValue });
 
             if (Token == null)
                 return; // Todo: Somehow handle token retrieval failure.

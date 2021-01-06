@@ -48,11 +48,9 @@ namespace osu.Game.Overlays.AccountCreation
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            FillFlowContainer mainContent;
-
             InternalChildren = new Drawable[]
             {
-                mainContent = new FillFlowContainer
+                new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
@@ -124,7 +122,7 @@ namespace osu.Game.Overlays.AccountCreation
                         },
                     },
                 },
-                loadingLayer = new LoadingLayer(mainContent)
+                loadingLayer = new LoadingLayer(true)
             };
 
             textboxes = new[] { usernameTextBox, emailTextBox, passwordTextBox };
