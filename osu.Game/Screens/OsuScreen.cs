@@ -185,6 +185,7 @@ namespace osu.Game.Screens
             if (background != ownedBackground)
             {
                 // background may have not been replaced, at which point we don't want to track the background lifetime.
+                ownedBackground?.Dispose();
                 ownedBackground = null;
             }
 
