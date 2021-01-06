@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -119,8 +120,10 @@ namespace osu.Game.Screens
         /// <summary>
         /// The background created and owned by this screen. May be null if the background didn't change.
         /// </summary>
+        [CanBeNull]
         private BackgroundScreen ownedBackground;
 
+        [CanBeNull]
         private BackgroundScreen background;
 
         [Resolved(canBeNull: true)]
