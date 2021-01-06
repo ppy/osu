@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.Toolbar
 
         public ToolbarBeatmapListingButton()
         {
-            Hotkey = GlobalAction.ToggleDirect;
+            Hotkey = GlobalAction.ToggleBeatmapListing;
         }
 
         [BackgroundDependencyLoader(true)]
