@@ -158,6 +158,109 @@ msgstr ""
 msgid "screen.multi.lounge.components.participantInfo.summary.text"
 msgstr ""
 
+# v2 Mvis设置
+msgid "settings.mvis.audio.mvisMusicSpeed"
+msgstr ""
+
+msgid "settings.mvis.audio.adjustPitch"
+msgstr ""
+
+msgid "settings.mvis.audio.adjustPitch.tooltip"
+msgstr ""
+
+msgid "settings.mvis.audio.nightcoreBeat"
+msgstr ""
+
+msgid "settings.mvis.audio.nightcoreBeat.tooltip"
+msgstr ""
+
+msgid "settings.mvis.audio.playFromCollection"
+msgstr ""
+
+msgid "settings.mvis.audio.header"
+msgstr ""
+
+msgid "settings.mvis.storyboard.header"
+msgstr ""
+
+msgid "settings.mvis.storyboard.enableStoryboard"
+msgstr ""
+
+msgid "settings.mvis.ui.header"
+msgstr ""
+
+msgid "settings.mvis.ui.bgBlur"
+msgstr ""
+
+msgid "settings.mvis.ui.idleBgDim"
+msgstr ""
+
+msgid "settings.mvis.ui.contentOpacity"
+msgstr ""
+
+msgid "settings.mvis.ui.accentColorR"
+msgstr ""
+
+msgid "settings.mvis.ui.accentColorG"
+msgstr ""
+
+msgid "settings.mvis.ui.accentColorB"
+msgstr ""
+
+msgid "settings.mvis.ui.hue"
+msgstr ""
+
+msgid "settings.mvis.visual.header"
+msgstr ""
+
+msgid "settings.mvis.visual.enableBgTriangles"
+msgstr ""
+
+msgid "settings.mvis.visual.showParticles"
+msgstr ""
+
+msgid "settings.mvis.visual.particleAmount"
+msgstr ""
+
+msgid "settings.mvis.visual.barType"
+msgstr ""
+
+msgid "settings.mvis.visual.visualizerAmount"
+msgstr ""
+
+msgid "settings.mvis.visual.barWidth"
+msgstr ""
+
+msgid "settings.mvis.visual.barsPerVisual"
+msgstr ""
+
+msgid "settings.mvis.visual.rotation"
+msgstr ""
+
+msgid "settings.mvis.visual.useCustomColor"
+msgstr ""
+
+msgid "settings.mvis.visual.iR"
+msgstr ""
+
+msgid "settings.mvis.visual.iG"
+msgstr ""
+
+msgid "settings.mvis.visual.iB"
+msgstr ""
+
+msgid "settings.mvis.visual.useOsuLogoVisualisation"
+msgstr ""
+
+msgid "settings.mvis.barType.basic"
+msgstr ""
+
+msgid "settings.mvis.barType.rounded"
+msgstr ""
+
+msgid "settings.mvis.barType.fall"
+msgstr ""
+
 # 新多人游戏界面
 msgid "Recent Participants"
 msgstr ""
@@ -630,165 +733,6 @@ msgid "内存"
 msgstr ""
 
 msgid "清理所有缓存"
-msgstr ""
-
-# Mvis设置Section标题
-msgid "M-vis播放器"
-msgstr ""
-
-# Mvis播放器界面
-msgid "选择该谱面"
-msgstr ""
-
-msgid "未选择收藏夹"
-msgstr ""
-
-msgid "请先选择一个收藏夹!"
-msgstr ""
-
-msgid "{0}首歌曲"
-msgstr ""
-
-msgid "收藏夹选择"
-msgstr ""
-
-msgid "播放器设置"
-msgstr ""
-
-msgid "退出"
-msgstr ""
-
-msgid "在浏览器中打开食用手册"
-msgstr ""
-
-msgid "上一首/从头开始"
-msgstr ""
-
-msgid "切换暂停"
-msgstr ""
-
-msgid "下一首"
-msgstr ""
-
-msgid "隐藏界面并锁定变更"
-msgstr ""
-
-msgid "单曲循环"
-msgstr ""
-
-msgid "在选歌界面中查看"
-msgstr ""
-
-msgid "切换悬浮锁"
-msgstr ""
-
-msgid "歌曲选择"
-msgstr ""
-
-# Mvis播放器设置 - UI
-msgid "界面"
-msgstr ""
-
-msgid "背景模糊"
-msgstr ""
-
-msgid "空闲时的背景亮度"
-msgstr ""
-
-msgid "空闲时的M-vis面板不透明度"
-msgstr ""
-
-msgid "主题色(红)"
-msgstr ""
-
-msgid "主题色(绿)"
-msgstr ""
-
-msgid "主题色(蓝)"
-msgstr ""
-
-msgid "色相(Hue): {0}"
-msgstr ""
-
-# Mvis播放器设置 - 音频
-msgid "音频"
-msgstr ""
-
-msgid "播放速度"
-msgstr ""
-
-msgid "调整播放速度时也同时调整音调"
-msgstr ""
-
-msgid "请注意: 播放速度调整暂不支持故事版音频, 调整故事版音频请手动前往歌曲选择添加加速/减速mod"
-msgstr ""
-
-msgid "夜核节拍器"
-msgstr ""
-
-msgid "动次打次动次打次"
-msgstr ""
-
-msgid "从收藏夹播放音乐"
-msgstr ""
-
-# Mvis播放器设置 - 特效
-msgid "特效"
-msgstr ""
-
-msgid "在无故事版可用时显示背景动画"
-msgstr ""
-
-msgid "显示粒子效果"
-msgstr ""
-
-msgid "屏幕粒子数"
-msgstr ""
-
-msgid "频谱类型"
-msgstr ""
-
-msgid "分段数"
-msgstr ""
-
-msgid "宽度"
-msgstr ""
-
-msgid "每个分段的频谱密度"
-msgstr ""
-
-msgid "频谱旋转角度"
-msgstr ""
-
-msgid "使用自定义颜色"
-msgstr ""
-
-msgid "红"
-msgstr ""
-
-msgid "绿"
-msgstr ""
-
-msgid "蓝"
-msgstr ""
-
-msgid "使用原版频谱效果"
-msgstr ""
-
-msgid "基本"
-msgstr ""
-
-msgid "圆角"
-msgstr ""
-
-msgid "打砖块"
-msgstr ""
-
-# Mvis播放器设置 - 故事版
-msgid "启用故事版/背景视频"
-msgstr ""
-
-msgid "故事版"
 msgstr ""
 
 # Mf-osu 设置 - 整体

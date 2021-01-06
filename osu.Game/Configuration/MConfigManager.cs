@@ -100,13 +100,13 @@ namespace osu.Game.Configuration
 
     public enum MvisBarType
     {
-        [Description("基本")]
+        [Description("settings.mvis.barType.basic")]
         Basic,
 
-        [Description("圆角")]
+        [Description("settings.mvis.barType.rounded")]
         Rounded,
 
-        [Description("打砖块")]
+        [Description("settings.mvis.barType.fall")]
         Fall
     }
 }
