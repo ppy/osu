@@ -115,8 +115,6 @@ namespace osu.Game.Screens
             Mods = screenDependencies.Mods;
         }
 
-        public void ApplyToBackground(Action<BackgroundScreen> action) => background.ApplyToBackground(action);
-
         /// <summary>
         /// The background created and owned by this screen. May be null if the background didn't change.
         /// </summary>
@@ -146,6 +144,18 @@ namespace osu.Game.Screens
             sampleExit = audio.Samples.Get(@"UI/screen-back");
 
             Activity.Value ??= InitialActivity;
+        }
+
+        /// <summary>
+        /// Apply arbitrary changes to the current background screen in a thread safe manner.
+        /// </summary>
+        /// <param name="action">The operation to perform.</param>
+        public void ApplyToBackground(Action<BackgroundScreen> action)
+        {
+            if (background == null)
+                throw new InvalidOperationException("Attempted to apply to background before screen is pushed");
+
+            background.ApplyToBackground(action);
         }
 
         public override void OnResuming(IScreen last)
