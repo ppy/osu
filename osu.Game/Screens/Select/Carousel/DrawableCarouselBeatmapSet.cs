@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -36,9 +38,13 @@ namespace osu.Game.Screens.Select.Carousel
 
         public IEnumerable<DrawableCarouselItem> DrawableBeatmaps => beatmapContainer?.Children ?? Enumerable.Empty<DrawableCarouselItem>();
 
+        [CanBeNull]
         private Container<DrawableCarouselItem> beatmapContainer;
 
         private BeatmapSetInfo beatmapSet;
+
+        [CanBeNull]
+        private Task beatmapsLoadTask;
 
         [Resolved]
         private BeatmapManager manager { get; set; }
@@ -85,7 +91,9 @@ namespace osu.Game.Screens.Select.Carousel
             base.UpdateItem();
 
             Content.Clear();
+
             beatmapContainer = null;
+            beatmapsLoadTask = null;
 
             if (Item == null)
                 return;
@@ -122,11 +130,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             MovementContainer.MoveToX(0, 500, Easing.OutExpo);
 
-            if (beatmapContainer != null)
-            {
-                foreach (var beatmap in beatmapContainer)
-                    beatmap.MoveToY(0, 800, Easing.OutQuint);
-            }
+            updateBeatmapYPositions();
         }
 
         protected override void Selected()
@@ -163,7 +167,7 @@ namespace osu.Game.Screens.Select.Carousel
                     ChildrenEnumerable = visibleBeatmaps.Select(c => c.CreateDrawableRepresentation())
                 };
 
-                LoadComponentAsync(beatmapContainer, loaded =>
+                beatmapsLoadTask = LoadComponentAsync(beatmapContainer, loaded =>
                 {
                     // make sure the pooled target hasn't changed.
                     if (beatmapContainer != loaded)
@@ -173,16 +177,29 @@ namespace osu.Game.Screens.Select.Carousel
                     updateBeatmapYPositions();
                 });
             }
+        }
 
-            void updateBeatmapYPositions()
+        private void updateBeatmapYPositions()
+        {
+            if (beatmapContainer == null)
+                return;
+
+            if (beatmapsLoadTask == null || !beatmapsLoadTask.IsCompleted)
+                return;
+
+            float yPos = DrawableCarouselBeatmap.CAROUSEL_BEATMAP_SPACING;
+
+            bool isSelected = Item.State.Value == CarouselItemState.Selected;
+
+            foreach (var panel in beatmapContainer.Children)
             {
-                float yPos = DrawableCarouselBeatmap.CAROUSEL_BEATMAP_SPACING;
-
-                foreach (var panel in beatmapContainer.Children)
+                if (isSelected)
                 {
                     panel.MoveToY(yPos, 800, Easing.OutQuint);
                     yPos += panel.Item.TotalHeight;
                 }
+                else
+                    panel.MoveToY(0, 800, Easing.OutQuint);
             }
         }
 
