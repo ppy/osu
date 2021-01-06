@@ -112,7 +112,7 @@ namespace osu.Game.Input.Bindings
         [Description("Toggle settings")]
         ToggleSettings,
 
-        [Description("Toggle osu!direct")]
+        [Description("Toggle beatmap listing")]
         ToggleDirect,
 
         [Description("Increase volume")]
