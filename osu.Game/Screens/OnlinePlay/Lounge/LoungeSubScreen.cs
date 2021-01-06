@@ -65,7 +65,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                                     Padding = new MarginPadding(10),
                                     Child = roomsContainer = new RoomsContainer { JoinRequested = joinRequested }
                                 },
-                                loadingLayer = new LoadingLayer(roomsContainer),
+                                loadingLayer = new LoadingLayer(true),
                             }
                         },
                         new RoomInspector
