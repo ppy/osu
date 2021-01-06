@@ -178,6 +178,9 @@ namespace osu.Game.Screens.Select.Carousel
 
         private void updateBeatmapYPositions()
         {
+            if (beatmapContainer == null)
+                return;
+
             if (beatmapsLoadTask == null || !beatmapsLoadTask.IsCompleted)
                 return;
 
