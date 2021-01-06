@@ -39,7 +39,6 @@ namespace osu.Game.Screens.Menu
 
         public Action OnEdit;
         public Action OnExit;
-        public Action OnBeatmapListing;
         public Action OnSolo;
         public Action OnSettings;
         public Action OnMultiplayer;
