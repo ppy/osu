@@ -266,6 +266,7 @@ namespace osu.Game
             AddInternal(scorePerformanceManager);
 
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
+            dependencies.Cache(new RealmKeyBindingStore(realmFactory, RulesetStore));
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
             dependencies.Cache(RulesetConfigCache = new RulesetConfigCache(SettingsStore));
             dependencies.Cache(new SessionStatics());
