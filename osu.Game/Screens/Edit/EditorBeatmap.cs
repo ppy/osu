@@ -74,11 +74,7 @@ namespace osu.Game.Screens.Edit
 
         public BeatmapMetadata Metadata => PlayableBeatmap.Metadata;
 
-        public ControlPointInfo ControlPointInfo
-        {
-            get => PlayableBeatmap.ControlPointInfo;
-            set => PlayableBeatmap.ControlPointInfo = value;
-        }
+        public ControlPointInfo ControlPointInfo => PlayableBeatmap.ControlPointInfo;
 
         public List<BreakPeriod> Breaks => PlayableBeatmap.Breaks;
 
