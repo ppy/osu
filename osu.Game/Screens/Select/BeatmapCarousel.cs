@@ -936,7 +936,6 @@ namespace osu.Game.Screens.Select
                 Masking = false;
             }
 
-            // ReSharper disable once OptionalParameterHierarchyMismatch 2020.3 EAP4 bug. (https://youtrack.jetbrains.com/issue/RSRP-481535?p=RIDER-51910)
             protected override void OnUserScroll(float value, bool animated = true, double? distanceDecay = default)
             {
                 UserScrolling = true;
