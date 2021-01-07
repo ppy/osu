@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Edit.Setup
                 audioTrackTextBox = new FileChooserLabelledTextBox
                 {
                     Label = "Audio Track",
-                    Current = { Value = Beatmap.Metadata.AudioFile ?? "Click to select a track" },
+                    Current = { Value = working.Value.Metadata.AudioFile ?? "Click to select a track" },
                     Target = audioTrackFileChooserContainer,
                     TabbableContentContainer = this
                 },
