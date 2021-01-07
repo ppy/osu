@@ -197,7 +197,7 @@ namespace osu.Game.Database
         public RealmWrapper(T original, IRealmFactory contextFactory)
         {
             ContextFactory = contextFactory;
-            ID = original.ID;
+            ID = original.Guid;
 
             var originalContext = original.Realm;
 
