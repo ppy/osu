@@ -146,6 +146,8 @@ namespace osu.Game
 
         private DatabaseContextFactory contextFactory;
 
+        private RealmContextFactory realmFactory;
+
         protected override UserInputManager CreateUserInputManager() => new OsuUserInputManager();
 
         [BackgroundDependencyLoader]
@@ -166,6 +168,8 @@ namespace osu.Game
             Resources.AddStore(new DllResourceStore(OsuResources.ResourceAssembly));
 
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
+
+            dependencies.Cache(realmFactory = new RealmContextFactory(Storage, Scheduler));
 
             dependencies.CacheAs(Storage);
 
