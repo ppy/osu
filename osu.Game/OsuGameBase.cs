@@ -73,7 +73,7 @@ namespace osu.Game
 
         protected FileStore FileStore;
 
-        protected KeyBindingStore KeyBindingStore;
+        protected RealmKeyBindingStore KeyBindingStore;
 
         protected SettingsStore SettingsStore;
 
@@ -265,8 +265,10 @@ namespace osu.Game
             dependencies.Cache(scorePerformanceManager);
             AddInternal(scorePerformanceManager);
 
-            dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
-            dependencies.Cache(new RealmKeyBindingStore(realmFactory, RulesetStore));
+            // todo: migrate to realm
+            // dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
+
+            dependencies.Cache(KeyBindingStore = new RealmKeyBindingStore(realmFactory, RulesetStore));
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
             dependencies.Cache(RulesetConfigCache = new RulesetConfigCache(SettingsStore));
             dependencies.Cache(new SessionStatics());
