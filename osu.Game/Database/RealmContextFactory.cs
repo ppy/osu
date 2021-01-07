@@ -163,7 +163,7 @@ namespace osu.Game.Database
             contexts.Value++;
             return Realm.GetInstance(new RealmConfiguration(storage.GetFullPath($"{database_name}.realm", true))
             {
-                SchemaVersion = 2,
+                SchemaVersion = 3,
                 MigrationCallback = onMigration
             });
         }
