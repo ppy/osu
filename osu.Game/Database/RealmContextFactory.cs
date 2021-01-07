@@ -43,6 +43,15 @@ namespace osu.Game.Database
             this.storage = storage;
             this.scheduler = scheduler;
             recreateThreadContexts();
+
+            using (CreateContext())
+            {
+                // ensure our schema is up-to-date and migrated.
+            }
+        }
+
+        private void onMigration(Migration migration, ulong oldschemaversion)
+        {
         }
 
         private static readonly GlobalStatistic<int> reads = GlobalStatistics.Get<int>("Realm", "Get (Read)");
@@ -158,7 +167,11 @@ namespace osu.Game.Database
         protected virtual Realm CreateContext()
         {
             contexts.Value++;
-            return Realm.GetInstance(new RealmConfiguration(storage.GetFullPath($"{database_name}.realm", true)));
+            return Realm.GetInstance(new RealmConfiguration(storage.GetFullPath($"{database_name}.realm", true))
+            {
+                SchemaVersion = 2,
+                MigrationCallback = onMigration
+            });
         }
 
         public void ResetDatabase()
