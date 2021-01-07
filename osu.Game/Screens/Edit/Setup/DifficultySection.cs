@@ -13,9 +13,6 @@ namespace osu.Game.Screens.Edit.Setup
 {
     internal class DifficultySection : SetupSection
     {
-        [Resolved]
-        private EditorBeatmap editorBeatmap { get; set; }
-
         private LabelledSliderBar<float> circleSizeSlider;
         private LabelledSliderBar<float> healthDrainSlider;
         private LabelledSliderBar<float> approachRateSlider;
@@ -93,7 +90,7 @@ namespace osu.Game.Screens.Edit.Setup
             Beatmap.BeatmapInfo.BaseDifficulty.ApproachRate = approachRateSlider.Current.Value;
             Beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty = overallDifficultySlider.Current.Value;
 
-            editorBeatmap.UpdateAllHitObjects();
+            Beatmap.UpdateAllHitObjects();
         }
     }
 }
