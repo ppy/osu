@@ -50,6 +50,7 @@ namespace osu.Game.Input
                         // insert any defaults which are missing.
                         usage.Context.Add(new RealmKeyBinding
                         {
+                            ID = Guid.NewGuid().ToString(),
                             KeyBinding = new KeyBinding
                             {
                                 KeyCombination = insertable.KeyCombination,
