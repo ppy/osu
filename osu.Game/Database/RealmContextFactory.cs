@@ -45,11 +45,11 @@ namespace osu.Game.Database
             recreateThreadContexts();
         }
 
-        private static readonly GlobalStatistic<int> reads = GlobalStatistics.Get<int>("Database", "Get (Read)");
-        private static readonly GlobalStatistic<int> writes = GlobalStatistics.Get<int>("Database", "Get (Write)");
-        private static readonly GlobalStatistic<int> commits = GlobalStatistics.Get<int>("Database", "Commits");
-        private static readonly GlobalStatistic<int> rollbacks = GlobalStatistics.Get<int>("Database", "Rollbacks");
-        private static readonly GlobalStatistic<int> contexts = GlobalStatistics.Get<int>("Database", "Contexts");
+        private static readonly GlobalStatistic<int> reads = GlobalStatistics.Get<int>("Realm", "Get (Read)");
+        private static readonly GlobalStatistic<int> writes = GlobalStatistics.Get<int>("Realm", "Get (Write)");
+        private static readonly GlobalStatistic<int> commits = GlobalStatistics.Get<int>("Realm", "Commits");
+        private static readonly GlobalStatistic<int> rollbacks = GlobalStatistics.Get<int>("Realm", "Rollbacks");
+        private static readonly GlobalStatistic<int> contexts = GlobalStatistics.Get<int>("Realm", "Contexts");
         private Thread writingThread;
 
         /// <summary>
