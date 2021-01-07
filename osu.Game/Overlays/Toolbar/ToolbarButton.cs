@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Caching;
 using osu.Framework.Extensions.Color4Extensions;
@@ -74,7 +75,7 @@ namespace osu.Game.Overlays.Toolbar
         protected FillFlowContainer Flow;
 
         [Resolved]
-        private KeyBindingStore keyBindings { get; set; }
+        private IKeyBindingStore keyBindings { get; set; }
 
         protected ToolbarButton()
             : base(HoverSampleSet.Loud)
@@ -171,9 +172,16 @@ namespace osu.Game.Overlays.Toolbar
             if (tooltipKeyBinding.IsValid)
                 return;
 
-            var binding = keyBindings.Query().Find(b => (GlobalAction)b.Action == Hotkey);
-            var keyBindingString = binding?.KeyCombination.ReadableString();
-            keyBindingTooltip.Text = !string.IsNullOrEmpty(keyBindingString) ? $" ({keyBindingString})" : string.Empty;
+            keyBindingTooltip.Text = string.Empty;
+
+            if (Hotkey != null)
+            {
+                KeyCombination? binding = keyBindings.Query(Hotkey.Value).FirstOrDefault()?.KeyCombination;
+                var keyBindingString = binding?.ReadableString();
+
+                if (!string.IsNullOrEmpty(keyBindingString))
+                    keyBindingTooltip.Text = $" ({keyBindingString})";
+            }
 
             tooltipKeyBinding.Validate();
         }

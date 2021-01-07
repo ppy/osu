@@ -12,7 +12,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Input
 {
-    public class KeyBindingStore : DatabaseBackedStore
+    public class KeyBindingStore : DatabaseBackedStore, IKeyBindingStore
     {
         public event Action KeyBindingChanged;
 
@@ -39,7 +39,7 @@ namespace osu.Game.Input
         /// <returns>A set of display strings for all the user's key configuration for the action.</returns>
         public IEnumerable<string> GetReadableKeyCombinationsFor(GlobalAction globalAction)
         {
-            foreach (var action in Query().Where(b => (GlobalAction)b.Action == globalAction))
+            foreach (var action in query().Where(b => (GlobalAction)b.Action == globalAction))
             {
                 string str = action.KeyCombination.ReadableString();
 
@@ -49,6 +49,12 @@ namespace osu.Game.Input
             }
         }
 
+        public List<KeyBinding> Query(int? rulesetId = null, int? variant = null)
+            => query(rulesetId, variant).OfType<KeyBinding>().ToList();
+
+        public List<KeyBinding> Query(GlobalAction action)
+            => query(null, null).Where(dkb => (GlobalAction)dkb.Action == action).OfType<KeyBinding>().ToList();
+
         private void insertDefaults(IEnumerable<KeyBinding> defaults, int? rulesetId = null, int? variant = null)
         {
             using (var usage = ContextFactory.GetForWrite())
@@ -56,7 +62,7 @@ namespace osu.Game.Input
                 // compare counts in database vs defaults
                 foreach (var group in defaults.GroupBy(k => k.Action))
                 {
-                    int count = Query(rulesetId, variant).Count(k => (int)k.Action == (int)group.Key);
+                    int count = query(rulesetId, variant).Count(k => (int)k.Action == (int)group.Key);
                     int aimCount = group.Count();
 
                     if (aimCount <= count)
@@ -86,7 +92,7 @@ namespace osu.Game.Input
         /// <param name="rulesetId">The ruleset's internal ID.</param>
         /// <param name="variant">An optional variant.</param>
         /// <returns></returns>
-        public List<DatabasedKeyBinding> Query(int? rulesetId = null, int? variant = null) =>
+        private List<DatabasedKeyBinding> query(int? rulesetId = null, int? variant = null) =>
             ContextFactory.Get().DatabasedKeyBinding.Where(b => b.RulesetID == rulesetId && b.Variant == variant).ToList();
 
         public void Update(KeyBinding keyBinding)

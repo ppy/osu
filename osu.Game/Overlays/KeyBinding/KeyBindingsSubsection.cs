@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.KeyBinding
         }
 
         [BackgroundDependencyLoader]
-        private void load(KeyBindingStore store)
+        private void load(IKeyBindingStore store)
         {
             var bindings = store.Query(Ruleset?.ID, variant);
 

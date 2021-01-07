@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets;
-using System.Linq;
 
 namespace osu.Game.Input.Bindings
 {
@@ -21,7 +20,8 @@ namespace osu.Game.Input.Bindings
 
         private readonly int? variant;
 
-        private KeyBindingStore store;
+        [Resolved]
+        private IKeyBindingStore store { get; set; }
 
         public override IEnumerable<KeyBinding> DefaultKeyBindings => ruleset.CreateInstance().GetDefaultKeyBindings(variant ?? 0);
 
@@ -40,12 +40,6 @@ namespace osu.Game.Input.Bindings
 
             if (ruleset != null && variant == null)
                 throw new InvalidOperationException($"{nameof(variant)} can not be null when a non-null {nameof(ruleset)} is provided.");
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(KeyBindingStore keyBindings)
-        {
-            store = keyBindings;
         }
 
         protected override void LoadComplete()
@@ -69,7 +63,7 @@ namespace osu.Game.Input.Bindings
                 // fallback to defaults instead.
                 KeyBindings = DefaultKeyBindings;
             else
-                KeyBindings = store.Query(ruleset?.ID, variant).ToList();
+                KeyBindings = store.Query(ruleset?.ID, variant);
         }
     }
 }

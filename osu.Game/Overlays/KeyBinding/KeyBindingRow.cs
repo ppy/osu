@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.KeyBinding
         }
 
         [Resolved]
-        private KeyBindingStore store { get; set; }
+        private IKeyBindingStore store { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)

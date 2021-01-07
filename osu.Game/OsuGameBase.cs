@@ -73,7 +73,7 @@ namespace osu.Game
 
         protected FileStore FileStore;
 
-        protected RealmKeyBindingStore KeyBindingStore;
+        protected IKeyBindingStore KeyBindingStore;
 
         protected SettingsStore SettingsStore;
 
@@ -268,7 +268,7 @@ namespace osu.Game
             // todo: migrate to realm
             // dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
 
-            dependencies.Cache(KeyBindingStore = new RealmKeyBindingStore(realmFactory, RulesetStore));
+            dependencies.CacheAs(KeyBindingStore = new RealmKeyBindingStore(realmFactory, RulesetStore));
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
             dependencies.Cache(RulesetConfigCache = new RulesetConfigCache(SettingsStore));
             dependencies.Cache(new SessionStatics());
