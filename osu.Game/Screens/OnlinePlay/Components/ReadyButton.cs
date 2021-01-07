@@ -2,8 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
-using System.Linq.Expressions;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
@@ -41,38 +39,21 @@ namespace osu.Game.Screens.OnlinePlay.Components
             SelectedItem.BindValueChanged(item => updateSelectedItem(item.NewValue), true);
         }
 
-        private void updateSelectedItem(PlaylistItem item)
-        {
-            hasBeatmap = findBeatmap(expr => beatmaps.QueryBeatmap(expr));
-        }
+        private void updateSelectedItem(PlaylistItem _) => Scheduler.AddOnce(updateBeatmapState);
+        private void beatmapUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> _) => Scheduler.AddOnce(updateBeatmapState);
+        private void beatmapRemoved(ValueChangedEvent<WeakReference<BeatmapSetInfo>> _) => Scheduler.AddOnce(updateBeatmapState);
 
-        private void beatmapUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakSet)
-        {
-            if (weakSet.NewValue.TryGetTarget(out var set))
-            {
-                if (findBeatmap(expr => set.Beatmaps.AsQueryable().FirstOrDefault(expr)))
-                    Schedule(() => hasBeatmap = true);
-            }
-        }
-
-        private void beatmapRemoved(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakSet)
-        {
-            if (weakSet.NewValue.TryGetTarget(out var set))
-            {
-                if (findBeatmap(expr => set.Beatmaps.AsQueryable().FirstOrDefault(expr)))
-                    Schedule(() => hasBeatmap = false);
-            }
-        }
-
-        private bool findBeatmap(Func<Expression<Func<BeatmapInfo, bool>>, BeatmapInfo> expression)
+        private void updateBeatmapState()
         {
             int? beatmapId = SelectedItem.Value?.Beatmap.Value?.OnlineBeatmapID;
             string checksum = SelectedItem.Value?.Beatmap.Value?.MD5Hash;
 
             if (beatmapId == null || checksum == null)
-                return false;
+                return;
 
-            return expression(b => b.OnlineBeatmapID == beatmapId && b.MD5Hash == checksum) != null;
+            var databasedBeatmap = beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == beatmapId && b.MD5Hash == checksum);
+
+            hasBeatmap = databasedBeatmap?.BeatmapSet?.DeletePending == false;
         }
 
         protected override void Update()
