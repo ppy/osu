@@ -30,6 +30,23 @@ namespace osu.Game.Input
             }
         }
 
+        /// <summary>
+        /// Retrieve all user-defined key combinations (in a format that can be displayed) for a specific action.
+        /// </summary>
+        /// <param name="globalAction">The action to lookup.</param>
+        /// <returns>A set of display strings for all the user's key configuration for the action.</returns>
+        public IEnumerable<string> GetReadableKeyCombinationsFor(GlobalAction globalAction)
+        {
+            foreach (var action in Query().Where(b => (GlobalAction)b.KeyBinding.Action == globalAction))
+            {
+                string str = action.KeyBinding.KeyCombination.ReadableString();
+
+                // even if found, the readable string may be empty for an unbound action.
+                if (str.Length > 0)
+                    yield return str;
+            }
+        }
+
         public void Register(KeyBindingContainer manager) => insertDefaults(manager.DefaultKeyBindings);
 
         private void insertDefaults(IEnumerable<KeyBinding> defaults, int? rulesetId = null, int? variant = null)
