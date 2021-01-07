@@ -59,7 +59,6 @@ namespace osu.Game.Database
         private static readonly GlobalStatistic<int> commits = GlobalStatistics.Get<int>("Realm", "Commits");
         private static readonly GlobalStatistic<int> rollbacks = GlobalStatistics.Get<int>("Realm", "Rollbacks");
         private static readonly GlobalStatistic<int> contexts = GlobalStatistics.Get<int>("Realm", "Contexts");
-        private Thread writingThread;
 
         /// <summary>
         /// Get a context for the current thread for read-only usage.
@@ -86,11 +85,7 @@ namespace osu.Game.Database
             {
                 context = getContextForCurrentThread();
 
-                if (currentWriteTransaction == null)
-                {
-                    writingThread = Thread.CurrentThread;
-                    currentWriteTransaction = context.BeginWrite();
-                }
+                currentWriteTransaction ??= context.BeginWrite();
             }
             catch
             {
@@ -144,7 +139,6 @@ namespace osu.Game.Database
                     }
 
                     currentWriteTransaction = null;
-                    writingThread = null;
                     rollbackRequired = false;
 
                     refreshCompleted = new ThreadLocal<bool>();
