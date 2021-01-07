@@ -30,8 +30,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         public abstract bool IsRedundant(ControlPoint existing);
 
         /// <summary>
-        /// Create a copy of this room without online information.
-        /// Should be used to create a local copy of a room for submitting in the future.
+        /// Create an unbound copy of this control point.
         /// </summary>
         public ControlPoint CreateCopy()
         {
