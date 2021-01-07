@@ -16,17 +16,19 @@ namespace osu.Game.Input.Bindings
 
         public int? Variant { get; set; }
 
+        public int Action { get; set; }
+
+        public string KeyCombination { get; set; }
+
         [Ignored]
         public KeyBinding KeyBinding
         {
-            get
+            get => new KeyBinding(KeyCombination, Action);
+            set
             {
-                var split = KeyBindingString.Split(':');
-                return new KeyBinding(split[0], int.Parse(split[1]));
+                KeyCombination = value.KeyCombination.ToString();
+                Action = (int)value.Action;
             }
-            set => KeyBindingString = $"{value.KeyCombination}:{(int)value.Action}";
         }
-
-        public string KeyBindingString { get; set; }
     }
 }

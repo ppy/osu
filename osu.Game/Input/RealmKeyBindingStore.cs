@@ -93,8 +93,13 @@ namespace osu.Game.Input
         public List<KeyBinding> Query(int? rulesetId = null, int? variant = null)
             => query(rulesetId, variant).Select(k => k.KeyBinding).ToList();
 
-        public List<KeyBinding> Query(GlobalAction action)
-            => query(null, null).Where(rkb => rkb.KeyBindingString.StartsWith($"{(int)action}:", StringComparison.Ordinal)).Select(k => k.KeyBinding).ToList();
+        public List<KeyBinding> Query<T>(T action)
+            where T : Enum
+        {
+            int lookup = (int)(object)action;
+
+            return query(null, null).Where(rkb => rkb.Action == lookup).Select(k => k.KeyBinding).ToList();
+        }
 
         public void Update(KeyBinding keyBinding)
         {

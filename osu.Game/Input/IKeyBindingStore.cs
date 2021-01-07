@@ -33,7 +33,7 @@ namespace osu.Game.Input
         /// Retrieve <see cref="KeyBinding"/>s for the specified action.
         /// </summary>
         /// <param name="action">The action to lookup.</param>
-        List<KeyBinding> Query(GlobalAction action);
+        List<KeyBinding> Query<T>(T action) where T : Enum;
 
         public void Update(KeyBinding buttonKeyBinding) => throw new NotImplementedException();
     }

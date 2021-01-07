@@ -52,8 +52,11 @@ namespace osu.Game.Input
         public List<KeyBinding> Query(int? rulesetId = null, int? variant = null)
             => query(rulesetId, variant).OfType<KeyBinding>().ToList();
 
-        public List<KeyBinding> Query(GlobalAction action)
-            => query(null, null).Where(dkb => (GlobalAction)dkb.Action == action).OfType<KeyBinding>().ToList();
+        public List<KeyBinding> Query<T>(T action) where T : Enum
+        {
+            int lookup = (int)(object)action;
+            return query(null, null).Where(rkb => (int)rkb.Action == lookup).OfType<KeyBinding>().ToList();
+        }
 
         private void insertDefaults(IEnumerable<KeyBinding> defaults, int? rulesetId = null, int? variant = null)
         {
