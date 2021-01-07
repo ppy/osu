@@ -164,7 +164,7 @@ namespace osu.Game.Beatmaps.Formats
             /// Legacy BPM multiplier that introduces floating-point errors for rulesets that depend on it.
             /// DO NOT USE THIS UNLESS 100% SURE.
             /// </summary>
-            public float BpmMultiplier { get; set; }
+            public float BpmMultiplier { get; private set; }
 
             public LegacyDifficultyControlPoint(double beatLength)
                 : this()
