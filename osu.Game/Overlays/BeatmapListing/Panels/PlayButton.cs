@@ -163,11 +163,5 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
             if (Preview?.Start() != true)
                 Playing.Value = false;
         }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            Playing.Value = false;
-        }
     }
 }
