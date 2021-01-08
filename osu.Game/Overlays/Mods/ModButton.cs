@@ -52,9 +52,10 @@ namespace osu.Game.Overlays.Mods
             if (newIndex == selectedIndex) return false;
 
             int direction = newIndex < selectedIndex ? -1 : 1;
+
             bool beforeSelected = Selected;
 
-            Mod modBefore = SelectedMod ?? Mods[0];
+            Mod previousSelection = SelectedMod ?? Mods[0];
 
             if (newIndex >= Mods.Length)
                 newIndex = -1;
@@ -64,25 +65,26 @@ namespace osu.Game.Overlays.Mods
             if (newIndex >= 0 && !Mods[newIndex].HasImplementation)
                 return false;
 
+            selectedIndex = newIndex;
+
+            Mod newSelection = SelectedMod ?? Mods[0];
+
             Schedule(() =>
             {
-                selectedIndex = newIndex;
-                Mod modAfter = SelectedMod ?? Mods[0];
-
                 if (beforeSelected != Selected)
                 {
                     iconsContainer.RotateTo(Selected ? 5f : 0f, 300, Easing.OutElastic);
                     iconsContainer.ScaleTo(Selected ? 1.1f : 1f, 300, Easing.OutElastic);
                 }
 
-                if (modBefore != modAfter)
+                if (previousSelection != newSelection)
                 {
                     const float rotate_angle = 16;
 
                     foregroundIcon.RotateTo(rotate_angle * direction, mod_switch_duration, mod_switch_easing);
                     backgroundIcon.RotateTo(-rotate_angle * direction, mod_switch_duration, mod_switch_easing);
 
-                    backgroundIcon.Mod = modAfter;
+                    backgroundIcon.Mod = newSelection;
 
                     using (BeginDelayedSequence(mod_switch_duration, true))
                     {
@@ -94,14 +96,14 @@ namespace osu.Game.Overlays.Mods
                             .RotateTo(rotate_angle * direction)
                             .RotateTo(0f, mod_switch_duration, mod_switch_easing);
 
-                        Schedule(() => displayMod(modAfter));
+                        Schedule(() => displayMod(newSelection));
                     }
                 }
 
                 foregroundIcon.Selected.Value = Selected;
-
-                SelectionChanged?.Invoke(SelectedMod);
             });
+
+            SelectionChanged?.Invoke(newSelection);
 
             return true;
         }
