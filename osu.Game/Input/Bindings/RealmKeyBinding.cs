@@ -8,13 +8,26 @@ using Realms;
 namespace osu.Game.Input.Bindings
 {
     [MapTo("KeyBinding")]
-    public class RealmKeyBinding : RealmObject, IHasGuidPrimaryKey
+    public class RealmKeyBinding : RealmObject, IHasGuidPrimaryKey, IKeyBinding
     {
+        [PrimaryKey]
         public string ID { get; set; }
 
         public int? RulesetID { get; set; }
 
         public int? Variant { get; set; }
+
+        KeyCombination IKeyBinding.KeyCombination
+        {
+            get => KeyCombination;
+            set => KeyCombination = value.ToString();
+        }
+
+        object IKeyBinding.Action
+        {
+            get => Action;
+            set => Action = (int)value;
+        }
 
         public int Action { get; set; }
 

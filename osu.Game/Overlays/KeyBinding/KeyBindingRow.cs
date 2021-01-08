@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -25,7 +26,7 @@ namespace osu.Game.Overlays.KeyBinding
     public class KeyBindingRow : Container, IFilterable
     {
         private readonly object action;
-        private readonly IEnumerable<Framework.Input.Bindings.KeyBinding> bindings;
+        private readonly IEnumerable<IKeyBinding> bindings;
 
         private const float transition_time = 150;
 
@@ -53,7 +54,7 @@ namespace osu.Game.Overlays.KeyBinding
 
         public IEnumerable<string> FilterTerms => bindings.Select(b => b.KeyCombination.ReadableString()).Prepend((string)text.Text);
 
-        public KeyBindingRow(object action, IEnumerable<Framework.Input.Bindings.KeyBinding> bindings)
+        public KeyBindingRow(object action, IEnumerable<IKeyBinding> bindings)
         {
             this.action = action;
             this.bindings = bindings;
@@ -126,7 +127,7 @@ namespace osu.Game.Overlays.KeyBinding
             {
                 var button = buttons[i++];
                 button.UpdateKeyCombination(d);
-                store.Update(button.KeyBinding);
+                store.Update((IHasGuidPrimaryKey)button.KeyBinding, k => k.KeyCombination = button.KeyBinding.KeyCombination);
             }
         }
 
@@ -285,7 +286,7 @@ namespace osu.Game.Overlays.KeyBinding
         {
             if (bindTarget != null)
             {
-                store.Update(bindTarget.KeyBinding);
+                store.Update((IHasGuidPrimaryKey)bindTarget.KeyBinding, k => k.KeyCombination = bindTarget.KeyBinding.KeyCombination);
 
                 bindTarget.IsBinding = false;
                 Schedule(() =>
@@ -359,7 +360,7 @@ namespace osu.Game.Overlays.KeyBinding
 
         public class KeyButton : Container
         {
-            public readonly Framework.Input.Bindings.KeyBinding KeyBinding;
+            public readonly IKeyBinding KeyBinding;
 
             private readonly Box box;
             public readonly OsuSpriteText Text;
@@ -381,7 +382,7 @@ namespace osu.Game.Overlays.KeyBinding
                 }
             }
 
-            public KeyButton(Framework.Input.Bindings.KeyBinding keyBinding)
+            public KeyButton(IKeyBinding keyBinding)
             {
                 KeyBinding = keyBinding;
 
