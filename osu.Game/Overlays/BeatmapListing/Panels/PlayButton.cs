@@ -142,7 +142,9 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
 
                     AddInternal(preview);
                     loading = false;
-                    preview.Stopped += () => Playing.Value = false;
+                    // make sure that the update of value of Playing (and the ensuing value change callbacks)
+                    // are marshaled back to the update thread.
+                    preview.Stopped += () => Schedule(() => Playing.Value = false);
 
                     // user may have changed their mind.
                     if (Playing.Value)
