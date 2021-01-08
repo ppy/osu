@@ -144,12 +144,12 @@ namespace osu.Game.Rulesets.Mods
 
             foreach (var (_, prop) in this.GetSettingsSourceProperties())
             {
-                var origBindable = (IBindable)prop.GetValue(this);
-                var copyBindable = (IBindable)prop.GetValue(copy);
+                var targetBindable = (IBindable)prop.GetValue(this);
+                var sourceBindable = (IBindable)prop.GetValue(them);
 
                 // we only care about changes that have been made away from defaults.
-                if (!origBindable.IsDefault)
-                    copy.CopyAdjustedSetting(copyBindable, origBindable);
+                if (!sourceBindable.IsDefault)
+                    CopyAdjustedSetting(targetBindable, sourceBindable);
             }
         }
 
