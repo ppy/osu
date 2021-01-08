@@ -32,16 +32,5 @@ namespace osu.Game.Input.Bindings
         public int Action { get; set; }
 
         public string KeyCombination { get; set; }
-
-        [Ignored]
-        public KeyBinding KeyBinding
-        {
-            get => new KeyBinding(KeyCombination, Action);
-            set
-            {
-                KeyCombination = value.KeyCombination.ToString();
-                Action = (int)value.Action;
-            }
-        }
     }
 }
