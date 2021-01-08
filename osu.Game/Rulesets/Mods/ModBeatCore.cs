@@ -7,8 +7,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModBeatCore<TObject> : Mod, IApplicableToDrawableRuleset<TObject>
-        where TObject : HitObject
+    public abstract class ModBeatCore : Mod
     {
         public override string Name => "节拍";
         public override string Acronym => "BC";
@@ -16,7 +15,11 @@ namespace osu.Game.Rulesets.Mods
         public override string Description => "在正常的速度动次打次动次打次...";
         public override ModType Type => ModType.Fun;
         public override Type[] IncompatibleMods => new[] { typeof(ModNightcore) };
+    }
 
+    public abstract class ModBeatCore<TObject> : ModBeatCore, IApplicableToDrawableRuleset<TObject>
+        where TObject : HitObject
+    {
         public void ApplyToDrawableRuleset(DrawableRuleset<TObject> drawableRuleset)
         {
             drawableRuleset.Overlays.Add(new NightcoreBeatContainer());
