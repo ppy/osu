@@ -68,11 +68,8 @@ namespace osu.Game.Input
                         usage.Context.Add(new RealmKeyBinding
                         {
                             ID = Guid.NewGuid().ToString(),
-                            KeyBinding = new KeyBinding
-                            {
-                                KeyCombination = insertable.KeyCombination,
-                                Action = insertable.Action,
-                            },
+                            KeyCombination = insertable.KeyCombination.ToString(),
+                            Action = (int)insertable.Action,
                             RulesetID = rulesetId,
                             Variant = variant
                         });
