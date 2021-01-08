@@ -29,7 +29,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         protected override UserActivity InitialActivity => new UserActivity.SearchingForLobby();
 
         private readonly IBindable<bool> initialRoomsReceived = new Bindable<bool>();
-        private readonly IBindable<bool> joiningRoom = new Bindable<bool>();
+        private readonly IBindable<bool> operationInProgress = new Bindable<bool>();
 
         private FilterControl filter;
         private Container content;
@@ -110,8 +110,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
             if (ongoingOperationTracker != null)
             {
-                joiningRoom.BindTo(ongoingOperationTracker.InProgress);
-                joiningRoom.BindValueChanged(_ => updateLoadingLayer(), true);
+                operationInProgress.BindTo(ongoingOperationTracker.InProgress);
+                operationInProgress.BindValueChanged(_ => updateLoadingLayer(), true);
             }
         }
 
@@ -187,7 +187,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         private void updateLoadingLayer()
         {
-            if (joiningRoom.Value || !initialRoomsReceived.Value)
+            if (operationInProgress.Value || !initialRoomsReceived.Value)
                 loadingLayer.Show();
             else
                 loadingLayer.Hide();
