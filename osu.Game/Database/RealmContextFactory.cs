@@ -163,7 +163,7 @@ namespace osu.Game.Database
             contexts.Value++;
             return Realm.GetInstance(new RealmConfiguration(storage.GetFullPath($"{database_name}.realm", true))
             {
-                SchemaVersion = 3,
+                SchemaVersion = 5,
                 MigrationCallback = onMigration
             });
         }
@@ -211,6 +211,12 @@ namespace osu.Game.Database
         public RealmWrapper<TChild> WrapChild<TChild>(Func<T, TChild> lookup)
             where TChild : RealmObject, IHasGuidPrimaryKey => new RealmWrapper<TChild>(lookup(Get()), ContextFactory);
 
+        public void PerformUpdate(Action<T> perform)
+        {
+            using (ContextFactory.GetForWrite())
+                perform(this);
+        }
+
         // ReSharper disable once CA2225
         public static implicit operator T(RealmWrapper<T> wrapper)
             => wrapper?.Get().Detach();
@@ -241,6 +247,7 @@ namespace osu.Game.Database
              .MaxDepth(2);
 
             c.CreateMap<DatabasedKeyBinding, DatabasedKeyBinding>();
+            c.CreateMap<RealmKeyBinding, RealmKeyBinding>();
             c.CreateMap<DatabasedSetting, DatabasedSetting>();
             c.CreateMap<FileInfo, FileInfo>();
             c.CreateMap<ScoreFileInfo, ScoreFileInfo>();
