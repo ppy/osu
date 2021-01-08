@@ -17,7 +17,7 @@ namespace osu.Game.Tournament
         public override void WriteJson(JsonWriter writer, Point value, JsonSerializer serializer)
         {
             // use the format of LaborSharp's Point since it is nicer.
-            serializer.Serialize(writer, new SixLabors.ImageSharp.Point(value.X, value.Y));
+            serializer.Serialize(writer, new { value.X, value.Y });
         }
 
         public override Point ReadJson(JsonReader reader, Type objectType, Point existingValue, bool hasExistingValue, JsonSerializer serializer)
