@@ -47,10 +47,9 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnHover(HoverEvent e)
         {
-            bool requiresDebounce = HoverDebounceTime <= 0;
             bool enoughTimePassedSinceLastPlayback = !lastPlaybackTime.Value.HasValue || Time.Current - lastPlaybackTime.Value >= HoverDebounceTime;
 
-            if (!requiresDebounce || enoughTimePassedSinceLastPlayback)
+            if (enoughTimePassedSinceLastPlayback)
             {
                 sampleHover?.Play();
                 lastPlaybackTime.Value = Time.Current;
