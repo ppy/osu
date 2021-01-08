@@ -29,7 +29,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected readonly HoverSampleSet SampleSet;
 
-        private Bindable<double> lastPlaybackTime;
+        private Bindable<double?> lastPlaybackTime;
 
         public HoverSounds(HoverSampleSet sampleSet = HoverSampleSet.Normal)
         {
@@ -40,7 +40,7 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, SessionStatics statics)
         {
-            lastPlaybackTime = statics.GetBindable<double>(Static.LastHoverSoundPlaybackTime);
+            lastPlaybackTime = statics.GetBindable<double?>(Static.LastHoverSoundPlaybackTime);
 
             sampleHover = audio.Samples.Get($@"UI/generic-hover{SampleSet.GetDescription()}");
         }
@@ -48,7 +48,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnHover(HoverEvent e)
         {
             bool requiresDebounce = HoverDebounceTime <= 0;
-            bool enoughTimePassedSinceLastPlayback = lastPlaybackTime.Value == 0 || Time.Current - lastPlaybackTime.Value > HoverDebounceTime;
+            bool enoughTimePassedSinceLastPlayback = !lastPlaybackTime.Value.HasValue || Time.Current - lastPlaybackTime.Value >= HoverDebounceTime;
 
             if (!requiresDebounce || enoughTimePassedSinceLastPlayback)
             {
