@@ -241,7 +241,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             void endOperation()
             {
-                readyClickOperation?.Dispose();
+                Debug.Assert(readyClickOperation != null);
+                readyClickOperation.Dispose();
                 readyClickOperation = null;
             }
         }

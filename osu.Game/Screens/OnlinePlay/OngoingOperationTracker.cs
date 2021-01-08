@@ -40,13 +40,12 @@ namespace osu.Game.Screens.OnlinePlay
             return new InvokeOnDisposal(endOperation);
         }
 
-        /// <summary>
-        /// Ends tracking an online operation.
-        /// Does nothing if an operation has not been begun yet.
-        /// </summary>
         private void endOperation()
         {
-            leasedInProgress?.Return();
+            if (leasedInProgress == null)
+                throw new InvalidOperationException("Cannot end operation multiple times.");
+
+            leasedInProgress.Return();
             leasedInProgress = null;
         }
     }
