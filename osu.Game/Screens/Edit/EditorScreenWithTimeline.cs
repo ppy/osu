@@ -30,15 +30,15 @@ namespace osu.Game.Screens.Edit
         {
         }
 
+        private Container mainContent;
+
+        private LoadingSpinner spinner;
+
         [BackgroundDependencyLoader(true)]
         private void load([CanBeNull] BindableBeatDivisor beatDivisor)
         {
             if (beatDivisor != null)
                 this.beatDivisor.BindTo(beatDivisor);
-
-            Container mainContent;
-
-            LoadingSpinner spinner;
 
             Children = new Drawable[]
             {
@@ -99,6 +99,11 @@ namespace osu.Game.Screens.Edit
                     }
                 },
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             LoadComponentAsync(CreateMainContent(), content =>
             {

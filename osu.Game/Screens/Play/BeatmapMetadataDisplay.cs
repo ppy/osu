@@ -59,7 +59,6 @@ namespace osu.Game.Screens.Play
         private readonly Drawable facade;
         private LoadingSpinner loading;
         private SelectedRulesetIcon ruleseticon;
-        private Sprite backgroundSprite;
 
         public IBindable<IReadOnlyList<Mod>> Mods => mods;
 
@@ -178,7 +177,7 @@ namespace osu.Game.Screens.Play
                                     Masking = true,
                                     Children = new Drawable[]
                                     {
-                                        backgroundSprite = new Sprite
+                                        new Sprite
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                             Texture = beatmap?.Background,
@@ -186,7 +185,7 @@ namespace osu.Game.Screens.Play
                                             Anchor = Anchor.Centre,
                                             FillMode = FillMode.Fill,
                                         },
-                                        loading = new LoadingLayer(backgroundSprite),
+                                        loading = new LoadingLayer(true),
                                         ruleseticon = new SelectedRulesetIcon(),
                                     }
                                 },

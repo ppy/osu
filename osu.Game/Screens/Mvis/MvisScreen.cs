@@ -581,7 +581,7 @@ namespace osu.Game.Screens.Mvis
             lockChanges.Value = true;
 
             //背景层的动画
-            Background?.FadeIn(250);
+            ApplyToBackground(b => b.FadeIn(250));
 
             //非背景层的动画
             gameplayContent.ScaleTo(0, duration, Easing.OutQuint);
@@ -598,7 +598,7 @@ namespace osu.Game.Screens.Mvis
 
             //背景层的动画
             applyBackgroundBrightness(false, 1);
-            Background?.FadeIn(250);
+            ApplyToBackground(b => b.FadeIn(250));
 
             //非背景层的动画
             gameplayContent.MoveToX(-DrawWidth, duration, Easing.OutQuint);
@@ -828,13 +828,14 @@ namespace osu.Game.Screens.Mvis
 
         private void updateBackground(WorkingBeatmap beatmap)
         {
-            if (Background == null || !this.IsCurrentScreen()) return;
-
-            if (Background is BackgroundScreenBeatmap backgroundScreenBeatmap)
+            ApplyToBackground(b =>
             {
-                backgroundScreenBeatmap.BlurAmount.Value = bgBlur.Value * 100;
-                backgroundScreenBeatmap.Beatmap = beatmap;
-            }
+                if (b is BackgroundScreenBeatmap bsb)
+                {
+                    bsb.BlurAmount.Value = bgBlur.Value * 100;
+                    bsb.Beatmap = beatmap;
+                }
+            });
 
             applyBackgroundBrightness();
         }
@@ -848,15 +849,18 @@ namespace osu.Game.Screens.Mvis
         {
             if (!this.IsCurrentScreen()) return;
 
-            if (auto)
-            {
-                Background?.FadeColour(
-                    (sbLoader?.StoryboardReplacesBackground.Value ?? false) ? Color4.Black : OsuColour.Gray(overlaysHidden ? idleBgDim.Value : 0.6f),
-                    duration,
-                    Easing.OutQuint);
-            }
-            else
-                Background?.FadeColour(OsuColour.Gray(brightness), duration, Easing.OutQuint);
+            ApplyToBackground(b =>
+                {
+                    if (auto)
+                    {
+                        b.FadeColour((sbLoader?.StoryboardReplacesBackground.Value ?? false) ? Color4.Black : OsuColour.Gray(overlaysHidden ? idleBgDim.Value : 0.6f),
+                            duration,
+                            Easing.OutQuint);
+                    }
+                    else
+                        b.FadeColour(OsuColour.Gray(brightness), duration, Easing.OutQuint);
+                }
+            );
 
             sbLoader?.FadeColour(OsuColour.Gray(auto ? (overlaysHidden ? idleBgDim.Value : 0.6f) : brightness), duration, Easing.OutQuint);
         }
