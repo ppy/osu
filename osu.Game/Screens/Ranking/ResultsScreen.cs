@@ -269,6 +269,11 @@ namespace osu.Game.Screens.Ranking
         {
             bool useOriginalAnimation = mConfig.Get<bool>(MSetting.OptUI);
 
+            ApplyToBackground(b =>
+            {
+                b.FadeTo(1, 250);
+            });
+
             switch (useOriginalAnimation)
             {
                 case true:

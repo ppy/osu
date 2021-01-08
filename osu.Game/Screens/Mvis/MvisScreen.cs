@@ -29,7 +29,6 @@ using osu.Framework.Graphics.Audio;
 using osu.Game.Screens.Select;
 using osu.Game.Overlays.Settings;
 using osuTK.Input;
-using osu.Game.Screens.Backgrounds;
 using osu.Game.Graphics;
 using osu.Framework;
 using osu.Game.Screens.Mvis.Collections;
@@ -38,15 +37,17 @@ using osu.Game.Users;
 using osu.Game.Screens.Mvis.Objects;
 using osu.Game.Screens.Mvis.SideBar;
 using osu.Game.Screens.Mvis.Skinning;
+using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using Sidebar = osu.Game.Screens.Mvis.SideBar.Sidebar;
+using SongProgressBar = osu.Game.Screens.Mvis.BottomBar.SongProgressBar;
 
 namespace osu.Game.Screens.Mvis
 {
     ///<summary>
     /// 音乐播放器
     ///</summary>
-    public class MvisScreen : OsuScreen, IKeyBindingHandler<GlobalAction>
+    public class MvisScreen : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>
     {
         private const float duration = 750;
 
@@ -56,8 +57,6 @@ namespace osu.Game.Screens.Mvis
         public override bool CursorVisible => allowCursor;
         public override bool AllowRateAdjustments => true;
 
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
-
         private bool canReallyHide =>
             // don't hide if the user is hovering one of the panes, unless they are idle.
             (IsHovered || isIdle.Value)
@@ -65,6 +64,8 @@ namespace osu.Game.Screens.Mvis
             && inputManager?.DraggedDrawable == null
             // don't hide if a focused overlay is visible, like settings.
             && inputManager?.FocusedDrawable == null;
+
+        private bool isPushed;
 
         [Resolved(CanBeNull = true)]
         private OsuGame game { get; set; }
@@ -567,6 +568,8 @@ namespace osu.Game.Screens.Mvis
             skinnableForeground.FadeIn(duration, Easing.OutQuint);
 
             playFromCollection.TriggerChange();
+
+            isPushed = true;
         }
 
         public override bool OnExiting(IScreen next)
@@ -579,9 +582,6 @@ namespace osu.Game.Screens.Mvis
             //停止beatmapLogo，取消故事版家在任务以及锁定变更
             beatmapLogo.StopResponseOnBeatmapChanges();
             lockChanges.Value = true;
-
-            //背景层的动画
-            ApplyToBackground(b => b.FadeIn(250));
 
             //非背景层的动画
             gameplayContent.ScaleTo(0, duration, Easing.OutQuint);
@@ -598,7 +598,6 @@ namespace osu.Game.Screens.Mvis
 
             //背景层的动画
             applyBackgroundBrightness(false, 1);
-            ApplyToBackground(b => b.FadeIn(250));
 
             //非背景层的动画
             gameplayContent.MoveToX(-DrawWidth, duration, Easing.OutQuint);
@@ -828,13 +827,12 @@ namespace osu.Game.Screens.Mvis
 
         private void updateBackground(WorkingBeatmap beatmap)
         {
-            ApplyToBackground(b =>
+            if (!isPushed) return;
+
+            ApplyToBackground(bsb =>
             {
-                if (b is BackgroundScreenBeatmap bsb)
-                {
-                    bsb.BlurAmount.Value = bgBlur.Value * 100;
-                    bsb.Beatmap = beatmap;
-                }
+                bsb.BlurAmount.Value = bgBlur.Value * 100;
+                bsb.Beatmap = beatmap;
             });
 
             applyBackgroundBrightness();
@@ -847,20 +845,19 @@ namespace osu.Game.Screens.Mvis
         /// <param name="brightness">要调整的亮度.</param>
         private void applyBackgroundBrightness(bool auto = true, float brightness = 0)
         {
-            if (!this.IsCurrentScreen()) return;
+            if (!this.IsCurrentScreen() || !isPushed) return;
 
             ApplyToBackground(b =>
+            {
+                if (auto)
                 {
-                    if (auto)
-                    {
-                        b.FadeColour((sbLoader?.StoryboardReplacesBackground.Value ?? false) ? Color4.Black : OsuColour.Gray(overlaysHidden ? idleBgDim.Value : 0.6f),
-                            duration,
-                            Easing.OutQuint);
-                    }
-                    else
-                        b.FadeColour(OsuColour.Gray(brightness), duration, Easing.OutQuint);
+                    b.FadeColour((sbLoader?.StoryboardReplacesBackground.Value ?? false) ? Color4.Black : OsuColour.Gray(overlaysHidden ? idleBgDim.Value : 0.6f),
+                        duration,
+                        Easing.OutQuint);
                 }
-            );
+                else
+                    b.FadeColour(OsuColour.Gray(brightness), duration, Easing.OutQuint);
+            });
 
             sbLoader?.FadeColour(OsuColour.Gray(auto ? (overlaysHidden ? idleBgDim.Value : 0.6f) : brightness), duration, Easing.OutQuint);
         }
