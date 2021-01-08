@@ -8,7 +8,7 @@ using osu.Game.Database;
 namespace osu.Game.Input.Bindings
 {
     [Table("KeyBinding")]
-    public class DatabasedKeyBinding : KeyBinding, IHasPrimaryKey
+    public class DatabasedKeyBinding : IKeyBinding, IHasPrimaryKey
     {
         public int ID { get; set; }
 
@@ -17,17 +17,23 @@ namespace osu.Game.Input.Bindings
         public int? Variant { get; set; }
 
         [Column("Keys")]
-        public string KeysString
-        {
-            get => KeyCombination.ToString();
-            private set => KeyCombination = value;
-        }
+        public string KeysString { get; set; }
 
         [Column("Action")]
-        public int IntAction
+        public int IntAction { get; set; }
+
+        [NotMapped]
+        public KeyCombination KeyCombination
         {
-            get => (int)Action;
-            set => Action = value;
+            get => KeysString;
+            set => KeysString = value.ToString();
+        }
+
+        [NotMapped]
+        public object Action
+        {
+            get => IntAction;
+            set => IntAction = (int)value;
         }
     }
 }

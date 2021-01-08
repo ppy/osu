@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Input.Bindings;
+using osu.Game.Database;
 using osu.Game.Input.Bindings;
 
 namespace osu.Game.Input
@@ -27,14 +28,14 @@ namespace osu.Game.Input
         /// <param name="rulesetId">The ruleset's internal ID.</param>
         /// <param name="variant">An optional variant.</param>
         /// <returns></returns>
-        List<KeyBinding> Query(int? rulesetId = null, int? variant = null);
+        List<IKeyBinding> Query(int? rulesetId = null, int? variant = null);
 
         /// <summary>
-        /// Retrieve <see cref="KeyBinding"/>s for the specified action.
+        /// Retrieve <see cref="IKeyBinding"/>s for the specified action.
         /// </summary>
         /// <param name="action">The action to lookup.</param>
-        List<KeyBinding> Query<T>(T action) where T : Enum;
+        List<IKeyBinding> Query<T>(T action) where T : Enum;
 
-        public void Update(KeyBinding buttonKeyBinding) => throw new NotImplementedException();
+        void Update(IHasGuidPrimaryKey keyBinding, Action<IKeyBinding> modification);
     }
 }

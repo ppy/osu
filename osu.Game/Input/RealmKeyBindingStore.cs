@@ -37,9 +37,9 @@ namespace osu.Game.Input
         /// <returns>A set of display strings for all the user's key configuration for the action.</returns>
         public IEnumerable<string> GetReadableKeyCombinationsFor(GlobalAction globalAction)
         {
-            foreach (var action in query().Where(b => (GlobalAction)b.KeyBinding.Action == globalAction))
+            foreach (var action in query().Where(b => (GlobalAction)b.Action == globalAction))
             {
-                string str = action.KeyBinding.KeyCombination.ReadableString();
+                string str = ((IKeyBinding)action).KeyCombination.ReadableString();
 
                 // even if found, the readable string may be empty for an unbound action.
                 if (str.Length > 0)
@@ -49,14 +49,14 @@ namespace osu.Game.Input
 
         public void Register(KeyBindingContainer manager) => insertDefaults(manager.DefaultKeyBindings);
 
-        private void insertDefaults(IEnumerable<KeyBinding> defaults, int? rulesetId = null, int? variant = null)
+        private void insertDefaults(IEnumerable<IKeyBinding> defaults, int? rulesetId = null, int? variant = null)
         {
             using (var usage = ContextFactory.GetForWrite())
             {
                 // compare counts in database vs defaults
                 foreach (var group in defaults.GroupBy(k => k.Action))
                 {
-                    int count = query(rulesetId, variant).Count(k => (int)k.KeyBinding.Action == (int)group.Key);
+                    int count = query(rulesetId, variant).Count(k => k.Action == (int)group.Key);
                     int aimCount = group.Count();
 
                     if (aimCount <= count)
@@ -87,32 +87,26 @@ namespace osu.Game.Input
         /// <param name="rulesetId">The ruleset's internal ID.</param>
         /// <param name="variant">An optional variant.</param>
         /// <returns></returns>
-        private List<RealmKeyBinding> query(int? rulesetId = null, int? variant = null) =>
-            ContextFactory.Get().All<RealmKeyBinding>().Where(b => b.RulesetID == rulesetId && b.Variant == variant).ToList();
+        private IQueryable<RealmKeyBinding> query(int? rulesetId = null, int? variant = null) =>
+            ContextFactory.Get().All<RealmKeyBinding>().Where(b => b.RulesetID == rulesetId && b.Variant == variant);
 
-        public List<KeyBinding> Query(int? rulesetId = null, int? variant = null)
-            => query(rulesetId, variant).Select(k => k.KeyBinding).ToList();
+        public List<IKeyBinding> Query(int? rulesetId = null, int? variant = null)
+            => query(rulesetId, variant).ToList().Select(r => r.Detach()).ToList<IKeyBinding>();
 
-        public List<KeyBinding> Query<T>(T action)
+        public List<IKeyBinding> Query<T>(T action)
             where T : Enum
         {
             int lookup = (int)(object)action;
 
-            return query(null, null).Where(rkb => rkb.Action == lookup).Select(k => k.KeyBinding).ToList();
+            return query(null, null).Where(rkb => rkb.Action == lookup).ToList().Select(r => r.Detach()).ToList<IKeyBinding>();
         }
 
-        public void Update(KeyBinding keyBinding)
+        public void Update(IHasGuidPrimaryKey keyBinding, Action<IKeyBinding> modification)
         {
-            using (ContextFactory.GetForWrite())
+            using (var realm = ContextFactory.GetForWrite())
             {
-                //todo: fix
-                // var dbKeyBinding = (RealmKeyBinding)keyBinding;
-                // Refresh(ref dbKeyBinding);
-                //
-                // if (dbKeyBinding.KeyCombination.Equals(keyBinding.KeyCombination))
-                //     return;
-                //
-                // dbKeyBinding.KeyCombination = keyBinding.KeyCombination;
+                var realmKeyBinding = realm.Context.Find<RealmKeyBinding>(keyBinding.ID);
+                modification(realmKeyBinding);
             }
 
             KeyBindingChanged?.Invoke();

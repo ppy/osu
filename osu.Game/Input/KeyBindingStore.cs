@@ -49,16 +49,21 @@ namespace osu.Game.Input
             }
         }
 
-        public List<KeyBinding> Query(int? rulesetId = null, int? variant = null)
-            => query(rulesetId, variant).OfType<KeyBinding>().ToList();
+        public List<IKeyBinding> Query(int? rulesetId = null, int? variant = null)
+            => query(rulesetId, variant).OfType<IKeyBinding>().ToList();
 
-        public List<KeyBinding> Query<T>(T action) where T : Enum
+        public List<IKeyBinding> Query<T>(T action) where T : Enum
         {
             int lookup = (int)(object)action;
-            return query(null, null).Where(rkb => (int)rkb.Action == lookup).OfType<KeyBinding>().ToList();
+            return query(null, null).Where(rkb => (int)rkb.Action == lookup).OfType<IKeyBinding>().ToList();
         }
 
-        private void insertDefaults(IEnumerable<KeyBinding> defaults, int? rulesetId = null, int? variant = null)
+        public void Update(IHasGuidPrimaryKey keyBinding, Action<IKeyBinding> modification)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void insertDefaults(IEnumerable<IKeyBinding> defaults, int? rulesetId = null, int? variant = null)
         {
             using (var usage = ContextFactory.GetForWrite())
             {
@@ -98,11 +103,11 @@ namespace osu.Game.Input
         private List<DatabasedKeyBinding> query(int? rulesetId = null, int? variant = null) =>
             ContextFactory.Get().DatabasedKeyBinding.Where(b => b.RulesetID == rulesetId && b.Variant == variant).ToList();
 
-        public void Update(KeyBinding keyBinding)
+        public void Update(DatabasedKeyBinding keyBinding)
         {
             using (ContextFactory.GetForWrite())
             {
-                var dbKeyBinding = (DatabasedKeyBinding)keyBinding;
+                var dbKeyBinding = keyBinding;
                 Refresh(ref dbKeyBinding);
 
                 if (dbKeyBinding.KeyCombination.Equals(keyBinding.KeyCombination))
