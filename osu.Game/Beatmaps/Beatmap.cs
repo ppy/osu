@@ -50,7 +50,15 @@ namespace osu.Game.Beatmaps
 
         IBeatmap IBeatmap.Clone() => Clone();
 
-        public Beatmap<T> Clone() => (Beatmap<T>)MemberwiseClone();
+        public Beatmap<T> Clone()
+        {
+            var clone = (Beatmap<T>)MemberwiseClone();
+
+            clone.ControlPointInfo = ControlPointInfo.CreateCopy();
+            // todo: deep clone other elements as required.
+
+            return clone;
+        }
     }
 
     public class Beatmap : Beatmap<HitObject>

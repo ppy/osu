@@ -16,6 +16,9 @@ namespace osu.Game.Screens.Edit.Compose
 {
     public class ComposeScreen : EditorScreenWithTimeline
     {
+        [Resolved]
+        private IBindable<WorkingBeatmap> beatmap { get; set; }
+
         private HitObjectComposer composer;
 
         public ComposeScreen()
@@ -59,7 +62,7 @@ namespace osu.Game.Screens.Edit.Compose
         {
             Debug.Assert(ruleset != null);
 
-            var beatmapSkinProvider = new BeatmapSkinProvidingContainer(Beatmap.Value.Skin);
+            var beatmapSkinProvider = new BeatmapSkinProvidingContainer(beatmap.Value.Skin);
 
             // the beatmapSkinProvider is used as the fallback source here to allow the ruleset-specific skin implementation
             // full access to all skin sources.
