@@ -177,7 +177,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                                         {
                                             if (!string.IsNullOrEmpty(creator))
                                             {
-                                                t.AddText("作图者：");
+                                                t.AddText("谱师：");
                                                 t.AddText(creator, s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
                                             }
                                         }),

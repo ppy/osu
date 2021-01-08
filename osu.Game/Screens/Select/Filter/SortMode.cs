@@ -10,7 +10,7 @@ namespace osu.Game.Screens.Select.Filter
         [Description("艺术家")]
         Artist,
 
-        [Description("作图者")]
+        [Description("谱师")]
         Author,
 
         [Description("BPM")]

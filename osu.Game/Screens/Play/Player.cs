@@ -722,15 +722,20 @@ namespace osu.Game.Screens.Play
                 .Delay(250)
                 .FadeIn(250);
 
-            Background.EnableUserDim.Value = true;
-            Background.BlurAmount.Value = 0;
+            ApplyToBackground(b =>
+            {
+                b.EnableUserDim.Value = true;
+                b.BlurAmount.Value = 0;
 
-            // bind component bindables.
-            Background.IsBreakTime.BindTo(breakTracker.IsBreakTime);
+                // bind component bindables.
+                b.IsBreakTime.BindTo(breakTracker.IsBreakTime);
+
+                b.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
+            });
+
             HUDOverlay.IsBreakTime.BindTo(breakTracker.IsBreakTime);
             DimmableStoryboard.IsBreakTime.BindTo(breakTracker.IsBreakTime);
 
-            Background.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
             DimmableStoryboard.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
 
             storyboardReplacesBackground.Value = Beatmap.Value.Storyboard.ReplacesBackground && Beatmap.Value.Storyboard.HasDrawable;
@@ -876,7 +881,7 @@ namespace osu.Game.Screens.Play
             float fadeOutDuration = instant ? 0 : 250;
             this.FadeOut(fadeOutDuration);
 
-            Background.EnableUserDim.Value = false;
+            ApplyToBackground(b => b.EnableUserDim.Value = false);
             storyboardReplacesBackground.Value = false;
         }
 

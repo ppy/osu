@@ -47,7 +47,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.R }, GlobalAction.ResetInputSettings),
             new KeyBinding(new[] { InputKey.Control, InputKey.T }, GlobalAction.ToggleToolbar),
             new KeyBinding(new[] { InputKey.Control, InputKey.O }, GlobalAction.ToggleSettings),
-            new KeyBinding(new[] { InputKey.Control, InputKey.D }, GlobalAction.ToggleDirect),
+            new KeyBinding(new[] { InputKey.Control, InputKey.D }, GlobalAction.ToggleBeatmapListing),
             new KeyBinding(new[] { InputKey.Control, InputKey.N }, GlobalAction.ToggleNotifications),
 
             new KeyBinding(InputKey.Escape, GlobalAction.Back),
@@ -125,8 +125,8 @@ namespace osu.Game.Input.Bindings
         [Description("切换设置界面")]
         ToggleSettings,
 
-        [Description("切换osu!direct界面")]
-        ToggleDirect,
+        [Description("切换谱面列表界面")]
+        ToggleBeatmapListing,
 
         [Description("增加音量")]
         IncreaseVolume,

@@ -919,10 +919,10 @@ msgstr ""
 msgid "艺术家"
 msgstr ""
 
-msgid "作图者"
+msgid "谱师"
 msgstr ""
 
-msgid "作图者："
+msgid "谱师："
 msgstr ""
 
 msgid "BPM"

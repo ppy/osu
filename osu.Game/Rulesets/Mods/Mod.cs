@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
@@ -84,12 +83,10 @@ namespace osu.Game.Rulesets.Mods
 
                 foreach ((SettingSourceAttribute attr, PropertyInfo property) in this.GetOrderedSettingsSourceProperties())
                 {
-                    object bindableObj = property.GetValue(this);
+                    var bindable = (IBindable)property.GetValue(this);
 
-                    if ((bindableObj as IHasDefaultValue)?.IsDefault == true)
-                        continue;
-
-                    tooltipTexts.Add($"{attr.Label} {bindableObj}");
+                    if (!bindable.IsDefault)
+                        tooltipTexts.Add($"{attr.Label} {bindable}");
                 }
 
                 return string.Join(", ", tooltipTexts.Where(s => !string.IsNullOrEmpty(s)));
@@ -136,17 +133,36 @@ namespace osu.Game.Rulesets.Mods
             // Copy bindable values across
             foreach (var (_, prop) in this.GetSettingsSourceProperties())
             {
-                var origBindable = prop.GetValue(this);
-                var copyBindable = prop.GetValue(copy);
+                var origBindable = (IBindable)prop.GetValue(this);
+                var copyBindable = (IBindable)prop.GetValue(copy);
 
-                // The bindables themselves are readonly, so the value must be transferred through the Bindable<T>.Value property.
-                var valueProperty = origBindable.GetType().GetProperty(nameof(Bindable<object>.Value), BindingFlags.Public | BindingFlags.Instance);
-                Debug.Assert(valueProperty != null);
-
-                valueProperty.SetValue(copyBindable, valueProperty.GetValue(origBindable));
+                // we only care about changes that have been made away from defaults.
+                if (!origBindable.IsDefault)
+                    copy.CopyAdjustedSetting(copyBindable, origBindable);
             }
 
             return copy;
+        }
+
+        /// <summary>
+        /// When creating copies or clones of a Mod, this method will be called
+        /// to copy explicitly adjusted user settings from <paramref name="target"/>.
+        /// The base implementation will transfer the value via <see cref="Bindable{T}.Parse"/>
+        /// or by binding and unbinding (if <paramref name="source"/> is an <see cref="IBindable"/>)
+        /// and should be called unless replaced with custom logic.
+        /// </summary>
+        /// <param name="target">The target bindable to apply the adjustment to.</param>
+        /// <param name="source">The adjustment to apply.</param>
+        internal virtual void CopyAdjustedSetting(IBindable target, object source)
+        {
+            if (source is IBindable sourceBindable)
+            {
+                // copy including transfer of default values.
+                target.BindTo(sourceBindable);
+                target.UnbindFrom(sourceBindable);
+            }
+            else
+                target.Parse(source);
         }
 
         public bool Equals(IMod other) => GetType() == other?.GetType();

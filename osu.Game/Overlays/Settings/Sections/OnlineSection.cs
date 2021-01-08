@@ -20,7 +20,8 @@ namespace osu.Game.Overlays.Settings.Sections
         {
             Children = new Drawable[]
             {
-                new WebSettings()
+                new WebSettings(),
+                new IntegrationSettings()
             };
         }
     }

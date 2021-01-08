@@ -84,7 +84,7 @@ namespace osu.Game.Online.Multiplayer
             IsConnected.BindValueChanged(connected =>
             {
                 // clean up local room state on server disconnect.
-                if (!connected.NewValue)
+                if (!connected.NewValue && Room != null)
                 {
                     Logger.Log("Connection to multiplayer server was lost.", LoggingTarget.Runtime, LogLevel.Important);
                     LeaveRoom().CatchUnobservedExceptions();

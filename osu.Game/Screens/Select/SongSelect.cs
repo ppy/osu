@@ -19,7 +19,6 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Select.Options;
@@ -39,10 +38,12 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Scoring;
 using osu.Game.Configuration;
 using System.Diagnostics;
+using osu.Game.Screens.Backgrounds;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.Select
 {
-    public abstract class SongSelect : OsuScreen, IKeyBindingHandler<GlobalAction>
+    public abstract class SongSelect : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>
     {
         public static readonly float WEDGE_HEIGHT = 245;
 
@@ -79,8 +80,6 @@ namespace osu.Game.Screens.Select
 
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; }
-
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
         protected BeatmapCarousel Carousel { get; private set; }
 
@@ -443,16 +442,21 @@ namespace osu.Game.Screens.Select
 
         private void updateSelectedBeatmap(BeatmapInfo beatmap)
         {
+            if (beatmap == null && beatmapNoDebounce == null)
+                return;
+
             if (beatmap?.Equals(beatmapNoDebounce) == true)
                 return;
 
             beatmapNoDebounce = beatmap;
-
             performUpdateSelected();
         }
 
         private void updateSelectedRuleset(RulesetInfo ruleset)
         {
+            if (ruleset == null && rulesetNoDebounce == null)
+                return;
+
             if (ruleset?.Equals(rulesetNoDebounce) == true)
                 return;
 
@@ -704,21 +708,18 @@ namespace osu.Game.Screens.Select
         private void updateComponentFromBeatmap(WorkingBeatmap beatmap, bool BlurOnly = false)
         {
             //我不放这oldBeatmapSet和BeatmapSetChanged就永远是null咋回事...
-            if ( oldBeatmapSet == null )
-                oldBeatmapSet = Carousel.SelectedBeatmapSet;
+            oldBeatmapSet ??= Carousel.SelectedBeatmapSet;
 
-            if ( Carousel.SelectedBeatmapSet != oldBeatmapSet )
-                BeatmapSetChanged = true;
-            else
-                BeatmapSetChanged = false;
+            BeatmapSetChanged = Carousel.SelectedBeatmapSet != oldBeatmapSet;
 
-            if (Background is BackgroundScreenBeatmap backgroundModeBeatmap)
+            ApplyToBackground(backgroundModeBeatmap =>
             {
                 backgroundModeBeatmap.BlurAmount.Value = OptUI.Value ? BgBlur.Value * 100 : BACKGROUND_BLUR;
-                if ( BlurOnly ) return;
+                if (BlurOnly) return;
+
                 backgroundModeBeatmap.Beatmap = beatmap;
                 backgroundModeBeatmap.FadeColour(Color4.White, 250);
-            }
+            });
 
             beatmapInfoWedge.Beatmap = beatmap;
 
@@ -727,10 +728,11 @@ namespace osu.Game.Screens.Select
 
         protected void ResetBgBlur()
         {
-            if (Background is BackgroundScreenBeatmap backgroundModeBeatmap)
+            ApplyToBackground(b =>
             {
-                backgroundModeBeatmap.BlurAmount.Value = BACKGROUND_BLUR;
-            }
+                if (b is BackgroundScreenBeatmap bsb)
+                    bsb.BlurAmount.Value = BACKGROUND_BLUR;
+            });
         }
 
         private readonly WeakReference<ITrack> lastTrack = new WeakReference<ITrack>(null);

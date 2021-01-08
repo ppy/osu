@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -24,6 +25,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "NC";
         public override IconUsage? Icon => OsuIcon.ModNightcore;
         public override string Description => "动次打次动次打次";
+        public override Type[] IncompatibleMods => new[] { typeof(ModBeatCore) };
     }
 
     public abstract class ModNightcore<TObject> : ModNightcore, IApplicableToDrawableRuleset<TObject>
@@ -54,12 +56,12 @@ namespace osu.Game.Rulesets.Mods
         }
     }
 
-        public class NightcoreBeatContainer : BeatSyncedContainer
-        {
-            private PausableSkinnableSound hatSample;
-            private PausableSkinnableSound clapSample;
-            private PausableSkinnableSound kickSample;
-            private PausableSkinnableSound finishSample;
+    public class NightcoreBeatContainer : BeatSyncedContainer
+    {
+        private PausableSkinnableSound hatSample;
+        private PausableSkinnableSound clapSample;
+        private PausableSkinnableSound kickSample;
+        private PausableSkinnableSound finishSample;
 
         private int? firstBeat;
 
@@ -73,10 +75,10 @@ namespace osu.Game.Rulesets.Mods
         {
             InternalChildren = new Drawable[]
             {
-                    hatSample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-hat")),
-                    clapSample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-clap")),
-                    kickSample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-kick")),
-                    finishSample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-finish")),
+                hatSample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-hat")),
+                clapSample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-clap")),
+                kickSample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-kick")),
+                finishSample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-finish")),
             };
         }
 
@@ -111,40 +113,40 @@ namespace osu.Game.Rulesets.Mods
             switch (signature)
             {
                 case TimeSignatures.SimpleTriple:
-                switch (beatIndex % 6)
-                {
-                    case 0:
-                        kickSample?.Play();
-                        break;
+                    switch (beatIndex % 6)
+                    {
+                        case 0:
+                            kickSample?.Play();
+                            break;
 
-                    case 3:
-                        clapSample?.Play();
-                        break;
+                        case 3:
+                            clapSample?.Play();
+                            break;
 
-                    default:
-                        hatSample?.Play();
-                        break;
-                }
+                        default:
+                            hatSample?.Play();
+                            break;
+                    }
 
-                break;
+                    break;
 
                 case TimeSignatures.SimpleQuadruple:
-                switch (beatIndex % 4)
-                {
-                    case 0:
-                        kickSample?.Play();
-                        break;
+                    switch (beatIndex % 4)
+                    {
+                        case 0:
+                            kickSample?.Play();
+                            break;
 
-                    case 2:
-                        clapSample?.Play();
-                        break;
+                        case 2:
+                            clapSample?.Play();
+                            break;
 
-                    default:
-                        hatSample?.Play();
-                        break;
-                }
+                        default:
+                            hatSample?.Play();
+                            break;
+                    }
 
-                break;
+                    break;
             }
         }
     }
