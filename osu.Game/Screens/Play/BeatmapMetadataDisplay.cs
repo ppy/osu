@@ -205,7 +205,7 @@ namespace osu.Game.Screens.Play
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                 },
-                                new MetadataLine("作图者", metadata.AuthorString)
+                                new MetadataLine("谱师", metadata.AuthorString)
                                 {
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,

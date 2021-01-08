@@ -88,7 +88,7 @@ namespace osu.Game.Tournament.Components
                             {
                                 new TournamentSpriteText
                                 {
-                                    Text = "作图者",
+                                    Text = "谱师",
                                     Padding = new MarginPadding { Right = 5 },
                                     Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: 15)
                                 },

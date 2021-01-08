@@ -88,7 +88,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                                                         Direction = FillDirection.Horizontal,
                                                     }.With(d =>
                                                     {
-                                                        d.AddText("作图者：");
+                                                        d.AddText("谱师：");
                                                         d.AddUserLink(beatmap.Metadata.Author);
                                                     }),
                                                 }

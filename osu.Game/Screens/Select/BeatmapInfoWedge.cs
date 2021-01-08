@@ -406,7 +406,7 @@ namespace osu.Game.Screens.Select
                 {
                     new OsuSpriteText
                     {
-                        Text = "作图者：",
+                        Text = "谱师：",
                         Font = OsuFont.GetFont(size: 17),
                     },
                     new OsuSpriteText
