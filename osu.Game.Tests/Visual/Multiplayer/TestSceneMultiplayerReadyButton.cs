@@ -15,7 +15,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
-using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Tests.Resources;
 using osu.Game.Users;
@@ -30,9 +29,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private BeatmapManager beatmaps;
         private RulesetStore rulesets;
-
-        [Cached]
-        private OngoingOperationTracker ongoingOperationTracker = new OngoingOperationTracker();
 
         private IDisposable readyClickOperation;
 
@@ -66,7 +62,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 },
                 OnReadyClick = async () =>
                 {
-                    readyClickOperation = ongoingOperationTracker.BeginOperation();
+                    readyClickOperation = OngoingOperationTracker.BeginOperation();
 
                     if (Client.IsHost && Client.LocalUser?.State == MultiplayerUserState.Ready)
                     {
