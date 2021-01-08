@@ -37,12 +37,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         [Resolved]
         private OngoingOperationTracker ongoingOperationTracker { get; set; }
 
+        private IBindable<bool> operationInProgress;
+
         private SampleChannel sampleReadyCount;
 
         private readonly ButtonWithTrianglesExposed button;
 
         private int countReady;
-        private IBindable<bool> operationInProgress;
 
         public MultiplayerReadyButton()
         {
