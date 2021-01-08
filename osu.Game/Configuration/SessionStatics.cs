@@ -16,7 +16,7 @@ namespace osu.Game.Configuration
         {
             Set(Static.LoginOverlayDisplayed, false);
             Set(Static.MutedAudioNotificationShownOnce, false);
-            Set(Static.LastHoverSoundPlaybackTime, (double?)0.0);
+            Set(Static.LastHoverSoundPlaybackTime, (double?)null);
             Set<APISeasonalBackgrounds>(Static.SeasonalBackgrounds, null);
         }
     }
