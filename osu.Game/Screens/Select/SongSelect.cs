@@ -19,7 +19,6 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Select.Options;
@@ -38,10 +37,11 @@ using osu.Game.Collections;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Scoring;
 using System.Diagnostics;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.Select
 {
-    public abstract class SongSelect : OsuScreen, IKeyBindingHandler<GlobalAction>
+    public abstract class SongSelect : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>
     {
         public static readonly float WEDGE_HEIGHT = 245;
 
@@ -75,8 +75,6 @@ namespace osu.Game.Screens.Select
 
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; }
-
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
         protected BeatmapCarousel Carousel { get; private set; }
 
@@ -428,16 +426,21 @@ namespace osu.Game.Screens.Select
 
         private void updateSelectedBeatmap(BeatmapInfo beatmap)
         {
+            if (beatmap == null && beatmapNoDebounce == null)
+                return;
+
             if (beatmap?.Equals(beatmapNoDebounce) == true)
                 return;
 
             beatmapNoDebounce = beatmap;
-
             performUpdateSelected();
         }
 
         private void updateSelectedRuleset(RulesetInfo ruleset)
         {
+            if (ruleset == null && rulesetNoDebounce == null)
+                return;
+
             if (ruleset?.Equals(rulesetNoDebounce) == true)
                 return;
 
@@ -684,12 +687,12 @@ namespace osu.Game.Screens.Select
         /// <param name="beatmap">The working beatmap.</param>
         private void updateComponentFromBeatmap(WorkingBeatmap beatmap)
         {
-            if (Background is BackgroundScreenBeatmap backgroundModeBeatmap)
+            ApplyToBackground(backgroundModeBeatmap =>
             {
                 backgroundModeBeatmap.Beatmap = beatmap;
                 backgroundModeBeatmap.BlurAmount.Value = BACKGROUND_BLUR;
                 backgroundModeBeatmap.FadeColour(Color4.White, 250);
-            }
+            });
 
             beatmapInfoWedge.Beatmap = beatmap;
 
