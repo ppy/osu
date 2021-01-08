@@ -103,7 +103,7 @@ namespace osu.Game.Overlays.Mods
                 foregroundIcon.Selected.Value = Selected;
             });
 
-            SelectionChanged?.Invoke(newSelection);
+            SelectionChanged?.Invoke(SelectedMod);
 
             return true;
         }
