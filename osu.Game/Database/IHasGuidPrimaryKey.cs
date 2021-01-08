@@ -20,6 +20,7 @@ namespace osu.Game.Database
 
         [JsonIgnore]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [PrimaryKey]
         string ID { get; set; }
     }
 }
