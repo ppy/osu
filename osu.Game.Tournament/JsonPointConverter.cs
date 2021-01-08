@@ -29,9 +29,7 @@ namespace osu.Game.Tournament
 
                 Debug.Assert(str != null);
 
-                var split = str.Split(',');
-
-                return new Point(int.Parse(split[0]), int.Parse(split[1]));
+                return new PointConverter().ConvertFromString(str) as Point? ?? new Point();
             }
 
             var point = new Point();
