@@ -23,7 +23,7 @@ namespace osu.Game.Graphics.UserInterface
         private SampleChannel sampleHover;
 
         /// <summary>
-        /// Length of debounce for hover sound playback, in milliseconds. Default is 50ms.
+        /// Length of debounce for hover sound playback, in milliseconds.
         /// </summary>
         public double HoverDebounceTime { get; } = 20;
 
