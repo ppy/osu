@@ -8,7 +8,6 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
-using static osu.Game.Tests.Visual.Components.TestScenePreviewTrackManager.TestPreviewTrackManager;
 
 namespace osu.Game.Tests.Visual.Components
 {
@@ -100,7 +99,7 @@ namespace osu.Game.Tests.Visual.Components
         [Test]
         public void TestNonPresentTrack()
         {
-            TestPreviewTrack track = null;
+            TestPreviewTrackManager.TestPreviewTrack track = null;
 
             AddStep("get non-present track", () =>
             {
@@ -182,9 +181,9 @@ namespace osu.Game.Tests.Visual.Components
             AddAssert("track stopped", () => !track.IsRunning);
         }
 
-        private TestPreviewTrack getTrack() => (TestPreviewTrack)trackManager.Get(null);
+        private TestPreviewTrackManager.TestPreviewTrack getTrack() => (TestPreviewTrackManager.TestPreviewTrack)trackManager.Get(null);
 
-        private TestPreviewTrack getOwnedTrack()
+        private TestPreviewTrackManager.TestPreviewTrack getOwnedTrack()
         {
             var track = getTrack();
 

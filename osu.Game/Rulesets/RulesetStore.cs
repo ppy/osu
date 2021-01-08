@@ -100,9 +100,7 @@ namespace osu.Game.Rulesets
 
                 foreach (var r in instances.Where(r => !(r is ILegacyRuleset)))
                 {
-                    // todo: StartsWith can be changed to Equals on 2020-11-08
-                    // This is to give users enough time to have their database use new abbreviated info).
-                    if (existingRulesets.FirstOrDefault(ri => ri.InstantiationInfo.StartsWith(r.RulesetInfo.InstantiationInfo, StringComparison.Ordinal)) == null)
+                    if (existingRulesets.FirstOrDefault(ri => ri.InstantiationInfo.Equals(r.RulesetInfo.InstantiationInfo, StringComparison.Ordinal)) == null)
                         context.RulesetInfo.Add(r.RulesetInfo);
                 }
 

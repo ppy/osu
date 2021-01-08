@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                     Size = new Vector2(18),
                     Shadow = false,
                 },
-                loading = new LoadingLayer(icon, false),
+                loading = new LoadingLayer(true, false),
             });
 
             Action = () =>
