@@ -24,6 +24,7 @@ using osu.Game.Online.API;
 using osu.Framework.Graphics.Performance;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Database;
@@ -265,10 +266,10 @@ namespace osu.Game
             dependencies.Cache(scorePerformanceManager);
             AddInternal(scorePerformanceManager);
 
-            // todo: migrate to realm
-            // dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
+            migrateDataToRealm();
 
             dependencies.CacheAs(KeyBindingStore = new RealmKeyBindingStore(realmFactory, RulesetStore));
+
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
             dependencies.Cache(RulesetConfigCache = new RulesetConfigCache(SettingsStore));
             dependencies.Cache(new SessionStatics());
@@ -320,6 +321,29 @@ namespace osu.Game
             dependencies.CacheAs(MusicController);
 
             Ruleset.BindValueChanged(onRulesetChanged);
+        }
+
+        private void migrateDataToRealm()
+        {
+            using (var db = contextFactory.GetForWrite())
+            using (var realm = realmFactory.GetForWrite())
+            {
+                var existingBindings = db.Context.DatabasedKeyBinding;
+
+                foreach (var dkb in existingBindings)
+                {
+                    realm.Context.Add(new RealmKeyBinding
+                    {
+                        ID = Guid.NewGuid().ToString(),
+                        KeyCombination = dkb.KeyCombination.ToString(),
+                        Action = (int)dkb.Action,
+                        RulesetID = dkb.RulesetID,
+                        Variant = dkb.Variant
+                    });
+                }
+
+                db.Context.RemoveRange(existingBindings);
+            }
         }
 
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)
