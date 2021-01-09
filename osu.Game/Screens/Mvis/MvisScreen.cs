@@ -31,6 +31,7 @@ using osu.Game.Overlays.Settings;
 using osuTK.Input;
 using osu.Game.Graphics;
 using osu.Framework;
+using osu.Game.Overlays.Settings.Sections.Mf;
 using osu.Game.Screens.Mvis.Collections;
 using osu.Game.Screens.Mvis.Collections.Interface;
 using osu.Game.Users;

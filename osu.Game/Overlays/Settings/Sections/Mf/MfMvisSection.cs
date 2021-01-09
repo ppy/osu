@@ -3,11 +3,8 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Overlays.Settings;
-using osu.Game.Overlays.Settings.Sections.General;
-using osu.Game.Overlays.Settings.Sections.Mf;
 
-namespace osu.Game.Overlays
+namespace osu.Game.Overlays.Settings.Sections.Mf
 {
     public class MfMvisSection : SettingsSection
     {
