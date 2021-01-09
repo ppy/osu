@@ -9,6 +9,7 @@ using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Platform;
+using osu.Game.Configuration;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Notifications;
 
@@ -25,6 +26,9 @@ namespace osu.Game.Updater
         [Resolved]
         private GameHost host { get; set; }
 
+        [Resolved]
+        private OsuConfigManager config { get; set; }
+
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game)
         {
@@ -35,7 +39,9 @@ namespace osu.Game.Updater
         {
             try
             {
-                var releases = new OsuJsonWebRequest<GitHubRelease>("https://api.github.com/repos/ppy/osu/releases/latest");
+                bool useOfficalReleaseStream = config.Get<ReleaseStream>(OsuSetting.ReleaseStream) == ReleaseStream.Lazer;
+
+                var releases = new OsuJsonWebRequest<GitHubRelease>($"https://api.github.com/repos/{(useOfficalReleaseStream ? "ppy" : "MATRIX-feather")}/osu/releases/latest");
 
                 await releases.PerformAsync();
 
@@ -46,9 +52,9 @@ namespace osu.Game.Updater
                     Notifications.Post(new SimpleNotification
                     {
                         Text = "osu!lazer已有新版本可用!\n"
-                                + $"你的版本{version}\n"
-                                + $"最新版本{latest.TagName}.\n\n"
-                                + "点击这里前往github下载",
+                               + $"你的版本{version}\n"
+                               + $"最新版本{latest.TagName}.\n\n"
+                               + $"点击这里前往github{(useOfficalReleaseStream ? "下载" : "查看")}",
                         Icon = FontAwesome.Solid.Upload,
                         Activated = () =>
                         {
