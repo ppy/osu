@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Edit.Timing
 
         protected override SampleControlPoint CreatePoint()
         {
-            var reference = Beatmap.Value.Beatmap.ControlPointInfo.SamplePointAt(SelectedGroup.Value.Time);
+            var reference = Beatmap.ControlPointInfo.SamplePointAt(SelectedGroup.Value.Time);
 
             return new SampleControlPoint
             {

@@ -127,11 +127,11 @@ namespace osu.Game.Screens.Menu
                 {
                     case ButtonSystemState.Initial:
                     case ButtonSystemState.Exit:
-                        Background.FadeColour(Color4.White, 500, Easing.OutSine);
+                        ApplyToBackground(b => b.FadeColour(Color4.White, 500, Easing.OutSine));
                         break;
 
                     default:
-                        Background.FadeColour(OsuColour.Gray(0.8f), 500, Easing.OutSine);
+                        ApplyToBackground(b => b.FadeColour(OsuColour.Gray(0.8f), 500, Easing.OutSine));
                         break;
                 }
             };
@@ -256,7 +256,7 @@ namespace osu.Game.Screens.Menu
         {
             base.OnResuming(last);
 
-            (Background as BackgroundScreenDefault)?.Next();
+            ApplyToBackground(b => (b as BackgroundScreenDefault)?.Next());
 
             // we may have consumed our preloaded instance, so let's make another.
             preloadSongSelect();

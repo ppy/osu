@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -138,6 +138,8 @@ namespace osu.Game.Configuration
             Set(OsuSetting.MenuBackgroundSource, BackgroundSource.Skin);
             Set(OsuSetting.SeasonalBackgroundMode, SeasonalBackgroundMode.Sometimes);
 
+            Set(OsuSetting.DiscordRichPresence, DiscordRichPresenceMode.Full);
+
             Set(OsuSetting.EditorWaveformOpacity, 1f);
         }
 
@@ -266,6 +268,7 @@ namespace osu.Game.Configuration
         GameplayDisableWinKey,
         SeasonalBackgroundMode,
         EditorWaveformOpacity,
+        DiscordRichPresence,
         AutomaticallyDownloadWhenSpectating,
     }
 }

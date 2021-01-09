@@ -81,201 +81,192 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                Container dimContent;
-
                 InternalChildren = new Drawable[]
                 {
-                    dimContent = new Container
+                    new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Children = new Drawable[]
+                        Colour = Color4Extensions.FromHex(@"28242d"),
+                    },
+                    new GridContainer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        RowDimensions = new[]
                         {
-                            new Box
+                            new Dimension(GridSizeMode.Distributed),
+                            new Dimension(GridSizeMode.AutoSize),
+                        },
+                        Content = new[]
+                        {
+                            new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = Color4Extensions.FromHex(@"28242d"),
-                            },
-                            new GridContainer
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                RowDimensions = new[]
+                                new OsuScrollContainer
                                 {
-                                    new Dimension(GridSizeMode.Distributed),
-                                    new Dimension(GridSizeMode.AutoSize),
-                                },
-                                Content = new[]
-                                {
-                                    new Drawable[]
+                                    Padding = new MarginPadding
                                     {
-                                        new OsuScrollContainer
+                                        Horizontal = OsuScreen.HORIZONTAL_OVERFLOW_PADDING,
+                                        Vertical = 10
+                                    },
+                                    RelativeSizeAxes = Axes.Both,
+                                    Children = new[]
+                                    {
+                                        new FillFlowContainer
                                         {
-                                            Padding = new MarginPadding
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            Direction = FillDirection.Vertical,
+                                            Spacing = new Vector2(0, 10),
+                                            Children = new Drawable[]
                                             {
-                                                Horizontal = OsuScreen.HORIZONTAL_OVERFLOW_PADDING,
-                                                Vertical = 10
-                                            },
-                                            RelativeSizeAxes = Axes.Both,
-                                            Children = new[]
-                                            {
-                                                new FillFlowContainer
+                                                new Container
                                                 {
+                                                    Anchor = Anchor.TopCentre,
+                                                    Origin = Anchor.TopCentre,
+                                                    Padding = new MarginPadding { Horizontal = WaveOverlayContainer.WIDTH_PADDING },
                                                     RelativeSizeAxes = Axes.X,
                                                     AutoSizeAxes = Axes.Y,
-                                                    Direction = FillDirection.Vertical,
-                                                    Spacing = new Vector2(0, 10),
                                                     Children = new Drawable[]
                                                     {
-                                                        new Container
+                                                        new SectionContainer
                                                         {
-                                                            Anchor = Anchor.TopCentre,
-                                                            Origin = Anchor.TopCentre,
-                                                            Padding = new MarginPadding { Horizontal = WaveOverlayContainer.WIDTH_PADDING },
-                                                            RelativeSizeAxes = Axes.X,
-                                                            AutoSizeAxes = Axes.Y,
-                                                            Children = new Drawable[]
+                                                            Padding = new MarginPadding { Right = FIELD_PADDING / 2 },
+                                                            Children = new[]
                                                             {
-                                                                new SectionContainer
+                                                                new Section("Room name")
                                                                 {
-                                                                    Padding = new MarginPadding { Right = FIELD_PADDING / 2 },
-                                                                    Children = new[]
+                                                                    Child = NameField = new SettingsTextBox
                                                                     {
-                                                                        new Section("Room name")
+                                                                        RelativeSizeAxes = Axes.X,
+                                                                        TabbableContentContainer = this,
+                                                                    },
+                                                                },
+                                                                new Section("Room visibility")
+                                                                {
+                                                                    Alpha = disabled_alpha,
+                                                                    Child = AvailabilityPicker = new RoomAvailabilityPicker
+                                                                    {
+                                                                        Enabled = { Value = false }
+                                                                    },
+                                                                },
+                                                                new Section("Game type")
+                                                                {
+                                                                    Alpha = disabled_alpha,
+                                                                    Child = new FillFlowContainer
+                                                                    {
+                                                                        AutoSizeAxes = Axes.Y,
+                                                                        RelativeSizeAxes = Axes.X,
+                                                                        Direction = FillDirection.Vertical,
+                                                                        Spacing = new Vector2(7),
+                                                                        Children = new Drawable[]
                                                                         {
-                                                                            Child = NameField = new SettingsTextBox
+                                                                            TypePicker = new GameTypePicker
                                                                             {
                                                                                 RelativeSizeAxes = Axes.X,
-                                                                                TabbableContentContainer = this,
-                                                                            },
-                                                                        },
-                                                                        new Section("Room visibility")
-                                                                        {
-                                                                            Alpha = disabled_alpha,
-                                                                            Child = AvailabilityPicker = new RoomAvailabilityPicker
-                                                                            {
                                                                                 Enabled = { Value = false }
                                                                             },
-                                                                        },
-                                                                        new Section("Game type")
-                                                                        {
-                                                                            Alpha = disabled_alpha,
-                                                                            Child = new FillFlowContainer
+                                                                            typeLabel = new OsuSpriteText
                                                                             {
-                                                                                AutoSizeAxes = Axes.Y,
-                                                                                RelativeSizeAxes = Axes.X,
-                                                                                Direction = FillDirection.Vertical,
-                                                                                Spacing = new Vector2(7),
-                                                                                Children = new Drawable[]
-                                                                                {
-                                                                                    TypePicker = new GameTypePicker
-                                                                                    {
-                                                                                        RelativeSizeAxes = Axes.X,
-                                                                                        Enabled = { Value = false }
-                                                                                    },
-                                                                                    typeLabel = new OsuSpriteText
-                                                                                    {
-                                                                                        Font = OsuFont.GetFont(size: 14),
-                                                                                        Colour = colours.Yellow
-                                                                                    },
-                                                                                },
+                                                                                Font = OsuFont.GetFont(size: 14),
+                                                                                Colour = colours.Yellow
                                                                             },
                                                                         },
                                                                     },
                                                                 },
-                                                                new SectionContainer
-                                                                {
-                                                                    Anchor = Anchor.TopRight,
-                                                                    Origin = Anchor.TopRight,
-                                                                    Padding = new MarginPadding { Left = FIELD_PADDING / 2 },
-                                                                    Children = new[]
-                                                                    {
-                                                                        new Section("Max participants")
-                                                                        {
-                                                                            Alpha = disabled_alpha,
-                                                                            Child = MaxParticipantsField = new SettingsNumberTextBox
-                                                                            {
-                                                                                RelativeSizeAxes = Axes.X,
-                                                                                TabbableContentContainer = this,
-                                                                                ReadOnly = true,
-                                                                            },
-                                                                        },
-                                                                        new Section("Password (optional)")
-                                                                        {
-                                                                            Alpha = disabled_alpha,
-                                                                            Child = new SettingsPasswordTextBox
-                                                                            {
-                                                                                RelativeSizeAxes = Axes.X,
-                                                                                TabbableContentContainer = this,
-                                                                                ReadOnly = true,
-                                                                            },
-                                                                        },
-                                                                    }
-                                                                }
                                                             },
                                                         },
-                                                        initialBeatmapControl = new BeatmapSelectionControl
+                                                        new SectionContainer
                                                         {
-                                                            Anchor = Anchor.TopCentre,
-                                                            Origin = Anchor.TopCentre,
-                                                            RelativeSizeAxes = Axes.X,
-                                                            Width = 0.5f
+                                                            Anchor = Anchor.TopRight,
+                                                            Origin = Anchor.TopRight,
+                                                            Padding = new MarginPadding { Left = FIELD_PADDING / 2 },
+                                                            Children = new[]
+                                                            {
+                                                                new Section("Max participants")
+                                                                {
+                                                                    Alpha = disabled_alpha,
+                                                                    Child = MaxParticipantsField = new SettingsNumberTextBox
+                                                                    {
+                                                                        RelativeSizeAxes = Axes.X,
+                                                                        TabbableContentContainer = this,
+                                                                        ReadOnly = true,
+                                                                    },
+                                                                },
+                                                                new Section("Password (optional)")
+                                                                {
+                                                                    Alpha = disabled_alpha,
+                                                                    Child = new SettingsPasswordTextBox
+                                                                    {
+                                                                        RelativeSizeAxes = Axes.X,
+                                                                        TabbableContentContainer = this,
+                                                                        ReadOnly = true,
+                                                                    },
+                                                                },
+                                                            }
                                                         }
-                                                    }
+                                                    },
+                                                },
+                                                initialBeatmapControl = new BeatmapSelectionControl
+                                                {
+                                                    Anchor = Anchor.TopCentre,
+                                                    Origin = Anchor.TopCentre,
+                                                    RelativeSizeAxes = Axes.X,
+                                                    Width = 0.5f
                                                 }
-                                            },
-                                        },
+                                            }
+                                        }
                                     },
-                                    new Drawable[]
+                                },
+                            },
+                            new Drawable[]
+                            {
+                                new Container
+                                {
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft,
+                                    Y = 2,
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Children = new Drawable[]
                                     {
-                                        new Container
+                                        new Box
                                         {
-                                            Anchor = Anchor.BottomLeft,
-                                            Origin = Anchor.BottomLeft,
-                                            Y = 2,
+                                            RelativeSizeAxes = Axes.Both,
+                                            Colour = Color4Extensions.FromHex(@"28242d").Darken(0.5f).Opacity(1f),
+                                        },
+                                        new FillFlowContainer
+                                        {
                                             RelativeSizeAxes = Axes.X,
                                             AutoSizeAxes = Axes.Y,
+                                            Direction = FillDirection.Vertical,
+                                            Spacing = new Vector2(0, 20),
+                                            Margin = new MarginPadding { Vertical = 20 },
+                                            Padding = new MarginPadding { Horizontal = OsuScreen.HORIZONTAL_OVERFLOW_PADDING },
                                             Children = new Drawable[]
                                             {
-                                                new Box
+                                                ApplyButton = new CreateOrUpdateButton
                                                 {
-                                                    RelativeSizeAxes = Axes.Both,
-                                                    Colour = Color4Extensions.FromHex(@"28242d").Darken(0.5f).Opacity(1f),
+                                                    Anchor = Anchor.BottomCentre,
+                                                    Origin = Anchor.BottomCentre,
+                                                    Size = new Vector2(230, 55),
+                                                    Enabled = { Value = false },
+                                                    Action = apply,
                                                 },
-                                                new FillFlowContainer
+                                                ErrorText = new OsuSpriteText
                                                 {
-                                                    RelativeSizeAxes = Axes.X,
-                                                    AutoSizeAxes = Axes.Y,
-                                                    Direction = FillDirection.Vertical,
-                                                    Spacing = new Vector2(0, 20),
-                                                    Margin = new MarginPadding { Vertical = 20 },
-                                                    Padding = new MarginPadding { Horizontal = OsuScreen.HORIZONTAL_OVERFLOW_PADDING },
-                                                    Children = new Drawable[]
-                                                    {
-                                                        ApplyButton = new CreateOrUpdateButton
-                                                        {
-                                                            Anchor = Anchor.BottomCentre,
-                                                            Origin = Anchor.BottomCentre,
-                                                            Size = new Vector2(230, 55),
-                                                            Enabled = { Value = false },
-                                                            Action = apply,
-                                                        },
-                                                        ErrorText = new OsuSpriteText
-                                                        {
-                                                            Anchor = Anchor.BottomCentre,
-                                                            Origin = Anchor.BottomCentre,
-                                                            Alpha = 0,
-                                                            Depth = 1,
-                                                            Colour = colours.RedDark
-                                                        }
-                                                    }
+                                                    Anchor = Anchor.BottomCentre,
+                                                    Origin = Anchor.BottomCentre,
+                                                    Alpha = 0,
+                                                    Depth = 1,
+                                                    Colour = colours.RedDark
                                                 }
                                             }
                                         }
                                     }
                                 }
-                            },
+                            }
                         }
                     },
-                    loadingLayer = new LoadingLayer(dimContent)
+                    loadingLayer = new LoadingLayer(true)
                 };
 
                 TypePicker.Current.BindValueChanged(type => typeLabel.Text = type.NewValue?.Name ?? string.Empty, true);

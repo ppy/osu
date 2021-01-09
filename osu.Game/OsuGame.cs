@@ -151,11 +151,11 @@ namespace osu.Game
             updateBlockingOverlayFade();
         }
 
-        public void RemoveBlockingOverlay(OverlayContainer overlay)
+        public void RemoveBlockingOverlay(OverlayContainer overlay) => Schedule(() =>
         {
             visibleBlockingOverlays.Remove(overlay);
             updateBlockingOverlayFade();
-        }
+        });
 
         /// <summary>
         /// Close all game-wide overlays.

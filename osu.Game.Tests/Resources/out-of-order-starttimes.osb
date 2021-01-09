@@ -1,0 +1,6 @@
+[Events]
+//Storyboard Layer 0 (Background)
+Sprite,Background,TopCentre,"img.jpg",320,240
+ F,0,1500,1600,0,1
+Sprite,Background,TopCentre,"img.jpg",320,240
+ F,0,1000,1100,0,1
