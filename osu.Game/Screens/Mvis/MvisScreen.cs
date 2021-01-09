@@ -275,13 +275,13 @@ namespace osu.Game.Screens.Mvis
                                                                 {
                                                                     ButtonIcon = FontAwesome.Solid.ArrowLeft,
                                                                     Action = this.Exit,
-                                                                    TooltipText = "退出",
+                                                                    TooltipText = "generic.exit",
                                                                 },
                                                                 new BottomBarButton
                                                                 {
                                                                     ButtonIcon = FontAwesome.Regular.QuestionCircle,
                                                                     Action = () => game?.OpenUrlExternally("https://matrix-feather.github.io/%E6%97%A5%E5%B8%B8/mfosu_mp_manual/"),
-                                                                    TooltipText = "在浏览器中打开食用手册"
+                                                                    TooltipText = "screen.mvis.main.openManualInBrowser"
                                                                 },
                                                             }
                                                         },
@@ -301,11 +301,11 @@ namespace osu.Game.Screens.Mvis
                                                                     Origin = Anchor.Centre,
                                                                     ButtonIcon = FontAwesome.Solid.StepBackward,
                                                                     Action = prevTrack,
-                                                                    TooltipText = "上一首/从头开始",
+                                                                    TooltipText = "screen.mvis.main.prevOrRestart",
                                                                 },
                                                                 songProgressButton = new SongProgressButton
                                                                 {
-                                                                    TooltipText = "切换暂停",
+                                                                    TooltipText = "screen.mvis.main.togglePause",
                                                                     Action = togglePause,
                                                                     Anchor = Anchor.Centre,
                                                                     Origin = Anchor.Centre
@@ -317,7 +317,7 @@ namespace osu.Game.Screens.Mvis
                                                                     Origin = Anchor.Centre,
                                                                     ButtonIcon = FontAwesome.Solid.StepForward,
                                                                     Action = nextTrack,
-                                                                    TooltipText = "下一首",
+                                                                    TooltipText = "screen.mvis.main.next",
                                                                 },
                                                             }
                                                         },
@@ -334,7 +334,7 @@ namespace osu.Game.Screens.Mvis
                                                                 collectionButton = new BottomBarButton
                                                                 {
                                                                     ButtonIcon = FontAwesome.Solid.List,
-                                                                    TooltipText = "收藏夹选择",
+                                                                    TooltipText = "screen.mvis.main.openCollection",
                                                                     Action = () => updateSidebarState(collectionPanel)
                                                                 },
                                                                 new BottomBarButton
@@ -352,25 +352,25 @@ namespace osu.Game.Screens.Mvis
                                                                         lockChanges.Value = RuntimeInfo.IsDesktop;
                                                                         lockButton.ToggleableValue.Value = !RuntimeInfo.IsDesktop;
                                                                     },
-                                                                    TooltipText = "隐藏界面并锁定变更"
+                                                                    TooltipText = "screen.mvis.main.lockChanges"
                                                                 },
                                                                 loopToggleButton = new ToggleLoopButton
                                                                 {
                                                                     ButtonIcon = FontAwesome.Solid.Undo,
                                                                     Action = () => track.Looping = loopToggleButton.ToggleableValue.Value,
-                                                                    TooltipText = "单曲循环",
+                                                                    TooltipText = "screen.mvis.main.loop",
                                                                 },
                                                                 soloButton = new BottomBarButton
                                                                 {
                                                                     ButtonIcon = FontAwesome.Solid.User,
                                                                     Action = presentBeatmap,
-                                                                    TooltipText = "在选歌界面中查看",
+                                                                    TooltipText = "screen.mvis.main.presentBeatmap",
                                                                 },
                                                                 sidebarToggleButton = new BottomBarButton
                                                                 {
                                                                     ButtonIcon = FontAwesome.Solid.Cog,
                                                                     Action = () => updateSidebarState(settingsScroll),
-                                                                    TooltipText = "播放器设置",
+                                                                    TooltipText = "screen.mvis.main.openSettings",
                                                                 },
                                                             }
                                                         },
@@ -393,7 +393,7 @@ namespace osu.Game.Screens.Mvis
                                     Margin = new MarginPadding { Bottom = 5 },
                                     Child = lockButton = new BottomBarOverlayLockSwitchButton
                                     {
-                                        TooltipText = "切换悬浮锁",
+                                        TooltipText = "screen.mvis.main.toggleLock",
                                         Action = updateLockButtonVisuals,
                                         Anchor = Anchor.BottomCentre,
                                         Origin = Anchor.BottomCentre,
@@ -425,7 +425,7 @@ namespace osu.Game.Screens.Mvis
                         },
                         new SettingsButton
                         {
-                            Text = "歌曲选择",
+                            Text = "screen.mvis.main.songSelect",
                             Action = () => this.Push(new MvisSongSelect())
                         }
                     }

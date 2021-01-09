@@ -111,14 +111,14 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
                                             {
                                                 Font = OsuFont.GetFont(size: 50),
                                                 RelativeSizeAxes = Axes.X,
-                                                Text = "未选择收藏夹",
+                                                Text = "screen.mvis.collections.ui.noCollectionSelected",
                                                 Truncate = true,
                                             },
                                             collectionBeatmapCount = new OsuSpriteText
                                             {
                                                 Font = OsuFont.GetFont(size: 38),
                                                 RelativeSizeAxes = Axes.X,
-                                                Text = "请先选择一个收藏夹!"
+                                                Text = "screen.mvis.collections.ui.selectOneFirst"
                                             }
                                         }
                                     }
@@ -195,7 +195,7 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
             }
 
             collectionName.Text = c.Name.Value;
-            collectionBeatmapCount.Text = new LocalisedString("{0}首歌曲", beatmapSets.Count);
+            collectionBeatmapCount.Text = new LocalisedString("screen.mvis.collections.ui.beatmapSetsCount", beatmapSets.Count);
 
             refreshBeatmapSetList();
         }
@@ -254,8 +254,8 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
         {
             beatmapSets.Clear();
             beatmapList.ClearList();
-            collectionName.Text = "未选择收藏夹";
-            collectionBeatmapCount.Text = "请先选择一个收藏夹!";
+            collectionName.Text = "screen.mvis.collections.ui.noCollectionSelected";
+            collectionBeatmapCount.Text = "screen.mvis.collections.ui.selectOneFirst";
         }
     }
 }

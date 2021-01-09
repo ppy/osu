@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mfosu!\n"
 "POT-Creation-Date: 2020-12-04 02:25+0800\n"
-"PO-Revision-Date: 2020-12-29 23:21+0800\n"
+"PO-Revision-Date: 2021-01-06 23:21+0800\n"
 "Last-Translator: \n"
 "Language-Team: MATRIX-feather\n"
 "Language: en\n"
@@ -13,91 +13,264 @@ msgstr ""
 "X-Poedit-Basepath: .\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#
-msgid "_HostedBy_Text"
-msgstr "hosted by "
-
-msgid "_Open_Multiplayer"
-msgstr "Open"
-
-# v2 主菜单
-msgid "Game.Menu.ButtonSystem.solo"
-msgstr "solo"
-
-msgid "Game.Menu.ButtonSystem.multi"
-msgstr "multi"
-
-msgid "Game.Menu.ButtonSystem.playlists"
-msgstr "playlists"
-
-msgid "Game.Menu.ButtonSystem.about-mfosu"
-msgstr "about mf-osu"
-
-msgid "Game.Menu.ButtonSystem.mvis"
-msgstr "mvis player"
-
-msgid "Game.Menu.ButtonSystem.file-import"
-msgstr "file import"
-
-msgid "Game.Menu.ButtonSystem.invoke-p2c"
-msgstr "TOP SECRET"
-
-msgid "Game.Menu.ButtonSystem.play"
-msgstr "play"
-
-msgid "Game.Menu.ButtonSystem.editor"
-msgstr "editor"
-
-msgid "Game.Menu.ButtonSystem.beatmaplisting"
-msgstr "beatmaplist"
-
-msgid "Game.Menu.ButtonSystem.exit"
+# v2 通用
+msgid "generic.exit"
 msgstr "exit"
 
-msgid "Game.Menu.ButtonSystem.onMultiplayerError"
+msgid "generic.back"
+msgstr "back"
+
+# v2 主菜单
+msgid "screen.menu.buttonSystem.solo"
+msgstr "solo"
+
+msgid "screen.menu.buttonSystem.multi"
+msgstr "multi"
+
+msgid "screen.menu.buttonSystem.playlists"
+msgstr "playlists"
+
+msgid "screen.menu.buttonSystem.about-mfosu"
+msgstr "about mf-osu"
+
+msgid "screen.menu.buttonSystem.mvis"
+msgstr "mvis player"
+
+msgid "screen.menu.buttonSystem.file-import"
+msgstr "file import"
+
+msgid "screen.menu.buttonSystem.invoke-p2c"
+msgstr "TOP SECRET"
+
+msgid "screen.menu.buttonSystem.play"
+msgstr "play"
+
+msgid "screen.menu.buttonSystem.editor"
+msgstr "editor"
+
+msgid "screen.menu.buttonSystem.beatmaplisting"
+msgstr "beatmaplist"
+
+msgid "screen.menu.buttonSystem.exit"
+msgstr "exit"
+
+msgid "screen.menu.buttonSystem.onMultiplayerError"
 msgstr "You gotta be online to multi 'yo!"
 
-msgid "Game.Menu.ButtonSystem.onPlaylistsError"
+msgid "screen.menu.buttonSystem.onPlaylistsError"
 msgstr "You gotta be online to view playlists 'yo!"
 
-# v2 新多人游戏界面
-msgid "Game.Online.Rooms.GameTypes.playlists"
-msgstr "Playlists"
-
 # v2 杂项
-msgid "Game.Users.Drawables.ClickableAvatar.tooltip"
+msgid "game.users.drawables.clickableAvatar.tooltip"
 msgstr "view profile"
 
-# 新多人游戏界面
-msgid "Multiplayer"
-msgstr ""
+# v2 Mvis播放器 主界面
+msgid "screen.mvis.main.openManualInBrowser"
+msgstr "open manual in browser"
 
-msgid "Lounge"
-msgstr ""
+msgid "screen.mvis.main.prevOrRestart"
+msgstr "previous / restart"
 
-msgid "Create room"
-msgstr ""
+msgid "screen.mvis.main.togglePause"
+msgstr "pause / play"
 
-msgid "Open Settings"
-msgstr ""
+msgid "screen.mvis.main.next"
+msgstr "next"
 
-msgid "Recently Ended"
-msgstr ""
+msgid "screen.mvis.main.openCollection"
+msgstr "open collections"
 
-msgid "Participated"
-msgstr ""
+msgid "screen.mvis.main.lockChanges"
+msgstr "lock changes"
 
-msgid "Owned"
-msgstr ""
+msgid "screen.mvis.main.loop"
+msgstr "toggle loop"
 
-msgid "hosted by {0}"
-msgstr ""
+msgid "screen.mvis.main.presentBeatmap"
+msgstr "view in solo song select"
 
-msgid "hosted by "
-msgstr ""
+msgid "screen.mvis.main.openSettings"
+msgstr "open settings"
 
-msgid "{0} 人参与"
+msgid "screen.mvis.main.toggleLock"
+msgstr "lock changes"
+
+msgid "screen.mvis.main.songSelect"
+msgstr "song select"
+
+# v2 Mvis播放器 收藏夹界面
+msgid "screen.mvis.collections.ui.noCollectionSelected"
+msgstr "No collection selected"
+
+msgid "screen.mvis.collections.ui.selectOneFirst"
+msgstr "Select one first!"
+
+msgid "screen.mvis.collections.ui.beatmapSetsCount"
+msgstr "{0} Song(s)"
+
+# v2 新多人游戏界面
+msgid "online.rooms.gameTypes.playlists"
+msgstr "Playlists"
+
+# v2 新多人游戏界面
+msgid "online.rooms.gameTypes.tag"
+msgstr "Tag"
+
+# v2 新多人游戏界面
+msgid "online.rooms.gameTypes.tagTeam"
+msgstr "Tag Team"
+
+# v2 新多人游戏界面
+msgid "online.rooms.gameTypes.versus"
+msgstr "Versus"
+
+# v2 新多人游戏界面
+msgid "online.rooms.gameTypes.teamVersus"
+msgstr "Team Versus"
+
+# v2 多人游戏 通用
+msgid "screen.multi.generic.hostedBy"
+msgstr "Hosted by "
+
+# v2 多人游戏 通用
+msgid "screen.multi.generic.lounge"
+msgstr "Lounge"
+
+# v2 多人游戏 RoomStatusFilter
+msgid "screen.multi.lounge.components.roomStatusFilter.open"
+msgstr "Open"
+
+msgid "screen.multi.lounge.components.roomStatusFilter.ended"
+msgstr "Recently Ended"
+
+msgid "screen.multi.lounge.components.roomStatusFilter.participated"
+msgstr "Participated"
+
+msgid "screen.multi.lounge.components.roomStatusFilter.owned"
+msgstr "Owned"
+
+# v2 多人游戏 主界面
+msgid "screen.multi.multiplayer.multiplayer.screenTitle"
+msgstr "Multiplayer"
+
+msgid "screen.multi.multiplayer.createMultiplayerMatchButton.text"
+msgstr "create room"
+
+msgid ""
+"screen.multi.multiplayer.match.multiplayerMatchHeader.openSettingsButton.text"
+msgstr "open settings"
+
+# {0}人参与
+msgid "screen.multi.lounge.components.participantInfo.summary.text"
 msgstr "{0} participant(s)"
+
+# v2 Mvis设置
+msgid "settings.mvis.audio.mvisMusicSpeed"
+msgstr "Speed"
+
+msgid "settings.mvis.audio.adjustPitch"
+msgstr "Adjust pitch"
+
+msgid "settings.mvis.audio.adjustPitch.tooltip"
+msgstr "Does not support storyboard audio now, please manually set DT/HT mod"
+
+msgid "settings.mvis.audio.nightcoreBeat"
+msgstr "Nightcore beat"
+
+msgid "settings.mvis.audio.nightcoreBeat.tooltip"
+msgstr "Uguu....."
+
+msgid "settings.mvis.audio.playFromCollection"
+msgstr "Play from collection"
+
+msgid "settings.mvis.audio.header"
+msgstr "AUDIO"
+
+msgid "settings.mvis.storyboard.header"
+msgstr "STORYBOARD"
+
+msgid "settings.mvis.storyboard.enableStoryboard"
+msgstr "Enable Storybord / Video"
+
+msgid "settings.mvis.ui.header"
+msgstr "INTERFACE"
+
+msgid "settings.mvis.ui.bgBlur"
+msgstr "Background blur"
+
+msgid "settings.mvis.ui.idleBgDim"
+msgstr "Background dim when idle"
+
+msgid "settings.mvis.ui.contentOpacity"
+msgstr "M-vis panel opacity when idle"
+
+msgid "settings.mvis.ui.accentColorR"
+msgstr "Theme color(Red)"
+
+msgid "settings.mvis.ui.accentColorG"
+msgstr "Theme color(Green)"
+
+msgid "settings.mvis.ui.accentColorB"
+msgstr "Theme color(Blue)"
+
+msgid "settings.mvis.ui.hue"
+msgstr "Hue : {0}"
+
+msgid "settings.mvis.visual.header"
+msgstr "VISUAL"
+
+msgid "settings.mvis.visual.enableBgTriangles"
+msgstr "Background Triangles"
+
+# v2 Mvis设置
+msgid "settings.mvis.visual.showParticles"
+msgstr "Show particles"
+
+msgid "settings.mvis.visual.particleAmount"
+msgstr "Particle amount"
+
+# v2 Mvis设置
+msgid "settings.mvis.visual.barType"
+msgstr "Bar type"
+
+# v2 Mvis设置
+msgid "settings.mvis.visual.visualizerAmount"
+msgstr "Visualizer amount"
+
+msgid "settings.mvis.visual.barWidth"
+msgstr "Bar width"
+
+msgid "settings.mvis.visual.barsPerVisual"
+msgstr "Bars per visual"
+
+msgid "settings.mvis.visual.rotation"
+msgstr "Rotation"
+
+msgid "settings.mvis.visual.useCustomColor"
+msgstr "Use custom color"
+
+# v2 Mvis设置
+msgid "settings.mvis.visual.iR"
+msgstr "Red"
+
+# v2 Mvis设置
+msgid "settings.mvis.visual.iG"
+msgstr "Green"
+
+msgid "settings.mvis.visual.iB"
+msgstr "Blue"
+
+msgid "settings.mvis.visual.useOsuLogoVisualisation"
+msgstr "Use osu! logo visualisation"
+
+msgid "settings.mvis.barType.basic"
+msgstr "Basic"
+
+msgid "settings.mvis.barType.rounded"
+msgstr "Rounded"
+
+msgid "settings.mvis.barType.fall"
+msgstr "Fall"
 
 msgid "Recent Participants"
 msgstr ""
@@ -582,167 +755,6 @@ msgstr "Memory"
 
 msgid "清理所有缓存"
 msgstr "Clear all caches"
-
-# Mvis设置Section标题
-msgid "M-vis播放器"
-msgstr "M-vis Player"
-
-# Mvis播放器界面
-msgid "选择该谱面"
-msgstr "Select this beatmap"
-
-msgid "未选择收藏夹"
-msgstr "No Collection Selected"
-
-msgid "请先选择一个收藏夹!"
-msgstr "Please select one first!"
-
-msgid "{0}首歌曲"
-msgstr "{0} Song(s)"
-
-msgid "收藏夹选择"
-msgstr "Select collection"
-
-msgid "播放器设置"
-msgstr "Player Settings"
-
-msgid "退出"
-msgstr "Exit"
-
-msgid "在浏览器中打开食用手册"
-msgstr "Open manual in browser"
-
-msgid "上一首/从头开始"
-msgstr "Previous/Restart"
-
-msgid "切换暂停"
-msgstr "Pause/Play"
-
-msgid "下一首"
-msgstr "Next"
-
-msgid "隐藏界面并锁定变更"
-msgstr "Hide & lock interface changes"
-
-msgid "单曲循环"
-msgstr "Loop"
-
-msgid "在选歌界面中查看"
-msgstr "View in song select"
-
-msgid "切换悬浮锁"
-msgstr "Lock interface changes"
-
-msgid "歌曲选择"
-msgstr "Song select"
-
-# 设置 - UI
-msgid "界面"
-msgstr "Interface"
-
-msgid "背景模糊"
-msgstr "Background blur"
-
-msgid "空闲时的背景亮度"
-msgstr "Background brightness when idle"
-
-msgid "空闲时的M-vis面板不透明度"
-msgstr "M-vis panel opacity when idle"
-
-msgid "主题色(红)"
-msgstr "Theme color(Red)"
-
-msgid "主题色(绿)"
-msgstr "Theme color(Green)"
-
-msgid "主题色(蓝)"
-msgstr "Theme color(Blue)"
-
-msgid "色相(Hue): {0}"
-msgstr "Hue: {0}"
-
-# 设置 - 音频
-msgid "音频"
-msgstr "Audio"
-
-msgid "播放速度"
-msgstr "Playback rate"
-
-msgid "调整播放速度时也同时调整音调"
-msgstr "Adjust pitch"
-
-msgid ""
-"请注意: 播放速度调整暂不支持故事版音频, 调整故事版音频请手动前往歌曲选择添加"
-"加速/减速mod"
-msgstr "Does not support storyboard audio now, please manually set DT/HT mod"
-
-msgid "夜核节拍器"
-msgstr "Nightcore beat"
-
-msgid "动次打次动次打次"
-msgstr "Uguuuuuuu..."
-
-msgid "从收藏夹播放音乐"
-msgstr "Play music from collections"
-
-# 设置 - 特效
-msgid "特效"
-msgstr "Visual"
-
-msgid "在无故事版可用时显示背景动画"
-msgstr "Display background animate when no storyboard is available"
-
-msgid "显示粒子效果"
-msgstr "Show particles"
-
-msgid "屏幕粒子数"
-msgstr "Particles count"
-
-msgid "频谱类型"
-msgstr "Bar type"
-
-msgid "分段数"
-msgstr "Visualizer amount"
-
-msgid "宽度"
-msgstr "Bar width"
-
-msgid "每个分段的频谱密度"
-msgstr "Bars per visual"
-
-msgid "频谱旋转角度"
-msgstr "Rotation"
-
-msgid "使用自定义颜色"
-msgstr "Use custom accent colour"
-
-msgid "红"
-msgstr "Red"
-
-msgid "绿"
-msgstr "Green"
-
-msgid "蓝"
-msgstr "Blue"
-
-msgid "使用原版频谱效果"
-msgstr "Use menu visualizer"
-
-msgid "基本"
-msgstr "Basic"
-
-msgid "圆角"
-msgstr ""
-
-msgid "打砖块"
-msgstr ""
-
-# 设置 - 故事版
-msgid "启用故事版/背景视频"
-msgstr "Enable storyboard/video"
-
-msgid "故事版"
-msgstr "Storyboard"
 
 # Mf-osu 设置 - 入口
 msgid "Mf-osu自定义选项"
@@ -1338,6 +1350,175 @@ msgstr "notifications"
 
 msgid "等待着您~"
 msgstr "waiting for 'ya"
+
+# Mvis设置Section标题
+#~ msgid "M-vis播放器"
+#~ msgstr "M-vis Player"
+
+# Mvis播放器界面
+#~ msgid "选择该谱面"
+#~ msgstr "Select this beatmap"
+
+#~ msgid "未选择收藏夹"
+#~ msgstr "No Collection Selected"
+
+#~ msgid "请先选择一个收藏夹!"
+#~ msgstr "Please select one first!"
+
+#~ msgid "{0}首歌曲"
+#~ msgstr "{0} Song(s)"
+
+#~ msgid "收藏夹选择"
+#~ msgstr "Select collection"
+
+#~ msgid "播放器设置"
+#~ msgstr "Player Settings"
+
+#~ msgid "退出"
+#~ msgstr "Exit"
+
+#~ msgid "在浏览器中打开食用手册"
+#~ msgstr "Open manual in browser"
+
+#~ msgid "上一首/从头开始"
+#~ msgstr "Previous/Restart"
+
+#~ msgid "切换暂停"
+#~ msgstr "Pause/Play"
+
+#~ msgid "下一首"
+#~ msgstr "Next"
+
+#~ msgid "隐藏界面并锁定变更"
+#~ msgstr "Hide & lock interface changes"
+
+#~ msgid "单曲循环"
+#~ msgstr "Loop"
+
+#~ msgid "在选歌界面中查看"
+#~ msgstr "View in song select"
+
+#~ msgid "切换悬浮锁"
+#~ msgstr "Lock interface changes"
+
+#~ msgid "歌曲选择"
+#~ msgstr "Song select"
+
+# 设置 - UI
+#~ msgid "界面"
+#~ msgstr "Interface"
+
+#~ msgid "背景模糊"
+#~ msgstr "Background blur"
+
+#~ msgid "空闲时的背景亮度"
+#~ msgstr "Background brightness when idle"
+
+#~ msgid "空闲时的M-vis面板不透明度"
+#~ msgstr "M-vis panel opacity when idle"
+
+#~ msgid "主题色(红)"
+#~ msgstr "Theme color(Red)"
+
+#~ msgid "主题色(绿)"
+#~ msgstr "Theme color(Green)"
+
+#~ msgid "主题色(蓝)"
+#~ msgstr "Theme color(Blue)"
+
+#~ msgid "色相(Hue): {0}"
+#~ msgstr "Hue: {0}"
+
+# 设置 - 特效
+#~ msgid "特效"
+#~ msgstr "Visual"
+
+#~ msgid "在无故事版可用时显示背景动画"
+#~ msgstr "Display background animate when no storyboard is available"
+
+#~ msgid "显示粒子效果"
+#~ msgstr "Show particles"
+
+#~ msgid "屏幕粒子数"
+#~ msgstr "Particles count"
+
+#~ msgid "频谱类型"
+#~ msgstr "Bar type"
+
+#~ msgid "分段数"
+#~ msgstr "Visualizer amount"
+
+#~ msgid "宽度"
+#~ msgstr "Bar width"
+
+#~ msgid "每个分段的频谱密度"
+#~ msgstr "Bars per visual"
+
+#~ msgid "频谱旋转角度"
+#~ msgstr "Rotation"
+
+#~ msgid "使用自定义颜色"
+#~ msgstr "Use custom accent colour"
+
+#~ msgid "红"
+#~ msgstr "Red"
+
+#~ msgid "绿"
+#~ msgstr "Green"
+
+#~ msgid "蓝"
+#~ msgstr "Blue"
+
+#~ msgid "使用原版频谱效果"
+#~ msgstr "Use menu visualizer"
+
+#~ msgid "基本"
+#~ msgstr "Basic"
+
+# 设置 - 故事版
+#~ msgid "启用故事版/背景视频"
+#~ msgstr "Enable storyboard/video"
+
+#~ msgid "故事版"
+#~ msgstr "Storyboard"
+
+# 设置 - 音频
+#~ msgid "音频"
+#~ msgstr "Audio"
+
+#~ msgid "播放速度"
+#~ msgstr "Playback rate"
+
+#~ msgid "调整播放速度时也同时调整音调"
+#~ msgstr "Adjust pitch"
+
+#~ msgid ""
+#~ "请注意: 播放速度调整暂不支持故事版音频, 调整故事版音频请手动前往歌曲选择添"
+#~ "加加速/减速mod"
+#~ msgstr ""
+#~ "Does not support storyboard audio now, please manually set DT/HT mod"
+
+#~ msgid "夜核节拍器"
+#~ msgstr "Nightcore beat"
+
+#~ msgid "动次打次动次打次"
+#~ msgstr "Uguuuuuuu..."
+
+#~ msgid "从收藏夹播放音乐"
+#~ msgstr "Play music from collections"
+
+#~ msgid "screen.multi.header.pageTitle.text"
+#~ msgstr "Lounge"
+
+#
+#~ msgid "_HostedBy_Text"
+#~ msgstr "hosted by "
+
+#~ msgid "_Open_Multiplayer"
+#~ msgstr "Open"
+
+#~ msgid "{0} 人参与"
+#~ msgstr "{0} participant(s)"
 
 # 主菜单
 #~ msgid "游玩"

@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -77,7 +78,7 @@ namespace osu.Game.Screens.OnlinePlay
 
             public IOnlinePlaySubScreen Screen
             {
-                set => pageTitle.Text = value.ShortTitle.Titleize();
+                set => pageTitle.Text = value.ShortTitle; //.Titleize();
             }
 
             public MultiHeaderTitle(string mainTitle)
@@ -112,7 +113,7 @@ namespace osu.Game.Screens.OnlinePlay
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 Font = OsuFont.GetFont(size: 24),
-                                Text = "Lounge"
+                                Text = "screen.multi.generic.lounge"
                             }
                         }
                     },

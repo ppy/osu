@@ -81,7 +81,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                     Size = new Vector2(150, HEIGHT),
-                    Text = "Open settings",
+                    Text = "screen.multi.multiplayer.match.multiplayerMatchHeader.openSettingsButton.text",
                     Action = () => OpenSettings?.Invoke(),
                     Alpha = 0
                 }
@@ -95,7 +95,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
                 if (host.NewValue != null)
                 {
-                    hostText.AddText("_HostedBy_Text");
+                    hostText.AddText("screen.multi.generic.hostedBy");
                     hostText.AddUserLink(host.NewValue, s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
                 }
 

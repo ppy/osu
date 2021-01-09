@@ -7,12 +7,16 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
     public enum RoomStatusFilter
     {
-        [Description("_Open_Multiplayer")]
+        [Description("screen.multi.lounge.components.roomStatusFilter.open")]
         Open,
 
-        [Description("Recently Ended")]
+        [Description("screen.multi.lounge.components.roomStatusFilter.ended")]
         Ended,
+
+        [Description("screen.multi.lounge.components.roomStatusFilter.participated")]
         Participated,
+
+        [Description("screen.multi.lounge.components.roomStatusFilter.owned")]
         Owned,
     }
 }

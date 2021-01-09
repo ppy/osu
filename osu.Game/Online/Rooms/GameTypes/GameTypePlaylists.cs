@@ -10,7 +10,7 @@ namespace osu.Game.Online.Rooms.GameTypes
 {
     public class GameTypePlaylists : GameType
     {
-        public override string Name => "Game.Online.Rooms.GameTypes.playlists";
+        public override string Name => "online.rooms.gameTypes.playlists";
 
         public override Drawable GetIcon(OsuColour colours, float size) => new SpriteIcon
         {

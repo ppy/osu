@@ -59,7 +59,7 @@ namespace osu.Game.Users.Drawables
 
         private class ClickableArea : OsuClickableContainer
         {
-            public override string TooltipText => Enabled.Value ? @"Game.Users.Drawables.ClickableAvatar.tooltip" : null;
+            public override string TooltipText => Enabled.Value ? @"game.users.drawables.clickableAvatar.tooltip" : null;
 
             protected override bool OnClick(ClickEvent e)
             {

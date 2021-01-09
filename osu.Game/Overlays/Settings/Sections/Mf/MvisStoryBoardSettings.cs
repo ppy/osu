@@ -5,11 +5,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 
-namespace osu.Game.Overlays.Settings.Sections.General
+namespace osu.Game.Overlays.Settings.Sections.Mf
 {
     public class MvisStoryBoardSettings : SettingsSubsection
     {
-        protected override string Header => "故事版";
+        protected override string Header => "settings.mvis.storyboard.header";
 
         [BackgroundDependencyLoader]
         private void load(MConfigManager config)
@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "启用故事版/背景视频",
+                    LabelText = "settings.mvis.storyboard.enableStoryboard",
                     Current = config.GetBindable<bool>(MSetting.MvisEnableStoryboard),
                 }
             };

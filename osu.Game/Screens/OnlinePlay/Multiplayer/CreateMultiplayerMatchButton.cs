@@ -15,7 +15,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             Triangles.TriangleScale = 1.5f;
 
-            Text = "Create room";
+            Text = "screen.multi.multiplayer.createMultiplayerMatchButton.text";
 
             ((IBindable<bool>)Enabled).BindTo(multiplayerClient.IsConnected);
         }
