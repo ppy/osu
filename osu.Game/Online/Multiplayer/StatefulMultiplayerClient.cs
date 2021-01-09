@@ -65,6 +65,23 @@ namespace osu.Game.Online.Multiplayer
         /// </summary>
         public readonly BindableList<int> CurrentMatchPlayingUserIds = new BindableList<int>();
 
+        /// <summary>
+        /// The <see cref="MultiplayerRoomUser"/> corresponding to the local player, if available.
+        /// </summary>
+        public MultiplayerRoomUser? LocalUser => Room?.Users.SingleOrDefault(u => u.User?.Id == api.LocalUser.Value.Id);
+
+        /// <summary>
+        /// Whether the <see cref="LocalUser"/> is the host in <see cref="Room"/>.
+        /// </summary>
+        public bool IsHost
+        {
+            get
+            {
+                var localUser = LocalUser;
+                return localUser != null && Room?.Host != null && localUser.Equals(Room.Host);
+            }
+        }
+
         [Resolved]
         private UserLookupCache userLookupCache { get; set; } = null!;
 
@@ -176,6 +193,32 @@ namespace osu.Game.Online.Multiplayer
                 RulesetID = item.GetOr(existingPlaylistItem).RulesetID,
                 Mods = item.HasValue ? item.Value.AsNonNull().RequiredMods.Select(m => new APIMod(m)).ToList() : Room.Settings.Mods
             });
+        }
+
+        /// <summary>
+        /// Toggles the <see cref="LocalUser"/>'s ready state.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">If a toggle of ready state is not valid at this time.</exception>
+        public async Task ToggleReady()
+        {
+            var localUser = LocalUser;
+
+            if (localUser == null)
+                return;
+
+            switch (localUser.State)
+            {
+                case MultiplayerUserState.Idle:
+                    await ChangeState(MultiplayerUserState.Ready);
+                    return;
+
+                case MultiplayerUserState.Ready:
+                    await ChangeState(MultiplayerUserState.Idle);
+                    return;
+
+                default:
+                    throw new InvalidOperationException($"Cannot toggle ready when in {localUser.State}");
+            }
         }
 
         public abstract Task TransferHost(int userId);
