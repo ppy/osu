@@ -54,7 +54,7 @@ namespace osu.Game.Screens.OnlinePlay
         private readonly Bindable<FilterCriteria> currentFilter = new Bindable<FilterCriteria>(new FilterCriteria());
 
         [Cached]
-        private readonly OngoingOperationTracker ongoingOperationTracker = new OngoingOperationTracker();
+        private OngoingOperationTracker ongoingOperationTracker { get; set; }
 
         [Resolved(CanBeNull = true)]
         private MusicController music { get; set; }
@@ -144,7 +144,8 @@ namespace osu.Game.Screens.OnlinePlay
                         };
                         button.Action = () => OpenNewRoom();
                     }),
-                    RoomManager = CreateRoomManager()
+                    RoomManager = CreateRoomManager(),
+                    ongoingOperationTracker = new OngoingOperationTracker()
                 }
             };
 
