@@ -78,8 +78,6 @@ namespace osu.Game.Screens.Mvis.Storyboard
             storyboardClock.IsCoupled = false;
             storyboardClock.Stop();
 
-            State.Value = StoryboardState.Loading;
-
             storyboardClock = new StoryboardClock();
             storyboardClock.ChangeSource(beatmap.Track);
             Seek(beatmap.Track.CurrentTime);
@@ -133,7 +131,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
             if (loadTask != null)
             {
                 var b = currentStoryboard;
-                loadTask?.ContinueWith(_ => b?.Expire());
+                loadTask.ContinueWith(_ => b?.Expire());
             }
         }
 
@@ -147,6 +145,8 @@ namespace osu.Game.Screens.Mvis.Storyboard
 
             if (targetBeatmap == null)
                 throw new InvalidOperationException("currentBeatmap 不能为 null");
+
+            State.Value = StoryboardState.Loading;
 
             Task.Run(async () =>
             {
