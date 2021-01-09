@@ -23,6 +23,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Cached]
         public Bindable<FilterCriteria> Filter { get; }
 
+        [Cached]
+        public OngoingOperationTracker OngoingOperationTracker { get; } = new OngoingOperationTracker();
+
         protected override Container<Drawable> Content => content;
         private readonly TestMultiplayerRoomContainer content;
 

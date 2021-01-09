@@ -10,14 +10,34 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
     public class CreateMultiplayerMatchButton : PurpleTriangleButton
     {
+        private IBindable<bool> isConnected;
+        private IBindable<bool> operationInProgress;
+
+        [Resolved]
+        private StatefulMultiplayerClient multiplayerClient { get; set; }
+
+        [Resolved]
+        private OngoingOperationTracker ongoingOperationTracker { get; set; }
+
         [BackgroundDependencyLoader]
-        private void load(StatefulMultiplayerClient multiplayerClient)
+        private void load()
         {
             Triangles.TriangleScale = 1.5f;
 
             Text = "Create room";
 
-            ((IBindable<bool>)Enabled).BindTo(multiplayerClient.IsConnected);
+            isConnected = multiplayerClient.IsConnected.GetBoundCopy();
+            operationInProgress = ongoingOperationTracker.InProgress.GetBoundCopy();
         }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            isConnected.BindValueChanged(_ => updateState());
+            operationInProgress.BindValueChanged(_ => updateState(), true);
+        }
+
+        private void updateState() => Enabled.Value = isConnected.Value && !operationInProgress.Value;
     }
 }
