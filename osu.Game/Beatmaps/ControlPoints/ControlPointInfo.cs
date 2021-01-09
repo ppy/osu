@@ -297,5 +297,15 @@ namespace osu.Game.Beatmaps.ControlPoints
                     break;
             }
         }
+
+        public ControlPointInfo CreateCopy()
+        {
+            var controlPointInfo = new ControlPointInfo();
+
+            foreach (var point in AllControlPoints)
+                controlPointInfo.Add(point.Time, point.CreateCopy());
+
+            return controlPointInfo;
+        }
     }
 }

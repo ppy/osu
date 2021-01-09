@@ -26,6 +26,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     public class TestSceneMultiplayerReadyButton : MultiplayerTestScene
     {
         private MultiplayerReadyButton button;
+        private BeatmapSetInfo importedSet;
 
         private BeatmapManager beatmaps;
         private RulesetStore rulesets;
@@ -43,9 +44,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [SetUp]
         public new void Setup() => Schedule(() =>
         {
-            var beatmap = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First().Beatmaps.First();
-
-            Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap);
+            importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First();
+            Beatmap.Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First());
 
             Child = button = new MultiplayerReadyButton
             {
@@ -56,8 +56,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     Value = new PlaylistItem
                     {
-                        Beatmap = { Value = beatmap },
-                        Ruleset = { Value = beatmap.Ruleset }
+                        Beatmap = { Value = Beatmap.Value.BeatmapInfo },
+                        Ruleset = { Value = Beatmap.Value.BeatmapInfo.Ruleset }
                     }
                 },
                 OnReadyClick = async () =>
@@ -75,6 +75,23 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 }
             };
         });
+
+        [Test]
+        public void TestDeletedBeatmapDisableReady()
+        {
+            OsuButton readyButton = null;
+
+            AddAssert("ensure ready button enabled", () =>
+            {
+                readyButton = button.ChildrenOfType<OsuButton>().Single();
+                return readyButton.Enabled.Value;
+            });
+
+            AddStep("delete beatmap", () => beatmaps.Delete(importedSet));
+            AddAssert("ready button disabled", () => !readyButton.Enabled.Value);
+            AddStep("undelete beatmap", () => beatmaps.Undelete(importedSet));
+            AddAssert("ready button enabled back", () => readyButton.Enabled.Value);
+        }
 
         [Test]
         public void TestToggleStateWhenNotHost()

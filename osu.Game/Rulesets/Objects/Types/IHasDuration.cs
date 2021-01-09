@@ -6,26 +6,16 @@ namespace osu.Game.Rulesets.Objects.Types
     /// <summary>
     /// A HitObject that ends at a different time than its start time.
     /// </summary>
-#pragma warning disable 618
-    public interface IHasDuration : IHasEndTime
-#pragma warning restore 618
+    public interface IHasDuration
     {
-        double IHasEndTime.EndTime
-        {
-            get => EndTime;
-            set => Duration = (Duration - EndTime) + value;
-        }
-
-        double IHasEndTime.Duration => Duration;
-
         /// <summary>
         /// The time at which the HitObject ends.
         /// </summary>
-        new double EndTime { get; }
+        double EndTime { get; }
 
         /// <summary>
         /// The duration of the HitObject.
         /// </summary>
-        new double Duration { get; set; }
+        double Duration { get; set; }
     }
 }
