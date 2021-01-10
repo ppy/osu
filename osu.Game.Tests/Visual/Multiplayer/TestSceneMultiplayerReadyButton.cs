@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -30,6 +31,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private BeatmapManager beatmaps;
         private RulesetStore rulesets;
 
+        private IDisposable readyClickOperation;
+
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
@@ -56,6 +59,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         Beatmap = { Value = Beatmap.Value.BeatmapInfo },
                         Ruleset = { Value = Beatmap.Value.BeatmapInfo.Ruleset }
                     }
+                },
+                OnReadyClick = async () =>
+                {
+                    readyClickOperation = OngoingOperationTracker.BeginOperation();
+
+                    if (Client.IsHost && Client.LocalUser?.State == MultiplayerUserState.Ready)
+                    {
+                        await Client.StartMatch();
+                        return;
+                    }
+
+                    await Client.ToggleReady();
+                    readyClickOperation.Dispose();
                 }
             };
         });
@@ -108,8 +124,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             addClickButtonStep();
             AddAssert("user is ready", () => Client.Room?.Users[0].State == MultiplayerUserState.Ready);
 
-            addClickButtonStep();
-            AddAssert("match started", () => Client.Room?.Users[0].State == MultiplayerUserState.WaitingForLoad);
+            verifyGameplayStartFlow();
         }
 
         [Test]
@@ -124,8 +139,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             addClickButtonStep();
             AddStep("make user host", () => Client.TransferHost(Client.Room?.Users[0].UserID ?? 0));
 
-            addClickButtonStep();
-            AddAssert("match started", () => Client.Room?.Users[0].State == MultiplayerUserState.WaitingForLoad);
+            verifyGameplayStartFlow();
         }
 
         [Test]
@@ -179,5 +193,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
             InputManager.MoveMouseTo(button);
             InputManager.Click(MouseButton.Left);
         });
+
+        private void verifyGameplayStartFlow()
+        {
+            addClickButtonStep();
+            AddAssert("user waiting for load", () => Client.Room?.Users[0].State == MultiplayerUserState.WaitingForLoad);
+            AddAssert("ready button disabled", () => !button.ChildrenOfType<OsuButton>().Single().Enabled.Value);
+
+            AddStep("transitioned to gameplay", () => readyClickOperation.Dispose());
+            AddAssert("ready button enabled", () => button.ChildrenOfType<OsuButton>().Single().Enabled.Value);
+        }
     }
 }

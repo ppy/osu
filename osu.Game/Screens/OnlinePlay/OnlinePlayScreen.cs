@@ -53,6 +53,9 @@ namespace osu.Game.Screens.OnlinePlay
         [Cached]
         private readonly Bindable<FilterCriteria> currentFilter = new Bindable<FilterCriteria>(new FilterCriteria());
 
+        [Cached]
+        private readonly OngoingOperationTracker ongoingOperationTracker = new OngoingOperationTracker();
+
         [Resolved(CanBeNull = true)]
         private MusicController music { get; set; }
 
