@@ -127,20 +127,30 @@ namespace osu.Game.Overlays.Mods
         }
 
         /// <summary>
-        /// Select one or more mods in this section and deselects all other ones.
+        /// Updates all buttons with the given list of selected mods.
         /// </summary>
-        /// <param name="modTypes">The types of <see cref="Mod"/>s which should be selected.</param>
-        public void SelectTypes(IEnumerable<Type> modTypes)
+        /// <param name="newSelectedMods">The new list of selected mods to select.</param>
+        public void UpdateSelectedMods(IReadOnlyList<Mod> newSelectedMods)
         {
             foreach (var button in buttons)
-            {
-                int i = Array.FindIndex(button.Mods, m => modTypes.Any(t => t == m.GetType()));
+                updateButtonMods(button, newSelectedMods);
+        }
 
-                if (i >= 0)
-                    button.SelectAt(i);
-                else
-                    button.Deselect();
+        private void updateButtonMods(ModButton button, IReadOnlyList<Mod> newSelectedMods)
+        {
+            foreach (var mod in newSelectedMods)
+            {
+                var index = Array.FindIndex(button.Mods, m1 => mod.GetType() == m1.GetType());
+                if (index < 0)
+                    continue;
+
+                var buttonMod = button.Mods[index];
+                buttonMod.CopyFrom(mod);
+                button.SelectAt(index);
+                return;
             }
+
+            button.Deselect();
         }
 
         protected ModSection()
