@@ -88,11 +88,12 @@ namespace osu.Game.Online.Multiplayer
             {
                 isConnected.Value = false;
 
-                if (ex != null)
-                {
-                    Logger.Log($"Multiplayer client lost connection: {ex}", LoggingTarget.Network);
+                Logger.Log(ex != null
+                    ? $"Multiplayer client lost connection: {ex}"
+                    : "Multiplayer client disconnected", LoggingTarget.Network);
+
+                if (connection != null)
                     await tryUntilConnected();
-                }
             };
 
             await tryUntilConnected();
