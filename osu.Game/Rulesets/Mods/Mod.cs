@@ -134,18 +134,18 @@ namespace osu.Game.Rulesets.Mods
         }
 
         /// <summary>
-        /// Copies mod setting values from <paramref name="them"/> into this instance.
+        /// Copies mod setting values from <paramref name="source"/> into this instance.
         /// </summary>
-        /// <param name="them">The mod to copy properties from.</param>
-        public void CopyFrom(Mod them)
+        /// <param name="source">The mod to copy properties from.</param>
+        public void CopyFrom(Mod source)
         {
-            if (them.GetType() != GetType())
-                throw new ArgumentException($"Expected mod of type {GetType()}, got {them.GetType()}.", nameof(them));
+            if (source.GetType() != GetType())
+                throw new ArgumentException($"Expected mod of type {GetType()}, got {source.GetType()}.", nameof(source));
 
             foreach (var (_, prop) in this.GetSettingsSourceProperties())
             {
                 var targetBindable = (IBindable)prop.GetValue(this);
-                var sourceBindable = (IBindable)prop.GetValue(them);
+                var sourceBindable = (IBindable)prop.GetValue(source);
 
                 // we only care about changes that have been made away from defaults.
                 if (!sourceBindable.IsDefault)
