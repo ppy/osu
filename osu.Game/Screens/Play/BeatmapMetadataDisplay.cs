@@ -280,27 +280,18 @@ namespace osu.Game.Screens.Play
             [BackgroundDependencyLoader]
             private void load()
             {
-                RelativeSizeAxes = Axes.Both;
+                Size = new Vector2(200, 40);
                 Origin = Anchor.Centre;
                 Anchor = Anchor.Centre;
+                CornerRadius = 10;
+                Masking = true;
                 Children = new Drawable[]
                 {
-                    new Container
+                    new Box
                     {
-                        Size = new Vector2(200, 40),
-                        Origin = Anchor.Centre,
-                        Anchor = Anchor.Centre,
-                        CornerRadius = 10,
-                        Masking = true,
-                        Children = new Drawable[]
-                        {
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Alpha = 0.8f,
-                                Colour = Color4.Black,
-                            }
-                        }
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0.8f,
+                        Colour = Color4.Black,
                     },
                     ContentFillFlow = new FillFlowContainer
                     {
