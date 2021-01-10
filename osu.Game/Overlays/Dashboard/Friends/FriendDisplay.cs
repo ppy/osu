@@ -128,7 +128,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
                                                 AutoSizeAxes = Axes.Y,
                                                 Padding = new MarginPadding { Horizontal = 50 }
                                             },
-                                            loading = new LoadingLayer(itemsPlaceholder)
+                                            loading = new LoadingLayer(true)
                                         }
                                     }
                                 }

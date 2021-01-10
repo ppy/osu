@@ -114,6 +114,12 @@ namespace osu.Game.Rulesets.Mods
             bindable.ValueChanged += _ => userChangedSettings[bindable] = !bindable.IsDefault;
         }
 
+        internal override void CopyAdjustedSetting(IBindable target, object source)
+        {
+            userChangedSettings[target] = true;
+            base.CopyAdjustedSetting(target, source);
+        }
+
         /// <summary>
         /// Apply all custom settings to the provided beatmap.
         /// </summary>
