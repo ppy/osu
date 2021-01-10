@@ -42,17 +42,13 @@ namespace osu.Game.Tournament.Screens
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
-        [Resolved]
-        private TournamentGameBase game { get; set; }
-
         [Resolved(canBeNull: true)]
         private TournamentSceneManager sceneManager { get; set; }
 
         private Bindable<Size> windowSize;
-        private TournamentStorage storage;
 
         [BackgroundDependencyLoader]
-        private void load(FrameworkConfigManager frameworkConfig, Storage storage)
+        private void load(FrameworkConfigManager frameworkConfig)
         {
             windowSize = frameworkConfig.GetBindable<Size>(FrameworkSetting.WindowedSize);
 
@@ -67,7 +63,6 @@ namespace osu.Game.Tournament.Screens
 
             api.LocalUser.BindValueChanged(_ => Schedule(reload));
             stableInfo.OnStableInfoSaved += () => Schedule(reload);
-            this.storage = (TournamentStorage)storage;
             reload();
         }
 
@@ -119,10 +114,6 @@ namespace osu.Game.Tournament.Screens
                 {
                     Label = "Current tournament",
                     Description = "Changes the background videos and bracket to match the selected tournament. This requires a restart to apply changes.",
-                    Items = storage.ListTournaments(),
-                    Current = storage.CurrentTournament,
-                    ButtonText = "Close osu!",
-                    Action = () => game.GracefullyExit()
                 },
                 resolution = new ResolutionSelector
                 {
@@ -240,12 +231,42 @@ namespace osu.Game.Tournament.Screens
                 set => dropdown.Current = value;
             }
 
+            private string originalTournament;
+
+            private TournamentStorage storage;
+
+            [Resolved]
+            private TournamentGameBase game { get; set; }
+
+            [BackgroundDependencyLoader]
+            private void load(Storage storage)
+            {
+                this.storage = (TournamentStorage)storage;
+                Current = this.storage.CurrentTournament;
+                originalTournament = this.storage.CurrentTournament.Value;
+                Items = this.storage.ListTournaments();
+                Action = () => game.GracefullyExit();
+                ButtonText = "Close osu!";
+            }
+
             protected override Drawable CreateComponent()
             {
                 var drawable = base.CreateComponent();
+
                 FlowContainer.Insert(-1, dropdown = new OsuDropdown<string>
                 {
                     Width = 510
+                });
+
+                Current.BindValueChanged(v =>
+                {
+                    if (v.NewValue == originalTournament)
+                    {
+                        Button.Hide();
+                        return;
+                    }
+
+                    Button.Show();
                 });
 
                 return drawable;
