@@ -1,45 +1,45 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Screens;
-using osu.Game.Beatmaps;
-using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Mvis.BottomBar.Buttons;
-using osuTK;
-using osuTK.Graphics;
-using osu.Game.Overlays;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
-using osu.Framework.Bindables;
-using osu.Framework.Input.Events;
-using osu.Game.Input.Bindings;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
+using osu.Framework.Screens;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Screens.Mvis.BottomBar;
-using osu.Game.Screens.Mvis.Storyboard;
-using osu.Game.Input;
-using osu.Framework.Audio;
-using osu.Game.Rulesets.Mods;
-using osu.Framework.Graphics.Audio;
-using osu.Game.Screens.Select;
-using osu.Game.Overlays.Settings;
-using osuTK.Input;
 using osu.Game.Graphics;
-using osu.Framework;
+using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Input;
+using osu.Game.Input.Bindings;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections.Mf;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Mvis.BottomBar;
+using osu.Game.Screens.Mvis.BottomBar.Buttons;
 using osu.Game.Screens.Mvis.Collections;
 using osu.Game.Screens.Mvis.Collections.Interface;
-using osu.Game.Users;
 using osu.Game.Screens.Mvis.Objects;
 using osu.Game.Screens.Mvis.SideBar;
 using osu.Game.Screens.Mvis.Skinning;
+using osu.Game.Screens.Mvis.Storyboard;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Select;
 using osu.Game.Skinning;
+using osu.Game.Users;
+using osuTK;
+using osuTK.Graphics;
+using osuTK.Input;
 using Sidebar = osu.Game.Screens.Mvis.SideBar.Sidebar;
 using SongProgressBar = osu.Game.Screens.Mvis.BottomBar.SongProgressBar;
 
@@ -345,7 +345,7 @@ namespace osu.Game.Screens.Mvis
                                                                     {
                                                                         //隐藏界面，锁定更改并隐藏锁定按钮
                                                                         lockChanges.Value = false;
-                                                                        hideOverlays();
+                                                                        hideOverlays(true);
 
                                                                         updateSidebarState(null);
 
@@ -480,7 +480,7 @@ namespace osu.Game.Screens.Mvis
 
             isIdle.BindValueChanged(v =>
             {
-                if (v.NewValue) tryHideOverlays();
+                if (v.NewValue) hideOverlays(false);
             });
             showParticles.BindValueChanged(v =>
             {
@@ -502,7 +502,7 @@ namespace osu.Game.Screens.Mvis
 
             songProgressButton.ToggleableValue.BindTo(trackRunning);
 
-            showOverlays();
+            showOverlays(true);
 
             base.LoadComplete();
         }
@@ -701,7 +701,7 @@ namespace osu.Game.Screens.Mvis
             switch (e)
             {
                 case MouseMoveEvent _:
-                    tryShowOverlays();
+                    showOverlays(false);
                     return base.Handle(e);
 
                 default:
@@ -718,16 +718,19 @@ namespace osu.Game.Screens.Mvis
             if (lockButton.ToggleableValue.Value && overlaysHidden)
                 lockButton.Toggle();
 
-            showOverlays();
+            showOverlays(true);
             base.OnHoverLost(e);
         }
 
         private void updateLockButtonVisuals() =>
             lockButton.FadeIn(500, Easing.OutQuint).Then().Delay(2000).FadeOut(500, Easing.OutQuint);
 
-        private void hideOverlays()
+        private void hideOverlays(bool force)
         {
-            if (lockChanges.Value) return;
+            if (!force && (!canReallyHide || !isIdle.Value || !IsHovered
+                           || bottomBar.Hovered.Value || lockButton.ToggleableValue.Value
+                           || lockChanges.Value))
+                return;
 
             skinnableBbBackground.MoveToY(bottomBar.Height, duration, Easing.OutQuint)
                                  .FadeOut(duration, Easing.OutQuint);
@@ -740,9 +743,14 @@ namespace osu.Game.Screens.Mvis
             updateIdleVisuals();
         }
 
-        private void showOverlays()
+        private void showOverlays(bool force)
         {
-            if (lockChanges.Value) return;
+            //在有锁并且悬浮界面已隐藏或悬浮界面可见的情况下显示悬浮锁
+            if (!force && (lockButton.ToggleableValue.Value && overlaysHidden || !overlaysHidden || lockChanges.Value))
+            {
+                lockButton.FadeIn(500, Easing.OutQuint).Then().Delay(2500).FadeOut(500, Easing.OutQuint);
+                return;
+            }
 
             gameplayContent.FadeTo(1, duration, Easing.OutQuint);
 
@@ -758,31 +766,9 @@ namespace osu.Game.Screens.Mvis
             applyBackgroundBrightness();
         }
 
-        //下一步优化界面隐藏，显示逻辑
-        private void tryHideOverlays()
-        {
-            if (!canReallyHide || !isIdle.Value || !IsHovered
-                || bottomBar.Hovered.Value || lockButton.ToggleableValue.Value)
-                return;
-
-            hideOverlays();
-        }
-
-        private void tryShowOverlays()
-        {
-            //在有锁并且悬浮界面已隐藏或悬浮界面可见的情况下显示悬浮锁
-            if ((lockButton.ToggleableValue.Value && overlaysHidden) || !overlaysHidden)
-            {
-                lockButton.FadeIn(500, Easing.OutQuint).Then().Delay(2500).FadeOut(500, Easing.OutQuint);
-                return;
-            }
-
-            showOverlays();
-        }
-
         private void togglePause()
         {
-            if (track?.IsRunning == true)
+            if (track.IsRunning)
                 musicController.Stop();
             else
                 musicController.Play();
