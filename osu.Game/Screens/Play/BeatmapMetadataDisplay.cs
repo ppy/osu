@@ -49,6 +49,7 @@ namespace osu.Game.Screens.Play
                         Origin = Anchor.TopLeft,
                         Margin = new MarginPadding { Left = 5 },
                         Text = string.IsNullOrEmpty(right) ? @"-" : right,
+                        UseLegacyUnicode = true
                     }
                 };
             }
@@ -199,6 +200,7 @@ namespace osu.Game.Screens.Play
                                     {
                                         Bottom = 40
                                     },
+                                    UseLegacyUnicode = true
                                 },
                                 new MetadataLine("来源", metadata.Source)
                                 {
