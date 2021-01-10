@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -19,7 +20,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
+        public Action OnReadyClick
+        {
+            set => readyButton.OnReadyClick = value;
+        }
+
         private readonly Drawable background;
+        private readonly MultiplayerReadyButton readyButton;
 
         public MultiplayerMatchFooter()
         {
@@ -29,7 +36,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             InternalChildren = new[]
             {
                 background = new Box { RelativeSizeAxes = Axes.Both },
-                new MultiplayerReadyButton
+                readyButton = new MultiplayerReadyButton
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

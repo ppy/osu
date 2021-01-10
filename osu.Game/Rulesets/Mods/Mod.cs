@@ -128,20 +128,29 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         public virtual Mod CreateCopy()
         {
-            var copy = (Mod)Activator.CreateInstance(GetType());
+            var result = (Mod)Activator.CreateInstance(GetType());
+            result.CopyFrom(this);
+            return result;
+        }
 
-            // Copy bindable values across
+        /// <summary>
+        /// Copies mod setting values from <paramref name="source"/> into this instance.
+        /// </summary>
+        /// <param name="source">The mod to copy properties from.</param>
+        public void CopyFrom(Mod source)
+        {
+            if (source.GetType() != GetType())
+                throw new ArgumentException($"Expected mod of type {GetType()}, got {source.GetType()}.", nameof(source));
+
             foreach (var (_, prop) in this.GetSettingsSourceProperties())
             {
-                var origBindable = (IBindable)prop.GetValue(this);
-                var copyBindable = (IBindable)prop.GetValue(copy);
+                var targetBindable = (IBindable)prop.GetValue(this);
+                var sourceBindable = (IBindable)prop.GetValue(source);
 
                 // we only care about changes that have been made away from defaults.
-                if (!origBindable.IsDefault)
-                    copy.CopyAdjustedSetting(copyBindable, origBindable);
+                if (!sourceBindable.IsDefault)
+                    CopyAdjustedSetting(targetBindable, sourceBindable);
             }
-
-            return copy;
         }
 
         /// <summary>
