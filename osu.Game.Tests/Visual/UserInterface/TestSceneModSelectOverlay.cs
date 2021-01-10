@@ -131,6 +131,18 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("ensure mods not selected", () => modDisplay.Current.Value.Count == 0);
         }
 
+        [Test]
+        public void TestExternallySetCustomizedMod()
+        {
+            AddStep("set customized mod externally", () => SelectedMods.Value = new[] { new OsuModDoubleTime { SpeedChange = { Value = 1.01 } } });
+
+            AddAssert("ensure button is selected and customized accordingly", () =>
+            {
+                var button = modSelect.GetModButton(SelectedMods.Value.Single());
+                return ((OsuModDoubleTime)button.SelectedMod).SpeedChange.Value == 1.01;
+            });
+        }
+
         private void testSingleMod(Mod mod)
         {
             selectNext(mod);
