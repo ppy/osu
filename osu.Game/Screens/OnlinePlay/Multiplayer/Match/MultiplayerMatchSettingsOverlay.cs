@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -67,6 +69,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             [Resolved]
             private Bindable<RulesetInfo> ruleset { get; set; }
+
+            [Resolved]
+            private OngoingOperationTracker ongoingOperationTracker { get; set; }
+
+            private readonly IBindable<bool> operationInProgress = new BindableBool();
+
+            [CanBeNull]
+            private IDisposable applyingSettingsOperation;
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
@@ -265,13 +275,22 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 Type.BindValueChanged(type => TypePicker.Current.Value = type.NewValue, true);
                 MaxParticipants.BindValueChanged(count => MaxParticipantsField.Text = count.NewValue?.ToString(), true);
                 RoomID.BindValueChanged(roomId => initialBeatmapControl.Alpha = roomId.NewValue == null ? 1 : 0, true);
+
+                operationInProgress.BindTo(ongoingOperationTracker.InProgress);
+                operationInProgress.BindValueChanged(v =>
+                {
+                    if (v.NewValue)
+                        loadingLayer.Show();
+                    else
+                        loadingLayer.Hide();
+                });
             }
 
             protected override void Update()
             {
                 base.Update();
 
-                ApplyButton.Enabled.Value = Playlist.Count > 0 && NameField.Text.Length > 0;
+                ApplyButton.Enabled.Value = Playlist.Count > 0 && NameField.Text.Length > 0 && !operationInProgress.Value;
             }
 
             private void apply()
@@ -280,7 +299,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     return;
 
                 hideError();
-                loadingLayer.Show();
+
+                Debug.Assert(applyingSettingsOperation == null);
+                applyingSettingsOperation = ongoingOperationTracker.BeginOperation();
 
                 // If the client is already in a room, update via the client.
                 // Otherwise, update the room directly in preparation for it to be submitted to the API on match creation.
@@ -313,16 +334,23 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             private void onSuccess(Room room)
             {
-                loadingLayer.Hide();
+                Debug.Assert(applyingSettingsOperation != null);
+
                 SettingsApplied?.Invoke();
+
+                applyingSettingsOperation.Dispose();
+                applyingSettingsOperation = null;
             }
 
             private void onError(string text)
             {
+                Debug.Assert(applyingSettingsOperation != null);
+
                 ErrorText.Text = text;
                 ErrorText.FadeIn(50);
 
-                loadingLayer.Hide();
+                applyingSettingsOperation.Dispose();
+                applyingSettingsOperation = null;
             }
         }
 
