@@ -3,18 +3,13 @@
 
 using System;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneCreateMultiplayerMatchButton : MultiplayerTestScene
     {
-        [Cached]
-        private OngoingOperationTracker ongoingOperationTracker = new OngoingOperationTracker();
-
         private CreateMultiplayerMatchButton button;
 
         public override void SetUpSteps()
@@ -36,7 +31,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             assertButtonEnableState(true);
 
-            AddStep("begin joining room", () => joiningRoomOperation = ongoingOperationTracker.BeginOperation());
+            AddStep("begin joining room", () => joiningRoomOperation = OngoingOperationTracker.BeginOperation());
             assertButtonEnableState(false);
 
             AddStep("end joining room", () => joiningRoomOperation.Dispose());
