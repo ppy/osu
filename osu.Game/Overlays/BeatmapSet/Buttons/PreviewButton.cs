@@ -24,7 +24,8 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         private readonly PlayButton playButton;
 
         private PreviewTrack preview => playButton.Preview;
-        public Bindable<bool> Playing => playButton.Playing;
+
+        public IBindable<bool> Playing => playButton.Playing;
 
         public BeatmapSetInfo BeatmapSet
         {
