@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay
 {
@@ -11,7 +12,7 @@ namespace osu.Game.Screens.OnlinePlay
     /// Utility class to track ongoing online operations' progress.
     /// Can be used to disable interactivity while waiting for a response from online sources.
     /// </summary>
-    public class OngoingOperationTracker
+    public class OngoingOperationTracker : Component
     {
         /// <summary>
         /// Whether there is an online operation in progress.
@@ -21,6 +22,11 @@ namespace osu.Game.Screens.OnlinePlay
         private readonly Bindable<bool> inProgress = new BindableBool();
 
         private LeasedBindable<bool> leasedInProgress;
+
+        public OngoingOperationTracker()
+        {
+            AlwaysPresent = true;
+        }
 
         /// <summary>
         /// Begins tracking a new online operation.
@@ -37,7 +43,8 @@ namespace osu.Game.Screens.OnlinePlay
             leasedInProgress = inProgress.BeginLease(true);
             leasedInProgress.Value = true;
 
-            return new InvokeOnDisposal(endOperation);
+            // for extra safety, marshal the end of operation back to the update thread if necessary.
+            return new InvokeOnDisposal(() => Scheduler.Add(endOperation, false));
         }
 
         private void endOperation()
