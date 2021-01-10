@@ -42,6 +42,9 @@ namespace osu.Game.Screens.Edit.Setup
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
+        [Resolved]
+        private IBindable<WorkingBeatmap> working { get; set; }
+
         [Resolved(canBeNull: true)]
         private Editor editor { get; set; }
 
@@ -70,7 +73,7 @@ namespace osu.Game.Screens.Edit.Setup
                 audioTrackTextBox = new FileChooserLabelledTextBox
                 {
                     Label = "Audio Track",
-                    Current = { Value = Beatmap.Value.Metadata.AudioFile ?? "Click to select a track" },
+                    Current = { Value = working.Value.Metadata.AudioFile ?? "Click to select a track" },
                     Target = audioTrackFileChooserContainer,
                     TabbableContentContainer = this
                 },
@@ -115,11 +118,11 @@ namespace osu.Game.Screens.Edit.Setup
             if (!info.Exists)
                 return false;
 
-            var set = Beatmap.Value.BeatmapSetInfo;
+            var set = working.Value.BeatmapSetInfo;
 
             // remove the previous background for now.
             // in the future we probably want to check if this is being used elsewhere (other difficulties?)
-            var oldFile = set.Files.FirstOrDefault(f => f.Filename == Beatmap.Value.Metadata.BackgroundFile);
+            var oldFile = set.Files.FirstOrDefault(f => f.Filename == working.Value.Metadata.BackgroundFile);
 
             using (var stream = info.OpenRead())
             {
@@ -129,7 +132,7 @@ namespace osu.Game.Screens.Edit.Setup
                     beatmaps.AddFile(set, stream, info.Name);
             }
 
-            Beatmap.Value.Metadata.BackgroundFile = info.Name;
+            working.Value.Metadata.BackgroundFile = info.Name;
             updateBackgroundSprite();
 
             return true;
@@ -148,11 +151,11 @@ namespace osu.Game.Screens.Edit.Setup
             if (!info.Exists)
                 return false;
 
-            var set = Beatmap.Value.BeatmapSetInfo;
+            var set = working.Value.BeatmapSetInfo;
 
             // remove the previous audio track for now.
             // in the future we probably want to check if this is being used elsewhere (other difficulties?)
-            var oldFile = set.Files.FirstOrDefault(f => f.Filename == Beatmap.Value.Metadata.AudioFile);
+            var oldFile = set.Files.FirstOrDefault(f => f.Filename == working.Value.Metadata.AudioFile);
 
             using (var stream = info.OpenRead())
             {
@@ -162,7 +165,7 @@ namespace osu.Game.Screens.Edit.Setup
                     beatmaps.AddFile(set, stream, info.Name);
             }
 
-            Beatmap.Value.Metadata.AudioFile = info.Name;
+            working.Value.Metadata.AudioFile = info.Name;
 
             music.ReloadCurrentTrack();
 
@@ -178,7 +181,7 @@ namespace osu.Game.Screens.Edit.Setup
 
         private void updateBackgroundSprite()
         {
-            LoadComponentAsync(new BeatmapBackgroundSprite(Beatmap.Value)
+            LoadComponentAsync(new BeatmapBackgroundSprite(working.Value)
             {
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,

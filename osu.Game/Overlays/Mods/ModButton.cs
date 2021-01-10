@@ -52,9 +52,10 @@ namespace osu.Game.Overlays.Mods
             if (newIndex == selectedIndex) return false;
 
             int direction = newIndex < selectedIndex ? -1 : 1;
+
             bool beforeSelected = Selected;
 
-            Mod modBefore = SelectedMod ?? Mods[0];
+            Mod previousSelection = SelectedMod ?? Mods[0];
 
             if (newIndex >= Mods.Length)
                 newIndex = -1;
@@ -65,40 +66,45 @@ namespace osu.Game.Overlays.Mods
                 return false;
 
             selectedIndex = newIndex;
-            Mod modAfter = SelectedMod ?? Mods[0];
 
-            if (beforeSelected != Selected)
+            Mod newSelection = SelectedMod ?? Mods[0];
+
+            Schedule(() =>
             {
-                iconsContainer.RotateTo(Selected ? 5f : 0f, 300, Easing.OutElastic);
-                iconsContainer.ScaleTo(Selected ? 1.1f : 1f, 300, Easing.OutElastic);
-            }
-
-            if (modBefore != modAfter)
-            {
-                const float rotate_angle = 16;
-
-                foregroundIcon.RotateTo(rotate_angle * direction, mod_switch_duration, mod_switch_easing);
-                backgroundIcon.RotateTo(-rotate_angle * direction, mod_switch_duration, mod_switch_easing);
-
-                backgroundIcon.Mod = modAfter;
-
-                using (BeginDelayedSequence(mod_switch_duration, true))
+                if (beforeSelected != Selected)
                 {
-                    foregroundIcon
-                        .RotateTo(-rotate_angle * direction)
-                        .RotateTo(0f, mod_switch_duration, mod_switch_easing);
-
-                    backgroundIcon
-                        .RotateTo(rotate_angle * direction)
-                        .RotateTo(0f, mod_switch_duration, mod_switch_easing);
-
-                    Schedule(() => displayMod(modAfter));
+                    iconsContainer.RotateTo(Selected ? 5f : 0f, 300, Easing.OutElastic);
+                    iconsContainer.ScaleTo(Selected ? 1.1f : 1f, 300, Easing.OutElastic);
                 }
-            }
 
-            foregroundIcon.Selected.Value = Selected;
+                if (previousSelection != newSelection)
+                {
+                    const float rotate_angle = 16;
+
+                    foregroundIcon.RotateTo(rotate_angle * direction, mod_switch_duration, mod_switch_easing);
+                    backgroundIcon.RotateTo(-rotate_angle * direction, mod_switch_duration, mod_switch_easing);
+
+                    backgroundIcon.Mod = newSelection;
+
+                    using (BeginDelayedSequence(mod_switch_duration, true))
+                    {
+                        foregroundIcon
+                            .RotateTo(-rotate_angle * direction)
+                            .RotateTo(0f, mod_switch_duration, mod_switch_easing);
+
+                        backgroundIcon
+                            .RotateTo(rotate_angle * direction)
+                            .RotateTo(0f, mod_switch_duration, mod_switch_easing);
+
+                        Schedule(() => displayMod(newSelection));
+                    }
+                }
+
+                foregroundIcon.Selected.Value = Selected;
+            });
 
             SelectionChanged?.Invoke(SelectedMod);
+
             return true;
         }
 
