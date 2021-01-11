@@ -43,7 +43,6 @@ namespace osu.Game.Online.Multiplayer
 
         /// <summary>
         /// Change the user's local availability state of the beatmap set in joined room.
-        /// This will also force user state back to <see cref="MultiplayerUserState.Idle"/>.
         /// </summary>
         /// <param name="newBeatmapAvailability">The proposed new beatmap availability state.</param>
         Task ChangeBeatmapAvailability(BeatmapAvailability newBeatmapAvailability);
