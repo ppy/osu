@@ -40,6 +40,8 @@ namespace osu.Game.Tournament
             Resources.AddStore(new DllResourceStore(typeof(TournamentGameBase).Assembly));
 
             dependencies.CacheAs<Storage>(storage = new TournamentStorage(baseStorage));
+            dependencies.CacheAs(storage);
+
             dependencies.Cache(new TournamentVideoResourceStore(storage));
 
             Textures.AddStore(new TextureLoaderStore(new StorageBackedResourceStore(storage)));
