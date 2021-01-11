@@ -13,7 +13,7 @@ namespace osu.Game.Input
     {
         event Action KeyBindingChanged;
 
-        void Register(KeyBindingContainer manager);
+        void Register(KeyBindingContainer container);
 
         /// <summary>
         /// Retrieve all user-defined key combinations (in a format that can be displayed) for a specific action.

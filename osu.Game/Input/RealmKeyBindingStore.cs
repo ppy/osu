@@ -14,11 +14,15 @@ namespace osu.Game.Input
 {
     public class RealmKeyBindingStore : RealmBackedStore, IKeyBindingStore
     {
+        /// <summary>
+        /// Fired whenever any key binding change occurs, across all rulesets and types.
+        /// </summary>
         public event Action KeyBindingChanged;
 
         public RealmKeyBindingStore(RealmContextFactory contextFactory, RulesetStore rulesets, Storage storage = null)
             : base(contextFactory, storage)
         {
+            // populate defaults from rulesets.
             using (ContextFactory.GetForWrite())
             {
                 foreach (RulesetInfo info in rulesets.AvailableRulesets)
@@ -47,11 +51,27 @@ namespace osu.Game.Input
             }
         }
 
-        public void Register(KeyBindingContainer manager) => insertDefaults(manager.DefaultKeyBindings);
+        /// <summary>
+        /// Register a new type of <see cref="KeyBindingContainer{T}"/>, adding default bindings from <see cref="KeyBindingContainer.DefaultKeyBindings"/>.
+        /// </summary>
+        /// <param name="container">The container to populate defaults from.</param>
+        public void Register(KeyBindingContainer container) => insertDefaults(container.DefaultKeyBindings);
 
+        /// <summary>
+        /// Retrieve all key bindings for the provided specification.
+        /// </summary>
+        /// <param name="rulesetId">An optional ruleset ID. If null, global bindings are returned.</param>
+        /// <param name="variant">An optional ruleset variant. If null, the no-variant bindings are returned.</param>
+        /// <returns>A list of all key bindings found for the query, detached from the database.</returns>
         public List<IKeyBinding> Query(int? rulesetId = null, int? variant = null)
             => query(rulesetId, variant).ToList().Select(r => r.Detach()).ToList<IKeyBinding>();
 
+        /// <summary>
+        /// Retrieve all key bindings for the provided action type.
+        /// </summary>
+        /// <param name="action">The action to lookup.</param>
+        /// <typeparam name="T">The enum type of the action.</typeparam>
+        /// <returns>A list of all key bindings found for the query, detached from the database.</returns>
         public List<IKeyBinding> Query<T>(T action)
             where T : Enum
         {
@@ -60,12 +80,21 @@ namespace osu.Game.Input
             return query(null, null).Where(rkb => rkb.Action == lookup).ToList().Select(r => r.Detach()).ToList<IKeyBinding>();
         }
 
+        /// <summary>
+        /// Update the database mapping for the provided key binding.
+        /// </summary>
+        /// <param name="keyBinding">The key binding to update. Can be detached from the database.</param>
+        /// <param name="modification">The modification to apply to the key binding.</param>
         public void Update(IHasGuidPrimaryKey keyBinding, Action<IKeyBinding> modification)
         {
             using (var realm = ContextFactory.GetForWrite())
             {
-                var realmKeyBinding = realm.Context.Find<RealmKeyBinding>(keyBinding.ID);
-                modification(realmKeyBinding);
+                RealmKeyBinding realmBinding = keyBinding as RealmKeyBinding;
+
+                if (realmBinding?.IsManaged != true)
+                    realmBinding = realm.Context.Find<RealmKeyBinding>(keyBinding.ID);
+
+                modification(realmBinding);
             }
 
             KeyBindingChanged?.Invoke();
@@ -101,11 +130,10 @@ namespace osu.Game.Input
         }
 
         /// <summary>
-        /// Retrieve <see cref="RealmKeyBinding"/>s for a specified ruleset/variant content.
+        /// Retrieve live queryable <see cref="RealmKeyBinding"/>s for a specified ruleset/variant content.
         /// </summary>
-        /// <param name="rulesetId">The ruleset's internal ID.</param>
-        /// <param name="variant">An optional variant.</param>
-        /// <returns></returns>
+        /// <param name="rulesetId">An optional ruleset ID. If null, global bindings are returned.</param>
+        /// <param name="variant">An optional ruleset variant. If null, the no-variant bindings are returned.</param>
         private IQueryable<RealmKeyBinding> query(int? rulesetId = null, int? variant = null) =>
             ContextFactory.Get().All<RealmKeyBinding>().Where(b => b.RulesetID == rulesetId && b.Variant == variant);
     }
