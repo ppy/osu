@@ -9,15 +9,13 @@ namespace osu.Game.Tournament.Screens.Setup
     {
         private OsuDropdown<string> dropdown;
 
-        private string startupTournament;
-
         [Resolved]
         private TournamentGameBase game { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(TournamentStorage storage)
         {
-            startupTournament = storage.CurrentTournament.Value;
+            string startupTournament = storage.CurrentTournament.Value;
 
             dropdown.Current = storage.CurrentTournament;
             dropdown.Items = storage.ListTournaments();
