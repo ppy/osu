@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Input.Bindings;
+using osu.Game.Database;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Input.Bindings
@@ -63,7 +64,7 @@ namespace osu.Game.Input.Bindings
                 // fallback to defaults instead.
                 KeyBindings = DefaultKeyBindings;
             else
-                KeyBindings = store.Query(ruleset?.ID, variant);
+                KeyBindings = store.Query(ruleset?.ID, variant).Detach();
         }
     }
 }
