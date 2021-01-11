@@ -49,6 +49,28 @@ namespace osu.Game.Input
 
         public void Register(KeyBindingContainer manager) => insertDefaults(manager.DefaultKeyBindings);
 
+        public List<IKeyBinding> Query(int? rulesetId = null, int? variant = null)
+            => query(rulesetId, variant).ToList().Select(r => r.Detach()).ToList<IKeyBinding>();
+
+        public List<IKeyBinding> Query<T>(T action)
+            where T : Enum
+        {
+            int lookup = (int)(object)action;
+
+            return query(null, null).Where(rkb => rkb.Action == lookup).ToList().Select(r => r.Detach()).ToList<IKeyBinding>();
+        }
+
+        public void Update(IHasGuidPrimaryKey keyBinding, Action<IKeyBinding> modification)
+        {
+            using (var realm = ContextFactory.GetForWrite())
+            {
+                var realmKeyBinding = realm.Context.Find<RealmKeyBinding>(keyBinding.ID);
+                modification(realmKeyBinding);
+            }
+
+            KeyBindingChanged?.Invoke();
+        }
+
         private void insertDefaults(IEnumerable<IKeyBinding> defaults, int? rulesetId = null, int? variant = null)
         {
             using (var usage = ContextFactory.GetForWrite())
@@ -86,27 +108,5 @@ namespace osu.Game.Input
         /// <returns></returns>
         private IQueryable<RealmKeyBinding> query(int? rulesetId = null, int? variant = null) =>
             ContextFactory.Get().All<RealmKeyBinding>().Where(b => b.RulesetID == rulesetId && b.Variant == variant);
-
-        public List<IKeyBinding> Query(int? rulesetId = null, int? variant = null)
-            => query(rulesetId, variant).ToList().Select(r => r.Detach()).ToList<IKeyBinding>();
-
-        public List<IKeyBinding> Query<T>(T action)
-            where T : Enum
-        {
-            int lookup = (int)(object)action;
-
-            return query(null, null).Where(rkb => rkb.Action == lookup).ToList().Select(r => r.Detach()).ToList<IKeyBinding>();
-        }
-
-        public void Update(IHasGuidPrimaryKey keyBinding, Action<IKeyBinding> modification)
-        {
-            using (var realm = ContextFactory.GetForWrite())
-            {
-                var realmKeyBinding = realm.Context.Find<RealmKeyBinding>(keyBinding.ID);
-                modification(realmKeyBinding);
-            }
-
-            KeyBindingChanged?.Invoke();
-        }
     }
 }
