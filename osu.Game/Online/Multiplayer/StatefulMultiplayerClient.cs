@@ -322,7 +322,7 @@ namespace osu.Game.Online.Multiplayer
             {
                 var user = Room?.Users.SingleOrDefault(u => u.UserID == userId);
 
-                // we don't care whether the room doesn't exist or user isn't in joined room, just return in that point.
+                // errors here are not critical - beatmap availability state is mostly for display.
                 if (user == null)
                     return;
 

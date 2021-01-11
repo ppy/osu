@@ -49,7 +49,7 @@ namespace osu.Game.Online.Multiplayer
         Task UserStateChanged(int userId, MultiplayerUserState state);
 
         /// <summary>
-        /// Signals that a user in this room has their beatmap availability state changed.
+        /// Signals that a user in this room changed their beatmap availability state.
         /// </summary>
         /// <param name="userId">The ID of the user whose beatmap availability state has changed.</param>
         /// <param name="beatmapAvailability">The new beatmap availability state of the user.</param>
