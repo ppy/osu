@@ -227,11 +227,11 @@ namespace osu.Game.Tournament.Screens
             [BackgroundDependencyLoader]
             private void load(TournamentStorage storage)
             {
+                startupTournament = storage.CurrentTournament.Value;
+
                 dropdown.Current = storage.CurrentTournament;
                 dropdown.Items = storage.ListTournaments();
-                dropdown.Current.BindValueChanged(v => Button.FadeTo(v.NewValue == startupTournament ? 0 : 1));
-
-                startupTournament = storage.CurrentTournament.Value;
+                dropdown.Current.BindValueChanged(v => Button.Enabled.Value = v.NewValue != startupTournament, true);
 
                 Action = () => game.GracefullyExit();
 
