@@ -69,6 +69,11 @@ namespace osu.Game.Database
         public T Get() => threadValues.Value;
 
         /// <summary>
+        /// Retrieve a detached copy of the data.
+        /// </summary>
+        public T Detach() => Get().Detach();
+
+        /// <summary>
         /// Wrap a property of this instance as its own live access object.
         /// </summary>
         /// <param name="lookup">The child to return.</param>
@@ -88,7 +93,7 @@ namespace osu.Game.Database
         }
 
         public static implicit operator T?(Live<T>? wrapper)
-            => wrapper?.Get().Detach();
+            => wrapper?.Detach() ?? null;
 
         public static implicit operator Live<T>(T obj) => obj.WrapAsUnmanaged();
 
