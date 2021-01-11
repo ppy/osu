@@ -21,7 +21,7 @@ namespace osu.Game.Input.Bindings
         private readonly int? variant;
 
         [Resolved]
-        private IKeyBindingStore store { get; set; }
+        private RealmKeyBindingStore store { get; set; }
 
         public override IEnumerable<IKeyBinding> DefaultKeyBindings => ruleset.CreateInstance().GetDefaultKeyBindings(variant ?? 0);
 
