@@ -9,25 +9,36 @@ using Realms;
 
 namespace osu.Game.Database
 {
+    /// <summary>
+    /// Provides a method of passing realm live objects across threads in a safe fashion.
+    /// </summary>
+    /// <remarks>
+    /// To consume this as a live instance, the live object should be stored and accessed via <see cref="Get"/> each time.
+    /// To consume this as a detached instance, assign to a variable of type <see cref="T"/>. The implicit conversion will handle detaching an instance.
+    /// </remarks>
+    /// <typeparam name="T">The underlying object type. Should be a <see cref="RealmObject"/> with a primary key provided via <see cref="IHasGuidPrimaryKey"/>.</typeparam>
     public class Live<T> : IEquatable<Live<T>>
         where T : RealmObject, IHasGuidPrimaryKey
     {
+        /// <summary>
+        /// The primary key of the object.
+        /// </summary>
         public Guid ID { get; }
 
         private readonly ThreadLocal<T> threadValues;
 
-        public readonly IRealmFactory ContextFactory;
+        private readonly IRealmFactory contextFactory;
 
         public Live(T original, IRealmFactory contextFactory)
         {
-            ContextFactory = contextFactory;
+            this.contextFactory = contextFactory;
             ID = original.Guid;
 
             var originalContext = original.Realm;
 
             threadValues = new ThreadLocal<T>(() =>
             {
-                var context = ContextFactory.Get();
+                var context = this.contextFactory.Get();
 
                 if (context == null || originalContext?.IsSameInstance(context) != false)
                     return original;
@@ -36,14 +47,27 @@ namespace osu.Game.Database
             });
         }
 
+        /// <summary>
+        /// Retrieve a live reference to the data.
+        /// </summary>
         public T Get() => threadValues.Value;
 
+        /// <summary>
+        /// Wrap a property of this instance as its own live access object.
+        /// </summary>
+        /// <param name="lookup">The child to return.</param>
+        /// <typeparam name="TChild">The underlying child object type. Should be a <see cref="RealmObject"/> with a primary key provided via <see cref="IHasGuidPrimaryKey"/>.</typeparam>
+        /// <returns>A wrapped instance of the child.</returns>
         public Live<TChild> WrapChild<TChild>(Func<T, TChild> lookup)
-            where TChild : RealmObject, IHasGuidPrimaryKey => new Live<TChild>(lookup(Get()), ContextFactory);
+            where TChild : RealmObject, IHasGuidPrimaryKey => new Live<TChild>(lookup(Get()), contextFactory);
 
+        /// <summary>
+        /// Perform a write operation on this live object.
+        /// </summary>
+        /// <param name="perform">The action to perform.</param>
         public void PerformUpdate(Action<T> perform)
         {
-            using (ContextFactory.GetForWrite())
+            using (contextFactory.GetForWrite())
                 perform(Get());
         }
 
