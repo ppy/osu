@@ -7,7 +7,7 @@ namespace osu.Game.Database
 {
     public interface IRealmFactory
     {
-        public Realm Get() => Realm.GetInstance();
+        Realm Get();
 
         /// <summary>
         /// Request a context for write usage. Can be consumed in a nested fashion (and will return the same underlying context).
