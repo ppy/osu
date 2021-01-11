@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using AutoMapper;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -38,6 +39,16 @@ namespace osu.Game.Database
             c.CreateMap<SkinInfo, SkinInfo>();
             c.CreateMap<RulesetInfo, RulesetInfo>();
         }).CreateMapper();
+
+        public static List<T> Detach<T>(this List<T> items) where T : RealmObject
+        {
+            var list = new List<T>();
+
+            foreach (var obj in items)
+                list.Add(obj.Detach());
+
+            return list;
+        }
 
         public static T Detach<T>(this T obj) where T : RealmObject
         {
