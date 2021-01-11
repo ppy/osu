@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Drawing;
 using osu.Framework.Allocation;
@@ -9,19 +8,16 @@ using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Platform;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
-using osu.Game.Tournament.IO;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
 using osuTK;
-using osuTK.Graphics;
 
-namespace osu.Game.Tournament.Screens
+namespace osu.Game.Tournament.Screens.Setup
 {
     public class SetupScreen : TournamentScreen, IProvideVideo
     {
@@ -154,145 +150,6 @@ namespace osu.Game.Tournament.Screens
                 RelativeSizeAxes = Axes.X,
                 Width = 0.5f,
             };
-        }
-
-        private class ActionableInfo : LabelledDrawable<Drawable>
-        {
-            protected OsuButton Button;
-
-            public ActionableInfo()
-                : base(true)
-            {
-            }
-
-            public string ButtonText
-            {
-                set => Button.Text = value;
-            }
-
-            public string Value
-            {
-                set => valueText.Text = value;
-            }
-
-            public bool Failing
-            {
-                set => valueText.Colour = value ? Color4.Red : Color4.White;
-            }
-
-            public Action Action;
-
-            private TournamentSpriteText valueText;
-            protected FillFlowContainer FlowContainer;
-
-            protected override Drawable CreateComponent() => new Container
-            {
-                AutoSizeAxes = Axes.Y,
-                RelativeSizeAxes = Axes.X,
-                Children = new Drawable[]
-                {
-                    valueText = new TournamentSpriteText
-                    {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                    },
-                    FlowContainer = new FillFlowContainer
-                    {
-                        Anchor = Anchor.CentreRight,
-                        Origin = Anchor.CentreRight,
-                        AutoSizeAxes = Axes.Both,
-                        Spacing = new Vector2(10, 0),
-                        Children = new Drawable[]
-                        {
-                            Button = new TriangleButton
-                            {
-                                Size = new Vector2(100, 40),
-                                Action = () => Action?.Invoke()
-                            }
-                        }
-                    }
-                }
-            };
-        }
-
-        private class TournamentSwitcher : ActionableInfo
-        {
-            private OsuDropdown<string> dropdown;
-
-            private string startupTournament;
-
-            [Resolved]
-            private TournamentGameBase game { get; set; }
-
-            [BackgroundDependencyLoader]
-            private void load(TournamentStorage storage)
-            {
-                startupTournament = storage.CurrentTournament.Value;
-
-                dropdown.Current = storage.CurrentTournament;
-                dropdown.Items = storage.ListTournaments();
-                dropdown.Current.BindValueChanged(v => Button.Enabled.Value = v.NewValue != startupTournament, true);
-
-                Action = () => game.GracefullyExit();
-
-                ButtonText = "Close osu!";
-            }
-
-            protected override Drawable CreateComponent()
-            {
-                var drawable = base.CreateComponent();
-
-                FlowContainer.Insert(-1, dropdown = new OsuDropdown<string>
-                {
-                    Width = 510
-                });
-
-                return drawable;
-            }
-        }
-
-        private class ResolutionSelector : ActionableInfo
-        {
-            private const int minimum_window_height = 480;
-            private const int maximum_window_height = 2160;
-
-            public new Action<int> Action;
-
-            private OsuNumberBox numberBox;
-
-            protected override Drawable CreateComponent()
-            {
-                var drawable = base.CreateComponent();
-                FlowContainer.Insert(-1, numberBox = new OsuNumberBox
-                {
-                    Text = "1080",
-                    Width = 100
-                });
-
-                base.Action = () =>
-                {
-                    if (string.IsNullOrEmpty(numberBox.Text))
-                        return;
-
-                    // box contains text
-                    if (!int.TryParse(numberBox.Text, out var number))
-                    {
-                        // at this point, the only reason we can arrive here is if the input number was too big to parse into an int
-                        // so clamp to max allowed value
-                        number = maximum_window_height;
-                    }
-                    else
-                    {
-                        number = Math.Clamp(number, minimum_window_height, maximum_window_height);
-                    }
-
-                    // in case number got clamped, reset number in numberBox
-                    numberBox.Text = number.ToString();
-
-                    Action?.Invoke(number);
-                };
-                return drawable;
-            }
         }
     }
 }
