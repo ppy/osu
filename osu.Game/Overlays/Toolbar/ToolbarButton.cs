@@ -75,7 +75,7 @@ namespace osu.Game.Overlays.Toolbar
         protected FillFlowContainer Flow;
 
         [Resolved]
-        private IKeyBindingStore keyBindings { get; set; }
+        private RealmKeyBindingStore keyBindings { get; set; }
 
         protected ToolbarButton()
             : base(HoverSampleSet.Loud)

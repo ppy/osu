@@ -12,7 +12,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Input
 {
-    public class RealmKeyBindingStore : RealmBackedStore, IKeyBindingStore
+    public class RealmKeyBindingStore : RealmBackedStore
     {
         /// <summary>
         /// Fired whenever any key binding change occurs, across all rulesets and types.
@@ -63,8 +63,7 @@ namespace osu.Game.Input
         /// <param name="rulesetId">An optional ruleset ID. If null, global bindings are returned.</param>
         /// <param name="variant">An optional ruleset variant. If null, the no-variant bindings are returned.</param>
         /// <returns>A list of all key bindings found for the query, detached from the database.</returns>
-        public List<IKeyBinding> Query(int? rulesetId = null, int? variant = null)
-            => query(rulesetId, variant).ToList().Select(r => r.Detach()).ToList<IKeyBinding>();
+        public List<RealmKeyBinding> Query(int? rulesetId = null, int? variant = null) => query(rulesetId, variant).ToList();
 
         /// <summary>
         /// Retrieve all key bindings for the provided action type.
@@ -72,12 +71,12 @@ namespace osu.Game.Input
         /// <param name="action">The action to lookup.</param>
         /// <typeparam name="T">The enum type of the action.</typeparam>
         /// <returns>A list of all key bindings found for the query, detached from the database.</returns>
-        public List<IKeyBinding> Query<T>(T action)
+        public List<RealmKeyBinding> Query<T>(T action)
             where T : Enum
         {
             int lookup = (int)(object)action;
 
-            return query(null, null).Where(rkb => rkb.Action == lookup).ToList().Select(r => r.Detach()).ToList<IKeyBinding>();
+            return query(null, null).Where(rkb => rkb.Action == lookup).ToList();
         }
 
         /// <summary>

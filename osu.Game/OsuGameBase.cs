@@ -73,7 +73,7 @@ namespace osu.Game
 
         protected FileStore FileStore;
 
-        protected IKeyBindingStore KeyBindingStore;
+        protected RealmKeyBindingStore KeyBindingStore;
 
         protected SettingsStore SettingsStore;
 
