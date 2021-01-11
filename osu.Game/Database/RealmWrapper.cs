@@ -2,13 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using Realms;
 
 namespace osu.Game.Database
 {
-    [SuppressMessage("ReSharper", "CA2225")]
     public class RealmWrapper<T> : IEquatable<RealmWrapper<T>>
         where T : RealmObject, IHasGuidPrimaryKey
     {
