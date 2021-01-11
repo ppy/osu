@@ -1,12 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Threading;
 using AutoMapper;
 using osu.Framework.Platform;
 using osu.Framework.Statistics;
-using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
@@ -21,7 +19,6 @@ namespace osu.Game.Database
     public class RealmContextFactory : IRealmFactory
     {
         private readonly Storage storage;
-        private readonly Scheduler scheduler;
 
         private const string database_name = @"client";
 
@@ -37,10 +34,10 @@ namespace osu.Game.Database
 
         private Transaction currentWriteTransaction;
 
-        public RealmContextFactory(Storage storage, Scheduler scheduler)
+        public RealmContextFactory(Storage storage)
         {
             this.storage = storage;
-            this.scheduler = scheduler;
+
             recreateThreadContexts();
 
             using (CreateContext())
@@ -97,9 +94,6 @@ namespace osu.Game.Database
 
             return new RealmWriteUsage(context, usageCompleted) { IsTransactionLeader = currentWriteTransaction != null && currentWriteUsages == 1 };
         }
-
-        // TODO: remove if not necessary.
-        public void Schedule(Action action) => scheduler.Add(action);
 
         private Realm getContextForCurrentThread()
         {
