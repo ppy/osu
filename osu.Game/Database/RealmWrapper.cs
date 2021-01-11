@@ -5,6 +5,8 @@ using System;
 using System.Threading;
 using Realms;
 
+#nullable enable
+
 namespace osu.Game.Database
 {
     public class RealmWrapper<T> : IEquatable<RealmWrapper<T>>
@@ -25,7 +27,7 @@ namespace osu.Game.Database
 
             threadValues = new ThreadLocal<T>(() =>
             {
-                var context = ContextFactory?.Get();
+                var context = ContextFactory.Get();
 
                 if (context == null || originalContext?.IsSameInstance(context) != false)
                     return original;
@@ -42,17 +44,15 @@ namespace osu.Game.Database
         public void PerformUpdate(Action<T> perform)
         {
             using (ContextFactory.GetForWrite())
-                perform(this);
+                perform(Get());
         }
 
-        // ReSharper disable once CA2225
-        public static implicit operator T(RealmWrapper<T> wrapper)
+        public static implicit operator T?(RealmWrapper<T>? wrapper)
             => wrapper?.Get().Detach();
 
-        // ReSharper disable once CA2225
         public static implicit operator RealmWrapper<T>(T obj) => obj.WrapAsUnmanaged();
 
-        public bool Equals(RealmWrapper<T> other) => other != null && other.ID == ID;
+        public bool Equals(RealmWrapper<T>? other) => other != null && other.ID == ID;
 
         public override string ToString() => Get().ToString();
     }
