@@ -24,7 +24,6 @@ using osu.Game.Online.API;
 using osu.Framework.Graphics.Performance;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
-using osu.Framework.Input.Bindings;
 using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Database;
@@ -330,16 +329,20 @@ namespace osu.Game
             {
                 var existingBindings = db.Context.DatabasedKeyBinding;
 
-                foreach (var dkb in existingBindings)
+                // only migrate data if the realm database is empty.
+                if (!realm.Context.All<RealmKeyBinding>().Any())
                 {
-                    realm.Context.Add(new RealmKeyBinding
+                    foreach (var dkb in existingBindings)
                     {
-                        ID = Guid.NewGuid().ToString(),
-                        KeyCombination = dkb.KeyCombination.ToString(),
-                        Action = (int)dkb.Action,
-                        RulesetID = dkb.RulesetID,
-                        Variant = dkb.Variant
-                    });
+                        realm.Context.Add(new RealmKeyBinding
+                        {
+                            ID = Guid.NewGuid().ToString(),
+                            KeyCombination = dkb.KeyCombination.ToString(),
+                            Action = (int)dkb.Action,
+                            RulesetID = dkb.RulesetID,
+                            Variant = dkb.Variant
+                        });
+                    }
                 }
 
                 db.Context.RemoveRange(existingBindings);
