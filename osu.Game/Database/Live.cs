@@ -17,13 +17,19 @@ namespace osu.Game.Database
     /// To consume this as a detached instance, assign to a variable of type <see cref="T"/>. The implicit conversion will handle detaching an instance.
     /// </remarks>
     /// <typeparam name="T">The underlying object type. Should be a <see cref="RealmObject"/> with a primary key provided via <see cref="IHasGuidPrimaryKey"/>.</typeparam>
-    public class Live<T> : IEquatable<Live<T>>
+    public class Live<T> : IEquatable<Live<T>>, IHasGuidPrimaryKey
         where T : RealmObject, IHasGuidPrimaryKey
     {
         /// <summary>
         /// The primary key of the object.
         /// </summary>
-        public Guid ID { get; }
+        public Guid Guid { get; }
+
+        public string ID
+        {
+            get => Guid.ToString();
+            set => throw new NotImplementedException();
+        }
 
         private readonly ThreadLocal<T> threadValues;
 
@@ -32,7 +38,7 @@ namespace osu.Game.Database
         public Live(T original, IRealmFactory contextFactory)
         {
             this.contextFactory = contextFactory;
-            ID = original.Guid;
+            Guid = original.Guid;
 
             var originalContext = original.Realm;
 
@@ -43,7 +49,7 @@ namespace osu.Game.Database
                 if (context == null || originalContext?.IsSameInstance(context) != false)
                     return original;
 
-                return context.Find<T>(ID);
+                return context.Find<T>(Guid);
             });
         }
 
@@ -76,7 +82,7 @@ namespace osu.Game.Database
 
         public static implicit operator Live<T>(T obj) => obj.WrapAsUnmanaged();
 
-        public bool Equals(Live<T>? other) => other != null && other.ID == ID;
+        public bool Equals(Live<T>? other) => other != null && other.Guid == Guid;
 
         public override string ToString() => Get().ToString();
     }
