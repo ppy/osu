@@ -9,7 +9,7 @@ using Realms;
 
 namespace osu.Game.Database
 {
-    public class RealmWrapper<T> : IEquatable<RealmWrapper<T>>
+    public class Live<T> : IEquatable<Live<T>>
         where T : RealmObject, IHasGuidPrimaryKey
     {
         public Guid ID { get; }
@@ -18,7 +18,7 @@ namespace osu.Game.Database
 
         public readonly IRealmFactory ContextFactory;
 
-        public RealmWrapper(T original, IRealmFactory contextFactory)
+        public Live(T original, IRealmFactory contextFactory)
         {
             ContextFactory = contextFactory;
             ID = original.Guid;
@@ -38,8 +38,8 @@ namespace osu.Game.Database
 
         public T Get() => threadValues.Value;
 
-        public RealmWrapper<TChild> WrapChild<TChild>(Func<T, TChild> lookup)
-            where TChild : RealmObject, IHasGuidPrimaryKey => new RealmWrapper<TChild>(lookup(Get()), ContextFactory);
+        public Live<TChild> WrapChild<TChild>(Func<T, TChild> lookup)
+            where TChild : RealmObject, IHasGuidPrimaryKey => new Live<TChild>(lookup(Get()), ContextFactory);
 
         public void PerformUpdate(Action<T> perform)
         {
@@ -47,12 +47,12 @@ namespace osu.Game.Database
                 perform(Get());
         }
 
-        public static implicit operator T?(RealmWrapper<T>? wrapper)
+        public static implicit operator T?(Live<T>? wrapper)
             => wrapper?.Get().Detach();
 
-        public static implicit operator RealmWrapper<T>(T obj) => obj.WrapAsUnmanaged();
+        public static implicit operator Live<T>(T obj) => obj.WrapAsUnmanaged();
 
-        public bool Equals(RealmWrapper<T>? other) => other != null && other.ID == ID;
+        public bool Equals(Live<T>? other) => other != null && other.ID == ID;
 
         public override string ToString() => Get().ToString();
     }

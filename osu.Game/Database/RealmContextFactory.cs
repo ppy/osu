@@ -215,10 +215,10 @@ namespace osu.Game.Database
             return detached;
         }
 
-        public static RealmWrapper<T> Wrap<T>(this T obj, IRealmFactory contextFactory)
-            where T : RealmObject, IHasGuidPrimaryKey => new RealmWrapper<T>(obj, contextFactory);
+        public static Live<T> Wrap<T>(this T obj, IRealmFactory contextFactory)
+            where T : RealmObject, IHasGuidPrimaryKey => new Live<T>(obj, contextFactory);
 
-        public static RealmWrapper<T> WrapAsUnmanaged<T>(this T obj)
-            where T : RealmObject, IHasGuidPrimaryKey => new RealmWrapper<T>(obj, null);
+        public static Live<T> WrapAsUnmanaged<T>(this T obj)
+            where T : RealmObject, IHasGuidPrimaryKey => new Live<T>(obj, null);
     }
 }
