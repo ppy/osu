@@ -30,7 +30,7 @@ namespace osu.Game.Input
             }
         }
 
-        public void Register(KeyBindingContainer manager) => insertDefaults(manager.DefaultKeyBindings);
+        public void Register(KeyBindingContainer container) => insertDefaults(container.DefaultKeyBindings);
 
         /// <summary>
         /// Retrieve all user-defined key combinations (in a format that can be displayed) for a specific action.
