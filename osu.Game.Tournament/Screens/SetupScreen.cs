@@ -219,33 +219,22 @@ namespace osu.Game.Tournament.Screens
         {
             private OsuDropdown<string> dropdown;
 
-            public IEnumerable<string> Items
-            {
-                get => dropdown.Items;
-                set => dropdown.Items = value;
-            }
-
-            public Bindable<string> Current
-            {
-                get => dropdown.Current;
-                set => dropdown.Current = value;
-            }
-
-            private string originalTournament;
-
-            private TournamentStorage storage;
+            private string startupTournament;
 
             [Resolved]
             private TournamentGameBase game { get; set; }
 
             [BackgroundDependencyLoader]
-            private void load(Storage storage)
+            private void load(TournamentStorage storage)
             {
-                this.storage = (TournamentStorage)storage;
-                Current = this.storage.CurrentTournament;
-                originalTournament = this.storage.CurrentTournament.Value;
-                Items = this.storage.ListTournaments();
+                dropdown.Current = storage.CurrentTournament;
+                dropdown.Items = storage.ListTournaments();
+                dropdown.Current.BindValueChanged(v => Button.FadeTo(v.NewValue == startupTournament ? 0 : 1));
+
+                startupTournament = storage.CurrentTournament.Value;
+
                 Action = () => game.GracefullyExit();
+
                 ButtonText = "Close osu!";
             }
 
@@ -256,17 +245,6 @@ namespace osu.Game.Tournament.Screens
                 FlowContainer.Insert(-1, dropdown = new OsuDropdown<string>
                 {
                     Width = 510
-                });
-
-                Current.BindValueChanged(v =>
-                {
-                    if (v.NewValue == originalTournament)
-                    {
-                        Button.Hide();
-                        return;
-                    }
-
-                    Button.Show();
                 });
 
                 return drawable;
