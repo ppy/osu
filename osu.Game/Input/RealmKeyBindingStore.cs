@@ -87,14 +87,22 @@ namespace osu.Game.Input
         /// <param name="modification">The modification to apply to the key binding.</param>
         public void Update(IHasGuidPrimaryKey keyBinding, Action<IKeyBinding> modification)
         {
+            // the incoming instance could already be a live access object.
+            Live<RealmKeyBinding> realmBinding = keyBinding as Live<RealmKeyBinding>;
+
             using (var realm = ContextFactory.GetForWrite())
             {
-                RealmKeyBinding realmBinding = keyBinding as RealmKeyBinding;
+                if (realmBinding == null)
+                {
+                    // the incoming instance could be a raw realm object.
+                    if (!(keyBinding is RealmKeyBinding rkb))
+                        // if neither of the above cases succeeded, retrieve a realm object for further processing.
+                        rkb = realm.Context.Find<RealmKeyBinding>(keyBinding.ID);
 
-                if (realmBinding?.IsManaged != true)
-                    realmBinding = realm.Context.Find<RealmKeyBinding>(keyBinding.ID);
+                    realmBinding = new Live<RealmKeyBinding>(rkb, ContextFactory);
+                }
 
-                modification(realmBinding);
+                realmBinding.PerformUpdate(modification);
             }
 
             KeyBindingChanged?.Invoke();
