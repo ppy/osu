@@ -83,7 +83,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Debug.Assert(Room != null);
 
             ((IMultiplayerClient)this).UserBeatmapAvailabilityChanged(userId, newBeatmapAvailability);
-            ChangeUserState(userId, MultiplayerUserState.Idle);
         }
 
         protected override Task<MultiplayerRoom> JoinRoom(long roomId)
