@@ -14,7 +14,7 @@ namespace osu.Game.Database
     /// </summary>
     /// <remarks>
     /// To consume this as a live instance, the live object should be stored and accessed via <see cref="Get"/> each time.
-    /// To consume this as a detached instance, assign to a variable of type <see cref="T"/>. The implicit conversion will handle detaching an instance.
+    /// To consume this as a detached instance, assign to a variable of type <typeparam ref="T"/>. The implicit conversion will handle detaching an instance.
     /// </remarks>
     /// <typeparam name="T">The underlying object type. Should be a <see cref="RealmObject"/> with a primary key provided via <see cref="IHasGuidPrimaryKey"/>.</typeparam>
     public class Live<T> : IEquatable<Live<T>>, IHasGuidPrimaryKey
@@ -33,24 +33,34 @@ namespace osu.Game.Database
 
         private readonly ThreadLocal<T> threadValues;
 
+        private readonly T original;
+
         private readonly IRealmFactory contextFactory;
 
-        public Live(T original, IRealmFactory contextFactory)
+        public Live(T item, IRealmFactory contextFactory)
         {
             this.contextFactory = contextFactory;
-            Guid = original.Guid;
 
-            var originalContext = original.Realm;
+            original = item;
+            Guid = item.Guid;
 
-            threadValues = new ThreadLocal<T>(() =>
-            {
-                var context = this.contextFactory.Get();
+            threadValues = new ThreadLocal<T>(getThreadLocalValue);
 
-                if (context == null || originalContext?.IsSameInstance(context) != false)
-                    return original;
+            // the instance passed in may not be in a managed state.
+            // for now let's immediately retrieve a managed object on the current thread.
+            // in the future we may want to delay this until the first access (only populating the Guid at construction time).
+            if (!item.IsManaged)
+                original = Get();
+        }
 
-                return context.Find<T>(Guid);
-            });
+        private T getThreadLocalValue()
+        {
+            var context = contextFactory.Get();
+
+            // only use the original if no context is available or the source realm is the same.
+            if (context == null || original.Realm?.IsSameInstance(context) == true) return original;
+
+            return context.Find<T>(ID);
         }
 
         /// <summary>
