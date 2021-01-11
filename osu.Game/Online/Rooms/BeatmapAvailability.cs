@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using Newtonsoft.Json;
 
 namespace osu.Game.Online.Rooms
 {
@@ -20,6 +21,7 @@ namespace osu.Game.Online.Rooms
         /// </summary>
         public readonly double? DownloadProgress;
 
+        [JsonConstructor]
         private BeatmapAvailability(DownloadState state, double? downloadProgress = null)
         {
             State = state;
