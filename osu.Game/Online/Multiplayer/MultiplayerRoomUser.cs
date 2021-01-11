@@ -18,7 +18,7 @@ namespace osu.Game.Online.Multiplayer
         public MultiplayerUserState State { get; set; } = MultiplayerUserState.Idle;
 
         /// <summary>
-        /// The availability state of the beatmap, set to <see cref="DownloadState.LocallyAvailable"/> by default.
+        /// The availability state of the current beatmap.
         /// </summary>
         public BeatmapAvailability BeatmapAvailability { get; set; } = BeatmapAvailability.LocallyAvailable();
 
