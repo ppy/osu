@@ -30,6 +30,8 @@ namespace osu.Game.Online.API.Requests
 
         public SearchPlayed Played { get; }
 
+        public SearchExplicit Explicit { get; }
+
         [CanBeNull]
         public IReadOnlyCollection<ScoreRank> Ranks { get; }
 
@@ -50,7 +52,8 @@ namespace osu.Game.Online.API.Requests
             SearchLanguage language = SearchLanguage.Any,
             IReadOnlyCollection<SearchExtra> extra = null,
             IReadOnlyCollection<ScoreRank> ranks = null,
-            SearchPlayed played = SearchPlayed.Any)
+            SearchPlayed played = SearchPlayed.Any,
+            SearchExplicit explicitMaps = SearchExplicit.Hide)
         {
             this.query = string.IsNullOrEmpty(query) ? string.Empty : System.Uri.EscapeDataString(query);
             this.ruleset = ruleset;
@@ -64,6 +67,7 @@ namespace osu.Game.Online.API.Requests
             Extra = extra;
             Ranks = ranks;
             Played = played;
+            Explicit = explicitMaps;
         }
 
         protected override WebRequest CreateWebRequest()
@@ -92,6 +96,8 @@ namespace osu.Game.Online.API.Requests
 
             if (Played != SearchPlayed.Any)
                 req.AddParameter("played", Played.ToString().ToLowerInvariant());
+
+            req.AddParameter("nsfw", Explicit == SearchExplicit.Show ? "true" : "false");
 
             req.AddCursor(cursor);
 

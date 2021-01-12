@@ -42,6 +42,8 @@ namespace osu.Game.Overlays.BeatmapListing
 
         public Bindable<SearchPlayed> Played => playedFilter.Current;
 
+        public Bindable<SearchExplicit> Explicit => explicitFilter.Current;
+
         public BeatmapSetInfo BeatmapSet
         {
             set
@@ -65,6 +67,7 @@ namespace osu.Game.Overlays.BeatmapListing
         private readonly BeatmapSearchMultipleSelectionFilterRow<SearchExtra> extraFilter;
         private readonly BeatmapSearchScoreFilterRow ranksFilter;
         private readonly BeatmapSearchFilterRow<SearchPlayed> playedFilter;
+        private readonly BeatmapSearchFilterRow<SearchExplicit> explicitFilter;
 
         private readonly Box background;
         private readonly UpdateableBeatmapSetCover beatmapCover;
@@ -125,7 +128,8 @@ namespace osu.Game.Overlays.BeatmapListing
                                     languageFilter = new BeatmapSearchFilterRow<SearchLanguage>(@"Language"),
                                     extraFilter = new BeatmapSearchMultipleSelectionFilterRow<SearchExtra>(@"Extra"),
                                     ranksFilter = new BeatmapSearchScoreFilterRow(),
-                                    playedFilter = new BeatmapSearchFilterRow<SearchPlayed>(@"Played")
+                                    playedFilter = new BeatmapSearchFilterRow<SearchPlayed>(@"Played"),
+                                    explicitFilter = new BeatmapSearchFilterRow<SearchExplicit>(@"Explicit Maps"),
                                 }
                             }
                         }
