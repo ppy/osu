@@ -76,11 +76,19 @@ namespace osu.Game.Screens.Purcashe.SubScreens
                     }));
             }
 
-            showNext();
+            this.Delay(300).Schedule(() =>
+            {
+                showNext(true);
+                unlocked = true;
+            });
         }
 
-        private void showNext()
+        private bool unlocked;
+
+        private void showNext(bool unlocked = false)
         {
+            if (!unlocked) return;
+
             foreach (var rc in showcaseContainer)
             {
                 rc.FadeOut(300).ScaleTo(0.8f, 300, Easing.OutQuint).Expire();
@@ -108,7 +116,7 @@ namespace osu.Game.Screens.Purcashe.SubScreens
 
         protected override bool OnClick(ClickEvent e)
         {
-            showNext();
+            showNext(unlocked);
             return base.OnClick(e);
         }
 
@@ -134,7 +142,7 @@ namespace osu.Game.Screens.Purcashe.SubScreens
             switch (e.Key)
             {
                 case Key.Space:
-                    showNext();
+                    showNext(unlocked);
                     break;
             }
 
