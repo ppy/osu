@@ -267,7 +267,7 @@ namespace osu.Game
 
             migrateDataToRealm();
 
-            dependencies.CacheAs(KeyBindingStore = new RealmKeyBindingStore(realmFactory, RulesetStore));
+            dependencies.CacheAs(KeyBindingStore = new RealmKeyBindingStore(realmFactory));
 
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
             dependencies.Cache(RulesetConfigCache = new RulesetConfigCache(SettingsStore));
@@ -310,6 +310,10 @@ namespace osu.Game
             base.Content.Add(CreateScalingContainer().WithChild(MenuCursorContainer));
 
             KeyBindingStore.Register(globalBindings);
+
+            foreach (var r in RulesetStore.AvailableRulesets)
+                KeyBindingStore.Register(r);
+
             dependencies.Cache(globalBindings);
 
             PreviewTrackManager previewTrackManager;
