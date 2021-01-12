@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Input.Bindings;
 using osu.Game.Database;
@@ -23,6 +24,9 @@ namespace osu.Game.Input.Bindings
 
         [Resolved]
         private RealmKeyBindingStore store { get; set; }
+
+        [Resolved]
+        private RealmContextFactory realmFactory { get; set; }
 
         public override IEnumerable<IKeyBinding> DefaultKeyBindings => ruleset.CreateInstance().GetDefaultKeyBindings(variant ?? 0);
 
@@ -64,7 +68,16 @@ namespace osu.Game.Input.Bindings
                 // fallback to defaults instead.
                 KeyBindings = DefaultKeyBindings;
             else
-                KeyBindings = store.Query(ruleset?.ID, variant).Detach();
+            {
+                var rulesetId = ruleset?.ID;
+
+                // #1
+                KeyBindings = store.Query(rulesetId, variant).Detach();
+
+                // #2 (Clearly shows lifetime of realm context access)
+                using (var realm = realmFactory.Get())
+                    KeyBindings = realm.All<RealmKeyBinding>().Where(b => b.RulesetID == rulesetId && b.Variant == variant).Detach();
+            }
         }
     }
 }

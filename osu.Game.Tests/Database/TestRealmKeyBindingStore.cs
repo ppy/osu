@@ -6,13 +6,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
-using osuTK.Input;
 
 namespace osu.Game.Tests.Database
 {
