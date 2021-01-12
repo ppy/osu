@@ -22,6 +22,7 @@ using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Import;
 using osu.Game.Screens.Mvis;
+using osu.Game.Screens.Purcashe;
 
 namespace osu.Game.Screens.Menu
 {
@@ -109,6 +110,7 @@ namespace osu.Game.Screens.Menu
                             },
                             OnSolo = onSolo,
                             OnMvisButton = onMvis,
+                            OnPurcasheButton = () => this.Push(new PurcasheScreen()),
                             OnImportButton = onImport,
                             OnMultiplayer = () => this.Push(new Multiplayer()),
                             OnPlaylists = () => this.Push(new Playlists()),
