@@ -32,7 +32,6 @@ namespace osu.Game.Database
              .ForMember(s => s.Files, d => d.MapFrom(s => s.Files))
              .MaxDepth(2);
 
-            c.CreateMap<DatabasedKeyBinding, DatabasedKeyBinding>();
             c.CreateMap<RealmKeyBinding, RealmKeyBinding>();
             c.CreateMap<DatabasedSetting, DatabasedSetting>();
             c.CreateMap<FileInfo, FileInfo>();
