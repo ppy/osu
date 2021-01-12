@@ -48,7 +48,8 @@ namespace osu.Game.Database
         private static readonly GlobalStatistic<int> writes = GlobalStatistics.Get<int>("Realm", "Get (Write)");
         private static readonly GlobalStatistic<int> commits = GlobalStatistics.Get<int>("Realm", "Commits");
         private static readonly GlobalStatistic<int> rollbacks = GlobalStatistics.Get<int>("Realm", "Rollbacks");
-        private static readonly GlobalStatistic<int> contexts = GlobalStatistics.Get<int>("Realm", "Contexts");
+        private static readonly GlobalStatistic<int> contexts_open = GlobalStatistics.Get<int>("Realm", "Contexts (Open)");
+        private static readonly GlobalStatistic<int> contexts_created = GlobalStatistics.Get<int>("Realm", "Contexts (Created)");
 
         /// <summary>
         /// Get a context for the current thread for read-only usage.
@@ -92,11 +93,16 @@ namespace osu.Game.Database
         private Realm getContextForCurrentThread()
         {
             var context = threadContexts.Value;
+
             if (context?.IsClosed != false)
                 threadContexts.Value = context = CreateContext();
 
+            contexts_open.Value = threadContexts.Values.Count;
+
             if (!refreshCompleted.Value)
             {
+                // to keep things simple, realm refreshes are currently performed per thread context at the point of retrieval.
+                // in the future this should likely be run as part of the update loop for the main (update thread) context.
                 context.Refresh();
                 refreshCompleted.Value = true;
             }
@@ -147,7 +153,8 @@ namespace osu.Game.Database
 
         protected virtual Realm CreateContext()
         {
-            contexts.Value++;
+            contexts_created.Value++;
+
             return Realm.GetInstance(new RealmConfiguration(storage.GetFullPath($"{database_name}.realm", true))
             {
                 SchemaVersion = schema_version,
