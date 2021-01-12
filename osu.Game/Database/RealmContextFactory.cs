@@ -34,11 +34,11 @@ namespace osu.Game.Database
 
             using (CreateContext())
             {
-                // ensure our schema is up-to-date and migrated.
+                // creating a context will ensure our schema is up-to-date and migrated.
             }
         }
 
-        private void onMigration(Migration migration, ulong oldschemaversion)
+        private void onMigration(Migration migration, ulong lastSchemaVersion)
         {
         }
 
