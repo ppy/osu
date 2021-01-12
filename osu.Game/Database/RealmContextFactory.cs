@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Threading;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Statistics;
 using Realms;
@@ -16,8 +17,11 @@ namespace osu.Game.Database
 
         private const int schema_version = 5;
 
-        private ThreadLocal<Realm> threadContexts;
+        private readonly ThreadLocal<Realm> threadContexts;
 
+        /// <summary>
+        /// Lock object which is held for the duration of a write operation (via <see cref="GetForWrite"/>).
+        /// </summary>
         private readonly object writeLock = new object();
 
         private ThreadLocal<bool> refreshCompleted = new ThreadLocal<bool>();
@@ -32,10 +36,11 @@ namespace osu.Game.Database
         {
             this.storage = storage;
 
-            recreateThreadContexts();
+            threadContexts = new ThreadLocal<Realm>(createContext, true);
 
-            using (CreateContext())
+            using (var realm = Get())
             {
+                Logger.Log($"Opened realm {database_name} at version {realm.Config.SchemaVersion}");
                 // creating a context will ensure our schema is up-to-date and migrated.
             }
         }
@@ -95,7 +100,7 @@ namespace osu.Game.Database
             var context = threadContexts.Value;
 
             if (context?.IsClosed != false)
-                threadContexts.Value = context = CreateContext();
+                threadContexts.Value = context = createContext();
 
             contexts_open.Value = threadContexts.Values.Count;
 
@@ -108,6 +113,17 @@ namespace osu.Game.Database
             }
 
             return context;
+        }
+
+        private Realm createContext()
+        {
+            contexts_created.Value++;
+
+            return Realm.GetInstance(new RealmConfiguration(storage.GetFullPath($"{database_name}.realm", true))
+            {
+                SchemaVersion = schema_version,
+                MigrationCallback = onMigration,
+            });
         }
 
         private void usageCompleted(RealmWriteUsage usage)
@@ -140,34 +156,6 @@ namespace osu.Game.Database
             finally
             {
                 Monitor.Exit(writeLock);
-            }
-        }
-
-        private void recreateThreadContexts()
-        {
-            // Contexts for other threads are not disposed as they may be in use elsewhere. Instead, fresh contexts are exposed
-            // for other threads to use, and we rely on the finalizer inside OsuDbContext to handle their previous contexts
-            threadContexts?.Value.Dispose();
-            threadContexts = new ThreadLocal<Realm>(CreateContext, true);
-        }
-
-        protected virtual Realm CreateContext()
-        {
-            contexts_created.Value++;
-
-            return Realm.GetInstance(new RealmConfiguration(storage.GetFullPath($"{database_name}.realm", true))
-            {
-                SchemaVersion = schema_version,
-                MigrationCallback = onMigration,
-            });
-        }
-
-        public void ResetDatabase()
-        {
-            lock (writeLock)
-            {
-                recreateThreadContexts();
-                storage.DeleteDatabase(database_name);
             }
         }
     }
