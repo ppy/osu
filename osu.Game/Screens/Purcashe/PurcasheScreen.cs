@@ -1,3 +1,4 @@
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -5,10 +6,13 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Purcashe.SubScreens;
@@ -27,6 +31,8 @@ namespace osu.Game.Screens.Purcashe
         private OsuSpriteText ppCountText;
         private OsuSpriteText versionTitle;
         private OsuSpriteText mainTitle;
+        private OsuTextBox textBox;
+        private ShakeContainer shake;
 
         [BackgroundDependencyLoader]
         private void load(TextureStore textures, MConfigManager config)
@@ -206,13 +212,17 @@ namespace osu.Game.Screens.Purcashe
                                                         config.Set(MSetting.PPCount, 500);
                                                     }
                                                 },
-                                                new TriangleButton
+                                                shake = new ShakeContainer
                                                 {
-                                                    Alpha = 0,
-                                                    Width = 120,
-                                                    Text = "退出",
-                                                    Action = this.Exit
-                                                },
+                                                    RelativeSizeAxes = Axes.X,
+                                                    Height = 50,
+                                                    Child = textBox = new OsuTextBox
+                                                    {
+                                                        Height = 50,
+                                                        RelativeSizeAxes = Axes.X,
+                                                        PlaceholderText = "在这里输入你想随机的次数"
+                                                    }
+                                                }
                                             }
                                         },
                                         new OsuSpriteText
@@ -225,7 +235,7 @@ namespace osu.Game.Screens.Purcashe
                                         {
                                             Text = "剩余pp",
                                             Anchor = Anchor.BottomCentre,
-                                            Origin = Anchor.BottomCentre,
+                                            Origin = Anchor.BottomCentre
                                         },
                                     }
                                 }
@@ -236,6 +246,25 @@ namespace osu.Game.Screens.Purcashe
             };
 
             rollMeme();
+            textBox.OnCommit += TextBoxOnOnCommit;
+        }
+
+        private void TextBoxOnOnCommit(TextBox sender, bool newtext)
+        {
+            try
+            {
+                var times = int.Parse(sender.Text);
+                this.Push(new CustomRandomScreen
+                {
+                    RandomTimes = times,
+                    IsCustom = true
+                });
+            }
+            catch (Exception e)
+            {
+                Logger.Log(e.ToString());
+                shake.Shake();
+            }
         }
 
         protected override void LoadComplete()

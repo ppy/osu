@@ -21,11 +21,15 @@ namespace osu.Game.Screens.Purcashe.SubScreens
 {
     public class RandomShowcaseScreen : PurcasheBasicScreen
     {
-        private Container<ResultContainer> showcaseContainer;
         public List<RollResult> Results { get; set; }
+        public bool IsCustom;
+
+        private Container<ResultContainer> showcaseContainer;
         private int currentIndex = -1;
         private SampleChannel sampleNext;
+
         private ShowcasePurcasheProgressBar progress;
+
         private int maxIndex => Results.Count;
 
         public override float BackgroundParallaxAmount => 5f;
@@ -34,36 +38,43 @@ namespace osu.Game.Screens.Purcashe.SubScreens
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
+            progress = new ShowcasePurcasheProgressBar
+            {
+                EndTime = maxIndex,
+                CurrentTime = 0,
+                RelativeSizeAxes = Axes.Both,
+                FillColour = Color4.LightBlue,
+                Anchor = Anchor.BottomLeft,
+                Origin = Anchor.BottomLeft,
+            };
+
             sampleNext = audio.Samples.Get("SongSelect/select-expand");
             InternalChildren = new Drawable[]
             {
                 showcaseContainer = new Container<ResultContainer>
                 {
                     RelativeSizeAxes = Axes.Both,
-                },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Height = 5,
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    Child = progress = new ShowcasePurcasheProgressBar
+                }
+            };
+
+            if (IsCustom)
+            {
+                AddInternal(
+                    new Container
                     {
-                        EndTime = maxIndex,
-                        CurrentTime = 0,
-                        RelativeSizeAxes = Axes.Both,
-                        FillColour = Color4.LightBlue,
+                        RelativeSizeAxes = Axes.X,
+                        Height = 5,
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
-                    }
-                }.WithEffect(new GlowEffect
-                {
-                    Colour = Color4.LightBlue,
-                    BlurSigma = new Vector2(1),
-                    Strength = 20,
-                    PadExtent = true
-                })
-            };
+                        Child = progress
+                    }.WithEffect(new GlowEffect
+                    {
+                        Colour = Color4.LightBlue,
+                        BlurSigma = new Vector2(1),
+                        Strength = 20,
+                        PadExtent = true
+                    }));
+            }
 
             showNext();
         }
@@ -161,6 +172,12 @@ namespace osu.Game.Screens.Purcashe.SubScreens
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Alpha = 0,
+                            EdgeEffect = new EdgeEffectParameters
+                            {
+                                Type = EdgeEffectType.Glow,
+                                Radius = 10,
+                                Colour = PurcasheColorProvider.GetColor(Result.Rank)
+                            },
                             Children = new Drawable[]
                             {
                                 new Sprite
@@ -173,14 +190,6 @@ namespace osu.Game.Screens.Purcashe.SubScreens
                         }
                     },
                 };
-
-                //视觉效果
-                spriteContainer.TweenEdgeEffectTo(new EdgeEffectParameters
-                {
-                    Type = EdgeEffectType.Glow,
-                    Radius = 5,
-                    Colour = PurcasheColorProvider.GetColor(Result.Rank)
-                });
             }
 
             protected override void LoadComplete()

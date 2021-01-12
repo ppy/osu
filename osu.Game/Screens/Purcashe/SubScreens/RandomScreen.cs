@@ -25,15 +25,16 @@ using static osu.Game.Screens.Purcashe.Components.ItemPanel;
 
 namespace osu.Game.Screens.Purcashe.SubScreens
 {
-    public class RandomScreen : PurcasheBasicScreen
+    public abstract class RandomScreen : PurcasheBasicScreen
     {
         private FillFlowContainer<ItemPanel> panelFillFlow;
         private OsuScrollContainer panelScroll;
 
         private readonly Bindable<int> coins = new Bindable<int>();
         private OsuSpriteText ppCountText;
-        protected virtual string ScreenTitle => null;
-        protected virtual int ItemCount => 0;
+        public virtual string ScreenTitle => null;
+        public virtual int ItemCount => 0;
+        public bool IsCustom;
 
         public override bool AllowExternalScreenChange => false;
         public override bool AllowBackButton => allowBack;
@@ -81,7 +82,8 @@ namespace osu.Game.Screens.Purcashe.SubScreens
                 {
                     OnFireAction = () => this.Push(new RandomShowcaseScreen
                     {
-                        Results = results
+                        Results = results,
+                        IsCustom = IsCustom
                     })
                 },
                 overlay = new Container
@@ -145,7 +147,7 @@ namespace osu.Game.Screens.Purcashe.SubScreens
                                     Action = this.Exit
                                 }
                             }
-                        },
+                        }
                     }
                 },
             };
@@ -154,6 +156,52 @@ namespace osu.Game.Screens.Purcashe.SubScreens
         public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
+
+            if (results.Count == 0)
+            {
+                panelScroll.Add(new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Direction = FillDirection.Vertical,
+                    Alpha = 0.8f,
+                    Children = new Drawable[]
+                    {
+                        new FillFlowContainer
+                        {
+                            AutoSizeAxes = Axes.Both,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Children = new Drawable[]
+                            {
+                                new SpriteIcon
+                                {
+                                    Icon = FontAwesome.Solid.HorseHead,
+                                    Size = new Vector2(80),
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre
+                                },
+                                new SpriteIcon
+                                {
+                                    Icon = FontAwesome.Solid.Question,
+                                    Size = new Vector2(80),
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre
+                                },
+                            }
+                        },
+                        new OsuSpriteText
+                        {
+                            Text = "没有结果",
+                            Font = OsuFont.GetFont(size: 80),
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        }
+                    }
+                });
+            }
+
             unMask();
         }
 
@@ -171,6 +219,11 @@ namespace osu.Game.Screens.Purcashe.SubScreens
                 overlay.Delay(600).FadeIn(300);
             });
 
+            commitPP();
+        }
+
+        private void commitPP()
+        {
             coins.Value = tempPPCount.Value;
             if (coins.Value < 0) coins.Value = 0;
         }
@@ -223,6 +276,18 @@ namespace osu.Game.Screens.Purcashe.SubScreens
 
         private void createPanels(float delay = 100)
         {
+            if (ItemCount < 0)
+            {
+                notifications?.Post(new SimpleNotification
+                {
+                    Text = "随机次数不能小于0!",
+                    Icon = FontAwesome.Solid.Exclamation
+                });
+
+                this.Delay(800).Schedule(this.Exit);
+                return;
+            }
+
             tempPPCount.Value -= ItemCount * 50;
 
             if (tempPPCount.Value < 0)
@@ -235,7 +300,7 @@ namespace osu.Game.Screens.Purcashe.SubScreens
                     Icon = FontAwesome.Solid.Exclamation
                 });
 
-                this.Delay(300).Schedule(this.Exit);
+                this.Delay(800).Schedule(this.Exit);
                 return;
             }
 
@@ -317,6 +382,9 @@ namespace osu.Game.Screens.Purcashe.SubScreens
                     box.GlowColor = Color4.Gold;
                     break;
             }
+
+            //在这里提交一次数值
+            commitPP();
         }
 
         private int randomPP() => RNG.Next(-400, 400);

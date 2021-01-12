@@ -98,7 +98,7 @@ namespace osu.Game.Screens.Purcashe
         {
             base.OnSuspending(next);
 
-            this.ScaleTo(0.6f, ANIM_DURATION, Easing.OutQuint)
+            this.ScaleTo(1.2f, ANIM_DURATION, Easing.OutQuint)
                 .FadeOut(ANIM_DURATION, Easing.OutQuint);
         }
 
