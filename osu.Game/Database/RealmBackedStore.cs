@@ -3,15 +3,17 @@
 
 using osu.Framework.Platform;
 
+#nullable enable
+
 namespace osu.Game.Database
 {
     public abstract class RealmBackedStore
     {
-        protected readonly Storage Storage;
+        protected readonly Storage? Storage;
 
         protected readonly IRealmFactory ContextFactory;
 
-        protected RealmBackedStore(IRealmFactory contextFactory, Storage storage = null)
+        protected RealmBackedStore(IRealmFactory contextFactory, Storage? storage = null)
         {
             ContextFactory = contextFactory;
             Storage = storage;
