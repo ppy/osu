@@ -21,22 +21,9 @@ namespace osu.Game.Input
         /// </summary>
         public event Action? KeyBindingChanged;
 
-        public RealmKeyBindingStore(RealmContextFactory contextFactory, RulesetStore? rulesets, Storage? storage = null)
+        public RealmKeyBindingStore(RealmContextFactory contextFactory, Storage? storage = null)
             : base(contextFactory, storage)
         {
-            if (rulesets != null)
-            {
-                // populate defaults from rulesets.
-                using (ContextFactory.GetForWrite())
-                {
-                    foreach (RulesetInfo info in rulesets.AvailableRulesets)
-                    {
-                        var ruleset = info.CreateInstance();
-                        foreach (var variant in ruleset.AvailableVariants)
-                            insertDefaults(ruleset.GetDefaultKeyBindings(variant), info.ID, variant);
-                    }
-                }
-            }
         }
 
         /// <summary>
@@ -61,6 +48,21 @@ namespace osu.Game.Input
         /// </summary>
         /// <param name="container">The container to populate defaults from.</param>
         public void Register(KeyBindingContainer container) => insertDefaults(container.DefaultKeyBindings);
+
+        /// <summary>
+        /// Register a ruleset, adding default bindings for each of its variants.
+        /// </summary>
+        /// <param name="ruleset">The ruleset to populate defaults from.</param>
+        public void Register(RulesetInfo ruleset)
+        {
+            var instance = ruleset.CreateInstance();
+
+            using (ContextFactory.GetForWrite())
+            {
+                foreach (var variant in instance.AvailableVariants)
+                    insertDefaults(instance.GetDefaultKeyBindings(variant), ruleset.ID, variant);
+            }
+        }
 
         /// <summary>
         /// Retrieve all key bindings for the provided specification.
