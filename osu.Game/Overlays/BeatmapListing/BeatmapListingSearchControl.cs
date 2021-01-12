@@ -11,6 +11,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osuTK.Graphics;
@@ -140,10 +141,19 @@ namespace osu.Game.Overlays.BeatmapListing
             categoryFilter.Current.Value = SearchCategory.Leaderboard;
         }
 
+        private IBindable<bool> allowExplicitContent;
+
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load(OverlayColourProvider colourProvider, OsuConfigManager config)
         {
             background.Colour = colourProvider.Dark6;
+
+            allowExplicitContent = config.GetBindable<bool>(OsuSetting.AllowExplicitContent);
+            allowExplicitContent.BindValueChanged(allow =>
+            {
+                // Update search control if global "explicit allowed" setting changed.
+                Explicit.Value = allow.NewValue ? SearchExplicit.Show : SearchExplicit.Hide;
+            }, true);
         }
 
         public void TakeFocus() => textBox.TakeFocus();
