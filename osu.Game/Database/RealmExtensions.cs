@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using AutoMapper;
 using osu.Game.Beatmaps;
@@ -40,6 +41,12 @@ namespace osu.Game.Database
             c.CreateMap<RulesetInfo, RulesetInfo>();
         }).CreateMapper();
 
+        /// <summary>
+        /// Create a detached copy of the each item in the list.
+        /// </summary>
+        /// <param name="items">A list of managed <see cref="RealmObject"/>s to detach.</param>
+        /// <typeparam name="T">The type of object.</typeparam>
+        /// <returns>A list containing non-managed copies of provided items.</returns>
         public static List<T> Detach<T>(this List<T> items) where T : RealmObject
         {
             var list = new List<T>();
@@ -50,22 +57,44 @@ namespace osu.Game.Database
             return list;
         }
 
-        public static T Detach<T>(this T obj) where T : RealmObject
+        /// <summary>
+        /// Create a detached copy of the each item in the list.
+        /// </summary>
+        /// <param name="item">The managed <see cref="RealmObject"/> to detach.</param>
+        /// <typeparam name="T">The type of object.</typeparam>
+        /// <returns>A non-managed copy of provided item. Will return the provided item if already detached.</returns>
+        public static T Detach<T>(this T item) where T : RealmObject
         {
-            if (!obj.IsManaged)
-                return obj;
+            if (!item.IsManaged)
+                return item;
 
-            var detached = mapper.Map<T>(obj);
-
-            //typeof(RealmObject).GetField("_realm", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(detached, null);
-
-            return detached;
+            return mapper.Map<T>(item);
         }
 
-        public static Live<T> Wrap<T>(this T obj, IRealmFactory contextFactory)
-            where T : RealmObject, IHasGuidPrimaryKey => new Live<T>(obj, contextFactory);
+        /// <summary>
+        /// Wrap a managed instance of a realm object in a <see cref="Live{T}"/>.
+        /// </summary>
+        /// <param name="item">The item to wrap.</param>
+        /// <param name="contextFactory">A factory to retrieve realm contexts from.</param>
+        /// <typeparam name="T">The type of object.</typeparam>
+        /// <returns>A wrapped instance of the provided item.</returns>
+        public static Live<T> Wrap<T>(this T item, IRealmFactory contextFactory)
+            where T : RealmObject, IHasGuidPrimaryKey => new Live<T>(item, contextFactory);
 
-        public static Live<T> WrapAsUnmanaged<T>(this T obj)
-            where T : RealmObject, IHasGuidPrimaryKey => new Live<T>(obj, null);
+        /// <summary>
+        /// Wrap an unmanaged instance of a realm object in a <see cref="Live{T}"/>.
+        /// </summary>
+        /// <param name="item">The item to wrap.</param>
+        /// <typeparam name="T">The type of object.</typeparam>
+        /// <returns>A wrapped instance of the provided item.</returns>
+        /// <exception cref="ArgumentException">Throws if the provided item is managed.</exception>
+        public static Live<T> WrapAsUnmanaged<T>(this T item)
+            where T : RealmObject, IHasGuidPrimaryKey
+        {
+            if (item.IsManaged)
+                throw new ArgumentException("Provided item must not be managed", nameof(item));
+
+            return new Live<T>(item, null);
+        }
     }
 }
