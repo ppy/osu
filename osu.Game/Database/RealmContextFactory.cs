@@ -14,6 +14,8 @@ namespace osu.Game.Database
 
         private const string database_name = @"client";
 
+        private const int schema_version = 5;
+
         private ThreadLocal<Realm> threadContexts;
 
         private readonly object writeLock = new object();
@@ -148,8 +150,8 @@ namespace osu.Game.Database
             contexts.Value++;
             return Realm.GetInstance(new RealmConfiguration(storage.GetFullPath($"{database_name}.realm", true))
             {
-                SchemaVersion = 5,
-                MigrationCallback = onMigration
+                SchemaVersion = schema_version,
+                MigrationCallback = onMigration,
             });
         }
 
