@@ -10,6 +10,8 @@ using osu.Game.Database;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets;
 
+#nullable enable
+
 namespace osu.Game.Input
 {
     public class RealmKeyBindingStore : RealmBackedStore
@@ -17,19 +19,22 @@ namespace osu.Game.Input
         /// <summary>
         /// Fired whenever any key binding change occurs, across all rulesets and types.
         /// </summary>
-        public event Action KeyBindingChanged;
+        public event Action? KeyBindingChanged;
 
-        public RealmKeyBindingStore(RealmContextFactory contextFactory, RulesetStore rulesets, Storage storage = null)
+        public RealmKeyBindingStore(RealmContextFactory contextFactory, RulesetStore? rulesets, Storage? storage = null)
             : base(contextFactory, storage)
         {
-            // populate defaults from rulesets.
-            using (ContextFactory.GetForWrite())
+            if (rulesets != null)
             {
-                foreach (RulesetInfo info in rulesets.AvailableRulesets)
+                // populate defaults from rulesets.
+                using (ContextFactory.GetForWrite())
                 {
-                    var ruleset = info.CreateInstance();
-                    foreach (var variant in ruleset.AvailableVariants)
-                        insertDefaults(ruleset.GetDefaultKeyBindings(variant), info.ID, variant);
+                    foreach (RulesetInfo info in rulesets.AvailableRulesets)
+                    {
+                        var ruleset = info.CreateInstance();
+                        foreach (var variant in ruleset.AvailableVariants)
+                            insertDefaults(ruleset.GetDefaultKeyBindings(variant), info.ID, variant);
+                    }
                 }
             }
         }
@@ -87,7 +92,7 @@ namespace osu.Game.Input
         public void Update(IHasGuidPrimaryKey keyBinding, Action<IKeyBinding> modification)
         {
             // the incoming instance could already be a live access object.
-            Live<RealmKeyBinding> realmBinding = keyBinding as Live<RealmKeyBinding>;
+            Live<RealmKeyBinding>? realmBinding = keyBinding as Live<RealmKeyBinding>;
 
             using (var realm = ContextFactory.GetForWrite())
             {
