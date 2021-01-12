@@ -41,12 +41,12 @@ namespace osu.Game.Database
         }).CreateMapper();
 
         /// <summary>
-        /// Create a detached copy of the each item in the list.
+        /// Create a detached copy of the each item in the collection.
         /// </summary>
         /// <param name="items">A list of managed <see cref="RealmObject"/>s to detach.</param>
         /// <typeparam name="T">The type of object.</typeparam>
         /// <returns>A list containing non-managed copies of provided items.</returns>
-        public static List<T> Detach<T>(this List<T> items) where T : RealmObject
+        public static List<T> Detach<T>(this IEnumerable<T> items) where T : RealmObject
         {
             var list = new List<T>();
 
