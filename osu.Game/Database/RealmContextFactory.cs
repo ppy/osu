@@ -38,11 +38,9 @@ namespace osu.Game.Database
 
             threadContexts = new ThreadLocal<Realm>(createContext, true);
 
-            using (var realm = Get())
-            {
-                Logger.Log($"Opened realm {database_name} at version {realm.Config.SchemaVersion}");
-                // creating a context will ensure our schema is up-to-date and migrated.
-            }
+            // creating a context will ensure our schema is up-to-date and migrated.
+            var realm = Get();
+            Logger.Log($"Opened realm \"{realm.Config.DatabasePath}\" at version {realm.Config.SchemaVersion}");
         }
 
         private void onMigration(Migration migration, ulong lastSchemaVersion)
