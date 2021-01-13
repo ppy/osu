@@ -37,17 +37,19 @@ namespace osu.Game.Tests.Database
         [Test]
         public void TestDefaultsPopulationAndQuery()
         {
-            Assert.That(keyBindingStore.Query().Count, Is.EqualTo(0));
+            Assert.That(query().Count, Is.EqualTo(0));
 
             KeyBindingContainer testContainer = new TestKeyBindingContainer();
 
             keyBindingStore.Register(testContainer);
 
-            Assert.That(keyBindingStore.Query().Count, Is.EqualTo(3));
+            Assert.That(query().Count, Is.EqualTo(3));
 
-            Assert.That(keyBindingStore.Query(GlobalAction.Back).Count, Is.EqualTo(1));
-            Assert.That(keyBindingStore.Query(GlobalAction.Select).Count, Is.EqualTo(2));
+            Assert.That(query().Where(k => k.Action == (int)GlobalAction.Back).Count, Is.EqualTo(1));
+            Assert.That(query().Where(k => k.Action == (int)GlobalAction.Select).Count, Is.EqualTo(2));
         }
+
+        private IQueryable<RealmKeyBinding> query() => realmContextFactory.Get().All<RealmKeyBinding>();
 
         [Test]
         public void TestUpdateViaQueriedReference()
@@ -56,7 +58,7 @@ namespace osu.Game.Tests.Database
 
             keyBindingStore.Register(testContainer);
 
-            var backBinding = keyBindingStore.Query(GlobalAction.Back).Single();
+            var backBinding = query().Single(k => k.Action == (int)GlobalAction.Back);
 
             Assert.That(((IKeyBinding)backBinding).KeyCombination.Keys, Is.EquivalentTo(new[] { InputKey.Escape }));
 
@@ -65,7 +67,7 @@ namespace osu.Game.Tests.Database
             Assert.That(((IKeyBinding)backBinding).KeyCombination.Keys, Is.EquivalentTo(new[] { InputKey.BackSpace }));
 
             // check still correct after re-query.
-            backBinding = keyBindingStore.Query(GlobalAction.Back).Single();
+            backBinding = query().Single(k => k.Action == (int)GlobalAction.Back);
             Assert.That(((IKeyBinding)backBinding).KeyCombination.Keys, Is.EquivalentTo(new[] { InputKey.BackSpace }));
         }
 

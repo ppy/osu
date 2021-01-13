@@ -21,8 +21,8 @@ namespace osu.Game.Input
         /// </summary>
         public event Action? KeyBindingChanged;
 
-        public RealmKeyBindingStore(RealmContextFactory contextFactory, Storage? storage = null)
-            : base(contextFactory, storage)
+        public RealmKeyBindingStore(RealmContextFactory realmFactory, Storage? storage = null)
+            : base(realmFactory, storage)
         {
         }
 
@@ -57,33 +57,11 @@ namespace osu.Game.Input
         {
             var instance = ruleset.CreateInstance();
 
-            using (ContextFactory.GetForWrite())
+            using (RealmFactory.GetForWrite())
             {
                 foreach (var variant in instance.AvailableVariants)
                     insertDefaults(instance.GetDefaultKeyBindings(variant), ruleset.ID, variant);
             }
-        }
-
-        /// <summary>
-        /// Retrieve all key bindings for the provided specification.
-        /// </summary>
-        /// <param name="rulesetId">An optional ruleset ID. If null, global bindings are returned.</param>
-        /// <param name="variant">An optional ruleset variant. If null, the no-variant bindings are returned.</param>
-        /// <returns>A list of all key bindings found for the query, detached from the database.</returns>
-        public List<RealmKeyBinding> Query(int? rulesetId = null, int? variant = null) => query(rulesetId, variant).ToList();
-
-        /// <summary>
-        /// Retrieve all key bindings for the provided action type.
-        /// </summary>
-        /// <param name="action">The action to lookup.</param>
-        /// <typeparam name="T">The enum type of the action.</typeparam>
-        /// <returns>A list of all key bindings found for the query, detached from the database.</returns>
-        public List<RealmKeyBinding> Query<T>(T action)
-            where T : Enum
-        {
-            int lookup = (int)(object)action;
-
-            return query(null, null).Where(rkb => rkb.Action == lookup).ToList();
         }
 
         /// <summary>
@@ -96,7 +74,7 @@ namespace osu.Game.Input
             // the incoming instance could already be a live access object.
             Live<RealmKeyBinding>? realmBinding = keyBinding as Live<RealmKeyBinding>;
 
-            using (var realm = ContextFactory.GetForWrite())
+            using (var realm = RealmFactory.GetForWrite())
             {
                 if (realmBinding == null)
                 {
@@ -105,7 +83,7 @@ namespace osu.Game.Input
                         // if neither of the above cases succeeded, retrieve a realm object for further processing.
                         rkb = realm.Context.Find<RealmKeyBinding>(keyBinding.ID);
 
-                    realmBinding = new Live<RealmKeyBinding>(rkb, ContextFactory);
+                    realmBinding = new Live<RealmKeyBinding>(rkb, RealmFactory);
                 }
 
                 realmBinding.PerformUpdate(modification);
@@ -116,7 +94,7 @@ namespace osu.Game.Input
 
         private void insertDefaults(IEnumerable<IKeyBinding> defaults, int? rulesetId = null, int? variant = null)
         {
-            using (var usage = ContextFactory.GetForWrite())
+            using (var usage = RealmFactory.GetForWrite())
             {
                 // compare counts in database vs defaults
                 foreach (var group in defaults.GroupBy(k => k.Action))
@@ -149,6 +127,6 @@ namespace osu.Game.Input
         /// <param name="rulesetId">An optional ruleset ID. If null, global bindings are returned.</param>
         /// <param name="variant">An optional ruleset variant. If null, the no-variant bindings are returned.</param>
         private IQueryable<RealmKeyBinding> query(int? rulesetId = null, int? variant = null) =>
-            ContextFactory.Get().All<RealmKeyBinding>().Where(b => b.RulesetID == rulesetId && b.Variant == variant);
+            RealmFactory.Get().All<RealmKeyBinding>().Where(b => b.RulesetID == rulesetId && b.Variant == variant);
     }
 }
