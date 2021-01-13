@@ -7,8 +7,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
@@ -38,9 +36,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         Margin = new MarginPadding { Horizontal = 10f, Vertical = 2f },
                         Text = "EXPLICIT",
                         Font = OsuFont.GetFont(size: 10, weight: FontWeight.Bold),
-                        // todo: this is --hsl-orange-2 from the new palette in https://github.com/ppy/osu-web/blob/8ceb46f/resources/assets/less/colors.less#L128-L151,
-                        // should probably take the whole palette from there onto OsuColour for a nicer look in code.
-                        Colour = Color4.FromHsl(new Vector4(45f / 360, 0.8f, 0.6f, 1f)),
+                        Colour = OverlayColourProvider.Orange.Colour2,
                     }
                 }
             };
