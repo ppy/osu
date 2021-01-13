@@ -99,6 +99,12 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("explicit control set to hide", () => control.Explicit.Value == SearchExplicit.Hide);
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            localConfig?.Dispose();
+            base.Dispose(isDisposing);
+        }
+
         private static readonly BeatmapSetInfo beatmap_set = new BeatmapSetInfo
         {
             OnlineInfo = new BeatmapSetOnlineInfo
