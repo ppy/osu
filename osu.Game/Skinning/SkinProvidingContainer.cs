@@ -93,10 +93,10 @@ namespace osu.Game.Skinning
             return fallbackSource?.GetConfig<TLookup, TValue>(lookup);
         }
 
-        private IBindable<TValue> getBindable<TLookup, TValue>(TLookup lookup, bool bindableReturnCheck)
+        private IBindable<TValue> lookupWithFallback<TLookup, TValue>(TLookup lookup, bool canUseSkinLookup)
         {
             var bindable = skin.GetConfig<TLookup, TValue>(lookup);
-            if (bindable != null && bindableReturnCheck)
+            if (bindable != null && canUseSkinLookup)
                 return bindable;
             else
                 return fallbackSource?.GetConfig<TLookup, TValue>(lookup);
