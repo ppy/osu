@@ -8,10 +8,10 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Dashboard;
 using osu.Game.Overlays.Dashboard.Friends;
+using osu.Game.Screens.OnlinePlay;
 
 namespace osu.Game.Overlays
 {
@@ -19,8 +19,9 @@ namespace osu.Game.Overlays
     {
         private CancellationTokenSource cancellationToken;
 
+        private IDisposable displayLoadedOperation;
+
         private Container content;
-        private LoadingLayer loading;
         private OverlayScrollContainer scrollFlow;
 
         public DashboardOverlay()
@@ -67,8 +68,7 @@ namespace osu.Game.Overlays
                             }
                         }
                     }
-                },
-                loading = new LoadingLayer(true),
+                }
             };
         }
 
@@ -107,7 +107,10 @@ namespace osu.Game.Overlays
             LoadComponentAsync(display, loaded =>
             {
                 if (API.IsLoggedIn)
-                    loading.Hide();
+                {
+                    displayLoadedOperation?.Dispose();
+                    displayLoadedOperation = null;
+                }
 
                 content.Child = loaded;
             }, (cancellationToken = new CancellationTokenSource()).Token);
@@ -116,7 +119,9 @@ namespace osu.Game.Overlays
         private void onTabChanged(ValueChangedEvent<DashboardOverlayTabs> tab)
         {
             cancellationToken?.Cancel();
-            loading.Show();
+
+            if (displayLoadedOperation == null)
+                displayLoadedOperation = OngoingOperationTracker.BeginOperation();
 
             if (!API.IsLoggedIn)
             {

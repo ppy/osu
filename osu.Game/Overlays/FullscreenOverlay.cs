@@ -7,7 +7,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
+using osu.Game.Screens.OnlinePlay;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays
@@ -27,35 +29,56 @@ namespace osu.Game.Overlays
         [Cached]
         protected readonly OverlayColourProvider ColourProvider;
 
+        [Cached]
+        protected OngoingOperationTracker OngoingOperationTracker { get; private set; }
+
+        private LoadingLayer loadingLayer;
+
         protected FullscreenOverlay(OverlayColourScheme colourScheme, T header)
         {
             Header = header;
-
             ColourProvider = new OverlayColourProvider(colourScheme);
 
+            AddRangeInternal(new Drawable[]
+            {
+                loadingLayer = new LoadingLayer(true),
+                OngoingOperationTracker = new OngoingOperationTracker()
+            });
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             RelativeSizeAxes = Axes.Both;
             RelativePositionAxes = Axes.Both;
             Width = 0.85f;
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
-
             Masking = true;
-
             EdgeEffect = new EdgeEffectParameters
             {
                 Colour = Color4.Black.Opacity(0),
                 Type = EdgeEffectType.Shadow,
                 Radius = 10
             };
-        }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
             Waves.FirstWaveColour = ColourProvider.Light4;
             Waves.SecondWaveColour = ColourProvider.Light3;
             Waves.ThirdWaveColour = ColourProvider.Dark4;
             Waves.FourthWaveColour = ColourProvider.Dark3;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            OngoingOperationTracker.InProgress.BindValueChanged(isInProgress =>
+            {
+                if (isInProgress.NewValue)
+                    loadingLayer.Show();
+                else
+                    loadingLayer.Hide();
+            });
         }
 
         public override void Show()
