@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Dashboard;
 using osu.Game.Overlays.Dashboard.Friends;
-using osu.Game.Screens.OnlinePlay;
 
 namespace osu.Game.Overlays
 {
@@ -119,9 +118,7 @@ namespace osu.Game.Overlays
         private void onTabChanged(ValueChangedEvent<DashboardOverlayTabs> tab)
         {
             cancellationToken?.Cancel();
-
-            if (displayLoadedOperation == null)
-                displayLoadedOperation = OngoingOperationTracker.BeginOperation();
+            displayLoadedOperation ??= OngoingOperationTracker.BeginOperation();
 
             if (!API.IsLoggedIn)
             {

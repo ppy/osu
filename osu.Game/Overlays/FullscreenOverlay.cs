@@ -32,7 +32,7 @@ namespace osu.Game.Overlays
         [Cached]
         protected OngoingOperationTracker OngoingOperationTracker { get; private set; }
 
-        private LoadingLayer loadingLayer;
+        private readonly LoadingLayer loadingLayer;
 
         protected FullscreenOverlay(OverlayColourScheme colourScheme, T header)
         {
