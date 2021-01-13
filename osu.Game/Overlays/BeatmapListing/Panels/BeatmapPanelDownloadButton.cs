@@ -57,7 +57,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                 switch (State.Value)
                 {
                     case DownloadState.Downloading:
-                    case DownloadState.Downloaded:
+                    case DownloadState.Importing:
                         shakeContainer.Shake();
                         break;
 
