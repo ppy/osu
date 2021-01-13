@@ -11,6 +11,13 @@ namespace osu.Game.Overlays
     {
         private readonly OverlayColourScheme colourScheme;
 
+        public static OverlayColourProvider Red { get; } = new OverlayColourProvider(OverlayColourScheme.Red);
+        public static OverlayColourProvider Pink { get; } = new OverlayColourProvider(OverlayColourScheme.Pink);
+        public static OverlayColourProvider Orange { get; } = new OverlayColourProvider(OverlayColourScheme.Orange);
+        public static OverlayColourProvider Green { get; } = new OverlayColourProvider(OverlayColourScheme.Green);
+        public static OverlayColourProvider Purple { get; } = new OverlayColourProvider(OverlayColourScheme.Purple);
+        public static OverlayColourProvider Blue { get; } = new OverlayColourProvider(OverlayColourScheme.Blue);
+
         public OverlayColourProvider(OverlayColourScheme colourScheme)
         {
             this.colourScheme = colourScheme;
