@@ -82,6 +82,7 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.ShowStoryboard, true);
             Set(OsuSetting.BeatmapSkins, true);
+            Set(OsuSetting.BeatmapColours, true);
             Set(OsuSetting.BeatmapHitsounds, true);
 
             Set(OsuSetting.CursorRotation, true);
@@ -250,6 +251,7 @@ namespace osu.Game.Configuration
         ScreenshotCaptureMenuCursor,
         SongSelectRightMouseScroll,
         BeatmapSkins,
+        BeatmapColours,
         BeatmapHitsounds,
         IncreaseFirstObjectVisibility,
         ScoreDisplayMode,
