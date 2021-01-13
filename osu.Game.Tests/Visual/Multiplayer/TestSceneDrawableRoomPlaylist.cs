@@ -222,6 +222,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("download buttons shown", () => playlist.ChildrenOfType<BeatmapDownloadTrackingComposite>().All(d => d.IsPresent));
         }
 
+        [Test]
+        public void TestExplicitBeatmapItem()
+        {
+            var beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
+            beatmap.BeatmapSet.OnlineInfo.HasExplicitContent = true;
+
+            createPlaylist(beatmap);
+        }
+
         private void moveToItem(int index, Vector2? offset = null)
             => AddStep($"move mouse to item {index}", () => InputManager.MoveMouseTo(playlist.ChildrenOfType<OsuRearrangeableListItem<PlaylistItem>>().ElementAt(index), offset));
 
