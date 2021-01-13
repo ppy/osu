@@ -80,28 +80,26 @@ namespace osu.Game.Skinning
                         switch (global)
                         {
                             case GlobalSkinColours.ComboColours:
-                                var bindable = skin.GetConfig<TLookup, TValue>(lookup);
-                                if (bindable != null && AllowColourLookup)
-                                    return bindable;
-                                else
-                                    return fallbackSource?.GetConfig<TLookup, TValue>(lookup);
+                                return getBindable<TLookup, TValue>(lookup, AllowColourLookup);
                         }
 
                         break;
 
                     default:
-                        if (AllowConfigurationLookup)
-                        {
-                            var bindable = skin.GetConfig<TLookup, TValue>(lookup);
-                            if (bindable != null)
-                                return bindable;
-                        }
-
-                        break;
+                        return getBindable<TLookup, TValue>(lookup, AllowConfigurationLookup);
                 }
             }
 
             return fallbackSource?.GetConfig<TLookup, TValue>(lookup);
+        }
+
+        private IBindable<TValue> getBindable<TLookup, TValue>(TLookup lookup, bool bindableReturnCheck)
+        {
+            var bindable = skin.GetConfig<TLookup, TValue>(lookup);
+            if (bindable != null && bindableReturnCheck)
+                return bindable;
+            else
+                return fallbackSource?.GetConfig<TLookup, TValue>(lookup);
         }
 
         protected virtual void TriggerSourceChanged() => SourceChanged?.Invoke();

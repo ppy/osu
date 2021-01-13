@@ -36,41 +36,41 @@ namespace osu.Game.Rulesets.Osu.Tests
             config.BindWith(OsuSetting.BeatmapColours, beatmapColours);
         }
 
-        [TestCase(true, true, true)]
-        [TestCase(true, false, true)]
-        [TestCase(false, true, true)]
-        [TestCase(false, false, true)]
-        public void TestBeatmapComboColours(bool userHasCustomColours, bool useBeatmapSkin, bool useBeatmapColour)
+        [TestCase(true, true)]
+        [TestCase(true, false)]
+        [TestCase(false, true)]
+        [TestCase(false, false)]
+        public void TestBeatmapComboColours(bool userHasCustomColours, bool useBeatmapSkin)
         {
             ExposedPlayer player = null;
 
-            configureSettings(useBeatmapSkin, useBeatmapColour);
+            configureSettings(useBeatmapSkin, true);
             AddStep("load coloured beatmap", () => player = loadBeatmap(userHasCustomColours, true));
             AddUntilStep("wait for player", () => player.IsLoaded);
 
             AddAssert("is beatmap skin colours", () => player.UsableComboColours.SequenceEqual(TestBeatmapSkin.Colours));
         }
 
-        [TestCase(true, false)]
-        [TestCase(false, false)]
-        public void TestBeatmapComboColoursOverride(bool useBeatmapSkin, bool useBeatmapColour)
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestBeatmapComboColoursOverride(bool useBeatmapSkin)
         {
             ExposedPlayer player = null;
 
-            configureSettings(useBeatmapSkin, useBeatmapColour);
+            configureSettings(useBeatmapSkin, false);
             AddStep("load coloured beatmap", () => player = loadBeatmap(true, true));
             AddUntilStep("wait for player", () => player.IsLoaded);
 
             AddAssert("is user custom skin colours", () => player.UsableComboColours.SequenceEqual(TestSkin.Colours));
         }
 
-        [TestCase(true, false)]
-        [TestCase(false, false)]
-        public void TestBeatmapComboColoursOverrideWithDefaultColours(bool useBeatmapSkin, bool useBeatmapColour)
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestBeatmapComboColoursOverrideWithDefaultColours(bool useBeatmapSkin)
         {
             ExposedPlayer player = null;
 
-            configureSettings(useBeatmapSkin, useBeatmapColour);
+            configureSettings(useBeatmapSkin, false);
             AddStep("load coloured beatmap", () => player = loadBeatmap(false, true));
             AddUntilStep("wait for player", () => player.IsLoaded);
 
