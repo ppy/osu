@@ -170,6 +170,7 @@ namespace osu.Game
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
 
             dependencies.Cache(realmFactory = new RealmContextFactory(Storage));
+            AddInternal(realmFactory);
 
             dependencies.CacheAs(Storage);
 

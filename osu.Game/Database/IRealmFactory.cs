@@ -7,10 +7,18 @@ namespace osu.Game.Database
 {
     public interface IRealmFactory
     {
-        Realm Get();
+        /// <summary>
+        /// The main realm context, bound to the update thread.
+        /// </summary>
+        public Realm Context { get; }
 
         /// <summary>
-        /// Request a context for write usage. Can be consumed in a nested fashion (and will return the same underlying context).
+        /// Get a fresh context for read usage.
+        /// </summary>
+        Realm GetForRead();
+
+        /// <summary>
+        /// Request a context for write usage.
         /// This method may block if a write is already active on a different thread.
         /// </summary>
         /// <returns>A usage containing a usable context.</returns>
