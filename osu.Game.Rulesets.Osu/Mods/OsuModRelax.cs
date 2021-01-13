@@ -10,13 +10,15 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Replays;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using static osu.Game.Input.Handlers.ReplayInputHandler;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModRelax : ModRelax, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToPlayer
+    public class OsuModRelax : ModRelax, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToPlayer, IApplicableToScoreProcessor
     {
         public override string Description => @"You don't need to click. Give your clicking/tapping fingers a break from the heat of things.";
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModAutopilot)).ToArray();
@@ -139,5 +141,10 @@ namespace osu.Game.Rulesets.Osu.Mods
                 state?.Apply(osuInputManager.CurrentState, osuInputManager);
             }
         }
+
+        public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor) => scoreProcessor.Combo.UnbindEvents();
+
+
+        public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
     }
 }
