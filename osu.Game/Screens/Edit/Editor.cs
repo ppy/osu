@@ -444,11 +444,14 @@ namespace osu.Game.Screens.Edit
         {
             base.OnEntering(last);
 
-            // todo: temporary. we want to be applying dim using the UserDimContainer eventually.
-            Background.FadeColour(Color4.DarkGray, 500);
+            ApplyToBackground(b =>
+            {
+                // todo: temporary. we want to be applying dim using the UserDimContainer eventually.
+                b.FadeColour(Color4.DarkGray, 500);
 
-            Background.EnableUserDim.Value = false;
-            Background.BlurAmount.Value = 0;
+                b.EnableUserDim.Value = false;
+                b.BlurAmount.Value = 0;
+            });
 
             resetTrack(true);
         }
@@ -480,8 +483,10 @@ namespace osu.Game.Screens.Edit
                 }
             }
 
-            Background.FadeColour(Color4.White, 500);
+            ApplyToBackground(b => b.FadeColour(Color4.White, 500));
             resetTrack();
+
+            Beatmap.Value = beatmapManager.GetWorkingBeatmap(Beatmap.Value.BeatmapInfo);
 
             return base.OnExiting(next);
         }

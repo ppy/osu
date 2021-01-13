@@ -380,6 +380,18 @@ namespace osu.Game
                 : new OsuConfigManager(Storage);
         }
 
+        /// <summary>
+        /// Use to programatically exit the game as if the user was triggering via alt-f4.
+        /// Will keep persisting until an exit occurs (exit may be blocked multiple times).
+        /// </summary>
+        public void GracefullyExit()
+        {
+            if (!OnExiting())
+                Exit();
+            else
+                Scheduler.AddDelayed(GracefullyExit, 2000);
+        }
+
         protected override Storage CreateStorage(GameHost host, Storage defaultStorage) => new OsuStorage(host, defaultStorage);
 
         private readonly List<ICanAcceptFiles> fileImporters = new List<ICanAcceptFiles>();
