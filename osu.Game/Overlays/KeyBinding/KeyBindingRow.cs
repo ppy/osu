@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -16,7 +17,7 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Input;
+using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -26,7 +27,7 @@ namespace osu.Game.Overlays.KeyBinding
     public class KeyBindingRow : Container, IFilterable
     {
         private readonly object action;
-        private readonly IEnumerable<IKeyBinding> bindings;
+        private readonly IEnumerable<RealmKeyBinding> bindings;
 
         private const float transition_time = 150;
 
@@ -52,9 +53,9 @@ namespace osu.Game.Overlays.KeyBinding
         private FillFlowContainer cancelAndClearButtons;
         private FillFlowContainer<KeyButton> buttons;
 
-        public IEnumerable<string> FilterTerms => bindings.Select(b => b.KeyCombination.ReadableString()).Prepend((string)text.Text);
+        public IEnumerable<string> FilterTerms => bindings.Select(b => ((IKeyBinding)b).KeyCombination.ReadableString()).Prepend((string)text.Text);
 
-        public KeyBindingRow(object action, IEnumerable<IKeyBinding> bindings)
+        public KeyBindingRow(object action, List<RealmKeyBinding> bindings)
         {
             this.action = action;
             this.bindings = bindings;
@@ -67,7 +68,7 @@ namespace osu.Game.Overlays.KeyBinding
         }
 
         [Resolved]
-        private RealmKeyBindingStore store { get; set; }
+        private RealmContextFactory realmFactory { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -127,7 +128,12 @@ namespace osu.Game.Overlays.KeyBinding
             {
                 var button = buttons[i++];
                 button.UpdateKeyCombination(d);
-                store.Update((IHasGuidPrimaryKey)button.KeyBinding, k => k.KeyCombination = button.KeyBinding.KeyCombination);
+
+                using (var write = realmFactory.GetForWrite())
+                {
+                    var binding = write.Context.Find<RealmKeyBinding>(((IHasGuidPrimaryKey)button.KeyBinding).ID);
+                    binding.KeyCombination = button.KeyBinding.KeyCombination;
+                }
             }
         }
 
@@ -286,7 +292,11 @@ namespace osu.Game.Overlays.KeyBinding
         {
             if (bindTarget != null)
             {
-                store.Update((IHasGuidPrimaryKey)bindTarget.KeyBinding, k => k.KeyCombination = bindTarget.KeyBinding.KeyCombination);
+                using (var write = realmFactory.GetForWrite())
+                {
+                    var binding = write.Context.Find<RealmKeyBinding>(((IHasGuidPrimaryKey)bindTarget.KeyBinding).ID);
+                    binding.KeyCombination = bindTarget.KeyBinding.KeyCombination;
+                }
 
                 bindTarget.IsBinding = false;
                 Schedule(() =>
@@ -360,7 +370,7 @@ namespace osu.Game.Overlays.KeyBinding
 
         public class KeyButton : Container
         {
-            public readonly IKeyBinding KeyBinding;
+            public readonly RealmKeyBinding KeyBinding;
 
             private readonly Box box;
             public readonly OsuSpriteText Text;
@@ -382,8 +392,11 @@ namespace osu.Game.Overlays.KeyBinding
                 }
             }
 
-            public KeyButton(IKeyBinding keyBinding)
+            public KeyButton(RealmKeyBinding keyBinding)
             {
+                if (keyBinding.IsManaged)
+                    throw new ArgumentException("Key binding should not be attached as we make temporary changes", nameof(keyBinding));
+
                 KeyBinding = keyBinding;
 
                 Margin = new MarginPadding(padding);
@@ -416,7 +429,7 @@ namespace osu.Game.Overlays.KeyBinding
                         Margin = new MarginPadding(5),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Text = keyBinding.KeyCombination.ReadableString(),
+                        Text = ((IKeyBinding)keyBinding).KeyCombination.ReadableString(),
                     },
                 };
             }
@@ -455,8 +468,10 @@ namespace osu.Game.Overlays.KeyBinding
 
             public void UpdateKeyCombination(KeyCombination newCombination)
             {
-                KeyBinding.KeyCombination = newCombination;
-                Text.Text = KeyBinding.KeyCombination.ReadableString();
+                var keyBinding = (IKeyBinding)KeyBinding;
+
+                keyBinding.KeyCombination = newCombination;
+                Text.Text = keyBinding.KeyCombination.ReadableString();
             }
         }
     }
