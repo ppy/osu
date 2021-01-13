@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Database
             Assert.That(query().Where(k => k.Action == (int)GlobalAction.Select).Count, Is.EqualTo(2));
         }
 
-        private IQueryable<RealmKeyBinding> query() => realmContextFactory.Get().All<RealmKeyBinding>();
+        private IQueryable<RealmKeyBinding> query() => realmContextFactory.Context.All<RealmKeyBinding>();
 
         [Test]
         public void TestUpdateViaQueriedReference()

@@ -55,7 +55,7 @@ namespace osu.Game.Database
 
         private T getThreadLocalValue()
         {
-            var context = contextFactory.Get();
+            var context = contextFactory.Context;
 
             // only use the original if no context is available or the source realm is the same.
             if (context == null || original.Realm?.IsSameInstance(context) == true) return original;

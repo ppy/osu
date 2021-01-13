@@ -53,14 +53,12 @@ namespace osu.Game.Input.Bindings
 
         protected override void LoadComplete()
         {
-            var realm = realmFactory.Get();
-
             if (ruleset == null || ruleset.ID.HasValue)
             {
                 var rulesetId = ruleset?.ID;
 
-                realmKeyBindings = realm.All<RealmKeyBinding>()
-                                        .Where(b => b.RulesetID == rulesetId && b.Variant == variant);
+                realmKeyBindings = realmFactory.Context.All<RealmKeyBinding>()
+                                               .Where(b => b.RulesetID == rulesetId && b.Variant == variant);
 
                 realmSubscription = realmKeyBindings
                     .SubscribeForNotifications((sender, changes, error) =>

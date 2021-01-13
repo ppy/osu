@@ -28,7 +28,7 @@ namespace osu.Game.Input
         /// <returns>A set of display strings for all the user's key configuration for the action.</returns>
         public IEnumerable<string> GetReadableKeyCombinationsFor(GlobalAction globalAction)
         {
-            foreach (var action in query().Where(b => (GlobalAction)b.Action == globalAction))
+            foreach (var action in RealmFactory.Context.All<RealmKeyBinding>().Where(b => (GlobalAction)b.Action == globalAction))
             {
                 string str = ((IKeyBinding)action).KeyCombination.ReadableString();
 
@@ -92,7 +92,7 @@ namespace osu.Game.Input
                 // compare counts in database vs defaults
                 foreach (var group in defaults.GroupBy(k => k.Action))
                 {
-                    int count = query(rulesetId, variant).Count(k => k.Action == (int)group.Key);
+                    int count = usage.Context.All<RealmKeyBinding>().Count(k => k.RulesetID == rulesetId && k.Variant == variant && k.Action == (int)group.Key);
                     int aimCount = group.Count();
 
                     if (aimCount <= count)
@@ -113,13 +113,5 @@ namespace osu.Game.Input
                 }
             }
         }
-
-        /// <summary>
-        /// Retrieve live queryable <see cref="RealmKeyBinding"/>s for a specified ruleset/variant content.
-        /// </summary>
-        /// <param name="rulesetId">An optional ruleset ID. If null, global bindings are returned.</param>
-        /// <param name="variant">An optional ruleset variant. If null, the no-variant bindings are returned.</param>
-        private IQueryable<RealmKeyBinding> query(int? rulesetId = null, int? variant = null) =>
-            RealmFactory.Get().All<RealmKeyBinding>().Where(b => b.RulesetID == rulesetId && b.Variant == variant);
     }
 }

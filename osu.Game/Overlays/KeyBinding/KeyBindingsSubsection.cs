@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.KeyBinding
         {
             var rulesetId = Ruleset?.ID;
 
-            using (var realm = realmFactory.Get())
+            using (var realm = realmFactory.GetForRead())
             {
                 var bindings = realm.All<RealmKeyBinding>().Where(b => b.RulesetID == rulesetId && b.Variant == variant).Detach();
 

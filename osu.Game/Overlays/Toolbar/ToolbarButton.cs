@@ -165,8 +165,7 @@ namespace osu.Game.Overlays.Toolbar
 
             if (Hotkey != null)
             {
-                var realm = realmFactory.Get();
-                realmKeyBinding = realm.All<RealmKeyBinding>().FirstOrDefault(rkb => rkb.RulesetID == null && rkb.Action == (int)Hotkey.Value);
+                realmKeyBinding = realmFactory.Context.All<RealmKeyBinding>().FirstOrDefault(rkb => rkb.RulesetID == null && rkb.Action == (int)Hotkey.Value);
 
                 if (realmKeyBinding != null)
                 {
