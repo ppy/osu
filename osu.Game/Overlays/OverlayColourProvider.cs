@@ -16,6 +16,11 @@ namespace osu.Game.Overlays
             this.colourScheme = colourScheme;
         }
 
+        public Color4 Colour1 => getColour(1, 0.7f);
+        public Color4 Colour2 => getColour(0.8f, 0.6f);
+        public Color4 Colour3 => getColour(0.6f, 0.5f);
+        public Color4 Colour4 => getColour(0.4f, 0.3f);
+
         public Color4 Highlight1 => getColour(1, 0.7f);
         public Color4 Content1 => getColour(0.4f, 1);
         public Color4 Content2 => getColour(0.4f, 0.9f);
