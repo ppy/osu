@@ -32,6 +32,8 @@ namespace osu.Game.Skinning
 
         protected virtual bool AllowConfigurationLookup => true;
 
+        protected virtual bool AllowColourLookup => true;
+
         public SkinProvidingContainer(ISkin skin)
         {
             this.skin = skin;
@@ -68,11 +70,35 @@ namespace osu.Game.Skinning
 
         public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
         {
-            if (AllowConfigurationLookup && skin != null)
+            if (skin != null)
             {
-                var bindable = skin.GetConfig<TLookup, TValue>(lookup);
-                if (bindable != null)
-                    return bindable;
+                switch (lookup)
+                {
+                    // todo: the GlobalSkinColours switch is pulled from LegacySkin and should not exist.
+                    // will likely change based on how databased storage of skin configuration goes.
+                    case GlobalSkinColours global:
+                        switch (global)
+                        {
+                            case GlobalSkinColours.ComboColours:
+                                var bindable = skin.GetConfig<TLookup, TValue>(lookup);
+                                if (bindable != null && AllowColourLookup)
+                                    return bindable;
+                                else
+                                    return fallbackSource?.GetConfig<TLookup, TValue>(lookup);
+                        }
+
+                        break;
+
+                    default:
+                        if (AllowConfigurationLookup)
+                        {
+                            var bindable = skin.GetConfig<TLookup, TValue>(lookup);
+                            if (bindable != null)
+                                return bindable;
+                        }
+
+                        break;
+                }
             }
 
             return fallbackSource?.GetConfig<TLookup, TValue>(lookup);

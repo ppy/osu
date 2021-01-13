@@ -25,6 +25,17 @@ namespace osu.Game.Skinning
                 if (beatmapSkins == null)
                     throw new InvalidOperationException($"{nameof(BeatmapSkinProvidingContainer)} needs to be loaded before being consumed.");
 
+                return beatmapSkins.Value;
+            }
+        }
+
+        protected override bool AllowColourLookup
+        {
+            get
+            {
+                if (beatmapColours == null)
+                    throw new InvalidOperationException($"{nameof(BeatmapSkinProvidingContainer)} needs to be loaded before being consumed.");
+
                 return beatmapColours.Value;
             }
         }
