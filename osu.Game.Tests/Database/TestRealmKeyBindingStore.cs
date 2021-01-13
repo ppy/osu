@@ -62,7 +62,12 @@ namespace osu.Game.Tests.Database
 
             Assert.That(((IKeyBinding)backBinding).KeyCombination.Keys, Is.EquivalentTo(new[] { InputKey.Escape }));
 
-            keyBindingStore.Update(backBinding, binding => binding.KeyCombination = new KeyCombination(InputKey.BackSpace));
+            var binding = backBinding;
+
+            realmContextFactory.Context.Write(() =>
+            {
+                ((IKeyBinding)binding).KeyCombination = new KeyCombination(InputKey.BackSpace);
+            });
 
             Assert.That(((IKeyBinding)backBinding).KeyCombination.Keys, Is.EquivalentTo(new[] { InputKey.BackSpace }));
 

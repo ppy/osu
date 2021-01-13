@@ -59,32 +59,6 @@ namespace osu.Game.Input
             }
         }
 
-        /// <summary>
-        /// Update the database mapping for the provided key binding.
-        /// </summary>
-        /// <param name="keyBinding">The key binding to update. Can be detached from the database.</param>
-        /// <param name="modification">The modification to apply to the key binding.</param>
-        public void Update(IHasGuidPrimaryKey keyBinding, Action<IKeyBinding> modification)
-        {
-            // the incoming instance could already be a live access object.
-            Live<RealmKeyBinding>? realmBinding = keyBinding as Live<RealmKeyBinding>;
-
-            using (var realm = RealmFactory.GetForWrite())
-            {
-                if (realmBinding == null)
-                {
-                    // the incoming instance could be a raw realm object.
-                    if (!(keyBinding is RealmKeyBinding rkb))
-                        // if neither of the above cases succeeded, retrieve a realm object for further processing.
-                        rkb = realm.Context.Find<RealmKeyBinding>(keyBinding.ID);
-
-                    realmBinding = new Live<RealmKeyBinding>(rkb, RealmFactory);
-                }
-
-                realmBinding.PerformUpdate(modification);
-            }
-        }
-
         private void insertDefaults(IEnumerable<IKeyBinding> defaults, int? rulesetId = null, int? variant = null)
         {
             using (var usage = RealmFactory.GetForWrite())
