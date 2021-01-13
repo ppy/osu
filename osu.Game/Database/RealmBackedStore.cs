@@ -11,11 +11,11 @@ namespace osu.Game.Database
     {
         protected readonly Storage? Storage;
 
-        protected readonly IRealmFactory ContextFactory;
+        protected readonly IRealmFactory RealmFactory;
 
-        protected RealmBackedStore(IRealmFactory contextFactory, Storage? storage = null)
+        protected RealmBackedStore(IRealmFactory realmFactory, Storage? storage = null)
         {
-            ContextFactory = contextFactory;
+            RealmFactory = realmFactory;
             Storage = storage;
         }
 

@@ -9,7 +9,7 @@ using osu.Framework.Graphics;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Input;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets;
 using osuTK;
@@ -33,20 +33,25 @@ namespace osu.Game.Overlays.KeyBinding
         }
 
         [BackgroundDependencyLoader]
-        private void load(RealmKeyBindingStore store)
+        private void load(RealmContextFactory realmFactory)
         {
-            var bindings = store.Query(Ruleset?.ID, variant).Detach();
+            var rulesetId = Ruleset?.ID;
 
-            foreach (var defaultGroup in Defaults.GroupBy(d => d.Action))
+            using (var realm = realmFactory.Get())
             {
-                int intKey = (int)defaultGroup.Key;
+                var bindings = realm.All<RealmKeyBinding>().Where(b => b.RulesetID == rulesetId && b.Variant == variant).Detach();
 
-                // one row per valid action.
-                Add(new KeyBindingRow(defaultGroup.Key, bindings.Where(b => b.Action.Equals(intKey)))
+                foreach (var defaultGroup in Defaults.GroupBy(d => d.Action))
                 {
-                    AllowMainMouseButtons = Ruleset != null,
-                    Defaults = defaultGroup.Select(d => d.KeyCombination)
-                });
+                    int intKey = (int)defaultGroup.Key;
+
+                    // one row per valid action.
+                    Add(new KeyBindingRow(defaultGroup.Key, bindings.Where(b => b.Action.Equals(intKey)))
+                    {
+                        AllowMainMouseButtons = Ruleset != null,
+                        Defaults = defaultGroup.Select(d => d.KeyCombination)
+                    });
+                }
             }
 
             Add(new ResetButton

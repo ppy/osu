@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Input.Bindings;
 using osu.Game.Database;
 using osu.Game.Rulesets;
+using Realms;
 
 namespace osu.Game.Input.Bindings
 {
@@ -21,6 +22,9 @@ namespace osu.Game.Input.Bindings
         private readonly RulesetInfo ruleset;
 
         private readonly int? variant;
+
+        private IDisposable realmSubscription;
+        private IQueryable<RealmKeyBinding> realmKeyBindings;
 
         [Resolved]
         private RealmKeyBindingStore store { get; set; }
@@ -49,35 +53,42 @@ namespace osu.Game.Input.Bindings
 
         protected override void LoadComplete()
         {
+            var realm = realmFactory.Get();
+
+            if (ruleset == null || ruleset.ID.HasValue)
+            {
+                var rulesetId = ruleset?.ID;
+
+                realmKeyBindings = realm.All<RealmKeyBinding>()
+                                        .Where(b => b.RulesetID == rulesetId && b.Variant == variant);
+
+                realmSubscription = realmKeyBindings
+                    .SubscribeForNotifications((sender, changes, error) =>
+                    {
+                        // first subscription ignored as we are handling this in LoadComplete.
+                        if (changes == null)
+                            return;
+
+                        ReloadMappings();
+                    });
+            }
+
             base.LoadComplete();
-            store.KeyBindingChanged += ReloadMappings;
+        }
+
+        protected override void ReloadMappings()
+        {
+            if (realmKeyBindings != null)
+                KeyBindings = realmKeyBindings.Detach();
+            else
+                base.ReloadMappings();
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
 
-            if (store != null)
-                store.KeyBindingChanged -= ReloadMappings;
-        }
-
-        protected override void ReloadMappings()
-        {
-            if (ruleset != null && !ruleset.ID.HasValue)
-                // if the provided ruleset is not stored to the database, we have no way to retrieve custom bindings.
-                // fallback to defaults instead.
-                KeyBindings = DefaultKeyBindings;
-            else
-            {
-                var rulesetId = ruleset?.ID;
-
-                // #1
-                KeyBindings = store.Query(rulesetId, variant).Detach();
-
-                // #2 (Clearly shows lifetime of realm context access)
-                using (var realm = realmFactory.Get())
-                    KeyBindings = realm.All<RealmKeyBinding>().Where(b => b.RulesetID == rulesetId && b.Variant == variant).Detach();
-            }
+            realmSubscription?.Dispose();
         }
     }
 }

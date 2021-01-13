@@ -77,7 +77,7 @@ namespace osu.Game.Database
 
             try
             {
-                context = getContextForCurrentThread();
+                context = createContext();
 
                 currentWriteTransaction ??= context.BeginWrite();
             }
