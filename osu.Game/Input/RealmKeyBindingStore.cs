@@ -16,11 +16,6 @@ namespace osu.Game.Input
 {
     public class RealmKeyBindingStore : RealmBackedStore
     {
-        /// <summary>
-        /// Fired whenever any key binding change occurs, across all rulesets and types.
-        /// </summary>
-        public event Action? KeyBindingChanged;
-
         public RealmKeyBindingStore(RealmContextFactory realmFactory, Storage? storage = null)
             : base(realmFactory, storage)
         {
@@ -88,8 +83,6 @@ namespace osu.Game.Input
 
                 realmBinding.PerformUpdate(modification);
             }
-
-            KeyBindingChanged?.Invoke();
         }
 
         private void insertDefaults(IEnumerable<IKeyBinding> defaults, int? rulesetId = null, int? variant = null)
