@@ -34,6 +34,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly Box coverGradient;
         private readonly OsuSpriteText title, artist;
         private readonly AuthorInfo author;
+        private readonly ExplicitBeatmapPill explicitPill;
         private readonly FillFlowContainer downloadButtonsContainer;
         private readonly BeatmapAvailability beatmapAvailability;
         private readonly BeatmapSetOnlineStatusPill onlineStatusPill;
@@ -146,6 +147,13 @@ namespace osu.Game.Overlays.BeatmapSet
                                                         Origin = Anchor.BottomLeft,
                                                         Margin = new MarginPadding { Left = 3, Bottom = 4 }, // To better lineup with the font
                                                     },
+                                                    explicitPill = new ExplicitBeatmapPill
+                                                    {
+                                                        Alpha = 0f,
+                                                        Anchor = Anchor.CentreLeft,
+                                                        Origin = Anchor.CentreLeft,
+                                                        Margin = new MarginPadding { Left = 10f, Top = 4 },
+                                                    }
                                                 }
                                             },
                                             artist = new OsuSpriteText
@@ -252,6 +260,8 @@ namespace osu.Game.Overlays.BeatmapSet
 
                     title.Text = setInfo.NewValue.Metadata.Title ?? string.Empty;
                     artist.Text = setInfo.NewValue.Metadata.Artist ?? string.Empty;
+
+                    explicitPill.Alpha = setInfo.NewValue.OnlineInfo.HasExplicitContent ? 1 : 0;
 
                     onlineStatusPill.FadeIn(500, Easing.OutQuint);
                     onlineStatusPill.Status = setInfo.NewValue.OnlineInfo.Status;

@@ -236,6 +236,17 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
+        public void TestExplicitBeatmap()
+        {
+            AddStep("show explicit map", () =>
+            {
+                var beatmapSet = CreateBeatmap(Ruleset.Value).BeatmapInfo.BeatmapSet;
+                beatmapSet.OnlineInfo.HasExplicitContent = true;
+                overlay.ShowBeatmapSet(beatmapSet);
+            });
+        }
+
+        [Test]
         public void TestHide()
         {
             AddStep(@"hide", overlay.Hide);
