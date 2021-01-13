@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Input.Bindings;
-using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets;
@@ -14,11 +13,13 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Input
 {
-    public class RealmKeyBindingStore : RealmBackedStore
+    public class RealmKeyBindingStore
     {
-        public RealmKeyBindingStore(RealmContextFactory realmFactory, Storage? storage = null)
-            : base(realmFactory, storage)
+        private readonly RealmContextFactory realmFactory;
+
+        public RealmKeyBindingStore(RealmContextFactory realmFactory)
         {
+            this.realmFactory = realmFactory;
         }
 
         /// <summary>
@@ -28,7 +29,7 @@ namespace osu.Game.Input
         /// <returns>A set of display strings for all the user's key configuration for the action.</returns>
         public IEnumerable<string> GetReadableKeyCombinationsFor(GlobalAction globalAction)
         {
-            foreach (var action in RealmFactory.Context.All<RealmKeyBinding>().Where(b => (GlobalAction)b.ActionInt == globalAction))
+            foreach (var action in realmFactory.Context.All<RealmKeyBinding>().Where(b => (GlobalAction)b.ActionInt == globalAction))
             {
                 string str = action.KeyCombination.ReadableString();
 
@@ -52,7 +53,7 @@ namespace osu.Game.Input
         {
             var instance = ruleset.CreateInstance();
 
-            using (RealmFactory.GetForWrite())
+            using (realmFactory.GetForWrite())
             {
                 foreach (var variant in instance.AvailableVariants)
                     insertDefaults(instance.GetDefaultKeyBindings(variant), ruleset.ID, variant);
@@ -61,7 +62,7 @@ namespace osu.Game.Input
 
         private void insertDefaults(IEnumerable<IKeyBinding> defaults, int? rulesetId = null, int? variant = null)
         {
-            using (var usage = RealmFactory.GetForWrite())
+            using (var usage = realmFactory.GetForWrite())
             {
                 // compare counts in database vs defaults
                 foreach (var group in defaults.GroupBy(k => k.Action))
