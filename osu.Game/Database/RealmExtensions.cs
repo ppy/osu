@@ -56,7 +56,7 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Create a detached copy of the each item in the list.
+        /// Create a detached copy of the item.
         /// </summary>
         /// <param name="item">The managed <see cref="RealmObject"/> to detach.</param>
         /// <typeparam name="T">The type of object.</typeparam>
