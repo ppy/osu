@@ -55,6 +55,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void Update(Playfield playfield)
         {
+            playfield.DisplayJudgements.Value = true;
             if (hasReplay)
                 return;
 
@@ -107,7 +108,10 @@ namespace osu.Game.Rulesets.Osu.Mods
             void handleHitCircle(DrawableHitCircle circle)
             {
                 if (!circle.HitArea.IsHovered)
+                {
+                    playfield.DisplayJudgements.Value = false;
                     return;
+                }
 
                 Debug.Assert(circle.HitObject.HitWindows != null);
                 requiresHit |= circle.HitObject.HitWindows.CanBeHit(time - circle.HitObject.StartTime);
