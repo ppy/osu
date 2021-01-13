@@ -18,13 +18,12 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
     public class PreviewButton : OsuClickableContainer
     {
-        private const float transition_duration = 500;
-
         private readonly Box background, progress;
         private readonly PlayButton playButton;
 
         private PreviewTrack preview => playButton.Preview;
-        public Bindable<bool> Playing => playButton.Playing;
+
+        public IBindable<bool> Playing => playButton.Playing;
 
         public BeatmapSetInfo BeatmapSet
         {

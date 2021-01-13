@@ -1,14 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
+using osu.Game.Extensions;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
@@ -31,9 +34,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Resolved]
         private StatefulMultiplayerClient client { get; set; }
 
+        [Resolved]
+        private OngoingOperationTracker ongoingOperationTracker { get; set; }
+
         private MultiplayerMatchSettingsOverlay settingsOverlay;
 
         private IBindable<bool> isConnected;
+
+        [CanBeNull]
+        private IDisposable readyClickOperation;
 
         public MultiplayerMatchSubScreen(Room room)
         {
@@ -150,7 +159,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                         },
                         new Drawable[]
                         {
-                            new MultiplayerMatchFooter { SelectedItem = { BindTarget = SelectedItem } }
+                            new MultiplayerMatchFooter
+                            {
+                                SelectedItem = { BindTarget = SelectedItem },
+                                OnReadyClick = onReadyClick
+                            }
                         }
                     },
                     RowDimensions = new[]
@@ -196,6 +209,43 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private void onPlaylistChanged(object sender, NotifyCollectionChangedEventArgs e) => SelectedItem.Value = Playlist.FirstOrDefault();
 
+        private void onReadyClick()
+        {
+            Debug.Assert(readyClickOperation == null);
+            readyClickOperation = ongoingOperationTracker.BeginOperation();
+
+            if (client.IsHost && client.LocalUser?.State == MultiplayerUserState.Ready)
+            {
+                client.StartMatch()
+                      .ContinueWith(t =>
+                      {
+                          // accessing Exception here silences any potential errors from the antecedent task
+                          if (t.Exception != null)
+                          {
+                              t.CatchUnobservedExceptions(true); // will run immediately.
+                              // gameplay was not started due to an exception; unblock button.
+                              endOperation();
+                          }
+
+                          // gameplay is starting, the button will be unblocked on load requested.
+                      });
+                return;
+            }
+
+            client.ToggleReady()
+                  .ContinueWith(t =>
+                  {
+                      t.CatchUnobservedExceptions(true); // will run immediately.
+                      endOperation();
+                  });
+
+            void endOperation()
+            {
+                readyClickOperation?.Dispose();
+                readyClickOperation = null;
+            }
+        }
+
         private void onLoadRequested()
         {
             Debug.Assert(client.Room != null);
@@ -203,6 +253,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             int[] userIds = client.CurrentMatchPlayingUserIds.ToArray();
 
             StartPlay(() => new MultiplayerPlayer(SelectedItem.Value, userIds));
+
+            readyClickOperation?.Dispose();
+            readyClickOperation = null;
         }
 
         protected override void Dispose(bool isDisposing)

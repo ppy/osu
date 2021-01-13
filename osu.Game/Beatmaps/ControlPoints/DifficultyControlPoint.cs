@@ -39,5 +39,12 @@ namespace osu.Game.Beatmaps.ControlPoints
         public override bool IsRedundant(ControlPoint existing)
             => existing is DifficultyControlPoint existingDifficulty
                && SpeedMultiplier == existingDifficulty.SpeedMultiplier;
+
+        public override void CopyFrom(ControlPoint other)
+        {
+            SpeedMultiplier = ((DifficultyControlPoint)other).SpeedMultiplier;
+
+            base.CopyFrom(other);
+        }
     }
 }
