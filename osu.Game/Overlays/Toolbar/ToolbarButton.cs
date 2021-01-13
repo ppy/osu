@@ -165,13 +165,13 @@ namespace osu.Game.Overlays.Toolbar
 
             if (Hotkey != null)
             {
-                realmKeyBinding = realmFactory.Context.All<RealmKeyBinding>().FirstOrDefault(rkb => rkb.RulesetID == null && rkb.Action == (int)Hotkey.Value);
+                realmKeyBinding = realmFactory.Context.All<RealmKeyBinding>().FirstOrDefault(rkb => rkb.RulesetID == null && rkb.ActionInt == (int)Hotkey.Value);
 
                 if (realmKeyBinding != null)
                 {
                     realmKeyBinding.PropertyChanged += (sender, args) =>
                     {
-                        if (args.PropertyName == nameof(realmKeyBinding.KeyCombination))
+                        if (args.PropertyName == nameof(realmKeyBinding.KeyCombinationString))
                             updateKeyBindingTooltip();
                     };
                 }
@@ -223,7 +223,7 @@ namespace osu.Game.Overlays.Toolbar
         {
             if (realmKeyBinding != null)
             {
-                KeyCombination? binding = ((IKeyBinding)realmKeyBinding).KeyCombination;
+                KeyCombination? binding = realmKeyBinding.KeyCombination;
 
                 var keyBindingString = binding?.ReadableString();
 

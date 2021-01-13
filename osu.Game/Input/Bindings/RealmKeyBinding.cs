@@ -7,7 +7,7 @@ using Realms;
 
 namespace osu.Game.Input.Bindings
 {
-    [MapTo("KeyBinding")]
+    [MapTo(nameof(KeyBinding))]
     public class RealmKeyBinding : RealmObject, IHasGuidPrimaryKey, IKeyBinding
     {
         [PrimaryKey]
@@ -17,20 +17,22 @@ namespace osu.Game.Input.Bindings
 
         public int? Variant { get; set; }
 
-        KeyCombination IKeyBinding.KeyCombination
+        public KeyCombination KeyCombination
         {
-            get => KeyCombination;
-            set => KeyCombination = value.ToString();
+            get => KeyCombinationString;
+            set => KeyCombinationString = value.ToString();
         }
 
-        object IKeyBinding.Action
+        public object Action
         {
-            get => Action;
-            set => Action = (int)value;
+            get => ActionInt;
+            set => ActionInt = (int)value;
         }
 
-        public int Action { get; set; }
+        [MapTo(nameof(Action))]
+        public int ActionInt { get; set; }
 
-        public string KeyCombination { get; set; }
+        [MapTo(nameof(KeyCombination))]
+        public string KeyCombinationString { get; set; }
     }
 }

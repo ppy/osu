@@ -342,8 +342,8 @@ namespace osu.Game
                         realm.Context.Add(new RealmKeyBinding
                         {
                             ID = Guid.NewGuid().ToString(),
-                            KeyCombination = dkb.KeyCombination.ToString(),
-                            Action = (int)dkb.Action,
+                            KeyCombinationString = dkb.KeyCombination.ToString(),
+                            ActionInt = (int)dkb.Action,
                             RulesetID = dkb.RulesetID,
                             Variant = dkb.Variant
                         });

@@ -45,8 +45,8 @@ namespace osu.Game.Tests.Database
 
             Assert.That(query().Count, Is.EqualTo(3));
 
-            Assert.That(query().Where(k => k.Action == (int)GlobalAction.Back).Count, Is.EqualTo(1));
-            Assert.That(query().Where(k => k.Action == (int)GlobalAction.Select).Count, Is.EqualTo(2));
+            Assert.That(query().Where(k => k.ActionInt == (int)GlobalAction.Back).Count, Is.EqualTo(1));
+            Assert.That(query().Where(k => k.ActionInt == (int)GlobalAction.Select).Count, Is.EqualTo(2));
         }
 
         private IQueryable<RealmKeyBinding> query() => realmContextFactory.Context.All<RealmKeyBinding>();
@@ -58,22 +58,22 @@ namespace osu.Game.Tests.Database
 
             keyBindingStore.Register(testContainer);
 
-            var backBinding = query().Single(k => k.Action == (int)GlobalAction.Back);
+            var backBinding = query().Single(k => k.ActionInt == (int)GlobalAction.Back);
 
-            Assert.That(((IKeyBinding)backBinding).KeyCombination.Keys, Is.EquivalentTo(new[] { InputKey.Escape }));
+            Assert.That(backBinding.KeyCombination.Keys, Is.EquivalentTo(new[] { InputKey.Escape }));
 
             var binding = backBinding;
 
             realmContextFactory.Context.Write(() =>
             {
-                ((IKeyBinding)binding).KeyCombination = new KeyCombination(InputKey.BackSpace);
+                binding.KeyCombination = new KeyCombination(InputKey.BackSpace);
             });
 
-            Assert.That(((IKeyBinding)backBinding).KeyCombination.Keys, Is.EquivalentTo(new[] { InputKey.BackSpace }));
+            Assert.That(backBinding.KeyCombination.Keys, Is.EquivalentTo(new[] { InputKey.BackSpace }));
 
             // check still correct after re-query.
-            backBinding = query().Single(k => k.Action == (int)GlobalAction.Back);
-            Assert.That(((IKeyBinding)backBinding).KeyCombination.Keys, Is.EquivalentTo(new[] { InputKey.BackSpace }));
+            backBinding = query().Single(k => k.ActionInt == (int)GlobalAction.Back);
+            Assert.That(backBinding.KeyCombination.Keys, Is.EquivalentTo(new[] { InputKey.BackSpace }));
         }
 
         [TearDown]
