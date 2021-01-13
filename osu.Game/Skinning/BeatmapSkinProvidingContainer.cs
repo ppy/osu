@@ -28,7 +28,7 @@ namespace osu.Game.Skinning
                 return beatmapColours.Value;
             }
         }
-        
+
         protected override bool AllowDrawableLookup(ISkinComponent component)
         {
             if (beatmapSkins == null)
