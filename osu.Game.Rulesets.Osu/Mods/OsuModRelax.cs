@@ -144,7 +144,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor) => scoreProcessor.Combo.UnbindEvents();
 
-
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
     }
 }
