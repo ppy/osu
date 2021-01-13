@@ -22,6 +22,6 @@ namespace osu.Game.Database
         /// This method may block if a write is already active on a different thread.
         /// </summary>
         /// <returns>A usage containing a usable context.</returns>
-        RealmWriteUsage GetForWrite();
+        RealmContextFactory.RealmWriteUsage GetForWrite();
     }
 }
