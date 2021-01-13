@@ -12,7 +12,6 @@ using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
