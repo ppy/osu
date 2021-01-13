@@ -28,9 +28,9 @@ namespace osu.Game.Input
         /// <returns>A set of display strings for all the user's key configuration for the action.</returns>
         public IEnumerable<string> GetReadableKeyCombinationsFor(GlobalAction globalAction)
         {
-            foreach (var action in RealmFactory.Context.All<RealmKeyBinding>().Where(b => (GlobalAction)b.Action == globalAction))
+            foreach (var action in RealmFactory.Context.All<RealmKeyBinding>().Where(b => (GlobalAction)b.ActionInt == globalAction))
             {
-                string str = ((IKeyBinding)action).KeyCombination.ReadableString();
+                string str = action.KeyCombination.ReadableString();
 
                 // even if found, the readable string may be empty for an unbound action.
                 if (str.Length > 0)
@@ -66,7 +66,7 @@ namespace osu.Game.Input
                 // compare counts in database vs defaults
                 foreach (var group in defaults.GroupBy(k => k.Action))
                 {
-                    int count = usage.Context.All<RealmKeyBinding>().Count(k => k.RulesetID == rulesetId && k.Variant == variant && k.Action == (int)group.Key);
+                    int count = usage.Context.All<RealmKeyBinding>().Count(k => k.RulesetID == rulesetId && k.Variant == variant && k.ActionInt == (int)group.Key);
                     int aimCount = group.Count();
 
                     if (aimCount <= count)
@@ -78,8 +78,8 @@ namespace osu.Game.Input
                         usage.Context.Add(new RealmKeyBinding
                         {
                             ID = Guid.NewGuid().ToString(),
-                            KeyCombination = insertable.KeyCombination.ToString(),
-                            Action = (int)insertable.Action,
+                            KeyCombinationString = insertable.KeyCombination.ToString(),
+                            ActionInt = (int)insertable.Action,
                             RulesetID = rulesetId,
                             Variant = variant
                         });

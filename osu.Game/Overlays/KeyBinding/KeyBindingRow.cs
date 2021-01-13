@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.KeyBinding
         private FillFlowContainer cancelAndClearButtons;
         private FillFlowContainer<KeyButton> buttons;
 
-        public IEnumerable<string> FilterTerms => bindings.Select(b => ((IKeyBinding)b).KeyCombination.ReadableString()).Prepend((string)text.Text);
+        public IEnumerable<string> FilterTerms => bindings.Select(b => b.KeyCombination.ReadableString()).Prepend((string)text.Text);
 
         public KeyBindingRow(object action, List<RealmKeyBinding> bindings)
         {
@@ -132,7 +132,7 @@ namespace osu.Game.Overlays.KeyBinding
                 using (var write = realmFactory.GetForWrite())
                 {
                     var binding = write.Context.Find<RealmKeyBinding>(((IHasGuidPrimaryKey)button.KeyBinding).ID);
-                    binding.KeyCombination = button.KeyBinding.KeyCombination;
+                    binding.KeyCombinationString = button.KeyBinding.KeyCombinationString;
                 }
             }
         }
@@ -295,7 +295,7 @@ namespace osu.Game.Overlays.KeyBinding
                 using (var write = realmFactory.GetForWrite())
                 {
                     var binding = write.Context.Find<RealmKeyBinding>(((IHasGuidPrimaryKey)bindTarget.KeyBinding).ID);
-                    binding.KeyCombination = bindTarget.KeyBinding.KeyCombination;
+                    binding.KeyCombinationString = bindTarget.KeyBinding.KeyCombinationString;
                 }
 
                 bindTarget.IsBinding = false;
@@ -429,7 +429,7 @@ namespace osu.Game.Overlays.KeyBinding
                         Margin = new MarginPadding(5),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Text = ((IKeyBinding)keyBinding).KeyCombination.ReadableString(),
+                        Text = keyBinding.KeyCombination.ReadableString(),
                     },
                 };
             }
@@ -468,10 +468,8 @@ namespace osu.Game.Overlays.KeyBinding
 
             public void UpdateKeyCombination(KeyCombination newCombination)
             {
-                var keyBinding = (IKeyBinding)KeyBinding;
-
-                keyBinding.KeyCombination = newCombination;
-                Text.Text = keyBinding.KeyCombination.ReadableString();
+                KeyBinding.KeyCombination = newCombination;
+                Text.Text = KeyBinding.KeyCombination.ReadableString();
             }
         }
     }
