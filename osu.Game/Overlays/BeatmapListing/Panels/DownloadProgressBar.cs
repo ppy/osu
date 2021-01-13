@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                         progressBar.ResizeHeightTo(4, 400, Easing.OutQuint);
                         break;
 
-                    case DownloadState.Downloaded:
+                    case DownloadState.Importing:
                         progressBar.FadeIn(400, Easing.OutQuint);
                         progressBar.ResizeHeightTo(4, 400, Easing.OutQuint);
 
