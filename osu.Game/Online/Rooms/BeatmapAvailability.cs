@@ -30,7 +30,7 @@ namespace osu.Game.Online.Rooms
 
         public static BeatmapAvailability NotDownloaded() => new BeatmapAvailability(DownloadState.NotDownloaded);
         public static BeatmapAvailability Downloading(double progress) => new BeatmapAvailability(DownloadState.Downloading, progress);
-        public static BeatmapAvailability Importing() => new BeatmapAvailability(DownloadState.Downloaded);
+        public static BeatmapAvailability Importing() => new BeatmapAvailability(DownloadState.Importing);
         public static BeatmapAvailability LocallyAvailable() => new BeatmapAvailability(DownloadState.LocallyAvailable);
 
         public bool Equals(BeatmapAvailability other) => other != null && State == other.State && DownloadProgress == other.DownloadProgress;
