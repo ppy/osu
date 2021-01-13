@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (Attributes.ApproachRate > 10.33)
                 approachRateFactor += 0.4 * (Attributes.ApproachRate - 10.33);
             else if (Attributes.ApproachRate < 8.0)
-                approachRateFactor += 0.1 * (8.0 - Attributes.ApproachRate);
+                approachRateFactor += 0.01 * (8.0 - Attributes.ApproachRate);
 
             aimValue *= 1.0 + Math.Min(approachRateFactor, approachRateFactor * (totalHits / 1000.0));
 
