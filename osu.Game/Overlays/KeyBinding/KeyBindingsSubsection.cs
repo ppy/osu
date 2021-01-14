@@ -37,21 +37,21 @@ namespace osu.Game.Overlays.KeyBinding
         {
             var rulesetId = Ruleset?.ID;
 
+            List<RealmKeyBinding> bindings;
+
             using (var realm = realmFactory.GetForRead())
+                bindings = realm.All<RealmKeyBinding>().Where(b => b.RulesetID == rulesetId && b.Variant == variant).Detach();
+
+            foreach (var defaultGroup in Defaults.GroupBy(d => d.Action))
             {
-                var bindings = realm.All<RealmKeyBinding>().Where(b => b.RulesetID == rulesetId && b.Variant == variant).Detach();
+                int intKey = (int)defaultGroup.Key;
 
-                foreach (var defaultGroup in Defaults.GroupBy(d => d.Action))
+                // one row per valid action.
+                Add(new KeyBindingRow(defaultGroup.Key, bindings.Where(b => b.ActionInt.Equals(intKey)).ToList())
                 {
-                    int intKey = (int)defaultGroup.Key;
-
-                    // one row per valid action.
-                    Add(new KeyBindingRow(defaultGroup.Key, bindings.Where(b => b.ActionInt.Equals(intKey)).ToList())
-                    {
-                        AllowMainMouseButtons = Ruleset != null,
-                        Defaults = defaultGroup.Select(d => d.KeyCombination)
-                    });
-                }
+                    AllowMainMouseButtons = Ruleset != null,
+                    Defaults = defaultGroup.Select(d => d.KeyCombination)
+                });
             }
 
             Add(new ResetButton
