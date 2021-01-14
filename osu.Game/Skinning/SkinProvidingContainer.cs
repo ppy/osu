@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
+using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {
@@ -72,22 +73,12 @@ namespace osu.Game.Skinning
         {
             if (skin != null)
             {
-                switch (lookup)
-                {
-                    // todo: the GlobalSkinColours switch is pulled from LegacySkin and should not exist.
-                    // will likely change based on how databased storage of skin configuration goes.
-                    case GlobalSkinColours global:
-                        switch (global)
-                        {
-                            case GlobalSkinColours.ComboColours:
-                                return getBindable<TLookup, TValue>(lookup, AllowColourLookup);
-                        }
+                TValue tValueTypeCheck = default;
 
-                        break;
-
-                    default:
-                        return getBindable<TLookup, TValue>(lookup, AllowConfigurationLookup);
-                }
+                if (lookup is GlobalSkinColours || tValueTypeCheck is Color4)
+                    return lookupWithFallback<TLookup, TValue>(lookup, AllowColourLookup);
+                else
+                    return lookupWithFallback<TLookup, TValue>(lookup, AllowConfigurationLookup);
             }
 
             return fallbackSource?.GetConfig<TLookup, TValue>(lookup);
