@@ -1,8 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Threading;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -92,19 +92,42 @@ namespace osu.Game.Database
         {
         }
 
-        public class RealmWriteUsage : InvokeOnDisposal<RealmContextFactory>
+        /// <summary>
+        /// A transaction used for making changes to realm data.
+        /// </summary>
+        public class RealmWriteUsage : IDisposable
         {
-            public readonly Realm Context;
+            public readonly Realm Realm;
 
-            public RealmWriteUsage(RealmContextFactory factory)
-                : base(factory, usageCompleted)
+            private readonly RealmContextFactory factory;
+            private readonly Transaction transaction;
+
+            internal RealmWriteUsage(RealmContextFactory factory)
             {
-                Context = factory.createContext();
-                Context.BeginWrite();
+                this.factory = factory;
+
+                Realm = factory.createContext();
+                transaction = Realm.BeginWrite();
             }
 
-            private static void usageCompleted(RealmContextFactory factory)
+            /// <summary>
+            /// Commit all changes made in this transaction.
+            /// </summary>
+            public void Commit() => transaction.Commit();
+
+            /// <summary>
+            /// Revert all changes made in this transaction.
+            /// </summary>
+            public void Rollback() => transaction.Rollback();
+
+            /// <summary>
+            /// Disposes this instance, calling the initially captured action.
+            /// </summary>
+            public virtual void Dispose()
             {
+                // rollback if not explicitly committed.
+                transaction?.Dispose();
+
                 Monitor.Exit(factory.writeLock);
                 pending_writes.Value--;
             }
