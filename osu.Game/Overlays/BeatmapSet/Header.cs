@@ -152,7 +152,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                                         Alpha = 0f,
                                                         Anchor = Anchor.CentreLeft,
                                                         Origin = Anchor.CentreLeft,
-                                                        Margin = new MarginPadding { Left = 10f, Top = 4 },
+                                                        Margin = new MarginPadding { Left = 15f, Top = 4 },
                                                     }
                                                 }
                                             },
