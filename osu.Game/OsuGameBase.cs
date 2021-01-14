@@ -330,16 +330,16 @@ namespace osu.Game
         private void migrateDataToRealm()
         {
             using (var db = contextFactory.GetForWrite())
-            using (var realm = realmFactory.GetForWrite())
+            using (var usage = realmFactory.GetForWrite())
             {
                 var existingBindings = db.Context.DatabasedKeyBinding;
 
                 // only migrate data if the realm database is empty.
-                if (!realm.Context.All<RealmKeyBinding>().Any())
+                if (!usage.Realm.All<RealmKeyBinding>().Any())
                 {
                     foreach (var dkb in existingBindings)
                     {
-                        realm.Context.Add(new RealmKeyBinding
+                        usage.Realm.Add(new RealmKeyBinding
                         {
                             ID = Guid.NewGuid().ToString(),
                             KeyCombinationString = dkb.KeyCombination.ToString(),
@@ -351,6 +351,8 @@ namespace osu.Game
                 }
 
                 db.Context.RemoveRange(existingBindings);
+
+                usage.Commit();
             }
         }
 

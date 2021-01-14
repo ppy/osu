@@ -53,11 +53,8 @@ namespace osu.Game.Input
         {
             var instance = ruleset.CreateInstance();
 
-            using (realmFactory.GetForWrite())
-            {
-                foreach (var variant in instance.AvailableVariants)
-                    insertDefaults(instance.GetDefaultKeyBindings(variant), ruleset.ID, variant);
-            }
+            foreach (var variant in instance.AvailableVariants)
+                insertDefaults(instance.GetDefaultKeyBindings(variant), ruleset.ID, variant);
         }
 
         private void insertDefaults(IEnumerable<IKeyBinding> defaults, int? rulesetId = null, int? variant = null)
@@ -67,7 +64,7 @@ namespace osu.Game.Input
                 // compare counts in database vs defaults
                 foreach (var group in defaults.GroupBy(k => k.Action))
                 {
-                    int count = usage.Context.All<RealmKeyBinding>().Count(k => k.RulesetID == rulesetId && k.Variant == variant && k.ActionInt == (int)group.Key);
+                    int count = usage.Realm.All<RealmKeyBinding>().Count(k => k.RulesetID == rulesetId && k.Variant == variant && k.ActionInt == (int)group.Key);
                     int aimCount = group.Count();
 
                     if (aimCount <= count)
@@ -76,7 +73,7 @@ namespace osu.Game.Input
                     foreach (var insertable in group.Skip(count).Take(aimCount - count))
                     {
                         // insert any defaults which are missing.
-                        usage.Context.Add(new RealmKeyBinding
+                        usage.Realm.Add(new RealmKeyBinding
                         {
                             ID = Guid.NewGuid().ToString(),
                             KeyCombinationString = insertable.KeyCombination.ToString(),
@@ -86,6 +83,8 @@ namespace osu.Game.Input
                         });
                     }
                 }
+
+                usage.Commit();
             }
         }
     }
