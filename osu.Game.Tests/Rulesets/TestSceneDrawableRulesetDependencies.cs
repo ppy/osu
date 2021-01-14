@@ -9,7 +9,6 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -107,6 +106,8 @@ namespace osu.Game.Tests.Rulesets
             }
 
             public SampleChannel Get(string name) => null;
+
+            public SampleChannel GetLayerable(string sampleName) => null;
 
             public Task<SampleChannel> GetAsync(string name) => null;
 

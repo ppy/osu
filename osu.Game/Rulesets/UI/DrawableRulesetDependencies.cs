@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
@@ -103,7 +102,9 @@ namespace osu.Game.Rulesets.UI
                 this.fallback = fallback;
             }
 
-            public SampleChannel Get(string name) => primary.Get(name) ?? fallback.Get(name);
+            public SampleChannel Get(string sampleName) => primary.Get(sampleName) ?? fallback.Get(sampleName);
+
+            public SampleChannel GetLayerable(string sampleName) => primary.GetLayerable(sampleName) ?? fallback.GetLayerable(sampleName);
 
             public Task<SampleChannel> GetAsync(string name) => primary.GetAsync(name) ?? fallback.GetAsync(name);
 
