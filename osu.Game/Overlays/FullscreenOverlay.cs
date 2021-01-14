@@ -32,23 +32,16 @@ namespace osu.Game.Overlays
         [Cached]
         protected OngoingOperationTracker OngoingOperationTracker { get; private set; }
 
+        protected override Container<Drawable> Content => content;
+
         private readonly LoadingLayer loadingLayer;
+        private readonly Container content;
 
         protected FullscreenOverlay(OverlayColourScheme colourScheme, T header)
         {
             Header = header;
             ColourProvider = new OverlayColourProvider(colourScheme);
 
-            AddRangeInternal(new Drawable[]
-            {
-                loadingLayer = new LoadingLayer(true),
-                OngoingOperationTracker = new OngoingOperationTracker()
-            });
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
             RelativeSizeAxes = Axes.Both;
             RelativePositionAxes = Axes.Both;
             Width = 0.85f;
@@ -61,7 +54,21 @@ namespace osu.Game.Overlays
                 Type = EdgeEffectType.Shadow,
                 Radius = 10
             };
+            base.Content.AddRange(new Drawable[]
+            {
+                content = new Container
+                {
+                    RelativeSizeAxes = Axes.Both
+                },
+                loadingLayer = new LoadingLayer(true),
+            });
 
+            AddInternal(OngoingOperationTracker = new OngoingOperationTracker());
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             Waves.FirstWaveColour = ColourProvider.Light4;
             Waves.SecondWaveColour = ColourProvider.Light3;
             Waves.ThirdWaveColour = ColourProvider.Dark4;
@@ -78,7 +85,7 @@ namespace osu.Game.Overlays
                     loadingLayer.Show();
                 else
                     loadingLayer.Hide();
-            });
+            }, true);
         }
 
         public override void Show()
