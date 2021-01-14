@@ -260,17 +260,10 @@ namespace osu.Game.Beatmaps
             }
             catch (BeatmapInvalidForRulesetException e)
             {
-                // Conversion has failed for the given ruleset, so return the difficulty in the beatmap's default ruleset.
-
-                // Ensure the beatmap's default ruleset isn't the one already being converted to.
-                // This shouldn't happen as it means something went seriously wrong, but if it does an endless loop should be avoided.
                 if (rulesetInfo.Equals(beatmapInfo.Ruleset))
-                {
                     Logger.Error(e, $"Failed to convert {beatmapInfo.OnlineBeatmapID} to the beatmap's default ruleset ({beatmapInfo.Ruleset}).");
-                    return new StarDifficulty();
-                }
 
-                return GetAsync(new DifficultyCacheLookup(key.Beatmap, key.Beatmap.Ruleset, key.OrderedMods)).Result;
+                return new StarDifficulty();
             }
             catch
             {
