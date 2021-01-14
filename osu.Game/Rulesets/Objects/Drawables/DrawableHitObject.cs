@@ -303,7 +303,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             samplesBindable.CollectionChanged -= onSamplesChanged;
 
             // Release the samples for other hitobjects to use.
-            Samples.Samples = null;
+            if (Samples != null)
+                Samples.Samples = null;
 
             if (nestedHitObjects.IsValueCreated)
             {
@@ -749,7 +750,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 if (Result.Type != originalType)
                 {
                     Logger.Log($"{GetType().ReadableName()} applied an invalid hit result ({originalType}) when {nameof(HitResult.IgnoreMiss)} or {nameof(HitResult.IgnoreHit)} is expected.\n"
-                               + $"This has been automatically adjusted to {Result.Type}, and support will be removed from 2020-03-28 onwards.", level: LogLevel.Important);
+                               + $"This has been automatically adjusted to {Result.Type}, and support will be removed from 2021-03-28 onwards.", level: LogLevel.Important);
                 }
             }
 

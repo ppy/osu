@@ -34,6 +34,12 @@ namespace osu.Game.Screens
             return false;
         }
 
+        /// <summary>
+        /// Apply arbitrary changes to this background in a thread safe manner.
+        /// </summary>
+        /// <param name="action">The operation to perform.</param>
+        public void ApplyToBackground(Action<BackgroundScreen> action) => Schedule(() => action.Invoke(this));
+
         protected override void Update()
         {
             base.Update();

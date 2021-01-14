@@ -30,6 +30,8 @@ using osu.Game.Database;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
+using osu.Game.Online;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
 using osu.Game.Resources;
@@ -52,6 +54,8 @@ namespace osu.Game
         public const string CLIENT_STREAM_NAME = "lazer";
 
         public const int SAMPLE_CONCURRENCY = 6;
+
+        public bool UseDevelopmentServer { get; }
 
         protected OsuConfigManager LocalConfig;
 
@@ -78,6 +82,7 @@ namespace osu.Game
         protected IAPIProvider API;
 
         private SpectatorStreamingClient spectatorStreaming;
+        private StatefulMultiplayerClient multiplayerClient;
 
         protected MenuCursorContainer MenuCursorContainer;
 
@@ -130,6 +135,7 @@ namespace osu.Game
 
         public OsuGameBase()
         {
+            UseDevelopmentServer = DebugUtils.IsDebugBuild;
             Name = @"osu!lazer";
         }
 
@@ -168,7 +174,7 @@ namespace osu.Game
             dependencies.Cache(largeStore);
 
             dependencies.CacheAs(this);
-            dependencies.Cache(LocalConfig);
+            dependencies.CacheAs(LocalConfig);
 
             AddFont(Resources, @"Fonts/osuFont");
 
@@ -208,9 +214,12 @@ namespace osu.Game
                 }
             });
 
-            dependencies.CacheAs(API ??= new APIAccess(LocalConfig));
+            EndpointConfiguration endpoints = UseDevelopmentServer ? (EndpointConfiguration)new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
 
-            dependencies.CacheAs(spectatorStreaming = new SpectatorStreamingClient());
+            dependencies.CacheAs(API ??= new APIAccess(LocalConfig, endpoints));
+
+            dependencies.CacheAs(spectatorStreaming = new SpectatorStreamingClient(endpoints));
+            dependencies.CacheAs(multiplayerClient = new MultiplayerClient(endpoints));
 
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 
@@ -277,6 +286,7 @@ namespace osu.Game
             if (API is APIAccess apiAccess)
                 AddInternal(apiAccess);
             AddInternal(spectatorStreaming);
+            AddInternal(multiplayerClient);
 
             AddInternal(RulesetConfigCache);
 
@@ -365,7 +375,21 @@ namespace osu.Game
             // may be non-null for certain tests
             Storage ??= host.Storage;
 
-            LocalConfig ??= new OsuConfigManager(Storage);
+            LocalConfig ??= UseDevelopmentServer
+                ? new DevelopmentOsuConfigManager(Storage)
+                : new OsuConfigManager(Storage);
+        }
+
+        /// <summary>
+        /// Use to programatically exit the game as if the user was triggering via alt-f4.
+        /// Will keep persisting until an exit occurs (exit may be blocked multiple times).
+        /// </summary>
+        public void GracefullyExit()
+        {
+            if (!OnExiting())
+                Exit();
+            else
+                Scheduler.AddDelayed(GracefullyExit, 2000);
         }
 
         protected override Storage CreateStorage(GameHost host, Storage defaultStorage) => new OsuStorage(host, defaultStorage);
@@ -395,7 +419,7 @@ namespace osu.Game
             }
         }
 
-        public async Task Import(Stream stream, string filename)
+        public virtual async Task Import(Stream stream, string filename)
         {
             var extension = Path.GetExtension(filename)?.ToLowerInvariant();
 

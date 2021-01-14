@@ -12,11 +12,13 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Online;
 using osu.Game.Online.Spectator;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Beatmaps.IO;
 using osu.Game.Users;
@@ -231,11 +233,16 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         public class TestSpectatorStreamingClient : SpectatorStreamingClient
         {
-            public readonly User StreamingUser = new User { Id = 1234, Username = "Test user" };
+            public readonly User StreamingUser = new User { Id = 55, Username = "Test user" };
 
             public new BindableList<int> PlayingUsers => (BindableList<int>)base.PlayingUsers;
 
             private int beatmapId;
+
+            public TestSpectatorStreamingClient()
+                : base(new DevelopmentEndpointConfiguration())
+            {
+            }
 
             protected override Task Connect()
             {
@@ -272,7 +279,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     frames.Add(new LegacyReplayFrame(i * 100, RNG.Next(0, 512), RNG.Next(0, 512), buttonState));
                 }
 
-                var bundle = new FrameDataBundle(frames);
+                var bundle = new FrameDataBundle(new ScoreInfo(), frames);
                 ((ISpectatorClient)this).UserSentFrames(StreamingUser.Id, bundle);
 
                 if (!sentState)

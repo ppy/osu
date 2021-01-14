@@ -28,6 +28,11 @@ namespace osu.Game.Screens.Play
 
         public const Easing FADE_EASING = Easing.Out;
 
+        /// <summary>
+        /// The total height of all the top of screen scoring elements.
+        /// </summary>
+        public float TopScoringElementsHeight { get; private set; }
+
         public readonly KeyCounterDisplay KeyCounter;
         public readonly SkinnableComboCounter ComboCounter;
         public readonly SkinnableScoreCounter ScoreCounter;
@@ -209,7 +214,7 @@ namespace osu.Game.Screens.Play
             // HACK: for now align with the accuracy counter.
             // this is done for the sake of hacky legacy skins which extend the health bar to take up the full screen area.
             // it only works with the default skin due to padding offsetting it *just enough* to coexist.
-            topRightElements.Y = ToLocalSpace(AccuracyCounter.Drawable.ScreenSpaceDrawQuad.BottomRight).Y;
+            topRightElements.Y = TopScoringElementsHeight = ToLocalSpace(AccuracyCounter.Drawable.ScreenSpaceDrawQuad.BottomRight).Y;
 
             bottomRightElements.Y = -Progress.Height;
         }

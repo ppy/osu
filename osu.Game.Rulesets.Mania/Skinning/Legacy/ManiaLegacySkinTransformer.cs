@@ -136,7 +136,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
             string filename = this.GetManiaSkinConfig<string>(hitresult_mapping[result])?.Value
                               ?? default_hitresult_skin_filenames[result];
 
-            return this.GetAnimation(filename, true, true);
+            var animation = this.GetAnimation(filename, true, true);
+            return animation == null ? null : new LegacyManiaJudgementPiece(result, animation);
         }
 
         public override SampleChannel GetSample(ISampleInfo sampleInfo)

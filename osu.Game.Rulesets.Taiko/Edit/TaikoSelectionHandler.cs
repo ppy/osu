@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Taiko.Edit
             base.UpdateTernaryStates();
 
             selectionRimState.Value = GetStateFromSelection(EditorBeatmap.SelectedHitObjects.OfType<Hit>(), h => h.Type == HitType.Rim);
-            selectionStrongState.Value = GetStateFromSelection(EditorBeatmap.SelectedHitObjects.OfType<TaikoHitObject>(), h => h.IsStrong);
+            selectionStrongState.Value = GetStateFromSelection(EditorBeatmap.SelectedHitObjects.OfType<TaikoStrongableHitObject>(), h => h.IsStrong);
         }
     }
 }

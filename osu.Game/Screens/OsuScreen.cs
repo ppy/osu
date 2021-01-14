@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -114,11 +115,17 @@ namespace osu.Game.Screens
             Mods = screenDependencies.Mods;
         }
 
-        protected BackgroundScreen Background => backgroundStack?.CurrentScreen as BackgroundScreen;
+        /// <summary>
+        /// The background created and owned by this screen. May be null if the background didn't change.
+        /// </summary>
+        [CanBeNull]
+        private BackgroundScreen ownedBackground;
 
-        private BackgroundScreen localBackground;
+        [CanBeNull]
+        private BackgroundScreen background;
 
         [Resolved(canBeNull: true)]
+        [CanBeNull]
         private BackgroundScreenStack backgroundStack { get; set; }
 
         [Resolved(canBeNull: true)]
@@ -136,8 +143,27 @@ namespace osu.Game.Screens
         private void load(OsuGame osu, AudioManager audio)
         {
             sampleExit = audio.Samples.Get(@"UI/screen-back");
+        }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
             Activity.Value ??= InitialActivity;
+        }
+
+        /// <summary>
+        /// Apply arbitrary changes to the current background screen in a thread safe manner.
+        /// </summary>
+        /// <param name="action">The operation to perform.</param>
+        public void ApplyToBackground(Action<BackgroundScreen> action)
+        {
+            if (backgroundStack == null)
+                throw new InvalidOperationException("Attempted to apply to background without a background stack being available.");
+
+            if (background == null)
+                throw new InvalidOperationException("Attempted to apply to background before screen is pushed.");
+
+            background.ApplyToBackground(action);
         }
 
         public override void OnResuming(IScreen last)
@@ -160,7 +186,16 @@ namespace osu.Game.Screens
         {
             applyArrivingDefaults(false);
 
-            backgroundStack?.Push(localBackground = CreateBackground());
+            backgroundStack?.Push(ownedBackground = CreateBackground());
+
+            background = backgroundStack?.CurrentScreen as BackgroundScreen;
+
+            if (background != ownedBackground)
+            {
+                // background may have not been replaced, at which point we don't want to track the background lifetime.
+                ownedBackground?.Dispose();
+                ownedBackground = null;
+            }
 
             base.OnEntering(last);
         }
@@ -173,7 +208,7 @@ namespace osu.Game.Screens
             if (base.OnExiting(next))
                 return true;
 
-            if (localBackground != null && backgroundStack?.CurrentScreen == localBackground)
+            if (ownedBackground != null && backgroundStack?.CurrentScreen == ownedBackground)
                 backgroundStack?.Exit();
 
             return false;

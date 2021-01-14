@@ -8,12 +8,12 @@ using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
-using osu.Framework.Platform;
 using osu.Framework.IO.Stores;
+using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests;
-using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.IO;
+using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
 using osu.Game.Users;
 using osuTK.Input;
@@ -40,6 +40,8 @@ namespace osu.Game.Tournament
             Resources.AddStore(new DllResourceStore(typeof(TournamentGameBase).Assembly));
 
             dependencies.CacheAs<Storage>(storage = new TournamentStorage(baseStorage));
+            dependencies.CacheAs(storage);
+
             dependencies.Cache(new TournamentVideoResourceStore(storage));
 
             Textures.AddStore(new TextureLoaderStore(new StorageBackedResourceStore(storage)));
@@ -60,7 +62,7 @@ namespace osu.Game.Tournament
             {
                 using (Stream stream = storage.GetStream(bracket_filename, FileAccess.Read, FileMode.Open))
                 using (var sr = new StreamReader(stream))
-                    ladder = JsonConvert.DeserializeObject<LadderInfo>(sr.ReadToEnd());
+                    ladder = JsonConvert.DeserializeObject<LadderInfo>(sr.ReadToEnd(), new JsonPointConverter());
             }
 
             ladder ??= new LadderInfo();
@@ -251,6 +253,7 @@ namespace osu.Game.Tournament
                         Formatting = Formatting.Indented,
                         NullValueHandling = NullValueHandling.Ignore,
                         DefaultValueHandling = DefaultValueHandling.Ignore,
+                        Converters = new JsonConverter[] { new JsonPointConverter() }
                     }));
             }
         }
