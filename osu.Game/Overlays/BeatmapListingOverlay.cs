@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -17,7 +18,6 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Overlays.BeatmapListing.Panels;
 using osuTK;
@@ -29,8 +29,9 @@ namespace osu.Game.Overlays
         [Resolved]
         private PreviewTrackManager previewTrackManager { get; set; }
 
+        private IDisposable beatmapsLoadedOperation;
+
         private Drawable currentContent;
-        private LoadingLayer loadingLayer;
         private Container panelTarget;
         private FillFlowContainer<BeatmapPanel> foundContent;
         private NotFoundDrawable notFoundContent;
@@ -98,8 +99,7 @@ namespace osu.Game.Overlays
                             },
                         }
                     },
-                },
-                loadingLayer = new LoadingLayer(true)
+                }
             };
         }
 
@@ -125,7 +125,7 @@ namespace osu.Game.Overlays
             previewTrackManager.StopAnyPlaying(this);
 
             if (panelTarget.Any())
-                loadingLayer.Show();
+                beatmapsLoadedOperation ??= OngoingOperationTracker.BeginOperation();
         }
 
         private Task panelLoadDelegate;
@@ -173,7 +173,9 @@ namespace osu.Game.Overlays
 
         private void addContentToPlaceholder(Drawable content)
         {
-            loadingLayer.Hide();
+            beatmapsLoadedOperation?.Dispose();
+            beatmapsLoadedOperation = null;
+
             lastFetchDisplayedTime = Time.Current;
 
             var lastContent = currentContent;
