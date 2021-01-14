@@ -62,22 +62,21 @@ namespace osu.Game.Input
             using (var usage = realmFactory.GetForWrite())
             {
                 // compare counts in database vs defaults
-                foreach (var group in defaults.GroupBy(k => k.Action))
+                foreach (var defaultsForAction in defaults.GroupBy(k => k.Action))
                 {
-                    int count = usage.Realm.All<RealmKeyBinding>().Count(k => k.RulesetID == rulesetId && k.Variant == variant && k.ActionInt == (int)group.Key);
-                    int aimCount = group.Count();
+                    int existingCount = usage.Realm.All<RealmKeyBinding>().Count(k => k.RulesetID == rulesetId && k.Variant == variant && k.ActionInt == (int)defaultsForAction.Key);
 
-                    if (aimCount <= count)
+                    if (defaultsForAction.Count() <= existingCount)
                         continue;
 
-                    foreach (var insertable in group.Skip(count).Take(aimCount - count))
+                    foreach (var k in defaultsForAction.Skip(existingCount))
                     {
                         // insert any defaults which are missing.
                         usage.Realm.Add(new RealmKeyBinding
                         {
                             ID = Guid.NewGuid().ToString(),
-                            KeyCombinationString = insertable.KeyCombination.ToString(),
-                            ActionInt = (int)insertable.Action,
+                            KeyCombinationString = k.KeyCombination.ToString(),
+                            ActionInt = (int)k.Action,
                             RulesetID = rulesetId,
                             Variant = variant
                         });
