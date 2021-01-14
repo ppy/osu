@@ -1,13 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.News;
 using osu.Game.Overlays.News.Displays;
 
@@ -17,8 +17,9 @@ namespace osu.Game.Overlays
     {
         private readonly Bindable<string> article = new Bindable<string>(null);
 
+        private IDisposable displayLoadedOperation;
+
         private Container content;
-        private LoadingLayer loading;
         private OverlayScrollContainer scrollFlow;
 
         public NewsOverlay()
@@ -58,8 +59,7 @@ namespace osu.Game.Overlays
                             }
                         },
                     },
-                },
-                loading = new LoadingLayer(true),
+                }
             };
         }
 
@@ -107,7 +107,7 @@ namespace osu.Game.Overlays
         private void onArticleChanged(ValueChangedEvent<string> e)
         {
             cancellationToken?.Cancel();
-            loading.Show();
+            displayLoadedOperation ??= OngoingOperationTracker.BeginOperation();
 
             if (e.NewValue == null)
             {
@@ -126,7 +126,9 @@ namespace osu.Game.Overlays
             LoadComponentAsync(display, loaded =>
             {
                 content.Child = loaded;
-                loading.Hide();
+
+                displayLoadedOperation?.Dispose();
+                displayLoadedOperation = null;
             }, (cancellationToken = new CancellationTokenSource()).Token);
         }
 
