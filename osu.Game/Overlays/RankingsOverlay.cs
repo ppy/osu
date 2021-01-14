@@ -11,9 +11,9 @@ using osu.Game.Users;
 using osu.Game.Rulesets;
 using osu.Game.Online.API;
 using System.Threading;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Rankings.Tables;
+using System;
 
 namespace osu.Game.Overlays
 {
@@ -25,7 +25,7 @@ namespace osu.Game.Overlays
 
         private readonly OverlayScrollContainer scrollFlow;
         private readonly Container contentContainer;
-        private readonly LoadingLayer loading;
+        private IDisposable displayLoadedOperation;
         private readonly Box background;
 
         private APIRequest lastRequest;
@@ -42,8 +42,6 @@ namespace osu.Game.Overlays
                 Depth = -float.MaxValue
             })
         {
-            loading = new LoadingLayer(true);
-
             Children = new Drawable[]
             {
                 background = new Box
@@ -80,8 +78,7 @@ namespace osu.Game.Overlays
                             }
                         }
                     }
-                },
-                loading
+                }
             };
         }
 
@@ -147,8 +144,6 @@ namespace osu.Game.Overlays
 
         private void loadNewContent()
         {
-            loading.Show();
-
             cancellationToken?.Cancel();
             lastRequest?.Cancel();
 
@@ -160,6 +155,8 @@ namespace osu.Game.Overlays
                 });
                 return;
             }
+
+            displayLoadedOperation ??= OngoingOperationTracker.BeginOperation();
 
             var request = createScopedRequest();
             lastRequest = request;
@@ -223,15 +220,23 @@ namespace osu.Game.Overlays
             if (content == null)
             {
                 contentContainer.Clear();
-                loading.Hide();
+                endOparation();
                 return;
             }
 
             LoadComponentAsync(content, loaded =>
             {
-                loading.Hide();
+                if (!(content is SpotlightsLayout))
+                    endOparation();
+
                 contentContainer.Child = loaded;
             }, (cancellationToken = new CancellationTokenSource()).Token);
+        }
+
+        private void endOparation()
+        {
+            displayLoadedOperation?.Dispose();
+            displayLoadedOperation = null;
         }
 
         protected override void Dispose(bool isDisposing)

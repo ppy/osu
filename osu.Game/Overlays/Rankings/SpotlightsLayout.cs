@@ -14,8 +14,9 @@ using osu.Game.Overlays.Rankings.Tables;
 using System.Linq;
 using System.Threading;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.BeatmapListing.Panels;
+using osu.Game.Screens.OnlinePlay;
+using System;
 
 namespace osu.Game.Overlays.Rankings
 {
@@ -32,13 +33,17 @@ namespace osu.Game.Overlays.Rankings
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
+        [Resolved(CanBeNull = true)]
+        private OngoingOperationTracker ongoingOperationTracker { get; set; }
+
+        private IDisposable rankingsLoadedOperation;
+
         private CancellationTokenSource cancellationToken;
         private GetSpotlightRankingsRequest getRankingsRequest;
         private GetSpotlightsRequest spotlightsRequest;
 
         private SpotlightSelector selector;
         private Container content;
-        private LoadingLayer loading;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -57,20 +62,11 @@ namespace osu.Game.Overlays.Rankings
                     {
                         Current = selectedSpotlight,
                     },
-                    new Container
+                    content = new Container
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Children = new Drawable[]
-                        {
-                            content = new Container
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Margin = new MarginPadding { Vertical = 10 }
-                            },
-                            loading = new LoadingLayer(true)
-                        }
+                        Margin = new MarginPadding { Vertical = 10 }
                     }
                 }
             };
@@ -81,6 +77,8 @@ namespace osu.Game.Overlays.Rankings
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            rankingsLoadedOperation ??= ongoingOperationTracker?.BeginOperation();
 
             selectedSpotlight.BindValueChanged(_ => onSpotlightChanged());
             sort.BindValueChanged(_ => onSpotlightChanged());
@@ -106,7 +104,7 @@ namespace osu.Game.Overlays.Rankings
 
         private void onSpotlightChanged()
         {
-            loading.Show();
+            rankingsLoadedOperation ??= ongoingOperationTracker?.BeginOperation();
 
             cancellationToken?.Cancel();
             getRankingsRequest?.Cancel();
@@ -125,7 +123,8 @@ namespace osu.Game.Overlays.Rankings
                 content.Clear();
                 content.Add(loaded);
 
-                loading.Hide();
+                rankingsLoadedOperation?.Dispose();
+                rankingsLoadedOperation = null;
             }, (cancellationToken = new CancellationTokenSource()).Token);
         }
 
