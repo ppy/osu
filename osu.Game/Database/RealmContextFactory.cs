@@ -24,12 +24,11 @@ namespace osu.Game.Database
         /// </summary>
         private readonly object writeLock = new object();
 
-        private int currentWriteUsages;
-
         private static readonly GlobalStatistic<int> reads = GlobalStatistics.Get<int>("Realm", "Get (Read)");
         private static readonly GlobalStatistic<int> writes = GlobalStatistics.Get<int>("Realm", "Get (Write)");
         private static readonly GlobalStatistic<int> refreshes = GlobalStatistics.Get<int>("Realm", "Dirty Refreshes");
         private static readonly GlobalStatistic<int> contexts_created = GlobalStatistics.Get<int>("Realm", "Contexts (Created)");
+        private static readonly GlobalStatistic<int> pending_writes = GlobalStatistics.Get<int>("Realm", "Pending writes");
 
         private Realm context;
 
@@ -63,9 +62,10 @@ namespace osu.Game.Database
         public RealmWriteUsage GetForWrite()
         {
             writes.Value++;
+            pending_writes.Value++;
+
             Monitor.Enter(writeLock);
 
-            Interlocked.Increment(ref currentWriteUsages);
             return new RealmWriteUsage(this);
         }
 
@@ -106,6 +106,7 @@ namespace osu.Game.Database
             private static void usageCompleted(RealmContextFactory factory)
             {
                 Monitor.Exit(factory.writeLock);
+                pending_writes.Value--;
             }
         }
     }
