@@ -24,12 +24,14 @@ namespace osu.Game.Database
         public DbSet<BeatmapDifficulty> BeatmapDifficulty { get; set; }
         public DbSet<BeatmapMetadata> BeatmapMetadata { get; set; }
         public DbSet<BeatmapSetInfo> BeatmapSetInfo { get; set; }
-        public DbSet<DatabasedKeyBinding> DatabasedKeyBinding { get; set; }
         public DbSet<DatabasedSetting> DatabasedSetting { get; set; }
         public DbSet<FileInfo> FileInfo { get; set; }
         public DbSet<RulesetInfo> RulesetInfo { get; set; }
         public DbSet<SkinInfo> SkinInfo { get; set; }
         public DbSet<ScoreInfo> ScoreInfo { get; set; }
+
+        // migrated to realm
+        public DbSet<DatabasedKeyBinding> DatabasedKeyBinding { get; set; }
 
         private readonly string connectionString;
 
