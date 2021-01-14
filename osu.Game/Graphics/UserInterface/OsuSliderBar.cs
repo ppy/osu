@@ -98,7 +98,7 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colours)
         {
-            sample = audio.Samples.Get(@"UI/sliderbar-notch");
+            sample = audio.Samples.GetLayerable(@"UI/sliderbar-notch");
             AccentColour = colours.Pink;
         }
 

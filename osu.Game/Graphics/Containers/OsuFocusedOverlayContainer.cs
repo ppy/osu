@@ -40,8 +40,8 @@ namespace osu.Game.Graphics.Containers
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio)
         {
-            samplePopIn = audio.Samples.Get(@"UI/overlay-pop-in");
-            samplePopOut = audio.Samples.Get(@"UI/overlay-pop-out");
+            samplePopIn = audio.Samples.GetLayerable(@"UI/overlay-pop-in");
+            samplePopOut = audio.Samples.GetLayerable(@"UI/overlay-pop-out");
         }
 
         protected override void LoadComplete()

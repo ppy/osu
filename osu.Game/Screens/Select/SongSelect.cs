@@ -279,9 +279,9 @@ namespace osu.Game.Screens.Select
 
             dialogOverlay = dialog;
 
-            sampleChangeDifficulty = audio.Samples.Get(@"SongSelect/select-difficulty");
-            sampleChangeBeatmap = audio.Samples.Get(@"SongSelect/select-expand");
-            SampleConfirm = audio.Samples.Get(@"SongSelect/confirm-selection");
+            sampleChangeDifficulty = audio.Samples.GetLayerable(@"SongSelect/select-difficulty");
+            sampleChangeBeatmap = audio.Samples.GetLayerable(@"SongSelect/select-expand");
+            SampleConfirm = audio.Samples.GetLayerable(@"SongSelect/confirm-selection");
 
             if (dialogOverlay != null)
             {

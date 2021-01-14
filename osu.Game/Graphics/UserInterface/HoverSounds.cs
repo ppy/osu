@@ -42,7 +42,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             lastPlaybackTime = statics.GetBindable<double?>(Static.LastHoverSoundPlaybackTime);
 
-            sampleHover = audio.Samples.Get($@"UI/generic-hover{SampleSet.GetDescription()}");
+            sampleHover = audio.Samples.GetLayerable($@"UI/generic-hover{SampleSet.GetDescription()}");
         }
 
         protected override bool OnHover(HoverEvent e)

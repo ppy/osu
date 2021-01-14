@@ -54,7 +54,7 @@ namespace osu.Game.Graphics
             screenshotFormat = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat);
             captureMenuCursor = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor);
 
-            shutter = audio.Samples.Get("UI/shutter");
+            shutter = audio.Samples.GetLayerable("UI/shutter");
         }
 
         public bool OnPressed(GlobalAction action)

@@ -58,7 +58,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sampleReadyCount = audio.Samples.Get(@"SongSelect/select-difficulty");
+            sampleReadyCount = audio.Samples.GetLayerable(@"SongSelect/select-difficulty");
 
             operationInProgress = ongoingOperationTracker.InProgress.GetBoundCopy();
             operationInProgress.BindValueChanged(_ => updateState());

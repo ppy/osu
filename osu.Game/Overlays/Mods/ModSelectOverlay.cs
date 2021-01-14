@@ -314,8 +314,8 @@ namespace osu.Game.Overlays.Mods
 
             availableMods = osu.AvailableMods.GetBoundCopy();
 
-            sampleOn = audio.Samples.Get(@"UI/check-on");
-            sampleOff = audio.Samples.Get(@"UI/check-off");
+            sampleOn = audio.Samples.GetLayerable(@"UI/check-on");
+            sampleOff = audio.Samples.GetLayerable(@"UI/check-off");
         }
 
         private void deselectAll()

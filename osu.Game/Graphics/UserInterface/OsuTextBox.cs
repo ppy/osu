@@ -64,12 +64,12 @@ namespace osu.Game.Graphics.UserInterface
             BackgroundCommit = BorderColour = colour.Yellow;
 
             for (int i = 0; i < textAddedSamples.Length; i++)
-                textAddedSamples[i] = audio.Samples.Get($@"Keyboard/key-press-{1 + i}");
+                textAddedSamples[i] = audio.Samples.GetLayerable($@"Keyboard/key-press-{1 + i}");
 
-            capsTextAddedSample = audio.Samples.Get(@"Keyboard/key-caps");
-            textRemovedSample = audio.Samples.Get(@"Keyboard/key-delete");
-            textCommittedSample = audio.Samples.Get(@"Keyboard/key-confirm");
-            caretMovedSample = audio.Samples.Get(@"Keyboard/key-movement");
+            capsTextAddedSample = audio.Samples.GetLayerable(@"Keyboard/key-caps");
+            textRemovedSample = audio.Samples.GetLayerable(@"Keyboard/key-delete");
+            textCommittedSample = audio.Samples.GetLayerable(@"Keyboard/key-confirm");
+            caretMovedSample = audio.Samples.GetLayerable(@"Keyboard/key-movement");
         }
 
         protected override Color4 SelectionColour => new Color4(249, 90, 255, 255);

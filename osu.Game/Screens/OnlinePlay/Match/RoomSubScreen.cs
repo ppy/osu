@@ -43,7 +43,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sampleStart = audio.Samples.Get(@"SongSelect/confirm-selection");
+            sampleStart = audio.Samples.GetLayerable(@"SongSelect/confirm-selection");
         }
 
         protected override void LoadComplete()

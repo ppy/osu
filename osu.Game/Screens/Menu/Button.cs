@@ -183,9 +183,9 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sampleHover = audio.Samples.Get(@"Menu/button-hover");
+            sampleHover = audio.Samples.GetLayerable(@"Menu/button-hover");
             if (!string.IsNullOrEmpty(sampleName))
-                sampleClick = audio.Samples.Get($@"Menu/{sampleName}");
+                sampleClick = audio.Samples.GetLayerable($@"Menu/{sampleName}");
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)

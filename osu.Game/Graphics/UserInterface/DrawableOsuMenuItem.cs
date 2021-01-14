@@ -35,8 +35,8 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sampleHover = audio.Samples.Get(@"UI/generic-hover");
-            sampleClick = audio.Samples.Get(@"UI/generic-select");
+            sampleHover = audio.Samples.GetLayerable(@"UI/generic-hover");
+            sampleClick = audio.Samples.GetLayerable(@"UI/generic-select");
 
             BackgroundColour = Color4.Transparent;
             BackgroundColourHover = Color4Extensions.FromHex(@"172023");
