@@ -163,21 +163,20 @@ namespace osu.Game.Overlays.Toolbar
         {
             base.LoadComplete();
 
-            if (Hotkey != null)
+            if (Hotkey == null) return;
+
+            realmKeyBinding = realmFactory.Context.All<RealmKeyBinding>().FirstOrDefault(rkb => rkb.RulesetID == null && rkb.ActionInt == (int)Hotkey.Value);
+
+            if (realmKeyBinding != null)
             {
-                realmKeyBinding = realmFactory.Context.All<RealmKeyBinding>().FirstOrDefault(rkb => rkb.RulesetID == null && rkb.ActionInt == (int)Hotkey.Value);
-
-                if (realmKeyBinding != null)
+                realmKeyBinding.PropertyChanged += (sender, args) =>
                 {
-                    realmKeyBinding.PropertyChanged += (sender, args) =>
-                    {
-                        if (args.PropertyName == nameof(realmKeyBinding.KeyCombinationString))
-                            updateKeyBindingTooltip();
-                    };
-                }
-
-                updateKeyBindingTooltip();
+                    if (args.PropertyName == nameof(realmKeyBinding.KeyCombinationString))
+                        updateKeyBindingTooltip();
+                };
             }
+
+            updateKeyBindingTooltip();
         }
 
         protected override bool OnMouseDown(MouseDownEvent e) => true;
