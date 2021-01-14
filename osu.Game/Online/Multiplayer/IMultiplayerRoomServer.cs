@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Threading.Tasks;
+using osu.Game.Online.Rooms;
 
 namespace osu.Game.Online.Multiplayer
 {
@@ -39,6 +40,12 @@ namespace osu.Game.Online.Multiplayer
         /// <exception cref="InvalidStateChangeException">If the state change requested is not valid, given the previous state or room state.</exception>
         /// <exception cref="NotJoinedRoomException">If the user is not in a room.</exception>
         Task ChangeState(MultiplayerUserState newState);
+
+        /// <summary>
+        /// Change the local user's availability state of the current beatmap set in joined room.
+        /// </summary>
+        /// <param name="newBeatmapAvailability">The proposed new beatmap availability state.</param>
+        Task ChangeBeatmapAvailability(BeatmapAvailability newBeatmapAvailability);
 
         /// <summary>
         /// As the host of a room, start the match.

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Threading.Tasks;
+using osu.Game.Online.Rooms;
 
 namespace osu.Game.Online.Multiplayer
 {
@@ -46,6 +47,13 @@ namespace osu.Game.Online.Multiplayer
         /// <param name="userId">The ID of the user performing a state change.</param>
         /// <param name="state">The new state of the user.</param>
         Task UserStateChanged(int userId, MultiplayerUserState state);
+
+        /// <summary>
+        /// Signals that a user in this room changed their beatmap availability state.
+        /// </summary>
+        /// <param name="userId">The ID of the user whose beatmap availability state has changed.</param>
+        /// <param name="beatmapAvailability">The new beatmap availability state of the user.</param>
+        Task UserBeatmapAvailabilityChanged(int userId, BeatmapAvailability beatmapAvailability);
 
         /// <summary>
         /// Signals that a match is to be started. This will *only* be sent to clients which are to begin loading at this point.
