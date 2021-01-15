@@ -83,7 +83,7 @@ namespace osu.Game.Beatmaps
                 }
             }
 
-            return 60000 / maxDurationBeatLength;
+            return maxDurationBeatLength;
         }
 
         IBeatmap IBeatmap.Clone() => Clone();
