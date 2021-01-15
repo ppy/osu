@@ -11,6 +11,7 @@ using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
+using Realms;
 
 namespace osu.Game.Tests.Database
 {
@@ -62,12 +63,15 @@ namespace osu.Game.Tests.Database
 
             Assert.That(backBinding.KeyCombination.Keys, Is.EquivalentTo(new[] { InputKey.Escape }));
 
-            var binding = backBinding;
+            var tsr = ThreadSafeReference.Create(backBinding);
 
-            realmContextFactory.Context.Write(() =>
+            using (var usage = realmContextFactory.GetForWrite())
             {
+                var binding = usage.Realm.ResolveReference(tsr);
                 binding.KeyCombination = new KeyCombination(InputKey.BackSpace);
-            });
+
+                usage.Commit();
+            }
 
             Assert.That(backBinding.KeyCombination.Keys, Is.EquivalentTo(new[] { InputKey.BackSpace }));
 
