@@ -77,14 +77,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             });
 
             isConnected = client.IsConnected.GetBoundCopy();
-            isConnected.BindValueChanged(connected =>
+            isConnected.BindValueChanged(connected => Schedule(() =>
             {
                 if (!connected.NewValue)
                 {
                     // messaging to the user about this disconnect will be provided by the MultiplayerMatchSubScreen.
                     failAndBail();
                 }
-            }, true);
+            }), true);
 
             Debug.Assert(client.Room != null);
         }
