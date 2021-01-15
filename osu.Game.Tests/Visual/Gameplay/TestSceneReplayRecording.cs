@@ -179,7 +179,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         internal class TestKeyBindingContainer : KeyBindingContainer<TestAction>
         {
-            public override IEnumerable<KeyBinding> DefaultKeyBindings => new[]
+            public override IEnumerable<IKeyBinding> DefaultKeyBindings => new[]
             {
                 new KeyBinding(InputKey.MouseLeft, TestAction.Down),
             };
