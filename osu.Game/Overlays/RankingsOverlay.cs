@@ -220,20 +220,20 @@ namespace osu.Game.Overlays
             if (content == null)
             {
                 contentContainer.Clear();
-                endOparation();
+                endOperation();
                 return;
             }
 
             LoadComponentAsync(content, loaded =>
             {
                 if (!(content is SpotlightsLayout))
-                    endOparation();
+                    endOperation();
 
                 contentContainer.Child = loaded;
             }, (cancellationToken = new CancellationTokenSource()).Token);
         }
 
-        private void endOparation()
+        private void endOperation()
         {
             displayLoadedOperation?.Dispose();
             displayLoadedOperation = null;
