@@ -35,6 +35,11 @@ namespace osu.Game.Screens.Edit
 
         private readonly Bindable<bool> seekingOrStopped = new Bindable<bool>(true);
 
+        /// <summary>
+        /// Whether a seek is currently in progress. True for the duration of a seek performed via <see cref="SeekSmoothlyTo"/>.
+        /// </summary>
+        public bool IsSeeking { get; private set; }
+
         public EditorClock(WorkingBeatmap beatmap, BindableBeatDivisor beatDivisor)
             : this(beatmap.Beatmap.ControlPointInfo, beatmap.Track.Length, beatDivisor)
         {
@@ -176,7 +181,7 @@ namespace osu.Game.Screens.Edit
 
         public bool Seek(double position)
         {
-            seekingOrStopped.Value = true;
+            seekingOrStopped.Value = IsSeeking = true;
 
             ClearTransforms();
             return underlyingClock.Seek(position);
@@ -246,6 +251,8 @@ namespace osu.Game.Screens.Edit
         {
             if (seekingOrStopped.Value)
             {
+                IsSeeking &= Transforms.Any();
+
                 if (track.Value?.IsRunning != true)
                 {
                     // seeking in the editor can happen while the track isn't running.
@@ -256,7 +263,7 @@ namespace osu.Game.Screens.Edit
                 // we are either running a seek tween or doing an immediate seek.
                 // in the case of an immediate seek the seeking bool will be set to false after one update.
                 // this allows for silencing hit sounds and the likes.
-                seekingOrStopped.Value = Transforms.Any();
+                seekingOrStopped.Value = IsSeeking;
             }
         }
 
