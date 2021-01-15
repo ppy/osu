@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Game.Online;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 

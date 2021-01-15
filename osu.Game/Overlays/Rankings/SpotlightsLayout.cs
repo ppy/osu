@@ -15,8 +15,8 @@ using System.Linq;
 using System.Threading;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.BeatmapListing.Panels;
-using osu.Game.Screens.OnlinePlay;
 using System;
+using osu.Game.Online;
 
 namespace osu.Game.Overlays.Rankings
 {

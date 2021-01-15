@@ -8,8 +8,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online;
 using osu.Game.Online.API;
-using osu.Game.Screens.OnlinePlay;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays
