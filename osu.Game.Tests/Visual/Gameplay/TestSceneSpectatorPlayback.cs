@@ -75,7 +75,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 switch (args.Action)
                 {
                     case NotifyCollectionChangedAction.Add:
-                        Debug.Assert(args.NewItems != null, "args.NewItems != null");
+                        Debug.Assert(args.NewItems != null);
 
                         foreach (int user in args.NewItems)
                         {
@@ -86,7 +86,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                         break;
 
                     case NotifyCollectionChangedAction.Remove:
-                        Debug.Assert(args.OldItems != null, "args.OldItems != null");
+                        Debug.Assert(args.OldItems != null);
 
                         foreach (int user in args.OldItems)
                         {
