@@ -52,6 +52,7 @@ namespace osu.Game.Online.Multiplayer
 
         /// <summary>
         /// Whether the <see cref="StatefulMultiplayerClient"/> is currently connected.
+        /// This is NOT thread safe and usage should be scheduled.
         /// </summary>
         public abstract IBindable<bool> IsConnected { get; }
 
