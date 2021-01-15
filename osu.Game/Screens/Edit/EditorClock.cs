@@ -111,7 +111,7 @@ namespace osu.Game.Screens.Edit
 
             if (!snapped || ControlPointInfo.TimingPoints.Count == 0)
             {
-                SeekTo(seekTime);
+                SeekSmoothlyTo(seekTime);
                 return;
             }
 
@@ -145,11 +145,11 @@ namespace osu.Game.Screens.Edit
 
             // Ensure the sought point is within the boundaries
             seekTime = Math.Clamp(seekTime, 0, TrackLength);
-            SeekTo(seekTime);
+            SeekSmoothlyTo(seekTime);
         }
 
         /// <summary>
-        /// The current time of this clock, include any active transform seeks performed via <see cref="SeekTo"/>.
+        /// The current time of this clock, include any active transform seeks performed via <see cref="SeekSmoothlyTo"/>.
         /// </summary>
         public double CurrentTimeAccurate =>
             Transforms.OfType<TransformSeek>().FirstOrDefault()?.EndValue ?? CurrentTime;
@@ -180,6 +180,23 @@ namespace osu.Game.Screens.Edit
 
             ClearTransforms();
             return underlyingClock.Seek(position);
+        }
+
+        /// <summary>
+        /// Seek smoothly to the provided destination.
+        /// Use <see cref="Seek"/> to perform an immediate seek.
+        /// </summary>
+        /// <param name="seekDestination"></param>
+        public void SeekSmoothlyTo(double seekDestination)
+        {
+            seekingOrStopped.Value = true;
+
+            if (IsRunning)
+                Seek(seekDestination);
+            else
+            {
+                transformSeekTo(seekDestination, transform_time, Easing.OutQuint);
+            }
         }
 
         public void ResetSpeedAdjustments() => underlyingClock.ResetSpeedAdjustments();
@@ -241,16 +258,6 @@ namespace osu.Game.Screens.Edit
                 // this allows for silencing hit sounds and the likes.
                 seekingOrStopped.Value = Transforms.Any();
             }
-        }
-
-        public void SeekTo(double seekDestination)
-        {
-            seekingOrStopped.Value = true;
-
-            if (IsRunning)
-                Seek(seekDestination);
-            else
-                transformSeekTo(seekDestination, transform_time, Easing.OutQuint);
         }
 
         private void transformSeekTo(double seek, double duration = 0, Easing easing = Easing.None)
