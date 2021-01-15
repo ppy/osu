@@ -138,6 +138,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 scrollToTrackTime();
         }
 
+        protected override bool OnScroll(ScrollEvent e)
+        {
+            // if this is not a precision scroll event, let the editor handle the seek itself (for snapping support)
+            if (!e.AltPressed && !e.IsPrecise)
+                return false;
+
+            return base.OnScroll(e);
+        }
+
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
