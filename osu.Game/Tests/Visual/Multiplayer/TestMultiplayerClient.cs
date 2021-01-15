@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Rooms;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
@@ -77,6 +78,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
         }
 
+        public void ChangeUserBeatmapAvailability(int userId, BeatmapAvailability newBeatmapAvailability)
+        {
+            Debug.Assert(Room != null);
+
+            ((IMultiplayerClient)this).UserBeatmapAvailabilityChanged(userId, newBeatmapAvailability);
+        }
+
         protected override Task<MultiplayerRoom> JoinRoom(long roomId)
         {
             var user = new MultiplayerRoomUser(api.LocalUser.Value.Id) { User = api.LocalUser.Value };
@@ -105,6 +113,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public override Task ChangeState(MultiplayerUserState newState)
         {
             ChangeUserState(api.LocalUser.Value.Id, newState);
+            return Task.CompletedTask;
+        }
+
+        public override Task ChangeBeatmapAvailability(BeatmapAvailability newBeatmapAvailability)
+        {
+            ChangeUserBeatmapAvailability(api.LocalUser.Value.Id, newBeatmapAvailability);
             return Task.CompletedTask;
         }
 
