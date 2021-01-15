@@ -48,6 +48,44 @@ namespace osu.Game.Beatmaps
 
         public virtual IEnumerable<BeatmapStatistic> GetStatistics() => Enumerable.Empty<BeatmapStatistic>();
 
+        public double GetMostCommonBeatLength()
+        {
+            // The last playable time in the beatmap - the last timing point extends to this time.
+            // Note: This is more accurate and may present different results because osu-stable didn't have the ability to calculate slider durations in this context.
+            double lastTime = HitObjects.LastOrDefault()?.GetEndTime() ?? ControlPointInfo.TimingPoints.LastOrDefault()?.Time ?? 0;
+
+            var beatLengthsAndDurations =
+                // Construct a set of (beatLength, duration) tuples for each individual timing point.
+                ControlPointInfo.TimingPoints.Select((t, i) =>
+                                {
+                                    if (t.Time > lastTime)
+                                        return (beatLength: t.BeatLength, 0);
+
+                                    var nextTime = i == ControlPointInfo.TimingPoints.Count - 1 ? lastTime : ControlPointInfo.TimingPoints[i + 1].Time;
+                                    return (beatLength: t.BeatLength, duration: nextTime - t.Time);
+                                })
+                                // Aggregate durations into a set of (beatLength, duration) tuples for each beat length
+                                .GroupBy(t => t.beatLength)
+                                .Select(g => (beatLength: g.Key, duration: g.Sum(t => t.duration)))
+                                // And if there are no timing points, use a default.
+                                .DefaultIfEmpty((TimingControlPoint.DEFAULT_BEAT_LENGTH, 0));
+
+            // Find the single beat length with the maximum aggregate duration.
+            double maxDurationBeatLength = double.NegativeInfinity;
+            double maxDuration = double.NegativeInfinity;
+
+            foreach (var (beatLength, duration) in beatLengthsAndDurations)
+            {
+                if (duration > maxDuration)
+                {
+                    maxDuration = duration;
+                    maxDurationBeatLength = beatLength;
+                }
+            }
+
+            return 60000 / maxDurationBeatLength;
+        }
+
         IBeatmap IBeatmap.Clone() => Clone();
 
         public Beatmap<T> Clone()
