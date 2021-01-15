@@ -36,6 +36,9 @@ namespace osu.Game.Database
         {
             get
             {
+                if (IsDisposed)
+                    throw new InvalidOperationException($"Attempted to access {nameof(Context)} on a disposed context factory");
+
                 if (context == null)
                 {
                     context = createContext();
@@ -90,6 +93,14 @@ namespace osu.Game.Database
 
         private void onMigration(Migration migration, ulong lastSchemaVersion)
         {
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            context?.Dispose();
+            context = null;
         }
 
         /// <summary>

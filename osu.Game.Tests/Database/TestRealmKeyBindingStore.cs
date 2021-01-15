@@ -83,6 +83,7 @@ namespace osu.Game.Tests.Database
         [TearDown]
         public void TearDown()
         {
+            realmContextFactory.Dispose();
             storage.DeleteDirectory(string.Empty);
         }
 
