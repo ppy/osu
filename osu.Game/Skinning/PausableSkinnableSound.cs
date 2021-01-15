@@ -67,7 +67,7 @@ namespace osu.Game.Skinning
             }
         }
 
-        public override void Play()
+        public override void Play(bool restart = true)
         {
             cancelPendingStart();
             RequestedPlaying = true;
@@ -75,7 +75,7 @@ namespace osu.Game.Skinning
             if (samplePlaybackDisabled.Value)
                 return;
 
-            base.Play();
+            base.Play(restart);
         }
 
         public override void Stop()
