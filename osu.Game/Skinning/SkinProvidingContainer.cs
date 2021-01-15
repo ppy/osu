@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
-using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {
@@ -73,9 +72,7 @@ namespace osu.Game.Skinning
         {
             if (skin != null)
             {
-                TValue tValueTypeCheck = default;
-
-                if (lookup is GlobalSkinColours || tValueTypeCheck is Color4)
+                if (lookup is GlobalSkinColours || lookup is SkinCustomColourLookup)
                     return lookupWithFallback<TLookup, TValue>(lookup, AllowColourLookup);
                 else
                     return lookupWithFallback<TLookup, TValue>(lookup, AllowConfigurationLookup);
