@@ -135,7 +135,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
             else
             {
-                spinningSample?.VolumeTo(0, 300).Finally(_ => spinningSample.Stop());
+                spinningSample?.VolumeTo(0, 300).OnComplete(_ => spinningSample.Stop());
             }
         }
 
