@@ -34,8 +34,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             base.LoadComplete();
 
-            isConnected.BindValueChanged(_ => updateState());
-            operationInProgress.BindValueChanged(_ => updateState(), true);
+            isConnected.BindValueChanged(_ => Scheduler.AddOnce(updateState));
+            operationInProgress.BindValueChanged(_ => Scheduler.AddOnce(updateState), true);
         }
 
         private void updateState() => Enabled.Value = isConnected.Value && !operationInProgress.Value;
