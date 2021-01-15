@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(true)]
         public void TestLongSpinner(bool autoplay)
         {
-            AddStep("Very short spinner", () => SetContents(() => testSingle(5, autoplay, 2000)));
+            AddStep("Very long spinner", () => SetContents(() => testSingle(5, autoplay, 4000)));
             AddUntilStep("Wait for completion", () => drawableSpinner.Result.HasResult);
             AddUntilStep("Check correct progress", () => drawableSpinner.Progress == (autoplay ? 1 : 0));
         }
