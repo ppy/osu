@@ -151,7 +151,6 @@ namespace osu.Game.Overlays.BeatmapListing
             allowExplicitContent = config.GetBindable<bool>(OsuSetting.AllowExplicitContent);
             allowExplicitContent.BindValueChanged(allow =>
             {
-                // Update search control if global "explicit allowed" setting changed.
                 Explicit.Value = allow.NewValue ? SearchExplicit.Show : SearchExplicit.Hide;
             }, true);
         }
