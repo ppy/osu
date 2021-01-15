@@ -381,9 +381,7 @@ namespace osu.Game.Skinning
                         var particle = getParticleTexture(resultComponent.Component);
 
                         if (particle != null)
-                        {
                             return new LegacyJudgementPieceNew(resultComponent.Component, createDrawable, particle);
-                        }
                         else
                             return new LegacyJudgementPieceOld(resultComponent.Component, createDrawable);
                     }
