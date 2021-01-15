@@ -119,12 +119,13 @@ namespace osu.Game.Skinning
         /// <summary>
         /// Plays the samples.
         /// </summary>
-        public virtual void Play()
+        /// <param name="restart">Whether to play the sample from the beginning.</param>
+        public virtual void Play(bool restart = true)
         {
             samplesContainer.ForEach(c =>
             {
                 if (PlayWhenZeroVolume || c.AggregateVolume.Value > 0)
-                    c.Play();
+                    c.Play(restart);
             });
         }
 
