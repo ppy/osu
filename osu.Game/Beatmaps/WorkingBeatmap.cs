@@ -111,6 +111,8 @@ namespace osu.Game.Beatmaps
                 // Convert
                 IBeatmap converted = converter.Convert(cancellationSource.Token);
 
+                converted.ControlPointInfo = converted.ControlPointInfo.CreateCopy();
+
                 // Apply conversion mods to the result
                 foreach (var mod in mods.OfType<IApplicableAfterBeatmapConversion>())
                 {
