@@ -7,7 +7,7 @@ namespace osu.Game.Screens.Purcashe.Components
     {
         protected override void UpdateValue(float value)
         {
-            fill.ResizeWidthTo(value * UsableWidth, 300, Easing.OutQuint);
+            fill.ResizeWidthTo(value * UsableWidth, 200, Easing.OutQuint);
         }
     }
 }

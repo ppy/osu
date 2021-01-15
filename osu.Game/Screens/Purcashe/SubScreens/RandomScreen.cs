@@ -1,8 +1,11 @@
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -15,8 +18,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays;
-using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Purcashe.Components;
 using osuTK;
 using osuTK.Graphics;
@@ -44,13 +45,16 @@ namespace osu.Game.Screens.Purcashe.SubScreens
         private Container overlay;
         private MystryBox box;
         private bool allowBack;
-
-        [Resolved(CanBeNull = true)]
-        private NotificationOverlay notifications { get; set; }
+        private DrawableSample loop;
 
         [BackgroundDependencyLoader]
-        private void load(MConfigManager config)
+        private void load(MConfigManager config, AudioManager audio)
         {
+            loop = new DrawableSample(audio.Samples.Get("Gameplay/pause-loop"))
+            {
+                Looping = true
+            };
+
             config.BindWith(MSetting.PPCount, coins);
             tempPPCount.Value = coins.Value;
             Scale = new Vector2(0.9f);
@@ -78,7 +82,7 @@ namespace osu.Game.Screens.Purcashe.SubScreens
                         Spacing = new Vector2(10)
                     },
                 },
-                box = new MystryBox(ItemCount > 1)
+                box = new MystryBox(ItemCount, loop)
                 {
                     OnFireAction = () => this.Push(new RandomShowcaseScreen
                     {
@@ -249,6 +253,7 @@ namespace osu.Game.Screens.Purcashe.SubScreens
         public override bool OnExiting(IScreen next)
         {
             this.FadeOut(300, Easing.OutQuint);
+            loop.VolumeTo(0, 300, Easing.Out).Expire();
 
             if (!this.IsCurrentScreen()) return base.OnExiting(next);
 
@@ -274,45 +279,45 @@ namespace osu.Game.Screens.Purcashe.SubScreens
 
         private readonly List<RollResult> results = new List<RollResult>();
 
-        private void createPanels(float delay = 100)
+        private void createPanels()
         {
-            if (ItemCount < 0)
-            {
-                notifications?.Post(new SimpleNotification
-                {
-                    Text = "随机次数不能小于0!",
-                    Icon = FontAwesome.Solid.Exclamation
-                });
-
-                this.Delay(800).Schedule(this.Exit);
-                return;
-            }
-
             tempPPCount.Value -= ItemCount * 50;
 
-            if (tempPPCount.Value < 0)
-            {
-                tempPPCount.Value = coins.Value;
-
-                notifications?.Post(new SimpleNotification
-                {
-                    Text = "你没有足够的PP!",
-                    Icon = FontAwesome.Solid.Exclamation
-                });
-
-                this.Delay(800).Schedule(this.Exit);
-                return;
-            }
-
-            for (int i = 0; i < ItemCount; i++)
+            for (int crt = 0; crt < ItemCount; crt++)
             {
                 var pp = randomPP();
                 var rank = Rank.Oops;
                 var lv = randomLevel();
                 var texturePath = randomTexture();
-                string name = pp + "pp";
 
                 //其他设定
+
+                //十连保底一个Rare
+                //随机次数=9(10-1) 并且 results中没有Rank>=Rank.Rare的结果
+                if ((1 + crt) % 10 == 0 && crt > 0)
+                {
+                    //crt - 9加上crt为本次十连, 取9个
+                    var last = results.GetRange(crt - 9, 9);
+
+                    if (!last.Any(s => s.Rank >= Rank.Rare))
+                        //[300, 501)
+                        pp = RNG.Next(300, 501);
+                }
+
+                //百连保底必出一金
+                //随机次数=99(100-1) 并且 results中没有Level>Regular的结果
+                if ((1 + crt) % 100 == 0 && crt > 0)
+                {
+                    //crt - 99加上crt为本次十连, 取99个
+                    var last = results.GetRange(crt - 99, 99);
+
+                    if (!last.Any(s => s.Level > LevelStats.Regular))
+                        lv = randomLevel(true);
+                }
+
+                string name = pp + "pp";
+
+                //根据LevelStats决定是否覆盖当前pp和name
                 switch (lv)
                 {
                     case LevelStats.Triangle:
@@ -328,7 +333,7 @@ namespace osu.Game.Screens.Purcashe.SubScreens
                     case LevelStats.Pippi:
                         name = "Pippi";
                         texturePath = "Backgrounds/registration";
-                        pp = 500;
+                        pp = 600;
                         break;
                 }
 
@@ -366,22 +371,27 @@ namespace osu.Game.Screens.Purcashe.SubScreens
 
             switch (bst)
             {
-                case Rank.Oops:
-                    box.GlowColor = Color4.DarkRed;
-                    break;
-
-                case Rank.Common:
-                    box.GlowColor = Color4.LightBlue;
+                case Rank.Legendary:
+                    loop.FrequencyTo(1.5f);
                     break;
 
                 case Rank.Rare:
-                    box.GlowColor = Color4.Silver;
+                    loop.FrequencyTo(1);
                     break;
 
-                case Rank.Legendary:
-                    box.GlowColor = Color4.Gold;
+                case Rank.Common:
+                    loop.FrequencyTo(0.75f);
+                    break;
+
+                case Rank.Oops:
+                    loop.FrequencyTo(0.5f);
                     break;
             }
+
+            loop.VolumeTo(0.2f);
+            loop.Play();
+
+            box.GlowColor = PurcasheColorProvider.GetColor(bst);
 
             //在这里提交一次数值
             commitPP();
@@ -389,20 +399,17 @@ namespace osu.Game.Screens.Purcashe.SubScreens
 
         private int randomPP() => RNG.Next(-400, 400);
 
-        private LevelStats randomLevel()
+        private LevelStats randomLevel(bool force = false)
         {
-            var rank = (LevelStats)RNG.Next(0, (int)LevelStats.Last);
+            LevelStats level;
 
-            switch (rank)
-            {
-                case LevelStats.Triangle:
-                case LevelStats.Beatmap:
-                    if ((ReturnRare)RNG.Next(0, (int)ReturnRare.last) != ReturnRare.yes)
-                        rank = (LevelStats)RNG.Next(0, (int)LevelStats.Triangle);
-                    break;
-            }
+            //[0, 50) -> 1/50 -> 2%
+            if (RNG.Next(0, 51) == 1 || force)
+                level = (LevelStats)RNG.Next((int)LevelStats.Triangle, (int)LevelStats.Last);
+            else
+                level = LevelStats.Regular;
 
-            return rank;
+            return level;
         }
 
         private string randomTexture()

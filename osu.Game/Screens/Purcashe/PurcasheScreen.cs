@@ -15,6 +15,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Purcashe.SubScreens;
 using osuTK;
 using osuTK.Graphics;
@@ -33,10 +35,15 @@ namespace osu.Game.Screens.Purcashe
         private OsuSpriteText mainTitle;
         private OsuTextBox textBox;
         private ShakeContainer shake;
+        private MConfigManager config;
+
+        [Resolved(CanBeNull = true)]
+        private NotificationOverlay notifications { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(TextureStore textures, MConfigManager config)
         {
+            this.config = config;
             config.BindWith(MSetting.PPCount, pp);
 
             Content = new Drawable[]
@@ -191,14 +198,14 @@ namespace osu.Game.Screens.Purcashe
                                                     Alpha = 0,
                                                     Width = 120,
                                                     Text = "单抽",
-                                                    Action = () => this.Push(new RandomOnceScreen())
+                                                    Action = () => calculateRemaingPP(1)
                                                 },
                                                 new TriangleButton
                                                 {
                                                     Alpha = 0,
                                                     Width = 120,
                                                     Text = "十连",
-                                                    Action = () => this.Push(new RandomTenTimesScreen())
+                                                    Action = () => calculateRemaingPP(10)
                                                 },
                                                 new TriangleButton
                                                 {
@@ -254,17 +261,49 @@ namespace osu.Game.Screens.Purcashe
             try
             {
                 var times = int.Parse(sender.Text);
-                this.Push(new CustomRandomScreen
-                {
-                    RandomTimes = times,
-                    IsCustom = true
-                });
+                if (!calculateRemaingPP(times, true))
+                    shake.Shake();
             }
             catch (Exception e)
             {
                 Logger.Log(e.ToString());
                 shake.Shake();
             }
+        }
+
+        private bool calculateRemaingPP(int times, bool isCustom = false)
+        {
+            var current = config.Get<int>(MSetting.PPCount);
+
+            if (times < 0)
+            {
+                notifications?.Post(new SimpleNotification
+                {
+                    Text = "随机次数不能小于0!",
+                    Icon = FontAwesome.Solid.Exclamation
+                });
+
+                return false;
+            }
+
+            if (current - times * 50 < 0)
+            {
+                notifications?.Post(new SimpleNotification
+                {
+                    Text = "你没有足够的PP!",
+                    Icon = FontAwesome.Solid.Exclamation
+                });
+
+                return false;
+            }
+
+            this.Push(new CustomRandomScreen
+            {
+                RandomTimes = times,
+                IsCustom = isCustom
+            });
+
+            return true;
         }
 
         protected override void LoadComplete()

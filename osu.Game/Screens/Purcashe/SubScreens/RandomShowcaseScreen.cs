@@ -89,10 +89,7 @@ namespace osu.Game.Screens.Purcashe.SubScreens
         {
             if (!unlocked) return;
 
-            foreach (var rc in showcaseContainer)
-            {
-                rc.FadeOut(300).ScaleTo(0.8f, 300, Easing.OutQuint).Expire();
-            }
+            showcaseContainer.Clear();
 
             currentIndex++;
 
@@ -149,70 +146,64 @@ namespace osu.Game.Screens.Purcashe.SubScreens
             return base.OnKeyDown(e);
         }
 
-        private class ResultContainer : Container
+        private class ResultContainer : FillFlowContainer
         {
-            private FillFlowContainer fillFlow;
             private Container spriteContainer;
+            private Drawable name;
             public RollResult Result { get; set; }
 
             [BackgroundDependencyLoader]
             private void load(TextureStore textures)
             {
                 Anchor = Origin = Anchor.Centre;
+                RelativeSizeAxes = Axes.X;
+                AutoSizeAxes = Axes.Y;
+                LayoutDuration = 300;
+                LayoutEasing = Easing.OutQuint;
+                Direction = FillDirection.Vertical;
+                Spacing = new Vector2(20);
 
-                InternalChildren = new Drawable[]
+                Children = new[]
                 {
-                    fillFlow = new FillFlowContainer
+                    spriteContainer = new Container
                     {
-                        AutoSizeAxes = Axes.Both,
-                        LayoutDuration = 300,
-                        LayoutEasing = Easing.OutQuint,
-                        Direction = FillDirection.Vertical,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Spacing = new Vector2(20),
-                        Child = spriteContainer = new Container
+                        Width = 540 * 1.2f,
+                        Height = 300 * 1.2f,
+                        Masking = true,
+                        CornerRadius = 12.5f,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Alpha = 0,
+                        Colour = Color4.Black,
+                        EdgeEffect = new EdgeEffectParameters
                         {
-                            Width = 540,
-                            Height = 300,
-                            Masking = true,
-                            CornerRadius = 12.5f,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Alpha = 0,
-                            EdgeEffect = new EdgeEffectParameters
-                            {
-                                Type = EdgeEffectType.Glow,
-                                Radius = 10,
-                                Colour = PurcasheColorProvider.GetColor(Result.Rank)
-                            },
-                            Children = new Drawable[]
-                            {
-                                new Sprite
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Texture = textures.Get($"{Result.TexturePath ?? "Online/avatar-guest"}"),
-                                    FillMode = FillMode.Fill
-                                },
-                            }
+                            Type = EdgeEffectType.Glow,
+                            Radius = 10,
+                            Colour = PurcasheColorProvider.GetColor(Result.Rank)
+                        },
+                        Child = new Sprite
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Texture = textures.Get($"{Result.TexturePath ?? "Online/avatar-guest"}"),
+                            FillMode = FillMode.Fill
                         }
                     },
+                    name = new GlowingSpriteText
+                    {
+                        Text = Result.RollName,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Font = OsuFont.Numeric.With(size: 40, weight: FontWeight.Black),
+                        GlowColour = PurcasheColorProvider.GetColor(Result.Rank),
+                        Alpha = 0,
+                        Depth = 1
+                    }
                 };
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-
-                var name = new GlowingSpriteText
-                {
-                    Text = Result.RollName,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Font = OsuFont.Numeric.With(size: 40, weight: FontWeight.Black),
-                    Depth = 1,
-                    GlowColour = PurcasheColorProvider.GetColor(Result.Rank)
-                };
 
                 //动画
                 spriteContainer.ScaleTo(0.8f).Then()
@@ -221,7 +212,7 @@ namespace osu.Game.Screens.Purcashe.SubScreens
                 this.Delay(500).Schedule(() =>
                 {
                     spriteContainer.FadeColour(Color4.White, 300);
-                    fillFlow.Add(name);
+                    name.Show();
                 });
             }
         }

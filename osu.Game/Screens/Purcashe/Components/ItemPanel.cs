@@ -12,6 +12,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Mvis.Collections.Interface;
 using osuTK;
 using osuTK.Graphics;
@@ -118,7 +119,8 @@ namespace osu.Game.Screens.Purcashe.Components
                                     Text = RollResult.PP + "pp"
                                 },
                             }
-                        }
+                        },
+                        new HoverSounds(HoverSampleSet.Soft)
                     }
                 }
             };
@@ -222,31 +224,11 @@ namespace osu.Game.Screens.Purcashe.Components
 
         public enum LevelStats
         {
-            F,
-            D,
-            C,
-            B,
-            A,
-            S,
-            SS,
-            Bruh,
+            Regular,
             Triangle,
             Beatmap,
             Pippi,
             Last,
-        }
-
-        public enum ReturnRare
-        {
-            no1,
-            no2,
-            no3,
-            no4,
-            no5,
-            no6,
-            no7,
-            yes,
-            last
         }
 
         public enum Rank

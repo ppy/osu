@@ -1,9 +1,11 @@
 using System;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
@@ -21,8 +23,6 @@ namespace osu.Game.Screens.Purcashe.Components
     {
         private readonly Container content;
 
-        private float scale = 1;
-
         public Action OnFireAction;
         public ColourInfo GlowColor = Color4.Silver;
 
@@ -31,12 +31,19 @@ namespace osu.Game.Screens.Purcashe.Components
         private SampleChannel sample1;
         private SampleChannel sample2;
         private SampleChannel sample3;
-        private readonly bool immidateFire;
+        private readonly int rollTimes;
+
+        [CanBeNull]
+        private readonly DrawableSample targetSample;
+
+        private int clickTime;
         private bool clicked;
 
-        public MystryBox(bool multipleTime)
+        public MystryBox(int rollTimes, DrawableSample targetSample)
         {
-            immidateFire = !multipleTime;
+            this.rollTimes = rollTimes;
+            this.targetSample = targetSample;
+
             Size = new Vector2(400, 400);
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
@@ -72,7 +79,7 @@ namespace osu.Game.Screens.Purcashe.Components
                                 Font = OsuFont.Numeric.With(size: 60),
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre
-                            },
+                            }
                         }
                     }
                 }
@@ -91,31 +98,10 @@ namespace osu.Game.Screens.Purcashe.Components
         {
             if (clicked) return base.OnClick(e);
 
-            this.ScaleTo(scale += 0.1f, 500, Easing.OutElastic);
+            clickTime++;
+            this.ScaleTo(1 + (clickTime * 0.1f), 500, Easing.OutElastic);
 
-            if (scale == 1.1f)
-            {
-                content.TweenEdgeEffectTo(new EdgeEffectParameters
-                {
-                    Type = EdgeEffectType.Glow,
-                    Radius = 10f,
-                    Colour = Color4.LightBlue
-                });
-                sample1?.Play();
-            }
-
-            if (scale == 1.2f)
-            {
-                content.TweenEdgeEffectTo(new EdgeEffectParameters
-                {
-                    Type = EdgeEffectType.Glow,
-                    Radius = 30f,
-                    Colour = Color4.LightBlue
-                });
-                sample2?.Play();
-            }
-
-            if (scale > 1.2f || immidateFire)
+            if (clickTime == 3 || clickTime >= rollTimes)
             {
                 clicked = true;
 
@@ -127,9 +113,27 @@ namespace osu.Game.Screens.Purcashe.Components
                 });
 
                 sample3?.Play();
+                targetSample?.VolumeTo(1, 200, Easing.Out);
                 this.ScaleTo(3, 300, Easing.OutQuint).FadeOut(300, Easing.OutQuad);
                 OnFireAction?.Invoke();
                 this.Delay(300).Then().Schedule(Hide);
+            }
+            else
+            {
+                content.TweenEdgeEffectTo(new EdgeEffectParameters
+                {
+                    Type = EdgeEffectType.Glow,
+                    Radius = 15 * clickTime,
+                    Colour = GlowColor
+                });
+
+                targetSample?.VolumeTo(0.2f + clickTime * 0.2f, 200, Easing.Out);
+
+                if (clickTime == 1)
+                    sample1?.Play();
+
+                if (clickTime == 2)
+                    sample2?.Play();
             }
 
             return base.OnClick(e);

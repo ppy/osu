@@ -104,6 +104,8 @@ namespace osu.Game.Screens.Purcashe
 
         protected void UpdateComponentFromBeatmap(WorkingBeatmap beatmap, bool blurOnly = false)
         {
+            if (!this.IsCurrentScreen()) return;
+
             ApplyToBackground(b =>
             {
                 if (!enableBeatmapBg.Value)
