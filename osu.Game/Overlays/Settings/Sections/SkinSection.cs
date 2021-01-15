@@ -91,7 +91,7 @@ namespace osu.Game.Overlays.Settings.Sections
             if (skinDropdown.Items.All(s => s.ID != configBindable.Value))
                 configBindable.Value = 0;
 
-            configBindable.BindValueChanged(id => dropdownBindable.Value = skinDropdown.Items.Single(s => s.ID == id.NewValue), true);
+            configBindable.BindValueChanged(id => Scheduler.AddOnce(updateSelectedSkinFromConfig), true);
             dropdownBindable.BindValueChanged(skin =>
             {
                 if (skin.NewValue == random_skin_info)
@@ -103,6 +103,8 @@ namespace osu.Game.Overlays.Settings.Sections
                 configBindable.Value = skin.NewValue.ID;
             });
         }
+
+        private void updateSelectedSkinFromConfig() => dropdownBindable.Value = skinDropdown.Items.Single(s => s.ID == configBindable.Value);
 
         private void updateItems()
         {
