@@ -47,7 +47,7 @@ namespace osu.Game.Online
             {
                 if (modelInfo.NewValue == null)
                     attachDownload(null);
-                else if (manager?.IsAvailableLocally(modelInfo.NewValue) == true)
+                else if (IsModelAvailableLocally())
                     State.Value = DownloadState.LocallyAvailable;
                 else
                     attachDownload(Manager?.GetExistingDownload(modelInfo.NewValue));
@@ -74,6 +74,13 @@ namespace osu.Game.Online
         /// </example>
         /// <param name="databasedModel">The model in database.</param>
         protected virtual bool VerifyDatabasedModel([NotNull] TModel databasedModel) => true;
+
+        /// <summary>
+        /// Whether the given model is available in the database.
+        /// By default, this calls <see cref="IModelDownloader{TModel}.IsAvailableLocally"/>,
+        /// but can be overriden to add additional checks for verifying the model in database.
+        /// </summary>
+        protected virtual bool IsModelAvailableLocally() => Manager.IsAvailableLocally(Model.Value);
 
         private void downloadBegan(ValueChangedEvent<WeakReference<ArchiveDownloadRequest<TModel>>> weakRequest)
         {
