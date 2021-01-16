@@ -20,7 +20,7 @@ namespace osu.Game.Online
         protected readonly Bindable<TModel> Model = new Bindable<TModel>();
 
         [Resolved(CanBeNull = true)]
-        private TModelManager manager { get; set; }
+        protected TModelManager Manager { get; private set; }
 
         /// <summary>
         /// Holds the current download state of the <typeparamref name="TModel"/>, whether is has already been downloaded, is in progress, or is not downloaded.
@@ -49,19 +49,19 @@ namespace osu.Game.Online
                 else if (manager?.IsAvailableLocally(modelInfo.NewValue) == true)
                     State.Value = DownloadState.LocallyAvailable;
                 else
-                    attachDownload(manager?.GetExistingDownload(modelInfo.NewValue));
+                    attachDownload(Manager?.GetExistingDownload(modelInfo.NewValue));
             }, true);
 
-            if (manager == null)
+            if (Manager == null)
                 return;
 
-            managerDownloadBegan = manager.DownloadBegan.GetBoundCopy();
+            managerDownloadBegan = Manager.DownloadBegan.GetBoundCopy();
             managerDownloadBegan.BindValueChanged(downloadBegan);
-            managerDownloadFailed = manager.DownloadFailed.GetBoundCopy();
+            managerDownloadFailed = Manager.DownloadFailed.GetBoundCopy();
             managerDownloadFailed.BindValueChanged(downloadFailed);
-            managedUpdated = manager.ItemUpdated.GetBoundCopy();
+            managedUpdated = Manager.ItemUpdated.GetBoundCopy();
             managedUpdated.BindValueChanged(itemUpdated);
-            managerRemoved = manager.ItemRemoved.GetBoundCopy();
+            managerRemoved = Manager.ItemRemoved.GetBoundCopy();
             managerRemoved.BindValueChanged(itemRemoved);
         }
 
