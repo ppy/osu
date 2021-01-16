@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
@@ -64,6 +65,15 @@ namespace osu.Game.Online
             managerRemoved = Manager.ItemRemoved.GetBoundCopy();
             managerRemoved.BindValueChanged(itemRemoved);
         }
+
+        /// <summary>
+        /// Verifies that the given databased model is in a correct state to be considered available.
+        /// </summary>
+        /// <example>
+        /// In the case of multiplayer/playlists, this has to verify that the databased beatmap set with the selected beatmap matches what's online.
+        /// </example>
+        /// <param name="databasedModel">The model in database.</param>
+        protected virtual bool VerifyDatabasedModel([NotNull] TModel databasedModel) => true;
 
         private void downloadBegan(ValueChangedEvent<WeakReference<ArchiveDownloadRequest<TModel>>> weakRequest)
         {
@@ -134,22 +144,34 @@ namespace osu.Game.Online
         private void itemUpdated(ValueChangedEvent<WeakReference<TModel>> weakItem)
         {
             if (weakItem.NewValue.TryGetTarget(out var item))
-                setDownloadStateFromManager(item, DownloadState.LocallyAvailable);
+            {
+                Schedule(() =>
+                {
+                    if (!item.Equals(Model.Value))
+                        return;
+
+                    if (!VerifyDatabasedModel(item))
+                    {
+                        State.Value = DownloadState.NotDownloaded;
+                        return;
+                    }
+
+                    State.Value = DownloadState.LocallyAvailable;
+                });
+            }
         }
 
         private void itemRemoved(ValueChangedEvent<WeakReference<TModel>> weakItem)
         {
             if (weakItem.NewValue.TryGetTarget(out var item))
-                setDownloadStateFromManager(item, DownloadState.NotDownloaded);
+            {
+                Schedule(() =>
+                {
+                    if (item.Equals(Model.Value))
+                        State.Value = DownloadState.NotDownloaded;
+                });
+            }
         }
-
-        private void setDownloadStateFromManager(TModel s, DownloadState state) => Schedule(() =>
-        {
-            if (!s.Equals(Model.Value))
-                return;
-
-            State.Value = state;
-        });
 
         #region Disposal
 
