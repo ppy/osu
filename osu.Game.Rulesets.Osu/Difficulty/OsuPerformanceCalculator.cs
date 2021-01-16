@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             countMeh = Score.Statistics.GetOrDefault(HitResult.Meh);
             countMiss = Score.Statistics.GetOrDefault(HitResult.Miss);
 
-            // guess the number of misses + slider breaks from combo
+            // guess the number minimum number of misses or slider breaks from combo
             int beatmapMaxCombo = Attributes.MaxCombo;
             int countSliders = Attributes.HitSliderCount;
             double comboBasedMissCount;
@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     comboBasedMissCount = Math.Pow((beatmapMaxCombo - scoreMaxCombo) / (0.1 * countSliders), 3);
             }
 
-            effectiveMissCount = countMiss; //Math.Max(countMiss, (int)comboBasedMissCount);
+            effectiveMissCount = Math.Max(countMiss, (int)comboBasedMissCount);
 
             // Don't count scores made with supposedly unranked mods
             if (mods.Any(m => !m.Ranked))
@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double multiplier = 1.12; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things
 
             if (mods.Any(m => m is OsuModNoFail))
-                multiplier *= 0.90;
+                multiplier *= Math.Max(0.90, 1.0 - 0.02 * countMiss);
 
             if (mods.Any(m => m is OsuModSpunOut))
                 multiplier *= 1.0 - Math.Pow((double)Attributes.SpinnerCount / totalHits, 0.85);
@@ -128,7 +128,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double aimValue = Math.Pow(5.0f * Math.Max(1.0f, rawAim / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
 
-            // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
+            // Penalize misses by assessing # of misses relative to the total # of objects.
             if (effectiveMissCount > 0)
                 aimValue *= Math.Pow(1 - Math.Pow((double)effectiveMissCount / totalHits, 0.775), effectiveMissCount);
 
@@ -138,6 +138,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             else if (Attributes.ApproachRate < 8.0)
                 approachRateFactor += 0.01 * (8.0 - Attributes.ApproachRate);
 
+            // We scale with length since high AR is sensitive to memorization techniques.
             aimValue *= 1.0 + Math.Min(approachRateFactor, approachRateFactor * (totalHits / 1000.0));
 
             // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
@@ -160,7 +161,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             aimValue *= 0.98 + Math.Pow(Attributes.OverallDifficulty, 2) / 2500;
 
             // Scale by % FC'd to encourage FC.
-            aimValue *= 0.8 + 0.2 * ((double)Score.MaxCombo / (double)Attributes.MaxCombo);
+            aimValue *= 0.8 + 0.2 * (Score.MaxCombo / (double)Attributes.MaxCombo);
 
             if (categoryRatings != null)
             {
@@ -181,7 +182,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double speedValue = Math.Pow(5.0f * Math.Max(1.0f, rawSpeed / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
 
-            // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
+            // Penalize misses by assessing # of misses relative to the total # of objects.
             if (effectiveMissCount > 0)
                 speedValue *= Math.Pow(1 - Math.Pow((double)effectiveMissCount / totalHits, 0.775), effectiveMissCount);
 
@@ -189,7 +190,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (Attributes.ApproachRate > 10.33)
                 approachRateFactor += 0.4 * (Attributes.ApproachRate - 10.33);
 
-            speedValue *= 1.0 + Math.Min(approachRateFactor, approachRateFactor);// * (totalHits / 1000.0));
+            // We don't scale buff by length for speed since speed isnt sensitive to any memorization techniques.
+            speedValue *= 1.0 + Math.Min(approachRateFactor, approachRateFactor);
 
             if (mods.Any(m => m is OsuModHidden))
                 speedValue *= 1.0 + 0.04 * (12.0 - Attributes.ApproachRate);
@@ -200,7 +202,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             speedValue *= Math.Pow(0.98, countMeh < totalHits / 500.0 ? 0.5 * countMeh : countMeh - totalHits / 500.0 * 0.5);
 
             // Scale by % FC'd to encourage FC.
-            speedValue *= 0.9 + 0.1 * ((double)Score.MaxCombo / (double)Attributes.MaxCombo);
+            speedValue *= 0.9 + 0.1 * (Score.MaxCombo / (double)Attributes.MaxCombo);
 
             if (categoryRatings != null)
             {
