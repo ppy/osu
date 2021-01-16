@@ -40,6 +40,17 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
 
+        [Cached]
+        protected readonly MultiplayerBeatmapTracker BeatmapTracker;
+
+        protected RoomSubScreen()
+        {
+            InternalChild = BeatmapTracker = new MultiplayerBeatmapTracker
+            {
+                SelectedItem = { BindTarget = SelectedItem },
+            };
+        }
+
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
