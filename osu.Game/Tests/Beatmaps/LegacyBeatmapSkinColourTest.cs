@@ -114,11 +114,22 @@ namespace osu.Game.Tests.Beatmaps
                 new Color4(40, 80, 120, 255),
             };
 
+            public static readonly Color4 HYPER_DASH_COLOUR = Color4.DarkBlue;
+
+            public static readonly Color4 HYPER_DASH_AFTER_IMAGE_COLOUR = Color4.DarkCyan;
+
+            public static readonly Color4 HYPER_DASH_FRUIT_COLOUR = Color4.DarkGoldenrod;
+
             public TestBeatmapSkin(BeatmapInfo beatmap, bool hasColours)
                 : base(beatmap, new ResourceStore<byte[]>(), null)
             {
                 if (hasColours)
+                {
                     Configuration.AddComboColours(Colours);
+                    Configuration.CustomColours.Add("HyperDash", HYPER_DASH_COLOUR);
+                    Configuration.CustomColours.Add("HyperDashAfterImage", HYPER_DASH_AFTER_IMAGE_COLOUR);
+                    Configuration.CustomColours.Add("HyperDashFruit", HYPER_DASH_FRUIT_COLOUR);
+                }
             }
         }
 
@@ -130,11 +141,22 @@ namespace osu.Game.Tests.Beatmaps
                 new Color4(20, 20, 20, 255),
             };
 
+            public static readonly Color4 HYPER_DASH_COLOUR = Color4.LightBlue;
+
+            public static readonly Color4 HYPER_DASH_AFTER_IMAGE_COLOUR = Color4.LightCoral;
+
+            public static readonly Color4 HYPER_DASH_FRUIT_COLOUR = Color4.LightCyan;
+
             public TestSkin(bool hasCustomColours)
                 : base(new SkinInfo(), new ResourceStore<byte[]>(), null, string.Empty)
             {
                 if (hasCustomColours)
+                {
                     Configuration.AddComboColours(Colours);
+                    Configuration.CustomColours.Add("HyperDash", HYPER_DASH_COLOUR);
+                    Configuration.CustomColours.Add("HyperDashAfterImage", HYPER_DASH_AFTER_IMAGE_COLOUR);
+                    Configuration.CustomColours.Add("HyperDashFruit", HYPER_DASH_FRUIT_COLOUR);
+                }
             }
 
             public event Action SourceChanged

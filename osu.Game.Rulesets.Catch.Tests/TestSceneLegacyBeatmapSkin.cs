@@ -1,22 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Skinning;
-using osu.Game.Rulesets.Catch.UI;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Skinning;
 using osu.Game.Tests.Beatmaps;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Tests
@@ -90,9 +85,9 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             TestBeatmap = new CatchCustomSkinWorkingBeatmap(audio, true);
             ConfigureTest(useBeatmapSkin, true, true);
-            AddAssert("is custom hyper dash colours", () => ((CatchExposedPlayer)TestPlayer).UsableHyperDashColour == CatchTestBeatmapSkin.HYPER_DASH_COLOUR);
-            AddAssert("is custom hyper dash after image colours", () => ((CatchExposedPlayer)TestPlayer).UsableHyperDashAfterImageColour == CatchTestBeatmapSkin.HYPER_DASH_AFTER_IMAGE_COLOUR);
-            AddAssert("is custom hyper dash fruit colours", () => ((CatchExposedPlayer)TestPlayer).UsableHyperDashFruitColour == CatchTestBeatmapSkin.HYPER_DASH_FRUIT_COLOUR);
+            AddAssert("is custom hyper dash colours", () => ((CatchExposedPlayer)TestPlayer).UsableHyperDashColour == TestBeatmapSkin.HYPER_DASH_COLOUR);
+            AddAssert("is custom hyper dash after image colours", () => ((CatchExposedPlayer)TestPlayer).UsableHyperDashAfterImageColour == TestBeatmapSkin.HYPER_DASH_AFTER_IMAGE_COLOUR);
+            AddAssert("is custom hyper dash fruit colours", () => ((CatchExposedPlayer)TestPlayer).UsableHyperDashFruitColour == TestBeatmapSkin.HYPER_DASH_FRUIT_COLOUR);
         }
 
         [TestCase(true)]
@@ -101,9 +96,9 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             TestBeatmap = new CatchCustomSkinWorkingBeatmap(audio, true);
             ConfigureTest(useBeatmapSkin, false, true);
-            AddAssert("is custom hyper dash colours", () => ((CatchExposedPlayer)TestPlayer).UsableHyperDashColour == CatchTestSkin.HYPER_DASH_COLOUR);
-            AddAssert("is custom hyper dash after image colours", () => ((CatchExposedPlayer)TestPlayer).UsableHyperDashAfterImageColour == CatchTestSkin.HYPER_DASH_AFTER_IMAGE_COLOUR);
-            AddAssert("is custom hyper dash fruit colours", () => ((CatchExposedPlayer)TestPlayer).UsableHyperDashFruitColour == CatchTestSkin.HYPER_DASH_FRUIT_COLOUR);
+            AddAssert("is custom hyper dash colours", () => ((CatchExposedPlayer)TestPlayer).UsableHyperDashColour == TestSkin.HYPER_DASH_COLOUR);
+            AddAssert("is custom hyper dash after image colours", () => ((CatchExposedPlayer)TestPlayer).UsableHyperDashAfterImageColour == TestSkin.HYPER_DASH_AFTER_IMAGE_COLOUR);
+            AddAssert("is custom hyper dash fruit colours", () => ((CatchExposedPlayer)TestPlayer).UsableHyperDashFruitColour == TestSkin.HYPER_DASH_FRUIT_COLOUR);
         }
 
         protected override ExposedPlayer CreateTestPlayer(bool userHasCustomColours) => new CatchExposedPlayer(userHasCustomColours);
@@ -113,13 +108,6 @@ namespace osu.Game.Rulesets.Catch.Tests
             public CatchExposedPlayer(bool userHasCustomColours)
                 : base(userHasCustomColours)
             {
-            }
-
-            protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-            {
-                var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-                dependencies.CacheAs<ISkinSource>(new CatchTestSkin(UserHasCustomColours));
-                return dependencies;
             }
 
             public Color4 UsableHyperDashColour =>
@@ -141,129 +129,23 @@ namespace osu.Game.Rulesets.Catch.Tests
                                       .Value ?? Color4.Red;
         }
 
-        private class TestJuiceStream : JuiceStream
-        {
-            public TestJuiceStream(float x)
-            {
-                X = x;
-
-                Path = new SliderPath(new[]
-                {
-                    new PathControlPoint(Vector2.Zero),
-                    new PathControlPoint(new Vector2(30, 0)),
-                });
-            }
-        }
-
         private class CatchCustomSkinWorkingBeatmap : CustomSkinWorkingBeatmap
         {
             public CatchCustomSkinWorkingBeatmap(AudioManager audio, bool hasColours)
-                : base(createBeatmap(new CatchRuleset().RulesetInfo), audio, hasColours)
+                : base(createBeatmap(), audio, hasColours)
             {
             }
 
-            protected override ISkin GetSkin() => new CatchTestBeatmapSkin(BeatmapInfo, HasColours);
-
-            private static IBeatmap createBeatmap(RulesetInfo ruleset)
-            {
-                var beatmap = new Beatmap
+            private static IBeatmap createBeatmap() =>
+                new Beatmap
                 {
                     BeatmapInfo =
                     {
-                        Ruleset = ruleset,
-                        BaseDifficulty = new BeatmapDifficulty { CircleSize = 3.6f }
-                    }
+                        BeatmapSet = new BeatmapSetInfo(),
+                        Ruleset = new CatchRuleset().RulesetInfo
+                    },
+                    HitObjects = { new Fruit { StartTime = 1816, X = 56, NewCombo = true } }
                 };
-
-                beatmap.ControlPointInfo.Add(0, new TimingControlPoint());
-
-                // Should produce a hyper-dash (edge case test)
-                beatmap.HitObjects.Add(new Fruit { StartTime = 1816, X = 56, NewCombo = true });
-                beatmap.HitObjects.Add(new Fruit { StartTime = 2008, X = 308, NewCombo = true });
-
-                double startTime = 3000;
-
-                const float left_x = 0.02f * CatchPlayfield.WIDTH;
-                const float right_x = 0.98f * CatchPlayfield.WIDTH;
-
-                createObjects(() => new Fruit { X = left_x });
-                createObjects(() => new TestJuiceStream(right_x), 1);
-                createObjects(() => new TestJuiceStream(left_x), 1);
-                createObjects(() => new Fruit { X = right_x });
-                createObjects(() => new Fruit { X = left_x });
-                createObjects(() => new Fruit { X = right_x });
-                createObjects(() => new TestJuiceStream(left_x), 1);
-
-                beatmap.ControlPointInfo.Add(startTime, new TimingControlPoint
-                {
-                    BeatLength = 50
-                });
-
-                createObjects(() => new TestJuiceStream(left_x)
-                {
-                    Path = new SliderPath(new[]
-                    {
-                        new PathControlPoint(Vector2.Zero),
-                        new PathControlPoint(new Vector2(512, 0))
-                    })
-                }, 1);
-
-                return beatmap;
-
-                void createObjects(Func<CatchHitObject> createObject, int count = 3)
-                {
-                    const float spacing = 140;
-
-                    for (int i = 0; i < count; i++)
-                    {
-                        var hitObject = createObject();
-                        hitObject.StartTime = startTime + i * spacing;
-                        beatmap.HitObjects.Add(hitObject);
-                    }
-
-                    startTime += 700;
-                }
-            }
-        }
-
-        private class CatchTestBeatmapSkin : TestBeatmapSkin
-        {
-            public static readonly Color4 HYPER_DASH_COLOUR = Color4.DarkBlue;
-
-            public static readonly Color4 HYPER_DASH_AFTER_IMAGE_COLOUR = Color4.DarkCyan;
-
-            public static readonly Color4 HYPER_DASH_FRUIT_COLOUR = Color4.DarkGoldenrod;
-
-            public CatchTestBeatmapSkin(BeatmapInfo beatmap, bool hasColours)
-                : base(beatmap, hasColours)
-            {
-                if (hasColours)
-                {
-                    Configuration.CustomColours.Add(CatchSkinColour.HyperDash.ToString(), HYPER_DASH_COLOUR);
-                    Configuration.CustomColours.Add(CatchSkinColour.HyperDashAfterImage.ToString(), HYPER_DASH_AFTER_IMAGE_COLOUR);
-                    Configuration.CustomColours.Add(CatchSkinColour.HyperDashFruit.ToString(), HYPER_DASH_FRUIT_COLOUR);
-                }
-            }
-        }
-
-        private class CatchTestSkin : TestSkin
-        {
-            public static readonly Color4 HYPER_DASH_COLOUR = Color4.LightBlue;
-
-            public static readonly Color4 HYPER_DASH_AFTER_IMAGE_COLOUR = Color4.LightCoral;
-
-            public static readonly Color4 HYPER_DASH_FRUIT_COLOUR = Color4.LightCyan;
-
-            public CatchTestSkin(bool hasCustomColours)
-                : base(hasCustomColours)
-            {
-                if (hasCustomColours)
-                {
-                    Configuration.CustomColours.Add(CatchSkinColour.HyperDash.ToString(), HYPER_DASH_COLOUR);
-                    Configuration.CustomColours.Add(CatchSkinColour.HyperDashAfterImage.ToString(), HYPER_DASH_AFTER_IMAGE_COLOUR);
-                    Configuration.CustomColours.Add(CatchSkinColour.HyperDashFruit.ToString(), HYPER_DASH_FRUIT_COLOUR);
-                }
-            }
         }
     }
 }
