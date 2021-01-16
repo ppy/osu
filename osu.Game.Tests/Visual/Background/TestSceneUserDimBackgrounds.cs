@@ -82,7 +82,7 @@ namespace osu.Game.Tests.Visual.Background
             });
             AddUntilStep("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
             AddStep("Stop background preview", () => InputManager.MoveMouseTo(playerLoader.ScreenPos));
-            AddUntilStep("Screen is undimmed and user blur removed", () => songSelect.IsBackgroundUndimmed() && playerLoader.IsBlurCorrect());
+            AddUntilStep("Screen is undimmed and user blur removed", () => songSelect.IsBackgroundUndimmed() && songSelect.CheckBackgroundBlur(playerLoader.ExpectedBackgroundBlur));
         }
 
         /// <summary>
@@ -106,6 +106,7 @@ namespace osu.Game.Tests.Visual.Background
         public void TestStoryboardBackgroundVisibility()
         {
             performFullSetup();
+            AddAssert("Background retained from song select", () => songSelect.IsBackgroundCurrent());
             createFakeStoryboard();
             AddStep("Enable Storyboard", () =>
             {
@@ -198,8 +199,9 @@ namespace osu.Game.Tests.Visual.Background
             })));
 
             AddUntilStep("Wait for results is current", () => results.IsCurrentScreen());
+
             AddUntilStep("Screen is undimmed, original background retained", () =>
-                songSelect.IsBackgroundUndimmed() && songSelect.IsBackgroundCurrent() && results.IsBlurCorrect());
+                songSelect.IsBackgroundUndimmed() && songSelect.IsBackgroundCurrent() && songSelect.CheckBackgroundBlur(results.ExpectedBackgroundBlur));
         }
 
         /// <summary>
@@ -224,7 +226,7 @@ namespace osu.Game.Tests.Visual.Background
             AddStep("Resume PlayerLoader", () => player.Restart());
             AddUntilStep("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
             AddStep("Move mouse to center of screen", () => InputManager.MoveMouseTo(playerLoader.ScreenPos));
-            AddUntilStep("Screen is undimmed and user blur removed", () => songSelect.IsBackgroundUndimmed() && playerLoader.IsBlurCorrect());
+            AddUntilStep("Screen is undimmed and user blur removed", () => songSelect.IsBackgroundUndimmed() && songSelect.CheckBackgroundBlur(playerLoader.ExpectedBackgroundBlur));
         }
 
         private void createFakeStoryboard() => AddStep("Create storyboard", () =>
@@ -274,9 +276,11 @@ namespace osu.Game.Tests.Visual.Background
 
         private class DummySongSelect : PlaySongSelect
         {
+            private FadeAccessibleBackground background;
+
             protected override BackgroundScreen CreateBackground()
             {
-                FadeAccessibleBackground background = new FadeAccessibleBackground(Beatmap.Value);
+                background = new FadeAccessibleBackground(Beatmap.Value);
                 DimEnabled.BindTo(background.EnableUserDim);
                 return background;
             }
@@ -294,25 +298,27 @@ namespace osu.Game.Tests.Visual.Background
                 config.BindWith(OsuSetting.BlurLevel, BlurLevel);
             }
 
-            public bool IsBackgroundDimmed() => ((FadeAccessibleBackground)Background).CurrentColour == OsuColour.Gray(1f - ((FadeAccessibleBackground)Background).CurrentDim);
+            public bool IsBackgroundDimmed() => background.CurrentColour == OsuColour.Gray(1f - background.CurrentDim);
 
-            public bool IsBackgroundUndimmed() => ((FadeAccessibleBackground)Background).CurrentColour == Color4.White;
+            public bool IsBackgroundUndimmed() => background.CurrentColour == Color4.White;
 
-            public bool IsUserBlurApplied() => ((FadeAccessibleBackground)Background).CurrentBlur == new Vector2((float)BlurLevel.Value * BackgroundScreenBeatmap.USER_BLUR_FACTOR);
+            public bool IsUserBlurApplied() => background.CurrentBlur == new Vector2((float)BlurLevel.Value * BackgroundScreenBeatmap.USER_BLUR_FACTOR);
 
-            public bool IsUserBlurDisabled() => ((FadeAccessibleBackground)Background).CurrentBlur == new Vector2(0);
+            public bool IsUserBlurDisabled() => background.CurrentBlur == new Vector2(0);
 
-            public bool IsBackgroundInvisible() => ((FadeAccessibleBackground)Background).CurrentAlpha == 0;
+            public bool IsBackgroundInvisible() => background.CurrentAlpha == 0;
 
-            public bool IsBackgroundVisible() => ((FadeAccessibleBackground)Background).CurrentAlpha == 1;
+            public bool IsBackgroundVisible() => background.CurrentAlpha == 1;
 
-            public bool IsBlurCorrect() => ((FadeAccessibleBackground)Background).CurrentBlur == new Vector2(BACKGROUND_BLUR);
+            public bool IsBlurCorrect() => background.CurrentBlur == new Vector2(BACKGROUND_BLUR);
+
+            public bool CheckBackgroundBlur(Vector2 expected) => background.CurrentBlur == expected;
 
             /// <summary>
             /// Make sure every time a screen gets pushed, the background doesn't get replaced
             /// </summary>
             /// <returns>Whether or not the original background (The one created in DummySongSelect) is still the current background</returns>
-            public bool IsBackgroundCurrent() => ((FadeAccessibleBackground)Background).IsCurrentScreen();
+            public bool IsBackgroundCurrent() => background?.IsCurrentScreen() == true;
         }
 
         private class FadeAccessibleResults : ResultsScreen
@@ -324,12 +330,20 @@ namespace osu.Game.Tests.Visual.Background
 
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground(Beatmap.Value);
 
-            public bool IsBlurCorrect() => ((FadeAccessibleBackground)Background).CurrentBlur == new Vector2(BACKGROUND_BLUR);
+            public Vector2 ExpectedBackgroundBlur => new Vector2(BACKGROUND_BLUR);
         }
 
         private class LoadBlockingTestPlayer : TestPlayer
         {
-            protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground(Beatmap.Value);
+            protected override BackgroundScreen CreateBackground() =>
+                new FadeAccessibleBackground(Beatmap.Value);
+
+            public override void OnEntering(IScreen last)
+            {
+                base.OnEntering(last);
+
+                ApplyToBackground(b => ReplacesBackground.BindTo(b.StoryboardReplacesBackground));
+            }
 
             public new DimmableStoryboard DimmableStoryboard => base.DimmableStoryboard;
 
@@ -354,15 +368,16 @@ namespace osu.Game.Tests.Visual.Background
                     Thread.Sleep(1);
 
                 StoryboardEnabled = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
-                ReplacesBackground.BindTo(Background.StoryboardReplacesBackground);
                 DrawableRuleset.IsPaused.BindTo(IsPaused);
             }
         }
 
         private class TestPlayerLoader : PlayerLoader
         {
+            private FadeAccessibleBackground background;
+
             public VisualSettings VisualSettingsPos => VisualSettings;
-            public BackgroundScreen ScreenPos => Background;
+            public BackgroundScreen ScreenPos => background;
 
             public TestPlayerLoader(Player player)
                 : base(() => player)
@@ -371,9 +386,9 @@ namespace osu.Game.Tests.Visual.Background
 
             public void TriggerOnHover() => OnHover(new HoverEvent(new InputState()));
 
-            public bool IsBlurCorrect() => ((FadeAccessibleBackground)Background).CurrentBlur == new Vector2(BACKGROUND_BLUR);
+            public Vector2 ExpectedBackgroundBlur => new Vector2(BACKGROUND_BLUR);
 
-            protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground(Beatmap.Value);
+            protected override BackgroundScreen CreateBackground() => background = new FadeAccessibleBackground(Beatmap.Value);
         }
 
         private class FadeAccessibleBackground : BackgroundScreenBeatmap

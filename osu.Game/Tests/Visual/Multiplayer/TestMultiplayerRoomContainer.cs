@@ -25,6 +25,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Cached]
         public readonly Bindable<FilterCriteria> Filter = new Bindable<FilterCriteria>(new FilterCriteria());
 
+        [Cached]
+        public readonly OngoingOperationTracker OngoingOperationTracker;
+
         public TestMultiplayerRoomContainer()
         {
             RelativeSizeAxes = Axes.Both;
@@ -33,6 +36,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 Client = new TestMultiplayerClient(),
                 RoomManager = new TestMultiplayerRoomManager(),
+                OngoingOperationTracker = new OngoingOperationTracker(),
                 content = new Container { RelativeSizeAxes = Axes.Both }
             });
         }

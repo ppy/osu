@@ -114,14 +114,32 @@ namespace osu.Game.Rulesets.Mods
             bindable.ValueChanged += _ => userChangedSettings[bindable] = !bindable.IsDefault;
         }
 
+        internal override void CopyAdjustedSetting(IBindable target, object source)
+        {
+            // if the value is non-bindable, it's presumably coming from an external source (like the API) - therefore presume it is not default.
+            // if the value is bindable, defer to the source's IsDefault to be able to tell.
+            userChangedSettings[target] = !(source is IBindable bindableSource) || !bindableSource.IsDefault;
+            base.CopyAdjustedSetting(target, source);
+        }
+
+        /// <summary>
+        /// Applies a setting from a configuration bindable using <paramref name="applyFunc"/>, if it has been changed by the user.
+        /// </summary>
+        protected void ApplySetting<T>(BindableNumber<T> setting, Action<T> applyFunc)
+            where T : struct, IComparable<T>, IConvertible, IEquatable<T>
+        {
+            if (userChangedSettings.TryGetValue(setting, out bool userChangedSetting) && userChangedSetting)
+                applyFunc.Invoke(setting.Value);
+        }
+
         /// <summary>
         /// Apply all custom settings to the provided beatmap.
         /// </summary>
         /// <param name="difficulty">The beatmap to have settings applied.</param>
         protected virtual void ApplySettings(BeatmapDifficulty difficulty)
         {
-            difficulty.DrainRate = DrainRate.Value;
-            difficulty.OverallDifficulty = OverallDifficulty.Value;
+            ApplySetting(DrainRate, dr => difficulty.DrainRate = dr);
+            ApplySetting(OverallDifficulty, od => difficulty.OverallDifficulty = od);
         }
     }
 }

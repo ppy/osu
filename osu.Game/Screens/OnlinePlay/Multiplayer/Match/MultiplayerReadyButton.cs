@@ -1,15 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Diagnostics;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Online.API;
@@ -24,14 +23,21 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
     {
         public Bindable<PlaylistItem> SelectedItem => button.SelectedItem;
 
+        public Action OnReadyClick
+        {
+            set => button.Action = value;
+        }
+
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        [CanBeNull]
-        private MultiplayerRoomUser localUser;
-
         [Resolved]
         private OsuColour colours { get; set; }
+
+        [Resolved]
+        private OngoingOperationTracker ongoingOperationTracker { get; set; }
+
+        private IBindable<bool> operationInProgress;
 
         private SampleChannel sampleReadyCount;
 
@@ -46,7 +52,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 RelativeSizeAxes = Axes.Both,
                 Size = Vector2.One,
                 Enabled = { Value = true },
-                Action = onClick
             };
         }
 
@@ -54,21 +59,22 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         private void load(AudioManager audio)
         {
             sampleReadyCount = audio.Samples.Get(@"SongSelect/select-difficulty");
+
+            operationInProgress = ongoingOperationTracker.InProgress.GetBoundCopy();
+            operationInProgress.BindValueChanged(_ => updateState());
         }
 
         protected override void OnRoomUpdated()
         {
             base.OnRoomUpdated();
 
-            // this method is called on leaving the room, so the local user may not exist in the room any more.
-            localUser = Room?.Users.SingleOrDefault(u => u.User?.Id == api.LocalUser.Value.Id);
-
-            button.Enabled.Value = Client.Room?.State == MultiplayerRoomState.Open;
             updateState();
         }
 
         private void updateState()
         {
+            var localUser = Client.LocalUser;
+
             if (localUser == null)
                 return;
 
@@ -100,6 +106,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     break;
             }
 
+            button.Enabled.Value = Client.Room?.State == MultiplayerRoomState.Open && !operationInProgress.Value;
+
             if (newCountReady != countReady)
             {
                 countReady = newCountReady;
@@ -129,22 +137,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 button.BackgroundColour = colours.YellowDark;
                 button.Triangles.ColourDark = colours.YellowDark;
                 button.Triangles.ColourLight = colours.Yellow;
-            }
-        }
-
-        private void onClick()
-        {
-            if (localUser == null)
-                return;
-
-            if (localUser.State == MultiplayerUserState.Idle)
-                Client.ChangeState(MultiplayerUserState.Ready).CatchUnobservedExceptions(true);
-            else
-            {
-                if (Room?.Host?.Equals(localUser) == true)
-                    Client.StartMatch().CatchUnobservedExceptions(true);
-                else
-                    Client.ChangeState(MultiplayerUserState.Idle).CatchUnobservedExceptions(true);
             }
         }
 
