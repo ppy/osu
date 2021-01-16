@@ -37,6 +37,8 @@ namespace osu.Game.Rulesets.Judgements
             {
                 JudgementText = new OsuSpriteText
                 {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     Text = Result.GetDescription().ToUpperInvariant(),
                     Colour = colours.ForHitResult(Result),
                     Font = OsuFont.Numeric.With(size: 20),

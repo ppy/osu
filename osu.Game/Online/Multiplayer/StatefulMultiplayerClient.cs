@@ -52,6 +52,7 @@ namespace osu.Game.Online.Multiplayer
 
         /// <summary>
         /// Whether the <see cref="StatefulMultiplayerClient"/> is currently connected.
+        /// This is NOT thread safe and usage should be scheduled.
         /// </summary>
         public abstract IBindable<bool> IsConnected { get; }
 
@@ -227,6 +228,8 @@ namespace osu.Game.Online.Multiplayer
 
         public abstract Task ChangeState(MultiplayerUserState newState);
 
+        public abstract Task ChangeBeatmapAvailability(BeatmapAvailability newBeatmapAvailability);
+
         public abstract Task StartMatch();
 
         Task IMultiplayerClient.RoomStateChanged(MultiplayerRoomState state)
@@ -347,6 +350,27 @@ namespace osu.Game.Online.Multiplayer
                 Room.Users.Single(u => u.UserID == userId).State = state;
 
                 updateUserPlayingState(userId, state);
+
+                RoomUpdated?.Invoke();
+            }, false);
+
+            return Task.CompletedTask;
+        }
+
+        Task IMultiplayerClient.UserBeatmapAvailabilityChanged(int userId, BeatmapAvailability beatmapAvailability)
+        {
+            if (Room == null)
+                return Task.CompletedTask;
+
+            Scheduler.Add(() =>
+            {
+                var user = Room?.Users.SingleOrDefault(u => u.UserID == userId);
+
+                // errors here are not critical - beatmap availability state is mostly for display.
+                if (user == null)
+                    return;
+
+                user.BeatmapAvailability = beatmapAvailability;
 
                 RoomUpdated?.Invoke();
             }, false);
