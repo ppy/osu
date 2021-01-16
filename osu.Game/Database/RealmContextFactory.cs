@@ -138,6 +138,7 @@ namespace osu.Game.Database
             {
                 // rollback if not explicitly committed.
                 transaction?.Dispose();
+                Realm?.Dispose();
 
                 Monitor.Exit(factory.writeLock);
                 pending_writes.Value--;
