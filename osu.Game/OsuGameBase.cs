@@ -426,7 +426,8 @@ namespace osu.Game
             {
                 var imports = tasks.Where(t => t.Path.EndsWith(ext, StringComparison.OrdinalIgnoreCase));
 
-                return fileImporters.FirstOrDefault(i => i.HandledExtensions.Contains(ext))?.Import(imports.ToArray()) ?? Task.CompletedTask;
+                var importer = fileImporters.FirstOrDefault(i => i.HandledExtensions.Contains(ext));
+                return importer?.Import(imports.ToArray()) ?? Task.CompletedTask;
             }));
         }
 
