@@ -33,12 +33,16 @@
       DeepEqual is not netstandard-compatible. This is fine since we run tests with .NET Framework anyway.
       This is required due to https://github.com/NuGet/Home/issues/5740
 
+    NU5104:
+      This is triggered on osu.Game due to using a beta/prerelease version of realm.
+      Warning suppression can be removed after migrating off of a beta release.
+
     CA9998:
       Microsoft.CodeAnalysis.FxCopAnalyzers has been deprecated.
       The entire package will be able to be removed after migrating to .NET 5,
       as analysers are shipped as part of the .NET 5 SDK anyway.
     -->
-    <NoWarn>$(NoWarn);NU1701;CA9998</NoWarn>
+    <NoWarn>$(NoWarn);NU1701;NU5104;CA9998</NoWarn>
   </PropertyGroup>
   <PropertyGroup Label="Nuget">
     <IsPackable>false</IsPackable>
