@@ -53,7 +53,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChildren = new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
                 new GridContainer
                 {
@@ -161,7 +161,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                         {
                             new MultiplayerMatchFooter
                             {
-                                SelectedItem = { BindTarget = SelectedItem },
                                 OnReadyClick = onReadyClick
                             }
                         }
@@ -177,7 +176,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     RelativeSizeAxes = Axes.Both,
                     State = { Value = client.Room == null ? Visibility.Visible : Visibility.Hidden }
                 }
-            };
+            });
         }
 
         protected override void LoadComplete()
