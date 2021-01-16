@@ -145,14 +145,14 @@ namespace osu.Game.Overlays.BeatmapSet
                                                     {
                                                         Anchor = Anchor.BottomLeft,
                                                         Origin = Anchor.BottomLeft,
-                                                        Margin = new MarginPadding { Left = 3, Bottom = 4 }, // To better lineup with the font
+                                                        Margin = new MarginPadding { Left = 5, Bottom = 4 }, // To better lineup with the font
                                                     },
                                                     explicitPill = new ExplicitBeatmapPill
                                                     {
                                                         Alpha = 0f,
-                                                        Anchor = Anchor.CentreLeft,
-                                                        Origin = Anchor.CentreLeft,
-                                                        Margin = new MarginPadding { Left = 15f, Top = 4 },
+                                                        Anchor = Anchor.BottomLeft,
+                                                        Origin = Anchor.BottomLeft,
+                                                        Margin = new MarginPadding { Left = 10, Bottom = 4 },
                                                     }
                                                 }
                                             },
