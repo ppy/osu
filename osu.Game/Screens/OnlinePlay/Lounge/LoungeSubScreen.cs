@@ -1,7 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -26,6 +29,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         protected override UserActivity InitialActivity => new UserActivity.SearchingForLobby();
 
         private readonly IBindable<bool> initialRoomsReceived = new Bindable<bool>();
+        private readonly IBindable<bool> operationInProgress = new Bindable<bool>();
 
         private FilterControl filter;
         private Container content;
@@ -37,7 +41,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         [Resolved]
         private MusicController music { get; set; }
 
-        private bool joiningRoom;
+        [Resolved(CanBeNull = true)]
+        private OngoingOperationTracker ongoingOperationTracker { get; set; }
+
+        [CanBeNull]
+        private IDisposable joiningRoomOperation { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -65,7 +73,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                                     Padding = new MarginPadding(10),
                                     Child = roomsContainer = new RoomsContainer { JoinRequested = joinRequested }
                                 },
-                                loadingLayer = new LoadingLayer(roomsContainer),
+                                loadingLayer = new LoadingLayer(true),
                             }
                         },
                         new RoomInspector
@@ -98,7 +106,13 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             base.LoadComplete();
 
             initialRoomsReceived.BindTo(RoomManager.InitialRoomsReceived);
-            initialRoomsReceived.BindValueChanged(onInitialRoomsReceivedChanged, true);
+            initialRoomsReceived.BindValueChanged(_ => updateLoadingLayer());
+
+            if (ongoingOperationTracker != null)
+            {
+                operationInProgress.BindTo(ongoingOperationTracker.InProgress);
+                operationInProgress.BindValueChanged(_ => updateLoadingLayer(), true);
+            }
         }
 
         protected override void UpdateAfterChildren()
@@ -156,26 +170,24 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         private void joinRequested(Room room)
         {
-            joiningRoom = true;
-            updateLoadingLayer();
+            Debug.Assert(joiningRoomOperation == null);
+            joiningRoomOperation = ongoingOperationTracker?.BeginOperation();
 
             RoomManager?.JoinRoom(room, r =>
             {
                 Open(room);
-                joiningRoom = false;
-                updateLoadingLayer();
+                joiningRoomOperation?.Dispose();
+                joiningRoomOperation = null;
             }, _ =>
             {
-                joiningRoom = false;
-                updateLoadingLayer();
+                joiningRoomOperation?.Dispose();
+                joiningRoomOperation = null;
             });
         }
 
-        private void onInitialRoomsReceivedChanged(ValueChangedEvent<bool> received) => updateLoadingLayer();
-
         private void updateLoadingLayer()
         {
-            if (joiningRoom || !initialRoomsReceived.Value)
+            if (operationInProgress.Value || !initialRoomsReceived.Value)
                 loadingLayer.Show();
             else
                 loadingLayer.Hide();

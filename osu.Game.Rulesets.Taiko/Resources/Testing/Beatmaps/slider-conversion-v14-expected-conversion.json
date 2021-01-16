@@ -1,7 +1,9 @@
 {
-    "Mappings": [{
+    "Mappings": [
+        {
             "StartTime": 2000,
-            "Objects": [{
+            "Objects": [
+                {
                     "StartTime": 2000,
                     "EndTime": 2000,
                     "IsRim": false,
@@ -23,7 +25,8 @@
         },
         {
             "StartTime": 4000,
-            "Objects": [{
+            "Objects": [
+                {
                     "StartTime": 4000,
                     "EndTime": 4000,
                     "IsRim": false,
@@ -45,7 +48,8 @@
         },
         {
             "StartTime": 6000,
-            "Objects": [{
+            "Objects": [
+                {
                     "StartTime": 6000,
                     "EndTime": 6000,
                     "IsRim": true,
@@ -76,300 +80,13 @@
         },
         {
             "StartTime": 8000,
-            "Objects": [{
+            "Objects": [
+                {
                     "StartTime": 8000,
-                    "EndTime": 8000,
-                    "IsRim": false,
-                    "IsCentre": true,
-                    "IsDrumRoll": false,
-                    "IsSwell": false,
-                    "IsStrong": false
-                },
-                {
-                    "StartTime": 8026,
-                    "EndTime": 8026,
-                    "IsRim": false,
-                    "IsCentre": true,
-                    "IsDrumRoll": false,
-                    "IsSwell": false,
-                    "IsStrong": false
-                },
-                {
-                    "StartTime": 8053,
-                    "EndTime": 8053,
-                    "IsRim": false,
-                    "IsCentre": true,
-                    "IsDrumRoll": false,
-                    "IsSwell": false,
-                    "IsStrong": false
-                },
-                {
-                    "StartTime": 8080,
-                    "EndTime": 8080,
-                    "IsRim": false,
-                    "IsCentre": true,
-                    "IsDrumRoll": false,
-                    "IsSwell": false,
-                    "IsStrong": false
-                },
-                {
-                    "StartTime": 8107,
-                    "EndTime": 8107,
-                    "IsRim": false,
-                    "IsCentre": true,
-                    "IsDrumRoll": false,
-                    "IsSwell": false,
-                    "IsStrong": false
-                },
-                {
-                    "StartTime": 8133,
-                    "EndTime": 8133,
-                    "IsRim": false,
-                    "IsCentre": true,
-                    "IsDrumRoll": false,
-                    "IsSwell": false,
-                    "IsStrong": false
-                },
-                {
-                    "StartTime": 8160,
-                    "EndTime": 8160,
-                    "IsRim": false,
-                    "IsCentre": true,
-                    "IsDrumRoll": false,
-                    "IsSwell": false,
-                    "IsStrong": false
-                },
-                {
-                    "StartTime": 8187,
-                    "EndTime": 8187,
-                    "IsRim": false,
-                    "IsCentre": true,
-                    "IsDrumRoll": false,
-                    "IsSwell": false,
-                    "IsStrong": false
-                },
-                {
-                    "StartTime": 8214,
-                    "EndTime": 8214,
-                    "IsRim": false,
-                    "IsCentre": true,
-                    "IsDrumRoll": false,
-                    "IsSwell": false,
-                    "IsStrong": false
-                },
-                {
-                    "StartTime": 8241,
-                    "EndTime": 8241,
-                    "IsRim": false,
-                    "IsCentre": true,
-                    "IsDrumRoll": false,
-                    "IsSwell": false,
-                    "IsStrong": false
-                },
-                {
-                    "StartTime": 8267,
-                    "EndTime": 8267,
-                    "IsRim": false,
-                    "IsCentre": true,
-                    "IsDrumRoll": false,
-                    "IsSwell": false,
-                    "IsStrong": false
-                },
-                {
-                    "StartTime": 8294,
-                    "EndTime": 8294,
-                    "IsRim": false,
-                    "IsCentre": true,
-                    "IsDrumRoll": false,
-                    "IsSwell": false,
-                    "IsStrong": false
-                },
-                {
-                    "StartTime": 8321,
-                    "EndTime": 8321,
-                    "IsRim": false,
-                    "IsCentre": true,
-                    "IsDrumRoll": false,
-                    "IsSwell": false,
-                    "IsStrong": false
-                },
-                {
-                    "StartTime": 8348,
-                    "EndTime": 8348,
-                    "IsRim": false,
-                    "IsCentre": true,
-                    "IsDrumRoll": false,
-                    "IsSwell": false,
-                    "IsStrong": false
-                },
-                {
-                    "StartTime": 8374,
-                    "EndTime": 8374,
-                    "IsRim": false,
-                    "IsCentre": true,
-                    "IsDrumRoll": false,
-                    "IsSwell": false,
-                    "IsStrong": false
-                },
-                {
-                    "StartTime": 8401,
-                    "EndTime": 8401,
-                    "IsRim": false,
-                    "IsCentre": true,
-                    "IsDrumRoll": false,
-                    "IsSwell": false,
-                    "IsStrong": false
-                },
-                {
-                    "StartTime": 8428,
-                    "EndTime": 8428,
-                    "IsRim": false,
-                    "IsCentre": true,
-                    "IsDrumRoll": false,
-                    "IsSwell": false,
-                    "IsStrong": false
-                },
-                {
-                    "StartTime": 8455,
-                    "EndTime": 8455,
-                    "IsRim": false,
-                    "IsCentre": true,
-                    "IsDrumRoll": false,
-                    "IsSwell": false,
-                    "IsStrong": false
-                },
-                {
-                    "StartTime": 8482,
-                    "EndTime": 8482,
-                    "IsRim": false,
-                    "IsCentre": true,
-                    "IsDrumRoll": false,
-                    "IsSwell": false,
-                    "IsStrong": false
-                },
-                {
-                    "StartTime": 8508,
-                    "EndTime": 8508,
-                    "IsRim": false,
-                    "IsCentre": true,
-                    "IsDrumRoll": false,
-                    "IsSwell": false,
-                    "IsStrong": false
-                },
-                {
-                    "StartTime": 8535,
-                    "EndTime": 8535,
-                    "IsRim": false,
-                    "IsCentre": true,
-                    "IsDrumRoll": false,
-                    "IsSwell": false,
-                    "IsStrong": false
-                },
-                {
-                    "StartTime": 8562,
-                    "EndTime": 8562,
-                    "IsRim": false,
-                    "IsCentre": true,
-                    "IsDrumRoll": false,
-                    "IsSwell": false,
-                    "IsStrong": false
-                },
-                {
-                    "StartTime": 8589,
-                    "EndTime": 8589,
-                    "IsRim": false,
-                    "IsCentre": true,
-                    "IsDrumRoll": false,
-                    "IsSwell": false,
-                    "IsStrong": false
-                },
-                {
-                    "StartTime": 8615,
-                    "EndTime": 8615,
-                    "IsRim": false,
-                    "IsCentre": true,
-                    "IsDrumRoll": false,
-                    "IsSwell": false,
-                    "IsStrong": false
-                },
-                {
-                    "StartTime": 8642,
-                    "EndTime": 8642,
-                    "IsRim": false,
-                    "IsCentre": true,
-                    "IsDrumRoll": false,
-                    "IsSwell": false,
-                    "IsStrong": false
-                },
-                {
-                    "StartTime": 8669,
-                    "EndTime": 8669,
-                    "IsRim": false,
-                    "IsCentre": true,
-                    "IsDrumRoll": false,
-                    "IsSwell": false,
-                    "IsStrong": false
-                },
-                {
-                    "StartTime": 8696,
-                    "EndTime": 8696,
-                    "IsRim": false,
-                    "IsCentre": true,
-                    "IsDrumRoll": false,
-                    "IsSwell": false,
-                    "IsStrong": false
-                },
-                {
-                    "StartTime": 8723,
-                    "EndTime": 8723,
-                    "IsRim": false,
-                    "IsCentre": true,
-                    "IsDrumRoll": false,
-                    "IsSwell": false,
-                    "IsStrong": false
-                },
-                {
-                    "StartTime": 8749,
-                    "EndTime": 8749,
-                    "IsRim": false,
-                    "IsCentre": true,
-                    "IsDrumRoll": false,
-                    "IsSwell": false,
-                    "IsStrong": false
-                },
-                {
-                    "StartTime": 8776,
-                    "EndTime": 8776,
-                    "IsRim": false,
-                    "IsCentre": true,
-                    "IsDrumRoll": false,
-                    "IsSwell": false,
-                    "IsStrong": false
-                },
-                {
-                    "StartTime": 8803,
-                    "EndTime": 8803,
-                    "IsRim": false,
-                    "IsCentre": true,
-                    "IsDrumRoll": false,
-                    "IsSwell": false,
-                    "IsStrong": false
-                },
-                {
-                    "StartTime": 8830,
-                    "EndTime": 8830,
-                    "IsRim": false,
-                    "IsCentre": true,
-                    "IsDrumRoll": false,
-                    "IsSwell": false,
-                    "IsStrong": false
-                },
-                {
-                    "StartTime": 8857,
                     "EndTime": 8857,
                     "IsRim": false,
-                    "IsCentre": true,
-                    "IsDrumRoll": false,
+                    "IsCentre": false,
+                    "IsDrumRoll": true,
                     "IsSwell": false,
                     "IsStrong": false
                 }
