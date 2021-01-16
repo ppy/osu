@@ -144,7 +144,7 @@ namespace osu.Game.Online
 
         private void onRequestSuccess(string _) => Schedule(() => State.Value = DownloadState.Importing);
 
-        private void onRequestProgress(float progress) => Schedule(() => Progress.Value = progress);
+        private void onRequestProgress(double progress) => Schedule(() => Progress.Value = progress);
 
         private void onRequestFailure(Exception e) => Schedule(() => attachDownload(null));
 

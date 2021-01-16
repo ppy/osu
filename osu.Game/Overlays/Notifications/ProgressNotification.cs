@@ -23,9 +23,9 @@ namespace osu.Game.Overlays.Notifications
 
         public string CompletionText { get; set; } = "Task has completed!";
 
-        private float progress;
+        private double progress;
 
-        public float Progress
+        public double Progress
         {
             get => progress;
             set
@@ -185,9 +185,9 @@ namespace osu.Game.Overlays.Notifications
             private Color4 colourActive;
             private Color4 colourInactive;
 
-            private float progress;
+            private double progress;
 
-            public float Progress
+            public double Progress
             {
                 get => progress;
                 set
@@ -195,7 +195,7 @@ namespace osu.Game.Overlays.Notifications
                     if (progress == value) return;
 
                     progress = value;
-                    box.ResizeTo(new Vector2(progress, 1), 100, Easing.OutQuad);
+                    box.ResizeTo(new Vector2((float)progress, 1), 100, Easing.OutQuad);
                 }
             }
 
