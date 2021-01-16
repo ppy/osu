@@ -8,10 +8,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     public class OsuDifficultyAttributes : DifficultyAttributes
     {
         public double AimStrain;
+        public double[] AimComboStarRatings;
+        public double[] AimMissCounts;
+
         public double SpeedStrain;
+        public double[] SpeedComboStarRatings;
+        public double[] SpeedMissCounts;
+
         public double ApproachRate;
         public double OverallDifficulty;
         public int HitCircleCount;
+        public int HitSliderCount;
         public int SpinnerCount;
     }
 }
