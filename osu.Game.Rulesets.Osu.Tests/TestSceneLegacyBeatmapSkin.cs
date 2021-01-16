@@ -77,34 +77,12 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("is custom user skin colours", () => TestPlayer.UsableComboColours.SequenceEqual(TestSkin.Colours));
         }
 
-        protected override ExposedPlayer CreateTestPlayer(bool userHasCustomColours) => new OsuExposedPlayer(userHasCustomColours);
-
-        private class OsuExposedPlayer : ExposedPlayer
-        {
-            public OsuExposedPlayer(bool userHasCustomColours)
-                : base(userHasCustomColours)
-            {
-            }
-
-            protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-            {
-                var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-                dependencies.CacheAs<ISkinSource>(new OsuTestSkin(UserHasCustomColours));
-                return dependencies;
-            }
-        }
-
         private class OsuCustomSkinWorkingBeatmap : CustomSkinWorkingBeatmap
         {
-            private readonly bool hasColours;
-
             public OsuCustomSkinWorkingBeatmap(AudioManager audio, bool hasColours)
                 : base(createBeatmap(), audio, hasColours)
             {
-                this.hasColours = hasColours;
             }
-
-            protected override ISkin GetSkin() => new OsuTestBeatmapSkin(BeatmapInfo, hasColours);
 
             private static IBeatmap createBeatmap() =>
                 new Beatmap
@@ -116,22 +94,6 @@ namespace osu.Game.Rulesets.Osu.Tests
                     },
                     HitObjects = { new HitCircle { Position = new Vector2(256, 192) } }
                 };
-        }
-
-        private class OsuTestBeatmapSkin : TestBeatmapSkin
-        {
-            public OsuTestBeatmapSkin(BeatmapInfo beatmap, bool hasColours)
-                : base(beatmap, hasColours)
-            {
-            }
-        }
-
-        private class OsuTestSkin : TestSkin
-        {
-            public OsuTestSkin(bool hasCustomColours)
-                : base(hasCustomColours)
-            {
-            }
         }
     }
 }
