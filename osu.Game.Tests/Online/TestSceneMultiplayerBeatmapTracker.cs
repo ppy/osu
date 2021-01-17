@@ -77,10 +77,10 @@ namespace osu.Game.Tests.Online
             addAvailabilityCheckStep("state not downloaded", BeatmapAvailability.NotDownloaded);
 
             AddStep("start downloading", () => beatmaps.Download(testBeatmapSet));
-            addAvailabilityCheckStep("state downloading 0%", () => BeatmapAvailability.Downloading(0.0));
+            addAvailabilityCheckStep("state downloading 0%", () => BeatmapAvailability.Downloading(0.0f));
 
-            AddStep("set progress 40%", () => ((TestDownloadRequest)beatmaps.GetExistingDownload(testBeatmapSet)).SetProgress(0.4));
-            addAvailabilityCheckStep("state downloading 40%", () => BeatmapAvailability.Downloading(0.4));
+            AddStep("set progress 40%", () => ((TestDownloadRequest)beatmaps.GetExistingDownload(testBeatmapSet)).SetProgress(0.4f));
+            addAvailabilityCheckStep("state downloading 40%", () => BeatmapAvailability.Downloading(0.4f));
 
             AddStep("finish download", () => ((TestDownloadRequest)beatmaps.GetExistingDownload(testBeatmapSet)).TriggerSuccess(testBeatmapFile));
             addAvailabilityCheckStep("state importing", BeatmapAvailability.Importing);
@@ -165,7 +165,7 @@ namespace osu.Game.Tests.Online
 
         private class TestDownloadRequest : ArchiveDownloadRequest<BeatmapSetInfo>
         {
-            public new void SetProgress(double progress) => base.SetProgress(progress);
+            public new void SetProgress(float progress) => base.SetProgress(progress);
 
             public TestDownloadRequest(BeatmapSetInfo model)
                 : base(model)

@@ -70,7 +70,7 @@ namespace osu.Game.Online.Rooms
                     break;
 
                 case DownloadState.Downloading:
-                    availability.Value = BeatmapAvailability.Downloading(Progress.Value);
+                    availability.Value = BeatmapAvailability.Downloading((float)Progress.Value);
                     break;
 
                 case DownloadState.Importing:
