@@ -60,7 +60,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.ExternalLinkWarning, true);
             Set(OsuSetting.PreferNoVideo, false);
 
-            Set(OsuSetting.AllowExplicitContent, false);
+            Set(OsuSetting.ShowOnlineExplicitContent, false);
 
             // Audio
             Set(OsuSetting.VolumeInactive, 0.25, 0, 1, 0.01);
@@ -272,6 +272,6 @@ namespace osu.Game.Configuration
         EditorWaveformOpacity,
         DiscordRichPresence,
         AutomaticallyDownloadWhenSpectating,
-        AllowExplicitContent,
+        ShowOnlineExplicitContent,
     }
 }

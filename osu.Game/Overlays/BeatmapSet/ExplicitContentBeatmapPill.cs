@@ -10,9 +10,9 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class ExplicitBeatmapPill : CompositeDrawable
+    public class ExplicitContentBeatmapPill : CompositeDrawable
     {
-        public ExplicitBeatmapPill()
+        public ExplicitContentBeatmapPill()
         {
             AutoSizeAxes = Axes.Both;
         }

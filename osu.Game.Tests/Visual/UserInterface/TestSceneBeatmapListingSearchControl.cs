@@ -78,7 +78,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             control.Extra.BindCollectionChanged((u, v) => extra.Text = $"Extra: {(control.Extra.Any() ? string.Join('.', control.Extra.Select(i => i.ToString().ToLowerInvariant())) : "")}", true);
             control.Ranks.BindCollectionChanged((u, v) => ranks.Text = $"Ranks: {(control.Ranks.Any() ? string.Join('.', control.Ranks.Select(i => i.ToString())) : "")}", true);
             control.Played.BindValueChanged(p => played.Text = $"Played: {p.NewValue}", true);
-            control.Explicit.BindValueChanged(e => explicitMap.Text = $"Explicit Maps: {e.NewValue}", true);
+            control.ExplicitContent.BindValueChanged(e => explicitMap.Text = $"Explicit Maps: {e.NewValue}", true);
         });
 
         [Test]
@@ -92,11 +92,11 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestExplicitConfig()
         {
-            AddStep("configure explicit content to allowed", () => localConfig.Set(OsuSetting.AllowExplicitContent, true));
-            AddAssert("explicit control set to show", () => control.Explicit.Value == SearchExplicit.Show);
+            AddStep("configure explicit content to allowed", () => localConfig.Set(OsuSetting.ShowOnlineExplicitContent, true));
+            AddAssert("explicit control set to show", () => control.ExplicitContent.Value == SearchExplicit.Show);
 
-            AddStep("configure explicit content to disallowed", () => localConfig.Set(OsuSetting.AllowExplicitContent, false));
-            AddAssert("explicit control set to hide", () => control.Explicit.Value == SearchExplicit.Hide);
+            AddStep("configure explicit content to disallowed", () => localConfig.Set(OsuSetting.ShowOnlineExplicitContent, false));
+            AddAssert("explicit control set to hide", () => control.ExplicitContent.Value == SearchExplicit.Hide);
         }
 
         protected override void Dispose(bool isDisposing)
