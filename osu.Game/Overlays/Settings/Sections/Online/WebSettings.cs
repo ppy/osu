@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Settings.Sections.Online
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Hide warnings for explicit content in beatmaps",
+                    LabelText = "Show explicit content in search results",
                     Keywords = new[] { "nsfw", "18+", "offensive" },
                     Current = config.GetBindable<bool>(OsuSetting.ShowOnlineExplicitContent),
                 }
