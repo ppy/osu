@@ -42,7 +42,7 @@ namespace osu.Game.Screens.OnlinePlay
         private Container difficultyIconContainer;
         private LinkFlowContainer beatmapText;
         private LinkFlowContainer authorText;
-        private ExplicitBeatmapPill explicitPill;
+        private ExplicitContentBeatmapPill explicitContentPill;
         private ModDisplay modDisplay;
 
         private readonly Bindable<BeatmapInfo> beatmap = new Bindable<BeatmapInfo>();
@@ -119,7 +119,7 @@ namespace osu.Game.Screens.OnlinePlay
             }
 
             bool hasExplicitContent = Item.Beatmap.Value.BeatmapSet.OnlineInfo?.HasExplicitContent == true;
-            explicitPill.Alpha = hasExplicitContent ? 1 : 0;
+            explicitContentPill.Alpha = hasExplicitContent ? 1 : 0;
 
             modDisplay.Current.Value = requiredMods.ToArray();
         }
@@ -181,7 +181,7 @@ namespace osu.Game.Screens.OnlinePlay
                                             Children = new Drawable[]
                                             {
                                                 authorText = new LinkFlowContainer { AutoSizeAxes = Axes.Both },
-                                                explicitPill = new ExplicitBeatmapPill
+                                                explicitContentPill = new ExplicitContentBeatmapPill
                                                 {
                                                     Alpha = 0f,
                                                     Anchor = Anchor.CentreLeft,

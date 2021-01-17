@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Settings.Sections.Online
                 {
                     LabelText = "Hide warnings for explicit content in beatmaps",
                     Keywords = new[] { "nsfw", "18+", "offensive" },
-                    Current = config.GetBindable<bool>(OsuSetting.AllowExplicitContent),
+                    Current = config.GetBindable<bool>(OsuSetting.ShowOnlineExplicitContent),
                 }
             };
         }

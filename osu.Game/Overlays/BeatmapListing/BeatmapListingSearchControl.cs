@@ -43,7 +43,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
         public Bindable<SearchPlayed> Played => playedFilter.Current;
 
-        public Bindable<SearchExplicit> Explicit => explicitFilter.Current;
+        public Bindable<SearchExplicit> ExplicitContent => explicitContentFilter.Current;
 
         public BeatmapSetInfo BeatmapSet
         {
@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.BeatmapListing
         private readonly BeatmapSearchMultipleSelectionFilterRow<SearchExtra> extraFilter;
         private readonly BeatmapSearchScoreFilterRow ranksFilter;
         private readonly BeatmapSearchFilterRow<SearchPlayed> playedFilter;
-        private readonly BeatmapSearchFilterRow<SearchExplicit> explicitFilter;
+        private readonly BeatmapSearchFilterRow<SearchExplicit> explicitContentFilter;
 
         private readonly Box background;
         private readonly UpdateableBeatmapSetCover beatmapCover;
@@ -130,7 +130,7 @@ namespace osu.Game.Overlays.BeatmapListing
                                     extraFilter = new BeatmapSearchMultipleSelectionFilterRow<SearchExtra>(@"Extra"),
                                     ranksFilter = new BeatmapSearchScoreFilterRow(),
                                     playedFilter = new BeatmapSearchFilterRow<SearchPlayed>(@"Played"),
-                                    explicitFilter = new BeatmapSearchFilterRow<SearchExplicit>(@"Explicit Maps"),
+                                    explicitContentFilter = new BeatmapSearchFilterRow<SearchExplicit>(@"Explicit Content"),
                                 }
                             }
                         }
@@ -148,10 +148,10 @@ namespace osu.Game.Overlays.BeatmapListing
         {
             background.Colour = colourProvider.Dark6;
 
-            allowExplicitContent = config.GetBindable<bool>(OsuSetting.AllowExplicitContent);
+            allowExplicitContent = config.GetBindable<bool>(OsuSetting.ShowOnlineExplicitContent);
             allowExplicitContent.BindValueChanged(allow =>
             {
-                Explicit.Value = allow.NewValue ? SearchExplicit.Show : SearchExplicit.Hide;
+                ExplicitContent.Value = allow.NewValue ? SearchExplicit.Show : SearchExplicit.Hide;
             }, true);
         }
 
