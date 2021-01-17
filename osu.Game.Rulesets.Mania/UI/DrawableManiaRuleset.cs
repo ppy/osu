@@ -55,6 +55,11 @@ namespace osu.Game.Rulesets.Mania.UI
         // Stores the current speed adjustment active in gameplay.
         private readonly Track speedAdjustmentTrack = new TrackVirtual(0);
 
+        /// <summary>
+        /// Whether difficulty points should be taken into account, even on convert maps.
+        /// </summary>
+        public bool PreserveDifficultyPoints { get; set; }
+
         public DrawableManiaRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset, beatmap, mods)
         {
@@ -76,7 +81,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 p.BaseBeatLength *= Beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier;
 
                 // For non-mania beatmap, speed changes should only happen through timing points
-                if (!isForCurrentRuleset)
+                if (!isForCurrentRuleset && !PreserveDifficultyPoints)
                     p.DifficultyPoint = new DifficultyControlPoint();
             }
 

@@ -6,11 +6,14 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public class ManiaModFixedScroll : Mod, IApplicableToBeatmap
+    public class ManiaModFixedScroll : Mod, IApplicableToBeatmap, IApplicableToDrawableRuleset<ManiaHitObject>
     {
         public override string Name => "Fixed Scroll";
         public override string Acronym => "FS";
@@ -57,6 +60,12 @@ namespace osu.Game.Rulesets.Mania.Mods
                     group.Add(diffControlPoint);
                 }
             }
+        }
+
+        public void ApplyToDrawableRuleset(DrawableRuleset<ManiaHitObject> drawableRuleset)
+        {
+            var maniaRuleset = (DrawableManiaRuleset)drawableRuleset;
+            maniaRuleset.PreserveDifficultyPoints = true;
         }
     }
 }
