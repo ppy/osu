@@ -48,10 +48,6 @@ desc 'Deploy to play store'
 
   desc 'Compile the project'
   lane :build do |options|
-    nuget_restore(
-      project_path: 'osu.sln'
-    )
-
     souyuz(
       build_configuration: 'Release',
       solution_path: 'osu.sln',
@@ -107,10 +103,6 @@ platform :ios do
 
   desc 'Compile the project'
   lane :build do
-    nuget_restore(
-      project_path: 'osu.sln'
-    )
-
     souyuz(
       platform: "ios",
       plist_path: "osu.iOS/Info.plist"
