@@ -47,6 +47,8 @@ namespace osu.Game.Tests.Online
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
+            beatmaps.AllowImport = new TaskCompletionSource<bool>();
+
             testBeatmapFile = getTestBeatmapOsz();
 
             testBeatmapInfo = new TestBeatmap(Ruleset.Value).BeatmapInfo;
@@ -83,7 +85,7 @@ namespace osu.Game.Tests.Online
             AddStep("finish download", () => ((TestDownloadRequest)beatmaps.GetExistingDownload(testBeatmapSet)).TriggerSuccess(testBeatmapFile));
             addAvailabilityCheckStep("state importing", BeatmapAvailability.Importing);
 
-            AddStep("allow importing", () => beatmaps.AllowImport.Set());
+            AddStep("allow importing", () => beatmaps.AllowImport.SetResult(true));
             AddUntilStep("wait for import", () => beatmaps.IsAvailableLocally(testBeatmapSet));
             addAvailabilityCheckStep("state locally available", BeatmapAvailability.LocallyAvailable);
         }
@@ -91,7 +93,7 @@ namespace osu.Game.Tests.Online
         [Test]
         public void TestTrackerRespectsSoftDeleting()
         {
-            AddStep("allow importing", () => beatmaps.AllowImport.Set());
+            AddStep("allow importing", () => beatmaps.AllowImport.SetResult(true));
             AddStep("import beatmap", () => beatmaps.Import(testBeatmapSet).Wait());
             addAvailabilityCheckStep("state locally available", BeatmapAvailability.LocallyAvailable);
 
@@ -105,7 +107,7 @@ namespace osu.Game.Tests.Online
         [Test]
         public void TestTrackerRespectsChecksum()
         {
-            AddStep("allow importing", () => beatmaps.AllowImport.Set());
+            AddStep("allow importing", () => beatmaps.AllowImport.SetResult(true));
 
             BeatmapInfo wrongBeatmap = null;
 
@@ -144,7 +146,7 @@ namespace osu.Game.Tests.Online
 
         private class TestBeatmapManager : BeatmapManager
         {
-            public readonly ManualResetEventSlim AllowImport = new ManualResetEventSlim();
+            public TaskCompletionSource<bool> AllowImport = new TaskCompletionSource<bool>();
 
             protected override ArchiveDownloadRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, bool minimiseDownloadSize)
                 => new TestDownloadRequest(set);
@@ -156,9 +158,7 @@ namespace osu.Game.Tests.Online
 
             public override async Task<BeatmapSetInfo> Import(BeatmapSetInfo item, ArchiveReader archive = null, CancellationToken cancellationToken = default)
             {
-                while (!AllowImport.IsSet)
-                    await Task.Delay(10, cancellationToken);
-
+                await AllowImport.Task;
                 return await base.Import(item, archive, cancellationToken);
             }
         }
