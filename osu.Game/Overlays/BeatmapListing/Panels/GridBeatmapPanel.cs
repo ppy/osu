@@ -205,7 +205,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
 
             if (SetInfo.OnlineInfo?.HasExplicitContent ?? false)
             {
-                titleContainer.Add(new ExplicitBeatmapPill
+                titleContainer.Add(new ExplicitContentBeatmapPill
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
