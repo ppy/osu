@@ -205,13 +205,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             createPlaylist(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo);
 
-            AddAssert("download button hidden", () => !playlist.ChildrenOfType<BeatmapDownloadTrackingComposite>().Single().IsPresent);
+            assertDownloadButtonVisible(false);
 
             AddStep("delete beatmap set", () => manager.Delete(manager.QueryBeatmapSets(_ => true).Single()));
-            AddUntilStep("download button shown", () => playlist.ChildrenOfType<BeatmapDownloadTrackingComposite>().Single().IsPresent);
+            assertDownloadButtonVisible(true);
 
             AddStep("undelete beatmap set", () => manager.Undelete(manager.QueryBeatmapSets(_ => true).Single()));
-            AddUntilStep("download button hidden", () => !playlist.ChildrenOfType<BeatmapDownloadTrackingComposite>().Single().IsPresent);
+            assertDownloadButtonVisible(false);
+
+            void assertDownloadButtonVisible(bool visible) => AddUntilStep($"download button {(visible ? "shown" : "hidden")}",
+                () => playlist.ChildrenOfType<BeatmapDownloadTrackingComposite>().Single().Alpha == (visible ? 1 : 0));
         }
 
         [Test]
