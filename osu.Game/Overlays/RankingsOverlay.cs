@@ -147,16 +147,21 @@ namespace osu.Game.Overlays
             cancellationToken?.Cancel();
             lastRequest?.Cancel();
 
+            displayLoadedOperation ??= OngoingOperationTracker.BeginOperation();
+
             if (Scope.Value == RankingsScope.Spotlights)
             {
-                loadContent(new SpotlightsLayout
+                var spotlights = new SpotlightsLayout
                 {
                     Ruleset = { BindTarget = ruleset }
-                });
+                };
+
+                spotlights.RankingsLoaded += endOperation;
+                spotlights.SpotlightChanged += beginOperation;
+
+                loadContent(spotlights);
                 return;
             }
-
-            displayLoadedOperation ??= OngoingOperationTracker.BeginOperation();
 
             var request = createScopedRequest();
             lastRequest = request;
@@ -232,6 +237,8 @@ namespace osu.Game.Overlays
                 contentContainer.Child = loaded;
             }, (cancellationToken = new CancellationTokenSource()).Token);
         }
+
+        private void beginOperation() => displayLoadedOperation ??= OngoingOperationTracker.BeginOperation();
 
         private void endOperation()
         {

@@ -16,7 +16,6 @@ using System.Threading;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.BeatmapListing.Panels;
 using System;
-using osu.Game.Online;
 
 namespace osu.Game.Overlays.Rankings
 {
@@ -33,10 +32,8 @@ namespace osu.Game.Overlays.Rankings
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
-        [Resolved(CanBeNull = true)]
-        private OngoingOperationTracker ongoingOperationTracker { get; set; }
-
-        private IDisposable rankingsLoadedOperation;
+        public event Action SpotlightChanged;
+        public event Action RankingsLoaded;
 
         private CancellationTokenSource cancellationToken;
         private GetSpotlightRankingsRequest getRankingsRequest;
@@ -78,8 +75,6 @@ namespace osu.Game.Overlays.Rankings
         {
             base.LoadComplete();
 
-            rankingsLoadedOperation ??= ongoingOperationTracker?.BeginOperation();
-
             selectedSpotlight.BindValueChanged(_ => onSpotlightChanged());
             sort.BindValueChanged(_ => onSpotlightChanged());
             Ruleset.BindValueChanged(onRulesetChanged);
@@ -104,7 +99,7 @@ namespace osu.Game.Overlays.Rankings
 
         private void onSpotlightChanged()
         {
-            rankingsLoadedOperation ??= ongoingOperationTracker?.BeginOperation();
+            SpotlightChanged?.Invoke();
 
             cancellationToken?.Cancel();
             getRankingsRequest?.Cancel();
@@ -123,8 +118,7 @@ namespace osu.Game.Overlays.Rankings
                 content.Clear();
                 content.Add(loaded);
 
-                rankingsLoadedOperation?.Dispose();
-                rankingsLoadedOperation = null;
+                RankingsLoaded?.Invoke();
             }, (cancellationToken = new CancellationTokenSource()).Token);
         }
 
