@@ -34,6 +34,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly Box coverGradient;
         private readonly OsuSpriteText title, artist;
         private readonly AuthorInfo author;
+        private readonly ExplicitContentBeatmapPill explicitContentPill;
         private readonly FillFlowContainer downloadButtonsContainer;
         private readonly BeatmapAvailability beatmapAvailability;
         private readonly BeatmapSetOnlineStatusPill onlineStatusPill;
@@ -144,8 +145,15 @@ namespace osu.Game.Overlays.BeatmapSet
                                                     {
                                                         Anchor = Anchor.BottomLeft,
                                                         Origin = Anchor.BottomLeft,
-                                                        Margin = new MarginPadding { Left = 3, Bottom = 4 }, // To better lineup with the font
+                                                        Margin = new MarginPadding { Left = 5, Bottom = 4 }, // To better lineup with the font
                                                     },
+                                                    explicitContentPill = new ExplicitContentBeatmapPill
+                                                    {
+                                                        Alpha = 0f,
+                                                        Anchor = Anchor.BottomLeft,
+                                                        Origin = Anchor.BottomLeft,
+                                                        Margin = new MarginPadding { Left = 10, Bottom = 4 },
+                                                    }
                                                 }
                                             },
                                             artist = new OsuSpriteText
@@ -252,6 +260,8 @@ namespace osu.Game.Overlays.BeatmapSet
 
                     title.Text = setInfo.NewValue.Metadata.Title ?? string.Empty;
                     artist.Text = setInfo.NewValue.Metadata.Artist ?? string.Empty;
+
+                    explicitContentPill.Alpha = setInfo.NewValue.OnlineInfo.HasExplicitContent ? 1 : 0;
 
                     onlineStatusPill.FadeIn(500, Easing.OutQuint);
                     onlineStatusPill.Status = setInfo.NewValue.OnlineInfo.Status;
