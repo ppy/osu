@@ -201,11 +201,17 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        public void TestDownloadButtonHiddenInitiallyWhenBeatmapExists()
+        public void TestDownloadButtonHiddenWhenBeatmapExists()
         {
             createPlaylist(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo);
 
             AddAssert("download button hidden", () => !playlist.ChildrenOfType<BeatmapDownloadTrackingComposite>().Single().IsPresent);
+
+            AddStep("delete beatmap set", () => manager.Delete(manager.QueryBeatmapSets(_ => true).Single()));
+            AddUntilStep("download button shown", () => playlist.ChildrenOfType<BeatmapDownloadTrackingComposite>().Single().IsPresent);
+
+            AddStep("undelete beatmap set", () => manager.Undelete(manager.QueryBeatmapSets(_ => true).Single()));
+            AddUntilStep("download button hidden", () => !playlist.ChildrenOfType<BeatmapDownloadTrackingComposite>().Single().IsPresent);
         }
 
         [Test]
