@@ -166,6 +166,7 @@ namespace osu.Game.Tests.Online
         private class TestDownloadRequest : ArchiveDownloadRequest<BeatmapSetInfo>
         {
             public new void SetProgress(float progress) => base.SetProgress(progress);
+            public new void TriggerSuccess(string filename) => base.TriggerSuccess(filename);
 
             public TestDownloadRequest(BeatmapSetInfo model)
                 : base(model)
