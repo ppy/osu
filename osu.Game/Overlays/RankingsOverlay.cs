@@ -266,7 +266,7 @@ namespace osu.Game.Overlays
         {
             switch (state.NewValue)
             {
-                case APIState.Online:
+                default:
                     contentContainer.Show();
                     placeholderContainer.Hide();
                     break;

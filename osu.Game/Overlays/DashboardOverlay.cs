@@ -159,12 +159,16 @@ namespace osu.Game.Overlays
 
         private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
         {
-            if (state.NewValue == APIState.Online)
-                placeholderContainer.Hide();
-            else if (state.NewValue == APIState.Offline)
+            switch (state.NewValue)
             {
-                placeholderContainer.Show();
-                loading.Hide();
+                default:
+                    placeholderContainer.Hide();
+                    break;
+
+                case APIState.Offline:
+                    placeholderContainer.Show();
+                    loading.Hide();
+                    break;
             }
 
             if (State.Value == Visibility.Hidden)

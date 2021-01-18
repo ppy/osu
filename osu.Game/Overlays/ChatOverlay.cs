@@ -509,7 +509,7 @@ namespace osu.Game.Overlays
         {
             switch (state.NewValue)
             {
-                case APIState.Online:
+                default:
                     currentChannelContainer.Show();
                     placeholderContainer.Hide();
                     textbox.Show();

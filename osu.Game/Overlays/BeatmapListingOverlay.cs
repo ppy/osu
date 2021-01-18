@@ -292,7 +292,7 @@ namespace osu.Game.Overlays
         {
             switch (state.NewValue)
             {
-                case APIState.Online:
+                default:
                     placeholderContainer.Hide();
                     panelTarget.Show();
                     foundContent.Show();
