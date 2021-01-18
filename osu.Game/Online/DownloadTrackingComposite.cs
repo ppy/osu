@@ -80,7 +80,7 @@ namespace osu.Game.Online
         /// By default, this calls <see cref="IModelDownloader{TModel}.IsAvailableLocally"/>,
         /// but can be overriden to add additional checks for verifying the model in database.
         /// </summary>
-        protected virtual bool IsModelAvailableLocally() => Manager.IsAvailableLocally(Model.Value);
+        protected virtual bool IsModelAvailableLocally() => Manager?.IsAvailableLocally(Model.Value) == true;
 
         private void downloadBegan(ValueChangedEvent<WeakReference<ArchiveDownloadRequest<TModel>>> weakRequest)
         {
@@ -144,7 +144,7 @@ namespace osu.Game.Online
 
         private void onRequestSuccess(string _) => Schedule(() => State.Value = DownloadState.Importing);
 
-        private void onRequestProgress(double progress) => Schedule(() => Progress.Value = progress);
+        private void onRequestProgress(float progress) => Schedule(() => Progress.Value = progress);
 
         private void onRequestFailure(Exception e) => Schedule(() => attachDownload(null));
 

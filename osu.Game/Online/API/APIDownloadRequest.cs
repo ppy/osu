@@ -29,7 +29,7 @@ namespace osu.Game.Online.API
 
         private void request_Progress(long current, long total) => API.Schedule(() => Progressed?.Invoke(current, total));
 
-        internal void TriggerSuccess(string filename)
+        protected void TriggerSuccess(string filename)
         {
             if (this.filename != null)
                 throw new InvalidOperationException("Attempted to trigger success more than once");

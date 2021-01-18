@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 
 namespace osu.Game.Online.Rooms
@@ -34,6 +35,15 @@ namespace osu.Game.Online.Rooms
         }
 
         protected override bool VerifyDatabasedModel(BeatmapSetInfo databasedSet)
+        {
+            var verified = verifyDatabasedModel(databasedSet);
+            if (!verified)
+                Logger.Log("The imported beatmapset does not match the online version.", LoggingTarget.Runtime, LogLevel.Important);
+
+            return verified;
+        }
+
+        private bool verifyDatabasedModel(BeatmapSetInfo databasedSet)
         {
             int? beatmapId = SelectedItem.Value.Beatmap.Value.OnlineBeatmapID;
             string checksum = SelectedItem.Value.Beatmap.Value.MD5Hash;
@@ -70,7 +80,7 @@ namespace osu.Game.Online.Rooms
                     break;
 
                 case DownloadState.Downloading:
-                    availability.Value = BeatmapAvailability.Downloading(Progress.Value);
+                    availability.Value = BeatmapAvailability.Downloading((float)Progress.Value);
                     break;
 
                 case DownloadState.Importing:
