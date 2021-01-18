@@ -184,7 +184,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.LoadComplete();
 
             Playlist.BindCollectionChanged(onPlaylistChanged, true);
-            BeatmapAvailability.BindValueChanged(updateClientAvailability, true);
+            BeatmapAvailability.BindValueChanged(updateBeatmapAvailability, true);
 
             client.RoomUpdated += onRoomUpdated;
             client.LoadRequested += onLoadRequested;
@@ -210,10 +210,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private void onPlaylistChanged(object sender, NotifyCollectionChangedEventArgs e) => SelectedItem.Value = Playlist.FirstOrDefault();
 
-        private void updateClientAvailability(ValueChangedEvent<BeatmapAvailability> _ = null)
+        private void updateBeatmapAvailability(ValueChangedEvent<BeatmapAvailability> _ = null)
         {
-            if (client.Room != null)
-                client.ChangeBeatmapAvailability(BeatmapAvailability.Value).CatchUnobservedExceptions(true);
+            if (client.Room == null)
+                return;
+
+            client.ChangeBeatmapAvailability(BeatmapAvailability.Value).CatchUnobservedExceptions(true);
+
+            if (client.LocalUser?.State == MultiplayerUserState.Ready)
+                client.ChangeState(MultiplayerUserState.Idle).CatchUnobservedExceptions(true);
         }
 
         private void onRoomUpdated()
@@ -222,7 +227,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return;
 
             if (client.LocalUser?.BeatmapAvailability.Equals(BeatmapAvailability.Value) == false)
-                updateClientAvailability();
+                updateBeatmapAvailability();
         }
 
         private void onReadyClick()
