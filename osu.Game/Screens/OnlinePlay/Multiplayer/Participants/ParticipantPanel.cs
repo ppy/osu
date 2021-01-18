@@ -143,7 +143,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
             const double fade_time = 50;
 
-            userStateDisplay.Status = User.State;
+            userStateDisplay.UpdateStatus(User.State, User.BeatmapAvailability);
 
             if (Room.Host?.Equals(User) == true)
                 crown.FadeIn(fade_time);
