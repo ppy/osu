@@ -315,7 +315,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private class TestBeatmapSetOverlay : BeatmapSetOverlay
         {
-            public new Header Header => base.Header;
+            public new BeatmapSetHeader Header => base.Header;
         }
     }
 }
