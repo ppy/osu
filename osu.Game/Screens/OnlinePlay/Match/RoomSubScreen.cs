@@ -43,6 +43,8 @@ namespace osu.Game.Screens.OnlinePlay.Match
         [Cached]
         protected readonly MultiplayerBeatmapTracker BeatmapTracker;
 
+        protected IBindable<BeatmapAvailability> BeatmapAvailability => BeatmapTracker.Availability;
+
         protected RoomSubScreen()
         {
             InternalChild = BeatmapTracker = new MultiplayerBeatmapTracker
