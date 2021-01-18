@@ -249,6 +249,8 @@ namespace osu.Game.Screens.OnlinePlay
             [Resolved]
             private BeatmapManager beatmapManager { get; set; }
 
+            public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
+
             public PlaylistDownloadButton(PlaylistItem playlistItem)
                 : base(playlistItem.Beatmap.Value.BeatmapSet)
             {
