@@ -38,7 +38,7 @@ namespace osu.Game.Online.Rooms
         {
             var verified = verifyDatabasedModel(databasedSet);
             if (!verified)
-                Logger.Log("The imported beatmapset does not match the online version.", LoggingTarget.Runtime, LogLevel.Important);
+                Logger.Log("The imported beatmap set does not match the online version.", LoggingTarget.Runtime, LogLevel.Important);
 
             return verified;
         }
