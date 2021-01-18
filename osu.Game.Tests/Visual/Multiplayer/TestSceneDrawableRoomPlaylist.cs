@@ -201,11 +201,20 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        public void TestDownloadButtonHiddenInitiallyWhenBeatmapExists()
+        public void TestDownloadButtonHiddenWhenBeatmapExists()
         {
             createPlaylist(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo);
 
-            AddAssert("download button hidden", () => !playlist.ChildrenOfType<BeatmapDownloadTrackingComposite>().Single().IsPresent);
+            assertDownloadButtonVisible(false);
+
+            AddStep("delete beatmap set", () => manager.Delete(manager.QueryBeatmapSets(_ => true).Single()));
+            assertDownloadButtonVisible(true);
+
+            AddStep("undelete beatmap set", () => manager.Undelete(manager.QueryBeatmapSets(_ => true).Single()));
+            assertDownloadButtonVisible(false);
+
+            void assertDownloadButtonVisible(bool visible) => AddUntilStep($"download button {(visible ? "shown" : "hidden")}",
+                () => playlist.ChildrenOfType<BeatmapDownloadTrackingComposite>().Single().Alpha == (visible ? 1 : 0));
         }
 
         [Test]
@@ -220,6 +229,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
             createPlaylist(byOnlineId, byChecksum);
 
             AddAssert("download buttons shown", () => playlist.ChildrenOfType<BeatmapDownloadTrackingComposite>().All(d => d.IsPresent));
+        }
+
+        [Test]
+        public void TestExplicitBeatmapItem()
+        {
+            var beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
+            beatmap.BeatmapSet.OnlineInfo.HasExplicitContent = true;
+
+            createPlaylist(beatmap);
         }
 
         private void moveToItem(int index, Vector2? offset = null)
