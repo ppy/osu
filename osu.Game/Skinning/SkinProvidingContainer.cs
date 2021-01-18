@@ -74,8 +74,8 @@ namespace osu.Game.Skinning
             {
                 if (lookup is GlobalSkinColours || lookup is SkinCustomColourLookup)
                     return lookupWithFallback<TLookup, TValue>(lookup, AllowColourLookup);
-                else
-                    return lookupWithFallback<TLookup, TValue>(lookup, AllowConfigurationLookup);
+
+                return lookupWithFallback<TLookup, TValue>(lookup, AllowConfigurationLookup);
             }
 
             return fallbackSource?.GetConfig<TLookup, TValue>(lookup);
@@ -83,11 +83,14 @@ namespace osu.Game.Skinning
 
         private IBindable<TValue> lookupWithFallback<TLookup, TValue>(TLookup lookup, bool canUseSkinLookup)
         {
-            var bindable = skin.GetConfig<TLookup, TValue>(lookup);
-            if (bindable != null && canUseSkinLookup)
-                return bindable;
-            else
-                return fallbackSource?.GetConfig<TLookup, TValue>(lookup);
+            if (canUseSkinLookup)
+            {
+                var bindable = skin.GetConfig<TLookup, TValue>(lookup);
+                if (bindable != null)
+                    return bindable;
+            }
+
+            return fallbackSource?.GetConfig<TLookup, TValue>(lookup);
         }
 
         protected virtual void TriggerSourceChanged() => SourceChanged?.Invoke();
