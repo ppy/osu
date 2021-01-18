@@ -13,7 +13,7 @@ using osu.Game.Overlays.Dashboard.Friends;
 
 namespace osu.Game.Overlays
 {
-    public class DashboardOverlay : WebOverlay<DashboardOverlayHeader>
+    public class DashboardOverlay : OnlineOverlay<DashboardOverlayHeader>
     {
         private CancellationTokenSource cancellationToken;
 
