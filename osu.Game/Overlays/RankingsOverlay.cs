@@ -106,7 +106,7 @@ namespace osu.Game.Overlays
         private void load()
         {
             apiState.BindTo(api.State);
-            apiState.BindValueChanged(OnlineStateChanged, true);
+            apiState.BindValueChanged(onlineStateChanged, true);
 
             background.Colour = ColourProvider.Background5;
         }
@@ -262,19 +262,21 @@ namespace osu.Game.Overlays
             base.Dispose(isDisposing);
         }
 
-        public void OnlineStateChanged(ValueChangedEvent<APIState> state)
+        private void onlineStateChanged(ValueChangedEvent<APIState> state) => Scheduler.Add(() =>
         {
-            if (state.NewValue == APIState.Online)
+            switch (state.NewValue)
             {
-                contentContainer.Show();
-                placeholderContainer.Hide();
+                case APIState.Online:
+                    contentContainer.Show();
+                    placeholderContainer.Hide();
+                    break;
+
+                case APIState.Offline:
+                    contentContainer.Hide();
+                    placeholderContainer.Show();
+                    loading.Hide();
+                    break;
             }
-            else if (state.NewValue == APIState.Offline)
-            {
-                contentContainer.Hide();
-                placeholderContainer.Show();
-                loading.Hide();
-            }
-        }
+        });
     }
 }

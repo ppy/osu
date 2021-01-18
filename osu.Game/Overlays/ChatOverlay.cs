@@ -205,7 +205,7 @@ namespace osu.Game.Overlays
             };
 
             apiState.BindTo(api.State);
-            apiState.BindValueChanged(OnlineStateChanged, true);
+            apiState.BindValueChanged(onlineStateChanged, true);
             textbox.OnCommit += postMessage;
 
             ChannelTabControl.Current.ValueChanged += current => channelManager.CurrentChannel.Value = current.NewValue;
@@ -505,21 +505,23 @@ namespace osu.Game.Overlays
             }
         }
 
-        public void OnlineStateChanged(ValueChangedEvent<APIState> state)
+        private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
         {
-            if (state.NewValue == APIState.Online)
+            switch (state.NewValue)
             {
-                currentChannelContainer.Show();
-                placeholderContainer.Hide();
-                textbox.Show();
+                case APIState.Online:
+                    currentChannelContainer.Show();
+                    placeholderContainer.Hide();
+                    textbox.Show();
+                    break;
+
+                case APIState.Offline:
+                    currentChannelContainer.Hide();
+                    placeholderContainer.Show();
+                    textbox.Hide();
+                    break;
             }
-            else if (state.NewValue == APIState.Offline)
-            {
-                currentChannelContainer.Hide();
-                placeholderContainer.Show();
-                textbox.Hide();
-            }
-        }
+        });
 
         private class TabsArea : Container
         {

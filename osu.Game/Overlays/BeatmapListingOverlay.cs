@@ -126,7 +126,7 @@ namespace osu.Game.Overlays
             };
 
             apiState.BindTo(api.State);
-            apiState.BindValueChanged(OnlineStateChanged, true);
+            apiState.BindValueChanged(onlineStateChanged, true);
         }
 
         private void onTypingStarted()
@@ -288,20 +288,22 @@ namespace osu.Game.Overlays
                 filterControl.FetchNextPage();
         }
 
-        public void OnlineStateChanged(ValueChangedEvent<APIState> state)
+        private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
         {
-            if (state.NewValue == APIState.Online)
+            switch (state.NewValue)
             {
-                placeholderContainer.Hide();
-                panelTarget.Show();
-                foundContent.Show();
+                case APIState.Online:
+                    placeholderContainer.Hide();
+                    panelTarget.Show();
+                    foundContent.Show();
+                    break;
+
+                case APIState.Offline:
+                    placeholderContainer.Show();
+                    panelTarget.Hide();
+                    foundContent.Hide();
+                    break;
             }
-            else if (state.NewValue == APIState.Offline)
-            {
-                placeholderContainer.Show();
-                panelTarget.Hide();
-                foundContent.Hide();
-            }
-        }
+        });
     }
 }
