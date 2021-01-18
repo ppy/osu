@@ -13,6 +13,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Online.API.Requests;
 
@@ -116,8 +117,17 @@ namespace osu.Game.Overlays.Rankings
             background.Colour = colourProvider.Dark3;
         }
 
-        public void ShowInfo(GetSpotlightRankingsResponse response)
+        public void ShowInfo([CanBeNull] GetSpotlightRankingsResponse response)
         {
+            if (response == null)
+            {
+                startDateColumn.Value = string.Empty;
+                endDateColumn.Value = string.Empty;
+                mapCountColumn.Value = string.Empty;
+                participantsColumn.Value = string.Empty;
+                return;
+            }
+
             startDateColumn.Value = dateToString(response.Spotlight.StartDate);
             endDateColumn.Value = dateToString(response.Spotlight.EndDate);
             mapCountColumn.Value = response.BeatmapSets.Count.ToString();

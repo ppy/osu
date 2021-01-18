@@ -16,6 +16,7 @@ using System.Threading;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.BeatmapListing.Panels;
 using System;
+using JetBrains.Annotations;
 
 namespace osu.Game.Overlays.Rankings
 {
@@ -85,7 +86,13 @@ namespace osu.Game.Overlays.Rankings
         private void getSpotlights()
         {
             spotlightsRequest = new GetSpotlightsRequest();
-            spotlightsRequest.Success += response => Schedule(() => selector.Spotlights = response.Spotlights);
+            spotlightsRequest.Success += response => Schedule(() =>
+            {
+                if (response.Spotlights.Count > 0)
+                    selector.Spotlights = response.Spotlights;
+                else
+                    onSpotlightChanged();
+            });
             api.Queue(spotlightsRequest);
         }
 
@@ -99,10 +106,21 @@ namespace osu.Game.Overlays.Rankings
 
         private void onSpotlightChanged()
         {
-            SpotlightChanged?.Invoke();
-
             cancellationToken?.Cancel();
             getRankingsRequest?.Cancel();
+
+            // avoid firing lookup request if there is no selection.
+            if (selectedSpotlight.Value == null)
+            {
+                selector.ShowInfo(null);
+                content.Clear();
+
+                // handles setting our loaded state as complete.
+                RankingsLoaded?.Invoke();
+                return;
+            }
+
+            SpotlightChanged?.Invoke();
 
             getRankingsRequest = new GetSpotlightRankingsRequest(Ruleset.Value, selectedSpotlight.Value.Id, sort.Value);
             getRankingsRequest.Success += onSuccess;
