@@ -13,12 +13,12 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Screens.Multi;
+using osu.Game.Screens.OnlinePlay;
 using osu.Game.Tests.Beatmaps;
 using osuTK;
 using osuTK.Input;
@@ -220,6 +220,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
             createPlaylist(byOnlineId, byChecksum);
 
             AddAssert("download buttons shown", () => playlist.ChildrenOfType<BeatmapDownloadTrackingComposite>().All(d => d.IsPresent));
+        }
+
+        [Test]
+        public void TestExplicitBeatmapItem()
+        {
+            var beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
+            beatmap.BeatmapSet.OnlineInfo.HasExplicitContent = true;
+
+            createPlaylist(beatmap);
         }
 
         private void moveToItem(int index, Vector2? offset = null)

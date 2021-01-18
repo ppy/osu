@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -20,10 +19,10 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays.BeatmapListing;
-using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Online.API;
 using osu.Game.Online.Placeholders;
+using osu.Game.Overlays.BeatmapListing;
+using osu.Game.Overlays.BeatmapListing.Panels;
 using osuTK;
 
 namespace osu.Game.Overlays
@@ -104,7 +103,6 @@ namespace osu.Game.Overlays
                                         {
                                             foundContent = new FillFlowContainer<BeatmapPanel>(),
                                             notFoundContent = new NotFoundDrawable(),
-                                            loadingLayer = new LoadingLayer(panelTarget),
                                         }
                                     },
                                     placeholderContainer = new Container
@@ -119,11 +117,12 @@ namespace osu.Game.Overlays
                                             errorPlaceholder
                                         }
                                     }
-                                }
+                                },
                             },
                         }
-                    }
-                }
+                    },
+                },
+                loadingLayer = new LoadingLayer(true)
             };
 
             apiState.BindTo(api.State);

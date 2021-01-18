@@ -21,7 +21,7 @@ namespace osu.Game.Input.Bindings
                 handler = game;
         }
 
-        public override IEnumerable<KeyBinding> DefaultKeyBindings => GlobalKeyBindings.Concat(InGameKeyBindings).Concat(AudioControlKeyBindings).Concat(EditorKeyBindings);
+        public override IEnumerable<IKeyBinding> DefaultKeyBindings => GlobalKeyBindings.Concat(InGameKeyBindings).Concat(AudioControlKeyBindings).Concat(EditorKeyBindings);
 
         public IEnumerable<KeyBinding> GlobalKeyBindings => new[]
         {
@@ -34,7 +34,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.R }, GlobalAction.ResetInputSettings),
             new KeyBinding(new[] { InputKey.Control, InputKey.T }, GlobalAction.ToggleToolbar),
             new KeyBinding(new[] { InputKey.Control, InputKey.O }, GlobalAction.ToggleSettings),
-            new KeyBinding(new[] { InputKey.Control, InputKey.D }, GlobalAction.ToggleDirect),
+            new KeyBinding(new[] { InputKey.Control, InputKey.D }, GlobalAction.ToggleBeatmapListing),
             new KeyBinding(new[] { InputKey.Control, InputKey.N }, GlobalAction.ToggleNotifications),
 
             new KeyBinding(InputKey.Escape, GlobalAction.Back),
@@ -68,7 +68,9 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.Tilde }, GlobalAction.QuickExit),
             new KeyBinding(new[] { InputKey.Control, InputKey.Plus }, GlobalAction.IncreaseScrollSpeed),
             new KeyBinding(new[] { InputKey.Control, InputKey.Minus }, GlobalAction.DecreaseScrollSpeed),
+            new KeyBinding(new[] { InputKey.Shift, InputKey.Tab }, GlobalAction.ToggleInGameInterface),
             new KeyBinding(InputKey.MouseMiddle, GlobalAction.PauseGameplay),
+            new KeyBinding(InputKey.Space, GlobalAction.TogglePauseReplay),
             new KeyBinding(InputKey.Control, GlobalAction.HoldForHUD),
         };
 
@@ -110,8 +112,8 @@ namespace osu.Game.Input.Bindings
         [Description("Toggle settings")]
         ToggleSettings,
 
-        [Description("Toggle osu!direct")]
-        ToggleDirect,
+        [Description("Toggle beatmap listing")]
+        ToggleBeatmapListing,
 
         [Description("Increase volume")]
         IncreaseVolume,
@@ -147,7 +149,7 @@ namespace osu.Game.Input.Bindings
         [Description("Select")]
         Select,
 
-        [Description("Quick exit (Hold)")]
+        [Description("Quick exit (hold)")]
         QuickExit,
 
         // Game-wide beatmap music controller keybindings
@@ -163,10 +165,10 @@ namespace osu.Game.Input.Bindings
         [Description("Toggle now playing overlay")]
         ToggleNowPlaying,
 
-        [Description("Previous Selection")]
+        [Description("Previous selection")]
         SelectPrevious,
 
-        [Description("Next Selection")]
+        [Description("Next selection")]
         SelectNext,
 
         [Description("Home")]
@@ -175,26 +177,32 @@ namespace osu.Game.Input.Bindings
         [Description("Toggle notifications")]
         ToggleNotifications,
 
-        [Description("Pause")]
+        [Description("Pause gameplay")]
         PauseGameplay,
 
         // Editor
-        [Description("Setup Mode")]
+        [Description("Setup mode")]
         EditorSetupMode,
 
-        [Description("Compose Mode")]
+        [Description("Compose mode")]
         EditorComposeMode,
 
-        [Description("Design Mode")]
+        [Description("Design mode")]
         EditorDesignMode,
 
-        [Description("Timing Mode")]
+        [Description("Timing mode")]
         EditorTimingMode,
 
         [Description("Hold for HUD")]
         HoldForHUD,
 
-        [Description("Random Skin")]
+        [Description("Random skin")]
         RandomSkin,
+
+        [Description("Pause / resume replay")]
+        TogglePauseReplay,
+
+        [Description("Toggle in-game interface")]
+        ToggleInGameInterface,
     }
 }

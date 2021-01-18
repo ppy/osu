@@ -74,7 +74,6 @@ namespace osu.Game.Overlays
                         }
                     }
                 },
-                loading = new LoadingLayer(content),
                 placeholderContainer = new Container
                 {
                     Anchor = Anchor.TopCentre,
@@ -86,7 +85,8 @@ namespace osu.Game.Overlays
                     {
                         errorPlaceholder
                     }
-                }
+                },
+                loading = new LoadingLayer(true),
             };
         }
 
@@ -166,6 +166,7 @@ namespace osu.Game.Overlays
                 placeholderContainer.Show();
                 loading.Hide();
             }
+
             if (State.Value == Visibility.Hidden)
                 return;
 

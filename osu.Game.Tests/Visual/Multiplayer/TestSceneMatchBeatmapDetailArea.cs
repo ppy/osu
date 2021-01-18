@@ -5,17 +5,17 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
-using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Screens.Multi.Components;
+using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Tests.Beatmaps;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMatchBeatmapDetailArea : MultiplayerTestScene
+    public class TestSceneMatchBeatmapDetailArea : RoomTestScene
     {
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
@@ -24,10 +24,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private RulesetStore rulesetStore { get; set; }
 
         [SetUp]
-        public void Setup() => Schedule(() =>
+        public new void Setup() => Schedule(() =>
         {
-            Room = new Room();
-
             Child = new MatchBeatmapDetailArea
             {
                 Anchor = Anchor.Centre,

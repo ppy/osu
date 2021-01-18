@@ -9,7 +9,6 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
-using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
@@ -19,7 +18,6 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
-using osuTK.Input;
 
 namespace osu.Game.Screens.Play
 {
@@ -29,6 +27,11 @@ namespace osu.Game.Screens.Play
         public const float FADE_DURATION = 400;
 
         public const Easing FADE_EASING = Easing.Out;
+
+        /// <summary>
+        /// The total height of all the top of screen scoring elements.
+        /// </summary>
+        public float TopScoringElementsHeight { get; private set; }
 
         public readonly KeyCounterDisplay KeyCounter;
         public readonly SkinnableComboCounter ComboCounter;
@@ -181,7 +184,7 @@ namespace osu.Game.Screens.Play
 
                 notificationOverlay?.Post(new SimpleNotification
                 {
-                    Text = @"The score overlay is currently disabled. You can toggle this by pressing Shift+Tab."
+                    Text = $"The score overlay is currently disabled. You can toggle this by pressing {config.LookupKeyBindings(GlobalAction.ToggleInGameInterface)}."
                 });
             }
 
@@ -211,7 +214,7 @@ namespace osu.Game.Screens.Play
             // HACK: for now align with the accuracy counter.
             // this is done for the sake of hacky legacy skins which extend the health bar to take up the full screen area.
             // it only works with the default skin due to padding offsetting it *just enough* to coexist.
-            topRightElements.Y = ToLocalSpace(AccuracyCounter.Drawable.ScreenSpaceDrawQuad.BottomRight).Y;
+            topRightElements.Y = TopScoringElementsHeight = ToLocalSpace(AccuracyCounter.Drawable.ScreenSpaceDrawQuad.BottomRight).Y;
 
             bottomRightElements.Y = -Progress.Height;
         }
@@ -271,37 +274,6 @@ namespace osu.Game.Screens.Play
             replayLoaded.BindTo(drawableRuleset.HasReplayLoaded);
 
             Progress.BindDrawableRuleset(drawableRuleset);
-        }
-
-        protected override bool OnKeyDown(KeyDownEvent e)
-        {
-            if (e.Repeat) return false;
-
-            if (e.ShiftPressed)
-            {
-                switch (e.Key)
-                {
-                    case Key.Tab:
-                        switch (configVisibilityMode.Value)
-                        {
-                            case HUDVisibilityMode.Never:
-                                configVisibilityMode.Value = HUDVisibilityMode.HideDuringGameplay;
-                                break;
-
-                            case HUDVisibilityMode.HideDuringGameplay:
-                                configVisibilityMode.Value = HUDVisibilityMode.Always;
-                                break;
-
-                            case HUDVisibilityMode.Always:
-                                configVisibilityMode.Value = HUDVisibilityMode.Never;
-                                break;
-                        }
-
-                        return true;
-                }
-            }
-
-            return base.OnKeyDown(e);
         }
 
         protected virtual SkinnableAccuracyCounter CreateAccuracyCounter() => new SkinnableAccuracyCounter();
@@ -376,6 +348,24 @@ namespace osu.Game.Screens.Play
                 case GlobalAction.HoldForHUD:
                     holdingForHUD = true;
                     updateVisibility();
+                    return true;
+
+                case GlobalAction.ToggleInGameInterface:
+                    switch (configVisibilityMode.Value)
+                    {
+                        case HUDVisibilityMode.Never:
+                            configVisibilityMode.Value = HUDVisibilityMode.HideDuringGameplay;
+                            break;
+
+                        case HUDVisibilityMode.HideDuringGameplay:
+                            configVisibilityMode.Value = HUDVisibilityMode.Always;
+                            break;
+
+                        case HUDVisibilityMode.Always:
+                            configVisibilityMode.Value = HUDVisibilityMode.Never;
+                            break;
+                    }
+
                     return true;
             }
 

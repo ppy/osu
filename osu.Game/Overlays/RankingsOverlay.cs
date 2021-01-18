@@ -47,6 +47,8 @@ namespace osu.Game.Overlays
                 Depth = -float.MaxValue
             })
         {
+            loading = new LoadingLayer(true);
+
             Children = new Drawable[]
             {
                 background = new Box
@@ -79,7 +81,6 @@ namespace osu.Game.Overlays
                                         RelativeSizeAxes = Axes.X,
                                         Margin = new MarginPadding { Bottom = 10 }
                                     },
-                                    loading = new LoadingLayer(contentContainer),
                                     placeholderContainer = new Container
                                     {
                                         Anchor = Anchor.TopCentre,
@@ -96,7 +97,8 @@ namespace osu.Game.Overlays
                             }
                         }
                     }
-                }
+                },
+                loading
             };
         }
 

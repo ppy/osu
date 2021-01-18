@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -19,8 +18,8 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
@@ -28,32 +27,26 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     public class TimelineHitObjectBlueprint : SelectionBlueprint
     {
-        private readonly Circle circle;
+        private const float thickness = 5;
+        private const float shadow_radius = 5;
+        private const float circle_size = 34;
+
+        public Action<DragEvent> OnDragHandled;
 
         [UsedImplicitly]
         private readonly Bindable<double> startTime;
 
-        public Action<DragEvent> OnDragHandled;
+        private Bindable<int> indexInCurrentComboBindable;
+        private Bindable<int> comboIndexBindable;
 
+        private readonly Circle circle;
         private readonly DragBar dragBar;
-
         private readonly List<Container> shadowComponents = new List<Container>();
-
-        private DrawableHitObject drawableHitObject;
-
-        private Bindable<Color4> comboColour;
-
         private readonly Container mainComponents;
-
         private readonly OsuSpriteText comboIndexText;
 
-        private Bindable<int> comboIndex;
-
-        private const float thickness = 5;
-
-        private const float shadow_radius = 5;
-
-        private const float circle_size = 24;
+        [Resolved]
+        private ISkinSource skin { get; set; }
 
         public TimelineHitObjectBlueprint(HitObject hitObject)
             : base(hitObject)
@@ -152,46 +145,42 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             updateShadows();
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(HitObjectComposer composer)
-        {
-            if (composer != null)
-            {
-                // best effort to get the drawable representation for grabbing colour and what not.
-                drawableHitObject = composer.HitObjects.FirstOrDefault(d => d.HitObject == HitObject);
-            }
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             if (HitObject is IHasComboInformation comboInfo)
             {
-                comboIndex = comboInfo.IndexInCurrentComboBindable.GetBoundCopy();
-                comboIndex.BindValueChanged(combo =>
-                {
-                    comboIndexText.Text = (combo.NewValue + 1).ToString();
-                }, true);
+                indexInCurrentComboBindable = comboInfo.IndexInCurrentComboBindable.GetBoundCopy();
+                indexInCurrentComboBindable.BindValueChanged(_ => updateComboIndex(), true);
+
+                comboIndexBindable = comboInfo.ComboIndexBindable.GetBoundCopy();
+                comboIndexBindable.BindValueChanged(_ => updateComboColour(), true);
+
+                skin.SourceChanged += updateComboColour;
             }
+        }
 
-            if (drawableHitObject != null)
-            {
-                comboColour = drawableHitObject.AccentColour.GetBoundCopy();
-                comboColour.BindValueChanged(colour =>
-                {
-                    if (HitObject is IHasDuration)
-                        mainComponents.Colour = ColourInfo.GradientHorizontal(drawableHitObject.AccentColour.Value, Color4.White);
-                    else
-                        mainComponents.Colour = drawableHitObject.AccentColour.Value;
+        private void updateComboIndex() => comboIndexText.Text = (indexInCurrentComboBindable.Value + 1).ToString();
 
-                    var col = mainComponents.Colour.TopLeft.Linear;
-                    float brightness = col.R + col.G + col.B;
+        private void updateComboColour()
+        {
+            if (!(HitObject is IHasComboInformation combo))
+                return;
 
-                    // decide the combo index colour based on brightness?
-                    comboIndexText.Colour = brightness > 0.5f ? Color4.Black : Color4.White;
-                }, true);
-            }
+            var comboColours = skin.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value ?? Array.Empty<Color4>();
+            var comboColour = combo.GetComboColour(comboColours);
+
+            if (HitObject is IHasDuration)
+                mainComponents.Colour = ColourInfo.GradientHorizontal(comboColour, Color4.White);
+            else
+                mainComponents.Colour = comboColour;
+
+            var col = mainComponents.Colour.TopLeft.Linear;
+            float brightness = col.R + col.G + col.B;
+
+            // decide the combo index colour based on brightness?
+            comboIndexText.Colour = brightness > 0.5f ? Color4.Black : Color4.White;
         }
 
         protected override void Update()

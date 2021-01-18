@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -59,6 +59,8 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.ExternalLinkWarning, true);
             Set(OsuSetting.PreferNoVideo, false);
+
+            Set(OsuSetting.ShowOnlineExplicitContent, false);
 
             // Audio
             Set(OsuSetting.VolumeInactive, 0.25, 0, 1, 0.01);
@@ -138,6 +140,8 @@ namespace osu.Game.Configuration
             Set(OsuSetting.MenuBackgroundSource, BackgroundSource.Skin);
             Set(OsuSetting.SeasonalBackgroundMode, SeasonalBackgroundMode.Sometimes);
 
+            Set(OsuSetting.DiscordRichPresence, DiscordRichPresenceMode.Full);
+
             Set(OsuSetting.EditorWaveformOpacity, 1f);
         }
 
@@ -184,7 +188,7 @@ namespace osu.Game.Configuration
             return new TrackedSettings
             {
                 new TrackedSetting<bool>(OsuSetting.MouseDisableButtons, v => new SettingDescription(!v, "gameplay mouse buttons", v ? "disabled" : "enabled", LookupKeyBindings(GlobalAction.ToggleGameplayMouseButtons))),
-                new TrackedSetting<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode, m => new SettingDescription(m, "HUD Visibility", m.GetDescription(), $"cycle: shift-tab quick view: {LookupKeyBindings(GlobalAction.HoldForHUD)}")),
+                new TrackedSetting<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode, m => new SettingDescription(m, "HUD Visibility", m.GetDescription(), $"cycle: {LookupKeyBindings(GlobalAction.ToggleInGameInterface)} quick view: {LookupKeyBindings(GlobalAction.HoldForHUD)}")),
                 new TrackedSetting<ScalingMode>(OsuSetting.Scaling, m => new SettingDescription(m, "scaling", m.GetDescription())),
                 new TrackedSetting<int>(OsuSetting.Skin, m =>
                 {
@@ -266,6 +270,8 @@ namespace osu.Game.Configuration
         GameplayDisableWinKey,
         SeasonalBackgroundMode,
         EditorWaveformOpacity,
+        DiscordRichPresence,
         AutomaticallyDownloadWhenSpectating,
+        ShowOnlineExplicitContent,
     }
 }

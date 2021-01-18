@@ -68,9 +68,9 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
             EndPlacement(true);
         }
 
-        public override void UpdatePosition(SnapResult result)
+        public override void UpdateTimeAndPosition(SnapResult result)
         {
-            base.UpdatePosition(result);
+            base.UpdateTimeAndPosition(result);
 
             if (PlacementActive)
             {
