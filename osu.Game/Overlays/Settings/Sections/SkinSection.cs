@@ -107,27 +107,44 @@ namespace osu.Game.Overlays.Settings.Sections
         private void updateItems()
         {
             skinItems = skins.GetAllUsableSkins();
-
-            // insert after lazer built-in skins
-            int firstNonDefault = skinItems.FindIndex(s => s.ID > 0);
-            if (firstNonDefault < 0)
-                firstNonDefault = skinItems.Count;
-
-            skinItems.Insert(firstNonDefault, random_skin_info);
-
+            skinItems = sortList(skinItems);
+            
             skinDropdown.Items = skinItems;
         }
 
         private void itemUpdated(ValueChangedEvent<WeakReference<SkinInfo>> weakItem)
         {
             if (weakItem.NewValue.TryGetTarget(out var item))
-                Schedule(() => skinDropdown.Items = skinDropdown.Items.Where(i => !i.Equals(item)).Append(item).ToArray());
+            {
+                List<SkinInfo> newDropdownItems = skinDropdown.Items.ToList();
+                newDropdownItems.Add(item);
+                newDropdownItems = sortList(newDropdownItems);
+                Schedule(() => skinDropdown.Items = newDropdownItems.ToArray());
+            }
         }
 
         private void itemRemoved(ValueChangedEvent<WeakReference<SkinInfo>> weakItem)
         {
             if (weakItem.NewValue.TryGetTarget(out var item))
                 Schedule(() => skinDropdown.Items = skinDropdown.Items.Where(i => i.ID != item.ID).ToArray());
+        }
+
+        private List<SkinInfo> sortList(List<SkinInfo> skinsList)
+        {
+            skinsList.Sort((a, b) => String.Compare(a.Name, b.Name, StringComparison.Ordinal));
+            for (int i = 0; i < skinsList.Count; i++)
+            {
+                // insert lazer built-in skins before user skins
+                if (skinsList[i].ID <= 0) {
+                    var itemToMove = skinsList[i];
+                    skinsList.RemoveAt(i);
+                    skinsList.Insert(0, itemToMove);
+                }
+            }
+            skinsList.RemoveAll(s => s.ID == SkinInfo.RANDOM_SKIN);
+            skinsList.Insert(0, random_skin_info);
+
+            return skinsList;
         }
 
         private class SkinSettingsDropdown : SettingsDropdown<SkinInfo>
