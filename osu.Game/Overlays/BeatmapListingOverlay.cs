@@ -23,7 +23,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class BeatmapListingOverlay : WebOverlay<BeatmapListingHeader>
+    public class BeatmapListingOverlay : OnlineOverlay<BeatmapListingHeader>
     {
         [Resolved]
         private PreviewTrackManager previewTrackManager { get; set; }

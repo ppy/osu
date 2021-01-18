@@ -9,7 +9,7 @@ using osu.Game.Overlays.News.Displays;
 
 namespace osu.Game.Overlays
 {
-    public class NewsOverlay : WebOverlay<NewsHeader>
+    public class NewsOverlay : OnlineOverlay<NewsHeader>
     {
         private readonly Bindable<string> article = new Bindable<string>(null);
 

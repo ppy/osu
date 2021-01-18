@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class ChangelogOverlay : WebOverlay<ChangelogHeader>
+    public class ChangelogOverlay : OnlineOverlay<ChangelogHeader>
     {
         public readonly Bindable<APIChangelogBuild> Current = new Bindable<APIChangelogBuild>();
 

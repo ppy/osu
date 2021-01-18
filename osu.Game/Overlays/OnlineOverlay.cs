@@ -7,7 +7,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays
 {
-    public abstract class WebOverlay<T> : FullscreenOverlay<T>
+    public abstract class OnlineOverlay<T> : FullscreenOverlay<T>
         where T : OverlayHeader
     {
         protected override Container<Drawable> Content => content;
@@ -16,7 +16,7 @@ namespace osu.Game.Overlays
         protected readonly LoadingLayer Loading;
         private readonly Container content;
 
-        protected WebOverlay(OverlayColourScheme colourScheme)
+        protected OnlineOverlay(OverlayColourScheme colourScheme)
             : base(colourScheme)
         {
             FillFlowContainer flow = new FillFlowContainer

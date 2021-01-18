@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class BeatmapSetOverlay : WebOverlay<OverlayHeader> // we don't provide a standard header for now.
+    public class BeatmapSetOverlay : OnlineOverlay<OverlayHeader> // we don't provide a standard header for now.
     {
         public const float X_PADDING = 40;
         public const float Y_PADDING = 25;
