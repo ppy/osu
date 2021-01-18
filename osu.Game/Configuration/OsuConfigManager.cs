@@ -60,6 +60,8 @@ namespace osu.Game.Configuration
             Set(OsuSetting.ExternalLinkWarning, true);
             Set(OsuSetting.PreferNoVideo, false);
 
+            Set(OsuSetting.ShowOnlineExplicitContent, false);
+
             // Audio
             Set(OsuSetting.VolumeInactive, 0.25, 0, 1, 0.01);
 
@@ -82,6 +84,7 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.ShowStoryboard, true);
             Set(OsuSetting.BeatmapSkins, true);
+            Set(OsuSetting.BeatmapColours, true);
             Set(OsuSetting.BeatmapHitsounds, true);
 
             Set(OsuSetting.CursorRotation, true);
@@ -250,6 +253,7 @@ namespace osu.Game.Configuration
         ScreenshotCaptureMenuCursor,
         SongSelectRightMouseScroll,
         BeatmapSkins,
+        BeatmapColours,
         BeatmapHitsounds,
         IncreaseFirstObjectVisibility,
         ScoreDisplayMode,
@@ -270,5 +274,6 @@ namespace osu.Game.Configuration
         EditorWaveformOpacity,
         DiscordRichPresence,
         AutomaticallyDownloadWhenSpectating,
+        ShowOnlineExplicitContent,
     }
 }

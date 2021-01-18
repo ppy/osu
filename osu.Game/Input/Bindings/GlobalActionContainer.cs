@@ -21,7 +21,7 @@ namespace osu.Game.Input.Bindings
                 handler = game;
         }
 
-        public override IEnumerable<KeyBinding> DefaultKeyBindings => GlobalKeyBindings.Concat(InGameKeyBindings).Concat(AudioControlKeyBindings).Concat(EditorKeyBindings);
+        public override IEnumerable<IKeyBinding> DefaultKeyBindings => GlobalKeyBindings.Concat(InGameKeyBindings).Concat(AudioControlKeyBindings).Concat(EditorKeyBindings);
 
         public IEnumerable<KeyBinding> GlobalKeyBindings => new[]
         {
