@@ -50,6 +50,10 @@ desc 'Deploy to play store'
   lane :build do |options|
     nuget_restore(project_path: 'osu.Android/osu.Android.csproj')
     nuget_restore(project_path: 'osu.Game/osu.Game.csproj')
+    nuget_restore(project_path: 'osu.Game.Rulesets.Osu/osu.Game.Rulesets.Osu.csproj')
+    nuget_restore(project_path: 'osu.Game.Rulesets.Taiko/osu.Game.Rulesets.Taiko.csproj')
+    nuget_restore(project_path: 'osu.Game.Rulesets.Catch/osu.Game.Rulesets.Catch.csproj')
+    nuget_restore(project_path: 'osu.Game.Rulesets.Mania/osu.Game.Rulesets.Mania.csproj')
 
     souyuz(
       build_configuration: 'Release',
@@ -108,6 +112,10 @@ platform :ios do
   lane :build do
     nuget_restore(project_path: 'osu.iOS/osu.iOS.csproj')
     nuget_restore(project_path: 'osu.Game/osu.Game.csproj')
+    nuget_restore(project_path: 'osu.Game.Rulesets.Osu/osu.Game.Rulesets.Osu.csproj')
+    nuget_restore(project_path: 'osu.Game.Rulesets.Taiko/osu.Game.Rulesets.Taiko.csproj')
+    nuget_restore(project_path: 'osu.Game.Rulesets.Catch/osu.Game.Rulesets.Catch.csproj')
+    nuget_restore(project_path: 'osu.Game.Rulesets.Mania/osu.Game.Rulesets.Mania.csproj')
 
     souyuz(
       platform: "ios",
