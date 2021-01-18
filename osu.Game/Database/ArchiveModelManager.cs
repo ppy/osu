@@ -115,13 +115,13 @@ namespace osu.Game.Database
             return Import(notification, paths.Select(p => new ImportTask(p)).ToArray());
         }
 
-        public Task Import(Stream stream, string filename)
+        public Task Import(params ImportTask[] tasks)
         {
             var notification = new ProgressNotification { State = ProgressNotificationState.Active };
 
             PostNotification?.Invoke(notification);
 
-            return Import(notification, new ImportTask(stream, filename));
+            return Import(notification, tasks);
         }
 
         protected async Task<IEnumerable<TModel>> Import(ProgressNotification notification, params ImportTask[] tasks)
