@@ -8,20 +8,18 @@ using osu.Game.Overlays.Rankings;
 using osu.Game.Users;
 using osu.Game.Rulesets;
 using osu.Game.Online.API;
-using System.Threading;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Rankings.Tables;
 
 namespace osu.Game.Overlays
 {
-    public class RankingsOverlay : OnlineOverlay<RankingsOverlayHeader>
+    public class RankingsOverlay : TabbableOnlineOverlay<RankingsOverlayHeader, RankingsScope>
     {
         protected Bindable<Country> Country => Header.Country;
 
         protected Bindable<RankingsScope> Scope => Header.Current;
 
         private APIRequest lastRequest;
-        private CancellationTokenSource cancellationToken;
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -31,11 +29,6 @@ namespace osu.Game.Overlays
 
         public RankingsOverlay()
             : base(OverlayColourScheme.Green)
-        {
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
         {
         }
 
@@ -54,6 +47,8 @@ namespace osu.Game.Overlays
                 Scheduler.AddOnce(loadNewContent);
             });
 
+            // Unbind events from scope so base class event will not be called
+            Scope.UnbindEvents();
             Scope.BindValueChanged(_ =>
             {
                 // country filtering is only valid for performance scope.
@@ -70,8 +65,6 @@ namespace osu.Game.Overlays
 
                 Scheduler.AddOnce(loadNewContent);
             });
-
-            Scheduler.AddOnce(loadNewContent);
         }
 
         protected override RankingsOverlayHeader CreateHeader() => new RankingsOverlayHeader();
@@ -92,16 +85,13 @@ namespace osu.Game.Overlays
             Show();
         }
 
-        private void loadNewContent()
+        protected override void CreateDisplayToLoad(RankingsScope tab)
         {
-            Loading.Show();
-
-            cancellationToken?.Cancel();
             lastRequest?.Cancel();
 
             if (Scope.Value == RankingsScope.Spotlights)
             {
-                loadContent(new SpotlightsLayout
+                LoadDisplay(new SpotlightsLayout
                 {
                     Ruleset = { BindTarget = ruleset }
                 });
@@ -113,12 +103,12 @@ namespace osu.Game.Overlays
 
             if (request == null)
             {
-                loadContent(null);
+                LoadDisplay(Empty());
                 return;
             }
 
-            request.Success += () => Schedule(() => loadContent(createTableFromResponse(request)));
-            request.Failure += _ => Schedule(() => loadContent(null));
+            request.Success += () => Schedule(() => LoadDisplay(createTableFromResponse(request)));
+            request.Failure += _ => Schedule(() => LoadDisplay(Empty()));
 
             api.Queue(request);
         }
@@ -163,29 +153,11 @@ namespace osu.Game.Overlays
             return null;
         }
 
-        private void loadContent(Drawable content)
-        {
-            ScrollFlow.ScrollToStart();
-
-            if (content == null)
-            {
-                Clear();
-                Loading.Hide();
-                return;
-            }
-
-            LoadComponentAsync(content, loaded =>
-            {
-                Loading.Hide();
-                Child = loaded;
-            }, (cancellationToken = new CancellationTokenSource()).Token);
-        }
+        private void loadNewContent() => OnTabChanged(Scope.Value);
 
         protected override void Dispose(bool isDisposing)
         {
             lastRequest?.Cancel();
-            cancellationToken?.Cancel();
-
             base.Dispose(isDisposing);
         }
     }
