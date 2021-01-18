@@ -33,6 +33,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (!this.IsCurrentScreen())
             {
                 multiplayerRoomManager.TimeBetweenListingPolls.Value = 0;
+                multiplayerRoomManager.TimeBetweenSelectionPolls.Value = 0;
             }
             else
             {
@@ -40,16 +41,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 {
                     case LoungeSubScreen _:
                         multiplayerRoomManager.TimeBetweenListingPolls.Value = isIdle ? 120000 : 15000;
+                        multiplayerRoomManager.TimeBetweenSelectionPolls.Value = isIdle ? 120000 : 15000;
                         break;
 
                     // Don't poll inside the match or anywhere else.
                     default:
                         multiplayerRoomManager.TimeBetweenListingPolls.Value = 0;
+                        multiplayerRoomManager.TimeBetweenSelectionPolls.Value = 0;
                         break;
                 }
             }
 
-            Logger.Log($"Polling adjusted (listing: {multiplayerRoomManager.TimeBetweenListingPolls.Value})");
+            Logger.Log($"Polling adjusted (listing: {multiplayerRoomManager.TimeBetweenListingPolls.Value}, selection: {multiplayerRoomManager.TimeBetweenSelectionPolls.Value})");
         }
 
         protected override Room CreateNewRoom()

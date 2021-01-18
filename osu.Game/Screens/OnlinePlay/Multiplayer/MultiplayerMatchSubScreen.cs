@@ -241,8 +241,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             void endOperation()
             {
-                Debug.Assert(readyClickOperation != null);
-                readyClickOperation.Dispose();
+                readyClickOperation?.Dispose();
                 readyClickOperation = null;
             }
         }
@@ -255,9 +254,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             StartPlay(() => new MultiplayerPlayer(SelectedItem.Value, userIds));
 
-            Debug.Assert(readyClickOperation != null);
-
-            readyClickOperation.Dispose();
+            readyClickOperation?.Dispose();
             readyClickOperation = null;
         }
 

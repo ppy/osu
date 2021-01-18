@@ -14,6 +14,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Game.Online.API;
+using osu.Game.Online.Rooms;
 
 namespace osu.Game.Online.Multiplayer
 {
@@ -171,6 +172,14 @@ namespace osu.Game.Online.Multiplayer
                 return Task.CompletedTask;
 
             return connection.InvokeAsync(nameof(IMultiplayerServer.ChangeState), newState);
+        }
+
+        public override Task ChangeBeatmapAvailability(BeatmapAvailability newBeatmapAvailability)
+        {
+            if (!isConnected.Value)
+                return Task.CompletedTask;
+
+            return connection.InvokeAsync(nameof(IMultiplayerServer.ChangeBeatmapAvailability), newBeatmapAvailability);
         }
 
         public override Task StartMatch()

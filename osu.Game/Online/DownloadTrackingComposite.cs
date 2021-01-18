@@ -106,7 +106,7 @@ namespace osu.Game.Online
             {
                 if (attachedRequest.Progress == 1)
                 {
-                    State.Value = DownloadState.Downloaded;
+                    State.Value = DownloadState.Importing;
                     Progress.Value = 1;
                 }
                 else
@@ -125,7 +125,7 @@ namespace osu.Game.Online
             }
         }
 
-        private void onRequestSuccess(string _) => Schedule(() => State.Value = DownloadState.Downloaded);
+        private void onRequestSuccess(string _) => Schedule(() => State.Value = DownloadState.Importing);
 
         private void onRequestProgress(float progress) => Schedule(() => Progress.Value = progress);
 
