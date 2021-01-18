@@ -19,14 +19,11 @@ using osuTK;
 
 namespace osu.Game.Overlays
 {
-    public class BeatmapSetOverlay : FullscreenOverlay<OverlayHeader> // we don't provide a standard header for now.
+    public class BeatmapSetOverlay : FullscreenOverlay<BeatmapSetHeader>
     {
         public const float X_PADDING = 40;
         public const float Y_PADDING = 25;
         public const float RIGHT_WIDTH = 275;
-
-        //todo: should be an OverlayHeader? or maybe not?
-        protected new readonly Header Header;
 
         [Resolved]
         private RulesetStore rulesets { get; set; }
@@ -39,7 +36,7 @@ namespace osu.Game.Overlays
         private readonly Box background;
 
         public BeatmapSetOverlay()
-            : base(OverlayColourScheme.Blue, null)
+            : base(OverlayColourScheme.Blue, new BeatmapSetHeader())
         {
             OverlayScrollContainer scroll;
             Info info;
@@ -72,7 +69,7 @@ namespace osu.Game.Overlays
                                     Direction = FillDirection.Vertical,
                                     Children = new Drawable[]
                                     {
-                                        Header = new Header(),
+                                        Header,
                                         info = new Info()
                                     }
                                 },
