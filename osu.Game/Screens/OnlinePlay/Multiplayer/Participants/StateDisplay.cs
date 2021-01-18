@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -8,119 +9,161 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Online;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Rooms;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 {
     public class StateDisplay : CompositeDrawable
     {
+        private const double fade_time = 50;
+
+        private SpriteIcon icon;
+        private OsuSpriteText text;
+        private ProgressBar progressBar;
+
         public StateDisplay()
         {
             AutoSizeAxes = Axes.Both;
             Alpha = 0;
         }
 
-        private MultiplayerUserState status;
-
-        private OsuSpriteText text;
-        private SpriteIcon icon;
-
-        private const double fade_time = 50;
-
-        public MultiplayerUserState Status
-        {
-            set
-            {
-                if (value == status)
-                    return;
-
-                status = value;
-
-                if (IsLoaded)
-                    updateStatus();
-            }
-        }
-
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
+            this.colours = colours;
+
             InternalChild = new FillFlowContainer
             {
                 AutoSizeAxes = Axes.Both,
+                Anchor = Anchor.CentreRight,
+                Origin = Anchor.CentreRight,
                 Spacing = new Vector2(5),
                 Children = new Drawable[]
                 {
-                    text = new OsuSpriteText
-                    {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 12),
-                        Colour = Color4Extensions.FromHex("#DDFFFF")
-                    },
                     icon = new SpriteIcon
                     {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
+                        Anchor = Anchor.CentreRight,
+                        Origin = Anchor.CentreRight,
                         Icon = FontAwesome.Solid.CheckCircle,
                         Size = new Vector2(12),
-                    }
+                    },
+                    new CircularContainer
+                    {
+                        Masking = true,
+                        AutoSizeAxes = Axes.Both,
+                        Anchor = Anchor.CentreRight,
+                        Origin = Anchor.CentreRight,
+                        Children = new Drawable[]
+                        {
+                            progressBar = new ProgressBar(false)
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                BackgroundColour = Color4.Black.Opacity(0.4f),
+                                FillColour = colours.Blue,
+                                Alpha = 0f,
+                            },
+                            text = new OsuSpriteText
+                            {
+                                Padding = new MarginPadding { Horizontal = 5f, Vertical = 1f },
+                                Anchor = Anchor.CentreRight,
+                                Origin = Anchor.CentreRight,
+                                Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 12),
+                                Colour = Color4Extensions.FromHex("#DDFFFF")
+                            },
+                        }
+                    },
                 }
             };
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            updateStatus();
-        }
+        private OsuColour colours;
 
-        [Resolved]
-        private OsuColour colours { get; set; }
-
-        private void updateStatus()
+        public void UpdateStatus(MultiplayerUserState state, BeatmapAvailability availability)
         {
-            switch (status)
+            if (availability.State != DownloadState.LocallyAvailable)
             {
-                default:
-                    this.FadeOut(fade_time);
-                    return;
+                switch (availability.State)
+                {
+                    case DownloadState.NotDownloaded:
+                        progressBar.FadeOut(fade_time);
+                        text.Text = "no map";
+                        icon.Icon = FontAwesome.Solid.MinusCircle;
+                        icon.Colour = colours.RedLight;
+                        break;
 
-                case MultiplayerUserState.Ready:
-                    text.Text = "ready";
-                    icon.Icon = FontAwesome.Solid.CheckCircle;
-                    icon.Colour = Color4Extensions.FromHex("#AADD00");
-                    break;
+                    case DownloadState.Downloading:
+                        Debug.Assert(availability.DownloadProgress != null);
 
-                case MultiplayerUserState.WaitingForLoad:
-                    text.Text = "loading";
-                    icon.Icon = FontAwesome.Solid.PauseCircle;
-                    icon.Colour = colours.Yellow;
-                    break;
+                        var progress = availability.DownloadProgress.Value;
+                        progressBar.FadeIn(fade_time);
+                        progressBar.CurrentTime = progress;
 
-                case MultiplayerUserState.Loaded:
-                    text.Text = "loaded";
-                    icon.Icon = FontAwesome.Solid.DotCircle;
-                    icon.Colour = colours.YellowLight;
-                    break;
+                        text.Text = "downloading map";
+                        icon.Icon = FontAwesome.Solid.ArrowAltCircleDown;
+                        icon.Colour = colours.Blue;
+                        break;
 
-                case MultiplayerUserState.Playing:
-                    text.Text = "playing";
-                    icon.Icon = FontAwesome.Solid.PlayCircle;
-                    icon.Colour = colours.BlueLight;
-                    break;
+                    case DownloadState.Importing:
+                        progressBar.FadeOut(fade_time);
+                        text.Text = "importing map";
+                        icon.Icon = FontAwesome.Solid.ArrowAltCircleDown;
+                        icon.Colour = colours.Yellow;
+                        break;
+                }
+            }
+            else
+            {
+                progressBar.FadeOut(fade_time);
 
-                case MultiplayerUserState.FinishedPlay:
-                    text.Text = "results pending";
-                    icon.Icon = FontAwesome.Solid.ArrowAltCircleUp;
-                    icon.Colour = colours.BlueLighter;
-                    break;
+                switch (state)
+                {
+                    default:
+                        this.FadeOut(fade_time);
+                        return;
 
-                case MultiplayerUserState.Results:
-                    text.Text = "results";
-                    icon.Icon = FontAwesome.Solid.ArrowAltCircleUp;
-                    icon.Colour = colours.BlueLighter;
-                    break;
+                    case MultiplayerUserState.Ready:
+                        text.Text = "ready";
+                        icon.Icon = FontAwesome.Solid.CheckCircle;
+                        icon.Colour = Color4Extensions.FromHex("#AADD00");
+                        break;
+
+                    case MultiplayerUserState.WaitingForLoad:
+                        text.Text = "loading";
+                        icon.Icon = FontAwesome.Solid.PauseCircle;
+                        icon.Colour = colours.Yellow;
+                        break;
+
+                    case MultiplayerUserState.Loaded:
+                        text.Text = "loaded";
+                        icon.Icon = FontAwesome.Solid.DotCircle;
+                        icon.Colour = colours.YellowLight;
+                        break;
+
+                    case MultiplayerUserState.Playing:
+                        text.Text = "playing";
+                        icon.Icon = FontAwesome.Solid.PlayCircle;
+                        icon.Colour = colours.BlueLight;
+                        break;
+
+                    case MultiplayerUserState.FinishedPlay:
+                        text.Text = "results pending";
+                        icon.Icon = FontAwesome.Solid.ArrowAltCircleUp;
+                        icon.Colour = colours.BlueLighter;
+                        break;
+
+                    case MultiplayerUserState.Results:
+                        text.Text = "results";
+                        icon.Icon = FontAwesome.Solid.ArrowAltCircleUp;
+                        icon.Colour = colours.BlueLighter;
+                        break;
+                }
             }
 
             this.FadeIn(fade_time);
