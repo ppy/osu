@@ -48,17 +48,7 @@ namespace osu.Game.Online.Rooms
             int? beatmapId = SelectedItem.Value.Beatmap.Value.OnlineBeatmapID;
             string checksum = SelectedItem.Value.Beatmap.Value.MD5Hash;
 
-            BeatmapInfo matchingBeatmap;
-
-            if (databasedSet.Beatmaps == null)
-            {
-                // The given databased beatmap set is not passed in a usable state to check with.
-                // Perform a full query instead, as per https://github.com/ppy/osu/pull/11415.
-                matchingBeatmap = Manager.QueryBeatmap(b => b.OnlineBeatmapID == beatmapId && b.MD5Hash == checksum);
-                return matchingBeatmap != null;
-            }
-
-            matchingBeatmap = databasedSet.Beatmaps.FirstOrDefault(b => b.OnlineBeatmapID == beatmapId && b.MD5Hash == checksum);
+            var matchingBeatmap = databasedSet.Beatmaps.FirstOrDefault(b => b.OnlineBeatmapID == beatmapId && b.MD5Hash == checksum);
             return matchingBeatmap != null;
         }
 
