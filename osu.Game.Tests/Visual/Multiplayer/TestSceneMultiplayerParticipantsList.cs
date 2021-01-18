@@ -7,7 +7,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Online;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Participants;
 using osu.Game.Users;
 using osuTK;
@@ -74,6 +76,20 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestBeatmapDownloadingStates()
+        {
+            AddStep("set to no map", () => Client.ChangeBeatmapAvailability(BeatmapAvailability.NotDownloaded()));
+            AddStep("set to downloading map", () => Client.ChangeBeatmapAvailability(BeatmapAvailability.Downloading(0)));
+            AddRepeatStep("increment progress", () =>
+            {
+                var progress = this.ChildrenOfType<ParticipantPanel>().Single().User.BeatmapAvailability.DownloadProgress ?? 0;
+                Client.ChangeBeatmapAvailability(BeatmapAvailability.Downloading(progress + RNG.NextSingle(0.1f)));
+            }, 25);
+            AddStep("set to importing map", () => Client.ChangeBeatmapAvailability(BeatmapAvailability.Importing()));
+            AddStep("set to available", () => Client.ChangeBeatmapAvailability(BeatmapAvailability.LocallyAvailable()));
+        }
+
+        [Test]
         public void TestToggleReadyState()
         {
             AddAssert("ready mark invisible", () => !this.ChildrenOfType<StateDisplay>().Single().IsPresent);
@@ -120,6 +136,26 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     });
 
                     Client.ChangeUserState(i, (MultiplayerUserState)RNG.Next(0, (int)MultiplayerUserState.Results + 1));
+
+                    if (RNG.NextBool())
+                    {
+                        var beatmapState = (DownloadState)RNG.Next(0, (int)DownloadState.LocallyAvailable + 1);
+
+                        switch (beatmapState)
+                        {
+                            case DownloadState.NotDownloaded:
+                                Client.ChangeUserBeatmapAvailability(i, BeatmapAvailability.NotDownloaded());
+                                break;
+
+                            case DownloadState.Downloading:
+                                Client.ChangeUserBeatmapAvailability(i, BeatmapAvailability.Downloading(RNG.NextSingle()));
+                                break;
+
+                            case DownloadState.Importing:
+                                Client.ChangeUserBeatmapAvailability(i, BeatmapAvailability.Importing());
+                                break;
+                        }
+                    }
                 }
             });
         }
