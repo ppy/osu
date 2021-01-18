@@ -130,6 +130,8 @@ namespace osu.Game.Tests.Online
 
         private void addAvailabilityCheckStep(string description, Func<BeatmapAvailability> expected)
         {
+            // In DownloadTrackingComposite, state changes are scheduled one frame later, wait one step.
+            AddWaitStep("wait for potential change", 1);
             AddAssert(description, () => tracker.Availability.Value.Equals(expected.Invoke()));
         }
 
