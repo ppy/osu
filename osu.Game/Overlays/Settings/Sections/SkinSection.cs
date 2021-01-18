@@ -113,7 +113,6 @@ namespace osu.Game.Overlays.Settings.Sections
         {
             skinItems = skins.GetAllUsableSkins();
             skinItems = sortList(skinItems);
-            
             skinDropdown.Items = skinItems;
         }
 
