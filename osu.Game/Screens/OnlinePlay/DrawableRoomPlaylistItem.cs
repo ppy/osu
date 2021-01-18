@@ -23,6 +23,7 @@ using osu.Game.Online;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays.BeatmapListing.Panels;
+using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play.HUD;
@@ -41,6 +42,7 @@ namespace osu.Game.Screens.OnlinePlay
         private Container difficultyIconContainer;
         private LinkFlowContainer beatmapText;
         private LinkFlowContainer authorText;
+        private ExplicitContentBeatmapPill explicitContentPill;
         private ModDisplay modDisplay;
 
         private readonly Bindable<BeatmapInfo> beatmap = new Bindable<BeatmapInfo>();
@@ -116,6 +118,9 @@ namespace osu.Game.Screens.OnlinePlay
                 authorText.AddUserLink(Item.Beatmap.Value?.Metadata.Author);
             }
 
+            bool hasExplicitContent = Item.Beatmap.Value.BeatmapSet.OnlineInfo?.HasExplicitContent == true;
+            explicitContentPill.Alpha = hasExplicitContent ? 1 : 0;
+
             modDisplay.Current.Value = requiredMods.ToArray();
         }
 
@@ -165,18 +170,37 @@ namespace osu.Game.Screens.OnlinePlay
                                 {
                                     AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Horizontal,
-                                    Spacing = new Vector2(15, 0),
+                                    Spacing = new Vector2(10f, 0),
                                     Children = new Drawable[]
                                     {
-                                        authorText = new LinkFlowContainer { AutoSizeAxes = Axes.Both },
-                                        modDisplay = new ModDisplay
+                                        new FillFlowContainer
+                                        {
+                                            AutoSizeAxes = Axes.Both,
+                                            Direction = FillDirection.Horizontal,
+                                            Spacing = new Vector2(10f, 0),
+                                            Children = new Drawable[]
+                                            {
+                                                authorText = new LinkFlowContainer { AutoSizeAxes = Axes.Both },
+                                                explicitContentPill = new ExplicitContentBeatmapPill
+                                                {
+                                                    Alpha = 0f,
+                                                    Anchor = Anchor.CentreLeft,
+                                                    Origin = Anchor.CentreLeft,
+                                                    Margin = new MarginPadding { Top = 3f },
+                                                }
+                                            },
+                                        },
+                                        new Container
                                         {
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
                                             AutoSizeAxes = Axes.Both,
-                                            Scale = new Vector2(0.4f),
-                                            DisplayUnrankedText = false,
-                                            ExpansionMode = ExpansionMode.AlwaysExpanded
+                                            Child = modDisplay = new ModDisplay
+                                            {
+                                                Scale = new Vector2(0.4f),
+                                                DisplayUnrankedText = false,
+                                                ExpansionMode = ExpansionMode.AlwaysExpanded
+                                            }
                                         }
                                     }
                                 }
