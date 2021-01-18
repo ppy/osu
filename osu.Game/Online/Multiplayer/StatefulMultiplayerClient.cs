@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -128,7 +127,8 @@ namespace osu.Game.Online.Multiplayer
 
             Debug.Assert(Room != null);
 
-            var users = getRoomUsers();
+            var users = await getRoomUsers();
+            Debug.Assert(users != null);
 
             await Task.WhenAll(users.Select(PopulateUser));
 
@@ -437,24 +437,20 @@ namespace osu.Game.Online.Multiplayer
         /// This should be used whenever accessing users from outside of an Update thread context (ie. when not calling <see cref="Drawable.Schedule"/>).
         /// </summary>
         /// <returns>A copy of users in the current room, or null if unavailable.</returns>
-        private List<MultiplayerRoomUser>? getRoomUsers()
+        private Task<List<MultiplayerRoomUser>?> getRoomUsers()
         {
-            List<MultiplayerRoomUser>? users = null;
-
-            ManualResetEventSlim resetEvent = new ManualResetEventSlim();
+            var tcs = new TaskCompletionSource<List<MultiplayerRoomUser>?>();
 
             // at some point we probably want to replace all these schedule calls with Room.LockForUpdate.
             // for now, as this would require quite some consideration due to the number of accesses to the room instance,
             // let's just add a manual schedule for the non-scheduled usages instead.
             Scheduler.Add(() =>
             {
-                users = Room?.Users.ToList();
-                resetEvent.Set();
+                var users = Room?.Users.ToList();
+                tcs.SetResult(users);
             }, false);
 
-            resetEvent.Wait(100);
-
-            return users;
+            return tcs.Task;
         }
 
         /// <summary>
