@@ -239,12 +239,14 @@ namespace osu.Game.Rulesets.Osu.Edit
             getSurroundingQuad(hitObjects.SelectMany(h =>
             {
                 if (h is IHasPath path)
+                {
                     return new[]
                     {
                         h.Position,
                         // can't use EndPosition for reverse slider cases.
                         h.Position + path.Path.PositionAt(1)
                     };
+                }
 
                 return new[] { h.Position };
             }));
