@@ -39,8 +39,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private MultiplayerMatchSettingsOverlay settingsOverlay;
 
-        private readonly Bindable<Visibility> settingsOverlayVisibility = new Bindable<Visibility>();
-
         private GridContainer subScreenContainer;
 
         private IBindable<bool> isConnected;
@@ -184,8 +182,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             };
 
             subScreenContainer.Hide();
-            settingsOverlayVisibility.BindTo(settingsOverlay.State);
-            settingsOverlayVisibility.ValueChanged += settingsOverlayVisibilityChanged;
+            client.RoomUpdated += roomUpdated;
         }
 
         protected override void LoadComplete()
@@ -266,19 +263,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             readyClickOperation = null;
         }
 
-        private void settingsOverlayVisibilityChanged(ValueChangedEvent<Visibility> settingsOverlayVisibilityChangedEvent)
+        private void roomUpdated()
         {
             if (client.Room != null)
             {
+                // If the room is updated and is not null, show the room sub screen container and unsubscribe.
                 subScreenContainer.Show();
-                settingsOverlayVisibility.ValueChanged -= settingsOverlayVisibilityChanged;
-            }
-            else
-            {
-                if (settingsOverlayVisibilityChangedEvent.NewValue == Visibility.Visible)
-                    subScreenContainer.Hide();
-                else
-                    subScreenContainer.Show();
+                client.RoomUpdated -= roomUpdated;
             }
         }
 
