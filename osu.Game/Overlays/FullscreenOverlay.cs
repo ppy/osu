@@ -6,6 +6,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osuTK.Graphics;
@@ -27,9 +28,13 @@ namespace osu.Game.Overlays
         [Cached]
         protected readonly OverlayColourProvider ColourProvider;
 
-        protected FullscreenOverlay(OverlayColourScheme colourScheme, T header)
+        protected override Container<Drawable> Content => content;
+
+        private readonly Container content;
+
+        protected FullscreenOverlay(OverlayColourScheme colourScheme)
         {
-            Header = header;
+            Header = CreateHeader();
 
             ColourProvider = new OverlayColourProvider(colourScheme);
 
@@ -47,6 +52,19 @@ namespace osu.Game.Overlays
                 Type = EdgeEffectType.Shadow,
                 Radius = 10
             };
+
+            base.Content.AddRange(new Drawable[]
+            {
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = GetBackgroundColour()
+                },
+                content = new Container
+                {
+                    RelativeSizeAxes = Axes.Both
+                }
+            });
         }
 
         [BackgroundDependencyLoader]
@@ -57,6 +75,10 @@ namespace osu.Game.Overlays
             Waves.ThirdWaveColour = ColourProvider.Dark4;
             Waves.FourthWaveColour = ColourProvider.Dark3;
         }
+
+        protected abstract T CreateHeader();
+
+        protected virtual Color4 GetBackgroundColour() => ColourProvider.Background5;
 
         public override void Show()
         {

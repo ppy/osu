@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.Online
         private class TestFullscreenOverlay : FullscreenOverlay<OverlayHeader>
         {
             public TestFullscreenOverlay()
-                : base(OverlayColourScheme.Pink, null)
+                : base(OverlayColourScheme.Pink)
             {
                 Children = new Drawable[]
                 {
@@ -52,6 +52,8 @@ namespace osu.Game.Tests.Visual.Online
                     },
                 };
             }
+
+            protected override OverlayHeader CreateHeader() => null;
         }
     }
 }
