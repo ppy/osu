@@ -40,8 +40,14 @@ namespace osu.Game.Graphics.UserInterface
             set => CurrentNumber.Value = value;
         }
 
-        public ProgressBar()
+        private readonly bool userInteractive;
+        public override bool HandlePositionalInput => userInteractive;
+        public override bool HandleNonPositionalInput => userInteractive;
+
+        public ProgressBar(bool userInteractive)
         {
+            this.userInteractive = userInteractive;
+
             CurrentNumber.MinValue = 0;
             CurrentNumber.MaxValue = 1;
             RelativeSizeAxes = Axes.X;
