@@ -411,6 +411,11 @@ namespace osu.Game.Overlays
 
         private class HoverableProgressBar : ProgressBar
         {
+            public HoverableProgressBar()
+                : base(true)
+            {
+            }
+
             protected override bool OnHover(HoverEvent e)
             {
                 this.ResizeHeightTo(progress_height, 500, Easing.OutQuint);
