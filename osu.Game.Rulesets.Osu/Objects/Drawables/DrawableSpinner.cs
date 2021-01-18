@@ -130,12 +130,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             if (tracking.NewValue)
             {
-                spinningSample?.Play();
-                spinningSample?.VolumeTo(1, 200);
+                spinningSample?.Play(!spinningSample.IsPlaying);
+                spinningSample?.VolumeTo(1, 300);
             }
             else
             {
-                spinningSample?.VolumeTo(0, 200).Finally(_ => spinningSample.Stop());
+                spinningSample?.VolumeTo(0, 300).OnComplete(_ => spinningSample.Stop());
             }
         }
 
