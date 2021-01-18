@@ -103,7 +103,7 @@ namespace osu.Game.Screens.Edit.Setup
             return Task.CompletedTask;
         }
 
-        Task ICanAcceptFiles.Import(Stream stream, string filename) => throw new NotImplementedException();
+        Task ICanAcceptFiles.Import(params ImportTask[] tasks) => throw new NotImplementedException();
 
         protected override void LoadComplete()
         {
