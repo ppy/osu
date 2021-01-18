@@ -6,7 +6,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
@@ -16,10 +15,11 @@ using osu.Game.Overlays.BeatmapSet.Scores;
 using osu.Game.Overlays.Comments;
 using osu.Game.Rulesets;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class BeatmapSetOverlay : FullscreenOverlay<OverlayHeader> // we don't provide a standard header for now.
+    public class BeatmapSetOverlay : WebOverlay<OverlayHeader> // we don't provide a standard header for now.
     {
         public const float X_PADDING = 40;
         public const float Y_PADDING = 25;
@@ -36,55 +36,40 @@ namespace osu.Game.Overlays
         // receive input outside our bounds so we can trigger a close event on ourselves.
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
-        private readonly Box background;
-
         public BeatmapSetOverlay()
-            : base(OverlayColourScheme.Blue, null)
+            : base(OverlayColourScheme.Blue)
         {
-            OverlayScrollContainer scroll;
             Info info;
             CommentsSection comments;
 
-            Children = new Drawable[]
+            Child = new FillFlowContainer
             {
-                background = new Box
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(0, 20),
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both
-                },
-                scroll = new OverlayScrollContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    ScrollbarVisible = false,
-                    Child = new ReverseChildIDFillFlowContainer<BeatmapSetLayoutSection>
+                    new BeatmapSetLayoutSection
                     {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 20),
-                        Children = new[]
+                        Child = new ReverseChildIDFillFlowContainer<Drawable>
                         {
-                            new BeatmapSetLayoutSection
+                            AutoSizeAxes = Axes.Y,
+                            RelativeSizeAxes = Axes.X,
+                            Direction = FillDirection.Vertical,
+                            Children = new Drawable[]
                             {
-                                Child = new ReverseChildIDFillFlowContainer<Drawable>
-                                {
-                                    AutoSizeAxes = Axes.Y,
-                                    RelativeSizeAxes = Axes.X,
-                                    Direction = FillDirection.Vertical,
-                                    Children = new Drawable[]
-                                    {
-                                        Header = new Header(),
-                                        info = new Info()
-                                    }
-                                },
-                            },
-                            new ScoresContainer
-                            {
-                                Beatmap = { BindTarget = Header.Picker.Beatmap }
-                            },
-                            comments = new CommentsSection()
+                                Header = new Header(),
+                                info = new Info()
+                            }
                         },
                     },
-                },
+                    new ScoresContainer
+                    {
+                        Beatmap = { BindTarget = Header.Picker.Beatmap }
+                    },
+                    comments = new CommentsSection()
+                }
             };
 
             Header.BeatmapSet.BindTo(beatmapSet);
@@ -94,16 +79,13 @@ namespace osu.Game.Overlays
             Header.Picker.Beatmap.ValueChanged += b =>
             {
                 info.Beatmap = b.NewValue;
-
-                scroll.ScrollToStart();
+                ScrollFlow.ScrollToStart();
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            background.Colour = ColourProvider.Background6;
-        }
+        protected override OverlayHeader CreateHeader() => null;
+
+        protected override Color4 GetBackgroundColour() => ColourProvider.Background6;
 
         protected override void PopOutComplete()
         {

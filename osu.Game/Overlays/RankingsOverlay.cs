@@ -4,29 +4,21 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Game.Overlays.Rankings;
 using osu.Game.Users;
 using osu.Game.Rulesets;
 using osu.Game.Online.API;
 using System.Threading;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Rankings.Tables;
 
 namespace osu.Game.Overlays
 {
-    public class RankingsOverlay : FullscreenOverlay<RankingsOverlayHeader>
+    public class RankingsOverlay : WebOverlay<RankingsOverlayHeader>
     {
         protected Bindable<Country> Country => Header.Country;
 
         protected Bindable<RankingsScope> Scope => Header.Current;
-
-        private readonly OverlayScrollContainer scrollFlow;
-        private readonly Container contentContainer;
-        private readonly LoadingLayer loading;
-        private readonly Box background;
 
         private APIRequest lastRequest;
         private CancellationTokenSource cancellationToken;
@@ -34,65 +26,18 @@ namespace osu.Game.Overlays
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        public RankingsOverlay()
-            : base(OverlayColourScheme.Green, new RankingsOverlayHeader
-            {
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre,
-                Depth = -float.MaxValue
-            })
-        {
-            loading = new LoadingLayer(true);
+        [Resolved]
+        private Bindable<RulesetInfo> ruleset { get; set; }
 
-            Children = new Drawable[]
-            {
-                background = new Box
-                {
-                    RelativeSizeAxes = Axes.Both
-                },
-                scrollFlow = new OverlayScrollContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    ScrollbarVisible = false,
-                    Child = new FillFlowContainer
-                    {
-                        AutoSizeAxes = Axes.Y,
-                        RelativeSizeAxes = Axes.X,
-                        Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
-                        {
-                            Header,
-                            new Container
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Children = new Drawable[]
-                                {
-                                    contentContainer = new Container
-                                    {
-                                        Anchor = Anchor.TopCentre,
-                                        Origin = Anchor.TopCentre,
-                                        AutoSizeAxes = Axes.Y,
-                                        RelativeSizeAxes = Axes.X,
-                                        Margin = new MarginPadding { Bottom = 10 }
-                                    },
-                                }
-                            }
-                        }
-                    }
-                },
-                loading
-            };
+        public RankingsOverlay()
+            : base(OverlayColourScheme.Green)
+        {
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            background.Colour = ColourProvider.Background5;
         }
-
-        [Resolved]
-        private Bindable<RulesetInfo> ruleset { get; set; }
 
         protected override void LoadComplete()
         {
@@ -129,6 +74,8 @@ namespace osu.Game.Overlays
             Scheduler.AddOnce(loadNewContent);
         }
 
+        protected override RankingsOverlayHeader CreateHeader() => new RankingsOverlayHeader();
+
         public void ShowCountry(Country requested)
         {
             if (requested == null)
@@ -147,7 +94,7 @@ namespace osu.Game.Overlays
 
         private void loadNewContent()
         {
-            loading.Show();
+            Loading.Show();
 
             cancellationToken?.Cancel();
             lastRequest?.Cancel();
@@ -218,19 +165,19 @@ namespace osu.Game.Overlays
 
         private void loadContent(Drawable content)
         {
-            scrollFlow.ScrollToStart();
+            ScrollFlow.ScrollToStart();
 
             if (content == null)
             {
-                contentContainer.Clear();
-                loading.Hide();
+                Clear();
+                Loading.Hide();
                 return;
             }
 
             LoadComponentAsync(content, loaded =>
             {
-                loading.Hide();
-                contentContainer.Child = loaded;
+                Loading.Hide();
+                Child = loaded;
             }, (cancellationToken = new CancellationTokenSource()).Token);
         }
 

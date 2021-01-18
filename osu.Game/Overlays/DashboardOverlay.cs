@@ -7,29 +7,18 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Dashboard;
 using osu.Game.Overlays.Dashboard.Friends;
 
 namespace osu.Game.Overlays
 {
-    public class DashboardOverlay : FullscreenOverlay<DashboardOverlayHeader>
+    public class DashboardOverlay : WebOverlay<DashboardOverlayHeader>
     {
         private CancellationTokenSource cancellationToken;
 
-        private Container content;
-        private LoadingLayer loading;
-        private OverlayScrollContainer scrollFlow;
-
         public DashboardOverlay()
-            : base(OverlayColourScheme.Purple, new DashboardOverlayHeader
-            {
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre,
-                Depth = -float.MaxValue
-            })
+            : base(OverlayColourScheme.Purple)
         {
         }
 
@@ -40,44 +29,15 @@ namespace osu.Game.Overlays
         {
             apiState.BindTo(api.State);
             apiState.BindValueChanged(onlineStateChanged, true);
-
-            Children = new Drawable[]
-            {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = ColourProvider.Background5
-                },
-                scrollFlow = new OverlayScrollContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    ScrollbarVisible = false,
-                    Child = new FillFlowContainer
-                    {
-                        AutoSizeAxes = Axes.Y,
-                        RelativeSizeAxes = Axes.X,
-                        Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
-                        {
-                            Header,
-                            content = new Container
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y
-                            }
-                        }
-                    }
-                },
-                loading = new LoadingLayer(true),
-            };
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
             Header.Current.BindValueChanged(onTabChanged);
         }
+
+        protected override DashboardOverlayHeader CreateHeader() => new DashboardOverlayHeader();
 
         private bool displayUpdateRequired = true;
 
@@ -102,21 +62,21 @@ namespace osu.Game.Overlays
 
         private void loadDisplay(Drawable display)
         {
-            scrollFlow.ScrollToStart();
+            ScrollFlow.ScrollToStart();
 
             LoadComponentAsync(display, loaded =>
             {
                 if (API.IsLoggedIn)
-                    loading.Hide();
+                    Loading.Hide();
 
-                content.Child = loaded;
+                Child = loaded;
             }, (cancellationToken = new CancellationTokenSource()).Token);
         }
 
         private void onTabChanged(ValueChangedEvent<DashboardOverlayTabs> tab)
         {
             cancellationToken?.Cancel();
-            loading.Show();
+            Loading.Show();
 
             if (!API.IsLoggedIn)
             {
