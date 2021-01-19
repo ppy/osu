@@ -115,7 +115,8 @@ namespace osu.Game.Overlays.Settings.Sections
         {
             skinItems = skins.GetAllUsableSkins();
             firstNonDefault = skinItems.FindIndex(s => s.ID > 0);
-
+            if (firstNonDefault < 0)
+                firstNonDefault = skinItems.Count;
             skinItems.Insert(firstNonDefault, random_skin_info);
             skinItems = sortList(skinItems);
             skinDropdown.Items = skinItems;
