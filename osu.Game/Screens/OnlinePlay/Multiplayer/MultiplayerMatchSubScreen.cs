@@ -39,14 +39,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private MultiplayerMatchSettingsOverlay settingsOverlay;
 
-        private readonly Bindable<Visibility> settingsOverlayVisibility = new Bindable<Visibility>();
-
-        private GridContainer subScreenContainer;
-
         private IBindable<bool> isConnected;
 
         [CanBeNull]
         private IDisposable readyClickOperation;
+
+        private GridContainer mainContent;
 
         public MultiplayerMatchSubScreen(Room room)
         {
@@ -59,7 +57,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             InternalChildren = new Drawable[]
             {
-                subScreenContainer = new GridContainer
+                mainContent = new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Content = new[]
@@ -183,9 +181,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 }
             };
 
-            subScreenContainer.Hide();
-            settingsOverlayVisibility.BindTo(settingsOverlay.State);
-            settingsOverlayVisibility.ValueChanged += settingsOverlayVisibilityChanged;
+            if (client.Room == null)
+            {
+                mainContent.Hide();
+
+                settingsOverlay.State.BindValueChanged(visibility =>
+                {
+                    if (visibility.NewValue == Visibility.Hidden)
+                        mainContent.Show();
+                }, true);
+            }
         }
 
         protected override void LoadComplete()
@@ -264,22 +269,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             readyClickOperation?.Dispose();
             readyClickOperation = null;
-        }
-
-        private void settingsOverlayVisibilityChanged(ValueChangedEvent<Visibility> settingsOverlayVisibilityChangedEvent)
-        {
-            if (client.Room != null)
-            {
-                subScreenContainer.Show();
-                settingsOverlayVisibility.ValueChanged -= settingsOverlayVisibilityChanged;
-            }
-            else
-            {
-                if (settingsOverlayVisibilityChangedEvent.NewValue == Visibility.Visible)
-                    subScreenContainer.Hide();
-                else
-                    subScreenContainer.Show();
-            }
         }
 
         protected override void Dispose(bool isDisposing)
