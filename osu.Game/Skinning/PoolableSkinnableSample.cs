@@ -27,6 +27,7 @@ namespace osu.Game.Skinning
 
         private readonly AudioContainer<DrawableSample> sampleContainer;
         private ISampleInfo sampleInfo;
+        private SampleChannel activeChannel;
 
         [Resolved]
         private ISampleStore sampleStore { get; set; }
@@ -99,7 +100,7 @@ namespace osu.Game.Skinning
             if (ch == null)
                 return;
 
-            sampleContainer.Add(Sample = new DrawableSample(ch) { Looping = Looping });
+            sampleContainer.Add(Sample = new DrawableSample(ch));
 
             // Start playback internally for the new sample if the previous one was playing beforehand.
             if (wasPlaying && Looping)
@@ -109,18 +110,26 @@ namespace osu.Game.Skinning
         /// <summary>
         /// Plays the sample.
         /// </summary>
-        /// <param name="restart">Whether to play the sample from the beginning.</param>
-        public void Play(bool restart = true) => Sample?.Play(restart);
+        public void Play()
+        {
+            if (Sample == null)
+                return;
+
+            activeChannel = Sample.Play();
+            activeChannel.Looping = Looping;
+        }
 
         /// <summary>
         /// Stops the sample.
         /// </summary>
-        public void Stop() => Sample?.Stop();
+        public void Stop() => activeChannel?.Stop();
 
         /// <summary>
         /// Whether the sample is currently playing.
         /// </summary>
-        public bool Playing => Sample?.Playing ?? false;
+        public bool Playing => activeChannel?.Playing ?? false;
+
+        public bool Played => activeChannel?.Played ?? false;
 
         private bool looping;
 
@@ -134,8 +143,8 @@ namespace osu.Game.Skinning
             {
                 looping = value;
 
-                if (Sample != null)
-                    Sample.Looping = value;
+                if (activeChannel != null)
+                    activeChannel.Looping = value;
             }
         }
 

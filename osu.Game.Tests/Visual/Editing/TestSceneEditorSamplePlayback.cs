@@ -3,11 +3,11 @@
 
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Graphics.Audio;
 using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Visual.Editing
 {
@@ -19,14 +19,14 @@ namespace osu.Game.Tests.Visual.Editing
         public void TestSlidingSampleStopsOnSeek()
         {
             DrawableSlider slider = null;
-            DrawableSample[] loopingSamples = null;
-            DrawableSample[] onceOffSamples = null;
+            SkinnableSound[] loopingSamples = null;
+            SkinnableSound[] onceOffSamples = null;
 
             AddStep("get first slider", () =>
             {
                 slider = Editor.ChildrenOfType<DrawableSlider>().OrderBy(s => s.HitObject.StartTime).First();
-                onceOffSamples = slider.ChildrenOfType<DrawableSample>().Where(s => !s.Looping).ToArray();
-                loopingSamples = slider.ChildrenOfType<DrawableSample>().Where(s => s.Looping).ToArray();
+                onceOffSamples = slider.ChildrenOfType<SkinnableSound>().Where(s => !s.Looping).ToArray();
+                loopingSamples = slider.ChildrenOfType<SkinnableSound>().Where(s => s.Looping).ToArray();
             });
 
             AddStep("start playback", () => EditorClock.Start());
@@ -36,15 +36,15 @@ namespace osu.Game.Tests.Visual.Editing
                 if (!slider.Tracking.Value)
                     return false;
 
-                if (!loopingSamples.Any(s => s.Playing))
+                if (!loopingSamples.Any(s => s.IsPlaying))
                     return false;
 
                 EditorClock.Seek(20000);
                 return true;
             });
 
-            AddAssert("non-looping samples are playing", () => onceOffSamples.Length == 4 && loopingSamples.All(s => s.Played || s.Playing));
-            AddAssert("looping samples are not playing", () => loopingSamples.Length == 1 && loopingSamples.All(s => s.Played && !s.Playing));
+            AddAssert("non-looping samples are playing", () => onceOffSamples.Length == 4 && loopingSamples.All(s => s.IsPlayed || s.IsPlaying));
+            AddAssert("looping samples are not playing", () => loopingSamples.Length == 1 && loopingSamples.All(s => s.IsPlayed && !s.IsPlaying));
         }
     }
 }

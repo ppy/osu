@@ -20,7 +20,7 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public class HoverSounds : CompositeDrawable
     {
-        private SampleChannel sampleHover;
+        private Sample sampleHover;
 
         /// <summary>
         /// Length of debounce for hover sound playback, in milliseconds.

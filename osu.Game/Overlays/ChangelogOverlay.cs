@@ -27,7 +27,7 @@ namespace osu.Game.Overlays
 
         private Container<ChangelogContent> content;
 
-        private SampleChannel sampleBack;
+        private Sample sampleBack;
 
         private List<APIChangelogBuild> builds;
 

@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.Mods
 
         private readonly FillFlowContainer footerContainer;
 
-        private SampleChannel sampleOn, sampleOff;
+        private Sample sampleOn, sampleOff;
 
         public ModSelectOverlay()
         {

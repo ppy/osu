@@ -17,7 +17,7 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public class HoverClickSounds : HoverSounds
     {
-        private SampleChannel sampleClick;
+        private Sample sampleClick;
         private readonly MouseButton[] buttons;
 
         /// <summary>

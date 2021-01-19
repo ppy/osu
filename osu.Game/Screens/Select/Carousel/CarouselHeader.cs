@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Select.Carousel
 {
     public class CarouselHeader : Container
     {
-        private SampleChannel sampleHover;
+        private Sample sampleHover;
 
         private readonly Box hoverLayer;
 
