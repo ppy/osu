@@ -94,13 +94,13 @@ namespace osu.Game.Tests.Online
         public void TestTrackerRespectsSoftDeleting()
         {
             AddStep("allow importing", () => beatmaps.AllowImport.SetResult(true));
-            AddStep("import beatmap", () => beatmaps.Import(testBeatmapSet).Wait());
+            AddStep("import beatmap", () => beatmaps.Import(testBeatmapFile).Wait());
             addAvailabilityCheckStep("state locally available", BeatmapAvailability.LocallyAvailable);
 
-            AddStep("delete beatmap", () => beatmaps.Delete(testBeatmapSet));
+            AddStep("delete beatmap", () => beatmaps.Delete(beatmaps.QueryBeatmapSet(b => b.OnlineBeatmapSetID == testBeatmapSet.OnlineBeatmapSetID)));
             addAvailabilityCheckStep("state not downloaded", BeatmapAvailability.NotDownloaded);
 
-            AddStep("undelete beatmap", () => beatmaps.Undelete(testBeatmapSet));
+            AddStep("undelete beatmap", () => beatmaps.Undelete(beatmaps.QueryBeatmapSet(b => b.OnlineBeatmapSetID == testBeatmapSet.OnlineBeatmapSetID)));
             addAvailabilityCheckStep("state locally available", BeatmapAvailability.LocallyAvailable);
         }
 
