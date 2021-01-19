@@ -195,6 +195,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             if (roomId.Value == null)
             {
+                // A new room is being created.
+                // The main content should be hidden until the settings overlay is hidden, signaling the room is ready to be displayed.
                 mainContent.Hide();
 
                 settingsOverlay.State.BindValueChanged(visibility =>
