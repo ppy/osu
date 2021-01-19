@@ -9,6 +9,12 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Online.Rooms
 {
+    /// <summary>
+    /// Represent a checksum-verifying beatmap availability tracker usable for online play screens.
+    ///
+    /// This differs from a regular download tracking composite as this accounts for the
+    /// databased beatmap set's checksum, to disallow from playing with an altered version of the beatmap.
+    /// </summary>
     public class MultiplayerBeatmapTracker : DownloadTrackingComposite<BeatmapSetInfo, BeatmapManager>
     {
         public readonly IBindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
