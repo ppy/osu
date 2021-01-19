@@ -27,7 +27,6 @@ namespace osu.Game.Screens.Purcashe
     {
         private Container contentContainer;
         private FillFlowContainer buttonsFillFlow;
-        private Container avatarScroll;
 
         private readonly Bindable<int> pp = new Bindable<int>();
         private OsuSpriteText ppCountText;
@@ -60,33 +59,6 @@ namespace osu.Game.Screens.Purcashe
                     Spacing = new Vector2(20),
                     Children = new Drawable[]
                     {
-                        avatarScroll = new Container
-                        {
-                            Alpha = 0,
-                            Name = "Avatar Container",
-                            RelativeSizeAxes = Axes.Both,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Width = 0.35f,
-                            Masking = true,
-                            CornerRadius = 25f,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = new Color4(0, 0, 0, 0.7f),
-                                },
-                                new Sprite
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Anchor = Anchor.CentreRight,
-                                    Origin = Anchor.CentreRight,
-                                    FillMode = FillMode.Fill,
-                                    Texture = textures.Get("Backgrounds/registration"),
-                                }
-                            }
-                        },
                         contentContainer = new Container
                         {
                             Name = "Content Container",
@@ -94,11 +66,18 @@ namespace osu.Game.Screens.Purcashe
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Alpha = 0,
-                            Width = 0.55f,
                             Masking = true,
                             CornerRadius = 25f,
                             Children = new Drawable[]
                             {
+                                new Sprite
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
+                                    FillMode = FillMode.Fill,
+                                    Texture = textures.Get("Backgrounds/registration")
+                                },
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
@@ -313,8 +292,6 @@ namespace osu.Game.Screens.Purcashe
             this.ResizeTo(0.8f).Then().ResizeTo(1, ANIM_DURATION, Easing.OutQuint);
 
             contentContainer.FadeIn(ANIM_DURATION, Easing.OutQuint);
-
-            avatarScroll.Delay(ANIM_DURATION).FadeTo(0.01f).Then().Delay(ANIM_DURATION).FadeIn(ANIM_DURATION, Easing.OutQuint);
 
             const int time = 300;
             var count = 0;
