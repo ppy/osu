@@ -71,7 +71,12 @@ namespace osu.Game.Overlays.Settings.Sections
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "使用谱面自带音效",
+                    LabelText = "使用谱面颜色",
+                    Current = config.GetBindable<bool>(OsuSetting.BeatmapColours)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "使用谱面击打音效",
                     Current = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds)
                 },
             };
