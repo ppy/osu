@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mfosu!\n"
 "POT-Creation-Date: 2020-12-04 02:25+0800\n"
-"PO-Revision-Date: 2021-01-09 13:24+0800\n"
+"PO-Revision-Date: 2021-01-19 19:12+0800\n"
 "Last-Translator: \n"
 "Language-Team: MATRIX-feather\n"
 "Language: en\n"
@@ -271,6 +271,21 @@ msgstr "Rounded"
 
 msgid "settings.mvis.barType.fall"
 msgstr "Fall"
+
+msgid "settings.integration.header"
+msgstr "Integration"
+
+msgid "settings.integration.discordRPC"
+msgstr "Discord Rich Presence"
+
+msgid "settings.integration.discordRPC.Off"
+msgstr "Off"
+
+msgid "settings.integration.discordRPC.Limited"
+msgstr "Hide identifiable information"
+
+msgid "settings.integration.discordRPC.Full"
+msgstr "Full"
 
 msgid "Recent Participants"
 msgstr ""
@@ -1350,6 +1365,12 @@ msgstr "notifications"
 
 msgid "等待着您~"
 msgstr "waiting for 'ya"
+
+#~ msgid "settings.online.integration.header"
+#~ msgstr "Intergrations"
+
+#~ msgid "settings.online.integration.discordRPC"
+#~ msgstr "Discord Rich Presence"
 
 # Mvis设置Section标题
 #~ msgid "M-vis播放器"

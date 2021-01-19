@@ -9,7 +9,7 @@ namespace osu.Game.Overlays.Settings.Sections.Online
 {
     public class IntegrationSettings : SettingsSubsection
     {
-        protected override string Header => "Integrations";
+        protected override string Header => "settings.integration.header";
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Settings.Sections.Online
             {
                 new SettingsEnumDropdown<DiscordRichPresenceMode>
                 {
-                    LabelText = "Discord Rich Presence",
+                    LabelText = "settings.integration.discordRPC",
                     Current = config.GetBindable<DiscordRichPresenceMode>(OsuSetting.DiscordRichPresence)
                 }
             };

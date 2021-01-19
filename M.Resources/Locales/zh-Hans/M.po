@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mfosu!\n"
 "POT-Creation-Date: 2020-12-04 02:25+0800\n"
-"PO-Revision-Date: 2021-01-09 13:24+0800\n"
+"PO-Revision-Date: 2021-01-19 19:12+0800\n"
 "Last-Translator: \n"
 "Language-Team: MATRIX-feather\n"
 "Language: zh_CN\n"
@@ -268,6 +268,21 @@ msgstr "圆角"
 
 msgid "settings.mvis.barType.fall"
 msgstr "打砖块"
+
+msgid "settings.integration.header"
+msgstr "集成"
+
+msgid "settings.integration.discordRPC"
+msgstr "Discord RPC"
+
+msgid "settings.integration.discordRPC.Off"
+msgstr "关闭"
+
+msgid "settings.integration.discordRPC.Limited"
+msgstr "开启(隐藏可供辨识的信息)"
+
+msgid "settings.integration.discordRPC.Full"
+msgstr "开启(全部)"
 
 msgid "Recent Participants"
 msgstr "最近参与"
@@ -1325,6 +1340,12 @@ msgstr ""
 
 msgid "等待着您~"
 msgstr ""
+
+#~ msgid "settings.online.integration.header"
+#~ msgstr "集成"
+
+#~ msgid "settings.online.integration.discordRPC"
+#~ msgstr "Discord RPC模式"
 
 #~ msgid "screen.multi.header.pageTitle.text"
 #~ msgstr "大厅"
