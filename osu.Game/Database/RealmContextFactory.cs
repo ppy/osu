@@ -9,7 +9,6 @@ using osu.Framework.Platform;
 using osu.Framework.Statistics;
 using osu.Game.Input.Bindings;
 using Realms;
-using Realms.Schema;
 
 namespace osu.Game.Database
 {
