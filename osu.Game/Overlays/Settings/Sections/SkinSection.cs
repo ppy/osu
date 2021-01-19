@@ -125,7 +125,7 @@ namespace osu.Game.Overlays.Settings.Sections
         {
             skinItems = skins.GetAllUsableSkins();
             skinItems.Insert(firstNonDefaultSkinIndex, random_skin_info);
-            skinItems = sortList(skinItems);
+            sortUserSkins(skinItems);
             skinDropdown.Items = skinItems;
         }
 
@@ -134,7 +134,7 @@ namespace osu.Game.Overlays.Settings.Sections
             if (weakItem.NewValue.TryGetTarget(out var item))
             {
                 List<SkinInfo> newDropdownItems = skinDropdown.Items.Where(i => !i.Equals(item)).Append(item).ToList();
-                newDropdownItems = sortList(newDropdownItems);
+                sortUserSkins(newDropdownItems);
                 Schedule(() => skinDropdown.Items = newDropdownItems.ToArray());
             }
         }
@@ -145,14 +145,11 @@ namespace osu.Game.Overlays.Settings.Sections
                 Schedule(() => skinDropdown.Items = skinDropdown.Items.Where(i => i.ID != item.ID).ToArray());
         }
 
-        private List<SkinInfo> sortList(List<SkinInfo> skinsList)
+        private void sortUserSkins(List<SkinInfo> skinsList)
         {
-            // Sort user skins seperate from built-in skins
-            List<SkinInfo> userSkinsList = skinsList.GetRange(firstNonDefaultSkinIndex, skinsList.Count - firstNonDefaultSkinIndex);
-            skinsList.RemoveRange(firstNonDefaultSkinIndex, skinsList.Count - firstNonDefaultSkinIndex);
-            userSkinsList.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.OrdinalIgnoreCase));
-            skinsList.AddRange(userSkinsList);
-            return skinsList;
+            // Sort user skins separately from built-in skins
+            skinsList.Sort(firstNonDefaultSkinIndex, skinsList.Count - firstNonDefaultSkinIndex,
+                Comparer<SkinInfo>.Create((a, b) => string.Compare(a.Name, b.Name, StringComparison.OrdinalIgnoreCase)));
         }
 
         private class SkinSettingsDropdown : SettingsDropdown<SkinInfo>
