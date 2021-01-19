@@ -44,6 +44,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [CanBeNull]
         private IDisposable readyClickOperation;
 
+        private GridContainer mainContent;
+
         public MultiplayerMatchSubScreen(Room room)
         {
             Title = room.RoomID.Value == null ? "New room" : room.Name.Value;
@@ -55,7 +57,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             InternalChildren = new Drawable[]
             {
-                new GridContainer
+                mainContent = new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Content = new[]
@@ -178,6 +180,20 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     State = { Value = client.Room == null ? Visibility.Visible : Visibility.Hidden }
                 }
             };
+
+            if (client.Room == null)
+            {
+                // we are creating a new room. the main content should not be visible until after the settings screen has been dismissed, signalling the room is ready for display.
+                mainContent.Hide();
+
+                settingsOverlay.State.BindValueChanged(settingsVisibilityChanged, true);
+            }
+        }
+
+        private void settingsVisibilityChanged(ValueChangedEvent<Visibility> visibility)
+        {
+            if (visibility.NewValue == Visibility.Hidden)
+                mainContent.Show();
         }
 
         protected override void LoadComplete()
