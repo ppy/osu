@@ -133,9 +133,12 @@ namespace osu.Game.Overlays.Settings.Sections
         {
             if (weakItem.NewValue.TryGetTarget(out var item))
             {
-                List<SkinInfo> newDropdownItems = skinDropdown.Items.Where(i => !i.Equals(item)).Append(item).ToList();
-                sortUserSkins(newDropdownItems);
-                Schedule(() => skinDropdown.Items = newDropdownItems.ToArray());
+                Schedule(() =>
+                {
+                    List<SkinInfo> newDropdownItems = skinDropdown.Items.Where(i => !i.Equals(item)).Append(item).ToList();
+                    sortUserSkins(newDropdownItems);
+                    skinDropdown.Items = newDropdownItems;
+                });
             }
         }
 
