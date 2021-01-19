@@ -140,7 +140,7 @@ namespace osu.Game.Screens.Menu
             buttonsCustom.Add(new Button(@"screen.menu.buttonSystem.about-mfosu", @"button-generic-select", FontAwesome.Solid.Gift, new Color4(0, 86, 73, 255), () => OnMfMenuButton?.Invoke(), WEDGE_WIDTH));
             buttonsCustom.Add(new Button(@"screen.menu.buttonSystem.mvis", @"button-generic-select", FontAwesome.Solid.Play, new Color4(0, 86, 73, 255), () => OnMvisButton?.Invoke()));
             buttonsCustom.Add(new Button(@"screen.menu.buttonSystem.file-import", @"button-generic-select", FontAwesome.Solid.File, new Color4(0, 86, 73, 255), () => OnImportButton?.Invoke()));
-            buttonsCustom.Add(new Button(@"screen.menu.buttonSystem.purcashe", @"button-generic-select", FontAwesome.Solid.File, new Color4(0, 86, 73, 255), () => OnPurcasheButton?.Invoke()));
+            //buttonsCustom.Add(new Button(@"screen.menu.buttonSystem.purcashe", @"button-generic-select", FontAwesome.Solid.File, new Color4(0, 86, 73, 255), () => OnPurcasheButton?.Invoke()));
             buttonsCustom.ForEach(b => b.VisibleState = ButtonSystemState.Custom);
 
             buttonsPlay.Add(new Button(@"screen.menu.buttonSystem.solo", @"button-solo-select", FontAwesome.Solid.User, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
