@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
@@ -34,10 +34,33 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// Process a <see cref="DifficultyHitObject"/>.
         /// </summary>
         /// <param name="current">The <see cref="DifficultyHitObject"/> to process.</param>
-        public virtual void Process(DifficultyHitObject current)
+        public void Process(DifficultyHitObject current)
         {
+            // Preprocessing
+            RemoveExtraneousHistory(current);
+
+            // Processing
+            Calculate(current);
+
+            // Postprocessing
             Previous.Push(current);
         }
+
+        /// <summary>
+        /// Remove objects from <see cref="Previous"/> that are no longer needed for calculations from the current object onwards.
+        /// </summary>
+        /// <param name="current">The <see cref="DifficultyHitObject"/> to be processed.</param>
+        protected virtual void RemoveExtraneousHistory(DifficultyHitObject current)
+        {
+            // Default implementation to not retain objects
+            Previous.Clear();
+        }
+
+        /// <summary>
+        /// Calculate the difficulty of a <see cref="DifficultyHitObject"/> and update current strain values accordingly.
+        /// </summary>
+        /// <param name="current">The <see cref="DifficultyHitObject"/> to calculate the difficulty of.</param>
+        protected abstract void Calculate(DifficultyHitObject current);
 
         /// <summary>
         /// Returns the calculated difficulty value representing all <see cref="DifficultyHitObject"/>s that have been processed up to this point.
