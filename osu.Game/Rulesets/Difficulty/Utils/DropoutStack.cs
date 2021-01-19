@@ -52,6 +52,9 @@ namespace osu.Game.Rulesets.Difficulty.Utils
             return item;
         }
 
+        /// <summary>
+        /// Clears <see cref="DropoutStack{T}"/> of all items.
+        /// </summary>
         public void Clear()
         {
             items.Clear();
