@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Input.Bindings;
 using osu.Game.Database;
 using Realms;
@@ -11,7 +12,7 @@ namespace osu.Game.Input.Bindings
     public class RealmKeyBinding : RealmObject, IHasGuidPrimaryKey, IKeyBinding
     {
         [PrimaryKey]
-        public string ID { get; set; }
+        public Guid ID { get; set; }
 
         public int? RulesetID { get; set; }
 

@@ -7,7 +7,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Statistics;
+using osu.Game.Input.Bindings;
 using Realms;
+using Realms.Schema;
 
 namespace osu.Game.Database
 {
@@ -17,7 +19,7 @@ namespace osu.Game.Database
 
         private const string database_name = @"client";
 
-        private const int schema_version = 5;
+        private const int schema_version = 6;
 
         /// <summary>
         /// Lock object which is held for the duration of a write operation (via <see cref="GetForWrite"/>).
@@ -93,6 +95,13 @@ namespace osu.Game.Database
 
         private void onMigration(Migration migration, ulong lastSchemaVersion)
         {
+            switch (lastSchemaVersion)
+            {
+                case 5:
+                    // let's keep things simple. changing the type of the primary key is a bit involved.
+                    migration.NewRealm.RemoveAll<RealmKeyBinding>();
+                    break;
+            }
         }
 
         protected override void Dispose(bool isDisposing)

@@ -341,7 +341,7 @@ namespace osu.Game
                     {
                         usage.Realm.Add(new RealmKeyBinding
                         {
-                            ID = Guid.NewGuid().ToString(),
+                            ID = Guid.NewGuid(),
                             KeyCombinationString = dkb.KeyCombination.ToString(),
                             ActionInt = (int)dkb.Action,
                             RulesetID = dkb.RulesetID,
