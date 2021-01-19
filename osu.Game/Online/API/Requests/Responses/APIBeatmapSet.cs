@@ -42,6 +42,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"bpm")]
         private double bpm { get; set; }
 
+        [JsonProperty(@"nsfw")]
+        private bool hasExplicitContent { get; set; }
+
         [JsonProperty(@"video")]
         private bool hasVideo { get; set; }
 
@@ -94,6 +97,7 @@ namespace osu.Game.Online.API.Requests.Responses
                     FavouriteCount = favouriteCount,
                     BPM = bpm,
                     Status = Status,
+                    HasExplicitContent = hasExplicitContent,
                     HasVideo = hasVideo,
                     HasStoryboard = hasStoryboard,
                     Submitted = submitted,
