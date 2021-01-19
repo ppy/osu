@@ -73,6 +73,11 @@ namespace osu.Game.Overlays.Settings.Sections
                 },
                 new SettingsCheckbox
                 {
+                    LabelText = "Beatmap colours",
+                    Current = config.GetBindable<bool>(OsuSetting.BeatmapColours)
+                },
+                new SettingsCheckbox
+                {
                     LabelText = "Beatmap hitsounds",
                     Current = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds)
                 },
