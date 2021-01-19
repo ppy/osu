@@ -60,8 +60,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.JoinRoom(room, r => joinMultiplayerRoom(r, onSuccess, onError), onError);
         }
 
+        private Task joinRoomRequest;
+
         public override void PartRoom()
         {
+            if (joinRoomRequest != null)
+            {
+                joinRoomRequest.ContinueWith(t => multiplayerClient.LeaveRoom().CatchUnobservedExceptions());
+                joinRoomRequest = null;
+            }
+
             if (JoinedRoom.Value == null)
                 return;
 
@@ -84,8 +92,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             Debug.Assert(room.RoomID.Value != null);
 
-            multiplayerClient.JoinRoom(room).ContinueWith(t =>
+            joinRoomRequest = multiplayerClient.JoinRoom(room).ContinueWith(t =>
             {
+                joinRoomRequest = null;
+
                 if (t.IsCompletedSuccessfully)
                     Schedule(() => onSuccess?.Invoke(room));
                 else
