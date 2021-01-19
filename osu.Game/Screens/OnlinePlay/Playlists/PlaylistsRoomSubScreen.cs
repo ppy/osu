@@ -33,6 +33,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         private OverlinedHeader participantsHeader;
 
+        private GridContainer subScreenContainer;
+
         public PlaylistsRoomSubScreen(Room room)
         {
             Title = room.RoomID.Value == null ? "New playlist" : room.Name.Value;
@@ -44,7 +46,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             InternalChildren = new Drawable[]
             {
-                new GridContainer
+                subScreenContainer = new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Content = new[]
@@ -194,6 +196,40 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         [Resolved]
         private IAPIProvider api { get; set; }
+
+        public override void OnEntering(IScreen last)
+        {
+            base.OnEntering(last);
+
+            subScreenContainer.FadeOut().Delay(1000).FadeIn(500);
+        }
+
+        public override bool OnExiting(IScreen next)
+        {
+            if (base.OnExiting(next))
+                return true;
+
+            subScreenContainer.FadeOut();
+
+            return false;
+        }
+
+        public override void OnResuming(IScreen last)
+        {
+            base.OnResuming(last);
+
+            if (roomId.Value == null)
+                subScreenContainer.FadeOut().Delay(1000).FadeIn(500);
+            else
+                subScreenContainer.FadeInFromZero();
+        }
+
+        public override void OnSuspending(IScreen next)
+        {
+            subScreenContainer.FadeOut();
+
+            base.OnSuspending(next);
+        }
 
         protected override void LoadComplete()
         {
