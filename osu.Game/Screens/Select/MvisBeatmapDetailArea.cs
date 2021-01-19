@@ -6,6 +6,7 @@ namespace osu.Game.Screens.Select
     public class MvisBeatmapDetailArea : BeatmapDetailArea
     {
         public Action SelectCurrentAction;
+
         protected override BeatmapDetailAreaTabItem[] CreateTabItems() => new BeatmapDetailAreaTabItem[]
         {
             new VoidTabItem(),

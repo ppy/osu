@@ -35,6 +35,7 @@ using osu.Game.Screens.Mvis.Skinning;
 using osu.Game.Screens.Mvis.Storyboard;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Share;
 using osu.Game.Skinning;
 using osu.Game.Users;
 using osuTK;
@@ -373,6 +374,14 @@ namespace osu.Game.Screens.Mvis
                                                                     Action = () => updateSidebarState(settingsScroll),
                                                                     TooltipText = "screen.mvis.main.openSettings",
                                                                 },
+                                                                new BottomBarButton
+                                                                {
+                                                                    Action = () => this.Push(new BeatmapShareSongSelect())
+                                                                },
+                                                                new BottomBarButton
+                                                                {
+                                                                    Action = () => this.Push(new ReadFromFileScreen())
+                                                                }
                                                             }
                                                         },
                                                     }
