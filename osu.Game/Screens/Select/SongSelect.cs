@@ -500,7 +500,7 @@ namespace osu.Game.Screens.Select
 
                     if (beatmap != null)
                     {
-                        if (beatmap.BeatmapSetInfoID == beatmapNoDebounce?.BeatmapSetInfoID)
+                        if (beatmap.BeatmapSetInfoID == previous?.BeatmapInfo.BeatmapSetInfoID)
                             sampleChangeDifficulty.Play();
                         else
                             sampleChangeBeatmap.Play();
