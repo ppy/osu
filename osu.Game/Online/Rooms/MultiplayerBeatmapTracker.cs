@@ -36,20 +36,18 @@ namespace osu.Game.Online.Rooms
 
         protected override bool VerifyDatabasedModel(BeatmapSetInfo databasedSet)
         {
-            var verified = verifyDatabasedModel(databasedSet);
-            if (!verified)
-                Logger.Log("The imported beatmap set does not match the online version.", LoggingTarget.Runtime, LogLevel.Important);
-
-            return verified;
-        }
-
-        private bool verifyDatabasedModel(BeatmapSetInfo databasedSet)
-        {
             int? beatmapId = SelectedItem.Value.Beatmap.Value.OnlineBeatmapID;
             string checksum = SelectedItem.Value.Beatmap.Value.MD5Hash;
 
             var matchingBeatmap = databasedSet.Beatmaps.FirstOrDefault(b => b.OnlineBeatmapID == beatmapId && b.MD5Hash == checksum);
-            return matchingBeatmap != null;
+
+            if (matchingBeatmap == null)
+            {
+                Logger.Log("The imported beatmap set does not match the online version.", LoggingTarget.Runtime, LogLevel.Important);
+                return false;
+            }
+
+            return true;
         }
 
         protected override bool IsModelAvailableLocally()
