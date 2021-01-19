@@ -24,7 +24,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
-        private SampleChannel sampleStart;
+        private Sample sampleStart;
 
         [Resolved(typeof(Room), nameof(Room.Playlist))]
         protected BindableList<PlaylistItem> Playlist { get; private set; }

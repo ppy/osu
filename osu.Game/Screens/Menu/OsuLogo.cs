@@ -43,8 +43,8 @@ namespace osu.Game.Screens.Menu
 
         private readonly IntroSequence intro;
 
-        private SampleChannel sampleClick;
-        private SampleChannel sampleBeat;
+        private Sample sampleClick;
+        private Sample sampleBeat;
 
         private readonly Container colourAndTriangles;
         private readonly Triangles triangles;

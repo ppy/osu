@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private MusicController musicController { get; set; }
 
-        private SampleChannel sampleRestart;
+        private Sample sampleRestart;
 
         public BreakOverlay BreakOverlay;
 

@@ -39,7 +39,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private IBindable<bool> operationInProgress;
 
-        private SampleChannel sampleReadyCount;
+        private Sample sampleReadyCount;
 
         private readonly ButtonWithTrianglesExposed button;
 
@@ -120,8 +120,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             if (sampleReadyCount == null)
                 return;
 
-            sampleReadyCount.Frequency.Value = 0.77f + countReady * 0.06f;
-            sampleReadyCount.Play();
+            var channel = sampleReadyCount.Play();
+            channel.Frequency.Value = 0.77f + countReady * 0.06f;
         }
 
         private void updateButtonColour(bool green)

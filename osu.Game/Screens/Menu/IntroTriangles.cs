@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Menu
 
         private BackgroundScreenDefault background;
 
-        private SampleChannel welcome;
+        private Sample welcome;
 
         [BackgroundDependencyLoader]
         private void load()

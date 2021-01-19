@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Graphics.Audio;
 using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
@@ -20,14 +19,14 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestAllSamplesStopDuringSeek()
         {
             DrawableSlider slider = null;
-            DrawableSample[] samples = null;
+            SkinnableSound[] samples = null;
             ISamplePlaybackDisabler sampleDisabler = null;
 
             AddUntilStep("get variables", () =>
             {
                 sampleDisabler = Player;
                 slider = Player.ChildrenOfType<DrawableSlider>().OrderBy(s => s.HitObject.StartTime).FirstOrDefault();
-                samples = slider?.ChildrenOfType<DrawableSample>().ToArray();
+                samples = slider?.ChildrenOfType<SkinnableSound>().ToArray();
 
                 return slider != null;
             });
@@ -37,7 +36,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 if (!slider.Tracking.Value)
                     return false;
 
-                if (!samples.Any(s => s.Playing))
+                if (!samples.Any(s => s.IsPlaying))
                     return false;
 
                 Player.ChildrenOfType<GameplayClockContainer>().First().Seek(40000);

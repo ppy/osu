@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Menu
 
         private const int exit_delay = 3000;
 
-        private SampleChannel seeya;
+        private Sample seeya;
 
         protected virtual string SeeyaSampleName => "Intro/seeya";
 

@@ -18,8 +18,8 @@ namespace osu.Game.Graphics.Containers
     [Cached(typeof(IPreviewTrackOwner))]
     public abstract class OsuFocusedOverlayContainer : FocusedOverlayContainer, IPreviewTrackOwner, IKeyBindingHandler<GlobalAction>
     {
-        private SampleChannel samplePopIn;
-        private SampleChannel samplePopOut;
+        private Sample samplePopIn;
+        private Sample samplePopOut;
 
         protected override bool BlockNonPositionalInput => true;
 
