@@ -49,6 +49,7 @@ namespace osu.Game.Screens.Play
                         Origin = Anchor.TopLeft,
                         Margin = new MarginPadding { Left = 5 },
                         Text = string.IsNullOrEmpty(right) ? @"-" : right,
+                        UseLegacyUnicode = true
                     }
                 };
             }
@@ -199,6 +200,7 @@ namespace osu.Game.Screens.Play
                                     {
                                         Bottom = 40
                                     },
+                                    UseLegacyUnicode = true
                                 },
                                 new MetadataLine("来源", metadata.Source)
                                 {
@@ -278,27 +280,18 @@ namespace osu.Game.Screens.Play
             [BackgroundDependencyLoader]
             private void load()
             {
-                RelativeSizeAxes = Axes.Both;
+                Size = new Vector2(200, 40);
                 Origin = Anchor.Centre;
                 Anchor = Anchor.Centre;
+                CornerRadius = 10;
+                Masking = true;
                 Children = new Drawable[]
                 {
-                    new Container
+                    new Box
                     {
-                        Size = new Vector2(200, 40),
-                        Origin = Anchor.Centre,
-                        Anchor = Anchor.Centre,
-                        CornerRadius = 10,
-                        Masking = true,
-                        Children = new Drawable[]
-                        {
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Alpha = 0.8f,
-                                Colour = Color4.Black,
-                            }
-                        }
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0.8f,
+                        Colour = Color4.Black,
                     },
                     ContentFillFlow = new FillFlowContainer
                     {

@@ -61,6 +61,11 @@ namespace osu.Game.Configuration
             Set(MSetting.MvisRed, 0, 0, 255);
             Set(MSetting.MvisGreen, 0, 0, 255);
             Set(MSetting.MvisBlue, 0, 0, 255);
+
+            //Purcashe Screen
+            Set(MSetting.PPCount, 0, 0);
+            Set(MSetting.PurcasheBgBeatmap, false);
+            Set(MSetting.PurcasheBgTriangles, false);
         }
     }
 
@@ -95,7 +100,10 @@ namespace osu.Game.Configuration
         MvisInterfaceBlue,
         SamplePlaybackGain,
         SongSelectBgBlur,
-        IntroLoadDirectToSongSelect
+        IntroLoadDirectToSongSelect,
+        PPCount,
+        PurcasheBgBeatmap,
+        PurcasheBgTriangles
     }
 
     public enum MvisBarType

@@ -261,6 +261,21 @@ msgstr ""
 msgid "settings.mvis.barType.fall"
 msgstr ""
 
+msgid "settings.integration.header"
+msgstr ""
+
+msgid "settings.integration.discordRPC"
+msgstr ""
+
+msgid "settings.integration.discordRPC.Off"
+msgstr ""
+
+msgid "settings.integration.discordRPC.Limited"
+msgstr ""
+
+msgid "settings.integration.discordRPC.Full"
+msgstr ""
+
 # 新多人游戏界面
 msgid "Recent Participants"
 msgstr ""

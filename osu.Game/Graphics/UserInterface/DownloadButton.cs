@@ -73,7 +73,7 @@ namespace osu.Game.Graphics.UserInterface
                     TooltipText = "下载中...";
                     break;
 
-                case DownloadState.Downloaded:
+                case DownloadState.Importing:
                     background.FadeColour(colours.Yellow, 500, Easing.InOutExpo);
                     TooltipText = "导入中";
                     break;
