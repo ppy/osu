@@ -180,40 +180,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     State = { Value = client.Room == null ? Visibility.Visible : Visibility.Hidden }
                 }
             };
-        }
 
-        public override void OnEntering(IScreen last)
-        {
-            base.OnEntering(last);
-
-            subScreenContainer.FadeOut().Delay(1000).FadeIn(500);
-        }
-
-        public override bool OnExiting(IScreen next)
-        {
-            if (base.OnExiting(next))
-                return true;
-
-            subScreenContainer.FadeOut();
-
-            return false;
-        }
-
-        public override void OnResuming(IScreen last)
-        {
-            base.OnResuming(last);
-
-            if (client.Room == null)
-                subScreenContainer.FadeOut().Delay(1000).FadeIn(500);
-            else
-                subScreenContainer.FadeInFromZero();
-        }
-
-        public override void OnSuspending(IScreen next)
-        {
-            subScreenContainer.FadeOut();
-
-            base.OnSuspending(next);
+            subScreenContainer.Hide();
+            client.RoomUpdated += roomUpdated;
         }
 
         protected override void LoadComplete()
@@ -292,6 +261,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             readyClickOperation?.Dispose();
             readyClickOperation = null;
+        }
+
+        private void roomUpdated()
+        {
+            if (client.Room != null)
+            {
+                // If the room is updated and is not null, show the room sub screen container and unsubscribe.
+                subScreenContainer.Show();
+                client.RoomUpdated -= roomUpdated;
+            }
         }
 
         protected override void Dispose(bool isDisposing)
