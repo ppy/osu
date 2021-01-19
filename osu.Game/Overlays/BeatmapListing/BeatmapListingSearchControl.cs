@@ -11,6 +11,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osuTK.Graphics;
@@ -42,6 +43,8 @@ namespace osu.Game.Overlays.BeatmapListing
 
         public Bindable<SearchPlayed> Played => playedFilter.Current;
 
+        public Bindable<SearchExplicit> ExplicitContent => explicitContentFilter.Current;
+
         public BeatmapSetInfo BeatmapSet
         {
             set
@@ -65,6 +68,7 @@ namespace osu.Game.Overlays.BeatmapListing
         private readonly BeatmapSearchMultipleSelectionFilterRow<SearchExtra> extraFilter;
         private readonly BeatmapSearchScoreFilterRow ranksFilter;
         private readonly BeatmapSearchFilterRow<SearchPlayed> playedFilter;
+        private readonly BeatmapSearchFilterRow<SearchExplicit> explicitContentFilter;
 
         private readonly Box background;
         private readonly UpdateableBeatmapSetCover beatmapCover;
@@ -125,7 +129,8 @@ namespace osu.Game.Overlays.BeatmapListing
                                     languageFilter = new BeatmapSearchFilterRow<SearchLanguage>(@"Language"),
                                     extraFilter = new BeatmapSearchMultipleSelectionFilterRow<SearchExtra>(@"Extra"),
                                     ranksFilter = new BeatmapSearchScoreFilterRow(),
-                                    playedFilter = new BeatmapSearchFilterRow<SearchPlayed>(@"Played")
+                                    playedFilter = new BeatmapSearchFilterRow<SearchPlayed>(@"Played"),
+                                    explicitContentFilter = new BeatmapSearchFilterRow<SearchExplicit>(@"Explicit Content"),
                                 }
                             }
                         }
@@ -136,10 +141,18 @@ namespace osu.Game.Overlays.BeatmapListing
             categoryFilter.Current.Value = SearchCategory.Leaderboard;
         }
 
+        private IBindable<bool> allowExplicitContent;
+
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load(OverlayColourProvider colourProvider, OsuConfigManager config)
         {
             background.Colour = colourProvider.Dark6;
+
+            allowExplicitContent = config.GetBindable<bool>(OsuSetting.ShowOnlineExplicitContent);
+            allowExplicitContent.BindValueChanged(allow =>
+            {
+                ExplicitContent.Value = allow.NewValue ? SearchExplicit.Show : SearchExplicit.Hide;
+            }, true);
         }
 
         public void TakeFocus() => textBox.TakeFocus();
