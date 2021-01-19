@@ -33,6 +33,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         private OverlinedHeader participantsHeader;
 
+        private GridContainer mainContent;
+
         public PlaylistsRoomSubScreen(Room room)
         {
             Title = room.RoomID.Value == null ? "New playlist" : room.Name.Value;
@@ -44,7 +46,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             InternalChildren = new Drawable[]
             {
-                new GridContainer
+                mainContent = new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Content = new[]
@@ -190,6 +192,17 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     State = { Value = roomId.Value == null ? Visibility.Visible : Visibility.Hidden }
                 }
             };
+
+            if (roomId.Value == null)
+            {
+                mainContent.Hide();
+
+                settingsOverlay.State.BindValueChanged(visibility =>
+                {
+                    if (visibility.NewValue == Visibility.Hidden)
+                        mainContent.Show();
+                }, true);
+            }
         }
 
         [Resolved]
