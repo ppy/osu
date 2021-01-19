@@ -143,7 +143,6 @@ namespace osu.Game.Overlays.Settings.Sections
             List<SkinInfo> userSkinsList = skinsList.GetRange(firstNonDefault + 1, skinsList.Count - (firstNonDefault + 1));
             skinsList.RemoveRange(firstNonDefault + 1, skinsList.Count - (firstNonDefault + 1));
             userSkinsList.Sort((a, b) => String.Compare(a.Name, b.Name, StringComparison.OrdinalIgnoreCase));
-            
             skinsList.AddRange(userSkinsList);
             return skinsList;
         }
