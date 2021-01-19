@@ -7,6 +7,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -43,13 +45,22 @@ namespace osu.Game.Screens.OnlinePlay.Match
         [Cached]
         protected readonly MultiplayerBeatmapTracker BeatmapTracker;
 
+        private readonly Container content = new Container { RelativeSizeAxes = Axes.Both };
+
         protected RoomSubScreen()
         {
-            InternalChild = BeatmapTracker = new MultiplayerBeatmapTracker
+            base.AddInternal(BeatmapTracker = new MultiplayerBeatmapTracker
             {
-                SelectedItem = { BindTarget = SelectedItem },
-            };
+                SelectedItem = { BindTarget = SelectedItem }
+            });
+
+            base.AddInternal(content);
         }
+
+        // This is a bit ugly but we don't have the concept of InternalContent so it'll have to do for now. (https://github.com/ppy/osu-framework/issues/1690)
+        protected override void AddInternal(Drawable drawable) => content.Add(drawable);
+        protected override bool RemoveInternal(Drawable drawable) => content.Remove(drawable);
+        protected override void ClearInternal(bool disposeChildren = true) => content.Clear(disposeChildren);
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
