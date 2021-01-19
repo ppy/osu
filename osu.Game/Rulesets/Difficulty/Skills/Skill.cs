@@ -1,8 +1,9 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Difficulty.Skills
@@ -15,7 +16,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// <see cref="DifficultyHitObject"/>s that were processed previously. They can affect the difficulty values of the following objects.
         /// </summary>
-        protected readonly Stack<DifficultyHitObject> Previous = new Stack<DifficultyHitObject>(); // Contained objects not used yet
+        protected readonly DropoutStack<DifficultyHitObject> Previous = new DropoutStack<DifficultyHitObject>(); // Contained objects not used yet
 
         /// <summary>
         /// Visual mods for use in skill calculations.

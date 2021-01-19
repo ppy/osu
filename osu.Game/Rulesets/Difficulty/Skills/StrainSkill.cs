@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         /// <param name="time">The time to retrieve the peak strain at.</param>
         /// <returns>The peak strain.</returns>
-        protected virtual double GetPeakStrain(double time) => CurrentStrain * strainDecay(time - Previous.Peek().StartTime);
+        protected virtual double GetPeakStrain(double time) => CurrentStrain * strainDecay(time - Previous[0].StartTime);
 
         /// <summary>
         /// Returns the calculated difficulty value representing all <see cref="DifficultyHitObject"/>s that have been processed up to this point.
