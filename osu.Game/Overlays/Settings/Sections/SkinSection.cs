@@ -38,6 +38,8 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private List<SkinInfo> skinItems;
 
+        private int firstNonDefault;
+
         [Resolved]
         private SkinManager skins { get; set; }
 
@@ -107,8 +109,10 @@ namespace osu.Game.Overlays.Settings.Sections
         private void updateItems()
         {
             skinItems = skins.GetAllUsableSkins();
+            firstNonDefault = skinItems.FindIndex(s => s.ID > 0);
+
+            skinItems.Insert(firstNonDefault, random_skin_info);
             skinItems = sortList(skinItems);
-            
             skinDropdown.Items = skinItems;
         }
 
@@ -130,19 +134,12 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private List<SkinInfo> sortList(List<SkinInfo> skinsList)
         {
-            skinsList.Sort((a, b) => String.Compare(a.Name, b.Name, StringComparison.Ordinal));
-            for (int i = 0; i < skinsList.Count; i++)
-            {
-                // insert lazer built-in skins before user skins
-                if (skinsList[i].ID <= 0) {
-                    var itemToMove = skinsList[i];
-                    skinsList.RemoveAt(i);
-                    skinsList.Insert(0, itemToMove);
-                }
-            }
-            skinsList.RemoveAll(s => s.ID == SkinInfo.RANDOM_SKIN);
-            skinsList.Insert(0, random_skin_info);
-
+            // Sort user skins seperate from built-in skins
+            List<SkinInfo> userSkinsList = skinsList.GetRange(firstNonDefault + 1, skinsList.Count - (firstNonDefault + 1));
+            skinsList.RemoveRange(firstNonDefault + 1, skinsList.Count - (firstNonDefault + 1));
+            userSkinsList.Sort((a, b) => String.Compare(a.Name, b.Name, StringComparison.OrdinalIgnoreCase));
+            
+            skinsList.AddRange(userSkinsList);
             return skinsList;
         }
 
