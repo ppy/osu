@@ -74,7 +74,7 @@ namespace osu.Game.Input
                         // insert any defaults which are missing.
                         usage.Realm.Add(new RealmKeyBinding
                         {
-                            ID = Guid.NewGuid().ToString(),
+                            ID = Guid.NewGuid(),
                             KeyCombinationString = k.KeyCombination.ToString(),
                             ActionInt = (int)k.Action,
                             RulesetID = rulesetId,
