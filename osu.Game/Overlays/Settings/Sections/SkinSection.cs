@@ -38,7 +38,17 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private List<SkinInfo> skinItems;
 
-        private int firstNonDefault;
+        private int firstNonDefaultSkinIndex
+        {
+            get
+            {
+                var index = skinItems.FindIndex(s => s.ID > 0);
+                if (index < 0)
+                    index = skinItems.Count;
+
+                return index;
+            }
+        }
 
         [Resolved]
         private SkinManager skins { get; set; }
@@ -114,10 +124,7 @@ namespace osu.Game.Overlays.Settings.Sections
         private void updateItems()
         {
             skinItems = skins.GetAllUsableSkins();
-            firstNonDefault = skinItems.FindIndex(s => s.ID > 0);
-            if (firstNonDefault < 0)
-                firstNonDefault = skinItems.Count;
-            skinItems.Insert(firstNonDefault, random_skin_info);
+            skinItems.Insert(firstNonDefaultSkinIndex, random_skin_info);
             skinItems = sortList(skinItems);
             skinDropdown.Items = skinItems;
         }
@@ -141,8 +148,8 @@ namespace osu.Game.Overlays.Settings.Sections
         private List<SkinInfo> sortList(List<SkinInfo> skinsList)
         {
             // Sort user skins seperate from built-in skins
-            List<SkinInfo> userSkinsList = skinsList.GetRange(firstNonDefault + 1, skinsList.Count - (firstNonDefault + 1));
-            skinsList.RemoveRange(firstNonDefault + 1, skinsList.Count - (firstNonDefault + 1));
+            List<SkinInfo> userSkinsList = skinsList.GetRange(firstNonDefaultSkinIndex, skinsList.Count - firstNonDefaultSkinIndex);
+            skinsList.RemoveRange(firstNonDefaultSkinIndex, skinsList.Count - firstNonDefaultSkinIndex);
             userSkinsList.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.OrdinalIgnoreCase));
             skinsList.AddRange(userSkinsList);
             return skinsList;
