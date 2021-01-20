@@ -143,9 +143,6 @@ namespace osu.Game.Online.Multiplayer
                 return;
             }
 
-            if (Room == null)
-                return;
-
             await base.LeaveRoom();
             await connection.InvokeAsync(nameof(IMultiplayerServer.LeaveRoom));
         }
