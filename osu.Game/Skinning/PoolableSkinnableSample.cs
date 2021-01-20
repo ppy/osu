@@ -129,7 +129,7 @@ namespace osu.Game.Skinning
         /// </summary>
         public bool Playing => activeChannel?.Playing ?? false;
 
-        public bool Played => activeChannel?.Played ?? false;
+        public bool Played => !activeChannel?.Playing ?? false;
 
         private bool looping;
 
