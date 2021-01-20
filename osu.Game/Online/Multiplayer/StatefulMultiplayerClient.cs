@@ -4,7 +4,6 @@
 #nullable enable
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -109,30 +108,54 @@ namespace osu.Game.Online.Multiplayer
             });
         }
 
+        private readonly object joinOrLeaveTaskLock = new object();
+        private Task? joinOrLeaveTask;
+
         /// <summary>
         /// Joins the <see cref="MultiplayerRoom"/> for a given API <see cref="Room"/>.
         /// </summary>
         /// <param name="room">The API <see cref="Room"/>.</param>
         public async Task JoinRoom(Room room)
         {
-            if (Room != null)
-                throw new InvalidOperationException("Cannot join a multiplayer room while already in one.");
+            Task? lastTask;
+            Task newTask;
 
-            Debug.Assert(room.RoomID.Value != null);
+            lock (joinOrLeaveTaskLock)
+            {
+                lastTask = joinOrLeaveTask;
+                joinOrLeaveTask = newTask = Task.Run(async () =>
+                {
+                    if (lastTask != null)
+                        await lastTask;
 
-            apiRoom = room;
-            playlistItemId = room.Playlist.SingleOrDefault()?.ID ?? 0;
+                    // Should be thread-safe since joinOrLeaveTask is locked on in both JoinRoom() and LeaveRoom().
+                    if (Room != null)
+                        throw new InvalidOperationException("Cannot join a multiplayer room while already in one.");
 
-            Room = await JoinRoom(room.RoomID.Value.Value);
+                    Debug.Assert(room.RoomID.Value != null);
 
-            Debug.Assert(Room != null);
+                    // Join the server-side room.
+                    var joinedRoom = await JoinRoom(room.RoomID.Value.Value);
+                    Debug.Assert(joinedRoom != null);
 
-            var users = await getRoomUsers();
-            Debug.Assert(users != null);
+                    // Populate users.
+                    Debug.Assert(joinedRoom.Users != null);
+                    await Task.WhenAll(joinedRoom.Users.Select(PopulateUser));
 
-            await Task.WhenAll(users.Select(PopulateUser));
+                    // Update the stored room (must be done on update thread for thread-safety).
+                    await scheduleAsync(() =>
+                    {
+                        Room = joinedRoom;
+                        apiRoom = room;
+                        playlistItemId = room.Playlist.SingleOrDefault()?.ID ?? 0;
+                    });
 
-            updateLocalRoomSettings(Room.Settings);
+                    // Update room settings.
+                    await updateLocalRoomSettings(joinedRoom.Settings);
+                });
+            }
+
+            await newTask;
         }
 
         /// <summary>
@@ -142,21 +165,35 @@ namespace osu.Game.Online.Multiplayer
         /// <returns>The joined <see cref="MultiplayerRoom"/>.</returns>
         protected abstract Task<MultiplayerRoom> JoinRoom(long roomId);
 
-        public virtual Task LeaveRoom()
+        public virtual async Task LeaveRoom()
         {
-            Scheduler.Add(() =>
+            Task? lastTask;
+            Task newTask;
+
+            lock (joinOrLeaveTaskLock)
             {
-                if (Room == null)
-                    return;
+                lastTask = joinOrLeaveTask;
+                joinOrLeaveTask = newTask = Task.Run(async () =>
+                {
+                    if (lastTask != null)
+                        await lastTask;
 
-                apiRoom = null;
-                Room = null;
-                CurrentMatchPlayingUserIds.Clear();
+                    // Should be thread-safe since joinOrLeaveTask is locked on in both JoinRoom() and LeaveRoom().
+                    if (Room == null)
+                        return;
 
-                RoomUpdated?.Invoke();
-            }, false);
+                    await scheduleAsync(() =>
+                    {
+                        apiRoom = null;
+                        Room = null;
+                        CurrentMatchPlayingUserIds.Clear();
 
-            return Task.CompletedTask;
+                        RoomUpdated?.Invoke();
+                    });
+                });
+            }
+
+            await newTask;
         }
 
         /// <summary>
@@ -433,61 +470,34 @@ namespace osu.Game.Online.Multiplayer
         protected async Task PopulateUser(MultiplayerRoomUser multiplayerUser) => multiplayerUser.User ??= await userLookupCache.GetUserAsync(multiplayerUser.UserID);
 
         /// <summary>
-        /// Retrieve a copy of users currently in the joined <see cref="Room"/> in a thread-safe manner.
-        /// This should be used whenever accessing users from outside of an Update thread context (ie. when not calling <see cref="Drawable.Schedule"/>).
-        /// </summary>
-        /// <returns>A copy of users in the current room, or null if unavailable.</returns>
-        private Task<List<MultiplayerRoomUser>?> getRoomUsers()
-        {
-            var tcs = new TaskCompletionSource<List<MultiplayerRoomUser>?>();
-
-            // at some point we probably want to replace all these schedule calls with Room.LockForUpdate.
-            // for now, as this would require quite some consideration due to the number of accesses to the room instance,
-            // let's just add a manual schedule for the non-scheduled usages instead.
-            Scheduler.Add(() =>
-            {
-                var users = Room?.Users.ToList();
-                tcs.SetResult(users);
-            }, false);
-
-            return tcs.Task;
-        }
-
-        /// <summary>
         /// Updates the local room settings with the given <see cref="MultiplayerRoomSettings"/>.
         /// </summary>
         /// <remarks>
         /// This updates both the joined <see cref="MultiplayerRoom"/> and the respective API <see cref="Room"/>.
         /// </remarks>
         /// <param name="settings">The new <see cref="MultiplayerRoomSettings"/> to update from.</param>
-        private void updateLocalRoomSettings(MultiplayerRoomSettings settings)
+        private Task updateLocalRoomSettings(MultiplayerRoomSettings settings) => scheduleAsync(() =>
         {
             if (Room == null)
                 return;
 
-            Scheduler.Add(() =>
-            {
-                if (Room == null)
-                    return;
+            Debug.Assert(apiRoom != null);
 
-                Debug.Assert(apiRoom != null);
+            // Update a few properties of the room instantaneously.
+            Room.Settings = settings;
+            apiRoom.Name.Value = Room.Settings.Name;
 
-                // Update a few properties of the room instantaneously.
-                Room.Settings = settings;
-                apiRoom.Name.Value = Room.Settings.Name;
+            // The playlist update is delayed until an online beatmap lookup (below) succeeds.
+            // In-order for the client to not display an outdated beatmap, the playlist is forcefully cleared here.
+            apiRoom.Playlist.Clear();
 
-                // The playlist update is delayed until an online beatmap lookup (below) succeeds.
-                // In-order for the client to not display an outdated beatmap, the playlist is forcefully cleared here.
-                apiRoom.Playlist.Clear();
+            RoomUpdated?.Invoke();
 
-                RoomUpdated?.Invoke();
+            var req = new GetBeatmapSetRequest(settings.BeatmapID, BeatmapSetLookupType.BeatmapId);
+            req.Success += res => updatePlaylist(settings, res);
 
-                var req = new GetBeatmapSetRequest(settings.BeatmapID, BeatmapSetLookupType.BeatmapId);
-                req.Success += res => updatePlaylist(settings, res);
-
-                api.Queue(req);
-            }, false);
-        }
+            api.Queue(req);
+        });
 
         private void updatePlaylist(MultiplayerRoomSettings settings, APIBeatmapSet onlineSet)
         {
@@ -533,6 +543,26 @@ namespace osu.Game.Online.Multiplayer
                 CurrentMatchPlayingUserIds.Add(userId);
             else
                 CurrentMatchPlayingUserIds.Remove(userId);
+        }
+
+        private Task scheduleAsync(Action action)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+
+            Scheduler.Add(() =>
+            {
+                try
+                {
+                    action();
+                    tcs.SetResult(true);
+                }
+                catch (Exception ex)
+                {
+                    tcs.SetException(ex);
+                }
+            });
+
+            return tcs.Task;
         }
     }
 }
