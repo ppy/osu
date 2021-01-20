@@ -124,7 +124,10 @@ namespace osu.Game.Skinning
             samplesContainer.ForEach(c =>
             {
                 if (PlayWhenZeroVolume || c.AggregateVolume.Value > 0)
+                {
+                    c.Stop();
                     c.Play();
+                }
             });
         }
 
