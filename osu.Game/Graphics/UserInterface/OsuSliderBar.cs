@@ -155,7 +155,6 @@ namespace osu.Game.Graphics.UserInterface
                 return;
 
             lastSampleValue = value;
-
             lastSampleTime = Clock.CurrentTime;
 
             var channel = sample.Play();
