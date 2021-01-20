@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         protected override void RemoveExtraneousHistory(DifficultyHitObject current)
         {
             while (Previous.Count > 1)
-                Previous.Drop();
+                Previous.Dequeue();
         }
 
         protected sealed override void Calculate(DifficultyHitObject current)

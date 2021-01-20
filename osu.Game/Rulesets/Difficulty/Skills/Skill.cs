@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// <see cref="DifficultyHitObject"/>s that were processed previously. They can affect the difficulty values of the following objects.
         /// </summary>
-        protected readonly DropoutStack<DifficultyHitObject> Previous = new DropoutStack<DifficultyHitObject>();
+        protected readonly ReverseQueue<DifficultyHitObject> Previous = new ReverseQueue<DifficultyHitObject>(4);
 
         /// <summary>
         /// Visual mods for use in skill calculations.
@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             Calculate(current);
 
             // Postprocessing
-            Previous.Push(current);
+            Previous.Enqueue(current);
         }
 
         /// <summary>
