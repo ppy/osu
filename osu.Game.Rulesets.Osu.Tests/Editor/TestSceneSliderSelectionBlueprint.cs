@@ -179,7 +179,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 InputManager.ReleaseButton(MouseButton.Left);
             });
             checkPositions();
-
         }
 
         private void moveHitObject()
