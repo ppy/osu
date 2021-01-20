@@ -19,14 +19,14 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestAllSamplesStopDuringSeek()
         {
             DrawableSlider slider = null;
-            SkinnableSound[] samples = null;
+            PoolableSkinnableSample[] samples = null;
             ISamplePlaybackDisabler sampleDisabler = null;
 
             AddUntilStep("get variables", () =>
             {
                 sampleDisabler = Player;
                 slider = Player.ChildrenOfType<DrawableSlider>().OrderBy(s => s.HitObject.StartTime).FirstOrDefault();
-                samples = slider?.ChildrenOfType<SkinnableSound>().ToArray();
+                samples = slider?.ChildrenOfType<PoolableSkinnableSample>().ToArray();
 
                 return slider != null;
             });
@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 if (!slider.Tracking.Value)
                     return false;
 
-                if (!samples.Any(s => s.IsPlaying))
+                if (!samples.Any(s => s.Playing))
                     return false;
 
                 Player.ChildrenOfType<GameplayClockContainer>().First().Seek(40000);

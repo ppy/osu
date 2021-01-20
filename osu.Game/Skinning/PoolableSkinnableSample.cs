@@ -117,19 +117,25 @@ namespace osu.Game.Skinning
 
             activeChannel = Sample.Play();
             activeChannel.Looping = Looping;
+
+            Played = true;
         }
 
         /// <summary>
         /// Stops the sample.
         /// </summary>
-        public void Stop() => activeChannel?.Stop();
+        public void Stop()
+        {
+            activeChannel?.Stop();
+            activeChannel = null;
+        }
 
         /// <summary>
         /// Whether the sample is currently playing.
         /// </summary>
         public bool Playing => activeChannel?.Playing ?? false;
 
-        public bool Played => !activeChannel?.Playing ?? false;
+        public bool Played { get; private set; }
 
         private bool looping;
 

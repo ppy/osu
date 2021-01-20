@@ -43,7 +43,11 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestStoppedSoundDoesntResumeAfterPause()
         {
-            AddStep("start sample with looping", () => skinnableSound.Looping = true);
+            AddStep("start sample with looping", () =>
+            {
+                skinnableSound.Looping = true;
+                skinnableSound.Play();
+            });
 
             AddUntilStep("wait for sample to start playing", () => skinnableSound.IsPlaying);
 
@@ -62,7 +66,11 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestLoopingSoundResumesAfterPause()
         {
-            AddStep("start sample with looping", () => skinnableSound.Looping = true);
+            AddStep("start sample with looping", () =>
+            {
+                skinnableSound.Looping = true;
+                skinnableSound.Play();
+            });
 
             AddUntilStep("wait for sample to start playing", () => skinnableSound.IsPlaying);
 
