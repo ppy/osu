@@ -46,6 +46,8 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         protected virtual int SectionLength => 400;
 
+        protected override int PreviousCollectionSoftCapacity => 1;
+
         private double currentSectionPeak = 1; // We also keep track of the peak strain level in the current section.
 
         private double currentSectionEnd;

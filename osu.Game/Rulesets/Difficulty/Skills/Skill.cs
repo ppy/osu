@@ -16,7 +16,14 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// <see cref="DifficultyHitObject"/>s that were processed previously. They can affect the difficulty values of the following objects.
         /// </summary>
-        protected readonly ReverseQueue<DifficultyHitObject> Previous = new ReverseQueue<DifficultyHitObject>(4);
+        protected readonly ReverseQueue<DifficultyHitObject> Previous;
+
+        /// <summary>
+        /// Soft capacity of the <see cref="Previous"/> queue.
+        /// <see cref="Previous"/> will automatically resize if it exceeds capacity, but will do so at a very slight performance impact.
+        /// The actual capacity will be set to this value + 1 to allow for storage of the current object before the next can be processed.
+        /// </summary>
+        protected virtual int PreviousCollectionSoftCapacity => 0;
 
         /// <summary>
         /// Visual mods for use in skill calculations.
@@ -28,6 +35,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         protected Skill(Mod[] mods)
         {
             this.mods = mods;
+            Previous = new ReverseQueue<DifficultyHitObject>(PreviousCollectionSoftCapacity + 1);
         }
 
         /// <summary>
