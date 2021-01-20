@@ -161,6 +161,27 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             checkControlPointSelected(1, false);
         }
 
+        [Test]
+        public void TestZeroLengthSliderNotAllowed()
+        {
+            moveMouseToControlPoint(1);
+            AddStep("drag control point 1 to control point 0", () =>
+            {
+                InputManager.PressButton(MouseButton.Left);
+                moveMouseToControlPoint(0);
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+            moveMouseToControlPoint(2);
+            AddStep("drag control point 2 to control point 0", () =>
+            {
+                InputManager.PressButton(MouseButton.Left);
+                moveMouseToControlPoint(0);
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+            checkPositions();
+
+        }
+
         private void moveHitObject()
         {
             AddStep("move hitobject", () =>

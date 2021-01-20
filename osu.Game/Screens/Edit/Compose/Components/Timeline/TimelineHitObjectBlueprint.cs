@@ -387,7 +387,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         case IHasDuration endTimeHitObject:
                             var snappedTime = Math.Max(hitObject.StartTime, beatSnapProvider.SnapTime(time));
 
-                            if (endTimeHitObject.EndTime == snappedTime)
+                            if (endTimeHitObject.EndTime == snappedTime || (snappedTime - hitObject.StartTime) < 1)
                                 return;
 
                             endTimeHitObject.Duration = snappedTime - hitObject.StartTime;
