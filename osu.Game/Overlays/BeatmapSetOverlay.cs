@@ -76,7 +76,7 @@ namespace osu.Game.Overlays
                             },
                             new ScoresContainer
                             {
-                                Beatmap = { BindTarget = Header.Picker.Beatmap }
+                                Beatmap = { BindTarget = Header.HeaderContent.Picker.Beatmap }
                             },
                             comments = new CommentsSection()
                         },
@@ -88,7 +88,7 @@ namespace osu.Game.Overlays
             info.BeatmapSet.BindTo(beatmapSet);
             comments.BeatmapSet.BindTo(beatmapSet);
 
-            Header.Picker.Beatmap.ValueChanged += b =>
+            Header.HeaderContent.Picker.Beatmap.ValueChanged += b =>
             {
                 info.Beatmap = b.NewValue;
 
@@ -122,7 +122,7 @@ namespace osu.Game.Overlays
             req.Success += res =>
             {
                 beatmapSet.Value = res.ToBeatmapSet(rulesets);
-                Header.Picker.Beatmap.Value = Header.BeatmapSet.Value.Beatmaps.First(b => b.OnlineBeatmapID == beatmapId);
+                Header.HeaderContent.Picker.Beatmap.Value = Header.BeatmapSet.Value.Beatmaps.First(b => b.OnlineBeatmapID == beatmapId);
             };
             API.Queue(req);
 
