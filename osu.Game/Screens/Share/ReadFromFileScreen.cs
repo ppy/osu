@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -12,6 +14,7 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.API;
@@ -25,7 +28,6 @@ namespace osu.Game.Screens.Share
     public class ReadFromFileScreen : OsuScreen
     {
         private FileSelector selector;
-        private TriangleButton readButton;
         private FillFlowContainer fillFlow;
         private LoadingLayer loading;
         private OsuScrollContainer scroll;
@@ -44,6 +46,11 @@ namespace osu.Game.Screens.Share
 
         [Resolved]
         private OsuColour colours { get; set; }
+
+        private readonly BindableList<GetBeatmapSetRequest> requests = new BindableList<GetBeatmapSetRequest>();
+        private int apiFailures;
+        private int beatmapsIgnored;
+        private OsuSpriteText tipText;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -87,13 +94,18 @@ namespace osu.Game.Screens.Share
                                         {
                                             selector = new FileSelector(validFileExtensions: ex)
                                             {
+                                                Anchor = Anchor.Centre,
+                                                Origin = Anchor.Centre,
                                                 RelativeSizeAxes = Axes.Both
                                             },
                                             scroll = new OsuScrollContainer
                                             {
                                                 RelativeSizeAxes = Axes.Both,
+                                                Anchor = Anchor.Centre,
+                                                Origin = Anchor.Centre,
                                                 ScrollbarVisible = false,
                                                 Alpha = 0,
+                                                ScrollContent = { Anchor = Anchor.Centre, Origin = Anchor.Centre },
                                                 Child = fillFlow = new FillFlowContainer
                                                 {
                                                     RelativeSizeAxes = Axes.X,
@@ -108,22 +120,39 @@ namespace osu.Game.Screens.Share
                                 },
                                 new Drawable[]
                                 {
-                                    new Container
+                                    new FillFlowContainer
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
                                         Padding = new MarginPadding { Horizontal = 22 },
                                         Margin = new MarginPadding { Vertical = 22 },
-                                        Child = readButton = new TriangleButton
+                                        Direction = FillDirection.Vertical,
+                                        Spacing = new Vector2(5),
+                                        LayoutDuration = 300,
+                                        LayoutEasing = Easing.OutQuint,
+                                        Children = new Drawable[]
                                         {
-                                            Text = "开始读取",
-                                            Anchor = Anchor.BottomCentre,
-                                            Origin = Anchor.BottomCentre,
-                                            RelativeSizeAxes = Axes.X,
-                                            Height = 40,
-                                            Width = 0.9f,
-                                            Action = () => readFrom(selector.CurrentFile.Value?.FullName)
-                                        },
+                                            new TriangleButton
+                                            {
+                                                Text = "重新选取",
+                                                Anchor = Anchor.BottomCentre,
+                                                Origin = Anchor.BottomCentre,
+                                                RelativeSizeAxes = Axes.X,
+                                                Height = 40,
+                                                Width = 0.9f,
+                                                Action = () =>
+                                                {
+                                                    tipText.Text = string.Empty;
+                                                    selector.CurrentFile.Value = null;
+                                                    showSelector();
+                                                }
+                                            },
+                                            tipText = new OsuSpriteText
+                                            {
+                                                Anchor = Anchor.BottomCentre,
+                                                Origin = Anchor.BottomCentre,
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -131,18 +160,58 @@ namespace osu.Game.Screens.Share
                     }
                 }
             };
+
+            selector.CurrentFile.BindValueChanged(v =>
+            {
+                readFrom(v.NewValue?.FullName);
+            });
+
+            requests.BindCollectionChanged(onRequestsChanged);
         }
+
+        private void onRequestsChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (requests.Count > 0)
+                loading.Show();
+            else
+                loading.Hide();
+        }
+
+        private void toggleSelectorAndScroll(bool showSelector, bool clearScroll)
+        {
+            if (showSelector)
+            {
+                selector.FadeIn(200);
+
+                if (clearScroll)
+                {
+                    scroll.FadeTo(0.01f, 200).OnComplete(_ =>
+                    {
+                        fillFlow.Clear();
+                        scroll.FadeOut();
+                    });
+                }
+                else
+                    scroll.FadeOut(200);
+            }
+            else
+            {
+                selector.FadeOut(300);
+                scroll.FadeIn(300);
+            }
+        }
+
+        private void showSelector() => toggleSelectorAndScroll(true, true);
+        private void hideSelector() => toggleSelectorAndScroll(false, false);
 
         private void readFrom(string location)
         {
             if (location == null) return;
 
-            readButton.Enabled.Value = false;
-
-            selector.Hide();
-            readButton.Hide();
-            loading.Show();
-            scroll.Show();
+            hideSelector();
+            cancelAllRequests(true);
+            apiFailures = 0;
+            beatmapsIgnored = 0;
 
             try
             {
@@ -168,7 +237,10 @@ namespace osu.Game.Screens.Share
                         //在可用谱面中对比，是否已有该图
                         if (localBeatmaps.Any(b => b.OnlineBeatmapSetID == currentID)
                             || newBeatmaps.Any(id => id == currentID))
+                        {
+                            beatmapsIgnored++;
                             continue; //有，继续
+                        }
 
                         //没有，添加进newBeatmaps
                         newBeatmaps.Add(currentID);
@@ -180,11 +252,23 @@ namespace osu.Game.Screens.Share
                 //完成后
                 foreach (var id in newBeatmaps)
                 {
-                    Logger.Log($"发送有关{id}的请求");
+                    //创建请求
                     var req = new GetBeatmapSetRequest(id);
+
+                    //向列表添加该请求
+                    requests.Add(req);
+
+                    //当请求成功后：
                     req.Success += res => Schedule(() =>
                     {
+                        //从列表中移除该请求
+                        requests.Remove(req);
+
+                        //创建(BeatmapSetInfo)onlineBeatmap
+                        //调用APIBeatmapSet为其赋值
                         var onlineBeatmap = res.ToBeatmapSet(rulesets);
+
+                        //向fillFlow添加面板
                         fillFlow.Add(new GridBeatmapPanel(onlineBeatmap)
                         {
                             Anchor = Anchor.TopCentre,
@@ -192,18 +276,44 @@ namespace osu.Game.Screens.Share
                         });
                     });
 
-                    req.Failure += res => this.Exit();
+                    //请求失败时同样从列表中移除，并增加apiFailures计数
+                    req.Failure += _ =>
+                    {
+                        requests.Remove(req);
+                        apiFailures++;
+
+                        //设置提示文字
+                        //todo: 找个更好的设置文字而不是在api完成或失败时更新
+                        tipText.Text = $"API请求失败了{apiFailures}次，忽略了{beatmapsIgnored}个已有谱面";
+                    };
+
                     api.Queue(req);
                 }
+
+                tipText.Text = $"API请求失败了{apiFailures}次，忽略了{beatmapsIgnored}个已有谱面";
             }
             catch (Exception e)
             {
                 Logger.Error(e, "尝试读取并列出谱面时发生了错误");
-                throw;
+                cancelAllRequests();
+                showSelector();
+            }
+        }
+
+        private void cancelAllRequests(bool clearList = false)
+        {
+            foreach (var req in requests)
+            {
+                req.Cancel();
             }
 
-            readButton.Enabled.Value = true;
-            loading.Hide();
+            if (clearList) requests.Clear();
+        }
+
+        public override bool OnExiting(IScreen next)
+        {
+            cancelAllRequests();
+            return base.OnExiting(next);
         }
     }
 }

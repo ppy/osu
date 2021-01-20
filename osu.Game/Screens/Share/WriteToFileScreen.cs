@@ -11,7 +11,6 @@ using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Share
 {
