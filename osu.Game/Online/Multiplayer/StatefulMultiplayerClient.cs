@@ -155,7 +155,19 @@ namespace osu.Game.Online.Multiplayer
                 });
             }
 
-            await newTask;
+            try
+            {
+                await newTask;
+            }
+            finally
+            {
+                // The task will be awaited in the future, so reset it so that the user doesn't get into a permanently faulted state if anything fails.
+                lock (joinOrLeaveTask)
+                {
+                    if (joinOrLeaveTask == newTask)
+                        joinOrLeaveTask = null;
+                }
+            }
         }
 
         /// <summary>
@@ -193,7 +205,19 @@ namespace osu.Game.Online.Multiplayer
                 });
             }
 
-            await newTask;
+            try
+            {
+                await newTask;
+            }
+            finally
+            {
+                // The task will be awaited in the future, so reset it so that the user doesn't get into a permanently faulted state if anything fails.
+                lock (joinOrLeaveTask)
+                {
+                    if (joinOrLeaveTask == newTask)
+                        joinOrLeaveTask = null;
+                }
+            }
         }
 
         /// <summary>
