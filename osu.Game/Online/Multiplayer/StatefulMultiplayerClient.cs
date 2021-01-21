@@ -162,7 +162,7 @@ namespace osu.Game.Online.Multiplayer
             finally
             {
                 // The task will be awaited in the future, so reset it so that the user doesn't get into a permanently faulted state if anything fails.
-                lock (joinOrLeaveTask)
+                lock (joinOrLeaveTaskLock)
                 {
                     if (joinOrLeaveTask == newTask)
                         joinOrLeaveTask = null;
@@ -212,7 +212,7 @@ namespace osu.Game.Online.Multiplayer
             finally
             {
                 // The task will be awaited in the future, so reset it so that the user doesn't get into a permanently faulted state if anything fails.
-                lock (joinOrLeaveTask)
+                lock (joinOrLeaveTaskLock)
                 {
                     if (joinOrLeaveTask == newTask)
                         joinOrLeaveTask = null;
