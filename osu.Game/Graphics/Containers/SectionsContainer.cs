@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -131,12 +132,12 @@ namespace osu.Game.Graphics.Containers
         public override void Add(T drawable)
         {
             base.Add(drawable);
+
+            Debug.Assert(drawable != null);
+
             lastKnownScroll = float.NaN;
             headerHeight = float.NaN;
             footerHeight = float.NaN;
-
-            if (drawable == null)
-                return;
 
             if (smallestSection == null || smallestSection.Height > drawable.Height)
                 smallestSection = drawable;
