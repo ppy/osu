@@ -72,7 +72,6 @@ namespace osu.Game.Overlays.Profile.Header
                     Width = UserProfileOverlay.CONTENT_X_MARGIN,
                     Child = new ExpandDetailsButton
                     {
-                        RelativeSizeAxes = Axes.Y,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         DetailsVisible = { BindTarget = DetailsVisible }
