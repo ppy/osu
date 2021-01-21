@@ -178,7 +178,10 @@ namespace osu.Game.Graphics.Containers
         {
             base.UpdateAfterChildren();
 
-            float headerH = (ExpandableHeader?.LayoutSize.Y ?? 0) + (FixedHeader?.LayoutSize.Y ?? 0);
+            float fixedHeaderSize = (FixedHeader?.LayoutSize.Y ?? 0);
+            float expandableHeaderSize = ExpandableHeader?.LayoutSize.Y ?? 0;
+
+            float headerH = expandableHeaderSize + fixedHeaderSize;
             float footerH = Footer?.LayoutSize.Y ?? 0;
 
             if (headerH != headerHeight || footerH != footerHeight)
@@ -200,13 +203,13 @@ namespace osu.Game.Graphics.Containers
 
                 if (ExpandableHeader != null && FixedHeader != null)
                 {
-                    float offset = Math.Min(ExpandableHeader.LayoutSize.Y, currentScroll);
+                    float offset = Math.Min(expandableHeaderSize, currentScroll);
 
                     ExpandableHeader.Y = -offset;
-                    FixedHeader.Y = -offset + ExpandableHeader.LayoutSize.Y;
+                    FixedHeader.Y = -offset + expandableHeaderSize;
                 }
 
-                headerBackgroundContainer.Height = (ExpandableHeader?.LayoutSize.Y ?? 0) + (FixedHeader?.LayoutSize.Y ?? 0);
+                headerBackgroundContainer.Height = expandableHeaderSize + fixedHeaderSize;
                 headerBackgroundContainer.Y = ExpandableHeader?.Y ?? 0;
 
                 var smallestSectionHeight = Children.Count > 0 ? Children.Min(d => d.Height) : 0;
@@ -216,7 +219,7 @@ namespace osu.Game.Graphics.Containers
                 // but the 5% can't be bigger than our smallest section height, otherwise it won't get selected correctly
                 float sectionOrContent = Math.Min(smallestSectionHeight / 2.0f, scrollContainer.DisplayableContent * 0.05f);
 
-                float scrollOffset = (FixedHeader?.LayoutSize.Y ?? 0) + scrollContainer.DisplayableContent * scroll_target_multiplier + sectionOrContent;
+                float scrollOffset = fixedHeaderSize + scrollContainer.DisplayableContent * scroll_target_multiplier + sectionOrContent;
 
                 if (Precision.AlmostBigger(0, scrollContainer.Current))
                     SelectedSection.Value = lastClickedSection as T ?? Children.FirstOrDefault();
