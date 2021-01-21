@@ -5,11 +5,12 @@ using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
-using osu.Framework.Threading;
+using osu.Game.Configuration;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -22,11 +23,13 @@ namespace osu.Game.Graphics.UserInterface
         private SampleChannel sampleHover;
 
         /// <summary>
-        /// Length of debounce for hover sound playback, in milliseconds. Default is 50ms.
+        /// Length of debounce for hover sound playback, in milliseconds.
         /// </summary>
-        public double HoverDebounceTime { get; } = 50;
+        public double HoverDebounceTime { get; } = 20;
 
         protected readonly HoverSampleSet SampleSet;
+
+        private Bindable<double?> lastPlaybackTime;
 
         public HoverSounds(HoverSampleSet sampleSet = HoverSampleSet.Normal)
         {
@@ -34,24 +37,25 @@ namespace osu.Game.Graphics.UserInterface
             RelativeSizeAxes = Axes.Both;
         }
 
-        private ScheduledDelegate playDelegate;
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio, SessionStatics statics)
+        {
+            lastPlaybackTime = statics.GetBindable<double?>(Static.LastHoverSoundPlaybackTime);
+
+            sampleHover = audio.Samples.Get($@"UI/generic-hover{SampleSet.GetDescription()}");
+        }
 
         protected override bool OnHover(HoverEvent e)
         {
-            playDelegate?.Cancel();
+            bool enoughTimePassedSinceLastPlayback = !lastPlaybackTime.Value.HasValue || Time.Current - lastPlaybackTime.Value >= HoverDebounceTime;
 
-            if (HoverDebounceTime <= 0)
+            if (enoughTimePassedSinceLastPlayback)
+            {
                 sampleHover?.Play();
-            else
-                playDelegate = Scheduler.AddDelayed(() => sampleHover?.Play(), HoverDebounceTime);
+                lastPlaybackTime.Value = Time.Current;
+            }
 
             return base.OnHover(e);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
-        {
-            sampleHover = audio.Samples.Get($@"UI/generic-hover{SampleSet.GetDescription()}");
         }
     }
 

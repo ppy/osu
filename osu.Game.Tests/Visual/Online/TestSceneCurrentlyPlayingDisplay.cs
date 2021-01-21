@@ -90,11 +90,17 @@ namespace osu.Game.Tests.Visual.Online
             };
 
             protected override Task<User> ComputeValueAsync(int lookup, CancellationToken token = default)
-                => Task.FromResult(new User
+            {
+                // tests against failed lookups
+                if (lookup == 13)
+                    return Task.FromResult<User>(null);
+
+                return Task.FromResult(new User
                 {
                     Id = lookup,
                     Username = usernames[lookup % usernames.Length],
                 });
+            }
         }
     }
 }

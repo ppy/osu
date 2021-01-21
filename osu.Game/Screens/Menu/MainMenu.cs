@@ -17,8 +17,8 @@ using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
-using osu.Game.Screens.Multi.RealtimeMultiplayer;
-using osu.Game.Screens.Multi.Timeshift;
+using osu.Game.Screens.OnlinePlay.Multiplayer;
+using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Select;
 
 namespace osu.Game.Screens.Menu
@@ -105,8 +105,8 @@ namespace osu.Game.Screens.Menu
                                 this.Push(new Editor());
                             },
                             OnSolo = onSolo,
-                            OnMultiplayer = () => this.Push(new RealtimeMultiplayer()),
-                            OnTimeshift = () => this.Push(new TimeshiftMultiplayer()),
+                            OnMultiplayer = () => this.Push(new Multiplayer()),
+                            OnPlaylists = () => this.Push(new Playlists()),
                             OnExit = confirmAndExit,
                         }
                     }
@@ -127,11 +127,11 @@ namespace osu.Game.Screens.Menu
                 {
                     case ButtonSystemState.Initial:
                     case ButtonSystemState.Exit:
-                        Background.FadeColour(Color4.White, 500, Easing.OutSine);
+                        ApplyToBackground(b => b.FadeColour(Color4.White, 500, Easing.OutSine));
                         break;
 
                     default:
-                        Background.FadeColour(OsuColour.Gray(0.8f), 500, Easing.OutSine);
+                        ApplyToBackground(b => b.FadeColour(OsuColour.Gray(0.8f), 500, Easing.OutSine));
                         break;
                 }
             };
@@ -256,7 +256,7 @@ namespace osu.Game.Screens.Menu
         {
             base.OnResuming(last);
 
-            (Background as BackgroundScreenDefault)?.Next();
+            ApplyToBackground(b => (b as BackgroundScreenDefault)?.Next());
 
             // we may have consumed our preloaded instance, so let's make another.
             preloadSongSelect();
