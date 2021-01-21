@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Icon = CreateIcon,
+                        Icon = Icon,
                         FillMode = FillMode.Fit,
                         Size = new Vector2(50, 14)
                     },
@@ -44,7 +44,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             };
         }
 
-        protected abstract IconUsage CreateIcon { get; }
+        protected abstract IconUsage Icon { get; }
 
         protected void SetValue(int value) => drawableText.Text = value.ToString("#,##0");
     }
