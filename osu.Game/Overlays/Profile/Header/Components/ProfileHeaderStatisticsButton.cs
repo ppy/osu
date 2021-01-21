@@ -16,7 +16,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         protected ProfileHeaderStatisticsButton()
         {
-            RelativeSizeAxes = Axes.Y;
             Child = new FillFlowContainer
             {
                 AutoSizeAxes = Axes.X,
