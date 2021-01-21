@@ -217,9 +217,9 @@ namespace osu.Game.Graphics.Containers
                 // scroll offset is our fixed header height if we have it plus 20% of content height
                 // plus 5% to fix floating point errors and to not have a section instantly unselect when scrolling upwards
                 // but the 5% can't be bigger than our smallest section height, otherwise it won't get selected correctly
-                float sectionOrContent = Math.Min(smallestSectionHeight / 2.0f, scrollContainer.DisplayableContent * 0.05f);
+                float scrollIntoSectionAmount = Math.Min(smallestSectionHeight / 2.0f, scrollContainer.DisplayableContent * 0.05f);
 
-                float scrollOffset = fixedHeaderSize + scrollContainer.DisplayableContent * scroll_target_multiplier + sectionOrContent;
+                float scrollOffset = fixedHeaderSize + scrollContainer.DisplayableContent * scroll_target_multiplier + scrollIntoSectionAmount;
 
                 if (Precision.AlmostBigger(0, scrollContainer.Current))
                     SelectedSection.Value = lastClickedSection as T ?? Children.FirstOrDefault();
