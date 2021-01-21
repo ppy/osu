@@ -1,6 +1,3 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
-// See the LICENCE file in the repository root for full licence text.
-
 using System;
 using System.Threading;
 using osu.Framework.Graphics;
@@ -77,7 +74,7 @@ namespace osu.Game.Database
         {
             base.Update();
 
-            if (Context.Refresh())
+            if (context?.Refresh() == true)
                 refreshes.Value++;
         }
 
@@ -107,8 +104,7 @@ namespace osu.Game.Database
         {
             base.Dispose(isDisposing);
 
-            context?.Dispose();
-            context = null;
+            FlushConnections();
         }
 
         /// <summary>
@@ -151,6 +147,15 @@ namespace osu.Game.Database
                 Monitor.Exit(factory.writeLock);
                 pending_writes.Value--;
             }
+        }
+
+        public void FlushConnections()
+        {
+            var previousContext = context;
+            context = null;
+            previousContext?.Dispose();
+            while (previousContext?.IsClosed == false)
+                Thread.Sleep(50);
         }
     }
 }

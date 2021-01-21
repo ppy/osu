@@ -513,6 +513,7 @@ namespace osu.Game
         public void Migrate(string path)
         {
             contextFactory.FlushConnections();
+            realmFactory.FlushConnections();
             (Storage as OsuStorage)?.Migrate(Host.GetStorage(path));
         }
     }
