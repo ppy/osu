@@ -108,7 +108,10 @@ namespace osu.Game.Graphics.Containers
 
         private float? lastKnownScroll;
 
-        private const float scroll_target_multiplier = 0.2f;
+        /// <summary>
+        /// The percentage of the container to consider the centre-point for deciding the active section (and scrolling to a requested section).
+        /// </summary>
+        private const float scroll_y_centre = 0.2f;
 
         public SectionsContainer()
         {
@@ -144,7 +147,7 @@ namespace osu.Game.Graphics.Containers
         public void ScrollTo(Drawable section)
         {
             lastClickedSection = section;
-            scrollContainer.ScrollTo(scrollContainer.GetChildPosInContent(section) - scrollContainer.DisplayableContent * scroll_target_multiplier - (FixedHeader?.BoundingBox.Height ?? 0));
+            scrollContainer.ScrollTo(scrollContainer.GetChildPosInContent(section) - scrollContainer.DisplayableContent * scroll_y_centre - (FixedHeader?.BoundingBox.Height ?? 0));
         }
 
         public void ScrollToTop() => scrollContainer.ScrollTo(0);
@@ -217,9 +220,9 @@ namespace osu.Game.Graphics.Containers
                 // scroll offset is our fixed header height if we have it plus 20% of content height
                 // plus 5% to fix floating point errors and to not have a section instantly unselect when scrolling upwards
                 // but the 5% can't be bigger than our smallest section height, otherwise it won't get selected correctly
-                float scrollIntoSectionAmount = Math.Min(smallestSectionHeight / 2.0f, scrollContainer.DisplayableContent * 0.05f);
+                float selectionLenienceAboveSection = Math.Min(smallestSectionHeight / 2.0f, scrollContainer.DisplayableContent * 0.05f);
 
-                float scrollOffset = fixedHeaderSize + scrollContainer.DisplayableContent * scroll_target_multiplier + scrollIntoSectionAmount;
+                float scrollCentre = fixedHeaderSize + scrollContainer.DisplayableContent * scroll_y_centre + selectionLenienceAboveSection;
 
                 if (Precision.AlmostBigger(0, scrollContainer.Current))
                     SelectedSection.Value = lastClickedSection as T ?? Children.FirstOrDefault();
@@ -228,7 +231,7 @@ namespace osu.Game.Graphics.Containers
                 else
                 {
                     SelectedSection.Value = Children
-                                            .TakeWhile(section => scrollContainer.GetChildPosInContent(section) - currentScroll - scrollOffset <= 0)
+                                            .TakeWhile(section => scrollContainer.GetChildPosInContent(section) - currentScroll - scrollCentre <= 0)
                                             .LastOrDefault() ?? Children.FirstOrDefault();
                 }
             }
