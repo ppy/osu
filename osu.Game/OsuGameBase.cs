@@ -368,6 +368,7 @@ namespace osu.Game
 
             if (!SelectedMods.Disabled)
                 SelectedMods.Value = Array.Empty<Mod>();
+
             AvailableMods.Value = dict;
         }
 
