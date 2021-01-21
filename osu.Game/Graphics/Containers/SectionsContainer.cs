@@ -23,7 +23,6 @@ namespace osu.Game.Graphics.Containers
     {
         public Bindable<T> SelectedSection { get; } = new Bindable<T>();
         private Drawable lastClickedSection;
-        private T smallestSection;
 
         public Drawable ExpandableHeader
         {
@@ -140,9 +139,6 @@ namespace osu.Game.Graphics.Containers
             lastKnownScroll = null;
             headerHeight = null;
             footerHeight = null;
-
-            if (smallestSection == null || smallestSection.Height > drawable.Height)
-                smallestSection = drawable;
         }
 
         public void ScrollTo(Drawable section)
@@ -213,10 +209,12 @@ namespace osu.Game.Graphics.Containers
                 headerBackgroundContainer.Height = (ExpandableHeader?.LayoutSize.Y ?? 0) + (FixedHeader?.LayoutSize.Y ?? 0);
                 headerBackgroundContainer.Y = ExpandableHeader?.Y ?? 0;
 
+                var smallestSectionHeight = Children.Count > 0 ? Children.Min(d => d.Height) : 0;
+
                 // scroll offset is our fixed header height if we have it plus 20% of content height
                 // plus 5% to fix floating point errors and to not have a section instantly unselect when scrolling upwards
                 // but the 5% can't be bigger than our smallest section height, otherwise it won't get selected correctly
-                float sectionOrContent = Math.Min(smallestSection?.Height / 2.0f ?? 0, scrollContainer.DisplayableContent * 0.05f);
+                float sectionOrContent = Math.Min(smallestSectionHeight / 2.0f, scrollContainer.DisplayableContent * 0.05f);
                 float scrollOffset = (FixedHeader?.LayoutSize.Y ?? 0) + scrollContainer.DisplayableContent * scroll_target_multiplier + sectionOrContent;
                 Func<T, float> diff = section => scrollContainer.GetChildPosInContent(section) - currentScroll - scrollOffset;
 
