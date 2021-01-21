@@ -217,14 +217,17 @@ namespace osu.Game.Graphics.Containers
                 float sectionOrContent = Math.Min(smallestSectionHeight / 2.0f, scrollContainer.DisplayableContent * 0.05f);
 
                 float scrollOffset = (FixedHeader?.LayoutSize.Y ?? 0) + scrollContainer.DisplayableContent * scroll_target_multiplier + sectionOrContent;
-                Func<T, float> diff = section => scrollContainer.GetChildPosInContent(section) - currentScroll - scrollOffset;
 
                 if (Precision.AlmostBigger(0, scrollContainer.Current))
                     SelectedSection.Value = lastClickedSection as T ?? Children.FirstOrDefault();
                 else if (Precision.AlmostBigger(scrollContainer.Current, scrollContainer.ScrollableExtent))
                     SelectedSection.Value = lastClickedSection as T ?? Children.LastOrDefault();
                 else
-                    SelectedSection.Value = Children.TakeWhile(section => diff(section) <= 0).LastOrDefault() ?? Children.FirstOrDefault();
+                {
+                    SelectedSection.Value = Children
+                                            .TakeWhile(section => scrollContainer.GetChildPosInContent(section) - currentScroll - scrollOffset <= 0)
+                                            .LastOrDefault() ?? Children.FirstOrDefault();
+                }
             }
         }
 
