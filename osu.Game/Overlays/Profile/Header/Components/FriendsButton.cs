@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         public override string TooltipText => "followers";
 
-        protected override IconUsage CreateIcon => FontAwesome.Solid.User;
+        protected override IconUsage Icon => FontAwesome.Solid.User;
 
         [BackgroundDependencyLoader]
         private void load()
