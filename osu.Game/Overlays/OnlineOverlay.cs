@@ -19,29 +19,27 @@ namespace osu.Game.Overlays
         protected OnlineOverlay(OverlayColourScheme colourScheme)
             : base(colourScheme)
         {
-            FillFlowContainer flow = new FillFlowContainer
-            {
-                AutoSizeAxes = Axes.Y,
-                RelativeSizeAxes = Axes.X,
-                Direction = FillDirection.Vertical
-            };
-
-            if (Header != null)
-                flow.Add(Header.With(h => h.Depth = -float.MaxValue));
-
-            flow.Add(content = new Container
-            {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y
-            });
-
             base.Content.AddRange(new Drawable[]
             {
                 ScrollFlow = new OverlayScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,
-                    Child = flow
+                    Child = new FillFlowContainer
+                    {
+                        AutoSizeAxes = Axes.Y,
+                        RelativeSizeAxes = Axes.X,
+                        Direction = FillDirection.Vertical,
+                        Children = new Drawable[]
+                        {
+                            Header.With(h => h.Depth = -float.MaxValue),
+                            content = new Container
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y
+                            }
+                        }
+                    }
                 },
                 Loading = new LoadingLayer(true)
             });

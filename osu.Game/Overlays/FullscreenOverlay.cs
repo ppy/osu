@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -16,9 +17,9 @@ namespace osu.Game.Overlays
     public abstract class FullscreenOverlay<T> : WaveOverlayContainer, INamedOverlayComponent
         where T : OverlayHeader
     {
-        public virtual string IconTexture => Header?.Title.IconTexture ?? string.Empty;
-        public virtual string Title => Header?.Title.Title ?? string.Empty;
-        public virtual string Description => Header?.Title.Description ?? string.Empty;
+        public virtual string IconTexture => Header.Title.IconTexture ?? string.Empty;
+        public virtual string Title => Header.Title.Title ?? string.Empty;
+        public virtual string Description => Header.Title.Description ?? string.Empty;
 
         public T Header { get; }
 
@@ -76,6 +77,7 @@ namespace osu.Game.Overlays
             Waves.FourthWaveColour = ColourProvider.Dark3;
         }
 
+        [NotNull]
         protected abstract T CreateHeader();
 
         protected virtual Color4 GetBackgroundColour() => ColourProvider.Background5;
