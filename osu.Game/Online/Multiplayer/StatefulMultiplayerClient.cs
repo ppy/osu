@@ -144,17 +144,14 @@ namespace osu.Game.Online.Multiplayer
 
         public virtual Task LeaveRoom()
         {
-            Scheduler.Add(() =>
+            if (Room != null)
             {
-                if (Room == null)
-                    return;
-
                 apiRoom = null;
                 Room = null;
                 CurrentMatchPlayingUserIds.Clear();
 
-                RoomUpdated?.Invoke();
-            }, false);
+                Scheduler.Add(() => RoomUpdated?.Invoke(), false);
+            }
 
             return Task.CompletedTask;
         }
