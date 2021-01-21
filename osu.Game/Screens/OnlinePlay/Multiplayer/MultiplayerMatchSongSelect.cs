@@ -13,6 +13,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
+using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select;
@@ -109,5 +110,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         }
 
         protected override BeatmapDetailArea CreateBeatmapDetailArea() => new PlayBeatmapDetailArea();
+
+        protected override ModSelectOverlay CreateModSelectOverlay() => new ModSelectOverlay(isValidMod);
+
+        private bool isValidMod(Mod mod) => !(mod is ModAutoplay) && (mod as MultiMod)?.Mods.Any(mm => mm is ModAutoplay) != true;
     }
 }
