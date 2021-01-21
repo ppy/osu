@@ -142,7 +142,8 @@ namespace osu.Game.Tests.NonVisual
 
                     foreach (var file in osuStorage.IgnoreFiles)
                     {
-                        Assert.That(File.Exists(Path.Combine(originalDirectory, file)));
+                        if (file.EndsWith(".ini", StringComparison.Ordinal))
+                            Assert.That(File.Exists(Path.Combine(originalDirectory, file)));
                         Assert.That(storage.Exists(file), Is.False);
                     }
 
