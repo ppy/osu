@@ -229,6 +229,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             float expectedDistance = composer?.GetSnappedDistanceFromDistance(HitObject.StartTime, (float)HitObject.Path.CalculatedDistance) ?? (float)HitObject.Path.CalculatedDistance;
             if (expectedDistance < 1)
                 return;
+
             HitObject.Path.ExpectedDistance.Value = expectedDistance;
             editorBeatmap?.Update(HitObject);
         }
