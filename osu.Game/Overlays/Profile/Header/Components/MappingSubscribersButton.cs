@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         public override string TooltipText => "mapping subscribers";
 
-        protected override IconUsage CreateIcon() => FontAwesome.Solid.Bell;
+        protected override IconUsage CreateIcon => FontAwesome.Solid.Bell;
 
         [BackgroundDependencyLoader]
         private void load()
