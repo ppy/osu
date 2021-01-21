@@ -109,6 +109,8 @@ namespace osu.Game.Graphics.Containers
 
         private float lastKnownScroll;
 
+        private const float scroll_target_multiplier = 0.2f;
+
         public SectionsContainer()
         {
             AddRangeInternal(new Drawable[]
@@ -142,8 +144,6 @@ namespace osu.Game.Graphics.Containers
             if (smallestSection == null || smallestSection.Height > drawable.Height)
                 smallestSection = drawable;
         }
-
-        private const float scroll_target_multiplier = 0.2f;
 
         public void ScrollTo(Drawable section)
         {
