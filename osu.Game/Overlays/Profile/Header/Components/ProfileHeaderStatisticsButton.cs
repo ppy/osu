@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -17,13 +16,14 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         protected ProfileHeaderStatisticsButton()
         {
+            RelativeSizeAxes = Axes.Y;
             Child = new FillFlowContainer
             {
-                AutoSizeAxes = Axes.Both,
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
+                AutoSizeAxes = Axes.X,
+                RelativeSizeAxes = Axes.Y,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
                 Direction = FillDirection.Horizontal,
-                Padding = new MarginPadding { Right = 10 },
                 Children = new Drawable[]
                 {
                     new SpriteIcon
@@ -38,15 +38,15 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
+                        Margin = new MarginPadding { Right = 10 },
                         Font = OsuFont.GetFont(weight: FontWeight.Bold)
                     }
                 }
             };
         }
 
-        [NotNull]
         protected abstract IconUsage CreateIcon();
 
-        protected void SetValue(string value) => drawableText.Text = value;
+        protected void SetValue(int value) => drawableText.Text = value.ToString("#,##0");
     }
 }

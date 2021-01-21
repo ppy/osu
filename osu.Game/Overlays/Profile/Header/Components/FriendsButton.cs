@@ -8,7 +8,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public class AddFriendButton : ProfileHeaderStatisticsButton
+    public class FriendsButton : ProfileHeaderStatisticsButton
     {
         public readonly Bindable<User> User = new Bindable<User>();
 
@@ -20,9 +20,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private void load()
         {
             // todo: when friending/unfriending is implemented, the APIAccess.Friends list should be updated accordingly.
-            User.BindValueChanged(user => updateFollowers(user.NewValue), true);
+            User.BindValueChanged(user => SetValue(user.NewValue?.FollowerCount ?? 0), true);
         }
-
-        private void updateFollowers(User user) => SetValue(user?.FollowerCount.ToString("#,##0"));
     }
 }

@@ -49,9 +49,12 @@ namespace osu.Game.Overlays.Profile.Header
                     Spacing = new Vector2(10, 0),
                     Children = new Drawable[]
                     {
-                        new AddFriendButton
+                        new FriendsButton
                         {
-                            RelativeSizeAxes = Axes.Y,
+                            User = { BindTarget = User }
+                        },
+                        new MappingSubscribersButton
+                        {
                             User = { BindTarget = User }
                         },
                         new MessageUserButton
