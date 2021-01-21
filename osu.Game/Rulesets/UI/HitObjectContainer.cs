@@ -124,9 +124,11 @@ namespace osu.Game.Rulesets.UI
             Debug.Assert(drawableMap.ContainsKey(entry));
 
             var drawable = drawableMap[entry];
+
+            // OnKilled can potentially change the hitobject's result, so it needs to run first before unbinding.
+            drawable.OnKilled();
             drawable.OnNewResult -= onNewResult;
             drawable.OnRevertResult -= onRevertResult;
-            drawable.OnKilled();
 
             drawableMap.Remove(entry);
 
