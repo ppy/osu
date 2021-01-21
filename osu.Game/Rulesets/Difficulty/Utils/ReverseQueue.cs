@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Difficulty.Utils
 
         public ReverseQueue(int initialCapacity)
         {
-            if (initialCapacity < 0)
+            if (initialCapacity <= 0)
                 throw new ArgumentOutOfRangeException(nameof(initialCapacity));
 
             items = new T[initialCapacity];
@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Difficulty.Utils
         {
             get
             {
-                if (index > Count - 1)
+                if (index < 0 || index > Count - 1)
                     throw new ArgumentOutOfRangeException(nameof(index));
 
                 int reverseIndex = Count - 1 - index;
