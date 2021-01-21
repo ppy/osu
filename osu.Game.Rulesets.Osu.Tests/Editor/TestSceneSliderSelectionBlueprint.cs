@@ -165,20 +165,12 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         public void TestZeroLengthSliderNotAllowed()
         {
             moveMouseToControlPoint(1);
-            AddStep("drag control point 1 to control point 0", () =>
-            {
-                InputManager.PressButton(MouseButton.Left);
-                moveMouseToControlPoint(0);
-                InputManager.ReleaseButton(MouseButton.Left);
-            });
+            dragMouseToControlPoint(0);
+
             moveMouseToControlPoint(2);
-            AddStep("drag control point 2 to control point 0", () =>
-            {
-                InputManager.PressButton(MouseButton.Left);
-                moveMouseToControlPoint(0);
-                InputManager.ReleaseButton(MouseButton.Left);
-            });
-            checkPositions();
+            dragMouseToControlPoint(0);
+
+            AddAssert("slider has non-zero duration", () => slider.Duration > 0);
         }
 
         private void moveHitObject()
@@ -207,6 +199,13 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 Vector2 position = slider.Position + slider.Path.ControlPoints[index].Position.Value;
                 InputManager.MoveMouseTo(drawableObject.Parent.ToScreenSpace(position));
             });
+        }
+
+        private void dragMouseToControlPoint(int index)
+        {
+            AddStep("hold down mouse button", () => InputManager.PressButton(MouseButton.Left));
+            moveMouseToControlPoint(index);
+            AddStep("release mouse button", () => InputManager.ReleaseButton(MouseButton.Left));
         }
 
         private void checkControlPointSelected(int index, bool selected)
