@@ -1,13 +1,9 @@
 ﻿using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
-using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK;
 using osuTK.Input;
@@ -17,34 +13,40 @@ namespace osu.Game.Tests.Visual.Editing
 {
     public class TestSceneTimelineHitObjectBlueprint : TimelineTestScene
     {
-        private Spinner spinner;
-
-        public TestSceneTimelineHitObjectBlueprint()
-        {
-            spinner = new Spinner
-            {
-                Position = new Vector2(256, 256),
-                StartTime = -1000,
-                EndTime = 2000
-            };
-
-            spinner.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = 2 });
-        }
-
-        public override Drawable CreateTestComponent() => new TimelineHitObjectBlueprint(spinner);
+        public override Drawable CreateTestComponent() => new TimelineBlueprintContainer(Composer);
 
         [Test]
-        public void TestDisallowZeroLengthSpinners()
+        public void TestDisallowZeroDurationObjects()
         {
-            DragBar dragBar = this.ChildrenOfType<DragBar>().First();
-            Circle circle = this.ChildrenOfType<Circle>().First();
-            InputManager.MoveMouseTo(dragBar.ScreenSpaceDrawQuad.TopRight);
-            AddStep("drag dragbar to hit object", () =>
+            DragBar dragBar;
+
+            AddStep("add spinner", () =>
             {
+                EditorBeatmap.Clear();
+                EditorBeatmap.Add(new Spinner
+                {
+                    Position = new Vector2(256, 256),
+                    StartTime = 150,
+                    Duration = 500
+                });
+            });
+
+            AddStep("hold down drag bar", () =>
+            {
+                // distinguishes between the actual drag bar and its "underlay shadow".
+                dragBar = this.ChildrenOfType<DragBar>().Single(bar => bar.HandlePositionalInput);
+                InputManager.MoveMouseTo(dragBar);
                 InputManager.PressButton(MouseButton.Left);
-                InputManager.MoveMouseTo(circle.ScreenSpaceDrawQuad.TopLeft);
+            });
+
+            AddStep("try to drag bar past start", () =>
+            {
+                var blueprint = this.ChildrenOfType<TimelineHitObjectBlueprint>().Single();
+                InputManager.MoveMouseTo(blueprint.SelectionQuad.TopLeft - new Vector2(100, 0));
                 InputManager.ReleaseButton(MouseButton.Left);
             });
+
+            AddAssert("object has non-zero duration", () => EditorBeatmap.HitObjects.OfType<IHasDuration>().Single().Duration > 0);
         }
     }
 }
