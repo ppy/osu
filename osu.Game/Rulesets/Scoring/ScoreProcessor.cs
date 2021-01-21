@@ -193,7 +193,7 @@ namespace osu.Game.Rulesets.Scoring
         private void updateScore()
         {
             if (rollingMaxBaseScore != 0)
-                Accuracy.Value = baseScore / rollingMaxBaseScore;
+                Accuracy.Value = calculateAccuracyRatio(baseScore, true);
 
             TotalScore.Value = getScore(Mode.Value);
         }
@@ -233,13 +233,13 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         /// <summary>
-        /// Given a minimal set of inputs, return the computed score and accuracy for the tracked beatmap / mods combination.
+        /// Given a minimal set of inputs, return the computed score for the tracked beatmap / mods combination, at the current point in time.
         /// </summary>
         /// <param name="mode">The <see cref="ScoringMode"/> to compute the total score in.</param>
         /// <param name="maxCombo">The maximum combo achievable in the beatmap.</param>
         /// <param name="statistics">Statistics to be used for calculating accuracy, bonus score, etc.</param>
-        /// <returns>The computed score and accuracy for provided inputs.</returns>
-        public (double score, double accuracy) GetScoreAndAccuracy(ScoringMode mode, int maxCombo, Dictionary<HitResult, int> statistics)
+        /// <returns>The computed score for provided inputs.</returns>
+        public double GetImmediateScore(ScoringMode mode, int maxCombo, Dictionary<HitResult, int> statistics)
         {
             // calculate base score from statistics pairs
             int computedBaseScore = 0;
@@ -252,15 +252,23 @@ namespace osu.Game.Rulesets.Scoring
                 computedBaseScore += Judgement.ToNumericResult(pair.Key) * pair.Value;
             }
 
-            double accuracy = calculateAccuracyRatio(computedBaseScore);
-            double comboRatio = calculateComboRatio(maxCombo);
-
-            double score = GetScore(mode, maxAchievableCombo, accuracy, comboRatio, scoreResultCounts);
-
-            return (score, accuracy);
+            return GetScore(mode, maxAchievableCombo, calculateAccuracyRatio(computedBaseScore), calculateComboRatio(maxCombo), scoreResultCounts);
         }
 
-        private double calculateAccuracyRatio(double baseScore) => maxBaseScore > 0 ? baseScore / maxBaseScore : 0;
+        /// <summary>
+        /// Get the accuracy fraction for the provided base score.
+        /// </summary>
+        /// <param name="baseScore">The score to be used for accuracy calculation.</param>
+        /// <param name="preferRolling">Whether the rolling base score should be used (ie. for the current point in time based on Apply/Reverted results).</param>
+        /// <returns>The computed accuracy.</returns>
+        private double calculateAccuracyRatio(double baseScore, bool preferRolling = false)
+        {
+            if (preferRolling && rollingMaxBaseScore != 0)
+                return baseScore / rollingMaxBaseScore;
+
+            return maxBaseScore > 0 ? baseScore / maxBaseScore : 0;
+        }
+
         private double calculateComboRatio(int maxCombo) => maxAchievableCombo > 0 ? (double)maxCombo / maxAchievableCombo : 1;
 
         private double getBonusScore(Dictionary<HitResult, int> statistics)

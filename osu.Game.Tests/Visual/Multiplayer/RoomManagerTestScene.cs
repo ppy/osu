@@ -4,14 +4,14 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
-using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
-using osu.Game.Screens.Multi;
+using osu.Game.Screens.OnlinePlay;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public abstract class RoomManagerTestScene : MultiplayerTestScene
+    public abstract class RoomManagerTestScene : RoomTestScene
     {
         [Cached(Type = typeof(IRoomManager))]
         protected TestRoomManager RoomManager { get; } = new TestRoomManager();

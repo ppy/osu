@@ -4,9 +4,9 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Online.Multiplayer;
-using osu.Game.Online.Multiplayer.RoomStatuses;
-using osu.Game.Screens.Multi.Lounge.Components;
+using osu.Game.Online.Rooms;
+using osu.Game.Online.Rooms.RoomStatuses;
+using osu.Game.Screens.OnlinePlay.Lounge.Components;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     }) { MatchingFilter = true },
                     new DrawableRoom(new Room
                     {
-                        Name = { Value = "Open (realtime)" },
+                        Name = { Value = "Open" },
                         Status = { Value = new RoomStatusOpen() },
                         Category = { Value = RoomCategory.Realtime }
                     }) { MatchingFilter = true },

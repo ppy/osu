@@ -12,6 +12,7 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Online;
 using osu.Game.Online.Spectator;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Osu;
@@ -237,6 +238,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             public new BindableList<int> PlayingUsers => (BindableList<int>)base.PlayingUsers;
 
             private int beatmapId;
+
+            public TestSpectatorStreamingClient()
+                : base(new DevelopmentEndpointConfiguration())
+            {
+            }
 
             protected override Task Connect()
             {

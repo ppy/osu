@@ -57,7 +57,7 @@ namespace osu.Game.Online.API
 
         protected virtual WebRequest CreateWebRequest() => new OsuWebRequest(Uri);
 
-        protected virtual string Uri => $@"{API.Endpoint}/api/v2/{Target}";
+        protected virtual string Uri => $@"{API.APIEndpointUrl}/api/v2/{Target}";
 
         protected APIAccess API;
         protected WebRequest WebRequest;

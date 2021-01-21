@@ -7,13 +7,13 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Online.API;
-using osu.Game.Screens.Multi.Match.Components;
+using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMatchLeaderboard : MultiplayerTestScene
+    public class TestSceneMatchLeaderboard : RoomTestScene
     {
         protected override bool UseOnlineAPI => true;
 

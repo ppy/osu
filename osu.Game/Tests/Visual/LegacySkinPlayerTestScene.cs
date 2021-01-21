@@ -3,7 +3,6 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Framework.IO.Stores;
 using osu.Game.Rulesets;
 using osu.Game.Skinning;
@@ -18,9 +17,9 @@ namespace osu.Game.Tests.Visual
         protected override TestPlayer CreatePlayer(Ruleset ruleset) => new SkinProvidingPlayer(legacySkinSource);
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuGameBase game)
+        private void load(OsuGameBase game, SkinManager skins)
         {
-            var legacySkin = new DefaultLegacySkin(new NamespacedResourceStore<byte[]>(game.Resources, "Skins/Legacy"), audio);
+            var legacySkin = new DefaultLegacySkin(new NamespacedResourceStore<byte[]>(game.Resources, "Skins/Legacy"), skins);
             legacySkinSource = new SkinProvidingContainer(legacySkin);
         }
 

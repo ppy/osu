@@ -28,7 +28,9 @@ namespace osu.Game.Online.API
 
         public string ProvidedUsername => LocalUser.Value.Username;
 
-        public string Endpoint => "http://localhost";
+        public string APIEndpointUrl => "http://localhost";
+
+        public string WebsiteRootUrl => "http://localhost";
 
         /// <summary>
         /// Provide handling logic for an arbitrary API request.

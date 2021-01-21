@@ -157,10 +157,16 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                 foreach (var h in hitObjects)
                 {
-                    h.Position = new Vector2(
-                        quad.TopLeft.X + (h.X - quad.TopLeft.X) / quad.Width * (quad.Width + scale.X),
-                        quad.TopLeft.Y + (h.Y - quad.TopLeft.Y) / quad.Height * (quad.Height + scale.Y)
-                    );
+                    var newPosition = h.Position;
+
+                    // guard against no-ops and NaN.
+                    if (scale.X != 0 && quad.Width > 0)
+                        newPosition.X = quad.TopLeft.X + (h.X - quad.TopLeft.X) / quad.Width * (quad.Width + scale.X);
+
+                    if (scale.Y != 0 && quad.Height > 0)
+                        newPosition.Y = quad.TopLeft.Y + (h.Y - quad.TopLeft.Y) / quad.Height * (quad.Height + scale.Y);
+
+                    h.Position = newPosition;
                 }
             }
 
@@ -230,7 +236,20 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// </summary>
         /// <param name="hitObjects">The hit objects to calculate a quad for.</param>
         private Quad getSurroundingQuad(OsuHitObject[] hitObjects) =>
-            getSurroundingQuad(hitObjects.SelectMany(h => new[] { h.Position, h.EndPosition }));
+            getSurroundingQuad(hitObjects.SelectMany(h =>
+            {
+                if (h is IHasPath path)
+                {
+                    return new[]
+                    {
+                        h.Position,
+                        // can't use EndPosition for reverse slider cases.
+                        h.Position + path.Path.PositionAt(1)
+                    };
+                }
+
+                return new[] { h.Position };
+            }));
 
         /// <summary>
         /// Returns a gamefield-space quad surrounding the provided points.

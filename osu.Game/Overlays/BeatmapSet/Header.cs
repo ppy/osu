@@ -15,6 +15,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
+using osu.Game.Online.API;
 using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Overlays.BeatmapSet.Buttons;
 using osu.Game.Rulesets;
@@ -33,12 +34,16 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly Box coverGradient;
         private readonly OsuSpriteText title, artist;
         private readonly AuthorInfo author;
+        private readonly ExplicitContentBeatmapPill explicitContentPill;
         private readonly FillFlowContainer downloadButtonsContainer;
         private readonly BeatmapAvailability beatmapAvailability;
         private readonly BeatmapSetOnlineStatusPill onlineStatusPill;
         public Details Details;
 
         public bool DownloadButtonsVisible => downloadButtonsContainer.Any();
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
         public BeatmapRulesetSelector RulesetSelector => beatmapSetHeader.RulesetSelector;
         public readonly BeatmapPicker Picker;
@@ -140,8 +145,15 @@ namespace osu.Game.Overlays.BeatmapSet
                                                     {
                                                         Anchor = Anchor.BottomLeft,
                                                         Origin = Anchor.BottomLeft,
-                                                        Margin = new MarginPadding { Left = 3, Bottom = 4 }, // To better lineup with the font
+                                                        Margin = new MarginPadding { Left = 5, Bottom = 4 }, // To better lineup with the font
                                                     },
+                                                    explicitContentPill = new ExplicitContentBeatmapPill
+                                                    {
+                                                        Alpha = 0f,
+                                                        Anchor = Anchor.BottomLeft,
+                                                        Origin = Anchor.BottomLeft,
+                                                        Margin = new MarginPadding { Left = 10, Bottom = 4 },
+                                                    }
                                                 }
                                             },
                                             artist = new OsuSpriteText
@@ -213,7 +225,7 @@ namespace osu.Game.Overlays.BeatmapSet
             Picker.Beatmap.ValueChanged += b =>
             {
                 Details.Beatmap = b.NewValue;
-                externalLink.Link = $@"https://osu.ppy.sh/beatmapsets/{BeatmapSet.Value?.OnlineBeatmapSetID}#{b.NewValue?.Ruleset.ShortName}/{b.NewValue?.OnlineBeatmapID}";
+                externalLink.Link = $@"{api.WebsiteRootUrl}/beatmapsets/{BeatmapSet.Value?.OnlineBeatmapSetID}#{b.NewValue?.Ruleset.ShortName}/{b.NewValue?.OnlineBeatmapID}";
             };
         }
 
@@ -249,6 +261,8 @@ namespace osu.Game.Overlays.BeatmapSet
                     title.Text = setInfo.NewValue.Metadata.Title ?? string.Empty;
                     artist.Text = setInfo.NewValue.Metadata.Artist ?? string.Empty;
 
+                    explicitContentPill.Alpha = setInfo.NewValue.OnlineInfo.HasExplicitContent ? 1 : 0;
+
                     onlineStatusPill.FadeIn(500, Easing.OutQuint);
                     onlineStatusPill.Status = setInfo.NewValue.OnlineInfo.Status;
 
@@ -283,7 +297,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     break;
 
                 case DownloadState.Downloading:
-                case DownloadState.Downloaded:
+                case DownloadState.Importing:
                     // temporary to avoid showing two buttons for maps with novideo. will be fixed in new beatmap overlay design.
                     downloadButtonsContainer.Child = new HeaderDownloadButton(BeatmapSet.Value);
                     break;
