@@ -1,10 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.IO;
 using System.IO;
+using System.Collections.Generic;
 using osu.Game.Tournament.Configuration;
 
 namespace osu.Game.Tournament.IO
@@ -13,24 +15,38 @@ namespace osu.Game.Tournament.IO
     {
         private const string default_tournament = "default";
         private readonly Storage storage;
+        private readonly Storage allTournaments;
         private readonly TournamentStorageManager storageConfig;
+        public readonly Bindable<string> CurrentTournament;
 
         public TournamentStorage(Storage storage)
             : base(storage.GetStorageForDirectory("tournaments"), string.Empty)
         {
             this.storage = storage;
+            allTournaments = UnderlyingStorage;
 
             storageConfig = new TournamentStorageManager(storage);
 
             if (storage.Exists("tournament.ini"))
             {
-                ChangeTargetStorage(UnderlyingStorage.GetStorageForDirectory(storageConfig.Get<string>(StorageConfig.CurrentTournament)));
+                ChangeTargetStorage(allTournaments.GetStorageForDirectory(storageConfig.Get<string>(StorageConfig.CurrentTournament)));
             }
             else
-                Migrate(UnderlyingStorage.GetStorageForDirectory(default_tournament));
+                Migrate(allTournaments.GetStorageForDirectory(default_tournament));
 
+            CurrentTournament = storageConfig.GetBindable<string>(StorageConfig.CurrentTournament);
             Logger.Log("Using tournament storage: " + GetFullPath(string.Empty));
+
+            CurrentTournament.BindValueChanged(updateTournament);
         }
+
+        private void updateTournament(ValueChangedEvent<string> newTournament)
+        {
+            ChangeTargetStorage(allTournaments.GetStorageForDirectory(newTournament.NewValue));
+            Logger.Log("Changing tournament storage: " + GetFullPath(string.Empty));
+        }
+
+        public IEnumerable<string> ListTournaments() => allTournaments.GetDirectories(string.Empty);
 
         public override void Migrate(Storage newStorage)
         {
