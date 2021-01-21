@@ -151,7 +151,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 // 2) The user changes the track time through some other means (scrolling in the editor or overview timeline; clicking a hitobject etc.). We want the timeline to track the clock's time.
                 // 3) An ongoing seek transform is running from an external seek. We want the timeline to track the clock's time.
 
-                // The simplest way to cover both cases is by checking whether the scroll position has changed and the audio hasn't been changed externally
+                // The simplest way to cover the first two cases is by checking whether the scroll position has changed and the audio hasn't been changed externally
                 // Checking IsSeeking covers the third case, where the transform may not have been applied yet.
                 if (Current != lastScrollPosition && editorClock.CurrentTime == lastTrackTime && !editorClock.IsSeeking)
                     seekTrackToCurrent();
