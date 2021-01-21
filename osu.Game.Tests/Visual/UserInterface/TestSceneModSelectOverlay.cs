@@ -40,6 +40,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
+            SelectedMods.Value = Array.Empty<Mod>();
             Children = new Drawable[]
             {
                 modSelect = new TestModSelectOverlay
