@@ -40,6 +40,16 @@ namespace osu.Game.Storyboards.Drawables
                 foreach (var sample in DrawableSamples)
                     mod.ApplyToSample(sample);
             }
+
+            SamplePlaybackDisabled.BindValueChanged(disabled =>
+            {
+                if (!RequestedPlaying) return;
+
+                // Since storyboard samples can be very long we want to stop the playback regardless of
+                // whether or not the sample is looping or not
+                if (disabled.NewValue)
+                    Stop();
+            });
         }
 
         protected override void Update()

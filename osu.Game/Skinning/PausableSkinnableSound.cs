@@ -32,7 +32,7 @@ namespace osu.Game.Skinning
         {
         }
 
-        private readonly IBindable<bool> samplePlaybackDisabled = new Bindable<bool>();
+        protected readonly IBindable<bool> SamplePlaybackDisabled = new Bindable<bool>();
 
         private ScheduledDelegate scheduledStart;
 
@@ -42,8 +42,8 @@ namespace osu.Game.Skinning
             // if in a gameplay context, pause sample playback when gameplay is paused.
             if (samplePlaybackDisabler != null)
             {
-                samplePlaybackDisabled.BindTo(samplePlaybackDisabler.SamplePlaybackDisabled);
-                samplePlaybackDisabled.BindValueChanged(disabled =>
+                SamplePlaybackDisabled.BindTo(samplePlaybackDisabler.SamplePlaybackDisabled);
+                SamplePlaybackDisabled.BindValueChanged(disabled =>
                 {
                     if (!RequestedPlaying) return;
 
@@ -72,7 +72,7 @@ namespace osu.Game.Skinning
             cancelPendingStart();
             RequestedPlaying = true;
 
-            if (samplePlaybackDisabled.Value)
+            if (SamplePlaybackDisabled.Value)
                 return;
 
             base.Play(restart);
