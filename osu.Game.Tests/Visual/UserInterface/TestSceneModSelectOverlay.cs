@@ -134,6 +134,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestExternallySetCustomizedMod()
         {
+            changeRuleset(0);
+
             AddStep("set customized mod externally", () => SelectedMods.Value = new[] { new OsuModDoubleTime { SpeedChange = { Value = 1.01 } } });
 
             AddAssert("ensure button is selected and customized accordingly", () =>
