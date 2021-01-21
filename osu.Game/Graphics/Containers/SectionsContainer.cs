@@ -40,7 +40,7 @@ namespace osu.Game.Graphics.Containers
                 if (value == null) return;
 
                 AddInternal(expandableHeader);
-                lastKnownScroll = float.NaN;
+                lastKnownScroll = null;
             }
         }
 
@@ -56,7 +56,7 @@ namespace osu.Game.Graphics.Containers
                 if (value == null) return;
 
                 AddInternal(fixedHeader);
-                lastKnownScroll = float.NaN;
+                lastKnownScroll = null;
             }
         }
 
@@ -75,7 +75,7 @@ namespace osu.Game.Graphics.Containers
                 footer.Anchor |= Anchor.y2;
                 footer.Origin |= Anchor.y2;
                 scrollContainer.Add(footer);
-                lastKnownScroll = float.NaN;
+                lastKnownScroll = null;
             }
         }
 
@@ -93,7 +93,7 @@ namespace osu.Game.Graphics.Containers
 
                 headerBackgroundContainer.Add(headerBackground);
 
-                lastKnownScroll = float.NaN;
+                lastKnownScroll = null;
             }
         }
 
@@ -105,9 +105,9 @@ namespace osu.Game.Graphics.Containers
         private Drawable expandableHeader, fixedHeader, footer, headerBackground;
         private FlowContainer<T> scrollContentContainer;
 
-        private float headerHeight, footerHeight;
+        private float? headerHeight, footerHeight;
 
-        private float lastKnownScroll;
+        private float? lastKnownScroll;
 
         private const float scroll_target_multiplier = 0.2f;
 
@@ -137,9 +137,9 @@ namespace osu.Game.Graphics.Containers
 
             Debug.Assert(drawable != null);
 
-            lastKnownScroll = float.NaN;
-            headerHeight = float.NaN;
-            footerHeight = float.NaN;
+            lastKnownScroll = null;
+            headerHeight = null;
+            footerHeight = null;
 
             if (smallestSection == null || smallestSection.Height > drawable.Height)
                 smallestSection = drawable;
@@ -171,7 +171,7 @@ namespace osu.Game.Graphics.Containers
 
             if (source == InvalidationSource.Child && (invalidation & Invalidation.DrawSize) != 0)
             {
-                lastKnownScroll = -1;
+                lastKnownScroll = null;
                 result = true;
             }
 
@@ -242,8 +242,9 @@ namespace osu.Game.Graphics.Containers
             if (!Children.Any()) return;
 
             var newMargin = originalSectionsMargin;
-            newMargin.Top += headerHeight;
-            newMargin.Bottom += footerHeight;
+
+            newMargin.Top += (headerHeight ?? 0);
+            newMargin.Bottom += (footerHeight ?? 0);
 
             scrollContentContainer.Margin = newMargin;
         }
