@@ -18,6 +18,10 @@ namespace osu.Game.Skinning
 
         protected bool RequestedPlaying { get; private set; }
 
+        protected IBindable<bool> SamplePlaybackDisabled => samplePlaybackDisabled;
+
+        private readonly Bindable<bool> samplePlaybackDisabled = new Bindable<bool>();
+
         public PausableSkinnableSound()
         {
         }
@@ -31,8 +35,6 @@ namespace osu.Game.Skinning
             : base(sample)
         {
         }
-
-        protected readonly IBindable<bool> SamplePlaybackDisabled = new Bindable<bool>();
 
         private ScheduledDelegate scheduledStart;
 
