@@ -327,6 +327,7 @@ namespace osu.Game
 
             if (!SelectedMods.Disabled)
                 SelectedMods.Value = Array.Empty<Mod>();
+
             AvailableMods.Value = dict;
         }
 
@@ -380,6 +381,18 @@ namespace osu.Game
                 : new OsuConfigManager(Storage);
         }
 
+        /// <summary>
+        /// Use to programatically exit the game as if the user was triggering via alt-f4.
+        /// Will keep persisting until an exit occurs (exit may be blocked multiple times).
+        /// </summary>
+        public void GracefullyExit()
+        {
+            if (!OnExiting())
+                Exit();
+            else
+                Scheduler.AddDelayed(GracefullyExit, 2000);
+        }
+
         protected override Storage CreateStorage(GameHost host, Storage defaultStorage) => new OsuStorage(host, defaultStorage);
 
         private readonly List<ICanAcceptFiles> fileImporters = new List<ICanAcceptFiles>();
@@ -407,15 +420,14 @@ namespace osu.Game
             }
         }
 
-        public virtual async Task Import(Stream stream, string filename)
+        public virtual async Task Import(params ImportTask[] tasks)
         {
-            var extension = Path.GetExtension(filename)?.ToLowerInvariant();
-
-            foreach (var importer in fileImporters)
+            var tasksPerExtension = tasks.GroupBy(t => Path.GetExtension(t.Path).ToLowerInvariant());
+            await Task.WhenAll(tasksPerExtension.Select(taskGroup =>
             {
-                if (importer.HandledExtensions.Contains(extension))
-                    await importer.Import(stream, Path.GetFileNameWithoutExtension(filename));
-            }
+                var importer = fileImporters.FirstOrDefault(i => i.HandledExtensions.Contains(taskGroup.Key));
+                return importer?.Import(taskGroup.ToArray()) ?? Task.CompletedTask;
+            }));
         }
 
         public IEnumerable<string> HandledExtensions => fileImporters.SelectMany(i => i.HandledExtensions);

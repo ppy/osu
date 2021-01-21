@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -52,6 +51,7 @@ namespace osu.Game.Online.Multiplayer
 
         /// <summary>
         /// Whether the <see cref="StatefulMultiplayerClient"/> is currently connected.
+        /// This is NOT thread safe and usage should be scheduled.
         /// </summary>
         public abstract IBindable<bool> IsConnected { get; }
 
@@ -64,6 +64,23 @@ namespace osu.Game.Online.Multiplayer
         /// The users in the joined <see cref="Room"/> which are participating in the current gameplay loop.
         /// </summary>
         public readonly BindableList<int> CurrentMatchPlayingUserIds = new BindableList<int>();
+
+        /// <summary>
+        /// The <see cref="MultiplayerRoomUser"/> corresponding to the local player, if available.
+        /// </summary>
+        public MultiplayerRoomUser? LocalUser => Room?.Users.SingleOrDefault(u => u.User?.Id == api.LocalUser.Value.Id);
+
+        /// <summary>
+        /// Whether the <see cref="LocalUser"/> is the host in <see cref="Room"/>.
+        /// </summary>
+        public bool IsHost
+        {
+            get
+            {
+                var localUser = LocalUser;
+                return localUser != null && Room?.Host != null && localUser.Equals(Room.Host);
+            }
+        }
 
         [Resolved]
         private UserLookupCache userLookupCache { get; set; } = null!;
@@ -110,7 +127,8 @@ namespace osu.Game.Online.Multiplayer
 
             Debug.Assert(Room != null);
 
-            var users = getRoomUsers();
+            var users = await getRoomUsers();
+            Debug.Assert(users != null);
 
             await Task.WhenAll(users.Select(PopulateUser));
 
@@ -178,11 +196,39 @@ namespace osu.Game.Online.Multiplayer
             });
         }
 
+        /// <summary>
+        /// Toggles the <see cref="LocalUser"/>'s ready state.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">If a toggle of ready state is not valid at this time.</exception>
+        public async Task ToggleReady()
+        {
+            var localUser = LocalUser;
+
+            if (localUser == null)
+                return;
+
+            switch (localUser.State)
+            {
+                case MultiplayerUserState.Idle:
+                    await ChangeState(MultiplayerUserState.Ready);
+                    return;
+
+                case MultiplayerUserState.Ready:
+                    await ChangeState(MultiplayerUserState.Idle);
+                    return;
+
+                default:
+                    throw new InvalidOperationException($"Cannot toggle ready when in {localUser.State}");
+            }
+        }
+
         public abstract Task TransferHost(int userId);
 
         public abstract Task ChangeSettings(MultiplayerRoomSettings settings);
 
         public abstract Task ChangeState(MultiplayerUserState newState);
+
+        public abstract Task ChangeBeatmapAvailability(BeatmapAvailability newBeatmapAvailability);
 
         public abstract Task StartMatch();
 
@@ -311,6 +357,27 @@ namespace osu.Game.Online.Multiplayer
             return Task.CompletedTask;
         }
 
+        Task IMultiplayerClient.UserBeatmapAvailabilityChanged(int userId, BeatmapAvailability beatmapAvailability)
+        {
+            if (Room == null)
+                return Task.CompletedTask;
+
+            Scheduler.Add(() =>
+            {
+                var user = Room?.Users.SingleOrDefault(u => u.UserID == userId);
+
+                // errors here are not critical - beatmap availability state is mostly for display.
+                if (user == null)
+                    return;
+
+                user.BeatmapAvailability = beatmapAvailability;
+
+                RoomUpdated?.Invoke();
+            }, false);
+
+            return Task.CompletedTask;
+        }
+
         Task IMultiplayerClient.LoadRequested()
         {
             if (Room == null)
@@ -370,24 +437,20 @@ namespace osu.Game.Online.Multiplayer
         /// This should be used whenever accessing users from outside of an Update thread context (ie. when not calling <see cref="Drawable.Schedule"/>).
         /// </summary>
         /// <returns>A copy of users in the current room, or null if unavailable.</returns>
-        private List<MultiplayerRoomUser>? getRoomUsers()
+        private Task<List<MultiplayerRoomUser>?> getRoomUsers()
         {
-            List<MultiplayerRoomUser>? users = null;
-
-            ManualResetEventSlim resetEvent = new ManualResetEventSlim();
+            var tcs = new TaskCompletionSource<List<MultiplayerRoomUser>?>();
 
             // at some point we probably want to replace all these schedule calls with Room.LockForUpdate.
             // for now, as this would require quite some consideration due to the number of accesses to the room instance,
             // let's just add a manual schedule for the non-scheduled usages instead.
             Scheduler.Add(() =>
             {
-                users = Room?.Users.ToList();
-                resetEvent.Set();
+                var users = Room?.Users.ToList();
+                tcs.SetResult(users);
             }, false);
 
-            resetEvent.Wait(100);
-
-            return users;
+            return tcs.Task;
         }
 
         /// <summary>
