@@ -33,12 +33,17 @@ namespace osu.Game.IO
         private readonly StorageConfigManager storageConfig;
         private readonly Storage defaultStorage;
 
-        public override string[] IgnoreDirectories => new[] { "cache" };
+        public override string[] IgnoreDirectories => new[]
+        {
+            "cache",
+            "client.realm.management"
+        };
 
         public override string[] IgnoreFiles => new[]
         {
             "framework.ini",
-            "storage.ini"
+            "storage.ini",
+            "client.realm.note"
         };
 
         public OsuStorage(GameHost host, Storage defaultStorage)
