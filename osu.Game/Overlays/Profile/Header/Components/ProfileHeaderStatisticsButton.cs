@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         Margin = new MarginPadding { Right = 10 },
-                        Font = OsuFont.GetFont(weight: FontWeight.Bold)
+                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold)
                     }
                 }
             };
