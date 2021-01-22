@@ -21,6 +21,8 @@ namespace osu.Game.Storyboards.Drawables
 
         public override bool RemoveWhenNotAlive => false;
 
+        protected override bool AllowNonLoopingCutOff => true;
+
         public DrawableStoryboardSample(StoryboardSampleInfo sampleInfo)
             : base(sampleInfo)
         {
@@ -30,19 +32,6 @@ namespace osu.Game.Storyboards.Drawables
 
         [Resolved]
         private IBindable<IReadOnlyList<Mod>> mods { get; set; }
-
-        protected override void SamplePlaybackDisabledChanged(ValueChangedEvent<bool> disabled)
-        {
-            if (!RequestedPlaying) return;
-
-            if (disabled.NewValue)
-                Stop();
-            else
-            {
-                CancelPendingStart();
-                ScheduleStart();
-            }
-        }
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
