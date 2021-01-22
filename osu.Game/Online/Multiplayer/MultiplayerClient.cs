@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
+using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 
@@ -51,11 +52,11 @@ namespace osu.Game.Online.Multiplayer
             {
                 case APIState.Failing:
                 case APIState.Offline:
-                    Task.Run(Disconnect);
+                    Task.Run(Disconnect).CatchUnobservedExceptions();
                     break;
 
                 case APIState.Online:
-                    Task.Run(Connect);
+                    Task.Run(Connect).CatchUnobservedExceptions();
                     break;
             }
         }
@@ -78,8 +79,10 @@ namespace osu.Game.Online.Multiplayer
                 // if cancelled, we can be sure that a disconnect or reconnect is handled elsewhere.
                 var cancellationToken = connectCancelSource.Token;
 
-                while (api.State.Value == APIState.Online && !cancellationToken.IsCancellationRequested)
+                while (api.State.Value == APIState.Online)
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
+
                     Logger.Log("Multiplayer client connecting...", LoggingTarget.Network);
 
                     try
@@ -96,7 +99,7 @@ namespace osu.Game.Online.Multiplayer
                     catch (OperationCanceledException)
                     {
                         //connection process was cancelled.
-                        return;
+                        throw;
                     }
                     catch (Exception e)
                     {
@@ -222,7 +225,7 @@ namespace osu.Game.Online.Multiplayer
             newConnection.On(nameof(IMultiplayerClient.MatchStarted), ((IMultiplayerClient)this).MatchStarted);
             newConnection.On(nameof(IMultiplayerClient.ResultsReady), ((IMultiplayerClient)this).ResultsReady);
 
-            newConnection.Closed += async ex =>
+            newConnection.Closed += ex =>
             {
                 isConnected.Value = false;
 
@@ -230,7 +233,9 @@ namespace osu.Game.Online.Multiplayer
 
                 // make sure a disconnect wasn't triggered (and this is still the active connection).
                 if (!cancellationToken.IsCancellationRequested)
-                    await Connect();
+                    Task.Run(Connect, default).CatchUnobservedExceptions();
+
+                return Task.CompletedTask;
             };
             return newConnection;
         }
