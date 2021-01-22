@@ -39,10 +39,9 @@ namespace osu.Game.Overlays.Comments
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
 
-        protected Box Background { get; private set; }
-
+        private bool isOwnComment;
         private readonly Comment comment;
-
+        private Box background;
         private Box hoverLayer;
         private CircularContainer borderContainer;
         private SpriteText sideNumber;
@@ -64,15 +63,14 @@ namespace osu.Game.Overlays.Comments
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
+            isOwnComment = api.LocalUser.Value.Id == comment.UserId;
+            Action = onAction;
+
             AccentColour = borderContainer.BorderColour = sideNumber.Colour = colours.GreenLight;
             hoverLayer.Colour = Color4.Black.Opacity(0.5f);
+            background.Alpha = isOwnComment ? 0 : 1;
 
-            var ownComment = api.LocalUser.Value.Id == comment.UserId;
-
-            if (!ownComment)
-                Action = onAction;
-
-            Background.Alpha = ownComment ? 0 : 1;
+            Enabled.Value = !isOwnComment;
         }
 
         protected override void LoadComplete()
@@ -80,7 +78,7 @@ namespace osu.Game.Overlays.Comments
             base.LoadComplete();
             isVoted.Value = comment.IsVoted;
             votesCount.Value = comment.VotesCount;
-            isVoted.BindValueChanged(voted => Background.Colour = voted.NewValue ? AccentColour : colourProvider.Background6, true);
+            isVoted.BindValueChanged(voted => background.Colour = voted.NewValue ? AccentColour : colourProvider.Background6, true);
             votesCount.BindValueChanged(count => votesCounter.Text = $"+{count.NewValue}", true);
         }
 
@@ -117,7 +115,7 @@ namespace osu.Game.Overlays.Comments
                     Masking = true,
                     Children = new Drawable[]
                     {
-                        Background = new Box
+                        background = new Box
                         {
                             RelativeSizeAxes = Axes.Both
                         },
@@ -151,55 +149,48 @@ namespace osu.Game.Overlays.Comments
         protected override void OnLoadStarted()
         {
             votesCounter.FadeOut(duration, Easing.OutQuint);
-            updateDisplay();
+            updateDisplay(false);
         }
 
         protected override void OnLoadFinished()
         {
             votesCounter.FadeIn(duration, Easing.OutQuint);
-
-            if (IsHovered)
-                onHoverAction();
+            updateDisplay(IsHovered);
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            onHoverAction();
+            if (!isOwnComment && !IsLoading)
+                updateDisplay(true);
+
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            updateDisplay();
+            if (!isOwnComment && !IsLoading)
+                updateDisplay(false);
+
             base.OnHoverLost(e);
         }
 
-        private void updateDisplay()
+        private void updateDisplay(bool isHovered)
         {
-            if (Action == null)
-                return;
-
             if (isVoted.Value)
             {
-                hoverLayer.FadeTo(IsHovered ? 1 : 0);
+                hoverLayer.FadeTo(isHovered ? 1 : 0);
                 sideNumber.Hide();
             }
             else
-                sideNumber.FadeTo(IsHovered ? 1 : 0);
+                sideNumber.FadeTo(isHovered ? 1 : 0);
 
-            borderContainer.BorderThickness = IsHovered ? 3 : 0;
-        }
-
-        private void onHoverAction()
-        {
-            if (!IsLoading)
-                updateDisplay();
+            borderContainer.BorderThickness = isHovered ? 3 : 0;
         }
 
         protected override void Dispose(bool isDisposing)
         {
-            base.Dispose(isDisposing);
             request?.Cancel();
+            base.Dispose(isDisposing);
         }
     }
 }
