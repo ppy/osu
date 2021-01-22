@@ -21,7 +21,11 @@ namespace osu.Game.Storyboards.Drawables
 
         public override bool RemoveWhenNotAlive => false;
 
-        protected override bool AllowNonLoopingCutOff => true;
+        /// <remarks>
+        /// Contrary to <see cref="PausableSkinnableSound"/>, all <see cref="DrawableStoryboardSample"/>s are affected
+        /// by sample disables, as they are oftentimes longer-running sound effects. This also matches stable behaviour.
+        /// </remarks>
+        protected override bool AffectedBySamplePlaybackDisable => true;
 
         public DrawableStoryboardSample(StoryboardSampleInfo sampleInfo)
             : base(sampleInfo)
