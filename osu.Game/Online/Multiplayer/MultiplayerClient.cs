@@ -4,7 +4,6 @@
 #nullable enable
 
 using System;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -30,6 +29,8 @@ namespace osu.Game.Online.Multiplayer
 
         private HubConnection? connection;
 
+        private CancellationTokenSource connectCancelSource = new CancellationTokenSource();
+
         private readonly string endpoint;
 
         public MultiplayerClient(EndpointConfiguration endpoints)
@@ -50,8 +51,7 @@ namespace osu.Game.Online.Multiplayer
             {
                 case APIState.Failing:
                 case APIState.Offline:
-                    connection?.StopAsync();
-                    connection = null;
+                    Task.Run(Disconnect);
                     break;
 
                 case APIState.Online:
@@ -60,69 +60,56 @@ namespace osu.Game.Online.Multiplayer
             }
         }
 
-        protected virtual async Task Connect()
+        private readonly SemaphoreSlim connectionLock = new SemaphoreSlim(1);
+
+        public Task Disconnect() => disconnect(true);
+
+        protected async Task Connect()
         {
-            if (connection != null)
-                return;
+            cancelExistingConnect();
 
-            connection = new HubConnectionBuilder()
-                         .WithUrl(endpoint, options =>
-                         {
-                             options.Headers.Add("Authorization", $"Bearer {api.AccessToken}");
-                         })
-                         .AddNewtonsoftJsonProtocol(options => { options.PayloadSerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore; })
-                         .Build();
+            await connectionLock.WaitAsync();
 
-            // this is kind of SILLY
-            // https://github.com/dotnet/aspnetcore/issues/15198
-            connection.On<MultiplayerRoomState>(nameof(IMultiplayerClient.RoomStateChanged), ((IMultiplayerClient)this).RoomStateChanged);
-            connection.On<MultiplayerRoomUser>(nameof(IMultiplayerClient.UserJoined), ((IMultiplayerClient)this).UserJoined);
-            connection.On<MultiplayerRoomUser>(nameof(IMultiplayerClient.UserLeft), ((IMultiplayerClient)this).UserLeft);
-            connection.On<int>(nameof(IMultiplayerClient.HostChanged), ((IMultiplayerClient)this).HostChanged);
-            connection.On<MultiplayerRoomSettings>(nameof(IMultiplayerClient.SettingsChanged), ((IMultiplayerClient)this).SettingsChanged);
-            connection.On<int, MultiplayerUserState>(nameof(IMultiplayerClient.UserStateChanged), ((IMultiplayerClient)this).UserStateChanged);
-            connection.On(nameof(IMultiplayerClient.LoadRequested), ((IMultiplayerClient)this).LoadRequested);
-            connection.On(nameof(IMultiplayerClient.MatchStarted), ((IMultiplayerClient)this).MatchStarted);
-            connection.On(nameof(IMultiplayerClient.ResultsReady), ((IMultiplayerClient)this).ResultsReady);
-
-            connection.Closed += async ex =>
+            try
             {
-                isConnected.Value = false;
+                await disconnect(false);
 
-                Logger.Log(ex != null
-                    ? $"Multiplayer client lost connection: {ex}"
-                    : "Multiplayer client disconnected", LoggingTarget.Network);
+                // this token will be valid for the scope of this connection.
+                // if cancelled, we can be sure that a disconnect or reconnect is handled elsewhere.
+                var cancellationToken = connectCancelSource.Token;
 
-                if (connection != null)
-                    await tryUntilConnected();
-            };
-
-            await tryUntilConnected();
-
-            async Task tryUntilConnected()
-            {
-                Logger.Log("Multiplayer client connecting...", LoggingTarget.Network);
-
-                while (api.State.Value == APIState.Online)
+                while (api.State.Value == APIState.Online && !cancellationToken.IsCancellationRequested)
                 {
+                    Logger.Log("Multiplayer client connecting...", LoggingTarget.Network);
+
                     try
                     {
-                        Debug.Assert(connection != null);
+                        // importantly, rebuild the connection each attempt to get an updated access token.
+                        connection = createConnection(cancellationToken);
 
-                        // reconnect on any failure
-                        await connection.StartAsync();
+                        await connection.StartAsync(cancellationToken);
+
                         Logger.Log("Multiplayer client connected!", LoggingTarget.Network);
-
-                        // Success.
                         isConnected.Value = true;
-                        break;
+                        return;
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        //connection process was cancelled.
+                        return;
                     }
                     catch (Exception e)
                     {
                         Logger.Log($"Multiplayer client connection error: {e}", LoggingTarget.Network);
-                        await Task.Delay(5000);
+
+                        // retry on any failure.
+                        await Task.Delay(5000, cancellationToken);
                     }
                 }
+            }
+            finally
+            {
+                connectionLock.Release();
             }
         }
 
@@ -188,6 +175,64 @@ namespace osu.Game.Online.Multiplayer
                 return Task.CompletedTask;
 
             return connection.InvokeAsync(nameof(IMultiplayerServer.StartMatch));
+        }
+
+        private async Task disconnect(bool takeLock)
+        {
+            cancelExistingConnect();
+
+            if (takeLock)
+                await connectionLock.WaitAsync();
+
+            try
+            {
+                if (connection != null)
+                    await connection.StopAsync();
+            }
+            finally
+            {
+                connection = null;
+                if (takeLock)
+                    connectionLock.Release();
+            }
+        }
+
+        private void cancelExistingConnect()
+        {
+            connectCancelSource.Cancel();
+            connectCancelSource = new CancellationTokenSource();
+        }
+
+        private HubConnection createConnection(CancellationToken cancellationToken)
+        {
+            var newConnection = new HubConnectionBuilder()
+                                .WithUrl(endpoint, options => { options.Headers.Add("Authorization", $"Bearer {api.AccessToken}"); })
+                                .AddNewtonsoftJsonProtocol(options => { options.PayloadSerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore; })
+                                .Build();
+
+            // this is kind of SILLY
+            // https://github.com/dotnet/aspnetcore/issues/15198
+            newConnection.On<MultiplayerRoomState>(nameof(IMultiplayerClient.RoomStateChanged), ((IMultiplayerClient)this).RoomStateChanged);
+            newConnection.On<MultiplayerRoomUser>(nameof(IMultiplayerClient.UserJoined), ((IMultiplayerClient)this).UserJoined);
+            newConnection.On<MultiplayerRoomUser>(nameof(IMultiplayerClient.UserLeft), ((IMultiplayerClient)this).UserLeft);
+            newConnection.On<int>(nameof(IMultiplayerClient.HostChanged), ((IMultiplayerClient)this).HostChanged);
+            newConnection.On<MultiplayerRoomSettings>(nameof(IMultiplayerClient.SettingsChanged), ((IMultiplayerClient)this).SettingsChanged);
+            newConnection.On<int, MultiplayerUserState>(nameof(IMultiplayerClient.UserStateChanged), ((IMultiplayerClient)this).UserStateChanged);
+            newConnection.On(nameof(IMultiplayerClient.LoadRequested), ((IMultiplayerClient)this).LoadRequested);
+            newConnection.On(nameof(IMultiplayerClient.MatchStarted), ((IMultiplayerClient)this).MatchStarted);
+            newConnection.On(nameof(IMultiplayerClient.ResultsReady), ((IMultiplayerClient)this).ResultsReady);
+
+            newConnection.Closed += async ex =>
+            {
+                isConnected.Value = false;
+
+                Logger.Log(ex != null ? $"Multiplayer client lost connection: {ex}" : "Multiplayer client disconnected", LoggingTarget.Network);
+
+                // make sure a disconnect wasn't triggered (and this is still the active connection).
+                if (!cancellationToken.IsCancellationRequested)
+                    await Connect();
+            };
+            return newConnection;
         }
     }
 }
