@@ -18,7 +18,7 @@ namespace osu.Game.Skinning
 
         protected bool RequestedPlaying { get; private set; }
 
-        protected readonly IBindable<bool> SamplePlaybackDisabled = new Bindable<bool>();
+        private readonly IBindable<bool> samplePlaybackDisabled = new Bindable<bool>();
 
         public PausableSkinnableSound()
         {
@@ -42,37 +42,32 @@ namespace osu.Game.Skinning
             // if in a gameplay context, pause sample playback when gameplay is paused.
             if (samplePlaybackDisabler != null)
             {
-                SamplePlaybackDisabled.BindTo(samplePlaybackDisabler.SamplePlaybackDisabled);
-                SamplePlaybackDisabled.BindValueChanged(disabled =>
-                {
-                    if (!RequestedPlaying) return;
-
-                    // let non-looping samples that have already been started play out to completion (sounds better than abruptly cutting off).
-                    if (!Looping) return;
-
-                    cancelPendingStart();
-
-                    if (disabled.NewValue)
-                        base.Stop();
-                    else
-                    {
-                        // schedule so we don't start playing a sample which is no longer alive.
-                        scheduledStart = Schedule(() =>
-                        {
-                            if (RequestedPlaying)
-                                base.Play();
-                        });
-                    }
-                });
+                samplePlaybackDisabled.BindTo(samplePlaybackDisabler.SamplePlaybackDisabled);
+                samplePlaybackDisabled.BindValueChanged(SamplePlaybackDisabledChanged);
             }
+        }
+
+        protected virtual void SamplePlaybackDisabledChanged(ValueChangedEvent<bool> disabled)
+        {
+            if (!RequestedPlaying) return;
+
+            // let non-looping samples that have already been started play out to completion (sounds better than abruptly cutting off).
+            if (!Looping) return;
+
+            CancelPendingStart();
+
+            if (disabled.NewValue)
+                base.Stop();
+            else
+                ScheduleStart();
         }
 
         public override void Play(bool restart = true)
         {
-            cancelPendingStart();
+            CancelPendingStart();
             RequestedPlaying = true;
 
-            if (SamplePlaybackDisabled.Value)
+            if (samplePlaybackDisabled.Value)
                 return;
 
             base.Play(restart);
@@ -80,15 +75,25 @@ namespace osu.Game.Skinning
 
         public override void Stop()
         {
-            cancelPendingStart();
+            CancelPendingStart();
             RequestedPlaying = false;
             base.Stop();
         }
 
-        private void cancelPendingStart()
+        protected void CancelPendingStart()
         {
             scheduledStart?.Cancel();
             scheduledStart = null;
+        }
+
+        protected void ScheduleStart()
+        {
+            // schedule so we don't start playing a sample which is no longer alive.
+            scheduledStart = Schedule(() =>
+            {
+                if (RequestedPlaying)
+                    base.Play();
+            });
         }
     }
 }
