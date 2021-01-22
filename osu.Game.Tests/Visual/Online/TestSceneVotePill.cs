@@ -7,6 +7,7 @@ using osu.Game.Overlays.Comments;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Framework.Allocation;
 using osu.Game.Overlays;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -16,13 +17,14 @@ namespace osu.Game.Tests.Visual.Online
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
-        private VotePill votePill;
+        private TestPill votePill;
 
         [Test]
         public void TestUserCommentPill()
         {
             AddStep("Log in", logIn);
             AddStep("User comment", () => addVotePill(getUserComment()));
+            AddAssert("Background is transparent", () => votePill.Background.Alpha == 0);
             AddStep("Click", () => votePill.Click());
             AddAssert("Not loading", () => !votePill.IsLoading);
         }
@@ -32,6 +34,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("Log in", logIn);
             AddStep("Random comment", () => addVotePill(getRandomComment()));
+            AddAssert("Background is not transparent", () => votePill.Background.Alpha == 1);
             AddStep("Click", () => votePill.Click());
             AddAssert("Loading", () => votePill.IsLoading);
         }
@@ -64,11 +67,21 @@ namespace osu.Game.Tests.Visual.Online
         private void addVotePill(Comment comment)
         {
             Clear();
-            Add(votePill = new VotePill(comment)
+            Add(votePill = new TestPill(comment)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             });
+        }
+
+        private class TestPill : VotePill
+        {
+            public new Box Background => base.Background;
+
+            public TestPill(Comment comment)
+                : base(comment)
+            {
+            }
         }
     }
 }
