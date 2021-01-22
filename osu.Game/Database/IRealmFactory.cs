@@ -15,7 +15,7 @@ namespace osu.Game.Database
         /// <summary>
         /// Get a fresh context for read usage.
         /// </summary>
-        Realm GetForRead();
+        RealmContextFactory.RealmUsage GetForRead();
 
         /// <summary>
         /// Request a context for write usage.

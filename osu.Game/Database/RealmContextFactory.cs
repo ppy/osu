@@ -3,6 +3,7 @@
 
 using System;
 using System.Threading;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -30,6 +31,9 @@ namespace osu.Game.Database
         private static readonly GlobalStatistic<int> refreshes = GlobalStatistics.Get<int>("Realm", "Dirty Refreshes");
         private static readonly GlobalStatistic<int> contexts_created = GlobalStatistics.Get<int>("Realm", "Contexts (Created)");
         private static readonly GlobalStatistic<int> pending_writes = GlobalStatistics.Get<int>("Realm", "Pending writes");
+        private static readonly GlobalStatistic<int> active_usages = GlobalStatistics.Get<int>("Realm", "Active usages");
+
+        private readonly ManualResetEventSlim blockingResetEvent = new ManualResetEventSlim(true);
 
         private Realm context;
 
@@ -57,10 +61,10 @@ namespace osu.Game.Database
             this.storage = storage;
         }
 
-        public Realm GetForRead()
+        public RealmUsage GetForRead()
         {
             reads.Value++;
-            return createContext();
+            return new RealmUsage(this);
         }
 
         public RealmWriteUsage GetForWrite()
@@ -83,6 +87,8 @@ namespace osu.Game.Database
 
         private Realm createContext()
         {
+            blockingResetEvent.Wait();
+
             contexts_created.Value++;
 
             return Realm.GetInstance(new RealmConfiguration(storage.GetFullPath($"{database_name}.realm", true))
@@ -107,24 +113,69 @@ namespace osu.Game.Database
         {
             base.Dispose(isDisposing);
 
-            FlushConnections();
+            BlockAllOperations();
+        }
+
+        public IDisposable BlockAllOperations()
+        {
+            blockingResetEvent.Reset();
+            flushContexts();
+
+            return new InvokeOnDisposal<RealmContextFactory>(this, r => endBlockingSection());
+        }
+
+        private void endBlockingSection()
+        {
+            blockingResetEvent.Set();
+        }
+
+        private void flushContexts()
+        {
+            var previousContext = context;
+            context = null;
+
+            // wait for all threaded usages to finish
+            while (active_usages.Value > 0)
+                Thread.Sleep(50);
+
+            previousContext?.Dispose();
+        }
+
+        /// <summary>
+        /// A usage of realm from an arbitrary thread.
+        /// </summary>
+        public class RealmUsage : IDisposable
+        {
+            public readonly Realm Realm;
+
+            protected readonly RealmContextFactory Factory;
+
+            internal RealmUsage(RealmContextFactory factory)
+            {
+                Factory = factory;
+                Realm = factory.createContext();
+            }
+
+            /// <summary>
+            /// Disposes this instance, calling the initially captured action.
+            /// </summary>
+            public virtual void Dispose()
+            {
+                Realm?.Dispose();
+                active_usages.Value--;
+            }
         }
 
         /// <summary>
         /// A transaction used for making changes to realm data.
         /// </summary>
-        public class RealmWriteUsage : IDisposable
+        public class RealmWriteUsage : RealmUsage
         {
-            public readonly Realm Realm;
-
-            private readonly RealmContextFactory factory;
             private readonly Transaction transaction;
 
             internal RealmWriteUsage(RealmContextFactory factory)
+                : base(factory)
             {
-                this.factory = factory;
-
-                Realm = factory.createContext();
                 transaction = Realm.BeginWrite();
             }
 
@@ -141,24 +192,16 @@ namespace osu.Game.Database
             /// <summary>
             /// Disposes this instance, calling the initially captured action.
             /// </summary>
-            public virtual void Dispose()
+            public override void Dispose()
             {
                 // rollback if not explicitly committed.
                 transaction?.Dispose();
-                Realm?.Dispose();
 
-                Monitor.Exit(factory.writeLock);
+                base.Dispose();
+
+                Monitor.Exit(Factory.writeLock);
                 pending_writes.Value--;
             }
-        }
-
-        public void FlushConnections()
-        {
-            var previousContext = context;
-            context = null;
-            previousContext?.Dispose();
-            while (previousContext?.IsClosed == false)
-                Thread.Sleep(50);
         }
     }
 }
