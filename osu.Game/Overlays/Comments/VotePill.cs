@@ -33,6 +33,9 @@ namespace osu.Game.Overlays.Comments
         [Resolved]
         private IAPIProvider api { get; set; }
 
+        [Resolved(canBeNull: true)]
+        private LoginOverlay login { get; set; }
+
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
 
@@ -66,7 +69,7 @@ namespace osu.Game.Overlays.Comments
 
             var ownComment = api.LocalUser.Value.Id == comment.UserId;
 
-            if (api.IsLoggedIn && !ownComment)
+            if (!ownComment)
                 Action = onAction;
 
             Background.Alpha = ownComment ? 0 : 1;
@@ -83,6 +86,12 @@ namespace osu.Game.Overlays.Comments
 
         private void onAction()
         {
+            if (!api.IsLoggedIn)
+            {
+                login?.Show();
+                return;
+            }
+
             request = new CommentVoteRequest(comment.Id, isVoted.Value ? CommentVoteAction.UnVote : CommentVoteAction.Vote);
             request.Success += onSuccess;
             api.Queue(request);
