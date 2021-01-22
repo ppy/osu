@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -109,7 +110,16 @@ namespace osu.Game.Screens.Edit
             if (Beatmap.Value is DummyWorkingBeatmap)
             {
                 isNewBeatmap = true;
-                Beatmap.Value = beatmapManager.CreateNew(Ruleset.Value, api.LocalUser.Value);
+
+                var newBeatmap = beatmapManager.CreateNew(Ruleset.Value, api.LocalUser.Value);
+
+                // this is a bit haphazard, but guards against setting the lease Beatmap bindable if
+                // the editor has already been exited.
+                if (!ValidForPush)
+                    return;
+
+                // this probably shouldn't be set in the asynchronous load method, but everything following relies on it.
+                Beatmap.Value = newBeatmap;
             }
 
             beatDivisor.Value = Beatmap.Value.BeatmapInfo.BeatDivisor;
