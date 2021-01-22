@@ -18,7 +18,13 @@ namespace osu.Game.Skinning
 
         protected bool RequestedPlaying { get; private set; }
 
-        protected virtual bool AllowNonLoopingCutOff => false;
+        /// <summary>
+        /// Whether this <see cref="PausableSkinnableSound"/> is affected by
+        /// a higher-level <see cref="ISamplePlaybackDisabler"/>'s state changes.
+        /// By default only looping samples are started/stopped on sample disable
+        /// to prevent one-time samples from cutting off abruptly.
+        /// </summary>
+        protected virtual bool AffectedBySamplePlaybackDisable => Looping;
 
         public PausableSkinnableSound()
         {
@@ -48,10 +54,7 @@ namespace osu.Game.Skinning
                 samplePlaybackDisabled.BindValueChanged(disabled =>
                 {
                     if (!RequestedPlaying) return;
-
-                    // if the sample is non-looping, and non-looping cut off is not allowed,
-                    // let the sample play out to completion (sounds better than abruptly cutting off).
-                    if (!Looping && !AllowNonLoopingCutOff) return;
+                    if (!AffectedBySamplePlaybackDisable) return;
 
                     cancelPendingStart();
 
