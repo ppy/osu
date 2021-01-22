@@ -181,7 +181,7 @@ namespace osu.Game.Graphics.Containers
         {
             base.UpdateAfterChildren();
 
-            float fixedHeaderSize = (FixedHeader?.LayoutSize.Y ?? 0);
+            float fixedHeaderSize = FixedHeader?.LayoutSize.Y ?? 0;
             float expandableHeaderSize = ExpandableHeader?.LayoutSize.Y ?? 0;
 
             float headerH = expandableHeaderSize + fixedHeaderSize;
