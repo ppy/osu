@@ -18,7 +18,7 @@ namespace osu.Game.Skinning
 
         protected bool RequestedPlaying { get; private set; }
 
-        private readonly IBindable<bool> samplePlaybackDisabled = new Bindable<bool>();
+        protected virtual bool AllowNonLoopingCutOff => false;
 
         public PausableSkinnableSound()
         {
@@ -34,6 +34,8 @@ namespace osu.Game.Skinning
         {
         }
 
+        private readonly IBindable<bool> samplePlaybackDisabled = new Bindable<bool>();
+
         private ScheduledDelegate scheduledStart;
 
         [BackgroundDependencyLoader(true)]
@@ -43,28 +45,34 @@ namespace osu.Game.Skinning
             if (samplePlaybackDisabler != null)
             {
                 samplePlaybackDisabled.BindTo(samplePlaybackDisabler.SamplePlaybackDisabled);
-                samplePlaybackDisabled.BindValueChanged(SamplePlaybackDisabledChanged);
+                samplePlaybackDisabled.BindValueChanged(disabled =>
+                {
+                    if (!RequestedPlaying) return;
+
+                    // if the sample is non-looping, and non-looping cut off is not allowed,
+                    // let the sample play out to completion (sounds better than abruptly cutting off).
+                    if (!Looping && !AllowNonLoopingCutOff) return;
+
+                    cancelPendingStart();
+
+                    if (disabled.NewValue)
+                        base.Stop();
+                    else
+                    {
+                        // schedule so we don't start playing a sample which is no longer alive.
+                        scheduledStart = Schedule(() =>
+                        {
+                            if (RequestedPlaying)
+                                base.Play();
+                        });
+                    }
+                });
             }
-        }
-
-        protected virtual void SamplePlaybackDisabledChanged(ValueChangedEvent<bool> disabled)
-        {
-            if (!RequestedPlaying) return;
-
-            // let non-looping samples that have already been started play out to completion (sounds better than abruptly cutting off).
-            if (!Looping) return;
-
-            CancelPendingStart();
-
-            if (disabled.NewValue)
-                base.Stop();
-            else
-                ScheduleStart();
         }
 
         public override void Play(bool restart = true)
         {
-            CancelPendingStart();
+            cancelPendingStart();
             RequestedPlaying = true;
 
             if (samplePlaybackDisabled.Value)
@@ -75,25 +83,15 @@ namespace osu.Game.Skinning
 
         public override void Stop()
         {
-            CancelPendingStart();
+            cancelPendingStart();
             RequestedPlaying = false;
             base.Stop();
         }
 
-        protected void CancelPendingStart()
+        private void cancelPendingStart()
         {
             scheduledStart?.Cancel();
             scheduledStart = null;
-        }
-
-        protected void ScheduleStart()
-        {
-            // schedule so we don't start playing a sample which is no longer alive.
-            scheduledStart = Schedule(() =>
-            {
-                if (RequestedPlaying)
-                    base.Play();
-            });
         }
     }
 }
