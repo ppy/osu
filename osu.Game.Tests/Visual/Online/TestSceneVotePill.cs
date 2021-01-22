@@ -8,6 +8,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Framework.Allocation;
 using osu.Game.Overlays;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -17,11 +18,30 @@ namespace osu.Game.Tests.Visual.Online
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
+        [Cached]
+        private LoginOverlay login;
+
         private TestPill votePill;
+        private readonly Container pillContainer;
+
+        public TestSceneVotePill()
+        {
+            AddRange(new Drawable[]
+            {
+                pillContainer = new Container
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    AutoSizeAxes = Axes.Both
+                },
+                login = new LoginOverlay()
+            });
+        }
 
         [Test]
         public void TestUserCommentPill()
         {
+            AddStep("Hide login overlay", () => login.Hide());
             AddStep("Log in", logIn);
             AddStep("User comment", () => addVotePill(getUserComment()));
             AddAssert("Background is transparent", () => votePill.Background.Alpha == 0);
@@ -32,9 +52,10 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestRandomCommentPill()
         {
+            AddStep("Hide login overlay", () => login.Hide());
             AddStep("Log in", logIn);
             AddStep("Random comment", () => addVotePill(getRandomComment()));
-            AddAssert("Background is not transparent", () => votePill.Background.Alpha == 1);
+            AddAssert("Background is visible", () => votePill.Background.Alpha == 1);
             AddStep("Click", () => votePill.Click());
             AddAssert("Loading", () => votePill.IsLoading);
         }
@@ -42,10 +63,11 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestOfflineRandomCommentPill()
         {
+            AddStep("Hide login overlay", () => login.Hide());
             AddStep("Log out", API.Logout);
             AddStep("Random comment", () => addVotePill(getRandomComment()));
             AddStep("Click", () => votePill.Click());
-            AddAssert("Not loading", () => !votePill.IsLoading);
+            AddAssert("Login overlay is visible", () => login.State.Value == Visibility.Visible);
         }
 
         private void logIn() => API.Login("localUser", "password");
@@ -66,12 +88,12 @@ namespace osu.Game.Tests.Visual.Online
 
         private void addVotePill(Comment comment)
         {
-            Clear();
-            Add(votePill = new TestPill(comment)
+            pillContainer.Clear();
+            pillContainer.Child = votePill = new TestPill(comment)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-            });
+            };
         }
 
         private class TestPill : VotePill
