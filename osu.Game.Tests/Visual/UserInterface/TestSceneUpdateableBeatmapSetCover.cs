@@ -22,9 +22,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestLocal([Values] BeatmapSetCoverType coverType)
         {
-            AddStep("setup cover", () => Child = new UpdateableBeatmapSetCover
+            AddStep("setup cover", () => Child = new UpdateableBeatmapSetCover(coverType)
             {
-                CoverType = coverType,
                 BeatmapSet = CreateBeatmap(Ruleset.Value).BeatmapInfo.BeatmapSet,
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
@@ -64,9 +63,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     var coverType = coverTypes[i % coverTypes.Length];
 
-                    var cover = new UpdateableBeatmapSetCover
+                    var cover = new UpdateableBeatmapSetCover(coverType)
                     {
-                        CoverType = coverType,
                         BeatmapSet = setInfo,
                         Height = 100,
                         Masking = true,
@@ -110,13 +108,25 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private class TestUpdateableBeatmapSetCover : UpdateableBeatmapSetCover
         {
-            protected override BeatmapSetCover CreateBeatmapSetCover(BeatmapSetInfo beatmapSet, BeatmapSetCoverType coverType) => new TestBeatmapSetCover(beatmapSet, coverType);
+            protected override Drawable CreateDrawable(BeatmapSetInfo model)
+            {
+                if (model == null)
+                    return null;
+
+                return new TestBeatmapSetCover(model)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    FillMode = FillMode.Fill,
+                };
+            }
         }
 
         private class TestBeatmapSetCover : BeatmapSetCover
         {
-            public TestBeatmapSetCover(BeatmapSetInfo set, BeatmapSetCoverType type = BeatmapSetCoverType.Cover)
-                : base(set, type)
+            public TestBeatmapSetCover(BeatmapSetInfo set)
+                : base(set)
             {
             }
 
