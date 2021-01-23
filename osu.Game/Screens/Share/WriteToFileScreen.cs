@@ -14,6 +14,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Mvis;
 using osuTK;
 
 namespace osu.Game.Screens.Share
@@ -27,6 +28,9 @@ namespace osu.Game.Screens.Share
         private FillFlowContainer writeSuccessContainer;
         private OsuSpriteText successText;
         private Container baseContainer;
+
+        [Cached]
+        private CustomColourProvider colourProvider = new CustomColourProvider(0, 119, 255);
 
         [Resolved]
         private Storage storage { get; set; }

@@ -21,7 +21,6 @@ namespace osu.Game.Tests.Visual.Mvis
         private void load(GameHost host, AudioManager audio)
         {
             Dependencies.Cache(manager);
-            Dependencies.Cache(new CustomColourProvider(0, 1, 0));
         }
 
         [Test]
