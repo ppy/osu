@@ -8,7 +8,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
     public struct NoteDifficultyData
     {
-        public double PowDifficulty { get; set; }
+        public double PowDifficulty { get; }
         public double CumulativePowDifficulty { get; set; }
         public double Timestamp { get; set; }
         public double PrevTimestamp => Timestamp - DeltaTime;

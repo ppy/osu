@@ -12,7 +12,6 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using MathNet.Numerics.Interpolation;
-using MathNet.Numerics;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
@@ -130,7 +129,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Penalize misses by assessing # of misses relative to the total # of objects.
             if (effectiveMissCount > 0)
-                aimValue *= Math.Pow(1 - Math.Pow((double)effectiveMissCount / totalHits, 0.775), effectiveMissCount);
+                aimValue *= Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), effectiveMissCount);
 
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
@@ -184,7 +183,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Penalize misses by assessing # of misses relative to the total # of objects.
             if (effectiveMissCount > 0)
-                speedValue *= Math.Pow(1 - Math.Pow((double)effectiveMissCount / totalHits, 0.775), effectiveMissCount);
+                speedValue *= Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), effectiveMissCount);
 
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
