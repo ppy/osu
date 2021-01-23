@@ -727,7 +727,7 @@ namespace osu.Game.Screens.Mvis
             if (lockButton.ToggleableValue.Value && overlaysHidden)
                 lockButton.Toggle();
 
-            showOverlays(true);
+            showOverlays(false);
             base.OnHoverLost(e);
         }
 
