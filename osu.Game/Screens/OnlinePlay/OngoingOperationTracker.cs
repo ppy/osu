@@ -52,5 +52,13 @@ namespace osu.Game.Screens.OnlinePlay
             leasedInProgress?.Return();
             leasedInProgress = null;
         }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            // base call does an UnbindAllBindables().
+            // clean up the leased reference here so that it doesn't get returned twice.
+            leasedInProgress = null;
+        }
     }
 }
