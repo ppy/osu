@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
                 for (int i = 0; i < 25; i++)
                 {
-                    var coverType = coverTypes.ElementAt(i);
+                    var coverType = coverTypes.ElementAt(i % coverTypes.Count());
 
                     var cover = new UpdateableBeatmapSetCover(coverType)
                     {
