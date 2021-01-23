@@ -5,7 +5,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
-using osu.Game.Screens.Import;
+using osu.Game.Screens.Select;
+using osu.Game.Screens.Share;
 
 namespace osu.Game.Overlays.Settings.Sections.Debug
 {
@@ -27,13 +28,18 @@ namespace osu.Game.Overlays.Settings.Sections.Debug
                 {
                     LabelText = "绕过front-to-back渲染检查",
                     Current = config.GetBindable<bool>(DebugSetting.BypassFrontToBackPass)
+                },
+                new SettingsButton
+                {
+                    Text = "导出谱面列表",
+                    Action = () => game?.PerformFromScreen(menu => menu.Push(new BeatmapShareSongSelect()))
+                },
+                new SettingsButton
+                {
+                    Text = "导入谱面列表",
+                    Action = () => game?.PerformFromScreen(menu => menu.Push(new ReadFromFileScreen()))
                 }
             };
-            Add(new SettingsButton
-            {
-                Text = "Import files",
-                Action = () => game?.PerformFromScreen(menu => menu.Push(new FileImportScreen()))
-            });
         }
     }
 }
