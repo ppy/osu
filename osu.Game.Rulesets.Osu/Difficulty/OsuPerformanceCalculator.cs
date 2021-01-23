@@ -28,7 +28,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private int countMeh;
         private int countMiss;
 
-        private const double miss_decay = 0.985;
         private const double combo_weight = 0.5;
 
         private double effectiveMissCount;
