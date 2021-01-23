@@ -57,11 +57,15 @@ namespace osu.Game.Tests.Visual.UserInterface
                     }
                 };
 
+#if NET5_0
                 var coverTypes = Enum.GetValues<BeatmapSetCoverType>();
+#else
+                var coverTypes = Enum.GetValues(typeof(BeatmapSetCoverType)).Cast<BeatmapSetCoverType>();
+#endif
 
                 for (int i = 0; i < 25; i++)
                 {
-                    var coverType = coverTypes[i % coverTypes.Length];
+                    var coverType = coverTypes.ElementAt(i);
 
                     var cover = new UpdateableBeatmapSetCover(coverType)
                     {
