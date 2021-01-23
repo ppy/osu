@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
@@ -52,19 +53,21 @@ namespace osu.Game.Screens.Share
         private int apiFailures;
         private int beatmapsIgnored;
         private OsuSpriteText tipText;
+        private Container baseContainer;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            var ex = new[] { ".bl" };
+            var ex = new[] { ".list" };
 
             InternalChildren = new Drawable[]
             {
-                new Container
+                baseContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Width = 0.8f,
                     Height = 0.9f,
+                    Alpha = 0,
                     Masking = true,
                     CornerRadius = 12.5f,
                     Anchor = Anchor.Centre,
@@ -218,7 +221,7 @@ namespace osu.Game.Screens.Share
             try
             {
                 //打开文件流
-                var stream = storage.GetStream(location);
+                var stream = File.Open(location, FileMode.Open, FileAccess.Read);
 
                 //获取所有可用谱面
                 var localBeatmaps = beatmapManager.GetAllUsableBeatmapSets(IncludedDetails.Minimal);
@@ -324,9 +327,19 @@ namespace osu.Game.Screens.Share
             if (clearList) requests.Clear();
         }
 
+        public override void OnEntering(IScreen last)
+        {
+            baseContainer.ScaleTo(0.95f).ScaleTo(1, 300, Easing.OutQuint)
+                         .FadeIn(300);
+
+            base.OnEntering(last);
+        }
+
         public override bool OnExiting(IScreen next)
         {
             cancelAllRequests();
+
+            this.FadeOut(300).ScaleTo(0.95f, 300, Easing.OutQuint);
             return base.OnExiting(next);
         }
 
@@ -346,7 +359,8 @@ namespace osu.Game.Screens.Share
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colours.GreySeafoamDark
+                        Colour = colours.GreySeafoamDark,
+                        Alpha = 0.9f
                     },
                     new FillFlowContainer
                     {
@@ -361,18 +375,28 @@ namespace osu.Game.Screens.Share
                                 Size = new Vector2(50),
                                 Margin = new MarginPadding { Bottom = 10 }
                             },
-                            new OsuSpriteText
+                            new FillFlowContainer
                             {
-                                Text = "处理中",
-                                Font = OsuFont.GetFont(size: 25),
+                                AutoSizeAxes = Axes.Both,
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                            },
-                            new OsuSpriteText
-                            {
-                                Text = "这可能需要一些时间...",
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
+                                Direction = FillDirection.Vertical,
+                                Children = new Drawable[]
+                                {
+                                    new OsuSpriteText
+                                    {
+                                        Text = "处理中",
+                                        Font = OsuFont.GetFont(size: 25),
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                    },
+                                    new OsuSpriteText
+                                    {
+                                        Text = "这可能需要一些时间...",
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                    }
+                                }
                             }
                         }
                     }
@@ -389,6 +413,16 @@ namespace osu.Game.Screens.Share
             {
                 this.FadeOut(300);
             }
+
+            protected override bool OnScroll(ScrollEvent e) => true;
+
+            protected override bool OnMouseMove(MouseMoveEvent e) => true;
+
+            protected override bool OnMouseDown(MouseDownEvent e) => true;
+
+            protected override bool OnClick(ClickEvent e) => true;
+
+            protected override bool OnHover(HoverEvent e) => true;
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -21,10 +22,35 @@ namespace osu.Game.Tests.Visual.Mvis
         [Resolved]
         private BeatmapManager manager { get; set; }
 
+        private APIBeatmapSet dummyBeatmapSet;
+
         [BackgroundDependencyLoader]
         private void load(GameHost host)
         {
             Dependencies.Cache(manager);
+
+            List<BeatmapInfo> info = new List<BeatmapInfo>();
+            List<BeatmapSetInfo> setInfo = new List<BeatmapSetInfo>();
+
+            var normal = CreateBeatmap(Ruleset.Value).BeatmapInfo.BeatmapSet;
+
+            info.Add(normal.Beatmaps.First());
+            setInfo.Add(normal);
+
+            dummyBeatmapSet = new APIBeatmapSet
+            {
+                OnlineBeatmapSetID = RNG.Next(0, 100),
+                Author = new User
+                {
+                    Username = "Author",
+                    Id = 1001,
+                },
+                Beatmaps = info,
+                BeatmapSets = setInfo,
+                Source = "Source",
+                Artist = "Song Artist",
+                Title = "Song Title"
+            };
         }
 
         [SetUp]
@@ -32,38 +58,15 @@ namespace osu.Game.Tests.Visual.Mvis
         {
             dummyAPI.HandleRequest = request =>
             {
-                switch (request)
+                if (request is GetBeatmapSetRequest getBeatmapSetRequest)
                 {
-                    case GetBeatmapSetRequest getBeatmapSetRequest:
-                        List<BeatmapInfo> info = new List<BeatmapInfo>();
-                        List<BeatmapSetInfo> setInfo = new List<BeatmapSetInfo>();
-
-                        var normal = CreateBeatmap(Ruleset.Value).BeatmapInfo.BeatmapSet;
-
-                        info.Add(normal.Beatmaps.First());
-                        setInfo.Add(normal);
-
-                        var set = new APIBeatmapSet
-                        {
-                            OnlineBeatmapSetID = RNG.Next(0, 100),
-                            Author = new User
-                            {
-                                Username = "Author",
-                                Id = 1001,
-                            },
-                            Beatmaps = info,
-                            BeatmapSets = setInfo,
-                            Source = "Source",
-                            Artist = "Song Artist",
-                            Title = "Song Title"
-                        };
-
-                        this.Delay(1500).Schedule(() =>
-                        {
-                            getBeatmapSetRequest.TriggerSuccess(set);
-                        });
-
-                        break;
+                    this.Delay(RNG.Next(0, 3001)).Schedule(() =>
+                    {
+                        if (RNG.Next(0, 11) == 0)
+                            getBeatmapSetRequest.TriggerFailure(new TimeoutException());
+                        else
+                            getBeatmapSetRequest.TriggerSuccess(dummyBeatmapSet);
+                    });
                 }
             };
         });

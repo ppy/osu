@@ -161,7 +161,7 @@ namespace osu.Game.Screens.Share
 
             writeRunning = true;
 
-            string fileName = sender.Text + ".bl";
+            string fileName = sender.Text + ".list";
 
             try
             {
@@ -201,13 +201,15 @@ namespace osu.Game.Screens.Share
 
         public override void OnEntering(IScreen last)
         {
-            baseContainer.FadeIn(300);
+            baseContainer.ScaleTo(0.95f).ScaleTo(1, 300, Easing.OutQuint)
+                         .FadeIn(300);
+
             base.OnEntering(last);
         }
 
         public override bool OnExiting(IScreen next)
         {
-            this.FadeOut(300).ScaleTo(0.9f, 300, Easing.OutQuint);
+            this.FadeOut(300).ScaleTo(0.95f, 300, Easing.OutQuint);
             return base.OnExiting(next);
         }
     }
