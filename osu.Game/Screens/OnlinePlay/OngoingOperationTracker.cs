@@ -49,10 +49,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         private void endOperation()
         {
-            if (leasedInProgress == null)
-                throw new InvalidOperationException("Cannot end operation multiple times.");
-
-            leasedInProgress.Return();
+            leasedInProgress?.Return();
             leasedInProgress = null;
         }
     }
