@@ -148,12 +148,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
 
             State.Value = StoryboardState.Loading;
 
-            Task.Run(async () =>
-            {
-                var task = Task.Run(() => prepareStoryboard(targetBeatmap));
-
-                await task;
-            });
+            Task.Run(() => prepareStoryboard(targetBeatmap));
         }
 
         protected override void Dispose(bool isDisposing)
