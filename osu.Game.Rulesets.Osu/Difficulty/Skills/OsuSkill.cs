@@ -12,19 +12,19 @@ using MathNet.Numerics.RootFinding;
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
     /// <summary>
-    /// Used to processes strain values of <see cref="DifficultyHitObject"/>s, keep track of strain levels caused by the processed objects
+    /// Used to process strain values of <see cref="DifficultyHitObject"/>s, keep track of strain levels caused by the processed objects
     /// and to calculate a final difficulty value representing the difficulty of hitting all the processed objects.
     /// </summary>
     public abstract class OsuSkill : Skill
     {
         /// <summary>
-        /// Strain time is assigned to a note for the minimum of it's duration and this value.
+        /// The maximum allowable strain time for a single note.
         /// </summary>
         protected virtual double MaxStrainTime => 200;
 
         /// <summary>
-        /// Repeating a section multiplies difficulty by this factor
-        /// Increasing this number increases the impact of map length and decreases the impact of difficulty spikes on SR.
+        /// Repeating a section one time multiplies difficulty by this factor.
+        /// Increasing this number increases the impact of map length and decreases the impact of difficulty spikes on star rating.
         /// </summary>
         protected virtual double DifficultyMultiplierPerRepeat => 1.0677;
 
@@ -32,37 +32,47 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         /// <summary>
         /// Constant difficulty sections of this length match old difficulty values.
-        /// Decreasing this value increases star rating of all maps equally
+        /// Decreasing this value increases star rating of all maps equally.
         /// </summary>
-        protected virtual double DifficultyBaseTime => (8.0 * 1000.0);
+        protected virtual double DifficultyBaseTime => 8.0 * 1000.0;
 
         /// <summary>
-        /// Final star rating is player skill level who can FC the map once per this amount of time (in ms).
+        /// The final star rating is supposed to be based on the skill level of a player who can FC the map once
+        /// in this amount of time (in milliseconds).
         /// Decrease this number to give longer maps more PP.
         /// </summary>
         private const double target_retry_time_before_fc = 3.5 * 60 * 60 * 1000;
 
         /// <summary>
-        /// Minimum precision for time spent for a player to full combo the map, though typically will be around 5x more precise.
+        /// Minimum allowable precision for the computation of the expected time spent before a player completes a full combo of the map.
         /// </summary>
-        private const double target_fc_precision = 0.05; // current setting of 0.05 usually takes 2 iterations, gives around 4dp for star ratings
+        /// <remarks>
+        /// Typically will be around 5x more precise.
+        /// Current setting of 0.05 usually takes 2 iterations and gives around 4 digits of precision for star ratings.
+        /// </remarks>
+        private const double target_fc_precision = 0.05;
+
+        /// <summary>
+        /// Maximum number of iterations allowed when estimating the full combo probability of a section.
+        /// </summary>
+        private const int max_fc_estimation_iterations = 5;
 
         /// <summary>
         /// Maps with this expected length will match legacy PP values.
-        /// Decrease this value to increase PP For all maps equally
+        /// Decrease this value to increase PP for all maps equally.
         /// </summary>
         private const double target_fc_base_time = 33 * 1000;
 
         /// <summary>
-        /// Time taken to retry and get to the beginning of a map.
+        /// Approximated amount of time needed to retry and get to the beginning of a map (in milliseconds).
         /// Increasing adds more weight to the first few notes of a map when calculating expected time to FC.
         /// </summary>
         private const double map_retry_time = 3 * 1000;
 
         /// <summary>
-        /// Multiplier used to preserve star rating for maps with length <see cref="target_fc_base_time"/>
+        /// Multiplier used to preserve star rating for maps with length of <see cref="target_fc_base_time"/>.
         /// </summary>
-        private double targetFcDifficultyMultiplier => 1 / skillLevel(target_fc_base_time / target_retry_time_before_fc, 1);
+        private double fullComboDifficultyMultiplier => 1 / skillLevel(target_fc_base_time / target_retry_time_before_fc, 1);
 
         /// <summary>
         /// Size of lists used to interpolate combo difficulty value and miss count difficulty value for performance calculations.
@@ -71,26 +81,45 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private readonly List<NoteDifficultyData> noteDifficulties = new List<NoteDifficultyData>();
 
-        private double totalPowDifficulty;
-        private double currentStrain = 1; // We keep track of the strain level at all times throughout the beatmap.
+        /// <summary>
+        /// The current total exponential difficulty of the map.
+        /// </summary>
+        private double currentTotalExponentialDifficulty;
 
-        public static readonly double[] MISS_STAR_RATING_MULTIPLIERS =
-            Enumerable.Range(0, difficulty_count)
-                      .Select(i => 1 - Math.Pow(i, 1.1) * 0.005)
-                      .ToArray();
+        /// <summary>
+        /// The current strain level.
+        /// </summary>
+        private double currentStrain = 1;
 
         public static readonly double[] COMBO_PERCENTAGES =
             Enumerable.Range(1, difficulty_count)
                       .Select(i => i / (double)difficulty_count)
                       .ToArray();
 
-        public double[] MissCounts { get; private set; }
+        /// <summary>
+        /// Contains a list of star rating values that indicate how hard it is to full combo the easiest X% of the map,
+        /// where values of X are taken from <see cref="COMBO_PERCENTAGES"/>.
+        /// </summary>
         public double[] ComboStarRatings { get; private set; }
+
+        public static readonly double[] MISS_STAR_RATING_MULTIPLIERS =
+            Enumerable.Range(0, difficulty_count)
+                      .Select(i => 1 - Math.Pow(i, 1.1) * 0.005)
+                      .ToArray();
+
+        /// <summary>
+        /// Contains the expected numbers of misses from players whose skill level allows them to FC maps
+        /// that are <see cref="MISS_STAR_RATING_MULTIPLIERS"/> times as hard as the FC of the currently considered map.
+        /// </summary>
+        public double[] MissCounts { get; private set; }
+
+        /// <summary>
+        /// The total difficulty of the map in terms of this skill.
+        /// </summary>
         public double Difficulty { get; private set; }
 
         /// <summary>
         /// Process a <see cref="DifficultyHitObject"/> and update current strain values.
-        /// Also calculates hit probability function for this note and adds to list
         /// </summary>
         public override void Process(DifficultyHitObject current)
         {
@@ -103,47 +132,47 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         }
 
         /// <summary>
-        /// Perform difficulty calculations
+        /// Complete calculations of the difficulty with regard to this skill.
         /// </summary>
         public override void Calculate()
         {
-            Difficulty = Math.Pow(totalPowDifficulty, 1 / difficultyExponent);
+            Difficulty = Math.Pow(currentTotalExponentialDifficulty, 1 / difficultyExponent);
 
-            ComboStarRatings = calculateSkillToFcSubsets();
+            ComboStarRatings = calculateMinimumStarRatingsForSections();
             MissCounts = calculateMissCounts(ComboStarRatings.Last());
         }
 
         private double strainDecay(double ms) => Math.Pow(StrainDecayBase, ms / 1000);
 
         /// <summary>
-        /// Get skill to fc easiest section with e.g. 5% combo, 10%, 15%, ... 100% combo.
+        /// Returns the expected star ratings of the easiest N sections of the map, where N is in range [1, <see cref="difficulty_count"/>].
+        /// The returned value corresponds directly to <see cref="ComboStarRatings"/>.
         /// </summary>
-        private double[] calculateSkillToFcSubsets()
+        private double[] calculateMinimumStarRatingsForSections()
         {
-            return Enumerable.Range(1, difficulty_count).Select(i => targetFcDifficultyMultiplier * SkillToFcSectionCountInGivenTime(i)).ToArray();
+            return Enumerable.Range(1, difficulty_count)
+                             .Select(i => fullComboDifficultyMultiplier * requiredSkillToFullComboEasiestSubmap(i)).ToArray();
         }
 
         /// <summary>
-        /// Calculate miss count for a list of star ratings (used to evaluate miss count of plays).
+        /// Estimates the number of misses expected from players that can FC maps <see cref="MISS_STAR_RATING_MULTIPLIERS"/> as hard as the current one.
+        /// The returned value corresponds directly to <see cref="MissCounts"/>.
         /// </summary>
-        private double[] calculateMissCounts(double fcDifficulty)
+        /// <param name="fullComboDifficulty">The star difficulty of a full combo on the current map.</param>
+        private double[] calculateMissCounts(double fullComboDifficulty)
         {
             var result = new double[difficulty_count];
 
-            double fcSkill = fcDifficulty / targetFcDifficultyMultiplier;
-
-            double fcProb = fcProbability(fcSkill, fcDifficulty);
+            double fcSkill = fullComboDifficulty / fullComboDifficultyMultiplier;
+            double fcProb = fcProbability(fcSkill, fullComboDifficulty);
 
             for (int i = 0; i < difficulty_count; ++i)
             {
-                double missDifficulty = fcDifficulty * MISS_STAR_RATING_MULTIPLIERS[i];
+                double missDifficulty = fullComboDifficulty * MISS_STAR_RATING_MULTIPLIERS[i];
+                double missSkill = missDifficulty / fullComboDifficultyMultiplier;
 
-                // skill is the same skill who can FC a missStars map with same length as this one in target_retry_time_until_fc
-                double skill = missDifficulty / targetFcDifficultyMultiplier;
-
-                double[] missProbs = getMissProbabilities(skill);
-
-                result[i] = getMissCount(fcProb, missProbs);
+                double[] missProbabilities = getMissProbabilities(missSkill);
+                result[i] = getMissCount(fcProb, missProbabilities);
             }
 
             return result;
@@ -152,6 +181,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// <summary>
         /// Calculate the probability of missing each note given a skill level.
         /// </summary>
+        /// <param name="skill">The skill level of the playing user.</param>
         private double[] getMissProbabilities(double skill)
         {
             var result = new double[noteDifficulties.Count];
@@ -160,7 +190,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             for (int i = 0; i < noteDifficulties.Count; ++i)
             {
-                result[i] = 1 - fcProbFromPow(powSkill, noteDifficulties[i].PowDifficulty);
+                result[i] = 1 - fcProbabilityPrecomputed(powSkill, noteDifficulties[i].PowDifficulty);
             }
 
             return result;
@@ -177,28 +207,41 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         }
 
         /// <summary>
-        /// The probability a player of the given skill full combos a map of the given difficulty
+        /// The probability a player of the given skill full combos a map of the given difficulty.
         /// </summary>
+        /// <param name="skill">The skill level of the player.</param>
+        /// <param name="difficulty">The difficulty of a range of notes.</param>
         private double fcProbability(double skill, double difficulty) => Math.Exp(-Math.Pow(difficulty / Math.Max(1e-10, skill), difficultyExponent));
 
         /// <summary>
-        /// Returns the same result as <see cref="fcProbability"/> with some values precomputed for efficiency
+        /// Returns the same result as <see cref="fcProbability"/> with some values precomputed for efficiency.
         /// </summary>
-        /// <param name="powSkill">Skill of the player transformed with Math.Pow(skill, -k)</param>
-        /// <param name="powDifficulty">Difficulty of a map/note/section transformed with Math.Pow(difficulty, k)</param>
-        private double fcProbFromPow(double powSkill, double powDifficulty) => Math.Exp(-powSkill * powDifficulty);
+        /// <param name="powSkill">The skill level of the player, raised to negative-<see cref="difficultyExponent"/>-th power.</param>
+        /// <param name="powDifficulty">The difficulty of a range of notes, raised to the <see cref="difficultyExponent"/>-th power.</param>
+        private double fcProbabilityPrecomputed(double powSkill, double powDifficulty) => Math.Exp(-powDifficulty * powSkill);
 
         /// <summary>
-        /// Player skill level that passes a map of the given difficulty with the given probability
+        /// Approximates the skill level of a player that can FC a map with the given <paramref name="difficulty"/>,
+        /// if their probability of success in doing so is equal to <paramref name="probability"/>.
         /// </summary>
         private double skillLevel(double probability, double difficulty) => difficulty * Math.Pow(-Math.Log(probability), -1 / difficultyExponent);
 
-        private double difficultyForSubmap(NoteDifficultyData first, NoteDifficultyData last)
+        /// <summary>
+        /// Calculates the difficulty of a map section starting with <paramref name="first"/>, and ending with <paramref name="last"/>.
+        /// </summary>
+        /// <param name="first">The first note of the section.</param>
+        /// <param name="last">The last note of the section.</param>
+        private double mapSectionDifficulty(NoteDifficultyData first, NoteDifficultyData last)
         {
-            return Math.Pow(powDifficultyForSubmap(first, last), 1 / difficultyExponent);
+            return Math.Pow(exponentialMapSectionDifficulty(first, last), 1 / difficultyExponent);
         }
 
-        private double powDifficultyForSubmap(NoteDifficultyData first, NoteDifficultyData last)
+        /// <summary>
+        /// Calculates the exponential difficulty of a map section starting with <paramref name="first"/>, and ending with <paramref name="last"/>.
+        /// </summary>
+        /// <param name="first">The first note of the section.</param>
+        /// <param name="last">The last note of the section.</param>
+        private double exponentialMapSectionDifficulty(NoteDifficultyData first, NoteDifficultyData last)
         {
             return last.CumulativePowDifficulty - first.CumulativePowDifficulty + first.PowDifficulty;
         }
@@ -206,7 +249,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private void addStrain(DifficultyHitObject hitObject, double strain)
         {
             double strainDurationScale = Math.Min(MaxStrainTime, hitObject.DeltaTime) / DifficultyBaseTime;
-            noteDifficulties.Add(new NoteDifficultyData(hitObject, strain, strainDurationScale, difficultyExponent, ref totalPowDifficulty));
+            noteDifficulties.Add(new NoteDifficultyData(hitObject, strain, strainDurationScale, difficultyExponent, ref currentTotalExponentialDifficulty));
 
             // add zero difficulty notes corresponding to slider ticks/slider ends so combo is reflected properly
             // (slider difficulty is currently handled in the following note)
@@ -214,33 +257,41 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             for (int i = 0; i < extraNestedCount; ++i)
             {
-                noteDifficulties.Add(NoteDifficultyData.SliderTick(hitObject, totalPowDifficulty));
+                noteDifficulties.Add(NoteDifficultyData.SliderTick(hitObject, currentTotalExponentialDifficulty));
             }
         }
 
-        public double SkillToFcSectionCountInGivenTime(int sectionCount)
+        /// <summary>
+        /// Estimates the skill required to FC the easiest submap.
+        /// A submap is defined as the easiest <paramref name="sectionCount"/> consecutive sections of the map.
+        /// </summary>
+        private double requiredSkillToFullComboEasiestSubmap(int sectionCount)
         {
             double skill = estimateSkillForEasiestSubmap(sectionCount);
 
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < max_fc_estimation_iterations; i++)
             {
-                var performaceData = getPerformanceDataForEasiestSubmap(skill, sectionCount);
+                var performanceData = getPerformanceDataForEasiestSubmap(skill, sectionCount);
 
-                if (Math.Abs(performaceData.ExpectedTimeUntilFullCombo - target_retry_time_before_fc) / target_retry_time_before_fc < target_fc_precision)
+                if (Math.Abs(performanceData.ExpectedTimeUntilFullCombo - target_retry_time_before_fc) / target_retry_time_before_fc < target_fc_precision)
                 {
                     // enough precision already
                     break;
                 }
 
-                double averageLength = performaceData.ExpectedTimeUntilFullCombo * performaceData.FullComboProbability;
+                double averageLength = performanceData.ExpectedTimeUntilFullCombo * performanceData.FullComboProbability;
                 double newFcProb = averageLength / target_retry_time_before_fc;
 
-                skill = skillLevel(newFcProb, Math.Pow(performaceData.ExponentialDifficulty, 1 / difficultyExponent));
+                skill = skillLevel(newFcProb, Math.Pow(performanceData.ExponentialDifficulty, 1 / difficultyExponent));
             }
 
             return skill;
         }
 
+        /// <summary>
+        /// Returns performance data for a player with the given <paramref name="skill"/>
+        /// playing the easiest submap of length <paramref name="sectionCount"/>.
+        /// </summary>
         private MapSectionPerformanceData getPerformanceDataForEasiestSubmap(double skill, int sectionCount)
         {
             var sectionData = getPerformanceDataForSections(skill);
@@ -272,7 +323,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 var last = noteDifficulties[sectionEndIndex];
 
                 double averagePlayTimeEstimate = (last.Timestamp - first.PrevTimestamp) * 0.3;
-                double difficulty = difficultyForSubmap(first, last);
+                double difficulty = mapSectionDifficulty(first, last);
 
                 double fcProb = averagePlayTimeEstimate / target_retry_time_before_fc;
 
@@ -300,10 +351,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// <summary>
         /// Calculate the average time a player with the given skill will take to Full Combo the given section of a map.
         /// </summary>
+        /// <param name="skill">The skill level of the player.</param>
+        /// <param name="first">Index of the first object in the section.</param>
+        /// <param name="last">Index of the last object in the section.</param>
         private MapSectionPerformanceData getPerformanceDataForSection(double skill, int first, int last)
         {
             double powSkill = Math.Pow(skill, -difficultyExponent);
-            double powDifficulty = powDifficultyForSubmap(noteDifficulties[first], noteDifficulties[last]);
+            double powDifficulty = exponentialMapSectionDifficulty(noteDifficulties[first], noteDifficulties[last]);
 
             var result = new MapSectionPerformanceData
             {
@@ -311,13 +365,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 EndTime = noteDifficulties[last].Timestamp,
                 ExpectedTimeUntilFullCombo = 0,
                 ExponentialDifficulty = powDifficulty,
-                FullComboProbability = fcProbFromPow(powSkill, powDifficulty)
+                FullComboProbability = fcProbabilityPrecomputed(powSkill, powDifficulty)
             };
 
             for (int i = first; i <= last; ++i)
             {
                 var note = noteDifficulties[i];
-                double hitProbability = fcProbFromPow(powSkill, note.PowDifficulty) + 1e-10;
+                double hitProbability = fcProbabilityPrecomputed(powSkill, note.PowDifficulty) + 1e-10;
                 result.ExpectedTimeUntilFullCombo = (result.ExpectedTimeUntilFullCombo + note.DeltaTime) / hitProbability;
             }
 
