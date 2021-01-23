@@ -190,7 +190,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             for (int i = 0; i < noteDifficulties.Count; ++i)
             {
-                result[i] = 1 - fcProbabilityPrecomputed(powSkill, noteDifficulties[i].PowDifficulty);
+                result[i] = 1 - fcProbabilityPrecomputed(powSkill, noteDifficulties[i].ExponentiatedDifficulty);
             }
 
             return result;
@@ -243,7 +243,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// <param name="last">The last note of the section.</param>
         private double exponentialMapSectionDifficulty(NoteDifficultyData first, NoteDifficultyData last)
         {
-            return last.CumulativePowDifficulty - first.CumulativePowDifficulty + first.PowDifficulty;
+            return last.TotalExponentiatedDifficulty - first.TotalExponentiatedDifficulty + first.ExponentiatedDifficulty;
         }
 
         private void addStrain(DifficultyHitObject hitObject, double strain)
@@ -282,7 +282,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 double averageLength = performanceData.ExpectedTimeUntilFullCombo * performanceData.FullComboProbability;
                 double newFcProb = averageLength / target_retry_time_before_fc;
 
-                skill = skillLevel(newFcProb, Math.Pow(performanceData.ExponentialDifficulty, 1 / difficultyExponent));
+                skill = skillLevel(newFcProb, Math.Pow(performanceData.ExponentiatedDifficulty, 1 / difficultyExponent));
             }
 
             return skill;
@@ -322,7 +322,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 var first = noteDifficulties[sectionStartIndex];
                 var last = noteDifficulties[sectionEndIndex];
 
-                double averagePlayTimeEstimate = (last.Timestamp - first.PrevTimestamp) * 0.3;
+                double averagePlayTimeEstimate = (last.StartTime - first.PreviousStartTime) * 0.3;
                 double difficulty = mapSectionDifficulty(first, last);
 
                 double fcProb = averagePlayTimeEstimate / target_retry_time_before_fc;
@@ -361,17 +361,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             var result = new MapSectionPerformanceData
             {
-                StartTime = noteDifficulties[first].PrevTimestamp,
-                EndTime = noteDifficulties[last].Timestamp,
+                StartTime = noteDifficulties[first].PreviousStartTime,
+                EndTime = noteDifficulties[last].StartTime,
                 ExpectedTimeUntilFullCombo = 0,
-                ExponentialDifficulty = powDifficulty,
+                ExponentiatedDifficulty = powDifficulty,
                 FullComboProbability = fcProbabilityPrecomputed(powSkill, powDifficulty)
             };
 
             for (int i = first; i <= last; ++i)
             {
                 var note = noteDifficulties[i];
-                double hitProbability = fcProbabilityPrecomputed(powSkill, note.PowDifficulty) + 1e-10;
+                double hitProbability = fcProbabilityPrecomputed(powSkill, note.ExponentiatedDifficulty) + 1e-10;
                 result.ExpectedTimeUntilFullCombo = (result.ExpectedTimeUntilFullCombo + note.DeltaTime) / hitProbability;
             }
 
@@ -402,7 +402,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 result.ExpectedTimeUntilFullCombo /= sectionData[i].FullComboProbability;
                 result.ExpectedTimeUntilFullCombo += sectionData[i].ExpectedTimeUntilFullCombo;
                 result.FullComboProbability *= sectionData[i].FullComboProbability;
-                result.ExponentialDifficulty += sectionData[i].ExponentialDifficulty;
+                result.ExponentiatedDifficulty += sectionData[i].ExponentiatedDifficulty;
             }
 
             return result;

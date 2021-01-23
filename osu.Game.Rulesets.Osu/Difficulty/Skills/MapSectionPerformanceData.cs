@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// <summary>
         /// The exponentiated difficulty value of this particular section.
         /// </summary>
-        public double ExponentialDifficulty { get; set; }
+        public double ExponentiatedDifficulty { get; set; }
 
         /// <summary>
         /// The start time of the section.
