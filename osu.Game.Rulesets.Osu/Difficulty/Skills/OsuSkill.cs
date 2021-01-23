@@ -246,7 +246,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             var sectionData = getPerformanceDataForSections(skill);
             var easiestSectionPerformanceData = new MapSectionPerformanceData
             {
-                ExpectedTimeUntilFullCombo = Double.PositiveInfinity,
+                ExpectedTimeUntilFullCombo = double.PositiveInfinity,
             };
 
             for (int i = 0; i <= sectionData.Length - sectionCount; i++)
@@ -261,7 +261,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double estimateSkillForEasiestSubmap(int sectionCount)
         {
-            double skill = Double.PositiveInfinity;
+            double skill = double.PositiveInfinity;
 
             for (int i = 0; i <= difficulty_count - sectionCount; i++)
             {
