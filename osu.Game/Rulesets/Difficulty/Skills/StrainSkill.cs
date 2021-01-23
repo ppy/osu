@@ -65,6 +65,11 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 Previous.Dequeue();
         }
 
+        protected override void AddToHistory(DifficultyHitObject current)
+        {
+            Previous.Enqueue(current);
+        }
+
         protected sealed override void Calculate(DifficultyHitObject current)
         {
             // The first object doesn't generate a strain, so we begin with an incremented section end

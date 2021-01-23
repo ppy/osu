@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             Calculate(current);
 
             // Postprocessing
-            Previous.Enqueue(current);
+            AddToHistory(current);
         }
 
         /// <summary>
@@ -60,8 +60,14 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <param name="current">The <see cref="DifficultyHitObject"/> to be processed.</param>
         protected virtual void RemoveExtraneousHistory(DifficultyHitObject current)
         {
-            // Default implementation to not retain objects
-            Previous.Clear();
+        }
+
+        /// <summary>
+        /// Add the current <see cref="DifficultyHitObject"/> to the <see cref="Previous"/> queue (if required).
+        /// </summary>
+        /// <param name="current">The <see cref="DifficultyHitObject"/> that was just processed.</param>
+        protected virtual void AddToHistory(DifficultyHitObject current)
+        {
         }
 
         /// <summary>
