@@ -44,7 +44,7 @@ namespace osu.Game.Screens.OnlinePlay
             leasedInProgress.Value = true;
 
             // for extra safety, marshal the end of operation back to the update thread if necessary.
-            return new InvokeOnDisposal(() => Scheduler.Add(endOperation, false));
+            return new OngoingOperation(() => Scheduler.Add(endOperation, false));
         }
 
         private void endOperation()
@@ -59,6 +59,27 @@ namespace osu.Game.Screens.OnlinePlay
             // base call does an UnbindAllBindables().
             // clean up the leased reference here so that it doesn't get returned twice.
             leasedInProgress = null;
+        }
+
+        private class OngoingOperation : InvokeOnDisposal
+        {
+            private bool isDisposed;
+
+            public OngoingOperation(Action action)
+                : base(action)
+            {
+            }
+
+            public override void Dispose()
+            {
+                // base class does not check disposal state for performance reasons which aren't relevant here.
+                // track locally, to avoid interfering with other operations in case of a potential double-disposal.
+                if (isDisposed)
+                    return;
+
+                base.Dispose();
+                isDisposed = true;
+            }
         }
     }
 }
