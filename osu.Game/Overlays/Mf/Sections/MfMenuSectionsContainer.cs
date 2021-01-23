@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.Mf.Sections
             RelativeSizeAxes = Axes.Both;
         }
 
-        protected override OsuScrollContainer CreateScrollContainer() => new OverlayScrollContainer();
+        protected override UserTrackingScrollContainer CreateScrollContainer() => new OverlayScrollContainer();
 
         protected override FlowContainer<MfMenuSection> CreateScrollContentContainer() => new FillFlowContainer<MfMenuSection>
         {

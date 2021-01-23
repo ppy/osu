@@ -192,13 +192,13 @@ namespace osu.Game.Overlays.Chat
                     }
                 }
             };
-
-            updateMessageContent();
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            updateMessageContent();
             FinishTransforms(true);
         }
 

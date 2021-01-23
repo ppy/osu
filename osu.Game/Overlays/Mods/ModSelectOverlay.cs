@@ -30,6 +30,7 @@ namespace osu.Game.Overlays.Mods
 {
     public class ModSelectOverlay : WaveOverlayContainer
     {
+        private readonly Func<Mod, bool> isValidMod;
         public const float HEIGHT = 510;
 
         protected readonly TriangleButton DeselectAllButton;
@@ -60,8 +61,10 @@ namespace osu.Game.Overlays.Mods
 
         private SampleChannel sampleOn, sampleOff;
 
-        public ModSelectOverlay()
+        public ModSelectOverlay(Func<Mod, bool> isValidMod = null)
         {
+            this.isValidMod = isValidMod ?? (m => true);
+
             Waves.FirstWaveColour = Color4Extensions.FromHex(@"19b0e2");
             Waves.SecondWaveColour = Color4Extensions.FromHex(@"2280a2");
             Waves.ThirdWaveColour = Color4Extensions.FromHex(@"005774");
@@ -403,7 +406,7 @@ namespace osu.Game.Overlays.Mods
             if (mods.NewValue == null) return;
 
             foreach (var section in ModSectionsContainer.Children)
-                section.Mods = mods.NewValue[section.ModType];
+                section.Mods = mods.NewValue[section.ModType].Where(isValidMod);
         }
 
         private void selectedModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)

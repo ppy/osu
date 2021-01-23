@@ -126,6 +126,9 @@ namespace osu.Game.Users
         [JsonProperty(@"follower_count")]
         public int FollowerCount;
 
+        [JsonProperty(@"mapping_follower_count")]
+        public int MappingFollowerCount;
+
         [JsonProperty(@"favourite_beatmapset_count")]
         public int FavouriteBeatmapsetCount;
 
