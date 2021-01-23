@@ -173,7 +173,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             var distribution = new PoissonBinomial(missProbabilities);
 
-            return Brent.FindRootExpand(missCount => distribution.Cdf(missCount) - p, 0, 20, 1e-4);
+            return Brent.FindRootExpand(missCount => distribution.CDF(missCount) - p, 0, 20, 1e-4);
         }
 
         /// <summary>
