@@ -19,6 +19,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Rulesets;
 using osuTK;
@@ -29,7 +30,7 @@ namespace osu.Game.Screens.Share
     {
         private FileSelector selector;
         private FillFlowContainer fillFlow;
-        private LoadingLayer loading;
+        private LoadingIndicator loading;
         private OsuScrollContainer scroll;
 
         [Resolved]
@@ -114,7 +115,7 @@ namespace osu.Game.Screens.Share
                                                     Margin = new MarginPadding { Vertical = 15 },
                                                 }
                                             },
-                                            loading = new LoadingLayer(true)
+                                            loading = new LoadingIndicator()
                                         }
                                     }
                                 },
@@ -142,6 +143,7 @@ namespace osu.Game.Screens.Share
                                                 Width = 0.9f,
                                                 Action = () =>
                                                 {
+                                                    cancelAllRequests(true);
                                                     tipText.Text = string.Empty;
                                                     selector.CurrentFile.Value = null;
                                                     showSelector();
@@ -259,33 +261,15 @@ namespace osu.Game.Screens.Share
                     requests.Add(req);
 
                     //当请求成功后：
-                    req.Success += res => Schedule(() =>
-                    {
-                        //从列表中移除该请求
-                        requests.Remove(req);
+                    req.Success += onRequestSuccess;
 
-                        //创建(BeatmapSetInfo)onlineBeatmap
-                        //调用APIBeatmapSet为其赋值
-                        var onlineBeatmap = res.ToBeatmapSet(rulesets);
-
-                        //向fillFlow添加面板
-                        fillFlow.Add(new GridBeatmapPanel(onlineBeatmap)
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre
-                        });
-                    });
+                    req.Success += _ => requests.Remove(req);
 
                     //请求失败时同样从列表中移除，并增加apiFailures计数
-                    req.Failure += _ =>
-                    {
-                        requests.Remove(req);
-                        apiFailures++;
+                    //bug: 在调用req.Cancel()后仍然能触发req.Success
+                    req.Failure += _ => requests.Remove(req);
 
-                        //设置提示文字
-                        //todo: 找个更好的设置文字而不是在api完成或失败时更新
-                        tipText.Text = $"API请求失败了{apiFailures}次，忽略了{beatmapsIgnored}个已有谱面";
-                    };
+                    req.Failure += onRequestFail;
 
                     api.Queue(req);
                 }
@@ -297,13 +281,43 @@ namespace osu.Game.Screens.Share
                 Logger.Error(e, "尝试读取并列出谱面时发生了错误");
                 cancelAllRequests();
                 showSelector();
+                selector.CurrentFile.Value = null;
             }
+        }
+
+        private void onRequestSuccess(APIBeatmapSet res)
+        {
+            Schedule(() =>
+            {
+                //创建(BeatmapSetInfo)onlineBeatmap
+                //调用APIBeatmapSet为其赋值
+                var onlineBeatmap = res.ToBeatmapSet(rulesets);
+
+                //向fillFlow添加面板
+                fillFlow.Add(new GridBeatmapPanel(onlineBeatmap)
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre
+                });
+            });
+        }
+
+        private void onRequestFail(Exception e)
+        {
+            apiFailures++;
+
+            //设置提示文字
+            tipText.Text = $"API请求失败了{apiFailures}次，忽略了{beatmapsIgnored}个已有谱面";
         }
 
         private void cancelAllRequests(bool clearList = false)
         {
             foreach (var req in requests)
             {
+                //fix: 请求失败后仍然可以触发Success和Failure内容
+                req.Failure -= onRequestFail;
+                req.Success -= onRequestSuccess;
+
                 req.Cancel();
             }
 
@@ -314,6 +328,67 @@ namespace osu.Game.Screens.Share
         {
             cancelAllRequests();
             return base.OnExiting(next);
+        }
+
+        private class LoadingIndicator : VisibilityContainer
+        {
+            private LoadingSpinner spinner;
+
+            [Resolved]
+            private OsuColour colours { get; set; }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                RelativeSizeAxes = Axes.Both;
+                Children = new Drawable[]
+                {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = colours.GreySeafoamDark
+                    },
+                    new FillFlowContainer
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Vertical,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Children = new Drawable[]
+                        {
+                            spinner = new LoadingSpinner
+                            {
+                                Size = new Vector2(50),
+                                Margin = new MarginPadding { Bottom = 10 }
+                            },
+                            new OsuSpriteText
+                            {
+                                Text = "处理中",
+                                Font = OsuFont.GetFont(size: 25),
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                            },
+                            new OsuSpriteText
+                            {
+                                Text = "这可能需要一些时间...",
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                            }
+                        }
+                    }
+                };
+                spinner.Show();
+            }
+
+            protected override void PopIn()
+            {
+                this.FadeIn(300);
+            }
+
+            protected override void PopOut()
+            {
+                this.FadeOut(300);
+            }
         }
     }
 }

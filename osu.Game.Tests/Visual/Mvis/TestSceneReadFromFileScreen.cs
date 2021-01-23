@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -56,7 +57,12 @@ namespace osu.Game.Tests.Visual.Mvis
                             Artist = "Song Artist",
                             Title = "Song Title"
                         };
-                        getBeatmapSetRequest.TriggerSuccess(set);
+
+                        this.Delay(1500).Schedule(() =>
+                        {
+                            getBeatmapSetRequest.TriggerSuccess(set);
+                        });
+
                         break;
                 }
             };

@@ -5,12 +5,16 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osuTK;
 
 namespace osu.Game.Screens.Share
 {
@@ -19,6 +23,10 @@ namespace osu.Game.Screens.Share
         public BindableList<BeatmapSetInfo> SelectedBeatmapSets = new BindableList<BeatmapSetInfo>();
         private OsuTextBox textBox;
         private bool writeRunning;
+        private GridContainer grid;
+        private FillFlowContainer writeSuccessContainer;
+        private OsuSpriteText successText;
+        private Container baseContainer;
 
         [Resolved]
         private Storage storage { get; set; }
@@ -32,7 +40,7 @@ namespace osu.Game.Screens.Share
             ShareBeatmapDetailArea.DrawableBeatmapList list;
             InternalChildren = new Drawable[]
             {
-                new Container
+                baseContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Width = 0.8f,
@@ -41,6 +49,7 @@ namespace osu.Game.Screens.Share
                     CornerRadius = 12.5f,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    Alpha = 0,
                     Children = new Drawable[]
                     {
                         new Box
@@ -48,16 +57,44 @@ namespace osu.Game.Screens.Share
                             RelativeSizeAxes = Axes.Both,
                             Colour = colours.GreySeafoamDark
                         },
-                        new GridContainer
+                        grid = new GridContainer
                         {
                             RelativeSizeAxes = Axes.Both,
                             RowDimensions = new[]
                             {
+                                new Dimension(GridSizeMode.AutoSize),
                                 new Dimension(),
                                 new Dimension(GridSizeMode.AutoSize)
                             },
                             Content = new[]
                             {
+                                new Drawable[]
+                                {
+                                    new FillFlowContainer
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Direction = FillDirection.Vertical,
+                                        Padding = new MarginPadding { Vertical = 22 },
+                                        Children = new Drawable[]
+                                        {
+                                            new OsuSpriteText
+                                            {
+                                                Text = "确认一下...",
+                                                Font = OsuFont.GetFont(size: 40),
+                                                Anchor = Anchor.TopCentre,
+                                                Origin = Anchor.TopCentre
+                                            },
+                                            new OsuSpriteText
+                                            {
+                                                Text = "即将根据下面的这些谱面创建列表",
+                                                Font = OsuFont.GetFont(size: 20),
+                                                Anchor = Anchor.TopCentre,
+                                                Origin = Anchor.TopCentre
+                                            }
+                                        }
+                                    },
+                                },
                                 new Drawable[]
                                 {
                                     list = new ShareBeatmapDetailArea.DrawableBeatmapList
@@ -84,6 +121,32 @@ namespace osu.Game.Screens.Share
                                 }
                             }
                         },
+                        writeSuccessContainer = new FillFlowContainer
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Alpha = 0,
+                            AutoSizeAxes = Axes.Both,
+                            Spacing = new Vector2(10),
+                            Direction = FillDirection.Vertical,
+                            Children = new Drawable[]
+                            {
+                                new SpriteIcon
+                                {
+                                    Icon = FontAwesome.Solid.CheckCircle,
+                                    Size = new Vector2(50),
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre
+                                },
+                                successText = new OsuSpriteText
+                                {
+                                    Text = "写入成功",
+                                    Font = OsuFont.GetFont(size: 25),
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre
+                                }
+                            }
+                        }
                     }
                 }
             };
@@ -121,6 +184,12 @@ namespace osu.Game.Screens.Share
 
                 //处理文件流
                 stream.Dispose();
+
+                grid.FadeOut(200);
+                writeSuccessContainer.Delay(200).FadeIn(300);
+                this.Delay(1500).Schedule(this.Exit);
+
+                successText.Text = $"已写入到文件{fileName}中";
             }
             catch (Exception e)
             {
@@ -128,6 +197,18 @@ namespace osu.Game.Screens.Share
             }
 
             writeRunning = false;
+        }
+
+        public override void OnEntering(IScreen last)
+        {
+            baseContainer.FadeIn(300);
+            base.OnEntering(last);
+        }
+
+        public override bool OnExiting(IScreen next)
+        {
+            this.FadeOut(300).ScaleTo(0.9f, 300, Easing.OutQuint);
+            return base.OnExiting(next);
         }
     }
 }
