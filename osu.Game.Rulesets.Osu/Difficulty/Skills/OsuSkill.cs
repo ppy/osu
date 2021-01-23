@@ -235,7 +235,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 double averageLength = performaceData.ExpectedTimeUntilFullCombo * performaceData.FullComboProbability;
                 double newFcProb = averageLength / target_retry_time_before_fc;
 
-                skill = skillLevel(newFcProb, Math.Pow(performaceData.PowDifficulty, 1 / difficultyExponent));
+                skill = skillLevel(newFcProb, Math.Pow(performaceData.ExponentialDifficulty, 1 / difficultyExponent));
             }
 
             return skill;
@@ -252,7 +252,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             for (int i = 0; i <= sectionData.Length - sectionCount; i++)
             {
                 var sectionPerformanceData = aggregateMapSectionPerformanceData(sectionData, i, sectionCount);
-                if (sectionPerformanceData.ExpectedTimeExcludingDuration < easiestSectionPerformanceData.ExpectedTimeExcludingDuration)
+                if (sectionPerformanceData.ExpectedDurationOfFailedFullComboAttempts < easiestSectionPerformanceData.ExpectedDurationOfFailedFullComboAttempts)
                     easiestSectionPerformanceData = sectionPerformanceData;
             }
 
@@ -310,7 +310,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 StartTime = noteDifficulties[first].PrevTimestamp,
                 EndTime = noteDifficulties[last].Timestamp,
                 ExpectedTimeUntilFullCombo = 0,
-                PowDifficulty = powDifficulty,
+                ExponentialDifficulty = powDifficulty,
                 FullComboProbability = fcProbFromPow(powSkill, powDifficulty)
             };
 
@@ -348,49 +348,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 result.ExpectedTimeUntilFullCombo /= sectionData[i].FullComboProbability;
                 result.ExpectedTimeUntilFullCombo += sectionData[i].ExpectedTimeUntilFullCombo;
                 result.FullComboProbability *= sectionData[i].FullComboProbability;
-                result.PowDifficulty += sectionData[i].PowDifficulty;
+                result.ExponentialDifficulty += sectionData[i].ExponentialDifficulty;
             }
 
             return result;
-        }
-
-        /// <summary>
-        /// Structure holding the expected performance parameters of a user with a given throughput (in terms of Fitts's law)
-        /// on a given segment of a map.
-        /// </summary>
-        private struct MapSectionPerformanceData
-        {
-            /// <summary>
-            /// The expected amount of time until a full combo is attained for the section.
-            /// </summary>
-            public double ExpectedTimeUntilFullCombo { get; set; }
-
-            /// <summary>
-            /// The expected probability of achieving a full combo on a single play-through of the section.
-            /// </summary>
-            public double FullComboProbability { get; set; }
-
-            public double PowDifficulty { get; set; }
-
-            /// <summary>
-            /// Timestamp for the beginning of the section
-            /// </summary>
-            public double StartTime { get; set; }
-
-            /// <summary>
-            /// Timestamp for the end of the section
-            /// </summary>
-            public double EndTime { get; set; }
-
-            /// <summary>
-            /// Time taken to play the section one time
-            /// </summary>
-            public double Duration => EndTime - StartTime;
-
-            /// <summary>
-            /// Expected time taken to play all failed attempts
-            /// </summary>
-            public double ExpectedTimeExcludingDuration => ExpectedTimeUntilFullCombo - Duration;
         }
     }
 }
