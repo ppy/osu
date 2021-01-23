@@ -194,7 +194,7 @@ namespace osu.Game.Tournament.Screens.Schedule
                                         {
                                             new TournamentSpriteText
                                             {
-                                                Text = "Starting ",
+                                                Text = match.NewValue.Date.Value.CompareTo(DateTimeOffset.Now) > 0 ? "Starting " : "Started ",
                                                 Font = OsuFont.Torus.With(size: 24, weight: FontWeight.Regular)
                                             },
                                             new DrawableDate(match.NewValue.Date.Value)
