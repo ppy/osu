@@ -59,6 +59,8 @@ namespace osu.Game.Beatmaps.Drawables
             updateCover();
         }
 
+        protected virtual BeatmapSetCover CreateBeatmapSetCover(BeatmapSetInfo beatmapSet, BeatmapSetCoverType coverType) => new BeatmapSetCover(beatmapSet, coverType);
+
         private void updateCover()
         {
             displayedCover?.FadeOut(400);
@@ -69,13 +71,11 @@ namespace osu.Game.Beatmaps.Drawables
             {
                 Add(displayedCover = new DelayedLoadUnloadWrapper(() =>
                 {
-                    var cover = new BeatmapSetCover(beatmapSet, coverType)
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.Both,
-                        FillMode = FillMode.Fill,
-                    };
+                    var cover = CreateBeatmapSetCover(beatmapSet, coverType);
+                    cover.Anchor = Anchor.Centre;
+                    cover.Origin = Anchor.Centre;
+                    cover.RelativeSizeAxes = Axes.Both;
+                    cover.FillMode = FillMode.Fill;
                     cover.OnLoadComplete += d => d.FadeInFromZero(400, Easing.Out);
                     return cover;
                 }));
