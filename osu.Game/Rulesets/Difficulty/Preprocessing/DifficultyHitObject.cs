@@ -21,15 +21,20 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
         public readonly HitObject LastObject;
 
         /// <summary>
-        /// Amount of time elapsed between <see cref="BaseObject"/> and <see cref="LastObject"/>.
+        /// Amount of time elapsed between <see cref="BaseObject"/> and <see cref="LastObject"/>,
+        /// taking <see cref="ClockRate"/> into account.
         /// </summary>
         public readonly double DeltaTime;
 
         /// <summary>
-        /// Adjusted start time of the <see cref="BaseObject"/>, taking into account clockRate.
+        /// Adjusted start time of the <see cref="BaseObject"/>,
+        /// taking <see cref="ClockRate"/> into account.
         /// </summary>
         public readonly double StartTime;
 
+        /// <summary>
+        /// The rate of the gameplay clock, as determined by the selected mods.
+        /// </summary>
         public readonly double ClockRate;
 
         /// <summary>
