@@ -203,7 +203,7 @@ namespace osu.Game.Tournament.Components
             }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures, IBindable<RulesetInfo> ruleset)
+            private void load(TextureStore textures)
             {
                 var texture = textures.Get($"mods/{Mod}");
 
