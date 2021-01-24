@@ -12,6 +12,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online;
 using osuTK;
 using osuTK.Graphics;
 
@@ -56,6 +57,9 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
         [Resolved]
         private PreviewTrackManager previewTrackManager { get; set; }
 
+        [Resolved]
+        private IExplicitContentPermission explicitPermission { get; set; }
+
         public PlayButton(BeatmapSetInfo setInfo = null)
         {
             BeatmapSet = setInfo;
@@ -75,9 +79,23 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
             updateEnabledState();
         }
 
+        private IBindable<bool> userAllowedExplicitContent;
+
         private void updateEnabledState()
         {
-            button.Enabled.Value = BeatmapSet != null;
+            if (BeatmapSet?.OnlineInfo.HasExplicitContent == true)
+            {
+                userAllowedExplicitContent = explicitPermission.UserAllowed.GetBoundCopy();
+                userAllowedExplicitContent.BindValueChanged(allowed =>
+                {
+                    if (!allowed.NewValue)
+                        playing.Value = false;
+
+                    button.Enabled.Value = allowed.NewValue;
+                }, true);
+            }
+            else
+                button.Enabled.Value = BeatmapSet != null;
         }
 
         public void ToggleButton()
