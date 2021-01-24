@@ -23,6 +23,8 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
 
         private readonly Button button;
 
+        public IBindable<bool> Enabled => button.Enabled;
+
         public IBindable<bool> Playing => playing;
 
         private readonly BindableBool playing = new BindableBool();

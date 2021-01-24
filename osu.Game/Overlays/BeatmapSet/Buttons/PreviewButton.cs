@@ -74,6 +74,13 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
             background.Colour = colourProvider.Background6;
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            playButton.Enabled.BindValueChanged(e => Enabled.Value = e.NewValue, true);
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -89,6 +96,9 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
         protected override bool OnHover(HoverEvent e)
         {
+            if (!Enabled.Value)
+                return false;
+
             background.FadeTo(0.75f, 80);
             return base.OnHover(e);
         }
