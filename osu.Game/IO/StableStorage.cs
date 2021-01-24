@@ -29,20 +29,14 @@ namespace osu.Game.IO
         /// <summary>
         /// Returns a <see cref="Storage"/> pointing to the osu-stable Songs directory.
         /// </summary>
-        public Storage GetSongStorage()
-        {
-            if (songs_path.Equals(stable_songs_path, StringComparison.OrdinalIgnoreCase))
-                return GetStorageForDirectory(stable_songs_path);
-            else
-                return new DesktopStorage(songs_path, host);
-        }
+        public Storage GetSongStorage() => new DesktopStorage(songs_path, host);
 
         private string locateSongsDirectory()
         {
             var configFile = GetStream(GetFiles(".", "osu!.*.cfg").First());
             var textReader = new StreamReader(configFile);
 
-            var songs_directory_path = stable_songs_path;
+            var songs_directory_path = Path.Combine(BasePath, stable_songs_path);
 
             while (!textReader.EndOfStream)
             {
@@ -51,7 +45,7 @@ namespace osu.Game.IO
                 if (line?.StartsWith("BeatmapDirectory", StringComparison.OrdinalIgnoreCase) == true)
                 {
                     var directory = line.Split('=')[1].TrimStart();
-                    if (Path.IsPathFullyQualified(directory) && !directory.Equals(stable_songs_path, StringComparison.OrdinalIgnoreCase))
+                    if (Path.IsPathFullyQualified(directory))
                         songs_directory_path = directory;
 
                     break;
