@@ -16,6 +16,9 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Tournament.Models;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Screens.Play.HUD;
 using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Components
@@ -124,21 +127,11 @@ namespace osu.Game.Tournament.Components
 
             if (!string.IsNullOrEmpty(mods))
             {
-                AddInternal(new Container
+                AddInternal(new ModSprite
                 {
-                    RelativeSizeAxes = Axes.Y,
-                    Width = 60,
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                    Margin = new MarginPadding(10),
-                    Child = new Sprite
-                    {
-                        FillMode = FillMode.Fit,
-                        RelativeSizeAxes = Axes.Both,
-                        Anchor = Anchor.CentreRight,
-                        Origin = Anchor.CentreRight,
-                        Texture = textures.Get($"mods/{mods}"),
-                    }
+                    Mod = mods
                 });
             }
         }
@@ -190,6 +183,87 @@ namespace osu.Game.Tournament.Components
                 Colour = Color4.White;
                 BorderThickness = 0;
                 Alpha = 1;
+            }
+        }
+
+        private class ModSprite : Container
+        {
+            public string Mod;
+
+            public ModSprite()
+            {
+                Margin = new MarginPadding(10);
+                Width = 60;
+                RelativeSizeAxes = Axes.Y;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(TextureStore textures)
+            {
+                var texture = textures.Get($"mods/{Mod}");
+
+                if (texture != null)
+                {
+                    Child = new Sprite
+                    {
+                        FillMode = FillMode.Fit,
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.CentreRight,
+                        Origin = Anchor.CentreRight,
+                        Texture = texture
+                    };
+                }
+                else
+                {
+                    Mod selectedMod = null;
+
+                    switch (Mod)
+                    {
+                        case "DT":
+                            selectedMod = new OsuModDoubleTime();
+                            break;
+
+                        case "FL":
+                            selectedMod = new OsuModFlashlight();
+                            break;
+
+                        case "HT":
+                            selectedMod = new OsuModHalfTime();
+                            break;
+
+                        case "HD":
+                            selectedMod = new OsuModHidden();
+                            break;
+
+                        case "HR":
+                            selectedMod = new OsuModHardRock();
+                            break;
+
+                        case "NF":
+                            selectedMod = new OsuModNoFail();
+                            break;
+
+                        case "EZ":
+                            selectedMod = new OsuModEasy();
+                            break;
+                    }
+
+                    if (selectedMod != null)
+                    {
+                        Child = new ModDisplay
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Current =
+                            {
+                                Value = new[]
+                                {
+                                    selectedMod
+                                }
+                            }
+                        };
+                    }
+                }
             }
         }
     }
