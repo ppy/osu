@@ -2,11 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays.BeatmapListing.Panels;
@@ -160,7 +158,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 base.LoadComplete();
 
-                PlayButton.ChildrenOfType<ClickableContainer>().Single().Enabled.Value = false;
+                PlayButton.Enabled.Value = false;
             }
         }
     }

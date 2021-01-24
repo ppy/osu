@@ -25,6 +25,8 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
         public IBindable<bool> Playing => playButton.Playing;
 
+        public new readonly BindableBool Enabled = new BindableBool(true);
+
         public BeatmapSetInfo BeatmapSet
         {
             get => playButton.BeatmapSet;
@@ -60,10 +62,11 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Size = new Vector2(18),
+                    Enabled = { BindTarget = Enabled },
                 },
             };
 
-            Action = () => playButton.ToggleButton();
+            Action = () => playButton.TogglePlaying();
             Playing.ValueChanged += playing => progress.FadeTo(playing.NewValue ? 1 : 0, 100);
         }
 
@@ -78,7 +81,14 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         {
             base.LoadComplete();
 
-            playButton.Enabled.BindValueChanged(e => Enabled.Value = e.NewValue, true);
+            Playing.BindDisabledChanged(_ => updateEnabledState());
+            Enabled.BindValueChanged(_ => updateEnabledState());
+            updateEnabledState();
+        }
+
+        private void updateEnabledState()
+        {
+            base.Enabled.Value = !Playing.Disabled && Enabled.Value;
         }
 
         protected override void Update()
@@ -96,7 +106,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
         protected override bool OnHover(HoverEvent e)
         {
-            if (!Enabled.Value)
+            if (!base.Enabled.Value)
                 return false;
 
             background.FadeTo(0.75f, 80);

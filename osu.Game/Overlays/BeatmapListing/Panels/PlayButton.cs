@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
 
         private readonly Button button;
 
-        public IBindable<bool> Enabled => button.Enabled;
+        public readonly BindableBool Enabled = new BindableBool(true);
 
         public IBindable<bool> Playing => playing;
 
@@ -46,10 +46,11 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                 Preview?.Expire();
                 Preview = null;
 
-                playing.Value = false;
-
                 if (IsLoaded)
                     updateEnabledState();
+
+                if (playing.Value)
+                    playing.Value = false;
             }
         }
 
@@ -63,7 +64,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
             InternalChild = button = new Button(this)
             {
                 RelativeSizeAxes = Axes.Both,
-                Action = ToggleButton,
+                Action = TogglePlaying,
             };
 
             playing.ValueChanged += playingStateChanged;
@@ -72,19 +73,20 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            updateEnabledState();
+            Enabled.BindValueChanged(_ => updateEnabledState(), true);
         }
 
         private void updateEnabledState()
         {
-            button.Enabled.Value = BeatmapSet != null;
+            var disabled = BeatmapSet == null || !Enabled.Value;
+
+            if (playing.Value && disabled)
+                playing.Value = false;
+
+            playing.Disabled = disabled;
         }
 
-        public void ToggleButton()
-        {
-            if (button.Enabled.Value)
-                playing.Toggle();
-        }
+        public void TogglePlaying() => playing.Toggle();
 
         private void playingStateChanged(ValueChangedEvent<bool> e)
         {
@@ -191,6 +193,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
             {
                 base.LoadComplete();
 
+                playing.BindDisabledChanged(disabled => Enabled.Value = !playing.Disabled, true);
                 Enabled.BindValueChanged(e => this.FadeTo(e.NewValue ? 1 : 0), true);
 
                 playing.BindValueChanged(e =>
