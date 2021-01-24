@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -36,6 +37,8 @@ namespace osu.Game.Screens.Mvis.Storyboard
         private BackgroundStoryboard currentStoryboard;
 
         private readonly WorkingBeatmap targetBeatmap;
+
+        public Action OnNewStoryboardLoaded;
 
         [Resolved]
         private MusicController music { get; set; }
@@ -96,8 +99,21 @@ namespace osu.Game.Screens.Mvis.Storyboard
 
                     Add(newStoryboard);
 
+                    setProxy(newStoryboard);
+
                     enableSb.TriggerChange();
+                    OnNewStoryboardLoaded?.Invoke();
                 });
+        }
+
+        [CanBeNull]
+        public Drawable StoryboardProxy;
+
+        private void setProxy(BackgroundStoryboard storyboard)
+        {
+            if (storyboard != currentStoryboard) return;
+
+            StoryboardProxy = storyboard.StoryboardProxy();
         }
 
         public void OnEnableSBChanged(ValueChangedEvent<bool> v)

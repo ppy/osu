@@ -39,6 +39,7 @@ namespace osu.Game.Configuration
             Set(MSetting.MvisContentAlpha, 1f, 0f, 1f);
             Set(MSetting.MvisBgBlur, 0.2f, 0f, 1f);
             Set(MSetting.MvisEnableStoryboard, true);
+            Set(MSetting.MvisStoryboardProxy, true);
             Set(MSetting.MvisUseOsuLogoVisualisation, false);
             Set(MSetting.MvisIdleBgDim, 0.9f, 0f, 1f);
             Set(MSetting.MvisEnableBgTriangles, true);
@@ -78,6 +79,7 @@ namespace osu.Game.Configuration
         MvisBgBlur,
         MvisUseOsuLogoVisualisation,
         MvisEnableStoryboard,
+        MvisStoryboardProxy,
         MvisIdleBgDim,
         MvisContentAlpha,
         MvisEnableBgTriangles,
