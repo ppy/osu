@@ -15,10 +15,9 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
-using osu.Game.Tournament.Models;
-using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Tournament.Models;
 using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Components
@@ -190,6 +189,12 @@ namespace osu.Game.Tournament.Components
         {
             public string Mod;
 
+            [Resolved]
+            private LadderInfo ladderInfo { get; set; }
+
+            [Resolved]
+            private RulesetStore rulesets { get; set; }
+
             public ModSprite()
             {
                 Margin = new MarginPadding(10);
@@ -198,7 +203,7 @@ namespace osu.Game.Tournament.Components
             }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
+            private void load(TextureStore textures, IBindable<RulesetInfo> ruleset)
             {
                 var texture = textures.Get($"mods/{Mod}");
 
@@ -215,54 +220,15 @@ namespace osu.Game.Tournament.Components
                 }
                 else
                 {
-                    Mod selectedMod = null;
-
-                    switch (Mod)
+                    Child = new ModDisplay
                     {
-                        case "DT":
-                            selectedMod = new OsuModDoubleTime();
-                            break;
-
-                        case "FL":
-                            selectedMod = new OsuModFlashlight();
-                            break;
-
-                        case "HT":
-                            selectedMod = new OsuModHalfTime();
-                            break;
-
-                        case "HD":
-                            selectedMod = new OsuModHidden();
-                            break;
-
-                        case "HR":
-                            selectedMod = new OsuModHardRock();
-                            break;
-
-                        case "NF":
-                            selectedMod = new OsuModNoFail();
-                            break;
-
-                        case "EZ":
-                            selectedMod = new OsuModEasy();
-                            break;
-                    }
-
-                    if (selectedMod != null)
-                    {
-                        Child = new ModDisplay
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Current =
                         {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Current =
-                            {
-                                Value = new[]
-                                {
-                                    selectedMod
-                                }
-                            }
-                        };
-                    }
+                            Value = rulesets.GetRuleset(ladderInfo.Ruleset.Value.ID ?? 0).CreateInstance().GetAllMods().Where(mod => mod.Acronym == Mod).ToArray()
+                        }
+                    };
                 }
             }
         }
