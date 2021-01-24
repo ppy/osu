@@ -47,6 +47,9 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                 Preview = null;
 
                 playing.Value = false;
+
+                if (IsLoaded)
+                    updateEnabledState();
             }
         }
 
@@ -64,6 +67,17 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
             };
 
             playing.ValueChanged += playingStateChanged;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            updateEnabledState();
+        }
+
+        private void updateEnabledState()
+        {
+            button.Enabled.Value = BeatmapSet != null;
         }
 
         public void ToggleButton()
