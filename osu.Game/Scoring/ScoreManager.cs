@@ -16,6 +16,7 @@ using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -71,7 +72,7 @@ namespace osu.Game.Scoring
             }
         }
 
-        protected override IEnumerable<string> GetStableImportPaths(Storage stableStorage)
+        protected override IEnumerable<string> GetStableImportPaths(StableStorage stableStorage)
             => stableStorage.GetFiles(ImportFromStablePath).Where(p => HandledExtensions.Any(ext => Path.GetExtension(p)?.Equals(ext, StringComparison.OrdinalIgnoreCase) ?? false));
 
         public Score GetScore(ScoreInfo score) => new LegacyDatabasedScore(score, rulesets, beatmaps(), Files.Store);

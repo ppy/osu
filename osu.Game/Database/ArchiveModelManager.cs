@@ -625,7 +625,7 @@ namespace osu.Game.Database
         /// <summary>
         /// Set a storage with access to an osu-stable install for import purposes.
         /// </summary>
-        public Func<Storage> GetStableStorage { private get; set; }
+        public Func<StableStorage> GetStableStorage { private get; set; }
 
         /// <summary>
         /// Denotes whether an osu-stable installation is present to perform automated imports from.
@@ -640,7 +640,7 @@ namespace osu.Game.Database
         /// <summary>
         /// Select paths to import from stable. Default implementation iterates all directories in <see cref="ImportFromStablePath"/>.
         /// </summary>
-        protected virtual IEnumerable<string> GetStableImportPaths(Storage stableStoage) => stableStoage.GetDirectories(ImportFromStablePath);
+        protected virtual IEnumerable<string> GetStableImportPaths(StableStorage stableStoage) => stableStoage.GetDirectories(ImportFromStablePath);
 
         /// <summary>
         /// Whether this specified path should be removed after successful import.
