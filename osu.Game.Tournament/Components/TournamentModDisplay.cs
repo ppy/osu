@@ -19,13 +19,10 @@ namespace osu.Game.Tournament.Components
         public string ModAcronym;
 
         [Resolved]
-        private LadderInfo ladderInfo { get; set; }
-
-        [Resolved]
         private RulesetStore rulesets { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
+        private void load(TextureStore textures, LadderInfo ladderInfo)
         {
             var texture = textures.Get($"mods/{ModAcronym}");
 
@@ -42,12 +39,8 @@ namespace osu.Game.Tournament.Components
             }
             else
             {
-                var ruleset = rulesets.AvailableRulesets.FirstOrDefault(r => r == ladderInfo.Ruleset.Value);
-
-                if (ruleset == null)
-                    return;
-
-                var modIcon = ruleset.CreateInstance().GetAllMods().FirstOrDefault(mod => mod.Acronym == ModAcronym);
+                var ruleset = rulesets.GetRuleset(ladderInfo.Ruleset.Value?.ID ?? 0);
+                var modIcon = ruleset?.CreateInstance().GetAllMods().FirstOrDefault(mod => mod.Acronym == ModAcronym);
 
                 if (modIcon == null)
                     return;
