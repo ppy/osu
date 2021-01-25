@@ -6,13 +6,14 @@ using NUnit.Framework;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneBeatmapListingOverlay : OsuTestScene
+    [Description("uses online API")]
+    public class TestSceneOnlineBeatmapListingOverlay : OsuTestScene
     {
         protected override bool UseOnlineAPI => true;
 
         private readonly BeatmapListingOverlay overlay;
 
-        public TestSceneBeatmapListingOverlay()
+        public TestSceneOnlineBeatmapListingOverlay()
         {
             Add(overlay = new BeatmapListingOverlay());
         }
