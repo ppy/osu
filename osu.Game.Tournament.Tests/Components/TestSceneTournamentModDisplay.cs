@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -43,24 +42,19 @@ namespace osu.Game.Tournament.Tests.Components
             });
         }
 
-        [Test]
-        public void TestModDisplay()
+        private void success(APIBeatmap apiBeatmap)
         {
-            AddUntilStep("beatmap is available", () => beatmap != null);
-            AddStep("add maps with available mods for ruleset", () => displayForRuleset(Ladder.Ruleset.Value.ID ?? 0));
-        }
-
-        private void displayForRuleset(int rulesetId)
-        {
-            fillFlow.Clear();
-            var mods = rulesets.GetRuleset(rulesetId).CreateInstance().GetAllMods();
+            beatmap = apiBeatmap.ToBeatmap(rulesets);
+            var mods = rulesets.GetRuleset(Ladder.Ruleset.Value.ID ?? 0).CreateInstance().GetAllMods();
 
             foreach (var mod in mods)
             {
-                fillFlow.Add(new TournamentBeatmapPanel(beatmap, mod.Acronym));
+                fillFlow.Add(new TournamentBeatmapPanel(beatmap, mod.Acronym)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre
+                });
             }
         }
-
-        private void success(APIBeatmap apiBeatmap) => beatmap = apiBeatmap.ToBeatmap(rulesets);
     }
 }
