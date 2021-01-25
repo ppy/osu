@@ -29,25 +29,25 @@ namespace osu.Game.Screens.Edit.Setup
                 artistTextBox = new LabelledTextBox
                 {
                     Label = "Artist",
-                    Current = { Value = Beatmap.Value.Metadata.Artist },
+                    Current = { Value = Beatmap.Metadata.Artist },
                     TabbableContentContainer = this
                 },
                 titleTextBox = new LabelledTextBox
                 {
                     Label = "Title",
-                    Current = { Value = Beatmap.Value.Metadata.Title },
+                    Current = { Value = Beatmap.Metadata.Title },
                     TabbableContentContainer = this
                 },
                 creatorTextBox = new LabelledTextBox
                 {
                     Label = "Creator",
-                    Current = { Value = Beatmap.Value.Metadata.AuthorString },
+                    Current = { Value = Beatmap.Metadata.AuthorString },
                     TabbableContentContainer = this
                 },
                 difficultyTextBox = new LabelledTextBox
                 {
                     Label = "Difficulty Name",
-                    Current = { Value = Beatmap.Value.BeatmapInfo.Version },
+                    Current = { Value = Beatmap.BeatmapInfo.Version },
                     TabbableContentContainer = this
                 },
             };
@@ -62,10 +62,10 @@ namespace osu.Game.Screens.Edit.Setup
 
             // for now, update these on commit rather than making BeatmapMetadata bindables.
             // after switching database engines we can reconsider if switching to bindables is a good direction.
-            Beatmap.Value.Metadata.Artist = artistTextBox.Current.Value;
-            Beatmap.Value.Metadata.Title = titleTextBox.Current.Value;
-            Beatmap.Value.Metadata.AuthorString = creatorTextBox.Current.Value;
-            Beatmap.Value.BeatmapInfo.Version = difficultyTextBox.Current.Value;
+            Beatmap.Metadata.Artist = artistTextBox.Current.Value;
+            Beatmap.Metadata.Title = titleTextBox.Current.Value;
+            Beatmap.Metadata.AuthorString = creatorTextBox.Current.Value;
+            Beatmap.BeatmapInfo.Version = difficultyTextBox.Current.Value;
         }
     }
 }

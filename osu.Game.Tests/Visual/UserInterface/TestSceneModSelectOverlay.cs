@@ -40,6 +40,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
+            SelectedMods.Value = Array.Empty<Mod>();
             Children = new Drawable[]
             {
                 modSelect = new TestModSelectOverlay
@@ -129,6 +130,20 @@ namespace osu.Game.Tests.Visual.UserInterface
             changeRuleset(0);
 
             AddAssert("ensure mods not selected", () => modDisplay.Current.Value.Count == 0);
+        }
+
+        [Test]
+        public void TestExternallySetCustomizedMod()
+        {
+            changeRuleset(0);
+
+            AddStep("set customized mod externally", () => SelectedMods.Value = new[] { new OsuModDoubleTime { SpeedChange = { Value = 1.01 } } });
+
+            AddAssert("ensure button is selected and customized accordingly", () =>
+            {
+                var button = modSelect.GetModButton(SelectedMods.Value.Single());
+                return ((OsuModDoubleTime)button.SelectedMod).SpeedChange.Value == 1.01;
+            });
         }
 
         private void testSingleMod(Mod mod)

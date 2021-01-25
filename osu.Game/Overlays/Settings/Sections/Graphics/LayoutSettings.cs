@@ -132,6 +132,15 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     }
                 },
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            scalingSettings.ForEach(s => bindPreviewEvent(s.Current));
+
+            windowModeDropdown.Current.ValueChanged += _ => updateResolutionDropdown();
 
             windowModes.BindCollectionChanged((sender, args) =>
             {
@@ -140,8 +149,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 else
                     windowModeDropdown.Hide();
             }, true);
-
-            windowModeDropdown.Current.ValueChanged += _ => updateResolutionDropdown();
 
             currentDisplay.BindValueChanged(display => Schedule(() =>
             {
@@ -158,8 +165,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
                 updateResolutionDropdown();
             }), true);
-
-            scalingSettings.ForEach(s => bindPreviewEvent(s.Current));
 
             scalingMode.BindValueChanged(mode =>
             {
@@ -181,11 +186,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             }
         }
 
-        /// <summary>
-        /// Create a delayed bindable which only updates when a condition is met.
-        /// </summary>
-        /// <param name="bindable">The config bindable.</param>
-        /// <returns>A bindable which will propagate updates with a delay.</returns>
         private void bindPreviewEvent(Bindable<float> bindable)
         {
             bindable.ValueChanged += _ =>

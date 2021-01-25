@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
@@ -293,8 +294,21 @@ namespace osu.Game.Online.API
                 failureCount = 0;
                 return true;
             }
+            catch (HttpRequestException re)
+            {
+                log.Add($"{nameof(HttpRequestException)} while performing request {req}: {re.Message}");
+                handleFailure();
+                return false;
+            }
+            catch (SocketException se)
+            {
+                log.Add($"{nameof(SocketException)} while performing request {req}: {se.Message}");
+                handleFailure();
+                return false;
+            }
             catch (WebException we)
             {
+                log.Add($"{nameof(WebException)} while performing request {req}: {we.Message}");
                 handleWebException(we);
                 return false;
             }
@@ -312,7 +326,7 @@ namespace osu.Game.Online.API
         /// </summary>
         public IBindable<APIState> State => state;
 
-        private bool handleWebException(WebException we)
+        private void handleWebException(WebException we)
         {
             HttpStatusCode statusCode = (we.Response as HttpWebResponse)?.StatusCode
                                         ?? (we.Status == WebExceptionStatus.UnknownError ? HttpStatusCode.NotAcceptable : HttpStatusCode.RequestTimeout);
@@ -330,26 +344,24 @@ namespace osu.Game.Online.API
             {
                 case HttpStatusCode.Unauthorized:
                     Logout();
-                    return true;
+                    break;
 
                 case HttpStatusCode.RequestTimeout:
-                    failureCount++;
-                    log.Add($@"API failure count is now {failureCount}");
-
-                    if (failureCount < 3)
-                        // we might try again at an api level.
-                        return false;
-
-                    if (State.Value == APIState.Online)
-                    {
-                        state.Value = APIState.Failing;
-                        flushQueue();
-                    }
-
-                    return true;
+                    handleFailure();
+                    break;
             }
+        }
 
-            return true;
+        private void handleFailure()
+        {
+            failureCount++;
+            log.Add($@"API failure count is now {failureCount}");
+
+            if (failureCount >= 3 && State.Value == APIState.Online)
+            {
+                state.Value = APIState.Failing;
+                flushQueue();
+            }
         }
 
         public bool IsLoggedIn => localUser.Value.Id > 1;
