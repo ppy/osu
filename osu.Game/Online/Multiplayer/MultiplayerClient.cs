@@ -25,6 +25,8 @@ namespace osu.Game.Online.Multiplayer
         private readonly Bindable<bool> isConnected = new Bindable<bool>();
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
 
+        private readonly SemaphoreSlim connectionLock = new SemaphoreSlim(1);
+
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
@@ -52,20 +54,16 @@ namespace osu.Game.Online.Multiplayer
             {
                 case APIState.Failing:
                 case APIState.Offline:
-                    Task.Run(Disconnect).CatchUnobservedExceptions();
+                    Task.Run(() => disconnect(true)).CatchUnobservedExceptions();
                     break;
 
                 case APIState.Online:
-                    Task.Run(Connect).CatchUnobservedExceptions();
+                    Task.Run(connect).CatchUnobservedExceptions();
                     break;
             }
         }
 
-        private readonly SemaphoreSlim connectionLock = new SemaphoreSlim(1);
-
-        public Task Disconnect() => disconnect(true);
-
-        protected async Task Connect()
+        private async Task connect()
         {
             cancelExistingConnect();
 
@@ -233,7 +231,7 @@ namespace osu.Game.Online.Multiplayer
 
                 // make sure a disconnect wasn't triggered (and this is still the active connection).
                 if (!cancellationToken.IsCancellationRequested)
-                    Task.Run(Connect, default).CatchUnobservedExceptions();
+                    Task.Run(connect, default).CatchUnobservedExceptions();
 
                 return Task.CompletedTask;
             };
