@@ -16,6 +16,11 @@ namespace osu.Game.Utils
         private readonly object currentTaskLock = new object();
         private Task? currentTask;
 
+        /// <summary>
+        /// Adds a new task to the end of this <see cref="TaskChain"/>.
+        /// </summary>
+        /// <param name="taskFunc">The task creation function.</param>
+        /// <returns>The awaitable <see cref="Task"/>.</returns>
         public Task Add(Func<Task> taskFunc)
         {
             lock (currentTaskLock)
