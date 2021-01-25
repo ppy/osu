@@ -9,14 +9,11 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
-using osu.Game.Rulesets;
-using osu.Game.Screens.Play.HUD;
 using osu.Game.Tournament.Models;
 using osuTK.Graphics;
 
@@ -25,7 +22,7 @@ namespace osu.Game.Tournament.Components
     public class TournamentBeatmapPanel : CompositeDrawable
     {
         public readonly BeatmapInfo Beatmap;
-        private readonly string mods;
+        private readonly string mod;
 
         private const float horizontal_padding = 10;
         private const float vertical_padding = 10;
@@ -40,7 +37,7 @@ namespace osu.Game.Tournament.Components
             if (beatmap == null) throw new ArgumentNullException(nameof(beatmap));
 
             Beatmap = beatmap;
-            this.mods = mods;
+            this.mod = mods;
             Width = 400;
             Height = HEIGHT;
         }
@@ -124,13 +121,16 @@ namespace osu.Game.Tournament.Components
                 },
             });
 
-            if (!string.IsNullOrEmpty(mods))
+            if (!string.IsNullOrEmpty(mod))
             {
-                AddInternal(new ModSprite
+                AddInternal(new TournamentModDisplay
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                    Mod = mods
+                    Margin = new MarginPadding(10),
+                    Width = 60,
+                    RelativeSizeAxes = Axes.Y,
+                    ModAcronym = mod
                 });
             }
         }
@@ -182,54 +182,6 @@ namespace osu.Game.Tournament.Components
                 Colour = Color4.White;
                 BorderThickness = 0;
                 Alpha = 1;
-            }
-        }
-
-        private class ModSprite : Container
-        {
-            public string Mod;
-
-            [Resolved]
-            private LadderInfo ladderInfo { get; set; }
-
-            [Resolved]
-            private RulesetStore rulesets { get; set; }
-
-            public ModSprite()
-            {
-                Margin = new MarginPadding(10);
-                Width = 60;
-                RelativeSizeAxes = Axes.Y;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
-            {
-                var texture = textures.Get($"mods/{Mod}");
-
-                if (texture != null)
-                {
-                    Child = new Sprite
-                    {
-                        FillMode = FillMode.Fit,
-                        RelativeSizeAxes = Axes.Both,
-                        Anchor = Anchor.CentreRight,
-                        Origin = Anchor.CentreRight,
-                        Texture = texture
-                    };
-                }
-                else
-                {
-                    Child = new ModDisplay
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Current =
-                        {
-                            Value = rulesets.GetRuleset(ladderInfo.Ruleset.Value.ID ?? 0).CreateInstance().GetAllMods().Where(mod => mod.Acronym == Mod).ToArray()
-                        }
-                    };
-                }
             }
         }
     }
