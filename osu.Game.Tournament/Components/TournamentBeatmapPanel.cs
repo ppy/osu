@@ -32,12 +32,12 @@ namespace osu.Game.Tournament.Components
         private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
         private Box flash;
 
-        public TournamentBeatmapPanel(BeatmapInfo beatmap, string mods = null)
+        public TournamentBeatmapPanel(BeatmapInfo beatmap, string mod = null)
         {
             if (beatmap == null) throw new ArgumentNullException(nameof(beatmap));
 
             Beatmap = beatmap;
-            this.mod = mods;
+            this.mod = mod;
             Width = 400;
             Height = HEIGHT;
         }
