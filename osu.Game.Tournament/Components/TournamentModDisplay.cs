@@ -42,9 +42,9 @@ namespace osu.Game.Tournament.Components
             }
             else
             {
-                var mod = rulesets.GetRuleset(ladderInfo.Ruleset.Value.ID ?? 0).CreateInstance().GetAllMods().FirstOrDefault(mod => mod.Acronym == ModAcronym);
+                var modIcon = rulesets.GetRuleset(ladderInfo.Ruleset.Value.ID ?? 0).CreateInstance().GetAllMods().FirstOrDefault(mod => mod.Acronym == ModAcronym);
 
-                AddInternal(new ModIcon(mod)
+                AddInternal(new ModIcon(modIcon)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
