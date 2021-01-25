@@ -6,6 +6,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -148,12 +149,15 @@ namespace osu.Game.Online.Multiplayer
         /// <returns>The joined <see cref="MultiplayerRoom"/>.</returns>
         protected abstract Task<MultiplayerRoom> JoinRoom(long roomId);
 
-        public async Task LeaveRoom() => await joinOrLeaveTaskChain.Add(async () =>
+        public Task LeaveRoom()
         {
             if (Room == null)
-                return;
+                return Task.FromCanceled(new CancellationToken(true));
 
-            await scheduleAsync(() =>
+            // Leaving rooms is expected to occur instantaneously whilst the operation is finalised in the background.
+            // However a few members need to be reset immediately to prevent other components from entering invalid states whilst the operation hasn't yet completed.
+            // For example, if a room was left and the user immediately pressed the "create room" button, then the user could be taken into the lobby if the value of Room is not reset in time.
+            var scheduledReset = scheduleAsync(() =>
             {
                 apiRoom = null;
                 Room = null;
@@ -162,8 +166,12 @@ namespace osu.Game.Online.Multiplayer
                 RoomUpdated?.Invoke();
             });
 
-            await LeaveRoomInternal();
-        });
+            return joinOrLeaveTaskChain.Add(async () =>
+            {
+                await scheduledReset;
+                await LeaveRoomInternal();
+            });
+        }
 
         protected abstract Task LeaveRoomInternal();
 
