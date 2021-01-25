@@ -42,7 +42,15 @@ namespace osu.Game.Tournament.Components
             }
             else
             {
-                var modIcon = rulesets.GetRuleset(ladderInfo.Ruleset.Value.ID ?? 0).CreateInstance().GetAllMods().FirstOrDefault(mod => mod.Acronym == ModAcronym);
+                var ruleset = rulesets.AvailableRulesets.FirstOrDefault(r => r == ladderInfo.Ruleset.Value);
+
+                if (ruleset == null)
+                    return;
+
+                var modIcon = ruleset.CreateInstance().GetAllMods().FirstOrDefault(mod => mod.Acronym == ModAcronym);
+
+                if (modIcon == null)
+                    return;
 
                 AddInternal(new ModIcon(modIcon)
                 {
