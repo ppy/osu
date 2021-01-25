@@ -67,7 +67,7 @@ namespace osu.Game.Online.Multiplayer
         {
             cancelExistingConnect();
 
-            await connectionLock.WaitAsync();
+            await connectionLock.WaitAsync(10000);
 
             try
             {
@@ -183,7 +183,7 @@ namespace osu.Game.Online.Multiplayer
             cancelExistingConnect();
 
             if (takeLock)
-                await connectionLock.WaitAsync();
+                await connectionLock.WaitAsync(10000);
 
             try
             {
@@ -236,6 +236,13 @@ namespace osu.Game.Online.Multiplayer
                 return Task.CompletedTask;
             };
             return newConnection;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            cancelExistingConnect();
         }
     }
 }
