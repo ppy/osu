@@ -10,7 +10,6 @@ using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
@@ -64,7 +63,6 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
             InternalChild = button = new Button(this)
             {
                 RelativeSizeAxes = Axes.Both,
-                Action = TogglePlaying,
             };
 
             playing.ValueChanged += playingStateChanged;
@@ -136,11 +134,12 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                 playing.Value = false;
         }
 
-        private class Button : OsuClickableContainer
+        private class Button : CompositeDrawable
         {
             private readonly SpriteIcon icon;
             private readonly LoadingSpinner loadingSpinner;
 
+            private readonly PlayButton player;
             private readonly IBindable<bool> playing;
 
             public bool Loading
@@ -162,9 +161,10 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
 
             public Button(PlayButton player)
             {
+                this.player = player;
                 playing = player.Playing.GetBoundCopy();
 
-                Children = new Drawable[]
+                InternalChildren = new Drawable[]
                 {
                     icon = new SpriteIcon
                     {
@@ -193,19 +193,27 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
             {
                 base.LoadComplete();
 
-                playing.BindDisabledChanged(disabled => Enabled.Value = !playing.Disabled, true);
-                Enabled.BindValueChanged(e => this.FadeTo(e.NewValue ? 1 : 0), true);
-
                 playing.BindValueChanged(e =>
                 {
                     icon.Icon = e.NewValue ? FontAwesome.Solid.Stop : FontAwesome.Solid.Play;
                     icon.FadeColour(e.NewValue || IsHovered ? hoverColour : Color4.White, 120, Easing.InOutQuint);
                 }, true);
+
+                playing.BindDisabledChanged(disabled => this.FadeTo(!disabled ? 1 : 0), true);
+            }
+
+            protected override bool OnClick(ClickEvent e)
+            {
+                if (playing.Disabled)
+                    return false;
+
+                player.TogglePlaying();
+                return true;
             }
 
             protected override bool OnHover(HoverEvent e)
             {
-                if (!Enabled.Value)
+                if (playing.Disabled)
                     return false;
 
                 icon.FadeColour(hoverColour, 120, Easing.InOutQuint);
