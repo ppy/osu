@@ -176,6 +176,9 @@ namespace osu.Game.Overlays
             loadingLayer.Hide();
             lastFetchDisplayedTime = Time.Current;
 
+            if (content == currentContent)
+                return;
+
             var lastContent = currentContent;
 
             if (lastContent != null)
