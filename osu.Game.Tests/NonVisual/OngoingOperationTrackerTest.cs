@@ -30,22 +30,22 @@ namespace osu.Game.Tests.NonVisual
             IDisposable secondOperation = null;
 
             AddStep("begin first operation", () => firstOperation = tracker.BeginOperation());
-            AddAssert("operation in progress", () => operationInProgress.Value);
+            AddAssert("first operation in progress", () => operationInProgress.Value);
 
             AddStep("cannot start another operation",
                 () => Assert.Throws<InvalidOperationException>(() => tracker.BeginOperation()));
 
             AddStep("end first operation", () => firstOperation.Dispose());
-            AddAssert("operation is ended", () => !operationInProgress.Value);
+            AddAssert("first operation is ended", () => !operationInProgress.Value);
 
             AddStep("start second operation", () => secondOperation = tracker.BeginOperation());
-            AddAssert("operation in progress", () => operationInProgress.Value);
+            AddAssert("second operation in progress", () => operationInProgress.Value);
 
             AddStep("dispose first operation again", () => firstOperation.Dispose());
-            AddAssert("operation in progress", () => operationInProgress.Value);
+            AddAssert("second operation still in progress", () => operationInProgress.Value);
 
             AddStep("dispose second operation", () => secondOperation.Dispose());
-            AddAssert("operation is ended", () => !operationInProgress.Value);
+            AddAssert("second operation is ended", () => !operationInProgress.Value);
         }
 
         [Test]
