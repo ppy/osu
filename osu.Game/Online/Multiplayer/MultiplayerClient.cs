@@ -188,7 +188,7 @@ namespace osu.Game.Online.Multiplayer
             try
             {
                 if (connection != null)
-                    await connection.StopAsync();
+                    await connection.DisposeAsync();
             }
             finally
             {
