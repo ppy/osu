@@ -10,13 +10,13 @@ using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.BeatmapListing.Panels;
 using osuTK;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
-    public class PreviewButton : OsuClickableContainer
+    public class PreviewButton : CompositeDrawable
     {
         private readonly Box background, progress;
         private readonly PlayButton playButton;
@@ -24,8 +24,6 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         private PreviewTrack preview => playButton.Preview;
 
         public IBindable<bool> Playing => playButton.Playing;
-
-        public new readonly BindableBool Enabled = new BindableBool(true);
 
         public BeatmapSetInfo BeatmapSet
         {
@@ -37,7 +35,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         {
             Height = 42;
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 background = new Box
                 {
@@ -62,11 +60,10 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Size = new Vector2(18),
-                    Enabled = { BindTarget = Enabled },
                 },
+                new HoverClickSounds()
             };
 
-            Action = () => playButton.TogglePlaying();
             Playing.ValueChanged += playing => progress.FadeTo(playing.NewValue ? 1 : 0, 100);
         }
 
@@ -75,20 +72,6 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         {
             progress.Colour = colours.Yellow;
             background.Colour = colourProvider.Background6;
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            Playing.BindDisabledChanged(_ => updateEnabledState());
-            Enabled.BindValueChanged(_ => updateEnabledState());
-            updateEnabledState();
-        }
-
-        private void updateEnabledState()
-        {
-            base.Enabled.Value = !Playing.Disabled && Enabled.Value;
         }
 
         protected override void Update()
@@ -104,9 +87,18 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                 progress.Width = 0;
         }
 
+        protected override bool OnClick(ClickEvent e)
+        {
+            if (Playing.Disabled)
+                return true;
+
+            playButton.TogglePlaying();
+            return true;
+        }
+
         protected override bool OnHover(HoverEvent e)
         {
-            if (!base.Enabled.Value)
+            if (Playing.Disabled)
                 return false;
 
             background.FadeTo(0.75f, 80);
