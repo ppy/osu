@@ -98,6 +98,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return Task.FromResult(room);
         }
 
+        protected override Task LeaveRoomInternal() => Task.CompletedTask;
+
         public override Task TransferHost(int userId) => ((IMultiplayerClient)this).HostChanged(userId);
 
         public override async Task ChangeSettings(MultiplayerRoomSettings settings)
