@@ -17,26 +17,26 @@ namespace osu.Game.IO
         private const string stable_songs_path = "Songs";
 
         private readonly DesktopGameHost host;
-        private string songs_path;
+        private readonly string songsPath;
 
         public StableStorage(string path, DesktopGameHost host)
             : base(path, host)
         {
             this.host = host;
-            songs_path = locateSongsDirectory();
+            songsPath = locateSongsDirectory();
         }
 
         /// <summary>
         /// Returns a <see cref="Storage"/> pointing to the osu-stable Songs directory.
         /// </summary>
-        public Storage GetSongStorage() => new DesktopStorage(songs_path, host);
+        public Storage GetSongStorage() => new DesktopStorage(songsPath, host);
 
         private string locateSongsDirectory()
         {
             var configFile = GetStream(GetFiles(".", "osu!.*.cfg").First());
             var textReader = new StreamReader(configFile);
 
-            var songs_directory_path = Path.Combine(BasePath, stable_songs_path);
+            var songsDirectoryPath = Path.Combine(BasePath, stable_songs_path);
 
             while (!textReader.EndOfStream)
             {
@@ -46,13 +46,13 @@ namespace osu.Game.IO
                 {
                     var directory = line.Split('=')[1].TrimStart();
                     if (Path.IsPathFullyQualified(directory))
-                        songs_directory_path = directory;
+                        songsDirectoryPath = directory;
 
                     break;
                 }
             }
 
-            return songs_directory_path;
+            return songsDirectoryPath;
         }
     }
 }
