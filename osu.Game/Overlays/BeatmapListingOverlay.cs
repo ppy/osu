@@ -211,7 +211,7 @@ namespace osu.Game.Overlays
             base.Dispose(isDisposing);
         }
 
-        private class NotFoundDrawable : CompositeDrawable
+        public class NotFoundDrawable : CompositeDrawable
         {
             public NotFoundDrawable()
             {
