@@ -123,14 +123,13 @@ namespace osu.Game.Tournament.Components
 
             if (!string.IsNullOrEmpty(mod))
             {
-                AddInternal(new TournamentModDisplay
+                AddInternal(new TournamentModDisplay(mod)
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                     Margin = new MarginPadding(10),
                     Width = 60,
                     RelativeSizeAxes = Axes.Y,
-                    ModAcronym = mod
                 });
             }
         }
