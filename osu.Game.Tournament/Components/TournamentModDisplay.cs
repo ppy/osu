@@ -16,15 +16,20 @@ namespace osu.Game.Tournament.Components
 {
     public class TournamentModDisplay : CompositeDrawable
     {
-        public string ModAcronym;
+        private readonly string modAcronym;
 
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
+        public TournamentModDisplay(string mod)
+        {
+            modAcronym = mod;
+        }
+
         [BackgroundDependencyLoader]
         private void load(TextureStore textures, LadderInfo ladderInfo)
         {
-            var texture = textures.Get($"mods/{ModAcronym}");
+            var texture = textures.Get($"mods/{modAcronym}");
 
             if (texture != null)
             {
@@ -40,7 +45,7 @@ namespace osu.Game.Tournament.Components
             else
             {
                 var ruleset = rulesets.GetRuleset(ladderInfo.Ruleset.Value?.ID ?? 0);
-                var modIcon = ruleset?.CreateInstance().GetAllMods().FirstOrDefault(mod => mod.Acronym == ModAcronym);
+                var modIcon = ruleset?.CreateInstance().GetAllMods().FirstOrDefault(mod => mod.Acronym == modAcronym);
 
                 if (modIcon == null)
                     return;
