@@ -1,7 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
+using System;
 using System.Threading.Tasks;
+using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Logging;
 
 namespace osu.Game.Extensions
@@ -13,13 +17,19 @@ namespace osu.Game.Extensions
         /// Avoids unobserved exceptions from being fired.
         /// </summary>
         /// <param name="task">The task.</param>
-        /// <param name="logOnError">Whether errors should be logged as important, or silently ignored.</param>
-        public static void CatchUnobservedExceptions(this Task task, bool logOnError = false)
+        /// <param name="logAsError">
+        /// Whether errors should be logged as errors visible to users, or as debug messages.
+        /// Logging as debug will essentially silence the errors on non-release builds.
+        /// </param>
+        public static void CatchUnobservedExceptions(this Task task, bool logAsError = false)
         {
             task.ContinueWith(t =>
             {
-                if (logOnError)
-                    Logger.Log($"Error running task: {t.Exception?.Message ?? "unknown"}", LoggingTarget.Runtime, LogLevel.Important);
+                Exception? exception = t.Exception?.AsSingular();
+                if (logAsError)
+                    Logger.Error(exception, $"Error running task: {exception?.Message ?? "(unknown)"}", LoggingTarget.Runtime, true);
+                else
+                    Logger.Log($"Error running task: {exception}", LoggingTarget.Runtime, LogLevel.Debug);
             }, TaskContinuationOptions.NotOnRanToCompletion);
         }
     }

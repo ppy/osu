@@ -68,7 +68,7 @@ namespace osu.Game.Overlays
                         }
                     }
                 },
-                loading = new LoadingLayer(content),
+                loading = new LoadingLayer(true),
             };
         }
 

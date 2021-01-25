@@ -34,10 +34,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.LoadComplete();
 
             isConnected.BindTo(multiplayerClient.IsConnected);
-            isConnected.BindValueChanged(_ => Schedule(updatePolling));
-            JoinedRoom.BindValueChanged(_ => updatePolling());
-
-            updatePolling();
+            isConnected.BindValueChanged(_ => Scheduler.AddOnce(updatePolling));
+            JoinedRoom.BindValueChanged(_ => Scheduler.AddOnce(updatePolling), true);
         }
 
         public override void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
