@@ -14,16 +14,19 @@ using osuTK;
 
 namespace osu.Game.Tournament.Components
 {
-    public class TournamentModDisplay : CompositeDrawable
+    /// <summary>
+    /// Mod icon displayed in tournament usages, allowing user overridden graphics.
+    /// </summary>
+    public class TournamentModIcon : CompositeDrawable
     {
         private readonly string modAcronym;
 
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
-        public TournamentModDisplay(string mod)
+        public TournamentModIcon(string modAcronym)
         {
-            modAcronym = mod;
+            this.modAcronym = modAcronym;
         }
 
         [BackgroundDependencyLoader]
