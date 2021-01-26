@@ -21,9 +21,9 @@ namespace osu.Game.Extensions
         /// Whether errors should be logged as errors visible to users, or as debug messages.
         /// Logging as debug will essentially silence the errors on non-release builds.
         /// </param>
-        public static void CatchUnobservedExceptions(this Task task, bool logAsError = false)
+        public static Task CatchUnobservedExceptions(this Task task, bool logAsError = false)
         {
-            task.ContinueWith(t =>
+            return task.ContinueWith(t =>
             {
                 Exception? exception = t.Exception?.AsSingular();
                 if (logAsError)

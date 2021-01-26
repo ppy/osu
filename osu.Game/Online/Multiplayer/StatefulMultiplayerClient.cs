@@ -110,37 +110,49 @@ namespace osu.Game.Online.Multiplayer
         }
 
         private readonly TaskChain joinOrLeaveTaskChain = new TaskChain();
+        private CancellationTokenSource? joinCancellationSource;
 
         /// <summary>
         /// Joins the <see cref="MultiplayerRoom"/> for a given API <see cref="Room"/>.
         /// </summary>
         /// <param name="room">The API <see cref="Room"/>.</param>
-        public async Task JoinRoom(Room room) => await joinOrLeaveTaskChain.Add(async () =>
+        public async Task JoinRoom(Room room)
         {
-            if (Room != null)
-                throw new InvalidOperationException("Cannot join a multiplayer room while already in one.");
+            var cancellationSource = new CancellationTokenSource();
 
-            Debug.Assert(room.RoomID.Value != null);
-
-            // Join the server-side room.
-            var joinedRoom = await JoinRoom(room.RoomID.Value.Value);
-            Debug.Assert(joinedRoom != null);
-
-            // Populate users.
-            Debug.Assert(joinedRoom.Users != null);
-            await Task.WhenAll(joinedRoom.Users.Select(PopulateUser));
-
-            // Update the stored room (must be done on update thread for thread-safety).
             await scheduleAsync(() =>
             {
-                Room = joinedRoom;
-                apiRoom = room;
-                playlistItemId = room.Playlist.SingleOrDefault()?.ID ?? 0;
-            });
+                joinCancellationSource?.Cancel();
+                joinCancellationSource = cancellationSource;
+            }, CancellationToken.None);
 
-            // Update room settings.
-            await updateLocalRoomSettings(joinedRoom.Settings);
-        });
+            await joinOrLeaveTaskChain.Add(async () =>
+            {
+                if (Room != null)
+                    throw new InvalidOperationException("Cannot join a multiplayer room while already in one.");
+
+                Debug.Assert(room.RoomID.Value != null);
+
+                // Join the server-side room.
+                var joinedRoom = await JoinRoom(room.RoomID.Value.Value);
+                Debug.Assert(joinedRoom != null);
+
+                // Populate users.
+                Debug.Assert(joinedRoom.Users != null);
+                await Task.WhenAll(joinedRoom.Users.Select(PopulateUser));
+
+                // Update the stored room (must be done on update thread for thread-safety).
+                await scheduleAsync(() =>
+                {
+                    Room = joinedRoom;
+                    apiRoom = room;
+                    playlistItemId = room.Playlist.SingleOrDefault()?.ID ?? 0;
+                }, cancellationSource.Token);
+
+                // Update room settings.
+                await updateLocalRoomSettings(joinedRoom.Settings, cancellationSource.Token);
+            }, cancellationSource.Token);
+        }
 
         /// <summary>
         /// Joins the <see cref="MultiplayerRoom"/> with a given ID.
@@ -151,14 +163,15 @@ namespace osu.Game.Online.Multiplayer
 
         public Task LeaveRoom()
         {
-            if (Room == null)
-                return Task.FromCanceled(new CancellationToken(true));
-
             // Leaving rooms is expected to occur instantaneously whilst the operation is finalised in the background.
             // However a few members need to be reset immediately to prevent other components from entering invalid states whilst the operation hasn't yet completed.
             // For example, if a room was left and the user immediately pressed the "create room" button, then the user could be taken into the lobby if the value of Room is not reset in time.
             var scheduledReset = scheduleAsync(() =>
             {
+                // The join may have not completed yet, so certain tasks that either update the room or reference the room should be cancelled.
+                // This includes the setting of Room itself along with the initial update of the room settings on join.
+                joinCancellationSource?.Cancel();
+
                 apiRoom = null;
                 Room = null;
                 CurrentMatchPlayingUserIds.Clear();
@@ -169,7 +182,7 @@ namespace osu.Game.Online.Multiplayer
             return joinOrLeaveTaskChain.Add(async () =>
             {
                 await scheduledReset;
-                await LeaveRoomInternal();
+                await LeaveRoomInternal().CatchUnobservedExceptions();
             });
         }
 
@@ -455,7 +468,8 @@ namespace osu.Game.Online.Multiplayer
         /// This updates both the joined <see cref="MultiplayerRoom"/> and the respective API <see cref="Room"/>.
         /// </remarks>
         /// <param name="settings">The new <see cref="MultiplayerRoomSettings"/> to update from.</param>
-        private Task updateLocalRoomSettings(MultiplayerRoomSettings settings) => scheduleAsync(() =>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> to cancel the update.</param>
+        private Task updateLocalRoomSettings(MultiplayerRoomSettings settings, CancellationToken cancellationToken = default) => scheduleAsync(() =>
         {
             if (Room == null)
                 return;
@@ -473,10 +487,17 @@ namespace osu.Game.Online.Multiplayer
             RoomUpdated?.Invoke();
 
             var req = new GetBeatmapSetRequest(settings.BeatmapID, BeatmapSetLookupType.BeatmapId);
-            req.Success += res => updatePlaylist(settings, res);
+
+            req.Success += res =>
+            {
+                if (cancellationToken.IsCancellationRequested)
+                    return;
+
+                updatePlaylist(settings, res);
+            };
 
             api.Queue(req);
-        });
+        }, cancellationToken);
 
         private void updatePlaylist(MultiplayerRoomSettings settings, APIBeatmapSet onlineSet)
         {
@@ -524,12 +545,15 @@ namespace osu.Game.Online.Multiplayer
                 CurrentMatchPlayingUserIds.Remove(userId);
         }
 
-        private Task scheduleAsync(Action action)
+        private Task scheduleAsync(Action action, CancellationToken cancellationToken = default)
         {
             var tcs = new TaskCompletionSource<bool>();
 
             Scheduler.Add(() =>
             {
+                if (cancellationToken.IsCancellationRequested)
+                    return;
+
                 try
                 {
                     action();
