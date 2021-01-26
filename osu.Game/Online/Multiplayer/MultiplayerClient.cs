@@ -71,14 +71,15 @@ namespace osu.Game.Online.Multiplayer
 
             try
             {
-                await disconnect(false);
-
                 // this token will be valid for the scope of this connection.
                 // if cancelled, we can be sure that a disconnect or reconnect is handled elsewhere.
                 var cancellationToken = connectCancelSource.Token;
 
                 while (api.State.Value == APIState.Online)
                 {
+                    // ensure any previous connection was disposed.
+                    await disconnect(false);
+
                     cancellationToken.ThrowIfCancellationRequested();
 
                     Logger.Log("Multiplayer client connecting...", LoggingTarget.Network);
