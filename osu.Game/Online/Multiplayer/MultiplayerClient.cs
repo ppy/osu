@@ -70,7 +70,7 @@ namespace osu.Game.Online.Multiplayer
                          {
                              options.Headers.Add("Authorization", $"Bearer {api.AccessToken}");
                          })
-                         .AddNewtonsoftJsonProtocol(options => { options.PayloadSerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore; })
+                         .AddMessagePackProtocol()
                          .Build();
 
             // this is kind of SILLY
