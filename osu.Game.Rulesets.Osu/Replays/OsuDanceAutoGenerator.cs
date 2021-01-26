@@ -35,6 +35,7 @@ namespace osu.Game.Rulesets.Osu.Replays
         private readonly BaseDanceObjectMover<Slider> sliderMover;
         private readonly BaseDanceObjectMover<Spinner> spinnerMover;
         private readonly OsuRulesetConfigManager config;
+        private int buttonIndex;
 
         private readonly double frameTime;
 
