@@ -4,6 +4,7 @@
 #nullable enable
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace osu.Game.Utils
@@ -19,15 +20,32 @@ namespace osu.Game.Utils
         /// <summary>
         /// Adds a new task to the end of this <see cref="TaskChain"/>.
         /// </summary>
-        /// <param name="taskFunc">The task creation function.</param>
+        /// <param name="action">The action to be executed.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> for this task. Does not affect further tasks in the chain.</param>
         /// <returns>The awaitable <see cref="Task"/>.</returns>
-        public Task Add(Func<Task> taskFunc)
+        public Task Add(Action action, CancellationToken cancellationToken = default)
         {
             lock (currentTaskLock)
             {
-                currentTask = currentTask == null
-                    ? taskFunc()
-                    : currentTask.ContinueWith(_ => taskFunc()).Unwrap();
+                // Note: Attaching the cancellation token to the continuation could lead to re-ordering of tasks in the chain.
+                // Therefore, the cancellation token is not used to cancel the continuation but only the run of each task.
+                if (currentTask == null)
+                {
+                    currentTask = Task.Run(() =>
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        action();
+                    }, CancellationToken.None);
+                }
+                else
+                {
+                    currentTask = currentTask.ContinueWith(_ =>
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        action();
+                    }, CancellationToken.None);
+                }
+
                 return currentTask;
             }
         }
