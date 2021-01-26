@@ -14,7 +14,7 @@ namespace osu.Game.IO
     /// </summary>
     public class StableStorage : DesktopStorage
     {
-        private const string stable_songs_path = "Songs";
+        private const string stable_default_songs_path = "Songs";
 
         private readonly DesktopGameHost host;
         private readonly string songsPath;
@@ -36,7 +36,7 @@ namespace osu.Game.IO
             var configFile = GetStream(GetFiles(".", "osu!.*.cfg").First());
             var textReader = new StreamReader(configFile);
 
-            var songsDirectoryPath = Path.Combine(BasePath, stable_songs_path);
+            var songsDirectoryPath = Path.Combine(BasePath, stable_default_songs_path);
 
             while (!textReader.EndOfStream)
             {
