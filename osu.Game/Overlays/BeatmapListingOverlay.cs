@@ -176,6 +176,9 @@ namespace osu.Game.Overlays
             loadingLayer.Hide();
             lastFetchDisplayedTime = Time.Current;
 
+            if (content == currentContent)
+                return;
+
             var lastContent = currentContent;
 
             if (lastContent != null)
@@ -210,7 +213,7 @@ namespace osu.Game.Overlays
             base.Dispose(isDisposing);
         }
 
-        private class NotFoundDrawable : CompositeDrawable
+        public class NotFoundDrawable : CompositeDrawable
         {
             public NotFoundDrawable()
             {
