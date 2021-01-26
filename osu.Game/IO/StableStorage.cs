@@ -17,38 +17,43 @@ namespace osu.Game.IO
         private const string stable_default_songs_path = "Songs";
 
         private readonly DesktopGameHost host;
-        private readonly string songsPath;
+        private readonly Lazy<string> songsPath;
 
         public StableStorage(string path, DesktopGameHost host)
             : base(path, host)
         {
             this.host = host;
-            songsPath = locateSongsDirectory();
+            songsPath = new Lazy<string>(locateSongsDirectory);
         }
 
         /// <summary>
         /// Returns a <see cref="Storage"/> pointing to the osu-stable Songs directory.
         /// </summary>
-        public Storage GetSongStorage() => new DesktopStorage(songsPath, host);
+        public Storage GetSongStorage() => new DesktopStorage(songsPath.Value, host);
 
         private string locateSongsDirectory()
         {
-            var configFile = GetStream(GetFiles(".", "osu!.*.cfg").First());
-            var textReader = new StreamReader(configFile);
-
             var songsDirectoryPath = Path.Combine(BasePath, stable_default_songs_path);
 
-            while (!textReader.EndOfStream)
+            var configFile = GetFiles(".", "osu!.*.cfg").FirstOrDefault();
+
+            if (configFile == null)
+                return songsDirectoryPath;
+
+            using (var textReader = new StreamReader(GetStream(configFile)))
             {
-                var line = textReader.ReadLine();
+                string line;
 
-                if (line?.StartsWith("BeatmapDirectory", StringComparison.OrdinalIgnoreCase) == true)
+                while ((line = textReader.ReadLine()) != null)
                 {
-                    var directory = line.Split('=')[1].TrimStart();
-                    if (Path.IsPathFullyQualified(directory))
-                        songsDirectoryPath = directory;
+                    if (line.StartsWith("BeatmapDirectory", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var directory = line.Split('=')[1].TrimStart();
+                        if (Path.IsPathFullyQualified(directory))
+                            songsDirectoryPath = directory;
 
-                    break;
+                        break;
+                    }
                 }
             }
 
