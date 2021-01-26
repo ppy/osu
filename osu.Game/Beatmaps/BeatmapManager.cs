@@ -66,9 +66,9 @@ namespace osu.Game.Beatmaps
 
         protected override bool CheckStableDirectoryExists(StableStorage stableStorage) => stableStorage.GetSongStorage().ExistsDirectory(".");
 
-        protected override IEnumerable<string> GetStableImportPaths(StableStorage stableStoage)
+        protected override IEnumerable<string> GetStableImportPaths(StableStorage stableStorage)
         {
-            var songStorage = stableStoage.GetSongStorage();
+            var songStorage = stableStorage.GetSongStorage();
             return songStorage.GetDirectories(".").Select(path => songStorage.GetFullPath(path));
         }
 
