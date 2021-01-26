@@ -50,7 +50,7 @@ namespace osu.Game.Tournament.Components
                 if (modIcon == null)
                     return;
 
-                AddInternal(new ModIcon(modIcon)
+                AddInternal(new ModIcon(modIcon, false)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
