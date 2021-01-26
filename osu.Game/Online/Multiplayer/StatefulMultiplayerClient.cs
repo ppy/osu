@@ -182,7 +182,7 @@ namespace osu.Game.Online.Multiplayer
             return joinOrLeaveTaskChain.Add(async () =>
             {
                 await scheduledReset;
-                await LeaveRoomInternal().CatchUnobservedExceptions();
+                await LeaveRoomInternal();
             });
         }
 
