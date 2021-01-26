@@ -4,6 +4,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using osu.Game.Extensions;
 using osu.Game.Utils;
 
 namespace osu.Game.Tests.NonVisual
@@ -13,12 +14,20 @@ namespace osu.Game.Tests.NonVisual
     {
         private TaskChain taskChain;
         private int currentTask;
+        private CancellationTokenSource globalCancellationToken;
 
         [SetUp]
         public void Setup()
         {
+            globalCancellationToken = new CancellationTokenSource();
             taskChain = new TaskChain();
             currentTask = 0;
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            globalCancellationToken?.Cancel();
         }
 
         [Test]
@@ -65,17 +74,40 @@ namespace osu.Game.Tests.NonVisual
             Assert.That(task3.task.Result, Is.EqualTo(2));
         }
 
+        [Test]
+        public async Task TestChainedTaskDoesNotCompleteBeforeChildTasks()
+        {
+            var mutex = new ManualResetEventSlim(false);
+
+            var task = taskChain.Add(async () =>
+            {
+                await Task.Run(() => mutex.Wait(globalCancellationToken.Token)).CatchUnobservedExceptions();
+            });
+
+            // Allow task to potentially complete
+            Thread.Sleep(1000);
+
+            Assert.That(task.IsCompleted, Is.False);
+
+            // Allow the task to complete.
+            mutex.Set();
+
+            await task;
+        }
+
         private (Task<int> task, ManualResetEventSlim mutex, CancellationTokenSource cancellation) addTask()
         {
             var mutex = new ManualResetEventSlim(false);
-            var cancellationSource = new CancellationTokenSource();
             var completionSource = new TaskCompletionSource<int>();
+
+            var cancellationSource = new CancellationTokenSource();
+            var token = CancellationTokenSource.CreateLinkedTokenSource(cancellationSource.Token, globalCancellationToken.Token);
 
             taskChain.Add(() =>
             {
-                mutex.Wait(CancellationToken.None);
+                mutex.Wait(globalCancellationToken.Token);
                 completionSource.SetResult(Interlocked.Increment(ref currentTask));
-            }, cancellationSource.Token);
+            }, token.Token);
 
             return (completionSource.Task, mutex, cancellationSource);
         }

@@ -14,8 +14,8 @@ namespace osu.Game.Utils
     /// </summary>
     public class TaskChain
     {
-        private readonly object currentTaskLock = new object();
-        private Task? currentTask;
+        private readonly object finalTaskLock = new object();
+        private Task? finalTask;
 
         /// <summary>
         /// Adds a new task to the end of this <see cref="TaskChain"/>.
@@ -23,31 +23,22 @@ namespace osu.Game.Utils
         /// <param name="action">The action to be executed.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> for this task. Does not affect further tasks in the chain.</param>
         /// <returns>The awaitable <see cref="Task"/>.</returns>
-        public Task Add(Action action, CancellationToken cancellationToken = default)
+        public async Task Add(Action action, CancellationToken cancellationToken = default)
         {
-            lock (currentTaskLock)
-            {
-                // Note: Attaching the cancellation token to the continuation could lead to re-ordering of tasks in the chain.
-                // Therefore, the cancellation token is not used to cancel the continuation but only the run of each task.
-                if (currentTask == null)
-                {
-                    currentTask = Task.Run(() =>
-                    {
-                        cancellationToken.ThrowIfCancellationRequested();
-                        action();
-                    }, CancellationToken.None);
-                }
-                else
-                {
-                    currentTask = currentTask.ContinueWith(_ =>
-                    {
-                        cancellationToken.ThrowIfCancellationRequested();
-                        action();
-                    }, CancellationToken.None);
-                }
+            Task? previousTask;
+            Task currentTask;
 
-                return currentTask;
+            lock (finalTaskLock)
+            {
+                previousTask = finalTask;
+                finalTask = currentTask = new Task(action, cancellationToken);
             }
+
+            if (previousTask != null)
+                await previousTask;
+
+            currentTask.Start();
+            await currentTask;
         }
     }
 }
