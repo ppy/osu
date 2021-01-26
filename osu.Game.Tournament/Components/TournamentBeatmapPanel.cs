@@ -123,7 +123,7 @@ namespace osu.Game.Tournament.Components
 
             if (!string.IsNullOrEmpty(mod))
             {
-                AddInternal(new TournamentModDisplay(mod)
+                AddInternal(new TournamentModIcon(mod)
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
