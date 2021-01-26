@@ -32,9 +32,9 @@ namespace osu.Game.Tournament.Components
         [BackgroundDependencyLoader]
         private void load(TextureStore textures, LadderInfo ladderInfo)
         {
-            var texture = textures.Get($"mods/{modAcronym}");
+            var customTexture = textures.Get($"mods/{modAcronym}");
 
-            if (texture != null)
+            if (customTexture != null)
             {
                 AddInternal(new Sprite
                 {
@@ -42,24 +42,24 @@ namespace osu.Game.Tournament.Components
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                    Texture = texture
+                    Texture = customTexture
                 });
+
+                return;
             }
-            else
+
+            var ruleset = rulesets.GetRuleset(ladderInfo.Ruleset.Value?.ID ?? 0);
+            var modIcon = ruleset?.CreateInstance().GetAllMods().FirstOrDefault(mod => mod.Acronym == modAcronym);
+
+            if (modIcon == null)
+                return;
+
+            AddInternal(new ModIcon(modIcon, false)
             {
-                var ruleset = rulesets.GetRuleset(ladderInfo.Ruleset.Value?.ID ?? 0);
-                var modIcon = ruleset?.CreateInstance().GetAllMods().FirstOrDefault(mod => mod.Acronym == modAcronym);
-
-                if (modIcon == null)
-                    return;
-
-                AddInternal(new ModIcon(modIcon, false)
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Scale = new Vector2(0.5f)
-                });
-            }
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Scale = new Vector2(0.5f)
+            });
         }
     }
 }
