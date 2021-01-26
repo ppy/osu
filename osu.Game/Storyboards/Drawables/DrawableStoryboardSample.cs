@@ -21,12 +21,6 @@ namespace osu.Game.Storyboards.Drawables
 
         public override bool RemoveWhenNotAlive => false;
 
-        /// <remarks>
-        /// Contrary to <see cref="PausableSkinnableSound"/>, all <see cref="DrawableStoryboardSample"/>s are affected
-        /// by sample disables, as they are oftentimes longer-running sound effects. This also matches stable behaviour.
-        /// </remarks>
-        protected override bool AffectedBySamplePlaybackDisable => true;
-
         public DrawableStoryboardSample(StoryboardSampleInfo sampleInfo)
             : base(sampleInfo)
         {
@@ -46,6 +40,14 @@ namespace osu.Game.Storyboards.Drawables
                 foreach (var sample in DrawableSamples)
                     mod.ApplyToSample(sample);
             }
+        }
+
+        protected override void SamplePlaybackDisabledChanged(ValueChangedEvent<bool> disabled)
+        {
+            if (!RequestedPlaying) return;
+
+            if (disabled.NewValue)
+                Stop();
         }
 
         protected override void Update()
