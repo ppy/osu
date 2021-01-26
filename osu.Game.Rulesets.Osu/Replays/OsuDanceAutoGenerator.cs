@@ -35,13 +35,27 @@ namespace osu.Game.Rulesets.Osu.Replays
         private readonly BaseDanceObjectMover<Slider> sliderMover;
         private readonly BaseDanceObjectMover<Spinner> spinnerMover;
         private readonly OsuRulesetConfigManager config;
+        private int buttonIndex;
 
-        private bool tapRight;
         private readonly double frameTime;
 
-        // yes, this is intended.
-        // ReSharper disable once AssignmentInConditionalExpression
-        private OsuAction action() => (tapRight = !tapRight) ? OsuAction.LeftButton : OsuAction.RightButton;
+        private OsuAction getAction(OsuHitObject h, OsuHitObject last)
+        {
+            double timeDifference = ApplyModsToTime(h.StartTime - last.StartTime);
+
+            if (timeDifference > 0 && // Sanity checks
+                ((last.StackedPosition - h.StackedPosition).Length > h.Radius * (1.5 + 100.0 / timeDifference) || // Either the distance is big enough
+                 timeDifference >= 266)) // ... or the beats are slow enough to tap anyway.
+            {
+                buttonIndex = 0;
+            }
+            else
+            {
+                buttonIndex++;
+            }
+
+            return buttonIndex % 2 == 0 ? OsuAction.LeftButton : OsuAction.RightButton;
+        }
 
         public OsuDanceAutoGenerator(IBeatmap beatmap)
             : base(beatmap)
@@ -76,35 +90,36 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         private void objectGenerate(OsuHitObject o, int idx)
         {
+            OsuHitObject last = Beatmap.HitObjects[idx == 0 ? idx : idx - 1];
+            OsuAction action = getAction(o, last);
             switch (o)
             {
                 case Slider s:
                     sliderMover.Object = s;
                     sliderMover.OnObjChange();
 
-                    var tap = action();
-                    AddFrameToReplay(new OsuReplayFrame(s.StartTime, s.StackedPosition, tap));
+                    AddFrameToReplay(new OsuReplayFrame(s.StartTime, s.StackedPosition, action));
 
                     if (ObjectsDuring[idx]) break;
 
                     for (double t = s.StartTime + frameTime; t < s.EndTime; t += frameTime)
-                        AddFrameToReplay(new OsuReplayFrame(t, sliderMover.Update(t), tap));
+                        AddFrameToReplay(new OsuReplayFrame(t, sliderMover.Update(t), action));
 
                     break;
 
                 case Spinner s:
+                    if(s.SpinsRequired == 0) return;
+
                     spinnerMover.Object = s;
                     spinnerMover.OnObjChange();
 
-                    tap = action();
-
                     for (double t = s.StartTime; t < (ObjectsDuring[idx] ? Beatmap.HitObjects[idx + 1].StartTime : s.EndTime); t += frameTime)
-                        AddFrameToReplay(new OsuReplayFrame(t, spinnerMover.Update(t), tap));
+                        AddFrameToReplay(new OsuReplayFrame(t, spinnerMover.Update(t), action));
 
                     break;
 
                 case HitCircle c:
-                    AddFrameToReplay(new OsuReplayFrame(c.StartTime, c.StackedPosition, action()));
+                    AddFrameToReplay(new OsuReplayFrame(c.StartTime, c.StackedPosition, action));
                     break;
 
                 default: return;
@@ -179,7 +194,6 @@ namespace osu.Game.Rulesets.Osu.Replays
         protected double StartTime => Start.GetEndTime();
         protected double EndTime => End.StartTime;
         protected double Duration => EndTime - StartTime;
-        protected float DurationF => (float)Duration;
 
         protected Vector2 StartPos => ObjectsDuring[ObjectIndex] ? Start.StackedPosition : Start.StackedEndPosition;
         protected Vector2 EndPos => End.StackedPosition;
@@ -194,8 +208,27 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         public int ObjectIndex { set; protected get; }
         public OsuBeatmap Beatmap { set; protected get; }
-        public OsuHitObject Start => Beatmap.HitObjects[ObjectIndex];
-        public OsuHitObject End => Beatmap.HitObjects[ObjectIndex + 1];
+
+        public OsuHitObject Start
+        {
+            get
+            {
+                if (Beatmap.HitObjects[ObjectIndex] is Spinner spinner && spinner.SpinsRequired == 0) return Beatmap.HitObjects[ObjectIndex == 0 ? ObjectIndex : ObjectIndex - 1];
+
+                return Beatmap.HitObjects[ObjectIndex];
+            }
+        }
+
+        public OsuHitObject End
+        {
+            get
+            {
+                if (Beatmap.HitObjects[ObjectIndex + 1] is Spinner spinner && spinner.SpinsRequired == 0) return Beatmap.HitObjects[ObjectIndex == Beatmap.HitObjects.Count ? ObjectIndex - 1 : ObjectIndex];
+
+                return Beatmap.HitObjects[ObjectIndex + 1];
+            }
+        }
+
         public virtual void OnObjChange() { }
         public abstract Vector2 Update(double time);
     }
