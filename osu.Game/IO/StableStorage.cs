@@ -35,12 +35,13 @@ namespace osu.Game.IO
         {
             var songsDirectoryPath = Path.Combine(BasePath, stable_default_songs_path);
 
-            var configFile = GetFiles(".", "osu!.*.cfg").FirstOrDefault();
+            var configFile = GetFiles(".", "osu!.*.cfg").SingleOrDefault();
 
             if (configFile == null)
                 return songsDirectoryPath;
 
-            using (var textReader = new StreamReader(GetStream(configFile)))
+            using (var stream = GetStream(configFile))
+            using (var textReader = new StreamReader(stream))
             {
                 string line;
 
