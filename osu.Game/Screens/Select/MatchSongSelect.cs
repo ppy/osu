@@ -81,7 +81,7 @@ namespace osu.Game.Screens.Select
             item.RequiredMods.AddRange(Mods.Value.Select(m => m.CreateCopy()));
         }
 
-        protected override ModSelectOverlay CreateModSelectOverlay() => new ModSelectOverlay(isValidMod);
+        protected override ModSelectOverlay CreateModSelectOverlay() => new SoloModSelectOverlay(isValidMod);
 
         private bool isValidMod(Mod mod) => !(mod is ModAutoplay) && (mod as MultiMod)?.Mods.Any(mm => mm is ModAutoplay) != true;
     }
