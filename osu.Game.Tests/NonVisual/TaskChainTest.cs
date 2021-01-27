@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Game.Extensions;
-using osu.Game.Utils;
 
 namespace osu.Game.Tests.NonVisual
 {

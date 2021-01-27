@@ -34,32 +34,46 @@ namespace osu.Game.Extensions
             }, TaskContinuationOptions.NotOnRanToCompletion);
         }
 
-        public static Task ContinueWithSequential(this Task task, Action continuationFunction, CancellationToken cancellationToken = default)
-        {
-            return task.ContinueWithSequential(() => Task.Run(continuationFunction, cancellationToken), cancellationToken);
-        }
+        /// <summary>
+        /// Add a continuation to be performed only after the attached task has completed.
+        /// </summary>
+        /// <param name="task">The previous task to be awaited on.</param>
+        /// <param name="action">The action to run.</param>
+        /// <param name="cancellationToken">An optional cancellation token. Will only cancel the provided action, not the sequence.</param>
+        /// <returns>A task representing the provided action.</returns>
+        public static Task ContinueWithSequential(this Task task, Action action, CancellationToken cancellationToken = default) =>
+            task.ContinueWithSequential(() => Task.Run(action, cancellationToken), cancellationToken);
 
+        /// <summary>
+        /// Add a continuation to be performed only after the attached task has completed.
+        /// </summary>
+        /// <param name="task">The previous task to be awaited on.</param>
+        /// <param name="continuationFunction">The continuation to run. Generally should be an async function.</param>
+        /// <param name="cancellationToken">An optional cancellation token. Will only cancel the provided action, not the sequence.</param>
+        /// <returns>A task representing the provided action.</returns>
         public static Task ContinueWithSequential(this Task task, Func<Task> continuationFunction, CancellationToken cancellationToken = default)
         {
             var tcs = new TaskCompletionSource<bool>();
 
             task.ContinueWith(t =>
             {
+                // the previous task has finished execution or been cancelled, so we can run the provided continuation.
+
                 if (cancellationToken.IsCancellationRequested)
                 {
                     tcs.SetCanceled();
                 }
                 else
                 {
-                    continuationFunction().ContinueWith(t2 =>
+                    continuationFunction().ContinueWith(continuationTask =>
                     {
-                        if (cancellationToken.IsCancellationRequested || t2.IsCanceled)
+                        if (cancellationToken.IsCancellationRequested || continuationTask.IsCanceled)
                         {
                             tcs.TrySetCanceled();
                         }
-                        else if (t2.IsFaulted)
+                        else if (continuationTask.IsFaulted)
                         {
-                            tcs.TrySetException(t2.Exception);
+                            tcs.TrySetException(continuationTask.Exception);
                         }
                         else
                         {
@@ -69,6 +83,8 @@ namespace osu.Game.Extensions
                 }
             }, cancellationToken: default);
 
+            // importantly, we are not returning the continuation itself but rather a task which represents its status in sequential execution order.
+            // this will not be cancelled or completed until the previous task has also.
             return tcs.Task;
         }
     }
