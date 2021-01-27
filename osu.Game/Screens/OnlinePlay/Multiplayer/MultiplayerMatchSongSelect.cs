@@ -39,6 +39,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Resolved]
         private StatefulMultiplayerClient client { get; set; }
 
+        private readonly Bindable<IReadOnlyList<Mod>> freeMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+
         private readonly FreeModSelectOverlay freeModSelectOverlay;
         private LoadingLayer loadingLayer;
 
@@ -52,7 +54,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING };
 
-            freeModSelectOverlay = new FreeModSelectOverlay();
+            freeModSelectOverlay = new FreeModSelectOverlay(isValidMod) { SelectedMods = { BindTarget = freeMods } };
         }
 
         [BackgroundDependencyLoader]
@@ -63,7 +65,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             initialRuleset = Ruleset.Value;
             initialMods = Mods.Value.ToList();
 
-            freeModSelectOverlay.SelectedMods.Value = playlist.FirstOrDefault()?.AllowedMods.Select(m => m.CreateCopy()).ToArray() ?? Array.Empty<Mod>();
+            freeMods.Value = playlist.FirstOrDefault()?.AllowedMods.Select(m => m.CreateCopy()).ToArray() ?? Array.Empty<Mod>();
+
             FooterPanels.Add(freeModSelectOverlay);
         }
 
@@ -79,7 +82,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             item.RequiredMods.AddRange(Mods.Value.Select(m => m.CreateCopy()));
 
             item.AllowedMods.Clear();
-            item.AllowedMods.AddRange(freeModSelectOverlay.SelectedMods.Value.Select(m => m.CreateCopy()));
+            item.AllowedMods.AddRange(freeMods.Value.Select(m => m.CreateCopy()));
 
             // If the client is already in a room, update via the client.
             // Otherwise, update the playlist directly in preparation for it to be submitted to the API on match creation.
@@ -132,7 +135,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         protected override IEnumerable<(FooterButton, OverlayContainer)> CreateFooterButtons()
         {
             var buttons = base.CreateFooterButtons().ToList();
-            buttons.Insert(buttons.FindIndex(b => b.Item1 is FooterButtonMods) + 1, (new FooterButtonFreeMods(), freeModSelectOverlay));
+            buttons.Insert(buttons.FindIndex(b => b.Item1 is FooterButtonMods) + 1, (new FooterButtonFreeMods { Current = freeMods }, freeModSelectOverlay));
             return buttons;
         }
 
