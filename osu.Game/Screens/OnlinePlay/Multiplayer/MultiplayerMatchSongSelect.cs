@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Humanizer;
@@ -38,8 +39,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Resolved]
         private StatefulMultiplayerClient client { get; set; }
 
+        private readonly FreeModSelectOverlay freeModSelectOverlay;
         private LoadingLayer loadingLayer;
-        private FreeModSelectOverlay freeModSelectOverlay;
 
         private WorkingBeatmap initialBeatmap;
         private RulesetInfo initialRuleset;
@@ -62,7 +63,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             initialRuleset = Ruleset.Value;
             initialMods = Mods.Value.ToList();
 
-            freeModSelectOverlay.SelectedMods.Value = playlist.FirstOrDefault()?.AllowedMods.Select(m => m.CreateCopy()).ToList();
+            freeModSelectOverlay.SelectedMods.Value = playlist.FirstOrDefault()?.AllowedMods.Select(m => m.CreateCopy()).ToArray() ?? Array.Empty<Mod>();
             FooterPanels.Add(freeModSelectOverlay);
         }
 
