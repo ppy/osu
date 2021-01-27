@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Mods
 {
     public class ModSection : Container
     {
-        private readonly OsuSpriteText headerLabel;
+        private readonly Drawable header;
 
         public FillFlowContainer<ModButtonEmpty> ButtonsContainer { get; }
 
@@ -47,10 +47,7 @@ namespace osu.Game.Overlays.Mods
                     if (m == null)
                         return new ModButtonEmpty();
 
-                    return new ModButton(m)
-                    {
-                        SelectionChanged = Action,
-                    };
+                    return CreateModButton(m).With(b => b.SelectionChanged = Action);
                 }).ToArray();
 
                 modsLoadCts?.Cancel();
@@ -58,7 +55,7 @@ namespace osu.Game.Overlays.Mods
                 if (modContainers.Length == 0)
                 {
                     ModIconsLoaded = true;
-                    headerLabel.Hide();
+                    header.Hide();
                     Hide();
                     return;
                 }
@@ -73,7 +70,7 @@ namespace osu.Game.Overlays.Mods
 
                 buttons = modContainers.OfType<ModButton>().ToArray();
 
-                headerLabel.FadeIn(200);
+                header.FadeIn(200);
                 this.FadeIn(200);
             }
         }
@@ -160,16 +157,9 @@ namespace osu.Game.Overlays.Mods
             Origin = Anchor.TopCentre;
             Anchor = Anchor.TopCentre;
 
-            Children = new Drawable[]
+            Children = new[]
             {
-                headerLabel = new OsuSpriteText
-                {
-                    Origin = Anchor.TopLeft,
-                    Anchor = Anchor.TopLeft,
-                    Position = new Vector2(0f, 0f),
-                    Font = OsuFont.GetFont(weight: FontWeight.Bold),
-                    Text = type.Humanize(LetterCasing.Title)
-                },
+                header = CreateHeader(type.Humanize(LetterCasing.Title)),
                 ButtonsContainer = new FillFlowContainer<ModButtonEmpty>
                 {
                     AutoSizeAxes = Axes.Y,
@@ -185,5 +175,13 @@ namespace osu.Game.Overlays.Mods
                 },
             };
         }
+
+        protected virtual ModButton CreateModButton(Mod mod) => new ModButton(mod);
+
+        protected virtual Drawable CreateHeader(string text) => new OsuSpriteText
+        {
+            Font = OsuFont.GetFont(weight: FontWeight.Bold),
+            Text = text
+        };
     }
 }

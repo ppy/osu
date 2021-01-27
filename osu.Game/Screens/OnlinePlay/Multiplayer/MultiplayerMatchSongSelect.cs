@@ -6,17 +6,23 @@ using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Select;
+using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
@@ -33,6 +39,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private StatefulMultiplayerClient client { get; set; }
 
         private LoadingLayer loadingLayer;
+        private FreeModSelectOverlay freeModSelectOverlay;
 
         private WorkingBeatmap initialBeatmap;
         private RulesetInfo initialRuleset;
@@ -43,6 +50,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         public MultiplayerMatchSongSelect()
         {
             Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING };
+
+            freeModSelectOverlay = new FreeModSelectOverlay();
         }
 
         [BackgroundDependencyLoader]
@@ -52,6 +61,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             initialBeatmap = Beatmap.Value;
             initialRuleset = Ruleset.Value;
             initialMods = Mods.Value.ToList();
+
+            FooterPanels.Add(freeModSelectOverlay);
         }
 
         protected override bool OnStart()
@@ -111,8 +122,61 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         protected override BeatmapDetailArea CreateBeatmapDetailArea() => new PlayBeatmapDetailArea();
 
-        protected override ModSelectOverlay CreateModSelectOverlay() => new ModSelectOverlay(isValidMod);
+        protected override ModSelectOverlay CreateModSelectOverlay() => new SoloModSelectOverlay(isValidMod);
+
+        protected override IEnumerable<(FooterButton, OverlayContainer)> CreateFooterButtons()
+        {
+            var buttons = base.CreateFooterButtons().ToList();
+            buttons.Insert(buttons.FindIndex(b => b.Item1 is FooterButtonMods) + 1, (new FooterButtonFreeMods(), freeModSelectOverlay));
+            return buttons;
+        }
 
         private bool isValidMod(Mod mod) => !(mod is ModAutoplay) && (mod as MultiMod)?.Mods.Any(mm => mm is ModAutoplay) != true;
+    }
+
+    public class FooterButtonFreeMods : FooterButton, IHasCurrentValue<IReadOnlyList<Mod>>
+    {
+        public Bindable<IReadOnlyList<Mod>> Current
+        {
+            get => modDisplay.Current;
+            set => modDisplay.Current = value;
+        }
+
+        private readonly ModDisplay modDisplay;
+
+        public FooterButtonFreeMods()
+        {
+            ButtonContentContainer.Add(modDisplay = new ModDisplay
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                DisplayUnrankedText = false,
+                Scale = new Vector2(0.8f),
+                ExpansionMode = ExpansionMode.AlwaysContracted,
+            });
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            SelectedColour = colours.Yellow;
+            DeselectedColour = SelectedColour.Opacity(0.5f);
+            Text = @"freemods";
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Current.BindValueChanged(_ => updateModDisplay(), true);
+        }
+
+        private void updateModDisplay()
+        {
+            if (Current.Value?.Count > 0)
+                modDisplay.FadeIn();
+            else
+                modDisplay.FadeOut();
+        }
     }
 }
