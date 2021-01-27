@@ -265,7 +265,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private void checkLabelColor(Func<Color4> getColour) => AddAssert("check label has expected colour", () => modSelect.MultiplierLabel.Colour.AverageColour == getColour());
 
-        private class TestModSelectOverlay : ModSelectOverlay
+        private class TestModSelectOverlay : SoloModSelectOverlay
         {
             public new Bindable<IReadOnlyList<Mod>> SelectedMods => base.SelectedMods;
 

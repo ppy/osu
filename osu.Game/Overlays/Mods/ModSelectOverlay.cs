@@ -27,7 +27,7 @@ using osuTK.Input;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class ModSelectOverlay : WaveOverlayContainer
+    public abstract class ModSelectOverlay : WaveOverlayContainer
     {
         private readonly Func<Mod, bool> isValidMod;
         public const float HEIGHT = 510;
@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.Mods
 
         private SampleChannel sampleOn, sampleOff;
 
-        public ModSelectOverlay(Func<Mod, bool> isValidMod = null)
+        protected ModSelectOverlay(Func<Mod, bool> isValidMod = null)
         {
             this.isValidMod = isValidMod ?? (m => true);
 
@@ -346,19 +346,6 @@ namespace osu.Game.Overlays.Mods
             refreshSelectedMods();
         }
 
-        /// <summary>
-        /// Deselect one or more mods.
-        /// </summary>
-        /// <param name="modTypes">The types of <see cref="Mod"/>s which should be deselected.</param>
-        /// <param name="immediate">Set to true to bypass animations and update selections immediately.</param>
-        private void deselectTypes(Type[] modTypes, bool immediate = false)
-        {
-            if (modTypes.Length == 0) return;
-
-            foreach (var section in ModSectionsContainer.Children)
-                section.DeselectTypes(modTypes, immediate);
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -458,7 +445,7 @@ namespace osu.Game.Overlays.Mods
             {
                 if (State.Value == Visibility.Visible) sampleOn?.Play();
 
-                deselectTypes(selectedMod.IncompatibleMods, true);
+                OnModSelected(selectedMod);
 
                 if (selectedMod.RequiresConfiguration) ModSettingsContainer.Show();
             }
@@ -468,6 +455,10 @@ namespace osu.Game.Overlays.Mods
             }
 
             refreshSelectedMods();
+        }
+
+        protected virtual void OnModSelected(Mod mod)
+        {
         }
 
         private void refreshSelectedMods() => SelectedMods.Value = ModSectionsContainer.Children.SelectMany(s => s.SelectedMods).ToArray();
