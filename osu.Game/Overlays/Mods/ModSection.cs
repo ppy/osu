@@ -11,26 +11,23 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
+using Humanizer;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Mods
 {
-    public abstract class ModSection : Container
+    public class ModSection : Container
     {
         private readonly OsuSpriteText headerLabel;
 
         public FillFlowContainer<ModButtonEmpty> ButtonsContainer { get; }
 
         public Action<Mod> Action;
-        protected abstract Key[] ToggleKeys { get; }
-        public abstract ModType ModType { get; }
 
-        public string Header
-        {
-            get => headerLabel.Text;
-            set => headerLabel.Text = value;
-        }
+        public Key[] ToggleKeys;
+
+        public readonly ModType ModType;
 
         public IEnumerable<Mod> SelectedMods => buttons.Select(b => b.SelectedMod).Where(m => m != null);
 
@@ -153,7 +150,7 @@ namespace osu.Game.Overlays.Mods
             button.Deselect();
         }
 
-        protected ModSection()
+        public ModSection(ModType type)
         {
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
@@ -168,7 +165,8 @@ namespace osu.Game.Overlays.Mods
                     Origin = Anchor.TopLeft,
                     Anchor = Anchor.TopLeft,
                     Position = new Vector2(0f, 0f),
-                    Font = OsuFont.GetFont(weight: FontWeight.Bold)
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold),
+                    Text = type.Humanize(LetterCasing.Title)
                 },
                 ButtonsContainer = new FillFlowContainer<ModButtonEmpty>
                 {

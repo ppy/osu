@@ -19,7 +19,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
-using osu.Game.Overlays.Mods.Sections;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens;
 using osuTK;
@@ -190,13 +189,31 @@ namespace osu.Game.Overlays.Mods
                                                 Width = content_width,
                                                 LayoutDuration = 200,
                                                 LayoutEasing = Easing.OutQuint,
-                                                Children = new ModSection[]
+                                                Children = new[]
                                                 {
-                                                    new DifficultyReductionSection { Action = modButtonPressed },
-                                                    new DifficultyIncreaseSection { Action = modButtonPressed },
-                                                    new AutomationSection { Action = modButtonPressed },
-                                                    new ConversionSection { Action = modButtonPressed },
-                                                    new FunSection { Action = modButtonPressed },
+                                                    CreateModSection(ModType.DifficultyReduction).With(s =>
+                                                    {
+                                                        s.ToggleKeys = new[] { Key.Q, Key.W, Key.E, Key.R, Key.T, Key.Y, Key.U, Key.I, Key.O, Key.P };
+                                                        s.Action = modButtonPressed;
+                                                    }),
+                                                    CreateModSection(ModType.DifficultyIncrease).With(s =>
+                                                    {
+                                                        s.ToggleKeys = new[] { Key.A, Key.S, Key.D, Key.F, Key.G, Key.H, Key.J, Key.K, Key.L };
+                                                        s.Action = modButtonPressed;
+                                                    }),
+                                                    CreateModSection(ModType.Automation).With(s =>
+                                                    {
+                                                        s.ToggleKeys = new[] { Key.Z, Key.X, Key.C, Key.V, Key.B, Key.N, Key.M };
+                                                        s.Action = modButtonPressed;
+                                                    }),
+                                                    CreateModSection(ModType.Conversion).With(s =>
+                                                    {
+                                                        s.Action = modButtonPressed;
+                                                    }),
+                                                    CreateModSection(ModType.Fun).With(s =>
+                                                    {
+                                                        s.Action = modButtonPressed;
+                                                    }),
                                                 }
                                             },
                                         }
@@ -454,6 +471,8 @@ namespace osu.Game.Overlays.Mods
         }
 
         private void refreshSelectedMods() => SelectedMods.Value = ModSectionsContainer.Children.SelectMany(s => s.SelectedMods).ToArray();
+
+        protected virtual ModSection CreateModSection(ModType type) => new ModSection(type);
 
         #region Disposal
 
