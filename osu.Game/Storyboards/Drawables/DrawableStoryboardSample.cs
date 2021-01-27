@@ -54,7 +54,6 @@ namespace osu.Game.Storyboards.Drawables
             }
             else
                 base.SamplePlaybackDisabledChanged(disabled);
-
         }
 
         protected override void Update()
