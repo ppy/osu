@@ -755,7 +755,7 @@ namespace osu.Game.Screens.Mvis
             switch (e.Key)
             {
                 case Key.Escape:
-                    if (sidebar.IsPresent)
+                    if (sidebar.IsPresent && !sidebar.Hiding)
                     {
                         sidebar.Hide();
                         return true;
