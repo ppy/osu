@@ -4,6 +4,7 @@
 #nullable enable
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Logging;
@@ -31,6 +32,44 @@ namespace osu.Game.Extensions
                 else
                     Logger.Log($"Error running task: {exception}", LoggingTarget.Runtime, LogLevel.Debug);
             }, TaskContinuationOptions.NotOnRanToCompletion);
+        }
+
+        public static Task ContinueWithSequential(this Task task, Action continuationFunction, CancellationToken cancellationToken = default)
+        {
+            return task.ContinueWithSequential(() => Task.Run(continuationFunction, cancellationToken), cancellationToken);
+        }
+
+        public static Task ContinueWithSequential(this Task task, Func<Task> continuationFunction, CancellationToken cancellationToken = default)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+
+            task.ContinueWith(t =>
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    tcs.SetCanceled();
+                }
+                else
+                {
+                    continuationFunction().ContinueWith(t2 =>
+                    {
+                        if (cancellationToken.IsCancellationRequested || t2.IsCanceled)
+                        {
+                            tcs.TrySetCanceled();
+                        }
+                        else if (t2.IsFaulted)
+                        {
+                            tcs.TrySetException(t2.Exception);
+                        }
+                        else
+                        {
+                            tcs.TrySetResult(true);
+                        }
+                    }, cancellationToken: default);
+                }
+            }, cancellationToken: default);
+
+            return tcs.Task;
         }
     }
 }
