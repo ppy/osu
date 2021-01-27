@@ -78,21 +78,21 @@
     <NoWarn>$(NoWarn);NU1605</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="3.0.3" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
   </ItemGroup>
   <!-- Xamarin.iOS does not automatically handle transitive dependencies from NuGet packages. -->
   <ItemGroup Label="Transitive Dependencies">
     <PackageReference Include="DiffPlex" Version="1.6.3" />
     <PackageReference Include="Humanizer" Version="2.8.26" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="2.2.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="5.0.2" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="ppy.osu.Framework" Version="2021.127.0" />
-    <PackageReference Include="SharpCompress" Version="0.26.0" />
-    <PackageReference Include="NUnit" Version="3.12.0" />
-    <PackageReference Include="SharpRaven" Version="2.4.0" />
+    <PackageReference Include="SharpCompress" Version="0.27.1" />
+    <PackageReference Include="NUnit" Version="3.13.0" />
+    <PackageReference Include="Sentry" Version="2.1.8" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
-    <PackageReference Include="ppy.osu.Framework.NativeLibs" Version="2020.923.0" ExcludeAssets="all" />
+    <PackageReference Include="ppy.osu.Framework.NativeLibs" Version="2021.115.0" ExcludeAssets="all" />
   </ItemGroup>
 </Project>
