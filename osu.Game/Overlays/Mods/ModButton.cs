@@ -174,7 +174,7 @@ namespace osu.Game.Overlays.Mods
                 switch (e.Button)
                 {
                     case MouseButton.Right:
-                        SelectNext(-1);
+                        OnRightClick(e);
                         break;
                 }
             }
@@ -183,8 +183,12 @@ namespace osu.Game.Overlays.Mods
         protected override bool OnClick(ClickEvent e)
         {
             SelectNext(1);
-
             return true;
+        }
+
+        protected virtual void OnRightClick(MouseUpEvent e)
+        {
+            SelectNext(-1);
         }
 
         /// <summary>
