@@ -263,9 +263,8 @@ namespace osu.Game.Screens.Select
 
             if (Footer != null)
             {
-                Footer.AddButton(new FooterButtonMods { Current = Mods }, ModSelect);
-                Footer.AddButton(new FooterButtonRandom { Action = triggerRandom });
-                Footer.AddButton(new FooterButtonOptions(), BeatmapOptions);
+                foreach (var (button, overlay) in CreateFooterButtons())
+                    Footer.AddButton(button, overlay);
 
                 BeatmapOptions.AddButton(@"Manage", @"collections", FontAwesome.Solid.Book, colours.Green, () => manageCollectionsDialog?.Show());
                 BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.Solid.Trash, colours.Pink, () => delete(Beatmap.Value.BeatmapSetInfo));
@@ -300,6 +299,13 @@ namespace osu.Game.Screens.Select
                 });
             }
         }
+
+        protected virtual IEnumerable<(FooterButton, OverlayContainer)> CreateFooterButtons() => new (FooterButton, OverlayContainer)[]
+        {
+            (new FooterButtonMods { Current = Mods }, ModSelect),
+            (new FooterButtonRandom { Action = triggerRandom }, null),
+            (new FooterButtonOptions(), BeatmapOptions)
+        };
 
         protected virtual ModSelectOverlay CreateModSelectOverlay() => new SoloModSelectOverlay();
 
