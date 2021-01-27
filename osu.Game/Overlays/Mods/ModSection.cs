@@ -152,6 +152,8 @@ namespace osu.Game.Overlays.Mods
 
         public ModSection(ModType type)
         {
+            ModType = type;
+
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
 
