@@ -62,6 +62,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             initialRuleset = Ruleset.Value;
             initialMods = Mods.Value.ToList();
 
+            freeModSelectOverlay.SelectedMods.Value = playlist.FirstOrDefault()?.AllowedMods.Select(m => m.CreateCopy()).ToList();
             FooterPanels.Add(freeModSelectOverlay);
         }
 
@@ -75,6 +76,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             item.RequiredMods.Clear();
             item.RequiredMods.AddRange(Mods.Value.Select(m => m.CreateCopy()));
+
+            item.AllowedMods.Clear();
+            item.AllowedMods.AddRange(freeModSelectOverlay.SelectedMods.Value.Select(m => m.CreateCopy()));
 
             // If the client is already in a room, update via the client.
             // Otherwise, update the playlist directly in preparation for it to be submitted to the API on match creation.
