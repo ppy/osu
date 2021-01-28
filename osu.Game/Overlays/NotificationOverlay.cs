@@ -1,18 +1,18 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Overlays.Notifications;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics.Containers;
+using System;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
-using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Overlays
 {

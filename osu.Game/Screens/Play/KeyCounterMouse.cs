@@ -2,8 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Input.Events;
-using osuTK;
 using osuTK.Input;
+using osuTK;
 
 namespace osu.Game.Screens.Play
 {

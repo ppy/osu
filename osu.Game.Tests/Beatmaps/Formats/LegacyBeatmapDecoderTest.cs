@@ -3,10 +3,14 @@
 
 using System;
 using System.IO;
-using System.Linq;
 using NUnit.Framework;
+using osuTK;
+using osuTK.Graphics;
+using osu.Game.Tests.Resources;
+using System.Linq;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.IO;
@@ -15,13 +19,9 @@ using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Legacy;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Skinning;
-using osu.Game.Tests.Resources;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Tests.Beatmaps.Formats
 {

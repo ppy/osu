@@ -2,8 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using NUnit.Framework;
 using osu.Game.Rulesets.Mania.Beatmaps;
+using NUnit.Framework;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {

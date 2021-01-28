@@ -1,20 +1,20 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
-using osuTK;
+using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Graphics.Sprites;
 using osuTK.Graphics;
+using osu.Game.Graphics.UserInterface;
+using System.Collections.Generic;
+using System;
+using osuTK;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Overlays.Comments
 {

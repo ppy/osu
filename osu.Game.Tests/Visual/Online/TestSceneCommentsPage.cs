@@ -3,18 +3,18 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Game.Overlays.Comments;
+using osu.Game.Overlays;
+using osu.Framework.Allocation;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Users;
+using osu.Game.Graphics.UserInterface;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics;
+using osuTK;
 using JetBrains.Annotations;
 using NUnit.Framework;
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Overlays;
-using osu.Game.Overlays.Comments;
-using osu.Game.Users;
-using osuTK;
 
 namespace osu.Game.Tests.Visual.Online
 {

@@ -2,27 +2,27 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.ComponentModel;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.Events;
 using osu.Game.Configuration;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
-using osu.Game.Users;
 using osuTK;
+using osu.Game.Users;
+using System.ComponentModel;
+using osu.Framework.Bindables;
+using osu.Game.Graphics;
 using osuTK.Graphics;
-using Container = osu.Framework.Graphics.Containers.Container;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
+using osu.Game.Graphics.Containers;
 using RectangleF = osu.Framework.Graphics.Primitives.RectangleF;
+using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Overlays.Settings.Sections.General
 {

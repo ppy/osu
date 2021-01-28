@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -11,12 +13,10 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Chat;
-using osuTK;
-using osuTK.Graphics;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Chat.Selection
 {

@@ -9,15 +9,15 @@ using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using Microsoft.Win32;
 using osu.Desktop.Overlays;
+using osu.Framework.Platform;
+using osu.Game;
 using osu.Desktop.Updater;
-using osu.Desktop.Windows;
 using osu.Framework;
 using osu.Framework.Logging;
-using osu.Framework.Platform;
 using osu.Framework.Screens;
-using osu.Game;
 using osu.Game.Screens.Menu;
 using osu.Game.Updater;
+using osu.Desktop.Windows;
 
 namespace osu.Desktop
 {

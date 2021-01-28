@@ -5,10 +5,10 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
-using osuTK;
 
 namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 {

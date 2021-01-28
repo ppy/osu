@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -11,6 +10,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osuTK;
+using System.Collections.Generic;
 
 namespace osu.Game.Graphics.UserInterface
 {

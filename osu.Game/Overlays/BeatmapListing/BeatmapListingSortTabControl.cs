@@ -2,12 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.Events;
-using osuTK;
+using osu.Framework.Graphics;
 using osuTK.Graphics;
+using osuTK;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Overlays.BeatmapListing
 {

@@ -7,8 +7,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Scoring;
 using osu.Game.Users;
+using osu.Game.Scoring;
 
 namespace osu.Game.Overlays.Rankings.Tables
 {

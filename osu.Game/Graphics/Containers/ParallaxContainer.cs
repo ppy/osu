@@ -2,14 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics;
+using osu.Framework.Input;
+using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
-using osu.Framework.Utils;
 using osu.Game.Configuration;
-using osuTK;
+using osu.Framework.Utils;
 
 namespace osu.Game.Graphics.Containers
 {

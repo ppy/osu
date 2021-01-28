@@ -12,9 +12,9 @@ using osu.Game.Configuration;
 using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
-using osu.Game.Skinning;
 using DatabasedKeyBinding = osu.Game.Input.Bindings.DatabasedKeyBinding;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
+using osu.Game.Skinning;
 
 namespace osu.Game.Database
 {

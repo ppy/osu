@@ -1,12 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osuTK.Graphics;
+using osu.Game.Skinning;
+using osu.Game.Online.API;
+using osu.Game.Users;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Game.Online.API;
-using osu.Game.Skinning;
-using osu.Game.Users;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Menu
 {

@@ -3,6 +3,7 @@
 
 using System.Linq;
 using System.Threading;
+using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -10,7 +11,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Platform;
 using osu.Game.IO;
 using osu.Game.Screens.Play;
-using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
 {

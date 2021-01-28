@@ -9,8 +9,8 @@ using NUnit.Framework;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Platform;
-using osu.Game.Tests;
 using osu.Game.Tournament.Configuration;
+using osu.Game.Tests;
 
 namespace osu.Game.Tournament.Tests.NonVisual
 {

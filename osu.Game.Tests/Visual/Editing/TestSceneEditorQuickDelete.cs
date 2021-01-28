@@ -8,11 +8,11 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
-using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Tests.Beatmaps;
+using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 using osuTK.Input;
 

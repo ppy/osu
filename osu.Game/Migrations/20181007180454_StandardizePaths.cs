@@ -1,6 +1,6 @@
 ﻿using System;
-using System.IO;
 using Microsoft.EntityFrameworkCore.Migrations;
+using System.IO;
 
 namespace osu.Game.Migrations
 {

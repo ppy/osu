@@ -11,11 +11,11 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
-using osu.Game.Overlays;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Menu;
+using osu.Game.Overlays;
 using osu.Game.Users;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Screens
 {

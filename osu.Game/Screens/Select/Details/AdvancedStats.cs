@@ -1,25 +1,25 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Threading;
-using osu.Framework.Utils;
-using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Beatmaps;
+using osu.Framework.Bindables;
+using System.Collections.Generic;
+using osu.Game.Rulesets.Mods;
+using System.Linq;
+using System.Threading;
+using osu.Framework.Threading;
+using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select.Details
 {

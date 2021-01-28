@@ -2,17 +2,17 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Drawing;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Tournament.Models;
+using osu.Game.Graphics;
 using osuTK;
 using osuTK.Graphics;
 

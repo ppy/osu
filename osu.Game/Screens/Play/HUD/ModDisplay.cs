@@ -8,13 +8,13 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.Events;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osuTK;
+using osu.Game.Graphics.Containers;
+using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {

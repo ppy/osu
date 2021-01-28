@@ -2,16 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Beatmaps;
-using osu.Game.Overlays;
 using osu.Game.Overlays.Profile.Sections.Ranks;
+using osu.Framework.Graphics;
+using osu.Game.Scoring;
+using osu.Framework.Graphics.Containers;
+using osuTK;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Scoring;
-using osuTK;
+using osu.Game.Overlays;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Tests.Visual.Online
 {
