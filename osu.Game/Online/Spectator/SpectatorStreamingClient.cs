@@ -124,7 +124,7 @@ namespace osu.Game.Online.Spectator
                 builder.AddMessagePackProtocol();
             else
             {
-                // eventuall we will precompile resolvers for messagepack, but this isn't working currently
+                // eventually we will precompile resolvers for messagepack, but this isn't working currently
                 // see https://github.com/neuecc/MessagePack-CSharp/issues/780#issuecomment-768794308.
                 builder.AddNewtonsoftJsonProtocol(options => { options.PayloadSerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore; });
             }
