@@ -320,7 +320,7 @@ namespace osu.Game.Database
                 {
                     // We may have not yet added the model to the underlying table, but should still clean up files.
                     LogForModel(item, "Dereferencing files for incomplete import.");
-                    Files.Dereference(item.Files.Where(f => f.FileInfo != null).Select(f => f.FileInfo).ToArray());
+                    Files.Dereference(item.Files.Select(f => f.FileInfo).ToArray());
                 }
             }
 
@@ -332,20 +332,6 @@ namespace osu.Game.Database
                 item.Hash = ComputeHash(item, archive);
 
                 await Populate(item, archive, cancellationToken);
-
-                var records = new Dictionary<int, FileInfo>();
-
-                foreach (var file in item.Files)
-                {
-                    // if file.FileInfo.ID has been assigned, we use its FileInfoID directly
-                    // instead of referencing its entity itself to avoid tracking issue
-                    if (file.FileInfo.ID != 0)
-                    {
-                        file.FileInfoID = file.FileInfo.ID;
-                        records[file.FileInfoID] = file.FileInfo;
-                        file.FileInfo = null;
-                    }
-                }
 
                 using (var write = ContextFactory.GetForWrite()) // used to share a context for full import. keep in mind this will block all writes.
                 {
@@ -380,15 +366,6 @@ namespace osu.Game.Database
                     {
                         write.Errors.Add(e);
                         throw;
-                    }
-                }
-
-                // restore entries which were set to null
-                foreach (var file in item.Files)
-                {
-                    if (file.FileInfoID != 0 && records.ContainsKey(file.FileInfoID))
-                    {
-                        file.FileInfo = records[file.FileInfoID];
                     }
                 }
 
@@ -745,7 +722,7 @@ namespace osu.Game.Database
         private IEnumerable<long> getIDs(List<TFileModel> files)
         {
             foreach (var f in files.OrderBy(f => f.Filename))
-                yield return f.FileInfo?.ID ?? f.FileInfoID;
+                yield return f.FileInfo.ID;
         }
 
         private IEnumerable<string> getFilenames(List<TFileModel> files)
