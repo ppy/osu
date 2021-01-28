@@ -328,7 +328,17 @@ namespace osu.Game.Database
             {
                 LogForModel(item, "Beginning import...");
 
-                item.Files = archive != null ? createFileInfos(archive, Files) : new List<TFileModel>();
+                item.Files = new List<TFileModel>();
+
+                if (archive != null)
+                {
+                    using (var write = ContextFactory.GetForWrite())
+                    {
+                        if (!write.IsTransactionLeader) throw new InvalidOperationException($"Ensure there is no parent transaction so errors can correctly be handled by {this}");
+                        item.Files = createFileInfos(archive, Files);
+                    }
+                }
+
                 item.Hash = ComputeHash(item, archive);
 
                 await Populate(item, archive, cancellationToken);
