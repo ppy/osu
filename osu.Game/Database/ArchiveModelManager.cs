@@ -444,7 +444,7 @@ namespace osu.Game.Database
         /// <param name="file">The existing file to be deleted.</param>
         public void DeleteFile(TModel model, TFileModel file)
         {
-            using (var usage = ContextFactory.GetForWrite())
+            using (ContextFactory.GetForWrite())
             {
                 // Dereference the existing file info, since the file model will be removed.
                 if (file.FileInfo != null)
@@ -455,11 +455,18 @@ namespace osu.Game.Database
                 model.Files.Remove(file);
             }
 
-            using (var usage = ContextFactory.GetForWrite())
+            try
             {
-                // This shouldn't be required, but here for safety in case the provided TModel is not being change tracked
-                // Definitely can be removed once we rework the database backend.
-                usage.Context.Set<TFileModel>().Remove(file);
+                using (var usage = ContextFactory.GetForWrite())
+                {
+                    // This shouldn't be required, but here for safety in case the provided TModel is not being change tracked
+                    // Definitely can be removed once we rework the database backend.
+                    usage.Context.Set<TFileModel>().Remove(file);
+                }
+            }
+            catch
+            {
+                // ignored, in case the provided TModel was being change tracked and TFileModel had been removed.
             }
         }
 

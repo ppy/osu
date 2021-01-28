@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using osu.Framework.Extensions;
@@ -66,44 +67,23 @@ namespace osu.Game.Scoring
                 if (mods != null)
                     return mods;
 
-                if (modsJson == null)
+                if (ModsJson == null)
                     return Array.Empty<Mod>();
 
-                return getModsFromRuleset(JsonConvert.DeserializeObject<DeserializedMod[]>(modsJson));
+                return getModsFromRuleset(JsonConvert.DeserializeObject<DeserializedMod[]>(ModsJson));
             }
             set
             {
-                modsJson = null;
                 mods = value;
+                ModsJson = mods == null ? null : JsonConvert.SerializeObject(mods.Select(m => new DeserializedMod { Acronym = m.Acronym }));
             }
         }
 
         private Mod[] getModsFromRuleset(DeserializedMod[] mods) => Ruleset.CreateInstance().GetAllMods().Where(mod => mods.Any(d => d.Acronym == mod.Acronym)).ToArray();
 
-        private string modsJson;
-
         [JsonIgnore]
         [Column("Mods")]
-        public string ModsJson
-        {
-            get
-            {
-                if (modsJson != null)
-                    return modsJson;
-
-                if (mods == null)
-                    return null;
-
-                return modsJson = JsonConvert.SerializeObject(mods.Select(m => new DeserializedMod { Acronym = m.Acronym }));
-            }
-            set
-            {
-                modsJson = value;
-
-                // we potentially can't update this yet due to Ruleset being late-bound, so instead update on read as necessary.
-                mods = null;
-            }
-        }
+        public string ModsJson { get; private set; }
 
         [NotMapped]
         [JsonProperty("user")]
