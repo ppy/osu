@@ -111,7 +111,11 @@ namespace osu.Game.Database
         {
             base.OnConfiguring(optionsBuilder);
             optionsBuilder
-                .UseSqlite(connectionString, sqliteOptions => sqliteOptions.CommandTimeout(10))
+                .UseSqlite(connectionString, sqliteOptions =>
+                {
+                    sqliteOptions.CommandTimeout(10);
+                    sqliteOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SingleQuery);
+                })
                 .UseLoggerFactory(logger.Value);
         }
 
