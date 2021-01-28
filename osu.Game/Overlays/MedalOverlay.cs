@@ -1,27 +1,27 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osuTK;
-using osuTK.Graphics;
+using System;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Users;
+using osu.Framework.Graphics.Textures;
+using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Overlays.MedalSplash;
-using osu.Framework.Allocation;
-using osu.Framework.Audio.Sample;
-using osu.Framework.Audio;
-using osu.Framework.Graphics.Textures;
+using osu.Game.Users;
+using osuTK;
+using osuTK.Graphics;
 using osuTK.Input;
-using osu.Framework.Graphics.Shapes;
-using System;
-using osu.Framework.Graphics.Effects;
-using osu.Framework.Input.Events;
-using osu.Framework.Utils;
 
 namespace osu.Game.Overlays
 {

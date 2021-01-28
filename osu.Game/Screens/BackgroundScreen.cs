@@ -2,9 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Screens;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Framework.Screens;
 using osuTK;
 
 namespace osu.Game.Screens

@@ -2,8 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Game.Online.API;
 using osu.Framework.Bindables;
+using osu.Game.Online.API;
 
 namespace osu.Game.Database
 {

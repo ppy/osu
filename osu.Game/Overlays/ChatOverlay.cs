@@ -4,13 +4,13 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
@@ -21,9 +21,9 @@ using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat;
 using osu.Game.Overlays.Chat.Selection;
 using osu.Game.Overlays.Chat.Tabs;
+using osuTK;
+using osuTK.Graphics;
 using osuTK.Input;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Overlays
 {

@@ -1,18 +1,18 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Game.Rulesets.Mania.Objects;
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Mania.Beatmaps.Patterns;
+using osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy;
+using osu.Game.Rulesets.Mania.MathUtils;
+using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Mania.Beatmaps.Patterns;
-using osu.Game.Rulesets.Mania.MathUtils;
-using osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy;
 using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps

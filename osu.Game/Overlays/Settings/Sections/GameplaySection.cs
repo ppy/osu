@@ -2,13 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Game.Overlays.Settings.Sections.Gameplay;
-using osu.Game.Rulesets;
-using System.Linq;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Logging;
+using osu.Game.Overlays.Settings.Sections.Gameplay;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Settings.Sections
 {

@@ -1,19 +1,19 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Overlays.Rankings;
-using osu.Game.Users;
-using osu.Game.Rulesets;
-using osu.Game.Online.API;
-using System.Threading;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Overlays.Rankings;
 using osu.Game.Overlays.Rankings.Tables;
+using osu.Game.Rulesets;
+using osu.Game.Users;
 
 namespace osu.Game.Overlays
 {
