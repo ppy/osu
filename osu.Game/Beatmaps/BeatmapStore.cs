@@ -89,15 +89,13 @@ namespace osu.Game.Beatmaps
 
         public IQueryable<BeatmapSetInfo> BeatmapSetsOverview => ContextFactory.Get().BeatmapSetInfo
                                                                                .Include(s => s.Metadata)
-                                                                               .Include(s => s.Beatmaps)
-                                                                               .AsNoTracking();
+                                                                               .Include(s => s.Beatmaps);
 
         public IQueryable<BeatmapSetInfo> BeatmapSetsWithoutFiles => ContextFactory.Get().BeatmapSetInfo
                                                                                    .Include(s => s.Metadata)
                                                                                    .Include(s => s.Beatmaps).ThenInclude(s => s.Ruleset)
                                                                                    .Include(s => s.Beatmaps).ThenInclude(b => b.BaseDifficulty)
-                                                                                   .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
-                                                                                   .AsNoTracking();
+                                                                                   .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata);
 
         public IQueryable<BeatmapInfo> Beatmaps =>
             ContextFactory.Get().BeatmapInfo

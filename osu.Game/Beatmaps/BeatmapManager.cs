@@ -345,7 +345,7 @@ namespace osu.Game.Beatmaps
         /// <param name="includes">The level of detail to include in the returned objects.</param>
         /// <param name="includeProtected">Whether to include protected (system) beatmaps. These should not be included for gameplay playable use cases.</param>
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
-        public IEnumerable<BeatmapSetInfo> GetAllUsableBeatmapSetsEnumerable(IncludedDetails includes, bool includeProtected = false)
+        public IQueryable<BeatmapSetInfo> GetAllUsableBeatmapSetsEnumerable(IncludedDetails includes, bool includeProtected = false)
         {
             IQueryable<BeatmapSetInfo> queryable;
 
@@ -366,8 +366,7 @@ namespace osu.Game.Beatmaps
 
             // AsEnumerable used here to avoid applying the WHERE in sql. When done so, ef core 2.x uses an incorrect ORDER BY
             // clause which causes queries to take 5-10x longer.
-            // TODO: remove if upgrading to EF core 3.x.
-            return queryable.AsEnumerable().Where(s => !s.DeletePending && (includeProtected || !s.Protected));
+            return queryable.Where(s => !s.DeletePending && (includeProtected || !s.Protected));
         }
 
         /// <summary>
