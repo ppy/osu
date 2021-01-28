@@ -367,7 +367,7 @@ namespace osu.Game.Database
                     }
                 }
 
-                using (var write = ContextFactory.GetForWrite()) // used to share a context for full import. keep in mind this will block all writes.
+                using (var write = ContextFactory.GetForWrite())
                 {
                     try
                     {
