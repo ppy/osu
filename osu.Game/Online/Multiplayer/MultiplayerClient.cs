@@ -9,7 +9,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
@@ -70,7 +69,7 @@ namespace osu.Game.Online.Multiplayer
                          {
                              options.Headers.Add("Authorization", $"Bearer {api.AccessToken}");
                          })
-                         .AddNewtonsoftJsonProtocol(options => { options.PayloadSerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore; })
+                         .AddMessagePackProtocol()
                          .Build();
 
             // this is kind of SILLY
