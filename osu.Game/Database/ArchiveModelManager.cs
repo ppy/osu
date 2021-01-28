@@ -433,11 +433,8 @@ namespace osu.Game.Database
         /// <param name="filename">An optional filename for the new file. Will use the previous filename if not specified.</param>
         public void ReplaceFile(TModel model, TFileModel file, Stream contents, string filename = null)
         {
-            using (ContextFactory.GetForWrite())
-            {
-                DeleteFile(model, file);
-                AddFile(model, contents, filename ?? file.Filename);
-            }
+            DeleteFile(model, file);
+            AddFile(model, contents, filename ?? file.Filename);
         }
 
         /// <summary>
@@ -456,6 +453,13 @@ namespace osu.Game.Database
                 }
 
                 model.Files.Remove(file);
+            }
+
+            using (var usage = ContextFactory.GetForWrite())
+            {
+                // This shouldn't be required, but here for safety in case the provided TModel is not being change tracked
+                // Definitely can be removed once we rework the database backend.
+                usage.Context.Set<TFileModel>().Remove(file);
             }
         }
 

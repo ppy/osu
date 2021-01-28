@@ -251,13 +251,15 @@ namespace osu.Game.Beatmaps
 
                 stream.Seek(0, SeekOrigin.Begin);
 
+                BeatmapSetFileInfo fileInfo;
+
                 using (ContextFactory.GetForWrite())
                 {
                     var beatmapInfo = setInfo.Beatmaps.Single(b => b.ID == info.ID);
                     var metadata = beatmapInfo.Metadata ?? setInfo.Metadata;
 
                     // grab the original file (or create a new one if not found).
-                    var fileInfo = setInfo.Files.SingleOrDefault(f => string.Equals(f.Filename, beatmapInfo.Path, StringComparison.OrdinalIgnoreCase)) ?? new BeatmapSetFileInfo();
+                    fileInfo = setInfo.Files.SingleOrDefault(f => string.Equals(f.Filename, beatmapInfo.Path, StringComparison.OrdinalIgnoreCase)) ?? new BeatmapSetFileInfo();
 
                     // metadata may have changed; update the path with the standard format.
                     beatmapInfo.Path = $"{metadata.Artist} - {metadata.Title} ({metadata.Author}) [{beatmapInfo.Version}].osu";
@@ -265,10 +267,10 @@ namespace osu.Game.Beatmaps
 
                     // update existing or populate new file's filename.
                     fileInfo.Filename = beatmapInfo.Path;
-
-                    stream.Seek(0, SeekOrigin.Begin);
-                    ReplaceFile(setInfo, fileInfo, stream);
                 }
+
+                stream.Seek(0, SeekOrigin.Begin);
+                ReplaceFile(setInfo, fileInfo, stream);
             }
 
             removeWorkingCache(info);
@@ -345,7 +347,7 @@ namespace osu.Game.Beatmaps
         /// <param name="includes">The level of detail to include in the returned objects.</param>
         /// <param name="includeProtected">Whether to include protected (system) beatmaps. These should not be included for gameplay playable use cases.</param>
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
-        public IQueryable<BeatmapSetInfo> GetAllUsableBeatmapSetsEnumerable(IncludedDetails includes, bool includeProtected = false)
+        public IEnumerable<BeatmapSetInfo> GetAllUsableBeatmapSetsEnumerable(IncludedDetails includes, bool includeProtected = false)
         {
             IQueryable<BeatmapSetInfo> queryable;
 
