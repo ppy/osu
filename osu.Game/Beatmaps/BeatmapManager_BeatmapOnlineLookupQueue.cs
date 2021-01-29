@@ -160,7 +160,7 @@ namespace osu.Game.Beatmaps
                             cmd.CommandText = "SELECT beatmapset_id, beatmap_id, approved FROM osu_beatmaps WHERE checksum = @MD5Hash OR beatmap_id = @OnlineBeatmapID OR filename = @Path";
 
                             cmd.Parameters.Add(new SqliteParameter("@MD5Hash", beatmap.MD5Hash));
-                            cmd.Parameters.Add(new SqliteParameter("@OnlineBeatmapID", beatmap.OnlineBeatmapID));
+                            cmd.Parameters.Add(new SqliteParameter("@OnlineBeatmapID", beatmap.OnlineBeatmapID ?? (object)DBNull.Value));
                             cmd.Parameters.Add(new SqliteParameter("@Path", beatmap.Path));
 
                             using (var reader = cmd.ExecuteReader())
