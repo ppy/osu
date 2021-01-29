@@ -18,7 +18,6 @@ using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 
