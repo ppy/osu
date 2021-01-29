@@ -30,6 +30,7 @@ namespace osu.Game.Overlays.Mods
 {
     public class ModSelectOverlay : WaveOverlayContainer
     {
+        private readonly Func<Mod, bool> isValidMod;
         public const float HEIGHT = 510;
 
         protected readonly TriangleButton DeselectAllButton;
@@ -60,8 +61,10 @@ namespace osu.Game.Overlays.Mods
 
         private SampleChannel sampleOn, sampleOff;
 
-        public ModSelectOverlay()
+        public ModSelectOverlay(Func<Mod, bool> isValidMod = null)
         {
+            this.isValidMod = isValidMod ?? (m => true);
+
             Waves.FirstWaveColour = Color4Extensions.FromHex(@"19b0e2");
             Waves.SecondWaveColour = Color4Extensions.FromHex(@"2280a2");
             Waves.ThirdWaveColour = Color4Extensions.FromHex(@"005774");
@@ -213,9 +216,9 @@ namespace osu.Game.Overlays.Mods
                         },
                         new Drawable[]
                         {
-                            // Footer
                             new Container
                             {
+                                Name = "Footer content",
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
                                 Origin = Anchor.TopCentre,
@@ -234,10 +237,9 @@ namespace osu.Game.Overlays.Mods
                                         Anchor = Anchor.BottomCentre,
                                         AutoSizeAxes = Axes.Y,
                                         RelativeSizeAxes = Axes.X,
+                                        RelativePositionAxes = Axes.X,
                                         Width = content_width,
                                         Spacing = new Vector2(footer_button_spacing, footer_button_spacing / 2),
-                                        LayoutDuration = 100,
-                                        LayoutEasing = Easing.OutQuint,
                                         Padding = new MarginPadding
                                         {
                                             Vertical = 15,
@@ -351,7 +353,7 @@ namespace osu.Game.Overlays.Mods
         {
             base.PopOut();
 
-            footerContainer.MoveToX(footerContainer.DrawSize.X, WaveContainer.DISAPPEAR_DURATION, Easing.InSine);
+            footerContainer.MoveToX(content_width, WaveContainer.DISAPPEAR_DURATION, Easing.InSine);
             footerContainer.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.InSine);
 
             foreach (var section in ModSectionsContainer.Children)
@@ -403,7 +405,7 @@ namespace osu.Game.Overlays.Mods
             if (mods.NewValue == null) return;
 
             foreach (var section in ModSectionsContainer.Children)
-                section.Mods = mods.NewValue[section.ModType];
+                section.Mods = mods.NewValue[section.ModType].Where(isValidMod);
         }
 
         private void selectedModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)

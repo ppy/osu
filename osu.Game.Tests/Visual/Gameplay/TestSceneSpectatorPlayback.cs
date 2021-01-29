@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -74,6 +75,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                 switch (args.Action)
                 {
                     case NotifyCollectionChangedAction.Add:
+                        Debug.Assert(args.NewItems != null);
+
                         foreach (int user in args.NewItems)
                         {
                             if (user == api.LocalUser.Value.Id)
@@ -83,6 +86,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                         break;
 
                     case NotifyCollectionChangedAction.Remove:
+                        Debug.Assert(args.OldItems != null);
+
                         foreach (int user in args.OldItems)
                         {
                             if (user == api.LocalUser.Value.Id)
@@ -298,7 +303,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             internal class TestKeyBindingContainer : KeyBindingContainer<TestAction>
             {
-                public override IEnumerable<KeyBinding> DefaultKeyBindings => new[]
+                public override IEnumerable<IKeyBinding> DefaultKeyBindings => new[]
                 {
                     new KeyBinding(InputKey.MouseLeft, TestAction.Down),
                 };

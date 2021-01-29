@@ -12,7 +12,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 using Humanizer;
-using osu.Game.Utils;
+using osu.Framework.Extensions.EnumExtensions;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
                 if (typeof(T).IsEnum)
                 {
-                    foreach (var val in OrderAttributeUtils.GetValuesInOrder<T>())
+                    foreach (var val in EnumExtensions.GetValuesInOrder<T>())
                         AddItem(val);
                 }
             }
