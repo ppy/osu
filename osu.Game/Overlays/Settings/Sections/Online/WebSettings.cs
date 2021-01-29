@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Settings.Sections.Online
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Show explicit content in search results",
+                    LabelText = "在搜索结果中显示不合适的内容",
                     Keywords = new[] { "nsfw", "18+", "offensive" },
                     Current = config.GetBindable<bool>(OsuSetting.ShowOnlineExplicitContent),
                 }
