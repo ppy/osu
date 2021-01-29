@@ -359,8 +359,10 @@ namespace osu.Game.Database
 
                         PreImport(item);
 
-                        write.Context.ChangeTracker.Entries().Where(e => e.State == EntityState.Unchanged)
-                            .ForEach(e => e.State = EntityState.Detached);
+                        write.Context.ChangeTracker.Entries()
+                             .Where(e => e.State == EntityState.Unchanged)
+                             .ToList()
+                             .ForEach(e => e.State = EntityState.Detached);
 
                         // import to store
                         ModelStore.Add(item);
@@ -420,8 +422,11 @@ namespace osu.Game.Database
         /// <param name="filename">An optional filename for the new file. Will use the previous filename if not specified.</param>
         public void ReplaceFile(TModel model, TFileModel file, Stream contents, string filename = null)
         {
-            DeleteFile(model, file);
-            AddFile(model, contents, filename ?? file.Filename);
+            using (ContextFactory.GetForWrite())
+            {
+                DeleteFile(model, file);
+                AddFile(model, contents, filename ?? file.Filename);
+            }
         }
 
         /// <summary>
@@ -434,6 +439,7 @@ namespace osu.Game.Database
             using (var usage = ContextFactory.GetForWrite())
             {
                 var fileInfo = file.FileInfo;
+
                 // Dereference the existing file info, since the file model will be removed.
                 if (fileInfo != null)
                 {

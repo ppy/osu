@@ -76,7 +76,7 @@ namespace osu.Game.IO
             }
         }
 
-        public void Reference(FileInfo[] files)
+        public void Reference(params FileInfo[] files)
         {
             for (var i = 0; i < files.Length; i++)
             {
@@ -96,7 +96,7 @@ namespace osu.Game.IO
             }
         }
 
-        public void Dereference(FileInfo[] files)
+        public void Dereference(params FileInfo[] files)
         {
             for (var i = 0; i < files.Length; i++)
             {

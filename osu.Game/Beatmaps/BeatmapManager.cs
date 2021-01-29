@@ -32,6 +32,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Skinning;
 using osu.Game.Users;
 using Decoder = osu.Game.Beatmaps.Formats.Decoder;
+using FileInfo = osu.Game.IO.FileInfo;
 
 namespace osu.Game.Beatmaps
 {
@@ -181,6 +182,50 @@ namespace osu.Game.Beatmaps
                     Delete(existingOnlineId);
                     beatmaps.PurgeDeletable(s => s.ID == existingOnlineId.ID);
                     LogForModel(beatmapSet, $"Found existing beatmap set with same OnlineBeatmapSetID ({beatmapSet.OnlineBeatmapSetID}). It has been purged.");
+                }
+            }
+
+            keepLatestRelationalEntriesOnly(beatmapSet);
+        }
+
+        private void keepLatestRelationalEntriesOnly(BeatmapSetInfo beatmapSet)
+        {
+            var latestFileInfos = new Dictionary<int, FileInfo>();
+            var latestRulesetInfos = new Dictionary<int, RulesetInfo>();
+
+            for (int i = beatmapSet.Files.Count - 1; i >= 0; i--)
+            {
+                var file = beatmapSet.Files[i];
+                var id = file.FileInfo?.ID;
+
+                if (id != null && id != 0)
+                {
+                    if (latestFileInfos.ContainsKey(id.Value))
+                    {
+                        file.FileInfo = latestFileInfos[id.Value];
+                    }
+                    else
+                    {
+                        latestFileInfos[id.Value] = file.FileInfo;
+                    }
+                }
+            }
+
+            for (int i = beatmapSet.Beatmaps.Count - 1; i >= 0; i--)
+            {
+                var beatmap = beatmapSet.Beatmaps[i];
+                var id = beatmap.Ruleset?.ID;
+
+                if (id != null)
+                {
+                    if (latestRulesetInfos.ContainsKey(id.Value))
+                    {
+                        beatmap.Ruleset = latestRulesetInfos[id.Value];
+                    }
+                    else
+                    {
+                        latestRulesetInfos[id.Value] = beatmap.Ruleset;
+                    }
                 }
             }
         }
