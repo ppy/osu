@@ -38,6 +38,18 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private List<SkinInfo> skinItems;
 
+        private int firstNonDefaultSkinIndex
+        {
+            get
+            {
+                var index = skinItems.FindIndex(s => s.ID > 0);
+                if (index < 0)
+                    index = skinItems.Count;
+
+                return index;
+            }
+        }
+
         [Resolved]
         private SkinManager skins { get; set; }
 
@@ -68,6 +80,11 @@ namespace osu.Game.Overlays.Settings.Sections
                 {
                     LabelText = "Beatmap skins",
                     Current = config.GetBindable<bool>(OsuSetting.BeatmapSkins)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "Beatmap colours",
+                    Current = config.GetBindable<bool>(OsuSetting.BeatmapColours)
                 },
                 new SettingsCheckbox
                 {
@@ -109,27 +126,35 @@ namespace osu.Game.Overlays.Settings.Sections
         private void updateItems()
         {
             skinItems = skins.GetAllUsableSkins();
-
-            // insert after lazer built-in skins
-            int firstNonDefault = skinItems.FindIndex(s => s.ID > 0);
-            if (firstNonDefault < 0)
-                firstNonDefault = skinItems.Count;
-
-            skinItems.Insert(firstNonDefault, random_skin_info);
-
+            skinItems.Insert(firstNonDefaultSkinIndex, random_skin_info);
+            sortUserSkins(skinItems);
             skinDropdown.Items = skinItems;
         }
 
         private void itemUpdated(ValueChangedEvent<WeakReference<SkinInfo>> weakItem)
         {
             if (weakItem.NewValue.TryGetTarget(out var item))
-                Schedule(() => skinDropdown.Items = skinDropdown.Items.Where(i => !i.Equals(item)).Append(item).ToArray());
+            {
+                Schedule(() =>
+                {
+                    List<SkinInfo> newDropdownItems = skinDropdown.Items.Where(i => !i.Equals(item)).Append(item).ToList();
+                    sortUserSkins(newDropdownItems);
+                    skinDropdown.Items = newDropdownItems;
+                });
+            }
         }
 
         private void itemRemoved(ValueChangedEvent<WeakReference<SkinInfo>> weakItem)
         {
             if (weakItem.NewValue.TryGetTarget(out var item))
                 Schedule(() => skinDropdown.Items = skinDropdown.Items.Where(i => i.ID != item.ID).ToArray());
+        }
+
+        private void sortUserSkins(List<SkinInfo> skinsList)
+        {
+            // Sort user skins separately from built-in skins
+            skinsList.Sort(firstNonDefaultSkinIndex, skinsList.Count - firstNonDefaultSkinIndex,
+                Comparer<SkinInfo>.Create((a, b) => string.Compare(a.Name, b.Name, StringComparison.OrdinalIgnoreCase)));
         }
 
         private class SkinSettingsDropdown : SettingsDropdown<SkinInfo>

@@ -236,7 +236,20 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// </summary>
         /// <param name="hitObjects">The hit objects to calculate a quad for.</param>
         private Quad getSurroundingQuad(OsuHitObject[] hitObjects) =>
-            getSurroundingQuad(hitObjects.SelectMany(h => new[] { h.Position, h.EndPosition }));
+            getSurroundingQuad(hitObjects.SelectMany(h =>
+            {
+                if (h is IHasPath path)
+                {
+                    return new[]
+                    {
+                        h.Position,
+                        // can't use EndPosition for reverse slider cases.
+                        h.Position + path.Path.PositionAt(1)
+                    };
+                }
+
+                return new[] { h.Position };
+            }));
 
         /// <summary>
         /// Returns a gamefield-space quad surrounding the provided points.

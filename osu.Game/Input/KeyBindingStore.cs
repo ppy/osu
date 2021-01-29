@@ -49,7 +49,7 @@ namespace osu.Game.Input
             }
         }
 
-        private void insertDefaults(IEnumerable<KeyBinding> defaults, int? rulesetId = null, int? variant = null)
+        private void insertDefaults(IEnumerable<IKeyBinding> defaults, int? rulesetId = null, int? variant = null)
         {
             using (var usage = ContextFactory.GetForWrite())
             {
