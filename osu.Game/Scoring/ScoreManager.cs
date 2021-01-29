@@ -22,6 +22,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring.Legacy;
+using FileInfo = osu.Game.IO.FileInfo;
 
 namespace osu.Game.Scoring
 {
@@ -87,6 +88,40 @@ namespace osu.Game.Scoring
         protected override bool CheckLocalAvailability(ScoreInfo model, IQueryable<ScoreInfo> items)
             => base.CheckLocalAvailability(model, items)
                || (model.OnlineScoreID != null && items.Any(i => i.OnlineScoreID == model.OnlineScoreID));
+
+        protected override void PreImport(ScoreInfo model)
+        {
+            var latestFileInfos = new Dictionary<int, FileInfo>();
+
+            void processFileInfos<UModel, UFileModel>(UModel model) where UModel : IHasFiles<UFileModel> where UFileModel : INamedFileInfo
+            {
+                var files = model.Files;
+
+                for (int i = files.Count - 1; i >= 0; i--)
+                {
+                    var id = files[i]?.FileInfo?.ID;
+
+                    if (id != null && id != 0)
+                    {
+                        if (latestFileInfos.ContainsKey(id.Value))
+                        {
+                            files[i].FileInfo = latestFileInfos[id.Value];
+                        }
+                        else
+                        {
+                            latestFileInfos[id.Value] = files[i].FileInfo;
+                        }
+                    }
+                }
+            }
+
+            processFileInfos<ScoreInfo, ScoreFileInfo>(model);
+
+            if (model.Beatmap.BeatmapSet != null)
+            {
+                processFileInfos<BeatmapSetInfo, BeatmapSetFileInfo>(model.Beatmap.BeatmapSet);
+            }
+        }
 
         /// <summary>
         /// Retrieves a bindable that represents the total score of a <see cref="ScoreInfo"/>.

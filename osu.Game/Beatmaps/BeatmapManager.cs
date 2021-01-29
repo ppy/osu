@@ -196,7 +196,7 @@ namespace osu.Game.Beatmaps
             for (int i = beatmapSet.Files.Count - 1; i >= 0; i--)
             {
                 var file = beatmapSet.Files[i];
-                var id = file.FileInfo?.ID;
+                var id = file?.FileInfo?.ID;
 
                 if (id != null && id != 0)
                 {
@@ -214,7 +214,7 @@ namespace osu.Game.Beatmaps
             for (int i = beatmapSet.Beatmaps.Count - 1; i >= 0; i--)
             {
                 var beatmap = beatmapSet.Beatmaps[i];
-                var id = beatmap.Ruleset?.ID;
+                var id = beatmap?.Ruleset?.ID;
 
                 if (id != null)
                 {
