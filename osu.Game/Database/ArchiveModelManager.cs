@@ -359,6 +359,9 @@ namespace osu.Game.Database
 
                         PreImport(item);
 
+                        write.Context.ChangeTracker.Entries().Where(e => e.State == EntityState.Unchanged)
+                            .ForEach(e => e.State = EntityState.Detached);
+
                         // import to store
                         ModelStore.Add(item);
                     }
