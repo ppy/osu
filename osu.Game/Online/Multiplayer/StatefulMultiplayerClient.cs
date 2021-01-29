@@ -192,7 +192,8 @@ namespace osu.Game.Online.Multiplayer
                 BeatmapID = item.GetOr(existingPlaylistItem).BeatmapID,
                 BeatmapChecksum = item.GetOr(existingPlaylistItem).Beatmap.Value.MD5Hash,
                 RulesetID = item.GetOr(existingPlaylistItem).RulesetID,
-                Mods = item.HasValue ? item.Value.AsNonNull().RequiredMods.Select(m => new APIMod(m)).ToList() : Room.Settings.Mods
+                Mods = item.HasValue ? item.Value.AsNonNull().RequiredMods.Select(m => new APIMod(m)).ToList() : Room.Settings.Mods,
+                AllowedMods = item.HasValue ? item.Value.AsNonNull().AllowedMods.Select(m => new APIMod(m)).ToList() : Room.Settings.AllowedMods
             });
         }
 
@@ -502,6 +503,7 @@ namespace osu.Game.Online.Multiplayer
 
             var ruleset = rulesets.GetRuleset(settings.RulesetID).CreateInstance();
             var mods = settings.Mods.Select(m => m.ToMod(ruleset));
+            var allowedMods = settings.AllowedMods.Select(m => m.ToMod(ruleset));
 
             PlaylistItem playlistItem = new PlaylistItem
             {
@@ -511,6 +513,7 @@ namespace osu.Game.Online.Multiplayer
             };
 
             playlistItem.RequiredMods.AddRange(mods);
+            playlistItem.AllowedMods.AddRange(allowedMods);
 
             apiRoom.Playlist.Clear(); // Clearing should be unnecessary, but here for sanity.
             apiRoom.Playlist.Add(playlistItem);
