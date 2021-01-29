@@ -46,7 +46,9 @@ namespace osu.Game.Rulesets.Catch.Replays
                 double timeAvailable = h.StartTime - lastTime;
 
                 if (timeAvailable < 0)
+                {
                     return;
+                }
 
                 // So we can either make it there without a dash or not.
                 // If positionChange is 0, we don't need to move, so speedRequired should also be 0 (could be NaN if timeAvailable is 0 too)
