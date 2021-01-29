@@ -70,43 +70,49 @@ namespace osu.Game.IO
                 }
 
                 if (reference || existing == null)
-                    Reference(info);
+                    Reference(ref info);
 
                 return info;
             }
         }
 
-        public void Reference(params FileInfo[] files)
+        public void Reference(FileInfo[] files)
         {
-            if (files.Length == 0) return;
-
-            using (var usage = ContextFactory.GetForWrite())
+            for (var i = 0; i < files.Length; i++)
             {
-                var context = usage.Context;
-
-                foreach (var f in files.GroupBy(f => f.ID))
-                {
-                    var refetch = context.Find<FileInfo>(f.First().ID) ?? f.First();
-                    refetch.ReferenceCount += f.Count();
-                    context.FileInfo.Update(refetch);
-                }
+                Reference(ref files[i]);
             }
         }
 
-        public void Dereference(params FileInfo[] files)
+        public void Reference(ref FileInfo file)
         {
-            if (files.Length == 0) return;
-
             using (var usage = ContextFactory.GetForWrite())
             {
                 var context = usage.Context;
+                var refetch = context.Find<FileInfo>(file.ID) ?? file;
+                refetch.ReferenceCount++;
+                context.FileInfo.Update(refetch);
+                file = refetch;
+            }
+        }
 
-                foreach (var f in files.GroupBy(f => f.ID))
-                {
-                    var refetch = context.FileInfo.Find(f.Key);
-                    refetch.ReferenceCount -= f.Count();
-                    context.FileInfo.Update(refetch);
-                }
+        public void Dereference(FileInfo[] files)
+        {
+            for (var i = 0; i < files.Length; i++)
+            {
+                Dereference(ref files[i]);
+            }
+        }
+
+        public void Dereference(ref FileInfo file)
+        {
+            using (var usage = ContextFactory.GetForWrite())
+            {
+                var context = usage.Context;
+                var refetch = context.FileInfo.Find(file.ID);
+                refetch.ReferenceCount--;
+                context.FileInfo.Update(refetch);
+                file = refetch;
             }
         }
 

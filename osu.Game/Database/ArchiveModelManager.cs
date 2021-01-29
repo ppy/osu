@@ -328,50 +328,34 @@ namespace osu.Game.Database
             {
                 LogForModel(item, "Beginning import...");
 
-                item.Files = new List<TFileModel>();
-
-                if (archive != null)
-                {
-                    using (var write = ContextFactory.GetForWrite())
-                    {
-                        if (!write.IsTransactionLeader) throw new InvalidOperationException($"Ensure there is no parent transaction so errors can correctly be handled by {this}");
-
-                        item.Files = createFileInfos(archive, Files);
-                    }
-                }
-
+                item.Files = archive != null ? createFileInfos(archive, Files) : new List<TFileModel>();
                 item.Hash = ComputeHash(item, archive);
 
                 await Populate(item, archive, cancellationToken);
 
-                using (var write = ContextFactory.GetForWrite())
-                {
-                    if (!write.IsTransactionLeader) throw new InvalidOperationException($"Ensure there is no parent transaction so errors can correctly be handled by {this}");
-
-                    var existing = CheckForExisting(item);
-
-                    if (existing != null)
-                    {
-                        if (CanReuseExisting(existing, item))
-                        {
-                            Undelete(existing);
-                            LogForModel(item, $"Found existing {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
-                            // existing item will be used; rollback new import and exit early.
-                            rollback();
-                            flushEvents(true);
-                            return existing;
-                        }
-
-                        Delete(existing);
-                        ModelStore.PurgeDeletable(s => s.ID == existing.ID);
-                    }
-                }
-
-                using (var write = ContextFactory.GetForWrite())
+                using (var write = ContextFactory.GetForWrite()) // used to share a context for full import. keep in mind this will block all writes.
                 {
                     try
                     {
                         if (!write.IsTransactionLeader) throw new InvalidOperationException($"Ensure there is no parent transaction so errors can correctly be handled by {this}");
+
+                        var existing = CheckForExisting(item);
+
+                        if (existing != null)
+                        {
+                            if (CanReuseExisting(existing, item))
+                            {
+                                Undelete(existing);
+                                LogForModel(item, $"Found existing {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
+                                // existing item will be used; rollback new import and exit early.
+                                rollback();
+                                flushEvents(true);
+                                return existing;
+                            }
+
+                            Delete(existing);
+                            ModelStore.PurgeDeletable(s => s.ID == existing.ID);
+                        }
 
                         PreImport(item);
 
@@ -444,29 +428,21 @@ namespace osu.Game.Database
         /// <param name="file">The existing file to be deleted.</param>
         public void DeleteFile(TModel model, TFileModel file)
         {
-            using (ContextFactory.GetForWrite())
+            using (var usage = ContextFactory.GetForWrite())
             {
+                var fileInfo = file.FileInfo;
                 // Dereference the existing file info, since the file model will be removed.
-                if (file.FileInfo != null)
+                if (fileInfo != null)
                 {
-                    Files.Dereference(file.FileInfo);
-                }
+                    Files.Dereference(ref fileInfo);
+                    file.FileInfo = fileInfo;
 
-                model.Files.Remove(file);
-            }
-
-            try
-            {
-                using (var usage = ContextFactory.GetForWrite())
-                {
                     // This shouldn't be required, but here for safety in case the provided TModel is not being change tracked
                     // Definitely can be removed once we rework the database backend.
                     usage.Context.Set<TFileModel>().Remove(file);
                 }
-            }
-            catch
-            {
-                // ignored, in case the provided TModel was being change tracked and TFileModel had been removed.
+
+                model.Files.Remove(file);
             }
         }
 
