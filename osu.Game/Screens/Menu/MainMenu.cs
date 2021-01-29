@@ -110,7 +110,7 @@ namespace osu.Game.Screens.Menu
                             },
                             OnSolo = onSolo,
                             OnMvisButton = onMvis,
-                            OnPurcasheButton = () => this.Push(new PurcasheScreen()),
+                            OnPurcasheButton = () => this.Push(new PurcasheDashBoardScreen()),
                             OnImportButton = onImport,
                             OnMultiplayer = () => this.Push(new Multiplayer()),
                             OnPlaylists = () => this.Push(new Playlists()),

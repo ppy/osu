@@ -23,7 +23,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Purcashe
 {
-    public class PurcasheScreen : PurcasheBasicScreen
+    public class PurcasheDashBoardScreen : PurcasheBasicScreen
     {
         private Container contentContainer;
         private FillFlowContainer buttonsFillFlow;

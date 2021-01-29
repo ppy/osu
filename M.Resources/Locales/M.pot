@@ -39,6 +39,9 @@ msgstr ""
 msgid "screen.menu.buttonSystem.file-import"
 msgstr ""
 
+msgid "screen.menu.buttonSystem.purcashe"
+msgstr ""
+
 msgid "screen.menu.buttonSystem.invoke-p2c"
 msgstr ""
 

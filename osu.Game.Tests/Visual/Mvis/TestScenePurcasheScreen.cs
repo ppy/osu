@@ -13,7 +13,7 @@ namespace osu.Game.Tests.Visual.Mvis
                 if (Stack.CurrentScreen != null)
                     Stack?.Exit();
 
-                LoadScreen(new PurcasheScreen());
+                LoadScreen(new PurcasheDashBoardScreen());
             });
         }
     }
