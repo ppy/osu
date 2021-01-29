@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 
@@ -242,6 +243,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.Update();
 
+            HandleUserInput = Time.Current >= HitObject.StartTime && Time.Current <= HitObject.EndTime;
+
             if (HandleUserInput)
                 RotationTracker.Tracking = !Result.HasResult && (OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false);
 
@@ -255,6 +258,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             if (!SpmCounter.IsPresent && RotationTracker.Tracking)
                 SpmCounter.FadeIn(HitObject.TimeFadeIn);
+
             SpmCounter.SetRotation(Result.RateAdjustedRotation);
 
             updateBonusScore();
