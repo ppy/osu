@@ -93,7 +93,7 @@ namespace osu.Game.Scoring
         {
             var latestFileInfos = new Dictionary<int, FileInfo>();
 
-            void processFileInfos<UModel, UFileModel>(UModel model) where UModel : IHasFiles<UFileModel> where UFileModel : INamedFileInfo
+            void processFileInfos<TModel, TFileModel>(TModel model) where TModel : IHasFiles<TFileModel> where TFileModel : INamedFileInfo
             {
                 var files = model.Files;
 
