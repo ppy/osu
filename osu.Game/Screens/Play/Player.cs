@@ -833,6 +833,7 @@ namespace osu.Game.Screens.Play
             {
                 score.ScoreInfo.User = api.LocalUser.Value;
                 score.Replay = new Replay { Frames = recordingScore?.Replay.Frames.ToList() ?? new List<ReplayFrame>() };
+                score.ScoreInfo.IsReplay = false;
             }
 
             ScoreProcessor.PopulateScore(score.ScoreInfo);

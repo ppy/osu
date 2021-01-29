@@ -20,6 +20,11 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 {
                     LabelText = "settings.mvis.storyboard.enableStoryboard",
                     Current = config.GetBindable<bool>(MSetting.MvisEnableStoryboard),
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "settings.mvis.storyboard.storyboardProxy",
+                    Current = config.GetBindable<bool>(MSetting.MvisStoryboardProxy),
                 }
             };
         }

@@ -17,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Beatmaps
 {
-    public class LegacyBeatmapSkinColourTest : ScreenTestScene
+    public abstract class LegacyBeatmapSkinColourTest : ScreenTestScene
     {
         protected readonly Bindable<bool> BeatmapSkins = new Bindable<bool>();
         protected readonly Bindable<bool> BeatmapColours = new Bindable<bool>();

@@ -276,9 +276,8 @@ namespace osu.Game.Overlays.Profile.Header
                                                     Origin = Anchor.Centre,
                                                     Children = new Drawable[]
                                                     {
-                                                        new AddFriendButton
+                                                        new FollowersButton
                                                         {
-                                                            RelativeSizeAxes = Axes.Y,
                                                             User = { BindTarget = User }
                                                         },
                                                         new MessageUserButton

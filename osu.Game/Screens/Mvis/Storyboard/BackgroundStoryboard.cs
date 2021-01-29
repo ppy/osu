@@ -24,6 +24,8 @@ namespace osu.Game.Screens.Mvis.Storyboard
             drawableStoryboard.Clock = RunningClock;
         }
 
+        public Drawable StoryboardProxy() => drawableStoryboard.OverlayLayer.CreateProxy();
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);

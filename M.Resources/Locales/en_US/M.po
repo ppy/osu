@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mfosu!\n"
 "POT-Creation-Date: 2020-12-04 02:25+0800\n"
-"PO-Revision-Date: 2021-01-19 19:12+0800\n"
+"PO-Revision-Date: 2021-01-29 16:03+0800\n"
 "Last-Translator: \n"
 "Language-Team: MATRIX-feather\n"
 "Language: en\n"
@@ -38,6 +38,9 @@ msgstr "mvis player"
 
 msgid "screen.menu.buttonSystem.file-import"
 msgstr "file import"
+
+msgid "screen.menu.buttonSystem.purcashe"
+msgstr "Pull Simulator"
 
 msgid "screen.menu.buttonSystem.invoke-p2c"
 msgstr "TOP SECRET"
@@ -191,6 +194,9 @@ msgstr "STORYBOARD"
 
 msgid "settings.mvis.storyboard.enableStoryboard"
 msgstr "Enable Storybord / Video"
+
+msgid "settings.mvis.storyboard.storyboardProxy"
+msgstr "Allow storyboard overlay displays in foreground"
 
 msgid "settings.mvis.ui.header"
 msgstr "INTERFACE"

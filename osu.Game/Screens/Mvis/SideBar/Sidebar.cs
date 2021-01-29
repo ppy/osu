@@ -32,7 +32,6 @@ namespace osu.Game.Screens.Mvis.SideBar
         [CanBeNull]
         private Box sidebarBg;
 
-        public bool IsHidden = true;
         public bool Hiding;
         public Bindable<Drawable> CurrentDisplay = new Bindable<Drawable>();
 
@@ -145,11 +144,10 @@ namespace osu.Game.Screens.Mvis.SideBar
             //如果要显示的是当前正在显示的内容，则中断
             if (CurrentDisplay.Value == d)
             {
-                IsHidden = false;
                 return;
             }
 
-            var resizeDuration = IsHidden ? 0 : duration;
+            var resizeDuration = !IsPresent ? 0 : duration;
 
             var lastDisplay = CurrentDisplay.Value;
             lastDisplay?.FadeOut(resizeDuration / 2, Easing.OutQuint)
@@ -165,7 +163,6 @@ namespace osu.Game.Screens.Mvis.SideBar
             CurrentDisplay.Value = d;
 
             this.ResizeTo(new Vector2(c.ResizeWidth, c.ResizeHeight), resizeDuration, Easing.OutQuint);
-            IsHidden = false;
         }
 
         private void addDrawableToList(Drawable d)
@@ -212,8 +209,7 @@ namespace osu.Game.Screens.Mvis.SideBar
                 popOutSample?.Play();
 
             this.MoveToX(100, duration + 100, Easing.OutQuint)
-                .FadeOut(duration + 100, Easing.OutQuint)
-                .OnComplete(_ => IsHidden = true);
+                .FadeOut(duration + 100, Easing.OutQuint);
             contentContainer.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
 
             Hiding = true;

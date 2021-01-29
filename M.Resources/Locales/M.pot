@@ -39,6 +39,9 @@ msgstr ""
 msgid "screen.menu.buttonSystem.file-import"
 msgstr ""
 
+msgid "screen.menu.buttonSystem.purcashe"
+msgstr ""
+
 msgid "screen.menu.buttonSystem.invoke-p2c"
 msgstr ""
 
@@ -184,6 +187,9 @@ msgid "settings.mvis.storyboard.header"
 msgstr ""
 
 msgid "settings.mvis.storyboard.enableStoryboard"
+msgstr ""
+
+msgid "settings.mvis.storyboard.storyboardProxy"
 msgstr ""
 
 msgid "settings.mvis.ui.header"

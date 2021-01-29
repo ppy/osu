@@ -146,10 +146,6 @@ namespace osu.Game.Screens.Ranking
                 // only show flair / animation when arriving after watching a play that isn't autoplay.
                 bool shouldFlair = player != null && !Score.Mods.Any(m => m is ModAutoplay);
 
-                var pp = mConfig.Get<int>(MSetting.PPCount);
-                if (Score.PP != null) pp += (int?)Score.PP.Value ?? 0;
-                mConfig.Set(MSetting.PPCount, pp);
-
                 ScorePanelList.AddScore(Score, shouldFlair);
             }
 
