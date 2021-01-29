@@ -6,6 +6,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using osu.Game.Extensions;
 
 namespace osu.Game.Utils
 {
@@ -14,8 +15,9 @@ namespace osu.Game.Utils
     /// </summary>
     public class TaskChain
     {
-        private readonly object finalTaskLock = new object();
-        private Task? finalTask;
+        private readonly object taskLock = new object();
+
+        private Task lastTaskInChain = Task.CompletedTask;
 
         /// <summary>
         /// Adds a new task to the end of this <see cref="TaskChain"/>.
@@ -23,22 +25,22 @@ namespace osu.Game.Utils
         /// <param name="action">The action to be executed.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> for this task. Does not affect further tasks in the chain.</param>
         /// <returns>The awaitable <see cref="Task"/>.</returns>
-        public async Task Add(Action action, CancellationToken cancellationToken = default)
+        public Task Add(Action action, CancellationToken cancellationToken = default)
         {
-            Task? previousTask;
-            Task currentTask;
+            lock (taskLock)
+                return lastTaskInChain = lastTaskInChain.ContinueWithSequential(action, cancellationToken);
+        }
 
-            lock (finalTaskLock)
-            {
-                previousTask = finalTask;
-                finalTask = currentTask = new Task(action, cancellationToken);
-            }
-
-            if (previousTask != null)
-                await previousTask;
-
-            currentTask.Start();
-            await currentTask;
+        /// <summary>
+        /// Adds a new task to the end of this <see cref="TaskChain"/>.
+        /// </summary>
+        /// <param name="task">The task to be executed.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> for this task. Does not affect further tasks in the chain.</param>
+        /// <returns>The awaitable <see cref="Task"/>.</returns>
+        public Task Add(Func<Task> task, CancellationToken cancellationToken = default)
+        {
+            lock (taskLock)
+                return lastTaskInChain = lastTaskInChain.ContinueWithSequential(task, cancellationToken);
         }
     }
 }
