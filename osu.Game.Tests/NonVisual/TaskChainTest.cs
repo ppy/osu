@@ -1,28 +1,25 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using osu.Game.Extensions;
+using osu.Game.Utils;
 
 namespace osu.Game.Tests.NonVisual
 {
     [TestFixture]
     public class TaskChainTest
     {
-        private Task taskChain;
-
+        private TaskChain taskChain;
         private int currentTask;
         private CancellationTokenSource globalCancellationToken;
 
         [SetUp]
         public void Setup()
         {
-            taskChain = Task.CompletedTask;
-
             globalCancellationToken = new CancellationTokenSource();
+            taskChain = new TaskChain();
             currentTask = 0;
         }
 
@@ -81,16 +78,7 @@ namespace osu.Game.Tests.NonVisual
         {
             var mutex = new ManualResetEventSlim(false);
 
-            var task = taskChain.ContinueWithSequential(async () =>
-            {
-                try
-                {
-                    await Task.Run(() => mutex.Wait(globalCancellationToken.Token));
-                }
-                catch (OperationCanceledException)
-                {
-                }
-            });
+            var task = taskChain.Add(async () => await Task.Run(() => mutex.Wait(globalCancellationToken.Token)));
 
             // Allow task to potentially complete
             Thread.Sleep(1000);
@@ -111,7 +99,7 @@ namespace osu.Game.Tests.NonVisual
             var cancellationSource = new CancellationTokenSource();
             var token = CancellationTokenSource.CreateLinkedTokenSource(cancellationSource.Token, globalCancellationToken.Token);
 
-            taskChain = taskChain.ContinueWithSequential(() =>
+            taskChain.Add(() =>
             {
                 mutex.Wait(globalCancellationToken.Token);
                 completionSource.SetResult(Interlocked.Increment(ref currentTask));
