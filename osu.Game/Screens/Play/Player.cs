@@ -170,11 +170,9 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio, OsuConfigManager config, OsuGame game, MConfigManager mconfig)
+        private void load(AudioManager audio, OsuConfigManager config, OsuGame game)
         {
             Mods.Value = base.Mods.Value.Select(m => m.CreateCopy()).ToArray();
-
-            mconfig.BindWith(MSetting.PPCount, mConfigPPCount);
 
             if (Beatmap.Value is DummyWorkingBeatmap)
                 return;
@@ -649,7 +647,6 @@ namespace osu.Game.Screens.Play
         protected PauseOverlay PauseOverlay { get; private set; }
 
         private double? lastPauseActionTime;
-        private readonly BindableInt mConfigPPCount = new BindableInt();
 
         private bool canPause =>
             // must pass basic screen conditions (beatmap loaded, instance allows pause)
@@ -836,7 +833,7 @@ namespace osu.Game.Screens.Play
             {
                 score.ScoreInfo.User = api.LocalUser.Value;
                 score.Replay = new Replay { Frames = recordingScore?.Replay.Frames.ToList() ?? new List<ReplayFrame>() };
-                mConfigPPCount.Value += 50 + (int)(score.ScoreInfo.PP ?? 0);
+                score.ScoreInfo.IsReplay = false;
             }
 
             ScoreProcessor.PopulateScore(score.ScoreInfo);

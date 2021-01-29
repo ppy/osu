@@ -213,6 +213,8 @@ namespace osu.Game.Scoring
             set => isLegacyScore = value;
         }
 
+        public bool IsReplay = true;
+
         public IEnumerable<HitResultDisplayStatistic> GetStatisticsForDisplay()
         {
             foreach (var r in Ruleset.CreateInstance().GetHitResults())
