@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mfosu!\n"
 "POT-Creation-Date: 2020-12-04 02:25+0800\n"
-"PO-Revision-Date: 2021-01-19 19:12+0800\n"
+"PO-Revision-Date: 2021-01-29 15:57+0800\n"
 "Last-Translator: \n"
 "Language-Team: MATRIX-feather\n"
 "Language: zh_CN\n"
@@ -193,6 +193,9 @@ msgstr "故事版"
 
 msgid "settings.mvis.storyboard.enableStoryboard"
 msgstr "启用故事版 / 背景视频"
+
+msgid "settings.mvis.storyboard.storyboardProxy"
+msgstr "允许故事版Overlay显示在前景"
 
 msgid "settings.mvis.ui.header"
 msgstr "界面"

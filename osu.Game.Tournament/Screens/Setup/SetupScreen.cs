@@ -108,8 +108,8 @@ namespace osu.Game.Tournament.Screens.Setup
                 },
                 new TournamentSwitcher
                 {
-                    Label = "Current tournament",
-                    Description = "Changes the background videos and bracket to match the selected tournament. This requires a restart to apply changes.",
+                    Label = "当前比赛",
+                    Description = "将更改背景视频和晋级榜图已匹配当前的比赛。需要重启以应用更改。",
                 },
                 resolution = new ResolutionSelector
                 {

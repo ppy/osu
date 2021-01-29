@@ -186,6 +186,9 @@ msgstr ""
 msgid "settings.mvis.storyboard.enableStoryboard"
 msgstr ""
 
+msgid "settings.mvis.storyboard.storyboardProxy"
+msgstr ""
+
 msgid "settings.mvis.ui.header"
 msgstr ""
 
