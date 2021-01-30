@@ -47,12 +47,12 @@ namespace osu.Game.Screens.OnlinePlay
 
         private void endOperationWithKnownLease(LeasedBindable<bool> lease)
         {
-            if (lease != leasedInProgress)
-                return;
-
             // for extra safety, marshal the end of operation back to the update thread if necessary.
             Scheduler.Add(() =>
             {
+                if (lease != leasedInProgress)
+                    return;
+
                 // UnbindAll() is purposefully used instead of Return() - the two do roughly the same thing, with one difference:
                 // the former won't throw if the lease has already been returned before.
                 // this matters because framework can unbind the lease via the internal UnbindAllBindables(), which is not always detectable
