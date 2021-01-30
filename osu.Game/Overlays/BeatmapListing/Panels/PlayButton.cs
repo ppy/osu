@@ -91,7 +91,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Enabled.BindValueChanged(_ => updateEnabledState(), true);
+            updateEnabledState();
         }
 
         private void updateEnabledState()
