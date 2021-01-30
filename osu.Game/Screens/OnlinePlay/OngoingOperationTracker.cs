@@ -53,18 +53,13 @@ namespace osu.Game.Screens.OnlinePlay
             // for extra safety, marshal the end of operation back to the update thread if necessary.
             Scheduler.Add(() =>
             {
-                leasedInProgress?.Return();
+                // UnbindAll() is purposefully used instead of Return() - the two do roughly the same thing, with one difference:
+                // the former won't throw if the lease has already been returned before.
+                // this matters because framework can unbind the lease via the internal UnbindAllBindables(), which is not always detectable
+                // (it is in the case of disposal, but not in the case of screen exit - at least not cleanly).
+                leasedInProgress?.UnbindAll();
                 leasedInProgress = null;
             }, false);
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            // base call does an UnbindAllBindables().
-            // clean up the leased reference here so that it doesn't get returned twice.
-            leasedInProgress = null;
         }
 
         private class OngoingOperation : IDisposable
