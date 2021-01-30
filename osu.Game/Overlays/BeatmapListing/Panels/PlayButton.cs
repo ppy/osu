@@ -22,21 +22,11 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
 
         private Button button;
 
-        private bool alwaysDisabled;
+        protected IBindable<bool> Disabled => disabled;
 
-        public bool AlwaysDisabled
-        {
-            get => alwaysDisabled;
-            set
-            {
-                alwaysDisabled = value;
-                updateEnabledState();
-            }
-        }
+        private readonly BindableBool disabled = new BindableBool();
 
-        protected IBindable<bool> Enabled => enabled;
-
-        private readonly BindableBool enabled = new BindableBool(true);
+        public BindableBool AlwaysDisabled = new BindableBool();
 
         public IBindable<bool> Playing => playing;
 
@@ -91,22 +81,23 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            updateEnabledState();
+
+            AlwaysDisabled.BindValueChanged(_ => updateEnabledState(), true);
         }
 
         private void updateEnabledState()
         {
-            var enabledValue = BeatmapSet != null && !AlwaysDisabled;
+            var disabledValue = AlwaysDisabled.Value || BeatmapSet == null;
 
-            if (playing.Value && !enabledValue)
+            if (playing.Value && disabledValue)
                 playing.Value = false;
 
-            enabled.Value = enabledValue;
+            disabled.Value = disabledValue;
         }
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (!Enabled.Value)
+            if (Disabled.Value)
                 return true;
 
             playing.Toggle();
@@ -167,7 +158,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
             private readonly LoadingSpinner loadingSpinner;
 
             private readonly IBindable<bool> playing;
-            private readonly IBindable<bool> enabled;
+            private readonly IBindable<bool> disabled;
 
             [Resolved]
             private OsuColour colours { get; set; }
@@ -192,7 +183,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
             public Button(PlayButton player)
             {
                 playing = player.Playing.GetBoundCopy();
-                enabled = player.Enabled.GetBoundCopy();
+                disabled = player.Disabled.GetBoundCopy();
 
                 InternalChildren = new Drawable[]
                 {
@@ -216,7 +207,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                 base.LoadComplete();
 
                 playing.BindValueChanged(_ => updateDisplay());
-                enabled.BindValueChanged(_ => updateDisplay());
+                disabled.BindValueChanged(_ => updateDisplay());
                 updateDisplay();
             }
 
@@ -236,12 +227,12 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
             {
                 icon.Icon = playing.Value ? FontAwesome.Solid.Stop : FontAwesome.Solid.Play;
 
-                if (enabled.Value && (IsHovered || playing.Value))
+                if ((IsHovered || playing.Value) && !disabled.Value)
                     icon.FadeColour(colours.Yellow, 120, Easing.InOutQuint);
-                else if (!playing.Value)
+                else if (!playing.Value || disabled.Value)
                     icon.FadeColour(Color4.White, 120, Easing.InOutQuint);
 
-                this.FadeTo(enabled.Value ? 1 : 0, 120, Easing.InOutQuint);
+                this.FadeTo(disabled.Value ? 0 : 1, 120, Easing.InOutQuint);
             }
         }
     }
