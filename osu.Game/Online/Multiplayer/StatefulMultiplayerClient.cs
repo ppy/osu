@@ -551,7 +551,10 @@ namespace osu.Game.Online.Multiplayer
             Scheduler.Add(() =>
             {
                 if (cancellationToken.IsCancellationRequested)
+                {
+                    tcs.SetCanceled();
                     return;
+                }
 
                 try
                 {
