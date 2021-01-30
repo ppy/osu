@@ -166,8 +166,11 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
             private readonly SpriteIcon icon;
             private readonly LoadingSpinner loadingSpinner;
 
-            private readonly PlayButton player;
             private readonly IBindable<bool> playing;
+            private readonly IBindable<bool> enabled;
+
+            [Resolved]
+            private OsuColour colours { get; set; }
 
             public bool Loading
             {
@@ -188,8 +191,8 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
 
             public Button(PlayButton player)
             {
-                this.player = player;
                 playing = player.Playing.GetBoundCopy();
+                enabled = player.Enabled.GetBoundCopy();
 
                 InternalChildren = new Drawable[]
                 {
@@ -208,41 +211,37 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                 };
             }
 
-            private Color4 hoverColour;
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                hoverColour = colours.Yellow;
-            }
-
             protected override void LoadComplete()
             {
                 base.LoadComplete();
 
-                playing.BindValueChanged(e =>
-                {
-                    icon.Icon = e.NewValue ? FontAwesome.Solid.Stop : FontAwesome.Solid.Play;
-                    icon.FadeColour(e.NewValue || IsHovered ? hoverColour : Color4.White, 120, Easing.InOutQuint);
-                }, true);
-
-                playing.BindDisabledChanged(disabled => this.FadeTo(!disabled ? 1 : 0), true);
+                playing.BindValueChanged(_ => updateDisplay());
+                enabled.BindValueChanged(_ => updateDisplay());
+                updateDisplay();
             }
 
             protected override bool OnHover(HoverEvent e)
             {
-                if (playing.Disabled)
-                    return false;
-
-                icon.FadeColour(hoverColour, 120, Easing.InOutQuint);
+                updateDisplay();
                 return base.OnHover(e);
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                if (!playing.Value)
-                    icon.FadeColour(Color4.White, 120, Easing.InOutQuint);
+                updateDisplay();
                 base.OnHoverLost(e);
+            }
+
+            private void updateDisplay()
+            {
+                icon.Icon = playing.Value ? FontAwesome.Solid.Stop : FontAwesome.Solid.Play;
+
+                if (enabled.Value && (IsHovered || playing.Value))
+                    icon.FadeColour(colours.Yellow, 120, Easing.InOutQuint);
+                else if (!playing.Value)
+                    icon.FadeColour(Color4.White, 120, Easing.InOutQuint);
+
+                this.FadeTo(enabled.Value ? 1 : 0, 120, Easing.InOutQuint);
             }
         }
     }
