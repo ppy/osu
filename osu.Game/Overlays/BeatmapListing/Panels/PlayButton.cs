@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
     {
         private const float transition_duration = 500;
 
-        private readonly Button button;
+        private Button button;
 
         private bool alwaysDisabled;
 
@@ -70,13 +70,19 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
         [Resolved]
         private PreviewTrackManager previewTrackManager { get; set; }
 
+        protected virtual Drawable CreateContent() => button = new Button(this)
+        {
+            RelativeSizeAxes = Axes.Both,
+        };
+
         public PlayButton(BeatmapSetInfo setInfo = null)
         {
             BeatmapSet = setInfo;
 
-            InternalChild = button = new Button(this)
+            InternalChildren = new[]
             {
-                RelativeSizeAxes = Axes.Both,
+                CreateContent(),
+                new HoverClickSounds()
             };
 
             playing.ValueChanged += playingStateChanged;
@@ -98,7 +104,14 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
             enabled.Value = enabledValue;
         }
 
-        public void TogglePlaying() => playing.Toggle();
+        protected override bool OnClick(ClickEvent e)
+        {
+            if (!Enabled.Value)
+                return true;
+
+            playing.Toggle();
+            return true;
+        }
 
         private void playingStateChanged(ValueChangedEvent<bool> e)
         {
@@ -214,15 +227,6 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                 }, true);
 
                 playing.BindDisabledChanged(disabled => this.FadeTo(!disabled ? 1 : 0), true);
-            }
-
-            protected override bool OnClick(ClickEvent e)
-            {
-                if (playing.Disabled)
-                    return false;
-
-                player.TogglePlaying();
-                return true;
             }
 
             protected override bool OnHover(HoverEvent e)
