@@ -1,41 +1,30 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Game.Audio;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.BeatmapListing.Panels;
 using osuTK;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
-    public class PreviewButton : CompositeDrawable
+    public class HeaderPlayButton : PlayButton
     {
-        private readonly Box background, progress;
-        private readonly PlayButton playButton;
+        private Box background, progress;
 
-        private PreviewTrack preview => playButton.Preview;
-
-        public IBindable<bool> Playing => playButton.Playing;
-
-        public BeatmapSetInfo BeatmapSet
-        {
-            get => playButton.BeatmapSet;
-            set => playButton.BeatmapSet = value;
-        }
-
-        public PreviewButton()
+        public HeaderPlayButton()
         {
             Height = 42;
+        }
 
-            InternalChildren = new Drawable[]
+        protected override Drawable CreateContent() => new Container
+        {
+            RelativeSizeAxes = Axes.Both,
+            Children = new[]
             {
                 background = new Box
                 {
@@ -55,17 +44,15 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                         Alpha = 0f,
                     },
                 },
-                playButton = new PlayButton
+                base.CreateContent().With(c =>
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Size = new Vector2(18),
-                },
-                new HoverClickSounds()
-            };
-
-            Playing.ValueChanged += playing => progress.FadeTo(playing.NewValue ? 1 : 0, 100);
-        }
+                    c.Anchor = Anchor.Centre;
+                    c.Origin = Anchor.Centre;
+                    c.RelativeSizeAxes = Axes.None;
+                    c.Size = new Vector2(18);
+                })
+            }
+        };
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, OverlayColourProvider colourProvider)
@@ -74,41 +61,43 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
             background.Colour = colourProvider.Background6;
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Playing.BindValueChanged(playing =>
+            {
+                progress.FadeTo(playing.NewValue ? 1 : 0, 100);
+            }, true);
+
+            Enabled.BindValueChanged(_ => updateDisplay(), true);
+        }
+
         protected override void Update()
         {
             base.Update();
 
-            if (Playing.Value && preview != null)
+            if (Playing.Value && Preview != null)
             {
                 // prevent negative (potential infinite) width if a track without length was loaded
-                progress.Width = preview.Length > 0 ? (float)(preview.CurrentTime / preview.Length) : 0f;
+                progress.Width = Preview.Length > 0 ? (float)(Preview.CurrentTime / Preview.Length) : 0f;
             }
             else
                 progress.Width = 0;
         }
 
-        protected override bool OnClick(ClickEvent e)
-        {
-            if (Playing.Disabled)
-                return true;
-
-            playButton.TogglePlaying();
-            return true;
-        }
-
         protected override bool OnHover(HoverEvent e)
         {
-            if (Playing.Disabled)
-                return false;
-
-            background.FadeTo(0.75f, 80);
+            updateDisplay();
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            background.FadeTo(0.5f, 80);
+            updateDisplay();
             base.OnHoverLost(e);
         }
+
+        private void updateDisplay() => background.FadeTo(IsHovered && Enabled.Value ? 0.75f : 0.5f, 80);
     }
 }
