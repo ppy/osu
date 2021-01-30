@@ -22,7 +22,21 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
 
         private readonly Button button;
 
-        public readonly BindableBool Enabled = new BindableBool(true);
+        private bool alwaysDisabled;
+
+        public bool AlwaysDisabled
+        {
+            get => alwaysDisabled;
+            set
+            {
+                alwaysDisabled = value;
+                updateEnabledState();
+            }
+        }
+
+        protected IBindable<bool> Enabled => enabled;
+
+        private readonly BindableBool enabled = new BindableBool(true);
 
         public IBindable<bool> Playing => playing;
 
@@ -76,12 +90,12 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
 
         private void updateEnabledState()
         {
-            var disabled = BeatmapSet == null || !Enabled.Value;
+            var enabledValue = BeatmapSet != null && !AlwaysDisabled;
 
-            if (playing.Value && disabled)
+            if (playing.Value && !enabledValue)
                 playing.Value = false;
 
-            playing.Disabled = disabled;
+            enabled.Value = enabledValue;
         }
 
         public void TogglePlaying() => playing.Toggle();
