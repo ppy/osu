@@ -10,6 +10,7 @@ using JetBrains.Annotations;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -116,14 +117,19 @@ namespace osu.Game.Online.Spectator
             if (connection != null)
                 return;
 
-            connection = new HubConnectionBuilder()
-                         .WithUrl(endpoint, options =>
-                         {
-                             options.Headers.Add("Authorization", $"Bearer {api.AccessToken}");
-                         })
-                         .AddNewtonsoftJsonProtocol(options => { options.PayloadSerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore; })
-                         .Build();
+            var builder = new HubConnectionBuilder()
+                .WithUrl(endpoint, options => { options.Headers.Add("Authorization", $"Bearer {api.AccessToken}"); });
 
+            if (RuntimeInfo.SupportsJIT)
+                builder.AddMessagePackProtocol();
+            else
+            {
+                // eventually we will precompile resolvers for messagepack, but this isn't working currently
+                // see https://github.com/neuecc/MessagePack-CSharp/issues/780#issuecomment-768794308.
+                builder.AddNewtonsoftJsonProtocol(options => { options.PayloadSerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore; });
+            }
+
+            connection = builder.Build();
             // until strong typed client support is added, each method must be manually bound (see https://github.com/dotnet/aspnetcore/issues/15198)
             connection.On<int, SpectatorState>(nameof(ISpectatorClient.UserBeganPlaying), ((ISpectatorClient)this).UserBeganPlaying);
             connection.On<int, FrameDataBundle>(nameof(ISpectatorClient.UserSentFrames), ((ISpectatorClient)this).UserSentFrames);

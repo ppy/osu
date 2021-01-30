@@ -11,7 +11,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
-using osu.Game.Extensions;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
@@ -44,6 +43,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [CanBeNull]
         private IDisposable readyClickOperation;
 
+        private GridContainer mainContent;
+
         public MultiplayerMatchSubScreen(Room room)
         {
             Title = room.RoomID.Value == null ? "New room" : room.Name.Value;
@@ -55,7 +56,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             InternalChildren = new Drawable[]
             {
-                new GridContainer
+                mainContent = new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Content = new[]
@@ -178,6 +179,19 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     State = { Value = client.Room == null ? Visibility.Visible : Visibility.Hidden }
                 }
             };
+
+            if (client.Room == null)
+            {
+                // A new room is being created.
+                // The main content should be hidden until the settings overlay is hidden, signaling the room is ready to be displayed.
+                mainContent.Hide();
+
+                settingsOverlay.State.BindValueChanged(visibility =>
+                {
+                    if (visibility.NewValue == Visibility.Hidden)
+                        mainContent.Show();
+                }, true);
+            }
         }
 
         protected override void LoadComplete()
@@ -222,7 +236,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                           // accessing Exception here silences any potential errors from the antecedent task
                           if (t.Exception != null)
                           {
-                              t.CatchUnobservedExceptions(true); // will run immediately.
                               // gameplay was not started due to an exception; unblock button.
                               endOperation();
                           }
@@ -233,11 +246,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }
 
             client.ToggleReady()
-                  .ContinueWith(t =>
-                  {
-                      t.CatchUnobservedExceptions(true); // will run immediately.
-                      endOperation();
-                  });
+                  .ContinueWith(t => endOperation());
 
             void endOperation()
             {

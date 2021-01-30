@@ -38,5 +38,11 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 
             Channel.Value = channelManager?.JoinChannel(new Channel { Id = channelId.Value, Type = ChannelType.Multiplayer, Name = $"#lazermp_{roomId.Value}" });
         }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            channelManager?.LeaveChannel(Channel.Value);
+        }
     }
 }
