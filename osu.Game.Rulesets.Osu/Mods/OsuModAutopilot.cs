@@ -62,7 +62,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             inputManager.AllowUserCursorMovement = false;
 
             // Generate the replay frames the cursor should follow
-            replayFrames = new OsuAutoGenerator(drawableRuleset.Beatmap).Generate().Frames.Cast<OsuReplayFrame>().ToList();
+            var mods = (IReadOnlyList<Mod>)drawableRuleset.Dependencies.Get(typeof(IReadOnlyList<Mod>));
+            replayFrames = new OsuAutoGenerator(drawableRuleset.Beatmap, mods).Generate().Frames.Cast<OsuReplayFrame>().ToList();
         }
     }
 }

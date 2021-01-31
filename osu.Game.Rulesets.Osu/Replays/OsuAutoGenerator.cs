@@ -6,10 +6,12 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Replays;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Scoring;
@@ -49,8 +51,8 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         #region Construction / Initialisation
 
-        public OsuAutoGenerator(IBeatmap beatmap)
-            : base(beatmap)
+        public OsuAutoGenerator(IBeatmap beatmap, IReadOnlyList<Mod> mods)
+            : base(beatmap, mods)
         {
             // Already superhuman, but still somewhat realistic
             reactionTime = ApplyModsToRate(100);
