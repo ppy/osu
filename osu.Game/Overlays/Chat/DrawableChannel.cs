@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Chat
     {
         public readonly Channel Channel;
         protected FillFlowContainer ChatLineFlow;
-        private OsuScrollContainer scroll;
+        private ChannelScrollContainer scroll;
 
         private bool scrollbarVisible = true;
 
@@ -56,7 +56,7 @@ namespace osu.Game.Overlays.Chat
             {
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
-                Child = scroll = new OsuScrollContainer
+                Child = scroll = new ChannelScrollContainer
                 {
                     ScrollbarVisible = scrollbarVisible,
                     RelativeSizeAxes = Axes.Both,
@@ -78,12 +78,6 @@ namespace osu.Game.Overlays.Chat
             Channel.NewMessagesArrived += newMessagesArrived;
             Channel.MessageRemoved += messageRemoved;
             Channel.PendingMessageResolved += pendingMessageResolved;
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            scrollToEnd();
         }
 
         protected override void Dispose(bool isDisposing)
@@ -112,8 +106,6 @@ namespace osu.Game.Overlays.Chat
                 newMessages = newMessages.Concat(chatLines.Select(c => c.Message)).OrderBy(m => m.Id).ToList();
                 ChatLineFlow.Clear();
             }
-
-            bool shouldScrollToEnd = scroll.IsScrolledToEnd(10) || !chatLines.Any() || newMessages.Any(m => m is LocalMessage);
 
             // Add up to last Channel.MAX_HISTORY messages
             var displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - Channel.MAX_HISTORY));
@@ -153,8 +145,10 @@ namespace osu.Game.Overlays.Chat
                 }
             }
 
-            if (shouldScrollToEnd)
-                scrollToEnd();
+            // due to the scroll adjusts from old messages removal above, a scroll-to-end must be enforced,
+            // to avoid making the container think the user has scrolled back up and unwantedly disable auto-scrolling.
+            if (scroll.ShouldAutoScroll || newMessages.Any(m => m is LocalMessage))
+                ScheduleAfterChildren(() => scroll.ScrollToEnd());
         });
 
         private void pendingMessageResolved(Message existing, Message updated) => Schedule(() =>
@@ -177,8 +171,6 @@ namespace osu.Game.Overlays.Chat
         });
 
         private IEnumerable<ChatLine> chatLines => ChatLineFlow.Children.OfType<ChatLine>();
-
-        private void scrollToEnd() => ScheduleAfterChildren(() => scroll.ScrollToEnd());
 
         public class DaySeparator : Container
         {
@@ -241,6 +233,33 @@ namespace osu.Game.Overlays.Chat
                         }
                     }
                 };
+            }
+        }
+
+        /// <summary>
+        /// An <see cref="OsuScrollContainer"/> with functionality to automatically scrolls whenever the maximum scrollable distance increases.
+        /// </summary>
+        private class ChannelScrollContainer : OsuScrollContainer
+        {
+            private const float auto_scroll_leniency = 10f;
+
+            private float? lastExtent;
+
+            /// <summary>
+            /// Whether this should automatically scroll to end on the next call to <see cref="UpdateAfterChildren"/>.
+            /// </summary>
+            public bool ShouldAutoScroll { get; private set; } = true;
+
+            protected override void UpdateAfterChildren()
+            {
+                base.UpdateAfterChildren();
+
+                if ((lastExtent == null || ScrollableExtent > lastExtent) && ShouldAutoScroll)
+                    ScrollToEnd();
+                else
+                    ShouldAutoScroll = IsScrolledToEnd(auto_scroll_leniency);
+
+                lastExtent = ScrollableExtent;
             }
         }
     }
