@@ -66,17 +66,18 @@ namespace osu.Game.Rulesets.Mods
 
         public virtual void ApplyToBeatmap(IBeatmap beatmap)
         {
-            HitObject lastObject = beatmap.HitObjects.LastOrDefault();
-
             SpeedChange.SetDefault();
 
-            beginRampTime = beatmap.HitObjects.FirstOrDefault()?.StartTime ?? 0;
-            finalRateTime = FINAL_RATE_PROGRESS * (lastObject?.GetEndTime() ?? 0);
+            double firstObjectStart = beatmap.HitObjects.FirstOrDefault()?.StartTime ?? 0;
+            double lastObjectEnd = beatmap.HitObjects.LastOrDefault()?.GetEndTime() ?? 0;
+
+            beginRampTime = firstObjectStart;
+            finalRateTime = firstObjectStart + FINAL_RATE_PROGRESS * (lastObjectEnd - firstObjectStart);
         }
 
         public virtual void Update(Playfield playfield)
         {
-            applyRateAdjustment((track.CurrentTime - beginRampTime) / finalRateTime);
+            applyRateAdjustment((track.CurrentTime - beginRampTime) / (finalRateTime - beginRampTime));
         }
 
         /// <summary>
