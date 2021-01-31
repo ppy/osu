@@ -8,6 +8,7 @@ using osu.Game.Users;
 using osuTK;
 using System;
 using System.Linq;
+using NUnit.Framework;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.Chat;
@@ -16,8 +17,6 @@ namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneStandAloneChatDisplay : OsuTestScene
     {
-        private readonly Channel testChannel = new Channel();
-
         private readonly User admin = new User
         {
             Username = "HappyStick",
@@ -46,78 +45,84 @@ namespace osu.Game.Tests.Visual.Online
         [Cached]
         private ChannelManager channelManager = new ChannelManager();
 
-        private readonly TestStandAloneChatDisplay chatDisplay;
-        private readonly TestStandAloneChatDisplay chatDisplay2;
+        private TestStandAloneChatDisplay chatDisplay;
+        private TestStandAloneChatDisplay chatDisplay2;
+        private int messageIdSequence;
+
+        private Channel testChannel;
 
         public TestSceneStandAloneChatDisplay()
         {
             Add(channelManager);
-
-            Add(chatDisplay = new TestStandAloneChatDisplay
-            {
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
-                Margin = new MarginPadding(20),
-                Size = new Vector2(400, 80)
-            });
-
-            Add(chatDisplay2 = new TestStandAloneChatDisplay(true)
-            {
-                Anchor = Anchor.CentreRight,
-                Origin = Anchor.CentreRight,
-                Margin = new MarginPadding(20),
-                Size = new Vector2(400, 150)
-            });
         }
 
-        protected override void LoadComplete()
+        [SetUp]
+        public void SetUp() => Schedule(() =>
         {
-            base.LoadComplete();
+            messageIdSequence = 0;
+            channelManager.CurrentChannel.Value = testChannel = new Channel();
 
-            channelManager.CurrentChannel.Value = testChannel;
+            Children = new[]
+            {
+                chatDisplay = new TestStandAloneChatDisplay
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    Margin = new MarginPadding(20),
+                    Size = new Vector2(400, 80),
+                    Channel = { Value = testChannel },
+                },
+                chatDisplay2 = new TestStandAloneChatDisplay(true)
+                {
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
+                    Margin = new MarginPadding(20),
+                    Size = new Vector2(400, 150),
+                    Channel = { Value = testChannel },
+                }
+            };
+        });
 
-            chatDisplay.Channel.Value = testChannel;
-            chatDisplay2.Channel.Value = testChannel;
-
-            int sequence = 0;
-
-            AddStep("message from admin", () => testChannel.AddNewMessages(new Message(sequence++)
+        [Test]
+        public void TestManyMessages()
+        {
+            AddStep("message from admin", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
             {
                 Sender = admin,
                 Content = "I am a wang!"
             }));
 
-            AddStep("message from team red", () => testChannel.AddNewMessages(new Message(sequence++)
+            AddStep("message from team red", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
             {
                 Sender = redUser,
                 Content = "I am team red."
             }));
 
-            AddStep("message from team red", () => testChannel.AddNewMessages(new Message(sequence++)
+            AddStep("message from team red", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
             {
                 Sender = redUser,
                 Content = "I plan to win!"
             }));
 
-            AddStep("message from team blue", () => testChannel.AddNewMessages(new Message(sequence++)
+            AddStep("message from team blue", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
             {
                 Sender = blueUser,
                 Content = "Not on my watch. Prepare to eat saaaaaaaaaand. Lots and lots of saaaaaaand."
             }));
 
-            AddStep("message from admin", () => testChannel.AddNewMessages(new Message(sequence++)
+            AddStep("message from admin", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
             {
                 Sender = admin,
                 Content = "Okay okay, calm down guys. Let's do this!"
             }));
 
-            AddStep("message from long username", () => testChannel.AddNewMessages(new Message(sequence++)
+            AddStep("message from long username", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
             {
                 Sender = longUsernameUser,
                 Content = "Hi guys, my new username is lit!"
             }));
 
-            AddStep("message with new date", () => testChannel.AddNewMessages(new Message(sequence++)
+            AddStep("message with new date", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
             {
                 Sender = longUsernameUser,
                 Content = "Message from the future!",
@@ -131,7 +136,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 for (int i = 0; i < messages_per_call; i++)
                 {
-                    testChannel.AddNewMessages(new Message(sequence++)
+                    testChannel.AddNewMessages(new Message(messageIdSequence++)
                     {
                         Sender = longUsernameUser,
                         Content = "Many messages! " + Guid.NewGuid(),
@@ -152,6 +157,45 @@ namespace osu.Game.Tests.Visual.Online
 
                 return true;
             });
+
+            AddUntilStep("ensure still scrolled to bottom", () => chatDisplay.ScrolledToBottom);
+        }
+
+        /// <summary>
+        /// Tests that when a message gets wrapped by the chat display getting contracted while scrolled to bottom, the chat will still keep scrolling down.
+        /// </summary>
+        [Test]
+        public void TestMessageWrappingKeepsAutoScrolling()
+        {
+            AddStep("fill chat", () =>
+            {
+                for (int i = 0; i < 10; i++)
+                {
+                    testChannel.AddNewMessages(new Message(messageIdSequence++)
+                    {
+                        Sender = longUsernameUser,
+                        Content = $"some stuff {Guid.NewGuid()}",
+                    });
+                }
+            });
+
+            AddAssert("ensure scrolled to bottom", () => chatDisplay.ScrolledToBottom);
+
+            // send message with short words for text wrapping to occur when contracting chat.
+            AddStep("send lorem ipsum", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
+            {
+                Sender = longUsernameUser,
+                Content = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce et bibendum velit.",
+            }));
+
+            AddStep("contract chat", () => chatDisplay.Width -= 100);
+            AddUntilStep("ensure still scrolled to bottom", () => chatDisplay.ScrolledToBottom);
+
+            AddStep("send another message", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
+            {
+                Sender = admin,
+                Content = "As we were saying...",
+            }));
 
             AddUntilStep("ensure still scrolled to bottom", () => chatDisplay.ScrolledToBottom);
         }
