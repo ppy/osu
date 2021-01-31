@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             public override Score CreateReplayScore(IBeatmap beatmap, IReadOnlyList<Mod> mods) => new Score
             {
                 ScoreInfo = new ScoreInfo { User = new User { Username = "Autoplay" } },
-                Replay = new MissingAutoGenerator(beatmap).Generate()
+                Replay = new MissingAutoGenerator(beatmap, mods).Generate()
             };
         }
 
@@ -78,8 +78,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             public new OsuBeatmap Beatmap => (OsuBeatmap)base.Beatmap;
 
-            public MissingAutoGenerator(IBeatmap beatmap)
-                : base(beatmap)
+            public MissingAutoGenerator(IBeatmap beatmap, IReadOnlyList<Mod> mods)
+                : base(beatmap, mods)
             {
             }
 
