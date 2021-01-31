@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Mods
 
         public virtual void Update(Playfield playfield)
         {
-            applyRateAdjustment((track.CurrentTime - beginRampTime) / (finalRateTime - beginRampTime));
+            applyRateAdjustment((track.CurrentTime - beginRampTime) / Math.Max(1, finalRateTime - beginRampTime));
         }
 
         /// <summary>

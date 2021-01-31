@@ -16,23 +16,11 @@ namespace osu.Game.Tests.Rulesets.Mods
         private const double duration = 9000;
 
         private TrackVirtual track;
-        private IBeatmap beatmap;
 
         [SetUp]
         public void SetUp()
         {
             track = new TrackVirtual(20_000);
-            beatmap = new Beatmap
-            {
-                HitObjects =
-                {
-                    new Spinner
-                    {
-                        StartTime = start_time,
-                        Duration = duration
-                    }
-                }
-            };
         }
 
         [TestCase(0, 1)]
@@ -43,6 +31,7 @@ namespace osu.Game.Tests.Rulesets.Mods
         [TestCase(15000, 1.5)]
         public void TestModWindUp(double time, double expectedRate)
         {
+            var beatmap = createSingleSpinnerBeatmap();
             var mod = new ModWindUp();
             mod.ApplyToBeatmap(beatmap);
             mod.ApplyToTrack(track);
@@ -60,10 +49,26 @@ namespace osu.Game.Tests.Rulesets.Mods
         [TestCase(15000, 0.5)]
         public void TestModWindDown(double time, double expectedRate)
         {
+            var beatmap = createSingleSpinnerBeatmap();
             var mod = new ModWindDown
             {
                 FinalRate = { Value = 0.5 }
             };
+            mod.ApplyToBeatmap(beatmap);
+            mod.ApplyToTrack(track);
+
+            seekTrackAndUpdateMod(mod, time);
+
+            Assert.That(mod.SpeedChange.Value, Is.EqualTo(expectedRate));
+        }
+
+        [TestCase(0, 1)]
+        [TestCase(start_time, 1)]
+        [TestCase(2 * start_time, 1.5)]
+        public void TestZeroDurationMap(double time, double expectedRate)
+        {
+            var beatmap = createSingleObjectBeatmap();
+            var mod = new ModWindUp();
             mod.ApplyToBeatmap(beatmap);
             mod.ApplyToTrack(track);
 
@@ -77,6 +82,32 @@ namespace osu.Game.Tests.Rulesets.Mods
             track.Seek(time);
             // update the mod via a fake playfield to re-calculate the current rate.
             mod.Update(null);
+        }
+
+        private static Beatmap createSingleSpinnerBeatmap()
+        {
+            return new Beatmap
+            {
+                HitObjects =
+                {
+                    new Spinner
+                    {
+                        StartTime = start_time,
+                        Duration = duration
+                    }
+                }
+            };
+        }
+
+        private static Beatmap createSingleObjectBeatmap()
+        {
+            return new Beatmap
+            {
+                HitObjects =
+                {
+                    new HitCircle { StartTime = start_time }
+                }
+            };
         }
     }
 }
