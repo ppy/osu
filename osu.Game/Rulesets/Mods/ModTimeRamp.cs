@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// The point in the beatmap at which the final ramping rate should be reached.
         /// </summary>
-        private const double final_rate_progress = 0.75f;
+        public const double FINAL_RATE_PROGRESS = 0.75f;
 
         [SettingSource("Initial rate", "The starting speed of the track")]
         public abstract BindableNumber<double> InitialRate { get; }
@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Mods
             SpeedChange.SetDefault();
 
             beginRampTime = beatmap.HitObjects.FirstOrDefault()?.StartTime ?? 0;
-            finalRateTime = final_rate_progress * (lastObject?.GetEndTime() ?? 0);
+            finalRateTime = FINAL_RATE_PROGRESS * (lastObject?.GetEndTime() ?? 0);
         }
 
         public virtual void Update(Playfield playfield)
