@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
@@ -14,7 +15,8 @@ namespace osu.Game.Rulesets.Mods
     {
         public virtual void ApplyToDrawableRuleset(DrawableRuleset<T> drawableRuleset)
         {
-            drawableRuleset.SetReplayScore(CreateReplayScore(drawableRuleset.Beatmap));
+            var mods = (IReadOnlyList<Mod>)drawableRuleset.Dependencies.Get(typeof(IReadOnlyList<Mod>));
+            drawableRuleset.SetReplayScore(CreateReplayScore(drawableRuleset.Beatmap, mods));
 
             // AlwaysPresent required for hitsounds
             drawableRuleset.Playfield.AlwaysPresent = true;
