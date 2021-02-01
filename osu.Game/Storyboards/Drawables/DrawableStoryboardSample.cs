@@ -46,14 +46,15 @@ namespace osu.Game.Storyboards.Drawables
         {
             if (!RequestedPlaying) return;
 
-            // non-looping storyboard samples should be stopped immediately when sample playback is disabled
-            if (!Looping)
+            if (!Looping && disabled.NewValue)
             {
-                if (disabled.NewValue)
-                    Stop();
+                // the default behaviour for sample disabling is to allow one-shot samples to play out.
+                // storyboards regularly have long running samples that can cause this behaviour to lead to unintended results.
+                // for this reason, we immediately stop such samples.
+                Stop();
             }
-            else
-                base.SamplePlaybackDisabledChanged(disabled);
+
+            base.SamplePlaybackDisabledChanged(disabled);
         }
 
         protected override void Update()
