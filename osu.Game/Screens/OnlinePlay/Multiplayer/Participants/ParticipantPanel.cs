@@ -129,32 +129,25 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                                     }
                                 }
                             },
-                            new FillFlowContainer
+                            new Container
                             {
                                 Anchor = Anchor.CentreRight,
                                 Origin = Anchor.CentreRight,
                                 AutoSizeAxes = Axes.Both,
-                                Direction = FillDirection.Horizontal,
-                                Margin = new MarginPadding { Right = 10 },
-                                Spacing = new Vector2(10),
-                                Children = new Drawable[]
+                                Margin = new MarginPadding { Right = 70 },
+                                Child = userModsDisplay = new ModDisplay
                                 {
-                                    userModsDisplay = new ModDisplay
-                                    {
-                                        Anchor = Anchor.Centre,
-                                        Origin = Anchor.Centre,
-                                        Scale = new Vector2(0.5f),
-                                        ExpansionMode = ExpansionMode.AlwaysContracted,
-                                        DisplayUnrankedText = false,
-                                        ExpandOnAppear = false
-                                    },
-                                    userStateDisplay = new StateDisplay
-                                    {
-                                        Anchor = Anchor.Centre,
-                                        Origin = Anchor.Centre,
-                                        AlwaysPresent = true
-                                    }
+                                    Scale = new Vector2(0.5f),
+                                    ExpansionMode = ExpansionMode.AlwaysContracted,
+                                    DisplayUnrankedText = false,
+                                    ExpandOnAppear = false
                                 }
+                            },
+                            userStateDisplay = new StateDisplay
+                            {
+                                Anchor = Anchor.CentreRight,
+                                Origin = Anchor.CentreRight,
+                                Margin = new MarginPadding { Right = 10 },
                             }
                         }
                     }
