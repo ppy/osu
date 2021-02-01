@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -29,7 +30,6 @@ namespace osu.Game.Overlays.Mods
 {
     public abstract class ModSelectOverlay : WaveOverlayContainer
     {
-        private readonly Func<Mod, bool> isValidMod;
         public const float HEIGHT = 510;
 
         protected readonly TriangleButton DeselectAllButton;
@@ -46,6 +46,20 @@ namespace osu.Game.Overlays.Mods
 
         protected readonly ModSettingsContainer ModSettingsContainer;
 
+        [NotNull]
+        private Func<Mod, bool> isValidMod = m => true;
+
+        [NotNull]
+        public Func<Mod, bool> IsValidMod
+        {
+            get => isValidMod;
+            set
+            {
+                isValidMod = value ?? throw new ArgumentNullException(nameof(value));
+                updateAvailableMods();
+            }
+        }
+
         public readonly Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         private Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> availableMods;
@@ -60,10 +74,8 @@ namespace osu.Game.Overlays.Mods
 
         private SampleChannel sampleOn, sampleOff;
 
-        protected ModSelectOverlay(Func<Mod, bool> isValidMod = null)
+        protected ModSelectOverlay()
         {
-            this.isValidMod = isValidMod ?? (m => true);
-
             Waves.FirstWaveColour = Color4Extensions.FromHex(@"19b0e2");
             Waves.SecondWaveColour = Color4Extensions.FromHex(@"2280a2");
             Waves.ThirdWaveColour = Color4Extensions.FromHex(@"005774");
@@ -350,7 +362,7 @@ namespace osu.Game.Overlays.Mods
         {
             base.LoadComplete();
 
-            availableMods.BindValueChanged(availableModsChanged, true);
+            availableMods.BindValueChanged(_ => updateAvailableMods(), true);
             SelectedMods.BindValueChanged(selectedModsChanged, true);
         }
 
@@ -405,12 +417,13 @@ namespace osu.Game.Overlays.Mods
 
         public override bool OnPressed(GlobalAction action) => false; // handled by back button
 
-        private void availableModsChanged(ValueChangedEvent<Dictionary<ModType, IReadOnlyList<Mod>>> mods)
+        private void updateAvailableMods()
         {
-            if (mods.NewValue == null) return;
+            if (availableMods.Value == null)
+                return;
 
             foreach (var section in ModSectionsContainer.Children)
-                section.Mods = mods.NewValue[section.ModType].Where(isValidMod);
+                section.Mods = availableMods.Value[section.ModType].Where(IsValidMod);
         }
 
         private void selectedModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)

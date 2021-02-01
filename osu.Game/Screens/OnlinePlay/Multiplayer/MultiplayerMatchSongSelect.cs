@@ -54,7 +54,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING };
 
-            freeModSelectOverlay = new FreeModSelectOverlay(isValidMod) { SelectedMods = { BindTarget = freeMods } };
+            freeModSelectOverlay = new FreeModSelectOverlay
+            {
+                SelectedMods = { BindTarget = freeMods },
+                IsValidMod = isValidMod,
+            };
         }
 
         [BackgroundDependencyLoader]
@@ -130,7 +134,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         protected override BeatmapDetailArea CreateBeatmapDetailArea() => new PlayBeatmapDetailArea();
 
-        protected override ModSelectOverlay CreateModSelectOverlay() => new SoloModSelectOverlay(isValidMod);
+        protected override ModSelectOverlay CreateModSelectOverlay() => new SoloModSelectOverlay
+        {
+            IsValidMod = isValidMod
+        };
 
         protected override IEnumerable<(FooterButton, OverlayContainer)> CreateFooterButtons()
         {
