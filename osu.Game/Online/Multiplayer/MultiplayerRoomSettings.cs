@@ -33,6 +33,7 @@ namespace osu.Game.Online.Multiplayer
         public IEnumerable<APIMod> Mods { get; set; } = Enumerable.Empty<APIMod>();
 
         [NotNull]
+        [Key(5)]
         public IEnumerable<APIMod> AllowedMods { get; set; } = Enumerable.Empty<APIMod>();
 
         public bool Equals(MultiplayerRoomSettings other)
