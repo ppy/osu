@@ -28,7 +28,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Online
 {
     [HeadlessTest]
-    public class TestSceneMultiplayerBeatmapTracker : OsuTestScene
+    public class TestSceneMultiplayerBeatmapAvailabilityTracker : OsuTestScene
     {
         private RulesetStore rulesets;
         private TestBeatmapManager beatmaps;
@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Online
         private BeatmapSetInfo testBeatmapSet;
 
         private readonly Bindable<PlaylistItem> selectedItem = new Bindable<PlaylistItem>();
-        private MultiplayerBeatmapTracker tracker;
+        private MultiplayerBeatmapAvailablilityTracker availablilityTracker;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, GameHost host)
@@ -67,7 +67,7 @@ namespace osu.Game.Tests.Online
                 Ruleset = { Value = testBeatmapInfo.Ruleset },
             };
 
-            Child = tracker = new MultiplayerBeatmapTracker
+            Child = availablilityTracker = new MultiplayerBeatmapAvailablilityTracker
             {
                 SelectedItem = { BindTarget = selectedItem, }
             };
@@ -118,7 +118,7 @@ namespace osu.Game.Tests.Online
             });
             addAvailabilityCheckStep("state still not downloaded", BeatmapAvailability.NotDownloaded);
 
-            AddStep("recreate tracker", () => Child = tracker = new MultiplayerBeatmapTracker
+            AddStep("recreate tracker", () => Child = availablilityTracker = new MultiplayerBeatmapAvailablilityTracker
             {
                 SelectedItem = { BindTarget = selectedItem }
             });
@@ -129,7 +129,7 @@ namespace osu.Game.Tests.Online
         {
             // In DownloadTrackingComposite, state changes are scheduled one frame later, wait one step.
             AddWaitStep("wait for potential change", 1);
-            AddAssert(description, () => tracker.Availability.Value.Equals(expected.Invoke()));
+            AddAssert(description, () => availablilityTracker.Availability.Value.Equals(expected.Invoke()));
         }
 
         private static BeatmapInfo getTestBeatmapInfo(string archiveFile)
