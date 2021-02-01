@@ -42,7 +42,7 @@ namespace osu.Game.Utils
             var incompatibleTypes = new HashSet<Type>();
             var incomingTypes = new HashSet<Type>();
 
-            foreach (var mod in combination.SelectMany(flattenMod))
+            foreach (var mod in combination.SelectMany(FlattenMod))
             {
                 // Add the new mod incompatibilities, checking whether any match the existing mod types.
                 foreach (var t in mod.IncompatibleMods)
@@ -79,7 +79,7 @@ namespace osu.Game.Utils
         {
             var allowedSet = new HashSet<Type>(allowedTypes);
 
-            return combination.SelectMany(flattenMod)
+            return combination.SelectMany(FlattenMod)
                               .All(m => allowedSet.Contains(m.GetType()));
         }
 
@@ -93,20 +93,27 @@ namespace osu.Game.Utils
         /// <param name="incompatibleTypes">The set of incompatible <see cref="Mod"/> types.</param>
         /// <returns>Whether the given <see cref="Mod"/> is incompatible.</returns>
         private static bool isModIncompatible(Mod mod, ICollection<Type> incompatibleTypes)
-            => flattenMod(mod)
+            => FlattenMod(mod)
                .SelectMany(m => m.GetType().EnumerateBaseTypes())
                .Any(incompatibleTypes.Contains);
+
+        /// <summary>
+        /// Flattens a set of <see cref="Mod"/>s, returning a new set with all <see cref="MultiMod"/>s removed.
+        /// </summary>
+        /// <param name="mods">The set of <see cref="Mod"/>s to flatten.</param>
+        /// <returns>The new set, containing all <see cref="Mod"/>s in <paramref name="mods"/> recursively with all <see cref="MultiMod"/>s removed.</returns>
+        public static IEnumerable<Mod> FlattenMods(IEnumerable<Mod> mods) => mods.SelectMany(FlattenMod);
 
         /// <summary>
         /// Flattens a <see cref="Mod"/>, returning a set of <see cref="Mod"/>s in-place of any <see cref="MultiMod"/>s.
         /// </summary>
         /// <param name="mod">The <see cref="Mod"/> to flatten.</param>
         /// <returns>A set of singular "flattened" <see cref="Mod"/>s</returns>
-        private static IEnumerable<Mod> flattenMod(Mod mod)
+        public static IEnumerable<Mod> FlattenMod(Mod mod)
         {
             if (mod is MultiMod multi)
             {
-                foreach (var m in multi.Mods.SelectMany(flattenMod))
+                foreach (var m in multi.Mods.SelectMany(FlattenMod))
                     yield return m;
             }
             else

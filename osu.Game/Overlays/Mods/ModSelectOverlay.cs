@@ -22,6 +22,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -46,9 +47,27 @@ namespace osu.Game.Overlays.Mods
 
         protected readonly ModSettingsContainer ModSettingsContainer;
 
+        private bool stacked = true;
+
+        /// <summary>
+        /// Whether mod icons should be stacked, or appear as individual buttons.
+        /// </summary>
+        public bool Stacked
+        {
+            get => stacked;
+            set
+            {
+                stacked = value;
+                updateAvailableMods();
+            }
+        }
+
         [NotNull]
         private Func<Mod, bool> isValidMod = m => true;
 
+        /// <summary>
+        /// A function that checks whether a given mod is valid.
+        /// </summary>
         [NotNull]
         public Func<Mod, bool> IsValidMod
         {
@@ -419,11 +438,18 @@ namespace osu.Game.Overlays.Mods
 
         private void updateAvailableMods()
         {
-            if (availableMods.Value == null)
+            if (availableMods?.Value == null)
                 return;
 
             foreach (var section in ModSectionsContainer.Children)
-                section.Mods = availableMods.Value[section.ModType].Where(IsValidMod);
+            {
+                IEnumerable<Mod> modEnumeration = availableMods.Value[section.ModType];
+
+                if (!stacked)
+                    modEnumeration = ModValidation.FlattenMods(modEnumeration);
+
+                section.Mods = modEnumeration.Where(IsValidMod);
+            }
         }
 
         private void selectedModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
