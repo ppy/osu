@@ -124,18 +124,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return Task.CompletedTask;
         }
 
-        public void ChangeUserExtraMods(int userId, IEnumerable<Mod> newMods)
-            => ChangeUserExtraMods(userId, newMods.Select(m => new APIMod(m)).ToList());
+        public void ChangeUserMods(int userId, IEnumerable<Mod> newMods)
+            => ChangeUserMods(userId, newMods.Select(m => new APIMod(m)).ToList());
 
-        public void ChangeUserExtraMods(int userId, IEnumerable<APIMod> newMods)
+        public void ChangeUserMods(int userId, IEnumerable<APIMod> newMods)
         {
             Debug.Assert(Room != null);
-            ((IMultiplayerClient)this).UserExtraModsChanged(userId, newMods.ToList());
+            ((IMultiplayerClient)this).UserModsChanged(userId, newMods.ToList());
         }
 
-        public override Task ChangeExtraMods(IEnumerable<APIMod> newMods)
+        public override Task ChangeUserMods(IEnumerable<APIMod> newMods)
         {
-            ChangeUserExtraMods(api.LocalUser.Value.Id, newMods);
+            ChangeUserMods(api.LocalUser.Value.Id, newMods);
             return Task.CompletedTask;
         }
 

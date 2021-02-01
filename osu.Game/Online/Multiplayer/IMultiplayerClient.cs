@@ -57,7 +57,7 @@ namespace osu.Game.Online.Multiplayer
         /// <param name="beatmapAvailability">The new beatmap availability state of the user.</param>
         Task UserBeatmapAvailabilityChanged(int userId, BeatmapAvailability beatmapAvailability);
 
-        Task UserExtraModsChanged(int userId, IEnumerable<APIMod> mods);
+        Task UserModsChanged(int userId, IEnumerable<APIMod> mods);
 
         /// <summary>
         /// Signals that a match is to be started. This will *only* be sent to clients which are to begin loading at this point.

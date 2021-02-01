@@ -33,7 +33,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         /// <summary>
         /// Any mods applied by/to the local user.
         /// </summary>
-        protected readonly Bindable<IReadOnlyList<Mod>> ExtraMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+        protected readonly Bindable<IReadOnlyList<Mod>> UserMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         [Resolved]
         private MusicController music { get; set; }
@@ -62,7 +62,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             managerUpdated = beatmapManager.ItemUpdated.GetBoundCopy();
             managerUpdated.BindValueChanged(beatmapUpdated);
 
-            ExtraMods.BindValueChanged(_ => updateMods());
+            UserMods.BindValueChanged(_ => updateMods());
         }
 
         public override void OnEntering(IScreen last)
@@ -108,9 +108,9 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 return;
 
             // Remove any extra mods that are no longer allowed.
-            ExtraMods.Value = ExtraMods.Value
-                                       .Where(m => SelectedItem.Value.AllowedMods.Any(a => m.GetType() == a.GetType()))
-                                       .ToList();
+            UserMods.Value = UserMods.Value
+                                     .Where(m => SelectedItem.Value.AllowedMods.Any(a => m.GetType() == a.GetType()))
+                                     .ToList();
 
             updateMods();
 
@@ -134,7 +134,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             if (SelectedItem.Value == null)
                 return;
 
-            Mods.Value = ExtraMods.Value.Concat(SelectedItem.Value.RequiredMods).ToList();
+            Mods.Value = UserMods.Value.Concat(SelectedItem.Value.RequiredMods).ToList();
         }
 
         private void beginHandlingTrack()

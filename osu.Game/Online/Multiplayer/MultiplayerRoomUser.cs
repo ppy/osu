@@ -27,7 +27,7 @@ namespace osu.Game.Online.Multiplayer
         public BeatmapAvailability BeatmapAvailability { get; set; } = BeatmapAvailability.LocallyAvailable();
 
         [NotNull]
-        public IEnumerable<APIMod> ExtraMods { get; set; } = Enumerable.Empty<APIMod>();
+        public IEnumerable<APIMod> UserMods { get; set; } = Enumerable.Empty<APIMod>();
 
         public User? User { get; set; }
 
