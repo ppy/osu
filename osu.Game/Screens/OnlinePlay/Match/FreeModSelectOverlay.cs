@@ -10,7 +10,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
 
-namespace osu.Game.Screens.OnlinePlay.Multiplayer
+namespace osu.Game.Screens.OnlinePlay.Match
 {
     public class FreeModSelectOverlay : ModSelectOverlay
     {
