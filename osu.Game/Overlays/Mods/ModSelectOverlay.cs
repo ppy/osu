@@ -444,8 +444,18 @@ namespace osu.Game.Overlays.Mods
                 if (!Stacked)
                     modEnumeration = ModValidation.FlattenMods(modEnumeration);
 
-                section.Mods = modEnumeration.Where(IsValidMod);
+                section.Mods = modEnumeration.Select(validModOrNull).Where(m => m != null);
             }
+        }
+
+        [CanBeNull]
+        private Mod validModOrNull([NotNull] Mod mod)
+        {
+            if (!(mod is MultiMod multi))
+                return IsValidMod(mod) ? mod : null;
+
+            var validSubset = multi.Mods.Select(validModOrNull).Where(m => m != null).ToArray();
+            return validSubset.Length == 0 ? null : new MultiMod(validSubset);
         }
 
         private void selectedModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
