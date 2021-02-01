@@ -24,9 +24,9 @@ using osu.Game.Skinning;
 using osu.Game.Users;
 using JetBrains.Annotations;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Testing;
 using osu.Game.Screens.Ranking.Statistics;
-using osu.Game.Utils;
 
 namespace osu.Game.Rulesets
 {
@@ -272,7 +272,7 @@ namespace osu.Game.Rulesets
             var validResults = GetValidHitResults();
 
             // enumerate over ordered list to guarantee return order is stable.
-            foreach (var result in OrderAttributeUtils.GetValuesInOrder<HitResult>())
+            foreach (var result in EnumExtensions.GetValuesInOrder<HitResult>())
             {
                 switch (result)
                 {
@@ -298,7 +298,7 @@ namespace osu.Game.Rulesets
         /// <remarks>
         /// <see cref="HitResult.Miss"/> is implicitly included. Special types like <see cref="HitResult.IgnoreHit"/> are ignored even when specified.
         /// </remarks>
-        protected virtual IEnumerable<HitResult> GetValidHitResults() => OrderAttributeUtils.GetValuesInOrder<HitResult>();
+        protected virtual IEnumerable<HitResult> GetValidHitResults() => EnumExtensions.GetValuesInOrder<HitResult>();
 
         /// <summary>
         /// Get a display friendly name for the specified result type.

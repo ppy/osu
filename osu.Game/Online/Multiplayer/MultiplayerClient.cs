@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
@@ -65,13 +66,19 @@ namespace osu.Game.Online.Multiplayer
             if (connection != null)
                 return;
 
-            connection = new HubConnectionBuilder()
-                         .WithUrl(endpoint, options =>
-                         {
-                             options.Headers.Add("Authorization", $"Bearer {api.AccessToken}");
-                         })
-                         .AddNewtonsoftJsonProtocol(options => { options.PayloadSerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore; })
-                         .Build();
+            var builder = new HubConnectionBuilder()
+                .WithUrl(endpoint, options => { options.Headers.Add("Authorization", $"Bearer {api.AccessToken}"); });
+
+            if (RuntimeInfo.SupportsJIT)
+                builder.AddMessagePackProtocol();
+            else
+            {
+                // eventually we will precompile resolvers for messagepack, but this isn't working currently
+                // see https://github.com/neuecc/MessagePack-CSharp/issues/780#issuecomment-768794308.
+                builder.AddNewtonsoftJsonProtocol(options => { options.PayloadSerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore; });
+            }
+
+            connection = builder.Build();
 
             // this is kind of SILLY
             // https://github.com/dotnet/aspnetcore/issues/15198
