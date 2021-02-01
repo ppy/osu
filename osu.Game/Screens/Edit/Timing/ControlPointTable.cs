@@ -206,7 +206,7 @@ namespace osu.Game.Screens.Edit.Timing
                 Action = () =>
                 {
                     selectedGroup.Value = controlGroup;
-                    clock.SeekTo(controlGroup.Time);
+                    clock.SeekSmoothlyTo(controlGroup.Time);
                 };
             }
 

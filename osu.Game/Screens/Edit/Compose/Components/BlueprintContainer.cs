@@ -170,7 +170,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (clickedBlueprint == null || SelectionHandler.SelectedBlueprints.FirstOrDefault(b => b.IsHovered) != clickedBlueprint)
                 return false;
 
-            EditorClock?.SeekTo(clickedBlueprint.HitObject.StartTime);
+            EditorClock?.SeekSmoothlyTo(clickedBlueprint.HitObject.StartTime);
             return true;
         }
 

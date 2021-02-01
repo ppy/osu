@@ -4,6 +4,7 @@
 #nullable enable
 
 using System;
+using MessagePack;
 using Newtonsoft.Json;
 using osu.Game.Online.Rooms;
 using osu.Game.Users;
@@ -11,21 +12,26 @@ using osu.Game.Users;
 namespace osu.Game.Online.Multiplayer
 {
     [Serializable]
+    [MessagePackObject]
     public class MultiplayerRoomUser : IEquatable<MultiplayerRoomUser>
     {
+        [Key(0)]
         public readonly int UserID;
 
+        [Key(1)]
         public MultiplayerUserState State { get; set; } = MultiplayerUserState.Idle;
 
         /// <summary>
         /// The availability state of the current beatmap.
         /// </summary>
+        [Key(2)]
         public BeatmapAvailability BeatmapAvailability { get; set; } = BeatmapAvailability.LocallyAvailable();
 
+        [IgnoreMember]
         public User? User { get; set; }
 
         [JsonConstructor]
-        public MultiplayerRoomUser(in int userId)
+        public MultiplayerRoomUser(int userId)
         {
             UserID = userId;
         }

@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 
@@ -43,17 +42,46 @@ namespace osu.Game.Screens.OnlinePlay
             leasedInProgress = inProgress.BeginLease(true);
             leasedInProgress.Value = true;
 
-            // for extra safety, marshal the end of operation back to the update thread if necessary.
-            return new InvokeOnDisposal(() => Scheduler.Add(endOperation, false));
+            return new OngoingOperation(this, leasedInProgress);
         }
 
-        private void endOperation()
+        private void endOperationWithKnownLease(LeasedBindable<bool> lease)
         {
-            if (leasedInProgress == null)
-                throw new InvalidOperationException("Cannot end operation multiple times.");
+            if (lease != leasedInProgress)
+                return;
 
-            leasedInProgress.Return();
+            // for extra safety, marshal the end of operation back to the update thread if necessary.
+            Scheduler.Add(() =>
+            {
+                leasedInProgress?.Return();
+                leasedInProgress = null;
+            }, false);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            // base call does an UnbindAllBindables().
+            // clean up the leased reference here so that it doesn't get returned twice.
             leasedInProgress = null;
+        }
+
+        private class OngoingOperation : IDisposable
+        {
+            private readonly OngoingOperationTracker tracker;
+            private readonly LeasedBindable<bool> lease;
+
+            public OngoingOperation(OngoingOperationTracker tracker, LeasedBindable<bool> lease)
+            {
+                this.tracker = tracker;
+                this.lease = lease;
+            }
+
+            public void Dispose()
+            {
+                tracker.endOperationWithKnownLease(lease);
+            }
         }
     }
 }
