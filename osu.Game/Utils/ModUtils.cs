@@ -12,9 +12,9 @@ using osu.Game.Rulesets.Mods;
 namespace osu.Game.Utils
 {
     /// <summary>
-    /// A set of utilities to validate <see cref="Mod"/> combinations.
+    /// A set of utilities to handle <see cref="Mod"/> combinations.
     /// </summary>
-    public static class ModValidation
+    public static class ModUtils
     {
         /// <summary>
         /// Checks that all <see cref="Mod"/>s are compatible with each-other, and that all appear within a set of allowed types.
@@ -25,11 +25,11 @@ namespace osu.Game.Utils
         /// <param name="combination">The <see cref="Mod"/>s to check.</param>
         /// <param name="allowedTypes">The set of allowed <see cref="Mod"/> types.</param>
         /// <returns>Whether all <see cref="Mod"/>s are compatible with each-other and appear in the set of allowed types.</returns>
-        public static bool CheckCompatibleAndAllowed(IEnumerable<Mod> combination, IEnumerable<Type> allowedTypes)
+        public static bool CheckCompatibleSetAndAllowed(IEnumerable<Mod> combination, IEnumerable<Type> allowedTypes)
         {
             // Prevent multiple-enumeration.
             var combinationList = combination as ICollection<Mod> ?? combination.ToArray();
-            return CheckCompatible(combinationList) && CheckAllowed(combinationList, allowedTypes);
+            return CheckCompatibleSet(combinationList) && CheckAllowed(combinationList, allowedTypes);
         }
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace osu.Game.Utils
         /// </summary>
         /// <param name="combination">The <see cref="Mod"/> combination to check.</param>
         /// <returns>Whether all <see cref="Mod"/>s in the combination are compatible with each-other.</returns>
-        public static bool CheckCompatible(IEnumerable<Mod> combination)
+        public static bool CheckCompatibleSet(IEnumerable<Mod> combination)
         {
             var incompatibleTypes = new HashSet<Type>();
             var incomingTypes = new HashSet<Type>();
@@ -82,20 +82,6 @@ namespace osu.Game.Utils
             return combination.SelectMany(FlattenMod)
                               .All(m => allowedSet.Contains(m.GetType()));
         }
-
-        /// <summary>
-        /// Determines whether a <see cref="Mod"/> is in a set of incompatible types.
-        /// </summary>
-        /// <remarks>
-        /// A <see cref="Mod"/> can be incompatible through its most-declared type or any of its base types.
-        /// </remarks>
-        /// <param name="mod">The <see cref="Mod"/> to test.</param>
-        /// <param name="incompatibleTypes">The set of incompatible <see cref="Mod"/> types.</param>
-        /// <returns>Whether the given <see cref="Mod"/> is incompatible.</returns>
-        private static bool isModIncompatible(Mod mod, ICollection<Type> incompatibleTypes)
-            => FlattenMod(mod)
-               .SelectMany(m => m.GetType().EnumerateBaseTypes())
-               .Any(incompatibleTypes.Contains);
 
         /// <summary>
         /// Flattens a set of <see cref="Mod"/>s, returning a new set with all <see cref="MultiMod"/>s removed.

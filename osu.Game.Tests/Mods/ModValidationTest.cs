@@ -15,7 +15,7 @@ namespace osu.Game.Tests.Mods
         public void TestModIsCompatibleByItself()
         {
             var mod = new Mock<Mod>();
-            Assert.That(ModValidation.CheckCompatible(new[] { mod.Object }));
+            Assert.That(ModUtils.CheckCompatibleSet(new[] { mod.Object }));
         }
 
         [Test]
@@ -27,8 +27,8 @@ namespace osu.Game.Tests.Mods
             mod1.Setup(m => m.IncompatibleMods).Returns(new[] { mod2.Object.GetType() });
 
             // Test both orderings.
-            Assert.That(ModValidation.CheckCompatible(new[] { mod1.Object, mod2.Object }), Is.False);
-            Assert.That(ModValidation.CheckCompatible(new[] { mod2.Object, mod1.Object }), Is.False);
+            Assert.That(ModUtils.CheckCompatibleSet(new[] { mod1.Object, mod2.Object }), Is.False);
+            Assert.That(ModUtils.CheckCompatibleSet(new[] { mod2.Object, mod1.Object }), Is.False);
         }
 
         [Test]
@@ -43,22 +43,22 @@ namespace osu.Game.Tests.Mods
             var multiMod = new MultiMod(new MultiMod(mod2.Object));
 
             // Test both orderings.
-            Assert.That(ModValidation.CheckCompatible(new[] { multiMod, mod1.Object }), Is.False);
-            Assert.That(ModValidation.CheckCompatible(new[] { mod1.Object, multiMod }), Is.False);
+            Assert.That(ModUtils.CheckCompatibleSet(new[] { multiMod, mod1.Object }), Is.False);
+            Assert.That(ModUtils.CheckCompatibleSet(new[] { mod1.Object, multiMod }), Is.False);
         }
 
         [Test]
         public void TestAllowedThroughMostDerivedType()
         {
             var mod = new Mock<Mod>();
-            Assert.That(ModValidation.CheckAllowed(new[] { mod.Object }, new[] { mod.Object.GetType() }));
+            Assert.That(ModUtils.CheckAllowed(new[] { mod.Object }, new[] { mod.Object.GetType() }));
         }
 
         [Test]
         public void TestNotAllowedThroughBaseType()
         {
             var mod = new Mock<Mod>();
-            Assert.That(ModValidation.CheckAllowed(new[] { mod.Object }, new[] { typeof(Mod) }), Is.False);
+            Assert.That(ModUtils.CheckAllowed(new[] { mod.Object }, new[] { typeof(Mod) }), Is.False);
         }
     }
 }

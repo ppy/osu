@@ -76,11 +76,15 @@ namespace osu.Game.Screens.OnlinePlay
             item.AllowedMods.Clear();
             item.AllowedMods.AddRange(freeMods.Value.Select(m => m.CreateCopy()));
 
-            OnSetItem(item);
+            SelectItem(item);
             return true;
         }
 
-        protected abstract void OnSetItem(PlaylistItem item);
+        /// <summary>
+        /// Invoked when the user has requested a selection of a beatmap.
+        /// </summary>
+        /// <param name="item">The resultant <see cref="PlaylistItem"/>. This item has not yet been added to the <see cref="Room"/>'s.</param>
+        protected abstract void SelectItem(PlaylistItem item);
 
         public override bool OnBackButton()
         {
@@ -117,8 +121,18 @@ namespace osu.Game.Screens.OnlinePlay
             return buttons;
         }
 
+        /// <summary>
+        /// Checks whether a given <see cref="Mod"/> is valid for global selection.
+        /// </summary>
+        /// <param name="mod">The <see cref="Mod"/> to check.</param>
+        /// <returns>Whether <paramref name="mod"/> is a valid mod for online play.</returns>
         protected virtual bool IsValidMod(Mod mod) => !(mod is ModAutoplay) && (mod as MultiMod)?.Mods.Any(mm => mm is ModAutoplay) != true;
 
+        /// <summary>
+        /// Checks whether a given <see cref="Mod"/> is valid for per-player free-mod selection.
+        /// </summary>
+        /// <param name="mod">The <see cref="Mod"/> to check.</param>
+        /// <returns>Whether <paramref name="mod"/> is a selectable free-mod.</returns>
         protected virtual bool IsValidFreeMod(Mod mod) => IsValidMod(mod);
     }
 }

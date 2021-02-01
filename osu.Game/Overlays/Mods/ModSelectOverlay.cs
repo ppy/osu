@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.Mods
         private Func<Mod, bool> isValidMod = m => true;
 
         /// <summary>
-        /// A function that checks whether a given mod is valid.
+        /// A function that checks whether a given mod is selectable.
         /// </summary>
         [NotNull]
         public Func<Mod, bool> IsValidMod
@@ -442,12 +442,20 @@ namespace osu.Game.Overlays.Mods
                 IEnumerable<Mod> modEnumeration = availableMods.Value[section.ModType];
 
                 if (!Stacked)
-                    modEnumeration = ModValidation.FlattenMods(modEnumeration);
+                    modEnumeration = ModUtils.FlattenMods(modEnumeration);
 
                 section.Mods = modEnumeration.Select(validModOrNull).Where(m => m != null);
             }
         }
 
+        /// <summary>
+        /// Returns a valid form of a given <see cref="Mod"/> if possible, or null otherwise.
+        /// </summary>
+        /// <remarks>
+        /// This is a recursive process during which any invalid mods are culled while preserving <see cref="MultiMod"/> structures where possible.
+        /// </remarks>
+        /// <param name="mod">The <see cref="Mod"/> to check.</param>
+        /// <returns>A valid form of <paramref name="mod"/> if exists, or null otherwise.</returns>
         [CanBeNull]
         private Mod validModOrNull([NotNull] Mod mod)
         {

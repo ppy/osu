@@ -5,13 +5,15 @@ using System;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Screens.OnlinePlay.Match
 {
+    /// <summary>
+    /// A <see cref="ModSelectOverlay"/> used for free-mod selection in online play.
+    /// </summary>
     public class FreeModSelectOverlay : ModSelectOverlay
     {
         protected override bool AllowCustomisation => false;
@@ -29,8 +31,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
             {
             }
 
-            protected override ModButton CreateModButton(Mod mod) => new FreeModButton(mod);
-
             protected override Drawable CreateHeader(string text) => new Container
             {
                 AutoSizeAxes = Axes.Y,
@@ -47,7 +47,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 foreach (var button in ButtonsContainer.OfType<ModButton>())
                 {
                     if (value)
-                        // Note: Buttons where only part of the group has an implementation are not fully supported.
                         button.SelectAt(0);
                     else
                         button.Deselect();
@@ -75,30 +74,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
             {
                 base.OnUserChange(value);
                 Changed?.Invoke(value);
-            }
-        }
-
-        private class FreeModButton : ModButton
-        {
-            public FreeModButton(Mod mod)
-                : base(mod)
-            {
-            }
-
-            protected override bool OnClick(ClickEvent e)
-            {
-                onClick();
-                return true;
-            }
-
-            protected override void OnRightClick(MouseUpEvent e) => onClick();
-
-            private void onClick()
-            {
-                if (Selected)
-                    Deselect();
-                else
-                    SelectNext(1);
             }
         }
     }

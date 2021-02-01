@@ -57,6 +57,11 @@ namespace osu.Game.Online.Multiplayer
         /// <param name="beatmapAvailability">The new beatmap availability state of the user.</param>
         Task UserBeatmapAvailabilityChanged(int userId, BeatmapAvailability beatmapAvailability);
 
+        /// <summary>
+        /// Signals that a user in this room changed their local mods.
+        /// </summary>
+        /// <param name="userId">The ID of the user whose mods have changed.</param>
+        /// <param name="mods">The user's new local mods.</param>
         Task UserModsChanged(int userId, IEnumerable<APIMod> mods);
 
         /// <summary>

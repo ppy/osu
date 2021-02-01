@@ -232,6 +232,10 @@ namespace osu.Game.Online.Multiplayer
 
         public abstract Task ChangeBeatmapAvailability(BeatmapAvailability newBeatmapAvailability);
 
+        /// <summary>
+        /// Change the local user's mods in the currently joined room.
+        /// </summary>
+        /// <param name="newMods">The proposed new mods, excluding any required by the room itself.</param>
         public Task ChangeUserMods(IEnumerable<Mod> newMods) => ChangeUserMods(newMods.Select(m => new APIMod(m)).ToList());
 
         public abstract Task ChangeUserMods(IEnumerable<APIMod> newMods);
@@ -393,7 +397,7 @@ namespace osu.Game.Online.Multiplayer
             {
                 var user = Room?.Users.SingleOrDefault(u => u.UserID == userId);
 
-                // errors here are not critical - user mods is mostly for display.
+                // errors here are not critical - user mods are mostly for display.
                 if (user == null)
                     return;
 
