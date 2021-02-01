@@ -216,7 +216,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     Origin = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.5f,
-                    Child = userModsSelectOverlay = new SoloModSelectOverlay
+                    Child = userModsSelectOverlay = new UserModSelectOverlay
                     {
                         SelectedMods = { BindTarget = UserMods },
                         IsValidMod = _ => false
@@ -357,6 +357,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             if (client != null)
                 client.LoadRequested -= onLoadRequested;
+        }
+
+        private class UserModSelectOverlay : ModSelectOverlay
+        {
+            protected override bool AllowCustomisation => false;
         }
     }
 }
