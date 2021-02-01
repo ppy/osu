@@ -39,6 +39,16 @@ namespace osu.Game.Overlays.Mods
 
         protected readonly OsuSpriteText MultiplierLabel;
 
+        /// <summary>
+        /// Whether to allow customisation of mod settings.
+        /// </summary>
+        protected virtual bool AllowCustomisation => true;
+
+        /// <summary>
+        /// Whether mod icons should be stacked, or appear as individual buttons.
+        /// </summary>
+        protected virtual bool Stacked => true;
+
         protected override bool BlockNonPositionalInput => false;
 
         protected override bool DimMainContent => false;
@@ -46,21 +56,6 @@ namespace osu.Game.Overlays.Mods
         protected readonly FillFlowContainer<ModSection> ModSectionsContainer;
 
         protected readonly ModSettingsContainer ModSettingsContainer;
-
-        private bool stacked = true;
-
-        /// <summary>
-        /// Whether mod icons should be stacked, or appear as individual buttons.
-        /// </summary>
-        public bool Stacked
-        {
-            get => stacked;
-            set
-            {
-                stacked = value;
-                updateAvailableMods();
-            }
-        }
 
         [NotNull]
         private Func<Mod, bool> isValidMod = m => true;
@@ -307,6 +302,7 @@ namespace osu.Game.Overlays.Mods
                                             CustomiseButton = new TriangleButton
                                             {
                                                 Width = 180,
+                                                Alpha = AllowCustomisation ? 1 : 0,
                                                 Text = "Customisation",
                                                 Action = () => ModSettingsContainer.ToggleVisibility(),
                                                 Enabled = { Value = false },
@@ -445,7 +441,7 @@ namespace osu.Game.Overlays.Mods
             {
                 IEnumerable<Mod> modEnumeration = availableMods.Value[section.ModType];
 
-                if (!stacked)
+                if (!Stacked)
                     modEnumeration = ModValidation.FlattenMods(modEnumeration);
 
                 section.Mods = modEnumeration.Where(IsValidMod);

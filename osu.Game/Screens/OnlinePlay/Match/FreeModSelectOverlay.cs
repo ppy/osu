@@ -14,10 +14,9 @@ namespace osu.Game.Screens.OnlinePlay.Match
 {
     public class FreeModSelectOverlay : ModSelectOverlay
     {
-        public FreeModSelectOverlay()
-        {
-            Stacked = false;
-        }
+        protected override bool AllowCustomisation => false;
+
+        protected override bool Stacked => false;
 
         protected override ModSection CreateModSection(ModType type) => new FreeModSection(type);
 
