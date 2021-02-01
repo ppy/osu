@@ -22,6 +22,7 @@ namespace osu.Game.Online.Rooms
         /// <summary>
         /// The beatmap's downloading progress, null when not in <see cref="DownloadState.Downloading"/> state.
         /// </summary>
+        [Key(1)]
         public readonly float? DownloadProgress;
 
         [JsonConstructor]
