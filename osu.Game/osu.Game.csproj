@@ -20,7 +20,7 @@
   <ItemGroup Label="Package References">
     <PackageReference Include="DiffPlex" Version="1.6.3" />
     <PackageReference Include="Humanizer" Version="2.8.26" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="3.1.10" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="3.1.11" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="3.1.11" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="3.1.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.6" />
