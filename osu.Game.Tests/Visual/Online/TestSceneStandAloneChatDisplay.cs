@@ -46,7 +46,6 @@ namespace osu.Game.Tests.Visual.Online
         private ChannelManager channelManager = new ChannelManager();
 
         private TestStandAloneChatDisplay chatDisplay;
-        private TestStandAloneChatDisplay chatDisplay2;
         private int messageIdSequence;
 
         private Channel testChannel;
@@ -72,7 +71,7 @@ namespace osu.Game.Tests.Visual.Online
                     Size = new Vector2(400, 80),
                     Channel = { Value = testChannel },
                 },
-                chatDisplay2 = new TestStandAloneChatDisplay(true)
+                new TestStandAloneChatDisplay(true)
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
