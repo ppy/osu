@@ -6,12 +6,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Rooms;
-using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Components;
+using osu.Game.Screens.Select;
 
-namespace osu.Game.Screens.Select
+namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public class MatchSongSelect : OnlinePlaySongSelect
+    public class PlaylistsSongSelect : OnlinePlaySongSelect
     {
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
