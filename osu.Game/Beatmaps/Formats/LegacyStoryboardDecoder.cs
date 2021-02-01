@@ -139,7 +139,7 @@ namespace osu.Game.Beatmaps.Formats
                             // this is random as hell but taken straight from osu-stable.
                             frameDelay = Math.Round(0.015 * frameDelay) * 1.186 * (1000 / 60f);
 
-                        var loopType = split.Length > 8 ? (AnimationLoopType)Enum.Parse(typeof(AnimationLoopType), split[8]) : AnimationLoopType.LoopForever;
+                        var loopType = split.Length > 8 ? parseAnimationLoopType(split[8]) : AnimationLoopType.LoopForever;
                         storyboardSprite = new StoryboardAnimation(path, origin, new Vector2(x, y), frameCount, frameDelay, loopType);
                         storyboard.GetLayer(layer).Add(storyboardSprite);
                         break;
@@ -339,6 +339,12 @@ namespace osu.Game.Beatmaps.Formats
                 default:
                     return Anchor.TopLeft;
             }
+        }
+
+        private AnimationLoopType parseAnimationLoopType(string value)
+        {
+            var parsed = (AnimationLoopType)Enum.Parse(typeof(AnimationLoopType), value);
+            return Enum.IsDefined(typeof(AnimationLoopType), parsed) ? parsed : AnimationLoopType.LoopForever;
         }
 
         private void handleVariables(string line)

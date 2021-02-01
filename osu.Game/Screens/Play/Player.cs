@@ -353,7 +353,7 @@ namespace osu.Game.Screens.Play
                     },
                     skipOverlay = new SkipOverlay(DrawableRuleset.GameplayStartTime)
                     {
-                        RequestSkip = GameplayClockContainer.Skip
+                        RequestSkip = performUserRequestedSkip
                     },
                     FailOverlay = new FailOverlay
                     {
@@ -486,6 +486,17 @@ namespace osu.Game.Screens.Play
                 performUserRequestedExit();
             else
                 this.Exit();
+        }
+
+        private void performUserRequestedSkip()
+        {
+            // user requested skip
+            // disable sample playback to stop currently playing samples and perform skip
+            samplePlaybackDisabled.Value = true;
+            GameplayClockContainer.Skip();
+
+            // return samplePlaybackDisabled.Value to what is defined by the beatmap's current state
+            updateSampleDisabledState();
         }
 
         private void performUserRequestedExit()

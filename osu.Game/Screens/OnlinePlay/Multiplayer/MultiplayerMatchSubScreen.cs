@@ -12,7 +12,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
-using osu.Game.Extensions;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays.Mods;
@@ -315,7 +314,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                           // accessing Exception here silences any potential errors from the antecedent task
                           if (t.Exception != null)
                           {
-                              t.CatchUnobservedExceptions(true); // will run immediately.
                               // gameplay was not started due to an exception; unblock button.
                               endOperation();
                           }
@@ -326,11 +324,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }
 
             client.ToggleReady()
-                  .ContinueWith(t =>
-                  {
-                      t.CatchUnobservedExceptions(true); // will run immediately.
-                      endOperation();
-                  });
+                  .ContinueWith(t => endOperation());
 
             void endOperation()
             {

@@ -5,6 +5,8 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Beatmaps;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using osuTK;
 
@@ -13,6 +15,9 @@ namespace osu.Game.Tests.Visual.Editing
     [TestFixture]
     public class TestSceneEditorSummaryTimeline : EditorClockTestScene
     {
+        [Cached(typeof(EditorBeatmap))]
+        private readonly EditorBeatmap editorBeatmap = new EditorBeatmap(new OsuBeatmap());
+
         [BackgroundDependencyLoader]
         private void load()
         {
