@@ -57,7 +57,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             freeModSelectOverlay = new FreeModSelectOverlay
             {
                 SelectedMods = { BindTarget = freeMods },
-                IsValidMod = isValidMod,
+                IsValidMod = isValidFreeMod,
             };
         }
 
@@ -147,6 +147,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         }
 
         private bool isValidMod(Mod mod) => !(mod is ModAutoplay) && (mod as MultiMod)?.Mods.Any(mm => mm is ModAutoplay) != true;
+
+        private bool isValidFreeMod(Mod mod) => isValidMod(mod) && !(mod is ModRateAdjust) && !(mod is ModTimeRamp);
     }
 
     public class FooterButtonFreeMods : FooterButton, IHasCurrentValue<IReadOnlyList<Mod>>
