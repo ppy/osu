@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -29,6 +30,11 @@ namespace osu.Game.Screens.OnlinePlay.Match
         [Resolved(typeof(Room), nameof(Room.Playlist))]
         protected BindableList<PlaylistItem> Playlist { get; private set; }
 
+        /// <summary>
+        /// Any mods applied by/to the local user.
+        /// </summary>
+        protected readonly Bindable<IReadOnlyList<Mod>> ExtraMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+
         [Resolved]
         private MusicController music { get; set; }
 
@@ -55,6 +61,8 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
             managerUpdated = beatmapManager.ItemUpdated.GetBoundCopy();
             managerUpdated.BindValueChanged(beatmapUpdated);
+
+            ExtraMods.BindValueChanged(_ => updateMods());
         }
 
         public override void OnEntering(IScreen last)
@@ -95,12 +103,17 @@ namespace osu.Game.Screens.OnlinePlay.Match
         {
             updateWorkingBeatmap();
 
-            var item = SelectedItem.Value;
+            if (SelectedItem.Value == null)
+                return;
 
-            Mods.Value = item?.RequiredMods?.ToArray() ?? Array.Empty<Mod>();
+            // Remove any extra mods that are no longer allowed.
+            ExtraMods.Value = ExtraMods.Value
+                                       .Where(m => SelectedItem.Value.AllowedMods.Any(a => m.GetType() == a.GetType()))
+                                       .ToList();
 
-            if (item?.Ruleset != null)
-                Ruleset.Value = item.Ruleset.Value;
+            updateMods();
+
+            Ruleset.Value = SelectedItem.Value.Ruleset.Value;
         }
 
         private void beatmapUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakSet) => Schedule(updateWorkingBeatmap);
@@ -113,6 +126,14 @@ namespace osu.Game.Screens.OnlinePlay.Match
             var localBeatmap = beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == beatmap.OnlineBeatmapID);
 
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
+        }
+
+        private void updateMods()
+        {
+            if (SelectedItem.Value == null)
+                return;
+
+            Mods.Value = ExtraMods.Value.Concat(SelectedItem.Value.RequiredMods).ToList();
         }
 
         private void beginHandlingTrack()

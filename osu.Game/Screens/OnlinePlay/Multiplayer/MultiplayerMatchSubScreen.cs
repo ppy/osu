@@ -14,12 +14,15 @@ using osu.Framework.Screens;
 using osu.Game.Extensions;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
+using osu.Game.Overlays.Mods;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Participants;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Users;
+using osuTK;
 using ParticipantsList = osu.Game.Screens.OnlinePlay.Multiplayer.Participants.ParticipantsList;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
@@ -37,7 +40,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Resolved]
         private OngoingOperationTracker ongoingOperationTracker { get; set; }
 
+        private ModSelectOverlay extraModSelectOverlay;
         private MultiplayerMatchSettingsOverlay settingsOverlay;
+        private Drawable extraModsSection;
 
         private IBindable<bool> isConnected;
 
@@ -129,10 +134,39 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                             RelativeSizeAxes = Axes.X,
                                                             AutoSizeAxes = Axes.Y,
                                                             Padding = new MarginPadding { Horizontal = 5 },
-                                                            Children = new Drawable[]
+                                                            Spacing = new Vector2(0, 10),
+                                                            Children = new[]
                                                             {
-                                                                new OverlinedHeader("Beatmap"),
-                                                                new BeatmapSelectionControl { RelativeSizeAxes = Axes.X }
+                                                                new FillFlowContainer
+                                                                {
+                                                                    RelativeSizeAxes = Axes.X,
+                                                                    AutoSizeAxes = Axes.Y,
+                                                                    Children = new Drawable[]
+                                                                    {
+                                                                        new OverlinedHeader("Beatmap"),
+                                                                        new BeatmapSelectionControl { RelativeSizeAxes = Axes.X }
+                                                                    }
+                                                                },
+                                                                extraModsSection = new FillFlowContainer
+                                                                {
+                                                                    RelativeSizeAxes = Axes.X,
+                                                                    AutoSizeAxes = Axes.Y,
+                                                                    Children = new Drawable[]
+                                                                    {
+                                                                        new OverlinedHeader("Extra mods"),
+                                                                        new ModDisplay
+                                                                        {
+                                                                            DisplayUnrankedText = false,
+                                                                            Current = ExtraMods
+                                                                        },
+                                                                        new PurpleTriangleButton
+                                                                        {
+                                                                            RelativeSizeAxes = Axes.X,
+                                                                            Text = "Select",
+                                                                            Action = () => extraModSelectOverlay.Show()
+                                                                        }
+                                                                    }
+                                                                }
                                                             }
                                                         }
                                                     }
@@ -173,6 +207,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                         new Dimension(),
                         new Dimension(GridSizeMode.AutoSize),
                     }
+                },
+                extraModSelectOverlay = new SoloModSelectOverlay
+                {
+                    SelectedMods = { BindTarget = ExtraMods },
+                    Stacked = false,
+                    IsValidMod = _ => false
                 },
                 settingsOverlay = new MultiplayerMatchSettingsOverlay
                 {
@@ -219,10 +259,31 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return true;
             }
 
+            if (extraModSelectOverlay.State.Value == Visibility.Visible)
+            {
+                extraModSelectOverlay.Hide();
+                return true;
+            }
+
             return base.OnBackButton();
         }
 
-        private void onPlaylistChanged(object sender, NotifyCollectionChangedEventArgs e) => SelectedItem.Value = Playlist.FirstOrDefault();
+        private void onPlaylistChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            SelectedItem.Value = Playlist.FirstOrDefault();
+
+            if (SelectedItem.Value?.AllowedMods.Any() != true)
+            {
+                extraModsSection.Hide();
+                extraModSelectOverlay.Hide();
+                extraModSelectOverlay.IsValidMod = _ => false;
+            }
+            else
+            {
+                extraModsSection.Show();
+                extraModSelectOverlay.IsValidMod = m => SelectedItem.Value.AllowedMods.Any(a => a.GetType() == m.GetType());
+            }
+        }
 
         private void onReadyClick()
         {
