@@ -241,6 +241,11 @@ namespace osu.Game.Overlays.Chat
         /// </summary>
         private class ChannelScrollContainer : OsuScrollContainer
         {
+            /// <summary>
+            /// The chat will be automatically scrolled to end if and only if
+            /// the distance between the current scroll position and the end of the scroll
+            /// is less than this value.
+            /// </summary>
             private const float auto_scroll_leniency = 10f;
 
             private float? lastExtent;
