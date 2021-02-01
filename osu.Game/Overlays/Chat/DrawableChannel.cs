@@ -237,7 +237,7 @@ namespace osu.Game.Overlays.Chat
         }
 
         /// <summary>
-        /// An <see cref="OsuScrollContainer"/> with functionality to automatically scrolls whenever the maximum scrollable distance increases.
+        /// An <see cref="OsuScrollContainer"/> with functionality to automatically scroll whenever the maximum scrollable distance increases.
         /// </summary>
         private class ChannelScrollContainer : OsuScrollContainer
         {
@@ -246,7 +246,7 @@ namespace osu.Game.Overlays.Chat
             private float? lastExtent;
 
             /// <summary>
-            /// Whether this should automatically scroll to end on the next call to <see cref="UpdateAfterChildren"/>.
+            /// Whether this container should automatically scroll to end on the next call to <see cref="UpdateAfterChildren"/>.
             /// </summary>
             public bool ShouldAutoScroll { get; private set; } = true;
 
