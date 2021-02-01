@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -200,7 +199,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                         if (Room.Host?.UserID != api.LocalUser.Value.Id)
                             return;
 
-                        Client.TransferHost(targetUser).CatchUnobservedExceptions(true);
+                        Client.TransferHost(targetUser);
                     })
                 };
             }

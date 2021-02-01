@@ -16,6 +16,9 @@ using osu.Framework.Bindables;
 
 namespace osu.Game.Rulesets.UI
 {
+    /// <summary>
+    /// Display the specified mod at a fixed size.
+    /// </summary>
     public class ModIcon : Container, IHasTooltip
     {
         public readonly BindableBool Selected = new BindableBool();
@@ -26,9 +29,10 @@ namespace osu.Game.Rulesets.UI
 
         private const float size = 80;
 
-        public virtual string TooltipText => mod.IconTooltip;
+        public virtual string TooltipText => showTooltip ? mod.IconTooltip : null;
 
         private Mod mod;
+        private readonly bool showTooltip;
 
         public Mod Mod
         {
@@ -48,9 +52,15 @@ namespace osu.Game.Rulesets.UI
         private Color4 backgroundColour;
         private Color4 highlightedColour;
 
-        public ModIcon(Mod mod)
+        /// <summary>
+        /// Construct a new instance.
+        /// </summary>
+        /// <param name="mod">The mod to be displayed</param>
+        /// <param name="showTooltip">Whether a tooltip describing the mod should display on hover.</param>
+        public ModIcon(Mod mod, bool showTooltip = true)
         {
             this.mod = mod ?? throw new ArgumentNullException(nameof(mod));
+            this.showTooltip = showTooltip;
 
             Size = new Vector2(size);
 

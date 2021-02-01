@@ -7,22 +7,29 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using MessagePack;
 using osu.Game.Online.API;
 
 namespace osu.Game.Online.Multiplayer
 {
     [Serializable]
+    [MessagePackObject]
     public class MultiplayerRoomSettings : IEquatable<MultiplayerRoomSettings>
     {
+        [Key(0)]
         public int BeatmapID { get; set; }
 
+        [Key(1)]
         public int RulesetID { get; set; }
 
+        [Key(2)]
         public string BeatmapChecksum { get; set; } = string.Empty;
 
+        [Key(3)]
         public string Name { get; set; } = "Unnamed room";
 
         [NotNull]
+        [Key(4)]
         public IEnumerable<APIMod> Mods { get; set; } = Enumerable.Empty<APIMod>();
 
         [NotNull]
