@@ -81,6 +81,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         {
             base.OnResuming(last);
             beginHandlingTrack();
+            updateMods();
         }
 
         public override bool OnExiting(IScreen next)
