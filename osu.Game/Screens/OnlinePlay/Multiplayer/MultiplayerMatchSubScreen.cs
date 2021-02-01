@@ -210,7 +210,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                         new Dimension(GridSizeMode.AutoSize),
                     }
                 },
-                userModsSelectOverlay = new UserModSelectOverlay
+                userModsSelectOverlay = new SoloModSelectOverlay
                 {
                     SelectedMods = { BindTarget = UserMods },
                     IsValidMod = _ => false
@@ -350,11 +350,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             if (client != null)
                 client.LoadRequested -= onLoadRequested;
-        }
-
-        private class UserModSelectOverlay : SoloModSelectOverlay
-        {
-            protected override bool Stacked => false;
         }
     }
 }
