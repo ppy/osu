@@ -210,10 +210,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                         new Dimension(GridSizeMode.AutoSize),
                     }
                 },
-                userModsSelectOverlay = new SoloModSelectOverlay
+                new Container
                 {
-                    SelectedMods = { BindTarget = UserMods },
-                    IsValidMod = _ => false
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    RelativeSizeAxes = Axes.Both,
+                    Height = 0.5f,
+                    Child = userModsSelectOverlay = new SoloModSelectOverlay
+                    {
+                        SelectedMods = { BindTarget = UserMods },
+                        IsValidMod = _ => false
+                    }
                 },
                 settingsOverlay = new MultiplayerMatchSettingsOverlay
                 {
