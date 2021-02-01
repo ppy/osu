@@ -42,9 +42,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Resolved]
         private OngoingOperationTracker ongoingOperationTracker { get; set; }
 
-        private ModSelectOverlay extraModSelectOverlay;
+        private ModSelectOverlay userModsSelectOverlay;
         private MultiplayerMatchSettingsOverlay settingsOverlay;
-        private Drawable extraModsSection;
+        private Drawable userModsSection;
 
         private IBindable<bool> isConnected;
 
@@ -149,7 +149,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                                         new BeatmapSelectionControl { RelativeSizeAxes = Axes.X }
                                                                     }
                                                                 },
-                                                                extraModsSection = new FillFlowContainer
+                                                                userModsSection = new FillFlowContainer
                                                                 {
                                                                     RelativeSizeAxes = Axes.X,
                                                                     AutoSizeAxes = Axes.Y,
@@ -159,13 +159,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                                         new ModDisplay
                                                                         {
                                                                             DisplayUnrankedText = false,
-                                                                            Current = ExtraMods
+                                                                            Current = UserMods
                                                                         },
                                                                         new PurpleTriangleButton
                                                                         {
                                                                             RelativeSizeAxes = Axes.X,
                                                                             Text = "Select",
-                                                                            Action = () => extraModSelectOverlay.Show()
+                                                                            Action = () => userModsSelectOverlay.Show()
                                                                         }
                                                                     }
                                                                 }
@@ -210,9 +210,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                         new Dimension(GridSizeMode.AutoSize),
                     }
                 },
-                extraModSelectOverlay = new SoloModSelectOverlay
+                userModsSelectOverlay = new SoloModSelectOverlay
                 {
-                    SelectedMods = { BindTarget = ExtraMods },
+                    SelectedMods = { BindTarget = UserMods },
                     Stacked = false,
                     IsValidMod = _ => false
                 },
@@ -242,7 +242,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.LoadComplete();
 
             Playlist.BindCollectionChanged(onPlaylistChanged, true);
-            ExtraMods.BindValueChanged(onExtraModsChanged);
+            UserMods.BindValueChanged(onUserModsChanged);
 
             client.LoadRequested += onLoadRequested;
 
@@ -262,9 +262,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return true;
             }
 
-            if (extraModSelectOverlay.State.Value == Visibility.Visible)
+            if (userModsSelectOverlay.State.Value == Visibility.Visible)
             {
-                extraModSelectOverlay.Hide();
+                userModsSelectOverlay.Hide();
                 return true;
             }
 
@@ -277,23 +277,23 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             if (SelectedItem.Value?.AllowedMods.Any() != true)
             {
-                extraModsSection.Hide();
-                extraModSelectOverlay.Hide();
-                extraModSelectOverlay.IsValidMod = _ => false;
+                userModsSection.Hide();
+                userModsSelectOverlay.Hide();
+                userModsSelectOverlay.IsValidMod = _ => false;
             }
             else
             {
-                extraModsSection.Show();
-                extraModSelectOverlay.IsValidMod = m => SelectedItem.Value.AllowedMods.Any(a => a.GetType() == m.GetType());
+                userModsSection.Show();
+                userModsSelectOverlay.IsValidMod = m => SelectedItem.Value.AllowedMods.Any(a => a.GetType() == m.GetType());
             }
         }
 
-        private void onExtraModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> extraMods)
+        private void onUserModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
             if (client.Room == null)
                 return;
 
-            client.ChangeExtraMods(extraMods.NewValue).CatchUnobservedExceptions();
+            client.ChangeUserMods(mods.NewValue).CatchUnobservedExceptions();
         }
 
         private void onReadyClick()

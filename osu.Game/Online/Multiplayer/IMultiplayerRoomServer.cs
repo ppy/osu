@@ -49,7 +49,7 @@ namespace osu.Game.Online.Multiplayer
         /// <param name="newBeatmapAvailability">The proposed new beatmap availability state.</param>
         Task ChangeBeatmapAvailability(BeatmapAvailability newBeatmapAvailability);
 
-        Task ChangeExtraMods(IEnumerable<APIMod> newMods);
+        Task ChangeUserMods(IEnumerable<APIMod> newMods);
 
         /// <summary>
         /// As the host of a room, start the match.

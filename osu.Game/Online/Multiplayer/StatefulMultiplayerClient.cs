@@ -232,9 +232,9 @@ namespace osu.Game.Online.Multiplayer
 
         public abstract Task ChangeBeatmapAvailability(BeatmapAvailability newBeatmapAvailability);
 
-        public Task ChangeExtraMods(IEnumerable<Mod> newMods) => ChangeExtraMods(newMods.Select(m => new APIMod(m)).ToList());
+        public Task ChangeUserMods(IEnumerable<Mod> newMods) => ChangeUserMods(newMods.Select(m => new APIMod(m)).ToList());
 
-        public abstract Task ChangeExtraMods(IEnumerable<APIMod> newMods);
+        public abstract Task ChangeUserMods(IEnumerable<APIMod> newMods);
 
         public abstract Task StartMatch();
 
@@ -384,7 +384,7 @@ namespace osu.Game.Online.Multiplayer
             return Task.CompletedTask;
         }
 
-        public Task UserExtraModsChanged(int userId, IEnumerable<APIMod> mods)
+        public Task UserModsChanged(int userId, IEnumerable<APIMod> mods)
         {
             if (Room == null)
                 return Task.CompletedTask;
@@ -397,7 +397,7 @@ namespace osu.Game.Online.Multiplayer
                 if (user == null)
                     return;
 
-                user.ExtraMods = mods;
+                user.UserMods = mods;
 
                 RoomUpdated?.Invoke();
             }, false);

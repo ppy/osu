@@ -36,7 +36,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
-        private ModDisplay extraModsDisplay;
+        private ModDisplay userModsDisplay;
         private StateDisplay userStateDisplay;
         private SpriteIcon crown;
 
@@ -139,7 +139,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                                 Spacing = new Vector2(10),
                                 Children = new Drawable[]
                                 {
-                                    extraModsDisplay = new ModDisplay
+                                    userModsDisplay = new ModDisplay
                                     {
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
@@ -174,7 +174,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             var ruleset = rulesets.GetRuleset(Room.Settings.RulesetID).CreateInstance();
 
             userStateDisplay.Status = User.State;
-            extraModsDisplay.Current.Value = User.ExtraMods.Select(m => m.ToMod(ruleset)).ToList();
+            userModsDisplay.Current.Value = User.UserMods.Select(m => m.ToMod(ruleset)).ToList();
 
             if (Room.Host?.Equals(User) == true)
                 crown.FadeIn(fade_time);

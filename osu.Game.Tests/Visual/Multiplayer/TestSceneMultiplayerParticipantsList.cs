@@ -139,7 +139,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
                 });
 
-                Client.ChangeUserExtraMods(0, new Mod[]
+                Client.ChangeUserMods(0, new Mod[]
                 {
                     new OsuModHardRock(),
                     new OsuModDifficultyAdjust { ApproachRate = { Value = 1 } }
