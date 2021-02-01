@@ -8,6 +8,8 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Participants;
 using osu.Game.Users;
 using osuTK;
@@ -122,6 +124,29 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Client.ChangeUserState(i, (MultiplayerUserState)RNG.Next(0, (int)MultiplayerUserState.Results + 1));
                 }
             });
+        }
+
+        [Test]
+        public void TestUserWithMods()
+        {
+            AddStep("add user", () =>
+            {
+                Client.AddUser(new User
+                {
+                    Id = 0,
+                    Username = $"User 0",
+                    CurrentModeRank = RNG.Next(1, 100000),
+                    CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                });
+
+                Client.ChangeUserExtraMods(0, new Mod[]
+                {
+                    new OsuModHardRock(),
+                    new OsuModDifficultyAdjust { ApproachRate = { Value = 1 } }
+                });
+            });
+
+            AddToggleStep("toggle ready state", v => Client.ChangeUserState(0, v ? MultiplayerUserState.Ready : MultiplayerUserState.Idle));
         }
     }
 }

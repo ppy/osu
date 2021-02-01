@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
@@ -15,6 +16,7 @@ using osu.Game.Extensions;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays.Mods;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Match.Components;
@@ -240,6 +242,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.LoadComplete();
 
             Playlist.BindCollectionChanged(onPlaylistChanged, true);
+            ExtraMods.BindValueChanged(onExtraModsChanged);
 
             client.LoadRequested += onLoadRequested;
 
@@ -283,6 +286,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 extraModsSection.Show();
                 extraModSelectOverlay.IsValidMod = m => SelectedItem.Value.AllowedMods.Any(a => a.GetType() == m.GetType());
             }
+        }
+
+        private void onExtraModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> extraMods)
+        {
+            if (client.Room == null)
+                return;
+
+            client.ChangeExtraMods(extraMods.NewValue).CatchUnobservedExceptions();
         }
 
         private void onReadyClick()

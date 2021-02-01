@@ -3,6 +3,7 @@
 
 #nullable enable
 
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ using osu.Framework.Bindables;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
@@ -119,6 +121,21 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public override Task ChangeBeatmapAvailability(BeatmapAvailability newBeatmapAvailability)
         {
             ChangeUserBeatmapAvailability(api.LocalUser.Value.Id, newBeatmapAvailability);
+            return Task.CompletedTask;
+        }
+
+        public void ChangeUserExtraMods(int userId, IEnumerable<Mod> newMods)
+            => ChangeUserExtraMods(userId, newMods.Select(m => new APIMod(m)).ToList());
+
+        public void ChangeUserExtraMods(int userId, IEnumerable<APIMod> newMods)
+        {
+            Debug.Assert(Room != null);
+            ((IMultiplayerClient)this).UserExtraModsChanged(userId, newMods.ToList());
+        }
+
+        public override Task ChangeExtraMods(IEnumerable<APIMod> newMods)
+        {
+            ChangeUserExtraMods(api.LocalUser.Value.Id, newMods);
             return Task.CompletedTask;
         }
 
