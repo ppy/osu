@@ -298,7 +298,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (client.Room == null)
                 return;
 
-            client.ChangeUserMods(mods.NewValue).CatchUnobservedExceptions();
+            client.ChangeUserMods(mods.NewValue);
         }
 
         private void onReadyClick()
