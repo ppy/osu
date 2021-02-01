@@ -146,7 +146,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 });
             });
 
-            AddToggleStep("toggle ready state", v => Client.ChangeUserState(0, v ? MultiplayerUserState.Ready : MultiplayerUserState.Idle));
+            for (var i = MultiplayerUserState.Idle; i < MultiplayerUserState.Results; i++)
+            {
+                var state = i;
+                AddStep($"set state: {state}", () => Client.ChangeUserState(0, state));
+            }
         }
     }
 }
