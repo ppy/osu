@@ -1,48 +1,27 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
-using Humanizer;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Rooms;
-using osu.Game.Overlays.Mods;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Components;
 
 namespace osu.Game.Screens.Select
 {
-    public class MatchSongSelect : SongSelect, IOnlinePlaySubScreen
+    public class MatchSongSelect : OnlinePlaySongSelect
     {
-        public Action<PlaylistItem> Selected;
-
-        public string ShortTitle => "song selection";
-        public override string Title => ShortTitle.Humanize();
-
-        public override bool AllowEditing => false;
-
-        [Resolved(typeof(Room), nameof(Room.Playlist))]
-        protected BindableList<PlaylistItem> Playlist { get; private set; }
-
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
-
-        public MatchSongSelect()
-        {
-            Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING };
-        }
 
         protected override BeatmapDetailArea CreateBeatmapDetailArea() => new MatchBeatmapDetailArea
         {
             CreateNewItem = createNewItem
         };
 
-        protected override bool OnStart()
+        protected override void OnSetItem(PlaylistItem item)
         {
             switch (Playlist.Count)
             {
@@ -56,8 +35,6 @@ namespace osu.Game.Screens.Select
             }
 
             this.Exit();
-
-            return true;
         }
 
         private void createNewItem()
@@ -80,12 +57,5 @@ namespace osu.Game.Screens.Select
             item.RequiredMods.Clear();
             item.RequiredMods.AddRange(Mods.Value.Select(m => m.CreateCopy()));
         }
-
-        protected override ModSelectOverlay CreateModSelectOverlay() => new SoloModSelectOverlay
-        {
-            IsValidMod = isValidMod
-        };
-
-        private bool isValidMod(Mod mod) => !(mod is ModAutoplay) && (mod as MultiMod)?.Mods.Any(mm => mm is ModAutoplay) != true;
     }
 }
