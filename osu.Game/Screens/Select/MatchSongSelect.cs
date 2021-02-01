@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Select
             CreateNewItem = createNewItem
         };
 
-        protected override void OnSetItem(PlaylistItem item)
+        protected override void SelectItem(PlaylistItem item)
         {
             switch (Playlist.Count)
             {

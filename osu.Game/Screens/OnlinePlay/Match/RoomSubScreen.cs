@@ -107,7 +107,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             if (SelectedItem.Value == null)
                 return;
 
-            // Remove any extra mods that are no longer allowed.
+            // Remove any user mods that are no longer allowed.
             UserMods.Value = UserMods.Value
                                      .Where(m => SelectedItem.Value.AllowedMods.Any(a => m.GetType() == a.GetType()))
                                      .ToList();
