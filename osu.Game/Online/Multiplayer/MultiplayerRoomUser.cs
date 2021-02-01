@@ -4,7 +4,11 @@
 #nullable enable
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
+using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Users;
 
@@ -21,6 +25,9 @@ namespace osu.Game.Online.Multiplayer
         /// The availability state of the current beatmap.
         /// </summary>
         public BeatmapAvailability BeatmapAvailability { get; set; } = BeatmapAvailability.LocallyAvailable();
+
+        [NotNull]
+        public IEnumerable<APIMod> ExtraMods { get; set; } = Enumerable.Empty<APIMod>();
 
         public User? User { get; set; }
 

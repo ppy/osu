@@ -22,6 +22,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Users;
 using osu.Game.Utils;
 
@@ -231,6 +232,10 @@ namespace osu.Game.Online.Multiplayer
 
         public abstract Task ChangeBeatmapAvailability(BeatmapAvailability newBeatmapAvailability);
 
+        public Task ChangeExtraMods(IEnumerable<Mod> newMods) => ChangeExtraMods(newMods.Select(m => new APIMod(m)).ToList());
+
+        public abstract Task ChangeExtraMods(IEnumerable<APIMod> newMods);
+
         public abstract Task StartMatch();
 
         Task IMultiplayerClient.RoomStateChanged(MultiplayerRoomState state)
@@ -372,6 +377,27 @@ namespace osu.Game.Online.Multiplayer
                     return;
 
                 user.BeatmapAvailability = beatmapAvailability;
+
+                RoomUpdated?.Invoke();
+            }, false);
+
+            return Task.CompletedTask;
+        }
+
+        public Task UserExtraModsChanged(int userId, IEnumerable<APIMod> mods)
+        {
+            if (Room == null)
+                return Task.CompletedTask;
+
+            Scheduler.Add(() =>
+            {
+                var user = Room?.Users.SingleOrDefault(u => u.UserID == userId);
+
+                // errors here are not critical - user mods is mostly for display.
+                if (user == null)
+                    return;
+
+                user.ExtraMods = mods;
 
                 RoomUpdated?.Invoke();
             }, false);

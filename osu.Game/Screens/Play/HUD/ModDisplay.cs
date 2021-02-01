@@ -26,6 +26,8 @@ namespace osu.Game.Screens.Play.HUD
 
         public ExpansionMode ExpansionMode = ExpansionMode.ExpandOnHover;
 
+        public bool ExpandOnAppear = true;
+
         private readonly Bindable<IReadOnlyList<Mod>> current = new Bindable<IReadOnlyList<Mod>>();
 
         public Bindable<IReadOnlyList<Mod>> Current
@@ -108,10 +110,14 @@ namespace osu.Game.Screens.Play.HUD
             else
                 unrankedText.Hide();
 
-            expand();
-
-            using (iconsContainer.BeginDelayedSequence(1200))
-                contract();
+            if (ExpandOnAppear)
+            {
+                expand();
+                using (iconsContainer.BeginDelayedSequence(1200))
+                    contract();
+            }
+            else
+                iconsContainer.TransformSpacingTo(new Vector2(-25, 0));
         }
 
         private void expand()
