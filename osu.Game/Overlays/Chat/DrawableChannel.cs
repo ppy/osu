@@ -261,8 +261,8 @@ namespace osu.Game.Overlays.Chat
 
                 if ((lastExtent == null || ScrollableExtent > lastExtent) && ShouldAutoScroll)
                     ScrollToEnd();
-                else
-                    ShouldAutoScroll = IsScrolledToEnd(auto_scroll_leniency);
+
+                ShouldAutoScroll = IsScrolledToEnd(auto_scroll_leniency);
 
                 lastExtent = ScrollableExtent;
             }
