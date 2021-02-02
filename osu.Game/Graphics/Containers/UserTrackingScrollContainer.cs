@@ -45,5 +45,11 @@ namespace osu.Game.Graphics.Containers
             UserScrolling = false;
             base.ScrollTo(value, animated, distanceDecay);
         }
+
+        public new void ScrollToEnd(bool animated = true, bool allowDuringDrag = false)
+        {
+            UserScrolling = false;
+            base.ScrollToEnd(animated, allowDuringDrag);
+        }
     }
 }
