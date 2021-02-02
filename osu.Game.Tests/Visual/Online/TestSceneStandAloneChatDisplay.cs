@@ -208,7 +208,7 @@ namespace osu.Game.Tests.Visual.Online
 
             protected DrawableChannel DrawableChannel => InternalChildren.OfType<DrawableChannel>().First();
 
-            protected OsuScrollContainer ScrollContainer => (OsuScrollContainer)((Container)DrawableChannel.Child).Child;
+            protected UserTrackingScrollContainer ScrollContainer => (UserTrackingScrollContainer)((Container)DrawableChannel.Child).Child;
 
             public FillFlowContainer FillFlow => (FillFlowContainer)ScrollContainer.Child;
 
