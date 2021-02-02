@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using osu.Game.Rulesets.Mods;
 
@@ -45,7 +46,7 @@ namespace osu.Game.Utils
         /// <param name="combination">The <see cref="Mod"/> combination to check.</param>
         /// <param name="invalidMods">Any invalid mods in the set.</param>
         /// <returns>Whether all <see cref="Mod"/>s in the combination are compatible with each-other.</returns>
-        public static bool CheckCompatibleSet(IEnumerable<Mod> combination, out List<Mod>? invalidMods)
+        public static bool CheckCompatibleSet(IEnumerable<Mod> combination, [NotNullWhen(false)] out List<Mod>? invalidMods)
         {
             combination = FlattenMods(combination).ToArray();
             invalidMods = null;
