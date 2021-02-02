@@ -113,14 +113,10 @@ namespace osu.Game.Screens.Play.HUD
             else
                 unrankedText.Hide();
 
-            if (ExpandOnAppear)
-            {
-                expand();
-                using (iconsContainer.BeginDelayedSequence(1200))
-                    contract();
-            }
-            else
-                iconsContainer.TransformSpacingTo(new Vector2(-25, 0));
+            expand();
+
+            using (iconsContainer.BeginDelayedSequence(ExpandOnAppear ? 1200 : 0))
+                contract();
         }
 
         private void expand()
