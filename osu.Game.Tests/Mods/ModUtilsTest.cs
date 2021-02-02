@@ -1,9 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Moq;
 using NUnit.Framework;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Utils;
 
 namespace osu.Game.Tests.Mods
@@ -59,6 +63,30 @@ namespace osu.Game.Tests.Mods
         {
             var mod = new Mock<Mod>();
             Assert.That(ModUtils.CheckAllowed(new[] { mod.Object }, new[] { typeof(Mod) }), Is.False);
+        }
+
+        // test incompatible pair.
+        [TestCase(new[] { typeof(OsuModDoubleTime), typeof(OsuModHalfTime) }, new[] { typeof(OsuModDoubleTime), typeof(OsuModHalfTime) })]
+        // test incompatible pair with derived class.
+        [TestCase(new[] { typeof(OsuModNightcore), typeof(OsuModHalfTime) }, new[] { typeof(OsuModNightcore), typeof(OsuModHalfTime) })]
+        // test system mod.
+        [TestCase(new[] { typeof(OsuModDoubleTime), typeof(OsuModTouchDevice) }, new[] { typeof(OsuModTouchDevice) })]
+        // test valid.
+        [TestCase(new[] { typeof(OsuModDoubleTime), typeof(OsuModHardRock) }, null)]
+        public void TestInvalidModScenarios(Type[] input, Type[] expectedInvalid)
+        {
+            List<Mod> inputMods = new List<Mod>();
+            foreach (var t in input)
+                inputMods.Add((Mod)Activator.CreateInstance(t));
+
+            bool isValid = ModUtils.CheckValidForGameplay(inputMods, out var invalid);
+
+            Assert.That(isValid, Is.EqualTo(expectedInvalid == null));
+
+            if (isValid)
+                Assert.IsNull(invalid);
+            else
+                Assert.That(invalid?.Select(t => t.GetType()), Is.EquivalentTo(expectedInvalid));
         }
     }
 }
