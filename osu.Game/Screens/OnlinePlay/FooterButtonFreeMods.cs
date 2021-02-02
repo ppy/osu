@@ -13,7 +13,7 @@ using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Select;
 using osuTK;
 
-namespace osu.Game.Screens.OnlinePlay.Match
+namespace osu.Game.Screens.OnlinePlay
 {
     public class FooterButtonFreeMods : FooterButton, IHasCurrentValue<IReadOnlyList<Mod>>
     {
