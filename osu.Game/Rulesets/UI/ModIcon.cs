@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.UI
             {
                 mod = value;
 
-                if (LoadState >= LoadState.Ready)
+                if (IsLoaded)
                     updateMod(value);
             }
         }
@@ -98,13 +98,15 @@ namespace osu.Game.Rulesets.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            updateMod(mod);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Selected.BindValueChanged(_ => updateColour(), true);
+
+            Selected.BindValueChanged(_ => updateColour());
+
+            updateMod(mod);
         }
 
         private void updateMod(Mod value)
