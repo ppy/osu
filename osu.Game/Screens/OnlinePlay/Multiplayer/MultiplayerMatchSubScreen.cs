@@ -355,7 +355,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private class UserModSelectOverlay : ModSelectOverlay
         {
-            protected override bool AllowCustomisation => false;
+            public UserModSelectOverlay()
+            {
+                CustomiseButton.Alpha = 0;
+            }
         }
     }
 }

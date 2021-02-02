@@ -17,7 +17,7 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class ModSection : Container
+    public class ModSection : CompositeDrawable
     {
         private readonly Drawable header;
 
@@ -47,7 +47,10 @@ namespace osu.Game.Overlays.Mods
                     if (m == null)
                         return new ModButtonEmpty();
 
-                    return CreateModButton(m).With(b => b.SelectionChanged = Action);
+                    return new ModButton(m)
+                    {
+                        SelectionChanged = Action,
+                    };
                 }).ToArray();
 
                 modsLoadCts?.Cancel();
@@ -91,12 +94,19 @@ namespace osu.Game.Overlays.Mods
             return base.OnKeyDown(e);
         }
 
+        /// <summary>
+        /// Selects all mods.
+        /// </summary>
         public void SelectAll()
         {
             foreach (var button in buttons.Where(b => !b.Selected))
                 button.SelectAt(0);
         }
 
+        /// <summary>
+        /// Deselects all mods.
+        /// </summary>
+        /// <param name="immediate">Set to true to bypass animations and update selections immediately.</param>
         public void DeselectAll(bool immediate = false) => DeselectTypes(buttons.Select(b => b.SelectedMod?.GetType()).Where(t => t != null), immediate);
 
         /// <summary>
@@ -163,7 +173,7 @@ namespace osu.Game.Overlays.Mods
             Origin = Anchor.TopCentre;
             Anchor = Anchor.TopCentre;
 
-            Children = new[]
+            InternalChildren = new[]
             {
                 header = CreateHeader(type.Humanize(LetterCasing.Title)),
                 ButtonsContainer = new FillFlowContainer<ModButtonEmpty>
@@ -181,8 +191,6 @@ namespace osu.Game.Overlays.Mods
                 },
             };
         }
-
-        protected virtual ModButton CreateModButton(Mod mod) => new ModButton(mod);
 
         protected virtual Drawable CreateHeader(string text) => new OsuSpriteText
         {

@@ -9,19 +9,25 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
 
-namespace osu.Game.Screens.OnlinePlay.Match
+namespace osu.Game.Screens.OnlinePlay
 {
     /// <summary>
     /// A <see cref="ModSelectOverlay"/> used for free-mod selection in online play.
     /// </summary>
     public class FreeModSelectOverlay : ModSelectOverlay
     {
-        protected override bool AllowCustomisation => false;
-
         protected override bool Stacked => false;
+
+        public new Func<Mod, bool> IsValidMod
+        {
+            get => base.IsValidMod;
+            set => base.IsValidMod = m => m.HasImplementation && !m.RequiresConfiguration && !(m is ModAutoplay) && value(m);
+        }
 
         public FreeModSelectOverlay()
         {
+            IsValidMod = m => true;
+
             CustomiseButton.Alpha = 0;
             MultiplierSection.Alpha = 0;
             DeselectAllButton.Alpha = 0;
@@ -111,6 +117,8 @@ namespace osu.Game.Screens.OnlinePlay.Match
         private class HeaderCheckbox : OsuCheckbox
         {
             public Action<bool> Changed;
+
+            protected override bool PlaySoundsOnUserChange => false;
 
             protected override void OnUserChange(bool value)
             {

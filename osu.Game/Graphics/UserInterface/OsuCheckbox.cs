@@ -18,6 +18,11 @@ namespace osu.Game.Graphics.UserInterface
         public Color4 UncheckedColor { get; set; } = Color4.White;
         public int FadeDuration { get; set; }
 
+        /// <summary>
+        /// Whether to play sounds when the state changes as a result of user interaction.
+        /// </summary>
+        protected virtual bool PlaySoundsOnUserChange => true;
+
         public string LabelText
         {
             set
@@ -96,10 +101,14 @@ namespace osu.Game.Graphics.UserInterface
         protected override void OnUserChange(bool value)
         {
             base.OnUserChange(value);
-            if (value)
-                sampleChecked?.Play();
-            else
-                sampleUnchecked?.Play();
+
+            if (PlaySoundsOnUserChange)
+            {
+                if (value)
+                    sampleChecked?.Play();
+                else
+                    sampleUnchecked?.Play();
+            }
         }
     }
 }
