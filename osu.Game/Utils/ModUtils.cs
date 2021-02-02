@@ -87,7 +87,7 @@ namespace osu.Game.Utils
         /// Check the provided combination of mods are valid for a local gameplay session.
         /// </summary>
         /// <param name="mods">The mods to check.</param>
-        /// <param name="invalidMods">Invalid mods, if any where found. Can be null if all mods were valid.</param>
+        /// <param name="invalidMods">Invalid mods, if any were found. Can be null if all mods were valid.</param>
         /// <returns>Whether the input mods were all valid. If false, <paramref name="invalidMods"/> will contain all invalid entries.</returns>
         public static bool CheckValidForGameplay(IEnumerable<Mod> mods, out Mod[]? invalidMods)
         {
