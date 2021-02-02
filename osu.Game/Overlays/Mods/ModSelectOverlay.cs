@@ -14,6 +14,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
@@ -495,11 +496,17 @@ namespace osu.Game.Overlays.Mods
                 MultiplierLabel.FadeColour(Color4.White, 200);
         }
 
+        private ScheduledDelegate sampleOnDelegate;
+        private ScheduledDelegate sampleOffDelegate;
+
         private void modButtonPressed(Mod selectedMod)
         {
             if (selectedMod != null)
             {
-                if (State.Value == Visibility.Visible) sampleOn?.Play();
+                // Fixes buzzing when multiple mods are selected in the same frame.
+                sampleOnDelegate?.Cancel();
+                if (State.Value == Visibility.Visible)
+                    sampleOnDelegate = Scheduler.Add(() => sampleOn?.Play());
 
                 OnModSelected(selectedMod);
 
@@ -507,7 +514,10 @@ namespace osu.Game.Overlays.Mods
             }
             else
             {
-                if (State.Value == Visibility.Visible) sampleOff?.Play();
+                // Fixes buzzing when multiple mods are deselected in the same frame.
+                sampleOffDelegate?.Cancel();
+                if (State.Value == Visibility.Visible)
+                    sampleOffDelegate = Scheduler.Add(() => sampleOff?.Play());
             }
 
             refreshSelectedMods();
