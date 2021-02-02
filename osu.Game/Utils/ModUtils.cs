@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Extensions.TypeExtensions;
 using osu.Game.Rulesets.Mods;
 
 #nullable enable
@@ -29,7 +28,7 @@ namespace osu.Game.Utils
         {
             // Prevent multiple-enumeration.
             var combinationList = combination as ICollection<Mod> ?? combination.ToArray();
-            return CheckCompatibleSet(combinationList) && CheckAllowed(combinationList, allowedTypes);
+            return CheckCompatibleSet(combinationList, out _) && CheckAllowed(combinationList, allowedTypes);
         }
 
         /// <summary>
@@ -38,32 +37,32 @@ namespace osu.Game.Utils
         /// <param name="combination">The <see cref="Mod"/> combination to check.</param>
         /// <returns>Whether all <see cref="Mod"/>s in the combination are compatible with each-other.</returns>
         public static bool CheckCompatibleSet(IEnumerable<Mod> combination)
+            => CheckCompatibleSet(combination, out _);
+
+        /// <summary>
+        /// Checks that all <see cref="Mod"/>s in a combination are compatible with each-other.
+        /// </summary>
+        /// <param name="combination">The <see cref="Mod"/> combination to check.</param>
+        /// <param name="invalidMods">Any invalid mods in the set.</param>
+        /// <returns>Whether all <see cref="Mod"/>s in the combination are compatible with each-other.</returns>
+        public static bool CheckCompatibleSet(IEnumerable<Mod> combination, out List<Mod>? invalidMods)
         {
-            var incompatibleTypes = new HashSet<Type>();
-            var incomingTypes = new HashSet<Type>();
+            combination = FlattenMods(combination).ToArray();
+            invalidMods = null;
 
-            foreach (var mod in combination.SelectMany(FlattenMod))
+            foreach (var mod in combination)
             {
-                // Add the new mod incompatibilities, checking whether any match the existing mod types.
-                foreach (var t in mod.IncompatibleMods)
+                foreach (var type in mod.IncompatibleMods)
                 {
-                    if (incomingTypes.Contains(t))
-                        return false;
-
-                    incompatibleTypes.Add(t);
-                }
-
-                // Add the new mod types, checking whether any match the incompatible types.
-                foreach (var t in mod.GetType().EnumerateBaseTypes())
-                {
-                    if (incomingTypes.Contains(t))
-                        return false;
-
-                    incomingTypes.Add(t);
+                    foreach (var invalid in combination.Where(m => type.IsInstanceOfType(m)))
+                    {
+                        invalidMods ??= new List<Mod>();
+                        invalidMods.Add(invalid);
+                    }
                 }
             }
 
-            return true;
+            return invalidMods == null;
         }
 
         /// <summary>
