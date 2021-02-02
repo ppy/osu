@@ -130,13 +130,13 @@ namespace osu.Game.Overlays.Mods
         /// Updates all buttons with the given list of selected mods.
         /// </summary>
         /// <param name="newSelectedMods">The new list of selected mods to select.</param>
-        public void UpdateSelectedMods(IReadOnlyList<Mod> newSelectedMods)
+        public void UpdateSelectedButtons(IReadOnlyList<Mod> newSelectedMods)
         {
             foreach (var button in buttons)
-                updateButtonMods(button, newSelectedMods);
+                updateButtonSelection(button, newSelectedMods);
         }
 
-        private void updateButtonMods(ModButton button, IReadOnlyList<Mod> newSelectedMods)
+        private void updateButtonSelection(ModButton button, IReadOnlyList<Mod> newSelectedMods)
         {
             foreach (var mod in newSelectedMods)
             {
