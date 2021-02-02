@@ -30,7 +30,7 @@ using osuTK.Input;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class ModSelectOverlay : WaveOverlayContainer
+    public abstract class ModSelectOverlay : WaveOverlayContainer
     {
         public const float HEIGHT = 510;
 
@@ -84,7 +84,7 @@ namespace osu.Game.Overlays.Mods
 
         private SampleChannel sampleOn, sampleOff;
 
-        public ModSelectOverlay()
+        protected ModSelectOverlay()
         {
             Waves.FirstWaveColour = Color4Extensions.FromHex(@"19b0e2");
             Waves.SecondWaveColour = Color4Extensions.FromHex(@"2280a2");
