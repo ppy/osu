@@ -110,6 +110,8 @@ namespace osu.Game.Screens.OnlinePlay
         {
             public Action<bool> Changed;
 
+            protected override bool PlaySoundsOnUserChange => false;
+
             protected override void OnUserChange(bool value)
             {
                 base.OnUserChange(value);
