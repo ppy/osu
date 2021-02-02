@@ -343,7 +343,7 @@ namespace osu.Game.Screens.OnlinePlay
                                 Colour = Color4.Black,
                                 Width = 0.4f,
                             },
-                            // Piecewise-linear gradient with 3 segments to make it appear smoother
+                            // Piecewise-linear gradient with 2 segments to make it appear smoother
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
