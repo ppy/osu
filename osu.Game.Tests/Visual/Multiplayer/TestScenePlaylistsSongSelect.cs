@@ -23,7 +23,7 @@ using osu.Game.Screens.OnlinePlay.Playlists;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMatchSongSelect : RoomTestScene
+    public class TestScenePlaylistsSongSelect : RoomTestScene
     {
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
