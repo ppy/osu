@@ -33,6 +33,7 @@ namespace osu.Game.Overlays.Mods
     {
         public const float HEIGHT = 510;
 
+        protected readonly FillFlowContainer FooterContainer;
         protected readonly TriangleButton DeselectAllButton;
         protected readonly TriangleButton CustomiseButton;
         protected readonly TriangleButton CloseButton;
@@ -84,8 +85,6 @@ namespace osu.Game.Overlays.Mods
 
         private const float content_width = 0.8f;
         private const float footer_button_spacing = 20;
-
-        private readonly FillFlowContainer footerContainer;
 
         private SampleChannel sampleOn, sampleOff;
 
@@ -275,7 +274,7 @@ namespace osu.Game.Overlays.Mods
                                         Colour = new Color4(172, 20, 116, 255),
                                         Alpha = 0.5f,
                                     },
-                                    footerContainer = new FillFlowContainer
+                                    FooterContainer = new FillFlowContainer
                                     {
                                         Origin = Anchor.BottomCentre,
                                         Anchor = Anchor.BottomCentre,
@@ -385,8 +384,8 @@ namespace osu.Game.Overlays.Mods
         {
             base.PopOut();
 
-            footerContainer.MoveToX(content_width, WaveContainer.DISAPPEAR_DURATION, Easing.InSine);
-            footerContainer.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.InSine);
+            FooterContainer.MoveToX(content_width, WaveContainer.DISAPPEAR_DURATION, Easing.InSine);
+            FooterContainer.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.InSine);
 
             foreach (var section in ModSectionsContainer.Children)
             {
@@ -400,8 +399,8 @@ namespace osu.Game.Overlays.Mods
         {
             base.PopIn();
 
-            footerContainer.MoveToX(0, WaveContainer.APPEAR_DURATION, Easing.OutQuint);
-            footerContainer.FadeIn(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
+            FooterContainer.MoveToX(0, WaveContainer.APPEAR_DURATION, Easing.OutQuint);
+            FooterContainer.FadeIn(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
 
             foreach (var section in ModSectionsContainer.Children)
             {
