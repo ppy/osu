@@ -12,10 +12,11 @@ using NUnit.Framework;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.Chat;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneStandAloneChatDisplay : OsuTestScene
+    public class TestSceneStandAloneChatDisplay : OsuManualInputManagerTestScene
     {
         private readonly User admin = new User
         {
@@ -128,7 +129,7 @@ namespace osu.Game.Tests.Visual.Online
                 Timestamp = DateTimeOffset.Now
             }));
 
-            AddUntilStep("ensure still scrolled to bottom", () => chatDisplay.ScrolledToBottom);
+            checkScrolledToBottom();
 
             const int messages_per_call = 10;
             AddRepeatStep("add many messages", () =>
@@ -157,7 +158,7 @@ namespace osu.Game.Tests.Visual.Online
                 return true;
             });
 
-            AddUntilStep("ensure still scrolled to bottom", () => chatDisplay.ScrolledToBottom);
+            checkScrolledToBottom();
         }
 
         /// <summary>
@@ -165,6 +166,58 @@ namespace osu.Game.Tests.Visual.Online
         /// </summary>
         [Test]
         public void TestMessageWrappingKeepsAutoScrolling()
+        {
+            fillChat();
+
+            // send message with short words for text wrapping to occur when contracting chat.
+            sendMessage();
+
+            AddStep("contract chat", () => chatDisplay.Width -= 100);
+            checkScrolledToBottom();
+
+            AddStep("send another message", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
+            {
+                Sender = admin,
+                Content = "As we were saying...",
+            }));
+
+            checkScrolledToBottom();
+        }
+
+        [Test]
+        public void TestUserScrollOverride()
+        {
+            fillChat();
+
+            sendMessage();
+            checkScrolledToBottom();
+
+            AddStep("User scroll up", () =>
+            {
+                InputManager.MoveMouseTo(chatDisplay.ScreenSpaceDrawQuad.Centre);
+                InputManager.PressButton(MouseButton.Left);
+                InputManager.MoveMouseTo(chatDisplay.ScreenSpaceDrawQuad.Centre + new Vector2(0, chatDisplay.ScreenSpaceDrawQuad.Height));
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+
+            checkNotScrolledToBottom();
+            sendMessage();
+            checkNotScrolledToBottom();
+
+            AddRepeatStep("User scroll to bottom", () =>
+            {
+                InputManager.MoveMouseTo(chatDisplay.ScreenSpaceDrawQuad.Centre);
+                InputManager.PressButton(MouseButton.Left);
+                InputManager.MoveMouseTo(chatDisplay.ScreenSpaceDrawQuad.Centre - new Vector2(0, chatDisplay.ScreenSpaceDrawQuad.Height));
+                InputManager.ReleaseButton(MouseButton.Left);
+            }, 5);
+
+            checkScrolledToBottom();
+            sendMessage();
+            checkScrolledToBottom();
+        }
+
+        private void fillChat()
         {
             AddStep("fill chat", () =>
             {
@@ -178,26 +231,23 @@ namespace osu.Game.Tests.Visual.Online
                 }
             });
 
-            AddAssert("ensure scrolled to bottom", () => chatDisplay.ScrolledToBottom);
+            checkScrolledToBottom();
+        }
 
-            // send message with short words for text wrapping to occur when contracting chat.
+        private void sendMessage()
+        {
             AddStep("send lorem ipsum", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
             {
                 Sender = longUsernameUser,
                 Content = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce et bibendum velit.",
             }));
-
-            AddStep("contract chat", () => chatDisplay.Width -= 100);
-            AddUntilStep("ensure still scrolled to bottom", () => chatDisplay.ScrolledToBottom);
-
-            AddStep("send another message", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
-            {
-                Sender = admin,
-                Content = "As we were saying...",
-            }));
-
-            AddUntilStep("ensure still scrolled to bottom", () => chatDisplay.ScrolledToBottom);
         }
+
+        private void checkScrolledToBottom() =>
+            AddUntilStep("is scrolled to bottom", () => chatDisplay.ScrolledToBottom);
+
+        private void checkNotScrolledToBottom() =>
+            AddUntilStep("not scrolled to bottom", () => !chatDisplay.ScrolledToBottom);
 
         private class TestStandAloneChatDisplay : StandAloneChatDisplay
         {
