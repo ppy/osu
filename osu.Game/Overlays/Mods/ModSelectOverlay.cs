@@ -14,6 +14,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
@@ -33,7 +34,6 @@ namespace osu.Game.Overlays.Mods
     {
         public const float HEIGHT = 510;
 
-        protected readonly FillFlowContainer FooterContainer;
         protected readonly TriangleButton DeselectAllButton;
         protected readonly TriangleButton CustomiseButton;
         protected readonly TriangleButton CloseButton;
@@ -41,23 +41,16 @@ namespace osu.Game.Overlays.Mods
         protected readonly Drawable MultiplierSection;
         protected readonly OsuSpriteText MultiplierLabel;
 
-        /// <summary>
-        /// Whether to allow customisation of mod settings.
-        /// </summary>
-        protected virtual bool AllowCustomisation => true;
-
-        /// <summary>
-        /// Whether mod icons should be stacked, or appear as individual buttons.
-        /// </summary>
-        protected virtual bool Stacked => true;
+        protected readonly FillFlowContainer FooterContainer;
 
         protected override bool BlockNonPositionalInput => false;
 
         protected override bool DimMainContent => false;
 
-        protected readonly FillFlowContainer<ModSection> ModSectionsContainer;
-
-        protected readonly ModSettingsContainer ModSettingsContainer;
+        /// <summary>
+        /// Whether <see cref="Mod"/>s underneath the same <see cref="MultiMod"/> instance should appear as stacked buttons.
+        /// </summary>
+        protected virtual bool Stacked => true;
 
         [NotNull]
         private Func<Mod, bool> isValidMod = m => true;
@@ -75,6 +68,10 @@ namespace osu.Game.Overlays.Mods
                 updateAvailableMods();
             }
         }
+
+        protected readonly FillFlowContainer<ModSection> ModSectionsContainer;
+
+        protected readonly ModSettingsContainer ModSettingsContainer;
 
         public readonly Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
@@ -301,7 +298,6 @@ namespace osu.Game.Overlays.Mods
                                             CustomiseButton = new TriangleButton
                                             {
                                                 Width = 180,
-                                                Alpha = AllowCustomisation ? 1 : 0,
                                                 Text = "Customisation",
                                                 Action = () => ModSettingsContainer.ToggleVisibility(),
                                                 Enabled = { Value = false },
@@ -443,7 +439,7 @@ namespace osu.Game.Overlays.Mods
                 if (!Stacked)
                     modEnumeration = ModUtils.FlattenMods(modEnumeration);
 
-                section.Mods = modEnumeration.Select(validModOrNull).Where(m => m != null);
+                section.Mods = modEnumeration.Select(getValidModOrNull).Where(m => m != null);
             }
 
             updateSelectedButtons();
@@ -458,13 +454,17 @@ namespace osu.Game.Overlays.Mods
         /// <param name="mod">The <see cref="Mod"/> to check.</param>
         /// <returns>A valid form of <paramref name="mod"/> if exists, or null otherwise.</returns>
         [CanBeNull]
-        private Mod validModOrNull([NotNull] Mod mod)
+        private Mod getValidModOrNull([NotNull] Mod mod)
         {
             if (!(mod is MultiMod multi))
                 return IsValidMod(mod) ? mod : null;
 
-            var validSubset = multi.Mods.Select(validModOrNull).Where(m => m != null).ToArray();
-            return validSubset.Length == 0 ? null : new MultiMod(validSubset);
+            var validSubset = multi.Mods.Select(getValidModOrNull).Where(m => m != null).ToArray();
+
+            if (validSubset.Length == 0)
+                return null;
+
+            return validSubset.Length == 1 ? validSubset[0] : new MultiMod(validSubset);
         }
 
         private void updateSelectedButtons()
@@ -496,11 +496,17 @@ namespace osu.Game.Overlays.Mods
                 MultiplierLabel.FadeColour(Color4.White, 200);
         }
 
+        private ScheduledDelegate sampleOnDelegate;
+        private ScheduledDelegate sampleOffDelegate;
+
         private void modButtonPressed(Mod selectedMod)
         {
             if (selectedMod != null)
             {
-                if (State.Value == Visibility.Visible) sampleOn?.Play();
+                // Fixes buzzing when multiple mods are selected in the same frame.
+                sampleOnDelegate?.Cancel();
+                if (State.Value == Visibility.Visible)
+                    sampleOnDelegate = Scheduler.Add(() => sampleOn?.Play());
 
                 OnModSelected(selectedMod);
 
@@ -508,7 +514,10 @@ namespace osu.Game.Overlays.Mods
             }
             else
             {
-                if (State.Value == Visibility.Visible) sampleOff?.Play();
+                // Fixes buzzing when multiple mods are deselected in the same frame.
+                sampleOffDelegate?.Cancel();
+                if (State.Value == Visibility.Visible)
+                    sampleOffDelegate = Scheduler.Add(() => sampleOff?.Play());
             }
 
             refreshSelectedMods();
@@ -524,6 +533,11 @@ namespace osu.Game.Overlays.Mods
 
         private void refreshSelectedMods() => SelectedMods.Value = ModSectionsContainer.Children.SelectMany(s => s.SelectedMods).ToArray();
 
+        /// <summary>
+        /// Creates a <see cref="ModSection"/> that groups <see cref="Mod"/>s with the same <see cref="ModType"/>.
+        /// </summary>
+        /// <param name="type">The <see cref="ModType"/> of <see cref="Mod"/>s in the section.</param>
+        /// <returns>The <see cref="ModSection"/>.</returns>
         protected virtual ModSection CreateModSection(ModType type) => new ModSection(type);
 
         #region Disposal

@@ -3,7 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Screens.OnlinePlay.Match;
+using osu.Game.Screens.OnlinePlay;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
