@@ -56,7 +56,7 @@ namespace osu.Game.Utils
                 // Add the new mod types, checking whether any match the incompatible types.
                 foreach (var t in mod.GetType().EnumerateBaseTypes())
                 {
-                    if (incomingTypes.Contains(t))
+                    if (incompatibleTypes.Contains(t))
                         return false;
 
                     incomingTypes.Add(t);
