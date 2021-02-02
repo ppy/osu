@@ -28,12 +28,7 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             base.SetUpSteps();
 
-            AddStep("push screen", () => LoadScreen(loungeScreen = new PlaylistsLoungeSubScreen
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Width = 0.5f,
-            }));
+            AddStep("push screen", () => LoadScreen(loungeScreen = new PlaylistsLoungeSubScreen()));
 
             AddUntilStep("wait for present", () => loungeScreen.IsCurrentScreen());
         }
