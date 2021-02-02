@@ -288,7 +288,7 @@ namespace osu.Game.Overlays.Mods
                                             Vertical = 15,
                                             Horizontal = OsuScreen.HORIZONTAL_OVERFLOW_PADDING
                                         },
-                                        Children = new Drawable[]
+                                        Children = new[]
                                         {
                                             DeselectAllButton = new TriangleButton
                                             {
@@ -509,6 +509,10 @@ namespace osu.Game.Overlays.Mods
             refreshSelectedMods();
         }
 
+        /// <summary>
+        /// Invoked when a new <see cref="Mod"/> has been selected.
+        /// </summary>
+        /// <param name="mod">The <see cref="Mod"/> that has been selected.</param>
         protected virtual void OnModSelected(Mod mod)
         {
         }
