@@ -58,8 +58,17 @@ namespace osu.Game.Screens.OnlinePlay
             initialRuleset = Ruleset.Value;
             initialMods = Mods.Value.ToList();
 
-            freeMods.Value = Playlist.FirstOrDefault()?.AllowedMods.Select(m => m.CreateCopy()).ToArray() ?? Array.Empty<Mod>();
             FooterPanels.Add(freeModSelectOverlay);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // At this point, Mods contains both the required and allowed mods. For selection purposes, it should only contain the required mods.
+            // Similarly, freeMods is currently empty but should only contain the allowed mods.
+            Mods.Value = Playlist.FirstOrDefault()?.RequiredMods.Select(m => m.CreateCopy()).ToArray() ?? Array.Empty<Mod>();
+            freeMods.Value = Playlist.FirstOrDefault()?.AllowedMods.Select(m => m.CreateCopy()).ToArray() ?? Array.Empty<Mod>();
 
             Ruleset.BindValueChanged(onRulesetChanged);
         }

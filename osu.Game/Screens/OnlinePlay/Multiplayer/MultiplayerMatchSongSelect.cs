@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
@@ -25,13 +23,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private void load()
         {
             AddInternal(loadingLayer = new LoadingLayer(true));
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            Mods.Value = Playlist.FirstOrDefault()?.RequiredMods.Select(m => m.CreateCopy()).ToArray() ?? Array.Empty<Mod>();
         }
 
         protected override void SelectItem(PlaylistItem item)
