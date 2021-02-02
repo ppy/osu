@@ -20,6 +20,7 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Tests.Beatmaps;
+using osu.Game.Users;
 using osuTK;
 using osuTK.Input;
 
@@ -278,7 +279,21 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     playlist.Items.Add(new PlaylistItem
                     {
                         ID = i,
-                        Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
+                        Beatmap =
+                        {
+                            Value = i % 2 == 1
+                                ? new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo
+                                : new BeatmapInfo
+                                {
+                                    Metadata = new BeatmapMetadata
+                                    {
+                                        Artist = "Artist",
+                                        Author = new User { Username = "Creator name here" },
+                                        Title = "Long title used to check background colour",
+                                    },
+                                    BeatmapSet = new BeatmapSetInfo()
+                                }
+                        },
                         Ruleset = { Value = new OsuRuleset().RulesetInfo },
                         RequiredMods =
                         {
