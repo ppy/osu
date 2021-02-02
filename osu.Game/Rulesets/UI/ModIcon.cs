@@ -95,11 +95,6 @@ namespace osu.Game.Rulesets.UI
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
