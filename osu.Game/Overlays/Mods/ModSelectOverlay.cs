@@ -377,7 +377,7 @@ namespace osu.Game.Overlays.Mods
             base.LoadComplete();
 
             availableMods.BindValueChanged(_ => updateAvailableMods(), true);
-            SelectedMods.BindValueChanged(selectedModsChanged, true);
+            SelectedMods.BindValueChanged(_ => updateSelectedButtons(), true);
         }
 
         protected override void PopOut()
@@ -445,6 +445,8 @@ namespace osu.Game.Overlays.Mods
 
                 section.Mods = modEnumeration.Select(validModOrNull).Where(m => m != null);
             }
+
+            updateSelectedButtons();
         }
 
         /// <summary>
@@ -465,10 +467,13 @@ namespace osu.Game.Overlays.Mods
             return validSubset.Length == 0 ? null : new MultiMod(validSubset);
         }
 
-        private void selectedModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
+        private void updateSelectedButtons()
         {
+            // Enumeration below may update the bindable list.
+            var selectedMods = SelectedMods.Value.ToList();
+
             foreach (var section in ModSectionsContainer.Children)
-                section.UpdateSelectedMods(mods.NewValue);
+                section.UpdateSelectedButtons(selectedMods);
 
             updateMods();
         }
