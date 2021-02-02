@@ -26,7 +26,7 @@ namespace osu.Game.Online.Rooms
         public readonly float? DownloadProgress;
 
         [JsonConstructor]
-        private BeatmapAvailability(DownloadState state, float? downloadProgress = null)
+        public BeatmapAvailability(DownloadState state, float? downloadProgress = null)
         {
             State = state;
             DownloadProgress = downloadProgress;
