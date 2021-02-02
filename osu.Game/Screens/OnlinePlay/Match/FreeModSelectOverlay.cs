@@ -57,12 +57,8 @@ namespace osu.Game.Screens.OnlinePlay.Match
             {
                 base.Update();
 
-                // If any of the buttons aren't selected, deselect the checkbox.
-                foreach (var button in ButtonsContainer.OfType<ModButton>())
-                {
-                    if (button.Mods.Any(m => m.HasImplementation) && !button.Selected)
-                        checkbox.Current.Value = false;
-                }
+                var validButtons = ButtonsContainer.OfType<ModButton>().Where(b => b.Mod.HasImplementation);
+                checkbox.Current.Value = validButtons.All(b => b.Selected);
             }
         }
 
