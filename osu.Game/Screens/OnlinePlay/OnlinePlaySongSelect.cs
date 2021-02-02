@@ -15,7 +15,6 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.Select;
 using osu.Game.Utils;
 
