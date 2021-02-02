@@ -220,7 +220,11 @@ namespace osu.Game.Screens.OnlinePlay
                         AutoSizeAxes = Axes.Both,
                         Spacing = new Vector2(5),
                         X = -10,
-                        ChildrenEnumerable = CreateButtons()
+                        ChildrenEnumerable = CreateButtons().Select(button => button.With(b =>
+                        {
+                            b.Anchor = Anchor.Centre;
+                            b.Origin = Anchor.Centre;
+                        }))
                     }
                 }
             };
@@ -231,14 +235,10 @@ namespace osu.Game.Screens.OnlinePlay
             {
                 new PlaylistDownloadButton(Item)
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
                     Size = new Vector2(50, 30)
                 },
                 new PlaylistRemoveButton
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
                     Size = new Vector2(30, 30),
                     Alpha = allowEdit ? 1 : 0,
                     Action = () => RequestDeletion?.Invoke(Model),
