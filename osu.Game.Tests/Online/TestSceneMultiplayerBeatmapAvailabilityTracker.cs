@@ -89,7 +89,7 @@ namespace osu.Game.Tests.Online
             addAvailabilityCheckStep("state importing", BeatmapAvailability.Importing);
 
             AddStep("allow importing", () => beatmaps.AllowImport.SetResult(true));
-            AddUntilStep("wait for import", () => beatmaps.IsAvailableLocally(testBeatmapSet));
+            AddUntilStep("wait for import", () => beatmaps.CurrentImportTask?.IsCompleted == true);
             addAvailabilityCheckStep("state locally available", BeatmapAvailability.LocallyAvailable);
         }
 
@@ -127,8 +127,6 @@ namespace osu.Game.Tests.Online
 
         private void addAvailabilityCheckStep(string description, Func<BeatmapAvailability> expected)
         {
-            // In DownloadTrackingComposite, state changes are scheduled one frame later, wait one step.
-            AddWaitStep("wait for potential change", 1);
             AddAssert(description, () => availablilityTracker.Availability.Value.Equals(expected.Invoke()));
         }
 
@@ -157,6 +155,8 @@ namespace osu.Game.Tests.Online
         {
             public TaskCompletionSource<bool> AllowImport = new TaskCompletionSource<bool>();
 
+            public Task<BeatmapSetInfo> CurrentImportTask { get; private set; }
+
             protected override ArchiveDownloadRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, bool minimiseDownloadSize)
                 => new TestDownloadRequest(set);
 
@@ -168,7 +168,7 @@ namespace osu.Game.Tests.Online
             public override async Task<BeatmapSetInfo> Import(BeatmapSetInfo item, ArchiveReader archive = null, CancellationToken cancellationToken = default)
             {
                 await AllowImport.Task;
-                return await base.Import(item, archive, cancellationToken);
+                return await (CurrentImportTask = base.Import(item, archive, cancellationToken));
             }
         }
 
