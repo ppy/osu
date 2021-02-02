@@ -24,6 +24,46 @@ namespace osu.Game.Screens.OnlinePlay.Match
         {
             CustomiseButton.Alpha = 0;
             MultiplierSection.Alpha = 0;
+            DeselectAllButton.Alpha = 0;
+
+            Drawable selectAllButton;
+            Drawable deselectAllButton;
+
+            FooterContainer.AddRange(new[]
+            {
+                selectAllButton = new TriangleButton
+                {
+                    Origin = Anchor.CentreLeft,
+                    Anchor = Anchor.CentreLeft,
+                    Width = 180,
+                    Text = "Select All",
+                    Action = selectAll,
+                },
+                // Unlike the base mod select overlay, this button deselects mods instantaneously.
+                deselectAllButton = new TriangleButton
+                {
+                    Origin = Anchor.CentreLeft,
+                    Anchor = Anchor.CentreLeft,
+                    Width = 180,
+                    Text = "Deselect All",
+                    Action = deselectAll,
+                },
+            });
+
+            FooterContainer.SetLayoutPosition(selectAllButton, -2);
+            FooterContainer.SetLayoutPosition(deselectAllButton, -1);
+        }
+
+        private void selectAll()
+        {
+            foreach (var section in ModSectionsContainer.Children)
+                section.SelectAll();
+        }
+
+        private void deselectAll()
+        {
+            foreach (var section in ModSectionsContainer.Children)
+                section.DeselectAll(true);
         }
 
         protected override ModSection CreateModSection(ModType type) => new FreeModSection(type);
