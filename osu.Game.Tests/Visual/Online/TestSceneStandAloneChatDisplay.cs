@@ -272,7 +272,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private void sendLocalMessage()
         {
-            AddStep("send local echo", () => testChannel.AddLocalEcho(new LocalEchoMessage()
+            AddStep("send local echo", () => testChannel.AddLocalEcho(new LocalEchoMessage
             {
                 Sender = longUsernameUser,
                 Content = "This is a local echo message.",
