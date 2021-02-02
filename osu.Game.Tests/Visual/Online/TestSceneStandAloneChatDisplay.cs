@@ -217,6 +217,33 @@ namespace osu.Game.Tests.Visual.Online
             checkScrolledToBottom();
         }
 
+        [Test]
+        public void TestLocalEchoMessageResetsScroll()
+        {
+            fillChat();
+
+            sendMessage();
+            checkScrolledToBottom();
+
+            AddStep("User scroll up", () =>
+            {
+                InputManager.MoveMouseTo(chatDisplay.ScreenSpaceDrawQuad.Centre);
+                InputManager.PressButton(MouseButton.Left);
+                InputManager.MoveMouseTo(chatDisplay.ScreenSpaceDrawQuad.Centre + new Vector2(0, chatDisplay.ScreenSpaceDrawQuad.Height));
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+
+            checkNotScrolledToBottom();
+            sendMessage();
+            checkNotScrolledToBottom();
+
+            sendLocalMessage();
+            checkScrolledToBottom();
+
+            sendMessage();
+            checkScrolledToBottom();
+        }
+
         private void fillChat()
         {
             AddStep("fill chat", () =>
@@ -240,6 +267,15 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Sender = longUsernameUser,
                 Content = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce et bibendum velit.",
+            }));
+        }
+
+        private void sendLocalMessage()
+        {
+            AddStep("send local echo", () => testChannel.AddLocalEcho(new LocalEchoMessage()
+            {
+                Sender = longUsernameUser,
+                Content = "This is a local echo message.",
             }));
         }
 
