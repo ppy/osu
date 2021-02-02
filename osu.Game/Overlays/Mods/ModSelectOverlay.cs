@@ -412,9 +412,12 @@ namespace osu.Game.Overlays.Mods
 
             foreach (var section in ModSectionsContainer.Children)
             {
-                section.Mods = Stacked
-                    ? availableMods.Value[section.ModType]
-                    : ModUtils.FlattenMods(availableMods.Value[section.ModType]);
+                IEnumerable<Mod> modEnumeration = availableMods.Value[section.ModType];
+
+                if (!Stacked)
+                    modEnumeration = ModUtils.FlattenMods(modEnumeration);
+
+                section.Mods = modEnumeration.Where(isValidMod);
             }
         }
 
