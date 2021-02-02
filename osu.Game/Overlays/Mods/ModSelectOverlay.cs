@@ -37,6 +37,7 @@ namespace osu.Game.Overlays.Mods
         protected readonly TriangleButton CustomiseButton;
         protected readonly TriangleButton CloseButton;
 
+        protected readonly Drawable MultiplierSection;
         protected readonly OsuSpriteText MultiplierLabel;
 
         /// <summary>
@@ -316,7 +317,7 @@ namespace osu.Game.Overlays.Mods
                                                 Origin = Anchor.CentreLeft,
                                                 Anchor = Anchor.CentreLeft,
                                             },
-                                            new FillFlowContainer
+                                            MultiplierSection = new FillFlowContainer
                                             {
                                                 AutoSizeAxes = Axes.Both,
                                                 Spacing = new Vector2(footer_button_spacing / 2, 0),
