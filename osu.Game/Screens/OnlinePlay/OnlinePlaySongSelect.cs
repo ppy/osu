@@ -17,6 +17,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.Select;
+using osu.Game.Utils;
 
 namespace osu.Game.Screens.OnlinePlay
 {
@@ -126,7 +127,7 @@ namespace osu.Game.Screens.OnlinePlay
         /// </summary>
         /// <param name="mod">The <see cref="Mod"/> to check.</param>
         /// <returns>Whether <paramref name="mod"/> is a valid mod for online play.</returns>
-        protected virtual bool IsValidMod(Mod mod) => mod.HasImplementation && !(mod is ModAutoplay) && (mod as MultiMod)?.Mods.Any(mm => mm is ModAutoplay) != true;
+        protected virtual bool IsValidMod(Mod mod) => mod.HasImplementation && !ModUtils.FlattenMod(mod).Any(m => m is ModAutoplay);
 
         /// <summary>
         /// Checks whether a given <see cref="Mod"/> is valid for per-player free-mod selection.
