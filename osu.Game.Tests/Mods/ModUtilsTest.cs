@@ -103,20 +103,43 @@ namespace osu.Game.Tests.Mods
             Assert.That(ModUtils.CheckAllowed(new[] { mod.Object }, new[] { typeof(Mod) }), Is.False);
         }
 
-        // test incompatible pair.
-        [TestCase(new[] { typeof(OsuModDoubleTime), typeof(OsuModHalfTime) }, new[] { typeof(OsuModDoubleTime), typeof(OsuModHalfTime) })]
-        // test incompatible pair with derived class.
-        [TestCase(new[] { typeof(OsuModNightcore), typeof(OsuModHalfTime) }, new[] { typeof(OsuModNightcore), typeof(OsuModHalfTime) })]
-        // test system mod.
-        [TestCase(new[] { typeof(OsuModDoubleTime), typeof(OsuModTouchDevice) }, new[] { typeof(OsuModTouchDevice) })]
-        // test valid.
-        [TestCase(new[] { typeof(OsuModDoubleTime), typeof(OsuModHardRock) }, null)]
-        public void TestInvalidModScenarios(Type[] input, Type[] expectedInvalid)
+        private static readonly object[] invalid_mod_test_scenarios =
         {
-            List<Mod> inputMods = new List<Mod>();
-            foreach (var t in input)
-                inputMods.Add((Mod)Activator.CreateInstance(t));
+            // incompatible pair.
+            new object[]
+            {
+                new Mod[] { new OsuModDoubleTime(), new OsuModHalfTime() },
+                new[] { typeof(OsuModDoubleTime), typeof(OsuModHalfTime) }
+            },
+            // incompatible pair with derived class.
+            new object[]
+            {
+                new Mod[] { new OsuModNightcore(), new OsuModHalfTime() },
+                new[] { typeof(OsuModNightcore), typeof(OsuModHalfTime) }
+            },
+            // system mod.
+            new object[]
+            {
+                new Mod[] { new OsuModDoubleTime(), new OsuModTouchDevice() },
+                new[] { typeof(OsuModTouchDevice) }
+            },
+            // multi mod.
+            new object[]
+            {
+                new Mod[] { new MultiMod(new OsuModHalfTime()), new OsuModHalfTime() },
+                new[] { typeof(MultiMod) }
+            },
+            // valid pair.
+            new object[]
+            {
+                new Mod[] { new OsuModDoubleTime(), new OsuModHardRock() },
+                null
+            }
+        };
 
+        [TestCaseSource(nameof(invalid_mod_test_scenarios))]
+        public void TestInvalidModScenarios(Mod[] inputMods, Type[] expectedInvalid)
+        {
             bool isValid = ModUtils.CheckValidForGameplay(inputMods, out var invalid);
 
             Assert.That(isValid, Is.EqualTo(expectedInvalid == null));
