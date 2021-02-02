@@ -60,6 +60,13 @@ namespace osu.Game.Screens.OnlinePlay
 
             freeMods.Value = Playlist.FirstOrDefault()?.AllowedMods.Select(m => m.CreateCopy()).ToArray() ?? Array.Empty<Mod>();
             FooterPanels.Add(freeModSelectOverlay);
+
+            Ruleset.BindValueChanged(onRulesetChanged);
+        }
+
+        private void onRulesetChanged(ValueChangedEvent<RulesetInfo> ruleset)
+        {
+            freeMods.Value = Array.Empty<Mod>();
         }
 
         protected sealed override bool OnStart()
