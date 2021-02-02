@@ -65,7 +65,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             {
                 failed = true;
 
-                Logger.Error(e, "Failed to retrieve a score submission token.\n\nThis may happen if you are running an old or non-official release of osu! (ie. you are self-compiling).");
+                Logger.Log($"You are not able to submit a score: {e.Message}", LoggingTarget.Information, LogLevel.Important);
 
                 Schedule(() =>
                 {
