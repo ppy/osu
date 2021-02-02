@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -31,7 +32,6 @@ namespace osu.Game.Overlays.Mods
 {
     public class ModSelectOverlay : WaveOverlayContainer
     {
-        private readonly Func<Mod, bool> isValidMod;
         public const float HEIGHT = 510;
 
         protected readonly TriangleButton DeselectAllButton;
@@ -48,6 +48,23 @@ namespace osu.Game.Overlays.Mods
         /// Whether <see cref="Mod"/>s underneath the same <see cref="MultiMod"/> instance should appear as stacked buttons.
         /// </summary>
         protected virtual bool Stacked => true;
+
+        [NotNull]
+        private Func<Mod, bool> isValidMod = m => true;
+
+        /// <summary>
+        /// A function that checks whether a given mod is selectable.
+        /// </summary>
+        [NotNull]
+        public Func<Mod, bool> IsValidMod
+        {
+            get => isValidMod;
+            set
+            {
+                isValidMod = value ?? throw new ArgumentNullException(nameof(value));
+                updateAvailableMods();
+            }
+        }
 
         protected readonly FillFlowContainer<ModSection> ModSectionsContainer;
 
@@ -67,10 +84,8 @@ namespace osu.Game.Overlays.Mods
 
         private SampleChannel sampleOn, sampleOff;
 
-        public ModSelectOverlay(Func<Mod, bool> isValidMod = null)
+        public ModSelectOverlay()
         {
-            this.isValidMod = isValidMod ?? (m => true);
-
             Waves.FirstWaveColour = Color4Extensions.FromHex(@"19b0e2");
             Waves.SecondWaveColour = Color4Extensions.FromHex(@"2280a2");
             Waves.ThirdWaveColour = Color4Extensions.FromHex(@"005774");
@@ -351,7 +366,7 @@ namespace osu.Game.Overlays.Mods
         {
             base.LoadComplete();
 
-            availableMods.BindValueChanged(availableModsChanged, true);
+            availableMods.BindValueChanged(_ => updateAvailableMods(), true);
             SelectedMods.BindValueChanged(selectedModsChanged, true);
         }
 
@@ -406,9 +421,10 @@ namespace osu.Game.Overlays.Mods
 
         public override bool OnPressed(GlobalAction action) => false; // handled by back button
 
-        private void availableModsChanged(ValueChangedEvent<Dictionary<ModType, IReadOnlyList<Mod>>> mods)
+        private void updateAvailableMods()
         {
-            if (mods.NewValue == null) return;
+            if (availableMods?.Value == null)
+                return;
 
             foreach (var section in ModSectionsContainer.Children)
             {
@@ -417,8 +433,30 @@ namespace osu.Game.Overlays.Mods
                 if (!Stacked)
                     modEnumeration = ModUtils.FlattenMods(modEnumeration);
 
-                section.Mods = modEnumeration.Where(isValidMod);
+                section.Mods = modEnumeration.Select(getValidModOrNull).Where(m => m != null);
             }
+        }
+
+        /// <summary>
+        /// Returns a valid form of a given <see cref="Mod"/> if possible, or null otherwise.
+        /// </summary>
+        /// <remarks>
+        /// This is a recursive process during which any invalid mods are culled while preserving <see cref="MultiMod"/> structures where possible.
+        /// </remarks>
+        /// <param name="mod">The <see cref="Mod"/> to check.</param>
+        /// <returns>A valid form of <paramref name="mod"/> if exists, or null otherwise.</returns>
+        [CanBeNull]
+        private Mod getValidModOrNull([NotNull] Mod mod)
+        {
+            if (!(mod is MultiMod multi))
+                return IsValidMod(mod) ? mod : null;
+
+            var validSubset = multi.Mods.Select(getValidModOrNull).Where(m => m != null).ToArray();
+
+            if (validSubset.Length == 0)
+                return null;
+
+            return validSubset.Length == 1 ? validSubset[0] : new MultiMod(validSubset);
         }
 
         private void selectedModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
