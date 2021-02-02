@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Utils;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Chat
@@ -147,8 +148,8 @@ namespace osu.Game.Overlays.Chat
 
             // due to the scroll adjusts from old messages removal above, a scroll-to-end must be enforced,
             // to avoid making the container think the user has scrolled back up and unwantedly disable auto-scrolling.
-            if (scroll.ShouldAutoScroll || newMessages.Any(m => m is LocalMessage))
-                ScheduleAfterChildren(() => scroll.ScrollToEnd());
+            if (newMessages.Any(m => m is LocalMessage))
+                scroll.ScrollToEnd();
         });
 
         private void pendingMessageResolved(Message existing, Message updated) => Schedule(() =>
@@ -239,7 +240,7 @@ namespace osu.Game.Overlays.Chat
         /// <summary>
         /// An <see cref="OsuScrollContainer"/> with functionality to automatically scroll whenever the maximum scrollable distance increases.
         /// </summary>
-        private class ChannelScrollContainer : OsuScrollContainer
+        private class ChannelScrollContainer : UserTrackingScrollContainer
         {
             /// <summary>
             /// The chat will be automatically scrolled to end if and only if
@@ -250,21 +251,30 @@ namespace osu.Game.Overlays.Chat
 
             private float? lastExtent;
 
-            /// <summary>
-            /// Whether this container should automatically scroll to end on the next call to <see cref="UpdateAfterChildren"/>.
-            /// </summary>
-            public bool ShouldAutoScroll { get; private set; } = true;
+            protected override void OnUserScroll(float value, bool animated = true, double? distanceDecay = default)
+            {
+                base.OnUserScroll(value, animated, distanceDecay);
+                lastExtent = null;
+            }
 
             protected override void UpdateAfterChildren()
             {
                 base.UpdateAfterChildren();
 
-                if ((lastExtent == null || ScrollableExtent > lastExtent) && ShouldAutoScroll)
-                    ScrollToEnd();
+                // If the user has scrolled to the bottom of the container, we should resume tracking new content.
+                bool cancelUserScroll = UserScrolling && IsScrolledToEnd(auto_scroll_leniency);
 
-                ShouldAutoScroll = IsScrolledToEnd(auto_scroll_leniency);
+                // If the user hasn't overridden our behaviour and there has been new content added to the container, we should update our scroll position to track it.
+                bool requiresScrollUpdate = !UserScrolling && (lastExtent == null || Precision.AlmostBigger(ScrollableExtent, lastExtent.Value));
 
-                lastExtent = ScrollableExtent;
+                if (cancelUserScroll || requiresScrollUpdate)
+                {
+                    ScheduleAfterChildren(() =>
+                    {
+                        ScrollToEnd();
+                        lastExtent = ScrollableExtent;
+                    });
+                }
             }
         }
     }
