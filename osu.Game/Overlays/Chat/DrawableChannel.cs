@@ -257,9 +257,9 @@ namespace osu.Game.Overlays.Chat
                 lastExtent = null;
             }
 
-            protected override void UpdateAfterChildren()
+            protected override void Update()
             {
-                base.UpdateAfterChildren();
+                base.Update();
 
                 // If the user has scrolled to the bottom of the container, we should resume tracking new content.
                 if (UserScrolling && IsScrolledToEnd(auto_scroll_leniency))
@@ -270,7 +270,8 @@ namespace osu.Game.Overlays.Chat
 
                 if (requiresScrollUpdate)
                 {
-                    ScheduleAfterChildren(() =>
+                    // Schedule required to allow FillFlow to be the correct size.
+                    Schedule(() =>
                     {
                         if (!UserScrolling)
                         {
