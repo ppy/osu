@@ -20,6 +20,12 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         protected override bool Stacked => false;
 
+        public FreeModSelectOverlay()
+        {
+            CustomiseButton.Alpha = 0;
+            MultiplierSection.Alpha = 0;
+        }
+
         protected override ModSection CreateModSection(ModType type) => new FreeModSection(type);
 
         private class FreeModSection : ModSection
