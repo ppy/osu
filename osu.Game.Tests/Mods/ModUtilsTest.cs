@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Mods
         }
 
         [Test]
-        public void TestIncompatibleThroughMultiMod()
+        public void TestMultiModIncompatibleWithTopLevel()
         {
             var mod1 = new Mock<Mod>();
 
@@ -45,6 +45,21 @@ namespace osu.Game.Tests.Mods
             // Test both orderings.
             Assert.That(ModUtils.CheckCompatibleSet(new[] { multiMod, mod1.Object }), Is.False);
             Assert.That(ModUtils.CheckCompatibleSet(new[] { mod1.Object, multiMod }), Is.False);
+        }
+
+        [Test]
+        public void TestTopLevelIncompatibleWithMultiMod()
+        {
+            // The nested mod.
+            var mod1 = new Mock<CustomMod1>();
+            var multiMod = new MultiMod(new MultiMod(mod1.Object));
+
+            var mod2 = new Mock<CustomMod2>();
+            mod2.Setup(m => m.IncompatibleMods).Returns(new[] { typeof(CustomMod1) });
+
+            // Test both orderings.
+            Assert.That(ModUtils.CheckCompatibleSet(new Mod[] { multiMod, mod2.Object }), Is.False);
+            Assert.That(ModUtils.CheckCompatibleSet(new Mod[] { mod2.Object, multiMod }), Is.False);
         }
 
         [Test]
@@ -82,6 +97,14 @@ namespace osu.Game.Tests.Mods
         {
             var mod = new Mock<Mod>();
             Assert.That(ModUtils.CheckAllowed(new[] { mod.Object }, new[] { typeof(Mod) }), Is.False);
+        }
+
+        public abstract class CustomMod1 : Mod
+        {
+        }
+
+        public abstract class CustomMod2 : Mod
+        {
         }
     }
 }
