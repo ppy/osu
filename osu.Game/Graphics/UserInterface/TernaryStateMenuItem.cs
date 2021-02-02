@@ -53,8 +53,6 @@ namespace osu.Game.Graphics.UserInterface
             switch (state)
             {
                 case TernaryState.False:
-                    return TernaryState.True;
-
                 case TernaryState.Indeterminate:
                     return TernaryState.True;
 
