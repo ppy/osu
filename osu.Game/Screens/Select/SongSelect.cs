@@ -301,7 +301,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        protected virtual ModSelectOverlay CreateModSelectOverlay() => new ModSelectOverlay();
+        protected virtual ModSelectOverlay CreateModSelectOverlay() => new SoloModSelectOverlay();
 
         protected virtual void ApplyFilterToCarousel(FilterCriteria criteria)
         {
