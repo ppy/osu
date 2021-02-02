@@ -153,6 +153,18 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("nightcore still visible", () => modSelect.ChildrenOfType<ModButton>().Any(b => b.Mods.Any(m => m is OsuModNightcore)));
         }
 
+        [Test]
+        public void TestChangeIsValidPreservesSelection()
+        {
+            changeRuleset(0);
+
+            AddStep("select DT + HD", () => SelectedMods.Value = new Mod[] { new OsuModDoubleTime(), new OsuModHidden() });
+            AddAssert("DT + HD selected", () => modSelect.ChildrenOfType<ModButton>().Count(b => b.Selected) == 2);
+
+            AddStep("make NF invalid", () => modSelect.IsValidMod = m => !(m is ModNoFail));
+            AddAssert("DT + HD still selected", () => modSelect.ChildrenOfType<ModButton>().Count(b => b.Selected) == 2);
+        }
+
         private void testSingleMod(Mod mod)
         {
             selectNext(mod);
