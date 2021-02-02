@@ -47,7 +47,7 @@ namespace osu.Game.Utils
         /// <returns>Whether all <see cref="Mod"/>s in the combination are compatible with each-other.</returns>
         public static bool CheckCompatibleSet(IEnumerable<Mod> combination, out List<Mod>? invalidMods)
         {
-            combination = FlattenMods(combination);
+            combination = FlattenMods(combination).ToArray();
             invalidMods = null;
 
             foreach (var mod in combination)
