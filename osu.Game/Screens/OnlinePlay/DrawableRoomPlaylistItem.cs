@@ -214,7 +214,8 @@ namespace osu.Game.Screens.OnlinePlay
                     Origin = Anchor.CentreRight,
                     Direction = FillDirection.Horizontal,
                     AutoSizeAxes = Axes.Both,
-                    X = -18,
+                    Spacing = new Vector2(5),
+                    X = -10,
                     ChildrenEnumerable = CreateButtons()
                 }
             }
@@ -225,15 +226,34 @@ namespace osu.Game.Screens.OnlinePlay
             {
                 new PlaylistDownloadButton(Item)
                 {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     Size = new Vector2(50, 30)
                 },
-                new IconButton
+                new PlaylistRemoveButton
                 {
-                    Icon = FontAwesome.Solid.MinusSquare,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(30, 30),
                     Alpha = allowEdit ? 1 : 0,
                     Action = () => RequestDeletion?.Invoke(Model),
                 },
             };
+
+        public class PlaylistRemoveButton : GrayButton
+        {
+            public PlaylistRemoveButton()
+                : base(FontAwesome.Solid.MinusSquare)
+            {
+                TooltipText = "Remove from playlist";
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                Icon.Scale = new Vector2(0.8f);
+            }
+        }
 
         protected override bool OnClick(ClickEvent e)
         {
