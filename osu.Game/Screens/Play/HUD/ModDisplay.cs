@@ -26,11 +26,6 @@ namespace osu.Game.Screens.Play.HUD
 
         public ExpansionMode ExpansionMode = ExpansionMode.ExpandOnHover;
 
-        /// <summary>
-        /// Whether the mods should initially appear expanded, before potentially contracting into their final expansion state (depending on <see cref="ExpansionMode"/>).
-        /// </summary>
-        public bool ExpandOnAppear = true;
-
         private readonly Bindable<IReadOnlyList<Mod>> current = new Bindable<IReadOnlyList<Mod>>();
 
         public Bindable<IReadOnlyList<Mod>> Current
@@ -115,7 +110,7 @@ namespace osu.Game.Screens.Play.HUD
 
             expand();
 
-            using (iconsContainer.BeginDelayedSequence(ExpandOnAppear ? 1200 : 0))
+            using (iconsContainer.BeginDelayedSequence(1200))
                 contract();
         }
 
