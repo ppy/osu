@@ -262,17 +262,21 @@ namespace osu.Game.Overlays.Chat
                 base.UpdateAfterChildren();
 
                 // If the user has scrolled to the bottom of the container, we should resume tracking new content.
-                bool cancelUserScroll = UserScrolling && IsScrolledToEnd(auto_scroll_leniency);
+                if (UserScrolling && IsScrolledToEnd(auto_scroll_leniency))
+                    CancelUserScroll();
 
                 // If the user hasn't overridden our behaviour and there has been new content added to the container, we should update our scroll position to track it.
                 bool requiresScrollUpdate = !UserScrolling && (lastExtent == null || Precision.AlmostBigger(ScrollableExtent, lastExtent.Value));
 
-                if (cancelUserScroll || requiresScrollUpdate)
+                if (requiresScrollUpdate)
                 {
                     ScheduleAfterChildren(() =>
                     {
-                        ScrollToEnd();
-                        lastExtent = ScrollableExtent;
+                        if (!UserScrolling)
+                        {
+                            ScrollToEnd();
+                            lastExtent = ScrollableExtent;
+                        }
                     });
                 }
             }
