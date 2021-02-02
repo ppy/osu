@@ -48,6 +48,29 @@ namespace osu.Game.Tests.Mods
         }
 
         [Test]
+        public void TestCompatibleMods()
+        {
+            var mod1 = new Mock<Mod>();
+            var mod2 = new Mock<Mod>();
+
+            // Test both orderings.
+            Assert.That(ModUtils.CheckCompatibleSet(new[] { mod1.Object, mod2.Object }), Is.True);
+            Assert.That(ModUtils.CheckCompatibleSet(new[] { mod2.Object, mod1.Object }), Is.True);
+        }
+
+        [Test]
+        public void TestIncompatibleThroughBaseType()
+        {
+            var mod1 = new Mock<Mod>();
+            var mod2 = new Mock<Mod>();
+            mod2.Setup(m => m.IncompatibleMods).Returns(new[] { mod1.Object.GetType().BaseType });
+
+            // Test both orderings.
+            Assert.That(ModUtils.CheckCompatibleSet(new[] { mod1.Object, mod2.Object }), Is.False);
+            Assert.That(ModUtils.CheckCompatibleSet(new[] { mod2.Object, mod1.Object }), Is.False);
+        }
+
+        [Test]
         public void TestAllowedThroughMostDerivedType()
         {
             var mod = new Mock<Mod>();
