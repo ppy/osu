@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.Scoring;
 using osuTK.Graphics;
 using osu.Game.Skinning;
 
@@ -249,7 +250,28 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (userTriggered || Time.Current < HitObject.EndTime)
                 return;
 
-            ApplyResult(r => r.Type = NestedHitObjects.Any(h => h.Result.IsHit) ? r.Judgement.MaxResult : r.Judgement.MinResult);
+            if (HitObject.IgnoreJudgement)
+            {
+                ApplyResult(r => r.Type = NestedHitObjects.Any(h => h.Result.IsHit) ? r.Judgement.MaxResult : r.Judgement.MinResult);
+                return;
+            }
+
+            // If not ignoring judgement, score proportionally based on the number of ticks hit, counting the head circle as a tick.
+            ApplyResult(r =>
+            {
+                int totalTicks = NestedHitObjects.Count;
+                int hitTicks = NestedHitObjects.Count(h => h.IsHit);
+                double hitFraction = (double)totalTicks / hitTicks;
+
+                if (hitTicks == totalTicks)
+                    r.Type = HitResult.Great;
+                else if (hitFraction >= 0.5)
+                    r.Type = HitResult.Ok;
+                else if (hitFraction > 0)
+                    r.Type = HitResult.Meh;
+                else
+                    r.Type = HitResult.Miss;
+            });
         }
 
         public override void PlaySamples()

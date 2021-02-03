@@ -7,6 +7,7 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -18,6 +19,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public Slider Slider => DrawableSlider?.HitObject;
 
         protected DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
+
+        public override bool DisplayResult => HitObject?.JudgeAsNormalHitCircle ?? base.DisplayResult;
 
         private readonly IBindable<int> pathVersion = new Bindable<int>();
 
@@ -71,6 +74,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 if (!IsHit)
                     Position = Slider.CurvePositionAt(completionProgress);
             }
+        }
+
+        protected override HitResult ResultFor(double timeOffset)
+        {
+            Debug.Assert(HitObject != null);
+
+            if (HitObject.JudgeAsNormalHitCircle)
+                return base.ResultFor(timeOffset);
+
+            // If not judged as a normal hitcircle, only track whether a hit has occurred (via IgnoreHit) rather than a scorable hit result.
+            var result = base.ResultFor(timeOffset);
+            return result.IsHit() ? HitResult.IgnoreHit : result;
         }
 
         public Action<double> OnShake;

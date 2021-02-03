@@ -114,6 +114,12 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         public double TickDistanceMultiplier = 1;
 
+        /// <summary>
+        /// Whether this <see cref="Slider"/>'s judgement should be ignored.
+        /// If <c>false</c>, this <see cref="Slider"/> will be judged proportionally to the number of ticks hit.
+        /// </summary>
+        public bool IgnoreJudgement = true;
+
         [JsonIgnore]
         public HitCircle HeadCircle { get; protected set; }
 
@@ -233,7 +239,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                 HeadCircle.Samples = this.GetNodeSamples(0);
         }
 
-        public override Judgement CreateJudgement() => new OsuIgnoreJudgement();
+        public override Judgement CreateJudgement() => IgnoreJudgement ? new OsuIgnoreJudgement() : new OsuJudgement();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }
