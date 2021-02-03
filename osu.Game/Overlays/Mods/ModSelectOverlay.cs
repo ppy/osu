@@ -29,7 +29,7 @@ using osuTK.Input;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class ModSelectOverlay : WaveOverlayContainer
+    public abstract class ModSelectOverlay : WaveOverlayContainer
     {
         public const float HEIGHT = 510;
 
@@ -83,7 +83,7 @@ namespace osu.Game.Overlays.Mods
 
         private SampleChannel sampleOn, sampleOff;
 
-        public ModSelectOverlay()
+        protected ModSelectOverlay()
         {
             Waves.FirstWaveColour = Color4Extensions.FromHex(@"19b0e2");
             Waves.SecondWaveColour = Color4Extensions.FromHex(@"2280a2");
@@ -366,19 +366,6 @@ namespace osu.Game.Overlays.Mods
             refreshSelectedMods();
         }
 
-        /// <summary>
-        /// Deselect one or more mods.
-        /// </summary>
-        /// <param name="modTypes">The types of <see cref="Mod"/>s which should be deselected.</param>
-        /// <param name="immediate">Set to true to bypass animations and update selections immediately.</param>
-        private void deselectTypes(Type[] modTypes, bool immediate = false)
-        {
-            if (modTypes.Length == 0) return;
-
-            foreach (var section in ModSectionsContainer.Children)
-                section.DeselectTypes(modTypes, immediate);
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -513,7 +500,7 @@ namespace osu.Game.Overlays.Mods
             {
                 if (State.Value == Visibility.Visible) sampleOn?.Play();
 
-                deselectTypes(selectedMod.IncompatibleMods, true);
+                OnModSelected(selectedMod);
 
                 if (selectedMod.RequiresConfiguration) ModSettingsContainer.Show();
             }
@@ -523,6 +510,14 @@ namespace osu.Game.Overlays.Mods
             }
 
             refreshSelectedMods();
+        }
+
+        /// <summary>
+        /// Invoked when a new <see cref="Mod"/> has been selected.
+        /// </summary>
+        /// <param name="mod">The <see cref="Mod"/> that has been selected.</param>
+        protected virtual void OnModSelected(Mod mod)
+        {
         }
 
         private void refreshSelectedMods() => SelectedMods.Value = ModSectionsContainer.Children.SelectMany(s => s.SelectedMods).ToArray();
