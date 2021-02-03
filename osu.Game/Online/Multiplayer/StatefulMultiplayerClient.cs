@@ -117,13 +117,7 @@ namespace osu.Game.Online.Multiplayer
         /// <param name="room">The API <see cref="Room"/>.</param>
         public async Task JoinRoom(Room room)
         {
-            var cancellationSource = new CancellationTokenSource();
-
-            await scheduleAsync(() =>
-            {
-                joinCancellationSource?.Cancel();
-                joinCancellationSource = cancellationSource;
-            }, CancellationToken.None);
+            var cancellationSource = joinCancellationSource = new CancellationTokenSource();
 
             await joinOrLeaveTaskChain.Add(async () =>
             {
@@ -162,15 +156,15 @@ namespace osu.Game.Online.Multiplayer
 
         public Task LeaveRoom()
         {
+            // The join may have not completed yet, so certain tasks that either update the room or reference the room should be cancelled.
+            // This includes the setting of Room itself along with the initial update of the room settings on join.
+            joinCancellationSource?.Cancel();
+
             // Leaving rooms is expected to occur instantaneously whilst the operation is finalised in the background.
             // However a few members need to be reset immediately to prevent other components from entering invalid states whilst the operation hasn't yet completed.
             // For example, if a room was left and the user immediately pressed the "create room" button, then the user could be taken into the lobby if the value of Room is not reset in time.
             var scheduledReset = scheduleAsync(() =>
             {
-                // The join may have not completed yet, so certain tasks that either update the room or reference the room should be cancelled.
-                // This includes the setting of Room itself along with the initial update of the room settings on join.
-                joinCancellationSource?.Cancel();
-
                 apiRoom = null;
                 Room = null;
                 CurrentMatchPlayingUserIds.Clear();
