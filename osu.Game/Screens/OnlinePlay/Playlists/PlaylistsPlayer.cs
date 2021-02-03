@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -65,7 +66,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             {
                 failed = true;
 
-                Logger.Log($"You are not able to submit a score: {e.Message}", LoggingTarget.Information, LogLevel.Important);
+                if (e is WebException || string.IsNullOrEmpty(e.Message))
+                    Logger.Error(e, "Failed to retrieve a score submission token.\n\nThis may happen if you are running an old or non-official release of osu! (ie. you are self-compiling).");
+                else
+                    Logger.Log($"You are not able to submit a score: {e.Message}", level: LogLevel.Important);
 
                 Schedule(() =>
                 {
