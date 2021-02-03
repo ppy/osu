@@ -84,6 +84,30 @@ namespace osu.Game.Utils
         }
 
         /// <summary>
+        /// Check the provided combination of mods are valid for a local gameplay session.
+        /// </summary>
+        /// <param name="mods">The mods to check.</param>
+        /// <param name="invalidMods">Invalid mods, if any were found. Can be null if all mods were valid.</param>
+        /// <returns>Whether the input mods were all valid. If false, <paramref name="invalidMods"/> will contain all invalid entries.</returns>
+        public static bool CheckValidForGameplay(IEnumerable<Mod> mods, out List<Mod>? invalidMods)
+        {
+            mods = mods.ToArray();
+
+            CheckCompatibleSet(mods, out invalidMods);
+
+            foreach (var mod in mods)
+            {
+                if (mod.Type == ModType.System || !mod.HasImplementation || mod is MultiMod)
+                {
+                    invalidMods ??= new List<Mod>();
+                    invalidMods.Add(mod);
+                }
+            }
+
+            return invalidMods == null;
+        }
+
+        /// <summary>
         /// Flattens a set of <see cref="Mod"/>s, returning a new set with all <see cref="MultiMod"/>s removed.
         /// </summary>
         /// <param name="mods">The set of <see cref="Mod"/>s to flatten.</param>
