@@ -38,7 +38,9 @@ namespace osu.Game.Online.API
                         break;
 
                     default:
-                        throw new ArgumentException("A setting was of a type not supported by the messagepack serialiser", nameof(bytes));
+                        // fall back for non-bindable cases.
+                        offset += primitiveFormatter.Serialize(ref bytes, offset, kvp.Value, formatterResolver);
+                        break;
                 }
             }
 
