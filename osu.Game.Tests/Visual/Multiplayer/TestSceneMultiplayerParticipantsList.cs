@@ -134,7 +134,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Client.AddUser(new User
                 {
                     Id = 0,
-                    Username = $"User 0",
+                    Username = "User 0",
                     CurrentModeRank = RNG.Next(1, 100000),
                     CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
                 });
