@@ -12,6 +12,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableSliderHead : DrawableHitCircle
     {
+        public new SliderHeadCircle HitObject => (SliderHeadCircle)base.HitObject;
+
         [CanBeNull]
         public Slider Slider => DrawableSlider?.HitObject;
 
@@ -59,12 +61,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.Update();
 
             Debug.Assert(Slider != null);
+            Debug.Assert(HitObject != null);
 
-            double completionProgress = Math.Clamp((Time.Current - Slider.StartTime) / Slider.Duration, 0, 1);
+            if (HitObject.TrackFollowCircle)
+            {
+                double completionProgress = Math.Clamp((Time.Current - Slider.StartTime) / Slider.Duration, 0, 1);
 
-            //todo: we probably want to reconsider this before adding scoring, but it looks and feels nice.
-            if (!IsHit)
-                Position = Slider.CurvePositionAt(completionProgress);
+                //todo: we probably want to reconsider this before adding scoring, but it looks and feels nice.
+                if (!IsHit)
+                    Position = Slider.CurvePositionAt(completionProgress);
+            }
         }
 
         public Action<double> OnShake;
