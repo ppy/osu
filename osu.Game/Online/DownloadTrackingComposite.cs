@@ -67,10 +67,10 @@ namespace osu.Game.Online
         }
 
         /// <summary>
-        /// Verifies that the given databased model is in a correct state to be considered available.
+        /// Checks that a database model matches the one expected to be downloaded.
         /// </summary>
         /// <example>
-        /// In the case of multiplayer/playlists, this has to verify that the databased beatmap set with the selected beatmap matches what's online.
+        /// In the case of multiplayer/playlists, this has to check that the databased beatmap set with the selected beatmap matches what's online.
         /// </example>
         /// <param name="databasedModel">The model in database.</param>
         protected virtual bool VerifyDatabasedModel([NotNull] TModel databasedModel) => true;
