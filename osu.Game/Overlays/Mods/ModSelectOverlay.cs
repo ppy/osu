@@ -21,6 +21,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -41,6 +42,11 @@ namespace osu.Game.Overlays.Mods
         protected override bool BlockNonPositionalInput => false;
 
         protected override bool DimMainContent => false;
+
+        /// <summary>
+        /// Whether <see cref="Mod"/>s underneath the same <see cref="MultiMod"/> instance should appear as stacked buttons.
+        /// </summary>
+        protected virtual bool Stacked => true;
 
         protected readonly FillFlowContainer<ModSection> ModSectionsContainer;
 
@@ -422,7 +428,14 @@ namespace osu.Game.Overlays.Mods
             if (mods.NewValue == null) return;
 
             foreach (var section in ModSectionsContainer.Children)
-                section.Mods = mods.NewValue[section.ModType].Where(isValidMod);
+            {
+                IEnumerable<Mod> modEnumeration = availableMods.Value[section.ModType];
+
+                if (!Stacked)
+                    modEnumeration = ModUtils.FlattenMods(modEnumeration);
+
+                section.Mods = modEnumeration.Where(isValidMod);
+            }
         }
 
         private void selectedModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
