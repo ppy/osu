@@ -1,9 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Linq;
 using Moq;
 using NUnit.Framework;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Utils;
 
 namespace osu.Game.Tests.Mods
@@ -97,6 +100,53 @@ namespace osu.Game.Tests.Mods
         {
             var mod = new Mock<CustomMod1>();
             Assert.That(ModUtils.CheckAllowed(new[] { mod.Object }, new[] { typeof(Mod) }), Is.False);
+        }
+
+        private static readonly object[] invalid_mod_test_scenarios =
+        {
+            // incompatible pair.
+            new object[]
+            {
+                new Mod[] { new OsuModDoubleTime(), new OsuModHalfTime() },
+                new[] { typeof(OsuModDoubleTime), typeof(OsuModHalfTime) }
+            },
+            // incompatible pair with derived class.
+            new object[]
+            {
+                new Mod[] { new OsuModNightcore(), new OsuModHalfTime() },
+                new[] { typeof(OsuModNightcore), typeof(OsuModHalfTime) }
+            },
+            // system mod.
+            new object[]
+            {
+                new Mod[] { new OsuModDoubleTime(), new OsuModTouchDevice() },
+                new[] { typeof(OsuModTouchDevice) }
+            },
+            // multi mod.
+            new object[]
+            {
+                new Mod[] { new MultiMod(new OsuModHalfTime()), new OsuModHalfTime() },
+                new[] { typeof(MultiMod) }
+            },
+            // valid pair.
+            new object[]
+            {
+                new Mod[] { new OsuModDoubleTime(), new OsuModHardRock() },
+                null
+            }
+        };
+
+        [TestCaseSource(nameof(invalid_mod_test_scenarios))]
+        public void TestInvalidModScenarios(Mod[] inputMods, Type[] expectedInvalid)
+        {
+            bool isValid = ModUtils.CheckValidForGameplay(inputMods, out var invalid);
+
+            Assert.That(isValid, Is.EqualTo(expectedInvalid == null));
+
+            if (isValid)
+                Assert.IsNull(invalid);
+            else
+                Assert.That(invalid?.Select(t => t.GetType()), Is.EquivalentTo(expectedInvalid));
         }
 
         public abstract class CustomMod1 : Mod
