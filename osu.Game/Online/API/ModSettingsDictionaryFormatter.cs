@@ -15,6 +15,8 @@ namespace osu.Game.Online.API
         {
             int startOffset = offset;
 
+            var primitiveFormatter = PrimitiveObjectFormatter.Instance;
+
             offset += MessagePackBinary.WriteArrayHeader(ref bytes, offset, value.Count);
 
             foreach (var kvp in value)
@@ -24,15 +26,15 @@ namespace osu.Game.Online.API
                 switch (kvp.Value)
                 {
                     case Bindable<double> d:
-                        offset += MessagePackBinary.WriteDouble(ref bytes, offset, d.Value);
+                        offset += primitiveFormatter.Serialize(ref bytes, offset, d.Value, formatterResolver);
                         break;
 
                     case Bindable<float> f:
-                        offset += MessagePackBinary.WriteSingle(ref bytes, offset, f.Value);
+                        offset += primitiveFormatter.Serialize(ref bytes, offset, f.Value, formatterResolver);
                         break;
 
                     case Bindable<bool> b:
-                        offset += MessagePackBinary.WriteBoolean(ref bytes, offset, b.Value);
+                        offset += primitiveFormatter.Serialize(ref bytes, offset, b.Value, formatterResolver);
                         break;
 
                     default:
@@ -57,39 +59,8 @@ namespace osu.Game.Online.API
                 var key = MessagePackBinary.ReadString(bytes, offset, out readSize);
                 offset += readSize;
 
-                switch (MessagePackBinary.GetMessagePackType(bytes, offset))
-                {
-                    case MessagePackType.Float:
-                    {
-                        // could be either float or double...
-                        // see https://github.com/msgpack/msgpack/blob/master/spec.md#serialization-type-to-format-conversion
-                        switch (MessagePackCode.ToFormatName(bytes[offset]))
-                        {
-                            case "float 32":
-                                output[key] = MessagePackBinary.ReadSingle(bytes, offset, out readSize);
-                                offset += readSize;
-                                break;
-
-                            case "float 64":
-                                output[key] = MessagePackBinary.ReadDouble(bytes, offset, out readSize);
-                                offset += readSize;
-                                break;
-
-                            default:
-                                throw new ArgumentException("A setting was of a type not supported by the messagepack deserialiser", nameof(bytes));
-                        }
-
-                        break;
-                    }
-
-                    case MessagePackType.Boolean:
-                        output[key] = MessagePackBinary.ReadBoolean(bytes, offset, out readSize);
-                        offset += readSize;
-                        break;
-
-                    default:
-                        throw new ArgumentException("A setting was of a type not supported by the messagepack deserialiser", nameof(bytes));
-                }
+                output[key] = PrimitiveObjectFormatter.Instance.Deserialize(bytes, offset, formatterResolver, out readSize);
+                offset += readSize;
             }
 
             readSize = offset - startOffset;
