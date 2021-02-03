@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public SliderBall Ball { get; private set; }
         public SkinnableDrawable Body { get; private set; }
 
-        public override bool DisplayResult => false;
+        public override bool DisplayResult => !HitObject.IgnoreJudgement;
 
         private PlaySliderBody sliderBody => Body.Drawable as PlaySliderBody;
 
