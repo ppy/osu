@@ -97,18 +97,19 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                         },
                                         new Drawable[]
                                         {
-                                            new GridContainer
+                                            new Container
                                             {
                                                 RelativeSizeAxes = Axes.Both,
-                                                Content = new[]
+                                                Padding = new MarginPadding { Horizontal = 5, Vertical = 10 },
+                                                Child = new GridContainer
                                                 {
-                                                    new Drawable[]
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    Content = new[]
                                                     {
-                                                        new Container
+                                                        new Drawable[]
                                                         {
-                                                            RelativeSizeAxes = Axes.Both,
-                                                            Padding = new MarginPadding { Horizontal = 5, Vertical = 10 },
-                                                            Child = new GridContainer
+                                                            // Main left column
+                                                            new GridContainer
                                                             {
                                                                 RelativeSizeAxes = Axes.Both,
                                                                 RowDimensions = new[]
@@ -126,45 +127,57 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                                         },
                                                                     }
                                                                 }
-                                                            }
-                                                        },
-                                                        new FillFlowContainer
-                                                        {
-                                                            Anchor = Anchor.Centre,
-                                                            Origin = Anchor.Centre,
-                                                            RelativeSizeAxes = Axes.X,
-                                                            AutoSizeAxes = Axes.Y,
-                                                            Padding = new MarginPadding { Horizontal = 5 },
-                                                            Spacing = new Vector2(0, 10),
-                                                            Children = new[]
+                                                            },
+                                                            // Main right column
+                                                            new FillFlowContainer
                                                             {
-                                                                new FillFlowContainer
+                                                                RelativeSizeAxes = Axes.X,
+                                                                AutoSizeAxes = Axes.Y,
+                                                                Children = new[]
                                                                 {
-                                                                    RelativeSizeAxes = Axes.X,
-                                                                    AutoSizeAxes = Axes.Y,
-                                                                    Children = new Drawable[]
+                                                                    new FillFlowContainer
                                                                     {
-                                                                        new OverlinedHeader("Beatmap"),
-                                                                        new BeatmapSelectionControl { RelativeSizeAxes = Axes.X }
-                                                                    }
-                                                                },
-                                                                userModsSection = new FillFlowContainer
-                                                                {
-                                                                    RelativeSizeAxes = Axes.X,
-                                                                    AutoSizeAxes = Axes.Y,
-                                                                    Children = new Drawable[]
+                                                                        RelativeSizeAxes = Axes.X,
+                                                                        AutoSizeAxes = Axes.Y,
+                                                                        Children = new Drawable[]
+                                                                        {
+                                                                            new OverlinedHeader("Beatmap"),
+                                                                            new BeatmapSelectionControl { RelativeSizeAxes = Axes.X }
+                                                                        }
+                                                                    },
+                                                                    userModsSection = new FillFlowContainer
                                                                     {
-                                                                        new OverlinedHeader("Extra mods"),
-                                                                        new ModDisplay
+                                                                        RelativeSizeAxes = Axes.X,
+                                                                        AutoSizeAxes = Axes.Y,
+                                                                        Margin = new MarginPadding { Top = 10 },
+                                                                        Children = new Drawable[]
                                                                         {
-                                                                            DisplayUnrankedText = false,
-                                                                            Current = UserMods
-                                                                        },
-                                                                        new PurpleTriangleButton
-                                                                        {
-                                                                            RelativeSizeAxes = Axes.X,
-                                                                            Text = "Select",
-                                                                            Action = () => userModsSelectOverlay.Show()
+                                                                            new OverlinedHeader("Extra mods"),
+                                                                            new FillFlowContainer
+                                                                            {
+                                                                                AutoSizeAxes = Axes.Both,
+                                                                                Direction = FillDirection.Horizontal,
+                                                                                Spacing = new Vector2(10, 0),
+                                                                                Children = new Drawable[]
+                                                                                {
+                                                                                    new PurpleTriangleButton
+                                                                                    {
+                                                                                        Anchor = Anchor.CentreLeft,
+                                                                                        Origin = Anchor.CentreLeft,
+                                                                                        Width = 90,
+                                                                                        Text = "Select",
+                                                                                        Action = () => userModsSelectOverlay.Show()
+                                                                                    },
+                                                                                    new ModDisplay
+                                                                                    {
+                                                                                        Anchor = Anchor.CentreLeft,
+                                                                                        Origin = Anchor.CentreLeft,
+                                                                                        DisplayUnrankedText = false,
+                                                                                        Current = UserMods,
+                                                                                        Scale = new Vector2(0.8f),
+                                                                                    },
+                                                                                }
+                                                                            }
                                                                         }
                                                                     }
                                                                 }
