@@ -38,28 +38,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [SetUp]
-        public void SetUp() => Schedule(() =>
-        {
-            SelectedMods.Value = Array.Empty<Mod>();
-            Children = new Drawable[]
-            {
-                modSelect = new TestModSelectOverlay
-                {
-                    Origin = Anchor.BottomCentre,
-                    Anchor = Anchor.BottomCentre,
-                    SelectedMods = { BindTarget = SelectedMods }
-                },
-
-                modDisplay = new ModDisplay
-                {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    AutoSizeAxes = Axes.Both,
-                    Position = new Vector2(-5, 25),
-                    Current = { BindTarget = modSelect.SelectedMods }
-                }
-            };
-        });
+        public void SetUp() => Schedule(() => createDisplay(() => new TestModSelectOverlay()));
 
         [SetUpSteps]
         public void SetUpSteps()
@@ -144,6 +123,18 @@ namespace osu.Game.Tests.Visual.UserInterface
                 var button = modSelect.GetModButton(SelectedMods.Value.Single());
                 return ((OsuModDoubleTime)button.SelectedMod).SpeedChange.Value == 1.01;
             });
+        }
+
+        [Test]
+        public void TestNonStacked()
+        {
+            changeRuleset(0);
+
+            AddStep("create overlay", () => createDisplay(() => new TestNonStackedModSelectOverlay()));
+
+            AddStep("show", () => modSelect.Show());
+
+            AddAssert("ensure all buttons are spread out", () => modSelect.ChildrenOfType<ModButton>().All(m => m.Mods.Length <= 1));
         }
 
         private void testSingleMod(Mod mod)
@@ -265,6 +256,28 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private void checkLabelColor(Func<Color4> getColour) => AddAssert("check label has expected colour", () => modSelect.MultiplierLabel.Colour.AverageColour == getColour());
 
+        private void createDisplay(Func<TestModSelectOverlay> createOverlayFunc)
+        {
+            SelectedMods.Value = Array.Empty<Mod>();
+            Children = new Drawable[]
+            {
+                modSelect = createOverlayFunc().With(d =>
+                {
+                    d.Origin = Anchor.BottomCentre;
+                    d.Anchor = Anchor.BottomCentre;
+                    d.SelectedMods.BindTarget = SelectedMods;
+                }),
+                modDisplay = new ModDisplay
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    AutoSizeAxes = Axes.Both,
+                    Position = new Vector2(-5, 25),
+                    Current = { BindTarget = modSelect.SelectedMods }
+                }
+            };
+        }
+
         private class TestModSelectOverlay : ModSelectOverlay
         {
             public new Bindable<IReadOnlyList<Mod>> SelectedMods => base.SelectedMods;
@@ -282,6 +295,11 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             public new Color4 LowMultiplierColour => base.LowMultiplierColour;
             public new Color4 HighMultiplierColour => base.HighMultiplierColour;
+        }
+
+        private class TestNonStackedModSelectOverlay : TestModSelectOverlay
+        {
+            protected override bool Stacked => false;
         }
     }
 }
