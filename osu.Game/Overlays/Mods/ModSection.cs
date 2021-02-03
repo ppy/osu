@@ -11,26 +11,24 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
+using Humanizer;
+using osu.Framework.Extensions;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Mods
 {
-    public abstract class ModSection : Container
+    public class ModSection : CompositeDrawable
     {
-        private readonly OsuSpriteText headerLabel;
+        private readonly Drawable header;
 
         public FillFlowContainer<ModButtonEmpty> ButtonsContainer { get; }
 
         public Action<Mod> Action;
-        protected abstract Key[] ToggleKeys { get; }
-        public abstract ModType ModType { get; }
 
-        public string Header
-        {
-            get => headerLabel.Text;
-            set => headerLabel.Text = value;
-        }
+        public Key[] ToggleKeys;
+
+        public readonly ModType ModType;
 
         public IEnumerable<Mod> SelectedMods => buttons.Select(b => b.SelectedMod).Where(m => m != null);
 
@@ -61,7 +59,7 @@ namespace osu.Game.Overlays.Mods
                 if (modContainers.Length == 0)
                 {
                     ModIconsLoaded = true;
-                    headerLabel.Hide();
+                    header.Hide();
                     Hide();
                     return;
                 }
@@ -76,7 +74,7 @@ namespace osu.Game.Overlays.Mods
 
                 buttons = modContainers.OfType<ModButton>().ToArray();
 
-                headerLabel.FadeIn(200);
+                header.FadeIn(200);
                 this.FadeIn(200);
             }
         }
@@ -153,23 +151,19 @@ namespace osu.Game.Overlays.Mods
             button.Deselect();
         }
 
-        protected ModSection()
+        public ModSection(ModType type)
         {
+            ModType = type;
+
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
 
             Origin = Anchor.TopCentre;
             Anchor = Anchor.TopCentre;
 
-            Children = new Drawable[]
+            InternalChildren = new[]
             {
-                headerLabel = new OsuSpriteText
-                {
-                    Origin = Anchor.TopLeft,
-                    Anchor = Anchor.TopLeft,
-                    Position = new Vector2(0f, 0f),
-                    Font = OsuFont.GetFont(weight: FontWeight.Bold)
-                },
+                header = CreateHeader(type.GetDescription() ?? type.Humanize(LetterCasing.Title)),
                 ButtonsContainer = new FillFlowContainer<ModButtonEmpty>
                 {
                     AutoSizeAxes = Axes.Y,
@@ -185,5 +179,11 @@ namespace osu.Game.Overlays.Mods
                 },
             };
         }
+
+        protected virtual Drawable CreateHeader(string text) => new OsuSpriteText
+        {
+            Font = OsuFont.GetFont(weight: FontWeight.Bold),
+            Text = text
+        };
     }
 }
