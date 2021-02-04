@@ -8,6 +8,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -44,6 +45,32 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void SetUpSteps()
         {
             AddStep("show", () => modSelect.Show());
+        }
+
+        [Test]
+        public void TestAnimationFlushOnClose()
+        {
+            changeRuleset(0);
+
+            AddStep("Select all fun mods", () =>
+            {
+                modSelect.ModSectionsContainer
+                         .Single(c => c.ModType == ModType.DifficultyIncrease)
+                         .SelectAll();
+            });
+
+            AddUntilStep("many mods selected", () => modDisplay.Current.Value.Count >= 5);
+
+            AddStep("trigger deselect and close overlay", () =>
+            {
+                modSelect.ModSectionsContainer
+                         .Single(c => c.ModType == ModType.DifficultyIncrease)
+                         .DeselectAll();
+
+                modSelect.Hide();
+            });
+
+            AddAssert("all mods deselected", () => modDisplay.Current.Value.Count == 0);
         }
 
         [Test]
@@ -311,6 +338,9 @@ namespace osu.Game.Tests.Visual.UserInterface
             public new Bindable<IReadOnlyList<Mod>> SelectedMods => base.SelectedMods;
 
             public bool AllLoaded => ModSectionsContainer.Children.All(c => c.ModIconsLoaded);
+
+            public new FillFlowContainer<ModSection> ModSectionsContainer =>
+                base.ModSectionsContainer;
 
             public ModButton GetModButton(Mod mod)
             {
