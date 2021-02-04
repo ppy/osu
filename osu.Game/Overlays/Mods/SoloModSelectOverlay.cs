@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.Mods
             base.OnModSelected(mod);
 
             foreach (var section in ModSectionsContainer.Children)
-                section.DeselectTypes(mod.IncompatibleMods);
+                section.DeselectTypes(mod.IncompatibleMods, true);
         }
     }
 }
