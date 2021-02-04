@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
@@ -57,7 +58,7 @@ namespace osu.Game.Graphics.UserInterface
 
             Children = new Drawable[]
             {
-                labelText = new OsuTextFlowContainer
+                labelText = new OsuTextFlowContainer(ApplyLabelParameters)
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
@@ -82,6 +83,13 @@ namespace osu.Game.Graphics.UserInterface
             Nub.Current.BindTo(Current);
 
             Current.DisabledChanged += disabled => labelText.Alpha = Nub.Alpha = disabled ? 0.3f : 1;
+        }
+
+        /// <summary>
+        /// A function which can be overridden to change the parameters of the label's text.
+        /// </summary>
+        protected virtual void ApplyLabelParameters(SpriteText text)
+        {
         }
 
         [BackgroundDependencyLoader]
