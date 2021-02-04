@@ -231,5 +231,14 @@ namespace osu.Game.Overlays.Mods
             Font = OsuFont.GetFont(weight: FontWeight.Bold),
             Text = text
         };
+
+        /// <summary>
+        /// Play out all remaining animations immediately to leave mods in a good (final) state.
+        /// </summary>
+        public void FlushAnimation()
+        {
+            while (pendingSelectionOperations.TryDequeue(out var dequeuedAction))
+                dequeuedAction();
+        }
     }
 }
