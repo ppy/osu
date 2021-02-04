@@ -145,11 +145,11 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("double time visible", () => modSelect.ChildrenOfType<ModButton>().Any(b => b.Mods.Any(m => m is OsuModDoubleTime)));
 
             AddStep("make double time invalid", () => modSelect.IsValidMod = m => !(m is OsuModDoubleTime));
-            AddAssert("double time not visible", () => modSelect.ChildrenOfType<ModButton>().All(b => !b.Mods.Any(m => m is OsuModDoubleTime)));
+            AddUntilStep("double time not visible", () => modSelect.ChildrenOfType<ModButton>().All(b => !b.Mods.Any(m => m is OsuModDoubleTime)));
             AddAssert("nightcore still visible", () => modSelect.ChildrenOfType<ModButton>().Any(b => b.Mods.Any(m => m is OsuModNightcore)));
 
             AddStep("make double time valid again", () => modSelect.IsValidMod = m => true);
-            AddAssert("double time visible", () => modSelect.ChildrenOfType<ModButton>().Any(b => b.Mods.Any(m => m is OsuModDoubleTime)));
+            AddUntilStep("double time visible", () => modSelect.ChildrenOfType<ModButton>().Any(b => b.Mods.Any(m => m is OsuModDoubleTime)));
             AddAssert("nightcore still visible", () => modSelect.ChildrenOfType<ModButton>().Any(b => b.Mods.Any(m => m is OsuModNightcore)));
         }
 
