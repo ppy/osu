@@ -33,6 +33,8 @@ namespace osu.Game.Overlays.Mods
 
         private CancellationTokenSource modsLoadCts;
 
+        protected bool SelectionAnimationRunning => pendingSelectionOperations.Count > 0;
+
         /// <summary>
         /// True when all mod icons have completed loading.
         /// </summary>
@@ -49,7 +51,11 @@ namespace osu.Game.Overlays.Mods
 
                     return new ModButton(m)
                     {
-                        SelectionChanged = Action,
+                        SelectionChanged = mod =>
+                        {
+                            ModButtonStateChanged(mod);
+                            Action?.Invoke(mod);
+                        },
                     };
                 }).ToArray();
 
@@ -78,6 +84,10 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
+        protected virtual void ModButtonStateChanged(Mod mod)
+        {
+        }
+
         private ModButton[] buttons = Array.Empty<ModButton>();
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -94,44 +104,53 @@ namespace osu.Game.Overlays.Mods
             return base.OnKeyDown(e);
         }
 
+        private const double initial_multiple_selection_delay = 100;
+
+        private readonly Queue<Action> pendingSelectionOperations = new Queue<Action>();
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Scheduler.AddDelayed(() =>
+            {
+                if (pendingSelectionOperations.TryDequeue(out var dequeuedAction))
+                    dequeuedAction();
+            }, initial_multiple_selection_delay, true);
+        }
+
         /// <summary>
         /// Selects all mods.
         /// </summary>
         public void SelectAll()
         {
+            pendingSelectionOperations.Clear();
+
             foreach (var button in buttons.Where(b => !b.Selected))
-                button.SelectAt(0);
+                pendingSelectionOperations.Enqueue(() => button.SelectAt(0));
         }
 
         /// <summary>
         /// Deselects all mods.
         /// </summary>
-        /// <param name="immediate">Set to true to bypass animations and update selections immediately.</param>
-        public void DeselectAll(bool immediate = false) => DeselectTypes(buttons.Select(b => b.SelectedMod?.GetType()).Where(t => t != null), immediate);
+        public void DeselectAll() => DeselectTypes(buttons.Select(b => b.SelectedMod?.GetType()).Where(t => t != null));
 
         /// <summary>
         /// Deselect one or more mods in this section.
         /// </summary>
         /// <param name="modTypes">The types of <see cref="Mod"/>s which should be deselected.</param>
-        /// <param name="immediate">Set to true to bypass animations and update selections immediately.</param>
-        public void DeselectTypes(IEnumerable<Type> modTypes, bool immediate = false)
+        public void DeselectTypes(IEnumerable<Type> modTypes)
         {
-            int delay = 0;
+            pendingSelectionOperations.Clear();
 
             foreach (var button in buttons)
             {
-                Mod selected = button.SelectedMod;
-                if (selected == null) continue;
+                if (button.SelectedMod == null) continue;
 
                 foreach (var type in modTypes)
                 {
-                    if (type.IsInstanceOfType(selected))
-                    {
-                        if (immediate)
-                            button.Deselect();
-                        else
-                            Scheduler.AddDelayed(button.Deselect, delay += 50);
-                    }
+                    if (type.IsInstanceOfType(button.SelectedMod))
+                        pendingSelectionOperations.Enqueue(button.Deselect);
                 }
             }
         }
