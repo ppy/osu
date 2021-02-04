@@ -5,6 +5,8 @@ using System;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
@@ -69,7 +71,7 @@ namespace osu.Game.Screens.OnlinePlay
         private void deselectAll()
         {
             foreach (var section in ModSectionsContainer.Children)
-                section.DeselectAll(true);
+                section.DeselectAll();
         }
 
         protected override ModSection CreateModSection(ModType type) => new FreeModSection(type);
@@ -86,7 +88,7 @@ namespace osu.Game.Screens.OnlinePlay
             protected override Drawable CreateHeader(string text) => new Container
             {
                 AutoSizeAxes = Axes.Y,
-                Width = 175,
+                RelativeSizeAxes = Axes.X,
                 Child = checkbox = new HeaderCheckbox
                 {
                     LabelText = text,
@@ -96,21 +98,21 @@ namespace osu.Game.Screens.OnlinePlay
 
             private void onCheckboxChanged(bool value)
             {
-                foreach (var button in ButtonsContainer.OfType<ModButton>())
-                {
-                    if (value)
-                        button.SelectAt(0);
-                    else
-                        button.Deselect();
-                }
+                if (value)
+                    SelectAll();
+                else
+                    DeselectAll();
             }
 
-            protected override void Update()
+            protected override void ModButtonStateChanged(Mod mod)
             {
-                base.Update();
+                base.ModButtonStateChanged(mod);
 
-                var validButtons = ButtonsContainer.OfType<ModButton>().Where(b => b.Mod.HasImplementation);
-                checkbox.Current.Value = validButtons.All(b => b.Selected);
+                if (!SelectionAnimationRunning)
+                {
+                    var validButtons = ButtonsContainer.OfType<ModButton>().Where(b => b.Mod.HasImplementation);
+                    checkbox.Current.Value = validButtons.All(b => b.Selected);
+                }
             }
         }
 
@@ -119,6 +121,19 @@ namespace osu.Game.Screens.OnlinePlay
             public Action<bool> Changed;
 
             protected override bool PlaySoundsOnUserChange => false;
+
+            public HeaderCheckbox()
+                : base(false)
+
+            {
+            }
+
+            protected override void ApplyLabelParameters(SpriteText text)
+            {
+                base.ApplyLabelParameters(text);
+
+                text.Font = OsuFont.GetFont(weight: FontWeight.Bold);
+            }
 
             protected override void OnUserChange(bool value)
             {
