@@ -148,7 +148,11 @@ namespace osu.Game.Overlays.Mods
         /// <summary>
         /// Deselects all mods.
         /// </summary>
-        public void DeselectAll() => DeselectTypes(buttons.Select(b => b.SelectedMod?.GetType()).Where(t => t != null));
+        public void DeselectAll()
+        {
+            pendingSelectionOperations.Clear();
+            DeselectTypes(buttons.Select(b => b.SelectedMod?.GetType()).Where(t => t != null));
+        }
 
         /// <summary>
         /// Deselect one or more mods in this section.
@@ -156,8 +160,6 @@ namespace osu.Game.Overlays.Mods
         /// <param name="modTypes">The types of <see cref="Mod"/>s which should be deselected.</param>
         public void DeselectTypes(IEnumerable<Type> modTypes)
         {
-            pendingSelectionOperations.Clear();
-
             foreach (var button in buttons)
             {
                 if (button.SelectedMod == null) continue;
