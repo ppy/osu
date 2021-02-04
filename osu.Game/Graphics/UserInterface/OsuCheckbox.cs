@@ -72,12 +72,12 @@ namespace osu.Game.Graphics.UserInterface
                 Nub.Anchor = Anchor.CentreRight;
                 Nub.Origin = Anchor.CentreRight;
                 Nub.Margin = new MarginPadding { Right = nub_padding };
-                labelText.Padding = new MarginPadding { Right = Nub.EXPANDED_SIZE + nub_padding };
+                labelText.Padding = new MarginPadding { Right = Nub.EXPANDED_SIZE + nub_padding * 2 };
             }
             else
             {
                 Nub.Margin = new MarginPadding { Left = nub_padding };
-                labelText.Padding = new MarginPadding { Left = Nub.EXPANDED_SIZE + nub_padding };
+                labelText.Padding = new MarginPadding { Left = Nub.EXPANDED_SIZE + nub_padding * 2 };
             }
 
             Nub.Current.BindTo(Current);
