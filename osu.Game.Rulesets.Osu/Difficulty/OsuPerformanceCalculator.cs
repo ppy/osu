@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Combo scaling
             if (Attributes.MaxCombo > 0)
-                aimValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(Attributes.MaxCombo, 0.8), 1.0);
+                aimValue *= (Math.Exp(-Math.Exp((930.58 - scoreMaxCombo) / 969.16)) - 0.073373) / (Math.Exp(-Math.Exp((930.58 - Attributes.MaxCombo) / 969.16)) - 0.073373);
 
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
@@ -145,7 +145,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Combo scaling
             if (Attributes.MaxCombo > 0)
-                speedValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(Attributes.MaxCombo, 0.8), 1.0);
+                speedValue *= (Math.Exp(-Math.Exp((930.58 - scoreMaxCombo) / 969.16)) - 0.073373) / (Math.Exp(-Math.Exp((930.58 - Attributes.MaxCombo) / 969.16)) - 0.073373);
 
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
