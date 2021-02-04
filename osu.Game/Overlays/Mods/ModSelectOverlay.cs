@@ -379,6 +379,11 @@ namespace osu.Game.Overlays.Mods
         {
             base.PopOut();
 
+            foreach (var section in ModSectionsContainer)
+            {
+                section.FlushAnimation();
+            }
+
             FooterContainer.MoveToX(content_width, WaveContainer.DISAPPEAR_DURATION, Easing.InSine);
             FooterContainer.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.InSine);
 
