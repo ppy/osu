@@ -37,7 +37,10 @@ namespace osu.Game.Overlays.Mods
         protected readonly TriangleButton CustomiseButton;
         protected readonly TriangleButton CloseButton;
 
+        protected readonly Drawable MultiplierSection;
         protected readonly OsuSpriteText MultiplierLabel;
+
+        protected readonly FillFlowContainer FooterContainer;
 
         protected override bool BlockNonPositionalInput => false;
 
@@ -78,8 +81,6 @@ namespace osu.Game.Overlays.Mods
 
         private const float content_width = 0.8f;
         private const float footer_button_spacing = 20;
-
-        private readonly FillFlowContainer footerContainer;
 
         private SampleChannel sampleOn, sampleOff;
 
@@ -269,7 +270,7 @@ namespace osu.Game.Overlays.Mods
                                         Colour = new Color4(172, 20, 116, 255),
                                         Alpha = 0.5f,
                                     },
-                                    footerContainer = new FillFlowContainer
+                                    FooterContainer = new FillFlowContainer
                                     {
                                         Origin = Anchor.BottomCentre,
                                         Anchor = Anchor.BottomCentre,
@@ -283,7 +284,7 @@ namespace osu.Game.Overlays.Mods
                                             Vertical = 15,
                                             Horizontal = OsuScreen.HORIZONTAL_OVERFLOW_PADDING
                                         },
-                                        Children = new Drawable[]
+                                        Children = new[]
                                         {
                                             DeselectAllButton = new TriangleButton
                                             {
@@ -310,7 +311,7 @@ namespace osu.Game.Overlays.Mods
                                                 Origin = Anchor.CentreLeft,
                                                 Anchor = Anchor.CentreLeft,
                                             },
-                                            new FillFlowContainer
+                                            MultiplierSection = new FillFlowContainer
                                             {
                                                 AutoSizeAxes = Axes.Both,
                                                 Spacing = new Vector2(footer_button_spacing / 2, 0),
@@ -378,8 +379,13 @@ namespace osu.Game.Overlays.Mods
         {
             base.PopOut();
 
-            footerContainer.MoveToX(content_width, WaveContainer.DISAPPEAR_DURATION, Easing.InSine);
-            footerContainer.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.InSine);
+            foreach (var section in ModSectionsContainer)
+            {
+                section.FlushAnimation();
+            }
+
+            FooterContainer.MoveToX(content_width, WaveContainer.DISAPPEAR_DURATION, Easing.InSine);
+            FooterContainer.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.InSine);
 
             foreach (var section in ModSectionsContainer.Children)
             {
@@ -393,8 +399,8 @@ namespace osu.Game.Overlays.Mods
         {
             base.PopIn();
 
-            footerContainer.MoveToX(0, WaveContainer.APPEAR_DURATION, Easing.OutQuint);
-            footerContainer.FadeIn(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
+            FooterContainer.MoveToX(0, WaveContainer.APPEAR_DURATION, Easing.OutQuint);
+            FooterContainer.FadeIn(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
 
             foreach (var section in ModSectionsContainer.Children)
             {
@@ -498,7 +504,8 @@ namespace osu.Game.Overlays.Mods
         {
             if (selectedMod != null)
             {
-                if (State.Value == Visibility.Visible) sampleOn?.Play();
+                if (State.Value == Visibility.Visible)
+                    Scheduler.AddOnce(playSelectedSound);
 
                 OnModSelected(selectedMod);
 
@@ -506,11 +513,15 @@ namespace osu.Game.Overlays.Mods
             }
             else
             {
-                if (State.Value == Visibility.Visible) sampleOff?.Play();
+                if (State.Value == Visibility.Visible)
+                    Scheduler.AddOnce(playDeselectedSound);
             }
 
             refreshSelectedMods();
         }
+
+        private void playSelectedSound() => sampleOn?.Play();
+        private void playDeselectedSound() => sampleOff?.Play();
 
         /// <summary>
         /// Invoked when a new <see cref="Mod"/> has been selected.
