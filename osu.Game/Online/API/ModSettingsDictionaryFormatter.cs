@@ -29,6 +29,10 @@ namespace osu.Game.Online.API
                         primitiveFormatter.Serialize(ref writer, d.Value, options);
                         break;
 
+                    case Bindable<int> i:
+                        primitiveFormatter.Serialize(ref writer, i.Value, options);
+                        break;
+
                     case Bindable<float> f:
                         primitiveFormatter.Serialize(ref writer, f.Value, options);
                         break;
