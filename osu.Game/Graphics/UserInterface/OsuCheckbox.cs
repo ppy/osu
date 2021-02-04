@@ -48,7 +48,7 @@ namespace osu.Game.Graphics.UserInterface
         private SampleChannel sampleChecked;
         private SampleChannel sampleUnchecked;
 
-        public OsuCheckbox()
+        public OsuCheckbox(bool nubOnRight = true)
         {
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
@@ -61,16 +61,23 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
-                    Padding = new MarginPadding { Right = Nub.EXPANDED_SIZE + nub_padding }
                 },
-                Nub = new Nub
-                {
-                    Anchor = Anchor.CentreRight,
-                    Origin = Anchor.CentreRight,
-                    Margin = new MarginPadding { Right = nub_padding },
-                },
+                Nub = new Nub(),
                 new HoverClickSounds()
             };
+
+            if (nubOnRight)
+            {
+                Nub.Anchor = Anchor.CentreRight;
+                Nub.Origin = Anchor.CentreRight;
+                Nub.Margin = new MarginPadding { Right = nub_padding };
+                labelText.Padding = new MarginPadding { Right = Nub.EXPANDED_SIZE + nub_padding };
+            }
+            else
+            {
+                Nub.Margin = new MarginPadding { Left = nub_padding };
+                labelText.Padding = new MarginPadding { Left = Nub.EXPANDED_SIZE + nub_padding };
+            }
 
             Nub.Current.BindTo(Current);
 
