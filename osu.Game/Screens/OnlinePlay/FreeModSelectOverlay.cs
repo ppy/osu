@@ -86,7 +86,7 @@ namespace osu.Game.Screens.OnlinePlay
             protected override Drawable CreateHeader(string text) => new Container
             {
                 AutoSizeAxes = Axes.Y,
-                Width = 175,
+                RelativeSizeAxes = Axes.X,
                 Child = checkbox = new HeaderCheckbox
                 {
                     LabelText = text,
