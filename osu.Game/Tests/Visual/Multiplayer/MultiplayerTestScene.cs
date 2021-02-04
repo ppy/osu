@@ -6,7 +6,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Testing;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
