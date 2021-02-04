@@ -158,7 +158,8 @@ namespace osu.Game.Overlays.Mods
         /// Deselect one or more mods in this section.
         /// </summary>
         /// <param name="modTypes">The types of <see cref="Mod"/>s which should be deselected.</param>
-        public void DeselectTypes(IEnumerable<Type> modTypes)
+        /// <param name="immediate">Whether the deselection should happen immediately. Should only be used when required to ensure correct selection flow.</param>
+        public void DeselectTypes(IEnumerable<Type> modTypes, bool immediate = false)
         {
             foreach (var button in buttons)
             {
@@ -167,7 +168,12 @@ namespace osu.Game.Overlays.Mods
                 foreach (var type in modTypes)
                 {
                     if (type.IsInstanceOfType(button.SelectedMod))
-                        pendingSelectionOperations.Enqueue(button.Deselect);
+                    {
+                        if (immediate)
+                            button.Deselect();
+                        else
+                            pendingSelectionOperations.Enqueue(button.Deselect);
+                    }
                 }
             }
         }
