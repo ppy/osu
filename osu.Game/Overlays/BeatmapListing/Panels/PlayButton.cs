@@ -85,16 +85,6 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
             AlwaysDisabled.BindValueChanged(_ => updateEnabledState(), true);
         }
 
-        private void updateEnabledState()
-        {
-            var disabledValue = AlwaysDisabled.Value || BeatmapSet == null;
-
-            if (playing.Value && disabledValue)
-                playing.Value = false;
-
-            disabled.Value = disabledValue;
-        }
-
         protected override bool OnClick(ClickEvent e)
         {
             if (Disabled.Value)
@@ -150,6 +140,16 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
         {
             if (Preview?.Start() != true)
                 playing.Value = false;
+        }
+
+        private void updateEnabledState()
+        {
+            var disabledValue = AlwaysDisabled.Value || BeatmapSet == null;
+
+            if (playing.Value && disabledValue)
+                playing.Value = false;
+
+            disabled.Value = disabledValue;
         }
 
         private class Button : CompositeDrawable
