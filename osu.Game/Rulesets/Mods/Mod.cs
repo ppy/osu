@@ -147,15 +147,16 @@ namespace osu.Game.Rulesets.Mods
                 var targetBindable = (IBindable)prop.GetValue(this);
                 var sourceBindable = (IBindable)prop.GetValue(source);
 
-                // we only care about changes that have been made away from defaults.
-                if (!sourceBindable.IsDefault)
+                // we only care about changes that have been made away from defaults, or if source is default but target is not.
+                if (!sourceBindable.IsDefault || !targetBindable.IsDefault)
                     CopyAdjustedSetting(targetBindable, sourceBindable);
             }
         }
 
         /// <summary>
-        /// When creating copies or clones of a Mod, this method will be called
-        /// to copy explicitly adjusted user settings from <paramref name="target"/>.
+        /// When creating copies or clones of or copying from a Mod, this method will be called
+        /// to copy explicitly adjusted user settings from <paramref name="source"/>,
+        /// or to reset already adjusted setting back to default.
         /// The base implementation will transfer the value via <see cref="Bindable{T}.Parse"/>
         /// or by binding and unbinding (if <paramref name="source"/> is an <see cref="IBindable"/>)
         /// and should be called unless replaced with custom logic.
