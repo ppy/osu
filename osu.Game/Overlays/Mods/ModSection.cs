@@ -104,19 +104,31 @@ namespace osu.Game.Overlays.Mods
             return base.OnKeyDown(e);
         }
 
-        private const double initial_multiple_selection_delay = 100;
+        private const double initial_multiple_selection_delay = 120;
+
+        private double selectionDelay = initial_multiple_selection_delay;
+        private double lastSelection;
 
         private readonly Queue<Action> pendingSelectionOperations = new Queue<Action>();
 
-        protected override void LoadComplete()
+        protected override void Update()
         {
-            base.LoadComplete();
+            base.Update();
 
-            Scheduler.AddDelayed(() =>
+            if (selectionDelay == initial_multiple_selection_delay || Time.Current - lastSelection >= selectionDelay)
             {
                 if (pendingSelectionOperations.TryDequeue(out var dequeuedAction))
+                {
                     dequeuedAction();
-            }, initial_multiple_selection_delay, true);
+
+                    selectionDelay = Math.Max(30, selectionDelay * 0.8f);
+                    lastSelection = Time.Current;
+                }
+                else
+                {
+                    selectionDelay = initial_multiple_selection_delay;
+                }
+            }
         }
 
         /// <summary>
