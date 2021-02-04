@@ -3,8 +3,11 @@
 
 using System;
 using System.Linq;
+using System.Reflection.Emit;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
@@ -119,6 +122,19 @@ namespace osu.Game.Screens.OnlinePlay
             public Action<bool> Changed;
 
             protected override bool PlaySoundsOnUserChange => false;
+
+            public HeaderCheckbox()
+                : base(false)
+
+            {
+            }
+
+            protected override void ApplyLabelParameters(SpriteText text)
+            {
+                base.ApplyLabelParameters(text);
+
+                text.Font = OsuFont.GetFont(weight: FontWeight.Bold);
+            }
 
             protected override void OnUserChange(bool value)
             {
