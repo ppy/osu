@@ -76,6 +76,8 @@ namespace osu.Game.Graphics.UserInterface
             }
             else
             {
+                Nub.Anchor = Anchor.CentreLeft;
+                Nub.Origin = Anchor.CentreLeft;
                 Nub.Margin = new MarginPadding { Left = nub_padding };
                 labelText.Padding = new MarginPadding { Left = Nub.EXPANDED_SIZE + nub_padding * 2 };
             }
