@@ -3,7 +3,6 @@
 
 using System;
 using System.Linq;
-using System.Reflection.Emit;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -72,7 +71,7 @@ namespace osu.Game.Screens.OnlinePlay
         private void deselectAll()
         {
             foreach (var section in ModSectionsContainer.Children)
-                section.DeselectAll(true);
+                section.DeselectAll();
         }
 
         protected override ModSection CreateModSection(ModType type) => new FreeModSection(type);
@@ -99,21 +98,21 @@ namespace osu.Game.Screens.OnlinePlay
 
             private void onCheckboxChanged(bool value)
             {
-                foreach (var button in ButtonsContainer.OfType<ModButton>())
-                {
-                    if (value)
-                        button.SelectAt(0);
-                    else
-                        button.Deselect();
-                }
+                if (value)
+                    SelectAll();
+                else
+                    DeselectAll();
             }
 
-            protected override void Update()
+            protected override void ModButtonStateChanged(Mod mod)
             {
-                base.Update();
+                base.ModButtonStateChanged(mod);
 
-                var validButtons = ButtonsContainer.OfType<ModButton>().Where(b => b.Mod.HasImplementation);
-                checkbox.Current.Value = validButtons.All(b => b.Selected);
+                if (!SelectionAnimationRunning)
+                {
+                    var validButtons = ButtonsContainer.OfType<ModButton>().Where(b => b.Mod.HasImplementation);
+                    checkbox.Current.Value = validButtons.All(b => b.Selected);
+                }
             }
         }
 
