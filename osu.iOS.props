@@ -80,6 +80,9 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="3.0.3" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="3.0.3" />
+    <PackageReference Include="MessagePack" Version="1.7.3.7" />
+    <PackageReference Include="MessagePack.Annotations" Version="2.2.85" />
   </ItemGroup>
   <!-- Xamarin.iOS does not automatically handle transitive dependencies from NuGet packages. -->
   <ItemGroup Label="Transitive Dependencies">
