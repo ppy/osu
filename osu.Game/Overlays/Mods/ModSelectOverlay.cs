@@ -496,17 +496,12 @@ namespace osu.Game.Overlays.Mods
                 MultiplierLabel.FadeColour(Color4.White, 200);
         }
 
-        private ScheduledDelegate sampleOnDelegate;
-        private ScheduledDelegate sampleOffDelegate;
-
         private void modButtonPressed(Mod selectedMod)
         {
             if (selectedMod != null)
             {
-                // Fixes buzzing when multiple mods are selected in the same frame.
-                sampleOnDelegate?.Cancel();
                 if (State.Value == Visibility.Visible)
-                    sampleOnDelegate = Scheduler.Add(() => sampleOn?.Play());
+                    Scheduler.AddOnce(playSelectedSound);
 
                 OnModSelected(selectedMod);
 
@@ -514,14 +509,15 @@ namespace osu.Game.Overlays.Mods
             }
             else
             {
-                // Fixes buzzing when multiple mods are deselected in the same frame.
-                sampleOffDelegate?.Cancel();
                 if (State.Value == Visibility.Visible)
-                    sampleOffDelegate = Scheduler.Add(() => sampleOff?.Play());
+                    Scheduler.AddOnce(playDeselectedSound);
             }
 
             refreshSelectedMods();
         }
+
+        private void playSelectedSound() => sampleOn?.Play();
+        private void playDeselectedSound() => sampleOff?.Play();
 
         /// <summary>
         /// Invoked when a new <see cref="Mod"/> has been selected.
