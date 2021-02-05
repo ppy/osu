@@ -21,6 +21,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         [Resolved(CanBeNull = true)]
         private OsuRulesetConfigManager config { get; set; }
 
+        private readonly Bindable<bool> snakingOut = new Bindable<bool>();
+
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, DrawableHitObject drawableObject)
         {
@@ -35,11 +37,29 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             accentColour = drawableObject.AccentColour.GetBoundCopy();
             accentColour.BindValueChanged(accent => updateAccentColour(skin, accent.NewValue), true);
 
+            SnakingOut.BindTo(snakingOut);
             config?.BindWith(OsuRulesetSetting.SnakingInSliders, SnakingIn);
-            config?.BindWith(OsuRulesetSetting.SnakingOutSliders, SnakingOut);
+            config?.BindWith(OsuRulesetSetting.SnakingOutSliders, snakingOut);
 
             BorderSize = skin.GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.SliderBorderSize)?.Value ?? 1;
             BorderColour = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderBorder)?.Value ?? Color4.White;
+
+            drawableObject.HitObjectApplied += onHitObjectApplied;
+            onHitObjectApplied(drawableObject);
+        }
+
+        private void onHitObjectApplied(DrawableHitObject obj)
+        {
+            var drawableSlider = (DrawableSlider)obj;
+            if (drawableSlider.HitObject == null)
+                return;
+
+            if (!drawableSlider.HitObject.HeadCircle.TrackFollowCircle)
+            {
+                // When not tracking the follow circle, force the path to not snake out as it looks better that way.
+                SnakingOut.UnbindFrom(snakingOut);
+                SnakingOut.Value = false;
+            }
         }
 
         private void updateAccentColour(ISkinSource skin, Color4 defaultAccentColour)
