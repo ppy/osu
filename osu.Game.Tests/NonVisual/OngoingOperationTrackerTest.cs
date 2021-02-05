@@ -3,8 +3,12 @@
 
 using System;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Game.Screens;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Tests.Visual;
 
@@ -57,6 +61,46 @@ namespace osu.Game.Tests.NonVisual
             AddStep("dispose tracker", () => tracker.Expire());
             AddStep("end operation", () => operation.Dispose());
             AddAssert("operation is ended", () => !operationInProgress.Value);
+        }
+
+        [Test]
+        public void TestOperationDisposalAfterScreenExit()
+        {
+            TestScreenWithTracker screen = null;
+            OsuScreenStack stack;
+            IDisposable operation = null;
+
+            AddStep("create screen with tracker", () =>
+            {
+                Child = stack = new OsuScreenStack
+                {
+                    RelativeSizeAxes = Axes.Both
+                };
+
+                stack.Push(screen = new TestScreenWithTracker());
+            });
+            AddUntilStep("wait for loaded", () => screen.IsLoaded);
+
+            AddStep("begin operation", () => operation = screen.OngoingOperationTracker.BeginOperation());
+            AddAssert("operation in progress", () => screen.OngoingOperationTracker.InProgress.Value);
+
+            AddStep("dispose after screen exit", () =>
+            {
+                screen.Exit();
+                operation.Dispose();
+            });
+            AddAssert("operation ended", () => !screen.OngoingOperationTracker.InProgress.Value);
+        }
+
+        private class TestScreenWithTracker : OsuScreen
+        {
+            public OngoingOperationTracker OngoingOperationTracker { get; private set; }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                InternalChild = OngoingOperationTracker = new OngoingOperationTracker();
+            }
         }
     }
 }
