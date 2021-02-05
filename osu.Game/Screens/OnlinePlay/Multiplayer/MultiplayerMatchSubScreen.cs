@@ -270,7 +270,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             BeatmapAvailability.BindValueChanged(updateBeatmapAvailability, true);
             UserMods.BindValueChanged(onUserModsChanged);
 
-            client.RoomUpdated += onRoomUpdated;
             client.LoadRequested += onLoadRequested;
 
             isConnected = client.IsConnected.GetBoundCopy();
@@ -323,24 +322,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             client.ChangeUserMods(mods.NewValue);
         }
 
-        private void updateBeatmapAvailability(ValueChangedEvent<BeatmapAvailability> _ = null)
+        private void updateBeatmapAvailability(ValueChangedEvent<BeatmapAvailability> availability)
         {
             if (client.Room == null)
                 return;
 
-            client.ChangeBeatmapAvailability(BeatmapAvailability.Value);
-
-            if (client.LocalUser?.State == MultiplayerUserState.Ready)
-                client.ChangeState(MultiplayerUserState.Idle);
-        }
-
-        private void onRoomUpdated()
-        {
-            if (client.Room == null)
-                return;
-
-            if (client.LocalUser?.BeatmapAvailability.Equals(BeatmapAvailability.Value) == false)
-                updateBeatmapAvailability();
+            client.ChangeBeatmapAvailability(availability.NewValue);
         }
 
         private void onReadyClick()
@@ -392,10 +379,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.Dispose(isDisposing);
 
             if (client != null)
-            {
                 client.LoadRequested -= onLoadRequested;
-                client.RoomUpdated -= onRoomUpdated;
-            }
         }
 
         private class UserModSelectOverlay : ModSelectOverlay
