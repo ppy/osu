@@ -328,6 +328,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return;
 
             client.ChangeBeatmapAvailability(availability.NewValue);
+
+            // while this flow is handled server-side, this covers the edge case of the local user being in a ready state and then deleting the current beatmap.
+            if (client.LocalUser?.State == MultiplayerUserState.Ready)
+                client.ChangeState(MultiplayerUserState.Idle);
         }
 
         private void onReadyClick()
