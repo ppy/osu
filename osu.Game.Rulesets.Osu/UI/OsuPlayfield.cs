@@ -31,7 +31,6 @@ namespace osu.Game.Rulesets.Osu.UI
         private readonly ProxyContainer spinnerProxies;
         private readonly JudgementContainer<DrawableOsuJudgement> judgementLayer;
         private readonly FollowPointRenderer followPoints;
-        private readonly IHitPolicy hitPolicy;
 
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
 
@@ -54,17 +53,27 @@ namespace osu.Game.Rulesets.Osu.UI
                 approachCircles = new ProxyContainer { RelativeSizeAxes = Axes.Both },
             };
 
-            hitPolicy = new ObjectOrderedHitPolicy();
-            hitPolicy.SetHitObjects(HitObjectContainer.AliveObjects);
+            HitPolicy = new ObjectOrderedHitPolicy();
 
             var hitWindows = new OsuHitWindows();
-
             foreach (var result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r > HitResult.None && hitWindows.IsHitResultAllowed(r)))
                 poolDictionary.Add(result, new DrawableJudgementPool(result, onJudgmentLoaded));
 
             AddRangeInternal(poolDictionary.Values);
 
             NewResult += onNewResult;
+        }
+
+        private IHitPolicy hitPolicy;
+
+        public IHitPolicy HitPolicy
+        {
+            get => hitPolicy;
+            set
+            {
+                hitPolicy = value ?? throw new ArgumentNullException(nameof(value));
+                hitPolicy.SetHitObjects(HitObjectContainer.AliveObjects);
+            }
         }
 
         protected override void OnNewDrawableHitObject(DrawableHitObject drawable)
