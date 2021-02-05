@@ -3,13 +3,11 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osuTK;
 
@@ -20,7 +18,6 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
         public const float HEIGHT = 50;
 
         public Action OnStart;
-        public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
         private readonly Drawable background;
 
@@ -37,7 +34,6 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Size = new Vector2(600, 50),
-                    SelectedItem = { BindTarget = SelectedItem },
                     Action = () => OnStart?.Invoke()
                 }
             };
