@@ -50,10 +50,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     slider.IgnoreJudgement = !DisableSliderHeadJudgement.Value;
 
                     foreach (var head in slider.NestedHitObjects.OfType<SliderHeadCircle>())
-                    {
-                        head.TrackFollowCircle = !DisableSliderHeadTracking.Value;
                         head.JudgeAsNormalHitCircle = !DisableSliderHeadJudgement.Value;
-                    }
 
                     break;
             }
@@ -71,8 +68,16 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             foreach (var obj in drawables)
             {
-                if (obj is DrawableSlider slider)
-                    slider.Ball.TrackVisualSize = !DisableExactFollowCircleTracking.Value;
+                switch (obj)
+                {
+                    case DrawableSlider slider:
+                        slider.Ball.TrackVisualSize = !DisableExactFollowCircleTracking.Value;
+                        break;
+
+                    case DrawableSliderHead head:
+                        head.TrackFollowCircle = !DisableSliderHeadTracking.Value;
+                        break;
+                }
             }
         }
     }

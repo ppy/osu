@@ -22,6 +22,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public override bool DisplayResult => HitObject?.JudgeAsNormalHitCircle ?? base.DisplayResult;
 
+        /// <summary>
+        /// Makes this <see cref="DrawableSliderHead"/> track the follow circle when the start time is reached.
+        /// If <c>false</c>, this <see cref="DrawableSliderHead"/> will be pinned to its initial position in the slider.
+        /// </summary>
+        public bool TrackFollowCircle = true;
+
         private readonly IBindable<int> pathVersion = new Bindable<int>();
 
         protected override OsuSkinComponents CirclePieceComponent => OsuSkinComponents.SliderHeadHitCircle;
@@ -66,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Debug.Assert(Slider != null);
             Debug.Assert(HitObject != null);
 
-            if (HitObject.TrackFollowCircle)
+            if (TrackFollowCircle)
             {
                 double completionProgress = Math.Clamp((Time.Current - Slider.StartTime) / Slider.Duration, 0, 1);
 
