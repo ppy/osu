@@ -251,11 +251,7 @@ namespace osu.Game.Screens.Select
                                     Children = new Drawable[]
                                     {
                                         BeatmapOptions = new BeatmapOptionsOverlay(),
-                                        ModSelect = new ModSelectOverlay
-                                        {
-                                            Origin = Anchor.BottomCentre,
-                                            Anchor = Anchor.BottomCentre,
-                                        }
+                                        ModSelect = CreateModSelectOverlay()
                                     }
                                 }
                             }
@@ -304,6 +300,8 @@ namespace osu.Game.Screens.Select
                 });
             }
         }
+
+        protected virtual ModSelectOverlay CreateModSelectOverlay() => new SoloModSelectOverlay();
 
         protected virtual void ApplyFilterToCarousel(FilterCriteria criteria)
         {
