@@ -2,14 +2,18 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModClassic : Mod, IApplicableToHitObject
+    public class OsuModClassic : Mod, IApplicableToHitObject, IApplicableToDrawableRuleset<OsuHitObject>
     {
         public override string Name => "Classic";
 
@@ -23,21 +27,38 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override bool Ranked => false;
 
+        [SettingSource("Disable slider head judgement", "Scores sliders proportionally to the number of ticks hit.")]
+        public Bindable<bool> DisableSliderHeadJudgement { get; } = new BindableBool(true);
+
+        [SettingSource("Disable slider head tracking", "Pins slider heads at their starting position, regardless of time.")]
+        public Bindable<bool> DisableSliderHeadTracking { get; } = new BindableBool(true);
+
+        [SettingSource("Disable note lock lenience", "Applies note lock to the full hit window.")]
+        public Bindable<bool> DisableLenientNoteLock { get; } = new BindableBool(true);
+
         public void ApplyToHitObject(HitObject hitObject)
         {
             switch (hitObject)
             {
                 case Slider slider:
-                    slider.IgnoreJudgement = false;
+                    slider.IgnoreJudgement = !DisableSliderHeadJudgement.Value;
 
                     foreach (var head in slider.NestedHitObjects.OfType<SliderHeadCircle>())
                     {
-                        head.TrackFollowCircle = false;
-                        head.JudgeAsNormalHitCircle = false;
+                        head.TrackFollowCircle = !DisableSliderHeadTracking.Value;
+                        head.JudgeAsNormalHitCircle = !DisableSliderHeadJudgement.Value;
                     }
 
                     break;
             }
+        }
+
+        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
+        {
+            var osuRuleset = (DrawableOsuRuleset)drawableRuleset;
+
+            if (!DisableLenientNoteLock.Value)
+                osuRuleset.Playfield.HitPolicy = new ObjectOrderedHitPolicy();
         }
     }
 }
