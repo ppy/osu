@@ -59,6 +59,8 @@ namespace osu.Game.Screens.Play
         // We are managing our own adjustments (see OnEntering/OnExiting).
         public override bool AllowRateAdjustments => false;
 
+        private readonly IBindable<bool> gameActive = new Bindable<bool>(true);
+
         private readonly Bindable<bool> samplePlaybackDisabled = new Bindable<bool>();
 
         /// <summary>
@@ -154,6 +156,9 @@ namespace osu.Game.Screens.Play
             // replays should never be recorded or played back when autoplay is enabled
             if (!Mods.Value.Any(m => m is ModAutoplay))
                 PrepareReplay();
+
+            // needs to be bound here as the last binding, otherwise starting a replay while not focused causes player to exit.
+            gameActive.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
         }
 
         [CanBeNull]
@@ -170,7 +175,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio, OsuConfigManager config, OsuGame game)
+        private void load(AudioManager audio, OsuConfigManager config, OsuGame game, OsuGameBase gameBase)
         {
             Mods.Value = base.Mods.Value.Select(m => m.CreateCopy()).ToArray();
 
@@ -185,6 +190,8 @@ namespace osu.Game.Screens.Play
             sampleRestart = audio.Samples.Get(@"Gameplay/restart");
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
+
+            gameActive.BindTo(gameBase.IsActive);
 
             if (game != null)
                 LocalUserPlaying.BindTo(game.LocalUserPlaying);
@@ -420,10 +427,14 @@ namespace osu.Game.Screens.Play
             samplePlaybackDisabled.Value = DrawableRuleset.FrameStableClock.IsCatchingUp.Value || GameplayClockContainer.GameplayClock.IsPaused.Value;
         }
 
-        private void updatePauseOnFocusLostState() =>
-            HUDOverlay.HoldToQuit.PauseOnFocusLost = PauseOnFocusLost
-                                                     && !DrawableRuleset.HasReplayLoaded.Value
-                                                     && !breakTracker.IsBreakTime.Value;
+        private void updatePauseOnFocusLostState()
+        {
+            if (!IsLoaded || !PauseOnFocusLost || DrawableRuleset.HasReplayLoaded.Value || breakTracker.IsBreakTime.Value)
+                return;
+
+            if (gameActive.Value == false)
+                performUserRequestedExit();
+        }
 
         private IBeatmap loadPlayableBeatmap()
         {
