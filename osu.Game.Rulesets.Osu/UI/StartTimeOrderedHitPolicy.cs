@@ -18,11 +18,11 @@ namespace osu.Game.Rulesets.Osu.UI
     /// <item><description>The hit causes all previous <see cref="HitObject"/>s to missed otherwise.</description></item>
     /// </list>
     /// </summary>
-    public class OrderedHitPolicy
+    public class StartTimeOrderedHitPolicy
     {
         private readonly HitObjectContainer hitObjectContainer;
 
-        public OrderedHitPolicy(HitObjectContainer hitObjectContainer)
+        public StartTimeOrderedHitPolicy(HitObjectContainer hitObjectContainer)
         {
             this.hitObjectContainer = hitObjectContainer;
         }
