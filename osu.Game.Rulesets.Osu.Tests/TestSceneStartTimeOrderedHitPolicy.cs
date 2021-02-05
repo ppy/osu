@@ -169,7 +169,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             addJudgementAssert(hitObjects[0], HitResult.Great);
             addJudgementAssert(hitObjects[1], HitResult.Great);
             addJudgementOffsetAssert(hitObjects[0], -200); // time_first_circle - 200
-            addJudgementOffsetAssert(hitObjects[0], -200); // time_second_circle - first_circle_time - 100
+            addJudgementOffsetAssert(hitObjects[1], -200); // time_second_circle - first_circle_time - 100
         }
 
         /// <summary>
