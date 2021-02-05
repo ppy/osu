@@ -121,7 +121,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         public bool IgnoreJudgement = true;
 
         [JsonIgnore]
-        public HitCircle HeadCircle { get; protected set; }
+        public SliderHeadCircle HeadCircle { get; protected set; }
 
         [JsonIgnore]
         public SliderTailCircle TailCircle { get; protected set; }
