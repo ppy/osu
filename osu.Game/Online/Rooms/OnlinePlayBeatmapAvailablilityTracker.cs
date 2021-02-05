@@ -36,7 +36,15 @@ namespace osu.Game.Online.Rooms
         {
             base.LoadComplete();
 
-            SelectedItem.BindValueChanged(item => Model.Value = item.NewValue?.Beatmap.Value.BeatmapSet, true);
+            SelectedItem.BindValueChanged(item =>
+            {
+                // the underlying playlist is regularly cleared for maintenance purposes (things which probably need to be fixed eventually).
+                // to avoid exposing a state change when there may actually be none, ignore all nulls for now.
+                if (item.NewValue == null)
+                    return;
+
+                Model.Value = item.NewValue.Beatmap.Value.BeatmapSet;
+            }, true);
         }
 
         protected override bool VerifyDatabasedModel(BeatmapSetInfo databasedSet)
