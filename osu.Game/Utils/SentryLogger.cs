@@ -23,7 +23,7 @@ namespace osu.Game.Utils
 
             var options = new SentryOptions
             {
-                Dsn = new Dsn("https://5e342cd55f294edebdc9ad604d28bbd3@sentry.io/1255255"),
+                Dsn = "https://5e342cd55f294edebdc9ad604d28bbd3@sentry.io/1255255",
                 Release = game.Version
             };
 

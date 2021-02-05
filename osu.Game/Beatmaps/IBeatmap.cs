@@ -24,7 +24,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// The control points in this beatmap.
         /// </summary>
-        ControlPointInfo ControlPointInfo { get; }
+        ControlPointInfo ControlPointInfo { get; set; }
 
         /// <summary>
         /// The breaks in this beatmap.
