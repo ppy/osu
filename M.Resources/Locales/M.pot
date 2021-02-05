@@ -20,6 +20,27 @@ msgstr ""
 msgid "generic.back"
 msgstr ""
 
+msgid "generic.selectAll"
+msgstr ""
+
+msgid "generic.deSelectAll"
+msgstr ""
+
+msgid "generic.select"
+msgstr ""
+
+msgid "generic.chat"
+msgstr ""
+
+msgid "generic.unlimited"
+msgstr ""
+
+msgid "generic.create"
+msgstr ""
+
+msgid "generic.leaderboard"
+msgstr ""
+
 #v2 主菜单
 msgid "screen.menu.buttonSystem.solo"
 msgstr ""
@@ -134,6 +155,18 @@ msgstr ""
 msgid "screen.multi.generic.lounge"
 msgstr ""
 
+msgid "screen.multi.generic.room"
+msgstr ""
+
+msgid "screen.multi.generic.newRoom"
+msgstr ""
+
+msgid "screen.multi.generic.playlist"
+msgstr ""
+
+msgid "screen.multi.generic.participants"
+msgstr ""
+
 #v2 多人游戏 RoomStatusFilter
 msgid "screen.multi.lounge.components.roomStatusFilter.open"
 msgstr ""
@@ -155,6 +188,65 @@ msgid "screen.multi.multiplayer.createMultiplayerMatchButton.text"
 msgstr ""
 
 msgid "screen.multi.multiplayer.match.multiplayerMatchHeader.openSettingsButton.text"
+msgstr ""
+
+msgid "screen.multi.multiplayer.match.beatmapOverlinedHeaderText"
+msgstr ""
+
+msgid "screen.multi.multiplayer.match.extraModsOverlinedHeaderText"
+msgstr ""
+
+#song selection
+msgid "screen.multi.onlinePlaySongSelect.ShortTitle"
+msgstr ""
+
+#Maximum attempts: {attempts.NewValue:N0}
+msgid "screen.multi.components.roomLocalUserInfo.maxAttempts"
+msgstr ""
+
+msgid "screen.multi.playlistSettings.roomName"
+msgstr ""
+
+msgid "screen.multi.playlistSettings.duration"
+msgstr ""
+
+#Allowed attempts (across all playlist items)
+msgid "screen.multi.playlistSettings.allowedAttempts"
+msgstr ""
+
+msgid "screen.multi.playlistSettings.visibility"
+msgstr ""
+
+msgid "screen.multi.playlistSettings.maxParticipants"
+msgstr ""
+
+#password (optional)
+msgid "screen.multi.playlistSettings.password"
+msgstr ""
+
+msgid "screen.multi.playlistSettings.playlist.edit"
+msgstr ""
+
+#Length: {0}
+msgid "screen.multi.playlistSettings.length"
+msgstr ""
+
+msgid "screen.multi.participantPanel.giveHost"
+msgstr ""
+
+msgid "screen.multi.playlistsRoomSubScreen.newPlaylist"
+msgstr ""
+
+msgid "screen.multi.readyButton.ready"
+msgstr ""
+
+msgid "screen.multi.readyButton.countText"
+msgstr ""
+
+msgid "screen.multi.readyButton.startMatch"
+msgstr ""
+
+msgid "screen.multi.readyButton.waitingForHost"
 msgstr ""
 
 # {0}人参与
@@ -304,40 +396,10 @@ msgstr ""
 msgid "New playlist"
 msgstr ""
 
-msgid "DURATION"
-msgstr ""
-
-msgid "ROOM NAME"
-msgstr ""
-
-msgid "PLAYLIST"
-msgstr ""
-
-msgid "ROOM VISIBILITY"
-msgstr ""
-
-msgid "GAME TYPE"
-msgstr ""
-
-msgid "MAX PARTICIPANTS"
-msgstr ""
-
-msgid "PASSWORD (OPTIONAL)"
-msgstr ""
-
 msgid "Select beatmap"
 msgstr ""
 
-msgid "Edit playlist"
-msgstr ""
-
-msgid "Length: {0}"
-msgstr ""
-
 msgid "Add new playlist entry"
-msgstr ""
-
-msgid "Create"
 msgstr ""
 
 msgid "Song Selection"
@@ -356,9 +418,6 @@ msgid "Create playlist"
 msgstr ""
 
 msgid "Leaderboard"
-msgstr ""
-
-msgid "Chat"
 msgstr ""
 
 msgid "Start"

@@ -1,9 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using MessagePack;
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
@@ -17,14 +16,14 @@ using osu.Game.Rulesets.UI;
 namespace osu.Game.Tests.Online
 {
     [TestFixture]
-    public class TestAPIModSerialization
+    public class TestAPIModMessagePackSerialization
     {
         [Test]
         public void TestAcronymIsPreserved()
         {
             var apiMod = new APIMod(new TestMod());
 
-            var deserialized = JsonConvert.DeserializeObject<APIMod>(JsonConvert.SerializeObject(apiMod));
+            var deserialized = MessagePackSerializer.Deserialize<APIMod>(MessagePackSerializer.Serialize(apiMod));
 
             Assert.That(deserialized.Acronym, Is.EqualTo(apiMod.Acronym));
         }
@@ -34,7 +33,7 @@ namespace osu.Game.Tests.Online
         {
             var apiMod = new APIMod(new TestMod { TestSetting = { Value = 2 } });
 
-            var deserialized = JsonConvert.DeserializeObject<APIMod>(JsonConvert.SerializeObject(apiMod));
+            var deserialized = MessagePackSerializer.Deserialize<APIMod>(MessagePackSerializer.Serialize(apiMod));
 
             Assert.That(deserialized.Settings, Contains.Key("test_setting").With.ContainValue(2.0));
         }
@@ -44,7 +43,7 @@ namespace osu.Game.Tests.Online
         {
             var apiMod = new APIMod(new TestMod { TestSetting = { Value = 2 } });
 
-            var deserialized = JsonConvert.DeserializeObject<APIMod>(JsonConvert.SerializeObject(apiMod));
+            var deserialized = MessagePackSerializer.Deserialize<APIMod>(MessagePackSerializer.Serialize(apiMod));
             var converted = (TestMod)deserialized.ToMod(new TestRuleset());
 
             Assert.That(converted.TestSetting.Value, Is.EqualTo(2));
@@ -61,7 +60,7 @@ namespace osu.Game.Tests.Online
                 FinalRate = { Value = 0.25 }
             });
 
-            var deserialised = JsonConvert.DeserializeObject<APIMod>(JsonConvert.SerializeObject(apiMod));
+            var deserialised = MessagePackSerializer.Deserialize<APIMod>(MessagePackSerializer.Serialize(apiMod));
             var converted = (TestModTimeRamp)deserialised.ToMod(new TestRuleset());
 
             Assert.That(converted.AdjustPitch.Value, Is.EqualTo(false));
@@ -77,11 +76,11 @@ namespace osu.Game.Tests.Online
                 new TestModTimeRamp(),
             };
 
-            public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => throw new NotImplementedException();
+            public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => throw new System.NotImplementedException();
 
-            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => throw new NotImplementedException();
+            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => throw new System.NotImplementedException();
 
-            public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => throw new NotImplementedException();
+            public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => throw new System.NotImplementedException();
 
             public override string Description { get; } = string.Empty;
             public override string ShortName { get; } = string.Empty;

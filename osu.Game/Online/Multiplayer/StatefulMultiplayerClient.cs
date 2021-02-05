@@ -21,6 +21,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Users;
 using osu.Game.Utils;
 
@@ -102,7 +103,7 @@ namespace osu.Game.Online.Multiplayer
                 // clean up local room state on server disconnect.
                 if (!connected.NewValue && Room != null)
                 {
-                    Logger.Log("Connection to multiplayer server was lost.", LoggingTarget.Runtime, LogLevel.Important);
+                    Logger.Log("与多人服务器断开连接。", LoggingTarget.Runtime, LogLevel.Important);
                     LeaveRoom();
                 }
             });
@@ -191,7 +192,8 @@ namespace osu.Game.Online.Multiplayer
                 BeatmapID = item.GetOr(existingPlaylistItem).BeatmapID,
                 BeatmapChecksum = item.GetOr(existingPlaylistItem).Beatmap.Value.MD5Hash,
                 RulesetID = item.GetOr(existingPlaylistItem).RulesetID,
-                Mods = item.HasValue ? item.Value.AsNonNull().RequiredMods.Select(m => new APIMod(m)).ToList() : Room.Settings.Mods
+                RequiredMods = item.HasValue ? item.Value.AsNonNull().RequiredMods.Select(m => new APIMod(m)).ToList() : Room.Settings.RequiredMods,
+                AllowedMods = item.HasValue ? item.Value.AsNonNull().AllowedMods.Select(m => new APIMod(m)).ToList() : Room.Settings.AllowedMods
             });
         }
 
@@ -228,6 +230,14 @@ namespace osu.Game.Online.Multiplayer
         public abstract Task ChangeState(MultiplayerUserState newState);
 
         public abstract Task ChangeBeatmapAvailability(BeatmapAvailability newBeatmapAvailability);
+
+        /// <summary>
+        /// Change the local user's mods in the currently joined room.
+        /// </summary>
+        /// <param name="newMods">The proposed new mods, excluding any required by the room itself.</param>
+        public Task ChangeUserMods(IEnumerable<Mod> newMods) => ChangeUserMods(newMods.Select(m => new APIMod(m)).ToList());
+
+        public abstract Task ChangeUserMods(IEnumerable<APIMod> newMods);
 
         public abstract Task StartMatch();
 
@@ -377,6 +387,27 @@ namespace osu.Game.Online.Multiplayer
             return Task.CompletedTask;
         }
 
+        public Task UserModsChanged(int userId, IEnumerable<APIMod> mods)
+        {
+            if (Room == null)
+                return Task.CompletedTask;
+
+            Scheduler.Add(() =>
+            {
+                var user = Room?.Users.SingleOrDefault(u => u.UserID == userId);
+
+                // errors here are not critical - user mods are mostly for display.
+                if (user == null)
+                    return;
+
+                user.Mods = mods;
+
+                RoomUpdated?.Invoke();
+            }, false);
+
+            return Task.CompletedTask;
+        }
+
         Task IMultiplayerClient.LoadRequested()
         {
             if (Room == null)
@@ -500,7 +531,8 @@ namespace osu.Game.Online.Multiplayer
             beatmap.MD5Hash = settings.BeatmapChecksum;
 
             var ruleset = rulesets.GetRuleset(settings.RulesetID).CreateInstance();
-            var mods = settings.Mods.Select(m => m.ToMod(ruleset));
+            var mods = settings.RequiredMods.Select(m => m.ToMod(ruleset));
+            var allowedMods = settings.AllowedMods.Select(m => m.ToMod(ruleset));
 
             PlaylistItem playlistItem = new PlaylistItem
             {
@@ -510,6 +542,7 @@ namespace osu.Game.Online.Multiplayer
             };
 
             playlistItem.RequiredMods.AddRange(mods);
+            playlistItem.AllowedMods.AddRange(allowedMods);
 
             apiRoom.Playlist.Clear(); // Clearing should be unnecessary, but here for sanity.
             apiRoom.Playlist.Add(playlistItem);

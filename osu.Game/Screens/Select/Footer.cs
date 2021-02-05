@@ -32,15 +32,12 @@ namespace osu.Game.Screens.Select
         /// <param name="overlay">The <see cref="OverlayContainer"/> to be toggled by this button.</param>
         public void AddButton(FooterButton button, OverlayContainer overlay)
         {
-            overlays.Add(overlay);
-            button.Action = () => showOverlay(overlay);
+            if (overlay != null)
+            {
+                overlays.Add(overlay);
+                button.Action = () => showOverlay(overlay);
+            }
 
-            AddButton(button);
-        }
-
-        /// <param name="button">Button to be added.</param>
-        public void AddButton(FooterButton button)
-        {
             button.Hovered = updateModeLight;
             button.HoverLost = updateModeLight;
 

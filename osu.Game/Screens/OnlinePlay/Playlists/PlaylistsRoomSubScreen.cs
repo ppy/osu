@@ -13,7 +13,6 @@ using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Match.Components;
-using osu.Game.Screens.Select;
 using osu.Game.Users;
 using Footer = osu.Game.Screens.OnlinePlay.Match.Components.Footer;
 
@@ -23,7 +22,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
     {
         public override string Title { get; }
 
-        public override string ShortTitle => "playlist";
+        public override string ShortTitle => "screen.multi.generic.playlist";
 
         [Resolved(typeof(Room), nameof(Room.RoomID))]
         private Bindable<int?> roomId { get; set; }
@@ -37,14 +36,14 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         public PlaylistsRoomSubScreen(Room room)
         {
-            Title = room.RoomID.Value == null ? "New playlist" : room.Name.Value;
+            Title = room.RoomID.Value == null ? "screen.multi.playlistsRoomSubScreen.newPlaylist" : room.Name.Value;
             Activity.Value = new UserActivity.InLobby(room);
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChildren = new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
                 mainContent = new GridContainer
                 {
@@ -76,7 +75,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                         new Drawable[] { new Match.Components.Header() },
                                         new Drawable[]
                                         {
-                                            participantsHeader = new OverlinedHeader("Participants")
+                                            participantsHeader = new OverlinedHeader("screen.multi.generic.participants")
                                             {
                                                 ShowLine = false
                                             }
@@ -141,9 +140,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                             RelativeSizeAxes = Axes.Both,
                                                             Content = new[]
                                                             {
-                                                                new Drawable[] { new OverlinedHeader("Leaderboard"), },
+                                                                new Drawable[] { new OverlinedHeader("generic.leaderboard"), },
                                                                 new Drawable[] { leaderboard = new MatchLeaderboard { RelativeSizeAxes = Axes.Both }, },
-                                                                new Drawable[] { new OverlinedHeader("Chat"), },
+                                                                new Drawable[] { new OverlinedHeader("generic.chat"), },
                                                                 new Drawable[] { new MatchChatDisplay { RelativeSizeAxes = Axes.Both } }
                                                             },
                                                             RowDimensions = new[]
@@ -175,7 +174,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                             new Footer
                             {
                                 OnStart = onStart,
-                                SelectedItem = { BindTarget = SelectedItem }
                             }
                         }
                     },
@@ -188,10 +186,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 settingsOverlay = new PlaylistsMatchSettingsOverlay
                 {
                     RelativeSizeAxes = Axes.Both,
-                    EditPlaylist = () => this.Push(new MatchSongSelect()),
+                    EditPlaylist = () => this.Push(new PlaylistsSongSelect()),
                     State = { Value = roomId.Value == null ? Visibility.Visible : Visibility.Hidden }
                 }
-            };
+            });
 
             if (roomId.Value == null)
             {

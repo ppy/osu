@@ -9,11 +9,11 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
 using osuTK;
 
@@ -21,8 +21,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
     public class MultiplayerReadyButton : MultiplayerRoomComposite
     {
-        public Bindable<PlaylistItem> SelectedItem => button.SelectedItem;
-
         public Action OnReadyClick
         {
             set => button.Action = value;
@@ -82,24 +80,24 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             int newCountReady = Room.Users.Count(u => u.State == MultiplayerUserState.Ready);
 
-            string countText = $"({newCountReady} / {Room.Users.Count} ready)";
+            string countText = $"({newCountReady} / {Room.Users.Count} 已准备)";
 
             switch (localUser.State)
             {
                 case MultiplayerUserState.Idle:
-                    button.Text = "Ready";
+                    button.Text = "screen.multi.readyButton.ready";
                     updateButtonColour(true);
                     break;
 
                 case MultiplayerUserState.Ready:
                     if (Room?.Host?.Equals(localUser) == true)
                     {
-                        button.Text = $"Start match {countText}";
+                        button.Text = new LocalisedString("screen.multi.readyButton.startMatch", countText);
                         updateButtonColour(true);
                     }
                     else
                     {
-                        button.Text = $"Waiting for host... {countText}";
+                        button.Text = new LocalisedString("screen.multi.readyButton.waitingForHost", countText);
                         updateButtonColour(false);
                     }
 

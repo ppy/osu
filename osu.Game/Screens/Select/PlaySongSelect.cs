@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Select
         {
             BeatmapOptions.AddButton(@"编辑", @"该谱面", FontAwesome.Solid.PencilAlt, colours.Yellow, () => Edit());
 
-            Footer.AddButton(new FooterButtonOpenInMvis { Action = openInMvis });
+            Footer.AddButton(new FooterButtonOpenInMvis { Action = openInMvis }, null);
 
             ((PlayBeatmapDetailArea)BeatmapDetails).Leaderboard.ScoreSelected += PresentScore;
         }

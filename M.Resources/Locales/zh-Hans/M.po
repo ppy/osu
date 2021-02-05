@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mfosu!\n"
 "POT-Creation-Date: 2020-12-04 02:25+0800\n"
-"PO-Revision-Date: 2021-01-29 16:03+0800\n"
+"PO-Revision-Date: 2021-02-06 02:18+0800\n"
 "Last-Translator: \n"
 "Language-Team: MATRIX-feather\n"
 "Language: zh_CN\n"
@@ -19,6 +19,27 @@ msgstr "退出"
 
 msgid "generic.back"
 msgstr "返回"
+
+msgid "generic.selectAll"
+msgstr "全选"
+
+msgid "generic.deSelectAll"
+msgstr "重置"
+
+msgid "generic.select"
+msgstr "选择"
+
+msgid "generic.chat"
+msgstr "聊天"
+
+msgid "generic.unlimited"
+msgstr "无限制"
+
+msgid "generic.create"
+msgstr "创建"
+
+msgid "generic.leaderboard"
+msgstr "排行榜"
 
 # v2 主菜单
 msgid "screen.menu.buttonSystem.solo"
@@ -138,6 +159,18 @@ msgstr "房主为 "
 msgid "screen.multi.generic.lounge"
 msgstr "大厅"
 
+msgid "screen.multi.generic.room"
+msgstr "房间"
+
+msgid "screen.multi.generic.newRoom"
+msgstr "新房间"
+
+msgid "screen.multi.generic.playlist"
+msgstr "游玩列表"
+
+msgid "screen.multi.generic.participants"
+msgstr "参与人数"
+
 # v2 多人游戏 RoomStatusFilter
 msgid "screen.multi.lounge.components.roomStatusFilter.open"
 msgstr "开放中的房间"
@@ -162,6 +195,65 @@ msgid ""
 "screen.multi.multiplayer.match.multiplayerMatchHeader."
 "openSettingsButton.text"
 msgstr "打开设置"
+
+msgid "screen.multi.multiplayer.match.beatmapOverlinedHeaderText"
+msgstr "谱面"
+
+msgid "screen.multi.multiplayer.match.extraModsOverlinedHeaderText"
+msgstr "额外Mods"
+
+# song selection
+msgid "screen.multi.onlinePlaySongSelect.ShortTitle"
+msgstr "歌曲选择"
+
+# Maximum attempts: {attempts.NewValue:N0}
+msgid "screen.multi.components.roomLocalUserInfo.maxAttempts"
+msgstr "最大尝试次数: {0}"
+
+msgid "screen.multi.playlistSettings.roomName"
+msgstr "房间名"
+
+msgid "screen.multi.playlistSettings.duration"
+msgstr "市场"
+
+# Allowed attempts (across all playlist items)
+msgid "screen.multi.playlistSettings.allowedAttempts"
+msgstr "最大尝试次数（在所有游玩列表项目之间）"
+
+msgid "screen.multi.playlistSettings.visibility"
+msgstr "可见度"
+
+msgid "screen.multi.playlistSettings.maxParticipants"
+msgstr "最大参与人数"
+
+# password (optional)
+msgid "screen.multi.playlistSettings.password"
+msgstr "密码（可选）"
+
+msgid "screen.multi.playlistSettings.playlist.edit"
+msgstr "编辑游玩列表"
+
+# Length: {0}
+msgid "screen.multi.playlistSettings.length"
+msgstr "长度：{0}"
+
+msgid "screen.multi.participantPanel.giveHost"
+msgstr "移交房主权限"
+
+msgid "screen.multi.playlistsRoomSubScreen.newPlaylist"
+msgstr "创建新游玩列表"
+
+msgid "screen.multi.readyButton.ready"
+msgstr "准备"
+
+msgid "screen.multi.readyButton.countText"
+msgstr "({0} / {1} 已准备)"
+
+msgid "screen.multi.readyButton.startMatch"
+msgstr "开始 {0}"
+
+msgid "screen.multi.readyButton.waitingForHost"
+msgstr "等待房主... {0}"
 
 # {0}人参与
 msgid "screen.multi.lounge.components.participantInfo.summary.text"
@@ -311,41 +403,11 @@ msgstr "新房间"
 msgid "New playlist"
 msgstr "新游玩列表"
 
-msgid "DURATION"
-msgstr "时长"
-
-msgid "ROOM NAME"
-msgstr "房间名"
-
-msgid "PLAYLIST"
-msgstr "游玩列表"
-
-msgid "ROOM VISIBILITY"
-msgstr "房间可见度"
-
-msgid "GAME TYPE"
-msgstr "游戏类型"
-
-msgid "MAX PARTICIPANTS"
-msgstr "最大参与人数"
-
-msgid "PASSWORD (OPTIONAL)"
-msgstr "密码 (可选）"
-
 msgid "Select beatmap"
 msgstr "选择谱面"
 
-msgid "Edit playlist"
-msgstr "编辑游玩列表"
-
-msgid "Length: {0}"
-msgstr "长度: {0}"
-
 msgid "Add new playlist entry"
 msgstr "添加新的游玩列表项目"
-
-msgid "Create"
-msgstr "创建"
 
 msgid "Song Selection"
 msgstr "歌曲选择"
@@ -364,9 +426,6 @@ msgstr "创建游玩列表"
 
 msgid "Leaderboard"
 msgstr "排行榜"
-
-msgid "Chat"
-msgstr "聊天"
 
 msgid "Start"
 msgstr "开始"
@@ -1346,6 +1405,42 @@ msgstr ""
 
 msgid "等待着您~"
 msgstr ""
+
+#~ msgid "screen.multi.playlistSettings.playlist"
+#~ msgstr "游玩列表"
+
+#~ msgid "DURATION"
+#~ msgstr "时长"
+
+#~ msgid "ROOM NAME"
+#~ msgstr "房间名"
+
+#~ msgid "PLAYLIST"
+#~ msgstr "游玩列表"
+
+#~ msgid "ROOM VISIBILITY"
+#~ msgstr "房间可见度"
+
+#~ msgid "GAME TYPE"
+#~ msgstr "游戏类型"
+
+#~ msgid "MAX PARTICIPANTS"
+#~ msgstr "最大参与人数"
+
+#~ msgid "PASSWORD (OPTIONAL)"
+#~ msgstr "密码 (可选）"
+
+#~ msgid "Edit playlist"
+#~ msgstr "编辑游玩列表"
+
+#~ msgid "Length: {0}"
+#~ msgstr "长度: {0}"
+
+#~ msgid "Create"
+#~ msgstr "创建"
+
+#~ msgid "Chat"
+#~ msgstr "聊天"
 
 #~ msgid "settings.online.integration.header"
 #~ msgstr "集成"

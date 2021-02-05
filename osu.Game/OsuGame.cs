@@ -476,6 +476,10 @@ namespace osu.Game
         {
             updateModDefaults();
 
+            // a lease may be taken on the mods bindable, at which point we can't really ensure valid mods.
+            if (SelectedMods.Disabled)
+                return;
+
             if (!ModUtils.CheckValidForGameplay(mods.NewValue, out var invalid))
             {
                 // ensure we always have a valid set of mods.
