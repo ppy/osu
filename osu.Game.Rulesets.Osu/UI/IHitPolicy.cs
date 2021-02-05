@@ -1,0 +1,32 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using System.Collections.Generic;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
+
+namespace osu.Game.Rulesets.Osu.UI
+{
+    public interface IHitPolicy
+    {
+        /// <summary>
+        /// Sets the <see cref="DrawableHitObject"/>s which this <see cref="IHitPolicy"/> controls.
+        /// </summary>
+        /// <param name="hitObjects">An enumeration of the <see cref="DrawableHitObject"/>s.</param>
+        void SetHitObjects(IEnumerable<DrawableHitObject> hitObjects);
+
+        /// <summary>
+        /// Determines whether a <see cref="DrawableHitObject"/> can be hit at a point in time.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="DrawableHitObject"/> to check.</param>
+        /// <param name="time">The time to check.</param>
+        /// <returns>Whether <paramref name="hitObject"/> can be hit at the given <paramref name="time"/>.</returns>
+        bool IsHittable(DrawableHitObject hitObject, double time);
+
+        /// <summary>
+        /// Handles a <see cref="HitObject"/> being hit.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> that was hit.</param>
+        void HandleHit(DrawableHitObject hitObject);
+    }
+}
