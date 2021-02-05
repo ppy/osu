@@ -192,7 +192,7 @@ namespace osu.Game.Online.Multiplayer
                 BeatmapID = item.GetOr(existingPlaylistItem).BeatmapID,
                 BeatmapChecksum = item.GetOr(existingPlaylistItem).Beatmap.Value.MD5Hash,
                 RulesetID = item.GetOr(existingPlaylistItem).RulesetID,
-                Mods = item.HasValue ? item.Value.AsNonNull().RequiredMods.Select(m => new APIMod(m)).ToList() : Room.Settings.Mods,
+                RequiredMods = item.HasValue ? item.Value.AsNonNull().RequiredMods.Select(m => new APIMod(m)).ToList() : Room.Settings.RequiredMods,
                 AllowedMods = item.HasValue ? item.Value.AsNonNull().AllowedMods.Select(m => new APIMod(m)).ToList() : Room.Settings.AllowedMods
             });
         }
@@ -531,7 +531,7 @@ namespace osu.Game.Online.Multiplayer
             beatmap.MD5Hash = settings.BeatmapChecksum;
 
             var ruleset = rulesets.GetRuleset(settings.RulesetID).CreateInstance();
-            var mods = settings.Mods.Select(m => m.ToMod(ruleset));
+            var mods = settings.RequiredMods.Select(m => m.ToMod(ruleset));
             var allowedMods = settings.AllowedMods.Select(m => m.ToMod(ruleset));
 
             PlaylistItem playlistItem = new PlaylistItem
