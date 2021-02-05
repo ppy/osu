@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
@@ -82,12 +83,20 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("set to no map", () => Client.ChangeBeatmapAvailability(BeatmapAvailability.NotDownloaded()));
             AddStep("set to downloading map", () => Client.ChangeBeatmapAvailability(BeatmapAvailability.Downloading(0)));
+
+            AddUntilStep("progress bar visible", () => this.ChildrenOfType<ProgressBar>().Single().IsPresent);
+
             AddRepeatStep("increment progress", () =>
             {
                 var progress = this.ChildrenOfType<ParticipantPanel>().Single().User.BeatmapAvailability.DownloadProgress ?? 0;
                 Client.ChangeBeatmapAvailability(BeatmapAvailability.Downloading(progress + RNG.NextSingle(0.1f)));
             }, 25);
+
+            AddAssert("progress bar increased", () => this.ChildrenOfType<ProgressBar>().Single().Current.Value > 0);
+
             AddStep("set to importing map", () => Client.ChangeBeatmapAvailability(BeatmapAvailability.Importing()));
+            AddUntilStep("progress bar not visible", () => !this.ChildrenOfType<ProgressBar>().Single().IsPresent);
+
             AddStep("set to available", () => Client.ChangeBeatmapAvailability(BeatmapAvailability.LocallyAvailable()));
         }
 
