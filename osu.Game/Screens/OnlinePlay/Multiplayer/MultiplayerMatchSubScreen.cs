@@ -104,6 +104,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                 Child = new GridContainer
                                                 {
                                                     RelativeSizeAxes = Axes.Both,
+                                                    ColumnDimensions = new[]
+                                                    {
+                                                        new Dimension(GridSizeMode.Relative, size: 0.5f, maxSize: 400),
+                                                        new Dimension(),
+                                                        new Dimension(GridSizeMode.Relative, size: 0.5f, maxSize: 600),
+                                                    },
                                                     Content = new[]
                                                     {
                                                         new Drawable[]
@@ -128,6 +134,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                                     }
                                                                 }
                                                             },
+                                                            // Spacer
+                                                            null,
                                                             // Main right column
                                                             new FillFlowContainer
                                                             {
