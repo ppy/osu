@@ -111,7 +111,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         protected override BeatmapDetailArea CreateBeatmapDetailArea() => new PlayBeatmapDetailArea();
 
-        protected override ModSelectOverlay CreateModSelectOverlay() => new ModSelectOverlay(isValidMod);
+        protected override ModSelectOverlay CreateModSelectOverlay() => new SoloModSelectOverlay { IsValidMod = isValidMod };
 
         private bool isValidMod(Mod mod) => !(mod is ModAutoplay) && (mod as MultiMod)?.Mods.Any(mm => mm is ModAutoplay) != true;
     }
