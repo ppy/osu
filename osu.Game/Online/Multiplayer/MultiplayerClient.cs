@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
-using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 
@@ -54,11 +54,11 @@ namespace osu.Game.Online.Multiplayer
             {
                 case APIState.Failing:
                 case APIState.Offline:
-                    Task.Run(() => disconnect(true)).CatchUnobservedExceptions();
+                    Task.Run(() => disconnect(true));
                     break;
 
                 case APIState.Online:
-                    Task.Run(connect).CatchUnobservedExceptions();
+                    Task.Run(connect);
                     break;
             }
         }
@@ -68,6 +68,20 @@ namespace osu.Game.Online.Multiplayer
             cancelExistingConnect();
 
             await connectionLock.WaitAsync(10000);
+
+            var builder = new HubConnectionBuilder()
+                .WithUrl(endpoint, options => { options.Headers.Add("Authorization", $"Bearer {api.AccessToken}"); });
+
+            if (RuntimeInfo.SupportsJIT)
+                builder.AddMessagePackProtocol();
+            else
+            {
+                // eventually we will precompile resolvers for messagepack, but this isn't working currently
+                // see https://github.com/neuecc/MessagePack-CSharp/issues/780#issuecomment-768794308.
+                builder.AddNewtonsoftJsonProtocol(options => { options.PayloadSerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore; });
+            }
+
+            connection = builder.Build();
 
             try
             {
@@ -233,7 +247,7 @@ namespace osu.Game.Online.Multiplayer
 
                 // make sure a disconnect wasn't triggered (and this is still the active connection).
                 if (!cancellationToken.IsCancellationRequested)
-                    Task.Run(connect, default).CatchUnobservedExceptions();
+                    Task.Run(connect, default);
 
                 return Task.CompletedTask;
             };
