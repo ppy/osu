@@ -45,18 +45,21 @@ namespace osu.Game.Screens.OnlinePlay.Match
         [Cached]
         protected OnlinePlayBeatmapAvailablilityTracker BeatmapAvailablilityTracker { get; }
 
-        private readonly Container content = new Container { RelativeSizeAxes = Axes.Both };
+        private readonly Container content;
 
         protected RoomSubScreen()
         {
-            BeatmapAvailablilityTracker = new OnlinePlayBeatmapAvailablilityTracker
+            InternalChildren = new Drawable[]
             {
-                SelectedItem = { BindTarget = SelectedItem }
+                BeatmapAvailablilityTracker = new OnlinePlayBeatmapAvailablilityTracker
+                {
+                    SelectedItem = { BindTarget = SelectedItem }
+                },
+                content = new Container { RelativeSizeAxes = Axes.Both },
             };
-
-            base.AddInternal(content);
         }
 
+        // Forward all internal management to content to ensure locally added components are not removed unintentionally.
         // This is a bit ugly but we don't have the concept of InternalContent so it'll have to do for now. (https://github.com/ppy/osu-framework/issues/1690)
         protected override void AddInternal(Drawable drawable) => content.Add(drawable);
         protected override bool RemoveInternal(Drawable drawable) => content.Remove(drawable);
@@ -65,8 +68,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            base.AddInternal(BeatmapAvailablilityTracker);
-
             sampleStart = audio.Samples.Get(@"SongSelect/confirm-selection");
         }
 
