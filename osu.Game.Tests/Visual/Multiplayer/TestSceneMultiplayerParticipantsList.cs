@@ -79,12 +79,26 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestGameStateHasPriorityOverDownloadState()
+        {
+            AddStep("set to downloading map", () => Client.ChangeBeatmapAvailability(BeatmapAvailability.Downloading(0)));
+            checkProgressBarVisibility(true);
+
+            AddStep("make user ready", () => Client.ChangeState(MultiplayerUserState.Results));
+            checkProgressBarVisibility(false);
+            AddUntilStep("ready mark visible", () => this.ChildrenOfType<StateDisplay>().Single().IsPresent);
+
+            AddStep("make user ready", () => Client.ChangeState(MultiplayerUserState.Idle));
+            checkProgressBarVisibility(true);
+        }
+
+        [Test]
         public void TestBeatmapDownloadingStates()
         {
             AddStep("set to no map", () => Client.ChangeBeatmapAvailability(BeatmapAvailability.NotDownloaded()));
             AddStep("set to downloading map", () => Client.ChangeBeatmapAvailability(BeatmapAvailability.Downloading(0)));
 
-            AddUntilStep("progress bar visible", () => this.ChildrenOfType<ProgressBar>().Single().IsPresent);
+            checkProgressBarVisibility(true);
 
             AddRepeatStep("increment progress", () =>
             {
@@ -95,7 +109,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("progress bar increased", () => this.ChildrenOfType<ProgressBar>().Single().Current.Value > 0);
 
             AddStep("set to importing map", () => Client.ChangeBeatmapAvailability(BeatmapAvailability.Importing()));
-            AddUntilStep("progress bar not visible", () => !this.ChildrenOfType<ProgressBar>().Single().IsPresent);
+            checkProgressBarVisibility(false);
 
             AddStep("set to available", () => Client.ChangeBeatmapAvailability(BeatmapAvailability.LocallyAvailable()));
         }
@@ -197,5 +211,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 AddStep($"set state: {state}", () => Client.ChangeUserState(0, state));
             }
         }
+
+        private void checkProgressBarVisibility(bool visible) =>
+            AddUntilStep($"progress bar {(visible ? "is" : "is not")}visible", () =>
+                this.ChildrenOfType<ProgressBar>().Single().IsPresent == visible);
     }
 }
