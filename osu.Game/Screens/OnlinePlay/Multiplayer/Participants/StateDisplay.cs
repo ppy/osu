@@ -101,9 +101,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                     case DownloadState.Downloading:
                         Debug.Assert(availability.DownloadProgress != null);
 
-                        var progress = availability.DownloadProgress.Value;
                         progressBar.FadeIn(fade_time);
-                        progressBar.CurrentTime = progress;
+                        progressBar.CurrentTime = availability.DownloadProgress.Value;
 
                         text.Text = "downloading map";
                         icon.Icon = FontAwesome.Solid.ArrowAltCircleDown;
