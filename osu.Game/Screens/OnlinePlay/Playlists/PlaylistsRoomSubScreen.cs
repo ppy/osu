@@ -44,7 +44,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChildren = new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
                 mainContent = new GridContainer
                 {
@@ -190,7 +190,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     EditPlaylist = () => this.Push(new MatchSongSelect()),
                     State = { Value = roomId.Value == null ? Visibility.Visible : Visibility.Hidden }
                 }
-            };
+            });
 
             if (roomId.Value == null)
             {

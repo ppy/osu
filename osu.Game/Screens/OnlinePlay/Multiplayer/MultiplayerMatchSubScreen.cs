@@ -54,7 +54,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChildren = new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
                 mainContent = new GridContainer
                 {
@@ -177,7 +177,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     RelativeSizeAxes = Axes.Both,
                     State = { Value = client.Room == null ? Visibility.Visible : Visibility.Hidden }
                 }
-            };
+            });
 
             if (client.Room == null)
             {
