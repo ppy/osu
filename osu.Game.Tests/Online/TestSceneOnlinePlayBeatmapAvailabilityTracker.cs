@@ -28,7 +28,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Online
 {
     [HeadlessTest]
-    public class TestSceneMultiplayerBeatmapAvailabilityTracker : OsuTestScene
+    public class TestSceneOnlinePlayBeatmapAvailabilityTracker : OsuTestScene
     {
         private RulesetStore rulesets;
         private TestBeatmapManager beatmaps;
@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Online
         private BeatmapSetInfo testBeatmapSet;
 
         private readonly Bindable<PlaylistItem> selectedItem = new Bindable<PlaylistItem>();
-        private MultiplayerBeatmapAvailablilityTracker availablilityTracker;
+        private OnlinePlayBeatmapAvailablilityTracker availablilityTracker;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, GameHost host)
@@ -67,7 +67,7 @@ namespace osu.Game.Tests.Online
                 Ruleset = { Value = testBeatmapInfo.Ruleset },
             };
 
-            Child = availablilityTracker = new MultiplayerBeatmapAvailablilityTracker
+            Child = availablilityTracker = new OnlinePlayBeatmapAvailablilityTracker
             {
                 SelectedItem = { BindTarget = selectedItem, }
             };
@@ -118,7 +118,7 @@ namespace osu.Game.Tests.Online
             });
             addAvailabilityCheckStep("state still not downloaded", BeatmapAvailability.NotDownloaded);
 
-            AddStep("recreate tracker", () => Child = availablilityTracker = new MultiplayerBeatmapAvailablilityTracker
+            AddStep("recreate tracker", () => Child = availablilityTracker = new OnlinePlayBeatmapAvailablilityTracker
             {
                 SelectedItem = { BindTarget = selectedItem }
             });

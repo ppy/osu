@@ -41,11 +41,11 @@ namespace osu.Game.Screens.OnlinePlay.Match
         private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
 
         [Cached]
-        protected MultiplayerBeatmapAvailablilityTracker BeatmapAvailablilityTracker { get; }
+        protected OnlinePlayBeatmapAvailablilityTracker BeatmapAvailablilityTracker { get; }
 
         protected RoomSubScreen()
         {
-            BeatmapAvailablilityTracker = new MultiplayerBeatmapAvailablilityTracker
+            BeatmapAvailablilityTracker = new OnlinePlayBeatmapAvailablilityTracker
             {
                 SelectedItem = { BindTarget = SelectedItem },
             };
