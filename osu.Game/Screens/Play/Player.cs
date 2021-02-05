@@ -81,6 +81,9 @@ namespace osu.Game.Screens.Play
         public int RestartCount;
 
         [Resolved]
+        private OsuGameBase gameBase { get; set; }
+
+        [Resolved]
         private ScoreManager scoreManager { get; set; }
 
         private RulesetInfo rulesetInfo;
@@ -157,7 +160,8 @@ namespace osu.Game.Screens.Play
             if (!Mods.Value.Any(m => m is ModAutoplay))
                 PrepareReplay();
 
-            // needs to be bound here as the last binding, otherwise starting a replay while not focused causes player to exit.
+            // needs to be bound here as the last binding, otherwise cases like starting a replay while not focused causes player to exit, if activity is bound before checks.
+            gameActive.BindTo(gameBase.IsActive);
             gameActive.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
         }
 
@@ -190,8 +194,6 @@ namespace osu.Game.Screens.Play
             sampleRestart = audio.Samples.Get(@"Gameplay/restart");
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
-
-            gameActive.BindTo(gameBase.IsActive);
 
             if (game != null)
                 LocalUserPlaying.BindTo(game.LocalUserPlaying);
@@ -429,7 +431,7 @@ namespace osu.Game.Screens.Play
 
         private void updatePauseOnFocusLostState()
         {
-            if (!IsLoaded || !PauseOnFocusLost || DrawableRuleset.HasReplayLoaded.Value || breakTracker.IsBreakTime.Value)
+            if (!PauseOnFocusLost || DrawableRuleset.HasReplayLoaded.Value || breakTracker.IsBreakTime.Value)
                 return;
 
             if (gameActive.Value == false)
