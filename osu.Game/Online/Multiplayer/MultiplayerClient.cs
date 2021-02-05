@@ -67,7 +67,8 @@ namespace osu.Game.Online.Multiplayer
         {
             cancelExistingConnect();
 
-            await connectionLock.WaitAsync(10000);
+            if (!await connectionLock.WaitAsync(10000))
+                throw new TimeoutException("Could not obtain a lock to connect. A previous attempt is likely stuck.");
 
             var builder = new HubConnectionBuilder()
                 .WithUrl(endpoint, options => { options.Headers.Add("Authorization", $"Bearer {api.AccessToken}"); });
@@ -199,7 +200,10 @@ namespace osu.Game.Online.Multiplayer
             cancelExistingConnect();
 
             if (takeLock)
-                await connectionLock.WaitAsync(10000);
+            {
+                if (!await connectionLock.WaitAsync(10000))
+                    throw new TimeoutException("Could not obtain a lock to disconnect. A previous attempt is likely stuck.");
+            }
 
             try
             {
