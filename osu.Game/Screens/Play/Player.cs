@@ -433,7 +433,7 @@ namespace osu.Game.Screens.Play
                 return;
 
             if (gameActive.Value == false)
-                performUserRequestedExit();
+                Pause();
         }
 
         private IBeatmap loadPlayableBeatmap()
