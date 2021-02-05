@@ -4,6 +4,7 @@
 #nullable enable
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -91,6 +92,7 @@ namespace osu.Game.Online.Multiplayer
             connection.On(nameof(IMultiplayerClient.LoadRequested), ((IMultiplayerClient)this).LoadRequested);
             connection.On(nameof(IMultiplayerClient.MatchStarted), ((IMultiplayerClient)this).MatchStarted);
             connection.On(nameof(IMultiplayerClient.ResultsReady), ((IMultiplayerClient)this).ResultsReady);
+            connection.On<int, IEnumerable<APIMod>>(nameof(IMultiplayerClient.UserModsChanged), ((IMultiplayerClient)this).UserModsChanged);
 
             connection.Closed += async ex =>
             {
@@ -187,6 +189,14 @@ namespace osu.Game.Online.Multiplayer
                 return Task.CompletedTask;
 
             return connection.InvokeAsync(nameof(IMultiplayerServer.ChangeBeatmapAvailability), newBeatmapAvailability);
+        }
+
+        public override Task ChangeUserMods(IEnumerable<APIMod> newMods)
+        {
+            if (!isConnected.Value)
+                return Task.CompletedTask;
+
+            return connection.InvokeAsync(nameof(IMultiplayerServer.ChangeUserMods), newMods);
         }
 
         public override Task StartMatch()

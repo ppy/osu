@@ -333,7 +333,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             };
         }
 
-        private class TestModSelectOverlay : SoloModSelectOverlay
+        private class TestModSelectOverlay : LocalPlayerModSelectOverlay
         {
             public new Bindable<IReadOnlyList<Mod>> SelectedMods => base.SelectedMods;
 

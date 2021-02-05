@@ -263,9 +263,8 @@ namespace osu.Game.Screens.Select
 
             if (Footer != null)
             {
-                Footer.AddButton(new FooterButtonMods { Current = Mods }, ModSelect);
-                Footer.AddButton(new FooterButtonRandom { Action = triggerRandom });
-                Footer.AddButton(new FooterButtonOptions(), BeatmapOptions);
+                foreach (var (button, overlay) in CreateFooterButtons())
+                    Footer.AddButton(button, overlay);
 
                 BeatmapOptions.AddButton(@"Manage", @"collections", FontAwesome.Solid.Book, colours.Green, () => manageCollectionsDialog?.Show());
                 BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.Solid.Trash, colours.Pink, () => delete(Beatmap.Value.BeatmapSetInfo));
@@ -301,7 +300,18 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        protected virtual ModSelectOverlay CreateModSelectOverlay() => new SoloModSelectOverlay();
+        /// <summary>
+        /// Creates the buttons to be displayed in the footer.
+        /// </summary>
+        /// <returns>A set of <see cref="FooterButton"/> and an optional <see cref="OverlayContainer"/> which the button opens when pressed.</returns>
+        protected virtual IEnumerable<(FooterButton, OverlayContainer)> CreateFooterButtons() => new (FooterButton, OverlayContainer)[]
+        {
+            (new FooterButtonMods { Current = Mods }, ModSelect),
+            (new FooterButtonRandom { Action = triggerRandom }, null),
+            (new FooterButtonOptions(), BeatmapOptions)
+        };
+
+        protected virtual ModSelectOverlay CreateModSelectOverlay() => new LocalPlayerModSelectOverlay();
 
         protected virtual void ApplyFilterToCarousel(FilterCriteria criteria)
         {
