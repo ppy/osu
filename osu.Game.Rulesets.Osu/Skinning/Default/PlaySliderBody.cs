@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             if (drawableSlider.HitObject == null)
                 return;
 
-            if (!drawableSlider.HitObject.HeadCircle.TrackFollowCircle)
+            if (!drawableSlider.HeadCircle.TrackFollowCircle)
             {
                 // When not tracking the follow circle, force the path to not snake out as it looks better that way.
                 SnakingOut.UnbindFrom(snakingOut);
