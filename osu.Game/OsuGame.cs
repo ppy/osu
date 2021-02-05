@@ -51,7 +51,7 @@ using osu.Game.Screens.Select;
 using osu.Game.Updater;
 using osu.Game.Utils;
 using LogLevel = osu.Framework.Logging.LogLevel;
-using System.IO;
+using osu.Game.Database;
 
 namespace osu.Game
 {
@@ -438,10 +438,10 @@ namespace osu.Game
             }, validScreens: new[] { typeof(PlaySongSelect) });
         }
 
-        public override Task Import(Stream stream, string filename)
+        public override Task Import(params ImportTask[] imports)
         {
             // encapsulate task as we don't want to begin the import process until in a ready state.
-            var importTask = new Task(async () => await base.Import(stream, filename));
+            var importTask = new Task(async () => await base.Import(imports));
 
             waitForReady(() => this, _ => importTask.Start());
 
@@ -468,6 +468,12 @@ namespace osu.Game
         private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
             updateModDefaults();
+
+            if (!ModUtils.CheckValidForGameplay(mods.NewValue, out var invalid))
+            {
+                // ensure we always have a valid set of mods.
+                SelectedMods.Value = mods.NewValue.Except(invalid).ToArray();
+            }
         }
 
         private void updateModDefaults()

@@ -9,7 +9,13 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Online.Rooms
 {
-    public class MultiplayerBeatmapTracker : DownloadTrackingComposite<BeatmapSetInfo, BeatmapManager>
+    /// <summary>
+    /// Represent a checksum-verifying beatmap availability tracker usable for online play screens.
+    ///
+    /// This differs from a regular download tracking composite as this accounts for the
+    /// databased beatmap set's checksum, to disallow from playing with an altered version of the beatmap.
+    /// </summary>
+    public class OnlinePlayBeatmapAvailablilityTracker : DownloadTrackingComposite<BeatmapSetInfo, BeatmapManager>
     {
         public readonly IBindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
@@ -20,11 +26,10 @@ namespace osu.Game.Online.Rooms
 
         private readonly Bindable<BeatmapAvailability> availability = new Bindable<BeatmapAvailability>();
 
-        public MultiplayerBeatmapTracker()
+        public OnlinePlayBeatmapAvailablilityTracker()
         {
             State.BindValueChanged(_ => updateAvailability());
-            Progress.BindValueChanged(_ => updateAvailability());
-            updateAvailability();
+            Progress.BindValueChanged(_ => updateAvailability(), true);
         }
 
         protected override void LoadComplete()
@@ -36,30 +41,18 @@ namespace osu.Game.Online.Rooms
 
         protected override bool VerifyDatabasedModel(BeatmapSetInfo databasedSet)
         {
-            var verified = verifyDatabasedModel(databasedSet);
-            if (!verified)
-                Logger.Log("The imported beatmapset does not match the online version.", LoggingTarget.Runtime, LogLevel.Important);
-
-            return verified;
-        }
-
-        private bool verifyDatabasedModel(BeatmapSetInfo databasedSet)
-        {
             int? beatmapId = SelectedItem.Value.Beatmap.Value.OnlineBeatmapID;
             string checksum = SelectedItem.Value.Beatmap.Value.MD5Hash;
 
-            BeatmapInfo matchingBeatmap;
+            var matchingBeatmap = databasedSet.Beatmaps.FirstOrDefault(b => b.OnlineBeatmapID == beatmapId && b.MD5Hash == checksum);
 
-            if (databasedSet.Beatmaps == null)
+            if (matchingBeatmap == null)
             {
-                // The given databased beatmap set is not passed in a usable state to check with.
-                // Perform a full query instead, as per https://github.com/ppy/osu/pull/11415.
-                matchingBeatmap = Manager.QueryBeatmap(b => b.OnlineBeatmapID == beatmapId && b.MD5Hash == checksum);
-                return matchingBeatmap != null;
+                Logger.Log("The imported beatmap set does not match the online version.", LoggingTarget.Runtime, LogLevel.Important);
+                return false;
             }
 
-            matchingBeatmap = databasedSet.Beatmaps.FirstOrDefault(b => b.OnlineBeatmapID == beatmapId && b.MD5Hash == checksum);
-            return matchingBeatmap != null;
+            return true;
         }
 
         protected override bool IsModelAvailableLocally()

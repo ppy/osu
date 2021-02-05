@@ -200,7 +200,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                             Child = new GridContainer
                                                             {
                                                                 RelativeSizeAxes = Axes.X,
-                                                                Height = 300,
+                                                                Height = 500,
                                                                 Content = new[]
                                                                 {
                                                                     new Drawable[]

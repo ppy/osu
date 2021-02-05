@@ -10,6 +10,8 @@ using osu.Framework.Utils;
 using osu.Game.Online;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Participants;
 using osu.Game.Users;
 using osuTK;
@@ -158,6 +160,33 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     }
                 }
             });
+        }
+
+        [Test]
+        public void TestUserWithMods()
+        {
+            AddStep("add user", () =>
+            {
+                Client.AddUser(new User
+                {
+                    Id = 0,
+                    Username = "User 0",
+                    CurrentModeRank = RNG.Next(1, 100000),
+                    CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+                });
+
+                Client.ChangeUserMods(0, new Mod[]
+                {
+                    new OsuModHardRock(),
+                    new OsuModDifficultyAdjust { ApproachRate = { Value = 1 } }
+                });
+            });
+
+            for (var i = MultiplayerUserState.Idle; i < MultiplayerUserState.Results; i++)
+            {
+                var state = i;
+                AddStep($"set state: {state}", () => Client.ChangeUserState(0, state));
+            }
         }
     }
 }
