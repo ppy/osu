@@ -43,15 +43,13 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             public Action EditPlaylist;
 
-            public OsuTextBox NameField, MaxParticipantsField;
+            public OsuTextBox NameField, MaxParticipantsField, MaxAttemptsField;
             public OsuDropdown<TimeSpan> DurationField;
             public RoomAvailabilityPicker AvailabilityPicker;
-            public GameTypePicker TypePicker;
             public TriangleButton ApplyButton;
 
             public OsuSpriteText ErrorText;
 
-            private OsuSpriteText typeLabel;
             private LoadingLayer loadingLayer;
             private DrawableRoomPlaylist playlist;
             private OsuSpriteText playlistLength;
@@ -106,7 +104,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                     Padding = new MarginPadding { Right = FIELD_PADDING / 2 },
                                                     Children = new[]
                                                     {
-                                                        new Section("Room name")
+                                                        new Section("screen.multi.playlistSettings.roomName")
                                                         {
                                                             Child = NameField = new SettingsTextBox
                                                             {
@@ -115,7 +113,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                 LengthLimit = 100
                                                             },
                                                         },
-                                                        new Section("Duration")
+                                                        new Section("screen.multi.playlistSettings.duration")
                                                         {
                                                             Child = DurationField = new DurationDropdown
                                                             {
@@ -135,7 +133,16 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                 }
                                                             }
                                                         },
-                                                        new Section("Room visibility")
+                                                        new Section("screen.multi.playlistSettings.allowedAttempts")
+                                                        {
+                                                            Child = MaxAttemptsField = new SettingsNumberTextBox
+                                                            {
+                                                                RelativeSizeAxes = Axes.X,
+                                                                TabbableContentContainer = this,
+                                                                PlaceholderText = "generic.unlimited",
+                                                            },
+                                                        },
+                                                        new Section("screen.multi.playlistSettings.visibility")
                                                         {
                                                             Alpha = disabled_alpha,
                                                             Child = AvailabilityPicker = new RoomAvailabilityPicker
@@ -143,31 +150,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                 Enabled = { Value = false }
                                                             },
                                                         },
-                                                        new Section("Game type")
-                                                        {
-                                                            Alpha = disabled_alpha,
-                                                            Child = new FillFlowContainer
-                                                            {
-                                                                AutoSizeAxes = Axes.Y,
-                                                                RelativeSizeAxes = Axes.X,
-                                                                Direction = FillDirection.Vertical,
-                                                                Spacing = new Vector2(7),
-                                                                Children = new Drawable[]
-                                                                {
-                                                                    TypePicker = new GameTypePicker
-                                                                    {
-                                                                        RelativeSizeAxes = Axes.X,
-                                                                        Enabled = { Value = false }
-                                                                    },
-                                                                    typeLabel = new OsuSpriteText
-                                                                    {
-                                                                        Font = OsuFont.GetFont(size: 14),
-                                                                        Colour = colours.Yellow
-                                                                    },
-                                                                },
-                                                            },
-                                                        },
-                                                        new Section("Max participants")
+                                                        new Section("screen.multi.playlistSettings.maxParticipants")
                                                         {
                                                             Alpha = disabled_alpha,
                                                             Child = MaxParticipantsField = new SettingsNumberTextBox
@@ -177,7 +160,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                 ReadOnly = true,
                                                             },
                                                         },
-                                                        new Section("Password (optional)")
+                                                        new Section("screen.multi.playlistSettings.password")
                                                         {
                                                             Alpha = disabled_alpha,
                                                             Child = new SettingsPasswordTextBox
@@ -196,12 +179,12 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                     Padding = new MarginPadding { Left = FIELD_PADDING / 2 },
                                                     Children = new[]
                                                     {
-                                                        new Section("Playlist")
+                                                        new Section("screen.multi.generic.playlist")
                                                         {
                                                             Child = new GridContainer
                                                             {
                                                                 RelativeSizeAxes = Axes.X,
-                                                                Height = 300,
+                                                                Height = 500,
                                                                 Content = new[]
                                                                 {
                                                                     new Drawable[]
@@ -223,7 +206,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                         {
                                                                             RelativeSizeAxes = Axes.X,
                                                                             Height = 40,
-                                                                            Text = "Edit playlist",
+                                                                            Text = "screen.multi.playlistSettings.edit",
                                                                             Action = () => EditPlaylist?.Invoke()
                                                                         }
                                                                     }
@@ -295,11 +278,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     loadingLayer = new LoadingLayer(true)
                 };
 
-                TypePicker.Current.BindValueChanged(type => typeLabel.Text = type.NewValue?.Name ?? string.Empty, true);
                 RoomName.BindValueChanged(name => NameField.Text = name.NewValue, true);
                 Availability.BindValueChanged(availability => AvailabilityPicker.Current.Value = availability.NewValue, true);
-                Type.BindValueChanged(type => TypePicker.Current.Value = type.NewValue, true);
                 MaxParticipants.BindValueChanged(count => MaxParticipantsField.Text = count.NewValue?.ToString(), true);
+                MaxAttempts.BindValueChanged(count => MaxAttemptsField.Text = count.NewValue?.ToString(), true);
                 Duration.BindValueChanged(duration => DurationField.Current.Value = duration.NewValue ?? TimeSpan.FromMinutes(30), true);
 
                 playlist.Items.BindTo(Playlist);
@@ -314,7 +296,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             }
 
             private void onPlaylistChanged(object sender, NotifyCollectionChangedEventArgs e) =>
-                playlistLength.Text = new LocalisedString("Length: {0}", Playlist.GetTotalDuration());
+                playlistLength.Text = new LocalisedString("screen.multi.playlistSettings.length", Playlist.GetTotalDuration());
 
             private bool hasValidSettings => RoomID.Value == null && NameField.Text.Length > 0 && Playlist.Count > 0;
 
@@ -327,12 +309,16 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
                 RoomName.Value = NameField.Text;
                 Availability.Value = AvailabilityPicker.Current.Value;
-                Type.Value = TypePicker.Current.Value;
 
                 if (int.TryParse(MaxParticipantsField.Text, out int max))
                     MaxParticipants.Value = max;
                 else
                     MaxParticipants.Value = null;
+
+                if (int.TryParse(MaxAttemptsField.Text, out max))
+                    MaxAttempts.Value = max;
+                else
+                    MaxAttempts.Value = null;
 
                 Duration.Value = DurationField.Current.Value;
 
@@ -358,7 +344,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             public CreateRoomButton()
             {
-                Text = "Create";
+                Text = "generic.create";
             }
 
             [BackgroundDependencyLoader]

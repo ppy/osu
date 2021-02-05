@@ -93,8 +93,8 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
                     {
                         new OsuSpriteText
                         {
-                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 12),
-                            Text = title.ToUpper(),
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 15),
+                            Text = title //.ToUpper(),
                         },
                         content = new Container
                         {

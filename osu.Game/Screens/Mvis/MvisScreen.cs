@@ -332,7 +332,7 @@ namespace osu.Game.Screens.Mvis
                                                                 new BottomBarButton
                                                                 {
                                                                     ButtonIcon = FontAwesome.Regular.QuestionCircle,
-                                                                    Action = () => game?.OpenUrlExternally("https://matrix-feather.github.io/%E6%97%A5%E5%B8%B8/mfosu_mp_manual/"),
+                                                                    Action = () => game?.OpenUrlExternally("https://matrix-feather.github.io/mfosu/mfosu_mp_manual/"),
                                                                     TooltipText = "screen.mvis.main.openManualInBrowser"
                                                                 },
                                                             }

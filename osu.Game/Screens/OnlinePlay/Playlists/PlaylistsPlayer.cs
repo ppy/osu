@@ -51,13 +51,13 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             // Sanity checks to ensure that PlaylistsPlayer matches the settings for the current PlaylistItem
             if (Beatmap.Value.BeatmapInfo.OnlineBeatmapID != PlaylistItem.Beatmap.Value.OnlineBeatmapID)
-                throw new InvalidOperationException("Current Beatmap does not match PlaylistItem's Beatmap");
+                throw new InvalidOperationException("当前谱面与游玩列表不匹配"); //Current Beatmap does not match PlaylistItem's Beatmap
 
             if (ruleset.Value.ID != PlaylistItem.Ruleset.Value.ID)
-                throw new InvalidOperationException("Current Ruleset does not match PlaylistItem's Ruleset");
+                throw new InvalidOperationException("当前游戏模式与游玩列表不匹配"); //Current Ruleset does not match PlaylistItem's Ruleset
 
             if (!PlaylistItem.RequiredMods.All(m => Mods.Value.Any(m.Equals)))
-                throw new InvalidOperationException("Current Mods do not match PlaylistItem's RequiredMods");
+                throw new InvalidOperationException("当前Mods与游玩列表所需要的不匹配"); //Current Mods do not match PlaylistItem's RequiredMods
 
             var req = new CreateRoomScoreRequest(RoomId.Value ?? 0, PlaylistItem.ID, Game.VersionHash);
             req.Success += r => Token = r.ID;
@@ -65,7 +65,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             {
                 failed = true;
 
-                Logger.Error(e, "Failed to retrieve a score submission token.\n\nThis may happen if you are running an old or non-official release of osu! (ie. you are self-compiling).");
+                if (string.IsNullOrEmpty(e.Message))
+                    Logger.Error(e, "无法获取用于提交分数的token。");
+                else
+                    Logger.Log($"你无法提交分数： {e.Message}", level: LogLevel.Important);
 
                 Schedule(() =>
                 {
@@ -120,7 +123,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             request.Failure += e =>
             {
-                Logger.Error(e, "Failed to submit score");
+                Logger.Error(e, "无法提交分数");
                 tcs.SetResult(false);
             };
 

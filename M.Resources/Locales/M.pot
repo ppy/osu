@@ -20,6 +20,30 @@ msgstr ""
 msgid "generic.back"
 msgstr ""
 
+msgid "generic.selectAll"
+msgstr ""
+
+msgid "generic.deSelectAll"
+msgstr ""
+
+msgid "generic.select"
+msgstr ""
+
+msgid "generic.chat"
+msgstr ""
+
+msgid "generic.unlimited"
+msgstr ""
+
+msgid "generic.create"
+msgstr ""
+
+msgid "generic.leaderboard"
+msgstr ""
+
+msgid "generic.close"
+msgstr ""
+
 #v2 主菜单
 msgid "screen.menu.buttonSystem.solo"
 msgstr ""
@@ -101,6 +125,12 @@ msgstr ""
 msgid "screen.mvis.main.songSelect"
 msgstr ""
 
+msgid "screen.mvis.main.sidebar.collections"
+msgstr ""
+
+msgid "screen.mvis.main.sidebar.playerSettings"
+msgstr ""
+
 #v2 Mvis播放器 收藏夹界面
 msgid "screen.mvis.collections.ui.noCollectionSelected"
 msgstr ""
@@ -134,6 +164,18 @@ msgstr ""
 msgid "screen.multi.generic.lounge"
 msgstr ""
 
+msgid "screen.multi.generic.room"
+msgstr ""
+
+msgid "screen.multi.generic.newRoom"
+msgstr ""
+
+msgid "screen.multi.generic.playlist"
+msgstr ""
+
+msgid "screen.multi.generic.participants"
+msgstr ""
+
 #v2 多人游戏 RoomStatusFilter
 msgid "screen.multi.lounge.components.roomStatusFilter.open"
 msgstr ""
@@ -155,6 +197,65 @@ msgid "screen.multi.multiplayer.createMultiplayerMatchButton.text"
 msgstr ""
 
 msgid "screen.multi.multiplayer.match.multiplayerMatchHeader.openSettingsButton.text"
+msgstr ""
+
+msgid "screen.multi.multiplayer.match.beatmapOverlinedHeaderText"
+msgstr ""
+
+msgid "screen.multi.multiplayer.match.extraModsOverlinedHeaderText"
+msgstr ""
+
+#song selection
+msgid "screen.multi.onlinePlaySongSelect.ShortTitle"
+msgstr ""
+
+#Maximum attempts: {attempts.NewValue:N0}
+msgid "screen.multi.components.roomLocalUserInfo.maxAttempts"
+msgstr ""
+
+msgid "screen.multi.playlistSettings.roomName"
+msgstr ""
+
+msgid "screen.multi.playlistSettings.duration"
+msgstr ""
+
+#Allowed attempts (across all playlist items)
+msgid "screen.multi.playlistSettings.allowedAttempts"
+msgstr ""
+
+msgid "screen.multi.playlistSettings.visibility"
+msgstr ""
+
+msgid "screen.multi.playlistSettings.maxParticipants"
+msgstr ""
+
+#password (optional)
+msgid "screen.multi.playlistSettings.password"
+msgstr ""
+
+msgid "screen.multi.playlistSettings.playlist.edit"
+msgstr ""
+
+#Length: {0}
+msgid "screen.multi.playlistSettings.length"
+msgstr ""
+
+msgid "screen.multi.participantPanel.giveHost"
+msgstr ""
+
+msgid "screen.multi.playlistsRoomSubScreen.newPlaylist"
+msgstr ""
+
+msgid "screen.multi.readyButton.ready"
+msgstr ""
+
+msgid "screen.multi.readyButton.countText"
+msgstr ""
+
+msgid "screen.multi.readyButton.startMatch"
+msgstr ""
+
+msgid "screen.multi.readyButton.waitingForHost"
 msgstr ""
 
 # {0}人参与
@@ -304,40 +405,10 @@ msgstr ""
 msgid "New playlist"
 msgstr ""
 
-msgid "DURATION"
-msgstr ""
-
-msgid "ROOM NAME"
-msgstr ""
-
-msgid "PLAYLIST"
-msgstr ""
-
-msgid "ROOM VISIBILITY"
-msgstr ""
-
-msgid "GAME TYPE"
-msgstr ""
-
-msgid "MAX PARTICIPANTS"
-msgstr ""
-
-msgid "PASSWORD (OPTIONAL)"
-msgstr ""
-
 msgid "Select beatmap"
 msgstr ""
 
-msgid "Edit playlist"
-msgstr ""
-
-msgid "Length: {0}"
-msgstr ""
-
 msgid "Add new playlist entry"
-msgstr ""
-
-msgid "Create"
 msgstr ""
 
 msgid "Song Selection"
@@ -356,9 +427,6 @@ msgid "Create playlist"
 msgstr ""
 
 msgid "Leaderboard"
-msgstr ""
-
-msgid "Chat"
 msgstr ""
 
 msgid "Start"
@@ -910,22 +978,21 @@ msgid "已选择的Mods"
 msgstr ""
 
 # 歌曲选择 - Mods
-msgid "游戏Mods提供了多种多样的游玩方式"
+msgid "screen.select.modOverlay.title"
 msgstr ""
 
-msgid "有一些会对您的分数等产生影响,还有一些仅供娱乐"
+#游戏Mods提供了多种多样的游玩方式
+msgid "screen.select.modOverlay.desc1"
 msgstr ""
 
-msgid "重置"
+#有一些会对您的分数等产生影响,还有一些仅供娱乐
+msgid "screen.select.modOverlay.desc2"
 msgstr ""
 
-msgid "自定义"
+msgid "screen.select.modOverlay.customisation"
 msgstr ""
 
-msgid "关闭"
-msgstr ""
-
-msgid "分数倍率:"
+msgid "screen.select.modOverlay.scoreMultiplier"
 msgstr ""
 
 # 歌曲选择界面 - FilterControl
@@ -1010,9 +1077,6 @@ msgid "来源"
 msgstr ""
 
 # 歌曲选择 - Footer
-msgid "游戏Mods"
-msgstr ""
-
 msgid "随机选择"
 msgstr ""
 

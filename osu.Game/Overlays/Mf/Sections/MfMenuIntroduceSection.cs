@@ -46,17 +46,17 @@ namespace osu.Game.Overlays.Mf.Sections
                                 new MfMenuTextBoxContainer
                                 {
                                     Title = "关于Mf-osu",
-                                    d = introduceText()
+                                    d = CreateIntroduceText()
                                 },
                                 new MfMenuTextBoxContainer
                                 {
                                     Title = "Bug反馈/提出建议",
-                                    d = reportIssuesText()
+                                    d = CreateReportIssuesText()
                                 },
                                 new MfMenuTextBoxContainer
                                 {
                                     Title = "项目引用",
-                                    d = projectRefsText(),
+                                    d = CreateProjectRefsText(),
                                 }
                             }
                         },
@@ -77,17 +77,17 @@ namespace osu.Game.Overlays.Mf.Sections
                                 new MfMenuTextBoxContainer
                                 {
                                     Title = "参与过完善该分支的人(按首字母排序)",
-                                    d = staffText()
+                                    d = CreateStaffText()
                                 },
                                 new MfMenuTextBoxContainer
                                 {
                                     Title = "注意事项",
-                                    d = attentionsText()
+                                    d = CreateAttentionsText()
                                 },
                                 new MfMenuTextBoxContainer
                                 {
                                     Title = "Special Thanks",
-                                    d = specialThanksText()
+                                    d = CreateSpecialThanksText()
                                 }
                             }
                         },
@@ -98,7 +98,7 @@ namespace osu.Game.Overlays.Mf.Sections
 
         #region 介绍
 
-        protected Drawable introduceText()
+        protected Drawable CreateIntroduceText()
         {
             var t = new MfText();
 
@@ -108,7 +108,7 @@ namespace osu.Game.Overlays.Mf.Sections
             return t;
         }
 
-        protected Drawable staffText()
+        protected Drawable CreateStaffText()
         {
             var t = new MfText();
 
@@ -129,11 +129,17 @@ namespace osu.Game.Overlays.Mf.Sections
                 Username = "pedajilao (游戏内翻译修正)",
                 Id = 13851970
             });
+            t.NewParagraph();
+            t.AddUserLink(new User
+            {
+                Username = "PercyDan (游戏内bug修复，功能增强)",
+                Id = 17268434
+            });
 
             return t;
         }
 
-        protected Drawable reportIssuesText()
+        protected Drawable CreateReportIssuesText()
         {
             var t = new MfText();
 
@@ -151,7 +157,7 @@ namespace osu.Game.Overlays.Mf.Sections
             return t;
         }
 
-        protected Drawable attentionsText()
+        protected Drawable CreateAttentionsText()
         {
             var t = new MfText();
 
@@ -172,7 +178,7 @@ namespace osu.Game.Overlays.Mf.Sections
             return t;
         }
 
-        protected Drawable projectRefsText()
+        protected Drawable CreateProjectRefsText()
         {
             var t = new MfText();
 
@@ -199,7 +205,7 @@ namespace osu.Game.Overlays.Mf.Sections
             return t;
         }
 
-        protected Drawable specialThanksText()
+        protected Drawable CreateSpecialThanksText()
         {
             var t = new MfText();
 
