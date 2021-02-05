@@ -24,6 +24,10 @@ namespace osu.Game.Graphics.Containers
 
         private Bindable<bool> parallaxEnabled;
 
+        private const float parallax_duration = 100;
+
+        private bool firstUpdate = true;
+
         public ParallaxContainer()
         {
             RelativeSizeAxes = Axes.Both;
@@ -60,17 +64,27 @@ namespace osu.Game.Graphics.Containers
             input = GetContainingInputManager();
         }
 
-        private bool firstUpdate = true;
-
         protected override void Update()
         {
             base.Update();
 
             if (parallaxEnabled.Value)
             {
-                Vector2 offset = (input.CurrentState.Mouse == null ? Vector2.Zero : ToLocalSpace(input.CurrentState.Mouse.Position) - DrawSize / 2) * ParallaxAmount;
+                Vector2 offset = Vector2.Zero;
 
-                const float parallax_duration = 100;
+                if (input.CurrentState.Mouse != null)
+                {
+                    var sizeDiv2 = DrawSize / 2;
+
+                    Vector2 relativeAmount = ToLocalSpace(input.CurrentState.Mouse.Position) - sizeDiv2;
+
+                    const float base_factor = 0.999f;
+
+                    relativeAmount.X = (float)(Math.Sign(relativeAmount.X) * Interpolation.Damp(0, 1, base_factor, Math.Abs(relativeAmount.X)));
+                    relativeAmount.Y = (float)(Math.Sign(relativeAmount.Y) * Interpolation.Damp(0, 1, base_factor, Math.Abs(relativeAmount.Y)));
+
+                    offset = relativeAmount * sizeDiv2 * ParallaxAmount;
+                }
 
                 double elapsed = Math.Clamp(Clock.ElapsedFrameTime, 0, parallax_duration);
 

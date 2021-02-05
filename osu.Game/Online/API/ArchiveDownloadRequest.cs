@@ -10,7 +10,7 @@ namespace osu.Game.Online.API
     {
         public readonly TModel Model;
 
-        public double Progress { get; private set; }
+        public float Progress { get; private set; }
 
         public event Action<float> DownloadProgressed;
 

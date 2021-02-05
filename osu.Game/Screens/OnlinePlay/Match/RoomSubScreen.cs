@@ -43,16 +43,16 @@ namespace osu.Game.Screens.OnlinePlay.Match
         private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
 
         [Cached]
-        protected readonly MultiplayerBeatmapTracker BeatmapTracker;
+        protected OnlinePlayBeatmapAvailablilityTracker BeatmapAvailablilityTracker { get; }
 
         private readonly Container content = new Container { RelativeSizeAxes = Axes.Both };
 
         protected RoomSubScreen()
         {
-            base.AddInternal(BeatmapTracker = new MultiplayerBeatmapTracker
+            BeatmapAvailablilityTracker = new OnlinePlayBeatmapAvailablilityTracker
             {
                 SelectedItem = { BindTarget = SelectedItem }
-            });
+            };
 
             base.AddInternal(content);
         }
@@ -65,6 +65,8 @@ namespace osu.Game.Screens.OnlinePlay.Match
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
+            base.AddInternal(BeatmapAvailablilityTracker);
+
             sampleStart = audio.Samples.Get(@"SongSelect/confirm-selection");
         }
 

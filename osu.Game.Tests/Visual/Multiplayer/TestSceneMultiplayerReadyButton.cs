@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     public class TestSceneMultiplayerReadyButton : MultiplayerTestScene
     {
         private MultiplayerReadyButton button;
-        private MultiplayerBeatmapTracker beatmapTracker;
+        private OnlinePlayBeatmapAvailablilityTracker beatmapTracker;
         private BeatmapSetInfo importedSet;
 
         private readonly Bindable<PlaylistItem> selectedItem = new Bindable<PlaylistItem>();
@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, host, Beatmap.Default));
             beatmaps.Import(TestResources.GetTestBeatmapForImport(true)).Wait();
 
-            Add(beatmapTracker = new MultiplayerBeatmapTracker
+            Add(beatmapTracker = new OnlinePlayBeatmapAvailablilityTracker
             {
                 SelectedItem = { BindTarget = selectedItem }
             });

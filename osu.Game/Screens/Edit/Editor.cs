@@ -109,7 +109,16 @@ namespace osu.Game.Screens.Edit
             if (Beatmap.Value is DummyWorkingBeatmap)
             {
                 isNewBeatmap = true;
-                Beatmap.Value = beatmapManager.CreateNew(Ruleset.Value, api.LocalUser.Value);
+
+                var newBeatmap = beatmapManager.CreateNew(Ruleset.Value, api.LocalUser.Value);
+
+                // this is a bit haphazard, but guards against setting the lease Beatmap bindable if
+                // the editor has already been exited.
+                if (!ValidForPush)
+                    return;
+
+                // this probably shouldn't be set in the asynchronous load method, but everything following relies on it.
+                Beatmap.Value = newBeatmap;
             }
 
             beatDivisor.Value = Beatmap.Value.BeatmapInfo.BeatDivisor;
@@ -131,6 +140,10 @@ namespace osu.Game.Screens.Edit
             try
             {
                 playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Beatmap.Value.BeatmapInfo.Ruleset);
+
+                // clone these locally for now to avoid incurring overhead on GetPlayableBeatmap usages.
+                // eventually we will want to improve how/where this is done as there are issues with *not* cloning it in all cases.
+                playableBeatmap.ControlPointInfo = playableBeatmap.ControlPointInfo.CreateCopy();
             }
             catch (Exception e)
             {
