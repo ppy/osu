@@ -400,7 +400,7 @@ namespace osu.Game.Online.Multiplayer
                 if (user == null)
                     return;
 
-                user.UserMods = mods;
+                user.Mods = mods;
 
                 RoomUpdated?.Invoke();
             }, false);
