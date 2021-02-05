@@ -7,8 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -45,25 +43,16 @@ namespace osu.Game.Screens.OnlinePlay.Match
         [Cached]
         protected OnlinePlayBeatmapAvailablilityTracker BeatmapAvailablilityTracker { get; }
 
-        private readonly Container content;
-
         protected RoomSubScreen()
         {
-            InternalChildren = new Drawable[]
+            AddInternal(BeatmapAvailablilityTracker = new OnlinePlayBeatmapAvailablilityTracker
             {
-                BeatmapAvailablilityTracker = new OnlinePlayBeatmapAvailablilityTracker
-                {
-                    SelectedItem = { BindTarget = SelectedItem }
-                },
-                content = new Container { RelativeSizeAxes = Axes.Both },
-            };
+                SelectedItem = { BindTarget = SelectedItem }
+            });
         }
 
-        // Forward all internal management to content to ensure locally added components are not removed unintentionally.
-        // This is a bit ugly but we don't have the concept of InternalContent so it'll have to do for now. (https://github.com/ppy/osu-framework/issues/1690)
-        protected override void AddInternal(Drawable drawable) => content.Add(drawable);
-        protected override bool RemoveInternal(Drawable drawable) => content.Remove(drawable);
-        protected override void ClearInternal(bool disposeChildren = true) => content.Clear(disposeChildren);
+        protected override void ClearInternal(bool disposeChildren = true) =>
+            throw new InvalidOperationException($"{nameof(RoomSubScreen)}'s children should not be cleared as it will remove required components");
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
