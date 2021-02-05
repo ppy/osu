@@ -147,9 +147,7 @@ namespace osu.Game.Rulesets.Mods
                 var targetBindable = (IBindable)prop.GetValue(this);
                 var sourceBindable = (IBindable)prop.GetValue(source);
 
-                // we only care about changes that have been made away from defaults, or if source is default but target is not.
-                if (!sourceBindable.IsDefault || !targetBindable.IsDefault)
-                    CopyAdjustedSetting(targetBindable, sourceBindable);
+                CopyAdjustedSetting(targetBindable, sourceBindable);
             }
         }
 
