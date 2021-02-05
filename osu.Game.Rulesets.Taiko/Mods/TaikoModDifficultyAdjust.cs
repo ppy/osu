@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 {
     public class TaikoModDifficultyAdjust : ModDifficultyAdjust
     {
-        [SettingSource("Scroll Speed", "Adjust a beatmap's set scroll speed", LAST_SETTING_ORDER + 1)]
+        [SettingSource("滚动速度", "Adjust a beatmap's set scroll speed", LAST_SETTING_ORDER + 1)]
         public BindableNumber<float> ScrollSpeed { get; } = new BindableFloat
         {
             Precision = 0.05f,
