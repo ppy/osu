@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
@@ -20,12 +19,9 @@ namespace osu.Game.Rulesets.Osu.UI
     /// </summary>
     public class StartTimeOrderedHitPolicy : IHitPolicy
     {
-        private readonly HitObjectContainer hitObjectContainer;
+        private IEnumerable<DrawableHitObject> hitObjects;
 
-        public StartTimeOrderedHitPolicy(HitObjectContainer hitObjectContainer)
-        {
-            this.hitObjectContainer = hitObjectContainer;
-        }
+        public void SetHitObjects(IEnumerable<DrawableHitObject> hitObjects) => this.hitObjects = hitObjects;
 
         public bool IsHittable(DrawableHitObject hitObject, double time)
         {
@@ -77,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private IEnumerable<DrawableHitObject> enumerateHitObjectsUpTo(double targetTime)
         {
-            foreach (var obj in hitObjectContainer.AliveObjects)
+            foreach (var obj in hitObjects)
             {
                 if (obj.HitObject.StartTime >= targetTime)
                     yield break;
