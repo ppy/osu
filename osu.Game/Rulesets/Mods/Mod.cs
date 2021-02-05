@@ -154,9 +154,9 @@ namespace osu.Game.Rulesets.Mods
         }
 
         /// <summary>
-        /// When creating copies or clones of or copying from a Mod, this method will be called
+        /// When copying from or creating copies/clones of a Mod, this method will be called
         /// to copy explicitly adjusted user settings from <paramref name="source"/>,
-        /// or to reset already adjusted setting back to default.
+        /// or to reset already adjusted setting here back to default.
         /// The base implementation will transfer the value via <see cref="Bindable{T}.Parse"/>
         /// or by binding and unbinding (if <paramref name="source"/> is an <see cref="IBindable"/>)
         /// and should be called unless replaced with custom logic.
