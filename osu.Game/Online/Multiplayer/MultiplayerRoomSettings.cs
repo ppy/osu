@@ -30,7 +30,7 @@ namespace osu.Game.Online.Multiplayer
 
         [NotNull]
         [Key(4)]
-        public IEnumerable<APIMod> Mods { get; set; } = Enumerable.Empty<APIMod>();
+        public IEnumerable<APIMod> RequiredMods { get; set; } = Enumerable.Empty<APIMod>();
 
         [NotNull]
         [Key(5)]
@@ -39,14 +39,14 @@ namespace osu.Game.Online.Multiplayer
         public bool Equals(MultiplayerRoomSettings other)
             => BeatmapID == other.BeatmapID
                && BeatmapChecksum == other.BeatmapChecksum
-               && Mods.SequenceEqual(other.Mods)
+               && RequiredMods.SequenceEqual(other.RequiredMods)
                && AllowedMods.SequenceEqual(other.AllowedMods)
                && RulesetID == other.RulesetID
                && Name.Equals(other.Name, StringComparison.Ordinal);
 
         public override string ToString() => $"Name:{Name}"
                                              + $" Beatmap:{BeatmapID} ({BeatmapChecksum})"
-                                             + $" Mods:{string.Join(',', Mods)}"
+                                             + $" RequiredMods:{string.Join(',', RequiredMods)}"
                                              + $" AllowedMods:{string.Join(',', AllowedMods)}"
                                              + $" Ruleset:{RulesetID}";
     }
