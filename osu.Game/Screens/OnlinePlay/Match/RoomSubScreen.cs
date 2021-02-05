@@ -51,17 +51,18 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         protected RoomSubScreen()
         {
-            BeatmapAvailablilityTracker = new OnlinePlayBeatmapAvailablilityTracker
+            AddInternal(BeatmapAvailablilityTracker = new OnlinePlayBeatmapAvailablilityTracker
             {
-                SelectedItem = { BindTarget = SelectedItem },
-            };
+                SelectedItem = { BindTarget = SelectedItem }
+            });
         }
+
+        protected override void ClearInternal(bool disposeChildren = true) =>
+            throw new InvalidOperationException($"{nameof(RoomSubScreen)}'s children should not be cleared as it will remove required components");
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            AddInternal(BeatmapAvailablilityTracker);
-
             sampleStart = audio.Samples.Get(@"SongSelect/confirm-selection");
         }
 
