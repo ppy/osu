@@ -1,21 +1,68 @@
 clone_depth: 1
 version: '{build}'
 image: Visual Studio 2019
-dotnet_csproj:
-  patch: true
-  file: 'osu.Game\osu.Game.csproj' # Use wildcard when it's able to exclude Xamarin projects
-  version: $(APPVEYOR_REPO_TAG_NAME)
-before_build:
-  - ps: dotnet --info # Useful when version mismatch between CI and local
-  - ps: nuget restore -verbosity quiet # Only nuget.exe knows both new (.NET Core) and old (Xamarin) projects
 test: off
 skip_non_tags: true
 configuration: Release
-build:
-  project: build\Desktop.proj # Skipping Xamarin Release that's slow and covered by fastlane
-  parallel: true
-  verbosity: minimal
-  publish_nuget: true
+
+environment:
+  matrix:
+    - job_name: osu-game
+    - job_name: osu-ruleset
+      job_depends_on: osu-game
+    - job_name: taiko-ruleset
+      job_depends_on: osu-game
+    - job_name: catch-ruleset
+      job_depends_on: osu-game
+    - job_name: mania-ruleset
+      job_depends_on: osu-game
+
+nuget:
+  project_feed: true
+
+for:
+  -
+    matrix:
+      only:
+        - job_name: osu-game
+    build_script:
+      - cmd: dotnet pack osu.Game\osu.Game.csproj /p:Version=%APPVEYOR_REPO_TAG_NAME%
+  -
+    matrix:
+      only:
+        - job_name: osu-ruleset
+    build_script:
+      - cmd: dotnet remove osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj reference osu.Game\osu.Game.csproj
+      - cmd: dotnet add osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj package ppy.osu.Game -v %APPVEYOR_REPO_TAG_NAME%
+      - cmd: dotnet pack osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj /p:Version=%APPVEYOR_REPO_TAG_NAME%
+  -
+    matrix:
+      only:
+        - job_name: taiko-ruleset
+    build_script:
+      - cmd: dotnet remove osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj reference osu.Game\osu.Game.csproj
+      - cmd: dotnet add osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj package ppy.osu.Game -v %APPVEYOR_REPO_TAG_NAME%
+      - cmd: dotnet pack osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj /p:Version=%APPVEYOR_REPO_TAG_NAME%
+  -
+    matrix:
+      only:
+        - job_name: catch-ruleset
+    build_script:
+      - cmd: dotnet remove osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj reference osu.Game\osu.Game.csproj
+      - cmd: dotnet add osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj package ppy.osu.Game -v %APPVEYOR_REPO_TAG_NAME%
+      - cmd: dotnet pack osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj /p:Version=%APPVEYOR_REPO_TAG_NAME%
+  -
+    matrix:
+      only:
+        - job_name: mania-ruleset
+    build_script:
+      - cmd: dotnet remove osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj reference osu.Game\osu.Game.csproj
+      - cmd: dotnet add osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj package ppy.osu.Game -v %APPVEYOR_REPO_TAG_NAME%
+      - cmd: dotnet pack osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj /p:Version=%APPVEYOR_REPO_TAG_NAME%
+
+artifacts:
+  - path: '**\*.nupkg'
+
 deploy:
   - provider: Environment
     name: nuget
