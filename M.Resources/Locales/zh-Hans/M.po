@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mfosu!\n"
 "POT-Creation-Date: 2020-12-04 02:25+0800\n"
-"PO-Revision-Date: 2021-02-06 02:18+0800\n"
+"PO-Revision-Date: 2021-02-06 02:53+0800\n"
 "Last-Translator: \n"
 "Language-Team: MATRIX-feather\n"
 "Language: zh_CN\n"
@@ -40,6 +40,9 @@ msgstr "创建"
 
 msgid "generic.leaderboard"
 msgstr "排行榜"
+
+msgid "generic.close"
+msgstr "关闭"
 
 # v2 主菜单
 msgid "screen.menu.buttonSystem.solo"
@@ -120,6 +123,12 @@ msgstr "锁定变更"
 
 msgid "screen.mvis.main.songSelect"
 msgstr "歌曲选择"
+
+msgid "screen.mvis.main.sidebar.collections"
+msgstr "收藏夹"
+
+msgid "screen.mvis.main.sidebar.playerSettings"
+msgstr "播放器设置"
 
 # v2 Mvis播放器收藏夹界面
 msgid "screen.mvis.collections.ui.noCollectionSelected"
@@ -977,23 +986,24 @@ msgid "已选择的Mods"
 msgstr ""
 
 # 歌曲选择 - Mods
-msgid "游戏Mods提供了多种多样的游玩方式"
-msgstr ""
+msgid "screen.select.modOverlay.title"
+msgstr "Mods"
 
-msgid "有一些会对您的分数等产生影响,还有一些仅供娱乐"
-msgstr ""
+# 游戏Mods提供了多种多样的游玩方式
+msgid "screen.select.modOverlay.desc1"
+msgstr "游戏Mods提供了多种多样的游玩方式"
 
-msgid "重置"
+# 有一些会对您的分数等产生影响,还有一些仅供娱乐
+msgid "screen.select.modOverlay.desc2"
 msgstr ""
+"有一些会对您的分数等产生影响,还有\n"
+"一些仅供娱乐"
 
-msgid "自定义"
-msgstr ""
+msgid "screen.select.modOverlay.customisation"
+msgstr "自定义"
 
-msgid "关闭"
-msgstr ""
-
-msgid "分数倍率:"
-msgstr ""
+msgid "screen.select.modOverlay.scoreMultiplier"
+msgstr "分数倍率："
 
 # 歌曲选择界面 - FilterControl
 msgid "分类依据"
@@ -1074,10 +1084,6 @@ msgid "标签"
 msgstr ""
 
 msgid "来源"
-msgstr ""
-
-# 歌曲选择 - Footer
-msgid "游戏Mods"
 msgstr ""
 
 msgid "随机选择"

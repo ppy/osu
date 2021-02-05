@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mfosu!\n"
 "POT-Creation-Date: 2020-12-04 02:25+0800\n"
-"PO-Revision-Date: 2021-01-29 16:03+0800\n"
+"PO-Revision-Date: 2021-02-06 02:52+0800\n"
 "Last-Translator: \n"
 "Language-Team: MATRIX-feather\n"
 "Language: en\n"
@@ -19,6 +19,30 @@ msgstr "exit"
 
 msgid "generic.back"
 msgstr "back"
+
+msgid "generic.selectAll"
+msgstr "select all"
+
+msgid "generic.deSelectAll"
+msgstr "deselect all"
+
+msgid "generic.select"
+msgstr "select"
+
+msgid "generic.chat"
+msgstr "chat"
+
+msgid "generic.unlimited"
+msgstr "Unlimited"
+
+msgid "generic.create"
+msgstr "create"
+
+msgid "generic.leaderboard"
+msgstr "leaderboard"
+
+msgid "generic.close"
+msgstr "Close"
 
 # v2 主菜单
 msgid "screen.menu.buttonSystem.solo"
@@ -101,6 +125,12 @@ msgstr "lock changes"
 msgid "screen.mvis.main.songSelect"
 msgstr "song select"
 
+msgid "screen.mvis.main.sidebar.collections"
+msgstr "Collections"
+
+msgid "screen.mvis.main.sidebar.playerSettings"
+msgstr "Player Settings"
+
 # v2 Mvis播放器 收藏夹界面
 msgid "screen.mvis.collections.ui.noCollectionSelected"
 msgstr "No collection selected"
@@ -139,6 +169,18 @@ msgstr "Hosted by "
 msgid "screen.multi.generic.lounge"
 msgstr "Lounge"
 
+msgid "screen.multi.generic.room"
+msgstr "room"
+
+msgid "screen.multi.generic.newRoom"
+msgstr "new room"
+
+msgid "screen.multi.generic.playlist"
+msgstr "playlist"
+
+msgid "screen.multi.generic.participants"
+msgstr "participants"
+
 # v2 多人游戏 RoomStatusFilter
 msgid "screen.multi.lounge.components.roomStatusFilter.open"
 msgstr "Open"
@@ -162,6 +204,65 @@ msgstr "create room"
 msgid ""
 "screen.multi.multiplayer.match.multiplayerMatchHeader.openSettingsButton.text"
 msgstr "open settings"
+
+msgid "screen.multi.multiplayer.match.beatmapOverlinedHeaderText"
+msgstr "beatmap"
+
+msgid "screen.multi.multiplayer.match.extraModsOverlinedHeaderText"
+msgstr "extra mods"
+
+# song selection
+msgid "screen.multi.onlinePlaySongSelect.ShortTitle"
+msgstr "Song Select"
+
+# Maximum attempts: {attempts.NewValue:N0}
+msgid "screen.multi.components.roomLocalUserInfo.maxAttempts"
+msgstr "Maximum attempts: {0}"
+
+msgid "screen.multi.playlistSettings.roomName"
+msgstr "ROOM NAME"
+
+msgid "screen.multi.playlistSettings.duration"
+msgstr "DURATION"
+
+# Allowed attempts (across all playlist items)
+msgid "screen.multi.playlistSettings.allowedAttempts"
+msgstr "ALLOWED ATTEMPTS (ACROSS ALL PLAYLIST ITEMS)"
+
+msgid "screen.multi.playlistSettings.visibility"
+msgstr "VISIBILITY"
+
+msgid "screen.multi.playlistSettings.maxParticipants"
+msgstr "MAX PARTICIPANTS"
+
+# password (optional)
+msgid "screen.multi.playlistSettings.password"
+msgstr "PASSWORD"
+
+msgid "screen.multi.playlistSettings.playlist.edit"
+msgstr "Edit Playlist"
+
+# Length: {0}
+msgid "screen.multi.playlistSettings.length"
+msgstr "Length: {0}"
+
+msgid "screen.multi.participantPanel.giveHost"
+msgstr "Give Host"
+
+msgid "screen.multi.playlistsRoomSubScreen.newPlaylist"
+msgstr "New Playlist"
+
+msgid "screen.multi.readyButton.ready"
+msgstr "Ready"
+
+msgid "screen.multi.readyButton.countText"
+msgstr "({0} / {1} ready)"
+
+msgid "screen.multi.readyButton.startMatch"
+msgstr "Start {0}"
+
+msgid "screen.multi.readyButton.waitingForHost"
+msgstr "Waiting for host... {0}"
 
 # {0}人参与
 msgid "screen.multi.lounge.components.participantInfo.summary.text"
@@ -314,40 +415,10 @@ msgstr ""
 msgid "New playlist"
 msgstr ""
 
-msgid "DURATION"
-msgstr ""
-
-msgid "ROOM NAME"
-msgstr ""
-
-msgid "PLAYLIST"
-msgstr ""
-
-msgid "ROOM VISIBILITY"
-msgstr ""
-
-msgid "GAME TYPE"
-msgstr ""
-
-msgid "MAX PARTICIPANTS"
-msgstr ""
-
-msgid "PASSWORD (OPTIONAL)"
-msgstr ""
-
 msgid "Select beatmap"
 msgstr ""
 
-msgid "Edit playlist"
-msgstr ""
-
-msgid "Length: {0}"
-msgstr ""
-
 msgid "Add new playlist entry"
-msgstr ""
-
-msgid "Create"
 msgstr ""
 
 msgid "Song Selection"
@@ -374,9 +445,6 @@ msgid "Create playlist"
 msgstr ""
 
 msgid "Leaderboard"
-msgstr ""
-
-msgid "Chat"
 msgstr ""
 
 msgid "Start"
@@ -935,26 +1003,24 @@ msgid "已选择的Mods"
 msgstr "Selected Mods"
 
 # 歌曲选择 - Mods
-msgid "游戏Mods提供了多种多样的游玩方式"
+msgid "screen.select.modOverlay.title"
+msgstr "Mods"
+
+# 游戏Mods提供了多种多样的游玩方式
+msgid "screen.select.modOverlay.desc1"
 msgstr ""
 "Mods provide different ways to enjoy gameplay. Some have an effect on the "
 "score you can achieve during ranked play."
 
-# 歌曲选择 - Mods
-msgid "有一些会对您的分数等产生影响,还有一些仅供娱乐"
+# 有一些会对您的分数等产生影响,还有一些仅供娱乐
+msgid "screen.select.modOverlay.desc2"
 msgstr "Others are just for fun."
 
-msgid "重置"
-msgstr "Deselect All"
-
-msgid "自定义"
+msgid "screen.select.modOverlay.customisation"
 msgstr "Customisation"
 
-msgid "关闭"
-msgstr "Close"
-
-msgid "分数倍率:"
-msgstr "Score Multiplier:"
+msgid "screen.select.modOverlay.scoreMultiplier"
+msgstr "Score Multiplier: "
 
 # 歌曲选择界面 - FilterControl
 msgid "分类依据"
@@ -1036,10 +1102,6 @@ msgstr "Tags"
 
 msgid "来源"
 msgstr "Source"
-
-# 歌曲选择 - Footer
-msgid "游戏Mods"
-msgstr "mods"
 
 msgid "随机选择"
 msgstr "random"
@@ -1371,6 +1433,32 @@ msgstr "notifications"
 
 msgid "等待着您~"
 msgstr "waiting for 'ya"
+
+# 歌曲选择 - Mods
+#~ msgid "游戏Mods提供了多种多样的游玩方式"
+#~ msgstr ""
+#~ "Mods provide different ways to enjoy gameplay. Some have an effect on the "
+#~ "score you can achieve during ranked play."
+
+# 歌曲选择 - Mods
+#~ msgid "有一些会对您的分数等产生影响,还有一些仅供娱乐"
+#~ msgstr "Others are just for fun."
+
+#~ msgid "重置"
+#~ msgstr "Deselect All"
+
+#~ msgid "自定义"
+#~ msgstr "Customisation"
+
+#~ msgid "关闭"
+#~ msgstr "Close"
+
+#~ msgid "分数倍率:"
+#~ msgstr "Score Multiplier:"
+
+# 歌曲选择 - Footer
+#~ msgid "游戏Mods"
+#~ msgstr "mods"
 
 #~ msgid "settings.online.integration.header"
 #~ msgstr "Intergrations"

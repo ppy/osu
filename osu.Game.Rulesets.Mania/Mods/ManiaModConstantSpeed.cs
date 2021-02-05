@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public override double ScoreMultiplier => 1;
 
-        public override string Description => "对突然变速说No!";
+        public override string Description => "对突如其来的变速说No!";
 
         public override IconUsage? Icon => FontAwesome.Solid.Equals;
 

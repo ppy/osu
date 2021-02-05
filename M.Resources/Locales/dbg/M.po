@@ -2,18 +2,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mfosu!\n"
 "POT-Creation-Date: 2020-12-04 02:25+0800\n"
-"PO-Revision-Date: 2020-12-04 18:34+0800\n"
+"PO-Revision-Date: 2021-02-06 02:37+0800\n"
 "Last-Translator: \n"
 "Language-Team: MATRIX-feather\n"
+"Language: dbg\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.4.1\n"
+"X-Generator: Poedit 2.4.2\n"
 "X-Poedit-Basepath: .\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"Language: zh_CN\n"
 
-#v2 通用
+# v2 通用
 msgid "generic.exit"
 msgstr ""
 
@@ -41,10 +41,7 @@ msgstr ""
 msgid "generic.leaderboard"
 msgstr ""
 
-msgid "generic.close"
-msgstr ""
-
-#v2 主菜单
+# v2 主菜单
 msgid "screen.menu.buttonSystem.solo"
 msgstr ""
 
@@ -87,11 +84,10 @@ msgstr ""
 msgid "screen.menu.buttonSystem.onPlaylistsError"
 msgstr ""
 
-#v2 杂项
+# v2 杂项
 msgid "game.users.drawables.clickableAvatar.tooltip"
 msgstr ""
 
-#v2 Mvis播放器 主界面
 msgid "screen.mvis.main.openManualInBrowser"
 msgstr ""
 
@@ -125,13 +121,7 @@ msgstr ""
 msgid "screen.mvis.main.songSelect"
 msgstr ""
 
-msgid "screen.mvis.main.sidebar.collections"
-msgstr ""
-
-msgid "screen.mvis.main.sidebar.playerSettings"
-msgstr ""
-
-#v2 Mvis播放器 收藏夹界面
+# v2 Mvis播放器收藏夹界面
 msgid "screen.mvis.collections.ui.noCollectionSelected"
 msgstr ""
 
@@ -141,26 +131,31 @@ msgstr ""
 msgid "screen.mvis.collections.ui.beatmapSetsCount"
 msgstr ""
 
-#v2 多人游戏 房间类型
+# v2 新多人游戏界面
 msgid "online.rooms.gameTypes.playlists"
 msgstr ""
 
+# v2 新多人游戏界面
 msgid "online.rooms.gameTypes.tag"
 msgstr ""
 
+# v2 新多人游戏界面
 msgid "online.rooms.gameTypes.tagTeam"
 msgstr ""
 
+# v2 新多人游戏界面
 msgid "online.rooms.gameTypes.versus"
 msgstr ""
 
+# v2 新多人游戏界面
 msgid "online.rooms.gameTypes.teamVersus"
 msgstr ""
 
-#v2 多人游戏 通用
+# v2 多人游戏 通用
 msgid "screen.multi.generic.hostedBy"
 msgstr ""
 
+# v2 多人游戏 通用
 msgid "screen.multi.generic.lounge"
 msgstr ""
 
@@ -176,7 +171,7 @@ msgstr ""
 msgid "screen.multi.generic.participants"
 msgstr ""
 
-#v2 多人游戏 RoomStatusFilter
+# v2 多人游戏 RoomStatusFilter
 msgid "screen.multi.lounge.components.roomStatusFilter.open"
 msgstr ""
 
@@ -189,14 +184,16 @@ msgstr ""
 msgid "screen.multi.lounge.components.roomStatusFilter.owned"
 msgstr ""
 
-#v2 多人游戏 主界面
+# v2 多人游戏 主界面
 msgid "screen.multi.multiplayer.multiplayer.screenTitle"
 msgstr ""
 
 msgid "screen.multi.multiplayer.createMultiplayerMatchButton.text"
 msgstr ""
 
-msgid "screen.multi.multiplayer.match.multiplayerMatchHeader.openSettingsButton.text"
+msgid ""
+"screen.multi.multiplayer.match.multiplayerMatchHeader."
+"openSettingsButton.text"
 msgstr ""
 
 msgid "screen.multi.multiplayer.match.beatmapOverlinedHeaderText"
@@ -205,11 +202,11 @@ msgstr ""
 msgid "screen.multi.multiplayer.match.extraModsOverlinedHeaderText"
 msgstr ""
 
-#song selection
+# song selection
 msgid "screen.multi.onlinePlaySongSelect.ShortTitle"
 msgstr ""
 
-#Maximum attempts: {attempts.NewValue:N0}
+# Maximum attempts: {attempts.NewValue:N0}
 msgid "screen.multi.components.roomLocalUserInfo.maxAttempts"
 msgstr ""
 
@@ -219,7 +216,7 @@ msgstr ""
 msgid "screen.multi.playlistSettings.duration"
 msgstr ""
 
-#Allowed attempts (across all playlist items)
+# Allowed attempts (across all playlist items)
 msgid "screen.multi.playlistSettings.allowedAttempts"
 msgstr ""
 
@@ -229,14 +226,14 @@ msgstr ""
 msgid "screen.multi.playlistSettings.maxParticipants"
 msgstr ""
 
-#password (optional)
+# password (optional)
 msgid "screen.multi.playlistSettings.password"
 msgstr ""
 
 msgid "screen.multi.playlistSettings.playlist.edit"
 msgstr ""
 
-#Length: {0}
+# Length: {0}
 msgid "screen.multi.playlistSettings.length"
 msgstr ""
 
@@ -271,6 +268,8 @@ msgstr ""
 
 msgid "settings.mvis.audio.adjustPitch.tooltip"
 msgstr ""
+"请注意: 播放速度调整暂不支持故事版音频, 调整故事版音频请手动前往歌"
+"曲选择添加加速/减速mod"
 
 msgid "settings.mvis.audio.nightcoreBeat"
 msgstr ""
@@ -383,7 +382,6 @@ msgstr ""
 msgid "settings.integration.discordRPC.Full"
 msgstr ""
 
-# 新多人游戏界面
 msgid "Recent Participants"
 msgstr ""
 
@@ -432,7 +430,6 @@ msgstr ""
 msgid "Start"
 msgstr ""
 
-# 设置界面
 msgid "设置"
 msgstr ""
 
@@ -745,7 +742,7 @@ msgstr ""
 msgid "当视觉效果Mods启用时,增强第一个物件的可见度"
 msgstr ""
 
-#Ruleset翻译应当由Ruleset自己设定
+# Ruleset翻译应当由Ruleset自己设定
 msgid "Ruleset翻译应当由Ruleset自己设定"
 msgstr ""
 
@@ -831,6 +828,7 @@ msgstr ""
 msgid "在这里调整Mf-osu的额外设置!"
 msgstr ""
 
+# Mf-osu 设置 - 整体
 msgid "整体"
 msgstr ""
 
@@ -846,7 +844,9 @@ msgstr ""
 msgid "启用Sayobot功能"
 msgstr ""
 
-msgid "这将影响所有谱面预览、封面、和下图的功能, 但不会影响已完成或正在进行中的请求"
+msgid ""
+"这将影响所有谱面预览、封面、和下图的功能, 但不会影响已完成或正在进"
+"行中的请求"
 msgstr ""
 
 msgid "立体音效增益"
@@ -958,7 +958,6 @@ msgstr ""
 msgid "返回"
 msgstr ""
 
-# 歌曲选择 - BeatmapDetailAreaTabItem
 msgid "谱面信息"
 msgstr ""
 
@@ -978,21 +977,22 @@ msgid "已选择的Mods"
 msgstr ""
 
 # 歌曲选择 - Mods
-msgid "screen.select.modOverlay.title"
+msgid "游戏Mods提供了多种多样的游玩方式"
 msgstr ""
 
-#游戏Mods提供了多种多样的游玩方式
-msgid "screen.select.modOverlay.desc1"
+msgid "有一些会对您的分数等产生影响,还有一些仅供娱乐"
 msgstr ""
 
-#有一些会对您的分数等产生影响,还有一些仅供娱乐
-msgid "screen.select.modOverlay.desc2"
+msgid "重置"
 msgstr ""
 
-msgid "screen.select.modOverlay.customisation"
+msgid "自定义"
 msgstr ""
 
-msgid "screen.select.modOverlay.scoreMultiplier"
+msgid "关闭"
+msgstr ""
+
+msgid "分数倍率:"
 msgstr ""
 
 # 歌曲选择界面 - FilterControl
@@ -1077,6 +1077,9 @@ msgid "来源"
 msgstr ""
 
 # 歌曲选择 - Footer
+msgid "游戏Mods"
+msgstr ""
+
 msgid "随机选择"
 msgstr ""
 
@@ -1355,7 +1358,6 @@ msgstr ""
 msgid "长得很好看(=・ω・=)"
 msgstr ""
 
-# OverlayHeaders
 msgid "关于Mf-osu"
 msgstr ""
 
@@ -1403,3 +1405,105 @@ msgstr ""
 
 msgid "等待着您~"
 msgstr ""
+
+#~ msgid "screen.multi.playlistSettings.playlist"
+#~ msgstr "游玩列表"
+
+#~ msgid "DURATION"
+#~ msgstr "时长"
+
+#~ msgid "ROOM NAME"
+#~ msgstr "房间名"
+
+#~ msgid "PLAYLIST"
+#~ msgstr "游玩列表"
+
+#~ msgid "ROOM VISIBILITY"
+#~ msgstr "房间可见度"
+
+#~ msgid "GAME TYPE"
+#~ msgstr "游戏类型"
+
+#~ msgid "MAX PARTICIPANTS"
+#~ msgstr "最大参与人数"
+
+#~ msgid "PASSWORD (OPTIONAL)"
+#~ msgstr "密码 (可选）"
+
+#~ msgid "Edit playlist"
+#~ msgstr "编辑游玩列表"
+
+#~ msgid "Length: {0}"
+#~ msgstr "长度: {0}"
+
+#~ msgid "Create"
+#~ msgstr "创建"
+
+#~ msgid "Chat"
+#~ msgstr "聊天"
+
+#~ msgid "settings.online.integration.header"
+#~ msgstr "集成"
+
+#~ msgid "settings.online.integration.discordRPC"
+#~ msgstr "Discord RPC模式"
+
+#~ msgid "screen.multi.header.pageTitle.text"
+#~ msgstr "大厅"
+
+#
+#~ msgid "_HostedBy_Text"
+#~ msgstr "房主为 "
+
+# 新多人游戏界面
+#~ msgid "_Open_Multiplayer"
+#~ msgstr "开放中的房间"
+
+# 新多人游戏界面
+#~ msgid "Multiplayer"
+#~ msgstr "多人游戏"
+
+#~ msgid "Lounge"
+#~ msgstr "大厅"
+
+#~ msgid "Create room"
+#~ msgstr "创建房间"
+
+#~ msgid "Open Settings"
+#~ msgstr "打开设置"
+
+#~ msgid "Recently Ended"
+#~ msgstr "最近结束的房间"
+
+#~ msgid "Participated"
+#~ msgstr "参加过的房间"
+
+#~ msgid "Owned"
+#~ msgstr "拥有的房间"
+
+#~ msgid "hosted by {0}"
+#~ msgstr "房主为 {0}"
+
+#~ msgid "hosted by "
+#~ msgstr "房主为 "
+
+#~ msgid "Open"
+#~ msgstr "打开"
+
+#~ msgid "{0} participant"
+#~ msgstr "{0} 人参与"
+
+#~ msgid "{0} participants"
+#~ msgstr "{0} 人参与"
+
+#~ msgid "Closed {0}"
+#~ msgstr "关闭于 {0}"
+
+#~ msgid "Closing {0}"
+#~ msgstr "将在 {0} 关闭"
+
+#~ msgid "Closing soon"
+#~ msgstr "即将关闭"
+
+#~ msgid "Frame Limiter"
+#~ msgstr "帧数限制"
