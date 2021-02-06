@@ -178,7 +178,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio, OsuConfigManager config, OsuGame game, OsuGameBase gameBase)
+        private void load(AudioManager audio, OsuConfigManager config, OsuGame game)
         {
             Mods.Value = base.Mods.Value.Select(m => m.CreateCopy()).ToArray();
 
