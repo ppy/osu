@@ -14,10 +14,6 @@ using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using IntroSequence = osu.Game.Configuration.IntroSequence;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
-using osuTK;
-using osu.Framework.Platform;
 
 namespace osu.Game.Screens
 {
@@ -34,17 +30,10 @@ namespace osu.Game.Screens
         private ShaderPrecompiler precompiler;
 
         private IntroSequence introSequence;
-        private Container logoContainer;
         private LoadingSpinner spinner;
         private ScheduledDelegate spinnerShow;
 
-        protected virtual OsuScreen CreateLoadableScreen()
-        {
-            if (showDisclaimer)
-                return new Disclaimer(getIntroSequence());
-
-            return getIntroSequence();
-        }
+        protected virtual OsuScreen CreateLoadableScreen() => new Disclaimer(getIntroSequence(), showDisclaimer);
 
         private IntroScreen getIntroSequence()
         {
@@ -75,9 +64,6 @@ namespace osu.Game.Screens
 
         protected virtual ShaderPrecompiler CreateShaderPrecompiler() => new ShaderPrecompiler();
 
-        private TextureStore textures;
-        private LoaderStorage loaderStorage;
-
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
@@ -93,29 +79,7 @@ namespace osu.Game.Screens
             }, _ =>
             {
                 AddInternal(spinner);
-                spinnerShow = Scheduler.AddDelayed(spinner.Show, (200 + 300));
-            });
-
-            LoadComponentAsync(logoContainer = new Container
-            {
-                Size = new Vector2(400),
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Children = new Drawable[]
-                {
-                    new Sprite
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        FillMode = FillMode.Fill,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Texture = textures.Get("avatarlogo"),
-                    }
-                }
-            }, _ =>
-            {
-                AddInternal(logoContainer);
-                logoContainer.FadeInFromZero(300);
+                spinnerShow = Scheduler.AddDelayed(spinner.Show, 200);
             });
 
             checkIfLoaded();
@@ -131,35 +95,18 @@ namespace osu.Game.Screens
 
             spinnerShow?.Cancel();
 
-            var logoFadeOutDelay = (textures.Get("avatarlogo") == null) ? 0 : 1500; //淡出前在屏幕上逗留的时间，如果没有则为D
-            var pushDelay = (logoFadeOutDelay == 0) ? 0 : (logoFadeOutDelay + LoadingSpinner.TRANSITION_DURATION); //推送下一个屏幕前的延时，若逗留时间为0则为0
-
-            logoContainer.Delay(logoFadeOutDelay).FadeOut(LoadingSpinner.TRANSITION_DURATION, Easing.OutQuint);
-
             if (spinner.State.Value == Visibility.Visible)
             {
                 spinner.Hide();
-                Scheduler.AddDelayed(() => this.Push(loadableScreen), LoadingSpinner.TRANSITION_DURATION + pushDelay);
+                Scheduler.AddDelayed(() => this.Push(loadableScreen), LoadingSpinner.TRANSITION_DURATION);
             }
             else
-            {
-                Scheduler.AddDelayed(() => this.Push(loadableScreen), LoadingSpinner.TRANSITION_DURATION + pushDelay);
-            }
-        }
-
-        private DependencyContainer dependencies;
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            return dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+                this.Push(loadableScreen);
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, OsuConfigManager config, TextureStore textures, Storage storage)
+        private void load(OsuGameBase game, OsuConfigManager config)
         {
-            this.textures = textures;
-            dependencies.CacheAs(loaderStorage = new LoaderStorage(storage));
-            textures.AddStore(new TextureLoaderStore(loaderStorage));
             showDisclaimer = game.IsDeployedBuild;
             introSequence = config.Get<IntroSequence>(OsuSetting.IntroSequence);
         }

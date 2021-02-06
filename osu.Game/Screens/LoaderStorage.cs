@@ -6,9 +6,9 @@ using osu.Framework.Platform;
 
 namespace osu.Game.Screens
 {
-    internal class LoaderStorage : NamespacedResourceStore<byte[]>
+    internal class CustomStorage : NamespacedResourceStore<byte[]>
     {
-        public LoaderStorage(Storage storage)
+        public CustomStorage(Storage storage)
             : base(new StorageBackedResourceStore(storage), "custom")
         {
         }

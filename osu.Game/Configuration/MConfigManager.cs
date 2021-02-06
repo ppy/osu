@@ -67,6 +67,10 @@ namespace osu.Game.Configuration
             Set(MSetting.PPCount, 0, 0);
             Set(MSetting.PurcasheBgBeatmap, false);
             Set(MSetting.PurcasheBgTriangles, false);
+
+            //实验性功能
+            Set(MSetting.CustomWindowIconPath, "");
+            Set(MSetting.UseCustomGreetingPicture, false);
         }
     }
 
@@ -105,7 +109,9 @@ namespace osu.Game.Configuration
         IntroLoadDirectToSongSelect,
         PPCount,
         PurcasheBgBeatmap,
-        PurcasheBgTriangles
+        PurcasheBgTriangles,
+        CustomWindowIconPath,
+        UseCustomGreetingPicture
     }
 
     public enum MvisBarType

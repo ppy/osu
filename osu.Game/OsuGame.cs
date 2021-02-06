@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using osu.Framework.Configuration;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
@@ -20,6 +21,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Humanizer;
 using JetBrains.Annotations;
+using osu.Framework;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
@@ -76,7 +78,7 @@ namespace osu.Game
 
         private MfMenuOverlay mfmenu;
 
-        public OnlinePictureOverlay picture;
+        public OnlinePictureOverlay Picture;
         private NewsOverlay news;
 
         private UserProfileOverlay userProfile;
@@ -146,6 +148,45 @@ namespace osu.Game
 
         private void updateBlockingOverlayFade() =>
             screenContainer.FadeColour(visibleBlockingOverlays.Any() ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
+
+        [Resolved]
+        private GameHost host { get; set; }
+
+        public void SetWindowIcon(string path)
+        {
+            if (!RuntimeInfo.IsDesktop)
+            {
+                Logger.Log("设置窗口图标仅适用于桌面", LoggingTarget.Runtime, LogLevel.Important);
+                return;
+            }
+
+            Stream stream;
+
+            if (File.Exists(path))
+                stream = File.Open(path, FileMode.Open, FileAccess.Read);
+            else
+                return;
+
+            try
+            {
+                switch (host.Window)
+                {
+                    case SDL2DesktopWindow sdl2DesktopWindow:
+                        sdl2DesktopWindow.SetIconFromStream(stream);
+                        break;
+
+                    case OsuTKDesktopWindow osuTKDesktopWindow:
+                        osuTKDesktopWindow.SetIconFromStream(stream);
+                        break;
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "设置窗口图标时出现了问题");
+            }
+
+            stream.Dispose();
+        }
 
         public void AddBlockingOverlay(OverlayContainer overlay)
         {
@@ -271,7 +312,7 @@ namespace osu.Game
                     break;
 
                 case LinkAction.OpenPictureURL:
-                    picture.UpdateImage(link.Argument, true);
+                    Picture.UpdateImage(link.Argument, true);
                     break;
 
                 case LinkAction.OpenEditorTimestamp:
@@ -675,7 +716,7 @@ namespace osu.Game
             var rankingsOverlay = loadComponentSingleFile(new RankingsOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal, true);
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(picture = new OnlinePictureOverlay(), overlayContent.Add, true);
+            loadComponentSingleFile(Picture = new OnlinePictureOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(Settings = new SettingsOverlay { GetToolbarHeight = () => ToolbarOffset }, leftFloatingOverlayContent.Add, true);
             var changelogOverlay = loadComponentSingleFile(new ChangelogOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
