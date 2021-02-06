@@ -5,6 +5,7 @@ using System;
 using osu.Game.Rulesets.Catch.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 {
@@ -25,7 +26,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
         private float lastDistanceMoved;
         private double lastStrainTime;
 
-        public Movement(float halfCatcherWidth)
+        public Movement(Mod[] mods, float halfCatcherWidth)
+            : base(mods)
         {
             HalfCatcherWidth = halfCatcherWidth;
         }
