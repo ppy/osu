@@ -160,7 +160,6 @@ namespace osu.Game.Screens.Play
             if (!Mods.Value.Any(m => m is ModAutoplay))
                 PrepareReplay();
 
-            // needs to be bound here as the last binding, otherwise cases like starting a replay while not focused causes player to exit, if activity is bound before checks.
             gameActive.BindTo(gameBase.IsActive);
             gameActive.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
         }
@@ -266,8 +265,6 @@ namespace osu.Game.Screens.Play
             DrawableRuleset.FrameStableClock.IsCatchingUp.BindValueChanged(_ => updateSampleDisabledState());
 
             DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updateGameplayState());
-
-            DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
 
             // bind clock into components that require it
             DrawableRuleset.IsPaused.BindTo(GameplayClockContainer.IsPaused);
@@ -431,7 +428,7 @@ namespace osu.Game.Screens.Play
 
         private void updatePauseOnFocusLostState()
         {
-            if (!PauseOnFocusLost || DrawableRuleset.HasReplayLoaded.Value || breakTracker.IsBreakTime.Value)
+            if (!PauseOnFocusLost || breakTracker.IsBreakTime.Value)
                 return;
 
             if (gameActive.Value == false)
