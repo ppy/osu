@@ -40,7 +40,14 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// <see cref="DifficultyHitObject"/>s that were processed previously. They can affect the strain values of the following objects.
         /// </summary>
-        protected readonly LimitedCapacityStack<DifficultyHitObject> Previous = new LimitedCapacityStack<DifficultyHitObject>(2); // Contained objects not used yet
+        protected readonly ReverseQueue<DifficultyHitObject> Previous;
+
+        /// <summary>
+        /// Soft capacity of the <see cref="Previous"/> queue.
+        /// <see cref="Previous"/> will automatically resize if it exceeds capacity, but will do so at a very slight performance impact.
+        /// The actual capacity will be set to this value + 1 to allow for storage of the current object before the next can be processed.
+        /// </summary>
+        protected virtual int PreviousCollectionSoftCapacity => 1;
 
         /// <summary>
         /// The current strain level.
@@ -61,6 +68,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         protected Skill(Mod[] mods)
         {
             this.mods = mods;
+            Previous = new ReverseQueue<DifficultyHitObject>(PreviousCollectionSoftCapacity + 1);
         }
 
         /// <summary>
@@ -68,12 +76,33 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         public void Process(DifficultyHitObject current)
         {
+            RemoveExtraneousHistory(current);
+
             CurrentStrain *= strainDecay(current.DeltaTime);
             CurrentStrain += StrainValueOf(current) * SkillMultiplier;
 
             currentSectionPeak = Math.Max(CurrentStrain, currentSectionPeak);
 
-            Previous.Push(current);
+            AddToHistory(current);
+        }
+
+        /// <summary>
+        /// Remove objects from <see cref="Previous"/> that are no longer needed for calculations from the current object onwards.
+        /// </summary>
+        /// <param name="current">The <see cref="DifficultyHitObject"/> to be processed.</param>
+        protected virtual void RemoveExtraneousHistory(DifficultyHitObject current)
+        {
+            while (Previous.Count > 1)
+                Previous.Dequeue();
+        }
+
+        /// <summary>
+        /// Add the current <see cref="DifficultyHitObject"/> to the <see cref="Previous"/> queue (if required).
+        /// </summary>
+        /// <param name="current">The <see cref="DifficultyHitObject"/> that was just processed.</param>
+        protected virtual void AddToHistory(DifficultyHitObject current)
+        {
+            Previous.Enqueue(current);
         }
 
         /// <summary>
