@@ -32,7 +32,8 @@ namespace osu.Game.Screens.Play
                 breaks = new PeriodTracker(value.Where(b => b.HasEffect)
                                                 .Select(b => new Period(b.StartTime, b.EndTime - BreakOverlay.BREAK_FADE_DURATION)));
 
-                updateBreakTime();
+                if (IsLoaded)
+                    updateBreakTime();
             }
         }
 
@@ -50,7 +51,7 @@ namespace osu.Game.Screens.Play
 
         private void updateBreakTime()
         {
-            var time = Clock?.CurrentTime ?? 0;
+            var time = Clock.CurrentTime;
 
             isBreakTime.Value = breaks?.IsInAny(time) == true
                                 || time < gameplayStartTime
