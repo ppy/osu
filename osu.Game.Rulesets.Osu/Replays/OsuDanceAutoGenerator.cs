@@ -4,13 +4,10 @@
 using osu.Game.Beatmaps;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays.Movers;
-using osu.Game.Rulesets.Osu.Replays.Movers.Sliders;
-using osu.Game.Rulesets.Osu.Replays.Movers.Spinners;
 using osu.Game.Rulesets.Osu.UI;
 using osuTK;
 using static osu.Game.Rulesets.Osu.Configuration.OsuDanceMover;
