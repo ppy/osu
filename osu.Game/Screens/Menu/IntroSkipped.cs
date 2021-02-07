@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Menu
             if (LoadDirectToSongSelect.Value)
             {
                 RandomBeatmaps();
-                game?.PresentBeatmap(setInfo);
+                game?.PresentBeatmap(SetInfo);
             }
         }
     }

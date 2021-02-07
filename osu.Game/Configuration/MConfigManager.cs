@@ -71,6 +71,7 @@ namespace osu.Game.Configuration
             //实验性功能
             Set(MSetting.CustomWindowIconPath, "");
             Set(MSetting.UseCustomGreetingPicture, false);
+            Set(MSetting.FadeWindowWhenExiting, false);
         }
     }
 
@@ -111,7 +112,8 @@ namespace osu.Game.Configuration
         PurcasheBgBeatmap,
         PurcasheBgTriangles,
         CustomWindowIconPath,
-        UseCustomGreetingPicture
+        UseCustomGreetingPicture,
+        FadeWindowWhenExiting
     }
 
     public enum MvisBarType

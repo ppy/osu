@@ -4,6 +4,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Platform;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -17,6 +18,9 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
         protected override string Header => "实验性功能";
 
         private readonly Bindable<string> customWindowIconPath = new Bindable<string>();
+
+        [Resolved]
+        private GameHost host { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(MConfigManager mConfig, OsuGame game)
@@ -45,6 +49,17 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
             if (RuntimeInfo.IsDesktop)
             {
                 Add(new ExperimentalSettingsSetupContainer("自定义窗口图标", MSetting.CustomWindowIconPath));
+
+                bool isSdlBackend = host.Window is SDL2DesktopWindow;
+                Bindable<bool> fadeWindowBindable;
+                Add(new SettingsCheckbox
+                {
+                    LabelText = "退出时淡出窗口",
+                    TooltipText = isSdlBackend ? string.Empty : "仅当窗口后端为SDL2时可用",
+                    Current = fadeWindowBindable = mConfig.GetBindable<bool>(MSetting.FadeWindowWhenExiting),
+                });
+
+                fadeWindowBindable.Disabled = !isSdlBackend;
             }
 
             mConfig.BindWith(MSetting.CustomWindowIconPath, customWindowIconPath);
