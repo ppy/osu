@@ -165,7 +165,10 @@ namespace osu.Game
             if (File.Exists(path))
                 stream = File.Open(path, FileMode.Open, FileAccess.Read);
             else
+            {
+                Logger.Log($"图标路径不存在: {path}", LoggingTarget.Runtime, LogLevel.Important);
                 return;
+            }
 
             try
             {
