@@ -26,6 +26,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private int countMeh;
         private int countMiss;
 
+        private const double combo_distribution_location = 930.58;
+        private const double combo_distribution_scale = 969.16;
+        private static readonly double combo_truncate_min = Math.Exp(-Math.Exp(combo_distribution_location / combo_distribution_scale));
+
         public OsuPerformanceCalculator(Ruleset ruleset, DifficultyAttributes attributes, ScoreInfo score)
             : base(ruleset, attributes, score)
         {
@@ -98,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Combo scaling
             if (Attributes.MaxCombo > 0)
-                aimValue *= (Math.Exp(-Math.Exp((930.58 - scoreMaxCombo) / 969.16)) - 0.073373) / (Math.Exp(-Math.Exp((930.58 - Attributes.MaxCombo) / 969.16)) - 0.073373);
+                aimValue *= comboScaling(scoreMaxCombo, Attributes.MaxCombo);
 
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
@@ -145,7 +149,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Combo scaling
             if (Attributes.MaxCombo > 0)
-                speedValue *= (Math.Exp(-Math.Exp((930.58 - scoreMaxCombo) / 969.16)) - 0.073373) / (Math.Exp(-Math.Exp((930.58 - Attributes.MaxCombo) / 969.16)) - 0.073373);
+                speedValue *= comboScaling(scoreMaxCombo, Attributes.MaxCombo);
 
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
@@ -192,6 +196,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 accuracyValue *= 1.02;
 
             return accuracyValue;
+        }
+
+        private double comboScaling(int scoreMaxCombo, int beatmapMaxCombo)
+        {
+            double cumulativeProbability = Math.Exp(-Math.Exp((combo_distribution_location - scoreMaxCombo) / combo_distribution_scale));
+
+            double truncateMax = Math.Exp(-Math.Exp((combo_distribution_location - beatmapMaxCombo) / combo_distribution_scale));
+
+            // Truncate distribution support to [0, maxCombo].
+            cumulativeProbability -= combo_truncate_min;
+            cumulativeProbability /= truncateMax - combo_truncate_min;
+
+            return cumulativeProbability;
         }
 
         private int totalHits => countGreat + countOk + countMeh + countMiss;
