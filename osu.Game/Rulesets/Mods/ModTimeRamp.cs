@@ -79,7 +79,9 @@ namespace osu.Game.Rulesets.Mods
         {
             double amount = (time - beginRampTime) / Math.Max(1, finalRateTime - beginRampTime);
             double ramp = InitialRate.Value + (FinalRate.Value - InitialRate.Value) * Math.Clamp(amount, 0, 1);
-            return rate * ramp;
+
+            // round the end result to match the bindable SpeedChange's precision, in case this is called externally.
+            return rate * Math.Round(ramp, 2);
         }
 
         public virtual void Update(Playfield playfield)
