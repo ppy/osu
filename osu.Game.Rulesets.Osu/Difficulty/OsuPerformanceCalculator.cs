@@ -204,7 +204,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double truncateMax = Math.Exp(-Math.Exp((combo_distribution_location - beatmapMaxCombo) / combo_distribution_scale));
 
-            // Truncate distribution support to [0, maxCombo].
+            // Truncate distribution support to [0, beatmapMaxCombo].
             cumulativeProbability -= combo_truncate_min;
             cumulativeProbability /= truncateMax - combo_truncate_min;
 
