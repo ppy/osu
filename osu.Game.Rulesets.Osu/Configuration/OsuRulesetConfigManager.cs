@@ -37,11 +37,9 @@ namespace osu.Game.Rulesets.Osu.Configuration
 
     public enum OsuDanceMover
     {
-        Linear,
         HalfCircle,
         Flower,
-        Momentum,
-        Test
+        Momentum
     }
 
     public enum OsuRulesetSetting
