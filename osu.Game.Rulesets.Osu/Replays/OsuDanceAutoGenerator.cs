@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Game.Beatmaps;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Objects;
@@ -100,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.Replays
                     break;
 
                 case Spinner s:
-                    if(s.SpinsRequired == 0) return;
+                    if (s.SpinsRequired == 0) return;
 
                     Vector2 difference = s.StackedPosition - SPINNER_CENTRE;
 
@@ -130,7 +131,7 @@ namespace osu.Game.Rulesets.Osu.Replays
 
                 default: return;
             }
-            
+
             if (Frames[^1].Time <= endFrame.Time)
                 AddFrameToReplay(endFrame);
         }
