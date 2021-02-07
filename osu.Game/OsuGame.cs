@@ -54,6 +54,7 @@ using osu.Game.Updater;
 using osu.Game.Utils;
 using LogLevel = osu.Framework.Logging.LogLevel;
 using osu.Game.Database;
+using SDL2;
 
 namespace osu.Game
 {
@@ -680,10 +681,14 @@ namespace osu.Game
 
             windowOpacity = new BindableFloat();
 
-            if (host.Window is SDL2DesktopWindow)
+            if (host.Window is SDL2DesktopWindow sdl2DesktopWindow)
             {
-                windowOpacity.Value = MfConfig.Get<bool>(MSetting.FadeInWindowWhenEntering) ? 0 : 1;
+                windowOpacity.Value = MfConfig.Get<bool>(MSetting.FadeInWindowWhenEntering)
+                    ? 0
+                    : 1;
                 windowOpacity.BindValueChanged(v => SetWindowOpacity(v.NewValue), true);
+
+                sdl2DesktopWindow.Visible = true;
             }
 
             loadComponentSingleFile(osuLogo, logo =>
