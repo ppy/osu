@@ -12,10 +12,6 @@
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <EnableNETAnalyzers>true</EnableNETAnalyzers>
-  </PropertyGroup>
-
   <ItemGroup Label="Project References">
     <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
   </ItemGroup>
