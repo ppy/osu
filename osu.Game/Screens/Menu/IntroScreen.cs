@@ -8,7 +8,6 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Platform;
 using osu.Framework.Utils;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -66,8 +65,8 @@ namespace osu.Game.Screens.Menu
         [Resolved]
         private MusicController musicController { get; set; }
 
-        [Resolved]
-        private GameHost host { get; set; }
+        [Resolved(CanBeNull = true)]
+        private OsuGame game { get; set; }
 
         [Resolved]
         private MConfigManager mConfig { get; set; }
@@ -164,18 +163,10 @@ namespace osu.Game.Screens.Menu
                 track.VolumeTo(0, fadeOutTime, Easing.Out);
             }
 
-            if (mConfig.Get<bool>(MSetting.FadeWindowWhenExiting)
-                && RuntimeInfo.IsDesktop
-                && host.Window is SDL2DesktopWindow sdl2DesktopWindow)
+            if (mConfig.Get<bool>(MSetting.FadeOutWindowWhenExiting)
+                && RuntimeInfo.IsDesktop)
             {
-                var opacity = new BindableFloat { Default = 1, Value = 1 };
-
-                opacity.BindValueChanged(v =>
-                {
-                    sdl2DesktopWindow.Opacity = v.NewValue;
-                });
-
-                this.TransformBindableTo(opacity, 0, fadeOutTime - 1);
+                game?.TransformWindowOpacity(0, fadeOutTime - 1);
             }
 
             //don't want to fade out completely else we will stop running updates.

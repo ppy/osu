@@ -51,15 +51,24 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 Add(new ExperimentalSettingsSetupContainer("自定义窗口图标", MSetting.CustomWindowIconPath));
 
                 bool isSdlBackend = host.Window is SDL2DesktopWindow;
-                Bindable<bool> fadeWindowBindable;
+                Bindable<bool> fadeOutWindowBindable;
+                Bindable<bool> fadeInWindowBindable;
                 Add(new SettingsCheckbox
                 {
                     LabelText = "退出时淡出窗口",
                     TooltipText = isSdlBackend ? string.Empty : "仅当窗口后端为SDL2时可用",
-                    Current = fadeWindowBindable = mConfig.GetBindable<bool>(MSetting.FadeWindowWhenExiting),
+                    Current = fadeOutWindowBindable = mConfig.GetBindable<bool>(MSetting.FadeOutWindowWhenExiting),
                 });
 
-                fadeWindowBindable.Disabled = !isSdlBackend;
+                Add(new SettingsCheckbox
+                {
+                    LabelText = "启动时淡入窗口",
+                    TooltipText = isSdlBackend ? string.Empty : "仅当窗口后端为SDL2时可用",
+                    Current = fadeInWindowBindable = mConfig.GetBindable<bool>(MSetting.FadeInWindowWhenEntering),
+                });
+
+                fadeOutWindowBindable.Disabled = !isSdlBackend;
+                fadeInWindowBindable.Disabled = !isSdlBackend;
             }
 
             mConfig.BindWith(MSetting.CustomWindowIconPath, customWindowIconPath);

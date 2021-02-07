@@ -191,6 +191,20 @@ namespace osu.Game
             stream.Dispose();
         }
 
+        private BindableFloat windowOpacity;
+
+        public void TransformWindowOpacity(float final, float duration = 0) =>
+            this.TransformBindableTo(windowOpacity, final, duration);
+
+        public void TransformWindowOpacity(float final, double duration) =>
+            this.TransformBindableTo(windowOpacity, final, duration);
+
+        public void SetWindowOpacity(float value)
+        {
+            if (host.Window is SDL2DesktopWindow sdl2DesktopWindow)
+                sdl2DesktopWindow.Opacity = value;
+        }
+
         public void AddBlockingOverlay(OverlayContainer overlay)
         {
             if (!visibleBlockingOverlays.Contains(overlay))
@@ -663,6 +677,14 @@ namespace osu.Game
 
             ScreenStack.ScreenPushed += screenPushed;
             ScreenStack.ScreenExited += screenExited;
+
+            windowOpacity = new BindableFloat();
+
+            if (host.Window is SDL2DesktopWindow)
+            {
+                windowOpacity.Value = MfConfig.Get<bool>(MSetting.FadeInWindowWhenEntering) ? 0 : 1;
+                windowOpacity.BindValueChanged(v => SetWindowOpacity(v.NewValue), true);
+            }
 
             loadComponentSingleFile(osuLogo, logo =>
             {

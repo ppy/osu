@@ -58,6 +58,9 @@ namespace osu.Game.Screens.Menu
         [Resolved]
         private Storage storage { get; set; }
 
+        [Resolved(CanBeNull = true)]
+        private OsuGame game { get; set; }
+
         [Resolved]
         private MConfigManager mConfig { get; set; }
 
@@ -191,6 +194,7 @@ namespace osu.Game.Screens.Menu
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
+            game?.TransformWindowOpacity(1, 300);
 
             icon.RotateTo(10);
             icon.FadeOut();
@@ -199,7 +203,8 @@ namespace osu.Game.Screens.Menu
             fill.FadeOut();
 
             var displayDelay = enableAvatarSprite ? 1000 : 0;
-            avatarSprite?.FadeIn(500);
+            bool fadeInWindowOnEnter = mConfig.Get<bool>(MSetting.FadeInWindowWhenEntering);
+            avatarSprite?.FadeIn(fadeInWindowOnEnter ? 0 : 500);
 
             if (showDisclaimer) //显示Disclaimer时要提供的动画过程
             {
@@ -230,7 +235,7 @@ namespace osu.Game.Screens.Menu
                 });
 
                 this
-                    .FadeInFromZero(500)
+                    .FadeInFromZero(fadeInWindowOnEnter ? 0 : 500)
                     .Then(5500)
                     .FadeOut(250)
                     .ScaleTo(0.9f, 250, Easing.InQuint)
@@ -245,7 +250,7 @@ namespace osu.Game.Screens.Menu
             {
                 if (enableAvatarSprite)
                     this
-                        .FadeInFromZero(500)
+                        .FadeInFromZero(fadeInWindowOnEnter ? 0 : 500)
                         .Then(2000)
                         .FadeOut(250)
                         .ScaleTo(0.9f, 250, Easing.InQuint)
