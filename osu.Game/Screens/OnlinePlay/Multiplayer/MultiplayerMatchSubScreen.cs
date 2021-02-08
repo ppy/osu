@@ -373,7 +373,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 client.LoadRequested -= onLoadRequested;
         }
 
-        private class UserModSelectOverlay : ModSelectOverlay
+        private class UserModSelectOverlay : LocalPlayerModSelectOverlay
         {
             public UserModSelectOverlay()
             {

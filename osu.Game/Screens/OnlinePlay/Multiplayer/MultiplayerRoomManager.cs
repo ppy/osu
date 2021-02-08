@@ -87,7 +87,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 if (t.IsCompletedSuccessfully)
                     Schedule(() => onSuccess?.Invoke(room));
-                else
+                else if (t.IsFaulted)
                 {
                     const string message = "Failed to join multiplayer room.";
 
