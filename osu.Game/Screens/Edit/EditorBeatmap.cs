@@ -88,6 +88,8 @@ namespace osu.Game.Screens.Edit
 
         public IEnumerable<BeatmapStatistic> GetStatistics() => PlayableBeatmap.GetStatistics();
 
+        public double GetMostCommonBeatLength() => PlayableBeatmap.GetMostCommonBeatLength();
+
         public IBeatmap Clone() => (EditorBeatmap)MemberwiseClone();
 
         private IList mutableHitObjects => (IList)PlayableBeatmap.HitObjects;
