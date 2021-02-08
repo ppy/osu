@@ -1,0 +1,209 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+#nullable enable
+
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
+using osu.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Logging;
+using osu.Game.Online.API;
+
+namespace osu.Game.Online
+{
+    /// <summary>
+    /// A component that maintains over a hub connection between client and server.
+    /// </summary>
+    public class HubClientConnector : Component
+    {
+        /// <summary>
+        /// Invoked whenever a new hub connection is built.
+        /// </summary>
+        public Action<HubConnection>? OnNewConnection;
+
+        private readonly string clientName;
+        private readonly string endpoint;
+
+        /// <summary>
+        /// The current connection opened by this connector.
+        /// </summary>
+        public HubConnection? CurrentConnection { get; private set; }
+
+        /// <summary>
+        /// Whether this is connected to the hub, use <see cref="CurrentConnection"/> to access the connection, if this is <c>true</c>.
+        /// </summary>
+        public IBindable<bool> IsConnected => isConnected;
+
+        private readonly Bindable<bool> isConnected = new Bindable<bool>();
+        private readonly SemaphoreSlim connectionLock = new SemaphoreSlim(1);
+        private CancellationTokenSource connectCancelSource = new CancellationTokenSource();
+
+        [Resolved]
+        private IAPIProvider api { get; set; } = null!;
+
+        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+
+        /// <summary>
+        /// Constructs a new <see cref="HubClientConnector"/>.
+        /// </summary>
+        /// <param name="clientName">The name of the client this connector connects for, used for logging.</param>
+        /// <param name="endpoint">The endpoint to the hub.</param>
+        public HubClientConnector(string clientName, string endpoint)
+        {
+            this.clientName = clientName;
+            this.endpoint = endpoint;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            apiState.BindTo(api.State);
+            apiState.BindValueChanged(state =>
+            {
+                switch (state.NewValue)
+                {
+                    case APIState.Failing:
+                    case APIState.Offline:
+                        Task.Run(() => disconnect(true));
+                        break;
+
+                    case APIState.Online:
+                        Task.Run(connect);
+                        break;
+                }
+            });
+        }
+
+        private async Task connect()
+        {
+            cancelExistingConnect();
+
+            if (!await connectionLock.WaitAsync(10000))
+                throw new TimeoutException("Could not obtain a lock to connect. A previous attempt is likely stuck.");
+
+            try
+            {
+                while (apiState.Value == APIState.Online)
+                {
+                    // ensure any previous connection was disposed.
+                    // this will also create a new cancellation token source.
+                    await disconnect(false);
+
+                    // this token will be valid for the scope of this connection.
+                    // if cancelled, we can be sure that a disconnect or reconnect is handled elsewhere.
+                    var cancellationToken = connectCancelSource.Token;
+
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    Logger.Log($"{clientName} connecting...", LoggingTarget.Network);
+
+                    try
+                    {
+                        // importantly, rebuild the connection each attempt to get an updated access token.
+                        CurrentConnection = createConnection(cancellationToken);
+
+                        await CurrentConnection.StartAsync(cancellationToken);
+
+                        Logger.Log($"{clientName} connected!", LoggingTarget.Network);
+                        isConnected.Value = true;
+                        return;
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        //connection process was cancelled.
+                        throw;
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Log($"{clientName} connection error: {e}", LoggingTarget.Network);
+
+                        // retry on any failure.
+                        await Task.Delay(5000, cancellationToken);
+                    }
+                }
+            }
+            finally
+            {
+                connectionLock.Release();
+            }
+        }
+
+        private HubConnection createConnection(CancellationToken cancellationToken)
+        {
+            var builder = new HubConnectionBuilder()
+                .WithUrl(endpoint, options => { options.Headers.Add("Authorization", $"Bearer {api.AccessToken}"); });
+
+            if (RuntimeInfo.SupportsJIT)
+                builder.AddMessagePackProtocol();
+            else
+            {
+                // eventually we will precompile resolvers for messagepack, but this isn't working currently
+                // see https://github.com/neuecc/MessagePack-CSharp/issues/780#issuecomment-768794308.
+                builder.AddNewtonsoftJsonProtocol(options => { options.PayloadSerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore; });
+            }
+
+            var newConnection = builder.Build();
+
+            OnNewConnection?.Invoke(newConnection);
+
+            newConnection.Closed += ex =>
+            {
+                isConnected.Value = false;
+
+                Logger.Log(ex != null ? $"{clientName} lost connection: {ex}" : $"{clientName} disconnected", LoggingTarget.Network);
+
+                // make sure a disconnect wasn't triggered (and this is still the active connection).
+                if (!cancellationToken.IsCancellationRequested)
+                    Task.Run(connect, default);
+
+                return Task.CompletedTask;
+            };
+
+            return newConnection;
+        }
+
+        private async Task disconnect(bool takeLock)
+        {
+            cancelExistingConnect();
+
+            if (takeLock)
+            {
+                if (!await connectionLock.WaitAsync(10000))
+                    throw new TimeoutException("Could not obtain a lock to disconnect. A previous attempt is likely stuck.");
+            }
+
+            try
+            {
+                if (CurrentConnection != null)
+                    await CurrentConnection.DisposeAsync();
+            }
+            finally
+            {
+                CurrentConnection = null;
+                if (takeLock)
+                    connectionLock.Release();
+            }
+        }
+
+        private void cancelExistingConnect()
+        {
+            connectCancelSource.Cancel();
+            connectCancelSource = new CancellationTokenSource();
+        }
+
+        public override string ToString() => $"Connector for {clientName} ({(IsConnected.Value ? "connected" : "not connected")}";
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            cancelExistingConnect();
+        }
+    }
+}
