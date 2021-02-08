@@ -248,7 +248,7 @@ namespace osu.Game.Users
         /// <summary>
         /// Retrieves the user statistics for a certain ruleset.
         /// If user is fetched from a <see cref="GetUserRequest"/>,
-        /// this will always return null, use <see cref="Statistics"/> instead.
+        /// this will always return empty instance, use <see cref="Statistics"/> instead.
         /// </summary>
         /// <param name="ruleset">The ruleset to retrieve statistics for.</param>
         // todo: this should likely be moved to a separate UserCompact class at some point.
@@ -263,7 +263,7 @@ namespace osu.Game.Users
         private UserStatistics parseStatisticsFor(RulesetInfo ruleset)
         {
             if (!(otherProperties.TryGetValue($"statistics_{ruleset.ShortName}", out var token)))
-                return null;
+                return new UserStatistics();
 
             var settings = JsonSerializableExtensions.CreateGlobalSettings();
             settings.DefaultValueHandling = DefaultValueHandling.Include;
