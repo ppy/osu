@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.UI
             set
             {
                 hitPolicy = value ?? throw new ArgumentNullException(nameof(value));
-                hitPolicy.SetHitObjects(HitObjectContainer.AliveObjects);
+                hitPolicy.HitObjectContainer = HitObjectContainer;
             }
         }
 
