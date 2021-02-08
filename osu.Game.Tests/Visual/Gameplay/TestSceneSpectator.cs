@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -233,6 +232,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         public class TestSpectatorStreamingClient : SpectatorStreamingClient
         {
+            protected override IBindable<bool> IsConnected { get; } = new BindableBool(false);
+
             public readonly User StreamingUser = new User { Id = 55, Username = "Test user" };
 
             public new BindableList<int> PlayingUsers => (BindableList<int>)base.PlayingUsers;
@@ -242,11 +243,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             public TestSpectatorStreamingClient()
                 : base(new DevelopmentEndpointConfiguration())
             {
-            }
-
-            protected override Task Connect()
-            {
-                return Task.CompletedTask;
             }
 
             public void StartPlay(int beatmapId)

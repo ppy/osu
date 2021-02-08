@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -96,6 +95,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public class TestMultiplayerStreaming : SpectatorStreamingClient
         {
+            protected override IBindable<bool> IsConnected { get; } = new BindableBool(false);
+
             public new BindableList<int> PlayingUsers => (BindableList<int>)base.PlayingUsers;
 
             private readonly int totalUsers;
@@ -163,8 +164,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     ((ISpectatorClient)this).UserSentFrames(userId, new FrameDataBundle(header, Array.Empty<LegacyReplayFrame>()));
                 }
             }
-
-            protected override Task Connect() => Task.CompletedTask;
         }
     }
 }
