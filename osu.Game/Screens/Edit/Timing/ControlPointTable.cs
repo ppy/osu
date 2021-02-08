@@ -106,6 +106,7 @@ namespace osu.Game.Screens.Edit.Timing
 
             public ControlGroupAttributes(ControlPointGroup group)
             {
+                RelativeSizeAxes = Axes.Both;
                 InternalChild = fill = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.Both,
