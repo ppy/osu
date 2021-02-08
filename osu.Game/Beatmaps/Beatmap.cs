@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Objects;
 using System.Collections.Generic;
@@ -65,7 +66,7 @@ namespace osu.Game.Beatmaps
                                     return (beatLength: t.BeatLength, duration: nextTime - t.Time);
                                 })
                                 // Aggregate durations into a set of (beatLength, duration) tuples for each beat length
-                                .GroupBy(t => t.beatLength)
+                                .GroupBy(t => Math.Round(t.beatLength * 1000) / 1000)
                                 .Select(g => (beatLength: g.Key, duration: g.Sum(t => t.duration)))
                                 // And if there are no timing points, use a default.
                                 .DefaultIfEmpty((TimingControlPoint.DEFAULT_BEAT_LENGTH, 0));
