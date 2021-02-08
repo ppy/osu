@@ -35,11 +35,7 @@ namespace osu.Game.IO
         {
             var songsDirectoryPath = Path.Combine(BasePath, stable_default_songs_path);
 
-            // enumerate the user config files available in case the user migrated their files from another pc / operating system.
-            var foundConfigFiles = GetFiles(".", "osu!.*.cfg");
-
-            // if more than one config file is found, let's use the oldest one (where the username in the filename doesn't match the local username).
-            var configFile = foundConfigFiles.Count() > 1 ? foundConfigFiles.FirstOrDefault(filename => !filename[5..^4].Contains(Environment.UserName, StringComparison.Ordinal)) : foundConfigFiles.FirstOrDefault();
+            var configFile = GetFiles(".", $"osu!.{Environment.UserName}.cfg").SingleOrDefault();
 
             if (configFile == null)
                 return songsDirectoryPath;
