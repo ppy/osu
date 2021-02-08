@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -56,13 +57,19 @@ namespace osu.Game.Screens.Menu
 
         private MainMenu mainMenu;
 
-        protected BeatmapSetInfo setInfo;
+        protected BeatmapSetInfo SetInfo;
 
         [Resolved]
         private AudioManager audio { get; set; }
 
         [Resolved]
         private MusicController musicController { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private OsuGame game { get; set; }
+
+        [Resolved]
+        private MConfigManager mConfig { get; set; }
 
         private BeatmapManager beatmaps { get; set; }
 
@@ -156,6 +163,12 @@ namespace osu.Game.Screens.Menu
                 track.VolumeTo(0, fadeOutTime, Easing.Out);
             }
 
+            if (mConfig.Get<bool>(MSetting.FadeOutWindowWhenExiting)
+                && RuntimeInfo.IsDesktop)
+            {
+                game?.TransformWindowOpacity(0, fadeOutTime - 1);
+            }
+
             //don't want to fade out completely else we will stop running updates.
             Game.FadeTo(0.01f, fadeOutTime).OnComplete(_ => this.Exit());
 
@@ -183,8 +196,8 @@ namespace osu.Game.Screens.Menu
 
             if (sets.Count > 0)
             {
-                setInfo = beatmaps.QueryBeatmapSet(s => s.ID == sets[RNG.Next(0, sets.Count - 1)].ID);
-                initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
+                SetInfo = beatmaps.QueryBeatmapSet(s => s.ID == sets[RNG.Next(0, sets.Count - 1)].ID);
+                initialBeatmap = beatmaps.GetWorkingBeatmap(SetInfo.Beatmaps[0]);
             }
         }
 

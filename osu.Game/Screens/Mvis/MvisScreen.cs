@@ -150,7 +150,8 @@ namespace osu.Game.Screens.Mvis
 
         private readonly Container proxyContainer = new Container
         {
-            RelativeSizeAxes = Axes.Both
+            RelativeSizeAxes = Axes.Both,
+            Depth = -1
         };
 
         private Drawable prevProxy;
@@ -251,6 +252,7 @@ namespace osu.Game.Screens.Mvis
                 {
                     Name = "Overlay Container",
                     RelativeSizeAxes = Axes.Both,
+                    Depth = float.MinValue,
                     Children = new Drawable[]
                     {
                         loadingSpinner = new LoadingSpinner(true, true)
@@ -560,11 +562,11 @@ namespace osu.Game.Screens.Mvis
                 if (v.NewValue)
                 {
                     background.Remove(proxyContainer);
-                    foreground.Add(proxyContainer);
+                    AddInternal(proxyContainer);
                 }
                 else
                 {
-                    foreground.Remove(proxyContainer);
+                    RemoveInternal(proxyContainer);
                     background.Add(proxyContainer);
                 }
             }, true);

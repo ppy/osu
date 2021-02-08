@@ -51,11 +51,11 @@ namespace osu.Game.Screens.Edit.Timing
                     {
                         textBox = new LabelledTextBox
                         {
-                            Label = "时间"
+                            Label = "editor.timing.section.group.time"
                         },
                         button = new TriangleButton
                         {
-                            Text = "使用当前时间",
+                            Text = "editor.timing.section.group.useCurrentTime",
                             RelativeSizeAxes = Axes.X,
                             Action = () => changeSelectedGroupTime(clock.CurrentTime)
                         }

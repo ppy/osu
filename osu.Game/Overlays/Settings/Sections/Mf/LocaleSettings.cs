@@ -3,6 +3,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings.Sections.Mf
@@ -12,12 +13,18 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
         private OsuTextBox textBox;
         protected override string Header => "语言环境(Locale)";
 
-        private FrameworkConfigManager config;
+        [Resolved]
+        private FrameworkConfigManager config { get; set; }
+
+        [Resolved]
+        private MConfigManager mConfig { get; set; }
+
+        [Resolved]
+        private OsuGame game { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(FrameworkConfigManager config)
+        private void load()
         {
-            this.config = config;
             Children = new Drawable[]
             {
                 new Container

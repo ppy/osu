@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using osu.Framework.Configuration;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
@@ -20,6 +21,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Humanizer;
 using JetBrains.Annotations;
+using osu.Framework;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
@@ -76,7 +78,7 @@ namespace osu.Game
 
         private MfMenuOverlay mfmenu;
 
-        public OnlinePictureOverlay picture;
+        public OnlinePictureOverlay Picture;
         private NewsOverlay news;
 
         private UserProfileOverlay userProfile;
@@ -146,6 +148,59 @@ namespace osu.Game
 
         private void updateBlockingOverlayFade() =>
             screenContainer.FadeColour(visibleBlockingOverlays.Any() ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
+
+        [Resolved]
+        private GameHost host { get; set; }
+
+        public void SetWindowIcon(string path)
+        {
+            if (!RuntimeInfo.IsDesktop || string.IsNullOrEmpty(path))
+                return;
+
+            Stream stream;
+
+            if (File.Exists(path))
+                stream = File.Open(path, FileMode.Open, FileAccess.Read);
+            else
+            {
+                Logger.Log($"图标路径不存在: {path}", LoggingTarget.Runtime, LogLevel.Important);
+                return;
+            }
+
+            try
+            {
+                switch (host.Window)
+                {
+                    case SDL2DesktopWindow sdl2DesktopWindow:
+                        sdl2DesktopWindow.SetIconFromStream(stream);
+                        break;
+
+                    case OsuTKDesktopWindow osuTKDesktopWindow:
+                        osuTKDesktopWindow.SetIconFromStream(stream);
+                        break;
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "设置窗口图标时出现了问题");
+            }
+
+            stream.Dispose();
+        }
+
+        private BindableFloat windowOpacity;
+
+        public void TransformWindowOpacity(float final, float duration = 0) =>
+            this.TransformBindableTo(windowOpacity, final, duration);
+
+        public void TransformWindowOpacity(float final, double duration) =>
+            this.TransformBindableTo(windowOpacity, final, duration);
+
+        public void SetWindowOpacity(float value)
+        {
+            if (host.Window is SDL2DesktopWindow sdl2DesktopWindow)
+                sdl2DesktopWindow.Opacity = value;
+        }
 
         public void AddBlockingOverlay(OverlayContainer overlay)
         {
@@ -271,7 +326,7 @@ namespace osu.Game
                     break;
 
                 case LinkAction.OpenPictureURL:
-                    picture.UpdateImage(link.Argument, true);
+                    Picture.UpdateImage(link.Argument, true);
                     break;
 
                 case LinkAction.OpenEditorTimestamp:
@@ -620,6 +675,18 @@ namespace osu.Game
             ScreenStack.ScreenPushed += screenPushed;
             ScreenStack.ScreenExited += screenExited;
 
+            windowOpacity = new BindableFloat();
+
+            if (host.Window is SDL2DesktopWindow sdl2DesktopWindow)
+            {
+                windowOpacity.Value = MfConfig.Get<bool>(MSetting.FadeInWindowWhenEntering)
+                    ? 0
+                    : 1;
+                windowOpacity.BindValueChanged(v => SetWindowOpacity(v.NewValue), true);
+
+                sdl2DesktopWindow.Visible = true;
+            }
+
             loadComponentSingleFile(osuLogo, logo =>
             {
                 logoContainer.Add(logo);
@@ -675,7 +742,7 @@ namespace osu.Game
             var rankingsOverlay = loadComponentSingleFile(new RankingsOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal, true);
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(picture = new OnlinePictureOverlay(), overlayContent.Add, true);
+            loadComponentSingleFile(Picture = new OnlinePictureOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(Settings = new SettingsOverlay { GetToolbarHeight = () => ToolbarOffset }, leftFloatingOverlayContent.Add, true);
             var changelogOverlay = loadComponentSingleFile(new ChangelogOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
@@ -729,7 +796,7 @@ namespace osu.Game
             }
 
             // ensure only one of these overlays are open at once.
-            var singleDisplayOverlays = new OverlayContainer[] { chatOverlay, news, dashboard, beatmapListing, changelogOverlay, rankingsOverlay };
+            var singleDisplayOverlays = new OverlayContainer[] { chatOverlay, news, dashboard, beatmapListing, changelogOverlay, rankingsOverlay, mfmenu };
 
             foreach (var overlay in singleDisplayOverlays)
             {

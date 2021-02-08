@@ -2,14 +2,19 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
@@ -32,12 +37,17 @@ namespace osu.Game.Screens.Menu
         private const float icon_size = 30;
 
         private readonly OsuScreen nextScreen;
+        private readonly bool showDisclaimer;
 
         private readonly Bindable<User> currentUser = new Bindable<User>();
         private FillFlowContainer fill;
 
-        public Disclaimer(OsuScreen nextScreen = null)
+        [CanBeNull]
+        private Sprite avatarSprite;
+
+        public Disclaimer(OsuScreen nextScreen = null, bool showDisclaimer = false)
         {
+            this.showDisclaimer = showDisclaimer;
             this.nextScreen = nextScreen;
             ValidForResume = false;
         }
@@ -45,9 +55,23 @@ namespace osu.Game.Screens.Menu
         [Resolved]
         private IAPIProvider api { get; set; }
 
+        [Resolved]
+        private Storage storage { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private OsuGame game { get; set; }
+
+        [Resolved]
+        private MConfigManager mConfig { get; set; }
+
+        private bool enableAvatarSprite;
+
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, TextureStore textures, Storage storage, OsuGame game)
         {
+            textures.AddStore(new TextureLoaderStore(new CustomStorage(storage)));
+            enableAvatarSprite = mConfig.Get<bool>(MSetting.UseCustomGreetingPicture);
+
             InternalChildren = new Drawable[]
             {
                 icon = new SpriteIcon
@@ -92,6 +116,20 @@ namespace osu.Game.Screens.Menu
                     }
                 }
             };
+
+            if (enableAvatarSprite)
+                AddInternal(avatarSprite = new Sprite
+                {
+                    Size = new Vector2(400),
+                    FillMode = FillMode.Fill,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Texture = textures.Get("avatarlogo"),
+                    Alpha = 0,
+                    Depth = float.MaxValue
+                });
+
+            game.SetWindowIcon(mConfig.Get<string>(MSetting.CustomWindowIconPath));
 
             textFlow.NewParagraph();
             textFlow.NewParagraph();
@@ -156,42 +194,75 @@ namespace osu.Game.Screens.Menu
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
+            game?.TransformWindowOpacity(1, 300);
 
             icon.RotateTo(10);
             icon.FadeOut();
             icon.ScaleTo(0.5f);
 
-            icon.Delay(500).FadeIn(500).ScaleTo(1, 500, Easing.OutQuint);
+            fill.FadeOut();
 
-            using (BeginDelayedSequence(3000, true))
+            var displayDelay = enableAvatarSprite ? 1000 : 0;
+            bool fadeInWindowOnEnter = mConfig.Get<bool>(MSetting.FadeInWindowWhenEntering);
+            avatarSprite?.FadeIn(fadeInWindowOnEnter ? 0 : 500);
+
+            if (showDisclaimer) //显示Disclaimer时要提供的动画过程
             {
-                icon.FadeColour(iconColour, 200, Easing.OutQuint);
-                icon.MoveToY(icon_y * 1.3f, 500, Easing.OutCirc)
-                    .RotateTo(-360, 520, Easing.OutQuint)
-                    .Then()
-                    .MoveToY(icon_y, 160, Easing.InQuart)
-                    .FadeColour(Color4.White, 160);
-
-                fill.Delay(520 + 160).MoveToOffset(new Vector2(0, 15), 160, Easing.OutQuart);
-            }
-
-            supportFlow.FadeOut().Delay(2000).FadeIn(500);
-            double delay = 500;
-            foreach (var c in textFlow.Children)
-                c.FadeTo(0.001f).Delay(delay += 20).FadeIn(500);
-
-            animateHeart();
-
-            this
-                .FadeInFromZero(500)
-                .Then(5500)
-                .FadeOut(250)
-                .ScaleTo(0.9f, 250, Easing.InQuint)
-                .Finally(d =>
+                this.Delay(displayDelay).Schedule(() =>
                 {
-                    if (nextScreen != null)
-                        this.Push(nextScreen);
+                    avatarSprite?.FadeColour(Color4.Gray.Opacity(0.15f), 500);
+                    icon.Delay(1000 - displayDelay).FadeIn(500).ScaleTo(1, 500, Easing.OutQuint);
+                    fill.Delay(1000 - displayDelay).FadeIn(500);
+
+                    using (BeginDelayedSequence(3000 - displayDelay, true))
+                    {
+                        icon.FadeColour(iconColour, 200, Easing.OutQuint);
+                        icon.MoveToY(icon_y * 1.3f, 500, Easing.OutCirc)
+                            .RotateTo(-360, 520, Easing.OutQuint)
+                            .Then()
+                            .MoveToY(icon_y, 160, Easing.InQuart)
+                            .FadeColour(Color4.White, 160);
+
+                        fill.Delay(520 + 160).MoveToOffset(new Vector2(0, 15), 160, Easing.OutQuart);
+                    }
+
+                    supportFlow.FadeOut().Delay(2000 - displayDelay).FadeIn(500);
+                    double delay = 1000 - displayDelay;
+                    foreach (var c in textFlow.Children)
+                        c.FadeTo(0.001f).Delay(delay += 20).FadeIn(500);
+
+                    animateHeart();
                 });
+
+                this
+                    .FadeInFromZero(fadeInWindowOnEnter ? 0 : 500)
+                    .Then(5500)
+                    .FadeOut(250)
+                    .ScaleTo(0.9f, 250, Easing.InQuint)
+                    .Then(1000)
+                    .Finally(d =>
+                    {
+                        if (nextScreen != null)
+                            this.Push(nextScreen);
+                    });
+            }
+            else //不显示时
+            {
+                if (enableAvatarSprite)
+                    this
+                        .FadeInFromZero(fadeInWindowOnEnter ? 0 : 500)
+                        .Then(2000)
+                        .FadeOut(250)
+                        .ScaleTo(0.9f, 250, Easing.InQuint)
+                        .Then(1000)
+                        .Finally(d =>
+                        {
+                            if (nextScreen != null)
+                                this.Push(nextScreen);
+                        });
+                else if (nextScreen != null)
+                    this.Push(nextScreen);
+            }
         }
 
         private string getRandomTip()

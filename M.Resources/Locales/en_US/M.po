@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mfosu!\n"
 "POT-Creation-Date: 2020-12-04 02:25+0800\n"
-"PO-Revision-Date: 2021-02-06 02:52+0800\n"
+"PO-Revision-Date: 2021-02-08 13:45+0800\n"
 "Last-Translator: \n"
 "Language-Team: MATRIX-feather\n"
 "Language: en\n"
@@ -12,6 +12,49 @@ msgstr ""
 "X-Generator: Poedit 2.4.2\n"
 "X-Poedit-Basepath: .\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+
+# v2 编辑器
+msgid "editor.controlPoint.effect"
+msgstr "Effect"
+
+msgid "editor.controlPoint.effect.kiai"
+msgstr "Kiai"
+
+msgid "editor.controlPoint.effect.noBarLine"
+msgstr "No bar line"
+
+msgid "editor.controlPoint.timing"
+msgstr "Timing"
+
+msgid "editor.controlPoint.difficulty"
+msgstr "Difficulty"
+
+msgid "editor.controlPoint.sample"
+msgstr "Sample"
+
+msgid "editor.timing.section.group.time"
+msgstr "Time"
+
+msgid "editor.timing.section.group.useCurrentTime"
+msgstr "Use current time"
+
+msgid "editor.timing.section.timing.timeSignature"
+msgstr "Time signature"
+
+msgid "editor.timing.section.difficulty.speedMultiplier"
+msgstr "Speed multiplier"
+
+msgid "editor.timing.section.sample.bankName"
+msgstr "Bank name"
+
+msgid "editor.timing.section.sample.volume"
+msgstr "Volume"
+
+msgid "editor.timing.section.effect.kiai"
+msgstr "Kiai"
+
+msgid "editor.timing.section.effect.skipFirstBarLine"
+msgstr "Skip first bar line"
 
 # v2 通用
 msgid "generic.exit"
