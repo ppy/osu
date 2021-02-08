@@ -35,9 +35,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
+        private SpriteIcon crown;
+        private OsuSpriteText userRankText;
         private ModDisplay userModsDisplay;
         private StateDisplay userStateDisplay;
-        private SpriteIcon crown;
 
         public ParticipantPanel(MultiplayerRoomUser user)
         {
@@ -119,12 +120,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                                         Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 18),
                                         Text = user?.Username
                                     },
-                                    new OsuSpriteText
+                                    userRankText = new OsuSpriteText
                                     {
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
                                         Font = OsuFont.GetFont(size: 14),
-                                        Text = user?.CurrentModeRank != null ? $"#{user.CurrentModeRank}" : string.Empty
                                     }
                                 }
                             },
@@ -162,6 +162,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
             const double fade_time = 50;
 
+            var ruleset = rulesets.GetRuleset(Room.Settings.RulesetID);
+
+            var currentModeRank = User.User?.GetStatisticsFor(ruleset)?.GlobalRank;
+
+            // fallback to current mode rank for testing purposes.
+            currentModeRank ??= User.User?.CurrentModeRank;
+
+            userRankText.Text = currentModeRank != null ? $"#{currentModeRank.Value:N0}" : string.Empty;
+
             userStateDisplay.Status = User.State;
 
             if (Room.Host?.Equals(User) == true)
@@ -171,11 +180,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
             // If the mods are updated at the end of the frame, the flow container will skip a reflow cycle: https://github.com/ppy/osu-framework/issues/4187
             // This looks particularly jarring here, so re-schedule the update to that start of our frame as a fix.
-            Schedule(() =>
-            {
-                var ruleset = rulesets.GetRuleset(Room.Settings.RulesetID).CreateInstance();
-                userModsDisplay.Current.Value = User.Mods.Select(m => m.ToMod(ruleset)).ToList();
-            });
+            Schedule(() => userModsDisplay.Current.Value = User.Mods.Select(m => m.ToMod(ruleset.CreateInstance())).ToList());
         }
 
         public MenuItem[] ContextMenuItems

@@ -3,6 +3,7 @@
 
 using System;
 using Newtonsoft.Json;
+using osu.Game.Online.API.Requests;
 using osu.Game.Scoring;
 using osu.Game.Utils;
 using static osu.Game.Users.User;
@@ -25,6 +26,13 @@ namespace osu.Game.Users
             [JsonProperty(@"progress")]
             public int Progress;
         }
+
+        /// <remarks>
+        /// This must only be used when coming from condensed user responses (e.g. from <see cref="GetUsersRequest"/>), otherwise use <code>Ranks.Global</code>.
+        /// </remarks>
+        // todo: this should likely be moved to a separate UserStatisticsCompact class at some point.
+        [JsonProperty(@"global_rank")]
+        public int? GlobalRank;
 
         [JsonProperty(@"pp")]
         public decimal? PP;
