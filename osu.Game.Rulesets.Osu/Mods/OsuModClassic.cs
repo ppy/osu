@@ -30,6 +30,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override bool Ranked => false;
 
+        public override ModType Type => ModType.Conversion;
+
         [SettingSource("Disable slider head judgement", "Scores sliders proportionally to the number of ticks hit.")]
         public Bindable<bool> DisableSliderHeadJudgement { get; } = new BindableBool(true);
 
