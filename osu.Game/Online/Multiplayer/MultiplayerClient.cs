@@ -4,6 +4,7 @@
 #nullable enable
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -187,6 +188,14 @@ namespace osu.Game.Online.Multiplayer
             return connection.InvokeAsync(nameof(IMultiplayerServer.ChangeBeatmapAvailability), newBeatmapAvailability);
         }
 
+        public override Task ChangeUserMods(IEnumerable<APIMod> newMods)
+        {
+            if (!isConnected.Value)
+                return Task.CompletedTask;
+
+            return connection.InvokeAsync(nameof(IMultiplayerServer.ChangeUserMods), newMods);
+        }
+
         public override Task StartMatch()
         {
             if (!isConnected.Value)
@@ -242,6 +251,7 @@ namespace osu.Game.Online.Multiplayer
             newConnection.On(nameof(IMultiplayerClient.LoadRequested), ((IMultiplayerClient)this).LoadRequested);
             newConnection.On(nameof(IMultiplayerClient.MatchStarted), ((IMultiplayerClient)this).MatchStarted);
             newConnection.On(nameof(IMultiplayerClient.ResultsReady), ((IMultiplayerClient)this).ResultsReady);
+            newConnection.On<int, IEnumerable<APIMod>>(nameof(IMultiplayerClient.UserModsChanged), ((IMultiplayerClient)this).UserModsChanged);
 
             newConnection.Closed += ex =>
             {
