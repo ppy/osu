@@ -9,6 +9,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -171,6 +172,7 @@ namespace osu.Game.Screens.Mvis
         private DrawableTrack track => musicController.CurrentTrack;
 
         private WorkingBeatmap prevBeatmap;
+        private Box dimBox;
 
         #endregion
 
@@ -255,6 +257,12 @@ namespace osu.Game.Screens.Mvis
                     Depth = float.MinValue,
                     Children = new Drawable[]
                     {
+                        dimBox = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.Black.Opacity(0.6f),
+                            Alpha = 0
+                        },
                         loadingSpinner = new LoadingSpinner(true, true)
                         {
                             Anchor = Anchor.BottomCentre,
@@ -570,6 +578,14 @@ namespace osu.Game.Screens.Mvis
                     background.Add(proxyContainer);
                 }
             }, true);
+
+            sidebar.State.BindValueChanged(v =>
+            {
+                if (v.NewValue == Visibility.Visible)
+                    dimBox.FadeIn(500, Easing.OutQuint);
+                else
+                    dimBox.FadeOut(500, Easing.OutQuint);
+            });
 
             showOverlays(true);
 
