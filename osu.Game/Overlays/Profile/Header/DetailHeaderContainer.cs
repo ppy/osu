@@ -104,6 +104,7 @@ namespace osu.Game.Overlays.Profile.Header
                                     Child = new Container
                                     {
                                         RelativeSizeAxes = Axes.Both,
+                                        Padding = new MarginPadding { Vertical = 15 },
                                         Child = rankGraph = new RankGraph
                                         {
                                             Anchor = Anchor.Centre,

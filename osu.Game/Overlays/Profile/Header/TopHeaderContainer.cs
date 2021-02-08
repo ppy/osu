@@ -323,83 +323,60 @@ namespace osu.Game.Overlays.Profile.Header
 
             if (user?.Statistics != null)
             {
-                userStats.Add(new Container
+                userStats.Add(new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                    Content = new[]
                     {
-                        new Container
+                        new Drawable[]
                         {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            RelativeSizeAxes = Axes.Both,
-                            Height = (float)2 / 3,
-                            Child = new GridContainer
+                            new UserStatsLine("Ranked谱面总分", user.Statistics.RankedScore.ToString("#,##0"))
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                ColumnDimensions = new[]
-                                {
-                                    new Dimension(),
-                                    new Dimension(),
-                                    new Dimension(),
-                                },
-                                Content = new[]
-                                {
-                                    new Drawable[]
-                                    {
-                                        new PlayerStatBox
-                                        {
-                                            Icon = FontAwesome.Regular.Map,
-                                            Title = "Ranked谱面总分",
-                                            ContentText = user.Statistics.RankedScore.ToString("#,##0")
-                                        },
-                                        new PlayerStatBox
-                                        {
-                                            Icon = FontAwesome.Regular.CheckCircle,
-                                            Title = "准确率",
-                                            ContentText = user.Statistics.DisplayAccuracy
-                                        },
-                                        new PlayerStatBox
-                                        {
-                                            Icon = FontAwesome.Solid.PlayCircle,
-                                            Title = "游玩次数",
-                                            ContentText = user.Statistics.PlayCount.ToString("#,##0")
-                                        },
-                                    },
-                                    new Drawable[]
-                                    {
-                                        new PlayerStatBox
-                                        {
-                                            Icon = FontAwesome.Regular.FileVideo,
-                                            Title = "回放被观看次数",
-                                            ContentText = user.Statistics.ReplaysWatched.ToString("#,##0")
-                                        },
-                                        new PlayerStatBox
-                                        {
-                                            Icon = FontAwesome.Regular.Compass,
-                                            Title = "总连击",
-                                            ContentText = user.Statistics.TotalHits.ToString("#,##0")
-                                        },
-                                        new PlayerStatBox
-                                        {
-                                            Icon = FontAwesome.Regular.WindowMaximize,
-                                            Title = "最大连击",
-                                            ContentText = user.Statistics.MaxCombo.ToString("#,##0")
-                                        },
-                                    },
-                                }
+                                Icon = FontAwesome.Regular.Map
                             }
                         },
-                        new PlayerStatBox
+                        new Drawable[]
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Height = (float)1 / 3,
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.BottomCentre,
-                            Icon = FontAwesome.Regular.Calendar,
-                            Title = "总分",
-                            ContentText = user.Statistics.TotalScore.ToString("#,##0")
+                            new UserStatsLine("准确率", user.Statistics.DisplayAccuracy)
+                            {
+                                Icon = FontAwesome.Regular.CheckCircle
+                            }
                         },
+                        new Drawable[]
+                        {
+                            new UserStatsLine("游玩次数", user.Statistics.PlayCount.ToString("#,##0"))
+                            {
+                                Icon = FontAwesome.Solid.PlayCircle
+                            }
+                        },
+                        new Drawable[]
+                        {
+                            new UserStatsLine("回放被观看次数", user.Statistics.ReplaysWatched.ToString("#,##0"))
+                            {
+                                Icon = FontAwesome.Regular.FileVideo
+                            }
+                        },
+                        new Drawable[]
+                        {
+                            new UserStatsLine("总连击", user.Statistics.TotalHits.ToString("#,##0"))
+                            {
+                                Icon = FontAwesome.Regular.Compass
+                            }
+                        },
+                        new Drawable[]
+                        {
+                            new UserStatsLine("最大连击", user.Statistics.MaxCombo.ToString("#,##0"))
+                            {
+                                Icon = FontAwesome.Regular.WindowMaximize
+                            }
+                        },
+                        new Drawable[]
+                        {
+                            new UserStatsLine("总分", user.Statistics.TotalScore.ToString("#,##0"))
+                            {
+                                Icon = FontAwesome.Regular.Calendar
+                            }
+                        }
                     }
                 });
 
@@ -416,25 +393,60 @@ namespace osu.Game.Overlays.Profile.Header
 
         private class UserStatsLine : Container
         {
+            private SpriteIcon icon;
+            public IconUsage Icon { get; set; }
+
             public UserStatsLine(string left, string right)
             {
-                RelativeSizeAxes = Axes.X;
-                AutoSizeAxes = Axes.Y;
+                RelativeSizeAxes = Axes.Both;
                 Children = new Drawable[]
                 {
-                    new OsuSpriteText
+                    new FillFlowContainer
                     {
-                        Font = OsuFont.GetFont(size: 20),
-                        Text = left,
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        RelativeSizeAxes = Axes.Both,
+                        Spacing = new Vector2(10),
+                        Margin = new MarginPadding { Left = 10 },
+                        Children = new Drawable[]
+                        {
+                            icon = new SpriteIcon
+                            {
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                Size = new Vector2(16)
+                            },
+                            new OsuSpriteText
+                            {
+                                Font = OsuFont.GetFont(size: 20),
+                                Text = left,
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft
+                            },
+                        }
                     },
                     new OsuSpriteText
                     {
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
+                        Anchor = Anchor.CentreRight,
+                        Origin = Anchor.CentreRight,
                         Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
                         Text = right,
-                    },
+                        Margin = new MarginPadding { Right = 10 }
+                    }
                 };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                Add(new Box
+                {
+                    Depth = float.MaxValue,
+                    Colour = colourProvider.Background4,
+                    RelativeSizeAxes = Axes.Both
+                });
+
+                icon.Icon = Icon;
             }
         }
     }

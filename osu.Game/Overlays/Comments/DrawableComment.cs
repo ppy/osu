@@ -140,7 +140,7 @@ namespace osu.Game.Overlays.Comments
                                                     Spacing = new Vector2(10, 0),
                                                     Children = new Drawable[]
                                                     {
-                                                        username = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold))
+                                                        username = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold))
                                                         {
                                                             AutoSizeAxes = Axes.Both
                                                         },
@@ -153,7 +153,7 @@ namespace osu.Game.Overlays.Comments
                                                         }
                                                     }
                                                 },
-                                                message = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 14))
+                                                message = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 16))
                                                 {
                                                     RelativeSizeAxes = Axes.X,
                                                     AutoSizeAxes = Axes.Y
@@ -165,7 +165,7 @@ namespace osu.Game.Overlays.Comments
                                                     Spacing = new Vector2(10, 0),
                                                     Children = new Drawable[]
                                                     {
-                                                        new DrawableDate(Comment.CreatedAt, 12, false)
+                                                        new DrawableDate(Comment.CreatedAt, 15, false)
                                                         {
                                                             Colour = colourProvider.Foreground1
                                                         }

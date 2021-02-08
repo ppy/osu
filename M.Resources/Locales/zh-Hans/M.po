@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mfosu!\n"
 "POT-Creation-Date: 2020-12-04 02:25+0800\n"
-"PO-Revision-Date: 2021-02-08 13:48+0800\n"
+"PO-Revision-Date: 2021-02-08 18:10+0800\n"
 "Last-Translator: \n"
 "Language-Team: MATRIX-feather\n"
 "Language: zh_CN\n"
@@ -266,7 +266,7 @@ msgid "screen.multi.playlistSettings.roomName"
 msgstr "房间名"
 
 msgid "screen.multi.playlistSettings.duration"
-msgstr "市场"
+msgstr "时长"
 
 # Allowed attempts (across all playlist items)
 msgid "screen.multi.playlistSettings.allowedAttempts"

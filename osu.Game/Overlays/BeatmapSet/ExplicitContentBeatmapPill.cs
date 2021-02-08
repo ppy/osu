@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     {
                         Margin = new MarginPadding { Horizontal = 10f, Vertical = 2f },
                         Text = "不合适的内容",
-                        Font = OsuFont.GetFont(size: 10, weight: FontWeight.SemiBold),
+                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold),
                         Colour = OverlayColourProvider.Orange.Colour2,
                     }
                 }

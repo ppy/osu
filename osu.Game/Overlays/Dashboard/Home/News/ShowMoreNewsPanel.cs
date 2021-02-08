@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Margin = new MarginPadding { Vertical = 20 },
-                    Text = "see more"
+                    Text = "显示更多"
                 }
             };
 
