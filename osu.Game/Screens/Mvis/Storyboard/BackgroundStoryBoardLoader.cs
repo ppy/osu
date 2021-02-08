@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -70,6 +71,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
         }
 
         private Task loadTask;
+        private CancellationTokenSource cancellationTokenSource;
 
         private void prepareStoryboard(WorkingBeatmap beatmap)
         {
@@ -84,6 +86,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
             storyboardClock = new StoryboardClock();
             storyboardClock.ChangeSource(beatmap.Track);
             Seek(beatmap.Track.CurrentTime);
+            cancellationTokenSource = new CancellationTokenSource();
 
             loadTask = LoadComponentAsync(
                 currentStoryboard = new BackgroundStoryboard(beatmap)
@@ -103,7 +106,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
 
                     enableSb.TriggerChange();
                     OnNewStoryboardLoaded?.Invoke();
-                });
+                }, cancellation: cancellationTokenSource.Token);
         }
 
         [CanBeNull]
@@ -147,7 +150,8 @@ namespace osu.Game.Screens.Mvis.Storyboard
             if (loadTask != null)
             {
                 var b = currentStoryboard;
-                loadTask.ContinueWith(_ => b?.Expire());
+                cancellationTokenSource.Cancel();
+                b?.Dispose();
             }
         }
 
@@ -163,8 +167,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
                 throw new InvalidOperationException("currentBeatmap 不能为 null");
 
             State.Value = StoryboardState.Loading;
-
-            Task.Run(() => prepareStoryboard(targetBeatmap));
+            prepareStoryboard(targetBeatmap);
         }
 
         protected override void Dispose(bool isDisposing)
