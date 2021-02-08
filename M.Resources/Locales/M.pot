@@ -13,6 +13,49 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "Language: zh_CN\n"
 
+#v2 编辑器
+msgid "editor.controlPoint.effect"
+msgstr ""
+
+msgid "editor.controlPoint.effect.kiai"
+msgstr ""
+
+msgid "editor.controlPoint.effect.noBarLine"
+msgstr ""
+
+msgid "editor.controlPoint.timing"
+msgstr ""
+
+msgid "editor.controlPoint.difficulty"
+msgstr ""
+
+msgid "editor.controlPoint.sample"
+msgstr ""
+
+msgid "editor.timing.section.group.time"
+msgstr ""
+
+msgid "editor.timing.section.group.useCurrentTime"
+msgstr ""
+
+msgid "editor.timing.section.timing.timeSignature"
+msgstr ""
+
+msgid "editor.timing.section.difficulty.speedMultiplier"
+msgstr ""
+
+msgid "editor.timing.section.sample.bankName"
+msgstr ""
+
+msgid "editor.timing.section.sample.volume"
+msgstr ""
+
+msgid "editor.timing.section.effect.kiai"
+msgstr ""
+
+msgid "editor.timing.section.effect.skipFirstBarLine"
+msgstr ""
+
 #v2 通用
 msgid "generic.exit"
 msgstr ""

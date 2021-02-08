@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mfosu!\n"
 "POT-Creation-Date: 2020-12-04 02:25+0800\n"
-"PO-Revision-Date: 2021-02-06 02:53+0800\n"
+"PO-Revision-Date: 2021-02-08 13:48+0800\n"
 "Last-Translator: \n"
 "Language-Team: MATRIX-feather\n"
 "Language: zh_CN\n"
@@ -12,6 +12,49 @@ msgstr ""
 "X-Generator: Poedit 2.4.2\n"
 "X-Poedit-Basepath: .\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+
+# v2 编辑器
+msgid "editor.controlPoint.effect"
+msgstr "效果"
+
+msgid "editor.controlPoint.effect.kiai"
+msgstr "高潮"
+
+msgid "editor.controlPoint.effect.noBarLine"
+msgstr "移除第一条横线"
+
+msgid "editor.controlPoint.timing"
+msgstr "Timing"
+
+msgid "editor.controlPoint.difficulty"
+msgstr "难度 / 绿线"
+
+msgid "editor.controlPoint.sample"
+msgstr "音效"
+
+msgid "editor.timing.section.group.time"
+msgstr "时间"
+
+msgid "editor.timing.section.group.useCurrentTime"
+msgstr "使用当前时间"
+
+msgid "editor.timing.section.timing.timeSignature"
+msgstr "节拍类型"
+
+msgid "editor.timing.section.difficulty.speedMultiplier"
+msgstr "速度倍率"
+
+msgid "editor.timing.section.sample.bankName"
+msgstr "Bank名称"
+
+msgid "editor.timing.section.sample.volume"
+msgstr "音量"
+
+msgid "editor.timing.section.effect.kiai"
+msgstr "高潮"
+
+msgid "editor.timing.section.effect.skipFirstBarLine"
+msgstr "移除第一条横线"
 
 # v2 通用
 msgid "generic.exit"
