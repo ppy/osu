@@ -42,13 +42,7 @@ namespace osu.Game.Graphics.UserInterface
                 },
             };
 
-            Current.ValueChanged += filled =>
-            {
-                if (filled.NewValue)
-                    fill.FadeIn(200, Easing.OutQuint);
-                else
-                    fill.FadeTo(0.01f, 200, Easing.OutQuint); //todo: remove once we figure why containers aren't drawing at all times
-            };
+            Current.ValueChanged += filled => fill.FadeTo(filled.NewValue ? 1 : 0, 200, Easing.OutQuint);
         }
 
         [BackgroundDependencyLoader]
