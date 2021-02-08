@@ -84,8 +84,6 @@ namespace osu.Game.Screens.Mvis.Storyboard
             storyboardClock.Stop();
 
             storyboardClock = new StoryboardClock();
-            storyboardClock.ChangeSource(beatmap.Track);
-            Seek(beatmap.Track.CurrentTime);
             cancellationTokenSource = new CancellationTokenSource();
 
             loadTask = LoadComponentAsync(
@@ -96,6 +94,10 @@ namespace osu.Game.Screens.Mvis.Storyboard
                 },
                 onLoaded: newStoryboard =>
                 {
+                    //bug: 过早Seek至歌曲时间会导致部分故事版加载过程僵死
+                    storyboardClock.ChangeSource(beatmap.Track);
+                    Seek(beatmap.Track.CurrentTime);
+
                     sbLoaded.Value = true;
                     State.Value = StoryboardState.Success;
                     NeedToHideTriangles.Value = beatmap.Storyboard.HasDrawable;
@@ -123,19 +125,22 @@ namespace osu.Game.Screens.Mvis.Storyboard
         {
             if (v.NewValue)
             {
-                if (!sbLoaded.Value)
-                    updateStoryBoardAsync();
-                else
+                if (sbLoaded.Value)
                 {
                     StoryboardReplacesBackground.Value = targetBeatmap.Storyboard.ReplacesBackground && targetBeatmap.Storyboard.HasDrawable;
                     NeedToHideTriangles.Value = targetBeatmap.Storyboard.HasDrawable;
+                    currentStoryboard?.FadeIn(STORYBOARD_FADEIN_DURATION, Easing.OutQuint);
                 }
-
-                currentStoryboard?.FadeIn(STORYBOARD_FADEIN_DURATION, Easing.OutQuint);
+                else
+                    updateStoryBoardAsync();
             }
             else
             {
-                currentStoryboard?.FadeOut(STORYBOARD_FADEOUT_DURATION, Easing.OutQuint);
+                if (sbLoaded.Value)
+                    currentStoryboard?.FadeOut(STORYBOARD_FADEOUT_DURATION, Easing.OutQuint);
+                else
+                    cancelAllTasks();
+
                 StoryboardReplacesBackground.Value = false;
                 NeedToHideTriangles.Value = false;
                 State.Value = StoryboardState.NotLoaded;
