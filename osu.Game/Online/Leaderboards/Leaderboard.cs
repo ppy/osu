@@ -152,7 +152,7 @@ namespace osu.Game.Online.Leaderboards
                 switch (placeholderState = value)
                 {
                     case PlaceholderState.NetworkFailure:
-                        replacePlaceholder(new ClickablePlaceholder(@"Couldn't fetch scores!", FontAwesome.Solid.Sync)
+                        replacePlaceholder(new ClickablePlaceholder(@"无法获取分数!", FontAwesome.Solid.Sync)
                         {
                             Action = UpdateScores,
                         });
@@ -171,7 +171,7 @@ namespace osu.Game.Online.Leaderboards
                         break;
 
                     case PlaceholderState.NotLoggedIn:
-                        replacePlaceholder(new LoginPlaceholder(@"查看在线排行"));
+                        replacePlaceholder(new LoginPlaceholder(@"请先登录来查看在线排行!"));
                         break;
 
                     case PlaceholderState.NotSupporter:
