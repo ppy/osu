@@ -4,8 +4,12 @@
 #nullable enable
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using JetBrains.Annotations;
 using MessagePack;
 using Newtonsoft.Json;
+using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Users;
 
@@ -26,6 +30,13 @@ namespace osu.Game.Online.Multiplayer
         /// </summary>
         [Key(2)]
         public BeatmapAvailability BeatmapAvailability { get; set; } = BeatmapAvailability.LocallyAvailable();
+
+        /// <summary>
+        /// Any mods applicable only to the local user.
+        /// </summary>
+        [Key(3)]
+        [NotNull]
+        public IEnumerable<APIMod> Mods { get; set; } = Enumerable.Empty<APIMod>();
 
         [IgnoreMember]
         public User? User { get; set; }

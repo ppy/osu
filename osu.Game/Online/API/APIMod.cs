@@ -23,6 +23,7 @@ namespace osu.Game.Online.API
 
         [JsonProperty("settings")]
         [Key(1)]
+        [MessagePackFormatter(typeof(ModSettingsDictionaryFormatter))]
         public Dictionary<string, object> Settings { get; set; } = new Dictionary<string, object>();
 
         [JsonConstructor]
