@@ -71,20 +71,6 @@ namespace osu.Game.Online.Multiplayer
             if (!await connectionLock.WaitAsync(10000))
                 throw new TimeoutException("Could not obtain a lock to connect. A previous attempt is likely stuck.");
 
-            var builder = new HubConnectionBuilder()
-                .WithUrl(endpoint, options => { options.Headers.Add("Authorization", $"Bearer {api.AccessToken}"); });
-
-            if (RuntimeInfo.SupportsJIT)
-                builder.AddMessagePackProtocol();
-            else
-            {
-                // eventually we will precompile resolvers for messagepack, but this isn't working currently
-                // see https://github.com/neuecc/MessagePack-CSharp/issues/780#issuecomment-768794308.
-                builder.AddNewtonsoftJsonProtocol(options => { options.PayloadSerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore; });
-            }
-
-            connection = builder.Build();
-
             try
             {
                 while (api.State.Value == APIState.Online)
@@ -235,10 +221,19 @@ namespace osu.Game.Online.Multiplayer
 
         private HubConnection createConnection(CancellationToken cancellationToken)
         {
-            var newConnection = new HubConnectionBuilder()
-                                .WithUrl(endpoint, options => { options.Headers.Add("Authorization", $"Bearer {api.AccessToken}"); })
-                                .AddNewtonsoftJsonProtocol(options => { options.PayloadSerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore; })
-                                .Build();
+            var builder = new HubConnectionBuilder()
+                .WithUrl(endpoint, options => { options.Headers.Add("Authorization", $"Bearer {api.AccessToken}"); });
+
+            if (RuntimeInfo.SupportsJIT)
+                builder.AddMessagePackProtocol();
+            else
+            {
+                // eventually we will precompile resolvers for messagepack, but this isn't working currently
+                // see https://github.com/neuecc/MessagePack-CSharp/issues/780#issuecomment-768794308.
+                builder.AddNewtonsoftJsonProtocol(options => { options.PayloadSerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore; });
+            }
+
+            var newConnection = builder.Build();
 
             // this is kind of SILLY
             // https://github.com/dotnet/aspnetcore/issues/15198
