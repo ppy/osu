@@ -54,6 +54,7 @@ using osu.Game.Updater;
 using osu.Game.Utils;
 using LogLevel = osu.Framework.Logging.LogLevel;
 using osu.Game.Database;
+using SDL2;
 
 namespace osu.Game
 {
@@ -154,8 +155,11 @@ namespace osu.Game
 
         public void SetWindowIcon(string path)
         {
-            if (!RuntimeInfo.IsDesktop || string.IsNullOrEmpty(path))
+            if (!RuntimeInfo.IsDesktop)
+            {
+                Logger.Log("设置窗口图标仅适用于桌面", LoggingTarget.Runtime, LogLevel.Important);
                 return;
+            }
 
             Stream stream;
 
@@ -684,7 +688,7 @@ namespace osu.Game
                     : 1;
                 windowOpacity.BindValueChanged(v => SetWindowOpacity(v.NewValue), true);
 
-                Schedule(() => sdl2DesktopWindow.Visible = true);
+                sdl2DesktopWindow.Visible = true;
             }
 
             loadComponentSingleFile(osuLogo, logo =>
