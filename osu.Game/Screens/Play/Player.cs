@@ -192,6 +192,7 @@ namespace osu.Game.Screens.Play
 
             if (game != null)
                 gameActive.BindTo(game.IsActive);
+
             if (game is OsuGame osuGame)
                 LocalUserPlaying.BindTo(osuGame.LocalUserPlaying);
 
