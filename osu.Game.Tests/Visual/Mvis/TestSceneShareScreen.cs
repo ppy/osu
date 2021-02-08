@@ -4,7 +4,6 @@ using osu.Framework.Audio;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
-using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Select;
 
 namespace osu.Game.Tests.Visual.Mvis

@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.Comments.Buttons
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
                                         AlwaysPresent = true,
-                                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold)
+                                        Font = OsuFont.GetFont(size: 15, weight: FontWeight.SemiBold)
                                     },
                                     icon = new ChevronIcon
                                     {

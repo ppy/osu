@@ -197,7 +197,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                         {
                                                                             Margin = new MarginPadding { Vertical = 5 },
                                                                             Colour = colours.Yellow,
-                                                                            Font = OsuFont.GetFont(size: 12),
+                                                                            Font = OsuFont.GetFont(size: 15),
                                                                         }
                                                                     },
                                                                     new Drawable[]
@@ -206,7 +206,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                         {
                                                                             RelativeSizeAxes = Axes.X,
                                                                             Height = 40,
-                                                                            Text = "screen.multi.playlistSettings.edit",
+                                                                            Text = "screen.multi.playlistSettings.playlist.edit",
                                                                             Action = () => EditPlaylist?.Invoke()
                                                                         }
                                                                     }

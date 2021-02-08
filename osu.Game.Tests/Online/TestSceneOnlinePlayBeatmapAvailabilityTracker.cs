@@ -79,7 +79,7 @@ namespace osu.Game.Tests.Online
             AddAssert("ensure beatmap unavailable", () => !beatmaps.IsAvailableLocally(testBeatmapSet));
             addAvailabilityCheckStep("state not downloaded", BeatmapAvailability.NotDownloaded);
 
-            AddStep("start downloading", () => beatmaps.Download(testBeatmapSet));
+            AddStep("start downloading", () => beatmaps.Download(testBeatmapSet, false, false, false));
             addAvailabilityCheckStep("state downloading 0%", () => BeatmapAvailability.Downloading(0.0f));
 
             AddStep("set progress 40%", () => ((TestDownloadRequest)beatmaps.GetExistingDownload(testBeatmapSet)).SetProgress(0.4f));
@@ -157,8 +157,8 @@ namespace osu.Game.Tests.Online
 
             public Task<BeatmapSetInfo> CurrentImportTask { get; private set; }
 
-            protected override ArchiveDownloadRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, bool minimiseDownloadSize)
-                => new TestDownloadRequest(set);
+            //protected override ArchiveDownloadRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, bool minimiseDownloadSize)
+            //    => new TestDownloadRequest(set);
 
             public TestBeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, GameHost host = null, WorkingBeatmap defaultBeatmap = null, bool performOnlineLookups = false)
                 : base(storage, contextFactory, rulesets, api, audioManager, host, defaultBeatmap, performOnlineLookups)
