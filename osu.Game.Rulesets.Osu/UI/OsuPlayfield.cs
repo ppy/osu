@@ -54,8 +54,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 approachCircles = new ProxyContainer { RelativeSizeAxes = Axes.Both },
             };
 
-            hitPolicy = new StartTimeOrderedHitPolicy();
-            hitPolicy.SetHitObjects(HitObjectContainer.AliveObjects);
+            hitPolicy = new StartTimeOrderedHitPolicy { HitObjectContainer = HitObjectContainer };
 
             var hitWindows = new OsuHitWindows();
 
