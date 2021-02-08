@@ -81,9 +81,6 @@ namespace osu.Game.Screens.Play
         public int RestartCount;
 
         [Resolved]
-        private OsuGameBase gameBase { get; set; }
-
-        [Resolved]
         private ScoreManager scoreManager { get; set; }
 
         private RulesetInfo rulesetInfo;
@@ -160,7 +157,6 @@ namespace osu.Game.Screens.Play
             if (!Mods.Value.Any(m => m is ModAutoplay))
                 PrepareReplay();
 
-            gameActive.BindTo(gameBase.IsActive);
             gameActive.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
         }
 
@@ -195,7 +191,10 @@ namespace osu.Game.Screens.Play
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
 
             if (game != null)
+            {
                 LocalUserPlaying.BindTo(game.LocalUserPlaying);
+                gameActive.BindTo(game.IsActive);
+            }
 
             DrawableRuleset = ruleset.CreateDrawableRulesetWith(playableBeatmap, Mods.Value);
 
