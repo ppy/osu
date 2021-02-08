@@ -74,7 +74,8 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 new TableColumn(string.Empty, Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
                 new TableColumn("Time", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-                new TableColumn("Attributes", Anchor.Centre),
+                new TableColumn(),
+                new TableColumn("Attributes", Anchor.CentreLeft),
             };
 
             return columns.ToArray();
@@ -93,6 +94,7 @@ namespace osu.Game.Screens.Edit.Timing
                 Text = group.Time.ToEditorFormattedString(),
                 Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
             },
+            null,
             new ControlGroupAttributes(group),
         };
 
@@ -108,7 +110,6 @@ namespace osu.Game.Screens.Edit.Timing
                 {
                     RelativeSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
-                    Padding = new MarginPadding(10),
                     Spacing = new Vector2(2)
                 };
 
