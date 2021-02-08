@@ -2,10 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using osu.Framework.Bindables;
+using osu.Game.IO.Serialization;
+using osu.Game.Online.API.Requests;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Users
 {
@@ -178,6 +184,11 @@ namespace osu.Game.Users
 
         private UserStatistics statistics;
 
+        /// <summary>
+        /// The user statistics of the ruleset specified within the API request.
+        /// If the user is fetched from a <see cref="GetUsersRequest"/> or similar
+        /// (i.e. is a user compact instance), use <see cref="GetStatisticsFor"/> instead.
+        /// </summary>
         [JsonProperty(@"statistics")]
         public UserStatistics Statistics
         {
@@ -228,13 +239,35 @@ namespace osu.Game.Users
         [JsonProperty("replays_watched_counts")]
         public UserHistoryCount[] ReplaysWatchedCounts;
 
-        public class UserHistoryCount
-        {
-            [JsonProperty("start_date")]
-            public DateTime Date;
+        [UsedImplicitly]
+        [JsonExtensionData]
+        private readonly IDictionary<string, JToken> otherProperties = new Dictionary<string, JToken>();
 
-            [JsonProperty("count")]
-            public long Count;
+        private readonly Dictionary<RulesetInfo, UserStatistics> statisticsCache = new Dictionary<RulesetInfo, UserStatistics>();
+
+        /// <summary>
+        /// Retrieves the user statistics for a certain ruleset.
+        /// If user is fetched from a <see cref="GetUserRequest"/>,
+        /// this will always return null, use <see cref="Statistics"/> instead.
+        /// </summary>
+        /// <param name="ruleset">The ruleset to retrieve statistics for.</param>
+        // todo: this should likely be moved to a separate UserCompact class at some point.
+        public UserStatistics GetStatisticsFor(RulesetInfo ruleset)
+        {
+            if (statisticsCache.TryGetValue(ruleset, out var existing))
+                return existing;
+
+            return statisticsCache[ruleset] = parseStatisticsFor(ruleset);
+        }
+
+        private UserStatistics parseStatisticsFor(RulesetInfo ruleset)
+        {
+            if (!(otherProperties.TryGetValue($"statistics_{ruleset.ShortName}", out var token)))
+                return null;
+
+            var settings = JsonSerializableExtensions.CreateGlobalSettings();
+            settings.DefaultValueHandling = DefaultValueHandling.Include;
+            return token.ToObject<UserStatistics>(JsonSerializer.Create(settings));
         }
 
         public override string ToString() => Username;
@@ -248,6 +281,14 @@ namespace osu.Game.Users
             Colour = @"9c0101",
             Id = 0
         };
+
+        public bool Equals(User other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+
+            return Id == other.Id;
+        }
 
         public enum PlayStyle
         {
@@ -264,12 +305,13 @@ namespace osu.Game.Users
             Touch,
         }
 
-        public bool Equals(User other)
+        public class UserHistoryCount
         {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+            [JsonProperty("start_date")]
+            public DateTime Date;
 
-            return Id == other.Id;
+            [JsonProperty("count")]
+            public long Count;
         }
     }
 }
