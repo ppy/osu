@@ -164,9 +164,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
             userStateDisplay.UpdateStatus(User.State, User.BeatmapAvailability);
 
-            var ruleset = rulesets.GetRuleset(Room.Settings.RulesetID).CreateInstance();
-            userModsDisplay.Current.Value = User.Mods.Select(m => m.ToMod(ruleset)).ToList();
-
             if (Room.Host?.Equals(User) == true)
                 crown.FadeIn(fade_time);
             else
