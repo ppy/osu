@@ -50,5 +50,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
             if (joinRoom)
                 RoomManager.Schedule(() => RoomManager.CreateRoom(Room));
         });
+
+        public override void SetUpSteps()
+        {
+            base.SetUpSteps();
+
+            if (joinRoom)
+                AddUntilStep("wait for room join", () => Client.Room != null);
+        }
     }
 }
