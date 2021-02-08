@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -16,13 +15,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
-using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Users;
 using osu.Game.Utils;
 
@@ -52,6 +51,7 @@ namespace osu.Game.Online.Multiplayer
 
         /// <summary>
         /// Whether the <see cref="StatefulMultiplayerClient"/> is currently connected.
+        /// This is NOT thread safe and usage should be scheduled.
         /// </summary>
         public abstract IBindable<bool> IsConnected { get; }
 
@@ -104,7 +104,7 @@ namespace osu.Game.Online.Multiplayer
                 if (!connected.NewValue && Room != null)
                 {
                     Logger.Log("Connection to multiplayer server was lost.", LoggingTarget.Runtime, LogLevel.Important);
-                    LeaveRoom().CatchUnobservedExceptions();
+                    LeaveRoom();
                 }
             });
         }
@@ -127,7 +127,8 @@ namespace osu.Game.Online.Multiplayer
 
             Debug.Assert(Room != null);
 
-            var users = getRoomUsers();
+            var users = await getRoomUsers();
+            Debug.Assert(users != null);
 
             await Task.WhenAll(users.Select(PopulateUser));
 
@@ -191,7 +192,8 @@ namespace osu.Game.Online.Multiplayer
                 BeatmapID = item.GetOr(existingPlaylistItem).BeatmapID,
                 BeatmapChecksum = item.GetOr(existingPlaylistItem).Beatmap.Value.MD5Hash,
                 RulesetID = item.GetOr(existingPlaylistItem).RulesetID,
-                Mods = item.HasValue ? item.Value.AsNonNull().RequiredMods.Select(m => new APIMod(m)).ToList() : Room.Settings.Mods
+                RequiredMods = item.HasValue ? item.Value.AsNonNull().RequiredMods.Select(m => new APIMod(m)).ToList() : Room.Settings.RequiredMods,
+                AllowedMods = item.HasValue ? item.Value.AsNonNull().AllowedMods.Select(m => new APIMod(m)).ToList() : Room.Settings.AllowedMods
             });
         }
 
@@ -228,6 +230,14 @@ namespace osu.Game.Online.Multiplayer
         public abstract Task ChangeState(MultiplayerUserState newState);
 
         public abstract Task ChangeBeatmapAvailability(BeatmapAvailability newBeatmapAvailability);
+
+        /// <summary>
+        /// Change the local user's mods in the currently joined room.
+        /// </summary>
+        /// <param name="newMods">The proposed new mods, excluding any required by the room itself.</param>
+        public Task ChangeUserMods(IEnumerable<Mod> newMods) => ChangeUserMods(newMods.Select(m => new APIMod(m)).ToList());
+
+        public abstract Task ChangeUserMods(IEnumerable<APIMod> newMods);
 
         public abstract Task StartMatch();
 
@@ -377,6 +387,27 @@ namespace osu.Game.Online.Multiplayer
             return Task.CompletedTask;
         }
 
+        public Task UserModsChanged(int userId, IEnumerable<APIMod> mods)
+        {
+            if (Room == null)
+                return Task.CompletedTask;
+
+            Scheduler.Add(() =>
+            {
+                var user = Room?.Users.SingleOrDefault(u => u.UserID == userId);
+
+                // errors here are not critical - user mods are mostly for display.
+                if (user == null)
+                    return;
+
+                user.Mods = mods;
+
+                RoomUpdated?.Invoke();
+            }, false);
+
+            return Task.CompletedTask;
+        }
+
         Task IMultiplayerClient.LoadRequested()
         {
             if (Room == null)
@@ -436,24 +467,20 @@ namespace osu.Game.Online.Multiplayer
         /// This should be used whenever accessing users from outside of an Update thread context (ie. when not calling <see cref="Drawable.Schedule"/>).
         /// </summary>
         /// <returns>A copy of users in the current room, or null if unavailable.</returns>
-        private List<MultiplayerRoomUser>? getRoomUsers()
+        private Task<List<MultiplayerRoomUser>?> getRoomUsers()
         {
-            List<MultiplayerRoomUser>? users = null;
-
-            ManualResetEventSlim resetEvent = new ManualResetEventSlim();
+            var tcs = new TaskCompletionSource<List<MultiplayerRoomUser>?>();
 
             // at some point we probably want to replace all these schedule calls with Room.LockForUpdate.
             // for now, as this would require quite some consideration due to the number of accesses to the room instance,
             // let's just add a manual schedule for the non-scheduled usages instead.
             Scheduler.Add(() =>
             {
-                users = Room?.Users.ToList();
-                resetEvent.Set();
+                var users = Room?.Users.ToList();
+                tcs.SetResult(users);
             }, false);
 
-            resetEvent.Wait(100);
-
-            return users;
+            return tcs.Task;
         }
 
         /// <summary>
@@ -504,7 +531,8 @@ namespace osu.Game.Online.Multiplayer
             beatmap.MD5Hash = settings.BeatmapChecksum;
 
             var ruleset = rulesets.GetRuleset(settings.RulesetID).CreateInstance();
-            var mods = settings.Mods.Select(m => m.ToMod(ruleset));
+            var mods = settings.RequiredMods.Select(m => m.ToMod(ruleset));
+            var allowedMods = settings.AllowedMods.Select(m => m.ToMod(ruleset));
 
             PlaylistItem playlistItem = new PlaylistItem
             {
@@ -514,6 +542,7 @@ namespace osu.Game.Online.Multiplayer
             };
 
             playlistItem.RequiredMods.AddRange(mods);
+            playlistItem.AllowedMods.AddRange(allowedMods);
 
             apiRoom.Playlist.Clear(); // Clearing should be unnecessary, but here for sanity.
             apiRoom.Playlist.Add(playlistItem);

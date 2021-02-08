@@ -40,6 +40,9 @@ namespace osu.Game.Screens.OnlinePlay
         protected Bindable<int?> MaxParticipants { get; private set; }
 
         [Resolved(typeof(Room))]
+        protected Bindable<int?> MaxAttempts { get; private set; }
+
+        [Resolved(typeof(Room))]
         protected Bindable<DateTimeOffset?> EndDate { get; private set; }
 
         [Resolved(typeof(Room))]
