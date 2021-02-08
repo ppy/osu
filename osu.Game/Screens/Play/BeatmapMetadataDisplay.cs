@@ -28,33 +28,6 @@ namespace osu.Game.Screens.Play
     /// </summary>
     public class BeatmapMetadataDisplay : Container
     {
-        private class MetadataLine : Container
-        {
-            public MetadataLine(string left, string right)
-            {
-                AutoSizeAxes = Axes.Both;
-                Children = new Drawable[]
-                {
-                    new OsuSpriteText
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopRight,
-                        Margin = new MarginPadding { Right = 5 },
-                        Colour = OsuColour.Gray(0.8f),
-                        Text = left,
-                    },
-                    new OsuSpriteText
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopLeft,
-                        Margin = new MarginPadding { Left = 5 },
-                        Text = string.IsNullOrEmpty(right) ? @"-" : right,
-                        UseLegacyUnicode = true
-                    }
-                };
-            }
-        }
-
         private readonly WorkingBeatmap beatmap;
         private readonly Bindable<IReadOnlyList<Mod>> mods;
         private readonly Drawable facade;
@@ -202,15 +175,34 @@ namespace osu.Game.Screens.Play
                                     },
                                     UseLegacyUnicode = true
                                 },
-                                new MetadataLine("来源", metadata.Source)
+                                new GridContainer
                                 {
-                                    Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
-                                },
-                                new MetadataLine("谱师", metadata.AuthorString)
-                                {
                                     Origin = Anchor.TopCentre,
-                                    Anchor = Anchor.TopCentre,
+                                    AutoSizeAxes = Axes.Both,
+                                    RowDimensions = new[]
+                                    {
+                                        new Dimension(GridSizeMode.AutoSize),
+                                        new Dimension(GridSizeMode.AutoSize),
+                                    },
+                                    ColumnDimensions = new[]
+                                    {
+                                        new Dimension(GridSizeMode.AutoSize),
+                                        new Dimension(GridSizeMode.AutoSize),
+                                    },
+                                    Content = new[]
+                                    {
+                                        new Drawable[]
+                                        {
+                                            new MetadataLineLabel("来源"),
+                                            new MetadataLineInfo(metadata.Source)
+                                        },
+                                        new Drawable[]
+                                        {
+                                            new MetadataLineLabel("谱师"),
+                                            new MetadataLineInfo(metadata.AuthorString)
+                                        }
+                                    }
                                 },
                                 new ModDisplay
                                 {
@@ -222,8 +214,8 @@ namespace osu.Game.Screens.Play
                                 }
                             },
                         },
-                    }
-                },
+                    },
+                }
             };
 
             Loading = true;
@@ -349,6 +341,27 @@ namespace osu.Game.Screens.Play
                     loadAnimationDone = true;
                 }
             }
-        };
+        }
+
+        private class MetadataLineLabel : OsuSpriteText
+        {
+            public MetadataLineLabel(string text)
+            {
+                Anchor = Anchor.TopRight;
+                Origin = Anchor.TopRight;
+                Margin = new MarginPadding { Right = 5 };
+                Colour = OsuColour.Gray(0.8f);
+                Text = text;
+            }
+        }
+
+        private class MetadataLineInfo : OsuSpriteText
+        {
+            public MetadataLineInfo(string text)
+            {
+                Margin = new MarginPadding { Left = 5 };
+                Text = string.IsNullOrEmpty(text) ? @"-" : text;
+            }
+        }
     }
 }
