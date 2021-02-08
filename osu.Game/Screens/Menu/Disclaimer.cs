@@ -62,6 +62,9 @@ namespace osu.Game.Screens.Menu
         private OsuGame game { get; set; }
 
         [Resolved]
+        private GameHost host { get; set; }
+
+        [Resolved]
         private MConfigManager mConfig { get; set; }
 
         private bool enableAvatarSprite;
@@ -203,7 +206,7 @@ namespace osu.Game.Screens.Menu
             fill.FadeOut();
 
             var displayDelay = enableAvatarSprite ? 1000 : 0;
-            bool fadeInWindowOnEnter = mConfig.Get<bool>(MSetting.FadeInWindowWhenEntering);
+            bool fadeInWindowOnEnter = mConfig.Get<bool>(MSetting.FadeInWindowWhenEntering) && host.Window is SDL2DesktopWindow;
             avatarSprite?.FadeIn(fadeInWindowOnEnter ? 0 : 500);
 
             if (showDisclaimer) //显示Disclaimer时要提供的动画过程
