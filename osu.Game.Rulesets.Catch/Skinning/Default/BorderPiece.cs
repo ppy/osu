@@ -29,4 +29,3 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
         }
     }
 }
-
