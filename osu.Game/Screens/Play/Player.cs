@@ -379,7 +379,7 @@ namespace osu.Game.Screens.Play
                             if (!this.IsCurrentScreen()) return;
 
                             fadeOut(true);
-                            PerformExit(true);
+                            PerformExit(false);
                         },
                     },
                     failAnimation = new FailAnimation(DrawableRuleset) { OnComplete = onFailComplete, },
