@@ -30,9 +30,11 @@ namespace osu.Game.Online.Spectator
         /// </summary>
         public const double TIME_BETWEEN_SENDS = 200;
 
-        private readonly HubClientConnector connector;
+        private readonly string endpoint;
 
-        protected virtual IBindable<bool> IsConnected => connector.IsConnected;
+        private HubClientConnector connector;
+
+        private readonly IBindable<bool> isConnected = new BindableBool();
 
         private HubConnection connection => connector.CurrentConnection;
 
@@ -77,23 +79,24 @@ namespace osu.Game.Online.Spectator
 
         public SpectatorStreamingClient(EndpointConfiguration endpoints)
         {
-            InternalChild = connector = new HubClientConnector("Spectator client", endpoints.SpectatorEndpointUrl)
-            {
-                OnNewConnection = newConnection =>
-                {
-                    // until strong typed client support is added, each method must be manually bound
-                    // (see https://github.com/dotnet/aspnetcore/issues/15198)
-                    newConnection.On<int, SpectatorState>(nameof(ISpectatorClient.UserBeganPlaying), ((ISpectatorClient)this).UserBeganPlaying);
-                    newConnection.On<int, FrameDataBundle>(nameof(ISpectatorClient.UserSentFrames), ((ISpectatorClient)this).UserSentFrames);
-                    newConnection.On<int, SpectatorState>(nameof(ISpectatorClient.UserFinishedPlaying), ((ISpectatorClient)this).UserFinishedPlaying);
-                }
-            };
+            endpoint = endpoints.SpectatorEndpointUrl;
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(IAPIProvider api)
         {
-            IsConnected.BindValueChanged(connected =>
+            connector = CreateConnector(nameof(SpectatorStreamingClient), endpoint, api);
+            connector.OnNewConnection = connection =>
+            {
+                // until strong typed client support is added, each method must be manually bound
+                // (see https://github.com/dotnet/aspnetcore/issues/15198)
+                connection.On<int, SpectatorState>(nameof(ISpectatorClient.UserBeganPlaying), ((ISpectatorClient)this).UserBeganPlaying);
+                connection.On<int, FrameDataBundle>(nameof(ISpectatorClient.UserSentFrames), ((ISpectatorClient)this).UserSentFrames);
+                connection.On<int, SpectatorState>(nameof(ISpectatorClient.UserFinishedPlaying), ((ISpectatorClient)this).UserFinishedPlaying);
+            };
+
+            isConnected.BindTo(connector.IsConnected);
+            isConnected.BindValueChanged(connected =>
             {
                 if (connected.NewValue)
                 {
@@ -120,6 +123,8 @@ namespace osu.Game.Online.Spectator
                 }
             }, true);
         }
+
+        protected virtual HubClientConnector CreateConnector(string name, string endpoint, IAPIProvider api) => new HubClientConnector(name, endpoint, api);
 
         Task ISpectatorClient.UserBeganPlaying(int userId, SpectatorState state)
         {
@@ -169,14 +174,14 @@ namespace osu.Game.Online.Spectator
         {
             Debug.Assert(isPlaying);
 
-            if (!IsConnected.Value) return;
+            if (!isConnected.Value) return;
 
             connection.SendAsync(nameof(ISpectatorServer.BeginPlaySession), currentState);
         }
 
         public void SendFrames(FrameDataBundle data)
         {
-            if (!IsConnected.Value) return;
+            if (!isConnected.Value) return;
 
             lastSend = connection.SendAsync(nameof(ISpectatorServer.SendFrameData), data);
         }
@@ -186,7 +191,7 @@ namespace osu.Game.Online.Spectator
             isPlaying = false;
             currentBeatmap = null;
 
-            if (!IsConnected.Value) return;
+            if (!isConnected.Value) return;
 
             connection.SendAsync(nameof(ISpectatorServer.EndPlaySession), currentState);
         }
@@ -200,7 +205,7 @@ namespace osu.Game.Online.Spectator
 
                 watchingUsers.Add(userId);
 
-                if (!IsConnected.Value)
+                if (!isConnected.Value)
                     return;
             }
 
@@ -213,7 +218,7 @@ namespace osu.Game.Online.Spectator
             {
                 watchingUsers.Remove(userId);
 
-                if (!IsConnected.Value)
+                if (!isConnected.Value)
                     return;
             }
 
