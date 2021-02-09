@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -28,7 +28,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Online.Multiplayer
 {
-    public abstract class StatefulMultiplayerClient : CompositeDrawable, IMultiplayerClient, IMultiplayerRoomServer
+    public abstract class StatefulMultiplayerClient : Component, IMultiplayerClient, IMultiplayerRoomServer
     {
         /// <summary>
         /// Invoked when any change occurs to the multiplayer room.

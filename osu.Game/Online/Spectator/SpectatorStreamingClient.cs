@@ -10,7 +10,7 @@ using JetBrains.Annotations;
 using Microsoft.AspNetCore.SignalR.Client;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Replays.Legacy;
@@ -23,7 +23,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Online.Spectator
 {
-    public class SpectatorStreamingClient : CompositeDrawable, ISpectatorClient
+    public class SpectatorStreamingClient : Component, ISpectatorClient
     {
         /// <summary>
         /// The maximum milliseconds between frame bundle sends.
