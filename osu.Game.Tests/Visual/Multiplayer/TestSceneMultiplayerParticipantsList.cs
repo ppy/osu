@@ -22,16 +22,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     public class TestSceneMultiplayerParticipantsList : MultiplayerTestScene
     {
         [SetUp]
-        public new void Setup() => Schedule(() =>
-        {
-            Child = new ParticipantsList
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.Y,
-                Size = new Vector2(380, 0.7f)
-            };
-        });
+        public new void Setup() => Schedule(createNewParticipantsList);
 
         [Test]
         public void TestAddUser()
@@ -89,6 +80,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("ready mark visible", () => this.ChildrenOfType<StateDisplay>().Single().IsPresent);
 
             AddStep("make user ready", () => Client.ChangeState(MultiplayerUserState.Idle));
+            checkProgressBarVisibility(true);
+        }
+
+        [Test]
+        public void TestCorrectInitialState()
+        {
+            AddStep("set to downloading map", () => Client.ChangeBeatmapAvailability(BeatmapAvailability.Downloading(0)));
+            AddStep("recreate list", createNewParticipantsList);
             checkProgressBarVisibility(true);
         }
 
@@ -210,6 +209,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 var state = i;
                 AddStep($"set state: {state}", () => Client.ChangeUserState(0, state));
             }
+        }
+
+        private void createNewParticipantsList()
+        {
+            Child = new ParticipantsList { Anchor = Anchor.Centre, Origin = Anchor.Centre, RelativeSizeAxes = Axes.Y, Size = new Vector2(380, 0.7f) };
         }
 
         private void checkProgressBarVisibility(bool visible) =>
