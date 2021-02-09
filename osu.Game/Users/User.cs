@@ -5,13 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.Serialization;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using osu.Framework.Bindables;
 using osu.Game.IO.Serialization;
 using osu.Game.Online.API.Requests;
-using osu.Game.Rulesets;
 
 namespace osu.Game.Users
 {
@@ -238,36 +238,26 @@ namespace osu.Game.Users
         [JsonProperty("replays_watched_counts")]
         public UserHistoryCount[] ReplaysWatchedCounts;
 
+        /// <summary>
+        /// All user statistics per ruleset's short name (in the case of a <see cref="GetUsersRequest"/> response).
+        /// Otherwise empty. Can be altered for testing purposes.
+        /// </summary>
+        // todo: this should likely be moved to a separate UserCompact class at some point.
+        [UsedImplicitly]
+        public readonly Dictionary<string, UserStatistics> AllStatistics = new Dictionary<string, UserStatistics>();
+
         [UsedImplicitly]
         [JsonExtensionData]
         private readonly IDictionary<string, JToken> otherProperties = new Dictionary<string, JToken>();
 
-        /// <summary>
-        /// Map for ruleset with their associated user statistics, can be altered for testing purposes.
-        /// </summary>
-        internal readonly Dictionary<RulesetInfo, UserStatistics> AllStatistics = new Dictionary<RulesetInfo, UserStatistics>();
-
-        /// <summary>
-        /// Retrieves the user statistics for a certain ruleset.
-        /// If user is fetched from a <see cref="GetUserRequest"/>,
-        /// this will always return empty instance, use <see cref="Statistics"/> instead.
-        /// </summary>
-        /// <param name="ruleset">The ruleset to retrieve statistics for.</param>
-        // todo: this should likely be moved to a separate UserCompact class at some point.
-        public UserStatistics GetStatisticsFor(RulesetInfo ruleset)
+        [OnDeserialized]
+        private void onDeserialized(StreamingContext context)
         {
-            if (AllStatistics.TryGetValue(ruleset, out var existing))
-                return existing;
-
-            return AllStatistics[ruleset] = parseStatisticsFor(ruleset);
-        }
-
-        private UserStatistics parseStatisticsFor(RulesetInfo ruleset)
-        {
-            if (!(otherProperties.TryGetValue($"statistics_{ruleset.ShortName}", out var token)))
-                return new UserStatistics();
-
-            return token.ToObject<UserStatistics>(JsonSerializer.Create(JsonSerializableExtensions.CreateGlobalSettings()));
+            foreach (var kvp in otherProperties.Where(kvp => kvp.Key.StartsWith("statistics_", StringComparison.Ordinal)))
+            {
+                var shortName = kvp.Key.Replace("statistics_", string.Empty);
+                AllStatistics[shortName] = kvp.Value.ToObject<UserStatistics>(JsonSerializer.Create(JsonSerializableExtensions.CreateGlobalSettings()));
+            }
         }
 
         public override string ToString() => Username;

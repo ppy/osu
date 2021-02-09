@@ -157,7 +157,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         Username = $"User {i}",
                         AllStatistics =
                         {
-                            { Ruleset.Value, new UserStatistics { GlobalRank = RNG.Next(1, 100000) } }
+                            { Ruleset.Value.ShortName, new UserStatistics { GlobalRank = RNG.Next(1, 100000) } }
                         },
                         CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
                     });
@@ -198,7 +198,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Username = "User 0",
                     AllStatistics =
                     {
-                        { Ruleset.Value, new UserStatistics { GlobalRank = RNG.Next(1, 100000) } }
+                        { Ruleset.Value.ShortName, new UserStatistics { GlobalRank = RNG.Next(1, 100000) } }
                     },
                     CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
                 });
