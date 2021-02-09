@@ -339,7 +339,7 @@ namespace osu.Game.Screens.Play
                     {
                         HoldToQuit =
                         {
-                            Action = performUserRequestedExit,
+                            Action = () => PerformExit(true),
                             IsPaused = { BindTarget = GameplayClockContainer.IsPaused }
                         },
                         PlayerSettingsOverlay = { PlaybackSettings = { UserPlaybackRate = { BindTarget = GameplayClockContainer.UserPlaybackRate } } },
@@ -363,14 +363,14 @@ namespace osu.Game.Screens.Play
                     FailOverlay = new FailOverlay
                     {
                         OnRetry = Restart,
-                        OnQuit = performUserRequestedExit,
+                        OnQuit = () => PerformExit(true),
                     },
                     PauseOverlay = new PauseOverlay
                     {
                         OnResume = Resume,
                         Retries = RestartCount,
                         OnRetry = Restart,
-                        OnQuit = performUserRequestedExit,
+                        OnQuit = () => PerformExit(true),
                     },
                     new HotkeyExitOverlay
                     {
@@ -487,14 +487,30 @@ namespace osu.Game.Screens.Play
             // if a restart has been requested, cancel any pending completion (user has shown intent to restart).
             completionProgressDelegate?.Cancel();
 
-            ValidForResume = false;
-
-            if (!this.IsCurrentScreen()) return;
+            if (!this.IsCurrentScreen())
+            {
+                // there is a chance that the exit was performed after the transition to results has started.
+                // we want to give the user what they want, so forcefully return to this screen (to proceed with the upwards exit process).
+                ValidForResume = false;
+                this.MakeCurrent();
+            }
 
             if (userRequested)
-                performUserRequestedExit();
-            else
-                this.Exit();
+            {
+                if (ValidForResume && HasFailed && !FailOverlay.IsPresent)
+                {
+                    failAnimation.FinishTransforms(true);
+                    return;
+                }
+
+                if (canPause)
+                {
+                    Pause();
+                    return;
+                }
+            }
+
+            this.Exit();
         }
 
         private void performUserRequestedSkip()
@@ -506,20 +522,6 @@ namespace osu.Game.Screens.Play
 
             // return samplePlaybackDisabled.Value to what is defined by the beatmap's current state
             updateSampleDisabledState();
-        }
-
-        private void performUserRequestedExit()
-        {
-            if (ValidForResume && HasFailed && !FailOverlay.IsPresent)
-            {
-                failAnimation.FinishTransforms(true);
-                return;
-            }
-
-            if (canPause)
-                Pause();
-            else
-                this.Exit();
         }
 
         /// <summary>
