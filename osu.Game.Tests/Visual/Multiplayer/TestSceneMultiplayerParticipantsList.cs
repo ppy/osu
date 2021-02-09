@@ -155,7 +155,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         Id = i,
                         Username = $"User {i}",
-                        CurrentModeRank = RNG.Next(1, 100000),
+                        AllStatistics =
+                        {
+                            { Ruleset.Value, new UserStatistics { GlobalRank = RNG.Next(1, 100000) } }
+                        },
                         CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
                     });
 
@@ -193,7 +196,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     Id = 0,
                     Username = "User 0",
-                    CurrentModeRank = RNG.Next(1, 100000),
+                    AllStatistics =
+                    {
+                        { Ruleset.Value, new UserStatistics { GlobalRank = RNG.Next(1, 100000) } }
+                    },
                     CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
                 });
 

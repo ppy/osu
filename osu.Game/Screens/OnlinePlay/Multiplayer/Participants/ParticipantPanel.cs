@@ -165,10 +165,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             var ruleset = rulesets.GetRuleset(Room.Settings.RulesetID);
 
             var currentModeRank = User.User?.GetStatisticsFor(ruleset)?.GlobalRank;
-
-            // fallback to current mode rank for testing purposes.
-            currentModeRank ??= User.User?.CurrentModeRank;
-
             userRankText.Text = currentModeRank != null ? $"#{currentModeRank.Value:N0}" : string.Empty;
 
             userStateDisplay.UpdateStatus(User.State, User.BeatmapAvailability);

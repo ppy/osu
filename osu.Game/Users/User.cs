@@ -243,7 +243,10 @@ namespace osu.Game.Users
         [JsonExtensionData]
         private readonly IDictionary<string, JToken> otherProperties = new Dictionary<string, JToken>();
 
-        private readonly Dictionary<RulesetInfo, UserStatistics> statisticsCache = new Dictionary<RulesetInfo, UserStatistics>();
+        /// <summary>
+        /// Map for ruleset with their associated user statistics, can be altered for testing purposes.
+        /// </summary>
+        internal readonly Dictionary<RulesetInfo, UserStatistics> AllStatistics = new Dictionary<RulesetInfo, UserStatistics>();
 
         /// <summary>
         /// Retrieves the user statistics for a certain ruleset.
@@ -254,10 +257,10 @@ namespace osu.Game.Users
         // todo: this should likely be moved to a separate UserCompact class at some point.
         public UserStatistics GetStatisticsFor(RulesetInfo ruleset)
         {
-            if (statisticsCache.TryGetValue(ruleset, out var existing))
+            if (AllStatistics.TryGetValue(ruleset, out var existing))
                 return existing;
 
-            return statisticsCache[ruleset] = parseStatisticsFor(ruleset);
+            return AllStatistics[ruleset] = parseStatisticsFor(ruleset);
         }
 
         private UserStatistics parseStatisticsFor(RulesetInfo ruleset)
