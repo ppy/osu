@@ -505,6 +505,10 @@ namespace osu.Game.Screens.Play
 
                 if (canPause && !GameplayClockContainer.IsPaused.Value)
                 {
+                    if (pauseCooldownActive && !GameplayClockContainer.IsPaused.Value)
+                        // still want to block if we are within the cooldown period and not already paused.
+                        return;
+
                     Pause();
                     return;
                 }
@@ -806,14 +810,6 @@ namespace osu.Game.Screens.Play
                 // proceed to result screen if beatmap already finished playing
                 completionProgressDelegate.RunTask();
                 return true;
-            }
-
-            // ValidForResume is false when restarting
-            if (ValidForResume)
-            {
-                if (pauseCooldownActive && !GameplayClockContainer.IsPaused.Value)
-                    // still want to block if we are within the cooldown period and not already paused.
-                    return true;
             }
 
             // GameplayClockContainer performs seeks / start / stop operations on the beatmap's track.
