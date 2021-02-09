@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -16,18 +14,18 @@ using osuTK;
 
 namespace osu.Game.Screens.Mvis.SideBar
 {
-    public class Sidebar : VisibilityContainer
+    public class Sidebar : OsuFocusedOverlayContainer
     {
         [Resolved]
         private CustomColourProvider colourProvider { get; set; }
+
+        protected override bool BlockNonPositionalInput => false;
+        protected override bool DimMainContent => false;
 
         private readonly List<ISidebarContent> components = new List<ISidebarContent>();
         private readonly TabHeader header;
         private const float duration = 400;
         private HeaderTabItem prevTab;
-        private SampleChannel popInSample;
-        private SampleChannel popOutSample;
-        private bool playPopoutSample;
 
         [CanBeNull]
         private Box sidebarBg;
@@ -64,7 +62,7 @@ namespace osu.Game.Screens.Mvis.SideBar
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load()
         {
             AddInternal(new SkinnableComponent(
                 "MSidebar-background",
@@ -87,9 +85,6 @@ namespace osu.Game.Screens.Mvis.SideBar
                 CentreComponent = false,
                 OverrideChildAnchor = true,
             });
-
-            popInSample = audio.Samples.Get(@"UI/overlay-pop-in");
-            popOutSample = audio.Samples.Get(@"UI/overlay-pop-out");
 
             colourProvider.HueColour.BindValueChanged(_ =>
             {
@@ -205,21 +200,15 @@ namespace osu.Game.Screens.Mvis.SideBar
 
         protected override void PopOut()
         {
-            if (playPopoutSample)
-                popOutSample?.Play();
-
             this.MoveToX(100, duration + 100, Easing.OutQuint)
                 .FadeOut(duration + 100, Easing.OutQuint);
             contentContainer.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
 
             Hiding = true;
-            playPopoutSample = true;
         }
 
         protected override void PopIn()
         {
-            popInSample?.Play();
-
             this.MoveToX(0, duration + 100, Easing.OutQuint)
                 .FadeIn(duration + 100, Easing.OutQuint);
             contentContainer.FadeIn(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
