@@ -141,5 +141,16 @@ namespace osu.Game.Rulesets.Mods
             ApplySetting(DrainRate, dr => difficulty.DrainRate = dr);
             ApplySetting(OverallDifficulty, od => difficulty.OverallDifficulty = od);
         }
+
+        public override void ResetSettingsToDefaults()
+        {
+            base.ResetSettingsToDefaults();
+
+            if (difficulty != null)
+            {
+                // base implementation potentially overwrite modified defaults that came from a beatmap selection.
+                TransferSettings(difficulty);
+            }
+        }
     }
 }

@@ -197,8 +197,10 @@ namespace osu.Game.Overlays.Mods
                     continue;
 
                 var buttonMod = button.Mods[index];
-                buttonMod.CopyFrom(mod);
                 button.SelectAt(index);
+
+                // the selection above will reset settings to defaults, but as this is an external change we want to copy the new settings across.
+                buttonMod.CopyFrom(mod);
                 return;
             }
 
