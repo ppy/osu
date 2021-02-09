@@ -25,7 +25,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneOutOfOrderHits : RateAdjustedBeatmapTestScene
+    public class TestSceneStartTimeOrderedHitPolicy : RateAdjustedBeatmapTestScene
     {
         private const double early_miss_window = 1000; // time after -1000 to -500 is considered a miss
         private const double late_miss_window = 500; // time after +500 is considered a miss
@@ -169,7 +169,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             addJudgementAssert(hitObjects[0], HitResult.Great);
             addJudgementAssert(hitObjects[1], HitResult.Great);
             addJudgementOffsetAssert(hitObjects[0], -200); // time_first_circle - 200
-            addJudgementOffsetAssert(hitObjects[0], -200); // time_second_circle - first_circle_time - 100
+            addJudgementOffsetAssert(hitObjects[1], -200); // time_second_circle - first_circle_time - 100
         }
 
         /// <summary>

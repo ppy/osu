@@ -3,6 +3,7 @@
 
 #nullable enable
 
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ using osu.Framework.Bindables;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
@@ -98,6 +100,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return Task.FromResult(room);
         }
 
+        protected override Task LeaveRoomInternal() => Task.CompletedTask;
+
         public override Task TransferHost(int userId) => ((IMultiplayerClient)this).HostChanged(userId);
 
         public override async Task ChangeSettings(MultiplayerRoomSettings settings)
@@ -119,6 +123,21 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public override Task ChangeBeatmapAvailability(BeatmapAvailability newBeatmapAvailability)
         {
             ChangeUserBeatmapAvailability(api.LocalUser.Value.Id, newBeatmapAvailability);
+            return Task.CompletedTask;
+        }
+
+        public void ChangeUserMods(int userId, IEnumerable<Mod> newMods)
+            => ChangeUserMods(userId, newMods.Select(m => new APIMod(m)).ToList());
+
+        public void ChangeUserMods(int userId, IEnumerable<APIMod> newMods)
+        {
+            Debug.Assert(Room != null);
+            ((IMultiplayerClient)this).UserModsChanged(userId, newMods.ToList());
+        }
+
+        public override Task ChangeUserMods(IEnumerable<APIMod> newMods)
+        {
+            ChangeUserMods(api.LocalUser.Value.Id, newMods);
             return Task.CompletedTask;
         }
 

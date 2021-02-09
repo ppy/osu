@@ -160,23 +160,34 @@ namespace osu.Game.Overlays
             Loading.Hide();
             lastFetchDisplayedTime = Time.Current;
 
+            if (content == currentContent)
+                return;
+
             var lastContent = currentContent;
 
             if (lastContent != null)
             {
-                lastContent.FadeOut(100, Easing.OutQuint).Expire();
+                var transform = lastContent.FadeOut(100, Easing.OutQuint);
 
-                // Consider the case when the new content is smaller than the last content.
-                // If the auto-size computation is delayed until fade out completes, the background remain high for too long making the resulting transition to the smaller height look weird.
-                // At the same time, if the last content's height is bypassed immediately, there is a period where the new content is at Alpha = 0 when the auto-sized height will be 0.
-                // To resolve both of these issues, the bypass is delayed until a point when the content transitions (fade-in and fade-out) overlap and it looks good to do so.
-                lastContent.Delay(25).Schedule(() => lastContent.BypassAutoSizeAxes = Axes.Y).Then().Schedule(() => panelTarget.Remove(lastContent));
+                if (lastContent == notFoundContent)
+                {
+                    // not found display may be used multiple times, so don't expire/dispose it.
+                    transform.Schedule(() => panelTarget.Remove(lastContent));
+                }
+                else
+                {
+                    // Consider the case when the new content is smaller than the last content.
+                    // If the auto-size computation is delayed until fade out completes, the background remain high for too long making the resulting transition to the smaller height look weird.
+                    // At the same time, if the last content's height is bypassed immediately, there is a period where the new content is at Alpha = 0 when the auto-sized height will be 0.
+                    // To resolve both of these issues, the bypass is delayed until a point when the content transitions (fade-in and fade-out) overlap and it looks good to do so.
+                    lastContent.Delay(25).Schedule(() => lastContent.BypassAutoSizeAxes = Axes.Y).Then().Schedule(() => lastContent.Expire());
+                }
             }
 
             if (!content.IsAlive)
                 panelTarget.Add(content);
-            content.FadeIn(200, Easing.OutQuint);
 
+            content.FadeInFromZero(200, Easing.OutQuint);
             currentContent = content;
         }
 
@@ -186,7 +197,7 @@ namespace osu.Game.Overlays
             base.Dispose(isDisposing);
         }
 
-        private class NotFoundDrawable : CompositeDrawable
+        public class NotFoundDrawable : CompositeDrawable
         {
             public NotFoundDrawable()
             {
