@@ -391,7 +391,7 @@ namespace osu.Game.Screens.Select
                 if (Precision.AlmostEquals(bpmMin, bpmMax))
                     return $"{bpmMin:0}";
 
-                return $"{bpmMin:0}-{bpmMax:0} (mostly {beatmap.ControlPointInfo.BPMMode:0})";
+                return $"{bpmMin:0}-{bpmMax:0} (mostly {60000 / beatmap.GetMostCommonBeatLength():0})";
             }
 
             private OsuSpriteText[] getMapper(BeatmapMetadata metadata)
