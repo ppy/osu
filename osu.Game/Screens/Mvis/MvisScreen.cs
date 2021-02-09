@@ -52,9 +52,10 @@ namespace osu.Game.Screens.Mvis
     public class MvisScreen : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>
     {
         public override bool HideOverlaysOnEnter => true;
-        private bool allowCursor;
         public override bool AllowBackButton => false;
-        public override bool CursorVisible => allowCursor;
+
+        public override bool CursorVisible => !overlaysHidden || sidebar.State.Value == Visibility.Visible; //隐藏界面或侧边栏可见，显示光标
+
         public override bool AllowRateAdjustments => true;
 
         private bool canReallyHide =>
@@ -121,7 +122,12 @@ namespace osu.Game.Screens.Mvis
         #region overlay
 
         private LoadingSpinner loadingSpinner;
-        private Sidebar sidebar;
+
+        private readonly Sidebar sidebar = new Sidebar
+        {
+            Name = "Sidebar Container",
+            Padding = new MarginPadding { Right = HORIZONTAL_OVERFLOW_PADDING }
+        };
 
         #endregion
 
@@ -269,11 +275,7 @@ namespace osu.Game.Screens.Mvis
                             Origin = Anchor.BottomCentre,
                             Margin = new MarginPadding(115)
                         },
-                        sidebar = new Sidebar
-                        {
-                            Name = "Sidebar Container",
-                            Padding = new MarginPadding { Right = HORIZONTAL_OVERFLOW_PADDING }
-                        },
+                        sidebar,
                         skinnableBbBackground = new FullScreenSkinnableComponent("MBottomBar-background",
                             confineMode: ConfineMode.ScaleToFill,
                             masking: true,
@@ -830,7 +832,6 @@ namespace osu.Game.Screens.Mvis
             progressBar.MoveToY(5, duration, Easing.OutQuint);
             bottomBar.FadeOut(duration, Easing.OutQuint);
 
-            allowCursor = false;
             overlaysHidden = true;
             updateIdleVisuals();
         }
@@ -852,7 +853,6 @@ namespace osu.Game.Screens.Mvis
             progressBar.MoveToY(0, duration, Easing.OutQuint);
             bottomBar.FadeIn(duration, Easing.OutQuint);
 
-            allowCursor = true;
             overlaysHidden = false;
 
             applyBackgroundBrightness();

@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
         private Box hover;
         private FillFlowContainer maskFillFlow;
         private Box bgBox;
-        private Container content;
+        private ShakeContainer content;
 
         public BeatmapPiece(WorkingBeatmap b)
         {
@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = content = new Container
+            InternalChild = content = new ShakeContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
@@ -242,6 +242,8 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
                 b.Value = Beatmap;
                 controller.Play();
             }
+            else
+                content.Shake();
 
             return base.OnClick(e);
         }
