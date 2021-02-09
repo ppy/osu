@@ -48,6 +48,24 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestSettingsResetOnDeselection()
+        {
+            var osuModDoubleTime = new OsuModDoubleTime { SpeedChange = { Value = 1.2 } };
+
+            changeRuleset(0);
+
+            AddStep("set dt mod with custom rate", () => { SelectedMods.Value = new[] { osuModDoubleTime }; });
+
+            AddAssert("selected mod matches", () => (SelectedMods.Value.Single() as OsuModDoubleTime)?.SpeedChange.Value == 1.2);
+
+            AddStep("deselect", () => modSelect.DeselectAllButton.Click());
+            AddAssert("selected mods empty", () => SelectedMods.Value.Count == 0);
+
+            AddStep("reselect", () => modSelect.GetModButton(osuModDoubleTime).Click());
+            AddAssert("selected mod has default value", () => (SelectedMods.Value.Single() as OsuModDoubleTime)?.SpeedChange.IsDefault == true);
+        }
+
+        [Test]
         public void TestAnimationFlushOnClose()
         {
             changeRuleset(0);
