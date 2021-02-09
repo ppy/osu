@@ -45,7 +45,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             BorderColour = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderBorder)?.Value ?? Color4.White;
 
             drawableObject.HitObjectApplied += onHitObjectApplied;
-            onHitObjectApplied(drawableObject);
         }
 
         private void onHitObjectApplied(DrawableHitObject obj)
