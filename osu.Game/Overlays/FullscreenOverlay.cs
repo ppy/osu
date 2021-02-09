@@ -23,6 +23,8 @@ namespace osu.Game.Overlays
 
         public T Header { get; }
 
+        protected virtual Color4 BackgroundColour => ColourProvider.Background5;
+
         [Resolved]
         protected IAPIProvider API { get; private set; }
 
@@ -59,7 +61,7 @@ namespace osu.Game.Overlays
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = GetBackgroundColour()
+                    Colour = BackgroundColour
                 },
                 content = new Container
                 {
@@ -79,8 +81,6 @@ namespace osu.Game.Overlays
 
         [NotNull]
         protected abstract T CreateHeader();
-
-        protected virtual Color4 GetBackgroundColour() => ColourProvider.Background5;
 
         public override void Show()
         {

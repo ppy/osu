@@ -55,7 +55,7 @@ namespace osu.Game.Overlays
             ListingSelected = ShowListing,
         };
 
-        protected override Color4 GetBackgroundColour() => ColourProvider.Background4;
+        protected override Color4 BackgroundColour => ColourProvider.Background4;
 
         public void ShowListing()
         {
