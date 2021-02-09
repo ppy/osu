@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -164,7 +165,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
             var ruleset = rulesets.GetRuleset(Room.Settings.RulesetID);
 
-            var currentModeRank = User.User?.GetStatisticsFor(ruleset)?.GlobalRank;
+            var currentModeRank = User.User?.AllStatistics.GetValueOrDefault(ruleset.ShortName)?.GlobalRank;
             userRankText.Text = currentModeRank != null ? $"#{currentModeRank.Value:N0}" : string.Empty;
 
             userStateDisplay.UpdateStatus(User.State, User.BeatmapAvailability);
