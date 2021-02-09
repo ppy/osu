@@ -267,9 +267,7 @@ namespace osu.Game.Users
             if (!(otherProperties.TryGetValue($"statistics_{ruleset.ShortName}", out var token)))
                 return new UserStatistics();
 
-            var settings = JsonSerializableExtensions.CreateGlobalSettings();
-            settings.DefaultValueHandling = DefaultValueHandling.Include;
-            return token.ToObject<UserStatistics>(JsonSerializer.Create(settings));
+            return token.ToObject<UserStatistics>(JsonSerializer.Create(JsonSerializableExtensions.CreateGlobalSettings()));
         }
 
         public override string ToString() => Username;
