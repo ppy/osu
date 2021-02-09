@@ -151,11 +151,10 @@ namespace osu.Game.Screens.Edit.Timing
                         return new RowAttribute("difficulty", () => $"{difficulty.SpeedMultiplier:n2}x", colour);
 
                     case EffectControlPoint effect:
-                        return new RowAttribute("effect", () => string.Join(" ", new[]
-                        {
+                        return new RowAttribute("effect", () => string.Join(" ",
                             effect.KiaiMode ? "Kiai" : string.Empty,
                             effect.OmitFirstBarLine ? "NoBarLine" : string.Empty
-                        }.Where(s => !string.IsNullOrEmpty(s))), colour);
+                        ).Trim(), colour);
 
                     case SampleControlPoint sample:
                         return new RowAttribute("sample", () => $"{sample.SampleBank} {sample.SampleVolume}%", colour);
