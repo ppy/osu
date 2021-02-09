@@ -32,7 +32,7 @@ namespace osu.Game.Overlays
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            Header,
+                            Header.With(h => h.Depth = -float.MaxValue),
                             content = new Container
                             {
                                 RelativeSizeAxes = Axes.X,
