@@ -173,5 +173,10 @@ namespace osu.Game.Rulesets.Mods
         }
 
         public bool Equals(IMod other) => GetType() == other?.GetType();
+
+        /// <summary>
+        /// Reset all custom settings for this mod back to their defaults.
+        /// </summary>
+        public virtual void ResetSettingsToDefaults() => CopyFrom((Mod)Activator.CreateInstance(GetType()));
     }
 }

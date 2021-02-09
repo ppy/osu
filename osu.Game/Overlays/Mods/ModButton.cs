@@ -69,6 +69,8 @@ namespace osu.Game.Overlays.Mods
 
             Mod newSelection = SelectedMod ?? Mods[0];
 
+            newSelection.ResetSettingsToDefaults();
+
             Schedule(() =>
             {
                 if (beforeSelected != Selected)
