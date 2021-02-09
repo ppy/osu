@@ -13,6 +13,7 @@ using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Database;
 using osu.Game.Online;
+using osu.Game.Online.API;
 using osu.Game.Online.Spectator;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Osu.Scoring;
@@ -103,6 +104,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 : base(new DevelopmentEndpointConfiguration())
             {
                 this.totalUsers = totalUsers;
+            }
+
+            protected override HubClientConnector CreateConnector(string name, string endpoint, IAPIProvider api)
+            {
+                // do not pass API to prevent attempting failing connections on an actual hub.
+                return base.CreateConnector(name, endpoint, null);
             }
 
             public void Start(int beatmapId)
