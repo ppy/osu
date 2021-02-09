@@ -68,7 +68,7 @@ namespace osu.Game.Overlays
             }, (cancellationToken = new CancellationTokenSource()).Token);
         }
 
-        protected void OnTabChanged(TEnum tab)
+        protected virtual void OnTabChanged(TEnum tab)
         {
             cancellationToken?.Cancel();
             Loading.Show();

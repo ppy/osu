@@ -17,8 +17,6 @@ namespace osu.Game.Overlays
     {
         protected Bindable<Country> Country => Header.Country;
 
-        protected Bindable<RankingsScope> Scope => Header.Current;
-
         private APIRequest lastRequest;
 
         [Resolved]
@@ -42,30 +40,30 @@ namespace osu.Game.Overlays
             {
                 // if a country is requested, force performance scope.
                 if (Country.Value != null)
-                    Scope.Value = RankingsScope.Performance;
+                    Header.Current.Value = RankingsScope.Performance;
 
-                Scheduler.AddOnce(loadNewContent);
-            });
-
-            // Unbind events from scope so base class event will not be called
-            Scope.UnbindEvents();
-            Scope.BindValueChanged(_ =>
-            {
-                // country filtering is only valid for performance scope.
-                if (Scope.Value != RankingsScope.Performance)
-                    Country.Value = null;
-
-                Scheduler.AddOnce(loadNewContent);
+                Scheduler.AddOnce(triggerTabChanged);
             });
 
             ruleset.BindValueChanged(_ =>
             {
-                if (Scope.Value == RankingsScope.Spotlights)
+                if (Header.Current.Value == RankingsScope.Spotlights)
                     return;
 
-                Scheduler.AddOnce(loadNewContent);
+                Scheduler.AddOnce(triggerTabChanged);
             });
         }
+
+        protected override void OnTabChanged(RankingsScope tab)
+        {
+            // country filtering is only valid for performance scope.
+            if (Header.Current.Value != RankingsScope.Performance)
+                Country.Value = null;
+
+            Scheduler.AddOnce(triggerTabChanged);
+        }
+
+        private void triggerTabChanged() => base.OnTabChanged(Header.Current.Value);
 
         protected override RankingsOverlayHeader CreateHeader() => new RankingsOverlayHeader();
 
@@ -79,17 +77,11 @@ namespace osu.Game.Overlays
             Country.Value = requested;
         }
 
-        public void ShowSpotlights()
-        {
-            Scope.Value = RankingsScope.Spotlights;
-            Show();
-        }
-
         protected override void CreateDisplayToLoad(RankingsScope tab)
         {
             lastRequest?.Cancel();
 
-            if (Scope.Value == RankingsScope.Spotlights)
+            if (Header.Current.Value == RankingsScope.Spotlights)
             {
                 LoadDisplay(new SpotlightsLayout
                 {
@@ -115,7 +107,7 @@ namespace osu.Game.Overlays
 
         private APIRequest createScopedRequest()
         {
-            switch (Scope.Value)
+            switch (Header.Current.Value)
             {
                 case RankingsScope.Performance:
                     return new GetUserRankingsRequest(ruleset.Value, country: Country.Value?.FlagName);
@@ -152,8 +144,6 @@ namespace osu.Game.Overlays
 
             return null;
         }
-
-        private void loadNewContent() => OnTabChanged(Scope.Value);
 
         protected override void Dispose(bool isDisposing)
         {
