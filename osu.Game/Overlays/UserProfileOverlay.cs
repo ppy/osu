@@ -36,7 +36,7 @@ namespace osu.Game.Overlays
 
         protected override ProfileHeader CreateHeader() => new ProfileHeader();
 
-        protected override Color4 GetBackgroundColour() => ColourProvider.Background6;
+        protected override Color4 BackgroundColour => ColourProvider.Background6;
 
         public void ShowUser(int userId) => ShowUser(new User { Id = userId });
 
