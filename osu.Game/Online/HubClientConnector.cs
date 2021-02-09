@@ -4,15 +4,14 @@
 #nullable enable
 
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using osu.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Online.API;
 
@@ -21,7 +20,7 @@ namespace osu.Game.Online
     /// <summary>
     /// A component that maintains over a hub connection between client and server.
     /// </summary>
-    public class HubClientConnector : Component
+    public class HubClientConnector : IDisposable
     {
         /// <summary>
         /// Invoked whenever a new hub connection is built.
@@ -30,6 +29,7 @@ namespace osu.Game.Online
 
         private readonly string clientName;
         private readonly string endpoint;
+        private readonly IAPIProvider? api;
 
         /// <summary>
         /// The current connection opened by this connector.
@@ -45,9 +45,6 @@ namespace osu.Game.Online
         private readonly SemaphoreSlim connectionLock = new SemaphoreSlim(1);
         private CancellationTokenSource connectCancelSource = new CancellationTokenSource();
 
-        [Resolved]
-        private IAPIProvider api { get; set; } = null!;
-
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
 
         /// <summary>
@@ -55,30 +52,32 @@ namespace osu.Game.Online
         /// </summary>
         /// <param name="clientName">The name of the client this connector connects for, used for logging.</param>
         /// <param name="endpoint">The endpoint to the hub.</param>
-        public HubClientConnector(string clientName, string endpoint)
+        /// <param name="api">The API provider for listening to state changes, or null to not listen.</param>
+        public HubClientConnector(string clientName, string endpoint, IAPIProvider? api)
         {
             this.clientName = clientName;
             this.endpoint = endpoint;
-        }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            apiState.BindTo(api.State);
-            apiState.BindValueChanged(state =>
+            this.api = api;
+
+            if (api != null)
             {
-                switch (state.NewValue)
+                apiState.BindTo(api.State);
+                apiState.BindValueChanged(state =>
                 {
-                    case APIState.Failing:
-                    case APIState.Offline:
-                        Task.Run(() => disconnect(true));
-                        break;
+                    switch (state.NewValue)
+                    {
+                        case APIState.Failing:
+                        case APIState.Offline:
+                            Task.Run(() => disconnect(true));
+                            break;
 
-                    case APIState.Online:
-                        Task.Run(connect);
-                        break;
-                }
-            });
+                        case APIState.Online:
+                            Task.Run(connect);
+                            break;
+                    }
+                }, true);
+            }
         }
 
         private async Task connect()
@@ -137,6 +136,8 @@ namespace osu.Game.Online
 
         private HubConnection createConnection(CancellationToken cancellationToken)
         {
+            Debug.Assert(api != null);
+
             var builder = new HubConnectionBuilder()
                 .WithUrl(endpoint, options => { options.Headers.Add("Authorization", $"Bearer {api.AccessToken}"); });
 
@@ -200,9 +201,9 @@ namespace osu.Game.Online
 
         public override string ToString() => $"Connector for {clientName} ({(IsConnected.Value ? "connected" : "not connected")}";
 
-        protected override void Dispose(bool isDisposing)
+        public void Dispose()
         {
-            base.Dispose(isDisposing);
+            apiState.UnbindAll();
             cancelExistingConnect();
         }
     }
