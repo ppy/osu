@@ -126,20 +126,12 @@ namespace osu.Game.Online.Multiplayer
             return connection.InvokeAsync<MultiplayerRoom>(nameof(IMultiplayerServer.JoinRoom), roomId);
         }
 
-        public override async Task LeaveRoom()
+        protected override Task LeaveRoomInternal()
         {
             if (!isConnected.Value)
-            {
-                // even if not connected, make sure the local room state can be cleaned up.
-                await base.LeaveRoom();
-                return;
-            }
+                return Task.FromCanceled(new CancellationToken(true));
 
-            if (Room == null)
-                return;
-
-            await base.LeaveRoom();
-            await connection.InvokeAsync(nameof(IMultiplayerServer.LeaveRoom));
+            return connection.InvokeAsync(nameof(IMultiplayerServer.LeaveRoom));
         }
 
         public override Task TransferHost(int userId)
