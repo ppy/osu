@@ -108,19 +108,19 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestExitTooSoon()
+        public void TestExitSoonAfterResumeSucceeds()
         {
             AddStep("seek before gameplay", () => Player.GameplayClockContainer.Seek(-5000));
 
             pauseAndConfirm();
             resume();
 
-            AddStep("exit too soon", () => Player.Exit());
+            AddStep("exit quick", () => Player.Exit());
 
             confirmClockRunning(true);
             confirmPauseOverlayShown(false);
 
-            AddAssert("not exited", () => Player.IsCurrentScreen());
+            AddAssert("exited", () => !Player.IsCurrentScreen());
         }
 
         [Test]
