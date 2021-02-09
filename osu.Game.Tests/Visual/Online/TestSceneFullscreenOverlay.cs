@@ -53,7 +53,16 @@ namespace osu.Game.Tests.Visual.Online
                 };
             }
 
-            protected override OverlayHeader CreateHeader() => null;
+            protected override OverlayHeader CreateHeader() => new TestHeader();
+
+            internal class TestHeader : OverlayHeader
+            {
+                protected override OverlayTitle CreateTitle() => new TestTitle();
+
+                internal class TestTitle : OverlayTitle
+                {
+                }
+            }
         }
     }
 }
