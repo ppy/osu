@@ -95,8 +95,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public class TestMultiplayerStreaming : SpectatorStreamingClient
         {
-            protected override IBindable<bool> IsConnected { get; } = new BindableBool(false);
-
             public new BindableList<int> PlayingUsers => (BindableList<int>)base.PlayingUsers;
 
             private readonly int totalUsers;

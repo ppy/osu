@@ -232,8 +232,6 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         public class TestSpectatorStreamingClient : SpectatorStreamingClient
         {
-            protected override IBindable<bool> IsConnected { get; } = new BindableBool(false);
-
             public readonly User StreamingUser = new User { Id = 55, Username = "Test user" };
 
             public new BindableList<int> PlayingUsers => (BindableList<int>)base.PlayingUsers;
