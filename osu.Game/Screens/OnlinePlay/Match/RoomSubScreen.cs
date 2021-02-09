@@ -49,6 +49,8 @@ namespace osu.Game.Screens.OnlinePlay.Match
         [Cached]
         protected OnlinePlayBeatmapAvailablilityTracker BeatmapAvailablilityTracker { get; }
 
+        protected IBindable<BeatmapAvailability> BeatmapAvailability => BeatmapAvailablilityTracker.Availability;
+
         protected RoomSubScreen()
         {
             AddInternal(BeatmapAvailablilityTracker = new OnlinePlayBeatmapAvailablilityTracker
