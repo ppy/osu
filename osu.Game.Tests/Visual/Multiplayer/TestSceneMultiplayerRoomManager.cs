@@ -101,7 +101,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 });
             });
 
-            AddAssert("multiplayer room joined", () => roomContainer.Client.Room != null);
+            AddUntilStep("multiplayer room joined", () => roomContainer.Client.Room != null);
         }
 
         [Test]
@@ -133,7 +133,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 });
             });
 
-            AddAssert("multiplayer room joined", () => roomContainer.Client.Room != null);
+            AddUntilStep("multiplayer room joined", () => roomContainer.Client.Room != null);
         }
 
         private TestMultiplayerRoomManager createRoomManager()
