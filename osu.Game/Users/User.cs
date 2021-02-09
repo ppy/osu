@@ -185,9 +185,8 @@ namespace osu.Game.Users
         private UserStatistics statistics;
 
         /// <summary>
-        /// The user statistics of the ruleset specified within the API request.
-        /// If the user is fetched from a <see cref="GetUsersRequest"/> or similar
-        /// (i.e. is a user compact instance), use <see cref="GetStatisticsFor"/> instead.
+        /// User statistics for the requested ruleset (in the case of a <see cref="GetUserRequest"/> response).
+        /// Otherwise empty.
         /// </summary>
         [JsonProperty(@"statistics")]
         public UserStatistics Statistics
