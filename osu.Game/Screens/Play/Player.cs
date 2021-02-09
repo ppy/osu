@@ -478,11 +478,11 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Exits the <see cref="Player"/>.
         /// </summary>
-        /// <param name="userRequested">
-        /// Whether the exit is requested by the user, or a higher-level game component.
-        /// Pausing is allowed only in the former case.
+        /// <param name="showDialogFirst">
+        /// Whether the pause or fail dialog should be shown before performing an exit.
+        /// If true and a dialog is not yet displayed, the exit will be blocked the the relevant dialog will display instead.
         /// </param>
-        protected void PerformExit(bool userRequested)
+        protected void PerformExit(bool showDialogFirst)
         {
             // if a restart has been requested, cancel any pending completion (user has shown intent to restart).
             completionProgressDelegate?.Cancel();
@@ -495,7 +495,7 @@ namespace osu.Game.Screens.Play
                 this.MakeCurrent();
             }
 
-            if (userRequested)
+            if (showDialogFirst)
             {
                 if (ValidForResume && HasFailed && !FailOverlay.IsPresent)
                 {
@@ -503,7 +503,7 @@ namespace osu.Game.Screens.Play
                     return;
                 }
 
-                if (canPause)
+                if (canPause && !GameplayClockContainer.IsPaused.Value)
                 {
                     Pause();
                     return;
@@ -540,10 +540,7 @@ namespace osu.Game.Screens.Play
             sampleRestart?.Play();
             RestartRequested?.Invoke();
 
-            if (this.IsCurrentScreen())
-                PerformExit(true);
-            else
-                this.MakeCurrent();
+            PerformExit(false);
         }
 
         private ScheduledDelegate completionProgressDelegate;
