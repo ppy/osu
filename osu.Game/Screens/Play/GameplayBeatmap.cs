@@ -43,6 +43,8 @@ namespace osu.Game.Screens.Play
 
         public IEnumerable<BeatmapStatistic> GetStatistics() => PlayableBeatmap.GetStatistics();
 
+        public double GetMostCommonBeatLength() => PlayableBeatmap.GetMostCommonBeatLength();
+
         public IBeatmap Clone() => PlayableBeatmap.Clone();
 
         private readonly Bindable<JudgementResult> lastJudgementResult = new Bindable<JudgementResult>();
