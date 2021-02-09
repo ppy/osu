@@ -29,18 +29,6 @@ namespace osu.Game.Online.Rooms
 
         private ScheduledDelegate progressUpdate;
 
-        public OnlinePlayBeatmapAvailablilityTracker()
-        {
-            State.BindValueChanged(_ => updateAvailability());
-            Progress.BindValueChanged(_ =>
-            {
-                // incoming progress changes are going to be at a very high rate.
-                // we don't want to flood the network with this, so rate limit how often we send progress updates.
-                if (progressUpdate?.Completed != false)
-                    progressUpdate = Scheduler.AddDelayed(updateAvailability, progressUpdate == null ? 0 : 500);
-            });
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -54,6 +42,16 @@ namespace osu.Game.Online.Rooms
 
                 Model.Value = item.NewValue.Beatmap.Value.BeatmapSet;
             }, true);
+
+            Progress.BindValueChanged(_ =>
+            {
+                // incoming progress changes are going to be at a very high rate.
+                // we don't want to flood the network with this, so rate limit how often we send progress updates.
+                if (progressUpdate?.Completed != false)
+                    progressUpdate = Scheduler.AddDelayed(updateAvailability, progressUpdate == null ? 0 : 500);
+            });
+
+            State.BindValueChanged(_ => updateAvailability(), true);
         }
 
         protected override bool VerifyDatabasedModel(BeatmapSetInfo databasedSet)
