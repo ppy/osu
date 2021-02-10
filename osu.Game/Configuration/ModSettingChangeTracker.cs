@@ -9,12 +9,25 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Configuration
 {
+    /// <summary>
+    /// A helper class for tracking changes to the settings of a set of <see cref="Mod"/>s.
+    /// </summary>
+    /// <remarks>
+    /// Ensure to dispose when usage is finished.
+    /// </remarks>
     public class ModSettingChangeTracker : IDisposable
     {
+        /// <summary>
+        /// Notifies that the setting of a <see cref="Mod"/> has changed.
+        /// </summary>
         public Action<Mod> SettingChanged;
 
-        private readonly List<ISettingsItem> references = new List<ISettingsItem>();
+        private readonly List<ISettingsItem> settings = new List<ISettingsItem>();
 
+        /// <summary>
+        /// Creates a new <see cref="ModSettingChangeTracker"/> for a set of <see cref="Mod"/>s.
+        /// </summary>
+        /// <param name="mods">The set of <see cref="Mod"/>s whose settings need to be tracked.</param>
         public ModSettingChangeTracker(IEnumerable<Mod> mods)
         {
             foreach (var mod in mods)
@@ -22,7 +35,7 @@ namespace osu.Game.Configuration
                 foreach (var setting in mod.CreateSettingsControls().OfType<ISettingsItem>())
                 {
                     setting.SettingChanged += () => SettingChanged?.Invoke(mod);
-                    references.Add(setting);
+                    settings.Add(setting);
                 }
             }
         }
@@ -31,9 +44,9 @@ namespace osu.Game.Configuration
         {
             SettingChanged = null;
 
-            foreach (var r in references)
+            foreach (var r in settings)
                 r.Dispose();
-            references.Clear();
+            settings.Clear();
         }
     }
 }
