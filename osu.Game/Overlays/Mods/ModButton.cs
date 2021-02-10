@@ -46,8 +46,9 @@ namespace osu.Game.Overlays.Mods
         /// Change the selected mod index of this button.
         /// </summary>
         /// <param name="newIndex">The new index.</param>
+        /// <param name="resetSettings">Whether any settings applied to the mod should be reset on selection.</param>
         /// <returns>Whether the selection changed.</returns>
-        private bool changeSelectedIndex(int newIndex)
+        private bool changeSelectedIndex(int newIndex, bool resetSettings = true)
         {
             if (newIndex == selectedIndex) return false;
 
@@ -69,7 +70,8 @@ namespace osu.Game.Overlays.Mods
 
             Mod newSelection = SelectedMod ?? Mods[0];
 
-            newSelection.ResetSettingsToDefaults();
+            if (resetSettings)
+                newSelection.ResetSettingsToDefaults();
 
             Schedule(() =>
             {
@@ -211,11 +213,17 @@ namespace osu.Game.Overlays.Mods
             Deselect();
         }
 
-        public bool SelectAt(int index)
+        /// <summary>
+        /// Select the mod at the provided index.
+        /// </summary>
+        /// <param name="index">The index to select.</param>
+        /// <param name="resetSettings">Whether any settings applied to the mod should be reset on selection.</param>
+        /// <returns>Whether the selection changed.</returns>
+        public bool SelectAt(int index, bool resetSettings = true)
         {
             if (!Mods[index].HasImplementation) return false;
 
-            changeSelectedIndex(index);
+            changeSelectedIndex(index, resetSettings);
             return true;
         }
 
