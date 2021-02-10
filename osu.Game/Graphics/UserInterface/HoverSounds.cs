@@ -48,9 +48,12 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnHover(HoverEvent e)
         {
+            if (sampleHover == null)
+                return false;
+
             bool enoughTimePassedSinceLastPlayback = !lastPlaybackTime.Value.HasValue || Time.Current - lastPlaybackTime.Value >= HoverDebounceTime;
 
-            if (enoughTimePassedSinceLastPlayback && sampleHover != null)
+            if (enoughTimePassedSinceLastPlayback)
             {
                 sampleHover.Frequency.Value = 0.96 + RNG.NextDouble(0.08);
                 sampleHover.Play();
@@ -58,7 +61,7 @@ namespace osu.Game.Graphics.UserInterface
                 lastPlaybackTime.Value = Time.Current;
             }
 
-            return base.OnHover(e);
+            return false;
         }
     }
 
