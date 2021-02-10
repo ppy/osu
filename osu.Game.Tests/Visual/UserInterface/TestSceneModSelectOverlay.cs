@@ -171,6 +171,31 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestExternallySetModIsReplacedByOverlayInstance()
+        {
+            Mod external = new OsuModDoubleTime();
+            Mod overlayButtonMod = null;
+
+            changeRuleset(0);
+
+            AddStep("set mod externally", () => { SelectedMods.Value = new[] { external }; });
+
+            AddAssert("ensure button is selected", () =>
+            {
+                var button = modSelect.GetModButton(SelectedMods.Value.Single());
+                overlayButtonMod = button.SelectedMod;
+                return overlayButtonMod.GetType() == external.GetType();
+            });
+
+            // Right now, when an external change occurs, the ModSelectOverlay will replace the global instance with its own
+            AddAssert("mod instance doesn't match", () => external != overlayButtonMod);
+
+            AddAssert("one mod present in global selected", () => SelectedMods.Value.Count == 1);
+            AddAssert("globally selected matches button's mod instance", () => SelectedMods.Value.Contains(overlayButtonMod));
+            AddAssert("globally selected doesn't contain original external change", () => !SelectedMods.Value.Contains(external));
+        }
+
+        [Test]
         public void TestNonStacked()
         {
             changeRuleset(0);
