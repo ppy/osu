@@ -32,27 +32,27 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override ModType Type => ModType.Conversion;
 
-        [SettingSource("Disable slider head judgement", "Scores sliders proportionally to the number of ticks hit.")]
-        public Bindable<bool> DisableSliderHeadJudgement { get; } = new BindableBool(true);
+        [SettingSource("No slider head accuracy requirement", "Scores sliders proportionally to the number of ticks hit.")]
+        public Bindable<bool> NoSliderHeadAccuracy { get; } = new BindableBool(true);
 
-        [SettingSource("Disable slider head tracking", "Pins slider heads at their starting position, regardless of time.")]
-        public Bindable<bool> DisableSliderHeadTracking { get; } = new BindableBool(true);
+        [SettingSource("No slider head movement", "Pins slider heads at their starting position, regardless of time.")]
+        public Bindable<bool> NoSliderHeadMovement { get; } = new BindableBool(true);
 
-        [SettingSource("Disable note lock lenience", "Applies note lock to the full hit window.")]
-        public Bindable<bool> DisableLenientNoteLock { get; } = new BindableBool(true);
+        [SettingSource("Apply classic note lock", "Applies note lock to the full hit window.")]
+        public Bindable<bool> ClassicNoteLock { get; } = new BindableBool(true);
 
-        [SettingSource("Disable exact slider follow circle tracking", "Makes the slider follow circle track its final size at all times.")]
-        public Bindable<bool> DisableExactFollowCircleTracking { get; } = new BindableBool(true);
+        [SettingSource("Use fixed slider follow circle hit area", "Makes the slider follow circle track its final size at all times.")]
+        public Bindable<bool> FixedFollowCircleHitArea { get; } = new BindableBool(true);
 
         public void ApplyToHitObject(HitObject hitObject)
         {
             switch (hitObject)
             {
                 case Slider slider:
-                    slider.IgnoreJudgement = !DisableSliderHeadJudgement.Value;
+                    slider.IgnoreJudgement = !NoSliderHeadAccuracy.Value;
 
                     foreach (var head in slider.NestedHitObjects.OfType<SliderHeadCircle>())
-                        head.JudgeAsNormalHitCircle = !DisableSliderHeadJudgement.Value;
+                        head.JudgeAsNormalHitCircle = !NoSliderHeadAccuracy.Value;
 
                     break;
             }
@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             var osuRuleset = (DrawableOsuRuleset)drawableRuleset;
 
-            if (!DisableLenientNoteLock.Value)
+            if (!ClassicNoteLock.Value)
                 osuRuleset.Playfield.HitPolicy = new ObjectOrderedHitPolicy();
         }
 
@@ -73,11 +73,11 @@ namespace osu.Game.Rulesets.Osu.Mods
                 switch (obj)
                 {
                     case DrawableSlider slider:
-                        slider.Ball.TrackVisualSize = !DisableExactFollowCircleTracking.Value;
+                        slider.Ball.TrackVisualSize = !FixedFollowCircleHitArea.Value;
                         break;
 
                     case DrawableSliderHead head:
-                        head.TrackFollowCircle = !DisableSliderHeadTracking.Value;
+                        head.TrackFollowCircle = !NoSliderHeadMovement.Value;
                         break;
                 }
             }
