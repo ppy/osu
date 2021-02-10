@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             var osuRuleset = (DrawableOsuRuleset)drawableRuleset;
 
-            if (!ClassicNoteLock.Value)
+            if (ClassicNoteLock.Value)
                 osuRuleset.Playfield.HitPolicy = new ObjectOrderedHitPolicy();
         }
 
