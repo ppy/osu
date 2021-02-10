@@ -162,6 +162,7 @@ namespace osu.Game.Screens.Select.Details
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
+            settingChangeTracker?.Dispose();
             starDifficultyCancellationSource?.Cancel();
         }
 

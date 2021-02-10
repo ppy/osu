@@ -402,6 +402,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             if (client != null)
                 client.LoadRequested -= onLoadRequested;
+
+            modSettingChangeTracker?.Dispose();
         }
 
         private class UserModSelectOverlay : LocalPlayerModSelectOverlay
