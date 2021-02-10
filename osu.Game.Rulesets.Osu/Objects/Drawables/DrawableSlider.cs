@@ -263,16 +263,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 int totalTicks = NestedHitObjects.Count;
                 int hitTicks = NestedHitObjects.Count(h => h.IsHit);
-                double hitFraction = (double)totalTicks / hitTicks;
 
                 if (hitTicks == totalTicks)
                     r.Type = HitResult.Great;
-                else if (hitFraction >= 0.5)
-                    r.Type = HitResult.Ok;
-                else if (hitFraction > 0)
-                    r.Type = HitResult.Meh;
-                else
+                else if (hitTicks == 0)
                     r.Type = HitResult.Miss;
+                else
+                {
+                    double hitFraction = (double)totalTicks / hitTicks;
+
+                    if (hitFraction >= 0.5)
+                        r.Type = HitResult.Ok;
+                    else if (hitFraction > 0)
+                        r.Type = HitResult.Meh;
+                }
             });
         }
 
