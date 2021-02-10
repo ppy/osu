@@ -162,6 +162,8 @@ namespace osu.Game.Configuration
 
         public void Dispose()
         {
+            SettingChanged = null;
+
             foreach (var r in references)
                 r.Dispose();
             references.Clear();
