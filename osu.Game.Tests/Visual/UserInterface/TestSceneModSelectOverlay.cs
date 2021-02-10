@@ -171,6 +171,20 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestSettingsAreRetainedOnReload()
+        {
+            changeRuleset(0);
+
+            AddStep("set customized mod externally", () => SelectedMods.Value = new[] { new OsuModDoubleTime { SpeedChange = { Value = 1.01 } } });
+
+            AddAssert("setting remains", () => (SelectedMods.Value.SingleOrDefault() as OsuModDoubleTime)?.SpeedChange.Value == 1.01);
+
+            AddStep("create overlay", () => createDisplay(() => new TestNonStackedModSelectOverlay()));
+
+            AddAssert("setting remains", () => (SelectedMods.Value.SingleOrDefault() as OsuModDoubleTime)?.SpeedChange.Value == 1.01);
+        }
+
+        [Test]
         public void TestExternallySetModIsReplacedByOverlayInstance()
         {
             Mod external = new OsuModDoubleTime();
