@@ -9,6 +9,7 @@ using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Settings;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Configuration
 {
@@ -138,6 +139,32 @@ namespace osu.Game.Configuration
             var unordered = original.Except(orderedRelative);
 
             return orderedRelative.Concat(unordered);
+        }
+    }
+
+    public class ModSettingChangeTracker : IDisposable
+    {
+        public Action<Mod> SettingChanged;
+
+        private readonly List<ISettingsItem> references = new List<ISettingsItem>();
+
+        public ModSettingChangeTracker(IEnumerable<Mod> mods)
+        {
+            foreach (var mod in mods)
+            {
+                foreach (var setting in mod.CreateSettingsControls().OfType<ISettingsItem>())
+                {
+                    setting.SettingChanged += () => SettingChanged?.Invoke(mod);
+                    references.Add(setting);
+                }
+            }
+        }
+
+        public void Dispose()
+        {
+            foreach (var r in references)
+                r.Dispose();
+            references.Clear();
         }
     }
 }
