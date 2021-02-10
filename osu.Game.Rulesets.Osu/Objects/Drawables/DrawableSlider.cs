@@ -250,13 +250,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (userTriggered || Time.Current < HitObject.EndTime)
                 return;
 
+            // If only the nested hitobjects are judged, then the slider's own judgement is ignored for scoring purposes.
+            // But the slider needs to still be judged with a reasonable hit/miss result for visual purposes (hit/miss transforms, etc).
             if (HitObject.OnlyJudgeNestedObjects)
             {
                 ApplyResult(r => r.Type = NestedHitObjects.Any(h => h.Result.IsHit) ? r.Judgement.MaxResult : r.Judgement.MinResult);
                 return;
             }
 
-            // If not ignoring judgement, score proportionally based on the number of ticks hit, counting the head circle as a tick.
+            // Otherwise, if this slider is also needs to be judged, apply judgement proportionally to the number of nested hitobjects hit. This is the classic osu!stable scoring.
             ApplyResult(r =>
             {
                 int totalTicks = NestedHitObjects.Count;
