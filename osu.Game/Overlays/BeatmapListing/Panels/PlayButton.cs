@@ -18,7 +18,10 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
 {
     public class PlayButton : Container
     {
-        public readonly BindableBool Playing = new BindableBool();
+        public IBindable<bool> Playing => playing;
+
+        private readonly BindableBool playing = new BindableBool();
+
         public PreviewTrack Preview { get; private set; }
 
         private BeatmapSetInfo beatmapSet;
@@ -36,7 +39,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                 Preview?.Expire();
                 Preview = null;
 
-                Playing.Value = false;
+                playing.Value = false;
             }
         }
 
@@ -82,7 +85,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                 },
             });
 
-            Playing.ValueChanged += playingStateChanged;
+            playing.ValueChanged += playingStateChanged;
         }
 
         [Resolved]
@@ -96,7 +99,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
 
         protected override bool OnClick(ClickEvent e)
         {
-            Playing.Toggle();
+            playing.Toggle();
             return true;
         }
 
@@ -108,7 +111,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (!Playing.Value)
+            if (!playing.Value)
                 icon.FadeColour(Color4.White, 120, Easing.InOutQuint);
             base.OnHoverLost(e);
         }
@@ -122,7 +125,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
             {
                 if (BeatmapSet == null)
                 {
-                    Playing.Value = false;
+                    playing.Value = false;
                     return;
                 }
 
@@ -142,10 +145,12 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
 
                     AddInternal(preview);
                     loading = false;
-                    preview.Stopped += () => Playing.Value = false;
+                    // make sure that the update of value of Playing (and the ensuing value change callbacks)
+                    // are marshaled back to the update thread.
+                    preview.Stopped += () => Schedule(() => playing.Value = false);
 
                     // user may have changed their mind.
-                    if (Playing.Value)
+                    if (playing.Value)
                         attemptStart();
                 });
             }
@@ -159,13 +164,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
         private void attemptStart()
         {
             if (Preview?.Start() != true)
-                Playing.Value = false;
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            Playing.Value = false;
+                playing.Value = false;
         }
     }
 }

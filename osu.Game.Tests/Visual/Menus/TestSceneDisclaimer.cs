@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Game.Online.API;
 using osu.Game.Screens.Menu;
 using osu.Game.Users;
 
@@ -16,7 +17,7 @@ namespace osu.Game.Tests.Visual.Menus
 
             AddStep("toggle support", () =>
             {
-                API.LocalUser.Value = new User
+                ((DummyAPIAccess)API).LocalUser.Value = new User
                 {
                     Username = API.LocalUser.Value.Username,
                     Id = API.LocalUser.Value.Id + 1,

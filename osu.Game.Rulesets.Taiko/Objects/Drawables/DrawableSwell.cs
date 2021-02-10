@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -35,7 +36,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         private readonly CircularContainer targetRing;
         private readonly CircularContainer expandingRing;
 
-        public DrawableSwell(Swell swell)
+        public DrawableSwell()
+            : this(null)
+        {
+        }
+
+        public DrawableSwell([CanBeNull] Swell swell)
             : base(swell)
         {
             FillMode = FillMode.Fit;
@@ -123,12 +129,13 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 Origin = Anchor.Centre,
             });
 
-        protected override void LoadComplete()
+        protected override void OnFree()
         {
-            base.LoadComplete();
+            base.OnFree();
 
-            // We need to set this here because RelativeSizeAxes won't/can't set our size by default with a different RelativeChildSize
-            Width *= Parent.RelativeChildSize.X;
+            UnproxyContent();
+
+            lastWasCentre = null;
         }
 
         protected override void AddNestedHitObject(DrawableHitObject hitObject)
@@ -146,7 +153,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected override void ClearNestedHitObjects()
         {
             base.ClearNestedHitObjects();
-            ticks.Clear();
+            ticks.Clear(false);
         }
 
         protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
@@ -168,7 +175,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 foreach (var t in ticks)
                 {
-                    if (!t.IsHit)
+                    if (!t.Result.HasResult)
                     {
                         nextTick = t;
                         break;
@@ -208,7 +215,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                         continue;
                     }
 
-                    tick.TriggerResult(false);
+                    if (!tick.Result.HasResult)
+                        tick.TriggerResult(false);
                 }
 
                 ApplyResult(r => r.Type = numHits > HitObject.RequiredHits / 2 ? HitResult.Ok : r.Judgement.MinResult);

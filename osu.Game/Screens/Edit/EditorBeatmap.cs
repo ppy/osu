@@ -74,7 +74,11 @@ namespace osu.Game.Screens.Edit
 
         public BeatmapMetadata Metadata => PlayableBeatmap.Metadata;
 
-        public ControlPointInfo ControlPointInfo => PlayableBeatmap.ControlPointInfo;
+        public ControlPointInfo ControlPointInfo
+        {
+            get => PlayableBeatmap.ControlPointInfo;
+            set => PlayableBeatmap.ControlPointInfo = value;
+        }
 
         public List<BreakPeriod> Breaks => PlayableBeatmap.Breaks;
 
@@ -83,6 +87,8 @@ namespace osu.Game.Screens.Edit
         public IReadOnlyList<HitObject> HitObjects => PlayableBeatmap.HitObjects;
 
         public IEnumerable<BeatmapStatistic> GetStatistics() => PlayableBeatmap.GetStatistics();
+
+        public double GetMostCommonBeatLength() => PlayableBeatmap.GetMostCommonBeatLength();
 
         public IBeatmap Clone() => (EditorBeatmap)MemberwiseClone();
 

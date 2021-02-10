@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.UI
         private readonly ProxyContainer spinnerProxies;
         private readonly JudgementContainer<DrawableOsuJudgement> judgementLayer;
         private readonly FollowPointRenderer followPoints;
-        private readonly OrderedHitPolicy hitPolicy;
+        private readonly StartTimeOrderedHitPolicy hitPolicy;
 
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
 
@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 approachCircles = new ProxyContainer { RelativeSizeAxes = Axes.Both },
             };
 
-            hitPolicy = new OrderedHitPolicy(HitObjectContainer);
+            hitPolicy = new StartTimeOrderedHitPolicy { HitObjectContainer = HitObjectContainer };
 
             var hitWindows = new OsuHitWindows();
 

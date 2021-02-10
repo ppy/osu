@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects;
-using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Taiko.Replays;
 using osu.Framework.Input;
@@ -17,6 +16,7 @@ using osu.Game.Replays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            new BarLineGenerator<BarLine>(Beatmap).BarLines.ForEach(bar => Playfield.Add(bar.Major ? new DrawableBarLineMajor(bar) : new DrawableBarLine(bar)));
+            new BarLineGenerator<BarLine>(Beatmap).BarLines.ForEach(bar => Playfield.Add(bar));
 
             FrameStableComponents.Add(scroller = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.Scroller), _ => Empty())
             {
@@ -63,25 +63,10 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         protected override Playfield CreatePlayfield() => new TaikoPlayfield(Beatmap.ControlPointInfo);
 
-        public override DrawableHitObject<TaikoHitObject> CreateDrawableRepresentation(TaikoHitObject h)
-        {
-            switch (h)
-            {
-                case Hit hit:
-                    return new DrawableHit(hit);
-
-                case DrumRoll drumRoll:
-                    return new DrawableDrumRoll(drumRoll);
-
-                case Swell swell:
-                    return new DrawableSwell(swell);
-            }
-
-            return null;
-        }
+        public override DrawableHitObject<TaikoHitObject> CreateDrawableRepresentation(TaikoHitObject h) => null;
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new TaikoFramedReplayInputHandler(replay);
 
-        protected override ReplayRecorder CreateReplayRecorder(Replay replay) => new TaikoReplayRecorder(replay);
+        protected override ReplayRecorder CreateReplayRecorder(Score score) => new TaikoReplayRecorder(score);
     }
 }

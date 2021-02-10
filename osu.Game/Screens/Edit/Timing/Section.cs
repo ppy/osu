@@ -7,7 +7,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -27,7 +26,7 @@ namespace osu.Game.Screens.Edit.Timing
         private const float header_height = 20;
 
         [Resolved]
-        protected IBindable<WorkingBeatmap> Beatmap { get; private set; }
+        protected EditorBeatmap Beatmap { get; private set; }
 
         [Resolved]
         protected Bindable<ControlPointGroup> SelectedGroup { get; private set; }

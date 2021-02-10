@@ -4,54 +4,38 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Online;
 using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class DownloadButton : OsuAnimatedButton
+    public class DownloadButton : GrayButton
     {
-        public readonly Bindable<DownloadState> State = new Bindable<DownloadState>();
-
-        private readonly SpriteIcon icon;
-        private readonly SpriteIcon checkmark;
-        private readonly Box background;
-
         [Resolved]
         private OsuColour colours { get; set; }
 
+        public readonly Bindable<DownloadState> State = new Bindable<DownloadState>();
+
+        private SpriteIcon checkmark;
+
         public DownloadButton()
+            : base(FontAwesome.Solid.Download)
         {
-            Children = new Drawable[]
-            {
-                background = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Depth = float.MaxValue
-                },
-                icon = new SpriteIcon
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Size = new Vector2(13),
-                    Icon = FontAwesome.Solid.Download,
-                },
-                checkmark = new SpriteIcon
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    X = 8,
-                    Size = Vector2.Zero,
-                    Icon = FontAwesome.Solid.Check,
-                }
-            };
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            AddInternal(checkmark = new SpriteIcon
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                X = 8,
+                Size = Vector2.Zero,
+                Icon = FontAwesome.Solid.Check,
+            });
+
             State.BindValueChanged(updateState, true);
         }
 
@@ -60,27 +44,27 @@ namespace osu.Game.Graphics.UserInterface
             switch (state.NewValue)
             {
                 case DownloadState.NotDownloaded:
-                    background.FadeColour(colours.Gray4, 500, Easing.InOutExpo);
-                    icon.MoveToX(0, 500, Easing.InOutExpo);
+                    Background.FadeColour(colours.Gray4, 500, Easing.InOutExpo);
+                    Icon.MoveToX(0, 500, Easing.InOutExpo);
                     checkmark.ScaleTo(Vector2.Zero, 500, Easing.InOutExpo);
                     TooltipText = "Download";
                     break;
 
                 case DownloadState.Downloading:
-                    background.FadeColour(colours.Blue, 500, Easing.InOutExpo);
-                    icon.MoveToX(0, 500, Easing.InOutExpo);
+                    Background.FadeColour(colours.Blue, 500, Easing.InOutExpo);
+                    Icon.MoveToX(0, 500, Easing.InOutExpo);
                     checkmark.ScaleTo(Vector2.Zero, 500, Easing.InOutExpo);
                     TooltipText = "Downloading...";
                     break;
 
-                case DownloadState.Downloaded:
-                    background.FadeColour(colours.Yellow, 500, Easing.InOutExpo);
+                case DownloadState.Importing:
+                    Background.FadeColour(colours.Yellow, 500, Easing.InOutExpo);
                     TooltipText = "Importing";
                     break;
 
                 case DownloadState.LocallyAvailable:
-                    background.FadeColour(colours.Green, 500, Easing.InOutExpo);
-                    icon.MoveToX(-8, 500, Easing.InOutExpo);
+                    Background.FadeColour(colours.Green, 500, Easing.InOutExpo);
+                    Icon.MoveToX(-8, 500, Easing.InOutExpo);
                     checkmark.ScaleTo(new Vector2(13), 500, Easing.InOutExpo);
                     break;
             }

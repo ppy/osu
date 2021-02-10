@@ -10,9 +10,11 @@ using NUnit.Framework;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics.Audio;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
 using osu.Game.Audio;
+using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
@@ -27,7 +29,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Gameplay
 {
     [HeadlessTest]
-    public class TestSceneStoryboardSamples : OsuTestScene
+    public class TestSceneStoryboardSamples : OsuTestScene, IStorageResourceProvider
     {
         [Test]
         public void TestRetrieveTopLevelSample()
@@ -35,7 +37,7 @@ namespace osu.Game.Tests.Gameplay
             ISkin skin = null;
             SampleChannel channel = null;
 
-            AddStep("create skin", () => skin = new TestSkin("test-sample", Audio));
+            AddStep("create skin", () => skin = new TestSkin("test-sample", this));
             AddStep("retrieve sample", () => channel = skin.GetSample(new SampleInfo("test-sample")));
 
             AddAssert("sample is non-null", () => channel != null);
@@ -47,7 +49,7 @@ namespace osu.Game.Tests.Gameplay
             ISkin skin = null;
             SampleChannel channel = null;
 
-            AddStep("create skin", () => skin = new TestSkin("folder/test-sample", Audio));
+            AddStep("create skin", () => skin = new TestSkin("folder/test-sample", this));
             AddStep("retrieve sample", () => channel = skin.GetSample(new SampleInfo("folder/test-sample")));
 
             AddAssert("sample is non-null", () => channel != null);
@@ -105,7 +107,7 @@ namespace osu.Game.Tests.Gameplay
 
             AddStep("setup storyboard sample", () =>
             {
-                Beatmap.Value = new TestCustomSkinWorkingBeatmap(new OsuRuleset().RulesetInfo, Audio);
+                Beatmap.Value = new TestCustomSkinWorkingBeatmap(new OsuRuleset().RulesetInfo, this);
                 SelectedMods.Value = new[] { testedMod };
 
                 var beatmapSkinSourceContainer = new BeatmapSkinProvidingContainer(Beatmap.Value.Skin);
@@ -128,8 +130,8 @@ namespace osu.Game.Tests.Gameplay
 
         private class TestSkin : LegacySkin
         {
-            public TestSkin(string resourceName, AudioManager audioManager)
-                : base(DefaultLegacySkin.Info, new TestResourceStore(resourceName), audioManager, "skin.ini")
+            public TestSkin(string resourceName, IStorageResourceProvider resources)
+                : base(DefaultLegacySkin.Info, new TestResourceStore(resourceName), resources, "skin.ini")
             {
             }
         }
@@ -158,15 +160,15 @@ namespace osu.Game.Tests.Gameplay
 
         private class TestCustomSkinWorkingBeatmap : ClockBackedTestWorkingBeatmap
         {
-            private readonly AudioManager audio;
+            private readonly IStorageResourceProvider resources;
 
-            public TestCustomSkinWorkingBeatmap(RulesetInfo ruleset, AudioManager audio)
-                : base(ruleset, null, audio)
+            public TestCustomSkinWorkingBeatmap(RulesetInfo ruleset, IStorageResourceProvider resources)
+                : base(ruleset, null, resources.AudioManager)
             {
-                this.audio = audio;
+                this.resources = resources;
             }
 
-            protected override ISkin GetSkin() => new TestSkin("test-sample", audio);
+            protected override ISkin GetSkin() => new TestSkin("test-sample", resources);
         }
 
         private class TestDrawableStoryboardSample : DrawableStoryboardSample
@@ -176,5 +178,13 @@ namespace osu.Game.Tests.Gameplay
             {
             }
         }
+
+        #region IResourceStorageProvider
+
+        public AudioManager AudioManager => Audio;
+        public IResourceStore<byte[]> Files => null;
+        public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => null;
+
+        #endregion
     }
 }

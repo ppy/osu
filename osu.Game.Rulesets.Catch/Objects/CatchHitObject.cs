@@ -4,7 +4,6 @@
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -16,37 +15,45 @@ namespace osu.Game.Rulesets.Catch.Objects
     {
         public const float OBJECT_RADIUS = 64;
 
-        // This value is after XOffset applied.
-        public readonly Bindable<float> XBindable = new Bindable<float>();
-
-        // This value is before XOffset applied.
-        private float originalX;
+        public readonly Bindable<float> OriginalXBindable = new Bindable<float>();
 
         /// <summary>
-        /// The horizontal position of the fruit between 0 and <see cref="CatchPlayfield.WIDTH"/>.
+        /// The horizontal position of the hit object between 0 and <see cref="CatchPlayfield.WIDTH"/>.
         /// </summary>
         public float X
         {
-            // TODO: I don't like this asymmetry.
-            get => XBindable.Value;
-            // originalX is set by `XBindable.BindValueChanged`
-            set => XBindable.Value = value + xOffset;
+            set => OriginalXBindable.Value = value;
         }
 
-        private float xOffset;
+        float IHasXPosition.X => OriginalXBindable.Value;
+
+        public readonly Bindable<float> XOffsetBindable = new Bindable<float>();
 
         /// <summary>
-        /// A random offset applied to <see cref="X"/>, set by the <see cref="CatchBeatmapProcessor"/>.
+        /// A random offset applied to the horizontal position, set by the beatmap processing.
         /// </summary>
-        internal float XOffset
+        public float XOffset
         {
-            get => xOffset;
-            set
-            {
-                xOffset = value;
-                XBindable.Value = originalX + xOffset;
-            }
+            set => XOffsetBindable.Value = value;
         }
+
+        /// <summary>
+        /// The horizontal position of the hit object between 0 and <see cref="CatchPlayfield.WIDTH"/>.
+        /// </summary>
+        /// <remarks>
+        /// This value is the original <see cref="X"/> value specified in the beatmap, not affected by the beatmap processing.
+        /// Use <see cref="EffectiveX"/> for a gameplay.
+        /// </remarks>
+        public float OriginalX => OriginalXBindable.Value;
+
+        /// <summary>
+        /// The effective horizontal position of the hit object between 0 and <see cref="CatchPlayfield.WIDTH"/>.
+        /// </summary>
+        /// <remarks>
+        /// This value is the original <see cref="X"/> value plus the offset applied by the beatmap processing.
+        /// Use <see cref="OriginalX"/> if a value not affected by the offset is desired.
+        /// </remarks>
+        public float EffectiveX => OriginalXBindable.Value + XOffsetBindable.Value;
 
         public double TimePreempt = 1000;
 
@@ -113,10 +120,5 @@ namespace osu.Game.Rulesets.Catch.Objects
         }
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
-
-        protected CatchHitObject()
-        {
-            XBindable.BindValueChanged(x => originalX = x.NewValue - xOffset);
-        }
     }
 }

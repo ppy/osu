@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -10,7 +9,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.UI;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -29,9 +27,8 @@ namespace osu.Game.Rulesets.Catch.Skinning
         [Resolved]
         protected ISkinSource Skin { get; private set; }
 
-        [Resolved(canBeNull: true)]
-        [CanBeNull]
-        protected DrawableHitObject DrawableHitObject { get; private set; }
+        [Resolved]
+        protected IHasCatchObjectState ObjectState { get; private set; }
 
         protected LegacyCatchHitObjectPiece()
         {
@@ -65,13 +62,8 @@ namespace osu.Game.Rulesets.Catch.Skinning
         {
             base.LoadComplete();
 
-            var hitObject = (DrawablePalpableCatchHitObject)DrawableHitObject;
-
-            if (hitObject != null)
-            {
-                AccentColour.BindTo(hitObject.AccentColour);
-                HyperDash.BindTo(hitObject.HyperDash);
-            }
+            AccentColour.BindTo(ObjectState.AccentColour);
+            HyperDash.BindTo(ObjectState.HyperDash);
 
             hyperSprite.Colour = Skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDashFruit)?.Value ??
                                  Skin.GetConfig<CatchSkinColour, Color4>(CatchSkinColour.HyperDash)?.Value ??

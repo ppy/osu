@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Layout;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -124,6 +125,8 @@ namespace osu.Game.Screens.Select
             {
                 BeatmapSetsChanged?.Invoke();
                 BeatmapSetsLoaded = true;
+
+                itemsCache.Invalidate();
             });
         }
 
@@ -567,6 +570,15 @@ namespace osu.Game.Screens.Select
 
         #endregion
 
+        protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
+        {
+            // handles the vertical size of the carousel changing (ie. on window resize when aspect ratio has changed).
+            if ((invalidation & Invalidation.Layout) > 0)
+                itemsCache.Invalidate();
+
+            return base.OnInvalidate(invalidation, source);
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -777,13 +789,19 @@ namespace osu.Game.Screens.Select
 
             Scroll.ScrollContent.Height = currentY;
 
-            if (BeatmapSetsLoaded && (selectedBeatmapSet == null || selectedBeatmap == null || selectedBeatmapSet.State.Value != CarouselItemState.Selected))
-            {
-                selectedBeatmapSet = null;
-                SelectionChanged?.Invoke(null);
-            }
-
             itemsCache.Validate();
+
+            // update and let external consumers know about selection loss.
+            if (BeatmapSetsLoaded)
+            {
+                bool selectionLost = selectedBeatmapSet != null && selectedBeatmapSet.State.Value != CarouselItemState.Selected;
+
+                if (selectionLost)
+                {
+                    selectedBeatmapSet = null;
+                    SelectionChanged?.Invoke(null);
+                }
+            }
         }
 
         private bool firstScroll = true;
@@ -806,14 +824,13 @@ namespace osu.Game.Screens.Select
                         break;
 
                     case PendingScrollOperation.Immediate:
+
                         // in order to simplify animation logic, rather than using the animated version of ScrollTo,
                         // we take the difference in scroll height and apply to all visible panels.
                         // this avoids edge cases like when the visible panels is reduced suddenly, causing ScrollContainer
                         // to enter clamp-special-case mode where it animates completely differently to normal.
                         float scrollChange = scrollTarget.Value - Scroll.Current;
-
                         Scroll.ScrollTo(scrollTarget.Value, false);
-
                         foreach (var i in Scroll.Children)
                             i.Y += scrollChange;
                         break;
@@ -901,14 +918,9 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        protected class CarouselScrollContainer : OsuScrollContainer<DrawableCarouselItem>
+        protected class CarouselScrollContainer : UserTrackingScrollContainer<DrawableCarouselItem>
         {
             private bool rightMouseScrollBlocked;
-
-            /// <summary>
-            /// Whether the last scroll event was user triggered, directly on the scroll container.
-            /// </summary>
-            public bool UserScrolling { get; private set; }
 
             public CarouselScrollContainer()
             {
@@ -917,19 +929,6 @@ namespace osu.Game.Screens.Select
 
                 // the scroll container may get pushed off-screen by global screen changes, but we still want panels to display outside of the bounds.
                 Masking = false;
-            }
-
-            // ReSharper disable once OptionalParameterHierarchyMismatch 2020.3 EAP4 bug. (https://youtrack.jetbrains.com/issue/RSRP-481535?p=RIDER-51910)
-            protected override void OnUserScroll(float value, bool animated = true, double? distanceDecay = default)
-            {
-                UserScrolling = true;
-                base.OnUserScroll(value, animated, distanceDecay);
-            }
-
-            public new void ScrollTo(float value, bool animated = true, double? distanceDecay = null)
-            {
-                UserScrolling = false;
-                base.ScrollTo(value, animated, distanceDecay);
             }
 
             protected override bool OnMouseDown(MouseDownEvent e)

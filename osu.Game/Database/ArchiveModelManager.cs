@@ -115,13 +115,13 @@ namespace osu.Game.Database
             return Import(notification, paths.Select(p => new ImportTask(p)).ToArray());
         }
 
-        public Task Import(Stream stream, string filename)
+        public Task Import(params ImportTask[] tasks)
         {
             var notification = new ProgressNotification { State = ProgressNotificationState.Active };
 
             PostNotification?.Invoke(notification);
 
-            return Import(notification, new ImportTask(stream, filename));
+            return Import(notification, tasks);
         }
 
         protected async Task<IEnumerable<TModel>> Import(ProgressNotification notification, params ImportTask[] tasks)
@@ -308,7 +308,7 @@ namespace osu.Game.Database
         /// <param name="item">The model to be imported.</param>
         /// <param name="archive">An optional archive to use for model population.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        public async Task<TModel> Import(TModel item, ArchiveReader archive = null, CancellationToken cancellationToken = default) => await Task.Factory.StartNew(async () =>
+        public virtual async Task<TModel> Import(TModel item, ArchiveReader archive = null, CancellationToken cancellationToken = default) => await Task.Factory.StartNew(async () =>
         {
             cancellationToken.ThrowIfCancellationRequested();
 

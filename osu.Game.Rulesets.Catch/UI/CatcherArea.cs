@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Catch.UI
         public readonly Catcher MovableCatcher;
         private readonly CatchComboDisplay comboDisplay;
 
-        public CatcherArea(Container droppedObjectContainer, BeatmapDifficulty difficulty = null)
+        public CatcherArea(Container<CaughtObject> droppedObjectContainer, BeatmapDifficulty difficulty = null)
         {
             Size = new Vector2(CatchPlayfield.WIDTH, CATCHER_SIZE);
             Children = new Drawable[]
