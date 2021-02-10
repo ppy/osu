@@ -267,6 +267,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.LoadComplete();
 
             Playlist.BindCollectionChanged(onPlaylistChanged, true);
+            BeatmapAvailability.BindValueChanged(updateBeatmapAvailability, true);
             UserMods.BindValueChanged(onUserModsChanged);
 
             client.LoadRequested += onLoadRequested;
@@ -319,6 +320,19 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return;
 
             client.ChangeUserMods(mods.NewValue);
+        }
+
+        private void updateBeatmapAvailability(ValueChangedEvent<BeatmapAvailability> availability)
+        {
+            if (client.Room == null)
+                return;
+
+            client.ChangeBeatmapAvailability(availability.NewValue);
+
+            // while this flow is handled server-side, this covers the edge case of the local user being in a ready state and then deleting the current beatmap.
+            if (availability.NewValue != Online.Rooms.BeatmapAvailability.LocallyAvailable()
+                && client.LocalUser?.State == MultiplayerUserState.Ready)
+                client.ChangeState(MultiplayerUserState.Idle);
         }
 
         private void onReadyClick()
