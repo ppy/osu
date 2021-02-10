@@ -372,7 +372,10 @@ namespace osu.Game.Overlays.Mods
             base.LoadComplete();
 
             availableMods.BindValueChanged(_ => updateAvailableMods(), true);
-            SelectedMods.BindValueChanged(_ => updateSelectedButtons(), true);
+
+            // intentionally bound after the above line to avoid a potential update feedback cycle.
+            // i haven't actually observed this happening but as updateAvailableMods() changes the selection it is plausible.
+            SelectedMods.BindValueChanged(_ => updateSelectedButtons());
         }
 
         protected override void PopOut()
@@ -479,10 +482,10 @@ namespace osu.Game.Overlays.Mods
             foreach (var section in ModSectionsContainer.Children)
                 section.UpdateSelectedButtons(selectedMods);
 
-            updateMods();
+            updateMultiplier();
         }
 
-        private void updateMods()
+        private void updateMultiplier()
         {
             var multiplier = 1.0;
 
