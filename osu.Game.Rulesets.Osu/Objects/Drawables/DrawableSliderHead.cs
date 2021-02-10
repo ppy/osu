@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (HitObject.JudgeAsNormalHitCircle)
                 return base.ResultFor(timeOffset);
 
-            // If not judged as a normal hitcircle, only track whether a hit has occurred (via IgnoreHit) rather than a scorable hit result.
+            // If not judged as a normal hitcircle, judge as a slider tick instead. This is the classic osu!stable scoring.
             var result = base.ResultFor(timeOffset);
             return result.IsHit() ? HitResult.LargeTickHit : HitResult.LargeTickMiss;
         }
