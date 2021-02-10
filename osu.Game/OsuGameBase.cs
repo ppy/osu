@@ -98,7 +98,14 @@ namespace osu.Game
         [Cached(typeof(IBindable<RulesetInfo>))]
         protected readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
-        // todo: move this to SongSelect once Screen has the ability to unsuspend.
+        /// <summary>
+        /// The current mod selection for the local user.
+        /// </summary>
+        /// <remarks>
+        /// If a mod select overlay is present, mod instances set to this value are not guaranteed to remain as the provided instance and will be overwritten by a copy.
+        /// In such a case, changes to settings of a mod will *not* propagate after a mod is added to this collection.
+        /// As such, all settings should be finalised before adding a mod to this collection.
+        /// </remarks>
         [Cached]
         [Cached(typeof(IBindable<IReadOnlyList<Mod>>))]
         protected readonly Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
