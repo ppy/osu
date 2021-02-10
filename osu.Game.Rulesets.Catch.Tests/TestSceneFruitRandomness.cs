@@ -5,19 +5,20 @@ using NUnit.Framework;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Tests.Visual;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
     public class TestSceneFruitRandomness : OsuTestScene
     {
-        private readonly TestDrawableFruit drawableFruit;
-        private readonly TestDrawableBanana drawableBanana;
+        private readonly DrawableFruit drawableFruit;
+        private readonly DrawableBanana drawableBanana;
 
         public TestSceneFruitRandomness()
         {
-            drawableFruit = new TestDrawableFruit(new Fruit());
-            drawableBanana = new TestDrawableBanana(new Banana());
+            drawableFruit = new DrawableFruit(new Fruit());
+            drawableBanana = new DrawableBanana(new Banana());
 
             Add(new TestDrawableCatchHitObjectSpecimen(drawableFruit) { X = -200 });
             Add(new TestDrawableCatchHitObjectSpecimen(drawableBanana));
@@ -37,16 +38,16 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             float fruitRotation = 0;
             float bananaRotation = 0;
-            float bananaScale = 0;
+            Vector2 bananaSize = new Vector2();
             Color4 bananaColour = new Color4();
 
             AddStep("Initialize start time", () =>
             {
                 drawableFruit.HitObject.StartTime = drawableBanana.HitObject.StartTime = initial_start_time;
 
-                fruitRotation = drawableFruit.InnerRotation;
-                bananaRotation = drawableBanana.InnerRotation;
-                bananaScale = drawableBanana.InnerScale;
+                fruitRotation = drawableFruit.DisplayRotation;
+                bananaRotation = drawableBanana.DisplayRotation;
+                bananaSize = drawableBanana.DisplaySize;
                 bananaColour = drawableBanana.AccentColour.Value;
             });
 
@@ -55,9 +56,9 @@ namespace osu.Game.Rulesets.Catch.Tests
                 drawableFruit.HitObject.StartTime = drawableBanana.HitObject.StartTime = another_start_time;
             });
 
-            AddAssert("fruit rotation is changed", () => drawableFruit.InnerRotation != fruitRotation);
-            AddAssert("banana rotation is changed", () => drawableBanana.InnerRotation != bananaRotation);
-            AddAssert("banana scale is changed", () => drawableBanana.InnerScale != bananaScale);
+            AddAssert("fruit rotation is changed", () => drawableFruit.DisplayRotation != fruitRotation);
+            AddAssert("banana rotation is changed", () => drawableBanana.DisplayRotation != bananaRotation);
+            AddAssert("banana size is changed", () => drawableBanana.DisplaySize != bananaSize);
             AddAssert("banana colour is changed", () => drawableBanana.AccentColour.Value != bananaColour);
 
             AddStep("reset start time", () =>
@@ -65,32 +66,11 @@ namespace osu.Game.Rulesets.Catch.Tests
                 drawableFruit.HitObject.StartTime = drawableBanana.HitObject.StartTime = initial_start_time;
             });
 
-            AddAssert("rotation and scale restored", () =>
-                drawableFruit.InnerRotation == fruitRotation &&
-                drawableBanana.InnerRotation == bananaRotation &&
-                drawableBanana.InnerScale == bananaScale &&
+            AddAssert("rotation and size restored", () =>
+                drawableFruit.DisplayRotation == fruitRotation &&
+                drawableBanana.DisplayRotation == bananaRotation &&
+                drawableBanana.DisplaySize == bananaSize &&
                 drawableBanana.AccentColour.Value == bananaColour);
-        }
-
-        private class TestDrawableFruit : DrawableFruit
-        {
-            public float InnerRotation => ScaleContainer.Rotation;
-
-            public TestDrawableFruit(Fruit h)
-                : base(h)
-            {
-            }
-        }
-
-        private class TestDrawableBanana : DrawableBanana
-        {
-            public float InnerRotation => ScaleContainer.Rotation;
-            public float InnerScale => ScaleContainer.Scale.X;
-
-            public TestDrawableBanana(Banana h)
-                : base(h)
-            {
-            }
         }
     }
 }

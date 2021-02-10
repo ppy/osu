@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private void attemptCatch(Fruit fruit)
         {
-            fruit.X += catcher.X;
+            fruit.X = fruit.OriginalX + catcher.X;
             fruit.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty
             {
                 CircleSize = circleSize
@@ -73,7 +73,10 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             SetContents(() =>
             {
-                var droppedObjectContainer = new Container();
+                var droppedObjectContainer = new Container<CaughtObject>
+                {
+                    RelativeSizeAxes = Axes.Both
+                };
 
                 return new CatchInputManager(catchRuleset)
                 {
@@ -99,7 +102,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private class TestCatcherArea : CatcherArea
         {
-            public TestCatcherArea(Container droppedObjectContainer, BeatmapDifficulty beatmapDifficulty)
+            public TestCatcherArea(Container<CaughtObject> droppedObjectContainer, BeatmapDifficulty beatmapDifficulty)
                 : base(droppedObjectContainer, beatmapDifficulty)
             {
             }

@@ -135,6 +135,8 @@ namespace osu.Game.Database
 
             modelBuilder.Entity<DatabasedKeyBinding>().HasIndex(b => new { b.RulesetID, b.Variant });
             modelBuilder.Entity<DatabasedKeyBinding>().HasIndex(b => b.IntAction);
+            modelBuilder.Entity<DatabasedKeyBinding>().Ignore(b => b.KeyCombination);
+            modelBuilder.Entity<DatabasedKeyBinding>().Ignore(b => b.Action);
 
             modelBuilder.Entity<DatabasedSetting>().HasIndex(b => new { b.RulesetID, b.Variant });
 

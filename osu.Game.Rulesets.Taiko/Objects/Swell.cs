@@ -17,8 +17,6 @@ namespace osu.Game.Rulesets.Taiko.Objects
             set => Duration = value - StartTime;
         }
 
-        public override bool CanBeStrong => false;
-
         public double Duration { get; set; }
 
         /// <summary>

@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Skinning;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Catch.Tests
@@ -28,7 +29,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         [Resolved]
         private OsuConfigManager config { get; set; }
 
-        private Container droppedObjectContainer;
+        private Container<CaughtObject> droppedObjectContainer;
 
         private TestCatcher catcher;
 
@@ -41,7 +42,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             };
 
             var trailContainer = new Container();
-            droppedObjectContainer = new Container();
+            droppedObjectContainer = new Container<CaughtObject>();
             catcher = new TestCatcher(trailContainer, droppedObjectContainer, difficulty);
 
             Child = new Container
@@ -65,13 +66,11 @@ namespace osu.Game.Rulesets.Catch.Tests
             JudgementResult result2 = null;
             AddStep("catch hyper fruit", () =>
             {
-                drawableObject1 = createDrawableObject(new Fruit { HyperDashTarget = new Fruit { X = 100 } });
-                result1 = attemptCatch(drawableObject1);
+                attemptCatch(new Fruit { HyperDashTarget = new Fruit { X = 100 } }, out drawableObject1, out result1);
             });
             AddStep("catch normal fruit", () =>
             {
-                drawableObject2 = createDrawableObject(new Fruit());
-                result2 = attemptCatch(drawableObject2);
+                attemptCatch(new Fruit(), out drawableObject2, out result2);
             });
             AddStep("revert second result", () =>
             {
@@ -92,8 +91,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             JudgementResult result = null;
             AddStep("catch kiai fruit", () =>
             {
-                drawableObject = createDrawableObject(new TestKiaiFruit());
-                result = attemptCatch(drawableObject);
+                attemptCatch(new TestKiaiFruit(), out drawableObject, out result);
             });
             checkState(CatcherAnimationState.Kiai);
             AddStep("revert result", () =>
@@ -200,13 +198,22 @@ namespace osu.Game.Rulesets.Catch.Tests
             AddAssert("fruits are dropped", () => !catcher.CaughtObjects.Any() && droppedObjectContainer.Count == 10);
         }
 
-        [TestCase(true)]
-        [TestCase(false)]
-        public void TestHitLighting(bool enabled)
+        [Test]
+        public void TestHitLightingColour()
         {
-            AddStep($"{(enabled ? "enable" : "disable")} hit lighting", () => config.Set(OsuSetting.HitLighting, enabled));
+            var fruitColour = SkinConfiguration.DefaultComboColours[1];
+            AddStep("enable hit lighting", () => config.Set(OsuSetting.HitLighting, true));
             AddStep("catch fruit", () => attemptCatch(new Fruit()));
-            AddAssert("check hit lighting", () => catcher.ChildrenOfType<HitExplosion>().Any() == enabled);
+            AddAssert("correct hit lighting colour", () =>
+                catcher.ChildrenOfType<HitExplosion>().First()?.ObjectColour == fruitColour);
+        }
+
+        [Test]
+        public void TestHitLightingDisabled()
+        {
+            AddStep("disable hit lighting", () => config.Set(OsuSetting.HitLighting, false));
+            AddStep("catch fruit", () => attemptCatch(new Fruit()));
+            AddAssert("no hit lighting", () => !catcher.ChildrenOfType<HitExplosion>().Any());
         }
 
         private void checkPlate(int count) => AddAssert($"{count} objects on the plate", () => catcher.CaughtObjects.Count() == count);
@@ -218,18 +225,34 @@ namespace osu.Game.Rulesets.Catch.Tests
         private void attemptCatch(CatchHitObject hitObject, int count = 1)
         {
             for (var i = 0; i < count; i++)
-                attemptCatch(createDrawableObject(hitObject));
+                attemptCatch(hitObject, out _, out _);
         }
 
-        private JudgementResult attemptCatch(DrawableCatchHitObject drawableObject)
+        private void attemptCatch(CatchHitObject hitObject, out DrawableCatchHitObject drawableObject, out JudgementResult result)
         {
-            drawableObject.HitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
-            var result = new CatchJudgementResult(drawableObject.HitObject, drawableObject.HitObject.CreateJudgement())
+            hitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+            drawableObject = createDrawableObject(hitObject);
+            result = createResult(hitObject);
+            applyResult(drawableObject, result);
+        }
+
+        private void applyResult(DrawableCatchHitObject drawableObject, JudgementResult result)
+        {
+            // Load DHO to set colour of hit explosion correctly
+            Add(drawableObject);
+            drawableObject.OnLoadComplete += _ =>
             {
-                Type = catcher.CanCatch(drawableObject.HitObject) ? HitResult.Great : HitResult.Miss
+                catcher.OnNewResult(drawableObject, result);
+                drawableObject.Expire();
             };
-            catcher.OnNewResult(drawableObject, result);
-            return result;
+        }
+
+        private JudgementResult createResult(CatchHitObject hitObject)
+        {
+            return new CatchJudgementResult(hitObject, hitObject.CreateJudgement())
+            {
+                Type = catcher.CanCatch(hitObject) ? HitResult.Great : HitResult.Miss
+            };
         }
 
         private DrawableCatchHitObject createDrawableObject(CatchHitObject hitObject)
@@ -252,9 +275,9 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         public class TestCatcher : Catcher
         {
-            public IEnumerable<DrawablePalpableCatchHitObject> CaughtObjects => this.ChildrenOfType<DrawablePalpableCatchHitObject>();
+            public IEnumerable<CaughtObject> CaughtObjects => this.ChildrenOfType<CaughtObject>();
 
-            public TestCatcher(Container trailsTarget, Container droppedObjectTarget, BeatmapDifficulty difficulty)
+            public TestCatcher(Container trailsTarget, Container<CaughtObject> droppedObjectTarget, BeatmapDifficulty difficulty)
                 : base(trailsTarget, droppedObjectTarget, difficulty)
             {
             }

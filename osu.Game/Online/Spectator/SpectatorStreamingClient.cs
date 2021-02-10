@@ -10,6 +10,7 @@ using JetBrains.Annotations;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -21,6 +22,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Online.Spectator
@@ -52,6 +54,9 @@ namespace osu.Game.Online.Spectator
         [CanBeNull]
         private IBeatmap currentBeatmap;
 
+        [CanBeNull]
+        private Score currentScore;
+
         [Resolved]
         private IBindable<RulesetInfo> currentRuleset { get; set; }
 
@@ -77,6 +82,13 @@ namespace osu.Game.Online.Spectator
         /// </summary>
         public event Action<int, SpectatorState> OnUserFinishedPlaying;
 
+        private readonly string endpoint;
+
+        public SpectatorStreamingClient(EndpointConfiguration endpoints)
+        {
+            endpoint = endpoints.SpectatorEndpointUrl;
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -100,21 +112,24 @@ namespace osu.Game.Online.Spectator
             }
         }
 
-        private const string endpoint = "https://spectator.ppy.sh/spectator";
-
         protected virtual async Task Connect()
         {
             if (connection != null)
                 return;
 
-            connection = new HubConnectionBuilder()
-                         .WithUrl(endpoint, options =>
-                         {
-                             options.Headers.Add("Authorization", $"Bearer {api.AccessToken}");
-                         })
-                         .AddNewtonsoftJsonProtocol(options => { options.PayloadSerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore; })
-                         .Build();
+            var builder = new HubConnectionBuilder()
+                .WithUrl(endpoint, options => { options.Headers.Add("Authorization", $"Bearer {api.AccessToken}"); });
 
+            if (RuntimeInfo.SupportsJIT)
+                builder.AddMessagePackProtocol();
+            else
+            {
+                // eventually we will precompile resolvers for messagepack, but this isn't working currently
+                // see https://github.com/neuecc/MessagePack-CSharp/issues/780#issuecomment-768794308.
+                builder.AddNewtonsoftJsonProtocol(options => { options.PayloadSerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore; });
+            }
+
+            connection = builder.Build();
             // until strong typed client support is added, each method must be manually bound (see https://github.com/dotnet/aspnetcore/issues/15198)
             connection.On<int, SpectatorState>(nameof(ISpectatorClient.UserBeganPlaying), ((ISpectatorClient)this).UserBeganPlaying);
             connection.On<int, FrameDataBundle>(nameof(ISpectatorClient.UserSentFrames), ((ISpectatorClient)this).UserSentFrames);
@@ -203,7 +218,7 @@ namespace osu.Game.Online.Spectator
             return Task.CompletedTask;
         }
 
-        public void BeginPlaying(GameplayBeatmap beatmap)
+        public void BeginPlaying(GameplayBeatmap beatmap, Score score)
         {
             if (isPlaying)
                 throw new InvalidOperationException($"Cannot invoke {nameof(BeginPlaying)} when already playing");
@@ -216,6 +231,8 @@ namespace osu.Game.Online.Spectator
             currentState.Mods = currentMods.Value.Select(m => new APIMod(m));
 
             currentBeatmap = beatmap.PlayableBeatmap;
+            currentScore = score;
+
             beginPlaying();
         }
 
@@ -308,7 +325,9 @@ namespace osu.Game.Online.Spectator
 
             pendingFrames.Clear();
 
-            SendFrames(new FrameDataBundle(frames));
+            Debug.Assert(currentScore != null);
+
+            SendFrames(new FrameDataBundle(currentScore.ScoreInfo, frames));
 
             lastSendTime = Time.Current;
         }

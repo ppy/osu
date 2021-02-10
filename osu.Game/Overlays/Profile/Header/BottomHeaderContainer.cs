@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Online.API;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
@@ -26,6 +27,9 @@ namespace osu.Game.Overlays.Profile.Header
         private LinkFlowContainer bottomLinkContainer;
 
         private Color4 iconColour;
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
         public BottomHeaderContainer()
         {
@@ -109,7 +113,7 @@ namespace osu.Game.Overlays.Profile.Header
             }
 
             topLinkContainer.AddText("Contributed ");
-            topLinkContainer.AddLink($@"{user.PostCount:#,##0} forum posts", $"https://osu.ppy.sh/users/{user.Id}/posts", creationParameters: embolden);
+            topLinkContainer.AddLink($@"{user.PostCount:#,##0} forum posts", $"{api.WebsiteRootUrl}/users/{user.Id}/posts", creationParameters: embolden);
 
             string websiteWithoutProtocol = user.Website;
 
