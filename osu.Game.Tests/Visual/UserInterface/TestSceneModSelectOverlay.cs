@@ -39,7 +39,11 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [SetUp]
-        public void SetUp() => Schedule(() => createDisplay(() => new TestModSelectOverlay()));
+        public void SetUp() => Schedule(() =>
+        {
+            SelectedMods.Value = Array.Empty<Mod>();
+            createDisplay(() => new TestModSelectOverlay());
+        });
 
         [SetUpSteps]
         public void SetUpSteps()
@@ -370,7 +374,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private void createDisplay(Func<TestModSelectOverlay> createOverlayFunc)
         {
-            SelectedMods.Value = Array.Empty<Mod>();
             Children = new Drawable[]
             {
                 modSelect = createOverlayFunc().With(d =>
