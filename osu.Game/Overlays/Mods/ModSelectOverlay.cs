@@ -479,10 +479,10 @@ namespace osu.Game.Overlays.Mods
             foreach (var section in ModSectionsContainer.Children)
                 section.UpdateSelectedButtons(selectedMods);
 
-            updateMods();
+            updateMultiplier();
         }
 
-        private void updateMods()
+        private void updateMultiplier()
         {
             var multiplier = 1.0;
 
