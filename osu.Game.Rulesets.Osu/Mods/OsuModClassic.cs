@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 switch (obj)
                 {
                     case DrawableSlider slider:
-                        slider.Ball.TrackVisualSize = !FixedFollowCircleHitArea.Value;
+                        slider.Ball.InputTracksVisualSize = !FixedFollowCircleHitArea.Value;
                         break;
 
                     case DrawableSliderHead head:
