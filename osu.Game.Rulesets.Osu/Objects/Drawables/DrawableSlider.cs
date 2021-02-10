@@ -258,7 +258,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 return;
             }
 
-            // Otherwise, if this slider is also needs to be judged, apply judgement proportionally to the number of nested hitobjects hit. This is the classic osu!stable scoring.
+            // Otherwise, if this slider also needs to be judged, apply judgement proportionally to the number of nested hitobjects hit. This is the classic osu!stable scoring.
             ApplyResult(r =>
             {
                 int totalTicks = NestedHitObjects.Count;
