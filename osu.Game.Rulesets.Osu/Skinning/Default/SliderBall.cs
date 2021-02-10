@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         /// Whether to track accurately to the visual size of this <see cref="SliderBall"/>.
         /// If <c>false</c>, tracking will be performed at the final scale at all times.
         /// </summary>
-        public bool TrackVisualSize = true;
+        public bool InputTracksVisualSize = true;
 
         private readonly Drawable followCircle;
         private readonly DrawableSlider drawableSlider;
@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
                 tracking = value;
 
-                if (TrackVisualSize)
+                if (InputTracksVisualSize)
                     followCircle.ScaleTo(tracking ? 2.4f : 1f, 300, Easing.OutQuint);
                 else
                 {
