@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 
 namespace osu.Game.Online.Rooms
@@ -24,19 +25,33 @@ namespace osu.Game.Online.Rooms
         /// </summary>
         public IBindable<BeatmapAvailability> Availability => availability;
 
-        private readonly Bindable<BeatmapAvailability> availability = new Bindable<BeatmapAvailability>();
+        private readonly Bindable<BeatmapAvailability> availability = new Bindable<BeatmapAvailability>(BeatmapAvailability.LocallyAvailable());
 
-        public OnlinePlayBeatmapAvailablilityTracker()
-        {
-            State.BindValueChanged(_ => updateAvailability());
-            Progress.BindValueChanged(_ => updateAvailability(), true);
-        }
+        private ScheduledDelegate progressUpdate;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            SelectedItem.BindValueChanged(item => Model.Value = item.NewValue?.Beatmap.Value.BeatmapSet, true);
+            SelectedItem.BindValueChanged(item =>
+            {
+                // the underlying playlist is regularly cleared for maintenance purposes (things which probably need to be fixed eventually).
+                // to avoid exposing a state change when there may actually be none, ignore all nulls for now.
+                if (item.NewValue == null)
+                    return;
+
+                Model.Value = item.NewValue.Beatmap.Value.BeatmapSet;
+            }, true);
+
+            Progress.BindValueChanged(_ =>
+            {
+                // incoming progress changes are going to be at a very high rate.
+                // we don't want to flood the network with this, so rate limit how often we send progress updates.
+                if (progressUpdate?.Completed != false)
+                    progressUpdate = Scheduler.AddDelayed(updateAvailability, progressUpdate == null ? 0 : 500);
+            });
+
+            State.BindValueChanged(_ => updateAvailability(), true);
         }
 
         protected override bool VerifyDatabasedModel(BeatmapSetInfo databasedSet)
