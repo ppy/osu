@@ -336,7 +336,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             // Debounce changes to mod settings so as to not thrash the network.
             debouncedModSettingsUpdate?.Cancel();
-            debouncedModSettingsUpdate = Scheduler.AddDelayed(() => client.ChangeUserMods(UserMods.Value), 500);
+            debouncedModSettingsUpdate = Scheduler.AddDelayed(() =>
+            {
+                if (client.Room == null)
+                    return;
+
+                client.ChangeUserMods(UserMods.Value);
+            }, 500);
         }
 
         private void updateBeatmapAvailability(ValueChangedEvent<BeatmapAvailability> availability)
