@@ -371,8 +371,8 @@ namespace osu.Game.Overlays.Mods
         {
             base.LoadComplete();
 
+            SelectedMods.BindValueChanged(_ => updateSelectedButtons());
             availableMods.BindValueChanged(_ => updateAvailableMods(), true);
-            SelectedMods.BindValueChanged(_ => updateSelectedButtons(), true);
         }
 
         protected override void PopOut()
