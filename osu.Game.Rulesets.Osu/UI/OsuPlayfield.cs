@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 approachCircles = new ProxyContainer { RelativeSizeAxes = Axes.Both },
             };
 
-            HitPolicy = new ObjectOrderedHitPolicy();
+            HitPolicy = new StartTimeOrderedHitPolicy();
 
             var hitWindows = new OsuHitWindows();
             foreach (var result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r > HitResult.None && hitWindows.IsHitResultAllowed(r)))
