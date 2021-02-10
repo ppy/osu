@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         [Resolved(CanBeNull = true)]
         private OsuRulesetConfigManager config { get; set; }
 
-        private readonly Bindable<bool> snakingOut = new Bindable<bool>();
+        private readonly Bindable<bool> configSnakingOut = new Bindable<bool>();
 
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin, DrawableHitObject drawableObject)
@@ -37,9 +37,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             accentColour = drawableObject.AccentColour.GetBoundCopy();
             accentColour.BindValueChanged(accent => updateAccentColour(skin, accent.NewValue), true);
 
-            SnakingOut.BindTo(snakingOut);
             config?.BindWith(OsuRulesetSetting.SnakingInSliders, SnakingIn);
-            config?.BindWith(OsuRulesetSetting.SnakingOutSliders, snakingOut);
+            config?.BindWith(OsuRulesetSetting.SnakingOutSliders, configSnakingOut);
+
+            SnakingOut.BindTo(configSnakingOut);
 
             BorderSize = skin.GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.SliderBorderSize)?.Value ?? 1;
             BorderColour = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderBorder)?.Value ?? Color4.White;
@@ -56,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             if (!drawableSlider.HeadCircle.TrackFollowCircle)
             {
                 // When not tracking the follow circle, force the path to not snake out as it looks better that way.
-                SnakingOut.UnbindFrom(snakingOut);
+                SnakingOut.UnbindFrom(configSnakingOut);
                 SnakingOut.Value = false;
             }
         }
