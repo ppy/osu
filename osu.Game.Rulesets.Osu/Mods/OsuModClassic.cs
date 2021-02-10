@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             switch (hitObject)
             {
                 case Slider slider:
-                    slider.IgnoreJudgement = !NoSliderHeadAccuracy.Value;
+                    slider.OnlyJudgeNestedObjects = !NoSliderHeadAccuracy.Value;
 
                     foreach (var head in slider.NestedHitObjects.OfType<SliderHeadCircle>())
                         head.JudgeAsNormalHitCircle = !NoSliderHeadAccuracy.Value;

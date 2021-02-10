@@ -115,10 +115,10 @@ namespace osu.Game.Rulesets.Osu.Objects
         public double TickDistanceMultiplier = 1;
 
         /// <summary>
-        /// Whether this <see cref="Slider"/>'s judgement should be ignored.
-        /// If <c>false</c>, this <see cref="Slider"/> will be judged proportionally to the number of ticks hit.
+        /// Whether this <see cref="Slider"/>'s judgement is fully handled by its nested <see cref="HitObject"/>s.
+        /// If <c>false</c>, this <see cref="Slider"/> will be judged proportionally to the number of nested <see cref="HitObject"/>s hit.
         /// </summary>
-        public bool IgnoreJudgement = true;
+        public bool OnlyJudgeNestedObjects = true;
 
         [JsonIgnore]
         public SliderHeadCircle HeadCircle { get; protected set; }
@@ -239,7 +239,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                 HeadCircle.Samples = this.GetNodeSamples(0);
         }
 
-        public override Judgement CreateJudgement() => IgnoreJudgement ? new OsuIgnoreJudgement() : new OsuJudgement();
+        public override Judgement CreateJudgement() => OnlyJudgeNestedObjects ? new OsuIgnoreJudgement() : new OsuJudgement();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }
