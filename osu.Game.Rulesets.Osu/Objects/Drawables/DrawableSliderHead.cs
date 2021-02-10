@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             // If not judged as a normal hitcircle, only track whether a hit has occurred (via IgnoreHit) rather than a scorable hit result.
             var result = base.ResultFor(timeOffset);
-            return result.IsHit() ? HitResult.IgnoreHit : HitResult.IgnoreMiss;
+            return result.IsHit() ? HitResult.LargeTickHit : HitResult.LargeTickMiss;
         }
 
         public Action<double> OnShake;

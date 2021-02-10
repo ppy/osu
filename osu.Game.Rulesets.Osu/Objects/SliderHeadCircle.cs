@@ -10,10 +10,10 @@ namespace osu.Game.Rulesets.Osu.Objects
     {
         /// <summary>
         /// Whether to treat this <see cref="SliderHeadCircle"/> as a normal <see cref="HitCircle"/> for judgement purposes.
-        /// If <c>false</c>, judgement will be ignored.
+        /// If <c>false</c>, this <see cref="SliderHeadCircle"/> will be judged as a <see cref="SliderTick"/> instead.
         /// </summary>
         public bool JudgeAsNormalHitCircle = true;
 
-        public override Judgement CreateJudgement() => JudgeAsNormalHitCircle ? base.CreateJudgement() : new OsuIgnoreJudgement();
+        public override Judgement CreateJudgement() => JudgeAsNormalHitCircle ? base.CreateJudgement() : new SliderTickJudgement();
     }
 }
