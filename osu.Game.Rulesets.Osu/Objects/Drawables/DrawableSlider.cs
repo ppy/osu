@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public SliderBall Ball { get; private set; }
         public SkinnableDrawable Body { get; private set; }
 
-        public override bool DisplayResult => !HitObject.IgnoreJudgement;
+        public override bool DisplayResult => !HitObject.OnlyJudgeNestedObjects;
 
         private PlaySliderBody sliderBody => Body.Drawable as PlaySliderBody;
 
@@ -250,7 +250,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (userTriggered || Time.Current < HitObject.EndTime)
                 return;
 
-            if (HitObject.IgnoreJudgement)
+            if (HitObject.OnlyJudgeNestedObjects)
             {
                 ApplyResult(r => r.Type = NestedHitObjects.Any(h => h.Result.IsHit) ? r.Judgement.MaxResult : r.Judgement.MinResult);
                 return;
