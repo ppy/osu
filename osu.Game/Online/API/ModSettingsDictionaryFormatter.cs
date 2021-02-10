@@ -3,6 +3,7 @@
 
 using System.Buffers;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using MessagePack;
 using MessagePack.Formatters;
@@ -39,6 +40,13 @@ namespace osu.Game.Online.API
 
                     case Bindable<bool> b:
                         primitiveFormatter.Serialize(ref writer, b.Value, options);
+                        break;
+
+                    case IBindable u:
+                        // A mod with unknown (e.g. enum) generic type.
+                        var valueMethod = u.GetType().GetProperty(nameof(IBindable<int>.Value));
+                        Debug.Assert(valueMethod != null);
+                        primitiveFormatter.Serialize(ref writer, valueMethod.GetValue(u), options);
                         break;
 
                     default:
