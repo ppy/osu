@@ -140,7 +140,8 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             // The samples should be attached to the slider tail, however this can only be done after LegacyLastTick is removed otherwise they would play earlier than they're intended to.
             // For now, the samples are attached to and played by the slider itself at the correct end time.
-            Samples = this.GetNodeSamples(repeatCount + 1);
+            // ToArray call is required as GetNodeSamples may fallback to Samples itself (without it it will get cleared due to the list reference being live).
+            Samples = this.GetNodeSamples(repeatCount + 1).ToArray();
         }
 
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
