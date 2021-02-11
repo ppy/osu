@@ -82,15 +82,15 @@ namespace osu.Game.Screens.Select.Details
             mods.BindValueChanged(modsChanged, true);
         }
 
-        private ModSettingChangeTracker settingChangeTracker;
+        private ModSettingChangeTracker modSettingChangeTracker;
         private ScheduledDelegate debouncedStatisticsUpdate;
 
         private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
-            settingChangeTracker?.Dispose();
+            modSettingChangeTracker?.Dispose();
 
-            settingChangeTracker = new ModSettingChangeTracker(mods.NewValue);
-            settingChangeTracker.SettingChanged += m =>
+            modSettingChangeTracker = new ModSettingChangeTracker(mods.NewValue);
+            modSettingChangeTracker.SettingChanged += m =>
             {
                 if (!(m is IApplicableToDifficulty))
                     return;
@@ -162,7 +162,7 @@ namespace osu.Game.Screens.Select.Details
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            settingChangeTracker?.Dispose();
+            modSettingChangeTracker?.Dispose();
             starDifficultyCancellationSource?.Cancel();
         }
 
