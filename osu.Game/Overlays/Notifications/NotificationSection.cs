@@ -109,11 +109,11 @@ namespace osu.Game.Overlays.Notifications
 
         private void clearAll()
         {
-            bool playSound = true;
+            bool first = true;
             notifications.Children.ForEach(c =>
             {
-                c.Close(playSound);
-                playSound = false;
+                c.Close(first);
+                first = false;
             });
         }
 
