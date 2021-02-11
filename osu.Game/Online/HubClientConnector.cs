@@ -23,7 +23,7 @@ namespace osu.Game.Online
     public class HubClientConnector : IDisposable
     {
         /// <summary>
-        /// Invoked whenever a new hub connection is built.
+        /// Invoked whenever a new hub connection is built, to configure it before it's started.
         /// </summary>
         public Action<HubConnection>? ConfigureConnection;
 
