@@ -37,6 +37,8 @@ namespace osu.Game.Overlays.Settings
 
         public bool ShowsDefaultIndicator = true;
 
+        public string TooltipText { get; set; }
+
         public virtual string LabelText
         {
             get => labelText?.Text ?? string.Empty;
@@ -214,7 +216,5 @@ namespace osu.Game.Overlays.Settings
                 this.FadeColour(bindable.Disabled ? Color4.Gray : buttonColour, 200, Easing.OutQuint);
             }
         }
-
-        public string TooltipText { get; set; }
     }
 }
