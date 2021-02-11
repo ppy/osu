@@ -155,6 +155,8 @@ namespace osu.Game
 
         protected override UserInputManager CreateUserInputManager() => new OsuUserInputManager();
 
+        private readonly BindableNumber<double> globalTrackVolumeAdjust = new BindableNumber<double>(0.5f);
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -278,9 +280,10 @@ namespace osu.Game
             RegisterImportHandler(ScoreManager);
             RegisterImportHandler(SkinManager);
 
-            // tracks play so loud our samples can't keep up.
-            // this adds a global reduction of track volume for the time being.
-            Audio.Tracks.AddAdjustment(AdjustableProperty.Volume, new BindableDouble(0.8));
+            // drop track volume game-wide to leave some head-room for UI effects / samples.
+            // this means that for the time being, gameplay sample playback is louder relative to the audio track, compared to stable.
+            // we may want to revisit this if users notice or complain about the difference (consider this a bit of a trial).
+            Audio.Tracks.AddAdjustment(AdjustableProperty.Volume, globalTrackVolumeAdjust);
 
             Beatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
 
