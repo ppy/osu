@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
@@ -44,6 +45,9 @@ namespace osu.Game.Rulesets.Edit
         protected PlacementBlueprint(HitObject hitObject)
         {
             HitObject = hitObject;
+
+            // adding the default hit sample should be the case regardless of the ruleset.
+            HitObject.Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_NORMAL));
 
             RelativeSizeAxes = Axes.Both;
 
