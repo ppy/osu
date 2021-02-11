@@ -18,8 +18,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public virtual void ApplyToDrawableRuleset(DrawableRuleset<T> drawableRuleset)
         {
-            var mods = (IReadOnlyList<Mod>)drawableRuleset.Dependencies.Get(typeof(IReadOnlyList<Mod>));
-            drawableRuleset.SetReplayScore(CreateReplayScore(drawableRuleset.Beatmap, mods));
+            drawableRuleset.SetReplayScore(CreateReplayScore(drawableRuleset.Beatmap, drawableRuleset.Mods));
         }
     }
 
