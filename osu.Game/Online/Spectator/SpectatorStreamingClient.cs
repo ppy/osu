@@ -86,7 +86,7 @@ namespace osu.Game.Online.Spectator
         private void load(IAPIProvider api)
         {
             connector = CreateConnector(nameof(SpectatorStreamingClient), endpoint, api);
-            connector.OnNewConnection = connection =>
+            connector.ConfigureConnection = connection =>
             {
                 // until strong typed client support is added, each method must be manually bound
                 // (see https://github.com/dotnet/aspnetcore/issues/15198)

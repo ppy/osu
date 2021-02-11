@@ -33,7 +33,7 @@ namespace osu.Game.Online.Multiplayer
         {
             connector = new HubClientConnector(nameof(MultiplayerClient), endpoint, api)
             {
-                OnNewConnection = connection =>
+                ConfigureConnection = connection =>
                 {
                     // this is kind of SILLY
                     // https://github.com/dotnet/aspnetcore/issues/15198
