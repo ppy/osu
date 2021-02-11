@@ -78,7 +78,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             managerUpdated = beatmapManager.ItemUpdated.GetBoundCopy();
             managerUpdated.BindValueChanged(beatmapUpdated);
 
-            UserMods.BindValueChanged(_ => UpdateMods());
+            UserMods.BindValueChanged(_ => Scheduler.AddOnce(UpdateMods));
         }
 
         public override void OnEntering(IScreen last)
@@ -97,7 +97,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         {
             base.OnResuming(last);
             beginHandlingTrack();
-            UpdateMods();
+            Scheduler.AddOnce(UpdateMods);
         }
 
         public override bool OnExiting(IScreen next)
