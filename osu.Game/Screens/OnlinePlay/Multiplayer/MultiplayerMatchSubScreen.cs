@@ -12,6 +12,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
+using osu.Framework.Threading;
+using osu.Game.Configuration;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays.Mods;
@@ -314,12 +316,33 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }
         }
 
+        private ModSettingChangeTracker modSettingChangeTracker;
+        private ScheduledDelegate debouncedModSettingsUpdate;
+
         private void onUserModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
+            modSettingChangeTracker?.Dispose();
+
             if (client.Room == null)
                 return;
 
             client.ChangeUserMods(mods.NewValue);
+
+            modSettingChangeTracker = new ModSettingChangeTracker(mods.NewValue);
+            modSettingChangeTracker.SettingChanged += onModSettingsChanged;
+        }
+
+        private void onModSettingsChanged(Mod mod)
+        {
+            // Debounce changes to mod settings so as to not thrash the network.
+            debouncedModSettingsUpdate?.Cancel();
+            debouncedModSettingsUpdate = Scheduler.AddDelayed(() =>
+            {
+                if (client.Room == null)
+                    return;
+
+                client.ChangeUserMods(UserMods.Value);
+            }, 500);
         }
 
         private void updateBeatmapAvailability(ValueChangedEvent<BeatmapAvailability> availability)
@@ -385,14 +408,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             if (client != null)
                 client.LoadRequested -= onLoadRequested;
+
+            modSettingChangeTracker?.Dispose();
         }
 
         private class UserModSelectOverlay : LocalPlayerModSelectOverlay
         {
-            public UserModSelectOverlay()
-            {
-                CustomiseButton.Alpha = 0;
-            }
         }
     }
 }
