@@ -28,8 +28,6 @@ namespace osu.Game.Overlays.OSD
         private SampleChannel sampleOff;
         private SampleChannel sampleChange;
 
-        private bool playedSample;
-
         public TrackedSettingToast(SettingDescription description)
             : base(description.Name, description.Value, description.Shortcut)
         {
@@ -77,11 +75,9 @@ namespace osu.Game.Overlays.OSD
                 optionLights.Add(new OptionLight { Glowing = i == selectedOption });
         }
 
-        protected override void Update()
+        protected override void LoadComplete()
         {
-            base.Update();
-
-            if (playedSample) return;
+            base.LoadComplete();
 
             if (optionCount == 1)
             {
@@ -97,8 +93,6 @@ namespace osu.Game.Overlays.OSD
                 sampleChange.Frequency.Value = 1 + (double)selectedOption / (optionCount - 1) * 0.25f;
                 sampleChange.Play();
             }
-
-            playedSample = true;
         }
 
         [BackgroundDependencyLoader]
