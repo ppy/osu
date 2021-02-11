@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
+using osu.Framework.Utils;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -47,15 +48,20 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnHover(HoverEvent e)
         {
+            if (sampleHover == null)
+                return false;
+
             bool enoughTimePassedSinceLastPlayback = !lastPlaybackTime.Value.HasValue || Time.Current - lastPlaybackTime.Value >= HoverDebounceTime;
 
             if (enoughTimePassedSinceLastPlayback)
             {
-                sampleHover?.Play();
+                sampleHover.Frequency.Value = 0.96 + RNG.NextDouble(0.08);
+                sampleHover.Play();
+
                 lastPlaybackTime.Value = Time.Current;
             }
 
-            return base.OnHover(e);
+            return false;
         }
     }
 
@@ -68,6 +74,9 @@ namespace osu.Game.Graphics.UserInterface
         Normal,
 
         [Description("-softer")]
-        Soft
+        Soft,
+
+        [Description("-toolbar")]
+        Toolbar
     }
 }
