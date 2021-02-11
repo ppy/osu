@@ -106,11 +106,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 this.totalUsers = totalUsers;
             }
 
-            protected override HubClientConnector CreateConnector(string name, string endpoint, IAPIProvider api)
-            {
-                // do not pass API to prevent attempting failing connections on an actual hub.
-                return base.CreateConnector(name, endpoint, null);
-            }
+            protected override HubClientConnector CreateConnector(string name, string endpoint, IAPIProvider api) => null;
 
             public void Start(int beatmapId)
             {

@@ -32,11 +32,12 @@ namespace osu.Game.Online.Spectator
 
         private readonly string endpoint;
 
+        [CanBeNull]
         private HubClientConnector connector;
 
         private readonly IBindable<bool> isConnected = new BindableBool();
 
-        private HubConnection connection => connector.CurrentConnection;
+        private HubConnection connection => connector?.CurrentConnection;
 
         private readonly List<int> watchingUsers = new List<int>();
 
@@ -86,42 +87,46 @@ namespace osu.Game.Online.Spectator
         private void load(IAPIProvider api)
         {
             connector = CreateConnector(nameof(SpectatorStreamingClient), endpoint, api);
-            connector.ConfigureConnection = connection =>
-            {
-                // until strong typed client support is added, each method must be manually bound
-                // (see https://github.com/dotnet/aspnetcore/issues/15198)
-                connection.On<int, SpectatorState>(nameof(ISpectatorClient.UserBeganPlaying), ((ISpectatorClient)this).UserBeganPlaying);
-                connection.On<int, FrameDataBundle>(nameof(ISpectatorClient.UserSentFrames), ((ISpectatorClient)this).UserSentFrames);
-                connection.On<int, SpectatorState>(nameof(ISpectatorClient.UserFinishedPlaying), ((ISpectatorClient)this).UserFinishedPlaying);
-            };
 
-            isConnected.BindTo(connector.IsConnected);
-            isConnected.BindValueChanged(connected =>
+            if (connector != null)
             {
-                if (connected.NewValue)
+                connector.ConfigureConnection = connection =>
                 {
-                    // get all the users that were previously being watched
-                    int[] users;
+                    // until strong typed client support is added, each method must be manually bound
+                    // (see https://github.com/dotnet/aspnetcore/issues/15198)
+                    connection.On<int, SpectatorState>(nameof(ISpectatorClient.UserBeganPlaying), ((ISpectatorClient)this).UserBeganPlaying);
+                    connection.On<int, FrameDataBundle>(nameof(ISpectatorClient.UserSentFrames), ((ISpectatorClient)this).UserSentFrames);
+                    connection.On<int, SpectatorState>(nameof(ISpectatorClient.UserFinishedPlaying), ((ISpectatorClient)this).UserFinishedPlaying);
+                };
 
-                    lock (userLock)
+                isConnected.BindTo(connector.IsConnected);
+                isConnected.BindValueChanged(connected =>
+                {
+                    if (connected.NewValue)
                     {
-                        users = watchingUsers.ToArray();
-                        watchingUsers.Clear();
+                        // get all the users that were previously being watched
+                        int[] users;
+
+                        lock (userLock)
+                        {
+                            users = watchingUsers.ToArray();
+                            watchingUsers.Clear();
+                        }
+
+                        // resubscribe to watched users.
+                        foreach (var userId in users)
+                            WatchUser(userId);
+
+                        // re-send state in case it wasn't received
+                        if (isPlaying)
+                            beginPlaying();
                     }
-
-                    // resubscribe to watched users.
-                    foreach (var userId in users)
-                        WatchUser(userId);
-
-                    // re-send state in case it wasn't received
-                    if (isPlaying)
-                        beginPlaying();
-                }
-                else
-                {
-                    playingUsers.Clear();
-                }
-            }, true);
+                    else
+                    {
+                        playingUsers.Clear();
+                    }
+                }, true);
+            }
         }
 
         protected virtual HubClientConnector CreateConnector(string name, string endpoint, IAPIProvider api) => new HubClientConnector(name, endpoint, api);
