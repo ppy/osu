@@ -29,7 +29,7 @@ namespace osu.Game.Online
 
         private readonly string clientName;
         private readonly string endpoint;
-        private readonly IAPIProvider? api;
+        private readonly IAPIProvider api;
 
         /// <summary>
         /// The current connection opened by this connector.
@@ -52,32 +52,28 @@ namespace osu.Game.Online
         /// </summary>
         /// <param name="clientName">The name of the client this connector connects for, used for logging.</param>
         /// <param name="endpoint">The endpoint to the hub.</param>
-        /// <param name="api"> An API provider used to react to connection state changes, or null to not establish connection at all (for testing purposes).</param>
-        public HubClientConnector(string clientName, string endpoint, IAPIProvider? api)
+        /// <param name="api"> An API provider used to react to connection state changes.</param>
+        public HubClientConnector(string clientName, string endpoint, IAPIProvider api)
         {
             this.clientName = clientName;
             this.endpoint = endpoint;
-
             this.api = api;
 
-            if (api != null)
+            apiState.BindTo(api.State);
+            apiState.BindValueChanged(state =>
             {
-                apiState.BindTo(api.State);
-                apiState.BindValueChanged(state =>
+                switch (state.NewValue)
                 {
-                    switch (state.NewValue)
-                    {
-                        case APIState.Failing:
-                        case APIState.Offline:
-                            Task.Run(() => disconnect(true));
-                            break;
+                    case APIState.Failing:
+                    case APIState.Offline:
+                        Task.Run(() => disconnect(true));
+                        break;
 
-                        case APIState.Online:
-                            Task.Run(connect);
-                            break;
-                    }
-                }, true);
-            }
+                    case APIState.Online:
+                        Task.Run(connect);
+                        break;
+                }
+            }, true);
         }
 
         private async Task connect()
@@ -136,8 +132,6 @@ namespace osu.Game.Online
 
         private HubConnection buildConnection(CancellationToken cancellationToken)
         {
-            Debug.Assert(api != null);
-
             var builder = new HubConnectionBuilder()
                 .WithUrl(endpoint, options => { options.Headers.Add("Authorization", $"Bearer {api.AccessToken}"); });
 
