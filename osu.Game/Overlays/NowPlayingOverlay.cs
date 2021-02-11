@@ -51,6 +51,9 @@ namespace osu.Game.Overlays
         private Container dragContainer;
         private Container playerContainer;
 
+        protected override string PopInSampleName => "UI/now-playing-pop-in";
+        protected override string PopOutSampleName => "UI/now-playing-pop-out";
+
         /// <summary>
         /// Provide a source for the toolbar height.
         /// </summary>
