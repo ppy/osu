@@ -78,7 +78,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             managerUpdated = beatmapManager.ItemUpdated.GetBoundCopy();
             managerUpdated.BindValueChanged(beatmapUpdated);
 
-            UserMods.BindValueChanged(_ => updateMods());
+            UserMods.BindValueChanged(_ => UpdateMods());
         }
 
         public override void OnEntering(IScreen last)
@@ -97,7 +97,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         {
             base.OnResuming(last);
             beginHandlingTrack();
-            updateMods();
+            UpdateMods();
         }
 
         public override bool OnExiting(IScreen next)
@@ -128,7 +128,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                                      .Where(m => SelectedItem.Value.AllowedMods.Any(a => m.GetType() == a.GetType()))
                                      .ToList();
 
-            updateMods();
+            UpdateMods();
 
             Ruleset.Value = SelectedItem.Value.Ruleset.Value;
         }
@@ -145,7 +145,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
         }
 
-        private void updateMods()
+        protected virtual void UpdateMods()
         {
             if (SelectedItem.Value == null)
                 return;

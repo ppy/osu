@@ -271,6 +271,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             UserMods.BindValueChanged(onUserModsChanged);
 
             client.LoadRequested += onLoadRequested;
+            client.RoomUpdated += onRoomUpdated;
 
             isConnected = client.IsConnected.GetBoundCopy();
             isConnected.BindValueChanged(connected =>
@@ -367,6 +368,27 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }
         }
 
+        private void onRoomUpdated()
+        {
+            UpdateMods(); // user mods may have changed.
+        }
+
+        protected override void UpdateMods()
+        {
+            if (SelectedItem.Value == null || client.LocalUser == null)
+                return;
+
+            // update local mods based on room's reported status for the local user (omitting the base call implementation).
+            // this makes the server authoritative, and avoids the local user potentially settings mods that the server is not aware of (ie. if the match was started during the selection being changed).
+            var localUserMods = client.LocalUser.Mods.ToList();
+
+            Schedule(() =>
+            {
+                var ruleset = Ruleset.Value.CreateInstance();
+                Mods.Value = localUserMods.Select(m => m.ToMod(ruleset)).Concat(SelectedItem.Value.RequiredMods).ToList();
+            });
+        }
+
         private void onLoadRequested()
         {
             Debug.Assert(client.Room != null);
@@ -384,7 +406,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.Dispose(isDisposing);
 
             if (client != null)
+            {
+                client.RoomUpdated -= onRoomUpdated;
                 client.LoadRequested -= onLoadRequested;
+            }
         }
 
         private class UserModSelectOverlay : LocalPlayerModSelectOverlay
