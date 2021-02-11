@@ -114,7 +114,7 @@ namespace osu.Game.Overlays.Notifications
                         closeButton = new CloseButton
                         {
                             Alpha = 0,
-                            Action = Close,
+                            Action = () => Close(),
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
                             Margin = new MarginPadding
@@ -167,9 +167,7 @@ namespace osu.Game.Overlays.Notifications
 
         public bool WasClosed;
 
-        public virtual void Close() => Close(true);
-
-        public virtual void Close(bool playSound)
+        public virtual void Close(bool playSound = true)
         {
             if (WasClosed) return;
 
