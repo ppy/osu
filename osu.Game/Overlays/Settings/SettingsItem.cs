@@ -21,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Settings
 {
-    public abstract class SettingsItem<T> : Container, IFilterable, ISettingsItem, IHasCurrentValue<T>
+    public abstract class SettingsItem<T> : Container, IFilterable, ISettingsItem, IHasCurrentValue<T>, IHasTooltip
     {
         protected abstract Drawable CreateControl();
 
@@ -214,5 +214,7 @@ namespace osu.Game.Overlays.Settings
                 this.FadeColour(bindable.Disabled ? Color4.Gray : buttonColour, 200, Easing.OutQuint);
             }
         }
+
+        public string TooltipText { get; set; }
     }
 }
