@@ -18,7 +18,7 @@ using osu.Game.Online.API;
 namespace osu.Game.Online
 {
     /// <summary>
-    /// A component that maintains over a hub connection between client and server.
+    /// A component that manages the life cycle of a connection to a SignalR Hub.
     /// </summary>
     public class HubClientConnector : IDisposable
     {
@@ -52,7 +52,7 @@ namespace osu.Game.Online
         /// </summary>
         /// <param name="clientName">The name of the client this connector connects for, used for logging.</param>
         /// <param name="endpoint">The endpoint to the hub.</param>
-        /// <param name="api">The API provider for listening to state changes, or null to not listen.</param>
+        /// <param name="api"> An API provider used to react to connection state changes, or null to not establish connection at all (for testing purposes).</param>
         public HubClientConnector(string clientName, string endpoint, IAPIProvider? api)
         {
             this.clientName = clientName;
