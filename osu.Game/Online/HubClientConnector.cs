@@ -25,7 +25,7 @@ namespace osu.Game.Online
         /// <summary>
         /// Invoked whenever a new hub connection is built.
         /// </summary>
-        public Action<HubConnection>? OnNewConnection;
+        public Action<HubConnection>? ConfigureConnection;
 
         private readonly string clientName;
         private readonly string endpoint;
@@ -106,7 +106,7 @@ namespace osu.Game.Online
                     try
                     {
                         // importantly, rebuild the connection each attempt to get an updated access token.
-                        CurrentConnection = createConnection(cancellationToken);
+                        CurrentConnection = buildConnection(cancellationToken);
 
                         await CurrentConnection.StartAsync(cancellationToken);
 
@@ -134,7 +134,7 @@ namespace osu.Game.Online
             }
         }
 
-        private HubConnection createConnection(CancellationToken cancellationToken)
+        private HubConnection buildConnection(CancellationToken cancellationToken)
         {
             Debug.Assert(api != null);
 
@@ -152,22 +152,23 @@ namespace osu.Game.Online
 
             var newConnection = builder.Build();
 
-            OnNewConnection?.Invoke(newConnection);
+            ConfigureConnection?.Invoke(newConnection);
 
-            newConnection.Closed += ex =>
-            {
-                isConnected.Value = false;
-
-                Logger.Log(ex != null ? $"{clientName} lost connection: {ex}" : $"{clientName} disconnected", LoggingTarget.Network);
-
-                // make sure a disconnect wasn't triggered (and this is still the active connection).
-                if (!cancellationToken.IsCancellationRequested)
-                    Task.Run(connect, default);
-
-                return Task.CompletedTask;
-            };
-
+            newConnection.Closed += ex => onConnectionClosed(ex, cancellationToken);
             return newConnection;
+        }
+
+        private Task onConnectionClosed(Exception? ex, CancellationToken cancellationToken)
+        {
+            isConnected.Value = false;
+
+            Logger.Log(ex != null ? $"{clientName} lost connection: {ex}" : $"{clientName} disconnected", LoggingTarget.Network);
+
+            // make sure a disconnect wasn't triggered (and this is still the active connection).
+            if (!cancellationToken.IsCancellationRequested)
+                Task.Run(connect, default);
+
+            return Task.CompletedTask;
         }
 
         private async Task disconnect(bool takeLock)
