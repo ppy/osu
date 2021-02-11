@@ -64,7 +64,7 @@ namespace osu.Game.Graphics.UserInterface
                     RelativeSizeAxes = Axes.X,
                 },
                 Nub = new Nub(),
-                new HoverClickSounds()
+                new HoverSounds()
             };
 
             if (nubOnRight)
