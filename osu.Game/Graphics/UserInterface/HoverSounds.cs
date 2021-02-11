@@ -68,6 +68,9 @@ namespace osu.Game.Graphics.UserInterface
         Normal,
 
         [Description("-softer")]
-        Soft
+        Soft,
+
+        [Description("-toolbar")]
+        Toolbar
     }
 }
