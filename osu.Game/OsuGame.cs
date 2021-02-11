@@ -174,6 +174,8 @@ namespace osu.Game
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
+        private readonly BindableNumber<double> globalTrackVolumeAdjust = new BindableNumber<double>(0.5f);
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -229,6 +231,11 @@ namespace osu.Game
             IsActive.BindValueChanged(active => updateActiveState(active.NewValue), true);
 
             Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeFade);
+
+            // drop track volume game-wide to leave some head-room for UI effects / samples.
+            // this means that for the time being, gameplay sample playback is louder relative to the audio track, compared to stable.
+            // we may want to revisit this if users notice or complain about the difference (consider this a bit of a trial).
+            Audio.Tracks.AddAdjustment(AdjustableProperty.Volume, globalTrackVolumeAdjust);
 
             SelectedMods.BindValueChanged(modsChanged);
             Beatmap.BindValueChanged(beatmapChanged, true);
