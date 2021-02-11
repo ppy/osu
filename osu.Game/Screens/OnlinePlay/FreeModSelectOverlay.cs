@@ -20,17 +20,18 @@ namespace osu.Game.Screens.OnlinePlay
     {
         protected override bool Stacked => false;
 
+        protected override bool AllowConfiguration => false;
+
         public new Func<Mod, bool> IsValidMod
         {
             get => base.IsValidMod;
-            set => base.IsValidMod = m => m.HasImplementation && !m.RequiresConfiguration && !(m is ModAutoplay) && value(m);
+            set => base.IsValidMod = m => m.HasImplementation && !(m is ModAutoplay) && value(m);
         }
 
         public FreeModSelectOverlay()
         {
             IsValidMod = m => true;
 
-            CustomiseButton.Alpha = 0;
             MultiplierSection.Alpha = 0;
             DeselectAllButton.Alpha = 0;
 
