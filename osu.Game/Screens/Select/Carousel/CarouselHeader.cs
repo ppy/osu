@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Select.Carousel
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colours)
         {
-            sampleHover = audio.Samples.Get($@"SongSelect/song-ping-variation-{RNG.Next(1, 5)}");
+            sampleHover = audio.Samples.Get("SongSelect/song-ping");
             hoverLayer.Colour = colours.Blue.Opacity(0.1f);
         }
 
@@ -99,7 +99,11 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected override bool OnHover(HoverEvent e)
         {
-            sampleHover?.Play();
+            if (sampleHover != null)
+            {
+                sampleHover.Frequency.Value = 0.90 + RNG.NextDouble(0.2);
+                sampleHover.Play();
+            }
 
             hoverLayer.FadeIn(100, Easing.OutQuint);
             return base.OnHover(e);
