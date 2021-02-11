@@ -31,6 +31,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             set => ball.Colour = value;
         }
 
+        /// <summary>
+        /// Whether to track accurately to the visual size of this <see cref="SliderBall"/>.
+        /// If <c>false</c>, tracking will be performed at the final scale at all times.
+        /// </summary>
+        public bool InputTracksVisualSize = true;
+
         private readonly Drawable followCircle;
         private readonly DrawableSlider drawableSlider;
         private readonly Drawable ball;
@@ -94,7 +100,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
                 tracking = value;
 
-                followCircle.ScaleTo(tracking ? 2.4f : 1f, 300, Easing.OutQuint);
+                if (InputTracksVisualSize)
+                    followCircle.ScaleTo(tracking ? 2.4f : 1f, 300, Easing.OutQuint);
+                else
+                {
+                    // We need to always be tracking the final size, at both endpoints. For now, this is achieved by removing the scale duration.
+                    followCircle.ScaleTo(tracking ? 2.4f : 1f);
+                }
+
                 followCircle.FadeTo(tracking ? 1f : 0, 300, Easing.OutQuint);
             }
         }
