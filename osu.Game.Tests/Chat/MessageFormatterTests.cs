@@ -21,6 +21,21 @@ namespace osu.Game.Tests.Chat
             Assert.AreEqual(36, result.Links[0].Length);
         }
 
+        [TestCase(LinkAction.OpenBeatmap, "456", "https://osu.ppy.sh/beatmapsets/123#osu/456")]
+        [TestCase(LinkAction.OpenBeatmap, "456", "https://osu.ppy.sh/beatmapsets/123#osu/456?whatever")]
+        [TestCase(LinkAction.OpenBeatmap, "456", "https://osu.ppy.sh/beatmapsets/123/456")]
+        [TestCase(LinkAction.OpenBeatmapSet, "123", "https://osu.ppy.sh/beatmapsets/123")]
+        [TestCase(LinkAction.OpenBeatmapSet, "123", "https://osu.ppy.sh/beatmapsets/123/whatever")]
+        public void TestBeatmapLinks(LinkAction expectedAction, string expectedArg, string link)
+        {
+            Message result = MessageFormatter.FormatMessage(new Message { Content = link });
+
+            Assert.AreEqual(result.Content, result.DisplayContent);
+            Assert.AreEqual(1, result.Links.Count);
+            Assert.AreEqual(expectedAction, result.Links[0].Action);
+            Assert.AreEqual(expectedArg, result.Links[0].Argument);
+        }
+
         [Test]
         public void TestMultipleComplexLinks()
         {
