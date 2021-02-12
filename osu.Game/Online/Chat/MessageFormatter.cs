@@ -49,6 +49,18 @@ namespace osu.Game.Online.Chat
         // Unicode emojis
         private static readonly Regex emoji_regex = new Regex(@"(\uD83D[\uDC00-\uDE4F])");
 
+        /// <summary>
+        /// The root URL for the website, used for chat link matching.
+        /// </summary>
+        public static string WebsiteRootUrl
+        {
+            set => websiteRootUrl = value
+                                    .Trim('/') // trim potential trailing slash/
+                                    .Split('/').Last(); // only keep domain name, ignoring protocol.
+        }
+
+        private static string websiteRootUrl = "osu.ppy.sh";
+
         private static void handleMatches(Regex regex, string display, string link, MessageFormatterResult result, int startIndex = 0, LinkAction? linkActionOverride = null, char[] escapeChars = null)
         {
             int captureOffset = 0;
@@ -119,7 +131,7 @@ namespace osu.Game.Online.Chat
                 case "http":
                 case "https":
                     // length > 3 since all these links need another argument to work
-                    if (args.Length > 3 && args[1] == "osu.ppy.sh")
+                    if (args.Length > 3 && args[1].EndsWith(websiteRootUrl, StringComparison.OrdinalIgnoreCase))
                     {
                         var mainArg = args[3];
 

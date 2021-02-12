@@ -31,6 +31,7 @@ using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Online;
+using osu.Game.Online.Chat;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
@@ -224,6 +225,8 @@ namespace osu.Game
             });
 
             EndpointConfiguration endpoints = UseDevelopmentServer ? (EndpointConfiguration)new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
+
+            MessageFormatter.WebsiteRootUrl = endpoints.WebsiteRootUrl;
 
             dependencies.CacheAs(API ??= new APIAccess(LocalConfig, endpoints));
 
