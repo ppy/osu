@@ -28,7 +28,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
@@ -52,6 +51,7 @@ using osu.Game.Updater;
 using osu.Game.Utils;
 using LogLevel = osu.Framework.Logging.LogLevel;
 using osu.Game.Database;
+using osu.Game.IO;
 
 namespace osu.Game
 {
@@ -88,7 +88,7 @@ namespace osu.Game
 
         protected SentryLogger SentryLogger;
 
-        public virtual Storage GetStorageForStableInstall() => null;
+        public virtual StableStorage GetStorageForStableInstall() => null;
 
         public float ToolbarOffset => (Toolbar?.Position.Y ?? 0) + (Toolbar?.DrawHeight ?? 0);
 
