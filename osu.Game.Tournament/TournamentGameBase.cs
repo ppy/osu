@@ -4,6 +4,8 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Textures;
@@ -29,6 +31,8 @@ namespace osu.Game.Tournament
         private DependencyContainer dependencies;
         private FileBasedIPC ipc;
 
+        protected Task BracketLoadTask { get; private set; }
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             return dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
@@ -46,14 +50,9 @@ namespace osu.Game.Tournament
 
             Textures.AddStore(new TextureLoaderStore(new StorageBackedResourceStore(storage)));
 
-            readBracket();
-
-            ladder.CurrentMatch.Value = ladder.Matches.FirstOrDefault(p => p.Current.Value);
+            BracketLoadTask = Task.Run(readBracket);
 
             dependencies.CacheAs(new StableInfo(storage));
-
-            dependencies.CacheAs<MatchIPCInfo>(ipc = new FileBasedIPC());
-            Add(ipc);
         }
 
         private void readBracket()
@@ -69,8 +68,6 @@ namespace osu.Game.Tournament
             ladder.Ruleset.Value ??= RulesetStore.AvailableRulesets.First();
 
             Ruleset.BindTo(ladder.Ruleset);
-
-            dependencies.Cache(ladder);
 
             bool addedInfo = false;
 
@@ -127,6 +124,15 @@ namespace osu.Game.Tournament
 
             if (addedInfo)
                 SaveChanges();
+
+            ladder.CurrentMatch.Value = ladder.Matches.FirstOrDefault(p => p.Current.Value);
+
+            Schedule(() =>
+            {
+                dependencies.Cache(ladder);
+                dependencies.CacheAs<MatchIPCInfo>(ipc = new FileBasedIPC());
+                Add(ipc);
+            });
         }
 
         /// <summary>
