@@ -146,7 +146,10 @@ namespace osu.Game.Online.Chat
 
                                 // https://osu.ppy.sh/beatmapsets/1154158#whatever
                                 string trimmed = mainArg.Split('#').First();
-                                return new LinkDetails(LinkAction.OpenBeatmapSet, trimmed);
+                                if (int.TryParse(trimmed, out id))
+                                    return new LinkDetails(LinkAction.OpenBeatmapSet, id.ToString());
+
+                                break;
                             }
 
                             case "u":
