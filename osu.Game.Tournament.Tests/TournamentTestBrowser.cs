@@ -13,6 +13,8 @@ namespace osu.Game.Tournament.Tests
         {
             base.LoadComplete();
 
+            BracketLoadTask.Wait();
+
             LoadComponentAsync(new Background("Menu/menu-background-0")
             {
                 Colour = OsuColour.Gray(0.5f),

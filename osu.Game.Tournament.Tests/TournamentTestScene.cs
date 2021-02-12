@@ -154,6 +154,8 @@ namespace osu.Game.Tournament.Tests
 
             protected override void LoadAsyncComplete()
             {
+                BracketLoadTask.Wait();
+
                 // this has to be run here rather than LoadComplete because
                 // TestScene.cs is checking the IsLoaded state (on another thread) and expects
                 // the runner to be loaded at that point.
