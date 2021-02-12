@@ -51,6 +51,11 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         protected virtual bool Stacked => true;
 
+        /// <summary>
+        /// Whether configurable <see cref="Mod"/>s can be configured by the local user.
+        /// </summary>
+        protected virtual bool AllowConfiguration => true;
+
         [NotNull]
         private Func<Mod, bool> isValidMod = m => true;
 
@@ -300,6 +305,7 @@ namespace osu.Game.Overlays.Mods
                                                 Text = "screen.select.modOverlay.customisation",
                                                 Action = () => ModSettingsContainer.ToggleVisibility(),
                                                 Enabled = { Value = false },
+                                                Alpha = AllowConfiguration ? 1 : 0,
                                                 Origin = Anchor.CentreLeft,
                                                 Anchor = Anchor.CentreLeft,
                                             },
@@ -372,7 +378,10 @@ namespace osu.Game.Overlays.Mods
             base.LoadComplete();
 
             availableMods.BindValueChanged(_ => updateAvailableMods(), true);
-            SelectedMods.BindValueChanged(_ => updateSelectedButtons(), true);
+
+            // intentionally bound after the above line to avoid a potential update feedback cycle.
+            // i haven't actually observed this happening but as updateAvailableMods() changes the selection it is plausible.
+            SelectedMods.BindValueChanged(_ => updateSelectedButtons());
         }
 
         protected override void PopOut()
@@ -479,10 +488,10 @@ namespace osu.Game.Overlays.Mods
             foreach (var section in ModSectionsContainer.Children)
                 section.UpdateSelectedButtons(selectedMods);
 
-            updateMods();
+            updateMultiplier();
         }
 
-        private void updateMods()
+        private void updateMultiplier()
         {
             var multiplier = 1.0;
 
@@ -509,7 +518,8 @@ namespace osu.Game.Overlays.Mods
 
                 OnModSelected(selectedMod);
 
-                if (selectedMod.RequiresConfiguration) ModSettingsContainer.Show();
+                if (selectedMod.RequiresConfiguration && AllowConfiguration)
+                    ModSettingsContainer.Show();
             }
             else
             {

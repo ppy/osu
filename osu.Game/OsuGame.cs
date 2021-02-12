@@ -54,6 +54,7 @@ using osu.Game.Updater;
 using osu.Game.Utils;
 using LogLevel = osu.Framework.Logging.LogLevel;
 using osu.Game.Database;
+using osu.Game.IO;
 
 namespace osu.Game
 {
@@ -93,7 +94,7 @@ namespace osu.Game
 
         protected SentryLogger SentryLogger;
 
-        public virtual Storage GetStorageForStableInstall() => null;
+        public virtual StableStorage GetStorageForStableInstall() => null;
 
         public float ToolbarOffset => (Toolbar?.Position.Y ?? 0) + (Toolbar?.DrawHeight ?? 0);
 
@@ -854,7 +855,7 @@ namespace osu.Game
 
                 if (recentLogCount < short_term_display_limit)
                 {
-                    Schedule(() => notifications.Post(new SimpleNotification
+                    Schedule(() => notifications.Post(new SimpleErrorNotification
                     {
                         Icon = entry.Level == LogLevel.Important ? FontAwesome.Solid.ExclamationCircle : FontAwesome.Solid.Bomb,
                         Text = entry.Message.Truncate(256) + (entry.Exception != null && IsDeployedBuild ? "\n\n该错误信息已被自动报告给开发人员" : string.Empty),

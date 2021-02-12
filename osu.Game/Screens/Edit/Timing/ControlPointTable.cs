@@ -74,7 +74,8 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 new TableColumn(string.Empty, Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
                 new TableColumn("时间", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-                new TableColumn("属性", Anchor.Centre),
+                new TableColumn(),
+                new TableColumn("属性", Anchor.CentreLeft),
             };
 
             return columns.ToArray();
@@ -93,6 +94,7 @@ namespace osu.Game.Screens.Edit.Timing
                 Text = group.Time.ToEditorFormattedString(),
                 Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
             },
+            null,
             new ControlGroupAttributes(group),
         };
 
@@ -104,11 +106,11 @@ namespace osu.Game.Screens.Edit.Timing
 
             public ControlGroupAttributes(ControlPointGroup group)
             {
+                RelativeSizeAxes = Axes.Both;
                 InternalChild = fill = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
-                    Padding = new MarginPadding(10),
                     Spacing = new Vector2(2)
                 };
 
@@ -149,8 +151,10 @@ namespace osu.Game.Screens.Edit.Timing
                         return new RowAttribute("editor.controlPoint.difficulty", () => $"{difficulty.SpeedMultiplier:n2}x", colour);
 
                     case EffectControlPoint effect:
-                        return new RowAttribute("editor.controlPoint.effect", () => $"{(effect.KiaiMode ? "高潮 " : "")}{(effect.OmitFirstBarLine ? "NoBarLine " : "")}", colour);
-                    //return new RowAttribute("editor.controlPoint.effect", () => $"{(effect.KiaiMode ? "editor.controlPoint.effect.kiai" : "")}{(effect.OmitFirstBarLine ? "editor.controlPoint.effect.noBarLine" : "")} ", colour);
+                        return new RowAttribute("editor.controlPoint.effect", () => string.Join(" ",
+                            effect.KiaiMode ? "高潮" : string.Empty,
+                            effect.OmitFirstBarLine ? "NoBarLine" : string.Empty
+                        ).Trim(), colour);
 
                     case SampleControlPoint sample:
                         return new RowAttribute("editor.controlPoint.sample", () => $"{sample.SampleBank} {sample.SampleVolume}%", colour);

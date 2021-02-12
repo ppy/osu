@@ -43,5 +43,10 @@ namespace osu.Game.Screens.Mvis.BottomBar
 
         protected override void UpdateValue(float value) =>
             fill.Width = value * UsableWidth;
+
+        public SongProgressBar(bool allowSeek = true)
+            : base(allowSeek)
+        {
+        }
     }
 }

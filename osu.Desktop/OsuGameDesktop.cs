@@ -17,6 +17,7 @@ using osu.Framework.Screens;
 using osu.Game.Screens.Menu;
 using osu.Game.Updater;
 using osu.Desktop.Windows;
+using osu.Game.IO;
 
 namespace osu.Desktop
 {
@@ -31,7 +32,7 @@ namespace osu.Desktop
             noVersionOverlay = args?.Any(a => a == "--no-version-overlay") ?? false;
         }
 
-        public override Storage GetStorageForStableInstall()
+        public override StableStorage GetStorageForStableInstall()
         {
             try
             {
@@ -39,7 +40,7 @@ namespace osu.Desktop
                 {
                     string stablePath = getStableInstallPath();
                     if (!string.IsNullOrEmpty(stablePath))
-                        return new DesktopStorage(stablePath, desktopHost);
+                        return new StableStorage(stablePath, desktopHost);
                 }
             }
             catch (Exception)

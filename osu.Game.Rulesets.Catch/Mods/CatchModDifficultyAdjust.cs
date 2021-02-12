@@ -11,8 +11,8 @@ namespace osu.Game.Rulesets.Catch.Mods
 {
     public class CatchModDifficultyAdjust : ModDifficultyAdjust
     {
-        [SettingSource("圆圈大小", "Override a beatmap's set CS.", FIRST_SETTING_ORDER - 1)]
-        public BindableNumber<float> CircleSize { get; } = new BindableFloat
+        [SettingSource("圆圈大小", "覆盖谱面的CS设置", FIRST_SETTING_ORDER - 1)]
+        public BindableNumber<float> CircleSize { get; } = new BindableFloatWithLimitExtension
         {
             Precision = 0.1f,
             MinValue = 1,
@@ -21,8 +21,8 @@ namespace osu.Game.Rulesets.Catch.Mods
             Value = 5,
         };
 
-        [SettingSource("降落速度", "Override a beatmap's set AR.", LAST_SETTING_ORDER + 1)]
-        public BindableNumber<float> ApproachRate { get; } = new BindableFloat
+        [SettingSource("降落速度", "覆盖谱面的AR设置", LAST_SETTING_ORDER + 1)]
+        public BindableNumber<float> ApproachRate { get; } = new BindableFloatWithLimitExtension
         {
             Precision = 0.1f,
             MinValue = 1,
@@ -30,6 +30,14 @@ namespace osu.Game.Rulesets.Catch.Mods
             Default = 5,
             Value = 5,
         };
+
+        protected override void ApplyLimits(bool extended)
+        {
+            base.ApplyLimits(extended);
+
+            CircleSize.MaxValue = extended ? 11 : 10;
+            ApproachRate.MaxValue = extended ? 11 : 10;
+        }
 
         public override string SettingDescription
         {

@@ -87,6 +87,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 Ruleset.Value = new OsuRuleset().RulesetInfo;
                 Beatmap.SetDefault();
+                SelectedMods.Value = Array.Empty<Mod>();
             });
 
             AddStep("create song select", () => LoadScreen(songSelect = new TestPlaylistsSongSelect()));

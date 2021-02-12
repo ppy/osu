@@ -16,7 +16,7 @@ namespace osu.Game.Overlays
         private readonly MfMenuHeaderTabControl tabControl;
 
         public MfMenuOverlay()
-            : base(OverlayColourScheme.Blue1, new MfMenuHeader())
+            : base(OverlayColourScheme.Blue1)
         {
             Children = new Drawable[]
             {
@@ -87,5 +87,7 @@ namespace osu.Game.Overlays
             last = s.NewValue;
             tabControl.Current.Value = s.NewValue;
         }
+
+        protected override MfMenuHeader CreateHeader() => new MfMenuHeader();
     }
 }

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mfosu!\n"
 "POT-Creation-Date: 2020-12-04 02:25+0800\n"
-"PO-Revision-Date: 2021-02-08 18:10+0800\n"
+"PO-Revision-Date: 2021-02-13 00:22+0800\n"
 "Last-Translator: \n"
 "Language-Team: MATRIX-feather\n"
 "Language: zh_CN\n"
@@ -118,7 +118,7 @@ msgstr "开始游戏"
 msgid "screen.menu.buttonSystem.editor"
 msgstr "osu!编辑器"
 
-msgid "screen.menu.buttonSystem.beatmaplisting"
+msgid "screen.menu.buttonSystem.browse"
 msgstr "谱面列表"
 
 msgid "screen.menu.buttonSystem.exit"
@@ -1454,6 +1454,9 @@ msgstr ""
 
 msgid "等待着您~"
 msgstr ""
+
+#~ msgid "screen.menu.buttonSystem.beatmaplisting"
+#~ msgstr "谱面列表"
 
 #~ msgid "screen.multi.playlistSettings.playlist"
 #~ msgstr "游玩列表"

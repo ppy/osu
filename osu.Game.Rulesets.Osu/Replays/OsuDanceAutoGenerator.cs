@@ -2,8 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Replays;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Configuration;
@@ -36,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         private OsuAction getAction(OsuHitObject h, OsuHitObject last)
         {
-            double timeDifference = ApplyModsToTime(h.StartTime - last.StartTime);
+            double timeDifference = ApplyModsToTimeDelta(h.StartTime, last.StartTime);
 
             if (timeDifference > 0 && // Sanity checks
                 ((last.StackedPosition - h.StackedPosition).Length > h.Radius * (1.5 + 100.0 / timeDifference) || // Either the distance is big enough
@@ -52,8 +54,8 @@ namespace osu.Game.Rulesets.Osu.Replays
             return buttonIndex % 2 == 0 ? OsuAction.LeftButton : OsuAction.RightButton;
         }
 
-        public OsuDanceAutoGenerator(IBeatmap beatmap)
-            : base(beatmap)
+        public OsuDanceAutoGenerator(IBeatmap beatmap, IReadOnlyList<Mod> mods)
+            : base(beatmap, mods)
         {
             config = OsuRulesetConfigManager.Instance;
             frameTime = 1000.0 / config.Get<float>(OsuRulesetSetting.ReplayFramerate);
@@ -86,11 +88,12 @@ namespace osu.Game.Rulesets.Osu.Replays
             OsuHitObject last = Beatmap.HitObjects[idx == 0 ? idx : idx - 1];
             OsuAction action = getAction(o, last);
             var endFrame = new OsuReplayFrame(o.GetEndTime() + KEY_UP_DELAY, o.StackedEndPosition);
+            var FrameDelay = GetFrameDelay(endFrame.Time);
 
             switch (o)
             {
                 case Slider slider:
-                    for (double j = FrameDelay; j < slider.Duration; j += FrameDelay)
+                    for (double j = GetFrameDelay(endFrame.Time); j < slider.Duration; j += (endFrame.Time))
                     {
                         Vector2 pos = slider.StackedPositionAt(j / slider.Duration);
                         AddFrameToReplay(new OsuReplayFrame(o.StartTime + j, pos, action));
@@ -112,13 +115,13 @@ namespace osu.Game.Rulesets.Osu.Replays
 
                     for (double j = s.StartTime + FrameDelay; j < s.EndTime; j += FrameDelay)
                     {
-                        t = ApplyModsToTime(j - s.StartTime) * -1;
+                        t = ApplyModsToTimeDelta(s.StartTime, j) * -1;
 
                         Vector2 pos = SPINNER_CENTRE + CirclePosition(t / 20 + angle, SPIN_RADIUS);
                         AddFrameToReplay(new OsuReplayFrame((int)j, pos, action));
                     }
 
-                    t = ApplyModsToTime(s.EndTime - s.StartTime) * -1;
+                    t = ApplyModsToTimeDelta(s.StartTime, s.EndTime) * -1;
                     Vector2 endPosition = SPINNER_CENTRE + CirclePosition(t / 20 + angle, SPIN_RADIUS);
 
                     AddFrameToReplay(new OsuReplayFrame(s.EndTime, endPosition, action));

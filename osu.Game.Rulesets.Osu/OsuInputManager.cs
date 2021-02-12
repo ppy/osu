@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu
 
         protected override bool Handle(UIEvent e)
         {
-            if (e is MouseMoveEvent && !AllowUserCursorMovement) return false;
+            if ((e is MouseMoveEvent || e is TouchMoveEvent) && !AllowUserCursorMovement) return false;
 
             return base.Handle(e);
         }

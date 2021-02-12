@@ -9,7 +9,7 @@ using System.ComponentModel;
 
 namespace osu.Game.Overlays.Rankings
 {
-    public class RankingsOverlayHeader : TabControlOverlayHeaderCN<RankingsScope>
+    public class RankingsOverlayHeader : TabControlOverlayHeader<RankingsScope>
     {
         public Bindable<RulesetInfo> Ruleset => rulesetSelector.Current;
 
