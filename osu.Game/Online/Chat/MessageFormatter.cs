@@ -52,7 +52,14 @@ namespace osu.Game.Online.Chat
         /// <summary>
         /// The root URL for the website, used for chat link matching.
         /// </summary>
-        public static string WebsiteRootUrl { get; set; } = "https://osu.ppy.sh";
+        public static string WebsiteRootUrl
+        {
+            set => websiteRootUrl = value
+                                    .Trim('/') // trim potential trailing slash/
+                                    .Split('/').Last(); // only keep domain name, ignoring protocol.
+        }
+
+        private static string websiteRootUrl;
 
         private static void handleMatches(Regex regex, string display, string link, MessageFormatterResult result, int startIndex = 0, LinkAction? linkActionOverride = null, char[] escapeChars = null)
         {
@@ -124,7 +131,7 @@ namespace osu.Game.Online.Chat
                 case "http":
                 case "https":
                     // length > 3 since all these links need another argument to work
-                    if (args.Length > 3 && url.StartsWith(WebsiteRootUrl, StringComparison.OrdinalIgnoreCase))
+                    if (args.Length > 3 && args[1].EndsWith(websiteRootUrl, StringComparison.OrdinalIgnoreCase))
                     {
                         switch (args[2])
                         {
