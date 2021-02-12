@@ -13,7 +13,6 @@ using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Match.Components;
-using osu.Game.Screens.Select;
 using osu.Game.Users;
 using Footer = osu.Game.Screens.OnlinePlay.Match.Components.Footer;
 
@@ -33,6 +32,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         private OverlinedHeader participantsHeader;
 
+        private GridContainer mainContent;
+
         public PlaylistsRoomSubScreen(Room room)
         {
             Title = room.RoomID.Value == null ? "New playlist" : room.Name.Value;
@@ -42,9 +43,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChildren = new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
-                new GridContainer
+                mainContent = new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Content = new[]
@@ -173,7 +174,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                             new Footer
                             {
                                 OnStart = onStart,
-                                SelectedItem = { BindTarget = SelectedItem }
                             }
                         }
                     },
@@ -186,10 +186,23 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 settingsOverlay = new PlaylistsMatchSettingsOverlay
                 {
                     RelativeSizeAxes = Axes.Both,
-                    EditPlaylist = () => this.Push(new MatchSongSelect()),
+                    EditPlaylist = () => this.Push(new PlaylistsSongSelect()),
                     State = { Value = roomId.Value == null ? Visibility.Visible : Visibility.Hidden }
                 }
-            };
+            });
+
+            if (roomId.Value == null)
+            {
+                // A new room is being created.
+                // The main content should be hidden until the settings overlay is hidden, signaling the room is ready to be displayed.
+                mainContent.Hide();
+
+                settingsOverlay.State.BindValueChanged(visibility =>
+                {
+                    if (visibility.NewValue == Visibility.Hidden)
+                        mainContent.Show();
+                }, true);
+            }
         }
 
         [Resolved]

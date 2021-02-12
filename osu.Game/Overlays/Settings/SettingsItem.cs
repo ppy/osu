@@ -21,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Settings
 {
-    public abstract class SettingsItem<T> : Container, IFilterable, ISettingsItem, IHasCurrentValue<T>
+    public abstract class SettingsItem<T> : Container, IFilterable, ISettingsItem, IHasCurrentValue<T>, IHasTooltip
     {
         protected abstract Drawable CreateControl();
 
@@ -36,6 +36,8 @@ namespace osu.Game.Overlays.Settings
         private SpriteText labelText;
 
         public bool ShowsDefaultIndicator = true;
+
+        public string TooltipText { get; set; }
 
         public virtual string LabelText
         {

@@ -238,6 +238,7 @@ namespace osu.Game.Rulesets.Mania
                         new ManiaModMirror(),
                         new ManiaModDifficultyAdjust(),
                         new ManiaModInvert(),
+                        new ManiaModConstantSpeed()
                     };
 
                 case ModType.Automation:
