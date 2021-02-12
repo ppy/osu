@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -36,6 +38,9 @@ namespace osu.Game.Screens.Mvis.SideBar
         private readonly Container<Drawable> contentContainer;
         protected override Container<Drawable> Content => contentContainer;
 
+        private SampleChannel sampleToggle;
+        private bool StartFromHiddenState;
+
         public Sidebar()
         {
             Anchor = Anchor.BottomRight;
@@ -62,8 +67,10 @@ namespace osu.Game.Screens.Mvis.SideBar
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
+            sampleToggle = audio.Samples.Get(PopInSampleName);
+
             AddInternal(new SkinnableComponent(
                 "MSidebar-background",
                 confineMode: ConfineMode.ScaleToFill,
@@ -100,9 +107,8 @@ namespace osu.Game.Screens.Mvis.SideBar
 
         private void onCurrentDisplayChanged(ValueChangedEvent<Drawable> v)
         {
-            if (!(v.NewValue is ISidebarContent)) return;
+            if (!(v.NewValue is ISidebarContent sc)) return;
 
-            var sc = (ISidebarContent)v.NewValue;
             prevTab?.MakeInActive();
 
             foreach (var t in header.Tabs)
@@ -114,6 +120,9 @@ namespace osu.Game.Screens.Mvis.SideBar
                     break;
                 }
             }
+
+            if (!StartFromHiddenState)
+                sampleToggle?.Play();
         }
 
         protected override void UpdateAfterChildren()
@@ -124,15 +133,16 @@ namespace osu.Game.Screens.Mvis.SideBar
 
         public void ShowComponent(Drawable d)
         {
-            if (!(d is ISidebarContent))
+            if (!(d is ISidebarContent c))
                 throw new InvalidOperationException($"{d}不是{typeof(ISidebarContent)}");
 
-            var c = (ISidebarContent)d;
             if (!components.Contains(c))
                 throw new InvalidOperationException($"组件不包含{c}");
 
             if (c.ResizeWidth < 0.3f || c.ResizeHeight < 0.3f)
                 throw new InvalidOperationException("组件过小");
+
+            StartFromHiddenState = State.Value == Visibility.Hidden;
 
             Show();
 
@@ -142,7 +152,7 @@ namespace osu.Game.Screens.Mvis.SideBar
                 return;
             }
 
-            var resizeDuration = !IsPresent ? 0 : duration;
+            var resizeDuration = StartFromHiddenState ? 0 : duration;
 
             var lastDisplay = CurrentDisplay.Value;
             lastDisplay?.FadeOut(resizeDuration / 2, Easing.OutQuint)
@@ -205,10 +215,14 @@ namespace osu.Game.Screens.Mvis.SideBar
             contentContainer.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
 
             Hiding = true;
+
+            base.PopOut();
         }
 
         protected override void PopIn()
         {
+            base.PopIn();
+
             this.MoveToX(0, duration + 100, Easing.OutQuint)
                 .FadeIn(duration + 100, Easing.OutQuint);
             contentContainer.FadeIn(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
