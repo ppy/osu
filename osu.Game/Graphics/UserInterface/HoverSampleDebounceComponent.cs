@@ -30,6 +30,10 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnHover(HoverEvent e)
         {
+            // hover sounds shouldn't be played during scroll operations.
+            if (e.HasAnyButtonPressed)
+                return false;
+
             bool enoughTimePassedSinceLastPlayback = !lastPlaybackTime.Value.HasValue || Time.Current - lastPlaybackTime.Value >= HoverDebounceTime;
 
             if (enoughTimePassedSinceLastPlayback)
