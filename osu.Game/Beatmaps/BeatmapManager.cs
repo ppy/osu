@@ -64,13 +64,9 @@ namespace osu.Game.Beatmaps
 
         protected override string[] HashableFileTypes => new[] { ".osu" };
 
-        protected override bool StableDirectoryExists(StableStorage stableStorage) => stableStorage.GetSongStorage().ExistsDirectory(".");
+        protected override string ImportFromStablePath => ".";
 
-        protected override IEnumerable<string> GetStableImportPaths(StableStorage stableStorage)
-        {
-            var songStorage = stableStorage.GetSongStorage();
-            return songStorage.GetDirectories(".").Select(path => songStorage.GetFullPath(path));
-        }
+        protected override Storage PrepareStableStorage(StableStorage stableStorage) => stableStorage.GetSongStorage();
 
         private readonly RulesetStore rulesets;
         private readonly BeatmapStore beatmaps;

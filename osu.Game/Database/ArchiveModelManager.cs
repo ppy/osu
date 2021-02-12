@@ -638,15 +638,10 @@ namespace osu.Game.Database
         protected virtual string ImportFromStablePath => null;
 
         /// <summary>
-        /// Checks for the existence of an osu-stable directory.
-        /// </summary>
-        protected virtual bool StableDirectoryExists(StableStorage stableStorage) => stableStorage.ExistsDirectory(ImportFromStablePath);
-
-        /// <summary>
         /// Select paths to import from stable where all paths should be absolute. Default implementation iterates all directories in <see cref="ImportFromStablePath"/>.
         /// </summary>
-        protected virtual IEnumerable<string> GetStableImportPaths(StableStorage stableStorage) => stableStorage.GetDirectories(ImportFromStablePath)
-                                                                                                                .Select(path => stableStorage.GetFullPath(path));
+        protected virtual IEnumerable<string> GetStableImportPaths(Storage storage) => storage.GetDirectories(ImportFromStablePath)
+                                                                                              .Select(path => storage.GetFullPath(path));
 
         /// <summary>
         /// Whether this specified path should be removed after successful import.
@@ -660,23 +655,32 @@ namespace osu.Game.Database
         /// </summary>
         public Task ImportFromStableAsync()
         {
-            var stable = GetStableStorage?.Invoke();
+            var stableStorage = GetStableStorage?.Invoke();
 
-            if (stable == null)
+            if (stableStorage == null)
             {
                 Logger.Log("No osu!stable installation available!", LoggingTarget.Information, LogLevel.Error);
                 return Task.CompletedTask;
             }
 
-            if (!StableDirectoryExists(stable))
+            var storage = PrepareStableStorage(stableStorage);
+
+            if (!storage.ExistsDirectory(ImportFromStablePath))
             {
                 // This handles situations like when the user does not have a Skins folder
                 Logger.Log($"No {ImportFromStablePath} folder available in osu!stable installation", LoggingTarget.Information, LogLevel.Error);
                 return Task.CompletedTask;
             }
 
-            return Task.Run(async () => await Import(GetStableImportPaths(stable).ToArray()));
+            return Task.Run(async () => await Import(GetStableImportPaths(storage).ToArray()));
         }
+
+        /// <summary>
+        /// Run any required traversal operations on the stable storage location before performing operations.
+        /// </summary>
+        /// <param name="stableStorage">The stable storage.</param>
+        /// <returns>The usable storage. Return the unchanged <paramref name="stableStorage"/> if no traversal is required.</returns>
+        protected virtual Storage PrepareStableStorage(StableStorage stableStorage) => stableStorage;
 
         #endregion
 
