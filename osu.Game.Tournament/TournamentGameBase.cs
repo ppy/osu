@@ -4,7 +4,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
@@ -31,7 +30,9 @@ namespace osu.Game.Tournament
         private DependencyContainer dependencies;
         private FileBasedIPC ipc;
 
-        protected Task BracketLoadTask { get; private set; }
+        protected Task BracketLoadTask => taskCompletionSource.Task;
+
+        private readonly TaskCompletionSource<bool> taskCompletionSource = new TaskCompletionSource<bool>();
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -50,9 +51,9 @@ namespace osu.Game.Tournament
 
             Textures.AddStore(new TextureLoaderStore(new StorageBackedResourceStore(storage)));
 
-            BracketLoadTask = Task.Run(readBracket);
-
             dependencies.CacheAs(new StableInfo(storage));
+
+            Task.Run(readBracket);
         }
 
         private void readBracket()
@@ -66,8 +67,6 @@ namespace osu.Game.Tournament
 
             ladder ??= new LadderInfo();
             ladder.Ruleset.Value ??= RulesetStore.AvailableRulesets.First();
-
-            Ruleset.BindTo(ladder.Ruleset);
 
             bool addedInfo = false;
 
@@ -129,9 +128,13 @@ namespace osu.Game.Tournament
 
             Schedule(() =>
             {
+                Ruleset.BindTo(ladder.Ruleset);
+
                 dependencies.Cache(ladder);
                 dependencies.CacheAs<MatchIPCInfo>(ipc = new FileBasedIPC());
                 Add(ipc);
+
+                taskCompletionSource.SetResult(true);
             });
         }
 
