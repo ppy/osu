@@ -121,20 +121,37 @@ namespace osu.Game.Online.Chat
                     // length > 3 since all these links need another argument to work
                     if (args.Length > 3 && args[1] == "osu.ppy.sh")
                     {
+                        var mainArg = args[3];
+
                         switch (args[2])
                         {
+                            // old site only
                             case "b":
                             case "beatmaps":
-                                return new LinkDetails(LinkAction.OpenBeatmap, args[3]);
+                            {
+                                string trimmed = mainArg.Split('?').First();
+                                if (int.TryParse(trimmed, out var id))
+                                    return new LinkDetails(LinkAction.OpenBeatmap, id.ToString());
+
+                                break;
+                            }
 
                             case "s":
                             case "beatmapsets":
                             case "d":
-                                return new LinkDetails(LinkAction.OpenBeatmapSet, args[3]);
+                            {
+                                if (args.Length > 4 && int.TryParse(args[4], out var id))
+                                    // https://osu.ppy.sh/beatmapsets/1154158#osu/2768184
+                                    return new LinkDetails(LinkAction.OpenBeatmap, id.ToString());
+
+                                // https://osu.ppy.sh/beatmapsets/1154158#whatever
+                                string trimmed = mainArg.Split('#').First();
+                                return new LinkDetails(LinkAction.OpenBeatmapSet, trimmed);
+                            }
 
                             case "u":
                             case "users":
-                                return new LinkDetails(LinkAction.OpenUserProfile, args[3]);
+                                return new LinkDetails(LinkAction.OpenUserProfile, mainArg);
                         }
                     }
 
@@ -183,10 +200,9 @@ namespace osu.Game.Online.Chat
 
                 case "osump":
                     return new LinkDetails(LinkAction.JoinMultiplayerMatch, args[1]);
-
-                default:
-                    return new LinkDetails(LinkAction.External, null);
             }
+
+            return new LinkDetails(LinkAction.External, null);
         }
 
         private static MessageFormatterResult format(string toFormat, int startIndex = 0, int space = 3)
@@ -259,8 +275,9 @@ namespace osu.Game.Online.Chat
 
     public class LinkDetails
     {
-        public LinkAction Action;
-        public string Argument;
+        public readonly LinkAction Action;
+
+        public readonly string Argument;
 
         public LinkDetails(LinkAction action, string argument)
         {
