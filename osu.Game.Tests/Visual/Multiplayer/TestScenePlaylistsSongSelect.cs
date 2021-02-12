@@ -19,11 +19,11 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.OnlinePlay.Components;
-using osu.Game.Screens.Select;
+using osu.Game.Screens.OnlinePlay.Playlists;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMatchSongSelect : RoomTestScene
+    public class TestScenePlaylistsSongSelect : RoomTestScene
     {
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private RulesetStore rulesets;
 
-        private TestMatchSongSelect songSelect;
+        private TestPlaylistsSongSelect songSelect;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -87,9 +87,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 Ruleset.Value = new OsuRuleset().RulesetInfo;
                 Beatmap.SetDefault();
+                SelectedMods.Value = Array.Empty<Mod>();
             });
 
-            AddStep("create song select", () => LoadScreen(songSelect = new TestMatchSongSelect()));
+            AddStep("create song select", () => LoadScreen(songSelect = new TestPlaylistsSongSelect()));
             AddUntilStep("wait for present", () => songSelect.IsCurrentScreen());
         }
 
@@ -176,7 +177,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("item has rate 1.5", () => Precision.AlmostEquals(1.5, ((OsuModDoubleTime)Room.Playlist.First().RequiredMods[0]).SpeedChange.Value));
         }
 
-        private class TestMatchSongSelect : MatchSongSelect
+        private class TestPlaylistsSongSelect : PlaylistsSongSelect
         {
             public new MatchBeatmapDetailArea BeatmapDetails => (MatchBeatmapDetailArea)base.BeatmapDetails;
         }

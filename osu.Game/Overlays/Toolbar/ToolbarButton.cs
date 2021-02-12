@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Toolbar
         private KeyBindingStore keyBindings { get; set; }
 
         protected ToolbarButton()
-            : base(HoverSampleSet.Loud)
+            : base(HoverSampleSet.Toolbar)
         {
             Width = Toolbar.HEIGHT;
             RelativeSizeAxes = Axes.Y;

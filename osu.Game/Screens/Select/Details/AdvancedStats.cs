@@ -18,7 +18,6 @@ using System.Threading;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
-using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.Select.Details
@@ -83,32 +82,22 @@ namespace osu.Game.Screens.Select.Details
             mods.BindValueChanged(modsChanged, true);
         }
 
-        private readonly List<ISettingsItem> references = new List<ISettingsItem>();
+        private ModSettingChangeTracker modSettingChangeTracker;
+        private ScheduledDelegate debouncedStatisticsUpdate;
 
         private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
-            // TODO: find a more permanent solution for this if/when it is needed in other components.
-            // this is generating drawables for the only purpose of storing bindable references.
-            foreach (var r in references)
-                r.Dispose();
+            modSettingChangeTracker?.Dispose();
 
-            references.Clear();
-
-            ScheduledDelegate debounce = null;
-
-            foreach (var mod in mods.NewValue.OfType<IApplicableToDifficulty>())
+            modSettingChangeTracker = new ModSettingChangeTracker(mods.NewValue);
+            modSettingChangeTracker.SettingChanged += m =>
             {
-                foreach (var setting in mod.CreateSettingsControls().OfType<ISettingsItem>())
-                {
-                    setting.SettingChanged += () =>
-                    {
-                        debounce?.Cancel();
-                        debounce = Scheduler.AddDelayed(updateStatistics, 100);
-                    };
+                if (!(m is IApplicableToDifficulty))
+                    return;
 
-                    references.Add(setting);
-                }
-            }
+                debouncedStatisticsUpdate?.Cancel();
+                debouncedStatisticsUpdate = Scheduler.AddDelayed(updateStatistics, 100);
+            };
 
             updateStatistics();
         }
@@ -173,6 +162,7 @@ namespace osu.Game.Screens.Select.Details
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
+            modSettingChangeTracker?.Dispose();
             starDifficultyCancellationSource?.Cancel();
         }
 

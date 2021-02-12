@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using MessagePack;
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
@@ -16,14 +16,14 @@ using osu.Game.Rulesets.UI;
 namespace osu.Game.Tests.Online
 {
     [TestFixture]
-    public class TestAPIModSerialization
+    public class TestAPIModMessagePackSerialization
     {
         [Test]
         public void TestAcronymIsPreserved()
         {
             var apiMod = new APIMod(new TestMod());
 
-            var deserialized = JsonConvert.DeserializeObject<APIMod>(JsonConvert.SerializeObject(apiMod));
+            var deserialized = MessagePackSerializer.Deserialize<APIMod>(MessagePackSerializer.Serialize(apiMod));
 
             Assert.That(deserialized.Acronym, Is.EqualTo(apiMod.Acronym));
         }
@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Online
         {
             var apiMod = new APIMod(new TestMod { TestSetting = { Value = 2 } });
 
-            var deserialized = JsonConvert.DeserializeObject<APIMod>(JsonConvert.SerializeObject(apiMod));
+            var deserialized = MessagePackSerializer.Deserialize<APIMod>(MessagePackSerializer.Serialize(apiMod));
 
             Assert.That(deserialized.Settings, Contains.Key("test_setting").With.ContainValue(2.0));
         }
@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Online
         {
             var apiMod = new APIMod(new TestMod { TestSetting = { Value = 2 } });
 
-            var deserialized = JsonConvert.DeserializeObject<APIMod>(JsonConvert.SerializeObject(apiMod));
+            var deserialized = MessagePackSerializer.Deserialize<APIMod>(MessagePackSerializer.Serialize(apiMod));
             var converted = (TestMod)deserialized.ToMod(new TestRuleset());
 
             Assert.That(converted.TestSetting.Value, Is.EqualTo(2));
@@ -60,12 +60,22 @@ namespace osu.Game.Tests.Online
                 FinalRate = { Value = 0.25 }
             });
 
-            var deserialised = JsonConvert.DeserializeObject<APIMod>(JsonConvert.SerializeObject(apiMod));
+            var deserialised = MessagePackSerializer.Deserialize<APIMod>(MessagePackSerializer.Serialize(apiMod));
             var converted = (TestModTimeRamp)deserialised.ToMod(new TestRuleset());
 
             Assert.That(converted.AdjustPitch.Value, Is.EqualTo(false));
             Assert.That(converted.InitialRate.Value, Is.EqualTo(1.25));
             Assert.That(converted.FinalRate.Value, Is.EqualTo(0.25));
+        }
+
+        [Test]
+        public void TestDeserialiseEnumMod()
+        {
+            var apiMod = new APIMod(new TestModEnum { TestSetting = { Value = TestEnum.Value2 } });
+
+            var deserialized = MessagePackSerializer.Deserialize<APIMod>(MessagePackSerializer.Serialize(apiMod));
+
+            Assert.That(deserialized.Settings, Contains.Key("test_setting").With.ContainValue(1));
         }
 
         private class TestRuleset : Ruleset
@@ -134,6 +144,23 @@ namespace osu.Game.Tests.Online
                 Default = true,
                 Value = true
             };
+        }
+
+        private class TestModEnum : Mod
+        {
+            public override string Name => "Test Mod";
+            public override string Acronym => "TM";
+            public override double ScoreMultiplier => 1;
+
+            [SettingSource("Test")]
+            public Bindable<TestEnum> TestSetting { get; } = new Bindable<TestEnum>();
+        }
+
+        private enum TestEnum
+        {
+            Value1 = 0,
+            Value2 = 1,
+            Value3 = 2
         }
     }
 }

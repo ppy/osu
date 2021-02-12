@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Dapper;
 using Microsoft.Data.Sqlite;
 using osu.Framework.Development;
 using osu.Framework.IO.Network;
@@ -154,20 +153,31 @@ namespace osu.Game.Beatmaps
                 {
                     using (var db = new SqliteConnection(storage.GetDatabaseConnectionString("online")))
                     {
-                        var found = db.QuerySingleOrDefault<CachedOnlineBeatmapLookup>(
-                            "SELECT * FROM osu_beatmaps WHERE checksum = @MD5Hash OR beatmap_id = @OnlineBeatmapID OR filename = @Path", beatmap);
+                        db.Open();
 
-                        if (found != null)
+                        using (var cmd = db.CreateCommand())
                         {
-                            var status = (BeatmapSetOnlineStatus)found.approved;
+                            cmd.CommandText = "SELECT beatmapset_id, beatmap_id, approved FROM osu_beatmaps WHERE checksum = @MD5Hash OR beatmap_id = @OnlineBeatmapID OR filename = @Path";
 
-                            beatmap.Status = status;
-                            beatmap.BeatmapSet.Status = status;
-                            beatmap.BeatmapSet.OnlineBeatmapSetID = found.beatmapset_id;
-                            beatmap.OnlineBeatmapID = found.beatmap_id;
+                            cmd.Parameters.Add(new SqliteParameter("@MD5Hash", beatmap.MD5Hash));
+                            cmd.Parameters.Add(new SqliteParameter("@OnlineBeatmapID", beatmap.OnlineBeatmapID ?? (object)DBNull.Value));
+                            cmd.Parameters.Add(new SqliteParameter("@Path", beatmap.Path));
 
-                            LogForModel(set, $"Cached local retrieval for {beatmap}.");
-                            return true;
+                            using (var reader = cmd.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    var status = (BeatmapSetOnlineStatus)reader.GetByte(2);
+
+                                    beatmap.Status = status;
+                                    beatmap.BeatmapSet.Status = status;
+                                    beatmap.BeatmapSet.OnlineBeatmapSetID = reader.GetInt32(0);
+                                    beatmap.OnlineBeatmapID = reader.GetInt32(1);
+
+                                    LogForModel(set, $"Cached local retrieval for {beatmap}.");
+                                    return true;
+                                }
+                            }
                         }
                     }
                 }

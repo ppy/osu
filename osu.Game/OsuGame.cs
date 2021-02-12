@@ -468,6 +468,16 @@ namespace osu.Game
         private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
             updateModDefaults();
+
+            // a lease may be taken on the mods bindable, at which point we can't really ensure valid mods.
+            if (SelectedMods.Disabled)
+                return;
+
+            if (!ModUtils.CheckValidForGameplay(mods.NewValue, out var invalid))
+            {
+                // ensure we always have a valid set of mods.
+                SelectedMods.Value = mods.NewValue.Except(invalid).ToArray();
+            }
         }
 
         private void updateModDefaults()
@@ -768,7 +778,7 @@ namespace osu.Game
 
                 if (recentLogCount < short_term_display_limit)
                 {
-                    Schedule(() => notifications.Post(new SimpleNotification
+                    Schedule(() => notifications.Post(new SimpleErrorNotification
                     {
                         Icon = entry.Level == LogLevel.Important ? FontAwesome.Solid.ExclamationCircle : FontAwesome.Solid.Bomb,
                         Text = entry.Message.Truncate(256) + (entry.Exception != null && IsDeployedBuild ? "\n\nThis error has been automatically reported to the devs." : string.Empty),
