@@ -77,7 +77,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                 RelativeSizeAxes = Axes.Both,
                                 Padding = new MarginPadding
                                 {
-                                    Horizontal = 105,
+                                    Horizontal = HORIZONTAL_OVERFLOW_PADDING + 55,
                                     Vertical = 20
                                 },
                                 Child = new GridContainer
