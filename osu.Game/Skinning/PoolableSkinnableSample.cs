@@ -115,7 +115,9 @@ namespace osu.Game.Skinning
             if (Sample == null)
                 return;
 
-            activeChannel = Sample.Play(Looping);
+            activeChannel = Sample.GetChannel();
+            activeChannel.Looping = Looping;
+            activeChannel.Play();
 
             Played = true;
         }
