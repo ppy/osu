@@ -67,6 +67,10 @@ namespace osu.Game.Screens.Menu
                     {
                         StartTrack();
 
+                        // this classic intro loops forever.
+                        if (UsingThemedIntro)
+                            Track.Looping = true;
+
                         const float fade_in_time = 200;
 
                         logo.ScaleTo(1);
