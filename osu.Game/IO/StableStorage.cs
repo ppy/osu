@@ -23,6 +23,7 @@ namespace osu.Game.IO
             : base(path, host)
         {
             this.host = host;
+
             songsPath = new Lazy<string>(locateSongsDirectory);
         }
 
@@ -33,32 +34,29 @@ namespace osu.Game.IO
 
         private string locateSongsDirectory()
         {
-            var songsDirectoryPath = Path.Combine(BasePath, stable_default_songs_path);
-
             var configFile = GetFiles(".", $"osu!.{Environment.UserName}.cfg").SingleOrDefault();
 
-            if (configFile == null)
-                return songsDirectoryPath;
-
-            using (var stream = GetStream(configFile))
-            using (var textReader = new StreamReader(stream))
+            if (configFile != null)
             {
-                string line;
-
-                while ((line = textReader.ReadLine()) != null)
+                using (var stream = GetStream(configFile))
+                using (var textReader = new StreamReader(stream))
                 {
-                    if (line.StartsWith("BeatmapDirectory", StringComparison.OrdinalIgnoreCase))
+                    string line;
+
+                    while ((line = textReader.ReadLine()) != null)
                     {
-                        var directory = line.Split('=')[1].TrimStart();
-                        if (Path.IsPathFullyQualified(directory))
-                            songsDirectoryPath = directory;
+                        if (!line.StartsWith("BeatmapDirectory", StringComparison.OrdinalIgnoreCase)) continue;
+
+                        var customDirectory = line.Split('=').LastOrDefault()?.Trim();
+                        if (customDirectory != null && Path.IsPathFullyQualified(customDirectory))
+                            return customDirectory;
 
                         break;
                     }
                 }
             }
 
-            return songsDirectoryPath;
+            return GetFullPath(stable_default_songs_path);
         }
     }
 }
