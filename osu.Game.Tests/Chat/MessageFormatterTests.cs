@@ -21,15 +21,17 @@ namespace osu.Game.Tests.Chat
             Assert.AreEqual(36, result.Links[0].Length);
         }
 
-        [TestCase(LinkAction.OpenBeatmap, "456", "https://osu.ppy.sh/beatmapsets/123#osu/456")]
-        [TestCase(LinkAction.OpenBeatmap, "456", "https://osu.ppy.sh/beatmapsets/123#osu/456?whatever")]
-        [TestCase(LinkAction.OpenBeatmap, "456", "https://osu.ppy.sh/beatmapsets/123/456")]
-        [TestCase(LinkAction.External, null, "https://osu.ppy.sh/beatmapsets/abc/def")]
-        [TestCase(LinkAction.OpenBeatmapSet, "123", "https://osu.ppy.sh/beatmapsets/123")]
-        [TestCase(LinkAction.OpenBeatmapSet, "123", "https://osu.ppy.sh/beatmapsets/123/whatever")]
-        [TestCase(LinkAction.External, null, "https://osu.ppy.sh/beatmapsets/abc")]
+        [TestCase(LinkAction.OpenBeatmap, "456", "https://dev.ppy.sh/beatmapsets/123#osu/456")]
+        [TestCase(LinkAction.OpenBeatmap, "456", "https://dev.ppy.sh/beatmapsets/123#osu/456?whatever")]
+        [TestCase(LinkAction.OpenBeatmap, "456", "https://dev.ppy.sh/beatmapsets/123/456")]
+        [TestCase(LinkAction.External, null, "https://dev.ppy.sh/beatmapsets/abc/def")]
+        [TestCase(LinkAction.OpenBeatmapSet, "123", "https://dev.ppy.sh/beatmapsets/123")]
+        [TestCase(LinkAction.OpenBeatmapSet, "123", "https://dev.ppy.sh/beatmapsets/123/whatever")]
+        [TestCase(LinkAction.External, null, "https://dev.ppy.sh/beatmapsets/abc")]
         public void TestBeatmapLinks(LinkAction expectedAction, string expectedArg, string link)
         {
+            MessageFormatter.WebsiteRootUrl = "dev.ppy.sh";
+
             Message result = MessageFormatter.FormatMessage(new Message { Content = link });
 
             Assert.AreEqual(result.Content, result.DisplayContent);
