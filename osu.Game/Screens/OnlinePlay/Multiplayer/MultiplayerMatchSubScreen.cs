@@ -77,7 +77,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                 RelativeSizeAxes = Axes.Both,
                                 Padding = new MarginPadding
                                 {
-                                    Horizontal = 105,
+                                    Horizontal = HORIZONTAL_OVERFLOW_PADDING + 55,
                                     Vertical = 20
                                 },
                                 Child = new GridContainer
@@ -237,6 +237,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     Origin = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.5f,
+                    Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING },
                     Child = userModsSelectOverlay = new UserModSelectOverlay
                     {
                         SelectedMods = { BindTarget = UserMods },
