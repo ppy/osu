@@ -158,7 +158,8 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
         {
             OnClickAnimation();
             Action?.Invoke();
-            return base.OnClick(e);
+
+            return true;
         }
 
         protected override bool OnHover(HoverEvent e)

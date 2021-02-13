@@ -5,24 +5,24 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Mvis.SideBar.Header;
 using osu.Game.Screens.Mvis.Skinning;
 using osu.Game.Skinning;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Mvis.SideBar
 {
-    public class Sidebar : OsuFocusedOverlayContainer
+    public class Sidebar : VisibilityContainer
     {
         [Resolved]
         private CustomColourProvider colourProvider { get; set; }
-
-        protected override bool BlockNonPositionalInput => false;
-        protected override bool DimMainContent => false;
 
         private readonly List<ISidebarContent> components = new List<ISidebarContent>();
         private readonly TabHeader header;
@@ -39,29 +39,46 @@ namespace osu.Game.Screens.Mvis.SideBar
         protected override Container<Drawable> Content => contentContainer;
 
         private SampleChannel sampleToggle;
-        private bool StartFromHiddenState;
+        private bool startFromHiddenState;
+        private readonly Container content;
+        private SampleChannel samplePopIn;
+        private SampleChannel samplePopOut;
+        private bool isFirstHide = true;
 
         public Sidebar()
         {
-            Anchor = Anchor.BottomRight;
-            Origin = Anchor.BottomRight;
             RelativeSizeAxes = Axes.Both;
-            Size = new Vector2(0.3f, 1f);
 
             InternalChildren = new Drawable[]
             {
-                header = new TabHeader
+                new ClickToCloseBox
                 {
-                    Depth = float.MinValue
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.Black.Opacity(0.6f),
+                    Action = Hide,
                 },
-                contentContainer = new Container
+                content = new BlockClickContainer
                 {
-                    Name = "Content",
-                    RelativeSizeAxes = Axes.Both
-                },
-                new Footer.Footer
-                {
-                    Depth = float.MinValue
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    RelativeSizeAxes = Axes.Both,
+                    Size = new Vector2(0.3f, 1f),
+                    Children = new Drawable[]
+                    {
+                        header = new TabHeader
+                        {
+                            Depth = float.MinValue
+                        },
+                        contentContainer = new Container
+                        {
+                            Name = "Content",
+                            RelativeSizeAxes = Axes.Both
+                        },
+                        new Footer.Footer
+                        {
+                            Depth = float.MinValue
+                        }
+                    }
                 }
             };
         }
@@ -69,9 +86,11 @@ namespace osu.Game.Screens.Mvis.SideBar
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sampleToggle = audio.Samples.Get(PopInSampleName);
+            sampleToggle = audio.Samples.Get("UI/overlay-pop-in");
+            samplePopIn = audio.Samples.Get("UI/overlay-pop-in");
+            samplePopOut = audio.Samples.Get("UI/overlay-pop-out");
 
-            AddInternal(new SkinnableComponent(
+            content.Add(new SkinnableComponent(
                 "MSidebar-background",
                 confineMode: ConfineMode.ScaleToFill,
                 masking: true,
@@ -121,7 +140,7 @@ namespace osu.Game.Screens.Mvis.SideBar
                 }
             }
 
-            if (!StartFromHiddenState)
+            if (!startFromHiddenState)
                 sampleToggle?.Play();
         }
 
@@ -142,7 +161,7 @@ namespace osu.Game.Screens.Mvis.SideBar
             if (c.ResizeWidth < 0.3f || c.ResizeHeight < 0.3f)
                 throw new InvalidOperationException("组件过小");
 
-            StartFromHiddenState = State.Value == Visibility.Hidden;
+            startFromHiddenState = State.Value == Visibility.Hidden;
 
             Show();
 
@@ -152,7 +171,7 @@ namespace osu.Game.Screens.Mvis.SideBar
                 return;
             }
 
-            var resizeDuration = StartFromHiddenState ? 0 : duration;
+            var resizeDuration = startFromHiddenState ? 0 : duration;
 
             var lastDisplay = CurrentDisplay.Value;
             lastDisplay?.FadeOut(resizeDuration / 2, Easing.OutQuint)
@@ -167,7 +186,7 @@ namespace osu.Game.Screens.Mvis.SideBar
 
             CurrentDisplay.Value = d;
 
-            this.ResizeTo(new Vector2(c.ResizeWidth, c.ResizeHeight), resizeDuration, Easing.OutQuint);
+            content.ResizeTo(new Vector2(c.ResizeWidth, c.ResizeHeight), resizeDuration, Easing.OutQuint);
         }
 
         private void addDrawableToList(Drawable d)
@@ -210,24 +229,45 @@ namespace osu.Game.Screens.Mvis.SideBar
 
         protected override void PopOut()
         {
-            this.MoveToX(100, duration + 100, Easing.OutQuint)
-                .FadeOut(duration + 100, Easing.OutQuint);
+            if (!isFirstHide)
+                samplePopOut?.Play();
+            else
+                isFirstHide = false;
+
+            content.MoveToX(100, duration + 100, Easing.OutQuint);
+            this.FadeOut(duration + 100, Easing.OutQuint);
+
             contentContainer.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
 
             Hiding = true;
-
-            base.PopOut();
         }
 
         protected override void PopIn()
         {
-            base.PopIn();
+            samplePopIn?.Play();
 
-            this.MoveToX(0, duration + 100, Easing.OutQuint)
-                .FadeIn(duration + 100, Easing.OutQuint);
+            content.MoveToX(0, duration + 100, Easing.OutQuint);
+            this.FadeIn(duration + 100, Easing.OutQuint);
+
             contentContainer.FadeIn(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
 
             Hiding = false;
+        }
+
+        private class ClickToCloseBox : Box
+        {
+            public Action Action;
+
+            protected override bool OnClick(ClickEvent e)
+            {
+                Action?.Invoke();
+                return base.OnClick(e);
+            }
+        }
+
+        private class BlockClickContainer : Container
+        {
+            protected override bool OnClick(ClickEvent e) => true;
         }
     }
 }
