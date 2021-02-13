@@ -14,20 +14,20 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModTimeRamp : Mod, IUpdatableByPlayfield, IApplicableToBeatmap, IApplicableToAudio
+    public abstract class ModTimeRamp : Mod, IUpdatableByPlayfield, IApplicableToBeatmap, IApplicableToRate
     {
         /// <summary>
         /// The point in the beatmap at which the final ramping rate should be reached.
         /// </summary>
         public const double FINAL_RATE_PROGRESS = 0.75f;
 
-        [SettingSource("初始速度", "The starting speed of the track")]
+        [SettingSource("初始速度", "歌曲的起始速度")]
         public abstract BindableNumber<double> InitialRate { get; }
 
-        [SettingSource("最终速度", "The final speed to ramp to")]
+        [SettingSource("最终速度", "歌曲的最终速度")]
         public abstract BindableNumber<double> FinalRate { get; }
 
-        [SettingSource("启用升调", "Should pitch be adjusted with speed")]
+        [SettingSource("启用变调", "是否要更随速度调整音调")]
         public abstract BindableBool AdjustPitch { get; }
 
         public override string SettingDescription => $"从 {InitialRate.Value:N2}x 到 {FinalRate.Value:N2}x";
@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Mods
         protected ModTimeRamp()
         {
             // for preview purpose at song select. eventually we'll want to be able to update every frame.
-            FinalRate.BindValueChanged(val => applyRateAdjustment(1), true);
+            FinalRate.BindValueChanged(val => applyRateAdjustment(double.PositiveInfinity), true);
             AdjustPitch.BindValueChanged(applyPitchAdjustment);
         }
 
@@ -75,17 +75,24 @@ namespace osu.Game.Rulesets.Mods
             finalRateTime = firstObjectStart + FINAL_RATE_PROGRESS * (lastObjectEnd - firstObjectStart);
         }
 
+        public double ApplyToRate(double time, double rate = 1)
+        {
+            double amount = (time - beginRampTime) / Math.Max(1, finalRateTime - beginRampTime);
+            double ramp = InitialRate.Value + (FinalRate.Value - InitialRate.Value) * Math.Clamp(amount, 0, 1);
+
+            // round the end result to match the bindable SpeedChange's precision, in case this is called externally.
+            return rate * Math.Round(ramp, 2);
+        }
+
         public virtual void Update(Playfield playfield)
         {
-            applyRateAdjustment((track.CurrentTime - beginRampTime) / Math.Max(1, finalRateTime - beginRampTime));
+            applyRateAdjustment(track.CurrentTime);
         }
 
         /// <summary>
-        /// Adjust the rate along the specified ramp
+        /// Adjust the rate along the specified ramp.
         /// </summary>
-        /// <param name="amount">The amount of adjustment to apply (from 0..1).</param>
-        private void applyRateAdjustment(double amount) =>
-            SpeedChange.Value = InitialRate.Value + (FinalRate.Value - InitialRate.Value) * Math.Clamp(amount, 0, 1);
+        private void applyRateAdjustment(double time) => SpeedChange.Value = ApplyToRate(time);
 
         private void applyPitchAdjustment(ValueChangedEvent<bool> adjustPitchSetting)
         {

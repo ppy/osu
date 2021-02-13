@@ -68,6 +68,16 @@ namespace osu.Game.Tests.Online
             Assert.That(converted.FinalRate.Value, Is.EqualTo(0.25));
         }
 
+        [Test]
+        public void TestDeserialiseEnumMod()
+        {
+            var apiMod = new APIMod(new TestModEnum { TestSetting = { Value = TestEnum.Value2 } });
+
+            var deserialized = MessagePackSerializer.Deserialize<APIMod>(MessagePackSerializer.Serialize(apiMod));
+
+            Assert.That(deserialized.Settings, Contains.Key("test_setting").With.ContainValue(1));
+        }
+
         private class TestRuleset : Ruleset
         {
             public override IEnumerable<Mod> GetModsFor(ModType type) => new Mod[]
@@ -134,6 +144,23 @@ namespace osu.Game.Tests.Online
                 Default = true,
                 Value = true
             };
+        }
+
+        private class TestModEnum : Mod
+        {
+            public override string Name => "Test Mod";
+            public override string Acronym => "TM";
+            public override double ScoreMultiplier => 1;
+
+            [SettingSource("Test")]
+            public Bindable<TestEnum> TestSetting { get; } = new Bindable<TestEnum>();
+        }
+
+        private enum TestEnum
+        {
+            Value1 = 0,
+            Value2 = 1,
+            Value3 = 2
         }
     }
 }

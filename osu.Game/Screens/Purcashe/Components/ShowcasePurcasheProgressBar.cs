@@ -9,5 +9,10 @@ namespace osu.Game.Screens.Purcashe.Components
         {
             fill.ResizeWidthTo(value * UsableWidth, 200, Easing.OutQuint);
         }
+
+        public ShowcasePurcasheProgressBar(bool allowSeek = false)
+            : base(allowSeek)
+        {
+        }
     }
 }

@@ -11,8 +11,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModDifficultyAdjust : ModDifficultyAdjust
     {
-        [SettingSource("圆圈大小", "Override a beatmap's set CS.", FIRST_SETTING_ORDER - 1)]
-        public BindableNumber<float> CircleSize { get; } = new BindableFloat
+        [SettingSource("圆圈大小", "覆盖谱面的CS设置", FIRST_SETTING_ORDER - 1)]
+        public BindableNumber<float> CircleSize { get; } = new BindableFloatWithLimitExtension
         {
             Precision = 0.1f,
             MinValue = 0,
@@ -21,8 +21,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             Value = 5,
         };
 
-        [SettingSource("缩圈速度", "Override a beatmap's set AR.", LAST_SETTING_ORDER + 1)]
-        public BindableNumber<float> ApproachRate { get; } = new BindableFloat
+        [SettingSource("缩圈速度", "覆盖谱面的AR设置", LAST_SETTING_ORDER + 1)]
+        public BindableNumber<float> ApproachRate { get; } = new BindableFloatWithLimitExtension
         {
             Precision = 0.1f,
             MinValue = 0,
@@ -30,6 +30,14 @@ namespace osu.Game.Rulesets.Osu.Mods
             Default = 5,
             Value = 5,
         };
+
+        protected override void ApplyLimits(bool extended)
+        {
+            base.ApplyLimits(extended);
+
+            CircleSize.MaxValue = extended ? 11 : 10;
+            ApproachRate.MaxValue = extended ? 11 : 10;
+        }
 
         public override string SettingDescription
         {

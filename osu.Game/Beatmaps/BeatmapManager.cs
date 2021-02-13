@@ -64,7 +64,9 @@ namespace osu.Game.Beatmaps
 
         protected override string[] HashableFileTypes => new[] { ".osu" };
 
-        protected override string ImportFromStablePath => "Songs";
+        protected override string ImportFromStablePath => ".";
+
+        protected override Storage PrepareStableStorage(StableStorage stableStorage) => stableStorage.GetSongStorage();
 
         private readonly RulesetStore rulesets;
         private readonly BeatmapStore beatmaps;
@@ -453,7 +455,7 @@ namespace osu.Game.Beatmaps
                     // TODO: this should be done in a better place once we actually need to dynamically update it.
                     beatmap.BeatmapInfo.StarDifficulty = ruleset?.CreateInstance().CreateDifficultyCalculator(new DummyConversionBeatmap(beatmap)).Calculate().StarRating ?? 0;
                     beatmap.BeatmapInfo.Length = calculateLength(beatmap);
-                    beatmap.BeatmapInfo.BPM = beatmap.ControlPointInfo.BPMMode;
+                    beatmap.BeatmapInfo.BPM = 60000 / beatmap.GetMostCommonBeatLength();
 
                     beatmapInfos.Add(beatmap.BeatmapInfo);
                 }

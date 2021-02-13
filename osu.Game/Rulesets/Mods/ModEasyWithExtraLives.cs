@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Mods
 {
     public abstract class ModEasyWithExtraLives : ModEasy, IApplicableFailOverride, IApplicableToHealthProcessor
     {
-        [SettingSource("额外生命数", "Number of extra lives")]
+        [SettingSource("额外生命数", "顾名思义")]
         public Bindable<int> Retries { get; } = new BindableInt(2)
         {
             MinValue = 0,

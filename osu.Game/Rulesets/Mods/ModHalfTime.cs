@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModDoubleTime)).ToArray();
 
-        [SettingSource("速度调整", "The actual decrease to apply")]
+        [SettingSource("速度调整", "要应用的速度")]
         public override BindableNumber<double> SpeedChange { get; } = new BindableDouble
         {
             MinValue = 0.5,

@@ -138,9 +138,9 @@ namespace osu.Game.Screens.Menu
         private void load(AudioManager audio, IdleTracker idleTracker, GameHost host, MConfigManager config)
         {
             buttonsCustom.Add(new Button(@"screen.menu.buttonSystem.about-mfosu", @"button-generic-select", FontAwesome.Solid.Gift, new Color4(0, 86, 73, 255), () => OnMfMenuButton?.Invoke(), WEDGE_WIDTH));
-            buttonsCustom.Add(new Button(@"screen.menu.buttonSystem.mvis", @"button-generic-select", FontAwesome.Solid.Play, new Color4(0, 86, 73, 255), () => OnMvisButton?.Invoke()));
-            buttonsCustom.Add(new Button(@"screen.menu.buttonSystem.file-import", @"button-generic-select", FontAwesome.Solid.File, new Color4(0, 86, 73, 255), () => OnImportButton?.Invoke()));
-            buttonsCustom.Add(new Button(@"screen.menu.buttonSystem.purcashe", @"button-generic-select", FontAwesome.Solid.File, new Color4(0, 86, 73, 255), () => OnPurcasheButton?.Invoke()));
+            buttonsCustom.Add(new Button(@"screen.menu.buttonSystem.mvis", @"button-solo-select", FontAwesome.Solid.Play, new Color4(0, 86, 73, 255), () => OnMvisButton?.Invoke()));
+            buttonsCustom.Add(new Button(@"screen.menu.buttonSystem.file-import", @"button-solo-select", FontAwesome.Solid.File, new Color4(0, 86, 73, 255), () => OnImportButton?.Invoke()));
+            buttonsCustom.Add(new Button(@"screen.menu.buttonSystem.purcashe", @"button-solo-select", FontAwesome.Solid.File, new Color4(0, 86, 73, 255), () => OnPurcasheButton?.Invoke()));
             buttonsCustom.ForEach(b => b.VisibleState = ButtonSystemState.Custom);
 
             buttonsPlay.Add(new Button(@"screen.menu.buttonSystem.solo", @"button-solo-select", FontAwesome.Solid.User, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
@@ -148,12 +148,12 @@ namespace osu.Game.Screens.Menu
             buttonsPlay.Add(new Button(@"screen.menu.buttonSystem.playlists", @"button-generic-select", OsuIcon.Charts, new Color4(94, 63, 186, 255), onPlaylists, 0, Key.L));
             buttonsPlay.ForEach(b => b.VisibleState = ButtonSystemState.Play);
 
-            buttonsP2C.Add(new Button(@"screen.menu.buttonSystem.invoke-p2c", @"button-generic-select", FontAwesome.Solid.QuestionCircle, new Color4(0, 86, 73, 255), () => State = ButtonSystemState.Custom));
+            buttonsP2C.Add(new Button(@"screen.menu.buttonSystem.invoke-p2c", @"osu-logo-select", FontAwesome.Solid.QuestionCircle, new Color4(0, 86, 73, 255), () => State = ButtonSystemState.Custom));
             buttonsP2C.ForEach(b => b.VisibleState = ButtonSystemState.Play);
 
             buttonsTopLevel.Add(new Button(@"screen.menu.buttonSystem.play", @"button-play-select", OsuIcon.Logo, new Color4(102, 68, 204, 255), () => State = ButtonSystemState.Play, WEDGE_WIDTH, Key.P));
-            buttonsTopLevel.Add(new Button(@"screen.menu.buttonSystem.editor", @"button-generic-select", OsuIcon.EditCircle, new Color4(238, 170, 0, 255), () => OnEdit?.Invoke(), 0, Key.E));
-            buttonsTopLevel.Add(new Button(@"screen.menu.buttonSystem.beatmaplisting", @"button-direct-select", OsuIcon.ChevronDownCircle, new Color4(165, 204, 0, 255), () => OnBeatmapListing?.Invoke(), 0, Key.D));
+            buttonsTopLevel.Add(new Button(@"screen.menu.buttonSystem.editor", @"button-edit-select", OsuIcon.EditCircle, new Color4(238, 170, 0, 255), () => OnEdit?.Invoke(), 0, Key.E));
+            buttonsTopLevel.Add(new Button(@"screen.menu.buttonSystem.browse", @"button-direct-select", OsuIcon.ChevronDownCircle, new Color4(165, 204, 0, 255), () => OnBeatmapListing?.Invoke(), 0, Key.D));
 
             if (host.CanExit)
                 buttonsTopLevel.Add(new Button(@"generic.exit", string.Empty, OsuIcon.CrossCircle, new Color4(238, 51, 153, 255), () => OnExit?.Invoke(), 0, Key.Q));

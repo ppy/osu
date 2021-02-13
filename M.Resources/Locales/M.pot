@@ -118,7 +118,7 @@ msgstr ""
 msgid "screen.menu.buttonSystem.editor"
 msgstr ""
 
-msgid "screen.menu.buttonSystem.beatmaplisting"
+msgid "screen.menu.buttonSystem.browse"
 msgstr ""
 
 msgid "screen.menu.buttonSystem.exit"

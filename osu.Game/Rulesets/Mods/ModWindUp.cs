@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage? Icon => FontAwesome.Solid.ChevronCircleUp;
         public override double ScoreMultiplier => 1.0;
 
-        [SettingSource("初始速度", "The starting speed of the track")]
+        [SettingSource("初始速度", "歌曲的初始速度")]
         public override BindableNumber<double> InitialRate { get; } = new BindableDouble
         {
             MinValue = 0.5,
@@ -27,8 +27,7 @@ namespace osu.Game.Rulesets.Mods
             Precision = 0.01,
         };
 
-
-        [SettingSource("最终速度", "The speed increase to ramp towards")]
+        [SettingSource("最终速度", "歌曲的最终速度")]
         public override BindableNumber<double> FinalRate { get; } = new BindableDouble
         {
             MinValue = 1.01,
@@ -38,7 +37,7 @@ namespace osu.Game.Rulesets.Mods
             Precision = 0.01,
         };
 
-        [SettingSource("调整音调", "Should pitch be adjusted with speed")]
+        [SettingSource("启用变调", "是否要更随速度调整音调")]
         public override BindableBool AdjustPitch { get; } = new BindableBool
         {
             Default = true,

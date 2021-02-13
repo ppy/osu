@@ -7,18 +7,24 @@ namespace osu.Game.Configuration
 {
     public enum IntroSequence
     {
-        [Description("圆周")]
+        [Description("config.introSequence.circles圆周")]
         Circles,
-        [Description("怀旧")]
+
+        [Description("config.introSequence.welcome")]
         Welcome,
-        [Description("三角")]
+
+        [Description("config.introSequence.triangles")]
         Triangles,
+
         [Description("圆周(中文)")]
         CirclesCN,
+
         [Description("三角(中文)")]
         TrianglesCN,
+
         [Description("略过开场")]
         SkippedIntro,
+
         [Description("随机")]
         Random
     }

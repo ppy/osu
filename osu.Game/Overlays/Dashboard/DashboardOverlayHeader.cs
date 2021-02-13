@@ -5,7 +5,7 @@ using System.ComponentModel;
 
 namespace osu.Game.Overlays.Dashboard
 {
-    public class DashboardOverlayHeader : TabControlOverlayHeaderCN<DashboardOverlayTabs>
+    public class DashboardOverlayHeader : TabControlOverlayHeader<DashboardOverlayTabs>
     {
         protected override OverlayTitle CreateTitle() => new DashboardTitle();
 

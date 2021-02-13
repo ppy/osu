@@ -9,7 +9,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -40,7 +39,6 @@ using osu.Game.Skinning;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
-using osuTK.Input;
 using Sidebar = osu.Game.Screens.Mvis.SideBar.Sidebar;
 using SongProgressBar = osu.Game.Screens.Mvis.BottomBar.SongProgressBar;
 
@@ -178,7 +176,6 @@ namespace osu.Game.Screens.Mvis
         private DrawableTrack track => musicController.CurrentTrack;
 
         private WorkingBeatmap prevBeatmap;
-        private Box dimBox;
 
         #endregion
 
@@ -263,19 +260,13 @@ namespace osu.Game.Screens.Mvis
                     Depth = float.MinValue,
                     Children = new Drawable[]
                     {
-                        dimBox = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black.Opacity(0.6f),
-                            Alpha = 0
-                        },
+                        sidebar,
                         loadingSpinner = new LoadingSpinner(true, true)
                         {
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.BottomCentre,
                             Margin = new MarginPadding(115)
                         },
-                        sidebar,
                         skinnableBbBackground = new FullScreenSkinnableComponent("MBottomBar-background",
                             confineMode: ConfineMode.ScaleToFill,
                             masking: true,
@@ -581,14 +572,6 @@ namespace osu.Game.Screens.Mvis
                 }
             }, true);
 
-            sidebar.State.BindValueChanged(v =>
-            {
-                if (v.NewValue == Visibility.Visible)
-                    dimBox.FadeIn(500, Easing.OutQuint);
-                else
-                    dimBox.FadeOut(500, Easing.OutQuint);
-            });
-
             showOverlays(true);
 
             base.LoadComplete();
@@ -687,11 +670,9 @@ namespace osu.Game.Screens.Mvis
             //背景层的动画
             applyBackgroundBrightness(false, 1);
 
-            //非背景层的动画
-            foreground.MoveToX(-DrawWidth, duration, Easing.OutQuint);
-            bottomFillFlow.MoveToY(bottomBar.Height + 30, duration, Easing.OutQuint);
+            this.FadeOut(duration * 0.6f, Easing.OutQuint)
+                .ScaleTo(1.2f, duration * 0.6f, Easing.OutQuint);
 
-            this.FadeOut(duration, Easing.OutQuint);
             beatmapLogo.StopResponseOnBeatmapChanges();
             Beatmap.UnbindEvents();
 
@@ -706,7 +687,9 @@ namespace osu.Game.Screens.Mvis
             collectionHelper.UpdateBeatmaps();
             collectionPanel.RefreshCollectionList();
 
-            this.FadeIn(duration);
+            this.FadeIn(duration * 0.6f)
+                .ScaleTo(1, duration * 0.6f, Easing.OutQuint);
+
             track.ResetSpeedAdjustments();
             applyTrackAdjustments();
             updateBackground(Beatmap.Value);
@@ -715,11 +698,7 @@ namespace osu.Game.Screens.Mvis
             beatmapLogo.ResponseOnBeatmapChanges();
 
             //背景层的动画
-            background.FadeOut().Then().Delay(250).FadeIn(500);
-
-            //非背景层的动画
-            foreground.MoveToX(0, duration, Easing.OutQuint);
-            bottomFillFlow.MoveToY(bottomBar.Height + 30).Then().MoveToY(0, duration, Easing.OutQuint);
+            background.FadeOut().Then().Delay(duration * 0.6f).FadeIn(duration / 2);
         }
 
         public bool OnPressed(GlobalAction action)
@@ -761,20 +740,8 @@ namespace osu.Game.Screens.Mvis
                 case GlobalAction.MvisSelectCollection:
                     collectionButton.Click();
                     return true;
-            }
 
-            return false;
-        }
-
-        public void OnReleased(GlobalAction action)
-        {
-        }
-
-        protected override bool OnKeyDown(KeyDownEvent e)
-        {
-            switch (e.Key)
-            {
-                case Key.Escape:
+                case GlobalAction.Back:
                     if (sidebar.IsPresent && !sidebar.Hiding)
                     {
                         sidebar.Hide();
@@ -787,7 +754,11 @@ namespace osu.Game.Screens.Mvis
                     return true;
             }
 
-            return base.OnKeyDown(e);
+            return false;
+        }
+
+        public void OnReleased(GlobalAction action)
+        {
         }
 
         protected override bool Handle(UIEvent e)

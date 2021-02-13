@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mfosu!\n"
 "POT-Creation-Date: 2020-12-04 02:25+0800\n"
-"PO-Revision-Date: 2021-02-08 13:45+0800\n"
+"PO-Revision-Date: 2021-02-13 00:23+0800\n"
 "Last-Translator: \n"
 "Language-Team: MATRIX-feather\n"
 "Language: en\n"
@@ -118,8 +118,8 @@ msgstr "play"
 msgid "screen.menu.buttonSystem.editor"
 msgstr "editor"
 
-msgid "screen.menu.buttonSystem.beatmaplisting"
-msgstr "beatmaplist"
+msgid "screen.menu.buttonSystem.browse"
+msgstr "browse"
 
 msgid "screen.menu.buttonSystem.exit"
 msgstr "exit"
@@ -1476,6 +1476,9 @@ msgstr "notifications"
 
 msgid "等待着您~"
 msgstr "waiting for 'ya"
+
+#~ msgid "screen.menu.buttonSystem.beatmaplisting"
+#~ msgstr "beatmaplist"
 
 # 歌曲选择 - Mods
 #~ msgid "游戏Mods提供了多种多样的游玩方式"

@@ -59,6 +59,8 @@ namespace osu.Game.Screens.Play
         // We are managing our own adjustments (see OnEntering/OnExiting).
         public override bool AllowRateAdjustments => false;
 
+        private readonly IBindable<bool> gameActive = new Bindable<bool>(true);
+
         private readonly Bindable<bool> samplePlaybackDisabled = new Bindable<bool>();
 
         /// <summary>
@@ -154,6 +156,8 @@ namespace osu.Game.Screens.Play
             // replays should never be recorded or played back when autoplay is enabled
             if (!Mods.Value.Any(m => m is ModAutoplay))
                 PrepareReplay();
+
+            gameActive.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
         }
 
         [CanBeNull]
@@ -170,7 +174,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio, OsuConfigManager config, OsuGame game)
+        private void load(AudioManager audio, OsuConfigManager config, OsuGameBase game)
         {
             Mods.Value = base.Mods.Value.Select(m => m.CreateCopy()).ToArray();
 
@@ -187,7 +191,10 @@ namespace osu.Game.Screens.Play
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
 
             if (game != null)
-                LocalUserPlaying.BindTo(game.LocalUserPlaying);
+                gameActive.BindTo(game.IsActive);
+
+            if (game is OsuGame osuGame)
+                LocalUserPlaying.BindTo(osuGame.LocalUserPlaying);
 
             DrawableRuleset = ruleset.CreateDrawableRulesetWith(playableBeatmap, Mods.Value);
 
@@ -257,8 +264,6 @@ namespace osu.Game.Screens.Play
             DrawableRuleset.FrameStableClock.IsCatchingUp.BindValueChanged(_ => updateSampleDisabledState());
 
             DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updateGameplayState());
-
-            DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
 
             // bind clock into components that require it
             DrawableRuleset.IsPaused.BindTo(GameplayClockContainer.IsPaused);
@@ -421,10 +426,14 @@ namespace osu.Game.Screens.Play
             samplePlaybackDisabled.Value = DrawableRuleset.FrameStableClock.IsCatchingUp.Value || GameplayClockContainer.GameplayClock.IsPaused.Value;
         }
 
-        private void updatePauseOnFocusLostState() =>
-            HUDOverlay.HoldToQuit.PauseOnFocusLost = PauseOnFocusLost
-                                                     && !DrawableRuleset.HasReplayLoaded.Value
-                                                     && !breakTracker.IsBreakTime.Value;
+        private void updatePauseOnFocusLostState()
+        {
+            if (!PauseOnFocusLost || breakTracker.IsBreakTime.Value)
+                return;
+
+            if (gameActive.Value == false)
+                Pause();
+        }
 
         private IBeatmap loadPlayableBeatmap()
         {
