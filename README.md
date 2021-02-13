@@ -14,7 +14,7 @@ git clone https://github.com/MATRIX-feather/osu-framework.git
 
 cd osu-framework
 
-git checkout locale
+git checkout custom
 cd ../osu
 
 dotnet run --project osu.Desktop -c Release
