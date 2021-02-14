@@ -25,6 +25,8 @@ namespace osu.Game.Online.API
     {
         private readonly OsuConfigManager config;
 
+        private readonly string versionHash;
+
         private readonly OAuth authentication;
 
         private readonly Queue<APIRequest> queue = new Queue<APIRequest>();
@@ -56,9 +58,10 @@ namespace osu.Game.Online.API
 
         private readonly Logger log;
 
-        public APIAccess(OsuConfigManager config, EndpointConfiguration endpointConfiguration)
+        public APIAccess(OsuConfigManager config, EndpointConfiguration endpointConfiguration, string versionHash)
         {
             this.config = config;
+            this.versionHash = versionHash;
 
             APIEndpointUrl = endpointConfiguration.APIEndpointUrl;
             WebsiteRootUrl = endpointConfiguration.WebsiteRootUrl;
@@ -243,7 +246,7 @@ namespace osu.Game.Online.API
             this.password = password;
         }
 
-        public IHubClientConnector GetHubConnector(string clientName, string endpoint) => new HubClientConnector(clientName, endpoint, this);
+        public IHubClientConnector GetHubConnector(string clientName, string endpoint) => new HubClientConnector(clientName, endpoint, this, versionHash);
 
         public RegistrationRequest.RegistrationRequestErrors CreateAccount(string email, string username, string password)
         {
