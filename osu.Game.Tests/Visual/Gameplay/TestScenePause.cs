@@ -69,13 +69,14 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for hitobjects", () => Player.HealthProcessor.Health.Value < 1);
 
             pauseAndConfirm();
-
             resume();
+
             confirmPausedWithNoOverlay();
             pauseAndConfirm();
 
             AddUntilStep("resume overlay is not active", () => Player.DrawableRuleset.ResumeOverlay.State.Value == Visibility.Hidden);
             confirmPaused();
+            confirmNotExited();
         }
 
         [Test]
@@ -100,7 +101,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             pauseExternally();
 
             confirmResumed();
-            AddAssert("not exited", () => Player.IsCurrentScreen());
+            confirmNotExited();
         }
 
         [Test]
@@ -114,7 +115,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("pause via exit key", () => Player.ExitViaPause());
 
             confirmResumed();
-            AddAssert("not exited", () => Player.IsCurrentScreen());
+            confirmNotExited();
         }
 
         [Test]
@@ -277,7 +278,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void exitAndConfirm()
         {
-            AddUntilStep("player not exited", () => Player.IsCurrentScreen());
+            confirmNotExited();
             AddStep("exit", () => Player.Exit());
             confirmExited();
             confirmNoTrackAdjustments();
@@ -286,7 +287,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private void confirmPaused()
         {
             confirmClockRunning(false);
-            AddAssert("player not exited", () => Player.IsCurrentScreen());
+            confirmNotExited();
             AddAssert("player not failed", () => !Player.HasFailed);
             AddAssert("pause overlay shown", () => Player.PauseOverlayVisible);
         }
@@ -303,10 +304,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             confirmPauseOverlayShown(false);
         }
 
-        private void confirmExited()
-        {
-            AddUntilStep("player exited", () => !Player.IsCurrentScreen());
-        }
+        private void confirmExited() => AddUntilStep("player exited", () => !Player.IsCurrentScreen());
+        private void confirmNotExited() => AddAssert("player not exited", () => Player.IsCurrentScreen());
 
         private void confirmNoTrackAdjustments()
         {
