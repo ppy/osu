@@ -97,7 +97,8 @@ namespace osu.Game.Online.Multiplayer
         // Todo: This is temporary, until the multiplayer server returns the item id on match start or otherwise.
         private int playlistItemId;
 
-        protected StatefulMultiplayerClient()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             IsConnected.BindValueChanged(connected =>
             {
