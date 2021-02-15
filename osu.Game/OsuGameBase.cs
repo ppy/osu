@@ -228,7 +228,7 @@ namespace osu.Game
 
             MessageFormatter.WebsiteRootUrl = endpoints.WebsiteRootUrl;
 
-            dependencies.CacheAs(API ??= new APIAccess(LocalConfig, endpoints));
+            dependencies.CacheAs(API ??= new APIAccess(LocalConfig, endpoints, VersionHash));
 
             dependencies.CacheAs(spectatorStreaming = new SpectatorStreamingClient(endpoints));
             dependencies.CacheAs(multiplayerClient = new MultiplayerClient(endpoints));
