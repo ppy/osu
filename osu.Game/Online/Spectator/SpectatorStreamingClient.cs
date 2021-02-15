@@ -33,7 +33,7 @@ namespace osu.Game.Online.Spectator
         private readonly string endpoint;
 
         [CanBeNull]
-        private HubClientConnector connector;
+        private IHubClientConnector connector;
 
         private readonly IBindable<bool> isConnected = new BindableBool();
 
@@ -86,7 +86,7 @@ namespace osu.Game.Online.Spectator
         [BackgroundDependencyLoader]
         private void load(IAPIProvider api)
         {
-            connector = CreateConnector(nameof(SpectatorStreamingClient), endpoint, api);
+            connector = api.GetHubConnector(nameof(SpectatorStreamingClient), endpoint);
 
             if (connector != null)
             {
@@ -128,8 +128,6 @@ namespace osu.Game.Online.Spectator
                 }, true);
             }
         }
-
-        protected virtual HubClientConnector CreateConnector(string name, string endpoint, IAPIProvider api) => new HubClientConnector(name, endpoint, api);
 
         Task ISpectatorClient.UserBeganPlaying(int userId, SpectatorState state)
         {
