@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
@@ -163,7 +164,13 @@ namespace osu.Game.Tournament.Tests
                 }));
             }
 
-            public void RunTestBlocking(TestScene test) => runner.RunTestBlocking(test);
+            public void RunTestBlocking(TestScene test)
+            {
+                while (runner?.IsLoaded != true && Host.ExecutionState == ExecutionState.Running)
+                    Thread.Sleep(10);
+
+                runner?.RunTestBlocking(test);
+            }
         }
     }
 }
