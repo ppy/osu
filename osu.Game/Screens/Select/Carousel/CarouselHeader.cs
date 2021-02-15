@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         public class HoverLayer : HoverSampleDebounceComponent
         {
-            private SampleChannel sampleHover;
+            private Sample sampleHover;
 
             private Box box;
 
