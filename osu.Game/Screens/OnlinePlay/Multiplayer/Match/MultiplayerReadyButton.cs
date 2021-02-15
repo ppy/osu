@@ -117,8 +117,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             if (sampleReadyCount == null)
                 return;
 
-            var channel = sampleReadyCount.Play();
+            var channel = sampleReadyCount.GetChannel();
             channel.Frequency.Value = 0.77f + countReady * 0.06f;
+            channel.Play();
         }
 
         private void updateButtonColour(bool green)
