@@ -16,15 +16,12 @@ using osu.Game.Online.API;
 
 namespace osu.Game.Online
 {
-    /// <summary>
-    /// A component that manages the life cycle of a connection to a SignalR Hub.
-    /// </summary>
-    public class HubClientConnector : IDisposable
+    public class HubClientConnector : IHubClientConnector
     {
         /// <summary>
         /// Invoked whenever a new hub connection is built, to configure it before it's started.
         /// </summary>
-        public Action<HubConnection>? ConfigureConnection;
+        public Action<HubConnection>? ConfigureConnection { get; set; }
 
         private readonly string clientName;
         private readonly string endpoint;
