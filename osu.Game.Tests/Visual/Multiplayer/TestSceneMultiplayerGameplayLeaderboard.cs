@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -14,6 +13,7 @@ using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Database;
 using osu.Game.Online;
+using osu.Game.Online.API;
 using osu.Game.Online.Spectator;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Osu.Scoring;
@@ -106,6 +106,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 this.totalUsers = totalUsers;
             }
 
+            protected override HubClientConnector CreateConnector(string name, string endpoint, IAPIProvider api) => null;
+
             public void Start(int beatmapId)
             {
                 for (int i = 0; i < totalUsers; i++)
@@ -163,8 +165,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     ((ISpectatorClient)this).UserSentFrames(userId, new FrameDataBundle(header, Array.Empty<LegacyReplayFrame>()));
                 }
             }
-
-            protected override Task Connect() => Task.CompletedTask;
         }
     }
 }
