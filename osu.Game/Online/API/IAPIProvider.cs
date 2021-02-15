@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
 using osu.Game.Users;
@@ -94,6 +96,13 @@ namespace osu.Game.Online.API
         /// Log out the current user.
         /// </summary>
         void Logout();
+
+        /// <summary>
+        /// Constructs a new <see cref="IHubClientConnector"/>. May be null if not supported.
+        /// </summary>
+        /// <param name="clientName">The name of the client this connector connects for, used for logging.</param>
+        /// <param name="endpoint">The endpoint to the hub.</param>
+        IHubClientConnector? GetHubConnector(string clientName, string endpoint);
 
         /// <summary>
         /// Create a new user account. This is a blocking operation.

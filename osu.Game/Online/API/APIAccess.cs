@@ -243,6 +243,8 @@ namespace osu.Game.Online.API
             this.password = password;
         }
 
+        public IHubClientConnector GetHubConnector(string clientName, string endpoint) => new HubClientConnector(clientName, endpoint, this);
+
         public RegistrationRequest.RegistrationRequestErrors CreateAccount(string email, string username, string password)
         {
             Debug.Assert(State.Value == APIState.Offline);

@@ -17,7 +17,8 @@ namespace osu.Game.Online.Multiplayer
     public class MultiplayerClient : StatefulMultiplayerClient
     {
         private readonly string endpoint;
-        private HubClientConnector? connector;
+
+        private IHubClientConnector? connector;
 
         public override IBindable<bool> IsConnected { get; } = new BindableBool();
 
@@ -31,9 +32,11 @@ namespace osu.Game.Online.Multiplayer
         [BackgroundDependencyLoader]
         private void load(IAPIProvider api)
         {
-            connector = new HubClientConnector(nameof(MultiplayerClient), endpoint, api)
+            connector = api.GetHubConnector(nameof(MultiplayerClient), endpoint);
+
+            if (connector != null)
             {
-                ConfigureConnection = connection =>
+                connector.ConfigureConnection = connection =>
                 {
                     // this is kind of SILLY
                     // https://github.com/dotnet/aspnetcore/issues/15198
@@ -48,10 +51,10 @@ namespace osu.Game.Online.Multiplayer
                     connection.On(nameof(IMultiplayerClient.ResultsReady), ((IMultiplayerClient)this).ResultsReady);
                     connection.On<int, IEnumerable<APIMod>>(nameof(IMultiplayerClient.UserModsChanged), ((IMultiplayerClient)this).UserModsChanged);
                     connection.On<int, BeatmapAvailability>(nameof(IMultiplayerClient.UserBeatmapAvailabilityChanged), ((IMultiplayerClient)this).UserBeatmapAvailabilityChanged);
-                },
-            };
+                };
 
-            IsConnected.BindTo(connector.IsConnected);
+                IsConnected.BindTo(connector.IsConnected);
+            }
         }
 
         protected override Task<MultiplayerRoom> JoinRoom(long roomId)
