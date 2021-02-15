@@ -87,7 +87,7 @@ namespace osu.Game.Overlays.Mods
         private const float content_width = 0.8f;
         private const float footer_button_spacing = 20;
 
-        private SampleChannel sampleOn, sampleOff;
+        private Sample sampleOn, sampleOff;
 
         protected ModSelectOverlay()
         {

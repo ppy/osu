@@ -39,7 +39,7 @@ namespace osu.Game.Skinning
             return base.GetConfig<TLookup, TValue>(lookup);
         }
 
-        public override SampleChannel GetSample(ISampleInfo sampleInfo)
+        public override Sample GetSample(ISampleInfo sampleInfo)
         {
             if (sampleInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacy && legacy.CustomSampleBank == 0)
             {
