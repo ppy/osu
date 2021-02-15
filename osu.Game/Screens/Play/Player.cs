@@ -493,6 +493,7 @@ namespace osu.Game.Screens.Play
                 // we want to give the user what they want, so forcefully return to this screen (to proceed with the upwards exit process).
                 ValidForResume = false;
                 this.MakeCurrent();
+                return;
             }
 
             if (showDialogFirst)
