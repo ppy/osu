@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
 
@@ -20,10 +21,6 @@ namespace osu.Game.Screens.Select.Carousel
 {
     public class CarouselHeader : Container
     {
-        private SampleChannel sampleHover;
-
-        private readonly Box hoverLayer;
-
         public Container BorderContainer;
 
         public readonly Bindable<CarouselItemState> State = new Bindable<CarouselItemState>(CarouselItemState.NotSelected);
@@ -44,21 +41,9 @@ namespace osu.Game.Screens.Select.Carousel
                 Children = new Drawable[]
                 {
                     Content,
-                    hoverLayer = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Alpha = 0,
-                        Blending = BlendingParameters.Additive,
-                    },
+                    new HoverLayer()
                 }
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuColour colours)
-        {
-            sampleHover = audio.Samples.Get($@"SongSelect/song-ping-variation-{RNG.Next(1, 5)}");
-            hoverLayer.Colour = colours.Blue.Opacity(0.1f);
         }
 
         protected override void LoadComplete()
@@ -97,18 +82,50 @@ namespace osu.Game.Screens.Select.Carousel
             }
         }
 
-        protected override bool OnHover(HoverEvent e)
+        public class HoverLayer : HoverSampleDebounceComponent
         {
-            sampleHover?.Play();
+            private SampleChannel sampleHover;
 
-            hoverLayer.FadeIn(100, Easing.OutQuint);
-            return base.OnHover(e);
-        }
+            private Box box;
 
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            hoverLayer.FadeOut(1000, Easing.OutQuint);
-            base.OnHoverLost(e);
+            public HoverLayer()
+            {
+                RelativeSizeAxes = Axes.Both;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(AudioManager audio, OsuColour colours)
+            {
+                InternalChild = box = new Box
+                {
+                    Colour = colours.Blue.Opacity(0.1f),
+                    Alpha = 0,
+                    Blending = BlendingParameters.Additive,
+                    RelativeSizeAxes = Axes.Both,
+                };
+
+                sampleHover = audio.Samples.Get("SongSelect/song-ping");
+            }
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                box.FadeIn(100, Easing.OutQuint);
+                return base.OnHover(e);
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                box.FadeOut(1000, Easing.OutQuint);
+                base.OnHoverLost(e);
+            }
+
+            public override void PlayHoverSample()
+            {
+                if (sampleHover == null) return;
+
+                sampleHover.Frequency.Value = 0.90 + RNG.NextDouble(0.2);
+                sampleHover.Play();
+            }
         }
     }
 }

@@ -71,8 +71,9 @@ namespace osu.Game.Scoring
             }
         }
 
-        protected override IEnumerable<string> GetStableImportPaths(Storage stableStorage)
-            => stableStorage.GetFiles(ImportFromStablePath).Where(p => HandledExtensions.Any(ext => Path.GetExtension(p)?.Equals(ext, StringComparison.OrdinalIgnoreCase) ?? false));
+        protected override IEnumerable<string> GetStableImportPaths(Storage storage)
+            => storage.GetFiles(ImportFromStablePath).Where(p => HandledExtensions.Any(ext => Path.GetExtension(p)?.Equals(ext, StringComparison.OrdinalIgnoreCase) ?? false))
+                      .Select(path => storage.GetFullPath(path));
 
         public Score GetScore(ScoreInfo score) => new LegacyDatabasedScore(score, rulesets, beatmaps(), Files.Store);
 
