@@ -503,14 +503,17 @@ namespace osu.Game.Screens.Play
                     return;
                 }
 
-                if (canPause && !GameplayClockContainer.IsPaused.Value)
+                if (!GameplayClockContainer.IsPaused.Value)
                 {
-                    if (pauseCooldownActive && !GameplayClockContainer.IsPaused.Value)
-                        // still want to block if we are within the cooldown period and not already paused.
+                    // if we are within the cooldown period and not already paused, the operation should block completely.
+                    if (pauseCooldownActive)
                         return;
 
-                    Pause();
-                    return;
+                    if (canPause)
+                    {
+                        Pause();
+                        return;
+                    }
                 }
             }
 
