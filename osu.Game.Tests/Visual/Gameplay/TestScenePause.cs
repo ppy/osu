@@ -90,17 +90,45 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestPauseDuringCooldownTooSoon()
+        public void TestExternalPauseDuringCooldownTooSoon()
         {
             AddStep("move cursor outside", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.TopLeft - new Vector2(10)));
 
             pauseAndConfirm();
 
             resume();
-            pause();
+            pauseExternally();
 
             confirmResumed();
             AddAssert("not exited", () => Player.IsCurrentScreen());
+        }
+
+        [Test]
+        public void TestUserPauseDuringCooldownTooSoon()
+        {
+            AddStep("move cursor outside", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.TopLeft - new Vector2(10)));
+
+            pauseAndConfirm();
+
+            resume();
+            AddStep("pause via exit key", () => Player.ExitViaPause());
+
+            confirmResumed();
+            AddAssert("not exited", () => Player.IsCurrentScreen());
+        }
+
+        [Test]
+        public void TestQuickExitDuringCooldownTooSoon()
+        {
+            AddStep("move cursor outside", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.TopLeft - new Vector2(10)));
+
+            pauseAndConfirm();
+
+            resume();
+            AddStep("pause via exit key", () => Player.ExitViaQuickExit());
+
+            confirmResumed();
+            AddAssert("exited", () => !Player.IsCurrentScreen());
         }
 
         [Test]
@@ -125,7 +153,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             confirmClockRunning(false);
 
-            pause();
+            pauseExternally();
 
             confirmPausedWithNoOverlay();
             AddAssert("fail overlay still shown", () => Player.FailOverlayVisible);
@@ -237,7 +265,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void pauseAndConfirm()
         {
-            pause();
+            pauseExternally();
             confirmPaused();
         }
 
@@ -286,7 +314,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         private void restart() => AddStep("restart", () => Player.Restart());
-        private void pause() => AddStep("pause", () => Player.Pause());
+        private void pauseExternally() => AddStep("pause", () => Player.Pause());
         private void resume() => AddStep("resume", () => Player.Resume());
 
         private void confirmPauseOverlayShown(bool isShown) =>
@@ -304,6 +332,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             public bool FailOverlayVisible => FailOverlay.State.Value == Visibility.Visible;
 
             public bool PauseOverlayVisible => PauseOverlay.State.Value == Visibility.Visible;
+
+            public void ExitViaPause() => PerformExit(true);
+
+            public void ExitViaQuickExit() => PerformExit(false);
 
             public override void OnEntering(IScreen last)
             {
