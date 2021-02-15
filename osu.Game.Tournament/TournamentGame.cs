@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Tournament.Models;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
 
@@ -32,25 +33,24 @@ namespace osu.Game.Tournament
         private Drawable heightWarning;
         private Bindable<Size> windowSize;
         private Bindable<WindowMode> windowMode;
+        private LoadingSpinner loadingSpinner;
 
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager frameworkConfig)
         {
             windowSize = frameworkConfig.GetBindable<Size>(FrameworkSetting.WindowedSize);
-            windowSize.BindValueChanged(size => ScheduleAfterChildren(() =>
-            {
-                var minWidth = (int)(size.NewValue.Height / 768f * TournamentSceneManager.REQUIRED_WIDTH) - 1;
-
-                heightWarning.Alpha = size.NewValue.Width < minWidth ? 1 : 0;
-            }), true);
-
             windowMode = frameworkConfig.GetBindable<WindowMode>(FrameworkSetting.WindowMode);
-            windowMode.BindValueChanged(mode => ScheduleAfterChildren(() =>
-            {
-                windowMode.Value = WindowMode.Windowed;
-            }), true);
 
-            AddRange(new[]
+            Add(loadingSpinner = new LoadingSpinner(true, true)
+            {
+                Anchor = Anchor.BottomRight,
+                Origin = Anchor.BottomRight,
+                Margin = new MarginPadding(40),
+            });
+
+            loadingSpinner.Show();
+
+            BracketLoadTask.ContinueWith(_ => LoadComponentsAsync(new[]
             {
                 new Container
                 {
@@ -93,7 +93,24 @@ namespace osu.Game.Tournament
                     RelativeSizeAxes = Axes.Both,
                     Child = new TournamentSceneManager()
                 }
-            });
+            }, drawables =>
+            {
+                loadingSpinner.Hide();
+                loadingSpinner.Expire();
+
+                AddRange(drawables);
+
+                windowSize.BindValueChanged(size => ScheduleAfterChildren(() =>
+                {
+                    var minWidth = (int)(size.NewValue.Height / 768f * TournamentSceneManager.REQUIRED_WIDTH) - 1;
+                    heightWarning.Alpha = size.NewValue.Width < minWidth ? 1 : 0;
+                }), true);
+
+                windowMode.BindValueChanged(mode => ScheduleAfterChildren(() =>
+                {
+                    windowMode.Value = WindowMode.Windowed;
+                }), true);
+            }));
         }
     }
 }

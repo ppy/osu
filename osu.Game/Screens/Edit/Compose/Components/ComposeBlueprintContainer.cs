@@ -211,9 +211,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             if (blueprint != null)
             {
-                // doing this post-creations as adding the default hit sample should be the case regardless of the ruleset.
-                blueprint.HitObject.Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_NORMAL));
-
                 placementBlueprintContainer.Child = currentPlacement = blueprint;
 
                 // Fixes a 1-frame position discrepancy due to the first mouse move event happening in the next frame
