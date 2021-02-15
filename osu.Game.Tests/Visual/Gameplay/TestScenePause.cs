@@ -56,9 +56,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             pauseAndConfirm();
             resume();
 
-            confirmClockRunning(false);
-            confirmPauseOverlayShown(false);
-
+            confirmPausedWithNoOverlay();
             AddStep("click to resume", () => InputManager.Click(MouseButton.Left));
 
             confirmClockRunning(true);
@@ -73,9 +71,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             pauseAndConfirm();
 
             resume();
-            confirmClockRunning(false);
-            confirmPauseOverlayShown(false);
-
+            confirmPausedWithNoOverlay();
             pauseAndConfirm();
 
             AddUntilStep("resume overlay is not active", () => Player.DrawableRuleset.ResumeOverlay.State.Value == Visibility.Hidden);
@@ -94,7 +90,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestPauseTooSoon()
+        public void TestPauseDuringCooldownTooSoon()
         {
             AddStep("move cursor outside", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.TopLeft - new Vector2(10)));
 
@@ -103,8 +99,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             resume();
             pause();
 
-            confirmClockRunning(true);
-            confirmPauseOverlayShown(false);
+            confirmResumed();
+            AddAssert("not exited", () => Player.IsCurrentScreen());
         }
 
         [Test]
@@ -117,9 +113,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("exit quick", () => Player.Exit());
 
-            confirmClockRunning(true);
-            confirmPauseOverlayShown(false);
-
+            confirmResumed();
             AddAssert("exited", () => !Player.IsCurrentScreen());
         }
 
@@ -133,9 +127,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             pause();
 
-            confirmClockRunning(false);
-            confirmPauseOverlayShown(false);
-
+            confirmPausedWithNoOverlay();
             AddAssert("fail overlay still shown", () => Player.FailOverlayVisible);
 
             exitAndConfirm();
@@ -274,6 +266,12 @@ namespace osu.Game.Tests.Visual.Gameplay
         private void confirmResumed()
         {
             confirmClockRunning(true);
+            confirmPauseOverlayShown(false);
+        }
+
+        private void confirmPausedWithNoOverlay()
+        {
+            confirmClockRunning(false);
             confirmPauseOverlayShown(false);
         }
 
