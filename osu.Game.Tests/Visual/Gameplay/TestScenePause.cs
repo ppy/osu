@@ -91,20 +91,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestExternalPauseDuringCooldownTooSoon()
-        {
-            AddStep("move cursor outside", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.TopLeft - new Vector2(10)));
-
-            pauseAndConfirm();
-
-            resume();
-            pauseExternally();
-
-            confirmResumed();
-            confirmNotExited();
-        }
-
-        [Test]
         public void TestUserPauseDuringCooldownTooSoon()
         {
             AddStep("move cursor outside", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.TopLeft - new Vector2(10)));
@@ -112,7 +98,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             pauseAndConfirm();
 
             resume();
-            AddStep("pause via exit key", () => Player.ExitViaPause());
+            pauseFromUserExitKey();
 
             confirmResumed();
             confirmNotExited();
@@ -154,7 +140,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             confirmClockRunning(false);
 
-            pauseExternally();
+            pauseFromUserExitKey();
 
             confirmPausedWithNoOverlay();
             AddAssert("fail overlay still shown", () => Player.FailOverlayVisible);
@@ -266,7 +252,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void pauseAndConfirm()
         {
-            pauseExternally();
+            pauseFromUserExitKey();
             confirmPaused();
         }
 
@@ -313,7 +299,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         private void restart() => AddStep("restart", () => Player.Restart());
-        private void pauseExternally() => AddStep("pause", () => Player.Pause());
+        private void pauseFromUserExitKey() => AddStep("user pause", () => Player.ExitViaPause());
         private void resume() => AddStep("resume", () => Player.Resume());
 
         private void confirmPauseOverlayShown(bool isShown) =>
