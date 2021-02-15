@@ -487,35 +487,30 @@ namespace osu.Game.Screens.Play
             // if a restart has been requested, cancel any pending completion (user has shown intent to restart).
             completionProgressDelegate?.Cancel();
 
+            // there is a chance that the exit was performed after the transition to results has started.
+            // we want to give the user what they want, so forcefully return to this screen (to proceed with the upwards exit process).
             if (!this.IsCurrentScreen())
             {
-                // there is a chance that the exit was performed after the transition to results has started.
-                // we want to give the user what they want, so forcefully return to this screen (to proceed with the upwards exit process).
                 ValidForResume = false;
                 this.MakeCurrent();
                 return;
             }
 
-            if (showDialogFirst)
+            bool pauseDialogShown = PauseOverlay.State.Value == Visibility.Visible;
+
+            if (showDialogFirst && !pauseDialogShown)
             {
+                // if the fail animation is currently in progress, accelerate it (it will show the pause dialog on completion).
                 if (ValidForResume && HasFailed && !FailOverlay.IsPresent)
                 {
                     failAnimation.FinishTransforms(true);
                     return;
                 }
 
-                if (!GameplayClockContainer.IsPaused.Value)
-                {
-                    // if we are within the cooldown period and not already paused, the operation should block completely.
-                    if (pauseCooldownActive)
-                        return;
-
-                    if (canPause)
-                    {
-                        Pause();
-                        return;
-                    }
-                }
+                // in the case a dialog needs to be shown, attempt to pause and show it.
+                // this may fail (see internal checks in Pause()) at which point the exit attempt will be aborted.
+                Pause();
+                return;
             }
 
             this.Exit();
