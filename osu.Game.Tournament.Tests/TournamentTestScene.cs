@@ -154,10 +154,13 @@ namespace osu.Game.Tournament.Tests
 
             protected override void LoadAsyncComplete()
             {
-                // this has to be run here rather than LoadComplete because
-                // TestScene.cs is checking the IsLoaded state (on another thread) and expects
-                // the runner to be loaded at that point.
-                Add(runner = new TestSceneTestRunner.TestRunner());
+                BracketLoadTask.ContinueWith(_ => Schedule(() =>
+                {
+                    // this has to be run here rather than LoadComplete because
+                    // TestScene.cs is checking the IsLoaded state (on another thread) and expects
+                    // the runner to be loaded at that point.
+                    Add(runner = new TestSceneTestRunner.TestRunner());
+                }));
             }
 
             public void RunTestBlocking(TestScene test) => runner.RunTestBlocking(test);
