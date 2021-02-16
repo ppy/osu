@@ -73,6 +73,10 @@ namespace osu.Game.Online.Rooms
         public readonly Bindable<int?> MaxParticipants = new Bindable<int?>();
 
         [Cached]
+        [JsonProperty("current_user_score")]
+        public readonly Bindable<PlaylistAggregateScore> UserScore = new Bindable<PlaylistAggregateScore>();
+
+        [Cached]
         [JsonProperty("recent_participants")]
         public readonly BindableList<User> RecentParticipants = new BindableList<User>();
 
@@ -144,6 +148,7 @@ namespace osu.Game.Online.Rooms
             MaxParticipants.Value = other.MaxParticipants.Value;
             ParticipantCount.Value = other.ParticipantCount.Value;
             EndDate.Value = other.EndDate.Value;
+            UserScore.Value = other.UserScore.Value;
 
             if (EndDate.Value != null && DateTimeOffset.Now >= EndDate.Value)
                 Status.Value = new RoomStatusEnded();
