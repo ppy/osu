@@ -24,9 +24,9 @@ namespace osu.Game.Overlays.OSD
         private readonly int optionCount;
         private readonly int selectedOption = -1;
 
-        private SampleChannel sampleOn;
-        private SampleChannel sampleOff;
-        private SampleChannel sampleChange;
+        private Sample sampleOn;
+        private Sample sampleOff;
+        private Sample sampleChange;
 
         public TrackedSettingToast(SettingDescription description)
             : base(description.Name, description.Value, description.Shortcut)

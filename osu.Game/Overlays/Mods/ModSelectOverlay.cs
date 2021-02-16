@@ -51,6 +51,11 @@ namespace osu.Game.Overlays.Mods
         /// </summary>
         protected virtual bool Stacked => true;
 
+        /// <summary>
+        /// Whether configurable <see cref="Mod"/>s can be configured by the local user.
+        /// </summary>
+        protected virtual bool AllowConfiguration => true;
+
         [NotNull]
         private Func<Mod, bool> isValidMod = m => true;
 
@@ -82,7 +87,7 @@ namespace osu.Game.Overlays.Mods
         private const float content_width = 0.8f;
         private const float footer_button_spacing = 20;
 
-        private SampleChannel sampleOn, sampleOff;
+        private Sample sampleOn, sampleOff;
 
         protected ModSelectOverlay()
         {
@@ -300,6 +305,7 @@ namespace osu.Game.Overlays.Mods
                                                 Text = "Customisation",
                                                 Action = () => ModSettingsContainer.ToggleVisibility(),
                                                 Enabled = { Value = false },
+                                                Alpha = AllowConfiguration ? 1 : 0,
                                                 Origin = Anchor.CentreLeft,
                                                 Anchor = Anchor.CentreLeft,
                                             },
@@ -512,7 +518,8 @@ namespace osu.Game.Overlays.Mods
 
                 OnModSelected(selectedMod);
 
-                if (selectedMod.RequiresConfiguration) ModSettingsContainer.Show();
+                if (selectedMod.RequiresConfiguration && AllowConfiguration)
+                    ModSettingsContainer.Show();
             }
             else
             {

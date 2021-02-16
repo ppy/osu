@@ -22,8 +22,8 @@ namespace osu.Game.Graphics.UserInterface
         private const int text_size = 17;
         private const int transition_length = 80;
 
-        private SampleChannel sampleClick;
-        private SampleChannel sampleHover;
+        private Sample sampleClick;
+        private Sample sampleHover;
 
         private TextContainer text;
 
