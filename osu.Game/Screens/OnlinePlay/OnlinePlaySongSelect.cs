@@ -31,7 +31,8 @@ namespace osu.Game.Screens.OnlinePlay
         [Resolved(typeof(Room), nameof(Room.Playlist))]
         protected BindableList<PlaylistItem> Playlist { get; private set; }
 
-        private readonly Bindable<IReadOnlyList<Mod>> freeMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+        protected readonly Bindable<IReadOnlyList<Mod>> FreeMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+
         private readonly FreeModSelectOverlay freeModSelectOverlay;
 
         private WorkingBeatmap initialBeatmap;
@@ -45,7 +46,7 @@ namespace osu.Game.Screens.OnlinePlay
 
             freeModSelectOverlay = new FreeModSelectOverlay
             {
-                SelectedMods = { BindTarget = freeMods },
+                SelectedMods = { BindTarget = FreeMods },
                 IsValidMod = IsValidFreeMod,
             };
         }
@@ -67,14 +68,14 @@ namespace osu.Game.Screens.OnlinePlay
             // At this point, Mods contains both the required and allowed mods. For selection purposes, it should only contain the required mods.
             // Similarly, freeMods is currently empty but should only contain the allowed mods.
             Mods.Value = Playlist.FirstOrDefault()?.RequiredMods.Select(m => m.CreateCopy()).ToArray() ?? Array.Empty<Mod>();
-            freeMods.Value = Playlist.FirstOrDefault()?.AllowedMods.Select(m => m.CreateCopy()).ToArray() ?? Array.Empty<Mod>();
+            FreeMods.Value = Playlist.FirstOrDefault()?.AllowedMods.Select(m => m.CreateCopy()).ToArray() ?? Array.Empty<Mod>();
 
             Ruleset.BindValueChanged(onRulesetChanged);
         }
 
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> ruleset)
         {
-            freeMods.Value = Array.Empty<Mod>();
+            FreeMods.Value = Array.Empty<Mod>();
         }
 
         protected sealed override bool OnStart()
@@ -90,7 +91,7 @@ namespace osu.Game.Screens.OnlinePlay
             item.RequiredMods.AddRange(Mods.Value.Select(m => m.CreateCopy()));
 
             item.AllowedMods.Clear();
-            item.AllowedMods.AddRange(freeMods.Value.Select(m => m.CreateCopy()));
+            item.AllowedMods.AddRange(FreeMods.Value.Select(m => m.CreateCopy()));
 
             SelectItem(item);
             return true;
@@ -133,7 +134,7 @@ namespace osu.Game.Screens.OnlinePlay
         protected override IEnumerable<(FooterButton, OverlayContainer)> CreateFooterButtons()
         {
             var buttons = base.CreateFooterButtons().ToList();
-            buttons.Insert(buttons.FindIndex(b => b.Item1 is FooterButtonMods) + 1, (new FooterButtonFreeMods { Current = freeMods }, freeModSelectOverlay));
+            buttons.Insert(buttons.FindIndex(b => b.Item1 is FooterButtonMods) + 1, (new FooterButtonFreeMods { Current = FreeMods }, freeModSelectOverlay));
             return buttons;
         }
 
