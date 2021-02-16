@@ -3,7 +3,6 @@
 
 using System;
 using Newtonsoft.Json;
-using osu.Game.Online.API.Requests;
 using osu.Game.Scoring;
 using osu.Game.Utils;
 using static osu.Game.Users.User;
@@ -27,24 +26,22 @@ namespace osu.Game.Users
             public int Progress;
         }
 
-        /// <remarks>
-        /// This must only be used when coming from condensed user responses (e.g. from <see cref="GetUsersRequest"/>), otherwise use <code>Ranks.Global</code>.
-        /// </remarks>
-        // todo: this should likely be moved to a separate UserStatisticsCompact class at some point.
+        [JsonProperty(@"rank")]
+        public UserRanks Ranks;
+
+        // eventually UserRanks object will be completely replaced with separate global and country rank properties, see https://github.com/ppy/osu-web/blob/cb79bb72186c8f1a25f6a6f5ef315123decb4231/app/Transformers/UserStatisticsTransformer.php#L53.
+        // but for now, always point UserRanks.Global to the global_rank property, as that is included solely for requests like GetUsersRequest.
         [JsonProperty(@"global_rank")]
-        public int? GlobalRank;
-
-        [JsonProperty(@"pp")]
-        public decimal? PP;
-
-        [JsonProperty(@"pp_rank")] // the API sometimes only returns this value in condensed user responses
-        private int? rank
+        private int? globalRank
         {
             set => Ranks.Global = value;
         }
 
-        [JsonProperty(@"rank")]
-        public UserRanks Ranks;
+        [JsonProperty(@"pp")]
+        public decimal? PP;
+
+        [JsonProperty(@"pp_rank")]
+        public int PPRank;
 
         [JsonProperty(@"ranked_score")]
         public long RankedScore;
