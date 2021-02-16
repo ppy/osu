@@ -133,6 +133,7 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
                                             RelativeSizeAxes = Axes.X,
                                             Text = "???",
                                             Truncate = true,
+                                            UseLegacyUnicode = true
                                         },
                                         collectionBeatmapCount = new OsuSpriteText
                                         {
