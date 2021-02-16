@@ -67,6 +67,9 @@ namespace osu.Game.Online.Rooms
             Beatmap.Value ??= apiBeatmap.ToBeatmap(rulesets);
             Ruleset.Value ??= rulesets.GetRuleset(RulesetID);
 
+            if (Ruleset.Value == null)
+                return;
+
             Ruleset rulesetInstance = Ruleset.Value.CreateInstance();
 
             if (allowedModsBacking != null)
