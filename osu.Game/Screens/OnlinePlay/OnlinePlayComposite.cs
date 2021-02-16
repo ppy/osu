@@ -58,7 +58,7 @@ namespace osu.Game.Screens.OnlinePlay
         /// May be null if this <see cref="OnlinePlayComposite"/> is not inside a <see cref="RoomSubScreen"/>.
         /// </summary>
         [CanBeNull]
-        [Resolved(typeof(Room), CanBeNull = true)]
+        [Resolved(CanBeNull = true)]
         protected IBindable<PlaylistItem> SelectedItem { get; private set; }
     }
 }
