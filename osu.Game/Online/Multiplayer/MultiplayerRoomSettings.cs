@@ -40,7 +40,7 @@ namespace osu.Game.Online.Multiplayer
         /// Only used for client-side mutation.
         /// </summary>
         [Key(6)]
-        public int PlaylistItemId { get; set; }
+        public long PlaylistItemId { get; set; }
 
         public bool Equals(MultiplayerRoomSettings other)
             => BeatmapID == other.BeatmapID
