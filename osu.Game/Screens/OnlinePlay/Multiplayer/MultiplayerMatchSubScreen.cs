@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
@@ -269,7 +268,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             base.LoadComplete();
 
-            Playlist.BindCollectionChanged(onPlaylistChanged, true);
+            SelectedItem.BindValueChanged(onSelectedItemChanged);
+            SelectedItem.BindTo(client.CurrentMatchPlayingItem);
+
             BeatmapAvailability.BindValueChanged(updateBeatmapAvailability, true);
             UserMods.BindValueChanged(onUserModsChanged);
 
@@ -300,11 +301,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             return base.OnBackButton();
         }
 
-        private void onPlaylistChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void onSelectedItemChanged(ValueChangedEvent<PlaylistItem> item)
         {
-            SelectedItem.Value = Playlist.LastOrDefault();
-
-            if (SelectedItem.Value?.AllowedMods.Any() != true)
+            if (item.NewValue?.AllowedMods.Any() != true)
             {
                 userModsSection.Hide();
                 userModsSelectOverlay.Hide();
@@ -313,7 +312,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             else
             {
                 userModsSection.Show();
-                userModsSelectOverlay.IsValidMod = m => SelectedItem.Value.AllowedMods.Any(a => a.GetType() == m.GetType());
+                userModsSelectOverlay.IsValidMod = m => item.NewValue.AllowedMods.Any(a => a.GetType() == m.GetType());
             }
         }
 

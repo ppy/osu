@@ -28,9 +28,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         private Sample sampleStart;
 
-        [Resolved(typeof(Room), nameof(Room.Playlist))]
-        protected BindableList<PlaylistItem> Playlist { get; private set; }
-
         /// <summary>
         /// Any mods applied by/to the local user.
         /// </summary>
@@ -74,7 +71,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
             base.LoadComplete();
 
             SelectedItem.BindValueChanged(_ => Scheduler.AddOnce(selectedItemChanged));
-            SelectedItem.Value = Playlist.FirstOrDefault();
 
             managerUpdated = beatmapManager.ItemUpdated.GetBoundCopy();
             managerUpdated.BindValueChanged(beatmapUpdated);

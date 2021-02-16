@@ -36,18 +36,26 @@ namespace osu.Game.Online.Multiplayer
         [Key(5)]
         public IEnumerable<APIMod> AllowedMods { get; set; } = Enumerable.Empty<APIMod>();
 
+        /// <summary>
+        /// Only used for client-side mutation.
+        /// </summary>
+        [Key(6)]
+        public int PlaylistItemId { get; set; }
+
         public bool Equals(MultiplayerRoomSettings other)
             => BeatmapID == other.BeatmapID
                && BeatmapChecksum == other.BeatmapChecksum
                && RequiredMods.SequenceEqual(other.RequiredMods)
                && AllowedMods.SequenceEqual(other.AllowedMods)
                && RulesetID == other.RulesetID
-               && Name.Equals(other.Name, StringComparison.Ordinal);
+               && Name.Equals(other.Name, StringComparison.Ordinal)
+               && PlaylistItemId == other.PlaylistItemId;
 
         public override string ToString() => $"Name:{Name}"
                                              + $" Beatmap:{BeatmapID} ({BeatmapChecksum})"
                                              + $" RequiredMods:{string.Join(',', RequiredMods)}"
                                              + $" AllowedMods:{string.Join(',', AllowedMods)}"
-                                             + $" Ruleset:{RulesetID}";
+                                             + $" Ruleset:{RulesetID}"
+                                             + $" Item:{PlaylistItemId}";
     }
 }
