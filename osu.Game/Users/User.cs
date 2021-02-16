@@ -5,12 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Runtime.Serialization;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using osu.Framework.Bindables;
-using osu.Game.IO.Serialization;
 using osu.Game.Online.API.Requests;
 
 namespace osu.Game.Users
@@ -243,22 +240,9 @@ namespace osu.Game.Users
         /// Otherwise empty. Can be altered for testing purposes.
         /// </summary>
         // todo: this should likely be moved to a separate UserCompact class at some point.
-        [UsedImplicitly]
-        public readonly Dictionary<string, UserStatistics> AllStatistics = new Dictionary<string, UserStatistics>();
-
-        [UsedImplicitly]
-        [JsonExtensionData]
-        private readonly IDictionary<string, JToken> otherProperties = new Dictionary<string, JToken>();
-
-        [OnDeserialized]
-        private void onDeserialized(StreamingContext context)
-        {
-            foreach (var kvp in otherProperties.Where(kvp => kvp.Key.StartsWith("statistics_", StringComparison.Ordinal)))
-            {
-                var shortName = kvp.Key.Replace("statistics_", string.Empty);
-                AllStatistics[shortName] = kvp.Value.ToObject<UserStatistics>(JsonSerializer.Create(JsonSerializableExtensions.CreateGlobalSettings()));
-            }
-        }
+        [JsonProperty("statistics_rulesets")]
+        [CanBeNull]
+        public Dictionary<string, UserStatistics> RulesetsStatistics { get; set; }
 
         public override string ToString() => Username;
 

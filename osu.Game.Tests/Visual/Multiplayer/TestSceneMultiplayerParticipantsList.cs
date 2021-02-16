@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -155,7 +156,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         Id = i,
                         Username = $"User {i}",
-                        AllStatistics =
+                        RulesetsStatistics = new Dictionary<string, UserStatistics>
                         {
                             { Ruleset.Value.ShortName, new UserStatistics { GlobalRank = RNG.Next(1, 100000) } }
                         },
@@ -196,7 +197,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     Id = 0,
                     Username = "User 0",
-                    AllStatistics =
+                    RulesetsStatistics = new Dictionary<string, UserStatistics>
                     {
                         { Ruleset.Value.ShortName, new UserStatistics { GlobalRank = RNG.Next(1, 100000) } }
                     },
