@@ -1,14 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Specialized;
-using System.Linq;
+using System.Diagnostics;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Screens;
 using osu.Game.Online.API;
+using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
@@ -60,7 +61,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             base.LoadComplete();
 
-            Playlist.BindCollectionChanged(onPlaylistChanged, true);
+            Debug.Assert(SelectedItem != null);
+            SelectedItem.BindValueChanged(onSelectedItemChanged, true);
+
             Host.BindValueChanged(host =>
             {
                 if (RoomID.Value == null || host.NewValue?.Equals(api.LocalUser.Value) == true)
@@ -70,12 +73,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             }, true);
         }
 
-        private void onPlaylistChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void onSelectedItemChanged(ValueChangedEvent<PlaylistItem> selectedItem)
         {
-            if (Playlist.Any())
-                beatmapPanelContainer.Child = new DrawableRoomPlaylistItem(Playlist.Single(), false, false);
-            else
+            if (selectedItem.NewValue == null)
                 beatmapPanelContainer.Clear();
+            else
+                beatmapPanelContainer.Child = new DrawableRoomPlaylistItem(selectedItem.NewValue, false, false);
         }
     }
 }
