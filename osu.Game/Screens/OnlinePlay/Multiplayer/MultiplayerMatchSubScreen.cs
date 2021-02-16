@@ -12,6 +12,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
+using osu.Framework.Threading;
+using osu.Game.Configuration;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays.Mods;
@@ -75,7 +77,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                 RelativeSizeAxes = Axes.Both,
                                 Padding = new MarginPadding
                                 {
-                                    Horizontal = 105,
+                                    Horizontal = HORIZONTAL_OVERFLOW_PADDING + 55,
                                     Vertical = 20
                                 },
                                 Child = new GridContainer
@@ -235,6 +237,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     Origin = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.5f,
+                    Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING },
                     Child = userModsSelectOverlay = new UserModSelectOverlay
                     {
                         SelectedMods = { BindTarget = UserMods },
@@ -267,6 +270,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.LoadComplete();
 
             Playlist.BindCollectionChanged(onPlaylistChanged, true);
+            BeatmapAvailability.BindValueChanged(updateBeatmapAvailability, true);
             UserMods.BindValueChanged(onUserModsChanged);
 
             client.LoadRequested += onLoadRequested;
@@ -313,12 +317,46 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }
         }
 
+        private ModSettingChangeTracker modSettingChangeTracker;
+        private ScheduledDelegate debouncedModSettingsUpdate;
+
         private void onUserModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
+            modSettingChangeTracker?.Dispose();
+
             if (client.Room == null)
                 return;
 
             client.ChangeUserMods(mods.NewValue);
+
+            modSettingChangeTracker = new ModSettingChangeTracker(mods.NewValue);
+            modSettingChangeTracker.SettingChanged += onModSettingsChanged;
+        }
+
+        private void onModSettingsChanged(Mod mod)
+        {
+            // Debounce changes to mod settings so as to not thrash the network.
+            debouncedModSettingsUpdate?.Cancel();
+            debouncedModSettingsUpdate = Scheduler.AddDelayed(() =>
+            {
+                if (client.Room == null)
+                    return;
+
+                client.ChangeUserMods(UserMods.Value);
+            }, 500);
+        }
+
+        private void updateBeatmapAvailability(ValueChangedEvent<BeatmapAvailability> availability)
+        {
+            if (client.Room == null)
+                return;
+
+            client.ChangeBeatmapAvailability(availability.NewValue);
+
+            // while this flow is handled server-side, this covers the edge case of the local user being in a ready state and then deleting the current beatmap.
+            if (availability.NewValue != Online.Rooms.BeatmapAvailability.LocallyAvailable()
+                && client.LocalUser?.State == MultiplayerUserState.Ready)
+                client.ChangeState(MultiplayerUserState.Idle);
         }
 
         private void onReadyClick()
@@ -371,14 +409,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             if (client != null)
                 client.LoadRequested -= onLoadRequested;
+
+            modSettingChangeTracker?.Dispose();
         }
 
         private class UserModSelectOverlay : LocalPlayerModSelectOverlay
         {
-            public UserModSelectOverlay()
-            {
-                CustomiseButton.Alpha = 0;
-            }
         }
     }
 }

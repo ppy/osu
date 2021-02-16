@@ -19,7 +19,7 @@ namespace osu.Game.Skinning
 
         public abstract Drawable GetDrawableComponent(ISkinComponent componentName);
 
-        public abstract SampleChannel GetSample(ISampleInfo sampleInfo);
+        public abstract Sample GetSample(ISampleInfo sampleInfo);
 
         public Texture GetTexture(string componentName) => GetTexture(componentName, default, default);
 

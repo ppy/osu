@@ -171,7 +171,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
             userRankText.Text = currentModeRank != null ? $"#{currentModeRank.Value:N0}" : string.Empty;
 
-            userStateDisplay.Status = User.State;
+            userStateDisplay.UpdateStatus(User.State, User.BeatmapAvailability);
 
             if (Room.Host?.Equals(User) == true)
                 crown.FadeIn(fade_time);

@@ -86,10 +86,10 @@ namespace osu.Game.Screens.Select
 
         protected ModSelectOverlay ModSelect { get; private set; }
 
-        protected SampleChannel SampleConfirm { get; private set; }
+        protected Sample SampleConfirm { get; private set; }
 
-        private SampleChannel sampleChangeDifficulty;
-        private SampleChannel sampleChangeBeatmap;
+        private Sample sampleChangeDifficulty;
+        private Sample sampleChangeBeatmap;
 
         private Container carouselContainer;
 

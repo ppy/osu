@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Audio;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModRateAdjust : Mod, IApplicableToAudio
+    public abstract class ModRateAdjust : Mod, IApplicableToRate
     {
         public abstract BindableNumber<double> SpeedChange { get; }
 
@@ -21,6 +21,8 @@ namespace osu.Game.Rulesets.Mods
         {
             sample.AddAdjustment(AdjustableProperty.Frequency, SpeedChange);
         }
+
+        public double ApplyToRate(double time, double rate) => rate * SpeedChange.Value;
 
         public override string SettingDescription => SpeedChange.IsDefault ? string.Empty : $"{SpeedChange.Value:N2}x";
     }
