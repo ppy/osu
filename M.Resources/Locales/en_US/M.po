@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mfosu!\n"
 "POT-Creation-Date: 2020-12-04 02:25+0800\n"
-"PO-Revision-Date: 2021-02-13 00:23+0800\n"
+"PO-Revision-Date: 2021-02-16 14:29+0800\n"
 "Last-Translator: \n"
 "Language-Team: MATRIX-feather\n"
 "Language: en\n"
@@ -12,6 +12,28 @@ msgstr ""
 "X-Generator: Poedit 2.4.2\n"
 "X-Poedit-Basepath: .\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+
+# v2 配置
+msgid "config.introSequence.circles"
+msgstr "circles"
+
+msgid "config.introSequence.triangles"
+msgstr "triangles"
+
+msgid "config.introSequence.welcome"
+msgstr "welcome"
+
+msgid "config.introSequence.circles.simplifiedChinese"
+msgstr "circles(Chinese)"
+
+msgid "config.introSequence.triangles.simplifiedChinese"
+msgstr "triangles(Chinese)"
+
+msgid "config.introSequence.skipped"
+msgstr "skip"
+
+msgid "config.introSequence.random"
+msgstr "random"
 
 # v2 编辑器
 msgid "editor.controlPoint.effect"
@@ -672,27 +694,6 @@ msgstr "osu! music theme"
 
 msgid "开场样式"
 msgstr "Intro sequence"
-
-msgid "圆周"
-msgstr "Circles"
-
-msgid "怀旧"
-msgstr "Welcome"
-
-msgid "三角"
-msgstr "Triangles"
-
-msgid "圆周(中文)"
-msgstr "Circles (Chinese)"
-
-msgid "三角(中文)"
-msgstr "Triangles (Chinese)"
-
-msgid "略过开场"
-msgstr "Skipped"
-
-msgid "随机"
-msgstr "Random"
 
 msgid "背景来源(需要osu!supporter)"
 msgstr "Background source"
@@ -1476,6 +1477,27 @@ msgstr "notifications"
 
 msgid "等待着您~"
 msgstr "waiting for 'ya"
+
+#~ msgid "圆周"
+#~ msgstr "Circles"
+
+#~ msgid "怀旧"
+#~ msgstr "Welcome"
+
+#~ msgid "三角"
+#~ msgstr "Triangles"
+
+#~ msgid "圆周(中文)"
+#~ msgstr "Circles (Chinese)"
+
+#~ msgid "三角(中文)"
+#~ msgstr "Triangles (Chinese)"
+
+#~ msgid "略过开场"
+#~ msgstr "Skipped"
+
+#~ msgid "随机"
+#~ msgstr "Random"
 
 #~ msgid "screen.menu.buttonSystem.beatmaplisting"
 #~ msgstr "beatmaplist"

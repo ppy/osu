@@ -13,6 +13,28 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "Language: zh_CN\n"
 
+#v2 配置
+msgid "config.introSequence.circles"
+msgstr ""
+
+msgid "config.introSequence.triangles"
+msgstr ""
+
+msgid "config.introSequence.welcome"
+msgstr ""
+
+msgid "config.introSequence.circles.simplifiedChinese"
+msgstr ""
+
+msgid "config.introSequence.triangles.simplifiedChinese"
+msgstr ""
+
+msgid "config.introSequence.skipped"
+msgstr ""
+
+msgid "config.introSequence.random"
+msgstr ""
+
 #v2 编辑器
 msgid "editor.controlPoint.effect"
 msgstr ""
@@ -651,27 +673,6 @@ msgid "osu!主题音乐"
 msgstr ""
 
 msgid "开场样式"
-msgstr ""
-
-msgid "圆周"
-msgstr ""
-
-msgid "怀旧"
-msgstr ""
-
-msgid "三角"
-msgstr ""
-
-msgid "圆周(中文)"
-msgstr ""
-
-msgid "三角(中文)"
-msgstr ""
-
-msgid "略过开场"
-msgstr ""
-
-msgid "随机"
 msgstr ""
 
 msgid "背景来源(需要osu!supporter)"
