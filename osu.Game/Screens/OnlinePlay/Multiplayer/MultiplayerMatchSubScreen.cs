@@ -271,7 +271,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             Playlist.BindCollectionChanged(onPlaylistChanged, true);
             BeatmapAvailability.BindValueChanged(updateBeatmapAvailability, true);
-            UserMods.BindValueChanged(onUserModsChanged);
 
             client.LoadRequested += onLoadRequested;
             client.RoomUpdated += onRoomUpdated;
