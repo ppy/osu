@@ -11,6 +11,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Extensions;
 using osu.Game.Graphics.Cursor;
@@ -41,6 +42,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         [Resolved(CanBeNull = true)]
         private LoungeSubScreen loungeSubScreen { get; set; }
+
+        // handle deselection
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         public RoomsContainer()
         {
@@ -157,6 +161,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             if (selectedRoom.Value == null) return;
 
             JoinRequested?.Invoke(selectedRoom.Value);
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            selectRoom(null);
+            return base.OnClick(e);
         }
 
         #region Key selection logic (shared with BeatmapCarousel)
