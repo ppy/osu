@@ -66,6 +66,8 @@ namespace osu.Game.Online.Multiplayer
         /// </summary>
         public readonly BindableList<int> CurrentMatchPlayingUserIds = new BindableList<int>();
 
+        public readonly Bindable<PlaylistItem?> CurrentMatchPlayingItem = new Bindable<PlaylistItem?>();
+
         /// <summary>
         /// The <see cref="MultiplayerRoomUser"/> corresponding to the local player, if available.
         /// </summary>
@@ -93,9 +95,6 @@ namespace osu.Game.Online.Multiplayer
         private RulesetStore rulesets { get; set; } = null!;
 
         private Room? apiRoom;
-
-        // Todo: This is temporary, until the multiplayer server returns the item id on match start or otherwise.
-        private int playlistItemId;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -142,7 +141,6 @@ namespace osu.Game.Online.Multiplayer
                 {
                     Room = joinedRoom;
                     apiRoom = room;
-                    playlistItemId = room.Playlist.SingleOrDefault()?.ID ?? 0;
                 }, cancellationSource.Token);
 
                 // Update room settings.
@@ -218,7 +216,8 @@ namespace osu.Game.Online.Multiplayer
                 BeatmapChecksum = item.GetOr(existingPlaylistItem).Beatmap.Value.MD5Hash,
                 RulesetID = item.GetOr(existingPlaylistItem).RulesetID,
                 RequiredMods = item.HasValue ? item.Value.AsNonNull().RequiredMods.Select(m => new APIMod(m)).ToList() : Room.Settings.RequiredMods,
-                AllowedMods = item.HasValue ? item.Value.AsNonNull().AllowedMods.Select(m => new APIMod(m)).ToList() : Room.Settings.AllowedMods
+                AllowedMods = item.HasValue ? item.Value.AsNonNull().AllowedMods.Select(m => new APIMod(m)).ToList() : Room.Settings.AllowedMods,
+                PlaylistItemId = Room.Settings.PlaylistItemId,
             });
         }
 
@@ -506,14 +505,13 @@ namespace osu.Game.Online.Multiplayer
             Room.Settings = settings;
             apiRoom.Name.Value = Room.Settings.Name;
 
-            // The playlist update is delayed until an online beatmap lookup (below) succeeds.
-            // In-order for the client to not display an outdated beatmap, the playlist is forcefully cleared here.
-            apiRoom.Playlist.Clear();
+            // The current item update is delayed until an online beatmap lookup (below) succeeds.
+            // In-order for the client to not display an outdated beatmap, the current item is forcefully cleared here.
+            CurrentMatchPlayingItem.Value = null;
 
             RoomUpdated?.Invoke();
 
             var req = new GetBeatmapSetRequest(settings.BeatmapID, BeatmapSetLookupType.BeatmapId);
-
             req.Success += res =>
             {
                 if (cancellationToken.IsCancellationRequested)
@@ -540,18 +538,21 @@ namespace osu.Game.Online.Multiplayer
             var mods = settings.RequiredMods.Select(m => m.ToMod(ruleset));
             var allowedMods = settings.AllowedMods.Select(m => m.ToMod(ruleset));
 
-            PlaylistItem playlistItem = new PlaylistItem
-            {
-                ID = playlistItemId,
-                Beatmap = { Value = beatmap },
-                Ruleset = { Value = ruleset.RulesetInfo },
-            };
+            // Update an existing playlist item from the API room, or create a new item.
+            var playlistItem = apiRoom.Playlist.FirstOrDefault(i => i.ID == settings.PlaylistItemId);
 
+            if (playlistItem == null)
+                apiRoom.Playlist.Add(playlistItem = new PlaylistItem());
+
+            playlistItem.ID = settings.PlaylistItemId;
+            playlistItem.Beatmap.Value = beatmap;
+            playlistItem.Ruleset.Value = ruleset.RulesetInfo;
+            playlistItem.RequiredMods.Clear();
             playlistItem.RequiredMods.AddRange(mods);
+            playlistItem.AllowedMods.Clear();
             playlistItem.AllowedMods.AddRange(allowedMods);
 
-            apiRoom.Playlist.Clear(); // Clearing should be unnecessary, but here for sanity.
-            apiRoom.Playlist.Add(playlistItem);
+            CurrentMatchPlayingItem.Value = playlistItem;
         }
 
         /// <summary>
