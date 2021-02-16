@@ -2,8 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Diagnostics;
+using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -62,7 +62,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             base.LoadComplete();
 
             Debug.Assert(SelectedItem != null);
-            SelectedItem.BindValueChanged(onSelectedItemChanged, true);
+            SelectedItem.BindValueChanged(_ => updateBeatmap());
+            Playlist.BindCollectionChanged((_, __) => updateBeatmap(), true);
 
             Host.BindValueChanged(host =>
             {
@@ -73,12 +74,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             }, true);
         }
 
-        private void onSelectedItemChanged(ValueChangedEvent<PlaylistItem> selectedItem)
+        private void updateBeatmap()
         {
-            if (selectedItem.NewValue == null)
+            Debug.Assert(SelectedItem != null);
+            PlaylistItem item = SelectedItem.Value ?? Playlist.FirstOrDefault();
+
+            if (item == null)
                 beatmapPanelContainer.Clear();
             else
-                beatmapPanelContainer.Child = new DrawableRoomPlaylistItem(selectedItem.NewValue, false, false);
+                beatmapPanelContainer.Child = new DrawableRoomPlaylistItem(item, false, false);
         }
     }
 }

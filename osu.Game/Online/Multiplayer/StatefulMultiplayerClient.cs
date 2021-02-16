@@ -539,10 +539,7 @@ namespace osu.Game.Online.Multiplayer
             var allowedMods = settings.AllowedMods.Select(m => m.ToMod(ruleset));
 
             // Update an existing playlist item from the API room, or create a new item.
-            var playlistItem = apiRoom.Playlist.FirstOrDefault(i => i.ID == settings.PlaylistItemId);
-
-            if (playlistItem == null)
-                apiRoom.Playlist.Add(playlistItem = new PlaylistItem());
+            var playlistItem = apiRoom.Playlist.FirstOrDefault(i => i.ID == settings.PlaylistItemId) ?? new PlaylistItem();
 
             playlistItem.ID = settings.PlaylistItemId;
             playlistItem.Beatmap.Value = beatmap;
@@ -551,6 +548,9 @@ namespace osu.Game.Online.Multiplayer
             playlistItem.RequiredMods.AddRange(mods);
             playlistItem.AllowedMods.Clear();
             playlistItem.AllowedMods.AddRange(allowedMods);
+
+            if (!apiRoom.Playlist.Contains(playlistItem))
+                apiRoom.Playlist.Add(playlistItem);
 
             CurrentMatchPlayingItem.Value = playlistItem;
         }
