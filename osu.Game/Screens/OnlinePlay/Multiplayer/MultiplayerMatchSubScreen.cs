@@ -302,7 +302,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private void onPlaylistChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            SelectedItem.Value = Playlist.FirstOrDefault();
+            SelectedItem.Value = Playlist.LastOrDefault();
 
             if (SelectedItem.Value?.AllowedMods.Any() != true)
             {
