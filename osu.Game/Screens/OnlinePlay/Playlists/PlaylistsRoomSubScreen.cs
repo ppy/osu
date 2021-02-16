@@ -25,7 +25,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         public override string ShortTitle => "playlist";
 
         [Resolved(typeof(Room), nameof(Room.RoomID))]
-        private Bindable<int?> roomId { get; set; }
+        private Bindable<long?> roomId { get; set; }
 
         [Resolved(typeof(Room), nameof(Room.Playlist))]
         private BindableList<PlaylistItem> playlist { get; set; }
