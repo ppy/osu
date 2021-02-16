@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Menu
         private readonly List<Button> buttonsP2C = new List<Button>();
         private readonly List<Button> buttonsCustom = new List<Button>();
 
-        private SampleChannel sampleBack;
+        private Sample sampleBack;
 
         private readonly LogoTrackingContainer logoTrackingContainer;
 

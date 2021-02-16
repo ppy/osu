@@ -28,9 +28,9 @@ namespace osu.Game.Screens.Purcashe.Components
 
         private readonly ParallaxContainer hoverContainer;
         private readonly Container bounceContainer;
-        private SampleChannel sample1;
-        private SampleChannel sample2;
-        private SampleChannel sample3;
+        private Sample sample1;
+        private Sample sample2;
+        private Sample sample3;
         private readonly int rollTimes;
 
         [CanBeNull]

@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Purcashe.SubScreens
 
         private Container<ResultContainer> showcaseContainer;
         private int currentIndex = -1;
-        private SampleChannel sampleNext;
+        private Sample sampleNext;
 
         private ShowcasePurcasheProgressBar progress;
 

@@ -38,11 +38,12 @@ namespace osu.Game.Screens.Mvis.SideBar
         private readonly Container<Drawable> contentContainer;
         protected override Container<Drawable> Content => contentContainer;
 
-        private SampleChannel sampleToggle;
+        private Sample sampleToggle;
+        private Sample samplePopIn;
+        private Sample samplePopOut;
+
         private bool startFromHiddenState;
         private readonly Container content;
-        private SampleChannel samplePopIn;
-        private SampleChannel samplePopOut;
         private bool isFirstHide = true;
 
         public Sidebar()

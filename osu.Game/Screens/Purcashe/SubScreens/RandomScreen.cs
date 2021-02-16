@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -50,10 +51,9 @@ namespace osu.Game.Screens.Purcashe.SubScreens
         [BackgroundDependencyLoader]
         private void load(MConfigManager config, AudioManager audio)
         {
-            loop = new DrawableSample(audio.Samples.Get("Gameplay/pause-loop"))
-            {
-                Looping = true
-            };
+            loop = new DrawableSample(audio.Samples.Get("Gameplay/pause-loop"));
+
+            loop.GetChannel().Looping = true;
 
             config.BindWith(MSetting.PPCount, coins);
             tempPPCount.Value = coins.Value;

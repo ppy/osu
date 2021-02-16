@@ -18,7 +18,7 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public class HoverSounds : HoverSampleDebounceComponent
     {
-        private SampleChannel sampleHover;
+        private Sample sampleHover;
 
         protected readonly HoverSampleSet SampleSet;
 

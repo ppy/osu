@@ -42,12 +42,11 @@ namespace osu.Game.Screens.Menu
         private readonly MenuLogoVisualisation visualizer;
 
         private readonly IntroSequence intro;
-
         private readonly IntroSequenceCN introCN;
 
-        private SampleChannel sampleClick;
-        private SampleChannel sampleBeat;
-        private SampleChannel sampleDownbeat;
+        private Sample sampleClick;
+        private Sample sampleBeat;
+        private Sample sampleDownbeat;
 
         private readonly Container colourAndTriangles;
         private readonly Triangles triangles;
