@@ -56,7 +56,6 @@ namespace osu.Game.Screens.OnlinePlay.Components
                     attemptDisplay.Text += $" ({remaining} remaining)";
                 }
             }
-
             else
             {
                 attemptDisplay.Text = string.Empty;
