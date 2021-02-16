@@ -25,7 +25,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         private const int max_decimal_digits = 5;
 
-        private SampleChannel sample;
+        private Sample sample;
         private double lastSampleTime;
         private T lastSampleValue;
 
@@ -155,16 +155,15 @@ namespace osu.Game.Graphics.UserInterface
                 return;
 
             lastSampleValue = value;
-
             lastSampleTime = Clock.CurrentTime;
-            sample.Frequency.Value = 1 + NormalizedValue * 0.2f;
 
+            var channel = sample.Play();
+
+            channel.Frequency.Value = 1 + NormalizedValue * 0.2f;
             if (NormalizedValue == 0)
-                sample.Frequency.Value -= 0.4f;
+                channel.Frequency.Value -= 0.4f;
             else if (NormalizedValue == 1)
-                sample.Frequency.Value += 0.4f;
-
-            sample.Play();
+                channel.Frequency.Value += 0.4f;
         }
 
         private void updateTooltipText(T value)

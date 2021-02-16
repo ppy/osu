@@ -87,6 +87,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 Ruleset.Value = new OsuRuleset().RulesetInfo;
                 Beatmap.SetDefault();
+                SelectedMods.Value = Array.Empty<Mod>();
             });
 
             AddStep("create song select", () => LoadScreen(songSelect = new TestPlaylistsSongSelect()));
@@ -143,7 +144,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         /// Tests that the same <see cref="Mod"/> instances are not shared between two playlist items.
         /// </summary>
         [Test]
-        [Ignore("Temporarily disabled due to a non-trivial test failure")]
         public void TestNewItemHasNewModInstances()
         {
             AddStep("set dt mod", () => SelectedMods.Value = new[] { new OsuModDoubleTime() });

@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -163,8 +162,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     ((ISpectatorClient)this).UserSentFrames(userId, new FrameDataBundle(header, Array.Empty<LegacyReplayFrame>()));
                 }
             }
-
-            protected override Task Connect() => Task.CompletedTask;
         }
     }
 }

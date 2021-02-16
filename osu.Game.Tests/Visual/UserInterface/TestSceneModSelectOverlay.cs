@@ -39,12 +39,34 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [SetUp]
-        public void SetUp() => Schedule(() => createDisplay(() => new TestModSelectOverlay()));
+        public void SetUp() => Schedule(() =>
+        {
+            SelectedMods.Value = Array.Empty<Mod>();
+            createDisplay(() => new TestModSelectOverlay());
+        });
 
         [SetUpSteps]
         public void SetUpSteps()
         {
             AddStep("show", () => modSelect.Show());
+        }
+
+        [Test]
+        public void TestSettingsResetOnDeselection()
+        {
+            var osuModDoubleTime = new OsuModDoubleTime { SpeedChange = { Value = 1.2 } };
+
+            changeRuleset(0);
+
+            AddStep("set dt mod with custom rate", () => { SelectedMods.Value = new[] { osuModDoubleTime }; });
+
+            AddAssert("selected mod matches", () => (SelectedMods.Value.Single() as OsuModDoubleTime)?.SpeedChange.Value == 1.2);
+
+            AddStep("deselect", () => modSelect.DeselectAllButton.Click());
+            AddAssert("selected mods empty", () => SelectedMods.Value.Count == 0);
+
+            AddStep("reselect", () => modSelect.GetModButton(osuModDoubleTime).Click());
+            AddAssert("selected mod has default value", () => (SelectedMods.Value.Single() as OsuModDoubleTime)?.SpeedChange.IsDefault == true);
         }
 
         [Test]
@@ -150,6 +172,45 @@ namespace osu.Game.Tests.Visual.UserInterface
                 var button = modSelect.GetModButton(SelectedMods.Value.Single());
                 return ((OsuModDoubleTime)button.SelectedMod).SpeedChange.Value == 1.01;
             });
+        }
+
+        [Test]
+        public void TestSettingsAreRetainedOnReload()
+        {
+            changeRuleset(0);
+
+            AddStep("set customized mod externally", () => SelectedMods.Value = new[] { new OsuModDoubleTime { SpeedChange = { Value = 1.01 } } });
+
+            AddAssert("setting remains", () => (SelectedMods.Value.SingleOrDefault() as OsuModDoubleTime)?.SpeedChange.Value == 1.01);
+
+            AddStep("create overlay", () => createDisplay(() => new TestNonStackedModSelectOverlay()));
+
+            AddAssert("setting remains", () => (SelectedMods.Value.SingleOrDefault() as OsuModDoubleTime)?.SpeedChange.Value == 1.01);
+        }
+
+        [Test]
+        public void TestExternallySetModIsReplacedByOverlayInstance()
+        {
+            Mod external = new OsuModDoubleTime();
+            Mod overlayButtonMod = null;
+
+            changeRuleset(0);
+
+            AddStep("set mod externally", () => { SelectedMods.Value = new[] { external }; });
+
+            AddAssert("ensure button is selected", () =>
+            {
+                var button = modSelect.GetModButton(SelectedMods.Value.Single());
+                overlayButtonMod = button.SelectedMod;
+                return overlayButtonMod.GetType() == external.GetType();
+            });
+
+            // Right now, when an external change occurs, the ModSelectOverlay will replace the global instance with its own
+            AddAssert("mod instance doesn't match", () => external != overlayButtonMod);
+
+            AddAssert("one mod present in global selected", () => SelectedMods.Value.Count == 1);
+            AddAssert("globally selected matches button's mod instance", () => SelectedMods.Value.Contains(overlayButtonMod));
+            AddAssert("globally selected doesn't contain original external change", () => !SelectedMods.Value.Contains(external));
         }
 
         [Test]
@@ -313,7 +374,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private void createDisplay(Func<TestModSelectOverlay> createOverlayFunc)
         {
-            SelectedMods.Value = Array.Empty<Mod>();
             Children = new Drawable[]
             {
                 modSelect = createOverlayFunc().With(d =>
