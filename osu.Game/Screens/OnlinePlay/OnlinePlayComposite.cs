@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.Rooms;
+using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.OnlinePlay
@@ -50,5 +52,13 @@ namespace osu.Game.Screens.OnlinePlay
 
         [Resolved(typeof(Room))]
         protected Bindable<TimeSpan?> Duration { get; private set; }
+
+        /// <summary>
+        /// The currently selected item in the <see cref="RoomSubScreen"/>.
+        /// May be null if this <see cref="OnlinePlayComposite"/> is not inside a <see cref="RoomSubScreen"/>.
+        /// </summary>
+        [CanBeNull]
+        [Resolved(typeof(Room), CanBeNull = true)]
+        protected IBindable<PlaylistItem> SelectedItem { get; private set; }
     }
 }
