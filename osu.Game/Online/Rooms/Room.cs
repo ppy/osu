@@ -17,7 +17,7 @@ namespace osu.Game.Online.Rooms
     {
         [Cached]
         [JsonProperty("id")]
-        public readonly Bindable<int?> RoomID = new Bindable<int?>();
+        public readonly Bindable<long?> RoomID = new Bindable<long?>();
 
         [Cached]
         [JsonProperty("name")]
