@@ -11,6 +11,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Extensions;
 using osu.Game.Graphics.Cursor;
@@ -42,6 +43,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         [Resolved(CanBeNull = true)]
         private LoungeSubScreen loungeSubScreen { get; set; }
 
+        // handle deselection
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+
         public RoomsContainer()
         {
             RelativeSizeAxes = Axes.X;
@@ -69,7 +73,15 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             rooms.BindTo(roomManager.Rooms);
 
             filter?.BindValueChanged(criteria => Filter(criteria.NewValue));
+
+            selectedRoom.BindValueChanged(selection =>
+            {
+                updateSelection();
+            }, true);
         }
+
+        private void updateSelection() =>
+            roomFlow.Children.ForEach(r => r.State = r.Room == selectedRoom.Value ? SelectionState.Selected : SelectionState.NotSelected);
 
         public void Filter(FilterCriteria criteria)
         {
@@ -125,6 +137,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             }
 
             Filter(filter?.Value);
+
+            updateSelection();
         }
 
         private void removeRooms(IEnumerable<Room> rooms)
@@ -146,17 +160,19 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 roomFlow.SetLayoutPosition(room, room.Room.Position.Value);
         }
 
-        private void selectRoom(Room room)
-        {
-            roomFlow.Children.ForEach(r => r.State = r.Room == room ? SelectionState.Selected : SelectionState.NotSelected);
-            selectedRoom.Value = room;
-        }
+        private void selectRoom(Room room) => selectedRoom.Value = room;
 
         private void joinSelected()
         {
             if (selectedRoom.Value == null) return;
 
             JoinRequested?.Invoke(selectedRoom.Value);
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            selectRoom(null);
+            return base.OnClick(e);
         }
 
         #region Key selection logic (shared with BeatmapCarousel)
