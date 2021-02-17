@@ -150,7 +150,8 @@ namespace osu.Game.Database
 
             bool isLowPriorityImport = tasks.Length > low_priority_import_batch_size;
 
-            await Task.WhenAll(tasks.Select(async task =>
+            // start running on task scheduler earlier than the final import call (to cover the archive opening / reading).
+            await Task.WhenAll(tasks.Select(task => Task.Factory.StartNew(async () =>
             {
                 notification.CancellationToken.ThrowIfCancellationRequested();
 
@@ -176,7 +177,7 @@ namespace osu.Game.Database
                 {
                     Logger.Error(e, $@"Could not import ({task})", LoggingTarget.Database);
                 }
-            }));
+            }, CancellationToken.None, TaskCreationOptions.HideScheduler, isLowPriorityImport ? import_scheduler_low_priority : import_scheduler).Unwrap()));
 
             if (imported.Count == 0)
             {
