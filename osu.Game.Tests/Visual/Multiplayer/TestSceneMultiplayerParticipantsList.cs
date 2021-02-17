@@ -160,10 +160,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         {
                             {
                                 Ruleset.Value.ShortName,
-                                new UserStatistics
-                                {
-                                    Ranks = new UserStatistics.UserRanks { Global = RNG.Next(1, 100000) }
-                                }
+                                new UserStatistics { GlobalRank = RNG.Next(1, 100000), }
                             }
                         },
                         CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
@@ -207,10 +204,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         {
                             Ruleset.Value.ShortName,
-                            new UserStatistics
-                            {
-                                Ranks = new UserStatistics.UserRanks { Global = RNG.Next(1, 100000) }
-                            }
+                            new UserStatistics { GlobalRank = RNG.Next(1, 100000), }
                         }
                     },
                     CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
