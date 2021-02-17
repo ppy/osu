@@ -15,7 +15,7 @@ namespace osu.Game.Online.Rooms
     public class PlaylistItem : IEquatable<PlaylistItem>
     {
         [JsonProperty("id")]
-        public int ID { get; set; }
+        public long ID { get; set; }
 
         [JsonProperty("beatmap_id")]
         public int BeatmapID { get; set; }
