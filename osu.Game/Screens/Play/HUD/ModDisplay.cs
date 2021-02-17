@@ -88,10 +88,13 @@ namespace osu.Game.Screens.Play.HUD
             {
                 iconsContainer.Clear();
 
-                foreach (Mod mod in mods.NewValue)
-                    iconsContainer.Add(new ModIcon(mod) { Scale = new Vector2(0.6f) });
+                if (mods.NewValue != null)
+                {
+                    foreach (Mod mod in mods.NewValue)
+                        iconsContainer.Add(new ModIcon(mod) { Scale = new Vector2(0.6f) });
 
-                appearTransform();
+                    appearTransform();
+                }
             }, true);
 
             iconsContainer.FadeInFromZero(fade_duration, Easing.OutQuint);
