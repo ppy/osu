@@ -225,11 +225,7 @@ namespace osu.Game.Tournament
                 success?.Invoke();
             };
 
-            req.Failure += _ =>
-            {
-                user.Id = 1;
-                failure?.Invoke();
-            };
+            req.Failure += _ => failure?.Invoke();
 
             if (immediate)
                 API.Perform(req);
