@@ -111,12 +111,10 @@ namespace osu.Game.Screens.Menu
             {
                 setInfo = beatmaps.QueryBeatmapSet(b => b.Hash == BeatmapHash);
 
-                if (setInfo != null)
-                {
-                    initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
-                }
+                if (setInfo == null)
+                    return false;
 
-                return UsingThemedIntro;
+                return (initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0])) != null;
             }
         }
 
