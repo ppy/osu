@@ -152,7 +152,7 @@ namespace osu.Game.Tournament
                 {
                     if (string.IsNullOrEmpty(p.Username) || p.Statistics == null)
                     {
-                        PopulateUser(p);
+                        PopulateUser(p, immediate: true);
                         addedInfo = true;
                     }
                 }
@@ -211,7 +211,7 @@ namespace osu.Game.Tournament
             return addedInfo;
         }
 
-        public void PopulateUser(User user, Action success = null, Action failure = null)
+        public void PopulateUser(User user, Action success = null, Action failure = null, bool immediate = false)
         {
             var req = new GetUserRequest(user.Id, Ruleset.Value);
 
@@ -225,13 +225,12 @@ namespace osu.Game.Tournament
                 success?.Invoke();
             };
 
-            req.Failure += _ =>
-            {
-                user.Id = 1;
-                failure?.Invoke();
-            };
+            req.Failure += _ => failure?.Invoke();
 
-            API.Queue(req);
+            if (immediate)
+                API.Perform(req);
+            else
+                API.Queue(req);
         }
 
         protected override void LoadComplete()
