@@ -45,6 +45,9 @@ namespace osu.Game.Screens.OnlinePlay
         protected Bindable<int?> MaxAttempts { get; private set; }
 
         [Resolved(typeof(Room))]
+        public Bindable<PlaylistAggregateScore> UserScore { get; private set; }
+
+        [Resolved(typeof(Room))]
         protected Bindable<DateTimeOffset?> EndDate { get; private set; }
 
         [Resolved(typeof(Room))]
