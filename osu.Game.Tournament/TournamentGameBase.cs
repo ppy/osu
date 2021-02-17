@@ -150,7 +150,7 @@ namespace osu.Game.Tournament
             {
                 foreach (var p in t.Players)
                 {
-                    if (string.IsNullOrEmpty(p.Username) || p.Statistics == null)
+                    if (string.IsNullOrEmpty(p.Username) || p.Statistics?.GlobalRank == null)
                     {
                         PopulateUser(p, immediate: true);
                         addedInfo = true;
