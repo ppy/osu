@@ -13,7 +13,7 @@ namespace osu.Game.Screens.OnlinePlay
     public class OnlinePlayComposite : CompositeDrawable
     {
         [Resolved(typeof(Room))]
-        protected Bindable<int?> RoomID { get; private set; }
+        protected Bindable<long?> RoomID { get; private set; }
 
         [Resolved(typeof(Room), nameof(Room.Name))]
         protected Bindable<string> RoomName { get; private set; }
@@ -41,6 +41,9 @@ namespace osu.Game.Screens.OnlinePlay
 
         [Resolved(typeof(Room))]
         protected Bindable<int?> MaxAttempts { get; private set; }
+
+        [Resolved(typeof(Room))]
+        public Bindable<PlaylistAggregateScore> UserScore { get; private set; }
 
         [Resolved(typeof(Room))]
         protected Bindable<DateTimeOffset?> EndDate { get; private set; }

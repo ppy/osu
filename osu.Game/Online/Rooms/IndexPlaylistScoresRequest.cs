@@ -15,8 +15,8 @@ namespace osu.Game.Online.Rooms
     /// </summary>
     public class IndexPlaylistScoresRequest : APIRequest<IndexedMultiplayerScores>
     {
-        public readonly int RoomId;
-        public readonly int PlaylistItemId;
+        public readonly long RoomId;
+        public readonly long PlaylistItemId;
 
         [CanBeNull]
         public readonly Cursor Cursor;
@@ -24,13 +24,13 @@ namespace osu.Game.Online.Rooms
         [CanBeNull]
         public readonly IndexScoresParams IndexParams;
 
-        public IndexPlaylistScoresRequest(int roomId, int playlistItemId)
+        public IndexPlaylistScoresRequest(long roomId, long playlistItemId)
         {
             RoomId = roomId;
             PlaylistItemId = playlistItemId;
         }
 
-        public IndexPlaylistScoresRequest(int roomId, int playlistItemId, [NotNull] Cursor cursor, [NotNull] IndexScoresParams indexParams)
+        public IndexPlaylistScoresRequest(long roomId, long playlistItemId, [NotNull] Cursor cursor, [NotNull] IndexScoresParams indexParams)
             : this(roomId, playlistItemId)
         {
             Cursor = cursor;
