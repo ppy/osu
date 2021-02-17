@@ -148,6 +148,12 @@ namespace osu.Game.Online.Rooms
             if (EndDate.Value != null && DateTimeOffset.Now >= EndDate.Value)
                 Status.Value = new RoomStatusEnded();
 
+            // Todo: This is not the best way/place to do this, but the intention is to display all playlist items when the room has ended,
+            // and display only the non-expired playlist items while the room is still active.
+            // In order to achieve this, all expired items are removed from the source Room.
+            if (!(Status.Value is RoomStatusEnded))
+                other.Playlist.RemoveAll(i => i.Expired);
+
             if (!Playlist.SequenceEqual(other.Playlist))
             {
                 Playlist.Clear();
