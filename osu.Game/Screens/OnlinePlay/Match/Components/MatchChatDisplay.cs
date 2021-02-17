@@ -11,7 +11,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
     public class MatchChatDisplay : StandAloneChatDisplay
     {
         [Resolved(typeof(Room), nameof(Room.RoomID))]
-        private Bindable<int?> roomId { get; set; }
+        private Bindable<long?> roomId { get; set; }
 
         [Resolved(typeof(Room), nameof(Room.ChannelId))]
         private Bindable<int> channelId { get; set; }
