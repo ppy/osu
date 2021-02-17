@@ -77,6 +77,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         private void updateBeatmap()
         {
             Debug.Assert(SelectedItem != null);
+
+            // When the selected item is null, the match hasn't yet been created. Use the playlist directly, which is mutated by song selection.
             PlaylistItem item = SelectedItem.Value ?? Playlist.FirstOrDefault();
 
             if (item == null)

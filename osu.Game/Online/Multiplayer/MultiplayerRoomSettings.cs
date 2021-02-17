@@ -36,9 +36,6 @@ namespace osu.Game.Online.Multiplayer
         [Key(5)]
         public IEnumerable<APIMod> AllowedMods { get; set; } = Enumerable.Empty<APIMod>();
 
-        /// <summary>
-        /// Only used for client-side mutation.
-        /// </summary>
         [Key(6)]
         public long PlaylistItemId { get; set; }
 
