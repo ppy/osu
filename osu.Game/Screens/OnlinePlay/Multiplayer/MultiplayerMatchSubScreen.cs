@@ -46,7 +46,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private MultiplayerMatchSettingsOverlay settingsOverlay;
         private Drawable userModsSection;
 
-        private IBindable<bool> isConnected;
+        private readonly IBindable<bool> isConnected = new Bindable<bool>();
+        private readonly IBindable<PlaylistItem> matchCurrentItem = new Bindable<PlaylistItem>();
 
         [CanBeNull]
         private IDisposable readyClickOperation;
@@ -268,8 +269,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             base.LoadComplete();
 
-            SelectedItem.BindValueChanged(onSelectedItemChanged);
-            SelectedItem.BindTo(client.CurrentMatchPlayingItem);
+            matchCurrentItem.BindTo(client.CurrentMatchPlayingItem);
+            matchCurrentItem.BindValueChanged(onCurrentItemChanged, true);
 
             BeatmapAvailability.BindValueChanged(updateBeatmapAvailability, true);
             UserMods.BindValueChanged(onUserModsChanged);
@@ -277,12 +278,39 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             client.LoadRequested += onLoadRequested;
             client.RoomUpdated += onRoomUpdated;
 
-            isConnected = client.IsConnected.GetBoundCopy();
+            isConnected.BindTo(client.IsConnected);
             isConnected.BindValueChanged(connected =>
             {
                 if (!connected.NewValue)
                     Schedule(this.Exit);
             }, true);
+        }
+
+        private void onCurrentItemChanged(ValueChangedEvent<PlaylistItem> item)
+        {
+            if (client?.LocalUser == null)
+                return;
+
+            // If we're about to enter gameplay, schedule the item to be set at a later time.
+            if (client.LocalUser.State > MultiplayerUserState.Ready)
+            {
+                Schedule(() => onCurrentItemChanged(item));
+                return;
+            }
+
+            SelectedItem.Value = item.NewValue;
+
+            if (item.NewValue?.AllowedMods.Any() != true)
+            {
+                userModsSection.Hide();
+                userModsSelectOverlay.Hide();
+                userModsSelectOverlay.IsValidMod = _ => false;
+            }
+            else
+            {
+                userModsSection.Show();
+                userModsSelectOverlay.IsValidMod = m => item.NewValue.AllowedMods.Any(a => a.GetType() == m.GetType());
+            }
         }
 
         protected override void UpdateMods()
@@ -311,21 +339,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }
 
             return base.OnBackButton();
-        }
-
-        private void onSelectedItemChanged(ValueChangedEvent<PlaylistItem> item)
-        {
-            if (item.NewValue?.AllowedMods.Any() != true)
-            {
-                userModsSection.Hide();
-                userModsSelectOverlay.Hide();
-                userModsSelectOverlay.IsValidMod = _ => false;
-            }
-            else
-            {
-                userModsSection.Show();
-                userModsSelectOverlay.IsValidMod = m => item.NewValue.AllowedMods.Any(a => a.GetType() == m.GetType());
-            }
         }
 
         private ModSettingChangeTracker modSettingChangeTracker;
