@@ -226,7 +226,7 @@ namespace osu.Game.Database
         public Action<IEnumerable<TModel>> PresentImport;
 
         /// <summary>
-        /// Import an item from an <see cref="ArchiveReader"/>.
+        /// Silently import an item from an <see cref="ArchiveReader"/>.
         /// </summary>
         /// <param name="archive">The archive to be imported.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
@@ -303,7 +303,7 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Import an item from a <typeparamref name="TModel"/>.
+        /// Silently import an item from a <typeparamref name="TModel"/>.
         /// </summary>
         /// <param name="item">The model to be imported.</param>
         /// <param name="archive">An optional archive to use for model population.</param>
