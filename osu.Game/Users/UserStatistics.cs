@@ -122,8 +122,10 @@ namespace osu.Game.Users
 
         private struct UserRanks
         {
+#pragma warning disable 649
             [JsonProperty(@"country")]
             public int? Country;
+#pragma warning restore 649
         }
 
         public RankHistoryData RankHistory;
