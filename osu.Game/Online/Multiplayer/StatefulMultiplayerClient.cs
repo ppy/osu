@@ -95,7 +95,7 @@ namespace osu.Game.Online.Multiplayer
         private Room? apiRoom;
 
         // Todo: This is temporary, until the multiplayer server returns the item id on match start or otherwise.
-        private int playlistItemId;
+        private long playlistItemId;
 
         [BackgroundDependencyLoader]
         private void load()
