@@ -192,7 +192,9 @@ namespace osu.Game.Overlays
                     },
                 },
             };
+
             textbox.OnCommit += postMessage;
+
             ChannelTabControl.Current.ValueChanged += current => channelManager.CurrentChannel.Value = current.NewValue;
             ChannelTabControl.ChannelSelectorActive.ValueChanged += active => ChannelSelectionOverlay.State.Value = active.NewValue ? Visibility.Visible : Visibility.Hidden;
             ChannelSelectionOverlay.State.ValueChanged += state =>
@@ -209,8 +211,10 @@ namespace osu.Game.Overlays
                 else
                     textbox.HoldFocus = true;
             };
+
             ChannelSelectionOverlay.OnRequestJoin = channel => channelManager.JoinChannel(channel);
             ChannelSelectionOverlay.OnRequestLeave = channelManager.LeaveChannel;
+
             ChatHeight = config.GetBindable<float>(OsuSetting.ChatDisplayHeight);
             ChatHeight.BindValueChanged(height =>
             {
@@ -218,7 +222,9 @@ namespace osu.Game.Overlays
                 channelSelectionContainer.Height = 1f - height.NewValue;
                 tabBackground.FadeTo(height.NewValue == 1f ? 1f : 0.8f, 200);
             }, true);
+
             chatBackground.Colour = colours.ChatBlue;
+
             loading.Show();
 
             // This is a relatively expensive (and blocking) operation.
@@ -228,10 +234,13 @@ namespace osu.Game.Overlays
             {
                 // TODO: consider scheduling bindable callbacks to not perform when overlay is not present.
                 channelManager.JoinedChannels.CollectionChanged += joinedChannelsChanged;
+
                 foreach (Channel channel in channelManager.JoinedChannels)
                     ChannelTabControl.AddChannel(channel);
+
                 channelManager.AvailableChannels.CollectionChanged += availableChannelsChanged;
                 availableChannelsChanged(null, null);
+
                 currentChannel = channelManager.CurrentChannel.GetBoundCopy();
                 currentChannel.BindValueChanged(currentChannelChanged, true);
             });
