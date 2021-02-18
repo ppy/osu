@@ -168,7 +168,7 @@ namespace osu.Game.Screens.Menu
         {
             // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Menu.
             if (UsingThemedIntro)
-                Track.Restart();
+                Track.Start();
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
