@@ -24,7 +24,8 @@ namespace osu.Game.Screens.Select.Carousel
         public Container BorderContainer;
 
         public readonly Bindable<CarouselItemState> State = new Bindable<CarouselItemState>(CarouselItemState.NotSelected);
-        private HoverLayer hoverLayer;
+
+        private readonly HoverLayer hoverLayer;
 
         protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
