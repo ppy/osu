@@ -29,10 +29,15 @@ namespace osu.Game.Users
         [JsonProperty(@"global_rank")]
         public int? GlobalRank;
 
-        // eventually UserRanks object will be completely replaced with separate global rank (exists) and country rank properties
-        // see https://github.com/ppy/osu-web/blob/cb79bb72186c8f1a25f6a6f5ef315123decb4231/app/Transformers/UserStatisticsTransformer.php#L53.
+        public int? CountryRank;
+
         [JsonProperty(@"rank")]
-        public UserRanks Ranks;
+        private UserRanks ranks
+        {
+            // eventually that will also become an own json property instead of reading from a `rank` object.
+            // see https://github.com/ppy/osu-web/blob/cb79bb72186c8f1a25f6a6f5ef315123decb4231/app/Transformers/UserStatisticsTransformer.php#L53.
+            set => CountryRank = value.Country;
+        }
 
         [JsonProperty(@"pp")]
         public decimal? PP;
@@ -115,7 +120,7 @@ namespace osu.Game.Users
             }
         }
 
-        public struct UserRanks
+        private struct UserRanks
         {
             [JsonProperty(@"country")]
             public int? Country;

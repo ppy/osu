@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Visual.Online
             Statistics = new UserStatistics
             {
                 GlobalRank = 2148,
-                Ranks = new UserStatistics.UserRanks { Country = 1, },
+                CountryRank = 1,
                 PP = 4567.89m,
                 Level = new UserStatistics.LevelInfo
                 {
