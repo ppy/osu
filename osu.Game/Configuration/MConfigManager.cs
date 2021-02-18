@@ -73,6 +73,7 @@ namespace osu.Game.Configuration
             Set(MSetting.UseCustomGreetingPicture, false);
             Set(MSetting.FadeOutWindowWhenExiting, false);
             Set(MSetting.FadeInWindowWhenEntering, false);
+            Set(MSetting.UseSystemCursor, false);
         }
     }
 
@@ -115,7 +116,8 @@ namespace osu.Game.Configuration
         CustomWindowIconPath,
         UseCustomGreetingPicture,
         FadeOutWindowWhenExiting,
-        FadeInWindowWhenEntering
+        FadeInWindowWhenEntering,
+        UseSystemCursor
     }
 
     public enum MvisBarType

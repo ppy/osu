@@ -13,6 +13,7 @@ using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
+using osu.Framework.Platform;
 using osu.Framework.Utils;
 
 namespace osu.Game.Graphics.Cursor
@@ -27,13 +28,33 @@ namespace osu.Game.Graphics.Cursor
         private Cursor activeCursor;
 
         private Bindable<bool> cursorRotate;
+        private Bindable<bool> useSystemCursor;
+        private bool changedWhenHidden;
         private DragRotationState dragRotationState;
         private Vector2 positionMouseDown;
 
+        [Resolved]
+        private GameHost host { get; set; }
+
         [BackgroundDependencyLoader(true)]
-        private void load([NotNull] OsuConfigManager config, [CanBeNull] ScreenshotManager screenshotManager)
+        private void load([NotNull] OsuConfigManager config, [NotNull]MConfigManager mConfig, [CanBeNull] ScreenshotManager screenshotManager)
         {
             cursorRotate = config.GetBindable<bool>(OsuSetting.CursorRotation);
+            useSystemCursor = mConfig.GetBindable<bool>(MSetting.UseSystemCursor);
+
+            useSystemCursor.BindValueChanged(v =>
+            {
+                if (State.Value == Visibility.Hidden)
+                {
+                    changedWhenHidden = true;
+                    return;
+                }
+
+                if (v.NewValue)
+                    showSystemCursor(true);
+                else
+                    hideSystemCursor(true);
+            }, true);
 
             if (screenshotManager != null)
                 screenshotCursorVisibility.BindTo(screenshotManager.CursorVisibility);
@@ -110,12 +131,54 @@ namespace osu.Game.Graphics.Cursor
         {
             activeCursor.FadeTo(1, 250, Easing.OutQuint);
             activeCursor.ScaleTo(1, 400, Easing.OutQuint);
+
+            if (useSystemCursor.Value) showSystemCursor(changedWhenHidden);
+            else hideSystemCursor(changedWhenHidden);
+            changedWhenHidden = false;
+        }
+
+        private void showSystemCursor(bool toggleGameCursor = false)
+        {
+            switch (host.Window)
+            {
+                // Legacy osuTK DesktopGameWindow
+                case OsuTKDesktopWindow tkWindow:
+                    tkWindow.CursorState = CursorState.Default;
+                    break;
+
+                // SDL2 DesktopWindow
+                case SDL2DesktopWindow desktopWindow:
+                    desktopWindow.CursorState = CursorState.Default;
+                    break;
+            }
+
+            if (toggleGameCursor) activeCursor.FadeOutContainer();
+        }
+
+        private void hideSystemCursor(bool toggleGameCursor = false)
+        {
+            switch (host.Window)
+            {
+                // Legacy osuTK DesktopGameWindow
+                case OsuTKDesktopWindow tkWindow:
+                    tkWindow.CursorState = CursorState.Hidden;
+                    break;
+
+                // SDL2 DesktopWindow
+                case SDL2DesktopWindow desktopWindow:
+                    desktopWindow.CursorState = CursorState.Hidden;
+                    break;
+            }
+
+            if (toggleGameCursor) activeCursor.FadeInContainer();
         }
 
         protected override void PopOut()
         {
             activeCursor.FadeTo(0, 250, Easing.OutQuint);
             activeCursor.ScaleTo(0.6f, 250, Easing.In);
+
+            if (useSystemCursor.Value) hideSystemCursor();
         }
 
         public class Cursor : Container
@@ -132,13 +195,14 @@ namespace osu.Game.Graphics.Cursor
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuConfigManager config, TextureStore textures, OsuColour colour)
+            private void load(OsuConfigManager config, TextureStore textures, OsuColour colour, MConfigManager mConfig)
             {
                 Children = new Drawable[]
                 {
                     cursorContainer = new Container
                     {
                         AutoSizeAxes = Axes.Both,
+                        Alpha = mConfig.Get<bool>(MSetting.UseSystemCursor) ? 0 : 1,
                         Children = new Drawable[]
                         {
                             new Sprite
@@ -158,6 +222,20 @@ namespace osu.Game.Graphics.Cursor
 
                 cursorScale = config.GetBindable<float>(OsuSetting.MenuCursorSize);
                 cursorScale.BindValueChanged(scale => cursorContainer.Scale = new Vector2(scale.NewValue * base_scale), true);
+            }
+
+            public void FadeOutContainer()
+            {
+                cursorContainer.FadeOut(200);
+                AutoSizeAxes = Axes.None;
+                Width = 15;
+                Height = 0;
+            }
+
+            public void FadeInContainer()
+            {
+                cursorContainer.FadeIn(200);
+                AutoSizeAxes = Axes.Both;
             }
         }
 
