@@ -41,19 +41,18 @@ namespace osu.Game.Collections
             ItemSource = filters;
         }
 
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load([CanBeNull] CollectionManager collectionManager)
+        [Resolved(CanBeNull = true)]
+        private CollectionManager collectionManager { get; set; }
+
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             if (collectionManager != null)
                 collections.BindTo(collectionManager.Collections);
 
             collections.CollectionChanged += (_, __) => collectionsChanged();
             collectionsChanged();
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
 
             Current.BindValueChanged(filterChanged, true);
         }
