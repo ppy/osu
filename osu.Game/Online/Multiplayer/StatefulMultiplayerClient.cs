@@ -217,7 +217,6 @@ namespace osu.Game.Online.Multiplayer
                 RulesetID = item.GetOr(existingPlaylistItem).RulesetID,
                 RequiredMods = item.HasValue ? item.Value.AsNonNull().RequiredMods.Select(m => new APIMod(m)).ToList() : Room.Settings.RequiredMods,
                 AllowedMods = item.HasValue ? item.Value.AsNonNull().AllowedMods.Select(m => new APIMod(m)).ToList() : Room.Settings.AllowedMods,
-                PlaylistItemId = Room.Settings.PlaylistItemId,
             });
         }
 
