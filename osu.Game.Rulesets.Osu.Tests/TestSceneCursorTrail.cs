@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 return null;
             }
 
-            public Sample GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
+            public ISample GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotImplementedException();
 

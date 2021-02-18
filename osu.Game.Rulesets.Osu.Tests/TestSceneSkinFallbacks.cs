@@ -162,7 +162,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => null;
 
-            public Sample GetSample(ISampleInfo sampleInfo) => null;
+            public ISample GetSample(ISampleInfo sampleInfo) => null;
 
             public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration => default;
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => null;

@@ -34,7 +34,7 @@ namespace osu.Game.Skinning
         public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
             => Source.GetTexture(componentName, wrapModeS, wrapModeT);
 
-        public virtual Sample GetSample(ISampleInfo sampleInfo)
+        public virtual ISample GetSample(ISampleInfo sampleInfo)
         {
             if (!(sampleInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacySample))
                 return Source.GetSample(sampleInfo);
