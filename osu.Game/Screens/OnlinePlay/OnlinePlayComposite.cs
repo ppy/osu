@@ -2,9 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Specialized;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
@@ -14,6 +12,9 @@ using osu.Game.Users;
 
 namespace osu.Game.Screens.OnlinePlay
 {
+    /// <summary>
+    /// A <see cref="CompositeDrawable"/> that exposes bindables for <see cref="Room"/> properties.
+    /// </summary>
     public class OnlinePlayComposite : CompositeDrawable
     {
         [Resolved(typeof(Room))]
@@ -62,41 +63,18 @@ namespace osu.Game.Screens.OnlinePlay
         /// The currently selected item in the <see cref="RoomSubScreen"/>, or the first item from <see cref="Playlist"/>
         /// if this <see cref="OnlinePlayComposite"/> is not within a <see cref="RoomSubScreen"/>.
         /// </summary>
-        protected IBindable<PlaylistItem> SelectedItem => selectedItem;
-
-        private readonly Bindable<PlaylistItem> selectedItem = new Bindable<PlaylistItem>();
-
-        [CanBeNull]
-        [Resolved(CanBeNull = true)]
-        private IBindable<PlaylistItem> subScreenSelectedItem { get; set; }
+        protected readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            if (subScreenSelectedItem != null)
-                subScreenSelectedItem.BindValueChanged(onSelectedItemChanged, true);
-            else
-                Playlist.BindCollectionChanged(onPlaylistChanged, true);
+            Playlist.BindCollectionChanged((_, __) => UpdateSelectedItem(), true);
         }
 
-        /// <summary>
-        /// Invoked when the selected item from within a <see cref="RoomSubScreen"/> changes.
-        /// Does not occur when this <see cref="OnlinePlayComposite"/> is outside a <see cref="RoomSubScreen"/>.
-        /// </summary>
-        private void onSelectedItemChanged(ValueChangedEvent<PlaylistItem> item)
+        protected virtual void UpdateSelectedItem()
         {
-            // If the room hasn't been created yet, fall-back to the first item from the playlist.
-            selectedItem.Value = RoomID.Value == null ? Playlist.FirstOrDefault() : item.NewValue;
-        }
-
-        /// <summary>
-        /// Invoked when the playlist changes.
-        /// Does not occur when this <see cref="OnlinePlayComposite"/> is inside a <see cref="RoomSubScreen"/>.
-        /// </summary>
-        private void onPlaylistChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            selectedItem.Value = Playlist.FirstOrDefault();
+            SelectedItem.Value = Playlist.FirstOrDefault();
         }
     }
 }
