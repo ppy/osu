@@ -24,6 +24,7 @@ using osu.Game.Overlays.Chat.Tabs;
 using osuTK.Input;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Online;
 
 namespace osu.Game.Overlays
 {
@@ -118,40 +119,47 @@ namespace osu.Game.Overlays
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 },
-                                currentChannelContainer = new Container<DrawableChannel>
+                                new OnlineViewContainer("Sign in to chat")
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Padding = new MarginPadding
-                                    {
-                                        Bottom = textbox_height
-                                    },
-                                },
-                                new Container
-                                {
-                                    Anchor = Anchor.BottomLeft,
-                                    Origin = Anchor.BottomLeft,
-                                    RelativeSizeAxes = Axes.X,
-                                    Height = textbox_height,
-                                    Padding = new MarginPadding
-                                    {
-                                        Top = padding * 2,
-                                        Bottom = padding * 2,
-                                        Left = ChatLine.LEFT_PADDING + padding * 2,
-                                        Right = padding * 2,
-                                    },
                                     Children = new Drawable[]
                                     {
-                                        textbox = new FocusedTextBox
+                                        currentChannelContainer = new Container<DrawableChannel>
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Height = 1,
-                                            PlaceholderText = "type your message",
-                                            ReleaseFocusOnCommit = false,
-                                            HoldFocus = true,
-                                        }
-                                    }
-                                },
-                                loading = new LoadingSpinner(),
+                                            Padding = new MarginPadding
+                                            {
+                                                Bottom = textbox_height
+                                            },
+                                        },
+                                        new Container
+                                        {
+                                            Anchor = Anchor.BottomLeft,
+                                            Origin = Anchor.BottomLeft,
+                                            RelativeSizeAxes = Axes.X,
+                                            Height = textbox_height,
+                                            Padding = new MarginPadding
+                                            {
+                                                Top = padding * 2,
+                                                Bottom = padding * 2,
+                                                Left = ChatLine.LEFT_PADDING + padding * 2,
+                                                Right = padding * 2,
+                                            },
+                                            Children = new Drawable[]
+                                            {
+                                                textbox = new FocusedTextBox
+                                                {
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    Height = 1,
+                                                    PlaceholderText = "type your message",
+                                                    ReleaseFocusOnCommit = false,
+                                                    HoldFocus = true,
+                                                }
+                                            }
+                                        },
+                                        loading = new LoadingSpinner(),
+                                    },
+                                }
                             }
                         },
                         tabsArea = new TabsArea
@@ -184,9 +192,7 @@ namespace osu.Game.Overlays
                     },
                 },
             };
-
             textbox.OnCommit += postMessage;
-
             ChannelTabControl.Current.ValueChanged += current => channelManager.CurrentChannel.Value = current.NewValue;
             ChannelTabControl.ChannelSelectorActive.ValueChanged += active => ChannelSelectionOverlay.State.Value = active.NewValue ? Visibility.Visible : Visibility.Hidden;
             ChannelSelectionOverlay.State.ValueChanged += state =>
@@ -203,10 +209,8 @@ namespace osu.Game.Overlays
                 else
                     textbox.HoldFocus = true;
             };
-
             ChannelSelectionOverlay.OnRequestJoin = channel => channelManager.JoinChannel(channel);
             ChannelSelectionOverlay.OnRequestLeave = channelManager.LeaveChannel;
-
             ChatHeight = config.GetBindable<float>(OsuSetting.ChatDisplayHeight);
             ChatHeight.BindValueChanged(height =>
             {
@@ -214,9 +218,7 @@ namespace osu.Game.Overlays
                 channelSelectionContainer.Height = 1f - height.NewValue;
                 tabBackground.FadeTo(height.NewValue == 1f ? 1f : 0.8f, 200);
             }, true);
-
             chatBackground.Colour = colours.ChatBlue;
-
             loading.Show();
 
             // This is a relatively expensive (and blocking) operation.
@@ -226,13 +228,10 @@ namespace osu.Game.Overlays
             {
                 // TODO: consider scheduling bindable callbacks to not perform when overlay is not present.
                 channelManager.JoinedChannels.CollectionChanged += joinedChannelsChanged;
-
                 foreach (Channel channel in channelManager.JoinedChannels)
                     ChannelTabControl.AddChannel(channel);
-
                 channelManager.AvailableChannels.CollectionChanged += availableChannelsChanged;
                 availableChannelsChanged(null, null);
-
                 currentChannel = channelManager.CurrentChannel.GetBoundCopy();
                 currentChannel.BindValueChanged(currentChannelChanged, true);
             });
