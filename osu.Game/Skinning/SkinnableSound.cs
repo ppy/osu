@@ -176,10 +176,10 @@ namespace osu.Game.Skinning
 
         public BindableNumber<double> Tempo => samplesContainer.Tempo;
 
-        public void AddAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable)
+        public void AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable)
             => samplesContainer.AddAdjustment(type, adjustBindable);
 
-        public void RemoveAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable)
+        public void RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable)
             => samplesContainer.RemoveAdjustment(type, adjustBindable);
 
         public void RemoveAllAdjustments(AdjustableProperty type)

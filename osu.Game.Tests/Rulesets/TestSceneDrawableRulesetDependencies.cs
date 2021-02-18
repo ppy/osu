@@ -118,9 +118,9 @@ namespace osu.Game.Tests.Rulesets
             public BindableNumber<double> Frequency => throw new NotImplementedException();
             public BindableNumber<double> Tempo => throw new NotImplementedException();
 
-            public void AddAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => throw new NotImplementedException();
+            public void AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => throw new NotImplementedException();
 
-            public void RemoveAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => throw new NotImplementedException();
+            public void RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => throw new NotImplementedException();
 
             public void RemoveAllAdjustments(AdjustableProperty type) => throw new NotImplementedException();
 
