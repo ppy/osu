@@ -48,7 +48,7 @@ namespace osu.Game.Overlays
                         }
                     }
                 },
-                Loading = new LoadingLayer()
+                Loading = new LoadingLayer(true)
             });
 
             base.Content.Add(mainContent);
