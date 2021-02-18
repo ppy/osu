@@ -461,10 +461,41 @@ namespace osu.Game.Skinning
                 var sample = Samples?.Get(lookup);
 
                 if (sample != null)
-                    return sample;
+                    return new LegacySkinSample(sample, this);
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// A sample wrapper which keeps a reference to the contained skin to avoid finalizer garbage collection of the managing SampleStore.
+        /// </summary>
+        private class LegacySkinSample : ISample
+        {
+            private readonly Sample sample;
+
+            [UsedImplicitly]
+            private readonly LegacySkin skin;
+
+            public LegacySkinSample(Sample sample, LegacySkin skin)
+            {
+                this.sample = sample;
+                this.skin = skin;
+            }
+
+            public SampleChannel Play()
+            {
+                return sample.Play();
+            }
+
+            public SampleChannel GetChannel()
+            {
+                return sample.GetChannel();
+            }
+
+            public double Length => sample.Length;
+
+            public Bindable<int> PlaybackConcurrency => sample.PlaybackConcurrency;
         }
 
         private IEnumerable<string> getLegacyLookupNames(HitSampleInfo hitSample)
