@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
+using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -496,6 +497,38 @@ namespace osu.Game.Skinning
             public double Length => sample.Length;
 
             public Bindable<int> PlaybackConcurrency => sample.PlaybackConcurrency;
+            public BindableNumber<double> Volume => sample.Volume;
+
+            public BindableNumber<double> Balance => sample.Balance;
+
+            public BindableNumber<double> Frequency => sample.Frequency;
+
+            public BindableNumber<double> Tempo => sample.Tempo;
+
+            public void BindAdjustments(IAggregateAudioAdjustment component)
+            {
+                sample.BindAdjustments(component);
+            }
+
+            public void UnbindAdjustments(IAggregateAudioAdjustment component)
+            {
+                sample.UnbindAdjustments(component);
+            }
+
+            public void AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable)
+            {
+                sample.AddAdjustment(type, adjustBindable);
+            }
+
+            public void RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable)
+            {
+                sample.RemoveAdjustment(type, adjustBindable);
+            }
+
+            public void RemoveAllAdjustments(AdjustableProperty type)
+            {
+                sample.RemoveAllAdjustments(type);
+            }
         }
 
         private IEnumerable<string> getLegacyLookupNames(HitSampleInfo hitSample)

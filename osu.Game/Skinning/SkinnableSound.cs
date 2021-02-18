@@ -176,14 +176,19 @@ namespace osu.Game.Skinning
 
         public BindableNumber<double> Tempo => samplesContainer.Tempo;
 
-        public void AddAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable)
-            => samplesContainer.AddAdjustment(type, adjustBindable);
+        public void BindAdjustments(IAggregateAudioAdjustment component) => samplesContainer.BindAdjustments(component);
 
-        public void RemoveAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable)
-            => samplesContainer.RemoveAdjustment(type, adjustBindable);
+        public void UnbindAdjustments(IAggregateAudioAdjustment component) => samplesContainer.UnbindAdjustments(component);
 
-        public void RemoveAllAdjustments(AdjustableProperty type)
-            => samplesContainer.RemoveAllAdjustments(type);
+        public void AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => samplesContainer.AddAdjustment(type, adjustBindable);
+
+        public void RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => samplesContainer.RemoveAdjustment(type, adjustBindable);
+
+        public void AddAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => samplesContainer.AddAdjustment(type, adjustBindable);
+
+        public void RemoveAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => samplesContainer.RemoveAdjustment(type, adjustBindable);
+
+        public void RemoveAllAdjustments(AdjustableProperty type) => samplesContainer.RemoveAllAdjustments(type);
 
         /// <summary>
         /// Whether any samples are currently playing.
