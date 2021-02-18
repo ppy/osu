@@ -648,8 +648,9 @@ namespace osu.Game.Screens.Select
         {
             Debug.Assert(!isHandlingLooping);
 
-            music.CurrentTrack.Looping = isHandlingLooping = true;
+            isHandlingLooping = true;
 
+            ensureTrackLooping(Beatmap.Value, TrackChangeDirection.None);
             music.TrackChanged += ensureTrackLooping;
         }
 
@@ -665,7 +666,7 @@ namespace osu.Game.Screens.Select
         }
 
         private void ensureTrackLooping(WorkingBeatmap beatmap, TrackChangeDirection changeDirection)
-            => music.CurrentTrack.Looping = true;
+            => beatmap.PrepareTrackForPreviewLooping();
 
         public override bool OnBackButton()
         {
@@ -718,8 +719,6 @@ namespace osu.Game.Screens.Select
             ITrack track = music.CurrentTrack;
 
             bool isNewTrack = !lastTrack.TryGetTarget(out var last) || last != track;
-
-            track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
 
             if (!track.IsRunning && (music.UserPauseRequested != true || isNewTrack))
                 music.Play(true);
