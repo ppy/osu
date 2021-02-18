@@ -11,7 +11,7 @@ using osu.Game.Screens.OnlinePlay.Match.Components;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
-    public class BeatmapSelectionControl : OnlinePlayComposite
+    public class BeatmapSelectionControl : RoomSubScreenComposite
     {
         [Resolved]
         private MultiplayerMatchSubScreen matchSubScreen { get; set; }
