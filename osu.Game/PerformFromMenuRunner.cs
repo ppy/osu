@@ -82,7 +82,9 @@ namespace osu.Game
             game?.CloseAllOverlays(false);
 
             // we may already be at the target screen type.
-            if (validScreens.Contains(current.GetType()) && !beatmap.Disabled)
+            var type = current.GetType();
+
+            if (validScreens.Any(t => type.IsAssignableFrom(t)) && !beatmap.Disabled)
             {
                 finalAction(current);
                 Cancel();
@@ -91,13 +93,14 @@ namespace osu.Game
 
             while (current != null)
             {
-                if (validScreens.Contains(current.GetType()))
+                if (validScreens.Any(t => type.IsAssignableFrom(t)))
                 {
                     current.MakeCurrent();
                     break;
                 }
 
                 current = current.GetParentScreen();
+                type = current?.GetType();
             }
         }
 
