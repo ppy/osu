@@ -163,7 +163,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
             const double fade_time = 50;
 
-            var ruleset = rulesets.GetRuleset(Room.Settings.RulesetID);
+            var ruleset = rulesets.GetRuleset(Room.Settings.RulesetID).CreateInstance();
 
             var currentModeRank = User.User?.RulesetsStatistics?.GetValueOrDefault(ruleset.ShortName)?.GlobalRank;
             userRankText.Text = currentModeRank != null ? $"#{currentModeRank.Value:N0}" : string.Empty;
@@ -177,7 +177,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
             // If the mods are updated at the end of the frame, the flow container will skip a reflow cycle: https://github.com/ppy/osu-framework/issues/4187
             // This looks particularly jarring here, so re-schedule the update to that start of our frame as a fix.
-            Schedule(() => userModsDisplay.Current.Value = User.Mods.Select(m => m.ToMod(ruleset.CreateInstance())).ToList());
+            Schedule(() => userModsDisplay.Current.Value = User.Mods.Select(m => m.ToMod(ruleset)).ToList());
         }
 
         public MenuItem[] ContextMenuItems
