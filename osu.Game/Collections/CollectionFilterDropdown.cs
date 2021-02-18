@@ -63,7 +63,7 @@ namespace osu.Game.Collections
             // Dropdown has logic which triggers a change on the bindable with every change to the contained items.
             // This is not desirable here, as it leads to multiple filter operations running even though nothing has changed.
             // An extra bindable is enough to subvert this behaviour.
-            base.Current.BindTo(Current);
+            base.Current = Current;
 
             collections.BindCollectionChanged((_, __) => collectionsChanged(), true);
             Current.BindValueChanged(filterChanged, true);
