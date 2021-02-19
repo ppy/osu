@@ -17,6 +17,8 @@ using osu.Framework.Screens;
 using osu.Game.Screens.Menu;
 using osu.Game.Updater;
 using osu.Desktop.Windows;
+using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics;
 using osu.Game.IO;
 
 namespace osu.Desktop
@@ -25,6 +27,7 @@ namespace osu.Desktop
     {
         private readonly bool noVersionOverlay;
         private VersionManager versionManager;
+        private TextEditIndicator textEditIndicator;
 
         public OsuGameDesktop(string[] args = null)
             : base(args)
@@ -103,6 +106,8 @@ namespace osu.Desktop
             if (!noVersionOverlay)
                 LoadComponentAsync(versionManager = new VersionManager { Depth = int.MinValue }, Add);
 
+            LoadComponentAsync(textEditIndicator = new TextEditIndicator { Depth = int.MinValue }, Add);
+
             LoadComponentAsync(new DiscordRichPresence(), Add);
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
@@ -148,6 +153,24 @@ namespace osu.Desktop
                     desktopWindow.SetIconFromStream(iconStream);
                     desktopWindow.Title = Name;
                     desktopWindow.DragDrop += f => fileDrop(new[] { f });
+                    desktopWindow.OnTextEdit += s =>
+                    {
+                        if (textEditIndicator != null)
+                        {
+                            textEditIndicator.Text = s;
+
+                            if (textEditIndicator.State.Value != Visibility.Visible)
+                                Schedule(() => textEditIndicator.Show());
+                        }
+                    };
+                    desktopWindow.OnTextInput += () =>
+                    {
+                        if (textEditIndicator != null)
+                        {
+                            if (textEditIndicator.State.Value != Visibility.Hidden)
+                                Schedule(() => textEditIndicator.Hide());
+                        }
+                    };
                     break;
             }
         }
