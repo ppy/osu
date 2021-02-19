@@ -13,7 +13,9 @@ using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Match.Components;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Users;
+using osuTK;
 using Footer = osu.Game.Screens.OnlinePlay.Match.Components.Footer;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
@@ -143,13 +145,55 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                             RelativeSizeAxes = Axes.Both,
                                                             Content = new[]
                                                             {
-                                                                new Drawable[] { new OverlinedHeader("Leaderboard"), },
+                                                                new[]
+                                                                {
+                                                                    UserModsSection = new FillFlowContainer
+                                                                    {
+                                                                        RelativeSizeAxes = Axes.X,
+                                                                        AutoSizeAxes = Axes.Y,
+                                                                        Margin = new MarginPadding { Bottom = 10 },
+                                                                        Children = new Drawable[]
+                                                                        {
+                                                                            new OverlinedHeader("Extra mods"),
+                                                                            new FillFlowContainer
+                                                                            {
+                                                                                AutoSizeAxes = Axes.Both,
+                                                                                Direction = FillDirection.Horizontal,
+                                                                                Spacing = new Vector2(10, 0),
+                                                                                Children = new Drawable[]
+                                                                                {
+                                                                                    new PurpleTriangleButton
+                                                                                    {
+                                                                                        Anchor = Anchor.CentreLeft,
+                                                                                        Origin = Anchor.CentreLeft,
+                                                                                        Width = 90,
+                                                                                        Text = "Select",
+                                                                                        Action = ShowUserModSelect,
+                                                                                    },
+                                                                                    new ModDisplay
+                                                                                    {
+                                                                                        Anchor = Anchor.CentreLeft,
+                                                                                        Origin = Anchor.CentreLeft,
+                                                                                        DisplayUnrankedText = false,
+                                                                                        Current = UserMods,
+                                                                                        Scale = new Vector2(0.8f),
+                                                                                    },
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                },
+                                                                new Drawable[]
+                                                                {
+                                                                    new OverlinedHeader("Leaderboard")
+                                                                },
                                                                 new Drawable[] { leaderboard = new MatchLeaderboard { RelativeSizeAxes = Axes.Both }, },
                                                                 new Drawable[] { new OverlinedHeader("Chat"), },
                                                                 new Drawable[] { new MatchChatDisplay { RelativeSizeAxes = Axes.Both } }
                                                             },
                                                             RowDimensions = new[]
                                                             {
+                                                                new Dimension(GridSizeMode.AutoSize),
                                                                 new Dimension(GridSizeMode.AutoSize),
                                                                 new Dimension(),
                                                                 new Dimension(GridSizeMode.AutoSize),
