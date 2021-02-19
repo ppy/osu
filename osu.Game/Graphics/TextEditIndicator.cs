@@ -5,8 +5,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Screens.Mvis.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
@@ -17,6 +19,7 @@ namespace osu.Game.Graphics
         private readonly OsuSpriteText spriteText;
         private readonly Box flashBox;
         private readonly BindableBool optUI = new BindableBool();
+        private readonly FillFlowContainer placeHolderContainer;
 
         [Resolved(canBeNull: true)]
         private OsuGame game { get; set; }
@@ -28,6 +31,19 @@ namespace osu.Game.Graphics
             {
                 if (value == spriteText.Text)
                     return;
+
+                if (string.IsNullOrEmpty(value))
+                    Schedule(() =>
+                    {
+                        placeHolderContainer.FadeIn(150);
+                        spriteText.FadeOut(150);
+                    });
+                else
+                    Schedule(() =>
+                    {
+                        placeHolderContainer.FadeOut(150);
+                        spriteText.FadeIn(150);
+                    });
 
                 spriteText.Text = value;
             }
@@ -67,11 +83,51 @@ namespace osu.Game.Graphics
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        spriteText = new OsuSpriteText
+                        new Container
                         {
-                            UseLegacyUnicode = true,
+                            AutoSizeAxes = Axes.Both,
                             Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre
+                            Origin = Anchor.TopCentre,
+                            Children = new Drawable[]
+                            {
+                                new PlaceHolder
+                                {
+                                    Height = 28
+                                },
+                                placeHolderContainer = new FillFlowContainer
+                                {
+                                    AutoSizeAxes = Axes.Both,
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                    Spacing = new Vector2(5),
+                                    Margin = new MarginPadding { Vertical = 5 },
+                                    Colour = Color4.White.Opacity(0.6f),
+                                    Children = new Drawable[]
+                                    {
+                                        new SpriteIcon
+                                        {
+                                            Size = new Vector2(14),
+                                            Icon = FontAwesome.Solid.Pen,
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
+                                            Margin = new MarginPadding { Vertical = 2 }
+                                        },
+                                        new OsuSpriteText
+                                        {
+                                            Text = "暂无输入",
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft
+                                        }
+                                    }
+                                },
+                                spriteText = new OsuSpriteText
+                                {
+                                    UseLegacyUnicode = true,
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                    Margin = new MarginPadding { Vertical = 5 },
+                                },
+                            }
                         },
                         new Circle
                         {
