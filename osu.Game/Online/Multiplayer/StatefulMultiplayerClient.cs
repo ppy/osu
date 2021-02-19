@@ -537,21 +537,30 @@ namespace osu.Game.Online.Multiplayer
             var mods = settings.RequiredMods.Select(m => m.ToMod(ruleset));
             var allowedMods = settings.AllowedMods.Select(m => m.ToMod(ruleset));
 
-            // Update an existing playlist item from the API room, or create a new item.
-            var playlistItem = apiRoom.Playlist.FirstOrDefault(i => i.ID == settings.PlaylistItemId) ?? new PlaylistItem();
+            // Try to retrieve the existing playlist item from the API room.
+            var playlistItem = apiRoom.Playlist.FirstOrDefault(i => i.ID == settings.PlaylistItemId);
 
-            playlistItem.ID = settings.PlaylistItemId;
-            playlistItem.Beatmap.Value = beatmap;
-            playlistItem.Ruleset.Value = ruleset.RulesetInfo;
-            playlistItem.RequiredMods.Clear();
-            playlistItem.RequiredMods.AddRange(mods);
-            playlistItem.AllowedMods.Clear();
-            playlistItem.AllowedMods.AddRange(allowedMods);
-
-            if (!apiRoom.Playlist.Contains(playlistItem))
+            if (playlistItem != null)
+                updateItem(playlistItem);
+            else
+            {
+                // An existing playlist item does not exist, so append a new one.
+                updateItem(playlistItem = new PlaylistItem());
                 apiRoom.Playlist.Add(playlistItem);
+            }
 
             CurrentMatchPlayingItem.Value = playlistItem;
+
+            void updateItem(PlaylistItem item)
+            {
+                item.ID = settings.PlaylistItemId;
+                item.Beatmap.Value = beatmap;
+                item.Ruleset.Value = ruleset.RulesetInfo;
+                item.RequiredMods.Clear();
+                item.RequiredMods.AddRange(mods);
+                item.AllowedMods.Clear();
+                item.AllowedMods.AddRange(allowedMods);
+            }
         }
 
         /// <summary>
