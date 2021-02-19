@@ -496,12 +496,13 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            bool pauseDialogShown = PauseOverlay.State.Value == Visibility.Visible;
+            bool pauseOrFailDialogVisible =
+                PauseOverlay.State.Value == Visibility.Visible || FailOverlay.State.Value == Visibility.Visible;
 
-            if (showDialogFirst && !pauseDialogShown)
+            if (showDialogFirst && !pauseOrFailDialogVisible)
             {
                 // if the fail animation is currently in progress, accelerate it (it will show the pause dialog on completion).
-                if (ValidForResume && HasFailed && !FailOverlay.IsPresent)
+                if (ValidForResume && HasFailed)
                 {
                     failAnimation.FinishTransforms(true);
                     return;
