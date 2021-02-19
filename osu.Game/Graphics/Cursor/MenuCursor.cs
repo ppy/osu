@@ -28,7 +28,7 @@ namespace osu.Game.Graphics.Cursor
         private Cursor activeCursor;
 
         private Bindable<bool> cursorRotate;
-        private Bindable<bool> useSystemCursor;
+        public BindableBool UseSystemCursor = new BindableBool();
         private bool changedWhenHidden;
         private DragRotationState dragRotationState;
         private Vector2 positionMouseDown;
@@ -37,12 +37,12 @@ namespace osu.Game.Graphics.Cursor
         private GameHost host { get; set; }
 
         [BackgroundDependencyLoader(true)]
-        private void load([NotNull] OsuConfigManager config, [NotNull]MConfigManager mConfig, [CanBeNull] ScreenshotManager screenshotManager)
+        private void load([NotNull] OsuConfigManager config, [NotNull] MConfigManager mConfig, [CanBeNull] ScreenshotManager screenshotManager)
         {
             cursorRotate = config.GetBindable<bool>(OsuSetting.CursorRotation);
-            useSystemCursor = mConfig.GetBindable<bool>(MSetting.UseSystemCursor);
+            mConfig.BindWith(MSetting.UseSystemCursor, UseSystemCursor);
 
-            useSystemCursor.BindValueChanged(v =>
+            UseSystemCursor.BindValueChanged(v =>
             {
                 if (State.Value == Visibility.Hidden)
                 {
@@ -132,7 +132,7 @@ namespace osu.Game.Graphics.Cursor
             activeCursor.FadeTo(1, 250, Easing.OutQuint);
             activeCursor.ScaleTo(1, 400, Easing.OutQuint);
 
-            if (useSystemCursor.Value) showSystemCursor(changedWhenHidden);
+            if (UseSystemCursor.Value) showSystemCursor(changedWhenHidden);
             else hideSystemCursor(changedWhenHidden);
             changedWhenHidden = false;
         }
@@ -178,7 +178,7 @@ namespace osu.Game.Graphics.Cursor
             activeCursor.FadeTo(0, 250, Easing.OutQuint);
             activeCursor.ScaleTo(0.6f, 250, Easing.In);
 
-            if (useSystemCursor.Value) hideSystemCursor();
+            if (UseSystemCursor.Value) hideSystemCursor();
         }
 
         public class Cursor : Container

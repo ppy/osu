@@ -7,11 +7,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Online.API.Requests;
 using osu.Game.Tournament.IO;
 using osu.Game.Tournament.IPC;
@@ -43,6 +45,12 @@ namespace osu.Game.Tournament
         private void load(Storage baseStorage)
         {
             Resources.AddStore(new DllResourceStore(typeof(TournamentGameBase).Assembly));
+
+            BindableBool fakeConfig = new BindableBool();
+            if (MenuCursorContainer.Cursor is MenuCursor cursor)
+                cursor.UseSystemCursor.BindTarget = fakeConfig;
+
+            fakeConfig.Value = true;
 
             dependencies.CacheAs<Storage>(storage = new TournamentStorage(baseStorage));
             dependencies.CacheAs(storage);
