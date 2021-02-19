@@ -61,8 +61,7 @@ namespace osu.Game.Overlays
 
             LoadComponentAsync(display, loaded =>
             {
-                if (API.IsLoggedIn)
-                    Loading.Hide();
+                Loading.Hide();
 
                 Child = loaded;
             }, (cancellationToken = new CancellationTokenSource()).Token);
