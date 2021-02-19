@@ -122,12 +122,10 @@ namespace osu.Game.Screens.Menu
             {
                 setInfo = beatmaps.QueryBeatmapSet(b => b.Hash == BeatmapHash);
 
-                if (setInfo != null)
-                {
-                    initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
-                }
+                if (setInfo == null)
+                    return false;
 
-                return UsingThemedIntro;
+                return (initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0])) != null;
             }
         }
 
@@ -187,7 +185,7 @@ namespace osu.Game.Screens.Menu
         {
             // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Menu.
             if (UsingThemedIntro)
-                Track.Restart();
+                Track.Start();
         }
 
         protected void RandomBeatmaps()

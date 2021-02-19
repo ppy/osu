@@ -105,7 +105,7 @@ namespace osu.Desktop
             if (privacyMode.Value == DiscordRichPresenceMode.Limited)
                 presence.Assets.LargeImageText = string.Empty;
             else
-                presence.Assets.LargeImageText = $"{user.Value.Username}" + (user.Value.Statistics?.Ranks.Global > 0 ? $" (全球排名 #{user.Value.Statistics.Ranks.Global:N0})" : string.Empty);
+                presence.Assets.LargeImageText = $"{user.Value.Username}" + (user.Value.Statistics?.GlobalRank > 0 ? $" (全球排名 #{user.Value.Statistics.GlobalRank:N0})" : string.Empty);
 
             // update ruleset
             presence.Assets.SmallImageKey = ruleset.Value.ID <= 3 ? $"mode_{ruleset.Value.ID}" : "mode_custom";

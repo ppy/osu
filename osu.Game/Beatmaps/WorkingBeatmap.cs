@@ -267,6 +267,26 @@ namespace osu.Game.Beatmaps
         public Track LoadTrack() => loadedTrack = GetBeatmapTrack() ?? GetVirtualTrack(1000);
 
         /// <summary>
+        /// Reads the correct track restart point from beatmap metadata and sets looping to enabled.
+        /// </summary>
+        public void PrepareTrackForPreviewLooping()
+        {
+            Track.Looping = true;
+            Track.RestartPoint = Metadata.PreviewTime;
+
+            if (Track.RestartPoint == -1)
+            {
+                if (!Track.IsLoaded)
+                {
+                    // force length to be populated (https://github.com/ppy/osu-framework/issues/4202)
+                    Track.Seek(Track.CurrentTime);
+                }
+
+                Track.RestartPoint = 0.4f * Track.Length;
+            }
+        }
+
+        /// <summary>
         /// Transfer a valid audio track into this working beatmap. Used as an optimisation to avoid reload / track swap
         /// across difficulties in the same beatmap set.
         /// </summary>

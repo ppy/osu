@@ -17,7 +17,7 @@ namespace osu.Game.Online.Rooms
     {
         [Cached]
         [JsonProperty("id")]
-        public readonly Bindable<int?> RoomID = new Bindable<int?>();
+        public readonly Bindable<long?> RoomID = new Bindable<long?>();
 
         [Cached]
         [JsonProperty("name")]
@@ -152,6 +152,12 @@ namespace osu.Game.Online.Rooms
 
             if (EndDate.Value != null && DateTimeOffset.Now >= EndDate.Value)
                 Status.Value = new RoomStatusEnded();
+
+            // Todo: This is not the best way/place to do this, but the intention is to display all playlist items when the room has ended,
+            // and display only the non-expired playlist items while the room is still active. In order to achieve this, all expired items are removed from the source Room.
+            // More refactoring is required before this can be done locally instead - DrawableRoomPlaylist is currently directly bound to the playlist to display items in the room.
+            if (!(Status.Value is RoomStatusEnded))
+                other.Playlist.RemoveAll(i => i.Expired);
 
             if (!Playlist.SequenceEqual(other.Playlist))
             {

@@ -311,6 +311,9 @@ msgstr ""
 msgid "screen.multi.playlistsRoomSubScreen.newPlaylist"
 msgstr ""
 
+msgid "screen.multi.playlistsRoomSubScreen.extraMods"
+msgstr ""
+
 msgid "screen.multi.readyButton.ready"
 msgstr ""
 
