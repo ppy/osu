@@ -427,11 +427,16 @@ namespace osu.Game.Screens.Play
 
         private void updatePauseOnFocusLostState()
         {
-            if (!PauseOnFocusLost || breakTracker.IsBreakTime.Value)
+            if (!PauseOnFocusLost || DrawableRuleset.HasReplayLoaded.Value || breakTracker.IsBreakTime.Value)
                 return;
 
             if (gameActive.Value == false)
-                Pause();
+            {
+                if (canPause)
+                    Pause();
+                else
+                    Scheduler.AddDelayed(updatePauseOnFocusLostState, 200);
+            }
         }
 
         private IBeatmap loadPlayableBeatmap()
