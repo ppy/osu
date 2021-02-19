@@ -53,6 +53,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("set active", () => ((Bindable<bool>)host.IsActive).Value = true);
 
             AddStep("resume player", () => Player.Resume());
+            AddAssert("unpaused", () => !Player.GameplayClockContainer.IsPaused.Value);
 
             bool pauseCooldownActive = false;
 
