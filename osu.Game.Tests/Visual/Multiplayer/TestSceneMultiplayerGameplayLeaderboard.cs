@@ -85,6 +85,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestScoreUpdates()
         {
             AddRepeatStep("update state", () => streamingClient.RandomlyUpdateState(), 100);
+            AddToggleStep("switch compact mode", expanded => leaderboard.Expanded.Value = expanded);
         }
 
         [Test]
