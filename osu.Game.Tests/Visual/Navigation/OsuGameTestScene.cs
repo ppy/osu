@@ -17,6 +17,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
@@ -114,6 +115,8 @@ namespace osu.Game.Tests.Visual.Navigation
             public new Bindable<WorkingBeatmap> Beatmap => base.Beatmap;
 
             public new Bindable<RulesetInfo> Ruleset => base.Ruleset;
+
+            public new Bindable<IReadOnlyList<Mod>> SelectedMods => base.SelectedMods;
 
             // if we don't do this, when running under nUnit the version that gets populated is that of nUnit.
             public override string Version => "test game";
