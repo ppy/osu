@@ -672,7 +672,7 @@ namespace osu.Game.Screens.Play
 
         private double? lastPauseActionTime;
 
-        public bool PauseCooldownActive =>
+        protected bool PauseCooldownActive =>
             lastPauseActionTime.HasValue && GameplayClockContainer.GameplayClock.CurrentTime < lastPauseActionTime + pause_cooldown;
 
         private bool canPause =>
