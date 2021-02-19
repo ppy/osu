@@ -39,6 +39,9 @@ namespace osu.Game.Users
             set => CountryRank = value.Country;
         }
 
+        // populated via User model, as that's where the data currently lives.
+        public RankHistoryData RankHistory;
+
         [JsonProperty(@"pp")]
         public decimal? PP;
 
@@ -117,14 +120,12 @@ namespace osu.Game.Users
             }
         }
 
+#pragma warning disable 649
         private struct UserRanks
         {
-#pragma warning disable 649
             [JsonProperty(@"country")]
             public int? Country;
-#pragma warning restore 649
         }
-
-        public RankHistoryData RankHistory;
+#pragma warning restore 649
     }
 }
