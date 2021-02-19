@@ -140,7 +140,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             confirmClockRunning(false);
 
-            pauseFromUserExitKey();
+            AddStep("pause via forced pause", () => Player.Pause());
 
             confirmPausedWithNoOverlay();
             AddAssert("fail overlay still shown", () => Player.FailOverlayVisible);
@@ -149,11 +149,28 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestExitFromFailedGameplay()
+        public void TestExitFromFailedGameplayAfterFailAnimation()
         {
             AddUntilStep("wait for fail", () => Player.HasFailed);
-            AddStep("exit", () => Player.Exit());
+            AddUntilStep("wait for fail overlay shown", () => Player.FailOverlayVisible);
 
+            confirmClockRunning(false);
+
+            AddStep("exit via user pause", () => Player.ExitViaPause());
+            confirmExited();
+        }
+
+        [Test]
+        public void TestExitFromFailedGameplayDuringFailAnimation()
+        {
+            AddUntilStep("wait for fail", () => Player.HasFailed);
+
+            // will finish the fail animation and show the fail/pause screen.
+            AddStep("attempt exit via pause key", () => Player.ExitViaPause());
+            AddAssert("fail overlay shown", () => Player.FailOverlayVisible);
+
+            // will actually exit.
+            AddStep("exit via pause key", () => Player.ExitViaPause());
             confirmExited();
         }
 
