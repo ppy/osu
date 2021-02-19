@@ -197,8 +197,11 @@ namespace osu.Game.Overlays.Mods
                     continue;
 
                 var buttonMod = button.Mods[index];
+
+                // as this is likely coming from an external change, ensure the settings of the mod are in sync.
                 buttonMod.CopyFrom(mod);
-                button.SelectAt(index);
+
+                button.SelectAt(index, false);
                 return;
             }
 
