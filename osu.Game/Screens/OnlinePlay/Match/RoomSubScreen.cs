@@ -8,11 +8,14 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play;
 
@@ -25,6 +28,14 @@ namespace osu.Game.Screens.OnlinePlay.Match
         protected readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
+
+        private readonly ModSelectOverlay userModsSelectOverlay;
+
+        /// <summary>
+        /// A container that provides controls for selection of user mods.
+        /// This will be shown/hidden automatically when applicable.
+        /// </summary>
+        protected Drawable UserModsSection;
 
         private Sample sampleStart;
 
@@ -51,9 +62,26 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         protected RoomSubScreen()
         {
-            AddInternal(BeatmapAvailablilityTracker = new OnlinePlayBeatmapAvailablilityTracker
+            AddRangeInternal(new Drawable[]
             {
-                SelectedItem = { BindTarget = SelectedItem }
+                BeatmapAvailablilityTracker = new OnlinePlayBeatmapAvailablilityTracker
+                {
+                    SelectedItem = { BindTarget = SelectedItem }
+                },
+                new Container
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Depth = float.MinValue,
+                    RelativeSizeAxes = Axes.Both,
+                    Height = 0.5f,
+                    Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING },
+                    Child = userModsSelectOverlay = new UserModSelectOverlay
+                    {
+                        SelectedMods = { BindTarget = UserMods },
+                        IsValidMod = _ => false
+                    }
+                },
             });
         }
 
@@ -77,6 +105,19 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
             UserMods.BindValueChanged(_ => Scheduler.AddOnce(UpdateMods));
         }
+
+        public override bool OnBackButton()
+        {
+            if (userModsSelectOverlay.State.Value == Visibility.Visible)
+            {
+                userModsSelectOverlay.Hide();
+                return true;
+            }
+
+            return base.OnBackButton();
+        }
+
+        protected void ShowUserModSelect() => userModsSelectOverlay.Show();
 
         public override void OnEntering(IScreen last)
         {
@@ -117,17 +158,31 @@ namespace osu.Game.Screens.OnlinePlay.Match
         {
             updateWorkingBeatmap();
 
-            if (SelectedItem.Value == null)
+            var selected = SelectedItem.Value;
+
+            if (selected == null)
                 return;
 
             // Remove any user mods that are no longer allowed.
             UserMods.Value = UserMods.Value
-                                     .Where(m => SelectedItem.Value.AllowedMods.Any(a => m.GetType() == a.GetType()))
+                                     .Where(m => selected.AllowedMods.Any(a => m.GetType() == a.GetType()))
                                      .ToList();
 
             UpdateMods();
 
-            Ruleset.Value = SelectedItem.Value.Ruleset.Value;
+            Ruleset.Value = selected.Ruleset.Value;
+
+            if (!selected.AllowedMods.Any())
+            {
+                UserModsSection?.Hide();
+                userModsSelectOverlay.Hide();
+                userModsSelectOverlay.IsValidMod = _ => false;
+            }
+            else
+            {
+                UserModsSection?.Show();
+                userModsSelectOverlay.IsValidMod = m => selected.AllowedMods.Any(a => a.GetType() == m.GetType());
+            }
         }
 
         private void beatmapUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> weakSet) => Schedule(updateWorkingBeatmap);
@@ -181,6 +236,10 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
             if (track != null)
                 track.Looping = false;
+        }
+
+        private class UserModSelectOverlay : LocalPlayerModSelectOverlay
+        {
         }
     }
 }

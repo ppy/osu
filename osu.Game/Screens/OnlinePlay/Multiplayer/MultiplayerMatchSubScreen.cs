@@ -15,7 +15,6 @@ using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
-using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Match;
@@ -42,9 +41,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Resolved]
         private OngoingOperationTracker ongoingOperationTracker { get; set; }
 
-        private ModSelectOverlay userModsSelectOverlay;
         private MultiplayerMatchSettingsOverlay settingsOverlay;
-        private Drawable userModsSection;
 
         private readonly IBindable<bool> isConnected = new Bindable<bool>();
 
@@ -154,7 +151,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                                             new BeatmapSelectionControl { RelativeSizeAxes = Axes.X }
                                                                         }
                                                                     },
-                                                                    userModsSection = new FillFlowContainer
+                                                                    UserModsSection = new FillFlowContainer
                                                                     {
                                                                         RelativeSizeAxes = Axes.X,
                                                                         AutoSizeAxes = Axes.Y,
@@ -175,7 +172,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                                                         Origin = Anchor.CentreLeft,
                                                                                         Width = 90,
                                                                                         Text = "Select",
-                                                                                        Action = () => userModsSelectOverlay.Show()
+                                                                                        Action = ShowUserModSelect,
                                                                                     },
                                                                                     new ModDisplay
                                                                                     {
@@ -230,19 +227,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                         new Dimension(GridSizeMode.AutoSize),
                     }
                 },
-                new Container
-                {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    RelativeSizeAxes = Axes.Both,
-                    Height = 0.5f,
-                    Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING },
-                    Child = userModsSelectOverlay = new UserModSelectOverlay
-                    {
-                        SelectedMods = { BindTarget = UserMods },
-                        IsValidMod = _ => false
-                    }
-                },
                 settingsOverlay = new MultiplayerMatchSettingsOverlay
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -269,7 +253,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.LoadComplete();
 
             SelectedItem.BindTo(client.CurrentMatchPlayingItem);
-            SelectedItem.BindValueChanged(onSelectedItemChanged, true);
 
             BeatmapAvailability.BindValueChanged(updateBeatmapAvailability, true);
             UserMods.BindValueChanged(onUserModsChanged);
@@ -283,24 +266,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 if (!connected.NewValue)
                     Schedule(this.Exit);
             }, true);
-        }
-
-        private void onSelectedItemChanged(ValueChangedEvent<PlaylistItem> item)
-        {
-            if (client?.LocalUser == null)
-                return;
-
-            if (item.NewValue?.AllowedMods.Any() != true)
-            {
-                userModsSection.Hide();
-                userModsSelectOverlay.Hide();
-                userModsSelectOverlay.IsValidMod = _ => false;
-            }
-            else
-            {
-                userModsSection.Show();
-                userModsSelectOverlay.IsValidMod = m => item.NewValue.AllowedMods.Any(a => a.GetType() == m.GetType());
-            }
         }
 
         protected override void UpdateMods()
@@ -319,12 +284,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (client.Room != null && settingsOverlay.State.Value == Visibility.Visible)
             {
                 settingsOverlay.Hide();
-                return true;
-            }
-
-            if (userModsSelectOverlay.State.Value == Visibility.Visible)
-            {
-                userModsSelectOverlay.Hide();
                 return true;
             }
 
@@ -434,10 +393,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }
 
             modSettingChangeTracker?.Dispose();
-        }
-
-        private class UserModSelectOverlay : LocalPlayerModSelectOverlay
-        {
         }
     }
 }
