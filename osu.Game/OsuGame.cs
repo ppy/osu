@@ -383,7 +383,7 @@ namespace osu.Game
 
                 Ruleset.Value = selection.Ruleset;
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(selection);
-            }, validScreens: new[] { typeof(PlaySongSelect) });
+            }, validScreens: new[] { typeof(SongSelect) });
         }
 
         /// <summary>
