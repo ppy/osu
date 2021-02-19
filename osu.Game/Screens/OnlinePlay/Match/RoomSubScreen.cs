@@ -21,14 +21,12 @@ namespace osu.Game.Screens.OnlinePlay.Match
     [Cached(typeof(IPreviewTrackOwner))]
     public abstract class RoomSubScreen : OnlinePlaySubScreen, IPreviewTrackOwner
     {
+        [Cached(typeof(IBindable<PlaylistItem>))]
         protected readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
         private Sample sampleStart;
-
-        [Resolved(typeof(Room), nameof(Room.Playlist))]
-        protected BindableList<PlaylistItem> Playlist { get; private set; }
 
         /// <summary>
         /// Any mods applied by/to the local user.
@@ -73,7 +71,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
             base.LoadComplete();
 
             SelectedItem.BindValueChanged(_ => Scheduler.AddOnce(selectedItemChanged));
-            SelectedItem.Value = Playlist.FirstOrDefault();
 
             managerUpdated = beatmapManager.ItemUpdated.GetBoundCopy();
             managerUpdated.BindValueChanged(beatmapUpdated);
