@@ -6,7 +6,6 @@ using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Scoring;
 
@@ -22,8 +21,6 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
 
         private RollingCounter<int> counter;
 
-        private readonly BindableInt configPP = new BindableInt();
-
         public PerformanceStatistic(ScoreInfo score)
             : base("PP")
         {
@@ -31,10 +28,8 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         }
 
         [BackgroundDependencyLoader]
-        private void load(ScorePerformanceCache performanceCache, MConfigManager config)
+        private void load(ScorePerformanceCache performanceCache)
         {
-            config.BindWith(MSetting.PPCount, configPP);
-
             if (score.PP.HasValue)
             {
                 setPerformanceValue(score.PP.Value);
@@ -52,11 +47,6 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
             {
                 var value = (int)Math.Round(pp.Value, MidpointRounding.AwayFromZero);
                 performance.Value = value;
-
-                if (!score.IsReplay)
-                {
-                    configPP.Value += 50 + value;
-                }
             }
         }
 
