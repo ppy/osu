@@ -1,0 +1,55 @@
+Index: osu.Game/Screens/Mvis/MvisScreen.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/osu.Game/Screens/Mvis/MvisScreen.cs b/osu.Game/Screens/Mvis/MvisScreen.cs
+--- a/osu.Game/Screens/Mvis/MvisScreen.cs	(revision f2d3b667f303338cf3463783229ece7d24d6aea7)
++++ b/osu.Game/Screens/Mvis/MvisScreen.cs	(date 1613560743428)
+@@ -176,6 +176,7 @@
+         private DrawableTrack track => musicController.CurrentTrack;
+ 
+         private WorkingBeatmap prevBeatmap;
++        private BufferedContainer bufferedStoryboardContainer;
+ 
+         #endregion
+ 
+@@ -217,7 +218,11 @@
+                             Name = "Gameplay Background Elements Container",
+                             Children = new Drawable[]
+                             {
+-                                bgTriangles = new BgTrianglesContainer()
++                                bgTriangles = new BgTrianglesContainer(),
++                                bufferedStoryboardContainer = new BufferedContainer
++                                {
++                                    RelativeSizeAxes = Axes.Both
++                                }
+                             }
+                         },
+                         foreground = new Container
+@@ -557,6 +562,11 @@
+ 
+             songProgressButton.ToggleableValue.BindTo(trackRunning);
+ 
++            sidebar.State.BindValueChanged(v =>
++            {
++                bufferedStoryboardContainer.BlurTo(v.NewValue == Visibility.Visible ? new Vector2(20) : Vector2.Zero, 300, Easing.InOutSine);
++            });
++
+             allowProxy.BindValueChanged(v =>
+             {
+                 //如果允许proxy显示
+@@ -931,6 +941,13 @@
+                 {
+                     OnNewStoryboardLoaded = () =>
+                     {
++                        if (sbLoader.StoryboardReplacesBackground.Value)
++                        {
++                            background.Remove(sbLoader);
++                            bufferedStoryboardContainer.Add(sbLoader);
++                        }
++
++                        //Overlay proxy
+                         if (prevProxy != null)
+                         {
+                             proxyContainer.Remove(prevProxy);

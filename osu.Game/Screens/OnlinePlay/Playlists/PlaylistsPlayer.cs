@@ -24,7 +24,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         public Action Exited;
 
         [Resolved(typeof(Room), nameof(Room.RoomID))]
-        protected Bindable<int?> RoomId { get; private set; }
+        protected Bindable<long?> RoomId { get; private set; }
 
         protected readonly PlaylistItem PlaylistItem;
 

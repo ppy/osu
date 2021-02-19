@@ -119,13 +119,15 @@ namespace osu.Game.Skinning
         /// <summary>
         /// Plays the samples.
         /// </summary>
-        /// <param name="restart">Whether to play the sample from the beginning.</param>
-        public virtual void Play(bool restart = true)
+        public virtual void Play()
         {
             samplesContainer.ForEach(c =>
             {
                 if (PlayWhenZeroVolume || c.AggregateVolume.Value > 0)
-                    c.Play(restart);
+                {
+                    c.Stop();
+                    c.Play();
+                }
             });
         }
 
@@ -174,10 +176,10 @@ namespace osu.Game.Skinning
 
         public BindableNumber<double> Tempo => samplesContainer.Tempo;
 
-        public void AddAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable)
+        public void AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable)
             => samplesContainer.AddAdjustment(type, adjustBindable);
 
-        public void RemoveAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable)
+        public void RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable)
             => samplesContainer.RemoveAdjustment(type, adjustBindable);
 
         public void RemoveAllAdjustments(AdjustableProperty type)
@@ -187,6 +189,8 @@ namespace osu.Game.Skinning
         /// Whether any samples are currently playing.
         /// </summary>
         public bool IsPlaying => samplesContainer.Any(s => s.Playing);
+
+        public bool IsPlayed => samplesContainer.Any(s => s.Played);
 
         #endregion
     }

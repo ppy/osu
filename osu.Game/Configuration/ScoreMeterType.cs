@@ -16,13 +16,13 @@ namespace osu.Game.Configuration
         [Description("误差 (右侧)")]
         HitErrorRight,
 
+        [Description("误差 (左右侧)")]
+        HitErrorBoth,
+
         [Description("误差 (底部)")]
         HitErrorBottom,
 
-        [Description("误差(左右侧)")]
-        HitErrorBoth,
-
-        [Description("颜色 (左侧)")]
+        [Description("误差 (左侧)")]
         ColourLeft,
 
         [Description("颜色 (右侧)")]

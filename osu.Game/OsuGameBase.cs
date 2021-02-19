@@ -146,7 +146,7 @@ namespace osu.Game
 
         public OsuGameBase()
         {
-            UseDevelopmentServer = DebugUtils.IsDebugBuild;
+            UseDevelopmentServer = RuntimeInfo.OS != RuntimeInfo.Platform.Android && DebugUtils.IsDebugBuild;
             Name = @"osu!lazer";
         }
 
@@ -159,7 +159,12 @@ namespace osu.Game
 
         protected override UserInputManager CreateUserInputManager() => new OsuUserInputManager();
 
-        private readonly BindableNumber<double> globalTrackVolumeAdjust = new BindableNumber<double>(0.5f);
+        /// <summary>
+        /// The maximum volume at which audio tracks should playback. This can be set lower than 1 to create some head-room for sound effects.
+        /// </summary>
+        internal const double GLOBAL_TRACK_VOLUME_ADJUST = 0.5;
+
+        private readonly BindableNumber<double> globalTrackVolumeAdjust = new BindableNumber<double>(GLOBAL_TRACK_VOLUME_ADJUST);
 
         [BackgroundDependencyLoader]
         private void load()
@@ -232,7 +237,7 @@ namespace osu.Game
 
             MessageFormatter.WebsiteRootUrl = endpoints.WebsiteRootUrl;
 
-            dependencies.CacheAs(API ??= new APIAccess(LocalConfig, endpoints));
+            dependencies.CacheAs(API ??= new APIAccess(LocalConfig, endpoints, VersionHash));
 
             dependencies.CacheAs(spectatorStreaming = new SpectatorStreamingClient(endpoints));
             dependencies.CacheAs(multiplayerClient = new MultiplayerClient(endpoints));

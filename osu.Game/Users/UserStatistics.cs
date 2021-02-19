@@ -26,17 +26,24 @@ namespace osu.Game.Users
             public int Progress;
         }
 
-        [JsonProperty(@"pp")]
-        public decimal? PP;
+        [JsonProperty(@"global_rank")]
+        public int? GlobalRank;
 
-        [JsonProperty(@"pp_rank")] // the API sometimes only returns this value in condensed user responses
-        private int? rank
-        {
-            set => Ranks.Global = value;
-        }
+        public int? CountryRank;
 
         [JsonProperty(@"rank")]
-        public UserRanks Ranks;
+        private UserRanks ranks
+        {
+            // eventually that will also become an own json property instead of reading from a `rank` object.
+            // see https://github.com/ppy/osu-web/blob/cb79bb72186c8f1a25f6a6f5ef315123decb4231/app/Transformers/UserStatisticsTransformer.php#L53.
+            set => CountryRank = value.Country;
+        }
+
+        // populated via User model, as that's where the data currently lives.
+        public RankHistoryData RankHistory;
+
+        [JsonProperty(@"pp")]
+        public decimal? PP;
 
         [JsonProperty(@"ranked_score")]
         public long RankedScore;
@@ -113,15 +120,12 @@ namespace osu.Game.Users
             }
         }
 
-        public struct UserRanks
+#pragma warning disable 649
+        private struct UserRanks
         {
-            [JsonProperty(@"global")]
-            public int? Global;
-
             [JsonProperty(@"country")]
             public int? Country;
         }
-
-        public RankHistoryData RankHistory;
+#pragma warning restore 649
     }
 }

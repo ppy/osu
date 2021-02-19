@@ -24,6 +24,7 @@ using osu.Game.Overlays.Chat.Tabs;
 using osuTK.Input;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Online;
 
 namespace osu.Game.Overlays
 {
@@ -118,40 +119,47 @@ namespace osu.Game.Overlays
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 },
-                                currentChannelContainer = new Container<DrawableChannel>
+                                new OnlineViewContainer("请先登录再进行聊天!")
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Padding = new MarginPadding
-                                    {
-                                        Bottom = textbox_height
-                                    },
-                                },
-                                new Container
-                                {
-                                    Anchor = Anchor.BottomLeft,
-                                    Origin = Anchor.BottomLeft,
-                                    RelativeSizeAxes = Axes.X,
-                                    Height = textbox_height,
-                                    Padding = new MarginPadding
-                                    {
-                                        Top = padding * 2,
-                                        Bottom = padding * 2,
-                                        Left = ChatLine.LEFT_PADDING + padding * 2,
-                                        Right = padding * 2,
-                                    },
                                     Children = new Drawable[]
                                     {
-                                        textbox = new FocusedTextBox
+                                        currentChannelContainer = new Container<DrawableChannel>
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Height = 1,
-                                            PlaceholderText = "在这里输入你要发送的消息",
-                                            ReleaseFocusOnCommit = false,
-                                            HoldFocus = true,
-                                        }
-                                    }
-                                },
-                                loading = new LoadingSpinner(),
+                                            Padding = new MarginPadding
+                                            {
+                                                Bottom = textbox_height
+                                            },
+                                        },
+                                        new Container
+                                        {
+                                            Anchor = Anchor.BottomLeft,
+                                            Origin = Anchor.BottomLeft,
+                                            RelativeSizeAxes = Axes.X,
+                                            Height = textbox_height,
+                                            Padding = new MarginPadding
+                                            {
+                                                Top = padding * 2,
+                                                Bottom = padding * 2,
+                                                Left = ChatLine.LEFT_PADDING + padding * 2,
+                                                Right = padding * 2,
+                                            },
+                                            Children = new Drawable[]
+                                            {
+                                                textbox = new FocusedTextBox
+                                                {
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    Height = 1,
+                                                    PlaceholderText = "在这输入你要发送的消息",
+                                                    ReleaseFocusOnCommit = false,
+                                                    HoldFocus = true,
+                                                }
+                                            }
+                                        },
+                                        loading = new LoadingSpinner(),
+                                    },
+                                }
                             }
                         },
                         tabsArea = new TabsArea

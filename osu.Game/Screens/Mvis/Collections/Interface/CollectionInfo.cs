@@ -112,7 +112,7 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
                                                 Font = OsuFont.GetFont(size: 50),
                                                 RelativeSizeAxes = Axes.X,
                                                 Text = "screen.mvis.collections.ui.noCollectionSelected",
-                                                Truncate = true,
+                                                Truncate = true
                                             },
                                             collectionBeatmapCount = new OsuSpriteText
                                             {

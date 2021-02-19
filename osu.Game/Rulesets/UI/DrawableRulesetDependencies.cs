@@ -102,17 +102,17 @@ namespace osu.Game.Rulesets.UI
                 this.fallback = fallback;
             }
 
-            public SampleChannel Get(string name) => primary.Get(name) ?? fallback.Get(name);
+            public Sample Get(string name) => primary.Get(name) ?? fallback.Get(name);
 
-            public Task<SampleChannel> GetAsync(string name) => primary.GetAsync(name) ?? fallback.GetAsync(name);
+            public Task<Sample> GetAsync(string name) => primary.GetAsync(name) ?? fallback.GetAsync(name);
 
             public Stream GetStream(string name) => primary.GetStream(name) ?? fallback.GetStream(name);
 
             public IEnumerable<string> GetAvailableResources() => throw new NotSupportedException();
 
-            public void AddAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => throw new NotSupportedException();
+            public void AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => throw new NotSupportedException();
 
-            public void RemoveAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => throw new NotSupportedException();
+            public void RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => throw new NotSupportedException();
 
             public void RemoveAllAdjustments(AdjustableProperty type) => throw new NotSupportedException();
 

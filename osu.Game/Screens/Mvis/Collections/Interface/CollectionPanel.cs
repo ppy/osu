@@ -133,6 +133,7 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
                                             RelativeSizeAxes = Axes.X,
                                             Text = "???",
                                             Truncate = true,
+                                            UseLegacyUnicode = true
                                         },
                                         collectionBeatmapCount = new OsuSpriteText
                                         {
@@ -165,7 +166,7 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
             collectionName.Text = Collection.Name.Value;
             collectionBeatmapCount.Text = new LocalisedString("{0}首歌曲", beatmapSets.Count);
 
-            State.BindValueChanged(OnStateChanged, true);
+            State.BindValueChanged(onStateChanged, true);
 
             if (State.Value != ActiveState.Disabled)
                 colourProvider.HueColour.BindValueChanged(_ => State.TriggerChange());
@@ -178,7 +179,7 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
             this.FadeIn(300);
         }
 
-        private void OnStateChanged(ValueChangedEvent<ActiveState> v)
+        private void onStateChanged(ValueChangedEvent<ActiveState> v)
         {
             if (v.NewValue >= ActiveState.Selected)
             {

@@ -63,16 +63,12 @@ namespace osu.Game.Configuration
             Set(MSetting.MvisGreen, 0, 0, 255);
             Set(MSetting.MvisBlue, 0, 0, 255);
 
-            //Purcashe Screen
-            Set(MSetting.PPCount, 0, 0);
-            Set(MSetting.PurcasheBgBeatmap, false);
-            Set(MSetting.PurcasheBgTriangles, false);
-
             //实验性功能
             Set(MSetting.CustomWindowIconPath, "");
             Set(MSetting.UseCustomGreetingPicture, false);
             Set(MSetting.FadeOutWindowWhenExiting, false);
             Set(MSetting.FadeInWindowWhenEntering, false);
+            Set(MSetting.UseSystemCursor, false);
         }
     }
 
@@ -109,13 +105,11 @@ namespace osu.Game.Configuration
         SamplePlaybackGain,
         SongSelectBgBlur,
         IntroLoadDirectToSongSelect,
-        PPCount,
-        PurcasheBgBeatmap,
-        PurcasheBgTriangles,
         CustomWindowIconPath,
         UseCustomGreetingPicture,
         FadeOutWindowWhenExiting,
-        FadeInWindowWhenEntering
+        FadeInWindowWhenEntering,
+        UseSystemCursor
     }
 
     public enum MvisBarType

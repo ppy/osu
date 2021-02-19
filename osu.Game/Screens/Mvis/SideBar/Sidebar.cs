@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
@@ -38,11 +39,12 @@ namespace osu.Game.Screens.Mvis.SideBar
         private readonly Container<Drawable> contentContainer;
         protected override Container<Drawable> Content => contentContainer;
 
-        private SampleChannel sampleToggle;
+        private Sample sampleToggle;
+        private Sample samplePopIn;
+        private Sample samplePopOut;
+
         private bool startFromHiddenState;
         private readonly Container content;
-        private SampleChannel samplePopIn;
-        private SampleChannel samplePopOut;
         private bool isFirstHide = true;
 
         public Sidebar()
@@ -55,7 +57,11 @@ namespace osu.Game.Screens.Mvis.SideBar
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black.Opacity(0.6f),
-                    Action = Hide,
+                    Action = () =>
+                    {
+                        if (!content.IsHovered)
+                            Hide();
+                    }
                 },
                 content = new BlockClickContainer
                 {
@@ -63,6 +69,13 @@ namespace osu.Game.Screens.Mvis.SideBar
                     Origin = Anchor.BottomRight,
                     RelativeSizeAxes = Axes.Both,
                     Size = new Vector2(0.3f, 1f),
+                    Masking = true,
+                    EdgeEffect = new EdgeEffectParameters
+                    {
+                        Type = EdgeEffectType.Shadow,
+                        Radius = 5,
+                        Colour = Color4.Black.Opacity(0.5f)
+                    },
                     Children = new Drawable[]
                     {
                         header = new TabHeader
@@ -156,7 +169,7 @@ namespace osu.Game.Screens.Mvis.SideBar
                 throw new InvalidOperationException($"{d}不是{typeof(ISidebarContent)}");
 
             if (!components.Contains(c))
-                throw new InvalidOperationException($"组件不包含{c}");
+                throw new InvalidOperationException($"组成部分中不包含{c}");
 
             if (c.ResizeWidth < 0.3f || c.ResizeHeight < 0.3f)
                 throw new InvalidOperationException("组件过小");
@@ -268,6 +281,7 @@ namespace osu.Game.Screens.Mvis.SideBar
         private class BlockClickContainer : Container
         {
             protected override bool OnClick(ClickEvent e) => true;
+            protected override bool OnMouseDown(MouseDownEvent e) => true;
         }
     }
 }

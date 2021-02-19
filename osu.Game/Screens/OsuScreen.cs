@@ -75,7 +75,7 @@ namespace osu.Game.Screens
         /// </summary>
         public virtual bool DisallowExternalBeatmapRulesetChanges => false;
 
-        private SampleChannel sampleExit;
+        private Sample sampleExit;
 
         protected virtual bool PlayResumeSound => true;
 
@@ -140,7 +140,7 @@ namespace osu.Game.Screens
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame osu, AudioManager audio)
+        private void load(AudioManager audio)
         {
             sampleExit = audio.Samples.Get(@"UI/screen-back");
         }

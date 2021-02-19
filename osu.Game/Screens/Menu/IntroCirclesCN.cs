@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Menu
         private const double delay_step_one = 2300;
         private const double delay_step_two = 600;
 
-        private SampleChannel welcome;
+        private Sample welcome;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)

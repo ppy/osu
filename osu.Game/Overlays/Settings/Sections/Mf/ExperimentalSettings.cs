@@ -67,6 +67,12 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                     Current = fadeInWindowBindable = mConfig.GetBindable<bool>(MSetting.FadeInWindowWhenEntering),
                 });
 
+                Add(new SettingsCheckbox
+                {
+                    LabelText = "使用系统光标",
+                    Current = mConfig.GetBindable<bool>(MSetting.UseSystemCursor),
+                });
+
                 fadeOutWindowBindable.Disabled = !isSdlBackend;
                 fadeInWindowBindable.Disabled = !isSdlBackend;
             }

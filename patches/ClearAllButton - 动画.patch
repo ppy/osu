@@ -1,0 +1,68 @@
+Index: osu.Game/Overlays/Notifications/NotificationSection.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/osu.Game/Overlays/Notifications/NotificationSection.cs b/osu.Game/Overlays/Notifications/NotificationSection.cs
+--- a/osu.Game/Overlays/Notifications/NotificationSection.cs	(revision f2d3b667f303338cf3463783229ece7d24d6aea7)
++++ b/osu.Game/Overlays/Notifications/NotificationSection.cs	(date 1613564014639)
+@@ -8,10 +8,11 @@
+ using osu.Framework.Extensions.IEnumerableExtensions;
+ using osu.Framework.Graphics;
+ using osu.Framework.Graphics.Containers;
++using osu.Framework.Input.Events;
+ using osu.Game.Graphics;
+ using osu.Game.Graphics.Sprites;
+ using osuTK;
+-using osu.Game.Graphics.Containers;
++using osu.Game.Graphics.UserInterface;
+ 
+ namespace osu.Game.Overlays.Notifications
+ {
+@@ -75,7 +76,8 @@
+                         {
+                             Margin = new MarginPadding
+                             {
+-                                Bottom = 5
++                                Bottom = 5,
++                                Top = 4
+                             },
+                             Spacing = new Vector2(5, 0),
+                             AutoSizeAxes = Axes.Both,
+@@ -124,18 +126,30 @@
+             countDrawable.Text = notifications.Children.Count(c => c.Alpha > 0.99f).ToString();
+         }
+ 
+-        private class ClearAllButton : OsuClickableContainer
++        private class ClearAllButton : OsuAnimatedButton
+         {
+             private readonly OsuSpriteText text;
+ 
+             public ClearAllButton()
+             {
+-                AutoSizeAxes = Axes.Both;
++                AutoSizeAxes = Axes.X;
++                Height = 26;
++
++                Add(text = new OsuSpriteText
++                {
++                    Margin = new MarginPadding { Vertical = 4, Horizontal = 10 },
++                    Anchor = Anchor.Centre,
++                    Origin = Anchor.Centre
++                });
++            }
++
++            protected override bool OnMouseDown(MouseDownEvent e)
++            {
++                return Handle(e);
++            }
+ 
+-                Children = new[]
+-                {
+-                    text = new OsuSpriteText()
+-                };
++            protected override void OnMouseUp(MouseUpEvent e)
++            {
+             }
+ 
+             public string Text

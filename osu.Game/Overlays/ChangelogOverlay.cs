@@ -23,14 +23,14 @@ namespace osu.Game.Overlays
     {
         public readonly Bindable<APIChangelogBuild> Current = new Bindable<APIChangelogBuild>();
 
-        private SampleChannel sampleBack;
+        private Sample sampleBack;
 
         private List<APIChangelogBuild> builds;
 
         protected List<APIUpdateStream> Streams;
 
         public ChangelogOverlay()
-            : base(OverlayColourScheme.Purple)
+            : base(OverlayColourScheme.Purple, false)
         {
         }
 
