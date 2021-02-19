@@ -1,9 +1,11 @@
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
@@ -14,6 +16,7 @@ namespace osu.Game.Graphics
     {
         private readonly OsuSpriteText spriteText;
         private readonly Box flashBox;
+        private readonly BindableBool optUI = new BindableBool();
 
         [Resolved(canBeNull: true)]
         private OsuGame game { get; set; }
@@ -90,10 +93,29 @@ namespace osu.Game.Graphics
             };
         }
 
+        [BackgroundDependencyLoader]
+        private void load(MConfigManager config)
+        {
+            config.BindWith(MSetting.OptUI, optUI);
+
+            optUI.BindValueChanged(v =>
+            {
+                if (!v.NewValue) Hide();
+                else if (!string.IsNullOrEmpty(Text)) Show();
+            });
+        }
+
         protected override void UpdateAfterChildren()
         {
             Margin = new MarginPadding { Top = (game?.ToolbarOffset ?? 0) + 5 };
             base.UpdateAfterChildren();
+        }
+
+        public override void Show()
+        {
+            if (!optUI.Value) return;
+
+            base.Show();
         }
 
         protected override void PopIn()
@@ -104,7 +126,6 @@ namespace osu.Game.Graphics
 
         protected override void PopOut()
         {
-            Flash();
             this.FadeOut(300, Easing.OutQuint)
                 .MoveToY(-23, 300, Easing.OutQuint);
         }

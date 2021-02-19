@@ -1,0 +1,80 @@
+Index: osu.Game/Graphics/TextEditIndicator.cs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/osu.Game/Graphics/TextEditIndicator.cs b/osu.Game/Graphics/TextEditIndicator.cs
+--- a/osu.Game/Graphics/TextEditIndicator.cs	(revision 70f6ebefef26937a00b6761733ae823feea1f8a2)
++++ b/osu.Game/Graphics/TextEditIndicator.cs	(date 1613734149529)
+@@ -1,3 +1,4 @@
++using System.Text;
+ using osu.Framework.Allocation;
+ using osu.Framework.Extensions.Color4Extensions;
+ using osu.Framework.Graphics;
+@@ -5,6 +6,7 @@
+ using osu.Framework.Graphics.Effects;
+ using osu.Framework.Graphics.Shapes;
+ using osu.Game.Graphics.Sprites;
++using osu.Game.Graphics.UserInterface;
+ using osuTK;
+ using osuTK.Graphics;
+ 
+@@ -13,6 +15,7 @@
+     public class TextEditIndicator : VisibilityContainer
+     {
+         private readonly OsuSpriteText spriteText;
++        private readonly ProgressBar bg;
+         private readonly Box flashBox;
+ 
+         [Resolved(canBeNull: true)]
+@@ -27,6 +30,7 @@
+                     return;
+ 
+                 spriteText.Text = value;
++                Schedule(() => bg.CurrentTime = Encoding.Default.GetBytes(Text).Length);
+             }
+         }
+ 
+@@ -46,10 +50,18 @@
+ 
+             Children = new Drawable[]
+             {
++                bg = new ByteLengthIndicator(false)
++                {
++                    RelativeSizeAxes = Axes.Both,
++                    BackgroundColour = Color4.Black.Opacity(0.5f),
++                    FillColour = Color4.Aqua.Opacity(0.5f),
++                    EndTime = 31,
++                    CurrentTime = 0
++                },
+                 flashBox = new Box
+                 {
+                     RelativeSizeAxes = Axes.Both,
+-                    Colour = Color4.Black.Opacity(0.5f),
++                    Colour = Color4.Gold.Opacity(0f),
+                     Anchor = Anchor.TopCentre,
+                     Origin = Anchor.TopCentre,
+                     Blending = BlendingParameters.Mixture
+@@ -111,5 +123,22 @@
+ 
+         public void Flash() =>
+             flashBox.FlashColour(Color4.Gold, 1000, Easing.OutQuint);
++
++        private class ByteLengthIndicator : ProgressBar
++        {
++            protected override void UpdateValue(float value)
++            {
++                fill.ResizeWidthTo(value, 300, Easing.OutQuint);
++                fill.FadeColour(CurrentNumber.Value >= CurrentNumber.MaxValue
++                    ? Color4.Red.Opacity(0.5f)
++                    : Color4.Aqua.Opacity(0.5f), 300);
++            }
++
++            public ByteLengthIndicator(bool allowSeek)
++                : base(allowSeek)
++            {
++                fill.RelativeSizeAxes = Axes.Both;
++            }
++        }
+     }
+ }

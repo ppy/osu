@@ -168,7 +168,11 @@ namespace osu.Desktop
                         if (textEditIndicator != null)
                         {
                             if (textEditIndicator.State.Value != Visibility.Hidden)
-                                Schedule(() => textEditIndicator.Hide());
+                                Schedule(() =>
+                                {
+                                    textEditIndicator.Flash();
+                                    textEditIndicator.Hide();
+                                });
                         }
                     };
                     break;
