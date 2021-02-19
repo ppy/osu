@@ -26,6 +26,11 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
         public readonly double DeltaTime;
 
         /// <summary>
+        /// Start time of <see cref="BaseObject"/>.
+        /// </summary>
+        public readonly double StartTime;
+
+        /// <summary>
         /// Creates a new <see cref="DifficultyHitObject"/>.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> which this <see cref="DifficultyHitObject"/> wraps.</param>
@@ -36,6 +41,7 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
             BaseObject = hitObject;
             LastObject = lastObject;
             DeltaTime = (hitObject.StartTime - lastObject.StartTime) / clockRate;
+            StartTime = hitObject.StartTime / clockRate;
         }
     }
 }
