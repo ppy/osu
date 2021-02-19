@@ -166,19 +166,21 @@ namespace osu.Game.Screens.OnlinePlay.Match
         {
             updateWorkingBeatmap();
 
-            if (SelectedItem.Value == null)
+            var selected = SelectedItem.Value;
+
+            if (selected == null)
                 return;
 
             // Remove any user mods that are no longer allowed.
             UserMods.Value = UserMods.Value
-                                     .Where(m => SelectedItem.Value.AllowedMods.Any(a => m.GetType() == a.GetType()))
+                                     .Where(m => selected.AllowedMods.Any(a => m.GetType() == a.GetType()))
                                      .ToList();
 
             UpdateMods();
 
-            Ruleset.Value = SelectedItem.Value.Ruleset.Value;
+            Ruleset.Value = selected.Ruleset.Value;
 
-            if (SelectedItem.Value?.AllowedMods.Any() != true)
+            if (selected.AllowedMods.Any() != true)
             {
                 UserModsSection?.Hide();
                 userModsSelectOverlay.Hide();
@@ -187,7 +189,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             else
             {
                 UserModsSection?.Show();
-                userModsSelectOverlay.IsValidMod = m => SelectedItem.Value.AllowedMods.Any(a => a.GetType() == m.GetType());
+                userModsSelectOverlay.IsValidMod = m => selected.AllowedMods.Any(a => a.GetType() == m.GetType());
             }
         }
 
