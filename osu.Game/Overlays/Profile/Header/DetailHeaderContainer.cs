@@ -176,8 +176,8 @@ namespace osu.Game.Overlays.Profile.Header
             foreach (var scoreRankInfo in scoreRankInfos)
                 scoreRankInfo.Value.RankCount = user?.Statistics?.GradesCount[scoreRankInfo.Key] ?? 0;
 
-            detailGlobalRank.Content = user?.Statistics?.Ranks.Global?.ToString("\\##,##0") ?? "-";
-            detailCountryRank.Content = user?.Statistics?.Ranks.Country?.ToString("\\##,##0") ?? "-";
+            detailGlobalRank.Content = user?.Statistics?.GlobalRank?.ToString("\\##,##0") ?? "-";
+            detailCountryRank.Content = user?.Statistics?.CountryRank?.ToString("\\##,##0") ?? "-";
 
             rankGraph.Statistics.Value = user?.Statistics;
         }
