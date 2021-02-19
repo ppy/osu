@@ -47,7 +47,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private Drawable userModsSection;
 
         private readonly IBindable<bool> isConnected = new Bindable<bool>();
-        private readonly IBindable<PlaylistItem> matchCurrentItem = new Bindable<PlaylistItem>();
 
         [CanBeNull]
         private IDisposable readyClickOperation;
@@ -269,8 +268,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             base.LoadComplete();
 
-            matchCurrentItem.BindTo(client.CurrentMatchPlayingItem);
-            matchCurrentItem.BindValueChanged(onCurrentItemChanged, true);
+            SelectedItem.BindTo(client.CurrentMatchPlayingItem);
+            SelectedItem.BindValueChanged(onSelectedItemChanged, true);
 
             BeatmapAvailability.BindValueChanged(updateBeatmapAvailability, true);
             UserMods.BindValueChanged(onUserModsChanged);
@@ -286,19 +285,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }, true);
         }
 
-        private void onCurrentItemChanged(ValueChangedEvent<PlaylistItem> item)
+        private void onSelectedItemChanged(ValueChangedEvent<PlaylistItem> item)
         {
             if (client?.LocalUser == null)
                 return;
-
-            // If we're about to enter gameplay, schedule the item to be set at a later time.
-            if (client.LocalUser.State > MultiplayerUserState.Ready)
-            {
-                Schedule(() => onCurrentItemChanged(item));
-                return;
-            }
-
-            SelectedItem.Value = item.NewValue;
 
             if (item.NewValue?.AllowedMods.Any() != true)
             {
