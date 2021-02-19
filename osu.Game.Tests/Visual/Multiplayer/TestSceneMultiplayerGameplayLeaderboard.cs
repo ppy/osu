@@ -13,6 +13,7 @@ using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Database;
 using osu.Game.Online;
+using osu.Game.Online.API;
 using osu.Game.Online.Spectator;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Osu.Scoring;
@@ -50,6 +51,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [SetUpSteps]
         public override void SetUpSteps()
         {
+            AddStep("set local user", () => ((DummyAPIAccess)API).LocalUser.Value = lookupCache.GetUserAsync(1).Result);
+
             AddStep("create leaderboard", () =>
             {
                 leaderboard?.Expire();
