@@ -667,6 +667,9 @@ namespace osu.Game.Screens.Play
 
         private double? lastPauseActionTime;
 
+        public bool PauseCooldownActive =>
+            lastPauseActionTime.HasValue && GameplayClockContainer.GameplayClock.CurrentTime < lastPauseActionTime + pause_cooldown;
+
         private bool canPause =>
             // must pass basic screen conditions (beatmap loaded, instance allows pause)
             LoadedBeatmapSuccessfully && Configuration.AllowPause && ValidForResume
@@ -675,10 +678,7 @@ namespace osu.Game.Screens.Play
             // cannot pause if we are already in a fail state
             && !HasFailed
             // cannot pause if already paused (or in a cooldown state) unless we are in a resuming state.
-            && (IsResuming || (GameplayClockContainer.IsPaused.Value == false && !pauseCooldownActive));
-
-        private bool pauseCooldownActive =>
-            lastPauseActionTime.HasValue && GameplayClockContainer.GameplayClock.CurrentTime < lastPauseActionTime + pause_cooldown;
+            && (IsResuming || (GameplayClockContainer.IsPaused.Value == false && !PauseCooldownActive));
 
         private bool canResume =>
             // cannot resume from a non-paused state
@@ -812,7 +812,7 @@ namespace osu.Game.Screens.Play
             // ValidForResume is false when restarting
             if (ValidForResume)
             {
-                if (pauseCooldownActive && !GameplayClockContainer.IsPaused.Value)
+                if (PauseCooldownActive && !GameplayClockContainer.IsPaused.Value)
                     // still want to block if we are within the cooldown period and not already paused.
                     return true;
             }
