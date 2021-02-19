@@ -2,21 +2,18 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Beatmaps;
-using osuTK.Input;
+using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -45,6 +42,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestPauseWhileInCooldown()
         {
+            AddStep("move cursor outside", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.TopLeft - new Vector2(10)));
+
             AddStep("resume player", () => Player.GameplayClockContainer.Start());
             AddStep("skip to gameplay", () => Player.GameplayClockContainer.Seek(Player.DrawableRuleset.GameplayStartTime));
 
@@ -54,14 +53,15 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("set active", () => ((Bindable<bool>)host.IsActive).Value = true);
 
             AddStep("resume player", () => Player.Resume());
-            AddStep("click resume overlay", () =>
-            {
-                InputManager.MoveMouseTo(this.ChildrenOfType<OsuResumeOverlay.OsuClickToResumeCursor>().Single());
-                InputManager.Click(MouseButton.Left);
-            });
 
-            AddAssert("pause cooldown active", () => Player.PauseCooldownActive);
-            AddStep("set inactive again", () => ((Bindable<bool>)host.IsActive).Value = false);
+            bool pauseCooldownActive = false;
+
+            AddStep("set inactive again", () =>
+            {
+                pauseCooldownActive = Player.PauseCooldownActive;
+                ((Bindable<bool>)host.IsActive).Value = false;
+            });
+            AddAssert("pause cooldown active", () => pauseCooldownActive);
             AddUntilStep("wait for pause", () => Player.GameplayClockContainer.IsPaused.Value);
         }
 
