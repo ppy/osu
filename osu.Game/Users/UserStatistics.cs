@@ -42,9 +42,6 @@ namespace osu.Game.Users
         [JsonProperty(@"pp")]
         public decimal? PP;
 
-        [JsonProperty(@"pp_rank")]
-        public int PPRank;
-
         [JsonProperty(@"ranked_score")]
         public long RankedScore;
 
