@@ -217,6 +217,8 @@ namespace osu.Game.Tournament
 
             req.Success += res =>
             {
+                user.Id = res.Id;
+
                 user.Username = res.Username;
                 user.Statistics = res.Statistics;
                 user.Country = res.Country;
@@ -225,7 +227,11 @@ namespace osu.Game.Tournament
                 success?.Invoke();
             };
 
-            req.Failure += _ => failure?.Invoke();
+            req.Failure += _ =>
+            {
+                user.Id = 1;
+                failure?.Invoke();
+            };
 
             if (immediate)
                 API.Perform(req);
