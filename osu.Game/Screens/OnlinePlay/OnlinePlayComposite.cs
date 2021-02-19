@@ -2,14 +2,19 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.Rooms;
+using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.OnlinePlay
 {
+    /// <summary>
+    /// A <see cref="CompositeDrawable"/> that exposes bindables for <see cref="Room"/> properties.
+    /// </summary>
     public class OnlinePlayComposite : CompositeDrawable
     {
         [Resolved(typeof(Room))]
@@ -53,5 +58,23 @@ namespace osu.Game.Screens.OnlinePlay
 
         [Resolved(typeof(Room))]
         protected Bindable<TimeSpan?> Duration { get; private set; }
+
+        /// <summary>
+        /// The currently selected item in the <see cref="RoomSubScreen"/>, or the first item from <see cref="Playlist"/>
+        /// if this <see cref="OnlinePlayComposite"/> is not within a <see cref="RoomSubScreen"/>.
+        /// </summary>
+        protected readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Playlist.BindCollectionChanged((_, __) => UpdateSelectedItem(), true);
+        }
+
+        protected virtual void UpdateSelectedItem()
+        {
+            SelectedItem.Value = Playlist.FirstOrDefault();
+        }
     }
 }

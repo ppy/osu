@@ -43,7 +43,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private MultiplayerMatchSettingsOverlay settingsOverlay;
 
-        private IBindable<bool> isConnected;
+        private readonly IBindable<bool> isConnected = new Bindable<bool>();
 
         [CanBeNull]
         private IDisposable readyClickOperation;
@@ -252,13 +252,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             base.LoadComplete();
 
+            SelectedItem.BindTo(client.CurrentMatchPlayingItem);
+
             BeatmapAvailability.BindValueChanged(updateBeatmapAvailability, true);
             UserMods.BindValueChanged(onUserModsChanged);
 
             client.LoadRequested += onLoadRequested;
             client.RoomUpdated += onRoomUpdated;
 
-            isConnected = client.IsConnected.GetBoundCopy();
+            isConnected.BindTo(client.IsConnected);
             isConnected.BindValueChanged(connected =>
             {
                 if (!connected.NewValue)

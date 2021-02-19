@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -25,6 +24,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
     [Cached(typeof(IPreviewTrackOwner))]
     public abstract class RoomSubScreen : OnlinePlaySubScreen, IPreviewTrackOwner
     {
+        [Cached(typeof(IBindable<PlaylistItem>))]
         protected readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
@@ -38,9 +38,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
         protected Drawable UserModsSection;
 
         private Sample sampleStart;
-
-        [Resolved(typeof(Room), nameof(Room.Playlist))]
-        protected BindableList<PlaylistItem> Playlist { get; private set; }
 
         /// <summary>
         /// Any mods applied by/to the local user.
@@ -103,8 +100,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
             SelectedItem.BindValueChanged(_ => Scheduler.AddOnce(selectedItemChanged));
 
-            Playlist.BindCollectionChanged(onPlaylistChanged, true);
-
             managerUpdated = beatmapManager.ItemUpdated.GetBoundCopy();
             managerUpdated.BindValueChanged(beatmapUpdated);
 
@@ -121,9 +116,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
             return base.OnBackButton();
         }
-
-        private void onPlaylistChanged(object sender, NotifyCollectionChangedEventArgs e) =>
-            SelectedItem.Value = Playlist.FirstOrDefault();
 
         protected void ShowUserModSelect() => userModsSelectOverlay.Show();
 
