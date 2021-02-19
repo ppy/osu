@@ -30,6 +30,8 @@ namespace osu.Game.Screens.Play.HUD
 
         private const float panel_shear = 0.15f;
 
+        public Bindable<bool> Expanded = new Bindable<bool>();
+
         private OsuSpriteText positionText, scoreText, accuracyText, comboText, usernameText;
 
         public BindableDouble TotalScore { get; } = new BindableDouble();
