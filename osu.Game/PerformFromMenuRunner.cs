@@ -84,7 +84,7 @@ namespace osu.Game
             // we may already be at the target screen type.
             var type = current.GetType();
 
-            if (validScreens.Any(t => type.IsAssignableFrom(t)) && !beatmap.Disabled)
+            if (validScreens.Any(t => t.IsAssignableFrom(type)) && !beatmap.Disabled)
             {
                 finalAction(current);
                 Cancel();
@@ -93,7 +93,7 @@ namespace osu.Game
 
             while (current != null)
             {
-                if (validScreens.Any(t => type.IsAssignableFrom(t)))
+                if (validScreens.Any(t => t.IsAssignableFrom(type)))
                 {
                     current.MakeCurrent();
                     break;
