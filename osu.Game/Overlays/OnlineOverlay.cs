@@ -4,6 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online;
 
 namespace osu.Game.Overlays
 {
@@ -16,10 +17,16 @@ namespace osu.Game.Overlays
         protected readonly LoadingLayer Loading;
         private readonly Container content;
 
-        protected OnlineOverlay(OverlayColourScheme colourScheme)
+        protected OnlineOverlay(OverlayColourScheme colourScheme, bool requiresSignIn = true)
             : base(colourScheme)
         {
-            base.Content.AddRange(new Drawable[]
+            var mainContent = requiresSignIn
+                ? new OnlineViewContainer($"Sign in to view the {Header.Title.Title}")
+                : new Container();
+
+            mainContent.RelativeSizeAxes = Axes.Both;
+
+            mainContent.AddRange(new Drawable[]
             {
                 ScrollFlow = new OverlayScrollContainer
                 {
@@ -43,6 +50,8 @@ namespace osu.Game.Overlays
                 },
                 Loading = new LoadingLayer(true)
             });
+
+            base.Content.Add(mainContent);
         }
     }
 }

@@ -231,9 +231,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
             if (track != null)
             {
-                track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
-                track.Looping = true;
-
+                Beatmap.Value.PrepareTrackForPreviewLooping();
                 music?.EnsurePlayingSomething();
             }
         }
@@ -243,10 +241,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             var track = Beatmap?.Value?.Track;
 
             if (track != null)
-            {
                 track.Looping = false;
-                track.RestartPoint = 0;
-            }
         }
 
         private class UserModSelectOverlay : LocalPlayerModSelectOverlay
