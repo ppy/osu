@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Humanizer;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -32,6 +33,10 @@ namespace osu.Game.Screens.OnlinePlay
         protected BindableList<PlaylistItem> Playlist { get; private set; }
 
         protected readonly Bindable<IReadOnlyList<Mod>> FreeMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+
+        [CanBeNull]
+        [Resolved(CanBeNull = true)]
+        private IBindable<PlaylistItem> selectedItem { get; set; }
 
         private readonly FreeModSelectOverlay freeModSelectOverlay;
 
@@ -67,8 +72,8 @@ namespace osu.Game.Screens.OnlinePlay
 
             // At this point, Mods contains both the required and allowed mods. For selection purposes, it should only contain the required mods.
             // Similarly, freeMods is currently empty but should only contain the allowed mods.
-            Mods.Value = Playlist.FirstOrDefault()?.RequiredMods.Select(m => m.CreateCopy()).ToArray() ?? Array.Empty<Mod>();
-            FreeMods.Value = Playlist.FirstOrDefault()?.AllowedMods.Select(m => m.CreateCopy()).ToArray() ?? Array.Empty<Mod>();
+            Mods.Value = selectedItem?.Value?.RequiredMods.Select(m => m.CreateCopy()).ToArray() ?? Array.Empty<Mod>();
+            FreeMods.Value = selectedItem?.Value?.AllowedMods.Select(m => m.CreateCopy()).ToArray() ?? Array.Empty<Mod>();
 
             Ruleset.BindValueChanged(onRulesetChanged);
         }

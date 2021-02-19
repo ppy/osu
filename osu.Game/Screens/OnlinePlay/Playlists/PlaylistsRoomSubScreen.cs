@@ -29,6 +29,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         [Resolved(typeof(Room), nameof(Room.RoomID))]
         private Bindable<long?> roomId { get; set; }
 
+        [Resolved(typeof(Room), nameof(Room.Playlist))]
+        private BindableList<PlaylistItem> playlist { get; set; }
+
         private MatchSettingsOverlay settingsOverlay;
         private MatchLeaderboard leaderboard;
 
@@ -119,7 +122,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                         new DrawableRoomPlaylistWithResults
                                                                         {
                                                                             RelativeSizeAxes = Axes.Both,
-                                                                            Items = { BindTarget = Playlist },
+                                                                            Items = { BindTarget = playlist },
                                                                             SelectedItem = { BindTarget = SelectedItem },
                                                                             RequestShowResults = item =>
                                                                             {
@@ -266,7 +269,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
                     // Set the first playlist item.
                     // This is scheduled since updating the room and playlist may happen in an arbitrary order (via Room.CopyFrom()).
-                    Schedule(() => SelectedItem.Value = Playlist.FirstOrDefault());
+                    Schedule(() => SelectedItem.Value = playlist.FirstOrDefault());
                 }
             }, true);
         }
