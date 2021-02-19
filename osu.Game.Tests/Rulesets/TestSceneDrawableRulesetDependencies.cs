@@ -105,9 +105,9 @@ namespace osu.Game.Tests.Rulesets
                 IsDisposed = true;
             }
 
-            public SampleChannel Get(string name) => null;
+            public Sample Get(string name) => null;
 
-            public Task<SampleChannel> GetAsync(string name) => null;
+            public Task<Sample> GetAsync(string name) => null;
 
             public Stream GetStream(string name) => null;
 
