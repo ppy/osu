@@ -50,8 +50,6 @@ namespace osu.Game.Screens.Play.HUD
         {
             var drawable = new GameplayLeaderboardScore(user, isTracked)
             {
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
                 Expanded = { BindTarget = Expanded },
             };
 
