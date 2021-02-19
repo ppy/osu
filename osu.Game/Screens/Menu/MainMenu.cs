@@ -179,14 +179,15 @@ namespace osu.Game.Screens.Menu
             base.OnEntering(last);
             buttons.FadeInFromZero(500);
 
-            var metadata = Beatmap.Value.Metadata;
-
             if (last is IntroScreen && musicController.TrackLoaded)
             {
-                if (!musicController.CurrentTrack.IsRunning)
+                var track = musicController.CurrentTrack;
+
+                // presume the track is the current beatmap's track. not sure how correct this assumption is but it has worked until now.
+                if (!track.IsRunning)
                 {
-                    musicController.CurrentTrack.Seek(metadata.PreviewTime != -1 ? metadata.PreviewTime : 0.4f * musicController.CurrentTrack.Length);
-                    musicController.CurrentTrack.Start();
+                    Beatmap.Value.PrepareTrackForPreviewLooping();
+                    track.Restart();
                 }
             }
 
