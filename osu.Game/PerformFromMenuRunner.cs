@@ -103,7 +103,11 @@ namespace osu.Game
                 if (current is IHasSubScreenStack currentSubScreen)
                 {
                     if (findValidTarget(currentSubScreen.SubScreenStack.CurrentScreen))
+                    {
+                        // should be correct in theory, but currently untested/unused in existing implementations.
+                        current.MakeCurrent();
                         return true;
+                    }
                 }
 
                 if (validScreens.Any(t => t.IsAssignableFrom(type)))
