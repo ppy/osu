@@ -172,7 +172,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
             Ruleset.Value = selected.Ruleset.Value;
 
-            if (selected.AllowedMods.Any() != true)
+            if (!selected.AllowedMods.Any())
             {
                 UserModsSection?.Hide();
                 userModsSelectOverlay.Hide();
