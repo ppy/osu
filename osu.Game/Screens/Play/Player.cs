@@ -435,7 +435,7 @@ namespace osu.Game.Screens.Play
                 if (canPause)
                     Pause();
                 else
-                    Scheduler.AddDelayed(updatePauseOnFocusLostState, 200);
+                    Scheduler.AddOnce(updatePauseOnFocusLostState);
             }
         }
 
