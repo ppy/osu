@@ -1,3 +1,4 @@
+using System.Text;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -8,6 +9,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Mvis.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -17,6 +19,7 @@ namespace osu.Game.Graphics
     public class TextEditIndicator : VisibilityContainer
     {
         private readonly OsuSpriteText spriteText;
+        private readonly ProgressBar bg;
         private readonly Box flashBox;
         private readonly BindableBool optUI = new BindableBool();
         private readonly FillFlowContainer placeHolderContainer;
@@ -33,19 +36,24 @@ namespace osu.Game.Graphics
                     return;
 
                 if (string.IsNullOrEmpty(value))
+                {
                     Schedule(() =>
                     {
                         placeHolderContainer.FadeIn(150);
                         spriteText.FadeOut(150);
                     });
+                }
                 else
+                {
                     Schedule(() =>
                     {
                         placeHolderContainer.FadeOut(150);
                         spriteText.FadeIn(150);
                     });
+                }
 
                 spriteText.Text = value;
+                Schedule(() => bg.CurrentTime = Encoding.Default.GetBytes(Text).Length);
             }
         }
 
@@ -65,10 +73,18 @@ namespace osu.Game.Graphics
 
             Children = new Drawable[]
             {
+                bg = new ByteLengthIndicator(false)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    BackgroundColour = Color4.Black.Opacity(0.5f),
+                    FillColour = Color4.Aqua.Opacity(0.5f),
+                    EndTime = 31,
+                    CurrentTime = 0
+                },
                 flashBox = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black.Opacity(0.5f),
+                    Colour = Color4.Gold.Opacity(0f),
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Blending = BlendingParameters.Mixture
@@ -188,5 +204,22 @@ namespace osu.Game.Graphics
 
         public void Flash() =>
             flashBox.FlashColour(Color4.Gold, 1000, Easing.OutQuint);
+
+        private class ByteLengthIndicator : ProgressBar
+        {
+            protected override void UpdateValue(float value)
+            {
+                fill.ResizeWidthTo(value, 300, Easing.OutQuint);
+                fill.FadeColour(CurrentNumber.Value >= CurrentNumber.MaxValue
+                    ? Color4.Red.Opacity(0.5f)
+                    : Color4.Aqua.Opacity(0.5f), 300);
+            }
+
+            public ByteLengthIndicator(bool allowSeek)
+                : base(allowSeek)
+            {
+                fill.RelativeSizeAxes = Axes.Both;
+            }
+        }
     }
 }
