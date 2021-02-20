@@ -508,10 +508,14 @@ namespace osu.Game.Screens.Play
                     return;
                 }
 
-                // in the case a dialog needs to be shown, attempt to pause and show it.
-                // this may fail (see internal checks in Pause()) at which point the exit attempt will be aborted.
-                Pause();
-                return;
+                // there's a chance the pausing is not supported in the current state, at which point immediate exit should be preferred.
+                if (pausingSupportedByCurrentState)
+                {
+                    // in the case a dialog needs to be shown, attempt to pause and show it.
+                    // this may fail (see internal checks in Pause()) but the fail cases are temporary, so don't fall through to Exit().
+                    Pause();
+                    return;
+                }
             }
 
             this.Exit();
@@ -670,15 +674,17 @@ namespace osu.Game.Screens.Play
 
         private double? lastPauseActionTime;
 
-        private bool canPause =>
+        /// <summary>
+        /// A set of conditionals which defines whether the current game state and configuration allows for
+        /// pausing to be attempted via <see cref="Pause"/>. If false, the game should generally exit if a user pause
+        /// is attempted.
+        /// </summary>
+        private bool pausingSupportedByCurrentState =>
             // must pass basic screen conditions (beatmap loaded, instance allows pause)
             LoadedBeatmapSuccessfully && Configuration.AllowPause && ValidForResume
             // replays cannot be paused and exit immediately
             && !DrawableRuleset.HasReplayLoaded.Value
-            // cannot pause if we are already in a fail state
-            && !HasFailed
-            // cannot pause if already paused (or in a cooldown state) unless we are in a resuming state.
-            && (IsResuming || (GameplayClockContainer.IsPaused.Value == false && !pauseCooldownActive));
+            && !HasFailed;
 
         private bool pauseCooldownActive =>
             lastPauseActionTime.HasValue && GameplayClockContainer.GameplayClock.CurrentTime < lastPauseActionTime + pause_cooldown;
@@ -693,7 +699,10 @@ namespace osu.Game.Screens.Play
 
         public void Pause()
         {
-            if (!canPause) return;
+            if (!pausingSupportedByCurrentState) return;
+
+            if (!IsResuming && pauseCooldownActive)
+                return;
 
             if (IsResuming)
             {

@@ -91,6 +91,15 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestUserPauseWhenPauseNotAllowed()
+        {
+            AddStep("disable pause support", () => Player.Configuration.AllowPause = false);
+
+            pauseFromUserExitKey();
+            confirmExited();
+        }
+
+        [Test]
         public void TestUserPauseDuringCooldownTooSoon()
         {
             AddStep("move cursor outside", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.TopLeft - new Vector2(10)));
