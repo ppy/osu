@@ -42,11 +42,12 @@ namespace osu.Game.Screens.Mvis.BottomBar
         }
 
         protected override void UpdateValue(float value) =>
-            fill.Width = value * UsableWidth;
+            fill.Width = value;
 
         public SongProgressBar(bool allowSeek = true)
             : base(allowSeek)
         {
+            fill.RelativeSizeAxes = Axes.Both;
         }
     }
 }
