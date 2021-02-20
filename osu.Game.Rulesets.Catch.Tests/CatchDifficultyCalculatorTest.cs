@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         public void Test(double expected, string name)
             => base.Test(expected, name);
 
-        [TestCase(5.0565038923984691d, "diffcalc-test")]
+        [TestCase(5.169743871843191d, "diffcalc-test")]
         public void TestClockRateAdjusted(double expected, string name)
             => Test(expected, name, new CatchModDoubleTime());
 
