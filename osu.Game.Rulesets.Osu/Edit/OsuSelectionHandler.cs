@@ -211,24 +211,33 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             var hitObjects = selectedMovableObjects;
 
-            Quad quad = getSurroundingQuad(hitObjects);
-
-            Vector2 newTopLeft = quad.TopLeft + delta;
-            if (newTopLeft.X < 0)
-                delta.X -= newTopLeft.X;
-            if (newTopLeft.Y < 0)
-                delta.Y -= newTopLeft.Y;
-
-            Vector2 newBottomRight = quad.BottomRight + delta;
-            if (newBottomRight.X > DrawWidth)
-                delta.X -= newBottomRight.X - DrawWidth;
-            if (newBottomRight.Y > DrawHeight)
-                delta.Y -= newBottomRight.Y - DrawHeight;
-
             foreach (var h in hitObjects)
                 h.Position += delta;
 
+            moveSelectionInBounds();
+
             return true;
+        }
+
+        private void moveSelectionInBounds()
+        {
+            var hitObjects = selectedMovableObjects;
+
+            Quad quad = getSurroundingQuad(hitObjects);
+            Vector2 delta = new Vector2(0);
+
+            if (quad.TopLeft.X < 0)
+                delta.X -= quad.TopLeft.X;
+            if (quad.TopLeft.Y < 0)
+                delta.Y -= quad.TopLeft.Y;
+
+            if (quad.BottomRight.X > DrawWidth)
+                delta.X -= quad.BottomRight.X - DrawWidth;
+            if (quad.BottomRight.Y > DrawHeight)
+                delta.Y -= quad.BottomRight.Y - DrawHeight;
+
+            foreach (var h in hitObjects)
+                h.Position += delta;
         }
 
         /// <summary>
