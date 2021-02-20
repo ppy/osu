@@ -23,20 +23,30 @@ namespace osu.Game.Graphics
         private readonly Box flashBox;
         private readonly BindableBool optUI = new BindableBool();
         private readonly FillFlowContainer placeHolderContainer;
+        private readonly Circle bar;
 
         [Resolved(canBeNull: true)]
         private OsuGame game { get; set; }
 
+        private string text;
+
         public string Text
         {
-            get => spriteText.Text;
+            get => text;
             set
             {
-                if (value == spriteText.Text)
+                if (value == text)
                     return;
+
+                text = value;
+
+                //bug: 不使用Schedule()会导致osu.Framework.Graphics.Drawable+InvalidThreadForMutationException
 
                 if (string.IsNullOrEmpty(value))
                 {
+                    if (State.Value == Visibility.Visible)
+                        Schedule(executeTimeoutHide);
+
                     Schedule(() =>
                     {
                         placeHolderContainer.FadeIn(150);
@@ -47,14 +57,30 @@ namespace osu.Game.Graphics
                 {
                     Schedule(() =>
                     {
+                        if (bar.Width != 0.8f)
+                            abortTimeoutHide(true);
+
                         placeHolderContainer.FadeOut(150);
                         spriteText.FadeIn(150);
                     });
                 }
 
-                spriteText.Text = value;
-                Schedule(() => bg.CurrentTime = Encoding.Default.GetBytes(Text).Length);
+                Schedule(() =>
+                {
+                    spriteText.Text = value;
+                    bg.CurrentTime = Encoding.Default.GetBytes(Text).Length;
+                });
             }
+        }
+
+        private void executeTimeoutHide()
+        {
+            bar.ResizeWidthTo(0, 3000).OnComplete(_ => Hide());
+        }
+
+        private void abortTimeoutHide(bool animate)
+        {
+            bar.ResizeWidthTo(0.8f, animate ? 300 : 0, Easing.OutQuint);
         }
 
         public TextEditIndicator()
@@ -145,7 +171,7 @@ namespace osu.Game.Graphics
                                 },
                             }
                         },
-                        new Circle
+                        bar = new Circle
                         {
                             Height = 3,
                             RelativeSizeAxes = Axes.X,
@@ -192,12 +218,22 @@ namespace osu.Game.Graphics
 
         protected override void PopIn()
         {
+            var emptyText = string.IsNullOrEmpty(Text);
+            abortTimeoutHide(!emptyText);
+
+            //在w10下
+            if (emptyText)
+                executeTimeoutHide();
+
             this.FadeIn(300, Easing.OutSine)
                 .MoveToY(0, 300, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
+            //中断bar其他正在执行的ResizeWidthTo变换
+            bar.ResizeWidthTo(bar.Width);
+
             this.FadeOut(300, Easing.OutQuint)
                 .MoveToY(-23, 300, Easing.OutQuint);
         }

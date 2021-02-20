@@ -34,7 +34,11 @@ namespace osu.Game.Tests.Visual.Mvis
 
             AddStep("Toggle Indicator", indicator.ToggleVisibility);
             AddStep("Clear Indicator", () => indicator.Text = string.Empty);
-            AddStep("Random Text", () => indicator.Text += RNG.Next().ToString());
+            AddStep("Random Text", () =>
+            {
+                indicator.Text += RNG.Next().ToString();
+                indicator.Show();
+            });
             AddStep("Flash", indicator.Flash);
         }
     }
