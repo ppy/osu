@@ -7,6 +7,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
+using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Rulesets.Filter
@@ -37,7 +38,9 @@ namespace osu.Game.Rulesets.Filter
 
         public string[] SearchTerms = Array.Empty<string>();
 
+        [CanBeNull]
         public RulesetInfo Ruleset;
+
         public bool AllowConvertedBeatmaps;
 
         private string searchText;
@@ -67,6 +70,79 @@ namespace osu.Game.Rulesets.Filter
         /// </summary>
         [CanBeNull]
         public BeatmapCollection Collection;
+
+        public FilterCriteria(RulesetInfo ruleset, FilterCreationParameters parameters)
+        {
+            Group = parameters.GroupMode;
+            Sort = parameters.SortMode;
+            AllowConvertedBeatmaps = parameters.AllowConvertedBeatmaps;
+            Ruleset = ruleset;
+            Collection = parameters.Collection;
+            UserStarDifficulty = parameters.UserStarDifficulty;
+
+            FilterQueryParser.ApplyQueries(this, parameters.Query);
+        }
+
+        internal FilterCriteria()
+        {
+        }
+
+        /// <summary>
+        /// Checks whether the supplied <paramref name="beatmap"/> satisfies the criteria represented
+        /// by this instance.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to test the criteria against.</param>
+        /// <returns><c>true</c> if the beatmap matches the current filtering criteria.</returns>
+        public virtual bool Matches(BeatmapInfo beatmap)
+        {
+            bool match =
+                Ruleset == null ||
+                beatmap.RulesetID == Ruleset.ID ||
+                (beatmap.RulesetID == 0 && Ruleset.ID > 0 && AllowConvertedBeatmaps);
+
+            if (beatmap.BeatmapSet?.Equals(SelectedBeatmapSet) == true)
+            {
+                // only check ruleset equality or convertability for selected beatmap
+                return match;
+            }
+
+            match &= !StarDifficulty.HasFilter || StarDifficulty.IsInRange(beatmap.StarDifficulty);
+            match &= !ApproachRate.HasFilter || ApproachRate.IsInRange(beatmap.BaseDifficulty.ApproachRate);
+            match &= !DrainRate.HasFilter || DrainRate.IsInRange(beatmap.BaseDifficulty.DrainRate);
+            match &= !CircleSize.HasFilter || CircleSize.IsInRange(beatmap.BaseDifficulty.CircleSize);
+            match &= !Length.HasFilter || Length.IsInRange(beatmap.Length);
+            match &= !BPM.HasFilter || BPM.IsInRange(beatmap.BPM);
+
+            match &= !BeatDivisor.HasFilter || BeatDivisor.IsInRange(beatmap.BeatDivisor);
+            match &= !OnlineStatus.HasFilter || OnlineStatus.IsInRange(beatmap.Status);
+
+            match &= !Creator.HasFilter || Creator.Matches(beatmap.Metadata.AuthorString);
+            match &= !Artist.HasFilter || Artist.Matches(beatmap.Metadata.Artist) ||
+                     Artist.Matches(beatmap.Metadata.ArtistUnicode);
+
+            match &= !UserStarDifficulty.HasFilter || UserStarDifficulty.IsInRange(beatmap.StarDifficulty);
+
+            if (match)
+            {
+                var terms = beatmap.SearchableTerms;
+
+                foreach (var criteriaTerm in SearchTerms)
+                    match &= terms.Any(term => term.Contains(criteriaTerm, StringComparison.InvariantCultureIgnoreCase));
+
+                // if a match wasn't found via text matching of terms, do a second catch-all check matching against online IDs.
+                // this should be done after text matching so we can prioritise matching numbers in metadata.
+                if (!match && SearchNumber.HasValue)
+                {
+                    match = (beatmap.OnlineBeatmapID == SearchNumber.Value) ||
+                            (beatmap.BeatmapSet?.OnlineBeatmapSetID == SearchNumber.Value);
+                }
+            }
+
+            if (match)
+                match &= Collection?.Beatmaps.Contains(beatmap) ?? true;
+
+            return match;
+        }
 
         public struct OptionalRange<T> : IEquatable<OptionalRange<T>>
             where T : struct

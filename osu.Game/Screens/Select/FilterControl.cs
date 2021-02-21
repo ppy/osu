@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -35,27 +36,30 @@ namespace osu.Game.Screens.Select
 
         private Bindable<GroupMode> groupMode;
 
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
+
         public FilterCriteria CreateCriteria()
         {
+            Debug.Assert(ruleset.Value.ID != null);
+
             var query = searchTextBox.Text;
 
-            var criteria = new FilterCriteria
+            var parameters = new FilterCreationParameters
             {
-                Group = groupMode.Value,
-                Sort = sortMode.Value,
+                Query = query,
+                GroupMode = groupMode.Value,
+                SortMode = sortMode.Value,
                 AllowConvertedBeatmaps = showConverted.Value,
-                Ruleset = ruleset.Value,
-                Collection = collectionDropdown?.Current.Value?.Collection
+                Collection = collectionDropdown?.Current.Value?.Collection,
+                UserStarDifficulty = new FilterCriteria.OptionalRange<double>
+                {
+                    Min = minimumStars.IsDefault ? (double?)null : minimumStars.Value,
+                    Max = maximumStars.IsDefault ? (double?)null : maximumStars.Value
+                }
             };
 
-            if (!minimumStars.IsDefault)
-                criteria.UserStarDifficulty.Min = minimumStars.Value;
-
-            if (!maximumStars.IsDefault)
-                criteria.UserStarDifficulty.Max = maximumStars.Value;
-
-            FilterQueryParser.ApplyQueries(criteria, query);
-            return criteria;
+            return rulesets.GetRuleset(ruleset.Value.ID.Value).CreateInstance().CreateFilterCriteria(parameters);
         }
 
         private SeekLimitedSearchTextBox searchTextBox;

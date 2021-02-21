@@ -26,6 +26,7 @@ using JetBrains.Annotations;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Testing;
+using osu.Game.Rulesets.Filter;
 using osu.Game.Screens.Ranking.Statistics;
 
 namespace osu.Game.Rulesets
@@ -306,5 +307,11 @@ namespace osu.Game.Rulesets
         /// <param name="result">The result type to get the name for.</param>
         /// <returns>The display name.</returns>
         public virtual string GetDisplayNameForHitResult(HitResult result) => result.GetDescription();
+
+        /// <summary>
+        /// Creates a <see cref="FilterCriteria"/> instance for filtering beatmaps in the song select screen.
+        /// </summary>
+        /// <param name="parameters">The creation parameters for the filter criteria.</param>
+        public virtual FilterCriteria CreateFilterCriteria(FilterCreationParameters parameters) => new FilterCriteria(RulesetInfo, parameters);
     }
 }
