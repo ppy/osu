@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => "Pitch Shift";
         public override string Acronym => "PS";
         public override IconUsage? Icon => FontAwesome.Solid.WaveSquare;
-        public override ModType Type => ModType.Fun;
+        public override ModType Type => ModType.Conversion;
         public override string Description => "Raise or lower the track's pitch.";
         public override double ScoreMultiplier => 1;
 
@@ -26,11 +26,13 @@ namespace osu.Game.Rulesets.Mods
             Default = 1,
             Value = 1,
             Precision = 0.01,
-            Disabled = false
         };
 
         [SettingSource("Match tempo", "Match the pitch with the current tempo")]
         public BindableBool MatchTempo { get; } = new BindableBool();
+
+        [SettingSource("Flatten pitch", "Counteract current pitch adjustments")]
+        public BindableBool FlattenPitch { get; } = new BindableBool();
 
         private readonly BindableNumber<double> tempoAdjust = new BindableDouble(1);
         private readonly BindableNumber<double> freqAdjust = new BindableDouble(1);
@@ -46,6 +48,7 @@ namespace osu.Game.Rulesets.Mods
             }, true);
 
             MatchTempo.BindValueChanged(applyMatchTempo);
+            FlattenPitch.BindValueChanged(applyFlattenTempo);
         }
 
         public void ApplyToTrack(ITrack track)
@@ -59,8 +62,19 @@ namespace osu.Game.Rulesets.Mods
         private void applyMatchTempo(ValueChangedEvent<bool> val)
         {
             if (val.NewValue)
-                PitchChange.Value = track.Tempo.Value; // track.Rate;
-            PitchChange.Disabled = val.NewValue;
+                PitchChange.Value = track.Tempo.Value;
+
+            //PitchChange.Disabled = val.NewValue;
+            //FlattenPitch.Disabled = val.NewValue;
+        }
+
+        private void applyFlattenTempo(ValueChangedEvent<bool> val)
+        {
+            if (val.NewValue)
+                PitchChange.Value = 1.0 / track.Frequency.Value;
+
+            //PitchChange.Disabled = val.NewValue;
+            //MatchTempo.Disabled = val.NewValue;
         }
     }
 }

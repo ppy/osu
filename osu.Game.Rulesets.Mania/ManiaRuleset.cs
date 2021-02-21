@@ -238,7 +238,8 @@ namespace osu.Game.Rulesets.Mania
                         new ManiaModMirror(),
                         new ManiaModDifficultyAdjust(),
                         new ManiaModInvert(),
-                        new ManiaModConstantSpeed()
+                        new ManiaModConstantSpeed(),
+                        new ModPitchShift(),
                     };
 
                 case ModType.Automation:
@@ -251,7 +252,6 @@ namespace osu.Game.Rulesets.Mania
                     return new Mod[]
                     {
                         new MultiMod(new ModWindUp(), new ModWindDown()),
-                        new ModPitchShift()
                     };
 
                 default:

@@ -134,6 +134,7 @@ namespace osu.Game.Rulesets.Taiko
                     {
                         new TaikoModRandom(),
                         new TaikoModDifficultyAdjust(),
+                        new ModPitchShift(),
                     };
 
                 case ModType.Automation:
@@ -147,7 +148,6 @@ namespace osu.Game.Rulesets.Taiko
                     return new Mod[]
                     {
                         new MultiMod(new ModWindUp(), new ModWindDown()),
-                        new ModPitchShift()
                     };
 
                 default:
