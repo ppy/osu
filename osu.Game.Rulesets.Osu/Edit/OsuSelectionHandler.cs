@@ -35,8 +35,12 @@ namespace osu.Game.Rulesets.Osu.Edit
             referenceOrigin = null;
         }
 
-        public override bool HandleMovement(MoveSelectionEvent moveEvent) =>
-            moveSelection(moveEvent.InstantDelta);
+        public override bool HandleMovement(MoveSelectionEvent moveEvent)
+        {
+            bool result = moveSelection(moveEvent.InstantDelta);
+            moveSelectionInBounds();
+            return result;
+        }
 
         /// <summary>
         /// During a transform, the initial origin is stored so it can be used throughout the operation.
@@ -233,8 +237,6 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             foreach (var h in hitObjects)
                 h.Position += delta;
-
-            moveSelectionInBounds();
 
             return true;
         }
