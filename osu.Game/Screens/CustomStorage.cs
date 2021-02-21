@@ -12,7 +12,7 @@ using osu.Framework.Platform;
 
 namespace osu.Game.Screens
 {
-    internal class CustomStorage : NamespacedResourceStore<byte[]>
+    internal class CustomStore : NamespacedResourceStore<byte[]>
     {
         private readonly OsuGameBase gameBase;
         private readonly Storage customStorage;
@@ -21,7 +21,7 @@ namespace osu.Game.Screens
         public List<Font> ActiveFonts = new List<Font>();
         public static bool CustomFontLoaded;
 
-        public CustomStorage(Storage storage, OsuGameBase gameBase)
+        public CustomStore(Storage storage, OsuGameBase gameBase)
             : base(new StorageBackedResourceStore(storage), "custom")
         {
             this.gameBase = gameBase;
@@ -75,13 +75,16 @@ namespace osu.Game.Screens
                 gameBase.Resources.AddStore(new DllResourceStore(assembly));
 
                 //加载字体
-                gameBase.AddFont(gameBase.Resources, "Fonts/Custom");
+                gameBase.AddFont(gameBase.Resources, $"Fonts/{currentFontInfo.FamilyName}-Regular");
+
+                if (currentFontInfo.HaveMedium)
+                    gameBase.AddFont(gameBase.Resources, $"Fonts/{currentFontInfo.FamilyName}-Medium");
 
                 if (currentFontInfo.HaveBlack)
-                    gameBase.AddFont(gameBase.Resources, "Fonts/Custom-Black");
+                    gameBase.AddFont(gameBase.Resources, $"Fonts/{currentFontInfo.FamilyName}-Black");
 
                 if (currentFontInfo.HaveBold)
-                    gameBase.AddFont(gameBase.Resources, "Fonts/Custom-Bold");
+                    gameBase.AddFont(gameBase.Resources, $"Fonts/{currentFontInfo.FamilyName}-Bold");
 
                 //设置CustomFontLoaded
                 CustomFontLoaded = true;

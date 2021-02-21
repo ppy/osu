@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Menu
         private bool enableAvatarSprite;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, TextureStore textures, Storage storage, OsuGame game, CustomStorage customStorage)
+        private void load(OsuColour colours, TextureStore textures, Storage storage, OsuGame game, CustomStore customStorage)
         {
             textures.AddStore(new TextureLoaderStore(customStorage));
             enableAvatarSprite = mConfig.Get<bool>(MSetting.UseCustomGreetingPicture);

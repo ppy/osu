@@ -45,6 +45,7 @@ using RuntimeInfo = osu.Framework.RuntimeInfo;
 using M.Resources;
 using osu.Game.Locale;
 using osu.Game.Screens;
+using osu.Game.Utils;
 
 namespace osu.Game
 {
@@ -197,14 +198,15 @@ namespace osu.Game
             dependencies.CacheAs(LocalConfig);
             dependencies.Cache(MfConfig);
 
+            //fallback机制: 先加载的字体会覆盖后加载的字体，即从上到下覆盖(如果在OsuFont.Typeface中)
             AddFont(Resources, @"Fonts/osuFont");
-
-            dependencies.Cache(new CustomStorage(Storage, this));
 
             AddFont(Resources, @"Fonts/Torus-Regular");
             AddFont(Resources, @"Fonts/Torus-Light");
             AddFont(Resources, @"Fonts/Torus-SemiBold");
             AddFont(Resources, @"Fonts/Torus-Bold");
+
+            dependencies.Cache(new CustomStore(Storage, this));
 
             AddFont(Resources, @"Fonts/Noto-Basic");
             AddFont(Resources, @"Fonts/Noto-Hangul");
@@ -281,6 +283,9 @@ namespace osu.Game
 
             dependencies.Cache(UserCache = new UserLookupCache());
             AddInternal(UserCache);
+
+            //var helper = new CustomFontHelper();
+            AddInternal(new CustomFontHelper());
 
             var scorePerformanceManager = new ScorePerformanceCache();
             dependencies.Cache(scorePerformanceManager);

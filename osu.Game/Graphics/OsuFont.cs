@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Screens;
+using osu.Game.Utils;
 
 namespace osu.Game.Graphics
 {
@@ -54,11 +55,9 @@ namespace osu.Game.Graphics
                     return "Venera";
 
                 case Typeface.Torus:
-                    return "Torus";
-
                 case Typeface.Custom:
-                    if (CustomStorage.CustomFontLoaded)
-                        return "Custom";
+                    if (CustomStore.CustomFontLoaded)
+                        return CustomFontHelper.CurrentTypeface.Value;
                     else
                         return "Torus";
             }

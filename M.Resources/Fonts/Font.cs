@@ -17,6 +17,8 @@ namespace M.Resources.Fonts
 
         public bool HaveBold;
         public bool HaveBlack;
+        public bool HaveMedium;
+        public string FamilyName = "Custom";
 
         #endregion
     }
