@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Screens;
 
 namespace osu.Game.Graphics
 {
@@ -54,6 +55,12 @@ namespace osu.Game.Graphics
 
                 case Typeface.Torus:
                     return "Torus";
+
+                case Typeface.Custom:
+                    if (CustomStorage.CustomFontLoaded)
+                        return "Custom";
+                    else
+                        return "Torus";
             }
 
             return null;
@@ -107,7 +114,8 @@ namespace osu.Game.Graphics
     public enum Typeface
     {
         Venera,
-        Torus
+        Torus,
+        Custom
     }
 
     public enum FontWeight

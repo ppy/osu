@@ -3,11 +3,14 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens;
 using osuTK;
 using osuTK.Graphics;
 
@@ -18,12 +21,13 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
         protected override string Header => "实验性功能";
 
         private readonly Bindable<string> customWindowIconPath = new Bindable<string>();
+        private TextFlowContainer textFlow;
 
         [Resolved]
         private GameHost host { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(MConfigManager mConfig, OsuGame game)
+        private void load(MConfigManager mConfig, OsuGame game, CustomStorage customStorage)
         {
             Children = new Drawable[]
             {
@@ -44,15 +48,23 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                     LabelText = "使用自定义开屏页背景",
                     Current = mConfig.GetBindable<bool>(MSetting.UseCustomGreetingPicture)
                 },
+                textFlow = new TextFlowContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Padding = new MarginPadding { Horizontal = 15 },
+                    Margin = new MarginPadding { Bottom = 8 }
+                }
             };
 
             if (RuntimeInfo.IsDesktop)
             {
-                Add(new ExperimentalSettingsSetupContainer("自定义窗口图标", MSetting.CustomWindowIconPath));
-
                 bool isSdlBackend = host.Window is SDL2DesktopWindow;
                 Bindable<bool> fadeOutWindowBindable;
                 Bindable<bool> fadeInWindowBindable;
+
+                Add(new ExperimentalSettingsSetupContainer("自定义窗口图标", MSetting.CustomWindowIconPath));
+
                 Add(new SettingsCheckbox
                 {
                     LabelText = "退出时淡出窗口",
@@ -75,6 +87,21 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
 
                 fadeOutWindowBindable.Disabled = !isSdlBackend;
                 fadeInWindowBindable.Disabled = !isSdlBackend;
+            }
+
+            if (customStorage.ActiveFonts.Count > 0)
+            {
+                textFlow.AddParagraph("已加载的字体：",
+                    f => f.Font = new FontUsage(family: "Noto-CJK-Basic"));
+
+                foreach (var font in customStorage.ActiveFonts)
+                {
+                    textFlow.AddParagraph($"{font.Author} - {font.Name}", f =>
+                    {
+                        f.Font = OsuFont.Default;
+                        f.UseLegacyUnicode = true;
+                    });
+                }
             }
 
             mConfig.BindWith(MSetting.CustomWindowIconPath, customWindowIconPath);

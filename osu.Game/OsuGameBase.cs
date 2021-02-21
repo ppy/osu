@@ -44,6 +44,7 @@ using osuTK.Input;
 using RuntimeInfo = osu.Framework.RuntimeInfo;
 using M.Resources;
 using osu.Game.Locale;
+using osu.Game.Screens;
 
 namespace osu.Game
 {
@@ -197,6 +198,9 @@ namespace osu.Game
             dependencies.Cache(MfConfig);
 
             AddFont(Resources, @"Fonts/osuFont");
+
+            dependencies.Cache(new CustomStorage(Storage, this));
+
             AddFont(Resources, @"Fonts/Torus-Regular");
             AddFont(Resources, @"Fonts/Torus-Light");
             AddFont(Resources, @"Fonts/Torus-SemiBold");
