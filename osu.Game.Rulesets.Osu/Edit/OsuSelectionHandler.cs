@@ -139,15 +139,8 @@ namespace osu.Game.Rulesets.Osu.Edit
             adjustScaleFromAnchor(ref scale, reference);
 
             var hitObjects = selectedMovableObjects;
-            Quad selectionQuad = getSurroundingQuad(hitObjects);
-
-            float newWidth = selectionQuad.Width + scale.X;
-            float newHeight = selectionQuad.Height + scale.Y;
-
-            if ((newHeight > DrawHeight) || (newWidth > DrawWidth))
-                return false;
-
             bool result;
+
             // for the time being, allow resizing of slider paths only if the slider is
             // the only hit object selected. with a group selection, it's likely the user
             // is not looking to change the duration of the slider but expand the whole pattern.
@@ -197,8 +190,18 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private bool scaleSlider(Slider slider, Vector2 scale)
         {
-            Quad quad = getSurroundingQuad(slider.Path.ControlPoints.Select(p => p.Position.Value));
-            Vector2 pathRelativeDeltaScale = new Vector2(1 + scale.X / quad.Width, 1 + scale.Y / quad.Height);
+            Quad sliderQuad = getSurroundingQuad(slider.Path.ControlPoints.Select(p => p.Position.Value));
+            Vector2 pathRelativeDeltaScale = new Vector2(1 + scale.X / sliderQuad.Width, 1 + scale.Y / sliderQuad.Height);
+
+            Quad selectionQuad = getSurroundingQuad(new OsuHitObject[] { slider });
+            Quad scaledQuad = new Quad(selectionQuad.TopLeft.X, selectionQuad.TopLeft.Y, selectionQuad.Width + scale.X, selectionQuad.Height + scale.Y);
+            (bool X, bool Y) inBounds = isQuadInBounds(scaledQuad);
+
+            if (!inBounds.X)
+                pathRelativeDeltaScale.X = 1;
+
+            if (!inBounds.Y)
+                pathRelativeDeltaScale.Y = 1;
 
             foreach (var point in slider.Path.ControlPoints)
                 point.Position.Value *= pathRelativeDeltaScale;
@@ -213,22 +216,34 @@ namespace osu.Game.Rulesets.Osu.Edit
             if ((reference & Anchor.y0) > 0 && !moveSelection(new Vector2(0, -scale.Y))) return false;
 
             Quad selectionQuad = getSurroundingQuad(hitObjects);
+            Quad scaledQuad = new Quad(selectionQuad.TopLeft.X, selectionQuad.TopLeft.Y, selectionQuad.Width + scale.X, selectionQuad.Height + scale.Y);
+            (bool X, bool Y) inBounds = isQuadInBounds(scaledQuad);
 
             foreach (var h in hitObjects)
             {
                 var newPosition = h.Position;
 
                 // guard against no-ops and NaN.
-                if (scale.X != 0 && selectionQuad.Width > 0)
+                if (scale.X != 0 && selectionQuad.Width > 0 && inBounds.X)
                     newPosition.X = selectionQuad.TopLeft.X + (h.X - selectionQuad.TopLeft.X) / selectionQuad.Width * (selectionQuad.Width + scale.X);
 
-                if (scale.Y != 0 && selectionQuad.Height > 0)
+                if (scale.Y != 0 && selectionQuad.Height > 0 && inBounds.Y)
                     newPosition.Y = selectionQuad.TopLeft.Y + (h.Y - selectionQuad.TopLeft.Y) / selectionQuad.Height * (selectionQuad.Height + scale.Y);
 
                 h.Position = newPosition;
             }
 
             return true;
+        }
+
+        private (bool X, bool Y) isQuadInBounds(Quad quad)
+        {
+            (bool X, bool Y) result;
+
+            result.X = (quad.TopLeft.X >= 0) && (quad.BottomRight.X < DrawWidth);
+            result.Y = (quad.TopLeft.Y >= 0) && (quad.BottomRight.Y < DrawHeight);
+
+            return result;
         }
 
         private bool moveSelection(Vector2 delta)
