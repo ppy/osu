@@ -22,6 +22,7 @@ using osu.Game.Extensions;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Bindings;
+using osu.Game.Rulesets.Filter;
 using osu.Game.Screens.Select.Carousel;
 using osuTK;
 using osuTK.Input;

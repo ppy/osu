@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Rulesets.Filter;
 
 namespace osu.Game.Screens.Select.Carousel
 {

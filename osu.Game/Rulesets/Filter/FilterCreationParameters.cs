@@ -3,7 +3,6 @@
 
 using JetBrains.Annotations;
 using osu.Game.Collections;
-using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Rulesets.Filter

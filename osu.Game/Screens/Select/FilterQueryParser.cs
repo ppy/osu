@@ -5,6 +5,7 @@ using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Filter;
 
 namespace osu.Game.Screens.Select
 {

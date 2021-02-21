@@ -4,7 +4,7 @@
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
-using osu.Game.Screens.Select;
+using osu.Game.Rulesets.Filter;
 using osu.Game.Screens.Select.Carousel;
 
 namespace osu.Game.Tests.NonVisual.Filtering

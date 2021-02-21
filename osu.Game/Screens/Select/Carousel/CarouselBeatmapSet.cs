@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Filter;
 using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Screens.Select.Carousel

@@ -15,6 +15,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Filter;
 using osu.Game.Screens.Select.Filter;
 using osuTK;
 using osuTK.Graphics;

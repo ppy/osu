@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Bindables;
+using osu.Game.Rulesets.Filter;
 
 namespace osu.Game.Screens.Select.Carousel
 {

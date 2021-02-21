@@ -37,6 +37,7 @@ using osu.Game.Collections;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Scoring;
 using System.Diagnostics;
+using osu.Game.Rulesets.Filter;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.Select
