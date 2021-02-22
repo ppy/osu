@@ -75,7 +75,16 @@ namespace osu.Game.Screens.OnlinePlay
             Mods.Value = selectedItem?.Value?.RequiredMods.Select(m => m.CreateCopy()).ToArray() ?? Array.Empty<Mod>();
             FreeMods.Value = selectedItem?.Value?.AllowedMods.Select(m => m.CreateCopy()).ToArray() ?? Array.Empty<Mod>();
 
+            Mods.BindValueChanged(onModsChanged);
             Ruleset.BindValueChanged(onRulesetChanged);
+        }
+
+        private void onModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
+        {
+            FreeMods.Value = FreeMods.Value.Where(checkCompatibleFreeMod).ToList();
+
+            // Reset the validity delegate to update the overlay's display.
+            freeModSelectOverlay.IsValidMod = IsValidFreeMod;
         }
 
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> ruleset)
@@ -155,6 +164,10 @@ namespace osu.Game.Screens.OnlinePlay
         /// </summary>
         /// <param name="mod">The <see cref="Mod"/> to check.</param>
         /// <returns>Whether <paramref name="mod"/> is a selectable free-mod.</returns>
-        protected virtual bool IsValidFreeMod(Mod mod) => IsValidMod(mod);
+        protected virtual bool IsValidFreeMod(Mod mod) => IsValidMod(mod) && checkCompatibleFreeMod(mod);
+
+        private bool checkCompatibleFreeMod(Mod mod)
+            => Mods.Value.All(m => m.Acronym != mod.Acronym) // Mod must not be contained in the required mods.
+               && ModUtils.CheckCompatibleSet(Mods.Value.Append(mod).ToArray()); // Mod must be compatible with all the required mods.
     }
 }
