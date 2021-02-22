@@ -57,13 +57,15 @@ namespace osu.Game.Graphics
                 case Typeface.Torus:
                 case Typeface.Custom:
                     if (CustomStore.CustomFontLoaded)
-                        return CustomFontHelper.CurrentTypeface.Value;
+                        return GetCustomTypeface();
                     else
                         return "Torus";
             }
 
             return null;
         }
+
+        public static string GetCustomTypeface() => CustomFontHelper.CurrentTypeface.Value;
 
         /// <summary>
         /// Retrieves the string representation of a <see cref="FontWeight"/>.

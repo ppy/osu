@@ -4,11 +4,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
+using osu.Game.Graphics.Mf;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens;
@@ -22,9 +21,9 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
         protected override string Header => "实验性功能";
 
         private readonly Bindable<string> customWindowIconPath = new Bindable<string>();
-        private readonly Bindable<Font> currentFont = new Bindable<Font> { Default = default_font };
+        private readonly Bindable<Font> currentFont = new Bindable<Font> { Default = fake_font };
 
-        private static readonly Font default_font = new FakeFont
+        private static readonly Font fake_font = new FakeFont
         {
             Name = "Torus",
             Author = "Paulo Goode",
@@ -32,7 +31,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
             FamilyName = "Torus"
         };
 
-        private TextFlowContainer textFlow;
+        private FillFlowContainer<FontInfoLabel> textFlow;
         private SettingsDropdown<Font> dropDown;
 
         [Resolved]
@@ -60,17 +59,26 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                     LabelText = "使用自定义开屏页背景",
                     Current = mConfig.GetBindable<bool>(MSetting.UseCustomGreetingPicture)
                 },
-                textFlow = new TextFlowContainerWithTooltip
+                new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Horizontal = 15 },
                     Margin = new MarginPadding { Top = 8 },
-                    TooltipText = "字体将从下往上应用, 先加载的字体将被后加载的字体覆盖"
+                    Padding = new MarginPadding { Horizontal = 15 },
+                    Children = new Drawable[]
+                    {
+                        textFlow = new FillFlowContainer<FontInfoLabel>
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Masking = true,
+                            CornerRadius = 5
+                        }
+                    }
                 },
-                dropDown = new DefaultFontSettingsDropDown
+                dropDown = new PreferredFontSettingsDropDown
                 {
-                    LabelText = "默认字体"
+                    LabelText = "首选字体"
                 }
             };
 
@@ -107,7 +115,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
             }
 
             var fonts = customStorage.ActiveFonts;
-            fonts.Insert(0, default_font);
+            fonts.Insert(0, fake_font);
             fonts.Add(new FakeFont
             {
                 Name = "Noto fonts",
@@ -117,29 +125,16 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
             });
 
             dropDown.Items = fonts;
-            currentFont.Value = fonts.Find(f => f.FamilyName == mConfig.Get<string>(MSetting.CurrentFont));
-            currentFont.BindValueChanged(v => mConfig.Set(MSetting.CurrentFont, v.NewValue.FamilyName));
+            currentFont.Value = fonts.Find(f => f.FamilyName == mConfig.Get<string>(MSetting.PreferredFont));
+            currentFont.BindValueChanged(v => mConfig.Set(MSetting.PreferredFont, v.NewValue.FamilyName));
             dropDown.Current = currentFont;
 
             //如果字体数>0，则显示已加载的字体
             if (customStorage.ActiveFonts.Count > 0)
             {
-                textFlow.AddParagraph("已加载的字体：",
-                    f => f.Font = new FontUsage("Noto-CJK-Basic"));
-
                 foreach (var font in customStorage.ActiveFonts)
                 {
-                    textFlow.AddParagraph($"{font.Author} - ", f =>
-                    {
-                        f.Font = new FontUsage("Noto-CJK-Basic", 18);
-                        f.UseLegacyUnicode = true;
-                    });
-
-                    textFlow.AddText(font.Name, f =>
-                    {
-                        f.Font = new FontUsage($"{font.FamilyName}-Regular", 18);
-                        f.UseLegacyUnicode = true;
-                    });
+                    textFlow.Add(new FontInfoLabel(font));
                 }
             }
 
@@ -147,12 +142,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
             customWindowIconPath.BindValueChanged(v => game?.SetWindowIcon(v.NewValue));
         }
 
-        private class TextFlowContainerWithTooltip : TextFlowContainer, IHasTooltip
-        {
-            public string TooltipText { get; set; }
-        }
-
-        private class DefaultFontSettingsDropDown : SettingsDropdown<Font>
+        private class PreferredFontSettingsDropDown : SettingsDropdown<Font>
         {
             protected override OsuDropdown<Font> CreateDropdown() => new FontDropdownControl();
 
@@ -216,6 +206,10 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 Author = "Paulo Goode";
                 Homepage = "https://paulogoode.com/torus/";
                 FamilyName = "Torus";
+
+                LightAvaliable = true;
+                SemiBoldAvaliable = true;
+                BoldAvaliable = true;
             }
         }
     }

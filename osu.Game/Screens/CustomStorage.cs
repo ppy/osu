@@ -77,14 +77,20 @@ namespace osu.Game.Screens
                 //加载字体
                 gameBase.AddFont(gameBase.Resources, $"Fonts/{currentFontInfo.FamilyName}-Regular");
 
-                if (currentFontInfo.HaveMedium)
+                if (currentFontInfo.LightAvaliable)
+                    gameBase.AddFont(gameBase.Resources, $"Fonts/{currentFontInfo.FamilyName}-Light");
+
+                if (currentFontInfo.MediumAvaliable)
                     gameBase.AddFont(gameBase.Resources, $"Fonts/{currentFontInfo.FamilyName}-Medium");
 
-                if (currentFontInfo.HaveBlack)
-                    gameBase.AddFont(gameBase.Resources, $"Fonts/{currentFontInfo.FamilyName}-Black");
+                if (currentFontInfo.SemiBoldAvaliable)
+                    gameBase.AddFont(gameBase.Resources, $"Fonts/{currentFontInfo.FamilyName}-SemiBold");
 
-                if (currentFontInfo.HaveBold)
+                if (currentFontInfo.BoldAvaliable)
                     gameBase.AddFont(gameBase.Resources, $"Fonts/{currentFontInfo.FamilyName}-Bold");
+
+                if (currentFontInfo.BlackAvaliable)
+                    gameBase.AddFont(gameBase.Resources, $"Fonts/{currentFontInfo.FamilyName}-Black");
 
                 //设置CustomFontLoaded
                 CustomFontLoaded = true;

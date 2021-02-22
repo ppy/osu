@@ -284,8 +284,9 @@ namespace osu.Game
             dependencies.Cache(UserCache = new UserLookupCache());
             AddInternal(UserCache);
 
-            //var helper = new CustomFontHelper();
-            AddInternal(new CustomFontHelper());
+            var helper = new CustomFontHelper();
+            dependencies.Cache(helper);
+            AddInternal(helper);
 
             var scorePerformanceManager = new ScorePerformanceCache();
             dependencies.Cache(scorePerformanceManager);

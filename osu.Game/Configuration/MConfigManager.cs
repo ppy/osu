@@ -69,7 +69,7 @@ namespace osu.Game.Configuration
             Set(MSetting.FadeOutWindowWhenExiting, false);
             Set(MSetting.FadeInWindowWhenEntering, false);
             Set(MSetting.UseSystemCursor, false);
-            Set(MSetting.CurrentFont, "Torus");
+            Set(MSetting.PreferredFont, "Torus");
         }
     }
 
@@ -111,7 +111,7 @@ namespace osu.Game.Configuration
         FadeOutWindowWhenExiting,
         FadeInWindowWhenEntering,
         UseSystemCursor,
-        CurrentFont
+        PreferredFont
     }
 
     public enum MvisBarType
