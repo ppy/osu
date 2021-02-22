@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
@@ -83,14 +84,14 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                                     {
                                         new OsuSpriteText
                                         {
-                                            Text = new LocalisedString((SetInfo.Metadata.TitleUnicode, SetInfo.Metadata.Title)),
+                                            Text = new RomanisableString(SetInfo.Metadata.Title, SetInfo.Metadata.TitleUnicode),
                                             Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold, italics: true)
                                         },
                                     }
                                 },
                                 new OsuSpriteText
                                 {
-                                    Text = new LocalisedString((SetInfo.Metadata.ArtistUnicode, SetInfo.Metadata.Artist)),
+                                    Text = new RomanisableString(SetInfo.Metadata.Artist, SetInfo.Metadata.ArtistUnicode),
                                     Font = OsuFont.GetFont(weight: FontWeight.Bold, italics: true)
                                 },
                             },
