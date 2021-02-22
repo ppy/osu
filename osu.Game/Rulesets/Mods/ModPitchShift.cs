@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Mods
         public override double ScoreMultiplier => 1;
 
         [SettingSource("Pitch shift", "Raise or lower the track's pitch")]
-        public BindableNumber<double> PitchChange { get; } = new BindableDouble()
+        public BindableNumber<double> PitchChange { get; } = new BindableDouble
         {
             MinValue = 0.5,
             MaxValue = 2.0,
