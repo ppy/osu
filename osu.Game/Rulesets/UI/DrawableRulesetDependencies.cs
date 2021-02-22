@@ -134,6 +134,10 @@ namespace osu.Game.Rulesets.UI
 
             public IBindable<double> AggregateTempo => throw new NotSupportedException();
 
+            public void BindAdjustments(IAggregateAudioAdjustment component) => throw new NotImplementedException();
+
+            public void UnbindAdjustments(IAggregateAudioAdjustment component) => throw new NotImplementedException();
+
             public int PlaybackConcurrency
             {
                 get => throw new NotSupportedException();
