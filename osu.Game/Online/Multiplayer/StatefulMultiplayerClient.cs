@@ -66,6 +66,8 @@ namespace osu.Game.Online.Multiplayer
         /// </summary>
         public readonly BindableList<int> CurrentMatchPlayingUserIds = new BindableList<int>();
 
+        public readonly Bindable<PlaylistItem?> CurrentMatchPlayingItem = new Bindable<PlaylistItem?>();
+
         /// <summary>
         /// The <see cref="MultiplayerRoomUser"/> corresponding to the local player, if available.
         /// </summary>
@@ -92,10 +94,11 @@ namespace osu.Game.Online.Multiplayer
         [Resolved]
         private RulesetStore rulesets { get; set; } = null!;
 
-        private Room? apiRoom;
+        // Only exists for compatibility with old osu-server-spectator build.
+        // Todo: Can be removed on 2021/02/26.
+        private long defaultPlaylistItemId;
 
-        // Todo: This is temporary, until the multiplayer server returns the item id on match start or otherwise.
-        private long playlistItemId;
+        private Room? apiRoom;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -142,7 +145,7 @@ namespace osu.Game.Online.Multiplayer
                 {
                     Room = joinedRoom;
                     apiRoom = room;
-                    playlistItemId = room.Playlist.SingleOrDefault()?.ID ?? 0;
+                    defaultPlaylistItemId = apiRoom.Playlist.FirstOrDefault()?.ID ?? 0;
                 }, cancellationSource.Token);
 
                 // Update room settings.
@@ -218,7 +221,7 @@ namespace osu.Game.Online.Multiplayer
                 BeatmapChecksum = item.GetOr(existingPlaylistItem).Beatmap.Value.MD5Hash,
                 RulesetID = item.GetOr(existingPlaylistItem).RulesetID,
                 RequiredMods = item.HasValue ? item.Value.AsNonNull().RequiredMods.Select(m => new APIMod(m)).ToList() : Room.Settings.RequiredMods,
-                AllowedMods = item.HasValue ? item.Value.AsNonNull().AllowedMods.Select(m => new APIMod(m)).ToList() : Room.Settings.AllowedMods
+                AllowedMods = item.HasValue ? item.Value.AsNonNull().AllowedMods.Select(m => new APIMod(m)).ToList() : Room.Settings.AllowedMods,
             });
         }
 
@@ -506,14 +509,13 @@ namespace osu.Game.Online.Multiplayer
             Room.Settings = settings;
             apiRoom.Name.Value = Room.Settings.Name;
 
-            // The playlist update is delayed until an online beatmap lookup (below) succeeds.
-            // In-order for the client to not display an outdated beatmap, the playlist is forcefully cleared here.
-            apiRoom.Playlist.Clear();
+            // The current item update is delayed until an online beatmap lookup (below) succeeds.
+            // In-order for the client to not display an outdated beatmap, the current item is forcefully cleared here.
+            CurrentMatchPlayingItem.Value = null;
 
             RoomUpdated?.Invoke();
 
             var req = new GetBeatmapSetRequest(settings.BeatmapID, BeatmapSetLookupType.BeatmapId);
-
             req.Success += res =>
             {
                 if (cancellationToken.IsCancellationRequested)
@@ -540,18 +542,30 @@ namespace osu.Game.Online.Multiplayer
             var mods = settings.RequiredMods.Select(m => m.ToMod(ruleset));
             var allowedMods = settings.AllowedMods.Select(m => m.ToMod(ruleset));
 
-            PlaylistItem playlistItem = new PlaylistItem
+            // Try to retrieve the existing playlist item from the API room.
+            var playlistItem = apiRoom.Playlist.FirstOrDefault(i => i.ID == settings.PlaylistItemId);
+
+            if (playlistItem != null)
+                updateItem(playlistItem);
+            else
             {
-                ID = playlistItemId,
-                Beatmap = { Value = beatmap },
-                Ruleset = { Value = ruleset.RulesetInfo },
-            };
+                // An existing playlist item does not exist, so append a new one.
+                updateItem(playlistItem = new PlaylistItem());
+                apiRoom.Playlist.Add(playlistItem);
+            }
 
-            playlistItem.RequiredMods.AddRange(mods);
-            playlistItem.AllowedMods.AddRange(allowedMods);
+            CurrentMatchPlayingItem.Value = playlistItem;
 
-            apiRoom.Playlist.Clear(); // Clearing should be unnecessary, but here for sanity.
-            apiRoom.Playlist.Add(playlistItem);
+            void updateItem(PlaylistItem item)
+            {
+                item.ID = settings.PlaylistItemId == 0 ? defaultPlaylistItemId : settings.PlaylistItemId;
+                item.Beatmap.Value = beatmap;
+                item.Ruleset.Value = ruleset.RulesetInfo;
+                item.RequiredMods.Clear();
+                item.RequiredMods.AddRange(mods);
+                item.AllowedMods.Clear();
+                item.AllowedMods.AddRange(allowedMods);
+            }
         }
 
         /// <summary>

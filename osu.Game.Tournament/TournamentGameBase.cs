@@ -150,9 +150,9 @@ namespace osu.Game.Tournament
             {
                 foreach (var p in t.Players)
                 {
-                    if (string.IsNullOrEmpty(p.Username) || p.Statistics == null)
+                    if (string.IsNullOrEmpty(p.Username) || p.Statistics?.GlobalRank == null)
                     {
-                        PopulateUser(p);
+                        PopulateUser(p, immediate: true);
                         addedInfo = true;
                     }
                 }
@@ -211,12 +211,14 @@ namespace osu.Game.Tournament
             return addedInfo;
         }
 
-        public void PopulateUser(User user, Action success = null, Action failure = null)
+        public void PopulateUser(User user, Action success = null, Action failure = null, bool immediate = false)
         {
             var req = new GetUserRequest(user.Id, Ruleset.Value);
 
             req.Success += res =>
             {
+                user.Id = res.Id;
+
                 user.Username = res.Username;
                 user.Statistics = res.Statistics;
                 user.Country = res.Country;
@@ -231,7 +233,10 @@ namespace osu.Game.Tournament
                 failure?.Invoke();
             };
 
-            API.Queue(req);
+            if (immediate)
+                API.Perform(req);
+            else
+                API.Queue(req);
         }
 
         protected override void LoadComplete()
