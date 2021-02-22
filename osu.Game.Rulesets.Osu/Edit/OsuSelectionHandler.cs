@@ -242,12 +242,10 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private (bool X, bool Y) isQuadInBounds(Quad quad)
         {
-            (bool X, bool Y) result;
+            bool xInBounds = (quad.TopLeft.X >= 0) && (quad.BottomRight.X < DrawWidth);
+            bool yInBounds = (quad.TopLeft.Y >= 0) && (quad.BottomRight.Y < DrawHeight);
 
-            result.X = (quad.TopLeft.X >= 0) && (quad.BottomRight.X < DrawWidth);
-            result.Y = (quad.TopLeft.Y >= 0) && (quad.BottomRight.Y < DrawHeight);
-
-            return result;
+            return (xInBounds, yInBounds);
         }
 
         private void moveSelectionInBounds()
