@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -255,16 +256,16 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
-                    Text = new LocalisedString((
-                        $"{beatmap.Metadata.TitleUnicode ?? beatmap.Metadata.Title} ",
-                        $"{beatmap.Metadata.Title ?? beatmap.Metadata.TitleUnicode} ")),
+                    Text = new RomanisableString(
+                        $"{beatmap.Metadata.Title ?? beatmap.Metadata.TitleUnicode} ",
+                        $"{beatmap.Metadata.TitleUnicode ?? beatmap.Metadata.Title} "),
                     Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold, italics: true)
                 },
                 new OsuSpriteText
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
-                    Text = "by " + new LocalisedString((beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist)),
+                    Text = "by " + new RomanisableString(beatmap.Metadata.Artist, beatmap.Metadata.ArtistUnicode),
                     Font = OsuFont.GetFont(size: 12, italics: true)
                 },
             };

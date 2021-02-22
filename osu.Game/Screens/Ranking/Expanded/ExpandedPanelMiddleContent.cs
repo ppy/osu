@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -100,7 +101,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                                 {
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
-                                    Text = new LocalisedString((metadata.TitleUnicode, metadata.Title)),
+                                    Text = new RomanisableString(metadata.Title, metadata.TitleUnicode),
                                     Font = OsuFont.Torus.With(size: 20, weight: FontWeight.SemiBold),
                                     MaxWidth = ScorePanel.EXPANDED_WIDTH - padding * 2,
                                     Truncate = true,
@@ -109,7 +110,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                                 {
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
-                                    Text = new LocalisedString((metadata.ArtistUnicode, metadata.Artist)),
+                                    Text = new RomanisableString(metadata.Artist, metadata.ArtistUnicode),
                                     Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold),
                                     MaxWidth = ScorePanel.EXPANDED_WIDTH - padding * 2,
                                     Truncate = true,

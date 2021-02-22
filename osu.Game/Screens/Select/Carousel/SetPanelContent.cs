@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -40,13 +41,13 @@ namespace osu.Game.Screens.Select.Carousel
                 {
                     new OsuSpriteText
                     {
-                        Text = new LocalisedString((beatmapSet.Metadata.TitleUnicode, beatmapSet.Metadata.Title)),
+                        Text = new RomanisableString(beatmapSet.Metadata.Title, beatmapSet.Metadata.TitleUnicode),
                         Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 22, italics: true),
                         Shadow = true,
                     },
                     new OsuSpriteText
                     {
-                        Text = new LocalisedString((beatmapSet.Metadata.ArtistUnicode, beatmapSet.Metadata.Artist)),
+                        Text = new RomanisableString(beatmapSet.Metadata.Artist, beatmapSet.Metadata.ArtistUnicode),
                         Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 17, italics: true),
                         Shadow = true,
                     },

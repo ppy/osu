@@ -12,6 +12,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
 {
@@ -128,14 +129,14 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             {
                 new OsuSpriteText
                 {
-                    Text = new LocalisedString((
-                        $"{beatmap.Metadata.TitleUnicode ?? beatmap.Metadata.Title} [{beatmap.Version}] ",
-                        $"{beatmap.Metadata.Title ?? beatmap.Metadata.TitleUnicode} [{beatmap.Version}] ")),
+                    Text = new RomanisableString(
+                        $"{beatmap.Metadata.Title ?? beatmap.Metadata.TitleUnicode} [{beatmap.Version}] ",
+                        $"{beatmap.Metadata.TitleUnicode ?? beatmap.Metadata.Title} [{beatmap.Version}] "),
                     Font = OsuFont.GetFont(weight: FontWeight.Bold)
                 },
                 new OsuSpriteText
                 {
-                    Text = "by " + new LocalisedString((beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist)),
+                    Text = "by " + new RomanisableString(beatmap.Metadata.Artist, beatmap.Metadata.ArtistUnicode),
                     Font = OsuFont.GetFont(weight: FontWeight.Regular)
                 },
             };
