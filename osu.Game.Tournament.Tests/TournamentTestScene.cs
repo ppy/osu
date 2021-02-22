@@ -113,11 +113,11 @@ namespace osu.Game.Tournament.Tests
                     },
                     Players =
                     {
-                        new User { Username = "Hello", Statistics = new UserStatistics { Ranks = new UserStatistics.UserRanks { Global = 12 } } },
-                        new User { Username = "Hello", Statistics = new UserStatistics { Ranks = new UserStatistics.UserRanks { Global = 16 } } },
-                        new User { Username = "Hello", Statistics = new UserStatistics { Ranks = new UserStatistics.UserRanks { Global = 20 } } },
-                        new User { Username = "Hello", Statistics = new UserStatistics { Ranks = new UserStatistics.UserRanks { Global = 24 } } },
-                        new User { Username = "Hello", Statistics = new UserStatistics { Ranks = new UserStatistics.UserRanks { Global = 30 } } },
+                        new User { Username = "Hello", Statistics = new UserStatistics { GlobalRank = 12 } },
+                        new User { Username = "Hello", Statistics = new UserStatistics { GlobalRank = 16 } },
+                        new User { Username = "Hello", Statistics = new UserStatistics { GlobalRank = 20 } },
+                        new User { Username = "Hello", Statistics = new UserStatistics { GlobalRank = 24 } },
+                        new User { Username = "Hello", Statistics = new UserStatistics { GlobalRank = 30 } },
                     }
                 }
             },

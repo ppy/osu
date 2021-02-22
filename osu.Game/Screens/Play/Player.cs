@@ -339,7 +339,7 @@ namespace osu.Game.Screens.Play
                     {
                         HoldToQuit =
                         {
-                            Action = performUserRequestedExit,
+                            Action = () => PerformExit(true),
                             IsPaused = { BindTarget = GameplayClockContainer.IsPaused }
                         },
                         PlayerSettingsOverlay = { PlaybackSettings = { UserPlaybackRate = { BindTarget = GameplayClockContainer.UserPlaybackRate } } },
@@ -363,14 +363,14 @@ namespace osu.Game.Screens.Play
                     FailOverlay = new FailOverlay
                     {
                         OnRetry = Restart,
-                        OnQuit = performUserRequestedExit,
+                        OnQuit = () => PerformExit(true),
                     },
                     PauseOverlay = new PauseOverlay
                     {
                         OnResume = Resume,
                         Retries = RestartCount,
                         OnRetry = Restart,
-                        OnQuit = performUserRequestedExit,
+                        OnQuit = () => PerformExit(true),
                     },
                     new HotkeyExitOverlay
                     {
@@ -379,7 +379,7 @@ namespace osu.Game.Screens.Play
                             if (!this.IsCurrentScreen()) return;
 
                             fadeOut(true);
-                            PerformExit(true);
+                            PerformExit(false);
                         },
                     },
                     failAnimation = new FailAnimation(DrawableRuleset) { OnComplete = onFailComplete, },
@@ -478,23 +478,47 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Exits the <see cref="Player"/>.
         /// </summary>
-        /// <param name="userRequested">
-        /// Whether the exit is requested by the user, or a higher-level game component.
-        /// Pausing is allowed only in the former case.
+        /// <param name="showDialogFirst">
+        /// Whether the pause or fail dialog should be shown before performing an exit.
+        /// If true and a dialog is not yet displayed, the exit will be blocked the the relevant dialog will display instead.
         /// </param>
-        protected void PerformExit(bool userRequested)
+        protected void PerformExit(bool showDialogFirst)
         {
             // if a restart has been requested, cancel any pending completion (user has shown intent to restart).
             completionProgressDelegate?.Cancel();
 
-            ValidForResume = false;
+            // there is a chance that the exit was performed after the transition to results has started.
+            // we want to give the user what they want, so forcefully return to this screen (to proceed with the upwards exit process).
+            if (!this.IsCurrentScreen())
+            {
+                ValidForResume = false;
+                this.MakeCurrent();
+                return;
+            }
 
-            if (!this.IsCurrentScreen()) return;
+            bool pauseOrFailDialogVisible =
+                PauseOverlay.State.Value == Visibility.Visible || FailOverlay.State.Value == Visibility.Visible;
 
-            if (userRequested)
-                performUserRequestedExit();
-            else
-                this.Exit();
+            if (showDialogFirst && !pauseOrFailDialogVisible)
+            {
+                // if the fail animation is currently in progress, accelerate it (it will show the pause dialog on completion).
+                if (ValidForResume && HasFailed)
+                {
+                    failAnimation.FinishTransforms(true);
+                    return;
+                }
+
+                // there's a chance the pausing is not supported in the current state, at which point immediate exit should be preferred.
+                if (pausingSupportedByCurrentState)
+                {
+                    // in the case a dialog needs to be shown, attempt to pause and show it.
+                    // this may fail (see internal checks in Pause()) but the fail cases are temporary, so don't fall through to Exit().
+                    Pause();
+                    return;
+                }
+            }
+
+            this.Exit();
         }
 
         private void performUserRequestedSkip()
@@ -506,20 +530,6 @@ namespace osu.Game.Screens.Play
 
             // return samplePlaybackDisabled.Value to what is defined by the beatmap's current state
             updateSampleDisabledState();
-        }
-
-        private void performUserRequestedExit()
-        {
-            if (ValidForResume && HasFailed && !FailOverlay.IsPresent)
-            {
-                failAnimation.FinishTransforms(true);
-                return;
-            }
-
-            if (canPause)
-                Pause();
-            else
-                this.Exit();
         }
 
         /// <summary>
@@ -538,10 +548,7 @@ namespace osu.Game.Screens.Play
             sampleRestart?.Play();
             RestartRequested?.Invoke();
 
-            if (this.IsCurrentScreen())
-                PerformExit(true);
-            else
-                this.MakeCurrent();
+            PerformExit(false);
         }
 
         private ScheduledDelegate completionProgressDelegate;
@@ -667,15 +674,17 @@ namespace osu.Game.Screens.Play
 
         private double? lastPauseActionTime;
 
-        private bool canPause =>
+        /// <summary>
+        /// A set of conditionals which defines whether the current game state and configuration allows for
+        /// pausing to be attempted via <see cref="Pause"/>. If false, the game should generally exit if a user pause
+        /// is attempted.
+        /// </summary>
+        private bool pausingSupportedByCurrentState =>
             // must pass basic screen conditions (beatmap loaded, instance allows pause)
             LoadedBeatmapSuccessfully && Configuration.AllowPause && ValidForResume
             // replays cannot be paused and exit immediately
             && !DrawableRuleset.HasReplayLoaded.Value
-            // cannot pause if we are already in a fail state
-            && !HasFailed
-            // cannot pause if already paused (or in a cooldown state) unless we are in a resuming state.
-            && (IsResuming || (GameplayClockContainer.IsPaused.Value == false && !pauseCooldownActive));
+            && !HasFailed;
 
         private bool pauseCooldownActive =>
             lastPauseActionTime.HasValue && GameplayClockContainer.GameplayClock.CurrentTime < lastPauseActionTime + pause_cooldown;
@@ -690,7 +699,10 @@ namespace osu.Game.Screens.Play
 
         public void Pause()
         {
-            if (!canPause) return;
+            if (!pausingSupportedByCurrentState) return;
+
+            if (!IsResuming && pauseCooldownActive)
+                return;
 
             if (IsResuming)
             {
@@ -807,14 +819,6 @@ namespace osu.Game.Screens.Play
                 // proceed to result screen if beatmap already finished playing
                 completionProgressDelegate.RunTask();
                 return true;
-            }
-
-            // ValidForResume is false when restarting
-            if (ValidForResume)
-            {
-                if (pauseCooldownActive && !GameplayClockContainer.IsPaused.Value)
-                    // still want to block if we are within the cooldown period and not already paused.
-                    return true;
             }
 
             // GameplayClockContainer performs seeks / start / stop operations on the beatmap's track.

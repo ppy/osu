@@ -56,6 +56,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             item.RequiredMods.Clear();
             item.RequiredMods.AddRange(Mods.Value.Select(m => m.CreateCopy()));
+
+            item.AllowedMods.Clear();
+            item.AllowedMods.AddRange(FreeMods.Value.Select(m => m.CreateCopy()));
         }
     }
 }

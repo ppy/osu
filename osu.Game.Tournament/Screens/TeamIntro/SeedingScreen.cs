@@ -250,7 +250,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                 };
 
                 foreach (var p in team.Players)
-                    fill.Add(new RowDisplay(p.Username, p.Statistics?.Ranks.Global?.ToString("\\##,0") ?? "-"));
+                    fill.Add(new RowDisplay(p.Username, p.Statistics?.GlobalRank?.ToString("\\##,0") ?? "-"));
             }
 
             internal class RowDisplay : CompositeDrawable

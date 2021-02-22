@@ -29,6 +29,14 @@ namespace osu.Game.Collections
         /// </summary>
         protected virtual bool ShowManageCollectionsItem => true;
 
+        private readonly BindableWithCurrent<CollectionFilterMenuItem> current = new BindableWithCurrent<CollectionFilterMenuItem>();
+
+        public new Bindable<CollectionFilterMenuItem> Current
+        {
+            get => current.Current;
+            set => current.Current = value;
+        }
+
         private readonly IBindableList<BeatmapCollection> collections = new BindableList<BeatmapCollection>();
         private readonly IBindableList<BeatmapInfo> beatmaps = new BindableList<BeatmapInfo>();
         private readonly BindableList<CollectionFilterMenuItem> filters = new BindableList<CollectionFilterMenuItem>();
@@ -36,25 +44,28 @@ namespace osu.Game.Collections
         [Resolved(CanBeNull = true)]
         private ManageCollectionsDialog manageCollectionsDialog { get; set; }
 
+        [Resolved(CanBeNull = true)]
+        private CollectionManager collectionManager { get; set; }
+
         public CollectionFilterDropdown()
         {
             ItemSource = filters;
-        }
-
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load([CanBeNull] CollectionManager collectionManager)
-        {
-            if (collectionManager != null)
-                collections.BindTo(collectionManager.Collections);
-
-            collections.CollectionChanged += (_, __) => collectionsChanged();
-            collectionsChanged();
+            Current.Value = new AllBeatmapsCollectionFilterMenuItem();
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
+            if (collectionManager != null)
+                collections.BindTo(collectionManager.Collections);
+
+            // Dropdown has logic which triggers a change on the bindable with every change to the contained items.
+            // This is not desirable here, as it leads to multiple filter operations running even though nothing has changed.
+            // An extra bindable is enough to subvert this behaviour.
+            base.Current = Current;
+
+            collections.BindCollectionChanged((_, __) => collectionsChanged(), true);
             Current.BindValueChanged(filterChanged, true);
         }
 
