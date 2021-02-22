@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             PushAndConfirm(() => new TestSongSelect());
 
-            AddStep("import beatmap", () => ImportBeatmapTest.LoadOszIntoOsu(Game, virtualTrack: true).Wait());
+            AddStep("import beatmap", () => ImportBeatmapTest.LoadQuickOszIntoOsu(Game).Wait());
 
             AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
 
