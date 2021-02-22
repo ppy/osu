@@ -468,7 +468,45 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        /// <summary>
+        private IEnumerable<string> getLegacyLookupNames(HitSampleInfo hitSample)
+        {
+            var lookupNames = hitSample.LookupNames.SelectMany(getFallbackNames);
+
+            if (!UseCustomSampleBanks && !string.IsNullOrEmpty(hitSample.Suffix))
+            {
+                // for compatibility with stable, exclude the lookup names with the custom sample bank suffix, if they are not valid for use in this skin.
+                // using .EndsWith() is intentional as it ensures parity in all edge cases
+                // (see LegacyTaikoSampleInfo for an example of one - prioritising the taiko prefix should still apply, but the sample bank should not).
+                lookupNames = lookupNames.Where(name => !name.EndsWith(hitSample.Suffix, StringComparison.Ordinal));
+            }
+
+            foreach (var l in lookupNames)
+                yield return l;
+
+            // also for compatibility, try falling back to non-bank samples (so-called "universal" samples) as the last resort.
+            // going forward specifying banks shall always be required, even for elements that wouldn't require it on stable,
+            // which is why this is done locally here.
+            yield return hitSample.Name;
+        }
+
+        private IEnumerable<string> getFallbackNames(string componentName)
+        {
+            // May be something like "Gameplay/osu/approachcircle" from lazer, or "Arrows/note1" from a user skin.
+            yield return componentName;
+
+            // Fall back to using the last piece for components coming from lazer (e.g. "Gameplay/osu/approachcircle" -> "approachcircle").
+            string lastPiece = componentName.Split('/').Last();
+            yield return componentName.StartsWith("Gameplay/taiko/", StringComparison.Ordinal) ? "taiko-" + lastPiece : lastPiece;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            Textures?.Dispose();
+            Samples?.Dispose();
+        }
+
+          /// <summary>
         /// A sample wrapper which keeps a reference to the contained skin to avoid finalizer garbage collection of the managing SampleStore.
         /// </summary>
         private class LegacySkinSample : ISample
@@ -537,44 +575,6 @@ namespace osu.Game.Skinning
             public IBindable<double> AggregateFrequency => sample.AggregateFrequency;
 
             public IBindable<double> AggregateTempo => sample.AggregateTempo;
-        }
-
-        private IEnumerable<string> getLegacyLookupNames(HitSampleInfo hitSample)
-        {
-            var lookupNames = hitSample.LookupNames.SelectMany(getFallbackNames);
-
-            if (!UseCustomSampleBanks && !string.IsNullOrEmpty(hitSample.Suffix))
-            {
-                // for compatibility with stable, exclude the lookup names with the custom sample bank suffix, if they are not valid for use in this skin.
-                // using .EndsWith() is intentional as it ensures parity in all edge cases
-                // (see LegacyTaikoSampleInfo for an example of one - prioritising the taiko prefix should still apply, but the sample bank should not).
-                lookupNames = lookupNames.Where(name => !name.EndsWith(hitSample.Suffix, StringComparison.Ordinal));
-            }
-
-            foreach (var l in lookupNames)
-                yield return l;
-
-            // also for compatibility, try falling back to non-bank samples (so-called "universal" samples) as the last resort.
-            // going forward specifying banks shall always be required, even for elements that wouldn't require it on stable,
-            // which is why this is done locally here.
-            yield return hitSample.Name;
-        }
-
-        private IEnumerable<string> getFallbackNames(string componentName)
-        {
-            // May be something like "Gameplay/osu/approachcircle" from lazer, or "Arrows/note1" from a user skin.
-            yield return componentName;
-
-            // Fall back to using the last piece for components coming from lazer (e.g. "Gameplay/osu/approachcircle" -> "approachcircle").
-            string lastPiece = componentName.Split('/').Last();
-            yield return componentName.StartsWith("Gameplay/taiko/", StringComparison.Ordinal) ? "taiko-" + lastPiece : lastPiece;
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            Textures?.Dispose();
-            Samples?.Dispose();
         }
     }
 }
