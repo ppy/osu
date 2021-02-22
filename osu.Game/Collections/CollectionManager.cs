@@ -139,35 +139,43 @@ namespace osu.Game.Collections
             PostNotification?.Invoke(notification);
 
             var collection = readCollections(stream, notification);
-            bool importCompleted = false;
-
-            Schedule(() =>
-            {
-                importCollections(collection);
-                importCompleted = true;
-            });
-
-            while (!IsDisposed && !importCompleted)
-                await Task.Delay(10);
+            await importCollections(collection);
 
             notification.CompletionText = $"Imported {collection.Count} collections";
             notification.State = ProgressNotificationState.Completed;
         }
 
-        private void importCollections(List<BeatmapCollection> newCollections)
+        private Task importCollections(List<BeatmapCollection> newCollections)
         {
-            foreach (var newCol in newCollections)
-            {
-                var existing = Collections.FirstOrDefault(c => c.Name == newCol.Name);
-                if (existing == null)
-                    Collections.Add(existing = new BeatmapCollection { Name = { Value = newCol.Name.Value } });
+            var tcs = new TaskCompletionSource<bool>();
 
-                foreach (var newBeatmap in newCol.Beatmaps)
+            Schedule(() =>
+            {
+                try
                 {
-                    if (!existing.Beatmaps.Contains(newBeatmap))
-                        existing.Beatmaps.Add(newBeatmap);
+                    foreach (var newCol in newCollections)
+                    {
+                        var existing = Collections.FirstOrDefault(c => c.Name == newCol.Name);
+                        if (existing == null)
+                            Collections.Add(existing = new BeatmapCollection { Name = { Value = newCol.Name.Value } });
+
+                        foreach (var newBeatmap in newCol.Beatmaps)
+                        {
+                            if (!existing.Beatmaps.Contains(newBeatmap))
+                                existing.Beatmaps.Add(newBeatmap);
+                        }
+                    }
+
+                    tcs.SetResult(true);
                 }
-            }
+                catch (Exception e)
+                {
+                    Logger.Error(e, "Failed to import collection.");
+                    tcs.SetException(e);
+                }
+            });
+
+            return tcs.Task;
         }
 
         private List<BeatmapCollection> readCollections(Stream stream, ProgressNotification notification = null)

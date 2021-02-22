@@ -110,16 +110,15 @@ namespace osu.Game.Rulesets.UI
 
             public IEnumerable<string> GetAvailableResources() => throw new NotSupportedException();
 
-            public void AddAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => throw new NotSupportedException();
+            public void AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => throw new NotSupportedException();
 
-            public void RemoveAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => throw new NotSupportedException();
-
-            public void RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable)
-            {
-                throw new NotImplementedException();
-            }
+            public void RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => throw new NotSupportedException();
 
             public void RemoveAllAdjustments(AdjustableProperty type) => throw new NotSupportedException();
+
+            public void BindAdjustments(IAggregateAudioAdjustment component) => throw new NotImplementedException();
+
+            public void UnbindAdjustments(IAggregateAudioAdjustment component) => throw new NotImplementedException();
 
             public BindableNumber<double> Volume => throw new NotSupportedException();
 
@@ -128,14 +127,6 @@ namespace osu.Game.Rulesets.UI
             public BindableNumber<double> Frequency => throw new NotSupportedException();
 
             public BindableNumber<double> Tempo => throw new NotSupportedException();
-
-            public void BindAdjustments(IAggregateAudioAdjustment component) => throw new NotImplementedException();
-
-            public void UnbindAdjustments(IAggregateAudioAdjustment component) => throw new NotImplementedException();
-
-            public void AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => throw new NotImplementedException();
-
-            public IBindable<double> GetAggregate(AdjustableProperty type) => throw new NotSupportedException();
 
             public IBindable<double> AggregateVolume => throw new NotSupportedException();
 
