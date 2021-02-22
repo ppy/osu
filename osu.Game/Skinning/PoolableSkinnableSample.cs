@@ -165,6 +165,10 @@ namespace osu.Game.Skinning
 
         public BindableNumber<double> Tempo => sampleContainer.Tempo;
 
+        public void BindAdjustments(IAggregateAudioAdjustment component) => sampleContainer.BindAdjustments(component);
+
+        public void UnbindAdjustments(IAggregateAudioAdjustment component) => sampleContainer.UnbindAdjustments(component);
+
         public void AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => sampleContainer.AddAdjustment(type, adjustBindable);
 
         public void RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => sampleContainer.RemoveAdjustment(type, adjustBindable);
