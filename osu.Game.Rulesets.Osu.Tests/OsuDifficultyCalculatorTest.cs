@@ -5,6 +5,7 @@ using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Osu.Difficulty;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Rulesets.Osu.Tests
@@ -18,6 +19,11 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(1.0736587013228804d, "zero-length-sliders")]
         public void Test(double expected, string name)
             => base.Test(expected, name);
+
+        [TestCase(8.6228371119393064d, "diffcalc-test")]
+        [TestCase(1.2864585434597433d, "zero-length-sliders")]
+        public void TestClockRateAdjusted(double expected, string name)
+            => Test(expected, name, new OsuModDoubleTime());
 
         protected override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new OsuDifficultyCalculator(new OsuRuleset(), beatmap);
 

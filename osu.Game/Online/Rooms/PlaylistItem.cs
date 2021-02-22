@@ -23,6 +23,12 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("ruleset_id")]
         public int RulesetID { get; set; }
 
+        /// <summary>
+        /// Whether this <see cref="PlaylistItem"/> is still a valid selection for the <see cref="Room"/>.
+        /// </summary>
+        [JsonProperty("expired")]
+        public bool Expired { get; set; }
+
         [JsonIgnore]
         public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
 

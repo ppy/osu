@@ -176,10 +176,20 @@ namespace osu.Game.Skinning
 
         public BindableNumber<double> Tempo => samplesContainer.Tempo;
 
-        public void AddAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable)
+        public void BindAdjustments(IAggregateAudioAdjustment component)
+        {
+            samplesContainer.BindAdjustments(component);
+        }
+
+        public void UnbindAdjustments(IAggregateAudioAdjustment component)
+        {
+            samplesContainer.UnbindAdjustments(component);
+        }
+
+        public void AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable)
             => samplesContainer.AddAdjustment(type, adjustBindable);
 
-        public void RemoveAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable)
+        public void RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable)
             => samplesContainer.RemoveAdjustment(type, adjustBindable);
 
         public void RemoveAllAdjustments(AdjustableProperty type)
@@ -191,6 +201,14 @@ namespace osu.Game.Skinning
         public bool IsPlaying => samplesContainer.Any(s => s.Playing);
 
         public bool IsPlayed => samplesContainer.Any(s => s.Played);
+
+        public IBindable<double> AggregateVolume => samplesContainer.AggregateVolume;
+
+        public IBindable<double> AggregateBalance => samplesContainer.AggregateBalance;
+
+        public IBindable<double> AggregateFrequency => samplesContainer.AggregateFrequency;
+
+        public IBindable<double> AggregateTempo => samplesContainer.AggregateTempo;
 
         #endregion
     }
