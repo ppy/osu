@@ -529,6 +529,14 @@ namespace osu.Game.Skinning
             {
                 sample.RemoveAllAdjustments(type);
             }
+
+            public IBindable<double> AggregateVolume => sample.AggregateVolume;
+
+            public IBindable<double> AggregateBalance => sample.AggregateBalance;
+
+            public IBindable<double> AggregateFrequency => sample.AggregateFrequency;
+
+            public IBindable<double> AggregateTempo => sample.AggregateTempo;
         }
 
         private IEnumerable<string> getLegacyLookupNames(HitSampleInfo hitSample)
