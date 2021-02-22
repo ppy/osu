@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -37,7 +38,7 @@ namespace osu.Game.Overlays.Notifications
 
         public NotificationSection(string title, string clearButtonText)
         {
-            this.clearButtonText = clearButtonText;
+            this.clearButtonText = clearButtonText.ToUpperInvariant();
             titleText = title;
         }
 
@@ -138,10 +139,10 @@ namespace osu.Game.Overlays.Notifications
                 };
             }
 
-            public string Text
+            public LocalisableString Text
             {
                 get => text.Text;
-                set => text.Text = value.ToUpperInvariant();
+                set => text.Text = value;
             }
         }
 

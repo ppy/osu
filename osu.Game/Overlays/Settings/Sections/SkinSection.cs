@@ -178,7 +178,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
             private class SkinDropdownControl : DropdownControl
             {
-                protected override string GenerateItemText(SkinInfo item) => item.ToString();
+                protected override LocalisableString GenerateItemText(SkinInfo item) => item.ToString();
             }
         }
 

@@ -9,7 +9,6 @@ using osuTK;
 using osu.Game.Graphics;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
-using osu.Framework.Localisation;
 
 namespace osu.Game.Screens.Menu
 {
