@@ -427,7 +427,7 @@ namespace osu.Game.Screens.Play
 
         private void updatePauseOnFocusLostState()
         {
-            if (!PauseOnFocusLost || DrawableRuleset.HasReplayLoaded.Value || breakTracker.IsBreakTime.Value)
+            if (!PauseOnFocusLost || pausingSupportedByCurrentState || breakTracker.IsBreakTime.Value)
                 return;
 
             if (gameActive.Value == false)
