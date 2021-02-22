@@ -6,10 +6,11 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public class ModPitchShift : Mod, IApplicableToTrack
+    public class ModPitchShift : Mod, IUpdatableByPlayfield, IApplicableToTrack
     {
         public override string Name => "Pitch Shift";
         public override string Acronym => "PS";
@@ -22,17 +23,14 @@ namespace osu.Game.Rulesets.Mods
         public BindableNumber<double> PitchChange { get; } = new BindableDouble()
         {
             MinValue = 0.5,
-            MaxValue = 1.5,
+            MaxValue = 2.0,
             Default = 1,
             Value = 1,
             Precision = 0.01,
         };
 
-        [SettingSource("Match tempo", "Match the pitch with the current tempo")]
+        [SettingSource("Match tempo", "Match pitch with the tempo")]
         public BindableBool MatchTempo { get; } = new BindableBool();
-
-        [SettingSource("Flatten pitch", "Counteract current pitch adjustments")]
-        public BindableBool FlattenPitch { get; } = new BindableBool();
 
         private readonly BindableNumber<double> tempoAdjust = new BindableDouble(1);
         private readonly BindableNumber<double> freqAdjust = new BindableDouble(1);
@@ -42,13 +40,9 @@ namespace osu.Game.Rulesets.Mods
         public ModPitchShift()
         {
             PitchChange.BindValueChanged(val =>
-            {
-                tempoAdjust.Value = 1 / val.NewValue;
-                freqAdjust.Value = val.NewValue;
-            }, true);
+                setPitch(val.NewValue), true);
 
-            MatchTempo.BindValueChanged(applyMatchTempo);
-            FlattenPitch.BindValueChanged(applyFlattenTempo);
+            MatchTempo.BindValueChanged(matchTempoChanged);
         }
 
         public void ApplyToTrack(ITrack track)
@@ -59,22 +53,27 @@ namespace osu.Game.Rulesets.Mods
             track.AddAdjustment(AdjustableProperty.Frequency, freqAdjust);
         }
 
-        private void applyMatchTempo(ValueChangedEvent<bool> val)
+        public void Update(Playfield playfield)
         {
-            if (val.NewValue)
-                PitchChange.Value = track.Tempo.Value;
-
-            //PitchChange.Disabled = val.NewValue;
-            //FlattenPitch.Disabled = val.NewValue;
+            if (MatchTempo.Value)
+                setPitch(getMatchTempoPitchAdjustment());
         }
 
-        private void applyFlattenTempo(ValueChangedEvent<bool> val)
+        private void setPitch(double pitch)
+        {
+            tempoAdjust.Value = 1 / pitch;
+            freqAdjust.Value = pitch;
+        }
+
+        private void matchTempoChanged(ValueChangedEvent<bool> val)
         {
             if (val.NewValue)
-                PitchChange.Value = 1.0 / track.Frequency.Value;
+                PitchChange.Value = getMatchTempoPitchAdjustment();
 
-            //PitchChange.Disabled = val.NewValue;
-            //MatchTempo.Disabled = val.NewValue;
+            PitchChange.Disabled = val.NewValue;
         }
+
+        private double getMatchTempoPitchAdjustment()
+            => track.AggregateTempo.Value / tempoAdjust.Value;
     }
 }
