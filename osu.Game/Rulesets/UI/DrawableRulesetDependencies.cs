@@ -110,9 +110,9 @@ namespace osu.Game.Rulesets.UI
 
             public IEnumerable<string> GetAvailableResources() => throw new NotSupportedException();
 
-            public void AddAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => throw new NotSupportedException();
+            public void AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => throw new NotSupportedException();
 
-            public void RemoveAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => throw new NotSupportedException();
+            public void RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => throw new NotSupportedException();
 
             public void RemoveAllAdjustments(AdjustableProperty type) => throw new NotSupportedException();
 
@@ -133,6 +133,10 @@ namespace osu.Game.Rulesets.UI
             public IBindable<double> AggregateFrequency => throw new NotSupportedException();
 
             public IBindable<double> AggregateTempo => throw new NotSupportedException();
+
+            public void BindAdjustments(IAggregateAudioAdjustment component) => throw new NotImplementedException();
+
+            public void UnbindAdjustments(IAggregateAudioAdjustment component) => throw new NotImplementedException();
 
             public int PlaybackConcurrency
             {
