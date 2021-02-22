@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Mods
 
         private void setPitch(double pitch)
         {
-            tempoAdjust.Value = 1 / pitch;
+            tempoAdjust.Value = 1.0 / pitch;
             freqAdjust.Value = pitch;
         }
 
@@ -74,6 +74,6 @@ namespace osu.Game.Rulesets.Mods
         }
 
         private double getMatchTempoPitchAdjustment()
-            => track.AggregateTempo.Value / tempoAdjust.Value;
+            => track != null ? track.AggregateTempo.Value / tempoAdjust.Value : 1.0;
     }
 }
