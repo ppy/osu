@@ -199,12 +199,12 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             Quad selectionQuad = getSurroundingQuad(new OsuHitObject[] { slider });
             Quad scaledQuad = new Quad(selectionQuad.TopLeft.X, selectionQuad.TopLeft.Y, selectionQuad.Width + scale.X, selectionQuad.Height + scale.Y);
-            (bool X, bool Y) inBounds = isQuadInBounds(scaledQuad);
+            (bool xInBounds, bool yInBounds) = isQuadInBounds(scaledQuad);
 
-            if (!inBounds.X)
+            if (!xInBounds)
                 pathRelativeDeltaScale.X = 1;
 
-            if (!inBounds.Y)
+            if (!yInBounds)
                 pathRelativeDeltaScale.Y = 1;
 
             foreach (var point in slider.Path.ControlPoints)
@@ -221,17 +221,17 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             Quad selectionQuad = getSurroundingQuad(hitObjects);
             Quad scaledQuad = new Quad(selectionQuad.TopLeft.X, selectionQuad.TopLeft.Y, selectionQuad.Width + scale.X, selectionQuad.Height + scale.Y);
-            (bool X, bool Y) inBounds = isQuadInBounds(scaledQuad);
+            (bool xInBounds, bool yInBounds) = isQuadInBounds(scaledQuad);
 
             foreach (var h in hitObjects)
             {
                 var newPosition = h.Position;
 
                 // guard against no-ops and NaN.
-                if (scale.X != 0 && selectionQuad.Width > 0 && inBounds.X)
+                if (scale.X != 0 && selectionQuad.Width > 0 && xInBounds)
                     newPosition.X = selectionQuad.TopLeft.X + (h.X - selectionQuad.TopLeft.X) / selectionQuad.Width * (selectionQuad.Width + scale.X);
 
-                if (scale.Y != 0 && selectionQuad.Height > 0 && inBounds.Y)
+                if (scale.Y != 0 && selectionQuad.Height > 0 && yInBounds)
                     newPosition.Y = selectionQuad.TopLeft.Y + (h.Y - selectionQuad.TopLeft.Y) / selectionQuad.Height * (selectionQuad.Height + scale.Y);
 
                 h.Position = newPosition;
