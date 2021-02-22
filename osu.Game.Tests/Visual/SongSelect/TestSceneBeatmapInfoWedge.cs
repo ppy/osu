@@ -119,7 +119,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         public void TestNullBeatmap()
         {
             selectBeatmap(null);
-            AddAssert("check empty version", () => string.IsNullOrEmpty(infoWedge.Info.VersionLabel.Text));
+            AddAssert("check empty version", () => string.IsNullOrEmpty(infoWedge.Info.VersionLabel.Text.ToString()));
             AddAssert("check default title", () => infoWedge.Info.TitleLabel.Text == Beatmap.Default.BeatmapInfo.Metadata.Title);
             AddAssert("check default artist", () => infoWedge.Info.ArtistLabel.Text == Beatmap.Default.BeatmapInfo.Metadata.Artist);
             AddAssert("check empty author", () => !infoWedge.Info.MapperContainer.Children.Any());
