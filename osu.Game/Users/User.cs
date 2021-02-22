@@ -2,10 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
+using osu.Game.Online.API.Requests;
 
 namespace osu.Game.Users
 {
@@ -178,6 +181,10 @@ namespace osu.Game.Users
 
         private UserStatistics statistics;
 
+        /// <summary>
+        /// User statistics for the requested ruleset (in the case of a <see cref="GetUserRequest"/> response).
+        /// Otherwise empty.
+        /// </summary>
         [JsonProperty(@"statistics")]
         public UserStatistics Statistics
         {
@@ -228,14 +235,14 @@ namespace osu.Game.Users
         [JsonProperty("replays_watched_counts")]
         public UserHistoryCount[] ReplaysWatchedCounts;
 
-        public class UserHistoryCount
-        {
-            [JsonProperty("start_date")]
-            public DateTime Date;
-
-            [JsonProperty("count")]
-            public long Count;
-        }
+        /// <summary>
+        /// All user statistics per ruleset's short name (in the case of a <see cref="GetUsersRequest"/> response).
+        /// Otherwise empty. Can be altered for testing purposes.
+        /// </summary>
+        // todo: this should likely be moved to a separate UserCompact class at some point.
+        [JsonProperty("statistics_rulesets")]
+        [CanBeNull]
+        public Dictionary<string, UserStatistics> RulesetsStatistics { get; set; }
 
         public override string ToString() => Username;
 
@@ -248,6 +255,14 @@ namespace osu.Game.Users
             Colour = @"9c0101",
             Id = 0
         };
+
+        public bool Equals(User other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+
+            return Id == other.Id;
+        }
 
         public enum PlayStyle
         {
@@ -264,12 +279,13 @@ namespace osu.Game.Users
             Touch,
         }
 
-        public bool Equals(User other)
+        public class UserHistoryCount
         {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+            [JsonProperty("start_date")]
+            public DateTime Date;
 
-            return Id == other.Id;
+            [JsonProperty("count")]
+            public long Count;
         }
     }
 }

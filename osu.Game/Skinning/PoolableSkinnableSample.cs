@@ -17,7 +17,7 @@ namespace osu.Game.Skinning
     /// <summary>
     /// A sample corresponding to an <see cref="ISampleInfo"/> that supports being pooled and responding to skin changes.
     /// </summary>
-    public class PoolableSkinnableSample : SkinReloadableDrawable, IAggregateAudioAdjustment, IAdjustableAudioComponent
+    public class PoolableSkinnableSample : SkinReloadableDrawable, IAdjustableAudioComponent
     {
         /// <summary>
         /// The currently-loaded <see cref="DrawableSample"/>.
@@ -172,10 +172,6 @@ namespace osu.Game.Skinning
         public void AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => sampleContainer.AddAdjustment(type, adjustBindable);
 
         public void RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => sampleContainer.RemoveAdjustment(type, adjustBindable);
-
-        public void AddAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => sampleContainer.AddAdjustment(type, adjustBindable);
-
-        public void RemoveAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => sampleContainer.RemoveAdjustment(type, adjustBindable);
 
         public void RemoveAllAdjustments(AdjustableProperty type) => sampleContainer.RemoveAllAdjustments(type);
 

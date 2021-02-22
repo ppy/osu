@@ -119,9 +119,11 @@ namespace osu.Game.Tests.Rulesets
             public BindableNumber<double> Tempo => throw new NotImplementedException();
 
             public void BindAdjustments(IAggregateAudioAdjustment component) => throw new NotImplementedException();
+
             public void UnbindAdjustments(IAggregateAudioAdjustment component) => throw new NotImplementedException();
 
             public void AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => throw new NotImplementedException();
+
             public void RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => throw new NotImplementedException();
 
             public void RemoveAllAdjustments(AdjustableProperty type) => throw new NotImplementedException();

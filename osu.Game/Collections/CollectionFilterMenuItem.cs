@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
 
@@ -9,7 +10,7 @@ namespace osu.Game.Collections
     /// <summary>
     /// A <see cref="BeatmapCollection"/> filter.
     /// </summary>
-    public class CollectionFilterMenuItem
+    public class CollectionFilterMenuItem : IEquatable<CollectionFilterMenuItem>
     {
         /// <summary>
         /// The collection to filter beatmaps from.
@@ -33,6 +34,11 @@ namespace osu.Game.Collections
             Collection = collection;
             CollectionName = Collection?.Name.GetBoundCopy() ?? new Bindable<string>("All beatmaps");
         }
+
+        public bool Equals(CollectionFilterMenuItem other)
+            => other != null && CollectionName.Value == other.CollectionName.Value;
+
+        public override int GetHashCode() => CollectionName.Value.GetHashCode();
     }
 
     public class AllBeatmapsCollectionFilterMenuItem : CollectionFilterMenuItem
