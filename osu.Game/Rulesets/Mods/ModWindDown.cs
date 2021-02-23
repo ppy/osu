@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Mods
         [SettingSource("Initial rate", "The starting speed of the track")]
         public override BindableNumber<double> InitialRate { get; } = new BindableDouble
         {
-            MinValue = 0.5,
+            MinValue = 0.51,
             MaxValue = 2,
             Default = 1,
             Value = 1,
@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Mods
         public override BindableNumber<double> FinalRate { get; } = new BindableDouble
         {
             MinValue = 0.5,
-            MaxValue = 2,
+            MaxValue = 1.99,
             Default = 0.75,
             Value = 0.75,
             Precision = 0.01,
@@ -49,10 +49,10 @@ namespace osu.Game.Rulesets.Mods
         public ModWindDown()
         {
             InitialRate.BindValueChanged(val =>
-                InitialRate.Value = Math.Max(val.NewValue, FinalRate.Value + 0.01));
+                FinalRate.Value = Math.Min(FinalRate.Value, val.NewValue - 0.01));
 
             FinalRate.BindValueChanged(val =>
-                FinalRate.Value = Math.Min(val.NewValue, InitialRate.Value - 0.01));
+                InitialRate.Value = Math.Max(InitialRate.Value, val.NewValue + 0.01));
         }
     }
 }

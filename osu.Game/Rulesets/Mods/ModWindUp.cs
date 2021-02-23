@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Mods
         public override BindableNumber<double> InitialRate { get; } = new BindableDouble
         {
             MinValue = 0.5,
-            MaxValue = 2,
+            MaxValue = 1.99,
             Default = 1,
             Value = 1,
             Precision = 0.01,
@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Mods
         [SettingSource("Final rate", "The speed increase to ramp towards")]
         public override BindableNumber<double> FinalRate { get; } = new BindableDouble
         {
-            MinValue = 0.5,
+            MinValue = 0.51,
             MaxValue = 2,
             Default = 1.5,
             Value = 1.5,
@@ -49,10 +49,10 @@ namespace osu.Game.Rulesets.Mods
         public ModWindUp()
         {
             InitialRate.BindValueChanged(val =>
-                InitialRate.Value = Math.Min(val.NewValue, FinalRate.Value - 0.01));
+                FinalRate.Value = Math.Max(FinalRate.Value, val.NewValue + 0.01));
 
             FinalRate.BindValueChanged(val =>
-                FinalRate.Value = Math.Max(val.NewValue, InitialRate.Value + 0.01));
+                InitialRate.Value = Math.Min(InitialRate.Value, val.NewValue - 0.01));
         }
     }
 }
