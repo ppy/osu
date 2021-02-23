@@ -434,6 +434,8 @@ namespace osu.Game.Screens.Play
             {
                 bool paused = Pause();
 
+                // if the initial pause could not be satisfied, the pause cooldown may be active.
+                // reschedule the pause attempt until it can be achieved.
                 if (!paused)
                     Scheduler.AddOnce(updatePauseOnFocusLostState);
             }
