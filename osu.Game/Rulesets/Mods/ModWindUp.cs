@@ -49,10 +49,10 @@ namespace osu.Game.Rulesets.Mods
         public ModWindUp()
         {
             InitialRate.BindValueChanged(val =>
-                FinalRate.Value = Math.Max(FinalRate.Value, val.NewValue + 0.01));
+                FinalRate.Value = Math.Max(FinalRate.Value, val.NewValue + FinalRate.Precision));
 
             FinalRate.BindValueChanged(val =>
-                InitialRate.Value = Math.Min(InitialRate.Value, val.NewValue - 0.01));
+                InitialRate.Value = Math.Min(InitialRate.Value, val.NewValue - InitialRate.Precision));
         }
     }
 }

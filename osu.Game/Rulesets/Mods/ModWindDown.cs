@@ -49,10 +49,10 @@ namespace osu.Game.Rulesets.Mods
         public ModWindDown()
         {
             InitialRate.BindValueChanged(val =>
-                FinalRate.Value = Math.Min(FinalRate.Value, val.NewValue - 0.01));
+                FinalRate.Value = Math.Min(FinalRate.Value, val.NewValue - FinalRate.Precision));
 
             FinalRate.BindValueChanged(val =>
-                InitialRate.Value = Math.Max(InitialRate.Value, val.NewValue + 0.01));
+                InitialRate.Value = Math.Max(InitialRate.Value, val.NewValue + InitialRate.Precision));
         }
     }
 }
