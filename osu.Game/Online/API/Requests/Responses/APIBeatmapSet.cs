@@ -42,6 +42,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"bpm")]
         private double bpm { get; set; }
 
+        [JsonProperty(@"nsfw")]
+        private bool hasExplicitContent { get; set; }
+
         [JsonProperty(@"video")]
         private bool hasVideo { get; set; }
 
@@ -61,7 +64,7 @@ namespace osu.Game.Online.API.Requests.Responses
         private int[] ratings { get; set; }
 
         [JsonProperty(@"user_id")]
-        private long creatorId
+        private int creatorId
         {
             set => Author.Id = value;
         }
@@ -78,9 +81,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"beatmaps")]
         private IEnumerable<APIBeatmap> beatmaps { get; set; }
 
-        public BeatmapSetInfo ToBeatmapSet(RulesetStore rulesets)
+        public virtual BeatmapSetInfo ToBeatmapSet(RulesetStore rulesets)
         {
-            return new BeatmapSetInfo
+            var beatmapSet = new BeatmapSetInfo
             {
                 OnlineBeatmapSetID = OnlineBeatmapSetID,
                 Metadata = this,
@@ -94,6 +97,7 @@ namespace osu.Game.Online.API.Requests.Responses
                     FavouriteCount = favouriteCount,
                     BPM = bpm,
                     Status = Status,
+                    HasExplicitContent = hasExplicitContent,
                     HasVideo = hasVideo,
                     HasStoryboard = hasStoryboard,
                     Submitted = submitted,
@@ -104,8 +108,17 @@ namespace osu.Game.Online.API.Requests.Responses
                     Genre = genre,
                     Language = language
                 },
-                Beatmaps = beatmaps?.Select(b => b.ToBeatmap(rulesets)).ToList(),
             };
+
+            beatmapSet.Beatmaps = beatmaps?.Select(b =>
+            {
+                var beatmap = b.ToBeatmap(rulesets);
+                beatmap.BeatmapSet = beatmapSet;
+                beatmap.Metadata = beatmapSet.Metadata;
+                return beatmap;
+            }).ToList();
+
+            return beatmapSet;
         }
     }
 }

@@ -3,13 +3,13 @@
 
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -17,26 +17,36 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableSliderRepeat : DrawableOsuHitObject, ITrackSnaking
     {
-        private readonly SliderRepeat sliderRepeat;
-        private readonly DrawableSlider drawableSlider;
+        public new SliderRepeat HitObject => (SliderRepeat)base.HitObject;
+
+        [CanBeNull]
+        public Slider Slider => DrawableSlider?.HitObject;
+
+        protected DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
 
         private double animDuration;
 
-        private readonly Drawable scaleContainer;
-
-        public readonly Drawable CirclePiece;
+        public Drawable CirclePiece { get; private set; }
+        private Drawable scaleContainer;
+        private ReverseArrowPiece arrow;
 
         public override bool DisplayResult => false;
 
-        public DrawableSliderRepeat(SliderRepeat sliderRepeat, DrawableSlider drawableSlider)
+        public DrawableSliderRepeat()
+            : base(null)
+        {
+        }
+
+        public DrawableSliderRepeat(SliderRepeat sliderRepeat)
             : base(sliderRepeat)
         {
-            this.sliderRepeat = sliderRepeat;
-            this.drawableSlider = drawableSlider;
+        }
 
-            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
-
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             Origin = Anchor.Centre;
+            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
 
             InternalChild = scaleContainer = new Container
             {
@@ -50,26 +60,26 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     arrow = new ReverseArrowPiece(),
                 }
             };
+
+            ScaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue));
         }
 
-        private readonly IBindable<float> scaleBindable = new BindableFloat();
-
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void OnApply()
         {
-            scaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue), true);
-            scaleBindable.BindTo(HitObject.ScaleBindable);
+            base.OnApply();
+
+            Position = HitObject.Position - DrawableSlider.Position;
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
-            if (sliderRepeat.StartTime <= Time.Current)
-                ApplyResult(r => r.Type = drawableSlider.Tracking.Value ? r.Judgement.MaxResult : r.Judgement.MinResult);
+            if (HitObject.StartTime <= Time.Current)
+                ApplyResult(r => r.Type = DrawableSlider.Tracking.Value ? r.Judgement.MaxResult : r.Judgement.MinResult);
         }
 
         protected override void UpdateInitialTransforms()
         {
-            animDuration = Math.Min(300, sliderRepeat.SpanDuration);
+            animDuration = Math.Min(300, HitObject.SpanDuration);
 
             this.Animate(
                 d => d.FadeIn(animDuration),
@@ -77,9 +87,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             );
         }
 
-        protected override void UpdateStateTransforms(ArmedState state)
+        protected override void UpdateHitStateTransforms(ArmedState state)
         {
-            base.UpdateStateTransforms(state);
+            base.UpdateHitStateTransforms(state);
 
             switch (state)
             {
@@ -100,15 +110,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private bool hasRotation;
 
-        private readonly ReverseArrowPiece arrow;
-
         public void UpdateSnakingPosition(Vector2 start, Vector2 end)
         {
             // When the repeat is hit, the arrow should fade out on spot rather than following the slider
             if (IsHit) return;
 
-            bool isRepeatAtEnd = sliderRepeat.RepeatIndex % 2 == 0;
-            List<Vector2> curve = ((PlaySliderBody)drawableSlider.Body.Drawable).CurrentCurve;
+            bool isRepeatAtEnd = HitObject.RepeatIndex % 2 == 0;
+            List<Vector2> curve = ((PlaySliderBody)DrawableSlider.Body.Drawable).CurrentCurve;
 
             Position = isRepeatAtEnd ? end : start;
 

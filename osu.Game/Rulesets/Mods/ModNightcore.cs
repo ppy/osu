@@ -18,14 +18,17 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModNightcore<TObject> : ModDoubleTime, IApplicableToDrawableRuleset<TObject>
-        where TObject : HitObject
+    public abstract class ModNightcore : ModDoubleTime
     {
         public override string Name => "Nightcore";
         public override string Acronym => "NC";
         public override IconUsage? Icon => OsuIcon.ModNightcore;
         public override string Description => "Uguuuuuuuu...";
+    }
 
+    public abstract class ModNightcore<TObject> : ModNightcore, IApplicableToDrawableRuleset<TObject>
+        where TObject : HitObject
+    {
         private readonly BindableNumber<double> tempoAdjust = new BindableDouble(1);
         private readonly BindableNumber<double> freqAdjust = new BindableDouble(1);
 
@@ -69,10 +72,10 @@ namespace osu.Game.Rulesets.Mods
             {
                 InternalChildren = new Drawable[]
                 {
-                    hatSample = new PausableSkinnableSound(new SampleInfo("nightcore-hat")),
-                    clapSample = new PausableSkinnableSound(new SampleInfo("nightcore-clap")),
-                    kickSample = new PausableSkinnableSound(new SampleInfo("nightcore-kick")),
-                    finishSample = new PausableSkinnableSound(new SampleInfo("nightcore-finish")),
+                    hatSample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-hat")),
+                    clapSample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-clap")),
+                    kickSample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-kick")),
+                    finishSample = new PausableSkinnableSound(new SampleInfo("Gameplay/nightcore-finish")),
                 };
             }
 

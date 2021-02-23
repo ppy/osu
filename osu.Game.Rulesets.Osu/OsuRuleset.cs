@@ -24,13 +24,13 @@ using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Difficulty;
 using osu.Game.Rulesets.Osu.Scoring;
-using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using System;
 using System.Linq;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Skinning.Legacy;
 using osu.Game.Rulesets.Osu.Statistics;
 using osu.Game.Screens.Ranking.Statistics;
 
@@ -107,6 +107,35 @@ namespace osu.Game.Rulesets.Osu
                 yield return new OsuModTouchDevice();
         }
 
+        public override LegacyMods ConvertToLegacyMods(Mod[] mods)
+        {
+            var value = base.ConvertToLegacyMods(mods);
+
+            foreach (var mod in mods)
+            {
+                switch (mod)
+                {
+                    case OsuModAutopilot _:
+                        value |= LegacyMods.Autopilot;
+                        break;
+
+                    case OsuModSpunOut _:
+                        value |= LegacyMods.SpunOut;
+                        break;
+
+                    case OsuModTarget _:
+                        value |= LegacyMods.Target;
+                        break;
+
+                    case OsuModTouchDevice _:
+                        value |= LegacyMods.TouchDevice;
+                        break;
+                }
+            }
+
+            return value;
+        }
+
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {
             switch (type)
@@ -135,6 +164,7 @@ namespace osu.Game.Rulesets.Osu
                     {
                         new OsuModTarget(),
                         new OsuModDifficultyAdjust(),
+                        new OsuModClassic()
                     };
 
                 case ModType.Automation:

@@ -13,7 +13,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Osu.Skinning.Default;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             Mod = new OsuModSpunOut(),
             Autoplay = false,
             Beatmap = singleSpinnerBeatmap,
-            PassCondition = () => Player.ChildrenOfType<DrawableSpinner>().Single().Progress >= 1
+            PassCondition = () => Player.ChildrenOfType<DrawableSpinner>().SingleOrDefault()?.Progress >= 1
         });
 
         [TestCase(null)]
@@ -45,7 +45,11 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 Mods = mods,
                 Autoplay = false,
                 Beatmap = singleSpinnerBeatmap,
-                PassCondition = () => Precision.AlmostEquals(Player.ChildrenOfType<SpinnerSpmCounter>().Single().SpinsPerMinute, 286, 1)
+                PassCondition = () =>
+                {
+                    var counter = Player.ChildrenOfType<SpinnerSpmCounter>().SingleOrDefault();
+                    return counter != null && Precision.AlmostEquals(counter.SpinsPerMinute, 286, 1);
+                }
             });
         }
 

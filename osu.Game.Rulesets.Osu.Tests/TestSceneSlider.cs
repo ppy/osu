@@ -108,14 +108,14 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddStep("change samples", () => slider.HitObject.Samples = new[]
             {
-                new HitSampleInfo { Name = HitSampleInfo.HIT_CLAP },
-                new HitSampleInfo { Name = HitSampleInfo.HIT_WHISTLE },
+                new HitSampleInfo(HitSampleInfo.HIT_CLAP),
+                new HitSampleInfo(HitSampleInfo.HIT_WHISTLE),
             });
 
-            AddAssert("head samples updated", () => assertSamples(((Slider)slider.HitObject).HeadCircle));
-            AddAssert("tick samples not updated", () => ((Slider)slider.HitObject).NestedHitObjects.OfType<SliderTick>().All(assertTickSamples));
-            AddAssert("repeat samples updated", () => ((Slider)slider.HitObject).NestedHitObjects.OfType<SliderRepeat>().All(assertSamples));
-            AddAssert("tail has no samples", () => ((Slider)slider.HitObject).TailCircle.Samples.Count == 0);
+            AddAssert("head samples updated", () => assertSamples(slider.HitObject.HeadCircle));
+            AddAssert("tick samples not updated", () => slider.HitObject.NestedHitObjects.OfType<SliderTick>().All(assertTickSamples));
+            AddAssert("repeat samples updated", () => slider.HitObject.NestedHitObjects.OfType<SliderRepeat>().All(assertSamples));
+            AddAssert("tail has no samples", () => slider.HitObject.TailCircle.Samples.Count == 0);
 
             static bool assertTickSamples(SliderTick tick) => tick.Samples.Single().Name == "slidertick";
 
@@ -136,21 +136,21 @@ namespace osu.Game.Rulesets.Osu.Tests
                 slider = (DrawableSlider)createSlider(repeats: 1);
 
                 for (int i = 0; i < 2; i++)
-                    ((Slider)slider.HitObject).NodeSamples.Add(new List<HitSampleInfo> { new HitSampleInfo { Name = HitSampleInfo.HIT_FINISH } });
+                    slider.HitObject.NodeSamples.Add(new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_FINISH) });
 
                 Add(slider);
             });
 
             AddStep("change samples", () => slider.HitObject.Samples = new[]
             {
-                new HitSampleInfo { Name = HitSampleInfo.HIT_CLAP },
-                new HitSampleInfo { Name = HitSampleInfo.HIT_WHISTLE },
+                new HitSampleInfo(HitSampleInfo.HIT_CLAP),
+                new HitSampleInfo(HitSampleInfo.HIT_WHISTLE),
             });
 
-            AddAssert("head samples not updated", () => assertSamples(((Slider)slider.HitObject).HeadCircle));
-            AddAssert("tick samples not updated", () => ((Slider)slider.HitObject).NestedHitObjects.OfType<SliderTick>().All(assertTickSamples));
-            AddAssert("repeat samples not updated", () => ((Slider)slider.HitObject).NestedHitObjects.OfType<SliderRepeat>().All(assertSamples));
-            AddAssert("tail has no samples", () => ((Slider)slider.HitObject).TailCircle.Samples.Count == 0);
+            AddAssert("head samples not updated", () => assertSamples(slider.HitObject.HeadCircle));
+            AddAssert("tick samples not updated", () => slider.HitObject.NestedHitObjects.OfType<SliderTick>().All(assertTickSamples));
+            AddAssert("repeat samples not updated", () => slider.HitObject.NestedHitObjects.OfType<SliderRepeat>().All(assertSamples));
+            AddAssert("tail has no samples", () => slider.HitObject.TailCircle.Samples.Count == 0);
 
             static bool assertTickSamples(SliderTick tick) => tick.Samples.Single().Name == "slidertick";
 

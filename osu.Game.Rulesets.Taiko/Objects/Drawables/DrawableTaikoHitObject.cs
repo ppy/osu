@@ -3,14 +3,12 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
+using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Bindings;
 using osu.Game.Audio;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Skinning;
 using osuTK;
@@ -24,7 +22,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private readonly Container nonProxiedContent;
 
-        protected DrawableTaikoHitObject(TaikoHitObject hitObject)
+        protected DrawableTaikoHitObject([CanBeNull] TaikoHitObject hitObject)
             : base(hitObject)
         {
             AddRangeInternal(new[]
@@ -115,117 +113,37 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
     {
         public override Vector2 OriginPosition => new Vector2(DrawHeight / 2);
 
-        public new TObject HitObject;
+        public new TObject HitObject => (TObject)base.HitObject;
 
         protected Vector2 BaseSize;
         protected SkinnableDrawable MainPiece;
 
-        private readonly Bindable<bool> isStrong;
-
-        private readonly Container<DrawableStrongNestedHit> strongHitContainer;
-
-        protected DrawableTaikoHitObject(TObject hitObject)
+        protected DrawableTaikoHitObject([CanBeNull] TObject hitObject)
             : base(hitObject)
         {
-            HitObject = hitObject;
-            isStrong = HitObject.IsStrongBindable.GetBoundCopy();
-
             Anchor = Anchor.CentreLeft;
             Origin = Anchor.Custom;
 
             RelativeSizeAxes = Axes.Both;
-
-            AddInternal(strongHitContainer = new Container<DrawableStrongNestedHit>());
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void OnApply()
         {
-            isStrong.BindValueChanged(_ =>
-            {
-                // will overwrite samples, should only be called on change.
-                updateSamplesFromStrong();
-
-                RecreatePieces();
-            });
-
+            base.OnApply();
             RecreatePieces();
-        }
-
-        private HitSampleInfo[] getStrongSamples() => HitObject.Samples.Where(s => s.Name == HitSampleInfo.HIT_FINISH).ToArray();
-
-        protected override void LoadSamples()
-        {
-            base.LoadSamples();
-
-            if (HitObject.CanBeStrong)
-                isStrong.Value = getStrongSamples().Any();
-        }
-
-        private void updateSamplesFromStrong()
-        {
-            var strongSamples = getStrongSamples();
-
-            if (isStrong.Value != strongSamples.Any())
-            {
-                if (isStrong.Value)
-                    HitObject.Samples.Add(new HitSampleInfo { Name = HitSampleInfo.HIT_FINISH });
-                else
-                {
-                    foreach (var sample in strongSamples)
-                        HitObject.Samples.Remove(sample);
-                }
-            }
         }
 
         protected virtual void RecreatePieces()
         {
-            Size = BaseSize = new Vector2(HitObject.IsStrong ? TaikoHitObject.DEFAULT_STRONG_SIZE : TaikoHitObject.DEFAULT_SIZE);
+            Size = BaseSize = new Vector2(TaikoHitObject.DEFAULT_SIZE);
 
             MainPiece?.Expire();
             Content.Add(MainPiece = CreateMainPiece());
-        }
-
-        protected override void AddNestedHitObject(DrawableHitObject hitObject)
-        {
-            base.AddNestedHitObject(hitObject);
-
-            switch (hitObject)
-            {
-                case DrawableStrongNestedHit strong:
-                    strongHitContainer.Add(strong);
-                    break;
-            }
-        }
-
-        protected override void ClearNestedHitObjects()
-        {
-            base.ClearNestedHitObjects();
-            strongHitContainer.Clear();
-        }
-
-        protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
-        {
-            switch (hitObject)
-            {
-                case StrongHitObject strong:
-                    return CreateStrongHit(strong);
-            }
-
-            return base.CreateNestedHitObject(hitObject);
         }
 
         // Most osu!taiko hitsounds are managed by the drum (see DrumSampleMapping).
         public override IEnumerable<HitSampleInfo> GetSamples() => Enumerable.Empty<HitSampleInfo>();
 
         protected abstract SkinnableDrawable CreateMainPiece();
-
-        /// <summary>
-        /// Creates the handler for this <see cref="DrawableHitObject"/>'s <see cref="StrongHitObject"/>.
-        /// This is only invoked if <see cref="TaikoHitObject.IsStrong"/> is true for <see cref="HitObject"/>.
-        /// </summary>
-        /// <param name="hitObject">The strong hitobject.</param>
-        /// <returns>The strong hitobject handler.</returns>
-        protected virtual DrawableStrongNestedHit CreateStrongHit(StrongHitObject hitObject) => null;
     }
 }

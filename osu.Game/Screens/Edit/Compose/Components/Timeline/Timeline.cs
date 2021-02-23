@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osuTK;
@@ -67,8 +68,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private TimelineControlPointDisplay controlPoints;
 
+        private Bindable<float> waveformOpacity;
+
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours)
+        private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours, OsuConfigManager config)
         {
             AddRange(new Drawable[]
             {
@@ -95,7 +98,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             // We don't want the centre marker to scroll
             AddInternal(new CentreMarker { Depth = float.MaxValue });
 
-            WaveformVisible.ValueChanged += visible => waveform.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
+            waveformOpacity = config.GetBindable<float>(OsuSetting.EditorWaveformOpacity);
+            waveformOpacity.BindValueChanged(_ => updateWaveformOpacity(), true);
+
+            WaveformVisible.ValueChanged += _ => updateWaveformOpacity();
             ControlPointsVisible.ValueChanged += visible => controlPoints.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
             TicksVisible.ValueChanged += visible => ticks.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
 
@@ -115,6 +121,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }, true);
         }
 
+        private void updateWaveformOpacity() =>
+            waveform.FadeTo(WaveformVisible.Value ? waveformOpacity.Value : 0, 200, Easing.OutQuint);
+
         private float getZoomLevelForVisibleMilliseconds(double milliseconds) => Math.Max(1, (float)(track.Length / milliseconds));
 
         protected override void Update()
@@ -129,6 +138,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 scrollToTrackTime();
         }
 
+        protected override bool OnScroll(ScrollEvent e)
+        {
+            // if this is not a precision scroll event, let the editor handle the seek itself (for snapping support)
+            if (!e.AltPressed && !e.IsPrecise)
+                return false;
+
+            return base.OnScroll(e);
+        }
+
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
@@ -137,12 +155,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 seekTrackToCurrent();
             else if (!editorClock.IsRunning)
             {
-                // The track isn't running. There are two cases we have to be wary of:
-                // 1) The user flick-drags on this timeline: We want the track to follow us
-                // 2) The user changes the track time through some other means (scrolling in the editor or overview timeline): We want to follow the track time
+                // The track isn't running. There are three cases we have to be wary of:
+                // 1) The user flick-drags on this timeline and we are applying an interpolated seek on the clock, until interrupted by 2 or 3.
+                // 2) The user changes the track time through some other means (scrolling in the editor or overview timeline; clicking a hitobject etc.). We want the timeline to track the clock's time.
+                // 3) An ongoing seek transform is running from an external seek. We want the timeline to track the clock's time.
 
-                // The simplest way to cover both cases is by checking whether the scroll position has changed and the audio hasn't been changed externally
-                if (Current != lastScrollPosition && editorClock.CurrentTime == lastTrackTime)
+                // The simplest way to cover the first two cases is by checking whether the scroll position has changed and the audio hasn't been changed externally
+                // Checking IsSeeking covers the third case, where the transform may not have been applied yet.
+                if (Current != lastScrollPosition && editorClock.CurrentTime == lastTrackTime && !editorClock.IsSeeking)
                     seekTrackToCurrent();
                 else
                     scrollToTrackTime();
@@ -164,6 +184,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             if (!track.IsLoaded || track.Length == 0)
                 return;
+
+            // covers the case where the user starts playback after a drag is in progress.
+            // we want to ensure the clock is always stopped during drags to avoid weird audio playback.
+            if (handlingDragInput)
+                editorClock.Stop();
 
             ScrollTo((float)(editorClock.CurrentTime / track.Length) * Content.DrawWidth, false);
         }
@@ -204,6 +229,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         [Resolved]
         private IBeatSnapProvider beatSnapProvider { get; set; }
+
+        /// <summary>
+        /// The total amount of time visible on the timeline.
+        /// </summary>
+        public double VisibleRange => track.Length / Zoom;
+
+        public SnapResult SnapScreenSpacePositionToValidPosition(Vector2 screenSpacePosition) =>
+            new SnapResult(screenSpacePosition, null);
 
         public SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition) =>
             new SnapResult(screenSpacePosition, beatSnapProvider.SnapTime(getTimeFromPosition(Content.ToLocalSpace(screenSpacePosition))));

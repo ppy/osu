@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -13,7 +14,7 @@ using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Taiko.Skinning.Default;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
@@ -35,7 +36,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         private readonly CircularContainer targetRing;
         private readonly CircularContainer expandingRing;
 
-        public DrawableSwell(Swell swell)
+        public DrawableSwell()
+            : this(null)
+        {
+        }
+
+        public DrawableSwell([CanBeNull] Swell swell)
             : base(swell)
         {
             FillMode = FillMode.Fit;
@@ -123,12 +129,13 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 Origin = Anchor.Centre,
             });
 
-        protected override void LoadComplete()
+        protected override void OnFree()
         {
-            base.LoadComplete();
+            base.OnFree();
 
-            // We need to set this here because RelativeSizeAxes won't/can't set our size by default with a different RelativeChildSize
-            Width *= Parent.RelativeChildSize.X;
+            UnproxyContent();
+
+            lastWasCentre = null;
         }
 
         protected override void AddNestedHitObject(DrawableHitObject hitObject)
@@ -146,7 +153,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected override void ClearNestedHitObjects()
         {
             base.ClearNestedHitObjects();
-            ticks.Clear();
+            ticks.Clear(false);
         }
 
         protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
@@ -168,7 +175,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 foreach (var t in ticks)
                 {
-                    if (!t.IsHit)
+                    if (!t.Result.HasResult)
                     {
                         nextTick = t;
                         break;
@@ -208,22 +215,23 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                         continue;
                     }
 
-                    tick.TriggerResult(false);
+                    if (!tick.Result.HasResult)
+                        tick.TriggerResult(false);
                 }
 
                 ApplyResult(r => r.Type = numHits > HitObject.RequiredHits / 2 ? HitResult.Ok : r.Judgement.MinResult);
             }
         }
 
-        protected override void UpdateInitialTransforms()
+        protected override void UpdateStartTimeStateTransforms()
         {
-            base.UpdateInitialTransforms();
+            base.UpdateStartTimeStateTransforms();
 
-            using (BeginAbsoluteSequence(HitObject.StartTime - ring_appear_offset, true))
+            using (BeginDelayedSequence(-ring_appear_offset, true))
                 targetRing.ScaleTo(target_ring_scale, 400, Easing.OutQuint);
         }
 
-        protected override void UpdateStateTransforms(ArmedState state)
+        protected override void UpdateHitStateTransforms(ArmedState state)
         {
             const double transition_duration = 300;
 
@@ -235,12 +243,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 case ArmedState.Miss:
                 case ArmedState.Hit:
-                    using (BeginDelayedSequence(HitObject.Duration, true))
-                    {
-                        this.FadeOut(transition_duration, Easing.Out);
-                        bodyContainer.ScaleTo(1.4f, transition_duration);
-                    }
-
+                    this.FadeOut(transition_duration, Easing.Out);
+                    bodyContainer.ScaleTo(1.4f, transition_duration);
                     break;
             }
         }

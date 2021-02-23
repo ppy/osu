@@ -126,7 +126,7 @@ namespace osu.Game.Screens.Select
                 if (string.IsNullOrEmpty(value))
                     return false;
 
-                return value.IndexOf(SearchTerm, StringComparison.InvariantCultureIgnoreCase) >= 0;
+                return value.Contains(SearchTerm, StringComparison.InvariantCultureIgnoreCase);
             }
 
             public string SearchTerm;

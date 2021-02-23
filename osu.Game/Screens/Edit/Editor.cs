@@ -20,6 +20,7 @@ using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
@@ -43,8 +44,9 @@ using osuTK.Input;
 namespace osu.Game.Screens.Edit
 {
     [Cached(typeof(IBeatSnapProvider))]
+    [Cached(typeof(ISamplePlaybackDisabler))]
     [Cached]
-    public class Editor : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, IKeyBindingHandler<PlatformAction>, IBeatSnapProvider
+    public class Editor : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, IKeyBindingHandler<PlatformAction>, IBeatSnapProvider, ISamplePlaybackDisabler
     {
         public override float BackgroundParallaxAmount => 0.1f;
 
@@ -63,6 +65,10 @@ namespace osu.Game.Screens.Edit
 
         [Resolved(canBeNull: true)]
         private DialogOverlay dialogOverlay { get; set; }
+
+        public IBindable<bool> SamplePlaybackDisabled => samplePlaybackDisabled;
+
+        private readonly Bindable<bool> samplePlaybackDisabled = new Bindable<bool>();
 
         private bool exitConfirmed;
 
@@ -98,8 +104,23 @@ namespace osu.Game.Screens.Edit
         private MusicController music { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, GameHost host)
+        private void load(OsuColour colours, GameHost host, OsuConfigManager config)
         {
+            if (Beatmap.Value is DummyWorkingBeatmap)
+            {
+                isNewBeatmap = true;
+
+                var newBeatmap = beatmapManager.CreateNew(Ruleset.Value, api.LocalUser.Value);
+
+                // this is a bit haphazard, but guards against setting the lease Beatmap bindable if
+                // the editor has already been exited.
+                if (!ValidForPush)
+                    return;
+
+                // this probably shouldn't be set in the asynchronous load method, but everything following relies on it.
+                Beatmap.Value = newBeatmap;
+            }
+
             beatDivisor.Value = Beatmap.Value.BeatmapInfo.BeatDivisor;
             beatDivisor.BindValueChanged(divisor => Beatmap.Value.BeatmapInfo.BeatDivisor = divisor.NewValue);
 
@@ -109,21 +130,20 @@ namespace osu.Game.Screens.Edit
             UpdateClockSource();
 
             dependencies.CacheAs(clock);
-            dependencies.CacheAs<ISamplePlaybackDisabler>(clock);
             AddInternal(clock);
+
+            clock.SeekingOrStopped.BindValueChanged(_ => updateSampleDisabledState());
 
             // todo: remove caching of this and consume via editorBeatmap?
             dependencies.Cache(beatDivisor);
 
-            if (Beatmap.Value is DummyWorkingBeatmap)
-            {
-                isNewBeatmap = true;
-                Beatmap.Value = beatmapManager.CreateNew(Ruleset.Value, api.LocalUser.Value);
-            }
-
             try
             {
                 playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Beatmap.Value.BeatmapInfo.Ruleset);
+
+                // clone these locally for now to avoid incurring overhead on GetPlayableBeatmap usages.
+                // eventually we will want to improve how/where this is done as there are issues with *not* cloning it in all cases.
+                playableBeatmap.ControlPointInfo = playableBeatmap.ControlPointInfo.CreateCopy();
             }
             catch (Exception e)
             {
@@ -201,6 +221,13 @@ namespace osu.Game.Screens.Edit
                                         cutMenuItem = new EditorMenuItem("Cut", MenuItemType.Standard, Cut),
                                         copyMenuItem = new EditorMenuItem("Copy", MenuItemType.Standard, Copy),
                                         pasteMenuItem = new EditorMenuItem("Paste", MenuItemType.Standard, Paste),
+                                    }
+                                },
+                                new MenuItem("View")
+                                {
+                                    Items = new[]
+                                    {
+                                        new WaveformOpacityMenu(config)
                                     }
                                 }
                             }
@@ -361,6 +388,9 @@ namespace osu.Game.Screens.Edit
 
         protected override bool OnScroll(ScrollEvent e)
         {
+            if (e.ControlPressed || e.AltPressed || e.SuperPressed)
+                return false;
+
             const double precision = 1;
 
             double scrollComponent = e.ScrollDelta.X + e.ScrollDelta.Y;
@@ -427,11 +457,14 @@ namespace osu.Game.Screens.Edit
         {
             base.OnEntering(last);
 
-            // todo: temporary. we want to be applying dim using the UserDimContainer eventually.
-            Background.FadeColour(Color4.DarkGray, 500);
+            ApplyToBackground(b =>
+            {
+                // todo: temporary. we want to be applying dim using the UserDimContainer eventually.
+                b.FadeColour(Color4.DarkGray, 500);
 
-            Background.EnableUserDim.Value = false;
-            Background.BlurAmount.Value = 0;
+                b.EnableUserDim.Value = false;
+                b.BlurAmount.Value = 0;
+            });
 
             resetTrack(true);
         }
@@ -444,18 +477,29 @@ namespace osu.Game.Screens.Edit
                 if (dialogOverlay == null || dialogOverlay.CurrentDialog is PromptForSaveDialog)
                 {
                     confirmExit();
-                    return true;
+                    return base.OnExiting(next);
                 }
 
                 if (isNewBeatmap || HasUnsavedChanges)
                 {
-                    dialogOverlay?.Push(new PromptForSaveDialog(confirmExit, confirmExitWithSave));
+                    dialogOverlay?.Push(new PromptForSaveDialog(() =>
+                    {
+                        confirmExit();
+                        this.Exit();
+                    }, () =>
+                    {
+                        confirmExitWithSave();
+                        this.Exit();
+                    }));
+
                     return true;
                 }
             }
 
-            Background.FadeColour(Color4.White, 500);
+            ApplyToBackground(b => b.FadeColour(Color4.White, 500));
             resetTrack();
+
+            Beatmap.Value = beatmapManager.GetWorkingBeatmap(Beatmap.Value.BeatmapInfo);
 
             return base.OnExiting(next);
         }
@@ -464,7 +508,6 @@ namespace osu.Game.Screens.Edit
         {
             exitConfirmed = true;
             Save();
-            this.Exit();
         }
 
         private void confirmExit()
@@ -477,13 +520,15 @@ namespace osu.Game.Screens.Edit
                 // confirming exit without save means we should delete the new beatmap completely.
                 beatmapManager.Delete(playableBeatmap.BeatmapInfo.BeatmapSet);
 
+                // eagerly clear contents before restoring default beatmap to prevent value change callbacks from firing.
+                ClearInternal();
+
                 // in theory this shouldn't be required but due to EF core not sharing instance states 100%
                 // MusicController is unaware of the changed DeletePending state.
                 Beatmap.SetDefault();
             }
 
             exitConfirmed = true;
-            this.Exit();
         }
 
         private readonly Bindable<string> clipboard = new Bindable<string>();
@@ -557,40 +602,52 @@ namespace osu.Game.Screens.Edit
                 .ScaleTo(0.98f, 200, Easing.OutQuint)
                 .FadeOut(200, Easing.OutQuint);
 
-            if ((currentScreen = screenContainer.SingleOrDefault(s => s.Type == e.NewValue)) != null)
+            try
             {
-                screenContainer.ChangeChildDepth(currentScreen, lastScreen?.Depth + 1 ?? 0);
+                if ((currentScreen = screenContainer.SingleOrDefault(s => s.Type == e.NewValue)) != null)
+                {
+                    screenContainer.ChangeChildDepth(currentScreen, lastScreen?.Depth + 1 ?? 0);
 
-                currentScreen
-                    .ScaleTo(1, 200, Easing.OutQuint)
-                    .FadeIn(200, Easing.OutQuint);
-                return;
+                    currentScreen
+                        .ScaleTo(1, 200, Easing.OutQuint)
+                        .FadeIn(200, Easing.OutQuint);
+                    return;
+                }
+
+                switch (e.NewValue)
+                {
+                    case EditorScreenMode.SongSetup:
+                        currentScreen = new SetupScreen();
+                        break;
+
+                    case EditorScreenMode.Compose:
+                        currentScreen = new ComposeScreen();
+                        break;
+
+                    case EditorScreenMode.Design:
+                        currentScreen = new DesignScreen();
+                        break;
+
+                    case EditorScreenMode.Timing:
+                        currentScreen = new TimingScreen();
+                        break;
+                }
+
+                LoadComponentAsync(currentScreen, newScreen =>
+                {
+                    if (newScreen == currentScreen)
+                        screenContainer.Add(newScreen);
+                });
             }
-
-            switch (e.NewValue)
+            finally
             {
-                case EditorScreenMode.SongSetup:
-                    currentScreen = new SetupScreen();
-                    break;
-
-                case EditorScreenMode.Compose:
-                    currentScreen = new ComposeScreen();
-                    break;
-
-                case EditorScreenMode.Design:
-                    currentScreen = new DesignScreen();
-                    break;
-
-                case EditorScreenMode.Timing:
-                    currentScreen = new TimingScreen();
-                    break;
+                updateSampleDisabledState();
             }
+        }
 
-            LoadComponentAsync(currentScreen, newScreen =>
-            {
-                if (newScreen == currentScreen)
-                    screenContainer.Add(newScreen);
-            });
+        private void updateSampleDisabledState()
+        {
+            samplePlaybackDisabled.Value = clock.SeekingOrStopped.Value || !(currentScreen is ComposeScreen);
         }
 
         private void seek(UIEvent e, int direction)

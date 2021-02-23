@@ -1,7 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using JetBrains.Annotations;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Objects;
 using osuTK;
@@ -15,49 +19,123 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
     /// </summary>
     public class DrawableBarLine : DrawableHitObject<HitObject>
     {
+        public new BarLine HitObject => (BarLine)base.HitObject;
+
         /// <summary>
         /// The width of the line tracker.
         /// </summary>
         private const float tracker_width = 2f;
 
         /// <summary>
-        /// Fade out time calibrated to a pre-empt of 1000ms.
+        /// The vertical offset of the triangles from the line tracker.
         /// </summary>
-        private const float base_fadeout_time = 100f;
+        private const float triangle_offset = 10f;
+
+        /// <summary>
+        /// The size of the triangles.
+        /// </summary>
+        private const float triangle_size = 20f;
 
         /// <summary>
         /// The visual line tracker.
         /// </summary>
-        protected SkinnableDrawable Line;
+        private SkinnableDrawable line;
 
         /// <summary>
-        /// The bar line.
+        /// Container with triangles. Only visible for major lines.
         /// </summary>
-        protected readonly BarLine BarLine;
+        private Container triangleContainer;
 
-        public DrawableBarLine(BarLine barLine)
+        private readonly Bindable<bool> major = new Bindable<bool>();
+
+        public DrawableBarLine()
+            : this(null)
+        {
+        }
+
+        public DrawableBarLine([CanBeNull] BarLine barLine)
             : base(barLine)
         {
-            BarLine = barLine;
+        }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             Anchor = Anchor.CentreLeft;
             Origin = Anchor.Centre;
 
             RelativeSizeAxes = Axes.Y;
             Width = tracker_width;
 
-            AddInternal(Line = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.BarLine), _ => new Box
+            AddRangeInternal(new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                EdgeSmoothness = new Vector2(0.5f, 0),
-            })
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Alpha = 0.75f,
+                line = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.BarLine), _ => new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    EdgeSmoothness = new Vector2(0.5f, 0),
+                })
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                },
+                triangleContainer = new Container
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new[]
+                    {
+                        new EquilateralTriangle
+                        {
+                            Name = "Top",
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Position = new Vector2(0, -triangle_offset),
+                            Size = new Vector2(-triangle_size),
+                            EdgeSmoothness = new Vector2(1),
+                        },
+                        new EquilateralTriangle
+                        {
+                            Name = "Bottom",
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.TopCentre,
+                            Position = new Vector2(0, triangle_offset),
+                            Size = new Vector2(triangle_size),
+                            EdgeSmoothness = new Vector2(1),
+                        }
+                    }
+                }
             });
         }
 
-        protected override void UpdateStateTransforms(ArmedState state) => this.FadeOut(150);
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            major.BindValueChanged(updateMajor, true);
+        }
+
+        private void updateMajor(ValueChangedEvent<bool> major)
+        {
+            line.Alpha = major.NewValue ? 1f : 0.75f;
+            triangleContainer.Alpha = major.NewValue ? 1 : 0;
+        }
+
+        protected override void OnApply()
+        {
+            base.OnApply();
+            major.BindTo(HitObject.MajorBindable);
+        }
+
+        protected override void OnFree()
+        {
+            base.OnFree();
+            major.UnbindFrom(HitObject.MajorBindable);
+        }
+
+        protected override void UpdateHitStateTransforms(ArmedState state)
+        {
+            using (BeginAbsoluteSequence(HitObject.StartTime))
+                this.FadeOutFromOne(150).Expire();
+        }
     }
 }

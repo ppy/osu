@@ -24,9 +24,9 @@ using osu.Game.Skinning;
 using osu.Game.Users;
 using JetBrains.Annotations;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Testing;
 using osu.Game.Screens.Ranking.Statistics;
-using osu.Game.Utils;
 
 namespace osu.Game.Rulesets
 {
@@ -81,8 +81,16 @@ namespace osu.Game.Rulesets
                         value |= LegacyMods.HardRock;
                         break;
 
+                    case ModPerfect _:
+                        value |= LegacyMods.Perfect;
+                        break;
+
                     case ModSuddenDeath _:
                         value |= LegacyMods.SuddenDeath;
+                        break;
+
+                    case ModNightcore _:
+                        value |= LegacyMods.Nightcore;
                         break;
 
                     case ModDoubleTime _:
@@ -99,6 +107,14 @@ namespace osu.Game.Rulesets
 
                     case ModFlashlight _:
                         value |= LegacyMods.Flashlight;
+                        break;
+
+                    case ModCinema _:
+                        value |= LegacyMods.Cinema;
+                        break;
+
+                    case ModAutoplay _:
+                        value |= LegacyMods.Autoplay;
                         break;
                 }
             }
@@ -256,7 +272,7 @@ namespace osu.Game.Rulesets
             var validResults = GetValidHitResults();
 
             // enumerate over ordered list to guarantee return order is stable.
-            foreach (var result in OrderAttributeUtils.GetValuesInOrder<HitResult>())
+            foreach (var result in EnumExtensions.GetValuesInOrder<HitResult>())
             {
                 switch (result)
                 {
@@ -282,7 +298,7 @@ namespace osu.Game.Rulesets
         /// <remarks>
         /// <see cref="HitResult.Miss"/> is implicitly included. Special types like <see cref="HitResult.IgnoreHit"/> are ignored even when specified.
         /// </remarks>
-        protected virtual IEnumerable<HitResult> GetValidHitResults() => OrderAttributeUtils.GetValuesInOrder<HitResult>();
+        protected virtual IEnumerable<HitResult> GetValidHitResults() => EnumExtensions.GetValuesInOrder<HitResult>();
 
         /// <summary>
         /// Get a display friendly name for the specified result type.

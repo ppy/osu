@@ -49,9 +49,12 @@ namespace osu.Game.Overlays.Profile.Header
                     Spacing = new Vector2(10, 0),
                     Children = new Drawable[]
                     {
-                        new AddFriendButton
+                        new FollowersButton
                         {
-                            RelativeSizeAxes = Axes.Y,
+                            User = { BindTarget = User }
+                        },
+                        new MappingSubscribersButton
+                        {
                             User = { BindTarget = User }
                         },
                         new MessageUserButton
@@ -69,7 +72,6 @@ namespace osu.Game.Overlays.Profile.Header
                     Width = UserProfileOverlay.CONTENT_X_MARGIN,
                     Child = new ExpandDetailsButton
                     {
-                        RelativeSizeAxes = Axes.Y,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         DetailsVisible = { BindTarget = DetailsVisible }
@@ -142,8 +144,8 @@ namespace osu.Game.Overlays.Profile.Header
 
         private void updateDisplay(User user)
         {
-            hiddenDetailGlobal.Content = user?.Statistics?.Ranks.Global?.ToString("\\##,##0") ?? "-";
-            hiddenDetailCountry.Content = user?.Statistics?.Ranks.Country?.ToString("\\##,##0") ?? "-";
+            hiddenDetailGlobal.Content = user?.Statistics?.GlobalRank?.ToString("\\##,##0") ?? "-";
+            hiddenDetailCountry.Content = user?.Statistics?.CountryRank?.ToString("\\##,##0") ?? "-";
         }
     }
 }

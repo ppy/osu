@@ -11,7 +11,9 @@ using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Toolbar;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Options;
 using osu.Game.Tests.Beatmaps.IO;
@@ -41,6 +43,30 @@ namespace osu.Game.Tests.Visual.Navigation
             exitViaEscapeAndConfirm();
         }
 
+        [Test]
+        public void TestRetryFromResults()
+        {
+            Player player = null;
+            ResultsScreen results = null;
+
+            WorkingBeatmap beatmap() => Game.Beatmap.Value;
+
+            PushAndConfirm(() => new TestSongSelect());
+
+            AddStep("import beatmap", () => ImportBeatmapTest.LoadOszIntoOsu(Game, virtualTrack: true).Wait());
+
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
+            AddStep("set autoplay", () => Game.SelectedMods.Value = new[] { new OsuModAutoplay() });
+
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
+            AddUntilStep("wait for player", () => (player = Game.ScreenStack.CurrentScreen as Player) != null);
+            AddStep("seek to end", () => beatmap().Track.Seek(beatmap().Track.Length));
+            AddUntilStep("wait for pass", () => (results = Game.ScreenStack.CurrentScreen as ResultsScreen) != null && results.IsLoaded);
+            AddStep("attempt to retry", () => results.ChildrenOfType<HotkeyRetryOverlay>().First().Action());
+            AddUntilStep("wait for player", () => Game.ScreenStack.CurrentScreen != player && Game.ScreenStack.CurrentScreen is Player);
+        }
+
         [TestCase(true)]
         [TestCase(false)]
         public void TestSongContinuesAfterExitPlayer(bool withUserPause)
@@ -56,9 +82,9 @@ namespace osu.Game.Tests.Visual.Navigation
             AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
 
             if (withUserPause)
-                AddStep("pause", () => Game.Dependencies.Get<MusicController>().Stop());
+                AddStep("pause", () => Game.Dependencies.Get<MusicController>().Stop(true));
 
-            AddStep("press enter", () => pressAndRelease(Key.Enter));
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
 
             AddUntilStep("wait for player", () => (player = Game.ScreenStack.CurrentScreen as Player) != null);
             AddUntilStep("wait for fail", () => player.HasFailed);
@@ -107,14 +133,14 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestExitMultiWithEscape()
         {
-            PushAndConfirm(() => new Screens.Multi.Multiplayer());
+            PushAndConfirm(() => new Screens.OnlinePlay.Playlists.Playlists());
             exitViaEscapeAndConfirm();
         }
 
         [Test]
         public void TestExitMultiWithBackButton()
         {
-            PushAndConfirm(() => new Screens.Multi.Multiplayer());
+            PushAndConfirm(() => new Screens.OnlinePlay.Playlists.Playlists());
             exitViaBackButtonAndConfirm();
         }
 
@@ -122,11 +148,11 @@ namespace osu.Game.Tests.Visual.Navigation
         public void TestOpenOptionsAndExitWithEscape()
         {
             AddUntilStep("Wait for options to load", () => Game.Settings.IsLoaded);
-            AddStep("Enter menu", () => pressAndRelease(Key.Enter));
+            AddStep("Enter menu", () => InputManager.Key(Key.Enter));
             AddStep("Move mouse to options overlay", () => InputManager.MoveMouseTo(optionsButtonPosition));
             AddStep("Click options overlay", () => InputManager.Click(MouseButton.Left));
             AddAssert("Options overlay was opened", () => Game.Settings.State.Value == Visibility.Visible);
-            AddStep("Hide options overlay using escape", () => pressAndRelease(Key.Escape));
+            AddStep("Hide options overlay using escape", () => InputManager.Key(Key.Escape));
             AddAssert("Options overlay was closed", () => Game.Settings.State.Value == Visibility.Hidden);
         }
 
@@ -158,10 +184,8 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("Change ruleset to osu!taiko", () =>
             {
                 InputManager.PressKey(Key.ControlLeft);
-                InputManager.PressKey(Key.Number2);
-
+                InputManager.Key(Key.Number2);
                 InputManager.ReleaseKey(Key.ControlLeft);
-                InputManager.ReleaseKey(Key.Number2);
             });
 
             AddAssert("Ruleset changed to osu!taiko", () => Game.Toolbar.ChildrenOfType<ToolbarRulesetSelector>().Single().Current.Value.ID == 1);
@@ -181,10 +205,8 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("Change ruleset to osu!taiko", () =>
             {
                 InputManager.PressKey(Key.ControlLeft);
-                InputManager.PressKey(Key.Number2);
-
+                InputManager.Key(Key.Number2);
                 InputManager.ReleaseKey(Key.ControlLeft);
-                InputManager.ReleaseKey(Key.Number2);
             });
 
             AddAssert("Ruleset changed to osu!taiko", () => Game.Toolbar.ChildrenOfType<ToolbarRulesetSelector>().Single().Current.Value.ID == 1);
@@ -193,7 +215,7 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         private void pushEscape() =>
-            AddStep("Press escape", () => pressAndRelease(Key.Escape));
+            AddStep("Press escape", () => InputManager.Key(Key.Escape));
 
         private void exitViaEscapeAndConfirm()
         {
@@ -206,12 +228,6 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("Move mouse to backButton", () => InputManager.MoveMouseTo(backButtonPosition));
             AddStep("Click back button", () => InputManager.Click(MouseButton.Left));
             ConfirmAtMainMenu();
-        }
-
-        private void pressAndRelease(Key key)
-        {
-            InputManager.PressKey(key);
-            InputManager.ReleaseKey(key);
         }
 
         private class TestSongSelect : PlaySongSelect

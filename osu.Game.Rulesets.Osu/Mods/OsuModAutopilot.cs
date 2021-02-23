@@ -11,7 +11,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -31,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private OsuInputManager inputManager;
 
-        private GameplayClock gameplayClock;
+        private IFrameStableClock gameplayClock;
 
         private List<OsuReplayFrame> replayFrames;
 
@@ -63,7 +62,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             inputManager.AllowUserCursorMovement = false;
 
             // Generate the replay frames the cursor should follow
-            replayFrames = new OsuAutoGenerator(drawableRuleset.Beatmap).Generate().Frames.Cast<OsuReplayFrame>().ToList();
+            replayFrames = new OsuAutoGenerator(drawableRuleset.Beatmap, drawableRuleset.Mods).Generate().Frames.Cast<OsuReplayFrame>().ToList();
         }
     }
 }

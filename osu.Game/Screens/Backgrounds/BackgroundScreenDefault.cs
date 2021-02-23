@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -21,10 +22,11 @@ namespace osu.Game.Screens.Backgrounds
 
         private int currentDisplay;
         private const int background_count = 7;
-        private Bindable<User> user;
+        private IBindable<User> user;
         private Bindable<Skin> skin;
         private Bindable<BackgroundSource> mode;
         private Bindable<IntroSequence> introSequence;
+        private readonly SeasonalBackgroundLoader seasonalBackgroundLoader = new SeasonalBackgroundLoader();
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; }
@@ -42,15 +44,18 @@ namespace osu.Game.Screens.Backgrounds
             mode = config.GetBindable<BackgroundSource>(OsuSetting.MenuBackgroundSource);
             introSequence = config.GetBindable<IntroSequence>(OsuSetting.IntroSequence);
 
+            AddInternal(seasonalBackgroundLoader);
+
             user.ValueChanged += _ => Next();
             skin.ValueChanged += _ => Next();
             mode.ValueChanged += _ => Next();
             beatmap.ValueChanged += _ => Next();
             introSequence.ValueChanged += _ => Next();
+            seasonalBackgroundLoader.SeasonalBackgroundChanged += Next;
 
             currentDisplay = RNG.Next(0, background_count);
 
-            display(createBackground());
+            Next();
         }
 
         private void display(Background newBackground)
@@ -63,17 +68,28 @@ namespace osu.Game.Screens.Backgrounds
         }
 
         private ScheduledDelegate nextTask;
+        private CancellationTokenSource cancellationTokenSource;
 
         public void Next()
         {
             nextTask?.Cancel();
-            nextTask = Scheduler.AddDelayed(() => { LoadComponentAsync(createBackground(), display); }, 100);
+            cancellationTokenSource?.Cancel();
+            cancellationTokenSource = new CancellationTokenSource();
+            nextTask = Scheduler.AddDelayed(() => LoadComponentAsync(createBackground(), display, cancellationTokenSource.Token), 100);
         }
 
         private Background createBackground()
         {
             Background newBackground;
             string backgroundName;
+
+            var seasonalBackground = seasonalBackgroundLoader.LoadNextBackground();
+
+            if (seasonalBackground != null)
+            {
+                seasonalBackground.Depth = currentDisplay;
+                return seasonalBackground;
+            }
 
             switch (introSequence.Value)
             {

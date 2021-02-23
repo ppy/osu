@@ -52,6 +52,31 @@ namespace osu.Game.Rulesets.Osu.Tests
             checkNextHitObject(null);
         }
 
+        [Test]
+        public void TestBeatmapColourDefault()
+        {
+            AddStep("enable user provider", () => testUserSkin.Enabled = true);
+
+            AddStep("enable beatmap skin", () => LocalConfig.Set<bool>(OsuSetting.BeatmapSkins, true));
+            AddStep("enable beatmap colours", () => LocalConfig.Set<bool>(OsuSetting.BeatmapColours, true));
+            checkNextHitObject("beatmap");
+
+            AddStep("enable beatmap skin", () => LocalConfig.Set<bool>(OsuSetting.BeatmapSkins, true));
+            AddStep("disable beatmap colours", () => LocalConfig.Set<bool>(OsuSetting.BeatmapColours, false));
+            checkNextHitObject("beatmap");
+
+            AddStep("disable beatmap skin", () => LocalConfig.Set<bool>(OsuSetting.BeatmapSkins, false));
+            AddStep("enable beatmap colours", () => LocalConfig.Set<bool>(OsuSetting.BeatmapColours, true));
+            checkNextHitObject("user");
+
+            AddStep("disable beatmap skin", () => LocalConfig.Set<bool>(OsuSetting.BeatmapSkins, false));
+            AddStep("disable beatmap colours", () => LocalConfig.Set<bool>(OsuSetting.BeatmapColours, false));
+            checkNextHitObject("user");
+
+            AddStep("disable user provider", () => testUserSkin.Enabled = false);
+            checkNextHitObject(null);
+        }
+
         private void checkNextHitObject(string skin) =>
             AddUntilStep($"check skin from {skin}", () =>
             {
@@ -125,6 +150,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 if (!enabled) return null;
 
+                if (component is OsuSkinComponent osuComponent && osuComponent.Component == OsuSkinComponents.SliderBody)
+                    return null;
+
                 return new OsuSpriteText
                 {
                     Text = identifier,
@@ -134,7 +162,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => null;
 
-            public SampleChannel GetSample(ISampleInfo sampleInfo) => null;
+            public Sample GetSample(ISampleInfo sampleInfo) => null;
 
             public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration => default;
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => null;

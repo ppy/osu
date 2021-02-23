@@ -2,22 +2,27 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Layout;
+using osu.Framework.Utils;
 
 namespace osu.Game.Graphics.Containers
 {
     /// <summary>
     /// A container that can scroll to each section inside it.
     /// </summary>
+    [Cached]
     public class SectionsContainer<T> : Container<T>
         where T : Drawable
     {
         public Bindable<T> SelectedSection { get; } = new Bindable<T>();
+        private Drawable lastClickedSection;
 
         public Drawable ExpandableHeader
         {
@@ -34,7 +39,7 @@ namespace osu.Game.Graphics.Containers
                 if (value == null) return;
 
                 AddInternal(expandableHeader);
-                lastKnownScroll = float.NaN;
+                lastKnownScroll = null;
             }
         }
 
@@ -50,7 +55,7 @@ namespace osu.Game.Graphics.Containers
                 if (value == null) return;
 
                 AddInternal(fixedHeader);
-                lastKnownScroll = float.NaN;
+                lastKnownScroll = null;
             }
         }
 
@@ -69,7 +74,7 @@ namespace osu.Game.Graphics.Containers
                 footer.Anchor |= Anchor.y2;
                 footer.Origin |= Anchor.y2;
                 scrollContainer.Add(footer);
-                lastKnownScroll = float.NaN;
+                lastKnownScroll = null;
             }
         }
 
@@ -87,21 +92,26 @@ namespace osu.Game.Graphics.Containers
 
                 headerBackgroundContainer.Add(headerBackground);
 
-                lastKnownScroll = float.NaN;
+                lastKnownScroll = null;
             }
         }
 
         protected override Container<T> Content => scrollContentContainer;
 
-        private readonly OsuScrollContainer scrollContainer;
+        private readonly UserTrackingScrollContainer scrollContainer;
         private readonly Container headerBackgroundContainer;
         private readonly MarginPadding originalSectionsMargin;
         private Drawable expandableHeader, fixedHeader, footer, headerBackground;
         private FlowContainer<T> scrollContentContainer;
 
-        private float headerHeight, footerHeight;
+        private float? headerHeight, footerHeight;
 
-        private float lastKnownScroll;
+        private float? lastKnownScroll;
+
+        /// <summary>
+        /// The percentage of the container to consider the centre-point for deciding the active section (and scrolling to a requested section).
+        /// </summary>
+        private const float scroll_y_centre = 0.1f;
 
         public SectionsContainer()
         {
@@ -126,18 +136,24 @@ namespace osu.Game.Graphics.Containers
         public override void Add(T drawable)
         {
             base.Add(drawable);
-            lastKnownScroll = float.NaN;
-            headerHeight = float.NaN;
-            footerHeight = float.NaN;
+
+            Debug.Assert(drawable != null);
+
+            lastKnownScroll = null;
+            headerHeight = null;
+            footerHeight = null;
         }
 
-        public void ScrollTo(Drawable section) =>
-            scrollContainer.ScrollTo(scrollContainer.GetChildPosInContent(section) - (FixedHeader?.BoundingBox.Height ?? 0));
+        public void ScrollTo(Drawable section)
+        {
+            lastClickedSection = section;
+            scrollContainer.ScrollTo(scrollContainer.GetChildPosInContent(section) - scrollContainer.DisplayableContent * scroll_y_centre - (FixedHeader?.BoundingBox.Height ?? 0));
+        }
 
         public void ScrollToTop() => scrollContainer.ScrollTo(0);
 
         [NotNull]
-        protected virtual OsuScrollContainer CreateScrollContainer() => new OsuScrollContainer();
+        protected virtual UserTrackingScrollContainer CreateScrollContainer() => new UserTrackingScrollContainer();
 
         [NotNull]
         protected virtual FlowContainer<T> CreateScrollContentContainer() =>
@@ -154,7 +170,7 @@ namespace osu.Game.Graphics.Containers
 
             if (source == InvalidationSource.Child && (invalidation & Invalidation.DrawSize) != 0)
             {
-                lastKnownScroll = -1;
+                lastKnownScroll = null;
                 result = true;
             }
 
@@ -165,7 +181,10 @@ namespace osu.Game.Graphics.Containers
         {
             base.UpdateAfterChildren();
 
-            float headerH = (ExpandableHeader?.LayoutSize.Y ?? 0) + (FixedHeader?.LayoutSize.Y ?? 0);
+            float fixedHeaderSize = FixedHeader?.LayoutSize.Y ?? 0;
+            float expandableHeaderSize = ExpandableHeader?.LayoutSize.Y ?? 0;
+
+            float headerH = expandableHeaderSize + fixedHeaderSize;
             float footerH = Footer?.LayoutSize.Y ?? 0;
 
             if (headerH != headerHeight || footerH != footerHeight)
@@ -181,28 +200,39 @@ namespace osu.Game.Graphics.Containers
             {
                 lastKnownScroll = currentScroll;
 
+                // reset last clicked section because user started scrolling themselves
+                if (scrollContainer.UserScrolling)
+                    lastClickedSection = null;
+
                 if (ExpandableHeader != null && FixedHeader != null)
                 {
-                    float offset = Math.Min(ExpandableHeader.LayoutSize.Y, currentScroll);
+                    float offset = Math.Min(expandableHeaderSize, currentScroll);
 
                     ExpandableHeader.Y = -offset;
-                    FixedHeader.Y = -offset + ExpandableHeader.LayoutSize.Y;
+                    FixedHeader.Y = -offset + expandableHeaderSize;
                 }
 
-                headerBackgroundContainer.Height = (ExpandableHeader?.LayoutSize.Y ?? 0) + (FixedHeader?.LayoutSize.Y ?? 0);
+                headerBackgroundContainer.Height = expandableHeaderSize + fixedHeaderSize;
                 headerBackgroundContainer.Y = ExpandableHeader?.Y ?? 0;
 
-                float scrollOffset = FixedHeader?.LayoutSize.Y ?? 0;
-                Func<T, float> diff = section => scrollContainer.GetChildPosInContent(section) - currentScroll - scrollOffset;
+                var smallestSectionHeight = Children.Count > 0 ? Children.Min(d => d.Height) : 0;
 
-                if (scrollContainer.IsScrolledToEnd())
-                {
-                    SelectedSection.Value = Children.LastOrDefault();
-                }
+                // scroll offset is our fixed header height if we have it plus 10% of content height
+                // plus 5% to fix floating point errors and to not have a section instantly unselect when scrolling upwards
+                // but the 5% can't be bigger than our smallest section height, otherwise it won't get selected correctly
+                float selectionLenienceAboveSection = Math.Min(smallestSectionHeight / 2.0f, scrollContainer.DisplayableContent * 0.05f);
+
+                float scrollCentre = fixedHeaderSize + scrollContainer.DisplayableContent * scroll_y_centre + selectionLenienceAboveSection;
+
+                if (Precision.AlmostBigger(0, scrollContainer.Current))
+                    SelectedSection.Value = lastClickedSection as T ?? Children.FirstOrDefault();
+                else if (Precision.AlmostBigger(scrollContainer.Current, scrollContainer.ScrollableExtent))
+                    SelectedSection.Value = lastClickedSection as T ?? Children.LastOrDefault();
                 else
                 {
-                    SelectedSection.Value = Children.TakeWhile(section => diff(section) <= 0).LastOrDefault()
-                                            ?? Children.FirstOrDefault();
+                    SelectedSection.Value = Children
+                                            .TakeWhile(section => scrollContainer.GetChildPosInContent(section) - currentScroll - scrollCentre <= 0)
+                                            .LastOrDefault() ?? Children.FirstOrDefault();
                 }
             }
         }
@@ -212,8 +242,9 @@ namespace osu.Game.Graphics.Containers
             if (!Children.Any()) return;
 
             var newMargin = originalSectionsMargin;
-            newMargin.Top += headerHeight;
-            newMargin.Bottom += footerHeight;
+
+            newMargin.Top += (headerHeight ?? 0);
+            newMargin.Bottom += (footerHeight ?? 0);
 
             scrollContentContainer.Margin = newMargin;
         }

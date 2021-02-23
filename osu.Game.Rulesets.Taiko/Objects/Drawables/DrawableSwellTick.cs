@@ -1,8 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using JetBrains.Annotations;
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Taiko.Skinning.Default;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
@@ -11,7 +12,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
     {
         public override bool DisplayResult => false;
 
-        public DrawableSwellTick(SwellTick hitObject)
+        public DrawableSwellTick()
+            : this(null)
+        {
+        }
+
+        public DrawableSwellTick([CanBeNull] SwellTick hitObject)
             : base(hitObject)
         {
         }

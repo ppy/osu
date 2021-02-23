@@ -6,6 +6,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Tests.Resources;
@@ -22,9 +23,9 @@ namespace osu.Game.Tests.Visual.Menus
         {
             AddStep("ensure playing something", () => Game.MusicController.EnsurePlayingSomething());
             AddStep("toggle playback", () => globalActionContainer.TriggerPressed(GlobalAction.MusicPlay));
-            AddAssert("music paused", () => !Game.MusicController.IsPlaying && Game.MusicController.IsUserPaused);
+            AddAssert("music paused", () => !Game.MusicController.IsPlaying && Game.MusicController.UserPauseRequested);
             AddStep("toggle playback", () => globalActionContainer.TriggerPressed(GlobalAction.MusicPlay));
-            AddAssert("music resumed", () => Game.MusicController.IsPlaying && !Game.MusicController.IsUserPaused);
+            AddAssert("music resumed", () => Game.MusicController.IsPlaying && !Game.MusicController.UserPauseRequested);
         }
 
         [Test]
@@ -52,7 +53,7 @@ namespace osu.Game.Tests.Visual.Menus
 
             AddStep("import beatmap with track", () =>
             {
-                var setWithTrack = Game.BeatmapManager.Import(TestResources.GetTestBeatmapForImport()).Result;
+                var setWithTrack = Game.BeatmapManager.Import(new ImportTask(TestResources.GetTestBeatmapForImport())).Result;
                 Beatmap.Value = Game.BeatmapManager.GetWorkingBeatmap(setWithTrack.Beatmaps.First());
             });
 

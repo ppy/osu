@@ -16,6 +16,8 @@ namespace osu.Game.Beatmaps.Formats
     public abstract class LegacyDecoder<T> : Decoder<T>
         where T : new()
     {
+        public const int LATEST_VERSION = 14;
+
         protected readonly int FormatVersion;
 
         protected LegacyDecoder(int version)
@@ -162,13 +164,25 @@ namespace osu.Game.Beatmaps.Formats
             /// Legacy BPM multiplier that introduces floating-point errors for rulesets that depend on it.
             /// DO NOT USE THIS UNLESS 100% SURE.
             /// </summary>
-            public readonly float BpmMultiplier;
+            public double BpmMultiplier { get; private set; }
 
             public LegacyDifficultyControlPoint(double beatLength)
+                : this()
+            {
+                // Note: In stable, the division occurs on floats, but with compiler optimisations turned on actually seems to occur on doubles via some .NET black magic (possibly inlining?).
+                BpmMultiplier = beatLength < 0 ? Math.Clamp((float)-beatLength, 10, 10000) / 100.0 : 1;
+            }
+
+            public LegacyDifficultyControlPoint()
             {
                 SpeedMultiplierBindable.Precision = double.Epsilon;
+            }
 
-                BpmMultiplier = beatLength < 0 ? Math.Clamp((float)-beatLength, 10, 10000) / 100f : 1;
+            public override void CopyFrom(ControlPoint other)
+            {
+                base.CopyFrom(other);
+
+                BpmMultiplier = ((LegacyDifficultyControlPoint)other).BpmMultiplier;
             }
         }
 
@@ -180,11 +194,8 @@ namespace osu.Game.Beatmaps.Formats
             {
                 var baseInfo = base.ApplyTo(hitSampleInfo);
 
-                if (baseInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacy
-                    && legacy.CustomSampleBank == 0)
-                {
-                    legacy.CustomSampleBank = CustomSampleBank;
-                }
+                if (baseInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacy && legacy.CustomSampleBank == 0)
+                    return legacy.With(newCustomSampleBank: CustomSampleBank);
 
                 return baseInfo;
             }
@@ -193,6 +204,13 @@ namespace osu.Game.Beatmaps.Formats
                 => base.IsRedundant(existing)
                    && existing is LegacySampleControlPoint existingSample
                    && CustomSampleBank == existingSample.CustomSampleBank;
+
+            public override void CopyFrom(ControlPoint other)
+            {
+                base.CopyFrom(other);
+
+                CustomSampleBank = ((LegacySampleControlPoint)other).CustomSampleBank;
+            }
         }
     }
 }

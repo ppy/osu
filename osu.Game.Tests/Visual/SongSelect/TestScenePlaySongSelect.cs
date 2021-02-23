@@ -98,10 +98,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("select next and enter", () =>
             {
-                InputManager.PressKey(Key.Down);
-                InputManager.ReleaseKey(Key.Down);
-                InputManager.PressKey(Key.Enter);
-                InputManager.ReleaseKey(Key.Enter);
+                InputManager.Key(Key.Down);
+                InputManager.Key(Key.Enter);
             });
 
             AddUntilStep("wait for not current", () => !songSelect.IsCurrentScreen());
@@ -123,10 +121,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("select next and enter", () =>
             {
-                InputManager.PressKey(Key.Enter);
-                InputManager.ReleaseKey(Key.Enter);
-                InputManager.PressKey(Key.Down);
-                InputManager.ReleaseKey(Key.Down);
+                InputManager.Key(Key.Enter);
+                InputManager.Key(Key.Down);
             });
 
             AddUntilStep("wait for not current", () => !songSelect.IsCurrentScreen());
@@ -151,11 +147,9 @@ namespace osu.Game.Tests.Visual.SongSelect
                 InputManager.MoveMouseTo(songSelect.Carousel.ChildrenOfType<DrawableCarouselBeatmap>()
                                                    .First(b => ((CarouselBeatmap)b.Item).Beatmap != songSelect.Carousel.SelectedBeatmap));
 
-                InputManager.PressButton(MouseButton.Left);
-                InputManager.ReleaseButton(MouseButton.Left);
+                InputManager.Click(MouseButton.Left);
 
-                InputManager.PressKey(Key.Enter);
-                InputManager.ReleaseKey(Key.Enter);
+                InputManager.Key(Key.Enter);
             });
 
             AddUntilStep("wait for not current", () => !songSelect.IsCurrentScreen());
@@ -182,8 +176,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 InputManager.PressButton(MouseButton.Left);
 
-                InputManager.PressKey(Key.Enter);
-                InputManager.ReleaseKey(Key.Enter);
+                InputManager.Key(Key.Enter);
 
                 InputManager.ReleaseButton(MouseButton.Left);
             });
@@ -567,10 +560,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("press ctrl+enter", () =>
             {
                 InputManager.PressKey(Key.ControlLeft);
-                InputManager.PressKey(Key.Enter);
-
+                InputManager.Key(Key.Enter);
                 InputManager.ReleaseKey(Key.ControlLeft);
-                InputManager.ReleaseKey(Key.Enter);
             });
 
             AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
@@ -617,8 +608,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 InputManager.MoveMouseTo(difficultyIcon);
 
-                InputManager.PressButton(MouseButton.Left);
-                InputManager.ReleaseButton(MouseButton.Left);
+                InputManager.Click(MouseButton.Left);
             });
 
             AddAssert("Selected beatmap correct", () => getCurrentBeatmapIndex() == getDifficultyIconIndex(set, difficultyIcon));
@@ -647,11 +637,59 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 InputManager.MoveMouseTo(filteredIcon);
 
-                InputManager.PressButton(MouseButton.Left);
-                InputManager.ReleaseButton(MouseButton.Left);
+                InputManager.Click(MouseButton.Left);
             });
 
             AddAssert("Selected beatmap correct", () => songSelect.Carousel.SelectedBeatmap == filteredBeatmap);
+        }
+
+        [Test]
+        public void TestChangingRulesetOnMultiRulesetBeatmap()
+        {
+            int changeCount = 0;
+
+            AddStep("change convert setting", () => config.Set(OsuSetting.ShowConvertedBeatmaps, false));
+            AddStep("bind beatmap changed", () =>
+            {
+                Beatmap.ValueChanged += onChange;
+                changeCount = 0;
+            });
+
+            changeRuleset(0);
+
+            createSongSelect();
+
+            AddStep("import multi-ruleset map", () =>
+            {
+                var usableRulesets = rulesets.AvailableRulesets.Where(r => r.ID != 2).ToArray();
+                manager.Import(createTestBeatmapSet(usableRulesets)).Wait();
+            });
+
+            int previousSetID = 0;
+
+            AddUntilStep("wait for selection", () => !Beatmap.IsDefault);
+
+            AddStep("record set ID", () => previousSetID = Beatmap.Value.BeatmapSetInfo.ID);
+            AddAssert("selection changed once", () => changeCount == 1);
+
+            AddAssert("Check ruleset is osu!", () => Ruleset.Value.ID == 0);
+
+            changeRuleset(3);
+
+            AddUntilStep("Check ruleset changed to mania", () => Ruleset.Value.ID == 3);
+
+            AddUntilStep("selection changed", () => changeCount > 1);
+
+            AddAssert("Selected beatmap still same set", () => Beatmap.Value.BeatmapSetInfo.ID == previousSetID);
+            AddAssert("Selected beatmap is mania", () => Beatmap.Value.BeatmapInfo.Ruleset.ID == 3);
+
+            AddAssert("selection changed only fired twice", () => changeCount == 2);
+
+            AddStep("unbind beatmap changed", () => Beatmap.ValueChanged -= onChange);
+            AddStep("change convert setting", () => config.Set(OsuSetting.ShowConvertedBeatmaps, true));
+
+            // ReSharper disable once AccessToModifiedClosure
+            void onChange(ValueChangedEvent<WorkingBeatmap> valueChangedEvent) => changeCount++;
         }
 
         [Test]
@@ -691,8 +729,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 InputManager.MoveMouseTo(difficultyIcon);
 
-                InputManager.PressButton(MouseButton.Left);
-                InputManager.ReleaseButton(MouseButton.Left);
+                InputManager.Click(MouseButton.Left);
             });
 
             AddUntilStep("Check ruleset changed to mania", () => Ruleset.Value.ID == 3);
@@ -738,8 +775,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 InputManager.MoveMouseTo(groupIcon);
 
-                InputManager.PressButton(MouseButton.Left);
-                InputManager.ReleaseButton(MouseButton.Left);
+                InputManager.Click(MouseButton.Left);
             });
 
             AddUntilStep("Check ruleset changed to mania", () => Ruleset.Value.ID == 3);

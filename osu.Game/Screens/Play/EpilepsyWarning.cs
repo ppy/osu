@@ -2,8 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -18,11 +16,7 @@ namespace osu.Game.Screens.Play
 {
     public class EpilepsyWarning : VisibilityContainer
     {
-        public const double FADE_DURATION = 500;
-
-        private readonly BindableDouble trackVolumeOnEpilepsyWarning = new BindableDouble(1f);
-
-        private Track track;
+        public const double FADE_DURATION = 250;
 
         public EpilepsyWarning()
         {
@@ -30,7 +24,19 @@ namespace osu.Game.Screens.Play
             Alpha = 0f;
         }
 
-        public BackgroundScreenBeatmap DimmableBackground { get; set; }
+        private BackgroundScreenBeatmap dimmableBackground;
+
+        public BackgroundScreenBeatmap DimmableBackground
+        {
+            get => dimmableBackground;
+            set
+            {
+                dimmableBackground = value;
+
+                if (IsLoaded)
+                    updateBackgroundFade();
+            }
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, IBindable<WorkingBeatmap> beatmap)
@@ -77,26 +83,20 @@ namespace osu.Game.Screens.Play
                     }
                 }
             };
-
-            track = beatmap.Value.Track;
-            track.AddAdjustment(AdjustableProperty.Volume, trackVolumeOnEpilepsyWarning);
         }
 
         protected override void PopIn()
         {
-            this.TransformBindableTo(trackVolumeOnEpilepsyWarning, 0.25, FADE_DURATION);
-
-            DimmableBackground?.FadeColour(OsuColour.Gray(0.5f), FADE_DURATION, Easing.OutQuint);
+            updateBackgroundFade();
 
             this.FadeIn(FADE_DURATION, Easing.OutQuint);
         }
 
-        protected override void PopOut() => this.FadeOut(FADE_DURATION);
-
-        protected override void Dispose(bool isDisposing)
+        private void updateBackgroundFade()
         {
-            base.Dispose(isDisposing);
-            track?.RemoveAdjustment(AdjustableProperty.Volume, trackVolumeOnEpilepsyWarning);
+            DimmableBackground?.FadeColour(OsuColour.Gray(0.5f), FADE_DURATION, Easing.OutQuint);
         }
+
+        protected override void PopOut() => this.FadeOut(FADE_DURATION);
     }
 }

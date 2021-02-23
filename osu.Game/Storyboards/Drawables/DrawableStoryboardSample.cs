@@ -37,9 +37,24 @@ namespace osu.Game.Storyboards.Drawables
 
             foreach (var mod in mods.Value.OfType<IApplicableToSample>())
             {
-                foreach (var sample in SamplesContainer)
+                foreach (var sample in DrawableSamples)
                     mod.ApplyToSample(sample);
             }
+        }
+
+        protected override void SamplePlaybackDisabledChanged(ValueChangedEvent<bool> disabled)
+        {
+            if (!RequestedPlaying) return;
+
+            if (!Looping && disabled.NewValue)
+            {
+                // the default behaviour for sample disabling is to allow one-shot samples to play out.
+                // storyboards regularly have long running samples that can cause this behaviour to lead to unintended results.
+                // for this reason, we immediately stop such samples.
+                Stop();
+            }
+
+            base.SamplePlaybackDisabledChanged(disabled);
         }
 
         protected override void Update()

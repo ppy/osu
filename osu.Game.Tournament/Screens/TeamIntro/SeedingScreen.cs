@@ -250,7 +250,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                 };
 
                 foreach (var p in team.Players)
-                    fill.Add(new RowDisplay(p.Username, p.Statistics?.Ranks.Global?.ToString("\\##,0") ?? "-"));
+                    fill.Add(new RowDisplay(p.Username, p.Statistics?.GlobalRank?.ToString("\\##,0") ?? "-"));
             }
 
             internal class RowDisplay : CompositeDrawable
@@ -288,8 +288,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                     AutoSizeAxes = Axes.Both;
 
                     Flag.RelativeSizeAxes = Axes.None;
-                    Flag.Size = new Vector2(300, 200);
-                    Flag.Scale = new Vector2(0.3f);
+                    Flag.Scale = new Vector2(1.2f);
 
                     InternalChild = new FillFlowContainer
                     {

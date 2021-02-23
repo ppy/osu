@@ -1,16 +1,16 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Audio;
 using osu.Framework.IO.Stores;
+using osu.Game.IO;
 using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {
     public class DefaultLegacySkin : LegacySkin
     {
-        public DefaultLegacySkin(IResourceStore<byte[]> storage, AudioManager audioManager)
-            : base(Info, storage, audioManager, string.Empty)
+        public DefaultLegacySkin(IResourceStore<byte[]> storage, IStorageResourceProvider resources)
+            : base(Info, storage, resources, string.Empty)
         {
             Configuration.CustomColours["SliderBall"] = new Color4(2, 170, 255, 255);
             Configuration.AddComboColours(
@@ -25,7 +25,7 @@ namespace osu.Game.Skinning
 
         public static SkinInfo Info { get; } = new SkinInfo
         {
-            ID = -1, // this is temporary until database storage is decided upon.
+            ID = SkinInfo.CLASSIC_SKIN, // this is temporary until database storage is decided upon.
             Name = "osu!classic",
             Creator = "team osu!"
         };

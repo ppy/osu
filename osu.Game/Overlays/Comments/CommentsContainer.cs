@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Comments
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
         public readonly BindableBool ShowDeleted = new BindableBool();
 
-        protected readonly Bindable<User> User = new Bindable<User>();
+        protected readonly IBindable<User> User = new Bindable<User>();
 
         [Resolved]
         private IAPIProvider api { get; set; }

@@ -44,7 +44,7 @@ namespace osu.Game.Graphics
         [Resolved]
         private NotificationOverlay notificationOverlay { get; set; }
 
-        private SampleChannel shutter;
+        private Sample shutter;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, Storage storage, AudioManager audio)
@@ -116,13 +116,13 @@ namespace osu.Game.Graphics
                 switch (screenshotFormat.Value)
                 {
                     case ScreenshotFormat.Png:
-                        image.SaveAsPng(stream);
+                        await image.SaveAsPngAsync(stream);
                         break;
 
                     case ScreenshotFormat.Jpg:
                         const int jpeg_quality = 92;
 
-                        image.SaveAsJpeg(stream, new JpegEncoder { Quality = jpeg_quality });
+                        await image.SaveAsJpegAsync(stream, new JpegEncoder { Quality = jpeg_quality });
                         break;
 
                     default:
