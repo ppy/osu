@@ -37,9 +37,13 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         public override bool HandleMovement(MoveSelectionEvent moveEvent)
         {
-            bool result = moveSelection(moveEvent.InstantDelta);
+            var hitObjects = selectedMovableObjects;
+
+            foreach (var h in hitObjects)
+                h.Position += moveEvent.InstantDelta;
+
             moveSelectionInBounds();
-            return result;
+            return true;
         }
 
         /// <summary>
@@ -244,16 +248,6 @@ namespace osu.Game.Rulesets.Osu.Edit
             result.Y = (quad.TopLeft.Y >= 0) && (quad.BottomRight.Y < DrawHeight);
 
             return result;
-        }
-
-        private bool moveSelection(Vector2 delta)
-        {
-            var hitObjects = selectedMovableObjects;
-
-            foreach (var h in hitObjects)
-                h.Position += delta;
-
-            return true;
         }
 
         private void moveSelectionInBounds()
