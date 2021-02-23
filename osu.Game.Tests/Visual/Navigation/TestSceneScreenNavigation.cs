@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("press enter", () => InputManager.Key(Key.Enter));
             AddUntilStep("wait for player", () => (player = Game.ScreenStack.CurrentScreen as Player) != null);
-            AddStep("seek to end", () => beatmap().Track.Seek(beatmap().Track.Length));
+            AddStep("seek to end", () => player.ChildrenOfType<GameplayClockContainer>().First().Seek(beatmap().Track.Length));
             AddUntilStep("wait for pass", () => (results = Game.ScreenStack.CurrentScreen as ResultsScreen) != null && results.IsLoaded);
             AddStep("attempt to retry", () => results.ChildrenOfType<HotkeyRetryOverlay>().First().Action());
             AddUntilStep("wait for player", () => Game.ScreenStack.CurrentScreen != player && Game.ScreenStack.CurrentScreen is Player);
