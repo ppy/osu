@@ -16,7 +16,6 @@ using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Input.Handlers;
 using osu.Game.Screens.Play;
-using osuTK.Input;
 using static osu.Game.Input.Handlers.ReplayInputHandler;
 
 namespace osu.Game.Rulesets.UI
