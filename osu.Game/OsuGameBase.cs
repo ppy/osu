@@ -206,8 +206,6 @@ namespace osu.Game
             AddFont(Resources, @"Fonts/Torus-SemiBold");
             AddFont(Resources, @"Fonts/Torus-Bold");
 
-            dependencies.Cache(new CustomStore(Storage, this));
-
             AddFont(Resources, @"Fonts/Noto-Basic");
             AddFont(Resources, @"Fonts/Noto-Hangul");
             AddFont(Resources, @"Fonts/Noto-CJK-Basic");
@@ -217,6 +215,8 @@ namespace osu.Game
             AddFont(Resources, @"Fonts/Venera-Light");
             AddFont(Resources, @"Fonts/Venera-Bold");
             AddFont(Resources, @"Fonts/Venera-Black");
+
+            dependencies.Cache(new CustomStore(Storage, this));
 
             Audio.Samples.PlaybackConcurrency = SAMPLE_CONCURRENCY;
 

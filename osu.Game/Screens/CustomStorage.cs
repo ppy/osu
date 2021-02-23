@@ -9,6 +9,7 @@ using M.Resources.Fonts;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Game.Overlays.Settings.Sections.Mf;
 
 namespace osu.Game.Screens
 {
@@ -27,6 +28,23 @@ namespace osu.Game.Screens
             this.gameBase = gameBase;
 
             customStorage = storage.GetStorageForDirectory("custom");
+
+            ActiveFonts.AddRange(new[]
+            {
+                new ExperimentalSettings.FakeFont(),
+                new ExperimentalSettings.FakeFont
+                {
+                    Name = "Noto fonts",
+                    Author = "Google",
+                    Homepage = "https://www.google.com/get/noto/",
+                    FamilyName = "Noto-CJK-Compatibility",
+                    LightAvaliable = false,
+                    MediumAvaliable = false,
+                    SemiBoldAvaliable = false,
+                    BoldAvaliable = false,
+                    BlackAvaliable = false
+                }
+            });
 
             prepareFontLoad();
 
@@ -70,6 +88,12 @@ namespace osu.Game.Screens
                 loadedAssemblies[assembly] = fontType;
 
                 var currentFontInfo = (Font)Activator.CreateInstance(fontType);
+
+                if (ActiveFonts.Any(f => f.FamilyName == currentFontInfo.FamilyName))
+                {
+                    Logger.Log($"将跳过 {assembly.FullName}, 因为已经存在家族名为 {currentFontInfo.FamilyName} 的字体被加载", level: LogLevel.Important);
+                    return;
+                }
 
                 //添加Store
                 gameBase.Resources.AddStore(new DllResourceStore(assembly));

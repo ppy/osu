@@ -32,6 +32,11 @@ namespace osu.Game.Rulesets.Osu.Configuration
             Set(OsuRulesetSetting.SkipStackAngles, true);
             Set(OsuRulesetSetting.BorderBounce, true);
             Set(OsuRulesetSetting.PlayfieldBorderStyle, PlayfieldBorderStyle.None);
+
+            Set(OsuRulesetSetting.SpinnerDance, true);
+            Set(OsuRulesetSetting.SliderDance, true);
+            Set(OsuRulesetSetting.SpinnerRadiusStart, 235f, 10f, 350f, 1f);
+            Set(OsuRulesetSetting.SpinnerRadiusEnd, 15f, 10f, 250f, 1f);
         }
     }
 
@@ -55,5 +60,9 @@ namespace osu.Game.Rulesets.Osu.Configuration
         BorderBounce,
         SkipStackAngles,
         PlayfieldBorderStyle,
+        SpinnerRadiusStart,
+        SpinnerRadiusEnd,
+        SpinnerDance,
+        SliderDance
     }
 }

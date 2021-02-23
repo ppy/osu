@@ -115,27 +115,15 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
             }
 
             var fonts = customStorage.ActiveFonts;
-            fonts.Insert(0, fake_font);
-            fonts.Add(new FakeFont
-            {
-                Name = "Noto fonts",
-                Author = "Google",
-                Homepage = "https://www.google.com/get/noto/",
-                FamilyName = "Noto-CJK-Compatibility"
-            });
 
             dropDown.Items = fonts;
             currentFont.Value = fonts.Find(f => f.FamilyName == mConfig.Get<string>(MSetting.PreferredFont));
             currentFont.BindValueChanged(v => mConfig.Set(MSetting.PreferredFont, v.NewValue.FamilyName));
             dropDown.Current = currentFont;
 
-            //如果字体数>0，则显示已加载的字体
-            if (customStorage.ActiveFonts.Count > 0)
+            foreach (var font in customStorage.ActiveFonts)
             {
-                foreach (var font in customStorage.ActiveFonts)
-                {
-                    textFlow.Add(new FontInfoLabel(font));
-                }
+                textFlow.Add(new FontInfoLabel(font));
             }
 
             mConfig.BindWith(MSetting.CustomWindowIconPath, customWindowIconPath);
