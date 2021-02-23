@@ -216,11 +216,11 @@ namespace osu.Game.Rulesets.Osu.Edit
         private bool scaleHitObjects(OsuHitObject[] hitObjects, Anchor reference, Vector2 scale)
         {
             // move the selection before scaling if dragging from top or left anchors.
-            if ((reference & Anchor.x0) > 0 && !moveSelection(new Vector2(-scale.X, 0))) return false;
-            if ((reference & Anchor.y0) > 0 && !moveSelection(new Vector2(0, -scale.Y))) return false;
+            float xOffset = ((reference & Anchor.x0) > 0) ? -scale.X : 0;
+            float yOffset = ((reference & Anchor.y0) > 0) ? -scale.Y : 0;
 
             Quad selectionQuad = getSurroundingQuad(hitObjects);
-            Quad scaledQuad = new Quad(selectionQuad.TopLeft.X, selectionQuad.TopLeft.Y, selectionQuad.Width + scale.X, selectionQuad.Height + scale.Y);
+            Quad scaledQuad = new Quad(selectionQuad.TopLeft.X + xOffset, selectionQuad.TopLeft.Y + yOffset, selectionQuad.Width + scale.X, selectionQuad.Height + scale.Y);
             (bool xInBounds, bool yInBounds) = isQuadInBounds(scaledQuad);
 
             foreach (var h in hitObjects)
@@ -229,10 +229,10 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                 // guard against no-ops and NaN.
                 if (scale.X != 0 && selectionQuad.Width > 0 && xInBounds)
-                    newPosition.X = selectionQuad.TopLeft.X + (h.X - selectionQuad.TopLeft.X) / selectionQuad.Width * (selectionQuad.Width + scale.X);
+                    newPosition.X = selectionQuad.TopLeft.X + xOffset + (h.X - selectionQuad.TopLeft.X) / selectionQuad.Width * (selectionQuad.Width + scale.X);
 
                 if (scale.Y != 0 && selectionQuad.Height > 0 && yInBounds)
-                    newPosition.Y = selectionQuad.TopLeft.Y + (h.Y - selectionQuad.TopLeft.Y) / selectionQuad.Height * (selectionQuad.Height + scale.Y);
+                    newPosition.Y = selectionQuad.TopLeft.Y + yOffset + (h.Y - selectionQuad.TopLeft.Y) / selectionQuad.Height * (selectionQuad.Height + scale.Y);
 
                 h.Position = newPosition;
             }
