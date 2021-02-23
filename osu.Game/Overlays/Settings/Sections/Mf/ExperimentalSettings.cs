@@ -194,6 +194,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 Author = "Paulo Goode";
                 Homepage = "https://paulogoode.com/torus/";
                 FamilyName = "Torus";
+                Description = "osu.Resources中的字体";
 
                 LightAvaliable = true;
                 SemiBoldAvaliable = true;

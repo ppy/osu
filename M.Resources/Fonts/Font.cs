@@ -5,11 +5,10 @@ namespace M.Resources.Fonts
         #region 基础信息
 
         public string Name = "未知字体";
-        public string Homepage = "主页";
+        public string Description = "未知描述";
+        public string Homepage = "未知主页";
         public string Author = "未知作者";
         public string License = "未知许可证";
-
-        protected int Version => 1;
 
         #endregion
 

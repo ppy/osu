@@ -29,6 +29,7 @@ namespace osu.Game.Graphics.Mf
         private readonly BoolInfoLine semiBold;
         private readonly BoolInfoLine bold;
         private readonly BoolInfoLine black;
+        private readonly BasicInfoLine desc;
 
         public FontInfoTooltip()
         {
@@ -68,6 +69,7 @@ namespace osu.Game.Graphics.Mf
                             Colour = Color4.DarkGray.Opacity(0.3f)
                         },
                         name = new BasicInfoLine("名称"),
+                        desc = new BasicInfoLine("描述"),
                         author = new BasicInfoLine("作者"),
                         homepage = new BasicInfoLine("主页"),
                         license = new BasicInfoLine("许可证"),
@@ -199,6 +201,7 @@ namespace osu.Game.Graphics.Mf
             if (!(content is Font font)) return false;
 
             name.Value = font.Name;
+            desc.Value = font.Description;
             author.Value = font.Author;
             homepage.Value = font.Homepage;
             license.Value = font.License;
