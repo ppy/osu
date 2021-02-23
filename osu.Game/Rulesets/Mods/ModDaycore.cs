@@ -5,6 +5,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Configuration;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -14,6 +15,12 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "DC";
         public override IconUsage? Icon => null;
         public override string Description => "Whoaaaaa...";
+
+        [SettingSource("Adjust pitch", "Should pitch be adjusted with speed", 1)]
+        public override BindableBool AdjustPitch { get; } = new BindableBool
+        {
+            Disabled = true
+        };
 
         private readonly BindableNumber<double> tempoAdjust = new BindableDouble(1);
         private readonly BindableNumber<double> freqAdjust = new BindableDouble(1);

@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModDoubleTime)).ToArray();
 
-        [SettingSource("Speed decrease", "The actual decrease to apply")]
+        [SettingSource("Speed decrease", "The actual decrease to apply", 0)]
         public override BindableNumber<double> SpeedChange { get; } = new BindableDouble
         {
             MinValue = 0.5,
@@ -30,5 +30,8 @@ namespace osu.Game.Rulesets.Mods
             Value = 0.75,
             Precision = 0.01,
         };
+
+        [SettingSource("Adjust pitch", "Should pitch be adjusted with speed", 1)]
+        public override BindableBool AdjustPitch { get; } = new BindableBool();
     }
 }

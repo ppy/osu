@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Objects;
@@ -24,6 +25,12 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "NC";
         public override IconUsage? Icon => OsuIcon.ModNightcore;
         public override string Description => "Uguuuuuuuu...";
+
+        [SettingSource("Adjust pitch", "Should pitch be adjusted with speed", 1)]
+        public override BindableBool AdjustPitch { get; } = new BindableBool
+        {
+            Disabled = true
+        };
     }
 
     public abstract class ModNightcore<TObject> : ModNightcore, IApplicableToDrawableRuleset<TObject>
