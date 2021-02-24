@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Mods
             FinalRate.BindValueChanged(val =>
             {
                 if (val.NewValue <= InitialRate.Value)
-                    InitialRate.Value = val.NewValue - FinalRate.Precision;
+                    InitialRate.Value = val.NewValue - InitialRate.Precision;
             });
         }
     }
