@@ -13,7 +13,7 @@ namespace osu.Game.Tests.Resources
 
         public static Stream OpenResource(string name) => GetStore().GetStream($"Resources/{name}");
 
-        public static Stream GetTestBeatmapStream(bool virtualTrack = false, bool quick = false) => OpenResource($"Archives/241526 Soleily - Renatus{(virtualTrack ? "_virtual" : "")}{(quick ? "_quick" : "")}.osz");
+        public static Stream GetTestBeatmapStream(bool virtualTrack = false) => OpenResource($"Archives/241526 Soleily - Renatus{(virtualTrack ? "_virtual" : "")}.osz");
 
         /// <summary>
         /// Retrieve a path to a copy of a shortened (~10 second) beatmap archive with a virtual track.
@@ -24,8 +24,7 @@ namespace osu.Game.Tests.Resources
         public static string GetQuickTestBeatmapForImport()
         {
             var tempPath = Path.GetTempFileName() + ".osz";
-
-            using (var stream = GetTestBeatmapStream(true, true))
+            using (var stream = OpenResource($"Archives/241526 Soleily - Renatus_virtual_quick.osz"))
             using (var newFile = File.Create(tempPath))
                 stream.CopyTo(newFile);
 
