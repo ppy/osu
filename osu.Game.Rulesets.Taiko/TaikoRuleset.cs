@@ -127,6 +127,7 @@ namespace osu.Game.Rulesets.Taiko
                         new MultiMod(new TaikoModDoubleTime(), new TaikoModNightcore()),
                         new TaikoModHidden(),
                         new TaikoModFlashlight(),
+                        new TaikoModAlternate(),
                     };
 
                 case ModType.Conversion:
@@ -146,7 +147,7 @@ namespace osu.Game.Rulesets.Taiko
                 case ModType.Fun:
                     return new Mod[]
                     {
-                        new MultiMod(new ModWindUp(), new ModWindDown())
+                        new MultiMod(new ModWindUp(), new ModWindDown()),
                     };
 
                 default:
