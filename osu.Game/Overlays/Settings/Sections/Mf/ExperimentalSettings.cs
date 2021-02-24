@@ -136,7 +136,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
 
             private class FontDropdownControl : DropdownControl
             {
-                protected override string GenerateItemText(Font font) => $"{font.Author} - {font.Name}({font.FamilyName})";
+                protected override string GenerateItemText(Font font) => $"{font.Name}({font.FamilyName})";
             }
         }
 

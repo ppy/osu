@@ -47,13 +47,6 @@ namespace osu.Game.Screens
             });
 
             prepareFontLoad();
-
-            var instances = loadedAssemblies.Values.Select(r => (Font)Activator.CreateInstance(r)).ToList();
-
-            foreach (var f in instances)
-            {
-                ActiveFonts.Add(f);
-            }
         }
 
         private void prepareFontLoad()
@@ -115,6 +108,8 @@ namespace osu.Game.Screens
 
                 if (currentFontInfo.BlackAvaliable)
                     gameBase.AddFont(gameBase.Resources, $"Fonts/{currentFontInfo.FamilyName}-Black");
+
+                ActiveFonts.Add(currentFontInfo);
 
                 //设置CustomFontLoaded
                 CustomFontLoaded = true;
