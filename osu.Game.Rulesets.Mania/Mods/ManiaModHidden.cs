@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using osu.Game.Rulesets.Mania.UI;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
@@ -12,5 +13,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override double ScoreMultiplier => 1;
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ManiaModFadeIn)).ToArray();
+
+        protected override CoverExpandDirection ExpandDirection => CoverExpandDirection.AgainstScroll;
     }
 }

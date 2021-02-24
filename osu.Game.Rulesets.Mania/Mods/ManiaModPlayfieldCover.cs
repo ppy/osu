@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         /// <summary>
         /// The direction in which the cover should expand.
         /// </summary>
-        protected virtual CoverExpandDirection ExpandDirection => CoverExpandDirection.AgainstScroll;
+        protected abstract CoverExpandDirection ExpandDirection { get; }
 
         public virtual void ApplyToDrawableRuleset(DrawableRuleset<ManiaHitObject> drawableRuleset)
         {
