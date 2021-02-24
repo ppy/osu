@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Mods
 
         public bool RestartOnFail => false;
 
-        public override Type[] IncompatibleMods => new[] { typeof(ModRelax), typeof(ModSuddenDeath), typeof(ModNoFail) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModRelax), typeof(ModFailCondition), typeof(ModNoFail) };
 
         public override bool HasImplementation => GetType().GenericTypeArguments.Length == 0;
 
