@@ -179,11 +179,6 @@ namespace osu.Game.Screens.Menu
                 {
                     Text = "Multiplayer is temporarily unavailable on iOS as we figure out some low level issues.",
                     Icon = FontAwesome.Solid.AppleAlt,
-                    Activated = () =>
-                    {
-                        loginOverlay?.Show();
-                        return true;
-                    }
                 });
 
                 return;
