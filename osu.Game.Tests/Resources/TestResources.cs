@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Resources
         public static string GetQuickTestBeatmapForImport()
         {
             var tempPath = Path.GetTempFileName() + ".osz";
-            using (var stream = OpenResource($"Archives/241526 Soleily - Renatus_virtual_quick.osz"))
+            using (var stream = OpenResource("Archives/241526 Soleily - Renatus_virtual_quick.osz"))
             using (var newFile = File.Create(tempPath))
                 stream.CopyTo(newFile);
 
