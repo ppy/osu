@@ -172,6 +172,23 @@ namespace osu.Game.Screens.Menu
                 return;
             }
 
+            // disabled until the underlying runtime issue is resolved, see https://github.com/mono/mono/issues/20805.
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.iOS)
+            {
+                notifications?.Post(new SimpleNotification
+                {
+                    Text = "Multiplayer is temporarily unavailable on iOS as we figure out some low level issues.",
+                    Icon = FontAwesome.Solid.AppleAlt,
+                    Activated = () =>
+                    {
+                        loginOverlay?.Show();
+                        return true;
+                    }
+                });
+
+                return;
+            }
+
             OnMultiplayer?.Invoke();
         }
 
