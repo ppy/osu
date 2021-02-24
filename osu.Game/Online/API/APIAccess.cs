@@ -381,7 +381,13 @@ namespace osu.Game.Online.API
 
         public void Queue(APIRequest request)
         {
-            lock (queue) queue.Enqueue(request);
+            lock (queue)
+            {
+                if (state.Value == APIState.Offline)
+                    return;
+
+                queue.Enqueue(request);
+            }
         }
 
         private void flushQueue(bool failOldRequests = true)
@@ -402,8 +408,6 @@ namespace osu.Game.Online.API
 
         public void Logout()
         {
-            flushQueue();
-
             password = null;
             authentication.Clear();
 
@@ -415,6 +419,7 @@ namespace osu.Game.Online.API
             });
 
             state.Value = APIState.Offline;
+            flushQueue();
         }
 
         private static User createGuestUser() => new GuestUser();
