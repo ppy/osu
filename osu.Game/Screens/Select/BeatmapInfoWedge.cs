@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using JetBrains.Annotations;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
@@ -39,8 +38,11 @@ namespace osu.Game.Screens.Select
 
         private static readonly Vector2 wedged_container_shear = new Vector2(shear_width / SongSelect.WEDGE_HEIGHT, 0);
 
-        private readonly IBindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
-        private readonly IBindable<IReadOnlyList<Mod>> mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; }
+
+        [Resolved]
+        private IBindable<IReadOnlyList<Mod>> mods { get; set; }
 
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; }
@@ -65,13 +67,10 @@ namespace osu.Game.Screens.Select
             };
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load([CanBeNull] Bindable<RulesetInfo> parentRuleset, [CanBeNull] Bindable<IReadOnlyList<Mod>> parentMods)
+        protected override void LoadComplete()
         {
-            ruleset.BindTo(parentRuleset);
-            mods.BindTo(parentMods);
-
-            ruleset.ValueChanged += _ => updateDisplay();
+            base.LoadComplete();
+            ruleset.BindValueChanged(_ => updateDisplay(), true);
         }
 
         protected override void PopIn()
