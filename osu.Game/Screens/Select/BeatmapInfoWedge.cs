@@ -383,10 +383,18 @@ namespace osu.Game.Screens.Select
                 return labels.ToArray();
             }
 
+            [Resolved]
+            private IBindable<IReadOnlyList<Mod>> mods { get; set; }
+
             private string getBPMRange(IBeatmap beatmap)
             {
-                double bpmMax = beatmap.ControlPointInfo.BPMMaximum;
-                double bpmMin = beatmap.ControlPointInfo.BPMMinimum;
+                // this doesn't consider mods which apply variable rates, yet.
+                double rate = 1;
+                foreach (var mod in mods.Value.OfType<IApplicableToRate>())
+                    rate = mod.ApplyToRate(0, rate);
+
+                double bpmMax = beatmap.ControlPointInfo.BPMMaximum * rate;
+                double bpmMin = beatmap.ControlPointInfo.BPMMinimum * rate;
 
                 if (Precision.AlmostEquals(bpmMin, bpmMax))
                     return $"{bpmMin:0}";
