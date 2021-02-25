@@ -67,10 +67,10 @@ namespace osu.Game.Screens.Select
             };
         }
 
-        protected override void LoadComplete()
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            base.LoadComplete();
-            ruleset.BindValueChanged(_ => updateDisplay(), true);
+            ruleset.BindValueChanged(_ => updateDisplay());
         }
 
         protected override void PopIn()
