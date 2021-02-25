@@ -296,7 +296,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             }
 
             private void onPlaylistChanged(object sender, NotifyCollectionChangedEventArgs e) =>
-                playlistLength.Text = new LocalisedString("screen.multi.playlistSettings.length", Playlist.GetTotalDuration());
+                playlistLength.Text = $"时长: {Playlist.GetTotalDuration()}";
 
             private bool hasValidSettings => RoomID.Value == null && NameField.Text.Length > 0 && Playlist.Count > 0;
 

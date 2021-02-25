@@ -130,7 +130,7 @@ namespace osu.Game.Screens.Mvis.Objects
             {
                 base.LoadComplete();
 
-                title = localisation.GetLocalisedString(new LocalisedString((beatmap.Metadata.TitleUnicode, beatmap.Metadata.Title)));
+                title = localisation.GetLocalisedString(new RomanisableString(beatmap.Metadata.TitleUnicode, beatmap.Metadata.Title));
                 title.BindValueChanged(v =>
                 {
                     titleText.Text = getShortTitle(v.NewValue);
@@ -161,17 +161,15 @@ namespace osu.Game.Screens.Mvis.Objects
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Font = OsuFont.GetFont(size: 26, weight: FontWeight.SemiBold),
-                            Text = new LocalisedString((beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist)),
-                            Shadow = false,
-                            UseLegacyUnicode = true
+                            Text = new RomanisableString(beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist),
+                            Shadow = false
                         },
                         titleText = new OsuSpriteText
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Font = OsuFont.GetFont(size: 20, weight: FontWeight.SemiBold),
-                            Shadow = false,
-                            UseLegacyUnicode = true
+                            Shadow = false
                         }
                     }
                 }.WithEffect(new BlurEffect

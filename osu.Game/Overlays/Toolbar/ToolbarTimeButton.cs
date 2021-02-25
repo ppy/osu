@@ -8,7 +8,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
-using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 
 namespace osu.Game.Overlays.Toolbar
@@ -57,13 +56,13 @@ namespace osu.Game.Overlays.Toolbar
 
             tooltipMainArg += $"{xE.Minutes:00}:{xE.Seconds:00}";
 
-            TooltipMain = new LocalisedString("osu!已经运行了 {0}。", tooltipMainArg);
+            TooltipMain = $"osu!已经运行了 {tooltipMainArg}。";
 
             this.Delay(500).Schedule(updateTime);
         }
 
         private void updateBeatmapTooltip() =>
-            TooltipSub = new LocalisedString("你共有{0}张谱面!", beatmapManager.QueryBeatmapsMinimal(_ => true).ToList().Count);
+            TooltipSub = $"你共有{beatmapManager.QueryBeatmapsMinimal(_ => true).ToList().Count}张谱面!";
 
         protected override bool OnClick(ClickEvent e)
         {

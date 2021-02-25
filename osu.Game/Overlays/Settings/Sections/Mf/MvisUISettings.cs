@@ -6,7 +6,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Mvis;
@@ -214,7 +213,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 l3.Colour = provider.Light3;
                 c2.Colour = provider.Content2;
 
-                hueText.Text = new LocalisedString("settings.mvis.ui.hue", (provider.HueColour.Value * 360).ToString("#0.00"));
+                hueText.Text = $"Hue: {(provider.HueColour.Value * 360):#0.00}";
             }
         }
     }

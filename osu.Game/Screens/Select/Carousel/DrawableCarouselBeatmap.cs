@@ -132,8 +132,7 @@ namespace osu.Game.Screens.Select.Carousel
                                             Text = beatmap.Version,
                                             Font = OsuFont.GetFont(size: 20),
                                             Anchor = Anchor.BottomLeft,
-                                            Origin = Anchor.BottomLeft,
-                                            UseLegacyUnicode = true
+                                            Origin = Anchor.BottomLeft
                                         },
                                         new OsuSpriteText
                                         {
@@ -146,8 +145,7 @@ namespace osu.Game.Screens.Select.Carousel
                                             Text = $"{(beatmap.Metadata ?? beatmap.BeatmapSet.Metadata).Author.Username}",
                                             Font = OsuFont.GetFont(italics: true),
                                             Anchor = Anchor.BottomLeft,
-                                            Origin = Anchor.BottomLeft,
-                                            UseLegacyUnicode = true
+                                            Origin = Anchor.BottomLeft
                                         },
                                     }
                                 },

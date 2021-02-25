@@ -246,8 +246,7 @@ namespace osu.Game.Screens.Select
                                 Text = beatmapInfo.Version,
                                 Font = OsuFont.GetFont(size: 24, italics: true),
                                 RelativeSizeAxes = Axes.X,
-                                Truncate = true,
-                                UseLegacyUnicode = true
+                                Truncate = true
                             },
                         }
                     },
@@ -295,15 +294,13 @@ namespace osu.Game.Screens.Select
                             {
                                 Font = OsuFont.GetFont(size: 28, italics: true),
                                 RelativeSizeAxes = Axes.X,
-                                Truncate = true,
-                                UseLegacyUnicode = true
+                                Truncate = true
                             },
                             ArtistLabel = new OsuSpriteText
                             {
                                 Font = OsuFont.GetFont(size: 17, italics: true),
                                 RelativeSizeAxes = Axes.X,
-                                Truncate = true,
-                                UseLegacyUnicode = true
+                                Truncate = true
                             },
                             MapperContainer = new FillFlowContainer
                             {

@@ -164,7 +164,6 @@ namespace osu.Game.Graphics
                                 },
                                 spriteText = new OsuSpriteText
                                 {
-                                    UseLegacyUnicode = true,
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                     Margin = new MarginPadding { Vertical = 5 },

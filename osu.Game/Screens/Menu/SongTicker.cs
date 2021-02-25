@@ -38,15 +38,13 @@ namespace osu.Game.Screens.Menu
                     {
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
-                        Font = OsuFont.GetFont(size: 24, weight: FontWeight.Light, italics: true),
-                        UseLegacyUnicode = true
+                        Font = OsuFont.GetFont(size: 24, weight: FontWeight.Light, italics: true)
                     },
                     artist = new OsuSpriteText
                     {
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
-                        Font = OsuFont.GetFont(size: 16),
-                        UseLegacyUnicode = true
+                        Font = OsuFont.GetFont(size: 16)
                     }
                 }
             };

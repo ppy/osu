@@ -96,8 +96,7 @@ namespace osu.Game.Overlays.Chat
                 Font = OsuFont.GetFont(size: TextSize, weight: FontWeight.Bold, italics: true),
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-                MaxWidth = MessagePadding - TimestampPadding,
-                UseLegacyUnicode = true
+                MaxWidth = MessagePadding - TimestampPadding
             };
 
             if (hasBackground)
@@ -173,7 +172,6 @@ namespace osu.Game.Overlays.Chat
                         ContentFlow = new LinkFlowContainer(t =>
                         {
                             t.Shadow = false;
-                            t.UseLegacyUnicode = true;
 
                             if (Message.IsAction)
                             {

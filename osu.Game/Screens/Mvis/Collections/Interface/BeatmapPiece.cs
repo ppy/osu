@@ -134,16 +134,14 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
                                 Text = Beatmap.Metadata.TitleUnicode ?? Beatmap.Metadata.Title,
                                 Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 20),
                                 RelativeSizeAxes = Axes.X,
-                                Truncate = true,
-                                UseLegacyUnicode = true
+                                Truncate = true
                             },
                             new OsuSpriteText
                             {
                                 Text = Beatmap.Metadata.ArtistUnicode ?? Beatmap.Metadata.Artist,
                                 Font = OsuFont.GetFont(weight: FontWeight.Bold),
                                 RelativeSizeAxes = Axes.X,
-                                Truncate = true,
-                                UseLegacyUnicode = true
+                                Truncate = true
                             }
                         }
                     },

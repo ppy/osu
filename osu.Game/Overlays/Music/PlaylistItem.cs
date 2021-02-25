@@ -82,7 +82,6 @@ namespace osu.Game.Overlays.Music
             titleSprites = text.AddText(title.Value + @"  ", sprite =>
             {
                 sprite.Font = OsuFont.GetFont(size: 18, weight: FontWeight.Regular);
-                sprite.UseLegacyUnicode = true;
             }).OfType<SpriteText>();
 
             text.AddText(artist.Value, sprite =>
@@ -90,7 +89,6 @@ namespace osu.Game.Overlays.Music
                 sprite.Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold);
                 sprite.Colour = artistColour;
                 sprite.Padding = new MarginPadding { Top = 1 };
-                sprite.UseLegacyUnicode = true;
             });
         }
 

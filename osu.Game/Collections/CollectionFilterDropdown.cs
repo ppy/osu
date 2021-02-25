@@ -151,7 +151,6 @@ namespace osu.Game.Collections
                 Height = 25;
                 Icon.Size = new Vector2(16);
                 Foreground.Padding = new MarginPadding { Top = 4, Bottom = 4, Left = 8, Right = 4 };
-                Text.UseLegacyUnicode = true;
             }
 
             protected override void LoadComplete()
@@ -293,7 +292,6 @@ namespace osu.Game.Collections
             protected override Drawable CreateContent()
             {
                 content = (Content)base.CreateContent();
-                content.Label.UseLegacyUnicode = true;
                 return content;
             }
         }

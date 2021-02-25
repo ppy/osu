@@ -141,11 +141,7 @@ namespace osu.Game.Collections
             var collections = readCollections(stream, notification);
             await importCollections(collections);
 
-<<<<<<< HEAD
-            notification.CompletionText = $"已导入 {collection.Count} 个收藏夹";
-=======
             notification.CompletionText = $"已导入 {collections.Count} 个收藏夹";
->>>>>>> upstream/master
             notification.State = ProgressNotificationState.Completed;
         }
 

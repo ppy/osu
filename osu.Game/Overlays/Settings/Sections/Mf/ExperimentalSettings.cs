@@ -5,6 +5,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Mf;
@@ -136,7 +137,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
 
             private class FontDropdownControl : DropdownControl
             {
-                protected override string GenerateItemText(Font font) => $"{font.Name}({font.FamilyName})";
+                protected override LocalisableString GenerateItemText(Font font) => $"{font.Name}({font.FamilyName})";
             }
         }
 
