@@ -395,11 +395,12 @@ namespace osu.Game.Screens.Select
 
                 double bpmMax = beatmap.ControlPointInfo.BPMMaximum * rate;
                 double bpmMin = beatmap.ControlPointInfo.BPMMinimum * rate;
+                double mostCommonBPM = 60000 / beatmap.GetMostCommonBeatLength() * rate;
 
                 if (Precision.AlmostEquals(bpmMin, bpmMax))
                     return $"{bpmMin:0}";
 
-                return $"{bpmMin:0}-{bpmMax:0} (mostly {60000 / beatmap.GetMostCommonBeatLength():0})";
+                return $"{bpmMin:0}-{bpmMax:0} (mostly {mostCommonBPM:0})";
             }
 
             private OsuSpriteText[] getMapper(BeatmapMetadata metadata)
