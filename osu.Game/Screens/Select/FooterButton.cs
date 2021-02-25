@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Select
 
         public LocalisableString Text
         {
-            get => SpriteText.Text;
+            get => SpriteText?.Text ?? default;
             set
             {
                 if (SpriteText != null)
