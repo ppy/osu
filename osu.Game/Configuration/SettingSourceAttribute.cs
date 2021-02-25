@@ -8,6 +8,7 @@ using System.Reflection;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Configuration
@@ -24,7 +25,7 @@ namespace osu.Game.Configuration
     [AttributeUsage(AttributeTargets.Property)]
     public class SettingSourceAttribute : Attribute
     {
-        public string Label { get; }
+        public LocalisableString Label { get; }
 
         public string Description { get; }
 

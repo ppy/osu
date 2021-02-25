@@ -10,6 +10,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -362,7 +363,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 Menu.MaxHeight = 100;
             }
 
-            protected override string GenerateItemText(TimeSpan item) => item.Humanize();
+            protected override LocalisableString GenerateItemText(TimeSpan item) => item.Humanize();
         }
     }
 }
