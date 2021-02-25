@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions.EnumExtensions;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -24,11 +25,11 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 direction = value;
-                base.Direction = direction.HasFlag(BarDirection.Horizontal) ? FillDirection.Vertical : FillDirection.Horizontal;
+                base.Direction = direction.HasFlagFast(BarDirection.Horizontal) ? FillDirection.Vertical : FillDirection.Horizontal;
 
                 foreach (var bar in Children)
                 {
-                    bar.Size = direction.HasFlag(BarDirection.Horizontal) ? new Vector2(1, 1.0f / Children.Count) : new Vector2(1.0f / Children.Count, 1);
+                    bar.Size = direction.HasFlagFast(BarDirection.Horizontal) ? new Vector2(1, 1.0f / Children.Count) : new Vector2(1.0f / Children.Count, 1);
                     bar.Direction = direction;
                 }
             }
@@ -56,14 +57,14 @@ namespace osu.Game.Graphics.UserInterface
                     if (bar.Bar != null)
                     {
                         bar.Bar.Length = length;
-                        bar.Bar.Size = direction.HasFlag(BarDirection.Horizontal) ? new Vector2(1, size) : new Vector2(size, 1);
+                        bar.Bar.Size = direction.HasFlagFast(BarDirection.Horizontal) ? new Vector2(1, size) : new Vector2(size, 1);
                     }
                     else
                     {
                         Add(new Bar
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Size = direction.HasFlag(BarDirection.Horizontal) ? new Vector2(1, size) : new Vector2(size, 1),
+                            Size = direction.HasFlagFast(BarDirection.Horizontal) ? new Vector2(1, size) : new Vector2(size, 1),
                             Length = length,
                             Direction = Direction,
                         });

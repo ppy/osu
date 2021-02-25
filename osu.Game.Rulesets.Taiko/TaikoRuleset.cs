@@ -22,6 +22,7 @@ using osu.Game.Rulesets.Taiko.Scoring;
 using osu.Game.Scoring;
 using System;
 using System.Linq;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Taiko.Edit;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -57,43 +58,43 @@ namespace osu.Game.Rulesets.Taiko
 
         public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
         {
-            if (mods.HasFlag(LegacyMods.Nightcore))
+            if (mods.HasFlagFast(LegacyMods.Nightcore))
                 yield return new TaikoModNightcore();
-            else if (mods.HasFlag(LegacyMods.DoubleTime))
+            else if (mods.HasFlagFast(LegacyMods.DoubleTime))
                 yield return new TaikoModDoubleTime();
 
-            if (mods.HasFlag(LegacyMods.Perfect))
+            if (mods.HasFlagFast(LegacyMods.Perfect))
                 yield return new TaikoModPerfect();
-            else if (mods.HasFlag(LegacyMods.SuddenDeath))
+            else if (mods.HasFlagFast(LegacyMods.SuddenDeath))
                 yield return new TaikoModSuddenDeath();
 
-            if (mods.HasFlag(LegacyMods.Cinema))
+            if (mods.HasFlagFast(LegacyMods.Cinema))
                 yield return new TaikoModCinema();
-            else if (mods.HasFlag(LegacyMods.Autoplay))
+            else if (mods.HasFlagFast(LegacyMods.Autoplay))
                 yield return new TaikoModAutoplay();
 
-            if (mods.HasFlag(LegacyMods.Easy))
+            if (mods.HasFlagFast(LegacyMods.Easy))
                 yield return new TaikoModEasy();
 
-            if (mods.HasFlag(LegacyMods.Flashlight))
+            if (mods.HasFlagFast(LegacyMods.Flashlight))
                 yield return new TaikoModFlashlight();
 
-            if (mods.HasFlag(LegacyMods.HalfTime))
+            if (mods.HasFlagFast(LegacyMods.HalfTime))
                 yield return new TaikoModHalfTime();
 
-            if (mods.HasFlag(LegacyMods.HardRock))
+            if (mods.HasFlagFast(LegacyMods.HardRock))
                 yield return new TaikoModHardRock();
 
-            if (mods.HasFlag(LegacyMods.Hidden))
+            if (mods.HasFlagFast(LegacyMods.Hidden))
                 yield return new TaikoModHidden();
 
-            if (mods.HasFlag(LegacyMods.NoFail))
+            if (mods.HasFlagFast(LegacyMods.NoFail))
                 yield return new TaikoModNoFail();
 
-            if (mods.HasFlag(LegacyMods.Relax))
+            if (mods.HasFlagFast(LegacyMods.Relax))
                 yield return new TaikoModRelax();
 
-            if (mods.HasFlag(LegacyMods.Random))
+            if (mods.HasFlagFast(LegacyMods.Random))
                 yield return new TaikoModRandom();
         }
 

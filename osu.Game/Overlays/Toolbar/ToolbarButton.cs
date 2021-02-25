@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Caching;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
@@ -127,9 +128,9 @@ namespace osu.Game.Overlays.Toolbar
                 {
                     Direction = FillDirection.Vertical,
                     RelativeSizeAxes = Axes.Both, // stops us being considered in parent's autosize
-                    Anchor = TooltipAnchor.HasFlag(Anchor.x0) ? Anchor.BottomLeft : Anchor.BottomRight,
+                    Anchor = TooltipAnchor.HasFlagFast(Anchor.x0) ? Anchor.BottomLeft : Anchor.BottomRight,
                     Origin = TooltipAnchor,
-                    Position = new Vector2(TooltipAnchor.HasFlag(Anchor.x0) ? 5 : -5, 5),
+                    Position = new Vector2(TooltipAnchor.HasFlagFast(Anchor.x0) ? 5 : -5, 5),
                     Alpha = 0,
                     Children = new Drawable[]
                     {
