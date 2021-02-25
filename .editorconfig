@@ -195,3 +195,6 @@ dotnet_diagnostic.IDE0069.severity = none
 
 #Disable operator overloads requiring alternate named methods
 dotnet_diagnostic.CA2225.severity = none
+
+# Banned APIs
+dotnet_diagnostic.RS0030.severity = error
