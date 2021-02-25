@@ -70,7 +70,7 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to get the difficulty of.</param>
         /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> which stops updating the star difficulty for the given <see cref="BeatmapInfo"/>.</param>
         /// <returns>A bindable that is updated to contain the star difficulty when it becomes available.</returns>
-        public IBindable<StarDifficulty> GetBindableDifficulty([NotNull] BeatmapInfo beatmapInfo, CancellationToken cancellationToken = default)
+        public IBindable<StarDifficulty?> GetBindableDifficulty([NotNull] BeatmapInfo beatmapInfo, CancellationToken cancellationToken = default)
         {
             var bindable = createBindable(beatmapInfo, currentRuleset.Value, currentMods.Value, cancellationToken);
 
@@ -91,8 +91,8 @@ namespace osu.Game.Beatmaps
         /// <param name="mods">The <see cref="Mod"/>s to get the difficulty with. If <c>null</c>, no mods will be assumed.</param>
         /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> which stops updating the star difficulty for the given <see cref="BeatmapInfo"/>.</param>
         /// <returns>A bindable that is updated to contain the star difficulty when it becomes available.</returns>
-        public IBindable<StarDifficulty> GetBindableDifficulty([NotNull] BeatmapInfo beatmapInfo, [CanBeNull] RulesetInfo rulesetInfo, [CanBeNull] IEnumerable<Mod> mods,
-                                                               CancellationToken cancellationToken = default)
+        public IBindable<StarDifficulty?> GetBindableDifficulty([NotNull] BeatmapInfo beatmapInfo, [CanBeNull] RulesetInfo rulesetInfo, [CanBeNull] IEnumerable<Mod> mods,
+                                                                CancellationToken cancellationToken = default)
             => createBindable(beatmapInfo, rulesetInfo, mods, cancellationToken);
 
         /// <summary>
@@ -313,7 +313,7 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        private class BindableStarDifficulty : Bindable<StarDifficulty>
+        private class BindableStarDifficulty : Bindable<StarDifficulty?>
         {
             public readonly BeatmapInfo Beatmap;
             public readonly CancellationToken CancellationToken;

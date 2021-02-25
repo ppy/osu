@@ -151,7 +151,7 @@ namespace osu.Game.Beatmaps.Drawables
                 this.mods = mods;
             }
 
-            private IBindable<StarDifficulty> localStarDifficulty;
+            private IBindable<StarDifficulty?> localStarDifficulty;
 
             [BackgroundDependencyLoader]
             private void load()
@@ -160,7 +160,11 @@ namespace osu.Game.Beatmaps.Drawables
                 localStarDifficulty = ruleset != null
                     ? difficultyCache.GetBindableDifficulty(beatmap, ruleset, mods, difficultyCancellation.Token)
                     : difficultyCache.GetBindableDifficulty(beatmap, difficultyCancellation.Token);
-                localStarDifficulty.BindValueChanged(difficulty => StarDifficulty.Value = difficulty.NewValue);
+                localStarDifficulty.BindValueChanged(d =>
+                {
+                    if (d.NewValue is StarDifficulty diff)
+                        StarDifficulty.Value = diff;
+                });
             }
 
             protected override void Dispose(bool isDisposing)

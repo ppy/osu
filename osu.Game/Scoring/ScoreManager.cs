@@ -137,7 +137,7 @@ namespace osu.Game.Scoring
                 ScoringMode.BindValueChanged(onScoringModeChanged, true);
             }
 
-            private IBindable<StarDifficulty> difficultyBindable;
+            private IBindable<StarDifficulty?> difficultyBindable;
             private CancellationTokenSource difficultyCancellationSource;
 
             private void onScoringModeChanged(ValueChangedEvent<ScoringMode> mode)
@@ -168,7 +168,11 @@ namespace osu.Game.Scoring
 
                         // We can compute the max combo locally after the async beatmap difficulty computation.
                         difficultyBindable = difficulties().GetBindableDifficulty(score.Beatmap, score.Ruleset, score.Mods, (difficultyCancellationSource = new CancellationTokenSource()).Token);
-                        difficultyBindable.BindValueChanged(d => updateScore(d.NewValue.MaxCombo), true);
+                        difficultyBindable.BindValueChanged(d =>
+                        {
+                            if (d.NewValue is StarDifficulty diff)
+                                updateScore(diff.MaxCombo);
+                        }, true);
 
                         return;
                     }
