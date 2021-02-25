@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.MathUtils;
@@ -141,7 +142,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             if (ConversionDifficulty > 6.5)
             {
-                if (convertType.HasFlag(PatternType.LowProbability))
+                if (convertType.HasFlagFast(PatternType.LowProbability))
                     return generateNRandomNotes(StartTime, 0.78, 0.3, 0);
 
                 return generateNRandomNotes(StartTime, 0.85, 0.36, 0.03);
@@ -149,7 +150,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             if (ConversionDifficulty > 4)
             {
-                if (convertType.HasFlag(PatternType.LowProbability))
+                if (convertType.HasFlagFast(PatternType.LowProbability))
                     return generateNRandomNotes(StartTime, 0.43, 0.08, 0);
 
                 return generateNRandomNotes(StartTime, 0.56, 0.18, 0);
@@ -157,13 +158,13 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             if (ConversionDifficulty > 2.5)
             {
-                if (convertType.HasFlag(PatternType.LowProbability))
+                if (convertType.HasFlagFast(PatternType.LowProbability))
                     return generateNRandomNotes(StartTime, 0.3, 0, 0);
 
                 return generateNRandomNotes(StartTime, 0.37, 0.08, 0);
             }
 
-            if (convertType.HasFlag(PatternType.LowProbability))
+            if (convertType.HasFlagFast(PatternType.LowProbability))
                 return generateNRandomNotes(StartTime, 0.17, 0, 0);
 
             return generateNRandomNotes(StartTime, 0.27, 0, 0);
@@ -221,7 +222,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             var pattern = new Pattern();
 
             int nextColumn = GetColumn((HitObject as IHasXPosition)?.X ?? 0, true);
-            if (convertType.HasFlag(PatternType.ForceNotStack) && PreviousPattern.ColumnWithObjects < TotalColumns)
+            if (convertType.HasFlagFast(PatternType.ForceNotStack) && PreviousPattern.ColumnWithObjects < TotalColumns)
                 nextColumn = FindAvailableColumn(nextColumn, PreviousPattern);
 
             int lastColumn = nextColumn;
@@ -373,7 +374,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             static bool isDoubleSample(HitSampleInfo sample) => sample.Name == HitSampleInfo.HIT_CLAP || sample.Name == HitSampleInfo.HIT_FINISH;
 
-            bool canGenerateTwoNotes = !convertType.HasFlag(PatternType.LowProbability);
+            bool canGenerateTwoNotes = !convertType.HasFlagFast(PatternType.LowProbability);
             canGenerateTwoNotes &= HitObject.Samples.Any(isDoubleSample) || sampleInfoListAt(StartTime).Any(isDoubleSample);
 
             if (canGenerateTwoNotes)
@@ -406,7 +407,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             int endTime = startTime + SegmentDuration * SpanCount;
 
             int nextColumn = GetColumn((HitObject as IHasXPosition)?.X ?? 0, true);
-            if (convertType.HasFlag(PatternType.ForceNotStack) && PreviousPattern.ColumnWithObjects < TotalColumns)
+            if (convertType.HasFlagFast(PatternType.ForceNotStack) && PreviousPattern.ColumnWithObjects < TotalColumns)
                 nextColumn = FindAvailableColumn(nextColumn, PreviousPattern);
 
             for (int i = 0; i < columnRepeat; i++)
@@ -435,7 +436,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             var pattern = new Pattern();
 
             int holdColumn = GetColumn((HitObject as IHasXPosition)?.X ?? 0, true);
-            if (convertType.HasFlag(PatternType.ForceNotStack) && PreviousPattern.ColumnWithObjects < TotalColumns)
+            if (convertType.HasFlagFast(PatternType.ForceNotStack) && PreviousPattern.ColumnWithObjects < TotalColumns)
                 holdColumn = FindAvailableColumn(holdColumn, PreviousPattern);
 
             // Create the hold note
