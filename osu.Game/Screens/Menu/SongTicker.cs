@@ -61,8 +61,8 @@ namespace osu.Game.Screens.Menu
         {
             var metadata = beatmap.Value.Metadata;
 
-            title.Text = new RomanisableString(metadata.Title, metadata.TitleUnicode);
-            artist.Text = new RomanisableString(metadata.Artist, metadata.ArtistUnicode);
+            title.Text = new RomanisableString(metadata.TitleUnicode, metadata.Title);
+            artist.Text = new RomanisableString(metadata.ArtistUnicode, metadata.Artist);
 
             this.FadeInFromZero(fade_duration / 2f)
                 .Delay(4000)

@@ -48,8 +48,8 @@ namespace osu.Game.Overlays.Music
             artistColour = colours.Gray9;
             HandleColour = colours.Gray5;
 
-            title = localisation.GetLocalisedString(new RomanisableString(Model.Metadata.Title, Model.Metadata.TitleUnicode));
-            artist = localisation.GetLocalisedString(new RomanisableString(Model.Metadata.Artist, Model.Metadata.ArtistUnicode));
+            title = localisation.GetLocalisedString(new RomanisableString(Model.Metadata.TitleUnicode, Model.Metadata.Title));
+            artist = localisation.GetLocalisedString(new RomanisableString(Model.Metadata.ArtistUnicode, Model.Metadata.Artist));
         }
 
         protected override void LoadComplete()
