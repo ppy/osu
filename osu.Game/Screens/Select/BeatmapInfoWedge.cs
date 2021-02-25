@@ -39,6 +39,7 @@ namespace osu.Game.Screens.Select
         private static readonly Vector2 wedged_container_shear = new Vector2(shear_width / SongSelect.WEDGE_HEIGHT, 0);
 
         private readonly IBindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
+        private readonly IBindable<IReadOnlyList<Mod>> mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; }
@@ -64,9 +65,11 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load([CanBeNull] Bindable<RulesetInfo> parentRuleset)
+        private void load([CanBeNull] Bindable<RulesetInfo> parentRuleset, [CanBeNull] Bindable<IReadOnlyList<Mod>> parentMods)
         {
             ruleset.BindTo(parentRuleset);
+            mods.BindTo(parentMods);
+
             ruleset.ValueChanged += _ => updateDisplay();
         }
 
@@ -132,7 +135,7 @@ namespace osu.Game.Screens.Select
                     return;
                 }
 
-                LoadComponentAsync(loadingInfo = new BufferedWedgeInfo(beatmap, ruleset.Value, beatmapDifficulty.Value)
+                LoadComponentAsync(loadingInfo = new BufferedWedgeInfo(beatmap, ruleset.Value, mods.Value, beatmapDifficulty.Value)
                 {
                     Shear = -Shear,
                     Depth = Info?.Depth + 1 ?? 0
@@ -167,13 +170,15 @@ namespace osu.Game.Screens.Select
 
             private readonly WorkingBeatmap beatmap;
             private readonly RulesetInfo ruleset;
+            private readonly IReadOnlyList<Mod> mods;
             private readonly StarDifficulty starDifficulty;
 
-            public BufferedWedgeInfo(WorkingBeatmap beatmap, RulesetInfo userRuleset, StarDifficulty difficulty)
+            public BufferedWedgeInfo(WorkingBeatmap beatmap, RulesetInfo userRuleset, IReadOnlyList<Mod> mods, StarDifficulty difficulty)
                 : base(pixelSnapping: true)
             {
                 this.beatmap = beatmap;
                 ruleset = userRuleset ?? beatmap.BeatmapInfo.Ruleset;
+                this.mods = mods;
                 starDifficulty = difficulty;
             }
 
@@ -383,14 +388,11 @@ namespace osu.Game.Screens.Select
                 return labels.ToArray();
             }
 
-            [Resolved]
-            private IBindable<IReadOnlyList<Mod>> mods { get; set; }
-
             private string getBPMRange(IBeatmap beatmap)
             {
                 // this doesn't consider mods which apply variable rates, yet.
                 double rate = 1;
-                foreach (var mod in mods.Value.OfType<IApplicableToRate>())
+                foreach (var mod in mods.OfType<IApplicableToRate>())
                     rate = mod.ApplyToRate(0, rate);
 
                 double bpmMax = beatmap.ControlPointInfo.BPMMaximum * rate;
