@@ -198,8 +198,8 @@ namespace osu.Game.Screens.Select
                 settingChangeTracker = new ModSettingChangeTracker(mods);
                 settingChangeTracker.SettingChanged += _ => updateBPM();
 
-                titleBinding = localisation.GetLocalisedString(new LocalisedString((metadata.TitleUnicode, metadata.Title)));
-                artistBinding = localisation.GetLocalisedString(new LocalisedString((metadata.ArtistUnicode, metadata.Artist)));
+                titleBinding = localisation.GetLocalisedString(new RomanisableString(metadata.TitleUnicode, metadata.Title));
+                artistBinding = localisation.GetLocalisedString(new RomanisableString(metadata.ArtistUnicode, metadata.Artist));
 
                 Children = new Drawable[]
                 {
