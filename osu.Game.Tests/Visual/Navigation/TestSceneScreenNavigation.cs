@@ -214,6 +214,21 @@ namespace osu.Game.Tests.Visual.Navigation
             AddAssert("Options overlay still visible", () => songSelect.BeatmapOptionsOverlay.State.Value == Visibility.Visible);
         }
 
+        [Test]
+        public void TestSettingsViaHotkeyFromMainMenu()
+        {
+            AddAssert("toolbar not displayed", () => Game.Toolbar.State.Value == Visibility.Hidden);
+
+            AddStep("press settings hotkey", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.O);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            AddUntilStep("settings displayed", () => Game.Settings.State.Value == Visibility.Visible);
+        }
+
         private void pushEscape() =>
             AddStep("Press escape", () => InputManager.Key(Key.Escape));
 
