@@ -293,8 +293,8 @@ namespace osu.Game.Overlays
                     else
                     {
                         BeatmapMetadata metadata = beatmap.Metadata;
-                        title.Text = new LocalisedString((metadata.TitleUnicode, metadata.Title));
-                        artist.Text = new LocalisedString((metadata.ArtistUnicode, metadata.Artist));
+                        title.Text = new RomanisableString(metadata.TitleUnicode, metadata.Title);
+                        artist.Text = new RomanisableString(metadata.ArtistUnicode, metadata.Artist);
                     }
                 });
 
