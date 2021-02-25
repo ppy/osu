@@ -103,10 +103,10 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private void testBeatmapLabels(Ruleset ruleset)
         {
-            AddAssert("check version", () => infoWedge.Info.VersionLabel.Text == $"{ruleset.ShortName}Version");
-            AddAssert("check title", () => infoWedge.Info.TitleLabel.Text == $"{ruleset.ShortName}Source — {ruleset.ShortName}Title");
-            AddAssert("check artist", () => infoWedge.Info.ArtistLabel.Text == $"{ruleset.ShortName}Artist");
-            AddAssert("check author", () => infoWedge.Info.MapperContainer.Children.OfType<OsuSpriteText>().Any(s => s.Text == $"{ruleset.ShortName}Author"));
+            AddAssert("check version", () => infoWedge.Info.VersionLabel.Current.Value == $"{ruleset.ShortName}Version");
+            AddAssert("check title", () => infoWedge.Info.TitleLabel.Current.Value == $"{ruleset.ShortName}Source — {ruleset.ShortName}Title");
+            AddAssert("check artist", () => infoWedge.Info.ArtistLabel.Current.Value == $"{ruleset.ShortName}Artist");
+            AddAssert("check author", () => infoWedge.Info.MapperContainer.Children.OfType<OsuSpriteText>().Any(s => s.Current.Value == $"{ruleset.ShortName}Author"));
         }
 
         private void testInfoLabels(int expectedCount)
@@ -119,9 +119,9 @@ namespace osu.Game.Tests.Visual.SongSelect
         public void TestNullBeatmap()
         {
             selectBeatmap(null);
-            AddAssert("check empty version", () => string.IsNullOrEmpty(infoWedge.Info.VersionLabel.Text));
-            AddAssert("check default title", () => infoWedge.Info.TitleLabel.Text == Beatmap.Default.BeatmapInfo.Metadata.Title);
-            AddAssert("check default artist", () => infoWedge.Info.ArtistLabel.Text == Beatmap.Default.BeatmapInfo.Metadata.Artist);
+            AddAssert("check empty version", () => string.IsNullOrEmpty(infoWedge.Info.VersionLabel.Current.Value));
+            AddAssert("check default title", () => infoWedge.Info.TitleLabel.Current.Value == Beatmap.Default.BeatmapInfo.Metadata.Title);
+            AddAssert("check default artist", () => infoWedge.Info.ArtistLabel.Current.Value == Beatmap.Default.BeatmapInfo.Metadata.Artist);
             AddAssert("check empty author", () => !infoWedge.Info.MapperContainer.Children.Any());
             AddAssert("check no info labels", () => !infoWedge.Info.InfoLabelContainer.Children.Any());
         }
