@@ -73,7 +73,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
                 {
                     new OsuSpriteText
                     {
-                        Text = new RomanisableString(beatmap.Value.Metadata.Artist, beatmap.Value.Metadata.ArtistUnicode),
+                        Text = new RomanisableString(beatmap.Value.Metadata.ArtistUnicode, beatmap.Value.Metadata.Artist),
                         Font = OsuFont.GetFont(size: TextSize),
                     },
                     new OsuSpriteText
@@ -83,7 +83,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
                     },
                     new OsuSpriteText
                     {
-                        Text = new RomanisableString(beatmap.Value.Metadata.Title, beatmap.Value.Metadata.TitleUnicode),
+                        Text = new RomanisableString(beatmap.Value.Metadata.TitleUnicode, beatmap.Value.Metadata.Title),
                         Font = OsuFont.GetFont(size: TextSize),
                     }
                 }, LinkAction.OpenBeatmap, beatmap.Value.OnlineBeatmapID.ToString(), "Open beatmap");

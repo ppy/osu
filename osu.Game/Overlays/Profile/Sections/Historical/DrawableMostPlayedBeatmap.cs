@@ -130,13 +130,13 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                 new OsuSpriteText
                 {
                     Text = new RomanisableString(
-                        $"{beatmap.Metadata.Title ?? beatmap.Metadata.TitleUnicode} [{beatmap.Version}] ",
-                        $"{beatmap.Metadata.TitleUnicode ?? beatmap.Metadata.Title} [{beatmap.Version}] "),
+                        $"{beatmap.Metadata.TitleUnicode ?? beatmap.Metadata.Title} [{beatmap.Version}] ",
+                        $"{beatmap.Metadata.Title ?? beatmap.Metadata.TitleUnicode} [{beatmap.Version}] "),
                     Font = OsuFont.GetFont(weight: FontWeight.Bold)
                 },
                 new OsuSpriteText
                 {
-                    Text = "by " + new RomanisableString(beatmap.Metadata.Artist, beatmap.Metadata.ArtistUnicode),
+                    Text = "by " + new RomanisableString(beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist),
                     Font = OsuFont.GetFont(weight: FontWeight.Regular)
                 },
             };
