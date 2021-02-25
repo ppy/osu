@@ -15,8 +15,6 @@ namespace osu.Game.Overlays.Chat.Selection
 {
     public class ChannelSection : Container, IHasFilterableChildren
     {
-        private readonly OsuSpriteText header;
-
         public readonly FillFlowContainer<ChannelListItem> ChannelFlow;
 
         public IEnumerable<IFilterable> FilterableChildren => ChannelFlow.Children;
@@ -41,7 +39,7 @@ namespace osu.Game.Overlays.Chat.Selection
 
             Children = new Drawable[]
             {
-                header = new OsuSpriteText
+                new OsuSpriteText
                 {
                     Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold),
                     Text = "All Channels".ToUpperInvariant()
