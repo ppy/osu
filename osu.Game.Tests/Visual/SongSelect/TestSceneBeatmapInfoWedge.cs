@@ -7,6 +7,7 @@ using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
@@ -111,8 +112,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private void testInfoLabels(int expectedCount)
         {
-            AddAssert("check info labels exists", () => infoWedge.Info.InfoLabelContainer.Children.Any());
-            AddAssert("check info labels count", () => infoWedge.Info.InfoLabelContainer.Children.Count == expectedCount);
+            AddAssert("check info labels exists", () => infoWedge.Info.ChildrenOfType<BeatmapInfoWedge.BufferedWedgeInfo.InfoLabel>().Any());
+            AddAssert("check info labels count", () => infoWedge.Info.ChildrenOfType<BeatmapInfoWedge.BufferedWedgeInfo.InfoLabel>().Count() == expectedCount);
         }
 
         [Test]
@@ -123,7 +124,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("check default title", () => infoWedge.Info.TitleLabel.Current.Value == Beatmap.Default.BeatmapInfo.Metadata.Title);
             AddAssert("check default artist", () => infoWedge.Info.ArtistLabel.Current.Value == Beatmap.Default.BeatmapInfo.Metadata.Artist);
             AddAssert("check empty author", () => !infoWedge.Info.MapperContainer.Children.Any());
-            AddAssert("check no info labels", () => !infoWedge.Info.InfoLabelContainer.Children.Any());
+            AddAssert("check no info labels", () => !infoWedge.Info.ChildrenOfType<BeatmapInfoWedge.BufferedWedgeInfo.InfoLabel>().Any());
         }
 
         [Test]
