@@ -25,6 +25,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
+using osu.Game.Configuration;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
@@ -167,11 +168,14 @@ namespace osu.Game.Screens.Select
 
             private ILocalisedBindableString titleBinding;
             private ILocalisedBindableString artistBinding;
+            private Container bpmLabelContainer;
 
             private readonly WorkingBeatmap beatmap;
             private readonly RulesetInfo ruleset;
             private readonly IReadOnlyList<Mod> mods;
             private readonly StarDifficulty starDifficulty;
+
+            private ModSettingChangeTracker settingChangeTracker;
 
             public BufferedWedgeInfo(WorkingBeatmap beatmap, RulesetInfo userRuleset, IReadOnlyList<Mod> mods, StarDifficulty difficulty)
                 : base(pixelSnapping: true)
@@ -189,8 +193,10 @@ namespace osu.Game.Screens.Select
                 var metadata = beatmapInfo.Metadata ?? beatmap.BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
 
                 CacheDrawnFrameBuffer = true;
-
                 RelativeSizeAxes = Axes.Both;
+
+                settingChangeTracker = new ModSettingChangeTracker(mods);
+                settingChangeTracker.SettingChanged += _ => updateBPM();
 
                 titleBinding = localisation.GetLocalisedString(new LocalisedString((metadata.TitleUnicode, metadata.Title)));
                 artistBinding = localisation.GetLocalisedString(new LocalisedString((metadata.ArtistUnicode, metadata.Artist)));
@@ -312,7 +318,25 @@ namespace osu.Game.Screens.Select
                                 Margin = new MarginPadding { Top = 20 },
                                 Spacing = new Vector2(20, 0),
                                 AutoSizeAxes = Axes.Both,
-                                Children = getInfoLabels()
+                                Children = new Drawable[]
+                                {
+                                    new InfoLabel(new BeatmapStatistic
+                                    {
+                                        Name = "Length",
+                                        CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Length),
+                                        Content = TimeSpan.FromMilliseconds(beatmapInfo.Length).ToString(@"m\:ss"),
+                                    }),
+                                    bpmLabelContainer = new Container
+                                    {
+                                        AutoSizeAxes = Axes.Both,
+                                    },
+                                    new FillFlowContainer
+                                    {
+                                        AutoSizeAxes = Axes.Both,
+                                        Spacing = new Vector2(20, 0),
+                                        Children = getRulesetInfoLabels()
+                                    }
+                                }
                             }
                         }
                     }
@@ -324,6 +348,8 @@ namespace osu.Game.Screens.Select
                 // no difficulty means it can't have a status to show
                 if (beatmapInfo.Version == null)
                     StatusPill.Hide();
+
+                updateBPM();
             }
 
             private static Drawable createStarRatingDisplay(StarDifficulty difficulty) => difficulty.Stars > 0
@@ -340,69 +366,60 @@ namespace osu.Game.Screens.Select
                 ForceRedraw();
             }
 
-            private InfoLabel[] getInfoLabels()
+            private InfoLabel[] getRulesetInfoLabels()
             {
-                var b = beatmap.Beatmap;
-
-                List<InfoLabel> labels = new List<InfoLabel>();
-
-                if (b?.HitObjects?.Any() == true)
+                try
                 {
-                    labels.Add(new InfoLabel(new BeatmapStatistic
-                    {
-                        Name = "Length",
-                        CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Length),
-                        Content = TimeSpan.FromMilliseconds(b.BeatmapInfo.Length).ToString(@"m\:ss"),
-                    }));
-
-                    labels.Add(new InfoLabel(new BeatmapStatistic
-                    {
-                        Name = "BPM",
-                        CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Bpm),
-                        Content = getBPMRange(b),
-                    }));
+                    IBeatmap playableBeatmap;
 
                     try
                     {
-                        IBeatmap playableBeatmap;
-
-                        try
-                        {
-                            // Try to get the beatmap with the user's ruleset
-                            playableBeatmap = beatmap.GetPlayableBeatmap(ruleset, Array.Empty<Mod>());
-                        }
-                        catch (BeatmapInvalidForRulesetException)
-                        {
-                            // Can't be converted to the user's ruleset, so use the beatmap's own ruleset
-                            playableBeatmap = beatmap.GetPlayableBeatmap(beatmap.BeatmapInfo.Ruleset, Array.Empty<Mod>());
-                        }
-
-                        labels.AddRange(playableBeatmap.GetStatistics().Select(s => new InfoLabel(s)));
+                        // Try to get the beatmap with the user's ruleset
+                        playableBeatmap = beatmap.GetPlayableBeatmap(ruleset, Array.Empty<Mod>());
                     }
-                    catch (Exception e)
+                    catch (BeatmapInvalidForRulesetException)
                     {
-                        Logger.Error(e, "Could not load beatmap successfully!");
+                        // Can't be converted to the user's ruleset, so use the beatmap's own ruleset
+                        playableBeatmap = beatmap.GetPlayableBeatmap(beatmap.BeatmapInfo.Ruleset, Array.Empty<Mod>());
                     }
+
+                    return playableBeatmap.GetStatistics().Select(s => new InfoLabel(s)).ToArray();
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, "Could not load beatmap successfully!");
                 }
 
-                return labels.ToArray();
+                return Array.Empty<InfoLabel>();
             }
 
-            private string getBPMRange(IBeatmap beatmap)
+            private void updateBPM()
             {
+                var b = beatmap.Beatmap;
+                if (b == null)
+                    return;
+
                 // this doesn't consider mods which apply variable rates, yet.
                 double rate = 1;
                 foreach (var mod in mods.OfType<IApplicableToRate>())
                     rate = mod.ApplyToRate(0, rate);
 
-                double bpmMax = beatmap.ControlPointInfo.BPMMaximum * rate;
-                double bpmMin = beatmap.ControlPointInfo.BPMMinimum * rate;
-                double mostCommonBPM = 60000 / beatmap.GetMostCommonBeatLength() * rate;
+                double bpmMax = b.ControlPointInfo.BPMMaximum * rate;
+                double bpmMin = b.ControlPointInfo.BPMMinimum * rate;
+                double mostCommonBPM = 60000 / b.GetMostCommonBeatLength() * rate;
 
-                if (Precision.AlmostEquals(bpmMin, bpmMax))
-                    return $"{bpmMin:0}";
+                string labelText = Precision.AlmostEquals(bpmMin, bpmMax)
+                    ? $"{bpmMin:0}"
+                    : $"{bpmMin:0}-{bpmMax:0} (mostly {mostCommonBPM:0})";
 
-                return $"{bpmMin:0}-{bpmMax:0} (mostly {mostCommonBPM:0})";
+                bpmLabelContainer.Child = new InfoLabel(new BeatmapStatistic
+                {
+                    Name = "BPM",
+                    CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Bpm),
+                    Content = labelText
+                });
+
+                ForceRedraw();
             }
 
             private OsuSpriteText[] getMapper(BeatmapMetadata metadata)
@@ -423,6 +440,12 @@ namespace osu.Game.Screens.Select
                         Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 15),
                     }
                 };
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+                settingChangeTracker?.Dispose();
             }
 
             public class InfoLabel : Container, IHasTooltip
