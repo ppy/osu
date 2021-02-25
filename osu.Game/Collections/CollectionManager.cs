@@ -138,10 +138,14 @@ namespace osu.Game.Collections
 
             PostNotification?.Invoke(notification);
 
-            var collection = readCollections(stream, notification);
-            await importCollections(collection);
+            var collections = readCollections(stream, notification);
+            await importCollections(collections);
 
+<<<<<<< HEAD
             notification.CompletionText = $"已导入 {collection.Count} 个收藏夹";
+=======
+            notification.CompletionText = $"已导入 {collections.Count} 个收藏夹";
+>>>>>>> upstream/master
             notification.State = ProgressNotificationState.Completed;
         }
 
@@ -155,7 +159,7 @@ namespace osu.Game.Collections
                 {
                     foreach (var newCol in newCollections)
                     {
-                        var existing = Collections.FirstOrDefault(c => c.Name == newCol.Name);
+                        var existing = Collections.FirstOrDefault(c => c.Name.Value == newCol.Name.Value);
                         if (existing == null)
                             Collections.Add(existing = new BeatmapCollection { Name = { Value = newCol.Name.Value } });
 

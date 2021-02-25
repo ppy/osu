@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
@@ -80,17 +81,17 @@ namespace osu.Game.Storyboards.Drawables
 
                 if (FlipH)
                 {
-                    if (origin.HasFlag(Anchor.x0))
+                    if (origin.HasFlagFast(Anchor.x0))
                         origin = Anchor.x2 | (origin & (Anchor.y0 | Anchor.y1 | Anchor.y2));
-                    else if (origin.HasFlag(Anchor.x2))
+                    else if (origin.HasFlagFast(Anchor.x2))
                         origin = Anchor.x0 | (origin & (Anchor.y0 | Anchor.y1 | Anchor.y2));
                 }
 
                 if (FlipV)
                 {
-                    if (origin.HasFlag(Anchor.y0))
+                    if (origin.HasFlagFast(Anchor.y0))
                         origin = Anchor.y2 | (origin & (Anchor.x0 | Anchor.x1 | Anchor.x2));
-                    else if (origin.HasFlag(Anchor.y2))
+                    else if (origin.HasFlagFast(Anchor.y2))
                         origin = Anchor.y0 | (origin & (Anchor.x0 | Anchor.x1 | Anchor.x2));
                 }
 

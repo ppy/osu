@@ -363,7 +363,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 Menu.MaxHeight = 100;
             }
 
-            protected override string GenerateItemText(TimeSpan item) => item.Humanize();
+            protected override LocalisableString GenerateItemText(TimeSpan item) => item.Humanize();
         }
     }
 }

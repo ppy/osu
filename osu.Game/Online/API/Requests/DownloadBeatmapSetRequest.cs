@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.IO.Network;
 using osu.Game.Beatmaps;
 
 namespace osu.Game.Online.API.Requests
@@ -44,5 +45,12 @@ namespace osu.Game.Online.API.Requests
         protected override string Target => $@"{calcTarget()}";
 
         protected override string Uri => $@"{selectUri()}";
+
+        protected override WebRequest CreateWebRequest()
+        {
+            var req = base.CreateWebRequest();
+            req.Timeout = 60000;
+            return req;
+        }
     }
 }

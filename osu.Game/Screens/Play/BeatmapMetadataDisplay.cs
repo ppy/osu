@@ -93,11 +93,26 @@ namespace osu.Game.Screens.Play
                     {
                         bg = new Container
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Origin = Anchor.Centre,
-                            Anchor = Anchor.Centre,
-                            CornerRadius = 20,
-                            CornerExponent = 2.5f,
+                            Text = new RomanisableString(metadata.TitleUnicode, metadata.Title),
+                            Font = OsuFont.GetFont(size: 36, italics: true),
+                            Origin = Anchor.TopCentre,
+                            Anchor = Anchor.TopCentre,
+                            Margin = new MarginPadding { Top = 15 },
+                        },
+                        new OsuSpriteText
+                        {
+                            Text = new RomanisableString(metadata.ArtistUnicode, metadata.Artist),
+                            Font = OsuFont.GetFont(size: 26, italics: true),
+                            Origin = Anchor.TopCentre,
+                            Anchor = Anchor.TopCentre,
+                        },
+                        new Container
+                        {
+                            Size = new Vector2(300, 60),
+                            Margin = new MarginPadding(10),
+                            Origin = Anchor.TopCentre,
+                            Anchor = Anchor.TopCentre,
+                            CornerRadius = 10,
                             Masking = true,
                             BorderColour = Color4.Black,
                             BorderThickness = 3f,

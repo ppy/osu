@@ -852,6 +852,21 @@ namespace osu.Game.Tests.Beatmaps.IO
             }
         }
 
+        public static async Task<BeatmapSetInfo> LoadQuickOszIntoOsu(OsuGameBase osu)
+        {
+            var temp = TestResources.GetQuickTestBeatmapForImport();
+
+            var manager = osu.Dependencies.Get<BeatmapManager>();
+
+            var importedSet = await manager.Import(new ImportTask(temp));
+
+            ensureLoaded(osu);
+
+            waitForOrAssert(() => !File.Exists(temp), "Temporary file still exists after standard import", 5000);
+
+            return manager.GetAllUsableBeatmapSets().Find(beatmapSet => beatmapSet.ID == importedSet.ID);
+        }
+
         public static async Task<BeatmapSetInfo> LoadOszIntoOsu(OsuGameBase osu, string path = null, bool virtualTrack = false)
         {
             var temp = path ?? TestResources.GetTestBeatmapForImport(virtualTrack);
