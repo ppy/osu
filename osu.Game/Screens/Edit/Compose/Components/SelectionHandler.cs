@@ -320,18 +320,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="sampleName">The name of the hit sample.</param>
         public void AddHitSample(string sampleName)
         {
-            EditorBeatmap.BeginChange();
-
-            foreach (var h in EditorBeatmap.SelectedHitObjects)
+            EditorBeatmap.PerformOnSelection(h =>
             {
                 // Make sure there isn't already an existing sample
                 if (h.Samples.Any(s => s.Name == sampleName))
-                    continue;
+                    return;
 
                 h.Samples.Add(new HitSampleInfo(sampleName));
-            }
-
-            EditorBeatmap.EndChange();
+            });
         }
 
         /// <summary>
@@ -341,19 +337,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <exception cref="InvalidOperationException">Throws if any selected object doesn't implement <see cref="IHasComboInformation"/></exception>
         public void SetNewCombo(bool state)
         {
-            EditorBeatmap.BeginChange();
-
-            foreach (var h in EditorBeatmap.SelectedHitObjects)
+            EditorBeatmap.PerformOnSelection(h =>
             {
                 var comboInfo = h as IHasComboInformation;
 
-                if (comboInfo == null || comboInfo.NewCombo == state) continue;
+                if (comboInfo == null || comboInfo.NewCombo == state) return;
 
                 comboInfo.NewCombo = state;
                 EditorBeatmap.Update(h);
-            }
-
-            EditorBeatmap.EndChange();
+            });
         }
 
         /// <summary>
@@ -362,12 +354,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="sampleName">The name of the hit sample.</param>
         public void RemoveHitSample(string sampleName)
         {
-            EditorBeatmap.BeginChange();
-
-            foreach (var h in EditorBeatmap.SelectedHitObjects)
-                h.SamplesBindable.RemoveAll(s => s.Name == sampleName);
-
-            EditorBeatmap.EndChange();
+            EditorBeatmap.PerformOnSelection(h => h.SamplesBindable.RemoveAll(s => s.Name == sampleName));
         }
 
         #endregion
