@@ -5,7 +5,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
@@ -49,12 +48,12 @@ namespace osu.Game.Screens.OnlinePlay.Components
         {
             if (MaxAttempts.Value != null)
             {
-                attemptDisplay.Text = new LocalisedString("screen.multi.components.roomLocalUserInfo.maxAttempts", $"{MaxAttempts.Value:N0}");
+                attemptDisplay.Text = $"最大尝试次数: {MaxAttempts.Value:N0}";
 
                 if (UserScore.Value != null)
                 {
                     int remaining = MaxAttempts.Value.Value - UserScore.Value.PlaylistItemAttempts.Sum(a => a.Attempts);
-                    attemptDisplay.Text += $" ({remaining} remaining)";
+                    attemptDisplay.Text += $" ({remaining} 剩余)";
                 }
             }
             else

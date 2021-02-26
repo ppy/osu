@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Edit.Timing
         {
             Flow.AddRange(new[]
             {
-                multiplierSlider = new SliderWithTextBoxInput<double>("editor.timing.section.difficulty.speedMultiplier")
+                multiplierSlider = new SliderWithTextBoxInput<double>("速度倍率")
                 {
                     Current = new DifficultyControlPoint().SpeedMultiplierBindable
                 }

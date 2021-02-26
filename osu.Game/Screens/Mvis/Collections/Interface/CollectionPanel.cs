@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Graphics;
@@ -130,14 +129,13 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
                                         collectionName = new OsuSpriteText
                                         {
                                             Font = OsuFont.GetFont(size: 30),
-                                            RelativeSizeAxes = Axes.X,
+                                            //RelativeSizeAxes = Axes.X,
                                             Text = "???",
-                                            Truncate = true,
-                                            UseLegacyUnicode = true
+                                            //Truncate = true
                                         },
                                         collectionBeatmapCount = new OsuSpriteText
                                         {
-                                            RelativeSizeAxes = Axes.X,
+                                            //RelativeSizeAxes = Axes.X,
                                             Text = "???"
                                         }
                                     }
@@ -164,7 +162,7 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
                 : ActiveState.Disabled;
 
             collectionName.Text = Collection.Name.Value;
-            collectionBeatmapCount.Text = new LocalisedString("{0}首歌曲", beatmapSets.Count);
+            collectionBeatmapCount.Text = $"{beatmapSets.Count}首歌曲";
 
             State.BindValueChanged(onStateChanged, true);
 

@@ -9,7 +9,7 @@ using static osu.Game.Rulesets.Osu.Replays.Movers.MoverUtilExtensions;
 
 namespace osu.Game.Rulesets.Osu.Replays.Movers
 {
-    public class MomentumMover : BaseDanceMover
+    public class MomentumMover : DanceMover
     {
         private readonly float jmult;
         private readonly float nmult;

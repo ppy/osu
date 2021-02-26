@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Skinning;
@@ -50,7 +51,7 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
             set => SpriteIcon.Icon = value;
         }
 
-        public string Text
+        public LocalisableString Text
         {
             get => SpriteText.Text;
             set => SpriteText.Text = value;
@@ -60,7 +61,7 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
-            Font = OsuFont.GetFont(weight: FontWeight.Black)
+            Font = OsuFont.GetFont(typeface: Typeface.Custom)
         };
 
         protected SpriteIcon SpriteIcon = new SpriteIcon
@@ -125,7 +126,7 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
             if (!ButtonIcon.Equals(emptyIcon))
                 ContentFillFlow.Add(SpriteIcon);
 
-            if (Text != null)
+            if (string.IsNullOrEmpty(Text.ToString()))
                 ContentFillFlow.Add(SpriteText);
 
             // From OsuAnimatedButton

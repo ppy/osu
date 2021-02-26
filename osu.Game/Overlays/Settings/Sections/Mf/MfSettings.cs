@@ -54,6 +54,16 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                     TooltipText = "仅在开场样式为\"略过开场\"时生效",
                     Current = config.GetBindable<bool>(MSetting.IntroLoadDirectToSongSelect)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "使用系统光标",
+                    Current = config.GetBindable<bool>(MSetting.UseSystemCursor)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "使用自定义开屏页背景",
+                    Current = config.GetBindable<bool>(MSetting.UseCustomGreetingPicture)
+                },
             };
         }
     }

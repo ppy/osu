@@ -7,7 +7,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Graphics;
@@ -110,15 +109,15 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
                                             collectionName = new OsuSpriteText
                                             {
                                                 Font = OsuFont.GetFont(size: 50),
-                                                RelativeSizeAxes = Axes.X,
-                                                Text = "screen.mvis.collections.ui.noCollectionSelected",
-                                                Truncate = true
+                                                //RelativeSizeAxes = Axes.X,
+                                                Text = "未选择收藏夹",
+                                                //Truncate = true
                                             },
                                             collectionBeatmapCount = new OsuSpriteText
                                             {
                                                 Font = OsuFont.GetFont(size: 38),
-                                                RelativeSizeAxes = Axes.X,
-                                                Text = "screen.mvis.collections.ui.selectOneFirst"
+                                                //RelativeSizeAxes = Axes.X,
+                                                Text = "请先选择一个!"
                                             }
                                         }
                                     }
@@ -195,7 +194,7 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
             }
 
             collectionName.Text = c.Name.Value;
-            collectionBeatmapCount.Text = new LocalisedString("screen.mvis.collections.ui.beatmapSetsCount", beatmapSets.Count);
+            collectionBeatmapCount.Text = $"{beatmapSets.Count}首歌曲";
 
             refreshBeatmapSetList();
         }
@@ -254,8 +253,8 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
         {
             beatmapSets.Clear();
             beatmapList.ClearList();
-            collectionName.Text = "screen.mvis.collections.ui.noCollectionSelected";
-            collectionBeatmapCount.Text = "screen.mvis.collections.ui.selectOneFirst";
+            collectionName.Text = "未选择收藏夹";
+            collectionBeatmapCount.Text = "请先选择一个!";
         }
     }
 }

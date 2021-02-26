@@ -43,7 +43,8 @@ using osu.Game.Skinning;
 using osuTK.Input;
 using RuntimeInfo = osu.Framework.RuntimeInfo;
 using M.Resources;
-using osu.Game.Locale;
+using osu.Game.Screens;
+using osu.Game.Utils;
 
 namespace osu.Game
 {
@@ -196,7 +197,9 @@ namespace osu.Game
             dependencies.CacheAs(LocalConfig);
             dependencies.Cache(MfConfig);
 
+            //fallback机制: 先加载的字体会覆盖后加载的字体，即从上到下覆盖(如果在OsuFont.Typeface中)
             AddFont(Resources, @"Fonts/osuFont");
+
             AddFont(Resources, @"Fonts/Torus-Regular");
             AddFont(Resources, @"Fonts/Torus-Light");
             AddFont(Resources, @"Fonts/Torus-SemiBold");
@@ -211,6 +214,8 @@ namespace osu.Game
             AddFont(Resources, @"Fonts/Venera-Light");
             AddFont(Resources, @"Fonts/Venera-Bold");
             AddFont(Resources, @"Fonts/Venera-Black");
+
+            dependencies.Cache(new CustomStore(Storage, this));
 
             Audio.Samples.PlaybackConcurrency = SAMPLE_CONCURRENCY;
 
@@ -278,6 +283,10 @@ namespace osu.Game
             dependencies.Cache(UserCache = new UserLookupCache());
             AddInternal(UserCache);
 
+            var helper = new CustomFontHelper();
+            dependencies.Cache(helper);
+            AddInternal(helper);
+
             var scorePerformanceManager = new ScorePerformanceCache();
             dependencies.Cache(scorePerformanceManager);
             AddInternal(scorePerformanceManager);
@@ -335,8 +344,6 @@ namespace osu.Game
             dependencies.CacheAs(MusicController);
 
             Ruleset.BindValueChanged(onRulesetChanged);
-
-            Add(new MLocaleManager());
         }
 
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)

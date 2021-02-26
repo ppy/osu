@@ -112,8 +112,7 @@ namespace osu.Game.Overlays
                                     Position = new Vector2(0, 40),
                                     Font = OsuFont.GetFont(size: 25, italics: true),
                                     Colour = Color4.White,
-                                    Text = @"什么东西都没有呢(´・ω・`)",
-                                    UseLegacyUnicode = true
+                                    Text = @"什么东西都没有呢(´・ω・`)"
                                 },
                                 artist = new OsuSpriteText
                                 {
@@ -122,8 +121,7 @@ namespace osu.Game.Overlays
                                     Position = new Vector2(0, 45),
                                     Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold, italics: true),
                                     Colour = Color4.White,
-                                    Text = @"去下几张图吧",
-                                    UseLegacyUnicode = true
+                                    Text = @"去下几张图吧"
                                 },
                                 new Container
                                 {
@@ -298,8 +296,8 @@ namespace osu.Game.Overlays
                     else
                     {
                         BeatmapMetadata metadata = beatmap.Metadata;
-                        title.Text = new LocalisedString((metadata.TitleUnicode, metadata.Title));
-                        artist.Text = new LocalisedString((metadata.ArtistUnicode, metadata.Artist));
+                        title.Text = new RomanisableString(metadata.TitleUnicode, metadata.Title);
+                        artist.Text = new RomanisableString(metadata.ArtistUnicode, metadata.Artist);
                     }
                 });
 

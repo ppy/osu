@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override ModType Type => ModType.Conversion;
 
-        [SettingSource("无滑条头判", "滑条分数与其命中的滑条刻成比例。")]
+        [SettingSource("去除滑条头的准确率要求", "滑条分数与其命中的滑条刻成比例。")]
         public Bindable<bool> NoSliderHeadAccuracy { get; } = new BindableBool(true);
 
         [SettingSource("不要移动滑条头", "无论何时，都将滑条头固定在其起始位置。")]

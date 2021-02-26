@@ -21,9 +21,9 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 bank = new LabelledTextBox
                 {
-                    Label = "editor.timing.section.sample.bankName",
+                    Label = "Bank名称",
                 },
-                volume = new SliderWithTextBoxInput<int>("editor.timing.section.sample.volume")
+                volume = new SliderWithTextBoxInput<int>("音量")
                 {
                     Current = new SampleControlPoint().SampleVolumeBindable,
                 }

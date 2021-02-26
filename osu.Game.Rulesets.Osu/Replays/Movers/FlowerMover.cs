@@ -9,7 +9,7 @@ using static osu.Game.Rulesets.Osu.Replays.Movers.MoverUtilExtensions;
 
 namespace osu.Game.Rulesets.Osu.Replays.Movers
 {
-    public class FlowerMover : BaseDanceMover
+    public class FlowerMover : DanceMover
     {
         private readonly float mult;
         private readonly float nmult;

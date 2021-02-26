@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -121,7 +122,7 @@ namespace osu.Game.Collections
             Current.TriggerChange();
         }
 
-        protected override string GenerateItemText(CollectionFilterMenuItem item) => item.CollectionName.Value;
+        protected override LocalisableString GenerateItemText(CollectionFilterMenuItem item) => item.CollectionName.Value;
 
         protected sealed override DropdownHeader CreateHeader() => CreateCollectionHeader().With(d =>
         {
@@ -139,7 +140,7 @@ namespace osu.Game.Collections
             public readonly Bindable<CollectionFilterMenuItem> SelectedItem = new Bindable<CollectionFilterMenuItem>();
             private readonly Bindable<string> collectionName = new Bindable<string>();
 
-            protected override string Label
+            protected override LocalisableString Label
             {
                 get => base.Label;
                 set { } // See updateText().
@@ -150,7 +151,6 @@ namespace osu.Game.Collections
                 Height = 25;
                 Icon.Size = new Vector2(16);
                 Foreground.Padding = new MarginPadding { Top = 4, Bottom = 4, Left = 8, Right = 4 };
-                Text.UseLegacyUnicode = true;
             }
 
             protected override void LoadComplete()
@@ -292,7 +292,6 @@ namespace osu.Game.Collections
             protected override Drawable CreateContent()
             {
                 content = (Content)base.CreateContent();
-                content.Label.UseLegacyUnicode = true;
                 return content;
             }
         }

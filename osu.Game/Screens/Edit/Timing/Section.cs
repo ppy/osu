@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Edit.Timing
                     {
                         checkbox = new OsuCheckbox
                         {
-                            LabelText = "editor.controlPoint." + typeof(T).Name.Replace(nameof(Beatmaps.ControlPoints.ControlPoint), string.Empty).ToLower()
+                            LabelText = typeof(T).Name.Replace(nameof(Beatmaps.ControlPoints.ControlPoint), string.Empty).ToLower()
                         }
                     }
                 },

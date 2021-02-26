@@ -69,6 +69,7 @@ namespace osu.Game.Configuration
             Set(MSetting.FadeOutWindowWhenExiting, false);
             Set(MSetting.FadeInWindowWhenEntering, false);
             Set(MSetting.UseSystemCursor, false);
+            Set(MSetting.PreferredFont, "Torus");
         }
     }
 
@@ -109,18 +110,19 @@ namespace osu.Game.Configuration
         UseCustomGreetingPicture,
         FadeOutWindowWhenExiting,
         FadeInWindowWhenEntering,
-        UseSystemCursor
+        UseSystemCursor,
+        PreferredFont
     }
 
     public enum MvisBarType
     {
-        [Description("settings.mvis.barType.basic")]
+        [Description("基本")]
         Basic,
 
-        [Description("settings.mvis.barType.rounded")]
+        [Description("圆角")]
         Rounded,
 
-        [Description("settings.mvis.barType.fall")]
+        [Description("打砖块")]
         Fall
     }
 }

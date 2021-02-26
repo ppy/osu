@@ -4,6 +4,7 @@
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Difficulty;
+using osu.Game.Rulesets.Catch.Mods;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Tests.Beatmaps;
 
@@ -16,6 +17,10 @@ namespace osu.Game.Rulesets.Catch.Tests
         [TestCase(4.050601681491468d, "diffcalc-test")]
         public void Test(double expected, string name)
             => base.Test(expected, name);
+
+        [TestCase(5.0565038923984691d, "diffcalc-test")]
+        public void TestClockRateAdjusted(double expected, string name)
+            => Test(expected, name, new CatchModDoubleTime());
 
         protected override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new CatchDifficultyCalculator(new CatchRuleset(), beatmap);
 

@@ -200,7 +200,7 @@ namespace osu.Game.Overlays.Mf.Sections
             t.NewParagraph();
             t.AddLink("Mvis播放器 → 基于EVAST9919/lazer-m-vis", "https://github.com/EVAST9919/lazer-m-vis");
             t.NewParagraph();
-            t.AddLink("osu!CursorDance → TechnoJo4/osu", "https://github.com/TechnoJo4/osu");
+            t.AddLink("osu!CursorDance → PercyDan54/osu", "https://github.com/PercyDan54/osu");
 
             return t;
         }

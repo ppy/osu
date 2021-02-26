@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -119,7 +118,7 @@ namespace osu.Game.Overlays.AccountCreation
 
             multiAccountExplanationText.AddText(new OsuSpriteText
             {
-                Text = new LocalisedString("你是{0}吗？", api.ProvidedUsername)
+                Text = $"你是{api.ProvidedUsername}吗？"
             });
             multiAccountExplanationText.AddText("osu!决不允许玩家多开账号！", cp => cp.Colour = colours.Yellow);
             multiAccountExplanationText.AddText("请注意开小号可能会导致永久封禁！", cp =>

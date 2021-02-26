@@ -7,7 +7,7 @@ using static osu.Game.Rulesets.Osu.Replays.Movers.MoverUtilExtensions;
 
 namespace osu.Game.Rulesets.Osu.Replays.Movers
 {
-    public class HalfCircleMover : BaseDanceMover
+    public class HalfCircleMover : DanceMover
     {
         private Vector2 middle = Vector2.Zero;
         private float radius;

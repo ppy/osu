@@ -24,13 +24,15 @@ namespace osu.Game.Overlays.Mods
 
         public FillFlowContainer<ModButtonEmpty> ButtonsContainer { get; }
 
+        protected IReadOnlyList<ModButton> Buttons { get; private set; } = Array.Empty<ModButton>();
+
         public Action<Mod> Action;
 
         public Key[] ToggleKeys;
 
         public readonly ModType ModType;
 
-        public IEnumerable<Mod> SelectedMods => buttons.Select(b => b.SelectedMod).Where(m => m != null);
+        public IEnumerable<Mod> SelectedMods => Buttons.Select(b => b.SelectedMod).Where(m => m != null);
 
         private CancellationTokenSource modsLoadCts;
 
@@ -78,7 +80,7 @@ namespace osu.Game.Overlays.Mods
                     ButtonsContainer.ChildrenEnumerable = c;
                 }, (modsLoadCts = new CancellationTokenSource()).Token);
 
-                buttons = modContainers.OfType<ModButton>().ToArray();
+                Buttons = modContainers.OfType<ModButton>().ToArray();
 
                 header.FadeIn(200);
                 this.FadeIn(200);
@@ -89,8 +91,6 @@ namespace osu.Game.Overlays.Mods
         {
         }
 
-        private ModButton[] buttons = Array.Empty<ModButton>();
-
         protected override bool OnKeyDown(KeyDownEvent e)
         {
             if (e.ControlPressed) return false;
@@ -98,8 +98,8 @@ namespace osu.Game.Overlays.Mods
             if (ToggleKeys != null)
             {
                 var index = Array.IndexOf(ToggleKeys, e.Key);
-                if (index > -1 && index < buttons.Length)
-                    buttons[index].SelectNext(e.ShiftPressed ? -1 : 1);
+                if (index > -1 && index < Buttons.Count)
+                    Buttons[index].SelectNext(e.ShiftPressed ? -1 : 1);
             }
 
             return base.OnKeyDown(e);
@@ -142,7 +142,7 @@ namespace osu.Game.Overlays.Mods
         {
             pendingSelectionOperations.Clear();
 
-            foreach (var button in buttons.Where(b => !b.Selected))
+            foreach (var button in Buttons.Where(b => !b.Selected))
                 pendingSelectionOperations.Enqueue(() => button.SelectAt(0));
         }
 
@@ -152,7 +152,7 @@ namespace osu.Game.Overlays.Mods
         public void DeselectAll()
         {
             pendingSelectionOperations.Clear();
-            DeselectTypes(buttons.Select(b => b.SelectedMod?.GetType()).Where(t => t != null));
+            DeselectTypes(Buttons.Select(b => b.SelectedMod?.GetType()).Where(t => t != null));
         }
 
         /// <summary>
@@ -162,7 +162,7 @@ namespace osu.Game.Overlays.Mods
         /// <param name="immediate">Whether the deselection should happen immediately. Should only be used when required to ensure correct selection flow.</param>
         public void DeselectTypes(IEnumerable<Type> modTypes, bool immediate = false)
         {
-            foreach (var button in buttons)
+            foreach (var button in Buttons)
             {
                 if (button.SelectedMod == null) continue;
 
@@ -185,7 +185,7 @@ namespace osu.Game.Overlays.Mods
         /// <param name="newSelectedMods">The new list of selected mods to select.</param>
         public void UpdateSelectedButtons(IReadOnlyList<Mod> newSelectedMods)
         {
-            foreach (var button in buttons)
+            foreach (var button in Buttons)
                 updateButtonSelection(button, newSelectedMods);
         }
 

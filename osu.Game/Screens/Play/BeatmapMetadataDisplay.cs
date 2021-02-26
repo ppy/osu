@@ -126,20 +126,18 @@ namespace osu.Game.Screens.Play
                                 }),
                                 new OsuSpriteText
                                 {
-                                    Text = new LocalisedString((metadata.TitleUnicode, metadata.Title)),
+                                    Text = new RomanisableString(metadata.TitleUnicode, metadata.Title),
                                     Font = OsuFont.GetFont(size: 36, italics: true),
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
-                                    Margin = new MarginPadding { Top = 15 },
-                                    UseLegacyUnicode = true
+                                    Margin = new MarginPadding { Top = 15 }
                                 },
                                 new OsuSpriteText
                                 {
-                                    Text = new LocalisedString((metadata.ArtistUnicode, metadata.Artist)),
+                                    Text = new RomanisableString(metadata.ArtistUnicode, metadata.Artist),
                                     Font = OsuFont.GetFont(size: 26, italics: true),
                                     Origin = Anchor.TopCentre,
-                                    Anchor = Anchor.TopCentre,
-                                    UseLegacyUnicode = true
+                                    Anchor = Anchor.TopCentre
                                 },
                                 new Container
                                 {
@@ -172,8 +170,7 @@ namespace osu.Game.Screens.Play
                                     Margin = new MarginPadding
                                     {
                                         Bottom = 40
-                                    },
-                                    UseLegacyUnicode = true
+                                    }
                                 },
                                 new GridContainer
                                 {

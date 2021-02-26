@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Edit.Timing
                 bpmSlider = new BPMSlider(),
                 timeSignature = new SettingsEnumDropdown<TimeSignatures>
                 {
-                    LabelText = "editor.timing.section.timing.timeSignature"
+                    LabelText = "节拍类型"
                 },
             });
         }

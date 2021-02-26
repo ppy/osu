@@ -9,7 +9,6 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Online.API;
@@ -85,19 +84,19 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             switch (localUser.State)
             {
                 case MultiplayerUserState.Idle:
-                    button.Text = "screen.multi.readyButton.ready";
+                    button.Text = "准备";
                     updateButtonColour(true);
                     break;
 
                 case MultiplayerUserState.Ready:
                     if (Room?.Host?.Equals(localUser) == true)
                     {
-                        button.Text = new LocalisedString("screen.multi.readyButton.startMatch", countText);
+                        button.Text = $"开始 {countText}";
                         updateButtonColour(true);
                     }
                     else
                     {
-                        button.Text = new LocalisedString("screen.multi.readyButton.waitingForHost", countText);
+                        button.Text = $"等待房主... {countText}";
                         updateButtonColour(false);
                     }
 

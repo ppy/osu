@@ -77,6 +77,34 @@ namespace osu.Game.Rulesets.Osu.UI
                 },
                 new SettingsCheckbox
                 {
+                    LabelText = "将Dance Mover应用至转盘",
+                    Current = config.GetBindable<bool>(OsuRulesetSetting.SpinnerDance)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "将Dance Mover应用至滑条",
+                    Current = config.GetBindable<bool>(OsuRulesetSetting.SliderDance)
+                },
+                new SettingsSlider<float, MultiplierSlider>
+                {
+                    LabelText = "Dance转盘起始半径",
+                    Current = config.GetBindable<float>(OsuRulesetSetting.SpinnerRadiusStart),
+                    KeyboardStep = 1f / 12f
+                },
+                new SettingsSlider<float, MultiplierSlider>
+                {
+                    LabelText = "Dance转盘结束半径",
+                    Current = config.GetBindable<float>(OsuRulesetSetting.SpinnerRadiusEnd),
+                    KeyboardStep = 1f / 12f
+                },
+                new SettingsSlider<float, MultiplierSlider>
+                {
+                    LabelText = "下一跳倍率(Next Jump Multiplier)",
+                    Current = config.GetBindable<float>(OsuRulesetSetting.NextJumpMulti),
+                    KeyboardStep = 1f / 12f
+                },
+                new SettingsCheckbox
+                {
                     LabelText = "遇到边界时反弹",
                     Current = config.GetBindable<bool>(OsuRulesetSetting.BorderBounce)
                 },

@@ -84,14 +84,14 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
                                     {
                                         new OsuSpriteText
                                         {
-                                            Text = new LocalisedString((SetInfo.Metadata.TitleUnicode, SetInfo.Metadata.Title)),
+                                            Text = new RomanisableString(SetInfo.Metadata.TitleUnicode, SetInfo.Metadata.Title),
                                             Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold, italics: true)
                                         },
                                     }
                                 },
                                 new OsuSpriteText
                                 {
-                                    Text = new LocalisedString((SetInfo.Metadata.ArtistUnicode, SetInfo.Metadata.Artist)),
+                                    Text = new RomanisableString(SetInfo.Metadata.ArtistUnicode, SetInfo.Metadata.Artist),
                                     Font = OsuFont.GetFont(weight: FontWeight.Bold, italics: true)
                                 },
                             },

@@ -48,8 +48,8 @@ namespace osu.Game.Overlays.Music
             artistColour = colours.Gray9;
             HandleColour = colours.Gray5;
 
-            title = localisation.GetLocalisedString(new LocalisedString((Model.Metadata.TitleUnicode, Model.Metadata.Title)));
-            artist = localisation.GetLocalisedString(new LocalisedString((Model.Metadata.ArtistUnicode, Model.Metadata.Artist)));
+            title = localisation.GetLocalisedString(new RomanisableString(Model.Metadata.TitleUnicode, Model.Metadata.Title));
+            artist = localisation.GetLocalisedString(new RomanisableString(Model.Metadata.ArtistUnicode, Model.Metadata.Artist));
         }
 
         protected override void LoadComplete()
@@ -82,7 +82,6 @@ namespace osu.Game.Overlays.Music
             titleSprites = text.AddText(title.Value + @"  ", sprite =>
             {
                 sprite.Font = OsuFont.GetFont(size: 18, weight: FontWeight.Regular);
-                sprite.UseLegacyUnicode = true;
             }).OfType<SpriteText>();
 
             text.AddText(artist.Value, sprite =>
@@ -90,7 +89,6 @@ namespace osu.Game.Overlays.Music
                 sprite.Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold);
                 sprite.Colour = artistColour;
                 sprite.Padding = new MarginPadding { Top = 1 };
-                sprite.UseLegacyUnicode = true;
             });
         }
 

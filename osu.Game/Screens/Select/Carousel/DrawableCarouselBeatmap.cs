@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Select.Carousel
         [Resolved(CanBeNull = true)]
         private ManageCollectionsDialog manageCollectionsDialog { get; set; }
 
-        private IBindable<StarDifficulty> starDifficultyBindable;
+        private IBindable<StarDifficulty?> starDifficultyBindable;
         private CancellationTokenSource starDifficultyCancellationSource;
 
         public DrawableCarouselBeatmap(CarouselBeatmap panel)
@@ -132,8 +132,7 @@ namespace osu.Game.Screens.Select.Carousel
                                             Text = beatmap.Version,
                                             Font = OsuFont.GetFont(size: 20),
                                             Anchor = Anchor.BottomLeft,
-                                            Origin = Anchor.BottomLeft,
-                                            UseLegacyUnicode = true
+                                            Origin = Anchor.BottomLeft
                                         },
                                         new OsuSpriteText
                                         {
@@ -146,8 +145,7 @@ namespace osu.Game.Screens.Select.Carousel
                                             Text = $"{(beatmap.Metadata ?? beatmap.BeatmapSet.Metadata).Author.Username}",
                                             Font = OsuFont.GetFont(italics: true),
                                             Anchor = Anchor.BottomLeft,
-                                            Origin = Anchor.BottomLeft,
-                                            UseLegacyUnicode = true
+                                            Origin = Anchor.BottomLeft
                                         },
                                     }
                                 },
@@ -219,7 +217,10 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 // We've potentially cancelled the computation above so a new bindable is required.
                 starDifficultyBindable = difficultyCache.GetBindableDifficulty(beatmap, (starDifficultyCancellationSource = new CancellationTokenSource()).Token);
-                starDifficultyBindable.BindValueChanged(d => starCounter.Current = (float)d.NewValue.Stars, true);
+                starDifficultyBindable.BindValueChanged(d =>
+                {
+                    starCounter.Current = (float)(d.NewValue?.Stars ?? 0);
+                }, true);
             }
 
             base.ApplyState();

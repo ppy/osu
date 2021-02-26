@@ -6,7 +6,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Mvis;
@@ -16,7 +15,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
 {
     public class MvisUISettings : SettingsSubsection
     {
-        protected override string Header => "settings.mvis.ui.header";
+        protected override string Header => "界面";
         private readonly BindableFloat iR = new BindableFloat();
         private readonly BindableFloat iG = new BindableFloat();
         private readonly BindableFloat iB = new BindableFloat();
@@ -33,42 +32,42 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
             {
                 new SettingsSlider<float>
                 {
-                    LabelText = "settings.mvis.ui.bgBlur",
+                    LabelText = "背景模糊",
                     Current = config.GetBindable<float>(MSetting.MvisBgBlur),
                     DisplayAsPercentage = true,
                     KeyboardStep = 0.01f,
                 },
                 new SettingsSlider<float>
                 {
-                    LabelText = "settings.mvis.ui.idleBgDim",
+                    LabelText = "空闲时的背景亮度",
                     Current = config.GetBindable<float>(MSetting.MvisIdleBgDim),
                     DisplayAsPercentage = true,
                     KeyboardStep = 0.01f,
                 },
                 new SettingsSlider<float>
                 {
-                    LabelText = "settings.mvis.ui.contentOpacity",
+                    LabelText = "空闲时Mvis面板的不透明度",
                     Current = config.GetBindable<float>(MSetting.MvisContentAlpha),
                     DisplayAsPercentage = true,
                     KeyboardStep = 0.01f,
                 },
                 new SettingsSlider<float>
                 {
-                    LabelText = "settings.mvis.ui.accentColorR",
+                    LabelText = "界面主题色(红)",
                     Current = iR,
                     KeyboardStep = 1,
                     TransferValueOnCommit = false
                 },
                 new SettingsSlider<float>
                 {
-                    LabelText = "settings.mvis.ui.accentColorG",
+                    LabelText = "界面主题色(绿)",
                     Current = iG,
                     KeyboardStep = 1,
                     TransferValueOnCommit = false
                 },
                 new SettingsSlider<float>
                 {
-                    LabelText = "settings.mvis.ui.accentColorB",
+                    LabelText = "界面主题色(蓝)",
                     Current = iB,
                     KeyboardStep = 1,
                     TransferValueOnCommit = false
@@ -214,7 +213,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 l3.Colour = provider.Light3;
                 c2.Colour = provider.Content2;
 
-                hueText.Text = new LocalisedString("settings.mvis.ui.hue", (provider.HueColour.Value * 360).ToString("#0.00"));
+                hueText.Text = $"Hue: {(provider.HueColour.Value * 360):#0.00}";
             }
         }
     }

@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
         private readonly CollectionInfo info;
 
         public float ResizeWidth => 0.8f;
-        public string Title => "screen.mvis.main.sidebar.collections";
+        public string Title => "收藏夹";
 
         public CollectionSelectPanel()
         {
