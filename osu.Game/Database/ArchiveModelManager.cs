@@ -141,6 +141,13 @@ namespace osu.Game.Database
 
         protected async Task<IEnumerable<TModel>> Import(ProgressNotification notification, params ImportTask[] tasks)
         {
+            if (tasks.Length == 0)
+            {
+                notification.CompletionText = $"没有找到任何 {HumanisedModelName} 可供导入!";
+                notification.State = ProgressNotificationState.Completed;
+                return Enumerable.Empty<TModel>();
+            }
+
             notification.Progress = 0;
             notification.Text = $"对{HumanisedModelName.Humanize(LetterCasing.Title)}的导入正在进行中";
 

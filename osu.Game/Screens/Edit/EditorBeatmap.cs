@@ -101,6 +101,22 @@ namespace osu.Game.Screens.Edit
         private readonly HashSet<HitObject> batchPendingUpdates = new HashSet<HitObject>();
 
         /// <summary>
+        /// Perform the provided action on every selected hitobject.
+        /// Changes will be grouped as one history action.
+        /// </summary>
+        /// <param name="action">The action to perform.</param>
+        public void PerformOnSelection(Action<HitObject> action)
+        {
+            if (SelectedHitObjects.Count == 0)
+                return;
+
+            BeginChange();
+            foreach (var h in SelectedHitObjects)
+                action(h);
+            EndChange();
+        }
+
+        /// <summary>
         /// Adds a collection of <see cref="HitObject"/>s to this <see cref="EditorBeatmap"/>.
         /// </summary>
         /// <param name="hitObjects">The <see cref="HitObject"/>s to add.</param>

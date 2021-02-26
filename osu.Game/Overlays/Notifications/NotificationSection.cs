@@ -10,9 +10,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
-using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Notifications
 {
@@ -122,7 +122,20 @@ namespace osu.Game.Overlays.Notifications
         {
             base.Update();
 
-            countDrawable.Text = notifications.Children.Count(c => c.Alpha > 0.99f).ToString();
+            countDrawable.Text = getVisibleCount().ToString();
+        }
+
+        private int getVisibleCount()
+        {
+            int count = 0;
+
+            foreach (var c in notifications)
+            {
+                if (c.Alpha > 0.99f)
+                    count++;
+            }
+
+            return count;
         }
 
         private class ClearAllButton : OsuClickableContainer

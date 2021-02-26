@@ -129,13 +129,13 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
                                         collectionName = new OsuSpriteText
                                         {
                                             Font = OsuFont.GetFont(size: 30),
-                                            RelativeSizeAxes = Axes.X,
+                                            //RelativeSizeAxes = Axes.X,
                                             Text = "???",
-                                            Truncate = true
+                                            //Truncate = true
                                         },
                                         collectionBeatmapCount = new OsuSpriteText
                                         {
-                                            RelativeSizeAxes = Axes.X,
+                                            //RelativeSizeAxes = Axes.X,
                                             Text = "???"
                                         }
                                     }
