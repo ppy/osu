@@ -9,7 +9,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
 {
     public class MvisAudioSettings : SettingsSubsection
     {
-        protected override string Header => "settings.mvis.audio.header";
+        protected override string Header => "音频";
 
         [BackgroundDependencyLoader]
         private void load(MConfigManager config)
@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
             {
                 new SettingsSlider<double>
                 {
-                    LabelText = "settings.mvis.audio.mvisMusicSpeed",
+                    LabelText = "播放速度",
                     Current = config.GetBindable<double>(MSetting.MvisMusicSpeed),
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true,
@@ -26,19 +26,19 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "settings.mvis.audio.adjustPitch",
+                    LabelText = "调整音调",
                     Current = config.GetBindable<bool>(MSetting.MvisAdjustMusicWithFreq),
-                    TooltipText = "settings.mvis.audio.adjustPitch.tooltip"
+                    TooltipText = "暂不支持调整故事版的音调"
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "settings.mvis.audio.nightcoreBeat",
+                    LabelText = "夜核节拍器",
                     Current = config.GetBindable<bool>(MSetting.MvisEnableNightcoreBeat),
-                    TooltipText = "settings.mvis.audio.nightcoreBeat.tooltip"
+                    TooltipText = "动次打次动次打次"
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "settings.mvis.audio.playFromCollection",
+                    LabelText = "从收藏夹播放歌曲",
                     Current = config.GetBindable<bool>(MSetting.MvisPlayFromCollection)
                 }
             };

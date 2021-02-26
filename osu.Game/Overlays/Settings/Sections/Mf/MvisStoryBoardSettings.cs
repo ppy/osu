@@ -9,7 +9,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
 {
     public class MvisStoryBoardSettings : SettingsSubsection
     {
-        protected override string Header => "settings.mvis.storyboard.header";
+        protected override string Header => "故事版";
 
         [BackgroundDependencyLoader]
         private void load(MConfigManager config)
@@ -18,13 +18,14 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "settings.mvis.storyboard.enableStoryboard",
+                    LabelText = "启用故事版",
                     Current = config.GetBindable<bool>(MSetting.MvisEnableStoryboard),
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "settings.mvis.storyboard.storyboardProxy",
+                    LabelText = "启用故事版Proxy",
                     Current = config.GetBindable<bool>(MSetting.MvisStoryboardProxy),
+                    TooltipText = "可以让故事版的Overlay显示在前景"
                 }
             };
         }

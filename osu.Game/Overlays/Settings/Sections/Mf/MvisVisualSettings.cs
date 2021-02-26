@@ -11,7 +11,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
 {
     public class MvisVisualSettings : SettingsSubsection
     {
-        protected override string Header => "settings.mvis.visual.header";
+        protected override string Header => "视觉效果";
 
         private SettingsCheckbox customColourCheckbox;
         private Container resizableContainer;
@@ -23,55 +23,55 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "settings.mvis.visual.enableBgTriangles",
+                    LabelText = "无故事版可用时显示背景动画",
                     Current = config.GetBindable<bool>(MSetting.MvisEnableBgTriangles),
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "settings.mvis.visual.showParticles",
+                    LabelText = "显示粒子",
                     Current = config.GetBindable<bool>(MSetting.MvisShowParticles)
                 },
                 new SettingsSlider<int>
                 {
-                    LabelText = "settings.mvis.visual.particleAmount",
+                    LabelText = "粒子数",
                     TransferValueOnCommit = true,
                     Current = config.GetBindable<int>(MSetting.MvisParticleAmount),
                     KeyboardStep = 1,
                 },
                 new SettingsEnumDropdown<MvisBarType>
                 {
-                    LabelText = "settings.mvis.visual.barType",
+                    LabelText = "频谱类型",
                     Current = config.GetBindable<MvisBarType>(MSetting.MvisBarType)
                 },
                 new SettingsSlider<int>
                 {
-                    LabelText = "settings.mvis.visual.visualizerAmount",
+                    LabelText = "分段数",
                     Current = config.GetBindable<int>(MSetting.MvisVisualizerAmount),
                     KeyboardStep = 1,
                     TransferValueOnCommit = true
                 },
                 new SettingsSlider<double>
                 {
-                    LabelText = "settings.mvis.visual.barWidth",
+                    LabelText = "宽度",
                     Current = config.GetBindable<double>(MSetting.MvisBarWidth),
                     KeyboardStep = 0.1f
                 },
                 new SettingsSlider<int>
                 {
-                    LabelText = "settings.mvis.visual.barsPerVisual",
+                    LabelText = "每个分段的频谱密度",
                     Current = config.GetBindable<int>(MSetting.MvisBarsPerVisual),
                     KeyboardStep = 1,
                     TransferValueOnCommit = true
                 },
                 new SettingsSlider<int>
                 {
-                    LabelText = "settings.mvis.visual.rotation",
+                    LabelText = "频谱旋转角度",
                     KeyboardStep = 1,
                     Current = config.GetBindable<int>(MSetting.MvisRotation)
                 },
                 customColourCheckbox = new SettingsCheckbox
                 {
-                    LabelText = "settings.mvis.visual.useCustomColor",
+                    LabelText = "使用自定义颜色",
                     Current = config.GetBindable<bool>(MSetting.MvisUseCustomColour)
                 },
                 resizableContainer = new Container
@@ -90,20 +90,20 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                         {
                             new SettingsSlider<int>
                             {
-                                LabelText = "settings.mvis.visual.iR",
+                                LabelText = "红",
                                 KeyboardStep = 1,
                                 Current = config.GetBindable<int>(MSetting.MvisRed)
                             },
                             new SettingsSlider<int>
                             {
-                                LabelText = "settings.mvis.visual.iG",
+                                LabelText = "绿",
                                 KeyboardStep = 1,
                                 Current = config.GetBindable<int>(MSetting.MvisGreen)
                             },
                             new SettingsSlider<int>
                             {
                                 KeyboardStep = 1,
-                                LabelText = "settings.mvis.visual.iB",
+                                LabelText = "蓝",
                                 Current = config.GetBindable<int>(MSetting.MvisBlue)
                             }
                         }
@@ -111,7 +111,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "settings.mvis.visual.useOsuLogoVisualisation",
+                    LabelText = "使用lazer自带频谱效果",
                     Current = config.GetBindable<bool>(MSetting.MvisUseOsuLogoVisualisation),
                 },
             };

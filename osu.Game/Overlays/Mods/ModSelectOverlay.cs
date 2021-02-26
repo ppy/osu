@@ -162,7 +162,7 @@ namespace osu.Game.Overlays.Mods
                                         {
                                             new OsuSpriteText
                                             {
-                                                Text = "screen.select.modOverlay.title",
+                                                Text = "Mods",
                                                 Font = OsuFont.GetFont(size: 22, weight: FontWeight.Bold),
                                                 Shadow = true,
                                                 Margin = new MarginPadding
@@ -178,7 +178,7 @@ namespace osu.Game.Overlays.Mods
                                             {
                                                 RelativeSizeAxes = Axes.X,
                                                 AutoSizeAxes = Axes.Y,
-                                                Text = "screen.select.modOverlay.desc1\nscreen.select.modOverlay.desc2",
+                                                Text = "游戏Mods提供了多种多样的游玩方式\n有一些会对您的分数等产生影响,还有一些仅供娱乐",
                                             },
                                         },
                                     },
@@ -294,7 +294,7 @@ namespace osu.Game.Overlays.Mods
                                             DeselectAllButton = new TriangleButton
                                             {
                                                 Width = 180,
-                                                Text = "generic.deSelectAll",
+                                                Text = "重置",
                                                 Action = deselectAll,
                                                 Origin = Anchor.CentreLeft,
                                                 Anchor = Anchor.CentreLeft,
@@ -302,7 +302,7 @@ namespace osu.Game.Overlays.Mods
                                             CustomiseButton = new TriangleButton
                                             {
                                                 Width = 180,
-                                                Text = "screen.select.modOverlay.customisation",
+                                                Text = "自定义",
                                                 Action = () => ModSettingsContainer.ToggleVisibility(),
                                                 Enabled = { Value = false },
                                                 Alpha = AllowConfiguration ? 1 : 0,
@@ -312,7 +312,7 @@ namespace osu.Game.Overlays.Mods
                                             CloseButton = new TriangleButton
                                             {
                                                 Width = 180,
-                                                Text = "generic.close",
+                                                Text = "关闭",
                                                 Action = Hide,
                                                 Origin = Anchor.CentreLeft,
                                                 Anchor = Anchor.CentreLeft,
@@ -327,7 +327,7 @@ namespace osu.Game.Overlays.Mods
                                                 {
                                                     new OsuSpriteText
                                                     {
-                                                        Text = "screen.select.modOverlay.scoreMultiplier",
+                                                        Text = "分数倍率: ",
                                                         Font = OsuFont.GetFont(size: 30),
                                                         Origin = Anchor.CentreLeft,
                                                         Anchor = Anchor.CentreLeft,

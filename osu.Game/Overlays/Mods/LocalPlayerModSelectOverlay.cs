@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Mods
                 Origin = Anchor.CentreLeft,
                 Anchor = Anchor.CentreLeft,
                 Width = 180,
-                Text = "generic.selectAll",
+                Text = "全选",
                 Action = selectAll,
                 TooltipText = "¿",
                 Alpha = 0
