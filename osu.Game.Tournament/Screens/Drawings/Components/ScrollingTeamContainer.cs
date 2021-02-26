@@ -345,7 +345,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
 
                 Flag.Anchor = Anchor.Centre;
                 Flag.Origin = Anchor.Centre;
-                Flag.Scale = new Vector2(0.9f);
+                Flag.Scale = new Vector2(0.7f);
 
                 InternalChildren = new Drawable[]
                 {
