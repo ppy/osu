@@ -147,7 +147,7 @@ namespace osu.Game
 
         public OsuGameBase()
         {
-            UseDevelopmentServer = RuntimeInfo.OS != RuntimeInfo.Platform.Android && DebugUtils.IsDebugBuild;
+            UseDevelopmentServer = DebugUtils.IsDebugBuild;
             Name = @"osu!lazer";
         }
 
