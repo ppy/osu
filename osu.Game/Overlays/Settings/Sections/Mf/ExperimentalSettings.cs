@@ -55,11 +55,6 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                         Colour = Color4.Gold
                     },
                 },
-                new SettingsCheckbox
-                {
-                    LabelText = "使用自定义开屏页背景",
-                    Current = mConfig.GetBindable<bool>(MSetting.UseCustomGreetingPicture)
-                },
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
@@ -103,12 +98,6 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                     LabelText = "启动时淡入窗口",
                     TooltipText = isSdlBackend ? string.Empty : "仅当窗口后端为SDL2时可用",
                     Current = fadeInWindowBindable = mConfig.GetBindable<bool>(MSetting.FadeInWindowWhenEntering),
-                });
-
-                Add(new SettingsCheckbox
-                {
-                    LabelText = "使用系统光标",
-                    Current = mConfig.GetBindable<bool>(MSetting.UseSystemCursor),
                 });
 
                 fadeOutWindowBindable.Disabled = !isSdlBackend;
