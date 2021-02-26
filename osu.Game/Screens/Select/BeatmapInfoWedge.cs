@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; }
 
-        private IBindable<StarDifficulty> beatmapDifficulty;
+        private IBindable<StarDifficulty?> beatmapDifficulty;
 
         protected BufferedWedgeInfo Info;
 
@@ -135,7 +135,7 @@ namespace osu.Game.Screens.Select
                     return;
                 }
 
-                LoadComponentAsync(loadingInfo = new BufferedWedgeInfo(beatmap, ruleset.Value, mods.Value, beatmapDifficulty.Value)
+                LoadComponentAsync(loadingInfo = new BufferedWedgeInfo(beatmap, ruleset.Value, mods.Value, beatmapDifficulty.Value ?? new StarDifficulty())
                 {
                     Shear = -Shear,
                     Depth = Info?.Depth + 1 ?? 0
