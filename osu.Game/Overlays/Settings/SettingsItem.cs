@@ -207,7 +207,9 @@ namespace osu.Game.Overlays.Settings
                 UpdateState();
             }
 
-            public void UpdateState()
+            public void UpdateState() => Scheduler.AddOnce(updateState);
+
+            private void updateState()
             {
                 if (bindable == null)
                     return;
