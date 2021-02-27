@@ -615,6 +615,7 @@ namespace osu.Game.Screens.Mvis
         {
             musicController.SeekTo(position);
             sbLoader?.Seek(position);
+            fakeEditor?.Seek(position);
         }
 
         protected override void Update()
@@ -912,10 +913,18 @@ namespace osu.Game.Screens.Mvis
             sbLoader?.FadeColour(OsuColour.Gray(auto ? (overlaysHidden ? idleBgDim.Value : 0.6f) : brightness), duration, Easing.OutQuint);
         }
 
+        private FakeEditor.FakeEditor fakeEditor;
+
         private void OnBeatmapChanged(ValueChangedEvent<WorkingBeatmap> v)
         {
             var beatmap = v.NewValue;
             playFromCollection.TriggerChange();
+
+            if (fakeEditor != null)
+            {
+                RemoveInternal(fakeEditor);
+                fakeEditor.Dispose();
+            }
 
             Schedule(() =>
             {
@@ -945,6 +954,16 @@ namespace osu.Game.Screens.Mvis
                 });
                 reBind();
             }
+
+            AddInternal(fakeEditor = new FakeEditor.FakeEditor(beatmap)
+            {
+                RelativeSizeAxes = Axes.Both,
+                Depth = float.MaxValue,
+                Alpha = 0.01f,
+                Size = new Vector2(0.01f),
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre
+            });
 
             activity.Value = new UserActivity.InMvis(beatmap.BeatmapInfo);
             prevBeatmap = beatmap;

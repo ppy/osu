@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Overlays;
@@ -34,7 +35,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
         public readonly BindableBool NeedToHideTriangles = new BindableBool();
         public readonly BindableBool StoryboardReplacesBackground = new BindableBool();
 
-        private StoryboardClock storyboardClock = new StoryboardClock();
+        private DecoupleableInterpolatingFramedClock storyboardClock = new DecoupleableInterpolatingFramedClock();
         private BackgroundStoryboard currentStoryboard;
 
         private readonly WorkingBeatmap targetBeatmap;
@@ -60,7 +61,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
             currentBeatmap.BindValueChanged(v =>
             {
                 if (v.NewValue == targetBeatmap)
-                    storyboardClock.ChangeSource(v.NewValue.Track);
+                    storyboardClock.ChangeSource(v.NewValue.Track, false);
             });
         }
 
@@ -81,9 +82,9 @@ namespace osu.Game.Screens.Mvis.Storyboard
             StoryboardReplacesBackground.Value = false;
 
             storyboardClock.IsCoupled = false;
-            storyboardClock.Stop();
+            storyboardClock.Stop(false);
 
-            storyboardClock = new StoryboardClock();
+            storyboardClock = new DecoupleableInterpolatingFramedClock();
             cancellationTokenSource = new CancellationTokenSource();
 
             loadTask = LoadComponentAsync(
@@ -95,7 +96,7 @@ namespace osu.Game.Screens.Mvis.Storyboard
                 onLoaded: newStoryboard =>
                 {
                     //bug: 过早Seek至歌曲时间会导致部分故事版加载过程僵死
-                    storyboardClock.ChangeSource(beatmap.Track);
+                    storyboardClock.ChangeSource(beatmap.Track, false);
                     Seek(beatmap.Track.CurrentTime);
 
                     sbLoaded.Value = true;

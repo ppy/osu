@@ -224,10 +224,12 @@ namespace osu.Game.Screens.Edit
 
         public FrameTimeInfo TimeInfo => underlyingClock.TimeInfo;
 
-        public void ChangeSource(IClock source)
+        public void ChangeSource(IClock source) => ChangeSource(source, true);
+
+        public void ChangeSource(IClock source, bool includeSource)
         {
             track.Value = source as Track;
-            underlyingClock.ChangeSource(source);
+            underlyingClock.ChangeSource(source, includeSource);
         }
 
         public IClock Source => underlyingClock.Source;
