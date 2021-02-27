@@ -224,12 +224,10 @@ namespace osu.Game.Screens.Edit
 
         public FrameTimeInfo TimeInfo => underlyingClock.TimeInfo;
 
-        public void ChangeSource(IClock source) => ChangeSource(source, true);
-
-        public void ChangeSource(IClock source, bool includeSource)
+        public void ChangeSource(IClock source)
         {
             track.Value = source as Track;
-            underlyingClock.ChangeSource(source, includeSource);
+            underlyingClock.ChangeSource(source);
         }
 
         public IClock Source => underlyingClock.Source;
@@ -238,6 +236,12 @@ namespace osu.Game.Screens.Edit
         {
             get => underlyingClock.IsCoupled;
             set => underlyingClock.IsCoupled = value;
+        }
+
+        public bool DisableSourceAdjustment
+        {
+            get => underlyingClock.DisableSourceAdjustment;
+            set => underlyingClock.DisableSourceAdjustment = value;
         }
 
         private const double transform_time = 300;

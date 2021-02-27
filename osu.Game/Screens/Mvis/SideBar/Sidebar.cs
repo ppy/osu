@@ -232,7 +232,8 @@ namespace osu.Game.Screens.Mvis.SideBar
                     if (t.Value == sc)
                     {
                         header.Tabs.Remove(t);
-                        break;
+                        drawable.Expire();
+                        return true;
                     }
                 }
             }

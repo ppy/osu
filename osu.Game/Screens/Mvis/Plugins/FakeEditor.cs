@@ -6,14 +6,15 @@ using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit;
 using osu.Game.Skinning;
 
-namespace osu.Game.Screens.Mvis.FakeEditor
+namespace osu.Game.Screens.Mvis.Plugins
 {
     [Cached(typeof(IBeatSnapProvider))]
-    public class FakeEditor : Container, IBeatSnapProvider
+    public class FakeEditor : MvisPlugin, IBeatSnapProvider
     {
         private DependencyContainer dependencies;
 
@@ -25,7 +26,11 @@ namespace osu.Game.Screens.Mvis.FakeEditor
 
         public FakeEditor(WorkingBeatmap beatmap)
         {
+            Name = "假Editor";
+            Description = "用于提供打击音效; Mfosu自带插件";
+
             this.beatmap = beatmap;
+            Masking = true;
         }
 
         [Resolved]
@@ -35,10 +40,22 @@ namespace osu.Game.Screens.Mvis.FakeEditor
 
         public EditorClock EditorClock;
 
+        private Ruleset ruleset;
+        private BeatmapSkinProvidingContainer beatmapSkinProvider;
+        private SkinProvidingContainer rulesetSkinProvider;
+
         public void Seek(double location) => EditorClock?.Seek(location);
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void Update()
+        {
+            EditorClock?.ProcessFrame();
+            base.Update();
+        }
+
+        protected override Drawable CreateContent()
+            => beatmapSkinProvider.WithChild(rulesetSkinProvider.WithChild(ruleset.CreateHitObjectComposer()));
+
+        protected override bool PostInit()
         {
             beatDivisor.Value = beatmap.BeatmapInfo.BeatDivisor;
 
@@ -46,7 +63,8 @@ namespace osu.Game.Screens.Mvis.FakeEditor
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                IsCoupled = false
+                IsCoupled = true,
+                DisableSourceAdjustment = true
             };
 
             AddInternal(EditorClock);
@@ -61,7 +79,7 @@ namespace osu.Game.Screens.Mvis.FakeEditor
                 Origin = Anchor.Centre
             });
 
-            AddInternal(new BlockMouseContainer
+            AddInternal(new BlockMouseBox
             {
                 RelativeSizeAxes = Axes.Both,
                 Depth = float.MinValue,
@@ -69,40 +87,32 @@ namespace osu.Game.Screens.Mvis.FakeEditor
             });
 
             dependencies.CacheAs(editorBeatmap);
-        }
 
-        protected override void Update()
-        {
-            EditorClock.ProcessFrame();
-            base.Update();
-        }
-
-        protected override void LoadComplete()
-        {
-            var ruleset = beatmap.BeatmapInfo.Ruleset?.CreateInstance();
+            ruleset = beatmap.BeatmapInfo.Ruleset?.CreateInstance();
 
             if (ruleset == null)
             {
                 Logger.Log($"未能从 {beatmap.BeatmapInfo} 获取到可用的ruleset, 将中止加载");
-                return;
+                return false;
             }
 
-            var beatmapSkinProvider = new BeatmapSkinProvidingContainer(beatmap.Skin);
+            beatmapSkinProvider = new BeatmapSkinProvidingContainer(beatmap.Skin);
+            rulesetSkinProvider = new SkinProvidingContainer(ruleset.CreateLegacySkinProvider(beatmapSkinProvider, editorBeatmap.PlayableBeatmap));
 
-            // the beatmapSkinProvider is used as the fallback source here to allow the ruleset-specific skin implementation
-            // full access to all skin sources.
-            var rulesetSkinProvider = new SkinProvidingContainer(ruleset.CreateLegacySkinProvider(beatmapSkinProvider, editorBeatmap.PlayableBeatmap));
+            return true;
+        }
 
-            AddInternal(beatmapSkinProvider.WithChild(rulesetSkinProvider.WithChild(ruleset.CreateHitObjectComposer())));
-            EditorClock.ChangeSource(music.CurrentTrack, false);
-            EditorClock.Start();
+        protected override bool OnContentLoaded(Drawable content)
+        {
+            EditorClock.ChangeSource(music.CurrentTrack);
 
             //Logger.Log($"Clock源: {EditorClock.Source}");
+            //Logger.Log($"是否不能单独操作: {EditorClock.IsCoupled}");
             //Logger.Log($"是否在运行: {EditorClock.IsRunning}");
             //Logger.Log($"当前Track是否在运行: {music.CurrentTrack.IsRunning}");
             //Logger.Log($"在Seek或已经停止: {EditorClock.SeekingOrStopped}");
 
-            base.LoadComplete();
+            return true;
         }
 
         public double SnapTime(double time, double? referenceTime = null) => editorBeatmap.SnapTime(time, referenceTime);
@@ -111,7 +121,7 @@ namespace osu.Game.Screens.Mvis.FakeEditor
 
         public int BeatDivisor => beatDivisor.Value;
 
-        private class BlockMouseContainer : Box
+        public class BlockMouseBox : Box
         {
             protected override bool OnClick(ClickEvent e) => true;
             protected override bool OnMouseMove(MouseMoveEvent e) => true;
