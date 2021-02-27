@@ -19,6 +19,10 @@ namespace osu.Game.Tests.Mods
             var orderedSettings = objectWithSettings.GetOrderedSettingsSourceProperties().ToArray();
 
             Assert.That(orderedSettings, Has.Length.EqualTo(3));
+
+            Assert.That(orderedSettings[0].Item2.Name, Is.EqualTo(nameof(ClassWithSettings.FirstSetting)));
+            Assert.That(orderedSettings[1].Item2.Name, Is.EqualTo(nameof(ClassWithSettings.SecondSetting)));
+            Assert.That(orderedSettings[2].Item2.Name, Is.EqualTo(nameof(ClassWithSettings.ThirdSetting)));
         }
 
         private class ClassWithSettings
