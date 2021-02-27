@@ -139,9 +139,12 @@ namespace osu.Game.Configuration
 
         public static IEnumerable<(SettingSourceAttribute, PropertyInfo)> GetOrderedSettingsSourceProperties(this object obj)
         {
-            var original = obj.GetSettingsSourceProperties();
+            var original = obj.GetSettingsSourceProperties().ToArray();
 
-            var orderedRelative = original.Where(attr => attr.Item1.OrderPosition != null).OrderBy(attr => attr.Item1.OrderPosition);
+            var orderedRelative = original
+                                  .Where(attr => attr.Item1.OrderPosition != null)
+                                  .OrderBy(attr => attr.Item1.OrderPosition)
+                                  .ToArray();
             var unordered = original.Except(orderedRelative);
 
             return orderedRelative.Concat(unordered);
