@@ -1,10 +1,12 @@
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
@@ -33,6 +35,35 @@ namespace osu.Game.Screens.Mvis.Plugins
             Masking = true;
         }
 
+        private readonly BindableBool enableFakeEditor = new BindableBool();
+
+        [BackgroundDependencyLoader]
+        private void load(MConfigManager config)
+        {
+            config.BindWith(MSetting.MvisEnableFakeEditor, enableFakeEditor);
+            enableFakeEditor.BindValueChanged(onEnableFakeEditorChanged);
+        }
+
+        private void onEnableFakeEditorChanged(ValueChangedEvent<bool> v)
+        {
+            if (v.NewValue)
+            {
+                if (ContentLoaded)
+                {
+                    this.FadeIn();
+                }
+                else
+                    Load();
+            }
+            else
+            {
+                if (ContentLoaded)
+                    this.FadeOut();
+                else
+                    Cancel();
+            }
+        }
+
         [Resolved]
         private MusicController music { get; set; }
 
@@ -57,6 +88,9 @@ namespace osu.Game.Screens.Mvis.Plugins
 
         protected override bool PostInit()
         {
+            if (!enableFakeEditor.Value)
+                return false;
+
             beatDivisor.Value = beatmap.BeatmapInfo.BeatDivisor;
 
             EditorClock = new EditorClock(beatmap, beatDivisor)
