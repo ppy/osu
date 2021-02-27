@@ -23,7 +23,7 @@ namespace osu.Game.Configuration
     /// </remarks>
     [MeansImplicitUse]
     [AttributeUsage(AttributeTargets.Property)]
-    public class SettingSourceAttribute : Attribute
+    public class SettingSourceAttribute : Attribute, IComparable<SettingSourceAttribute>
     {
         public LocalisableString Label { get; }
 
@@ -41,6 +41,21 @@ namespace osu.Game.Configuration
             : this(label, description)
         {
             OrderPosition = orderPosition;
+        }
+
+        public int CompareTo(SettingSourceAttribute other)
+        {
+            if (OrderPosition == other.OrderPosition)
+                return 0;
+
+            // unordered items come last (are greater than any ordered items).
+            if (OrderPosition == null)
+                return 1;
+            if (other.OrderPosition == null)
+                return -1;
+
+            // ordered items are sorted by the order value.
+            return OrderPosition.Value.CompareTo(other.OrderPosition);
         }
     }
 
@@ -137,17 +152,13 @@ namespace osu.Game.Configuration
             }
         }
 
-        public static IEnumerable<(SettingSourceAttribute, PropertyInfo)> GetOrderedSettingsSourceProperties(this object obj)
+        public static ICollection<(SettingSourceAttribute, PropertyInfo)> GetOrderedSettingsSourceProperties(this object obj)
         {
             var original = obj.GetSettingsSourceProperties().ToArray();
 
-            var orderedRelative = original
-                                  .Where(attr => attr.Item1.OrderPosition != null)
-                                  .OrderBy(attr => attr.Item1.OrderPosition)
-                                  .ToArray();
-            var unordered = original.Except(orderedRelative);
-
-            return orderedRelative.Concat(unordered);
+            return original
+                   .OrderBy(attr => attr.Item1)
+                   .ToArray();
         }
     }
 }
