@@ -18,15 +18,19 @@ namespace osu.Game.Tests.Mods
 
             var orderedSettings = objectWithSettings.GetOrderedSettingsSourceProperties().ToArray();
 
-            Assert.That(orderedSettings, Has.Length.EqualTo(3));
+            Assert.That(orderedSettings, Has.Length.EqualTo(4));
 
             Assert.That(orderedSettings[0].Item2.Name, Is.EqualTo(nameof(ClassWithSettings.FirstSetting)));
             Assert.That(orderedSettings[1].Item2.Name, Is.EqualTo(nameof(ClassWithSettings.SecondSetting)));
             Assert.That(orderedSettings[2].Item2.Name, Is.EqualTo(nameof(ClassWithSettings.ThirdSetting)));
+            Assert.That(orderedSettings[3].Item2.Name, Is.EqualTo(nameof(ClassWithSettings.UnorderedSetting)));
         }
 
         private class ClassWithSettings
         {
+            [SettingSource("Unordered setting", "Should be last")]
+            public BindableFloat UnorderedSetting { get; set; } = new BindableFloat();
+
             [SettingSource("Second setting", "Another description", 2)]
             public BindableBool SecondSetting { get; set; } = new BindableBool();
 
