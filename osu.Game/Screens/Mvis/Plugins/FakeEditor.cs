@@ -11,12 +11,13 @@ using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Mvis.Plugins
 {
     [Cached(typeof(IBeatSnapProvider))]
-    public class FakeEditor : MvisPlugin, IBeatSnapProvider
+    public class FakeEditor : MvisPlugin, IBeatSnapProvider, ISamplePlaybackDisabler
     {
         private DependencyContainer dependencies;
 
@@ -101,6 +102,8 @@ namespace osu.Game.Screens.Mvis.Plugins
                 DisableSourceAdjustment = true
             };
 
+            SamplePlaybackDisabled.BindTo(EditorClock.SeekingOrStopped);
+
             AddInternal(EditorClock);
             dependencies.CacheAs(EditorClock);
             dependencies.CacheAs(beatDivisor);
@@ -161,5 +164,7 @@ namespace osu.Game.Screens.Mvis.Plugins
             protected override bool OnMouseMove(MouseMoveEvent e) => true;
             protected override bool OnMouseDown(MouseDownEvent e) => true;
         }
+
+        public IBindable<bool> SamplePlaybackDisabled { get; } = new Bindable<bool>();
     }
 }
