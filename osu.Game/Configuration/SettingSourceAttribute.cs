@@ -153,12 +153,8 @@ namespace osu.Game.Configuration
         }
 
         public static ICollection<(SettingSourceAttribute, PropertyInfo)> GetOrderedSettingsSourceProperties(this object obj)
-        {
-            var original = obj.GetSettingsSourceProperties().ToArray();
-
-            return original
-                   .OrderBy(attr => attr.Item1)
-                   .ToArray();
-        }
+            => obj.GetSettingsSourceProperties()
+                  .OrderBy(attr => attr.Item1)
+                  .ToArray();
     }
 }
