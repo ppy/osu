@@ -68,12 +68,10 @@ namespace osu.Game.Rulesets.Filter
                     break;
 
                 case "creator":
-                    updateCriteriaText(ref Creator, op, value);
-                    break;
+                    return updateCriteriaText(ref Creator, op, value);
 
                 case "artist":
-                    updateCriteriaText(ref Artist, op, value);
-                    break;
+                    return updateCriteriaText(ref Artist, op, value);
 
                 default:
                     return TryParseCustomKeywordCriteria(key, value, op);
@@ -141,13 +139,16 @@ namespace osu.Game.Rulesets.Filter
         private static bool parseInt(string value, out int result) =>
             int.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out result);
 
-        private static void updateCriteriaText(ref OptionalTextFilter textFilter, Operator op, string value)
+        private static bool updateCriteriaText(ref OptionalTextFilter textFilter, Operator op, string value)
         {
             switch (op)
             {
                 case Operator.Equal:
                     textFilter.SearchTerm = value.Trim('"');
-                    break;
+                    return true;
+
+                default:
+                    return false;
             }
         }
 
