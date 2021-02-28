@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Logging;
 
 namespace osu.Game.Screens.Mvis.Plugins
 {
@@ -31,10 +33,19 @@ namespace osu.Game.Screens.Mvis.Plugins
 
             sideBar?.Remove(pl.SidebarPage);
 
-            pl.Disable();
-
-            pl.UnLoad();
             avaliablePlugins.Remove(pl);
+
+            try
+            {
+                pl.UnLoad();
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "卸载插件时出现了问题");
+                avaliablePlugins.Add(pl);
+                throw;
+            }
+
             return true;
         }
 

@@ -68,8 +68,6 @@ namespace osu.Game.Screens.Mvis.Plugins
             cancellationTokenSource.Cancel();
             cancellationTokenSource = new CancellationTokenSource();
 
-            CreateContent()?.Dispose();
-
             mvisScreen?.RemovePluginFromLoadList(this);
         }
 
@@ -102,11 +100,15 @@ namespace osu.Game.Screens.Mvis.Plugins
 
         public virtual void UnLoad()
         {
+            Disable();
             Expire();
         }
 
         public virtual bool Disable()
         {
+            if (!ContentLoaded)
+                Cancel();
+
             Disabled.Value = true;
             return true;
         }
