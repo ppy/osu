@@ -193,6 +193,14 @@ namespace osu.Game.Tests.NonVisual.Filtering
         }
 
         [Test]
+        public void TestOperatorParsing()
+        {
+            const string query = "custom=><something";
+            var filterCriteria = new CustomFilterCriteria(new OsuRuleset().RulesetInfo, new FilterCreationParameters { Query = query });
+            Assert.AreEqual("><something", filterCriteria.CustomValue);
+        }
+
+        [Test]
         public void TestCustomKeywordIsParsed()
         {
             const string query = "custom=readme unrecognised=keyword";
@@ -210,9 +218,9 @@ namespace osu.Game.Tests.NonVisual.Filtering
 
             public string CustomValue { get; set; }
 
-            protected override bool TryParseCustomKeywordCriteria(string key, string value, string op)
+            protected override bool TryParseCustomKeywordCriteria(string key, string value, Operator op)
             {
-                if (key == "custom" && op == "=")
+                if (key == "custom" && op == Operator.Equal)
                 {
                     CustomValue = value;
                     return true;

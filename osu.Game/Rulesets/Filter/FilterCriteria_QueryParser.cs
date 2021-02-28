@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Filter
     public partial class FilterCriteria
     {
         private static readonly Regex query_syntax_regex = new Regex(
-            @"\b(?<key>\w+)(?<op>[=:><]+)(?<value>("".*"")|(\S*))",
+            @"\b(?<key>\w+)(?<op>(:|=|(>|<)(:|=)?))(?<value>("".*"")|(\S*))",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private void applyQueries(string query)
@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Filter
             foreach (Match match in query_syntax_regex.Matches(query))
             {
                 var key = match.Groups["key"].Value.ToLower();
-                var op = match.Groups["op"].Value;
+                var op = parseOperator(match.Groups["op"].Value);
                 var value = match.Groups["value"].Value;
 
                 if (tryParseKeywordCriteria(key, value, op))
@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Filter
             SearchText = query;
         }
 
-        private bool tryParseKeywordCriteria(string key, string value, string op)
+        private bool tryParseKeywordCriteria(string key, string value, Operator op)
         {
             switch (key)
             {
@@ -97,7 +97,34 @@ namespace osu.Game.Rulesets.Filter
         /// Valid criteria are stripped from <see cref="SearchText"/>,
         /// while ignored criteria are included in <see cref="SearchText"/>.
         /// </returns>
-        protected virtual bool TryParseCustomKeywordCriteria(string key, string value, string op) => false;
+        protected virtual bool TryParseCustomKeywordCriteria(string key, string value, Operator op) => false;
+
+        private Operator parseOperator(string value)
+        {
+            switch (value)
+            {
+                case "=":
+                case ":":
+                    return Operator.Equal;
+
+                case "<":
+                    return Operator.Less;
+
+                case "<=":
+                case "<:":
+                    return Operator.LessOrEqual;
+
+                case ">":
+                    return Operator.Greater;
+
+                case ">=":
+                case ">:":
+                    return Operator.GreaterOrEqual;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(value), $"Unsupported operator {value}");
+            }
+        }
 
         private static int getLengthScale(string value) =>
             value.EndsWith("ms", StringComparison.Ordinal) ? 1 :
@@ -114,84 +141,77 @@ namespace osu.Game.Rulesets.Filter
         private static bool parseInt(string value, out int result) =>
             int.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out result);
 
-        private static void updateCriteriaText(ref OptionalTextFilter textFilter, string op, string value)
+        private static void updateCriteriaText(ref OptionalTextFilter textFilter, Operator op, string value)
         {
             switch (op)
             {
-                case "=":
-                case ":":
+                case Operator.Equal:
                     textFilter.SearchTerm = value.Trim('"');
                     break;
             }
         }
 
-        private static void updateCriteriaRange(ref OptionalRange<float> range, string op, float value, float tolerance = 0.05f)
+        private static void updateCriteriaRange(ref OptionalRange<float> range, Operator op, float value, float tolerance = 0.05f)
         {
             switch (op)
             {
                 default:
                     return;
 
-                case "=":
-                case ":":
+                case Operator.Equal:
                     range.Min = value - tolerance;
                     range.Max = value + tolerance;
                     break;
 
-                case ">":
+                case Operator.Greater:
                     range.Min = value + tolerance;
                     break;
 
-                case ">=":
-                case ">:":
+                case Operator.GreaterOrEqual:
                     range.Min = value - tolerance;
                     break;
 
-                case "<":
+                case Operator.Less:
                     range.Max = value - tolerance;
                     break;
 
-                case "<=":
-                case "<:":
+                case Operator.LessOrEqual:
                     range.Max = value + tolerance;
                     break;
             }
         }
 
-        private static void updateCriteriaRange(ref OptionalRange<double> range, string op, double value, double tolerance = 0.05)
+        private static void updateCriteriaRange(ref OptionalRange<double> range, Operator op, double value, double tolerance = 0.05)
         {
             switch (op)
             {
                 default:
                     return;
 
-                case "=":
-                case ":":
+                case Operator.Equal:
                     range.Min = value - tolerance;
                     range.Max = value + tolerance;
                     break;
 
-                case ">":
+                case Operator.Greater:
                     range.Min = value + tolerance;
                     break;
 
-                case ">=":
-                case ">:":
+                case Operator.GreaterOrEqual:
                     range.Min = value - tolerance;
                     break;
 
-                case "<":
+                case Operator.Less:
                     range.Max = value - tolerance;
                     break;
 
-                case "<=":
-                case "<:":
+                case Operator.LessOrEqual:
                     range.Max = value + tolerance;
                     break;
             }
         }
 
-        private static void updateCriteriaRange<T>(ref OptionalRange<T> range, string op, T value)
+        private static void updateCriteriaRange<T>(ref OptionalRange<T> range, Operator op, T value)
             where T : struct
         {
             switch (op)
@@ -199,35 +219,41 @@ namespace osu.Game.Rulesets.Filter
                 default:
                     return;
 
-                case "=":
-                case ":":
+                case Operator.Equal:
                     range.IsLowerInclusive = range.IsUpperInclusive = true;
                     range.Min = value;
                     range.Max = value;
                     break;
 
-                case ">":
+                case Operator.Greater:
                     range.IsLowerInclusive = false;
                     range.Min = value;
                     break;
 
-                case ">=":
-                case ">:":
+                case Operator.GreaterOrEqual:
                     range.IsLowerInclusive = true;
                     range.Min = value;
                     break;
 
-                case "<":
+                case Operator.Less:
                     range.IsUpperInclusive = false;
                     range.Max = value;
                     break;
 
-                case "<=":
-                case "<:":
+                case Operator.LessOrEqual:
                     range.IsUpperInclusive = true;
                     range.Max = value;
                     break;
             }
+        }
+
+        protected enum Operator
+        {
+            Less,
+            LessOrEqual,
+            Equal,
+            GreaterOrEqual,
+            Greater
         }
     }
 }
