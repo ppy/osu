@@ -5,6 +5,7 @@ using System;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Filter;
+using osu.Game.Rulesets.Osu;
 
 namespace osu.Game.Tests.NonVisual.Filtering
 {
@@ -15,8 +16,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         public void TestApplyQueriesBareWords()
         {
             const string query = "looking for a beatmap";
-            var filterCriteria = new FilterCriteria();
-            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            var filterCriteria = new FilterCriteria(new OsuRuleset().RulesetInfo, new FilterCreationParameters { Query = query });
             Assert.AreEqual("looking for a beatmap", filterCriteria.SearchText);
             Assert.AreEqual(4, filterCriteria.SearchTerms.Length);
         }
@@ -35,8 +35,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         public void TestApplyStarQueries()
         {
             const string query = "stars<4 easy";
-            var filterCriteria = new FilterCriteria();
-            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            var filterCriteria = new FilterCriteria(new OsuRuleset().RulesetInfo, new FilterCreationParameters { Query = query });
             Assert.AreEqual("easy", filterCriteria.SearchText.Trim());
             Assert.AreEqual(1, filterCriteria.SearchTerms.Length);
             Assert.IsNotNull(filterCriteria.StarDifficulty.Max);
@@ -49,8 +48,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         public void TestApplyApproachRateQueries()
         {
             const string query = "ar>=9 difficult";
-            var filterCriteria = new FilterCriteria();
-            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            var filterCriteria = new FilterCriteria(new OsuRuleset().RulesetInfo, new FilterCreationParameters { Query = query });
             Assert.AreEqual("difficult", filterCriteria.SearchText.Trim());
             Assert.AreEqual(1, filterCriteria.SearchTerms.Length);
             Assert.IsNotNull(filterCriteria.ApproachRate.Min);
@@ -63,8 +61,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         public void TestApplyDrainRateQueriesByDrKeyword()
         {
             const string query = "dr>2 quite specific dr<:6";
-            var filterCriteria = new FilterCriteria();
-            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            var filterCriteria = new FilterCriteria(new OsuRuleset().RulesetInfo, new FilterCreationParameters { Query = query });
             Assert.AreEqual("quite specific", filterCriteria.SearchText.Trim());
             Assert.AreEqual(2, filterCriteria.SearchTerms.Length);
             Assert.Greater(filterCriteria.DrainRate.Min, 2.0f);
@@ -77,8 +74,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         public void TestApplyDrainRateQueriesByHpKeyword()
         {
             const string query = "hp>2 quite specific hp<=6";
-            var filterCriteria = new FilterCriteria();
-            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            var filterCriteria = new FilterCriteria(new OsuRuleset().RulesetInfo, new FilterCreationParameters { Query = query });
             Assert.AreEqual("quite specific", filterCriteria.SearchText.Trim());
             Assert.AreEqual(2, filterCriteria.SearchTerms.Length);
             Assert.Greater(filterCriteria.DrainRate.Min, 2.0f);
@@ -91,8 +87,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         public void TestApplyBPMQueries()
         {
             const string query = "bpm>:200 gotta go fast";
-            var filterCriteria = new FilterCriteria();
-            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            var filterCriteria = new FilterCriteria(new OsuRuleset().RulesetInfo, new FilterCreationParameters { Query = query });
             Assert.AreEqual("gotta go fast", filterCriteria.SearchText.Trim());
             Assert.AreEqual(3, filterCriteria.SearchTerms.Length);
             Assert.IsNotNull(filterCriteria.BPM.Min);
@@ -115,8 +110,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         public void TestApplyLengthQueries(string lengthQuery, TimeSpan expectedLength, TimeSpan scale)
         {
             string query = $"length={lengthQuery} time";
-            var filterCriteria = new FilterCriteria();
-            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            var filterCriteria = new FilterCriteria(new OsuRuleset().RulesetInfo, new FilterCreationParameters { Query = query });
             Assert.AreEqual("time", filterCriteria.SearchText.Trim());
             Assert.AreEqual(1, filterCriteria.SearchTerms.Length);
             Assert.AreEqual(expectedLength.TotalMilliseconds - scale.TotalMilliseconds / 2.0, filterCriteria.Length.Min);
@@ -127,8 +121,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         public void TestApplyDivisorQueries()
         {
             const string query = "that's a time signature alright! divisor:12";
-            var filterCriteria = new FilterCriteria();
-            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            var filterCriteria = new FilterCriteria(new OsuRuleset().RulesetInfo, new FilterCreationParameters { Query = query });
             Assert.AreEqual("that's a time signature alright!", filterCriteria.SearchText.Trim());
             Assert.AreEqual(5, filterCriteria.SearchTerms.Length);
             Assert.AreEqual(12, filterCriteria.BeatDivisor.Min);
@@ -141,8 +134,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         public void TestApplyStatusQueries()
         {
             const string query = "I want the pp status=ranked";
-            var filterCriteria = new FilterCriteria();
-            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            var filterCriteria = new FilterCriteria(new OsuRuleset().RulesetInfo, new FilterCreationParameters { Query = query });
             Assert.AreEqual("I want the pp", filterCriteria.SearchText.Trim());
             Assert.AreEqual(4, filterCriteria.SearchTerms.Length);
             Assert.AreEqual(BeatmapSetOnlineStatus.Ranked, filterCriteria.OnlineStatus.Min);
@@ -155,8 +147,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         public void TestApplyCreatorQueries()
         {
             const string query = "beatmap specifically by creator=my_fav";
-            var filterCriteria = new FilterCriteria();
-            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            var filterCriteria = new FilterCriteria(new OsuRuleset().RulesetInfo, new FilterCreationParameters { Query = query });
             Assert.AreEqual("beatmap specifically by", filterCriteria.SearchText.Trim());
             Assert.AreEqual(3, filterCriteria.SearchTerms.Length);
             Assert.AreEqual("my_fav", filterCriteria.Creator.SearchTerm);
@@ -166,8 +157,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         public void TestApplyArtistQueries()
         {
             const string query = "find me songs by artist=singer please";
-            var filterCriteria = new FilterCriteria();
-            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            var filterCriteria = new FilterCriteria(new OsuRuleset().RulesetInfo, new FilterCreationParameters { Query = query });
             Assert.AreEqual("find me songs by  please", filterCriteria.SearchText.Trim());
             Assert.AreEqual(5, filterCriteria.SearchTerms.Length);
             Assert.AreEqual("singer", filterCriteria.Artist.SearchTerm);
@@ -177,8 +167,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         public void TestApplyArtistQueriesWithSpaces()
         {
             const string query = "really like artist=\"name with space\" yes";
-            var filterCriteria = new FilterCriteria();
-            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            var filterCriteria = new FilterCriteria(new OsuRuleset().RulesetInfo, new FilterCreationParameters { Query = query });
             Assert.AreEqual("really like  yes", filterCriteria.SearchText.Trim());
             Assert.AreEqual(3, filterCriteria.SearchTerms.Length);
             Assert.AreEqual("name with space", filterCriteria.Artist.SearchTerm);
@@ -188,8 +177,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         public void TestApplyArtistQueriesOneDoubleQuote()
         {
             const string query = "weird artist=double\"quote";
-            var filterCriteria = new FilterCriteria();
-            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            var filterCriteria = new FilterCriteria(new OsuRuleset().RulesetInfo, new FilterCreationParameters { Query = query });
             Assert.AreEqual("weird", filterCriteria.SearchText.Trim());
             Assert.AreEqual(1, filterCriteria.SearchTerms.Length);
             Assert.AreEqual("double\"quote", filterCriteria.Artist.SearchTerm);
