@@ -127,5 +127,33 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             if (DrawableSpinner != null)
                 DrawableSpinner.ApplyCustomUpdateState -= UpdateStateTransforms;
         }
+
+        /// <summary>
+        /// A <see cref="Container"/> simulating osu!stable's absolute screen-space,
+        /// for perfect placements of legacy spinner components with legacy coordinates.
+        /// </summary>
+        protected class LegacyCoordinatesContainer : Container
+        {
+            /// <summary>
+            /// An offset that simulates stable's spinner top offset,
+            /// for positioning some legacy spinner components perfectly as in stable.
+            /// (e.g. 'spin' sprite, 'clear' sprite, metre in old-style spinners)
+            /// </summary>
+            public const float SPINNER_TOP_OFFSET = 29f;
+
+            public LegacyCoordinatesContainer()
+            {
+                // legacy spinners relied heavily on absolute screen-space coordinate values.
+                // wrap everything in a container simulating absolute coords to preserve alignment
+                // as there are skins that depend on it.
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+                Size = new Vector2(640, 480);
+
+                // since legacy coordinates were on screen-space, they were accounting for the playfield shift offset.
+                // therefore cancel it from here.
+                Position = new Vector2(0, -8f);
+            }
+        }
     }
 }
