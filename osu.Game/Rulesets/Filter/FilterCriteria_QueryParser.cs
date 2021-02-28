@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Filter
     public partial class FilterCriteria
     {
         private static readonly Regex query_syntax_regex = new Regex(
-            @"\b(?<key>stars|ar|dr|hp|cs|divisor|length|objects|bpm|status|creator|artist)(?<op>[=:><]+)(?<value>("".*"")|(\S*))",
+            @"\b(?<key>\w+)(?<op>[=:><]+)(?<value>("".*"")|(\S*))",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private void applyQueries(string query)
@@ -22,15 +22,14 @@ namespace osu.Game.Rulesets.Filter
                 var op = match.Groups["op"].Value;
                 var value = match.Groups["value"].Value;
 
-                parseKeywordCriteria(key, value, op);
-
-                query = query.Replace(match.ToString(), "");
+                if (tryParseKeywordCriteria(key, value, op))
+                    query = query.Replace(match.ToString(), "");
             }
 
             SearchText = query;
         }
 
-        private void parseKeywordCriteria(string key, string value, string op)
+        private bool tryParseKeywordCriteria(string key, string value, string op)
         {
             switch (key)
             {
@@ -75,8 +74,15 @@ namespace osu.Game.Rulesets.Filter
                 case "artist":
                     updateCriteriaText(ref Artist, op, value);
                     break;
+
+                default:
+                    return TryParseCustomKeywordCriteria(key, value, op);
             }
+
+            return true;
         }
+
+        protected virtual bool TryParseCustomKeywordCriteria(string key, string value, string op) => false;
 
         private static int getLengthScale(string value) =>
             value.EndsWith("ms", StringComparison.Ordinal) ? 1 :
