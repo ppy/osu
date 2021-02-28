@@ -82,6 +82,21 @@ namespace osu.Game.Rulesets.Filter
             return true;
         }
 
+        /// <summary>
+        /// Attempts to parse a single custom keyword criterion, given by the user via the song select search box.
+        /// The format of the criterion is:
+        /// <code>
+        /// {key}{op}{value}
+        /// </code>
+        /// </summary>
+        /// <param name="key">The key (name) of the criterion.</param>
+        /// <param name="value">The value of the criterion.</param>
+        /// <param name="op">The operator in the criterion.</param>
+        /// <returns>
+        /// <c>true</c> if the keyword criterion is valid, <c>false</c> if it has been ignored.
+        /// Valid criteria are stripped from <see cref="SearchText"/>,
+        /// while ignored criteria are included in <see cref="SearchText"/>.
+        /// </returns>
         protected virtual bool TryParseCustomKeywordCriteria(string key, string value, string op) => false;
 
         private static int getLengthScale(string value) =>
