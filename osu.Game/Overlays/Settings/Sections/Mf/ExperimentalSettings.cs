@@ -53,7 +53,13 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                         Text = "注意! 这些设置可能会很有帮助, 但调整不好可能会影响整个游戏的稳定性!",
                         RelativeSizeAxes = Axes.X,
                         Colour = Color4.Gold
-                    },
+                    }
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "在Mvis播放器中启用Note打击音效",
+                    TooltipText = "不稳定, 相当于在后台开了个编辑器",
+                    Current = mConfig.GetBindable<bool>(MSetting.MvisEnableFakeEditor)
                 },
                 new Container
                 {
