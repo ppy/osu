@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Mvis.Plugins
 
         #region 异步加载任务
 
-        private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        private CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
         #endregion
 
@@ -66,6 +66,8 @@ namespace osu.Game.Screens.Mvis.Plugins
         public void Cancel()
         {
             cancellationTokenSource.Cancel();
+            cancellationTokenSource = new CancellationTokenSource();
+
             CreateContent()?.Dispose();
 
             mvisScreen?.RemovePluginFromLoadList(this);

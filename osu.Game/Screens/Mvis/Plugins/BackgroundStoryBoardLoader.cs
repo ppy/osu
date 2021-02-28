@@ -3,6 +3,7 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+//using osu.Framework.Logging;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -29,6 +30,7 @@ namespace osu.Game.Screens.Mvis.Plugins
         public readonly BindableBool StoryboardReplacesBackground = new BindableBool();
 
         private DecoupleableInterpolatingFramedClock storyboardClock = new DecoupleableInterpolatingFramedClock();
+
         private BackgroundStoryboard currentStoryboard;
 
         private readonly WorkingBeatmap targetBeatmap;
@@ -81,6 +83,8 @@ namespace osu.Game.Screens.Mvis.Plugins
             if (!enableSb.Value)
                 return false;
 
+            //Logger.Log("故事版PostInit");
+
             if (targetBeatmap == null)
                 throw new InvalidOperationException("currentBeatmap 不能为 null");
 
@@ -93,13 +97,14 @@ namespace osu.Game.Screens.Mvis.Plugins
                 IsCoupled = true,
                 DisableSourceAdjustment = true
             };
-            storyboardClock.Start();
 
+            //Logger.Log("故事版PostInit - 完成");
             return true;
         }
 
         protected override bool OnContentLoaded(Drawable content)
         {
+            //Logger.Log("故事版OnContentLoaded");
             var newStoryboard = (BackgroundStoryboard)content;
 
             //bug: 过早Seek至歌曲时间会导致部分故事版加载过程僵死
@@ -114,6 +119,7 @@ namespace osu.Game.Screens.Mvis.Plugins
             enableSb.TriggerChange();
             OnNewStoryboardLoaded?.Invoke();
 
+            //Logger.Log("故事版OnContentLoaded - 完成");
             return true;
         }
 
@@ -138,14 +144,20 @@ namespace osu.Game.Screens.Mvis.Plugins
                     currentStoryboard?.FadeIn(STORYBOARD_FADEIN_DURATION, Easing.OutQuint);
                 }
                 else
+                {
+                    //Logger.Log("内容没有加载, 重新加载");
                     Load();
+                }
             }
             else
             {
                 if (ContentLoaded)
                     currentStoryboard?.FadeOut(STORYBOARD_FADEOUT_DURATION, Easing.OutQuint);
                 else
+                {
+                    //Logger.Log("取消加载");
                     Cancel();
+                }
 
                 StoryboardReplacesBackground.Value = false;
                 NeedToHideTriangles.Value = false;

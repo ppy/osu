@@ -25,13 +25,14 @@ namespace osu.Game.Screens.Mvis.Plugins
             return true;
         }
 
-        public bool RemovePlugin(MvisPlugin pl)
+        public bool UnLoadPlugin(MvisPlugin pl)
         {
             if (!avaliablePlugins.Contains(pl) || pl == null) return false;
 
             sideBar?.Remove(pl.SidebarPage);
 
             pl.Disable();
+
             pl.UnLoad();
             avaliablePlugins.Remove(pl);
             return true;

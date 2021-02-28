@@ -511,6 +511,8 @@ namespace osu.Game.Screens.Mvis
 
         protected override void LoadComplete()
         {
+            loadList.BindCollectionChanged(onLoadListChanged);
+
             bgBlur.BindValueChanged(v => updateBackground(Beatmap.Value));
             contentAlpha.BindValueChanged(_ => updateIdleVisuals());
             idleBgDim.BindValueChanged(_ => updateIdleVisuals());
@@ -580,8 +582,6 @@ namespace osu.Game.Screens.Mvis
                     background.Add(proxyContainer);
                 }
             }, true);
-
-            loadList.BindCollectionChanged(onLoadListChanged, true);
 
             showOverlays(true);
 
@@ -961,7 +961,7 @@ namespace osu.Game.Screens.Mvis
 
             if (fakeEditor != null)
             {
-                pluginManager.RemovePlugin(fakeEditor);
+                pluginManager.UnLoadPlugin(fakeEditor);
                 RemoveInternal(fakeEditor);
                 fakeEditor.Dispose();
             }
@@ -974,7 +974,7 @@ namespace osu.Game.Screens.Mvis
 
             if (beatmap != prevBeatmap)
             {
-                pluginManager.RemovePlugin(sbLoader);
+                pluginManager.UnLoadPlugin(sbLoader);
                 sbLoader?.FadeOut(BackgroundStoryBoardLoader.STORYBOARD_FADEOUT_DURATION, Easing.OutQuint).Expire();
                 sbLoader = null;
                 background.Add(sbLoader = new BackgroundStoryBoardLoader(beatmap)

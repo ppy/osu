@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Visual.Mvis
             {
                 foreach (var mvisPlugin in manager.GetAvaliablePlugins())
                 {
-                    if (manager.RemovePlugin(mvisPlugin))
+                    if (manager.UnLoadPlugin(mvisPlugin))
                         Remove(mvisPlugin);
                 }
 
@@ -114,11 +114,13 @@ namespace osu.Game.Tests.Visual.Mvis
 
         private class VoidSidebarContent : PluginSidebarPage
         {
+            private readonly OsuSpriteText t;
+
             public VoidSidebarContent(float reWidth, string tabTitle)
                 : base(reWidth, tabTitle)
             {
                 RelativeSizeAxes = Axes.Both;
-                InternalChild = new FillFlowContainer
+                Child = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
@@ -134,8 +136,15 @@ namespace osu.Game.Tests.Visual.Mvis
                         {
                             Text = "width: " + reWidth.ToString(CultureInfo.CurrentCulture),
                         },
+                        t = new OsuSpriteText()
                     }
                 };
+            }
+
+            protected override void InitContent(MvisPlugin plugin)
+            {
+                t.Text = plugin.ToString();
+                base.InitContent(plugin);
             }
         }
     }

@@ -1,5 +1,3 @@
-using System;
-using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -9,9 +7,16 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Mvis.Plugins
 {
-    public class PluginSidebarPage : CompositeDrawable, ISidebarContent
+    public class PluginSidebarPage : Container, ISidebarContent
     {
-        private Container blockMouseContainer;
+        private readonly Container blockMouseContainer;
+        private readonly Container content;
+
+        protected override Container<Drawable> Content => content;
+
+        protected virtual void InitContent(MvisPlugin plugin)
+        {
+        }
 
         private MvisPlugin plugin;
 
@@ -20,20 +25,28 @@ namespace osu.Game.Screens.Mvis.Plugins
             get => plugin;
             set
             {
-                if (plugin != null) throw new InvalidOperationException("不能设置两次Plugin");
-
                 plugin = value;
+
+                InitContent(value);
 
                 value.Disabled.BindValueChanged(v =>
                 {
                     switch (v.NewValue)
                     {
                         case true:
-                            Schedule(() => blockMouseContainer.FadeIn(200));
+                            Schedule(() =>
+                            {
+                                content.FadeOut();
+                                blockMouseContainer.FadeIn(200);
+                            });
                             break;
 
                         case false:
-                            Schedule(() => blockMouseContainer.FadeOut(200));
+                            Schedule(() =>
+                            {
+                                content.FadeIn(200);
+                                blockMouseContainer.FadeOut(200);
+                            });
                             break;
                     }
                 }, true);
@@ -44,30 +57,34 @@ namespace osu.Game.Screens.Mvis.Plugins
         {
             ResizeWidth = resizeWidth;
             Title = title;
-        }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            AddInternal(blockMouseContainer = new Container
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Depth = float.MinValue,
-                Children = new Drawable[]
+                content = new Container
                 {
-                    new FakeEditor.BlockMouseBox
+                    RelativeSizeAxes = Axes.Both,
+                    Alpha = 0
+                },
+                blockMouseContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Depth = float.MinValue,
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black.Opacity(0.5f),
-                    },
-                    new OsuSpriteText
-                    {
-                        Text = "插件已禁用",
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre
+                        new FakeEditor.BlockMouseBox
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.Black.Opacity(0.5f),
+                        },
+                        new OsuSpriteText
+                        {
+                            Text = "插件已禁用",
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre
+                        }
                     }
                 }
-            });
+            };
         }
 
         public float ResizeWidth { get; }
