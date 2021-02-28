@@ -7,8 +7,9 @@ using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Overlays;
+using osu.Game.Screens.Mvis.Plugins.Storyboard;
 
-namespace osu.Game.Screens.Mvis.Plugins.Storyboard
+namespace osu.Game.Screens.Mvis.Plugins
 {
     ///<summary>
     /// 负责故事版的异步加载功能
@@ -92,6 +93,7 @@ namespace osu.Game.Screens.Mvis.Plugins.Storyboard
                 IsCoupled = true,
                 DisableSourceAdjustment = true
             };
+            storyboardClock.Start();
 
             return true;
         }

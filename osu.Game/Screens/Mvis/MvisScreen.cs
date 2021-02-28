@@ -32,7 +32,6 @@ using osu.Game.Screens.Mvis.Collections;
 using osu.Game.Screens.Mvis.Collections.Interface;
 using osu.Game.Screens.Mvis.Objects;
 using osu.Game.Screens.Mvis.Plugins;
-using osu.Game.Screens.Mvis.Plugins.Storyboard;
 using osu.Game.Screens.Mvis.SideBar;
 using osu.Game.Screens.Mvis.Skinning;
 using osu.Game.Screens.Play;
@@ -582,7 +581,7 @@ namespace osu.Game.Screens.Mvis
                 }
             }, true);
 
-            loadList.BindCollectionChanged(onLoadListChanged);
+            loadList.BindCollectionChanged(onLoadListChanged, true);
 
             showOverlays(true);
 
