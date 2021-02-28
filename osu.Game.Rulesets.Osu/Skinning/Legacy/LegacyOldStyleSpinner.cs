@@ -33,39 +33,31 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         {
             spinnerBlink = source.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.SpinnerNoBlink)?.Value != true;
 
-            AddInternal(new Container
+            AddRangeInternal(new Drawable[]
             {
-                // the old-style spinner relied heavily on absolute screen-space coordinate values.
-                // wrap everything in a container simulating absolute coords to preserve alignment
-                // as there are skins that depend on it.
-                Width = 640,
-                Height = 480,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Children = new Drawable[]
+                new Sprite
                 {
-                    new Sprite
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Texture = source.GetTexture("spinner-background"),
-                        Scale = new Vector2(SPRITE_SCALE)
-                    },
-                    disc = new Sprite
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Texture = source.GetTexture("spinner-circle"),
-                        Scale = new Vector2(SPRITE_SCALE)
-                    },
-                    metre = new Container
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Texture = source.GetTexture("spinner-background"),
+                    Scale = new Vector2(SPRITE_SCALE)
+                },
+                disc = new Sprite
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Texture = source.GetTexture("spinner-circle"),
+                    Scale = new Vector2(SPRITE_SCALE)
+                },
+                new LegacyCoordinatesContainer
+                {
+                    Child = metre = new Container
                     {
                         AutoSizeAxes = Axes.Both,
                         // this anchor makes no sense, but that's what stable uses.
                         Anchor = Anchor.TopLeft,
                         Origin = Anchor.TopLeft,
-                        // adjustment for stable (metre has additional offset)
-                        Margin = new MarginPadding { Top = 20 },
+                        Margin = new MarginPadding { Top = LegacyCoordinatesContainer.SPINNER_TOP_OFFSET },
                         Masking = true,
                         Child = metreSprite = new Sprite
                         {

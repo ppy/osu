@@ -30,27 +30,29 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             DrawableSpinner = (DrawableSpinner)drawableHitObject;
 
-            AddRangeInternal(new[]
+            AddInternal(new LegacyCoordinatesContainer
             {
-                spin = new Sprite
+                Depth = float.MinValue,
+                Children = new Drawable[]
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Depth = float.MinValue,
-                    Texture = source.GetTexture("spinner-spin"),
-                    Scale = new Vector2(SPRITE_SCALE),
-                    Y = 120 - 45 // offset temporarily to avoid overlapping default spin counter
-                },
-                clear = new Sprite
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Depth = float.MinValue,
-                    Alpha = 0,
-                    Texture = source.GetTexture("spinner-clear"),
-                    Scale = new Vector2(SPRITE_SCALE),
-                    Y = -60
-                },
+                    spin = new Sprite
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.Centre,
+                        Texture = source.GetTexture("spinner-spin"),
+                        Scale = new Vector2(SPRITE_SCALE),
+                        Y = LegacyCoordinatesContainer.SPINNER_TOP_OFFSET + 335,
+                    },
+                    clear = new Sprite
+                    {
+                        Alpha = 0,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.Centre,
+                        Texture = source.GetTexture("spinner-clear"),
+                        Scale = new Vector2(SPRITE_SCALE),
+                        Y = LegacyCoordinatesContainer.SPINNER_TOP_OFFSET + 115,
+                    },
+                }
             });
         }
 
