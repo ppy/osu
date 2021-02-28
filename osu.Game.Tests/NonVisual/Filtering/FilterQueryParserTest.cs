@@ -4,6 +4,7 @@
 using System;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Filter;
 using osu.Game.Rulesets.Osu;
 
@@ -181,6 +182,44 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.AreEqual("weird", filterCriteria.SearchText.Trim());
             Assert.AreEqual(1, filterCriteria.SearchTerms.Length);
             Assert.AreEqual("double\"quote", filterCriteria.Artist.SearchTerm);
+        }
+
+        [Test]
+        public void TestUnrecognisedKeywordIsIgnored()
+        {
+            const string query = "unrecognised=keyword";
+            var filterCriteria = new FilterCriteria(new OsuRuleset().RulesetInfo, new FilterCreationParameters { Query = query });
+            Assert.AreEqual("unrecognised=keyword", filterCriteria.SearchText.Trim());
+        }
+
+        [Test]
+        public void TestCustomKeywordIsParsed()
+        {
+            const string query = "custom=readme unrecognised=keyword";
+            var filterCriteria = new CustomFilterCriteria(new OsuRuleset().RulesetInfo, new FilterCreationParameters { Query = query });
+            Assert.AreEqual("readme", filterCriteria.CustomValue);
+            Assert.AreEqual("unrecognised=keyword", filterCriteria.SearchText.Trim());
+        }
+
+        private class CustomFilterCriteria : FilterCriteria
+        {
+            public CustomFilterCriteria(RulesetInfo rulesetInfo, FilterCreationParameters filterCreationParameters)
+                : base(rulesetInfo, filterCreationParameters)
+            {
+            }
+
+            public string CustomValue { get; set; }
+
+            protected override bool TryParseCustomKeywordCriteria(string key, string value, string op)
+            {
+                if (key == "custom" && op == "=")
+                {
+                    CustomValue = value;
+                    return true;
+                }
+
+                return false;
+            }
         }
     }
 }
