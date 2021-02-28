@@ -5,7 +5,6 @@ using System;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Filter;
-using osu.Game.Screens.Select;
 
 namespace osu.Game.Tests.NonVisual.Filtering
 {

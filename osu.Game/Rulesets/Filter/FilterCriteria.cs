@@ -7,12 +7,11 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
-using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Rulesets.Filter
 {
-    public class FilterCriteria
+    public partial class FilterCriteria
     {
         public GroupMode Group;
         public SortMode Sort;
@@ -80,7 +79,7 @@ namespace osu.Game.Rulesets.Filter
             Collection = parameters.Collection;
             UserStarDifficulty = parameters.UserStarDifficulty;
 
-            FilterQueryParser.ApplyQueries(this, parameters.Query);
+            applyQueries(parameters.Query);
         }
 
         internal FilterCriteria()
