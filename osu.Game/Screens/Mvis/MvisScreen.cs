@@ -959,12 +959,7 @@ namespace osu.Game.Screens.Mvis
             var beatmap = v.NewValue;
             playFromCollection.TriggerChange();
 
-            if (fakeEditor != null)
-            {
-                pluginManager.UnLoadPlugin(fakeEditor);
-                RemoveInternal(fakeEditor);
-                fakeEditor.Dispose();
-            }
+            pluginManager.UnLoadPlugin(fakeEditor);
 
             Schedule(() =>
             {
