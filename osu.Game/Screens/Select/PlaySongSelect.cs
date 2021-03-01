@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Select
         {
             BeatmapOptions.AddButton(@"编辑", @"该谱面", FontAwesome.Solid.PencilAlt, colours.Yellow, () => Edit());
 
-            Footer.AddButton(new FooterButtonOpenInMvis { Action = openInMvis });
+            Footer.AddButton(new FooterButtonOpenInMvis { Action = openInMvis }, null);
 
             ((PlayBeatmapDetailArea)BeatmapDetails).Leaderboard.ScoreSelected += PresentScore;
         }
@@ -102,12 +102,14 @@ namespace osu.Game.Screens.Select
                 }
 
                 var mods = Mods.Value;
-                
-                if (mods.Any(m => m is ModAutoplay)) goto Play;
-                Mods.Value = mods.Append(autoplayMod).ToArray();
-                removeAutoModOnResume = true;
+
+                if (!mods.Any(m => m is ModAutoplay))
+                {
+                    Mods.Value = mods.Append(autoplayMod).ToArray();
+                    removeAutoModOnResume = true;
+                }
             }
-        Play:
+
             SampleConfirm?.Play();
 
             this.Push(player = new PlayerLoader(() => new Player()));
