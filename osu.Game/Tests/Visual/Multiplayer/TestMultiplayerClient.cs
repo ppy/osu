@@ -3,12 +3,15 @@
 
 #nullable enable
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
@@ -27,6 +30,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         [Resolved]
         private Room apiRoom { get; set; } = null!;
+
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; } = null!;
 
         public void Connect() => isConnected.Value = true;
 
@@ -167,6 +173,20 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 ChangeUserState(user.UserID, MultiplayerUserState.WaitingForLoad);
 
             return ((IMultiplayerClient)this).LoadRequested();
+        }
+
+        protected override Task<BeatmapSetInfo> GetOnlineBeatmapSet(int beatmapId, CancellationToken cancellationToken = default)
+        {
+            Debug.Assert(Room != null);
+            Debug.Assert(apiRoom != null);
+
+            var set = apiRoom.Playlist.FirstOrDefault(p => p.BeatmapID == beatmapId)?.Beatmap.Value.BeatmapSet
+                      ?? beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == beatmapId)?.BeatmapSet;
+
+            if (set == null)
+                throw new InvalidOperationException("Beatmap not found.");
+
+            return Task.FromResult(set);
         }
     }
 }

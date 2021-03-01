@@ -17,8 +17,6 @@ using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Rulesets;
@@ -71,7 +69,7 @@ namespace osu.Game.Online.Multiplayer
         /// <summary>
         /// The <see cref="MultiplayerRoomUser"/> corresponding to the local player, if available.
         /// </summary>
-        public MultiplayerRoomUser? LocalUser => Room?.Users.SingleOrDefault(u => u.User?.Id == api.LocalUser.Value.Id);
+        public MultiplayerRoomUser? LocalUser => Room?.Users.SingleOrDefault(u => u.User?.Id == API.LocalUser.Value.Id);
 
         /// <summary>
         /// Whether the <see cref="LocalUser"/> is the host in <see cref="Room"/>.
@@ -86,13 +84,13 @@ namespace osu.Game.Online.Multiplayer
         }
 
         [Resolved]
+        protected IAPIProvider API { get; private set; } = null!;
+
+        [Resolved]
+        protected RulesetStore Rulesets { get; private set; } = null!;
+
+        [Resolved]
         private UserLookupCache userLookupCache { get; set; } = null!;
-
-        [Resolved]
-        private IAPIProvider api { get; set; } = null!;
-
-        [Resolved]
-        private RulesetStore rulesets { get; set; } = null!;
 
         // Only exists for compatibility with old osu-server-spectator build.
         // Todo: Can be removed on 2021/02/26.
@@ -515,30 +513,26 @@ namespace osu.Game.Online.Multiplayer
 
             RoomUpdated?.Invoke();
 
-            var req = new GetBeatmapSetRequest(settings.BeatmapID, BeatmapSetLookupType.BeatmapId);
-            req.Success += res =>
+            GetOnlineBeatmapSet(settings.BeatmapID, cancellationToken).ContinueWith(set => Schedule(() =>
             {
                 if (cancellationToken.IsCancellationRequested)
                     return;
 
-                updatePlaylist(settings, res);
-            };
-
-            api.Queue(req);
+                updatePlaylist(settings, set.Result);
+            }), TaskContinuationOptions.OnlyOnRanToCompletion);
         }, cancellationToken);
 
-        private void updatePlaylist(MultiplayerRoomSettings settings, APIBeatmapSet onlineSet)
+        private void updatePlaylist(MultiplayerRoomSettings settings, BeatmapSetInfo beatmapSet)
         {
             if (Room == null || !Room.Settings.Equals(settings))
                 return;
 
             Debug.Assert(apiRoom != null);
 
-            var beatmapSet = onlineSet.ToBeatmapSet(rulesets);
             var beatmap = beatmapSet.Beatmaps.Single(b => b.OnlineBeatmapID == settings.BeatmapID);
             beatmap.MD5Hash = settings.BeatmapChecksum;
 
-            var ruleset = rulesets.GetRuleset(settings.RulesetID).CreateInstance();
+            var ruleset = Rulesets.GetRuleset(settings.RulesetID).CreateInstance();
             var mods = settings.RequiredMods.Select(m => m.ToMod(ruleset));
             var allowedMods = settings.AllowedMods.Select(m => m.ToMod(ruleset));
 
@@ -567,6 +561,14 @@ namespace osu.Game.Online.Multiplayer
                 item.AllowedMods.AddRange(allowedMods);
             }
         }
+
+        /// <summary>
+        /// Retrieves a <see cref="BeatmapSetInfo"/> from an online source.
+        /// </summary>
+        /// <param name="beatmapId">The beatmap set ID.</param>
+        /// <param name="cancellationToken">A token to cancel the request.</param>
+        /// <returns>The <see cref="BeatmapSetInfo"/> retrieval task.</returns>
+        protected abstract Task<BeatmapSetInfo> GetOnlineBeatmapSet(int beatmapId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// For the provided user ID, update whether the user is included in <see cref="CurrentMatchPlayingUserIds"/>.
