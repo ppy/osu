@@ -25,6 +25,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
+        [Resolved]
+        private Room apiRoom { get; set; } = null!;
+
         public void Connect() => isConnected.Value = true;
 
         public void Disconnect() => isConnected.Value = false;
@@ -89,13 +92,28 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         protected override Task<MultiplayerRoom> JoinRoom(long roomId)
         {
-            var user = new MultiplayerRoomUser(api.LocalUser.Value.Id) { User = api.LocalUser.Value };
+            Debug.Assert(apiRoom != null);
 
-            var room = new MultiplayerRoom(roomId);
-            room.Users.Add(user);
+            var user = new MultiplayerRoomUser(api.LocalUser.Value.Id)
+            {
+                User = api.LocalUser.Value
+            };
 
-            if (room.Users.Count == 1)
-                room.Host = user;
+            var room = new MultiplayerRoom(roomId)
+            {
+                Settings =
+                {
+                    Name = apiRoom.Name.Value,
+                    BeatmapID = apiRoom.Playlist.Last().BeatmapID,
+                    RulesetID = apiRoom.Playlist.Last().RulesetID,
+                    BeatmapChecksum = apiRoom.Playlist.Last().Beatmap.Value.MD5Hash,
+                    RequiredMods = apiRoom.Playlist.Last().RequiredMods.Select(m => new APIMod(m)).ToArray(),
+                    AllowedMods = apiRoom.Playlist.Last().AllowedMods.Select(m => new APIMod(m)).ToArray(),
+                    PlaylistItemId = apiRoom.Playlist.Last().ID
+                },
+                Users = { user },
+                Host = user
+            };
 
             return Task.FromResult(room);
         }
