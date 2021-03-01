@@ -86,7 +86,13 @@ namespace osu.Game.Rulesets.Filter
         {
         }
 
-        public virtual bool Matches(BeatmapInfo beatmap)
+        /// <summary>
+        /// Checks whether the supplied <paramref name="beatmap"/> satisfies the criteria represented
+        /// by this instance.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to test the criteria against.</param>
+        /// <returns><c>true</c> if the beatmap matches the current filtering criteria, <c>false</c> otherwise.</returns>
+        public bool Matches(BeatmapInfo beatmap)
         {
             bool match =
                 Ruleset == null ||
@@ -134,8 +140,22 @@ namespace osu.Game.Rulesets.Filter
             if (match)
                 match &= Collection?.Beatmaps.Contains(beatmap) ?? true;
 
+            if (match)
+                match &= MatchesCustomCriteria(beatmap);
+
             return match;
         }
+
+        /// <summary>
+        /// Checks whether the supplied <paramref name="beatmap"/> satisfies ruleset-specific custom criteria,
+        /// in addition to the ones mandated by song select.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to test the criteria against.</param>
+        /// <returns>
+        /// <c>true</c> if the beatmap matches the ruleset-specific custom filtering criteria,
+        /// <c>false</c> otherwise.
+        /// </returns>
+        protected virtual bool MatchesCustomCriteria(BeatmapInfo beatmap) => true;
 
         public struct OptionalRange<T> : IEquatable<OptionalRange<T>>
             where T : struct
