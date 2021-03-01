@@ -35,6 +35,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             int currentScoreId = 0;
             int currentRoomId = 0;
+            int currentPlaylistItemId = 0;
 
             ((DummyAPIAccess)api).HandleRequest = req =>
             {
@@ -45,6 +46,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                         createdRoom.CopyFrom(createRoomRequest.Room);
                         createdRoom.RoomID.Value ??= currentRoomId++;
+
+                        for (int i = 0; i < createdRoom.Playlist.Count; i++)
+                            createdRoom.Playlist[i].ID = currentPlaylistItemId++;
 
                         rooms.Add(createdRoom);
                         createRoomRequest.TriggerSuccess(createdRoom);
