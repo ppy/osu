@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     public abstract class LegacySpinner : CompositeDrawable
     {
-        protected const float SPRITE_SCALE = 0.625f;
+        public const float SPRITE_SCALE = 0.625f;
 
         protected DrawableSpinner DrawableSpinner { get; private set; }
 
@@ -134,7 +134,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         /// A <see cref="Container"/> simulating osu!stable's absolute screen-space,
         /// for perfect placements of legacy spinner components with legacy coordinates.
         /// </summary>
-        protected class LegacyCoordinatesContainer : Container
+        public class LegacyCoordinatesContainer : Container
         {
             /// <summary>
             /// An offset that simulates stable's spinner top offset,
