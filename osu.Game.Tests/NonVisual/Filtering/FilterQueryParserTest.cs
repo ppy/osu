@@ -4,7 +4,9 @@
 using System;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Filter;
 using osu.Game.Screens.Select;
+using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Tests.NonVisual.Filtering
 {
@@ -202,6 +204,44 @@ namespace osu.Game.Tests.NonVisual.Filtering
             var filterCriteria = new FilterCriteria();
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.AreEqual("><something", filterCriteria.Artist.SearchTerm);
+        }
+
+        [Test]
+        public void TestUnrecognisedKeywordIsIgnored()
+        {
+            const string query = "unrecognised=keyword";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual("unrecognised=keyword", filterCriteria.SearchText);
+        }
+
+        [Test]
+        public void TestCustomKeywordIsParsed()
+        {
+            var customCriteria = new CustomFilterCriteria();
+            const string query = "custom=readme unrecognised=keyword";
+            var filterCriteria = new FilterCriteria { RulesetCriteria = customCriteria };
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual("readme", customCriteria.CustomValue);
+            Assert.AreEqual("unrecognised=keyword", filterCriteria.SearchText.Trim());
+        }
+
+        private class CustomFilterCriteria : IRulesetFilterCriteria
+        {
+            public string CustomValue { get; set; }
+
+            public bool Matches(BeatmapInfo beatmap) => true;
+
+            public bool TryParseCustomKeywordCriteria(string key, Operator op, string value)
+            {
+                if (key == "custom" && op == Operator.Equal)
+                {
+                    CustomValue = value;
+                    return true;
+                }
+
+                return false;
+            }
         }
     }
 }
