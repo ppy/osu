@@ -5,13 +5,14 @@ using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using osu.Game.Beatmaps;
+using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Screens.Select
 {
     internal static class FilterQueryParser
     {
         private static readonly Regex query_syntax_regex = new Regex(
-            @"\b(?<key>\w+)(?<op>[=:><]+)(?<value>("".*"")|(\S*))",
+            @"\b(?<key>\w+)(?<op>(:|=|(>|<)(:|=)?))(?<value>("".*"")|(\S*))",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         internal static void ApplyQueries(FilterCriteria criteria, string query)
@@ -19,7 +20,7 @@ namespace osu.Game.Screens.Select
             foreach (Match match in query_syntax_regex.Matches(query))
             {
                 var key = match.Groups["key"].Value.ToLower();
-                var op = match.Groups["op"].Value;
+                var op = parseOperator(match.Groups["op"].Value);
                 var value = match.Groups["value"].Value;
 
                 if (tryParseKeywordCriteria(criteria, key, value, op))
@@ -29,57 +30,72 @@ namespace osu.Game.Screens.Select
             criteria.SearchText = query;
         }
 
-        private static bool tryParseKeywordCriteria(FilterCriteria criteria, string key, string value, string op)
+        private static bool tryParseKeywordCriteria(FilterCriteria criteria, string key, string value, Operator op)
         {
             switch (key)
             {
                 case "stars" when parseFloatWithPoint(value, out var stars):
-                    updateCriteriaRange(ref criteria.StarDifficulty, op, stars, 0.01f / 2);
-                    break;
+                    return updateCriteriaRange(ref criteria.StarDifficulty, op, stars, 0.01f / 2);
 
                 case "ar" when parseFloatWithPoint(value, out var ar):
-                    updateCriteriaRange(ref criteria.ApproachRate, op, ar, 0.1f / 2);
-                    break;
+                    return updateCriteriaRange(ref criteria.ApproachRate, op, ar, 0.1f / 2);
 
                 case "dr" when parseFloatWithPoint(value, out var dr):
                 case "hp" when parseFloatWithPoint(value, out dr):
-                    updateCriteriaRange(ref criteria.DrainRate, op, dr, 0.1f / 2);
-                    break;
+                    return updateCriteriaRange(ref criteria.DrainRate, op, dr, 0.1f / 2);
 
                 case "cs" when parseFloatWithPoint(value, out var cs):
-                    updateCriteriaRange(ref criteria.CircleSize, op, cs, 0.1f / 2);
-                    break;
+                    return updateCriteriaRange(ref criteria.CircleSize, op, cs, 0.1f / 2);
 
                 case "bpm" when parseDoubleWithPoint(value, out var bpm):
-                    updateCriteriaRange(ref criteria.BPM, op, bpm, 0.01d / 2);
-                    break;
+                    return updateCriteriaRange(ref criteria.BPM, op, bpm, 0.01d / 2);
 
                 case "length" when parseDoubleWithPoint(value.TrimEnd('m', 's', 'h'), out var length):
                     var scale = getLengthScale(value);
-                    updateCriteriaRange(ref criteria.Length, op, length * scale, scale / 2.0);
-                    break;
+                    return updateCriteriaRange(ref criteria.Length, op, length * scale, scale / 2.0);
 
                 case "divisor" when parseInt(value, out var divisor):
-                    updateCriteriaRange(ref criteria.BeatDivisor, op, divisor);
-                    break;
+                    return updateCriteriaRange(ref criteria.BeatDivisor, op, divisor);
 
                 case "status" when Enum.TryParse<BeatmapSetOnlineStatus>(value, true, out var statusValue):
-                    updateCriteriaRange(ref criteria.OnlineStatus, op, statusValue);
-                    break;
+                    return updateCriteriaRange(ref criteria.OnlineStatus, op, statusValue);
 
                 case "creator":
-                    updateCriteriaText(ref criteria.Creator, op, value);
-                    break;
+                    return updateCriteriaText(ref criteria.Creator, op, value);
 
                 case "artist":
-                    updateCriteriaText(ref criteria.Artist, op, value);
-                    break;
+                    return updateCriteriaText(ref criteria.Artist, op, value);
 
                 default:
                     return false;
             }
+        }
 
-            return true;
+        private static Operator parseOperator(string value)
+        {
+            switch (value)
+            {
+                case "=":
+                case ":":
+                    return Operator.Equal;
+
+                case "<":
+                    return Operator.Less;
+
+                case "<=":
+                case "<:":
+                    return Operator.LessOrEqual;
+
+                case ">":
+                    return Operator.Greater;
+
+                case ">=":
+                case ">:":
+                    return Operator.GreaterOrEqual;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(value), $"Unsupported operator {value}");
+            }
         }
 
         private static int getLengthScale(string value) =>
@@ -97,120 +113,119 @@ namespace osu.Game.Screens.Select
         private static bool parseInt(string value, out int result) =>
             int.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out result);
 
-        private static void updateCriteriaText(ref FilterCriteria.OptionalTextFilter textFilter, string op, string value)
+        private static bool updateCriteriaText(ref FilterCriteria.OptionalTextFilter textFilter, Operator op, string value)
         {
             switch (op)
             {
-                case "=":
-                case ":":
+                case Operator.Equal:
                     textFilter.SearchTerm = value.Trim('"');
-                    break;
+                    return true;
+
+                default:
+                    return false;
             }
         }
 
-        private static void updateCriteriaRange(ref FilterCriteria.OptionalRange<float> range, string op, float value, float tolerance = 0.05f)
+        private static bool updateCriteriaRange(ref FilterCriteria.OptionalRange<float> range, Operator op, float value, float tolerance = 0.05f)
         {
             switch (op)
             {
                 default:
-                    return;
+                    return false;
 
-                case "=":
-                case ":":
+                case Operator.Equal:
                     range.Min = value - tolerance;
                     range.Max = value + tolerance;
                     break;
 
-                case ">":
+                case Operator.Greater:
                     range.Min = value + tolerance;
                     break;
 
-                case ">=":
-                case ">:":
+                case Operator.GreaterOrEqual:
                     range.Min = value - tolerance;
                     break;
 
-                case "<":
+                case Operator.Less:
                     range.Max = value - tolerance;
                     break;
 
-                case "<=":
-                case "<:":
+                case Operator.LessOrEqual:
                     range.Max = value + tolerance;
                     break;
             }
+
+            return true;
         }
 
-        private static void updateCriteriaRange(ref FilterCriteria.OptionalRange<double> range, string op, double value, double tolerance = 0.05)
+        private static bool updateCriteriaRange(ref FilterCriteria.OptionalRange<double> range, Operator op, double value, double tolerance = 0.05)
         {
             switch (op)
             {
                 default:
-                    return;
+                    return false;
 
-                case "=":
-                case ":":
+                case Operator.Equal:
                     range.Min = value - tolerance;
                     range.Max = value + tolerance;
                     break;
 
-                case ">":
+                case Operator.Greater:
                     range.Min = value + tolerance;
                     break;
 
-                case ">=":
-                case ">:":
+                case Operator.GreaterOrEqual:
                     range.Min = value - tolerance;
                     break;
 
-                case "<":
+                case Operator.Less:
                     range.Max = value - tolerance;
                     break;
 
-                case "<=":
-                case "<:":
+                case Operator.LessOrEqual:
                     range.Max = value + tolerance;
                     break;
             }
+
+            return true;
         }
 
-        private static void updateCriteriaRange<T>(ref FilterCriteria.OptionalRange<T> range, string op, T value)
+        private static bool updateCriteriaRange<T>(ref FilterCriteria.OptionalRange<T> range, Operator op, T value)
             where T : struct
         {
             switch (op)
             {
                 default:
-                    return;
+                    return false;
 
-                case "=":
-                case ":":
+                case Operator.Equal:
                     range.IsLowerInclusive = range.IsUpperInclusive = true;
                     range.Min = value;
                     range.Max = value;
                     break;
 
-                case ">":
+                case Operator.Greater:
                     range.IsLowerInclusive = false;
                     range.Min = value;
                     break;
 
-                case ">=":
-                case ">:":
+                case Operator.GreaterOrEqual:
                     range.IsLowerInclusive = true;
                     range.Min = value;
                     break;
 
-                case "<":
+                case Operator.Less:
                     range.IsUpperInclusive = false;
                     range.Max = value;
                     break;
 
-                case "<=":
-                case "<:":
+                case Operator.LessOrEqual:
                     range.IsUpperInclusive = true;
                     range.Max = value;
                     break;
             }
+
+            return true;
         }
     }
 }

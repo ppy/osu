@@ -194,5 +194,14 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.AreEqual(1, filterCriteria.SearchTerms.Length);
             Assert.AreEqual("double\"quote", filterCriteria.Artist.SearchTerm);
         }
+
+        [Test]
+        public void TestOperatorParsing()
+        {
+            const string query = "artist=><something";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual("><something", filterCriteria.Artist.SearchTerm);
+        }
     }
 }
