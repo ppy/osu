@@ -82,6 +82,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Y = 120,
                     Alpha = 0
                 },
+                new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SpinnerBonusCounter), _ => new DefaultSpinnerBonusCounter()),
                 spinningSample = new PausableSkinnableSound
                 {
                     Volume = { Value = 0 },
