@@ -33,11 +33,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public SpinnerSpmCounter SpmCounter { get; private set; }
 
         private Container<DrawableSpinnerTick> ticks;
-        private SpinnerBonusDisplay bonusDisplay;
         private PausableSkinnableSound spinningSample;
 
         private Bindable<bool> isSpinning;
         private bool spinnerFrequencyModulate;
+
+        /// <summary>
+        /// The amount of bonus score gained from spinning after the required number of spins, for display purposes.
+        /// </summary>
+        public IBindable<double> GainedBonus => gainedBonus;
+
+        private readonly Bindable<double> gainedBonus = new Bindable<double>();
 
         public DrawableSpinner()
             : this(null)
@@ -75,12 +81,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Origin = Anchor.Centre,
                     Y = 120,
                     Alpha = 0
-                },
-                bonusDisplay = new SpinnerBonusDisplay
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Y = -120,
                 },
                 spinningSample = new PausableSkinnableSound
                 {
@@ -293,8 +293,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 if (tick != null)
                 {
                     tick.TriggerResult(true);
+
                     if (tick is DrawableSpinnerBonusTick)
-                        bonusDisplay.SetBonusCount(spins - HitObject.SpinsRequired);
+                        gainedBonus.Value = tick.Result.Judgement.MaxNumericResult * (spins - HitObject.SpinsRequired);
                 }
 
                 wholeSpins++;
