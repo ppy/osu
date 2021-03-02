@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Select
                     return updateCriteriaText(ref criteria.Artist, op, value);
 
                 default:
-                    return false;
+                    return criteria.RulesetCriteria?.TryParseCustomKeywordCriteria(key, op, value) ?? false;
             }
         }
 
