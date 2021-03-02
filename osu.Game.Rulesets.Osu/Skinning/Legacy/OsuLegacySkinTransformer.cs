@@ -13,6 +13,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
     {
         private Lazy<bool> hasHitCircle;
 
+        private Lazy<SpinnerStyle> spinnerStyle;
+
+        private bool hasSpinner => spinnerStyle.Value != SpinnerStyle.Modern;
+
         /// <summary>
         /// On osu-stable, hitcircles have 5 pixels of transparent padding on each side to allow for shadows etc.
         /// Their hittable area is 128px, but the actual circle portion is 118px.
@@ -30,6 +34,19 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private void sourceChanged()
         {
             hasHitCircle = new Lazy<bool>(() => Source.GetTexture("hitcircle") != null);
+
+            spinnerStyle = new Lazy<SpinnerStyle>(() =>
+            {
+                bool hasBackground = Source.GetTexture("spinner-background") != null;
+
+                if (Source.GetTexture("spinner-top") != null && !hasBackground)
+                    return SpinnerStyle.NewLegacy;
+
+                if (hasBackground)
+                    return SpinnerStyle.OldLegacy;
+
+                return SpinnerStyle.Modern;
+            });
         }
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
@@ -110,11 +127,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         };
 
                 case OsuSkinComponents.SpinnerBody:
-                    bool hasBackground = Source.GetTexture("spinner-background") != null;
-
-                    if (Source.GetTexture("spinner-top") != null && !hasBackground)
+                    if (spinnerStyle.Value == SpinnerStyle.NewLegacy)
                         return new LegacyNewStyleSpinner();
-                    else if (hasBackground)
+                    else if (spinnerStyle.Value == SpinnerStyle.OldLegacy)
                         return new LegacyOldStyleSpinner();
 
                     return null;
@@ -150,6 +165,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             }
 
             return Source.GetConfig<TLookup, TValue>(lookup);
+        }
+
+        private enum SpinnerStyle
+        {
+            NewLegacy,
+            OldLegacy,
+            Modern,
         }
     }
 }
