@@ -147,6 +147,7 @@ namespace osu.Game.Overlays.Settings
                 RelativeSizeAxes = Axes.Y;
                 Width = SettingsPanel.CONTENT_MARGINS;
                 Alpha = 0f;
+                AlwaysPresent = true;
             }
 
             [BackgroundDependencyLoader]
