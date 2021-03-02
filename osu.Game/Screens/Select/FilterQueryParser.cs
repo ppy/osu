@@ -11,7 +11,7 @@ namespace osu.Game.Screens.Select
     internal static class FilterQueryParser
     {
         private static readonly Regex query_syntax_regex = new Regex(
-            @"\b(?<key>stars|ar|dr|hp|cs|divisor|length|objects|bpm|status|creator|artist)(?<op>[=:><]+)(?<value>("".*"")|(\S*))",
+            @"\b(?<key>\w+)(?<op>[=:><]+)(?<value>("".*"")|(\S*))",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         internal static void ApplyQueries(FilterCriteria criteria, string query)
@@ -22,15 +22,14 @@ namespace osu.Game.Screens.Select
                 var op = match.Groups["op"].Value;
                 var value = match.Groups["value"].Value;
 
-                parseKeywordCriteria(criteria, key, value, op);
-
-                query = query.Replace(match.ToString(), "");
+                if (tryParseKeywordCriteria(criteria, key, value, op))
+                    query = query.Replace(match.ToString(), "");
             }
 
             criteria.SearchText = query;
         }
 
-        private static void parseKeywordCriteria(FilterCriteria criteria, string key, string value, string op)
+        private static bool tryParseKeywordCriteria(FilterCriteria criteria, string key, string value, string op)
         {
             switch (key)
             {
@@ -75,7 +74,12 @@ namespace osu.Game.Screens.Select
                 case "artist":
                     updateCriteriaText(ref criteria.Artist, op, value);
                     break;
+
+                default:
+                    return false;
             }
+
+            return true;
         }
 
         private static int getLengthScale(string value) =>
