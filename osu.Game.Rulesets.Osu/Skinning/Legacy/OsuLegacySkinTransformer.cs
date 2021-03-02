@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Skinning;
 using osuTK;
+using static osu.Game.Skinning.LegacySkinConfiguration;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
@@ -16,6 +17,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private Lazy<SpinnerStyle> spinnerStyle;
 
         private bool hasSpinner => spinnerStyle.Value != SpinnerStyle.Modern;
+
+        private bool hasScoreFont => this.HasFont(GetConfig<LegacySetting, string>(LegacySetting.ScorePrefix)?.Value ?? "score");
 
         /// <summary>
         /// On osu-stable, hitcircles have 5 pixels of transparent padding on each side to allow for shadows etc.
@@ -131,6 +134,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         return new LegacyNewStyleSpinner();
                     else if (spinnerStyle.Value == SpinnerStyle.OldLegacy)
                         return new LegacyOldStyleSpinner();
+
+                    return null;
+
+                case OsuSkinComponents.SpinnerBonusCounter:
+                    if (hasSpinner && hasScoreFont)
+                        return new LegacySpinnerBonusCounter();
 
                     return null;
             }
