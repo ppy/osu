@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -34,8 +35,13 @@ namespace osu.Game.Screens.Select
 
         private Bindable<GroupMode> groupMode;
 
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
+
         public FilterCriteria CreateCriteria()
         {
+            Debug.Assert(ruleset.Value.ID != null);
+
             var query = searchTextBox.Text;
 
             var criteria = new FilterCriteria
@@ -52,6 +58,8 @@ namespace osu.Game.Screens.Select
 
             if (!maximumStars.IsDefault)
                 criteria.UserStarDifficulty.Max = maximumStars.Value;
+
+            criteria.RulesetCriteria = rulesets.GetRuleset(ruleset.Value.ID.Value).CreateInstance().CreateRulesetFilterCriteria();
 
             FilterQueryParser.ApplyQueries(criteria, query);
             return criteria;
