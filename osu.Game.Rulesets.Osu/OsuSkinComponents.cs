@@ -18,6 +18,7 @@ namespace osu.Game.Rulesets.Osu
         SliderFollowCircle,
         SliderBall,
         SliderBody,
-        SpinnerBody
+        SpinnerBody,
+        SpinnerBonusCounter,
     }
 }
