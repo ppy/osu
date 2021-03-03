@@ -11,30 +11,27 @@ namespace osu.Game.Overlays.Dialog
     /// </summary>
     public class ConfirmDialog : PopupDialog
     {
-        protected PopupDialogOkButton ButtonConfirm;
-        protected PopupDialogCancelButton ButtonCancel;
-
         /// <summary>
-        /// Construct a new dialog.
+        /// Construct a new confirmation dialog.
         /// </summary>
-        /// <param name="description">The description of the action to be displayed to the user.</param>
+        /// <param name="message">The description of the action to be displayed to the user.</param>
         /// <param name="onConfirm">An action to perform on confirmation.</param>
         /// <param name="onCancel">An optional action to perform on cancel.</param>
-        public ConfirmDialog(string description, Action onConfirm, Action onCancel = null)
+        public ConfirmDialog(string message, Action onConfirm, Action onCancel = null)
         {
-            HeaderText = $"Are you sure you want to {description}?";
-            BodyText = "Last chance to back out.";
+            HeaderText = message;
+            BodyText = "Last chance to turn back";
 
             Icon = FontAwesome.Solid.ExclamationTriangle;
 
             Buttons = new PopupDialogButton[]
             {
-                ButtonConfirm = new PopupDialogOkButton
+                new PopupDialogOkButton
                 {
                     Text = @"Yes",
                     Action = onConfirm
                 },
-                ButtonCancel = new PopupDialogCancelButton
+                new PopupDialogCancelButton
                 {
                     Text = @"Cancel",
                     Action = onCancel
