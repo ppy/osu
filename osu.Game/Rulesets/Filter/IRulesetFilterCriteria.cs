@@ -31,6 +31,17 @@ namespace osu.Game.Rulesets.Filter
         /// {key}{op}{value}
         /// </code>
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// For adding optional string criteria, <see cref="FilterCriteria.OptionalTextFilter"/> can be used for matching,
+        /// along with <see cref="FilterQueryParser.TryUpdateCriteriaText"/> for parsing.
+        /// </para>
+        /// <para>
+        /// For adding numerical-type range criteria, <see cref="FilterCriteria.OptionalRange{T}"/> can be used for matching,
+        /// along with <see cref="FilterQueryParser.TryUpdateCriteriaRange{T}(ref osu.Game.Screens.Select.FilterCriteria.OptionalRange{T},osu.Game.Screens.Select.Filter.Operator,string,FilterQueryParser.TryParseFunction{T})"/>
+        /// and <see cref="float"/>- and <see cref="double"/>-typed overloads for parsing.
+        /// </para>
+        /// </remarks>
         /// <param name="key">The key (name) of the criterion.</param>
         /// <param name="op">The operator in the criterion.</param>
         /// <param name="value">The value of the criterion.</param>

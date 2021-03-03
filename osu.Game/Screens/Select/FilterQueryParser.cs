@@ -9,7 +9,10 @@ using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Screens.Select
 {
-    internal static class FilterQueryParser
+    /// <summary>
+    /// Utility class used for parsing song select filter queries entered via the search box.
+    /// </summary>
+    public static class FilterQueryParser
     {
         private static readonly Regex query_syntax_regex = new Regex(
             @"\b(?<key>\w+)(?<op>(:|=|(>|<)(:|=)?))(?<value>("".*"")|(\S*))",
@@ -35,36 +38,36 @@ namespace osu.Game.Screens.Select
             switch (key)
             {
                 case "stars":
-                    return tryUpdateCriteriaRange(ref criteria.StarDifficulty, op, value, 0.01d / 2);
+                    return TryUpdateCriteriaRange(ref criteria.StarDifficulty, op, value, 0.01d / 2);
 
                 case "ar":
-                    return tryUpdateCriteriaRange(ref criteria.ApproachRate, op, value);
+                    return TryUpdateCriteriaRange(ref criteria.ApproachRate, op, value);
 
                 case "dr":
                 case "hp":
-                    return tryUpdateCriteriaRange(ref criteria.DrainRate, op, value);
+                    return TryUpdateCriteriaRange(ref criteria.DrainRate, op, value);
 
                 case "cs":
-                    return tryUpdateCriteriaRange(ref criteria.CircleSize, op, value);
+                    return TryUpdateCriteriaRange(ref criteria.CircleSize, op, value);
 
                 case "bpm":
-                    return tryUpdateCriteriaRange(ref criteria.BPM, op, value, 0.01d / 2);
+                    return TryUpdateCriteriaRange(ref criteria.BPM, op, value, 0.01d / 2);
 
                 case "length":
                     return tryUpdateLengthRange(criteria, op, value);
 
                 case "divisor":
-                    return tryUpdateCriteriaRange(ref criteria.BeatDivisor, op, value, tryParseInt);
+                    return TryUpdateCriteriaRange(ref criteria.BeatDivisor, op, value, tryParseInt);
 
                 case "status":
-                    return tryUpdateCriteriaRange(ref criteria.OnlineStatus, op, value,
+                    return TryUpdateCriteriaRange(ref criteria.OnlineStatus, op, value,
                         (string s, out BeatmapSetOnlineStatus val) => Enum.TryParse(value, true, out val));
 
                 case "creator":
-                    return tryUpdateCriteriaText(ref criteria.Creator, op, value);
+                    return TryUpdateCriteriaText(ref criteria.Creator, op, value);
 
                 case "artist":
-                    return tryUpdateCriteriaText(ref criteria.Artist, op, value);
+                    return TryUpdateCriteriaText(ref criteria.Artist, op, value);
 
                 default:
                     return criteria.RulesetCriteria?.TryParseCustomKeywordCriteria(key, op, value) ?? false;
@@ -113,7 +116,18 @@ namespace osu.Game.Screens.Select
         private static bool tryParseInt(string value, out int result) =>
             int.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out result);
 
-        private static bool tryUpdateCriteriaText(ref FilterCriteria.OptionalTextFilter textFilter, Operator op, string value)
+        /// <summary>
+        /// Attempts to parse a keyword filter with the specified <paramref name="op"/> and textual <paramref name="value"/>.
+        /// If the value indicates a valid textual filter, the function returns <c>true</c> and the resulting data is stored into
+        /// <paramref name="textFilter"/>.
+        /// </summary>
+        /// <param name="textFilter">The <see cref="FilterCriteria.OptionalTextFilter"/> to store the parsed data into, if successful.</param>
+        /// <param name="op">
+        /// The operator for the keyword filter.
+        /// Only <see cref="Operator.Equal"/> is valid for textual filters.
+        /// </param>
+        /// <param name="value">The value of the keyword filter.</param>
+        public static bool TryUpdateCriteriaText(ref FilterCriteria.OptionalTextFilter textFilter, Operator op, string value)
         {
             switch (op)
             {
@@ -126,7 +140,20 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private static bool tryUpdateCriteriaRange(ref FilterCriteria.OptionalRange<float> range, Operator op, string val, float tolerance = 0.05f)
+        /// <summary>
+        /// Attempts to parse a keyword filter of type <see cref="float"/>
+        /// from the specified <paramref name="op"/> and <paramref name="val"/>.
+        /// If <paramref name="val"/> can be parsed as a <see cref="float"/>, the function returns <c>true</c>
+        /// and the resulting range constraint is stored into <paramref name="range"/>.
+        /// </summary>
+        /// <param name="range">
+        /// The <see cref="float"/>-typed <see cref="FilterCriteria.OptionalRange{T}"/>
+        /// to store the parsed data into, if successful.
+        /// </param>
+        /// <param name="op">The operator for the keyword filter.</param>
+        /// <param name="val">The value of the keyword filter.</param>
+        /// <param name="tolerance">Allowed tolerance of the parsed range boundary value.</param>
+        public static bool TryUpdateCriteriaRange(ref FilterCriteria.OptionalRange<float> range, Operator op, string val, float tolerance = 0.05f)
             => tryParseFloatWithPoint(val, out float value) && tryUpdateCriteriaRange(ref range, op, value, tolerance);
 
         private static bool tryUpdateCriteriaRange(ref FilterCriteria.OptionalRange<float> range, Operator op, float value, float tolerance = 0.05f)
@@ -161,7 +188,20 @@ namespace osu.Game.Screens.Select
             return true;
         }
 
-        private static bool tryUpdateCriteriaRange(ref FilterCriteria.OptionalRange<double> range, Operator op, string val, double tolerance = 0.05)
+        /// <summary>
+        /// Attempts to parse a keyword filter of type <see cref="double"/>
+        /// from the specified <paramref name="op"/> and <paramref name="val"/>.
+        /// If <paramref name="val"/> can be parsed as a <see cref="double"/>, the function returns <c>true</c>
+        /// and the resulting range constraint is stored into <paramref name="range"/>.
+        /// </summary>
+        /// <param name="range">
+        /// The <see cref="double"/>-typed <see cref="FilterCriteria.OptionalRange{T}"/>
+        /// to store the parsed data into, if successful.
+        /// </param>
+        /// <param name="op">The operator for the keyword filter.</param>
+        /// <param name="val">The value of the keyword filter.</param>
+        /// <param name="tolerance">Allowed tolerance of the parsed range boundary value.</param>
+        public static bool TryUpdateCriteriaRange(ref FilterCriteria.OptionalRange<double> range, Operator op, string val, double tolerance = 0.05)
             => tryParseDoubleWithPoint(val, out double value) && tryUpdateCriteriaRange(ref range, op, value, tolerance);
 
         private static bool tryUpdateCriteriaRange(ref FilterCriteria.OptionalRange<double> range, Operator op, double value, double tolerance = 0.05)
@@ -196,11 +236,28 @@ namespace osu.Game.Screens.Select
             return true;
         }
 
-        private delegate bool TryParseFunction<T>(string val, out T value);
+        /// <summary>
+        /// Used to determine whether the string value <paramref name="val"/> can be converted to type <typeparamref name="T"/>.
+        /// If conversion can be performed, the delegate returns <c>true</c>
+        /// and the conversion result is returned in the <c>out</c> parameter <paramref name="parsed"/>.
+        /// </summary>
+        /// <param name="val">The string value to attempt parsing for.</param>
+        /// <param name="parsed">The parsed value, if conversion is possible.</param>
+        public delegate bool TryParseFunction<T>(string val, out T parsed);
 
-        private static bool tryUpdateCriteriaRange<T>(ref FilterCriteria.OptionalRange<T> range, Operator op, string value, TryParseFunction<T> conversionFunc)
+        /// <summary>
+        /// Attempts to parse a keyword filter of type <typeparamref name="T"/>,
+        /// from the specified <paramref name="op"/> and <paramref name="val"/>.
+        /// If <paramref name="val"/> can be parsed into <typeparamref name="T"/> using <paramref name="parseFunction"/>, the function returns <c>true</c>
+        /// and the resulting range constraint is stored into <paramref name="range"/>.
+        /// </summary>
+        /// <param name="range">The <see cref="FilterCriteria.OptionalRange{T}"/> to store the parsed data into, if successful.</param>
+        /// <param name="op">The operator for the keyword filter.</param>
+        /// <param name="val">The value of the keyword filter.</param>
+        /// <param name="parseFunction">Function used to determine if <paramref name="val"/> can be converted to type <typeparamref name="T"/>.</param>
+        public static bool TryUpdateCriteriaRange<T>(ref FilterCriteria.OptionalRange<T> range, Operator op, string val, TryParseFunction<T> parseFunction)
             where T : struct
-            => conversionFunc.Invoke(value, out var converted) && tryUpdateCriteriaRange(ref range, op, converted);
+            => parseFunction.Invoke(val, out var converted) && tryUpdateCriteriaRange(ref range, op, converted);
 
         private static bool tryUpdateCriteriaRange<T>(ref FilterCriteria.OptionalRange<T> range, Operator op, T value)
             where T : struct
