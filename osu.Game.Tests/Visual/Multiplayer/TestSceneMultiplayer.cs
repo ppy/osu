@@ -9,12 +9,21 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMultiplayer : ScreenTestScene
     {
+        private TestMultiplayer multiplayerScreen;
+
         public TestSceneMultiplayer()
         {
-            var multi = new TestMultiplayer();
+            AddStep("show", () =>
+            {
+                multiplayerScreen = new TestMultiplayer();
 
-            AddStep("show", () => LoadScreen(multi));
-            AddUntilStep("wait for loaded", () => multi.IsLoaded);
+                // Needs to be added at a higher level since the multiplayer screen becomes non-current.
+                Child = multiplayerScreen.Client;
+
+                LoadScreen(multiplayerScreen);
+            });
+
+            AddUntilStep("wait for loaded", () => multiplayerScreen.IsLoaded);
         }
 
         private class TestMultiplayer : Screens.OnlinePlay.Multiplayer.Multiplayer
@@ -24,7 +33,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             public TestMultiplayer()
             {
-                AddInternal(Client = new TestMultiplayerClient((TestMultiplayerRoomManager)RoomManager));
+                Client = new TestMultiplayerClient((TestMultiplayerRoomManager)RoomManager);
             }
 
             protected override RoomManager CreateRoomManager() => new TestMultiplayerRoomManager();
