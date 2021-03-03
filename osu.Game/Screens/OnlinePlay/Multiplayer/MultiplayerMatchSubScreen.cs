@@ -402,6 +402,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (!this.IsCurrentScreen())
                 return;
 
+            if (!client.IsHost)
+            {
+                // todo: should handle this when the request queue is implemented.
+                // if we decide that the presentation should exit the user from the multiplayer game, the PresentBeatmap
+                // flow may need to change to support an "unable to present" return value.
+                return;
+            }
+
             this.Push(new MultiplayerMatchSongSelect(beatmap, ruleset));
         }
     }
