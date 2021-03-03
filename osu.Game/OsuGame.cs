@@ -361,10 +361,6 @@ namespace osu.Game
 
             PerformFromScreen(screen =>
             {
-                // we might already be at song select, so a check is required before performing the load to solo.
-                if (screen is MainMenu)
-                    menuScreen.LoadToSolo();
-
                 // we might even already be at the song
                 if (Beatmap.Value.BeatmapSetInfo.Hash == databasedSet.Hash && (difficultyCriteria?.Invoke(Beatmap.Value.BeatmapInfo) ?? true))
                     return;
