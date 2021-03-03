@@ -302,7 +302,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             if (!exitConfirmed && dialogOverlay != null)
             {
-                dialogOverlay.Push(new ConfirmDialog("leave this multiplayer match", () =>
+                dialogOverlay.Push(new ConfirmDialog("Are you sure you want to leave this multiplayer match?", () =>
                 {
                     exitConfirmed = true;
                     this.Exit();

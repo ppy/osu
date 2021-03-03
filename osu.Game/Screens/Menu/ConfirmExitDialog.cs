@@ -2,17 +2,38 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Screens.Menu
 {
-    public class ConfirmExitDialog : ConfirmDialog
+    public class ConfirmExitDialog : PopupDialog
     {
-        public ConfirmExitDialog(Action confirm, Action onCancel = null)
-            : base("exit osu!", confirm, onCancel)
+        /// <summary>
+        /// Construct a new exit confirmation dialog.
+        /// </summary>
+        /// <param name="onConfirm">An action to perform on confirmation.</param>
+        /// <param name="onCancel">An optional action to perform on cancel.</param>
+        public ConfirmExitDialog(Action onConfirm, Action onCancel = null)
         {
-            ButtonConfirm.Text = "Let me out!";
-            ButtonCancel.Text = "Just a little more...";
+            HeaderText = "Are you sure you want to exit osu!?";
+            BodyText = "Last chance to turn back";
+
+            Icon = FontAwesome.Solid.ExclamationTriangle;
+
+            Buttons = new PopupDialogButton[]
+            {
+                new PopupDialogOkButton
+                {
+                    Text = @"Let me out!",
+                    Action = onConfirm
+                },
+                new PopupDialogCancelButton
+                {
+                    Text = @"Just a little more...",
+                    Action = onCancel
+                },
+            };
         }
     }
 }
