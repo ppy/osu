@@ -361,10 +361,6 @@ namespace osu.Game
 
             PerformFromScreen(screen =>
             {
-                // we might even already be at the song
-                if (Beatmap.Value.BeatmapSetInfo.Hash == databasedSet.Hash && (difficultyCriteria?.Invoke(Beatmap.Value.BeatmapInfo) ?? true))
-                    return;
-
                 // Find beatmaps that match our predicate.
                 var beatmaps = databasedSet.Beatmaps.Where(b => difficultyCriteria?.Invoke(b) ?? true).ToList();
 
