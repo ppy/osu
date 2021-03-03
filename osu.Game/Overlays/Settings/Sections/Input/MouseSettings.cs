@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private Bindable<double> configSensitivity;
 
-        private Bindable<double> localSensitivity = new BindableDouble();
+        private Bindable<double> localSensitivity;
 
         private Bindable<string> ignoredInputHandlers;
 
