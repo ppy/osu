@@ -18,6 +18,6 @@ namespace osu.Game.Screens
         /// </summary>
         /// <param name="beatmap">The beatmap to be selected.</param>
         /// <param name="ruleset">The ruleset to be selected.</param>
-        public void PresentBeatmap(WorkingBeatmap beatmap, RulesetInfo ruleset);
+        void PresentBeatmap(WorkingBeatmap beatmap, RulesetInfo ruleset);
     }
 }
