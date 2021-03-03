@@ -281,7 +281,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             Mods.Value = client.LocalUser.Mods.Select(m => m.ToMod(ruleset)).Concat(SelectedItem.Value.RequiredMods).ToList();
         }
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private DialogOverlay dialogOverlay { get; set; }
 
         private bool exitConfirmed;
@@ -300,7 +300,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return true;
             }
 
-            if (!exitConfirmed)
+            if (!exitConfirmed && dialogOverlay != null)
             {
                 dialogOverlay.Push(new ConfirmDialog("leave this multiplayer match", () =>
                 {
