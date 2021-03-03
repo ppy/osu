@@ -34,37 +34,37 @@ namespace osu.Game.Screens.Select
         {
             switch (key)
             {
-                case "stars" when parseFloatWithPoint(value, out var stars):
-                    return updateCriteriaRange(ref criteria.StarDifficulty, op, stars, 0.01f / 2);
+                case "stars":
+                    return tryUpdateCriteriaRange(ref criteria.StarDifficulty, op, value, 0.01d / 2);
 
-                case "ar" when parseFloatWithPoint(value, out var ar):
-                    return updateCriteriaRange(ref criteria.ApproachRate, op, ar, 0.1f / 2);
+                case "ar":
+                    return tryUpdateCriteriaRange(ref criteria.ApproachRate, op, value);
 
-                case "dr" when parseFloatWithPoint(value, out var dr):
-                case "hp" when parseFloatWithPoint(value, out dr):
-                    return updateCriteriaRange(ref criteria.DrainRate, op, dr, 0.1f / 2);
+                case "dr":
+                case "hp":
+                    return tryUpdateCriteriaRange(ref criteria.DrainRate, op, value);
 
-                case "cs" when parseFloatWithPoint(value, out var cs):
-                    return updateCriteriaRange(ref criteria.CircleSize, op, cs, 0.1f / 2);
+                case "cs":
+                    return tryUpdateCriteriaRange(ref criteria.CircleSize, op, value);
 
-                case "bpm" when parseDoubleWithPoint(value, out var bpm):
-                    return updateCriteriaRange(ref criteria.BPM, op, bpm, 0.01d / 2);
+                case "bpm":
+                    return tryUpdateCriteriaRange(ref criteria.BPM, op, value, 0.01d / 2);
 
-                case "length" when parseDoubleWithPoint(value.TrimEnd('m', 's', 'h'), out var length):
-                    var scale = getLengthScale(value);
-                    return updateCriteriaRange(ref criteria.Length, op, length * scale, scale / 2.0);
+                case "length":
+                    return tryUpdateLengthRange(criteria, op, value);
 
-                case "divisor" when parseInt(value, out var divisor):
-                    return updateCriteriaRange(ref criteria.BeatDivisor, op, divisor);
+                case "divisor":
+                    return tryUpdateCriteriaRange(ref criteria.BeatDivisor, op, value, tryParseInt);
 
-                case "status" when Enum.TryParse<BeatmapSetOnlineStatus>(value, true, out var statusValue):
-                    return updateCriteriaRange(ref criteria.OnlineStatus, op, statusValue);
+                case "status":
+                    return tryUpdateCriteriaRange(ref criteria.OnlineStatus, op, value,
+                        (string s, out BeatmapSetOnlineStatus val) => Enum.TryParse(value, true, out val));
 
                 case "creator":
-                    return updateCriteriaText(ref criteria.Creator, op, value);
+                    return tryUpdateCriteriaText(ref criteria.Creator, op, value);
 
                 case "artist":
-                    return updateCriteriaText(ref criteria.Artist, op, value);
+                    return tryUpdateCriteriaText(ref criteria.Artist, op, value);
 
                 default:
                     return criteria.RulesetCriteria?.TryParseCustomKeywordCriteria(key, op, value) ?? false;
@@ -104,16 +104,16 @@ namespace osu.Game.Screens.Select
             value.EndsWith('m') ? 60000 :
             value.EndsWith('h') ? 3600000 : 1000;
 
-        private static bool parseFloatWithPoint(string value, out float result) =>
+        private static bool tryParseFloatWithPoint(string value, out float result) =>
             float.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out result);
 
-        private static bool parseDoubleWithPoint(string value, out double result) =>
+        private static bool tryParseDoubleWithPoint(string value, out double result) =>
             double.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out result);
 
-        private static bool parseInt(string value, out int result) =>
+        private static bool tryParseInt(string value, out int result) =>
             int.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out result);
 
-        private static bool updateCriteriaText(ref FilterCriteria.OptionalTextFilter textFilter, Operator op, string value)
+        private static bool tryUpdateCriteriaText(ref FilterCriteria.OptionalTextFilter textFilter, Operator op, string value)
         {
             switch (op)
             {
@@ -126,7 +126,10 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private static bool updateCriteriaRange(ref FilterCriteria.OptionalRange<float> range, Operator op, float value, float tolerance = 0.05f)
+        private static bool tryUpdateCriteriaRange(ref FilterCriteria.OptionalRange<float> range, Operator op, string val, float tolerance = 0.05f)
+            => tryParseFloatWithPoint(val, out float value) && tryUpdateCriteriaRange(ref range, op, value, tolerance);
+
+        private static bool tryUpdateCriteriaRange(ref FilterCriteria.OptionalRange<float> range, Operator op, float value, float tolerance = 0.05f)
         {
             switch (op)
             {
@@ -158,7 +161,10 @@ namespace osu.Game.Screens.Select
             return true;
         }
 
-        private static bool updateCriteriaRange(ref FilterCriteria.OptionalRange<double> range, Operator op, double value, double tolerance = 0.05)
+        private static bool tryUpdateCriteriaRange(ref FilterCriteria.OptionalRange<double> range, Operator op, string val, double tolerance = 0.05)
+            => tryParseDoubleWithPoint(val, out double value) && tryUpdateCriteriaRange(ref range, op, value, tolerance);
+
+        private static bool tryUpdateCriteriaRange(ref FilterCriteria.OptionalRange<double> range, Operator op, double value, double tolerance = 0.05)
         {
             switch (op)
             {
@@ -190,7 +196,13 @@ namespace osu.Game.Screens.Select
             return true;
         }
 
-        private static bool updateCriteriaRange<T>(ref FilterCriteria.OptionalRange<T> range, Operator op, T value)
+        private delegate bool TryParseFunction<T>(string val, out T value);
+
+        private static bool tryUpdateCriteriaRange<T>(ref FilterCriteria.OptionalRange<T> range, Operator op, string value, TryParseFunction<T> conversionFunc)
+            where T : struct
+            => conversionFunc.Invoke(value, out var converted) && tryUpdateCriteriaRange(ref range, op, converted);
+
+        private static bool tryUpdateCriteriaRange<T>(ref FilterCriteria.OptionalRange<T> range, Operator op, T value)
             where T : struct
         {
             switch (op)
@@ -226,6 +238,15 @@ namespace osu.Game.Screens.Select
             }
 
             return true;
+        }
+
+        private static bool tryUpdateLengthRange(FilterCriteria criteria, Operator op, string val)
+        {
+            if (!tryParseDoubleWithPoint(val.TrimEnd('m', 's', 'h'), out var length))
+                return false;
+
+            var scale = getLengthScale(val);
+            return tryUpdateCriteriaRange(ref criteria.Length, op, length * scale, scale / 2.0);
         }
     }
 }

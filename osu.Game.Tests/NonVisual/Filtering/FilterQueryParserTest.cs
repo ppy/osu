@@ -215,6 +215,17 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.AreEqual("unrecognised=keyword", filterCriteria.SearchText);
         }
 
+        [TestCase("cs=nope")]
+        [TestCase("bpm>=bad")]
+        [TestCase("divisor<nah")]
+        [TestCase("status=noidea")]
+        public void TestInvalidKeywordValueIsIgnored(string query)
+        {
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual(query, filterCriteria.SearchText);
+        }
+
         [Test]
         public void TestCustomKeywordIsParsed()
         {
