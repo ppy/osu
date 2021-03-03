@@ -15,6 +15,8 @@ using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Match;
@@ -279,11 +281,33 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             Mods.Value = client.LocalUser.Mods.Select(m => m.ToMod(ruleset)).Concat(SelectedItem.Value.RequiredMods).ToList();
         }
 
+        [Resolved]
+        private DialogOverlay dialogOverlay { get; set; }
+
+        private bool exitConfirmed;
+
         public override bool OnBackButton()
         {
-            if (client.Room != null && settingsOverlay.State.Value == Visibility.Visible)
+            if (client.Room == null)
+            {
+                // room has not been created yet; exit immediately.
+                return base.OnBackButton();
+            }
+
+            if (settingsOverlay.State.Value == Visibility.Visible)
             {
                 settingsOverlay.Hide();
+                return true;
+            }
+
+            if (!exitConfirmed)
+            {
+                dialogOverlay.Push(new ConfirmDialog("leave this multiplayer match", () =>
+                {
+                    exitConfirmed = true;
+                    this.Exit();
+                }));
+
                 return true;
             }
 
