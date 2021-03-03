@@ -17,7 +17,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         protected override string Header => "Mouse";
 
         private readonly BindableBool rawInputToggle = new BindableBool();
-        private Bindable<double> sensitivityBindable = new BindableDouble();
+
+        private Bindable<double> configSensitivity;
+
+        private Bindable<double> localSensitivity = new BindableDouble();
+
         private Bindable<string> ignoredInputHandlers;
 
         private Bindable<WindowMode> windowMode;
@@ -26,12 +30,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager osuConfig, FrameworkConfigManager config)
         {
-            var configSensitivity = config.GetBindable<double>(FrameworkSetting.CursorSensitivity);
-
             // use local bindable to avoid changing enabled state of game host's bindable.
-            sensitivityBindable = configSensitivity.GetUnboundCopy();
-            configSensitivity.BindValueChanged(val => sensitivityBindable.Value = val.NewValue);
-            sensitivityBindable.BindValueChanged(val => configSensitivity.Value = val.NewValue);
+            configSensitivity = config.GetBindable<double>(FrameworkSetting.CursorSensitivity);
+            localSensitivity = configSensitivity.GetUnboundCopy();
+
+            windowMode = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode);
+            ignoredInputHandlers = config.GetBindable<string>(FrameworkSetting.IgnoredInputHandlers);
 
             Children = new Drawable[]
             {
@@ -43,7 +47,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 new SensitivitySetting
                 {
                     LabelText = "Cursor sensitivity",
-                    Current = sensitivityBindable
+                    Current = localSensitivity
                 },
                 new SettingsCheckbox
                 {
@@ -66,8 +70,15 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     Current = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableButtons)
                 },
             };
+        }
 
-            windowMode = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode);
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            configSensitivity.BindValueChanged(val => localSensitivity.Value = val.NewValue, true);
+            localSensitivity.BindValueChanged(val => configSensitivity.Value = val.NewValue);
+
             windowMode.BindValueChanged(mode =>
             {
                 var isFullscreen = mode.NewValue == WindowMode.Fullscreen;
@@ -87,7 +98,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows)
             {
                 rawInputToggle.Disabled = true;
-                sensitivityBindable.Disabled = true;
+                localSensitivity.Disabled = true;
             }
             else
             {
@@ -100,12 +111,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     ignoredInputHandlers.Value = enabled.NewValue ? standard_mouse_handlers : raw_mouse_handler;
                 };
 
-                ignoredInputHandlers = config.GetBindable<string>(FrameworkSetting.IgnoredInputHandlers);
                 ignoredInputHandlers.ValueChanged += handler =>
                 {
                     bool raw = !handler.NewValue.Contains("Raw");
                     rawInputToggle.Value = raw;
-                    sensitivityBindable.Disabled = !raw;
+                    localSensitivity.Disabled = !raw;
                 };
 
                 ignoredInputHandlers.TriggerChange();
