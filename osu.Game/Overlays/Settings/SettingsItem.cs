@@ -121,7 +121,7 @@ namespace osu.Game.Overlays.Settings
                 labelText.Alpha = controlWithCurrent.Current.Disabled ? 0.3f : 1;
         }
 
-        private class RestoreDefaultValueButton : Container, IHasTooltip
+        protected internal class RestoreDefaultValueButton : Container, IHasTooltip
         {
             private Bindable<T> bindable;
 
@@ -147,6 +147,7 @@ namespace osu.Game.Overlays.Settings
                 RelativeSizeAxes = Axes.Y;
                 Width = SettingsPanel.CONTENT_MARGINS;
                 Alpha = 0f;
+                AlwaysPresent = true;
             }
 
             [BackgroundDependencyLoader]
