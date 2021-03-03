@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Cached]
         public readonly Bindable<FilterCriteria> Filter = new Bindable<FilterCriteria>(new FilterCriteria());
 
-        private readonly List<Room> rooms = new List<Room>();
+        public new readonly List<Room> Rooms = new List<Room>();
 
         protected override void LoadComplete()
         {
@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         for (int i = 0; i < createdRoom.Playlist.Count; i++)
                             createdRoom.Playlist[i].ID = currentPlaylistItemId++;
 
-                        rooms.Add(createdRoom);
+                        Rooms.Add(createdRoom);
                         createRoomRequest.TriggerSuccess(createdRoom);
                         break;
 
@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     case GetRoomsRequest getRoomsRequest:
                         var roomsWithoutParticipants = new List<Room>();
 
-                        foreach (var r in rooms)
+                        foreach (var r in Rooms)
                         {
                             var newRoom = new Room();
 
@@ -79,7 +79,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         break;
 
                     case GetRoomRequest getRoomRequest:
-                        getRoomRequest.TriggerSuccess(rooms.Single(r => r.RoomID.Value == getRoomRequest.RoomId));
+                        getRoomRequest.TriggerSuccess(Rooms.Single(r => r.RoomID.Value == getRoomRequest.RoomId));
                         break;
 
                     case GetBeatmapSetRequest getBeatmapSetRequest:

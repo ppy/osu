@@ -29,10 +29,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private IAPIProvider api { get; set; } = null!;
 
         [Resolved]
-        private Room apiRoom { get; set; } = null!;
-
-        [Resolved]
         private BeatmapManager beatmaps { get; set; } = null!;
+
+        private readonly TestMultiplayerRoomManager roomManager;
+
+        public TestMultiplayerClient(TestMultiplayerRoomManager roomManager)
+        {
+            this.roomManager = roomManager;
+        }
 
         public void Connect() => isConnected.Value = true;
 
@@ -98,7 +102,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         protected override Task<MultiplayerRoom> JoinRoom(long roomId)
         {
-            Debug.Assert(apiRoom != null);
+            var apiRoom = roomManager.Rooms.Single(r => r.RoomID.Value == roomId);
 
             var user = new MultiplayerRoomUser(api.LocalUser.Value.Id)
             {
@@ -178,8 +182,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         protected override Task<BeatmapSetInfo> GetOnlineBeatmapSet(int beatmapId, CancellationToken cancellationToken = default)
         {
             Debug.Assert(Room != null);
-            Debug.Assert(apiRoom != null);
 
+            var apiRoom = roomManager.Rooms.Single(r => r.RoomID.Value == Room.RoomID);
             var set = apiRoom.Playlist.FirstOrDefault(p => p.BeatmapID == beatmapId)?.Beatmap.Value.BeatmapSet
                       ?? beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == beatmapId)?.BeatmapSet;
 
