@@ -381,9 +381,16 @@ namespace osu.Game
                                 ?? beatmaps.FirstOrDefault(b => b.Ruleset.Equals(Ruleset.Value))
                                 ?? beatmaps.First();
 
-                Ruleset.Value = selection.Ruleset;
-                Beatmap.Value = BeatmapManager.GetWorkingBeatmap(selection);
-            }, validScreens: new[] { typeof(SongSelect) });
+                if (screen is IHandlePresentBeatmap presentableScreen)
+                {
+                    presentableScreen.PresentBeatmap(BeatmapManager.GetWorkingBeatmap(selection), selection.Ruleset);
+                }
+                else
+                {
+                    Ruleset.Value = selection.Ruleset;
+                    Beatmap.Value = BeatmapManager.GetWorkingBeatmap(selection);
+                }
+            }, validScreens: new[] { typeof(SongSelect), typeof(IHandlePresentBeatmap) });
         }
 
         /// <summary>
