@@ -12,11 +12,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Match;
@@ -31,7 +33,7 @@ using ParticipantsList = osu.Game.Screens.OnlinePlay.Multiplayer.Participants.Pa
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
     [Cached]
-    public class MultiplayerMatchSubScreen : RoomSubScreen
+    public class MultiplayerMatchSubScreen : RoomSubScreen, IHandlePresentBeatmap
     {
         public override string Title { get; }
 
@@ -417,6 +419,22 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }
 
             modSettingChangeTracker?.Dispose();
+        }
+
+        public void PresentBeatmap(WorkingBeatmap beatmap, RulesetInfo ruleset)
+        {
+            if (!this.IsCurrentScreen())
+                return;
+
+            if (!client.IsHost)
+            {
+                // todo: should handle this when the request queue is implemented.
+                // if we decide that the presentation should exit the user from the multiplayer game, the PresentBeatmap
+                // flow may need to change to support an "unable to present" return value.
+                return;
+            }
+
+            this.Push(new MultiplayerMatchSongSelect(beatmap, ruleset));
         }
     }
 }
