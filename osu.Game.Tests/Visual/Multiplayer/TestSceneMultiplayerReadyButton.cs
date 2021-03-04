@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
             Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, host, Beatmap.Default));
-            beatmaps.Import(TestResources.GetTestBeatmapForImport(true)).Wait();
+            beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).Wait();
 
             Add(beatmapTracker = new OnlinePlayBeatmapAvailablilityTracker
             {

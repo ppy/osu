@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
@@ -76,7 +75,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddStep("bind user score info handler", () =>
             {
                 userScore = new TestScoreInfo(new OsuRuleset().RulesetInfo) { OnlineScoreID = currentScoreId++ };
-                bindHandler(3000, userScore);
+                bindHandler(true, userScore);
             });
 
             createResults(() => userScore);
@@ -89,7 +88,7 @@ namespace osu.Game.Tests.Visual.Playlists
         [Test]
         public void TestShowNullUserScoreWithDelay()
         {
-            AddStep("bind delayed handler", () => bindHandler(3000));
+            AddStep("bind delayed handler", () => bindHandler(true));
 
             createResults();
             waitForDisplay();
@@ -103,7 +102,7 @@ namespace osu.Game.Tests.Visual.Playlists
             createResults();
             waitForDisplay();
 
-            AddStep("bind delayed handler", () => bindHandler(3000));
+            AddStep("bind delayed handler", () => bindHandler(true));
 
             for (int i = 0; i < 2; i++)
             {
@@ -134,7 +133,7 @@ namespace osu.Game.Tests.Visual.Playlists
             createResults(() => userScore);
             waitForDisplay();
 
-            AddStep("bind delayed handler", () => bindHandler(3000));
+            AddStep("bind delayed handler", () => bindHandler(true));
 
             for (int i = 0; i < 2; i++)
             {
@@ -169,70 +168,47 @@ namespace osu.Game.Tests.Visual.Playlists
             AddWaitStep("wait for display", 5);
         }
 
-        private void bindHandler(double delay = 0, ScoreInfo userScore = null, bool failRequests = false) => ((DummyAPIAccess)API).HandleRequest = request =>
+        private void bindHandler(bool delayed = false, ScoreInfo userScore = null, bool failRequests = false) => ((DummyAPIAccess)API).HandleRequest = request =>
         {
             requestComplete = false;
 
-            if (failRequests)
-            {
-                triggerFail(request, delay);
-                return;
-            }
+            double delay = delayed ? 3000 : 0;
 
-            switch (request)
+            Scheduler.AddDelayed(() =>
             {
-                case ShowPlaylistUserScoreRequest s:
-                    if (userScore == null)
-                        triggerFail(s, delay);
-                    else
-                        triggerSuccess(s, createUserResponse(userScore), delay);
-                    break;
+                if (failRequests)
+                {
+                    triggerFail(request);
+                    return;
+                }
 
-                case IndexPlaylistScoresRequest i:
-                    triggerSuccess(i, createIndexResponse(i), delay);
-                    break;
-            }
+                switch (request)
+                {
+                    case ShowPlaylistUserScoreRequest s:
+                        if (userScore == null)
+                            triggerFail(s);
+                        else
+                            triggerSuccess(s, createUserResponse(userScore));
+                        break;
+
+                    case IndexPlaylistScoresRequest i:
+                        triggerSuccess(i, createIndexResponse(i));
+                        break;
+                }
+            }, delay);
         };
 
-        private void triggerSuccess<T>(APIRequest<T> req, T result, double delay)
+        private void triggerSuccess<T>(APIRequest<T> req, T result)
             where T : class
         {
-            if (delay == 0)
-                success();
-            else
-            {
-                Task.Run(async () =>
-                {
-                    await Task.Delay(TimeSpan.FromMilliseconds(delay));
-                    Schedule(success);
-                });
-            }
-
-            void success()
-            {
-                requestComplete = true;
-                req.TriggerSuccess(result);
-            }
+            requestComplete = true;
+            req.TriggerSuccess(result);
         }
 
-        private void triggerFail(APIRequest req, double delay)
+        private void triggerFail(APIRequest req)
         {
-            if (delay == 0)
-                fail();
-            else
-            {
-                Task.Run(async () =>
-                {
-                    await Task.Delay(TimeSpan.FromMilliseconds(delay));
-                    Schedule(fail);
-                });
-            }
-
-            void fail()
-            {
-                requestComplete = true;
-                req.TriggerFailure(new WebException("Failed."));
-            }
+            requestComplete = true;
+            req.TriggerFailure(new WebException("Failed."));
         }
 
         private MultiplayerScore createUserResponse([NotNull] ScoreInfo userScore)

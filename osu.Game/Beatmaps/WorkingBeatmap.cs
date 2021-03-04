@@ -12,7 +12,6 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
-using osu.Framework.Statistics;
 using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -34,8 +33,6 @@ namespace osu.Game.Beatmaps
 
         protected AudioManager AudioManager { get; }
 
-        private static readonly GlobalStatistic<int> total_count = GlobalStatistics.Get<int>(nameof(Beatmaps), $"Total {nameof(WorkingBeatmap)}s");
-
         protected WorkingBeatmap(BeatmapInfo beatmapInfo, AudioManager audioManager)
         {
             AudioManager = audioManager;
@@ -47,8 +44,6 @@ namespace osu.Game.Beatmaps
             waveform = new RecyclableLazy<Waveform>(GetWaveform);
             storyboard = new RecyclableLazy<Storyboard>(GetStoryboard);
             skin = new RecyclableLazy<ISkin>(GetSkin);
-
-            total_count.Value++;
         }
 
         protected virtual Track GetVirtualTrack(double emptyLength = 0)
@@ -330,11 +325,6 @@ namespace osu.Game.Beatmaps
 
         protected virtual ISkin GetSkin() => new DefaultSkin();
         private readonly RecyclableLazy<ISkin> skin;
-
-        ~WorkingBeatmap()
-        {
-            total_count.Value--;
-        }
 
         public class RecyclableLazy<T>
         {
