@@ -10,6 +10,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using osu.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -246,7 +247,14 @@ namespace osu.Game.Online.API
             this.password = password;
         }
 
-        public IHubClientConnector GetHubConnector(string clientName, string endpoint) => new HubClientConnector(clientName, endpoint, this, versionHash);
+        public IHubClientConnector GetHubConnector(string clientName, string endpoint)
+        {
+            // disabled until the underlying runtime issue is resolved, see https://github.com/mono/mono/issues/20805.
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.iOS)
+                return null;
+
+            return new HubClientConnector(clientName, endpoint, this, versionHash);
+        }
 
         public RegistrationRequest.RegistrationRequestErrors CreateAccount(string email, string username, string password)
         {
@@ -373,7 +381,13 @@ namespace osu.Game.Online.API
 
         public void Queue(APIRequest request)
         {
-            lock (queue) queue.Enqueue(request);
+            lock (queue)
+            {
+                if (state.Value == APIState.Offline)
+                    return;
+
+                queue.Enqueue(request);
+            }
         }
 
         private void flushQueue(bool failOldRequests = true)
@@ -394,8 +408,6 @@ namespace osu.Game.Online.API
 
         public void Logout()
         {
-            flushQueue();
-
             password = null;
             authentication.Clear();
 
@@ -407,6 +419,7 @@ namespace osu.Game.Online.API
             });
 
             state.Value = APIState.Offline;
+            flushQueue();
         }
 
         private static User createGuestUser() => new GuestUser();

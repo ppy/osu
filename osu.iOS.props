@@ -70,7 +70,7 @@
     <Reference Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup Label="Package References">
-    <PackageReference Include="ppy.osu.Framework.iOS" Version="2021.219.1" />
+    <PackageReference Include="ppy.osu.Framework.iOS" Version="2021.302.0" />
     <PackageReference Include="ppy.osu.Game.Resources" Version="2021.211.1" />
   </ItemGroup>
   <!-- See https://github.com/dotnet/runtime/issues/35988 (can be removed after Xamarin uses net5.0 / net6.0) -->
@@ -80,7 +80,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="3.0.3" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.0.3" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="3.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="5.0.3" />
     <PackageReference Include="MessagePack" Version="1.7.3.7" />
     <PackageReference Include="MessagePack.Annotations" Version="2.2.85" />
   </ItemGroup>
@@ -91,8 +91,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="2.2.6" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="ppy.osu.Framework" Version="2021.219.1" />
-    <PackageReference Include="SharpCompress" Version="0.27.1" />
+    <PackageReference Include="ppy.osu.Framework" Version="2021.302.0" />
+    <PackageReference Include="SharpCompress" Version="0.28.1" />
     <PackageReference Include="NUnit" Version="3.12.0" />
     <PackageReference Include="SharpRaven" Version="2.4.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />

@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -39,7 +40,7 @@ namespace osu.Game.Overlays.Settings
 
         public string TooltipText { get; set; }
 
-        public virtual string LabelText
+        public virtual LocalisableString LabelText
         {
             get => labelText?.Text ?? string.Empty;
             set
@@ -69,7 +70,7 @@ namespace osu.Game.Overlays.Settings
             set => controlWithCurrent.Current = value;
         }
 
-        public virtual IEnumerable<string> FilterTerms => Keywords == null ? new[] { LabelText } : new List<string>(Keywords) { LabelText }.ToArray();
+        public virtual IEnumerable<string> FilterTerms => Keywords == null ? new[] { LabelText.ToString() } : new List<string>(Keywords) { LabelText.ToString() }.ToArray();
 
         public IEnumerable<string> Keywords { get; set; }
 
@@ -120,7 +121,7 @@ namespace osu.Game.Overlays.Settings
                 labelText.Alpha = controlWithCurrent.Current.Disabled ? 0.3f : 1;
         }
 
-        private class RestoreDefaultValueButton : Container, IHasTooltip
+        protected internal class RestoreDefaultValueButton : Container, IHasTooltip
         {
             private Bindable<T> bindable;
 
@@ -146,6 +147,7 @@ namespace osu.Game.Overlays.Settings
                 RelativeSizeAxes = Axes.Y;
                 Width = SettingsPanel.CONTENT_MARGINS;
                 Alpha = 0f;
+                AlwaysPresent = true;
             }
 
             [BackgroundDependencyLoader]
@@ -206,7 +208,9 @@ namespace osu.Game.Overlays.Settings
                 UpdateState();
             }
 
-            public void UpdateState()
+            public void UpdateState() => Scheduler.AddOnce(updateState);
+
+            private void updateState()
             {
                 if (bindable == null)
                     return;

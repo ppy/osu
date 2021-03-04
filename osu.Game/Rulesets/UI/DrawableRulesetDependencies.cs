@@ -63,6 +63,7 @@ namespace osu.Game.Rulesets.UI
 
         ~DrawableRulesetDependencies()
         {
+            // required to potentially clean up sample store from audio hierarchy.
             Dispose(false);
         }
 
@@ -133,6 +134,10 @@ namespace osu.Game.Rulesets.UI
             public IBindable<double> AggregateFrequency => throw new NotSupportedException();
 
             public IBindable<double> AggregateTempo => throw new NotSupportedException();
+
+            public void BindAdjustments(IAggregateAudioAdjustment component) => throw new NotImplementedException();
+
+            public void UnbindAdjustments(IAggregateAudioAdjustment component) => throw new NotImplementedException();
 
             public int PlaybackConcurrency
             {

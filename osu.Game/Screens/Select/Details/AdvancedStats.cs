@@ -15,6 +15,8 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
+using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
@@ -137,8 +139,6 @@ namespace osu.Game.Screens.Select.Details
             updateStarDifficulty();
         }
 
-        private IBindable<StarDifficulty> normalStarDifficulty;
-        private IBindable<StarDifficulty> moddedStarDifficulty;
         private CancellationTokenSource starDifficultyCancellationSource;
 
         private void updateStarDifficulty()
@@ -150,13 +150,13 @@ namespace osu.Game.Screens.Select.Details
 
             starDifficultyCancellationSource = new CancellationTokenSource();
 
-            normalStarDifficulty = difficultyCache.GetBindableDifficulty(Beatmap, ruleset.Value, null, starDifficultyCancellationSource.Token);
-            moddedStarDifficulty = difficultyCache.GetBindableDifficulty(Beatmap, ruleset.Value, mods.Value, starDifficultyCancellationSource.Token);
+            var normalStarDifficulty = difficultyCache.GetDifficultyAsync(Beatmap, ruleset.Value, null, starDifficultyCancellationSource.Token);
+            var moddedStarDifficulty = difficultyCache.GetDifficultyAsync(Beatmap, ruleset.Value, mods.Value, starDifficultyCancellationSource.Token);
 
-            normalStarDifficulty.BindValueChanged(_ => updateDisplay());
-            moddedStarDifficulty.BindValueChanged(_ => updateDisplay(), true);
-
-            void updateDisplay() => starDifficulty.Value = ((float)normalStarDifficulty.Value.Stars, (float)moddedStarDifficulty.Value.Stars);
+            Task.WhenAll(normalStarDifficulty, moddedStarDifficulty).ContinueWith(_ => Schedule(() =>
+            {
+                starDifficulty.Value = ((float)normalStarDifficulty.Result.Stars, (float)moddedStarDifficulty.Result.Stars);
+            }), starDifficultyCancellationSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
         }
 
         protected override void Dispose(bool isDisposing)
@@ -180,7 +180,7 @@ namespace osu.Game.Screens.Select.Details
             [Resolved]
             private OsuColour colours { get; set; }
 
-            public string Title
+            public LocalisableString Title
             {
                 get => name.Text;
                 set => name.Text = value;
