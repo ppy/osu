@@ -76,7 +76,15 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             base.LoadComplete();
 
-            configSensitivity.BindValueChanged(val => localSensitivity.Value = val.NewValue, true);
+            configSensitivity.BindValueChanged(val =>
+            {
+                var disabled = localSensitivity.Disabled;
+
+                localSensitivity.Disabled = false;
+                localSensitivity.Value = val.NewValue;
+                localSensitivity.Disabled = disabled;
+            }, true);
+
             localSensitivity.BindValueChanged(val => configSensitivity.Value = val.NewValue);
 
             windowMode.BindValueChanged(mode =>
