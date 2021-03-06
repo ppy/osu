@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             {
                 // if a taiko skin is providing explosion sprites, hide the judgements completely
                 if (hasExplosion.Value)
-                    return Drawable.Empty();
+                    return Drawable.Empty().With(d => d.LifetimeEnd = double.MinValue);
             }
 
             if (!(component is TaikoSkinComponent taikoComponent))
