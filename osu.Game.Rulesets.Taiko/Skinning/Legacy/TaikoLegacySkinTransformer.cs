@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             {
                 // if a taiko skin is providing explosion sprites, hide the judgements completely
                 if (hasExplosion.Value)
-                    return Drawable.Empty().With(d => d.LifetimeEnd = double.MinValue);
+                    return Drawable.Empty().With(d => d.Expire());
             }
 
             if (!(component is TaikoSkinComponent taikoComponent))
@@ -118,7 +118,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                     // suppress the default kiai explosion if the skin brings its own sprites.
                     // the drawable needs to expire as soon as possible to avoid accumulating empty drawables on the playfield.
                     if (hasExplosion.Value)
-                        return Drawable.Empty().With(d => d.LifetimeEnd = double.MinValue);
+                        return Drawable.Empty().With(d => d.Expire());
 
                     return null;
 
