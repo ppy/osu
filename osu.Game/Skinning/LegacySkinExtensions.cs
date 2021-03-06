@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -63,8 +64,51 @@ namespace osu.Game.Skinning
             }
         }
 
-        public static bool HasFont(this ISkin source, string fontPrefix)
-            => source.GetTexture($"{fontPrefix}-0") != null;
+        public static bool HasFont(this ISkin source, LegacyFont font)
+        {
+            return source.GetTexture($"{source.GetFontPrefix(font)}-0") != null;
+        }
+
+        public static string GetFontPrefix(this ISkin source, LegacyFont font)
+        {
+            switch (font)
+            {
+                case LegacyFont.Score:
+                    return source.GetConfig<LegacySetting, string>(LegacySetting.ScorePrefix)?.Value ?? "score";
+
+                case LegacyFont.Combo:
+                    return source.GetConfig<LegacySetting, string>(LegacySetting.ComboPrefix)?.Value ?? "score";
+
+                case LegacyFont.HitCircle:
+                    return source.GetConfig<LegacySetting, string>(LegacySetting.HitCirclePrefix)?.Value ?? "default";
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(font));
+            }
+        }
+
+        /// <summary>
+        /// Returns the numeric overlap of number sprites to use.
+        /// A positive number will bring the number sprites closer together, while a negative number
+        /// will split them apart more.
+        /// </summary>
+        public static float GetFontOverlap(this ISkin source, LegacyFont font)
+        {
+            switch (font)
+            {
+                case LegacyFont.Score:
+                    return source.GetConfig<LegacySetting, float>(LegacySetting.ScoreOverlap)?.Value ?? -2f;
+
+                case LegacyFont.Combo:
+                    return source.GetConfig<LegacySetting, float>(LegacySetting.ComboOverlap)?.Value ?? -2f;
+
+                case LegacyFont.HitCircle:
+                    return source.GetConfig<LegacySetting, float>(LegacySetting.HitCircleOverlap)?.Value ?? -2f;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(font));
+            }
+        }
 
         public class SkinnableTextureAnimation : TextureAnimation
         {
