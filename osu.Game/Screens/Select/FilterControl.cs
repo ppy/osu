@@ -35,9 +35,6 @@ namespace osu.Game.Screens.Select
 
         private Bindable<GroupMode> groupMode;
 
-        [Resolved]
-        private RulesetStore rulesets { get; set; }
-
         public FilterCriteria CreateCriteria()
         {
             Debug.Assert(ruleset.Value.ID != null);
@@ -59,7 +56,7 @@ namespace osu.Game.Screens.Select
             if (!maximumStars.IsDefault)
                 criteria.UserStarDifficulty.Max = maximumStars.Value;
 
-            criteria.RulesetCriteria = rulesets.GetRuleset(ruleset.Value.ID.Value).CreateInstance().CreateRulesetFilterCriteria();
+            criteria.RulesetCriteria = ruleset.Value.CreateInstance().CreateRulesetFilterCriteria();
 
             FilterQueryParser.ApplyQueries(criteria, query);
             return criteria;
