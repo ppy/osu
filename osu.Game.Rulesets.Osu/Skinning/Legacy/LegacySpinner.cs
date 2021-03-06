@@ -141,7 +141,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             /// for positioning some legacy spinner components perfectly as in stable.
             /// (e.g. 'spin' sprite, 'clear' sprite, metre in old-style spinners)
             /// </summary>
-            public const float SPINNER_TOP_OFFSET = 29f;
+            public static readonly float SPINNER_TOP_OFFSET = (float)Math.Ceiling(45f * SPRITE_SCALE);
 
             public LegacyCoordinatesContainer()
             {
