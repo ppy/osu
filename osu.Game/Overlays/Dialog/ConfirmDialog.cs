@@ -3,20 +3,23 @@
 
 using System;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Overlays.Dialog;
 
-namespace osu.Game.Screens.Menu
+namespace osu.Game.Overlays.Dialog
 {
-    public class ConfirmExitDialog : PopupDialog
+    /// <summary>
+    /// A dialog which confirms a user action.
+    /// </summary>
+    public class ConfirmDialog : PopupDialog
     {
         /// <summary>
-        /// Construct a new exit confirmation dialog.
+        /// Construct a new confirmation dialog.
         /// </summary>
+        /// <param name="message">The description of the action to be displayed to the user.</param>
         /// <param name="onConfirm">An action to perform on confirmation.</param>
         /// <param name="onCancel">An optional action to perform on cancel.</param>
-        public ConfirmExitDialog(Action onConfirm, Action onCancel = null)
+        public ConfirmDialog(string message, Action onConfirm, Action onCancel = null)
         {
-            HeaderText = "Are you sure you want to exit osu!?";
+            HeaderText = message;
             BodyText = "Last chance to turn back";
 
             Icon = FontAwesome.Solid.ExclamationTriangle;
@@ -25,12 +28,12 @@ namespace osu.Game.Screens.Menu
             {
                 new PopupDialogOkButton
                 {
-                    Text = @"Let me out!",
+                    Text = @"Yes",
                     Action = onConfirm
                 },
                 new PopupDialogCancelButton
                 {
-                    Text = @"Just a little more...",
+                    Text = @"Cancel",
                     Action = onCancel
                 },
             };
