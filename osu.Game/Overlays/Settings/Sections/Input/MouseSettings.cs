@@ -68,7 +68,21 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             };
 
             windowMode = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode);
-            windowMode.BindValueChanged(mode => confineMouseModeSetting.Alpha = mode.NewValue == WindowMode.Fullscreen ? 0 : 1, true);
+            windowMode.BindValueChanged(mode =>
+            {
+                var isFullscreen = mode.NewValue == WindowMode.Fullscreen;
+
+                if (isFullscreen)
+                {
+                    confineMouseModeSetting.Current.Disabled = true;
+                    confineMouseModeSetting.TooltipText = "不能在全屏模式下启用";
+                }
+                else
+                {
+                    confineMouseModeSetting.Current.Disabled = false;
+                    confineMouseModeSetting.TooltipText = string.Empty;
+                }
+            }, true);
 
             if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows)
             {

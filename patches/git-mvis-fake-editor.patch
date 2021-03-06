@@ -1,0 +1,1410 @@
+diff --git a/osu.Game.Tests/Visual/Mvis/TestSceneMvisPluginManager.cs b/osu.Game.Tests/Visual/Mvis/TestSceneMvisPluginManager.cs
+new file mode 100644
+index 0000000000..b2c4934148
+--- /dev/null
++++ b/osu.Game.Tests/Visual/Mvis/TestSceneMvisPluginManager.cs
+@@ -0,0 +1,151 @@
++// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
++// See the LICENCE file in the repository root for full licence text.
++
++using System.Globalization;
++using osu.Framework.Allocation;
++using osu.Framework.Graphics;
++using osu.Framework.Graphics.Containers;
++using osu.Framework.Logging;
++using osu.Game.Graphics.Sprites;
++using osu.Game.Screens.Mvis;
++using osu.Game.Screens.Mvis.Plugins;
++using osu.Game.Screens.Mvis.SideBar;
++using osuTK;
++
++namespace osu.Game.Tests.Visual.Mvis
++{
++    public class TestSceneMvisPluginManager : ScreenTestScene
++    {
++        private DependencyContainer dependencies;
++        private Sidebar sidebar;
++
++        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
++            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
++
++        private Plugin plugin = new Plugin();
++
++        [BackgroundDependencyLoader]
++        private void load()
++        {
++            var manager = new MvisPluginManager();
++            dependencies.Cache(new CustomColourProvider(0, 0, 1));
++
++            dependencies.Cache(sidebar = new Sidebar
++            {
++                RelativeSizeAxes = Axes.Both,
++                Anchor = Anchor.BottomCentre,
++                Origin = Anchor.BottomCentre,
++            });
++
++            Children = new Drawable[]
++            {
++                sidebar,
++                manager
++            };
++
++            AddStep("Toggle Sidebar ", sidebar.ToggleVisibility);
++            AddStep("Add Plugin To Manager", () =>
++            {
++                if (manager.AddPlugin(plugin))
++                    Add(plugin);
++            });
++            AddStep("Enable Plugin", () => manager.ActivePlugin(plugin));
++            AddStep("Disable Plugin", () => manager.DisablePlugin(plugin));
++            AddStep("Remove All Plugin From Manager", () =>
++            {
++                foreach (var mvisPlugin in manager.GetAvaliablePlugins())
++                {
++                    if (manager.UnLoadPlugin(mvisPlugin))
++                        Remove(mvisPlugin);
++                }
++
++                plugin = new Plugin();
++            });
++        }
++
++        private class Plugin : MvisPlugin
++        {
++            public Plugin()
++            {
++                page.Plugin = this;
++                Size = new Vector2(200, 100);
++            }
++
++            private readonly OsuSpriteText text = new OsuSpriteText
++            {
++                Text = "这是一个插件！"
++            };
++
++            protected override Drawable CreateContent() => text;
++
++            protected override bool OnContentLoaded(Drawable content) => true;
++
++            protected override bool PostInit() => true;
++
++            private readonly PluginSidebarPage page = new VoidSidebarContent(0.5f, "插件");
++            public override PluginSidebarPage SidebarPage => page;
++
++            public override bool Enable()
++            {
++                Logger.Log("插件启用");
++                text.Alpha = 1;
++                return base.Enable();
++            }
++
++            public override void Load()
++            {
++                Logger.Log("插件加载");
++                base.Load();
++            }
++
++            public override bool Disable()
++            {
++                Logger.Log("插件禁用");
++                text.Alpha = 0.5f;
++                return base.Disable();
++            }
++
++            public override void UnLoad()
++            {
++                Logger.Log("插件卸载");
++                base.UnLoad();
++            }
++        }
++
++        private class VoidSidebarContent : PluginSidebarPage
++        {
++            private readonly OsuSpriteText t;
++
++            public VoidSidebarContent(float reWidth, string tabTitle)
++                : base(reWidth, tabTitle)
++            {
++                RelativeSizeAxes = Axes.Both;
++                Child = new FillFlowContainer
++                {
++                    RelativeSizeAxes = Axes.Both,
++                    Direction = FillDirection.Vertical,
++                    Anchor = Anchor.Centre,
++                    Origin = Anchor.Centre,
++                    Children = new Drawable[]
++                    {
++                        new OsuSpriteText
++                        {
++                            Text = "num: " + tabTitle,
++                        },
++                        new OsuSpriteText
++                        {
++                            Text = "width: " + reWidth.ToString(CultureInfo.CurrentCulture),
++                        },
++                        t = new OsuSpriteText()
++                    }
++                };
++            }
++
++            protected override void InitContent(MvisPlugin plugin)
++            {
++                t.Text = plugin.ToString();
++                base.InitContent(plugin);
++            }
++        }
++    }
++}
+diff --git a/osu.Game/Configuration/MConfigManager.cs b/osu.Game/Configuration/MConfigManager.cs
+index 50e81fdd5e..fc30dd9363 100644
+--- a/osu.Game/Configuration/MConfigManager.cs
++++ b/osu.Game/Configuration/MConfigManager.cs
+@@ -62,6 +62,7 @@ protected override void InitialiseDefaults()
+             Set(MSetting.MvisRed, 0, 0, 255);
+             Set(MSetting.MvisGreen, 0, 0, 255);
+             Set(MSetting.MvisBlue, 0, 0, 255);
++            Set(MSetting.MvisEnableFakeEditor, false);
+ 
+             //实验性功能
+             Set(MSetting.CustomWindowIconPath, "");
+@@ -103,6 +104,7 @@ public enum MSetting
+         MvisInterfaceRed,
+         MvisInterfaceGreen,
+         MvisInterfaceBlue,
++        MvisEnableFakeEditor,
+         SamplePlaybackGain,
+         SongSelectBgBlur,
+         IntroLoadDirectToSongSelect,
+diff --git a/osu.Game/Overlays/Settings/Sections/Mf/ExperimentalSettings.cs b/osu.Game/Overlays/Settings/Sections/Mf/ExperimentalSettings.cs
+index a73bc232a2..94e0b91024 100644
+--- a/osu.Game/Overlays/Settings/Sections/Mf/ExperimentalSettings.cs
++++ b/osu.Game/Overlays/Settings/Sections/Mf/ExperimentalSettings.cs
+@@ -53,7 +53,13 @@ private void load(MConfigManager mConfig, OsuGame game, CustomStore customStorag
+                         Text = "注意! 这些设置可能会很有帮助, 但调整不好可能会影响整个游戏的稳定性!",
+                         RelativeSizeAxes = Axes.X,
+                         Colour = Color4.Gold
+-                    },
++                    }
++                },
++                new SettingsCheckbox
++                {
++                    LabelText = "在Mvis播放器中启用Note打击音效",
++                    TooltipText = "不稳定, 相当于在后台开了个编辑器",
++                    Current = mConfig.GetBindable<bool>(MSetting.MvisEnableFakeEditor)
+                 },
+                 new Container
+                 {
+diff --git a/osu.Game/Screens/Edit/EditorClock.cs b/osu.Game/Screens/Edit/EditorClock.cs
+index ec0f5d7154..0b77b100cd 100755
+--- a/osu.Game/Screens/Edit/EditorClock.cs
++++ b/osu.Game/Screens/Edit/EditorClock.cs
+@@ -238,6 +238,12 @@ public bool IsCoupled
+             set => underlyingClock.IsCoupled = value;
+         }
+ 
++        public bool DisableSourceAdjustment
++        {
++            get => underlyingClock.DisableSourceAdjustment;
++            set => underlyingClock.DisableSourceAdjustment = value;
++        }
++
+         private const double transform_time = 300;
+ 
+         protected override void Update()
+diff --git a/osu.Game/Screens/Mvis/MvisScreen.cs b/osu.Game/Screens/Mvis/MvisScreen.cs
+index b21cfb8a2f..b398163c9b 100644
+--- a/osu.Game/Screens/Mvis/MvisScreen.cs
++++ b/osu.Game/Screens/Mvis/MvisScreen.cs
+@@ -1,6 +1,7 @@
+ // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+ // See the LICENCE file in the repository root for full licence text.
+ 
++using System.Collections.Specialized;
+ using osu.Framework;
+ using osu.Framework.Allocation;
+ using osu.Framework.Audio;
+@@ -30,9 +31,9 @@
+ using osu.Game.Screens.Mvis.Collections;
+ using osu.Game.Screens.Mvis.Collections.Interface;
+ using osu.Game.Screens.Mvis.Objects;
++using osu.Game.Screens.Mvis.Plugins;
+ using osu.Game.Screens.Mvis.SideBar;
+ using osu.Game.Screens.Mvis.Skinning;
+-using osu.Game.Screens.Mvis.Storyboard;
+ using osu.Game.Screens.Play;
+ using osu.Game.Screens.Select;
+ using osu.Game.Skinning;
+@@ -177,6 +178,8 @@ public class MvisScreen : ScreenWithBeatmapBackground, IKeyBindingHandler<Global
+ 
+         private WorkingBeatmap prevBeatmap;
+ 
++        private readonly BindableList<MvisPlugin> loadList = new BindableList<MvisPlugin>();
++
+         #endregion
+ 
+         public MvisScreen()
+@@ -194,11 +197,14 @@ private void load(MConfigManager config, IdleTracker idleTracker)
+             var iB = config.Get<float>(MSetting.MvisInterfaceBlue);
+             dependencies.Cache(colourProvider = new CustomColourProvider(iR, iG, iB));
+             dependencies.Cache(collectionHelper = new CollectionHelper());
++            dependencies.Cache(pluginManager = new MvisPluginManager());
++            dependencies.Cache(this);
+ 
+             InternalChildren = new Drawable[]
+             {
+                 colourProvider,
+                 collectionHelper,
++                pluginManager,
+                 nightcoreBeatContainer = new NightcoreBeatContainer
+                 {
+                     Alpha = 0
+@@ -460,6 +466,8 @@ private void load(MConfigManager config, IdleTracker idleTracker)
+                 },
+             };
+ 
++            dependencies.Cache(sidebar);
++
+             sidebar.Add(settingsScroll = new SidebarSettingsScrollContainer
+             {
+                 RelativeSizeAxes = Axes.Both,
+@@ -487,6 +495,7 @@ private void load(MConfigManager config, IdleTracker idleTracker)
+                 },
+             });
+             sidebar.Add(collectionPanel = new CollectionSelectPanel());
++            //sidebar.Add(new SidebarPluginsPage());
+ 
+             isIdle.BindTo(idleTracker.IsIdle);
+             config.BindWith(MSetting.MvisBgBlur, bgBlur);
+@@ -502,6 +511,8 @@ private void load(MConfigManager config, IdleTracker idleTracker)
+ 
+         protected override void LoadComplete()
+         {
++            loadList.BindCollectionChanged(onLoadListChanged);
++
+             bgBlur.BindValueChanged(v => updateBackground(Beatmap.Value));
+             contentAlpha.BindValueChanged(_ => updateIdleVisuals());
+             idleBgDim.BindValueChanged(_ => updateIdleVisuals());
+@@ -577,6 +588,33 @@ protected override void LoadComplete()
+             base.LoadComplete();
+         }
+ 
++        public bool RemovePluginFromLoadList(MvisPlugin pl)
++        {
++            if (!loadList.Contains(pl)) return false;
++
++            loadList.Remove(pl);
++            return true;
++        }
++
++        public bool AddPluginToLoadList(MvisPlugin pl)
++        {
++            if (loadList.Contains(pl)) return false;
++
++            loadList.Add(pl);
++            return true;
++        }
++
++        private void onLoadListChanged(object sender, NotifyCollectionChangedEventArgs e)
++        {
++            if (sender is BindableList<MvisPlugin> list)
++            {
++                if (list.Count > 0)
++                    loadingSpinner.Show();
++                else
++                    loadingSpinner.Hide();
++            }
++        }
++
+         ///<summary>
+         ///更新bgTriangles是否可见
+         ///</summary>
+@@ -615,6 +653,7 @@ private void seekTo(double position)
+         {
+             musicController.SeekTo(position);
+             sbLoader?.Seek(position);
++            fakeEditor?.Seek(position);
+         }
+ 
+         protected override void Update()
+@@ -912,11 +951,16 @@ private void applyBackgroundBrightness(bool auto = true, float brightness = 0)
+             sbLoader?.FadeColour(OsuColour.Gray(auto ? (overlaysHidden ? idleBgDim.Value : 0.6f) : brightness), duration, Easing.OutQuint);
+         }
+ 
++        private FakeEditor fakeEditor;
++        private MvisPluginManager pluginManager;
++
+         private void OnBeatmapChanged(ValueChangedEvent<WorkingBeatmap> v)
+         {
+             var beatmap = v.NewValue;
+             playFromCollection.TriggerChange();
+ 
++            pluginManager.UnLoadPlugin(fakeEditor);
++
+             Schedule(() =>
+             {
+                 applyTrackAdjustments();
+@@ -925,6 +969,7 @@ private void OnBeatmapChanged(ValueChangedEvent<WorkingBeatmap> v)
+ 
+             if (beatmap != prevBeatmap)
+             {
++                pluginManager.UnLoadPlugin(sbLoader);
+                 sbLoader?.FadeOut(BackgroundStoryBoardLoader.STORYBOARD_FADEOUT_DURATION, Easing.OutQuint).Expire();
+                 sbLoader = null;
+                 background.Add(sbLoader = new BackgroundStoryBoardLoader(beatmap)
+@@ -946,6 +991,22 @@ private void OnBeatmapChanged(ValueChangedEvent<WorkingBeatmap> v)
+                 reBind();
+             }
+ 
++            AddInternal(fakeEditor = new FakeEditor(beatmap)
++            {
++                RelativeSizeAxes = Axes.Both,
++                Depth = float.MaxValue,
++                Alpha = 0.01f,
++                Size = new Vector2(0.01f),
++                Anchor = Anchor.Centre,
++                Origin = Anchor.Centre
++            });
++
++            pluginManager.AddPlugin(fakeEditor);
++            pluginManager.AddPlugin(sbLoader);
++
++            pluginManager.ActivePlugin(fakeEditor);
++            pluginManager.ActivePlugin(sbLoader);
++
+             activity.Value = new UserActivity.InMvis(beatmap.BeatmapInfo);
+             prevBeatmap = beatmap;
+         }
+@@ -953,22 +1014,6 @@ private void OnBeatmapChanged(ValueChangedEvent<WorkingBeatmap> v)
+         private void reBind()
+         {
+             sbLoader.NeedToHideTriangles.BindValueChanged(updateBgTriangles, true);
+-            sbLoader.State.BindValueChanged(v =>
+-            {
+-                switch (v.NewValue)
+-                {
+-                    case StoryboardState.Success:
+-                    case StoryboardState.NotLoaded:
+-                        loadingSpinner.Hide();
+-                        break;
+-
+-                    case StoryboardState.Loading:
+-                        loadingSpinner.Show();
+-                        loadingSpinner.FadeColour(Color4.White, 300);
+-                        break;
+-                }
+-            }, true);
+-
+             sbLoader.StoryboardReplacesBackground.BindValueChanged(_ => applyBackgroundBrightness());
+         }
+     }
+diff --git a/osu.Game/Screens/Mvis/Storyboard/BackgroundStoryBoardLoader.cs b/osu.Game/Screens/Mvis/Plugins/BackgroundStoryBoardLoader.cs
+similarity index 56%
+rename from osu.Game/Screens/Mvis/Storyboard/BackgroundStoryBoardLoader.cs
+rename to osu.Game/Screens/Mvis/Plugins/BackgroundStoryBoardLoader.cs
+index 98fa2de0e0..33ceeb7224 100644
+--- a/osu.Game/Screens/Mvis/Storyboard/BackgroundStoryBoardLoader.cs
++++ b/osu.Game/Screens/Mvis/Plugins/BackgroundStoryBoardLoader.cs
+@@ -1,21 +1,21 @@
+ using System;
+-using System.Threading;
+-using System.Threading.Tasks;
+ using JetBrains.Annotations;
+ using osu.Framework.Allocation;
+ using osu.Framework.Bindables;
+ using osu.Framework.Graphics;
+-using osu.Framework.Graphics.Containers;
++//using osu.Framework.Logging;
++using osu.Framework.Timing;
+ using osu.Game.Beatmaps;
+ using osu.Game.Configuration;
+ using osu.Game.Overlays;
++using osu.Game.Screens.Mvis.Plugins.Storyboard;
+ 
+-namespace osu.Game.Screens.Mvis.Storyboard
++namespace osu.Game.Screens.Mvis.Plugins
+ {
+     ///<summary>
+     /// 负责故事版的异步加载功能
+     ///</summary>
+-    public class BackgroundStoryBoardLoader : Container<BackgroundStoryboard>
++    public class BackgroundStoryBoardLoader : MvisPlugin
+     {
+         public const float STORYBOARD_FADEIN_DURATION = 750;
+         public const float STORYBOARD_FADEOUT_DURATION = STORYBOARD_FADEIN_DURATION / 2;
+@@ -26,15 +26,11 @@ public class BackgroundStoryBoardLoader : Container<BackgroundStoryboard>
+         ///</summary>
+         private readonly BindableBool sbLoaded = new BindableBool();
+ 
+-        ///<summary>
+-        ///用于对外提供该BindableBool用于检测故事版功能是否已经准备好了
+-        ///</summary>
+-        public readonly Bindable<StoryboardState> State = new Bindable<StoryboardState>();
+-
+         public readonly BindableBool NeedToHideTriangles = new BindableBool();
+         public readonly BindableBool StoryboardReplacesBackground = new BindableBool();
+ 
+-        private StoryboardClock storyboardClock = new StoryboardClock();
++        private DecoupleableInterpolatingFramedClock storyboardClock = new DecoupleableInterpolatingFramedClock();
++
+         private BackgroundStoryboard currentStoryboard;
+ 
+         private readonly WorkingBeatmap targetBeatmap;
+@@ -51,6 +47,9 @@ public BackgroundStoryBoardLoader(WorkingBeatmap working)
+         {
+             RelativeSizeAxes = Axes.Both;
+             targetBeatmap = working;
++
++            Name = "故事版加载器";
++            Description = "用于呈现故事版; Mfosu自带插件";
+         }
+ 
+         [BackgroundDependencyLoader]
+@@ -60,55 +59,68 @@ private void load(MConfigManager config)
+             currentBeatmap.BindValueChanged(v =>
+             {
+                 if (v.NewValue == targetBeatmap)
+-                    storyboardClock.ChangeSource(v.NewValue.Track);
++                {
++                    storyboardClock.Start();
++                    storyboardClock.ChangeSource(music.CurrentTrack);
++                }
+             });
+         }
+ 
+         protected override void LoadComplete()
+         {
+             enableSb.BindValueChanged(OnEnableSBChanged);
+-            updateStoryBoardAsync();
++            base.LoadComplete();
+         }
+ 
+-        private Task loadTask;
+-        private CancellationTokenSource cancellationTokenSource;
++        protected override Drawable CreateContent() => currentStoryboard = new BackgroundStoryboard(targetBeatmap)
++        {
++            RunningClock = storyboardClock,
++            Alpha = 0.1f
++        };
+ 
+-        private void prepareStoryboard(WorkingBeatmap beatmap)
++        protected override bool PostInit()
+         {
+-            cancelAllTasks();
++            if (!enableSb.Value)
++                return false;
++
++            //Logger.Log("故事版PostInit");
++
++            if (targetBeatmap == null)
++                throw new InvalidOperationException("currentBeatmap 不能为 null");
++
+             sbLoaded.Value = false;
+             NeedToHideTriangles.Value = false;
+             StoryboardReplacesBackground.Value = false;
+ 
+-            storyboardClock.IsCoupled = false;
+-            storyboardClock.Stop();
++            storyboardClock = new DecoupleableInterpolatingFramedClock
++            {
++                IsCoupled = true,
++                DisableSourceAdjustment = true
++            };
++
++            //Logger.Log("故事版PostInit - 完成");
++            return true;
++        }
+ 
+-            storyboardClock = new StoryboardClock();
+-            cancellationTokenSource = new CancellationTokenSource();
++        protected override bool OnContentLoaded(Drawable content)
++        {
++            //Logger.Log("故事版OnContentLoaded");
++            var newStoryboard = (BackgroundStoryboard)content;
+ 
+-            loadTask = LoadComponentAsync(
+-                currentStoryboard = new BackgroundStoryboard(beatmap)
+-                {
+-                    RunningClock = storyboardClock,
+-                    Alpha = 0.1f
+-                },
+-                onLoaded: newStoryboard =>
+-                {
+-                    //bug: 过早Seek至歌曲时间会导致部分故事版加载过程僵死
+-                    storyboardClock.ChangeSource(beatmap.Track);
+-                    Seek(beatmap.Track.CurrentTime);
++            //bug: 过早Seek至歌曲时间会导致部分故事版加载过程僵死
++            storyboardClock.ChangeSource(music.CurrentTrack);
++            Seek(music.CurrentTrack.CurrentTime);
+ 
+-                    sbLoaded.Value = true;
+-                    State.Value = StoryboardState.Success;
+-                    NeedToHideTriangles.Value = beatmap.Storyboard.HasDrawable;
++            sbLoaded.Value = true;
++            NeedToHideTriangles.Value = targetBeatmap.Storyboard.HasDrawable;
+ 
+-                    Add(newStoryboard);
++            setProxy(newStoryboard);
+ 
+-                    setProxy(newStoryboard);
++            enableSb.TriggerChange();
++            OnNewStoryboardLoaded?.Invoke();
+ 
+-                    enableSb.TriggerChange();
+-                    OnNewStoryboardLoaded?.Invoke();
+-                }, cancellation: cancellationTokenSource.Token);
++            //Logger.Log("故事版OnContentLoaded - 完成");
++            return true;
+         }
+ 
+         [CanBeNull]
+@@ -125,69 +137,42 @@ public void OnEnableSBChanged(ValueChangedEvent<bool> v)
+         {
+             if (v.NewValue)
+             {
+-                if (sbLoaded.Value)
++                if (ContentLoaded)
+                 {
+                     StoryboardReplacesBackground.Value = targetBeatmap.Storyboard.ReplacesBackground && targetBeatmap.Storyboard.HasDrawable;
+                     NeedToHideTriangles.Value = targetBeatmap.Storyboard.HasDrawable;
+                     currentStoryboard?.FadeIn(STORYBOARD_FADEIN_DURATION, Easing.OutQuint);
+                 }
+                 else
+-                    updateStoryBoardAsync();
++                {
++                    //Logger.Log("内容没有加载, 重新加载");
++                    Load();
++                }
+             }
+             else
+             {
+-                if (sbLoaded.Value)
++                if (ContentLoaded)
+                     currentStoryboard?.FadeOut(STORYBOARD_FADEOUT_DURATION, Easing.OutQuint);
+                 else
+-                    cancelAllTasks();
++                {
++                    //Logger.Log("取消加载");
++                    Cancel();
++                }
+ 
+                 StoryboardReplacesBackground.Value = false;
+                 NeedToHideTriangles.Value = false;
+-                State.Value = StoryboardState.NotLoaded;
+             }
+         }
+ 
+         public void Seek(double position) =>
+             storyboardClock?.Seek(position);
+ 
+-        private void cancelAllTasks()
+-        {
+-            if (loadTask != null)
+-            {
+-                var b = currentStoryboard;
+-                cancellationTokenSource.Cancel();
+-                b?.Dispose();
+-            }
+-        }
+-
+-        private void updateStoryBoardAsync()
+-        {
+-            if (!enableSb.Value)
+-            {
+-                State.Value = StoryboardState.NotLoaded;
+-                return;
+-            }
+-
+-            if (targetBeatmap == null)
+-                throw new InvalidOperationException("currentBeatmap 不能为 null");
+-
+-            State.Value = StoryboardState.Loading;
+-            prepareStoryboard(targetBeatmap);
+-        }
+-
+         protected override void Dispose(bool isDisposing)
+         {
+             base.Dispose(isDisposing);
+ 
+             if (isDisposing)
+-                cancelAllTasks();
++                Cancel();
+         }
+     }
+-
+-    public enum StoryboardState
+-    {
+-        NotLoaded,
+-        Loading,
+-        Success
+-    }
+ }
+diff --git a/osu.Game/Screens/Mvis/Plugins/FakeEditor.cs b/osu.Game/Screens/Mvis/Plugins/FakeEditor.cs
+new file mode 100644
+index 0000000000..e3933bc814
+--- /dev/null
++++ b/osu.Game/Screens/Mvis/Plugins/FakeEditor.cs
+@@ -0,0 +1,170 @@
++using osu.Framework.Allocation;
++using osu.Framework.Bindables;
++using osu.Framework.Graphics;
++using osu.Framework.Graphics.Containers;
++using osu.Framework.Graphics.Shapes;
++using osu.Framework.Input.Events;
++using osu.Framework.Logging;
++using osu.Game.Beatmaps;
++using osu.Game.Configuration;
++using osu.Game.Overlays;
++using osu.Game.Rulesets;
++using osu.Game.Rulesets.Edit;
++using osu.Game.Screens.Edit;
++using osu.Game.Screens.Play;
++using osu.Game.Skinning;
++
++namespace osu.Game.Screens.Mvis.Plugins
++{
++    [Cached(typeof(IBeatSnapProvider))]
++    public class FakeEditor : MvisPlugin, IBeatSnapProvider, ISamplePlaybackDisabler
++    {
++        private DependencyContainer dependencies;
++
++        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
++            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
++
++        private readonly WorkingBeatmap beatmap;
++        private EditorBeatmap editorBeatmap;
++
++        public FakeEditor(WorkingBeatmap beatmap)
++        {
++            Name = "假Editor";
++            Description = "用于提供打击音效; Mfosu自带插件";
++
++            this.beatmap = beatmap;
++            Masking = true;
++        }
++
++        private readonly BindableBool enableFakeEditor = new BindableBool();
++
++        [BackgroundDependencyLoader]
++        private void load(MConfigManager config)
++        {
++            config.BindWith(MSetting.MvisEnableFakeEditor, enableFakeEditor);
++            enableFakeEditor.BindValueChanged(onEnableFakeEditorChanged);
++        }
++
++        private void onEnableFakeEditorChanged(ValueChangedEvent<bool> v)
++        {
++            if (v.NewValue)
++            {
++                if (ContentLoaded)
++                {
++                    this.FadeIn();
++                }
++                else
++                    Load();
++            }
++            else
++            {
++                if (ContentLoaded)
++                    this.FadeOut();
++                else
++                    Cancel();
++            }
++        }
++
++        [Resolved]
++        private MusicController music { get; set; }
++
++        private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
++
++        public EditorClock EditorClock;
++
++        private Ruleset ruleset;
++        private BeatmapSkinProvidingContainer beatmapSkinProvider;
++        private SkinProvidingContainer rulesetSkinProvider;
++
++        public void Seek(double location) => EditorClock?.Seek(location);
++
++        protected override void Update()
++        {
++            EditorClock?.ProcessFrame();
++            base.Update();
++        }
++
++        protected override Drawable CreateContent()
++            => beatmapSkinProvider.WithChild(rulesetSkinProvider.WithChild(ruleset.CreateHitObjectComposer()));
++
++        protected override bool PostInit()
++        {
++            if (!enableFakeEditor.Value)
++                return false;
++
++            beatDivisor.Value = beatmap.BeatmapInfo.BeatDivisor;
++
++            EditorClock = new EditorClock(beatmap, beatDivisor)
++            {
++                Anchor = Anchor.Centre,
++                Origin = Anchor.Centre,
++                IsCoupled = true,
++                DisableSourceAdjustment = true
++            };
++
++            SamplePlaybackDisabled.BindTo(EditorClock.SeekingOrStopped);
++
++            AddInternal(EditorClock);
++            dependencies.CacheAs(EditorClock);
++            dependencies.CacheAs(beatDivisor);
++
++            var playableBeatmap = beatmap.GetPlayableBeatmap(beatmap.BeatmapInfo.Ruleset);
++
++            AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap)
++            {
++                Anchor = Anchor.Centre,
++                Origin = Anchor.Centre
++            });
++
++            AddInternal(new BlockMouseBox
++            {
++                RelativeSizeAxes = Axes.Both,
++                Depth = float.MinValue,
++                Alpha = 0.001f
++            });
++
++            dependencies.CacheAs(editorBeatmap);
++
++            ruleset = beatmap.BeatmapInfo.Ruleset?.CreateInstance();
++
++            if (ruleset == null)
++            {
++                Logger.Log($"未能从 {beatmap.BeatmapInfo} 获取到可用的ruleset, 将中止加载");
++                return false;
++            }
++
++            beatmapSkinProvider = new BeatmapSkinProvidingContainer(beatmap.Skin);
++            rulesetSkinProvider = new SkinProvidingContainer(ruleset.CreateLegacySkinProvider(beatmapSkinProvider, editorBeatmap.PlayableBeatmap));
++
++            return true;
++        }
++
++        protected override bool OnContentLoaded(Drawable content)
++        {
++            EditorClock.ChangeSource(music.CurrentTrack);
++
++            //Logger.Log($"Clock源: {EditorClock.Source}");
++            //Logger.Log($"是否不能单独操作: {EditorClock.IsCoupled}");
++            //Logger.Log($"是否在运行: {EditorClock.IsRunning}");
++            //Logger.Log($"当前Track是否在运行: {music.CurrentTrack.IsRunning}");
++            //Logger.Log($"在Seek或已经停止: {EditorClock.SeekingOrStopped}");
++
++            return true;
++        }
++
++        public double SnapTime(double time, double? referenceTime = null) => editorBeatmap.SnapTime(time, referenceTime);
++
++        public double GetBeatLengthAtTime(double referenceTime) => editorBeatmap.GetBeatLengthAtTime(referenceTime);
++
++        public int BeatDivisor => beatDivisor.Value;
++
++        public class BlockMouseBox : Box
++        {
++            protected override bool OnClick(ClickEvent e) => true;
++            protected override bool OnMouseMove(MouseMoveEvent e) => true;
++            protected override bool OnMouseDown(MouseDownEvent e) => true;
++        }
++
++        public IBindable<bool> SamplePlaybackDisabled { get; } = new Bindable<bool>();
++    }
++}
+diff --git a/osu.Game/Screens/Mvis/Plugins/MvisPlugin.cs b/osu.Game/Screens/Mvis/Plugins/MvisPlugin.cs
+new file mode 100644
+index 0000000000..49735403de
+--- /dev/null
++++ b/osu.Game/Screens/Mvis/Plugins/MvisPlugin.cs
+@@ -0,0 +1,116 @@
++using System.Threading;
++using JetBrains.Annotations;
++using osu.Framework.Allocation;
++using osu.Framework.Bindables;
++using osu.Framework.Graphics;
++using osu.Framework.Graphics.Containers;
++using osu.Game.Screens.Mvis.SideBar;
++
++namespace osu.Game.Screens.Mvis.Plugins
++{
++    public abstract class MvisPlugin : Container
++    {
++        protected abstract Drawable CreateContent();
++        protected abstract bool OnContentLoaded(Drawable content);
++        protected abstract bool PostInit();
++        public virtual PluginSidebarPage SidebarPage => null;
++
++        public string Description = "插件描述";
++        public string Author = "插件作者";
++        public int Version = 0;
++
++        [CanBeNull]
++        [Resolved(CanBeNull = true)]
++        private MvisScreen mvisScreen { get; set; }
++
++        [Resolved]
++        private Sidebar sidebar { get; set; }
++
++        #region 异步加载任务
++
++        private CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
++
++        #endregion
++
++        #region 杂项
++
++        protected bool ContentLoaded;
++
++        public BindableBool Disabled = new BindableBool
++        {
++            Default = true,
++            Value = true
++        };
++
++        #endregion
++
++        private void createLoadTask()
++        {
++            ContentLoaded = false;
++
++            //加载内容
++            LoadComponentAsync(CreateContent(), content =>
++            {
++                ContentLoaded = true;
++
++                //添加内容
++                Add(content);
++
++                //调用OnContentLoaded进行善后
++                OnContentLoaded(content);
++
++                mvisScreen?.RemovePluginFromLoadList(this);
++            }, cancellationTokenSource.Token);
++        }
++
++        public void Cancel()
++        {
++            cancellationTokenSource.Cancel();
++            cancellationTokenSource = new CancellationTokenSource();
++
++            mvisScreen?.RemovePluginFromLoadList(this);
++        }
++
++        public virtual void Load()
++        {
++            if (Disabled.Value) return;
++
++            //向加载列表添加这个plugin
++            mvisScreen?.AddPluginToLoadList(this);
++
++            //调用PostInit在加载内容前初始化
++            if (!PostInit())
++            {
++                mvisScreen?.RemovePluginFromLoadList(this);
++                return;
++            }
++
++            createLoadTask();
++        }
++
++        public virtual bool Enable()
++        {
++            Disabled.Value = false;
++
++            if (!ContentLoaded)
++                Load();
++
++            return true;
++        }
++
++        public virtual void UnLoad()
++        {
++            Disable();
++            Expire();
++        }
++
++        public virtual bool Disable()
++        {
++            if (!ContentLoaded)
++                Cancel();
++
++            Disabled.Value = true;
++            return true;
++        }
++    }
++}
+diff --git a/osu.Game/Screens/Mvis/Plugins/MvisPluginManager.cs b/osu.Game/Screens/Mvis/Plugins/MvisPluginManager.cs
+new file mode 100644
+index 0000000000..e2c6d55665
+--- /dev/null
++++ b/osu.Game/Screens/Mvis/Plugins/MvisPluginManager.cs
+@@ -0,0 +1,86 @@
++using System;
++using System.Collections.Generic;
++using System.Linq;
++using JetBrains.Annotations;
++using osu.Framework.Allocation;
++using osu.Framework.Bindables;
++using osu.Framework.Graphics;
++using osu.Framework.Logging;
++
++namespace osu.Game.Screens.Mvis.Plugins
++{
++    public class MvisPluginManager : Component
++    {
++        private readonly BindableList<MvisPlugin> avaliablePlugins = new BindableList<MvisPlugin>();
++        private readonly BindableList<MvisPlugin> activePlugins = new BindableList<MvisPlugin>();
++
++        [CanBeNull]
++        [Resolved(CanBeNull = true)]
++        private SideBar.Sidebar sideBar { get; set; }
++
++        public bool AddPlugin(MvisPlugin pl)
++        {
++            if (avaliablePlugins.Contains(pl) || pl == null) return false;
++
++            avaliablePlugins.Add(pl);
++            sideBar?.Add(pl.SidebarPage);
++            return true;
++        }
++
++        public bool UnLoadPlugin(MvisPlugin pl)
++        {
++            if (!avaliablePlugins.Contains(pl) || pl == null) return false;
++
++            sideBar?.Remove(pl.SidebarPage);
++
++            avaliablePlugins.Remove(pl);
++
++            try
++            {
++                pl.UnLoad();
++            }
++            catch (Exception e)
++            {
++                Logger.Error(e, "卸载插件时出现了问题");
++                avaliablePlugins.Add(pl);
++                throw;
++            }
++
++            return true;
++        }
++
++        public bool ActivePlugin(MvisPlugin pl)
++        {
++            if (!avaliablePlugins.Contains(pl) || activePlugins.Contains(pl) || pl == null) return false;
++
++            bool success = pl.Enable();
++
++            if (success)
++                activePlugins.Add(pl);
++
++            return success;
++        }
++
++        public bool DisablePlugin(MvisPlugin pl)
++        {
++            if (!avaliablePlugins.Contains(pl) || !activePlugins.Contains(pl) || pl == null) return false;
++
++            bool success = pl.Disable();
++
++            if (success)
++                activePlugins.Remove(pl);
++
++            return success;
++        }
++
++        public List<MvisPlugin> GetAvaliablePlugins()
++        {
++            return avaliablePlugins.ToList();
++        }
++
++        public List<MvisPlugin> GetActivePlugins()
++        {
++            return activePlugins.ToList();
++        }
++    }
++}
+diff --git a/osu.Game/Screens/Mvis/Plugins/PluginSidebarPage.cs b/osu.Game/Screens/Mvis/Plugins/PluginSidebarPage.cs
+new file mode 100644
+index 0000000000..1c67d27808
+--- /dev/null
++++ b/osu.Game/Screens/Mvis/Plugins/PluginSidebarPage.cs
+@@ -0,0 +1,93 @@
++using osu.Framework.Extensions.Color4Extensions;
++using osu.Framework.Graphics;
++using osu.Framework.Graphics.Containers;
++using osu.Game.Graphics.Sprites;
++using osu.Game.Screens.Mvis.SideBar;
++using osuTK.Graphics;
++
++namespace osu.Game.Screens.Mvis.Plugins
++{
++    public class PluginSidebarPage : Container, ISidebarContent
++    {
++        private readonly Container blockMouseContainer;
++        private readonly Container content;
++
++        protected override Container<Drawable> Content => content;
++
++        protected virtual void InitContent(MvisPlugin plugin)
++        {
++        }
++
++        private MvisPlugin plugin;
++
++        public MvisPlugin Plugin
++        {
++            get => plugin;
++            set
++            {
++                plugin = value;
++
++                InitContent(value);
++
++                value.Disabled.BindValueChanged(v =>
++                {
++                    switch (v.NewValue)
++                    {
++                        case true:
++                            Schedule(() =>
++                            {
++                                content.FadeOut();
++                                blockMouseContainer.FadeIn(200);
++                            });
++                            break;
++
++                        case false:
++                            Schedule(() =>
++                            {
++                                content.FadeIn(200);
++                                blockMouseContainer.FadeOut(200);
++                            });
++                            break;
++                    }
++                }, true);
++            }
++        }
++
++        public PluginSidebarPage(float resizeWidth, string title)
++        {
++            ResizeWidth = resizeWidth;
++            Title = title;
++
++            InternalChildren = new Drawable[]
++            {
++                content = new Container
++                {
++                    RelativeSizeAxes = Axes.Both,
++                    Alpha = 0
++                },
++                blockMouseContainer = new Container
++                {
++                    RelativeSizeAxes = Axes.Both,
++                    Depth = float.MinValue,
++                    Children = new Drawable[]
++                    {
++                        new FakeEditor.BlockMouseBox
++                        {
++                            RelativeSizeAxes = Axes.Both,
++                            Colour = Color4.Black.Opacity(0.5f),
++                        },
++                        new OsuSpriteText
++                        {
++                            Text = "插件已禁用",
++                            Anchor = Anchor.Centre,
++                            Origin = Anchor.Centre
++                        }
++                    }
++                }
++            };
++        }
++
++        public float ResizeWidth { get; }
++        public string Title { get; }
++    }
++}
+diff --git a/osu.Game/Screens/Mvis/Storyboard/BackgroundStoryboard.cs b/osu.Game/Screens/Mvis/Plugins/Storyboard/BackgroundStoryboard.cs
+similarity index 91%
+rename from osu.Game/Screens/Mvis/Storyboard/BackgroundStoryboard.cs
+rename to osu.Game/Screens/Mvis/Plugins/Storyboard/BackgroundStoryboard.cs
+index b90e52b148..e2d8c43c55 100644
+--- a/osu.Game/Screens/Mvis/Storyboard/BackgroundStoryboard.cs
++++ b/osu.Game/Screens/Mvis/Plugins/Storyboard/BackgroundStoryboard.cs
+@@ -1,16 +1,18 @@
+ using osu.Framework.Allocation;
+ using osu.Framework.Graphics;
+-//using osu.Framework.Logging;
++using osu.Framework.Timing;
+ using osu.Game.Beatmaps;
+ using osu.Game.Skinning;
+ using osu.Game.Storyboards.Drawables;
+ 
+-namespace osu.Game.Screens.Mvis.Storyboard
++//using osu.Framework.Logging;
++
++namespace osu.Game.Screens.Mvis.Plugins.Storyboard
+ {
+     [LongRunningLoad]
+     public class BackgroundStoryboard : BeatmapSkinProvidingContainer
+     {
+-        public StoryboardClock RunningClock;
++        public DecoupleableInterpolatingFramedClock RunningClock;
+         private DrawableStoryboard drawableStoryboard;
+ 
+         private readonly WorkingBeatmap working;
+diff --git a/osu.Game/Screens/Mvis/SideBar/ISidebarContent.cs b/osu.Game/Screens/Mvis/SideBar/ISidebarContent.cs
+index 729dac2030..2156878a6d 100644
+--- a/osu.Game/Screens/Mvis/SideBar/ISidebarContent.cs
++++ b/osu.Game/Screens/Mvis/SideBar/ISidebarContent.cs
+@@ -2,8 +2,8 @@ namespace osu.Game.Screens.Mvis.SideBar
+ {
+     public interface ISidebarContent
+     {
+-        float ResizeWidth { get; }
+-        string Title { get; }
+-        float ResizeHeight => 1f;
++        public float ResizeWidth { get; }
++        public string Title { get; }
++        public float ResizeHeight => 1f;
+     }
+ }
+diff --git a/osu.Game/Screens/Mvis/SideBar/Sidebar.cs b/osu.Game/Screens/Mvis/SideBar/Sidebar.cs
+index 5318f97917..c7e9088aa8 100644
+--- a/osu.Game/Screens/Mvis/SideBar/Sidebar.cs
++++ b/osu.Game/Screens/Mvis/SideBar/Sidebar.cs
+@@ -232,7 +232,8 @@ public override bool Remove(Drawable drawable)
+                     if (t.Value == sc)
+                     {
+                         header.Tabs.Remove(t);
+-                        break;
++                        drawable.Expire();
++                        return true;
+                     }
+                 }
+             }
+diff --git a/osu.Game/Screens/Mvis/SideBar/SidebarPluginsPage.cs b/osu.Game/Screens/Mvis/SideBar/SidebarPluginsPage.cs
+new file mode 100644
+index 0000000000..fe34a80817
+--- /dev/null
++++ b/osu.Game/Screens/Mvis/SideBar/SidebarPluginsPage.cs
+@@ -0,0 +1,42 @@
++using osu.Framework.Allocation;
++using osu.Framework.Graphics;
++using osu.Framework.Graphics.Containers;
++using osu.Game.Graphics.Sprites;
++using osu.Game.Screens.Mvis.Plugins;
++using osuTK;
++
++namespace osu.Game.Screens.Mvis.SideBar
++{
++    public class SidebarPluginsPage : FillFlowContainer, ISidebarContent
++    {
++        public float ResizeWidth => 0.5f;
++        public string Title => "插件";
++
++        [BackgroundDependencyLoader]
++        private void load(MvisPluginManager pluginManager)
++        {
++            Spacing = new Vector2(5);
++            Direction = FillDirection.Vertical;
++
++            foreach (var avaliablePlugin in pluginManager.GetAvaliablePlugins())
++            {
++                Add(new FillFlowContainer
++                {
++                    AutoSizeAxes = Axes.Both,
++                    Direction = FillDirection.Vertical,
++                    Children = new Drawable[]
++                    {
++                        new OsuSpriteText
++                        {
++                            Text = avaliablePlugin.Name
++                        },
++                        new OsuSpriteText
++                        {
++                            Text = avaliablePlugin.Description
++                        }
++                    }
++                });
++            }
++        }
++    }
++}
+diff --git a/osu.Game/Screens/Mvis/Storyboard/StoryboardClock.cs b/osu.Game/Screens/Mvis/Storyboard/StoryboardClock.cs
+deleted file mode 100644
+index a9a5946bc7..0000000000
+--- a/osu.Game/Screens/Mvis/Storyboard/StoryboardClock.cs
++++ /dev/null
+@@ -1,168 +0,0 @@
+-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+-// See the LICENCE file in the repository root for full licence text.
+-
+-using System;
+-using osu.Framework.Timing;
+-
+-namespace osu.Game.Screens.Mvis.Storyboard
+-{
+-    /// <summary>
+-    /// 这是一个更改过的<see cref="DecoupleableInterpolatingFramedClock"/>副本, 对应Framework版本`commit 596418a69d40c52bd83e0bc533aac2e51e1cf498`
+-    ///
+-    /// 改变了什么:
+-    /// `ChangeSource()`
+-    /// `Stop()`
+-    ///
+-    /// Adds the ability to keep the clock running even when the underlying source has stopped or cannot handle the current time range.
+-    /// This is handled by performing seeks on the underlying source and checking whether they were successful or not.
+-    /// On failure to seek, we take over with an internal clock until control can be returned to the actual source.
+-    ///
+-    /// This clock type removes the requirement of having a source set.
+-    ///
+-    /// If a <see cref="InterpolatingFramedClock.Source"/> is set, it is presumed that we have exclusive control over operations on it.
+-    /// This is used to our advantage to allow correct <see cref="IsRunning"/> state tracking in the event of cross-thread communication delays (with an audio thread, for instance).
+-    /// </summary>
+-    public class StoryboardClock : InterpolatingFramedClock, IAdjustableClock
+-    {
+-        /// <summary>
+-        /// Specify whether we are coupled 1:1 to SourceClock. If not, we can independently continue operation.
+-        /// </summary>
+-        public bool IsCoupled = true;
+-
+-        /// <summary>
+-        /// In some cases we should always use the interpolated source.
+-        /// </summary>
+-        private bool useInterpolatedSourceTime => IsRunning && FramedSourceClock?.IsRunning == true;
+-
+-        private readonly FramedClock decoupledClock;
+-        private readonly StopwatchClock decoupledStopwatch;
+-
+-        /// <summary>
+-        /// We need to be able to pass on adjustments to the source if it supports them.
+-        /// </summary>
+-        private IAdjustableClock adjustableSource => Source as IAdjustableClock;
+-
+-        public override double CurrentTime => currentTime;
+-
+-        private double currentTime;
+-
+-        public double ProposedCurrentTime => useInterpolatedSourceTime ? base.CurrentTime : decoupledClock.CurrentTime;
+-
+-        public double ProposedElapsedTime => useInterpolatedSourceTime ? base.ElapsedFrameTime : decoupledClock.ElapsedFrameTime;
+-
+-        public override bool IsRunning => decoupledClock.IsRunning; // we always want to use our local IsRunning state, as it is more correct.
+-
+-        private double elapsedFrameTime;
+-
+-        public override double ElapsedFrameTime => elapsedFrameTime;
+-
+-        public override double Rate
+-        {
+-            get => Source?.Rate ?? 1;
+-            set => adjustableSource.Rate = value;
+-        }
+-
+-        public void ResetSpeedAdjustments() => Rate = 1;
+-
+-        public StoryboardClock()
+-        {
+-            decoupledClock = new FramedClock(decoupledStopwatch = new StopwatchClock());
+-        }
+-
+-        public override void ProcessFrame()
+-        {
+-            base.ProcessFrame();
+-
+-            bool sourceRunning = Source?.IsRunning ?? false;
+-
+-            decoupledStopwatch.Rate = adjustableSource?.Rate ?? 1;
+-
+-            // if interpolating based on the source, keep the decoupled clock in sync with the interpolated time.
+-            if (IsCoupled && sourceRunning)
+-                decoupledStopwatch.Seek(base.CurrentTime);
+-
+-            // process the decoupled clock to update the current proposed time.
+-            decoupledClock.ProcessFrame();
+-
+-            // if the source clock is started as a result of becoming capable of handling the decoupled time, the proposed time may change to reflect the interpolated source time.
+-            // however the interpolated source time that was calculated inside base.ProcessFrame() (above) did not consider the current (post-seek) time of the source.
+-            // in all other cases the proposed time will match before and after clocks are started/stopped.
+-            double proposedTime = ProposedCurrentTime;
+-            double elapsedTime = ProposedElapsedTime;
+-
+-            if (IsRunning)
+-            {
+-                if (IsCoupled)
+-                {
+-                    // when coupled, we want to stop when our source clock stops.
+-                    if (!sourceRunning)
+-                        Stop();
+-                }
+-                else
+-                {
+-                    // when decoupled and running, we should try to start the source clock it if it's capable of handling the current time.
+-                    if (!sourceRunning)
+-                        Start();
+-                }
+-            }
+-            else if (IsCoupled && sourceRunning)
+-            {
+-                // when coupled and not running, we want to start when the source clock starts.
+-                Start();
+-            }
+-
+-            elapsedFrameTime = elapsedTime;
+-
+-            // the source may be started during playback but remain behind the current time in the playback direction for a number of frames.
+-            // in such cases, the current time should remain paused until the source time catches up.
+-            currentTime = elapsedFrameTime < 0 ? Math.Min(currentTime, proposedTime) : Math.Max(currentTime, proposedTime);
+-        }
+-
+-        public override void ChangeSource(IClock source)
+-        {
+-            if (source == null) return;
+-
+-            Seek(((IAdjustableClock)source).CurrentTime);
+-
+-            base.ChangeSource(source);
+-        }
+-
+-        public void Reset()
+-        {
+-            IsCoupled = true;
+-
+-            adjustableSource?.Reset();
+-            decoupledStopwatch.Reset();
+-        }
+-
+-        public void Start()
+-        {
+-            if (adjustableSource?.IsRunning == false)
+-            {
+-                if (adjustableSource.Seek(ProposedCurrentTime))
+-                    //only start the source clock if our time values match.
+-                    //this handles the case where we seeked to an unsupported value and the source clock is out of sync.
+-                    adjustableSource.Start();
+-            }
+-
+-            decoupledStopwatch.Start();
+-        }
+-
+-        public void Stop()
+-        {
+-            decoupledStopwatch.Stop();
+-        }
+-
+-        public bool Seek(double position)
+-        {
+-            try
+-            {
+-                return decoupledStopwatch.Seek(position);
+-            }
+-            finally
+-            {
+-                ProcessFrame();
+-            }
+-        }
+-    }
+-}
