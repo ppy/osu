@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         // this anchor makes no sense, but that's what stable uses.
                         Anchor = Anchor.TopLeft,
                         Origin = Anchor.TopLeft,
-                        Margin = new MarginPadding { Top = LegacyCoordinatesContainer.SPINNER_TOP_OFFSET },
+                        Margin = new MarginPadding { Top = SPINNER_TOP_OFFSET },
                         Masking = true,
                         Child = metreSprite = new Sprite
                         {

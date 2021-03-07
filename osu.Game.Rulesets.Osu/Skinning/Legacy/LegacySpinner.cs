@@ -16,6 +16,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     public abstract class LegacySpinner : CompositeDrawable
     {
+        /// <summary>
+        /// An offset that simulates stable's spinner top offset, can be used with <see cref="LegacyCoordinatesContainer"/>
+        /// for positioning some legacy spinner components perfectly as in stable.
+        /// (e.g. 'spin' sprite, 'clear' sprite, metre in old-style spinners)
+        /// </summary>
+        public static readonly float SPINNER_TOP_OFFSET = (float)Math.Ceiling(45f * SPRITE_SCALE);
+
         protected const float SPRITE_SCALE = 0.625f;
 
         protected DrawableSpinner DrawableSpinner { get; private set; }
@@ -41,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         Origin = Anchor.Centre,
                         Texture = source.GetTexture("spinner-spin"),
                         Scale = new Vector2(SPRITE_SCALE),
-                        Y = LegacyCoordinatesContainer.SPINNER_TOP_OFFSET + 335,
+                        Y = SPINNER_TOP_OFFSET + 335,
                     },
                     clear = new Sprite
                     {
@@ -50,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         Origin = Anchor.Centre,
                         Texture = source.GetTexture("spinner-clear"),
                         Scale = new Vector2(SPRITE_SCALE),
-                        Y = LegacyCoordinatesContainer.SPINNER_TOP_OFFSET + 115,
+                        Y = SPINNER_TOP_OFFSET + 115,
                     },
                 }
             });
@@ -136,13 +143,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         /// </summary>
         protected class LegacyCoordinatesContainer : Container
         {
-            /// <summary>
-            /// An offset that simulates stable's spinner top offset,
-            /// for positioning some legacy spinner components perfectly as in stable.
-            /// (e.g. 'spin' sprite, 'clear' sprite, metre in old-style spinners)
-            /// </summary>
-            public static readonly float SPINNER_TOP_OFFSET = (float)Math.Ceiling(45f * SPRITE_SCALE);
-
             public LegacyCoordinatesContainer()
             {
                 // legacy spinners relied heavily on absolute screen-space coordinate values.
