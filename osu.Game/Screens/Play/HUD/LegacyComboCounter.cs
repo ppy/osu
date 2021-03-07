@@ -88,6 +88,7 @@ namespace osu.Game.Screens.Play.HUD
                 {
                     s.Alpha = 0;
                     s.Margin = new MarginPadding(0.05f);
+                    s.Blending = BlendingParameters.Additive;
                 }),
                 displayedCountSpriteText = createSpriteText().With(s =>
                 {
