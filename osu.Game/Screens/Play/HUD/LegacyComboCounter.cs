@@ -84,14 +84,15 @@ namespace osu.Game.Screens.Play.HUD
         {
             InternalChildren = new[]
             {
-                displayedCountSpriteText = createSpriteText().With(s =>
-                {
-                    s.Alpha = 0;
-                }),
                 popOutCount = createSpriteText().With(s =>
                 {
                     s.Alpha = 0;
                     s.Margin = new MarginPadding(0.05f);
+                    s.Blending = BlendingParameters.Additive;
+                }),
+                displayedCountSpriteText = createSpriteText().With(s =>
+                {
+                    s.Alpha = 0;
                 })
             };
 
