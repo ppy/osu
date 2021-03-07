@@ -152,8 +152,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 Origin = Anchor.Centre;
                 Size = new Vector2(640, 480);
 
-                // since legacy coordinates were on screen-space, they were accounting for the playfield shift offset.
-                // therefore cancel it from here.
+                // counteracts the playfield shift from OsuPlayfieldAdjustmentContainer.
                 Position = new Vector2(0, -8f);
             }
         }
