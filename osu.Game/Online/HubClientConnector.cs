@@ -79,7 +79,7 @@ namespace osu.Game.Online
         {
             cancelExistingConnect();
 
-            if (!await connectionLock.WaitAsync(10000))
+            if (!await connectionLock.WaitAsync(10000).ConfigureAwait(false))
                 throw new TimeoutException("Could not obtain a lock to connect. A previous attempt is likely stuck.");
 
             try
@@ -88,7 +88,7 @@ namespace osu.Game.Online
                 {
                     // ensure any previous connection was disposed.
                     // this will also create a new cancellation token source.
-                    await disconnect(false);
+                    await disconnect(false).ConfigureAwait(false);
 
                     // this token will be valid for the scope of this connection.
                     // if cancelled, we can be sure that a disconnect or reconnect is handled elsewhere.
@@ -103,7 +103,7 @@ namespace osu.Game.Online
                         // importantly, rebuild the connection each attempt to get an updated access token.
                         CurrentConnection = buildConnection(cancellationToken);
 
-                        await CurrentConnection.StartAsync(cancellationToken);
+                        await CurrentConnection.StartAsync(cancellationToken).ConfigureAwait(false);
 
                         Logger.Log($"{clientName} connected!", LoggingTarget.Network);
                         isConnected.Value = true;
@@ -119,7 +119,7 @@ namespace osu.Game.Online
                         Logger.Log($"{clientName} connection error: {e}", LoggingTarget.Network);
 
                         // retry on any failure.
-                        await Task.Delay(5000, cancellationToken);
+                        await Task.Delay(5000, cancellationToken).ConfigureAwait(false);
                     }
                 }
             }
@@ -174,14 +174,14 @@ namespace osu.Game.Online
 
             if (takeLock)
             {
-                if (!await connectionLock.WaitAsync(10000))
+                if (!await connectionLock.WaitAsync(10000).ConfigureAwait(false))
                     throw new TimeoutException("Could not obtain a lock to disconnect. A previous attempt is likely stuck.");
             }
 
             try
             {
                 if (CurrentConnection != null)
-                    await CurrentConnection.DisposeAsync();
+                    await CurrentConnection.DisposeAsync().ConfigureAwait(false);
             }
             finally
             {

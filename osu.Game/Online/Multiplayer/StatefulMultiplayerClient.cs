@@ -131,12 +131,12 @@ namespace osu.Game.Online.Multiplayer
                 Debug.Assert(room.RoomID.Value != null);
 
                 // Join the server-side room.
-                var joinedRoom = await JoinRoom(room.RoomID.Value.Value);
+                var joinedRoom = await JoinRoom(room.RoomID.Value.Value).ConfigureAwait(false);
                 Debug.Assert(joinedRoom != null);
 
                 // Populate users.
                 Debug.Assert(joinedRoom.Users != null);
-                await Task.WhenAll(joinedRoom.Users.Select(PopulateUser));
+                await Task.WhenAll(joinedRoom.Users.Select(PopulateUser)).ConfigureAwait(false);
 
                 // Update the stored room (must be done on update thread for thread-safety).
                 await scheduleAsync(() =>
@@ -144,11 +144,11 @@ namespace osu.Game.Online.Multiplayer
                     Room = joinedRoom;
                     apiRoom = room;
                     defaultPlaylistItemId = apiRoom.Playlist.FirstOrDefault()?.ID ?? 0;
-                }, cancellationSource.Token);
+                }, cancellationSource.Token).ConfigureAwait(false);
 
                 // Update room settings.
-                await updateLocalRoomSettings(joinedRoom.Settings, cancellationSource.Token);
-            }, cancellationSource.Token);
+                await updateLocalRoomSettings(joinedRoom.Settings, cancellationSource.Token).ConfigureAwait(false);
+            }, cancellationSource.Token).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -178,8 +178,8 @@ namespace osu.Game.Online.Multiplayer
 
             return joinOrLeaveTaskChain.Add(async () =>
             {
-                await scheduledReset;
-                await LeaveRoomInternal();
+                await scheduledReset.ConfigureAwait(false);
+                await LeaveRoomInternal().ConfigureAwait(false);
             });
         }
 
@@ -237,11 +237,11 @@ namespace osu.Game.Online.Multiplayer
             switch (localUser.State)
             {
                 case MultiplayerUserState.Idle:
-                    await ChangeState(MultiplayerUserState.Ready);
+                    await ChangeState(MultiplayerUserState.Ready).ConfigureAwait(false);
                     return;
 
                 case MultiplayerUserState.Ready:
-                    await ChangeState(MultiplayerUserState.Idle);
+                    await ChangeState(MultiplayerUserState.Idle).ConfigureAwait(false);
                     return;
 
                 default:
@@ -307,7 +307,7 @@ namespace osu.Game.Online.Multiplayer
             if (Room == null)
                 return;
 
-            await PopulateUser(user);
+            await PopulateUser(user).ConfigureAwait(false);
 
             Scheduler.Add(() =>
             {
@@ -486,7 +486,7 @@ namespace osu.Game.Online.Multiplayer
         /// Populates the <see cref="User"/> for a given <see cref="MultiplayerRoomUser"/>.
         /// </summary>
         /// <param name="multiplayerUser">The <see cref="MultiplayerRoomUser"/> to populate.</param>
-        protected async Task PopulateUser(MultiplayerRoomUser multiplayerUser) => multiplayerUser.User ??= await userLookupCache.GetUserAsync(multiplayerUser.UserID);
+        protected async Task PopulateUser(MultiplayerRoomUser multiplayerUser) => multiplayerUser.User ??= await userLookupCache.GetUserAsync(multiplayerUser.UserID).ConfigureAwait(false);
 
         /// <summary>
         /// Updates the local room settings with the given <see cref="MultiplayerRoomSettings"/>.

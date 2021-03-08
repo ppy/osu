@@ -20,6 +20,9 @@
   <ItemGroup>
     <None Include="Properties\AndroidManifest.xml" />
   </ItemGroup>
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);CA2007</NoWarn>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\osu.Game.Tests\**\Beatmaps\**\*.cs">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
