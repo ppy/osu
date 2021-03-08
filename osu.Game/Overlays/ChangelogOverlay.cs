@@ -160,9 +160,9 @@ namespace osu.Game.Overlays
                     tcs.SetException(e);
                 };
 
-                await API.PerformAsync(req);
+                await API.PerformAsync(req).ConfigureAwait(false);
 
-                await tcs.Task;
+                return tcs.Task;
             });
         }
 

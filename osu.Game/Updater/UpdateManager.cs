@@ -69,7 +69,7 @@ namespace osu.Game.Updater
             lock (updateTaskLock)
                 waitTask = (updateCheckTask ??= PerformUpdateCheck());
 
-            bool hasUpdates = await waitTask;
+            bool hasUpdates = await waitTask.ConfigureAwait(false);
 
             lock (updateTaskLock)
                 updateCheckTask = null;
