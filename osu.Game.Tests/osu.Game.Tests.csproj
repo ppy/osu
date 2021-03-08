@@ -3,11 +3,11 @@
   <ItemGroup Label="Package References">
     <PackageReference Include="Appveyor.TestLogger" Version="2.0.0" />
     <PackageReference Include="DeepEqual" Version="2.0.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.1" />
     <PackageReference Include="NUnit" Version="3.13.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
     <PackageReference Update="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.4" />
-    <PackageReference Include="Moq" Version="4.16.0" />
+    <PackageReference Include="Moq" Version="4.16.1" />
   </ItemGroup>
   <PropertyGroup Label="Project">
     <OutputType>WinExe</OutputType>
