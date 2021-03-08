@@ -100,15 +100,15 @@ namespace osu.Android
                 // copy to an arbitrary-access memory stream to be able to proceed with the import.
                 var copy = new MemoryStream();
                 using (var stream = ContentResolver.OpenInputStream(uri))
-                    await stream.CopyToAsync(copy);
+                    await stream.CopyToAsync(copy).ConfigureAwait(false);
 
                 lock (tasks)
                 {
                     tasks.Add(new ImportTask(copy, filename));
                 }
-            }));
+            })).ConfigureAwait(false);
 
-            await game.Import(tasks.ToArray());
+            await game.Import(tasks.ToArray()).ConfigureAwait(false);
         }, TaskCreationOptions.LongRunning);
     }
 }
