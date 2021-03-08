@@ -124,7 +124,7 @@ namespace osu.Game.Collections
             return Task.Run(async () =>
             {
                 using (var stream = stable.GetStream(database_name))
-                    await Import(stream);
+                    await Import(stream).ConfigureAwait(false);
             });
         }
 
@@ -139,7 +139,7 @@ namespace osu.Game.Collections
             PostNotification?.Invoke(notification);
 
             var collections = readCollections(stream, notification);
-            await importCollections(collections);
+            await importCollections(collections).ConfigureAwait(false);
 
             notification.CompletionText = $"Imported {collections.Count} collections";
             notification.State = ProgressNotificationState.Completed;

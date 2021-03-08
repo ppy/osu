@@ -440,7 +440,7 @@ namespace osu.Game
         public override Task Import(params ImportTask[] imports)
         {
             // encapsulate task as we don't want to begin the import process until in a ready state.
-            var importTask = new Task(async () => await base.Import(imports));
+            var importTask = new Task(async () => await base.Import(imports).ConfigureAwait(false));
 
             waitForReady(() => this, _ => importTask.Start());
 
@@ -831,7 +831,7 @@ namespace osu.Game
                 asyncLoadStream = Task.Run(async () =>
                 {
                     if (previousLoadStream != null)
-                        await previousLoadStream;
+                        await previousLoadStream.ConfigureAwait(false);
 
                     try
                     {
@@ -845,7 +845,7 @@ namespace osu.Game
 
                         // The delegate won't complete if OsuGame has been disposed in the meantime
                         while (!IsDisposed && !del.Completed)
-                            await Task.Delay(10);
+                            await Task.Delay(10).ConfigureAwait(false);
 
                         // Either we're disposed or the load process has started successfully
                         if (IsDisposed)
@@ -853,7 +853,7 @@ namespace osu.Game
 
                         Debug.Assert(task != null);
 
-                        await task;
+                        await task.ConfigureAwait(false);
 
                         Logger.Log($"Loaded {component}!", level: LogLevel.Debug);
                     }

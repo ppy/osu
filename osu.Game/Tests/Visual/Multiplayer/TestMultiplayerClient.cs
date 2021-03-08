@@ -136,7 +136,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             Debug.Assert(Room != null);
 
-            await ((IMultiplayerClient)this).SettingsChanged(settings);
+            await ((IMultiplayerClient)this).SettingsChanged(settings).ConfigureAwait(false);
 
             foreach (var user in Room.Users.Where(u => u.State == MultiplayerUserState.Ready))
                 ChangeUserState(user.UserID, MultiplayerUserState.Idle);

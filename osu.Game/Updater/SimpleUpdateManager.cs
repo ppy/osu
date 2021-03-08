@@ -37,7 +37,7 @@ namespace osu.Game.Updater
             {
                 var releases = new OsuJsonWebRequest<GitHubRelease>("https://api.github.com/repos/ppy/osu/releases/latest");
 
-                await releases.PerformAsync();
+                await releases.PerformAsync().ConfigureAwait(false);
 
                 var latest = releases.ResponseObject;
 
