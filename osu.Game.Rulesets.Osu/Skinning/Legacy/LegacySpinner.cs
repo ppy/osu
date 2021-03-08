@@ -152,7 +152,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 Origin = Anchor.Centre;
                 Size = new Vector2(640, 480);
 
-                // counteracts the playfield shift from OsuPlayfieldAdjustmentContainer.
+                // stable applies this adjustment conditionally, locally in the spinner.
+                // in lazer this is handled at a higher level in OsuPlayfieldAdjustmentContainer,
+                // therefore it's safe to apply it unconditionally in this component.
                 Position = new Vector2(0, -8f);
             }
         }
