@@ -230,7 +230,7 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
                     }, refreshTaskCancellationToken.Token);
                 }, refreshTaskCancellationToken.Token);
 
-                await refreshTask;
+                await refreshTask.ConfigureAwait(true);
             });
         }
 
