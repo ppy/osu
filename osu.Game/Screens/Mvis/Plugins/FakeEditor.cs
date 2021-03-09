@@ -17,8 +17,17 @@ using osu.Game.Skinning;
 namespace osu.Game.Screens.Mvis.Plugins
 {
     [Cached(typeof(IBeatSnapProvider))]
+    [Cached(typeof(ISamplePlaybackDisabler))]
     public class FakeEditor : MvisPlugin, IBeatSnapProvider, ISamplePlaybackDisabler
     {
+        public IBindable<bool> SamplePlaybackDisabled => samplePlaybackDisabled;
+
+        private readonly BindableBool samplePlaybackDisabled = new BindableBool
+        {
+            Value = true,
+            Default = true
+        };
+
         private DependencyContainer dependencies;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
@@ -39,10 +48,14 @@ namespace osu.Game.Screens.Mvis.Plugins
         private readonly BindableBool enableFakeEditor = new BindableBool();
 
         [BackgroundDependencyLoader]
-        private void load(MConfigManager config)
+        private void load(MConfigManager config, MvisScreen mvisScreen, MusicController musicController)
         {
             config.BindWith(MSetting.MvisEnableFakeEditor, enableFakeEditor);
             enableFakeEditor.BindValueChanged(onEnableFakeEditorChanged);
+
+            //todo: 移除下面这一行，只保留Action触发部分
+            samplePlaybackDisabled.Value = !musicController.CurrentTrack.IsRunning;
+            mvisScreen.OnTrackRunningToggle += running => samplePlaybackDisabled.Value = !running;
         }
 
         private void onEnableFakeEditorChanged(ValueChangedEvent<bool> v)
@@ -101,8 +114,6 @@ namespace osu.Game.Screens.Mvis.Plugins
                 IsCoupled = true,
                 DisableSourceAdjustment = true
             };
-
-            SamplePlaybackDisabled.BindTo(EditorClock.SeekingOrStopped);
 
             AddInternal(EditorClock);
             dependencies.CacheAs(EditorClock);
@@ -164,7 +175,5 @@ namespace osu.Game.Screens.Mvis.Plugins
             protected override bool OnMouseMove(MouseMoveEvent e) => true;
             protected override bool OnMouseDown(MouseDownEvent e) => true;
         }
-
-        public IBindable<bool> SamplePlaybackDisabled { get; } = new Bindable<bool>();
     }
 }

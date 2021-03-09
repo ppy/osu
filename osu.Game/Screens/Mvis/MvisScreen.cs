@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Specialized;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -66,6 +67,12 @@ namespace osu.Game.Screens.Mvis
             && inputManager?.FocusedDrawable == null;
 
         private bool isPushed;
+
+        #region 外部事件
+
+        public Action<bool> OnTrackRunningToggle;
+
+        #endregion
 
         #region 依赖
 
@@ -656,6 +663,8 @@ namespace osu.Game.Screens.Mvis
             fakeEditor?.Seek(position);
         }
 
+        #region override事件
+
         protected override void Update()
         {
             base.Update();
@@ -813,9 +822,6 @@ namespace osu.Game.Screens.Mvis
             }
         }
 
-        private void presentBeatmap() =>
-            game?.PresentBeatmap(Beatmap.Value.BeatmapSetInfo);
-
         //当有弹窗或游戏失去焦点时要进行的动作
         protected override void OnHoverLost(HoverLostEvent e)
         {
@@ -825,6 +831,11 @@ namespace osu.Game.Screens.Mvis
             showOverlays(false);
             base.OnHoverLost(e);
         }
+
+        #endregion
+
+        private void presentBeatmap() =>
+            game?.PresentBeatmap(Beatmap.Value.BeatmapSetInfo);
 
         private void updateLockButtonVisuals() =>
             lockButton.FadeIn(500, Easing.OutQuint).Then().Delay(2000).FadeOut(500, Easing.OutQuint);
@@ -874,6 +885,8 @@ namespace osu.Game.Screens.Mvis
                 musicController.Stop();
             else
                 musicController.Play();
+
+            OnTrackRunningToggle?.Invoke(track.IsRunning);
         }
 
         private void prevTrack()

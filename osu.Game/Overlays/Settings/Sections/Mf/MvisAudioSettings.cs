@@ -40,6 +40,12 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 {
                     LabelText = "从收藏夹播放歌曲",
                     Current = config.GetBindable<bool>(MSetting.MvisPlayFromCollection)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "启用Note打击音效",
+                    TooltipText = "高内存占用, 不要用来尝试那些会崩掉你游戏/电脑的图",
+                    Current = config.GetBindable<bool>(MSetting.MvisEnableFakeEditor)
                 }
             };
         }

@@ -55,12 +55,6 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                         Colour = Color4.Gold
                     }
                 },
-                new SettingsCheckbox
-                {
-                    LabelText = "在Mvis播放器中启用Note打击音效",
-                    TooltipText = "不稳定, 相当于在后台开了个编辑器",
-                    Current = mConfig.GetBindable<bool>(MSetting.MvisEnableFakeEditor)
-                },
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
