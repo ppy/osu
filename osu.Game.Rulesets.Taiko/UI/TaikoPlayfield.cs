@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Pooling;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -17,6 +19,7 @@ using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.Taiko.Scoring;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -37,6 +40,8 @@ namespace osu.Game.Rulesets.Taiko.UI
         private ScrollingHitObjectContainer drumRollHitContainer;
         internal Drawable HitTarget;
         private SkinnableDrawable mascot;
+
+        private readonly IDictionary<HitResult, DrawablePool<DrawableTaikoJudgement>> judgementPools = new Dictionary<HitResult, DrawablePool<DrawableTaikoJudgement>>();
 
         private ProxyContainer topLevelHitContainer;
         private Container rightArea;
@@ -159,6 +164,12 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             RegisterPool<Swell, DrawableSwell>(5);
             RegisterPool<SwellTick, DrawableSwellTick>(100);
+
+            var hitWindows = new TaikoHitWindows();
+            foreach (var result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => hitWindows.IsHitResultAllowed(r)))
+                judgementPools.Add(result, new DrawablePool<DrawableTaikoJudgement>(15));
+
+            AddRangeInternal(judgementPools.Values);
         }
 
         protected override void LoadComplete()
@@ -283,13 +294,15 @@ namespace osu.Game.Rulesets.Taiko.UI
                     break;
 
                 default:
-                    judgementContainer.Add(new DrawableTaikoJudgement(result, judgedObject)
+                    judgementContainer.Add(judgementPools[result.Type].Get(j =>
                     {
-                        Anchor = result.IsHit ? Anchor.TopLeft : Anchor.CentreLeft,
-                        Origin = result.IsHit ? Anchor.BottomCentre : Anchor.Centre,
-                        RelativePositionAxes = Axes.X,
-                        X = result.IsHit ? judgedObject.Position.X : 0,
-                    });
+                        j.Apply(result, judgedObject);
+
+                        j.Anchor = result.IsHit ? Anchor.TopLeft : Anchor.CentreLeft;
+                        j.Origin = result.IsHit ? Anchor.BottomCentre : Anchor.Centre;
+                        j.RelativePositionAxes = Axes.X;
+                        j.X = result.IsHit ? judgedObject.Position.X : 0;
+                    }));
 
                     var type = (judgedObject.HitObject as Hit)?.Type ?? HitType.Centre;
                     addExplosion(judgedObject, result.Type, type);

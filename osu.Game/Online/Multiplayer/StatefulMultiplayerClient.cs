@@ -17,8 +17,6 @@ using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Rulesets;
@@ -71,7 +69,7 @@ namespace osu.Game.Online.Multiplayer
         /// <summary>
         /// The <see cref="MultiplayerRoomUser"/> corresponding to the local player, if available.
         /// </summary>
-        public MultiplayerRoomUser? LocalUser => Room?.Users.SingleOrDefault(u => u.User?.Id == api.LocalUser.Value.Id);
+        public MultiplayerRoomUser? LocalUser => Room?.Users.SingleOrDefault(u => u.User?.Id == API.LocalUser.Value.Id);
 
         /// <summary>
         /// Whether the <see cref="LocalUser"/> is the host in <see cref="Room"/>.
@@ -86,13 +84,13 @@ namespace osu.Game.Online.Multiplayer
         }
 
         [Resolved]
+        protected IAPIProvider API { get; private set; } = null!;
+
+        [Resolved]
+        protected RulesetStore Rulesets { get; private set; } = null!;
+
+        [Resolved]
         private UserLookupCache userLookupCache { get; set; } = null!;
-
-        [Resolved]
-        private IAPIProvider api { get; set; } = null!;
-
-        [Resolved]
-        private RulesetStore rulesets { get; set; } = null!;
 
         // Only exists for compatibility with old osu-server-spectator build.
         // Todo: Can be removed on 2021/02/26.
@@ -133,12 +131,12 @@ namespace osu.Game.Online.Multiplayer
                 Debug.Assert(room.RoomID.Value != null);
 
                 // Join the server-side room.
-                var joinedRoom = await JoinRoom(room.RoomID.Value.Value);
+                var joinedRoom = await JoinRoom(room.RoomID.Value.Value).ConfigureAwait(false);
                 Debug.Assert(joinedRoom != null);
 
                 // Populate users.
                 Debug.Assert(joinedRoom.Users != null);
-                await Task.WhenAll(joinedRoom.Users.Select(PopulateUser));
+                await Task.WhenAll(joinedRoom.Users.Select(PopulateUser)).ConfigureAwait(false);
 
                 // Update the stored room (must be done on update thread for thread-safety).
                 await scheduleAsync(() =>
@@ -146,11 +144,11 @@ namespace osu.Game.Online.Multiplayer
                     Room = joinedRoom;
                     apiRoom = room;
                     defaultPlaylistItemId = apiRoom.Playlist.FirstOrDefault()?.ID ?? 0;
-                }, cancellationSource.Token);
+                }, cancellationSource.Token).ConfigureAwait(false);
 
                 // Update room settings.
-                await updateLocalRoomSettings(joinedRoom.Settings, cancellationSource.Token);
-            }, cancellationSource.Token);
+                await updateLocalRoomSettings(joinedRoom.Settings, cancellationSource.Token).ConfigureAwait(false);
+            }, cancellationSource.Token).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -180,8 +178,8 @@ namespace osu.Game.Online.Multiplayer
 
             return joinOrLeaveTaskChain.Add(async () =>
             {
-                await scheduledReset;
-                await LeaveRoomInternal();
+                await scheduledReset.ConfigureAwait(false);
+                await LeaveRoomInternal().ConfigureAwait(false);
             });
         }
 
@@ -239,11 +237,11 @@ namespace osu.Game.Online.Multiplayer
             switch (localUser.State)
             {
                 case MultiplayerUserState.Idle:
-                    await ChangeState(MultiplayerUserState.Ready);
+                    await ChangeState(MultiplayerUserState.Ready).ConfigureAwait(false);
                     return;
 
                 case MultiplayerUserState.Ready:
-                    await ChangeState(MultiplayerUserState.Idle);
+                    await ChangeState(MultiplayerUserState.Idle).ConfigureAwait(false);
                     return;
 
                 default:
@@ -309,7 +307,7 @@ namespace osu.Game.Online.Multiplayer
             if (Room == null)
                 return;
 
-            await PopulateUser(user);
+            await PopulateUser(user).ConfigureAwait(false);
 
             Scheduler.Add(() =>
             {
@@ -488,7 +486,7 @@ namespace osu.Game.Online.Multiplayer
         /// Populates the <see cref="User"/> for a given <see cref="MultiplayerRoomUser"/>.
         /// </summary>
         /// <param name="multiplayerUser">The <see cref="MultiplayerRoomUser"/> to populate.</param>
-        protected async Task PopulateUser(MultiplayerRoomUser multiplayerUser) => multiplayerUser.User ??= await userLookupCache.GetUserAsync(multiplayerUser.UserID);
+        protected async Task PopulateUser(MultiplayerRoomUser multiplayerUser) => multiplayerUser.User ??= await userLookupCache.GetUserAsync(multiplayerUser.UserID).ConfigureAwait(false);
 
         /// <summary>
         /// Updates the local room settings with the given <see cref="MultiplayerRoomSettings"/>.
@@ -515,30 +513,26 @@ namespace osu.Game.Online.Multiplayer
 
             RoomUpdated?.Invoke();
 
-            var req = new GetBeatmapSetRequest(settings.BeatmapID, BeatmapSetLookupType.BeatmapId);
-            req.Success += res =>
+            GetOnlineBeatmapSet(settings.BeatmapID, cancellationToken).ContinueWith(set => Schedule(() =>
             {
                 if (cancellationToken.IsCancellationRequested)
                     return;
 
-                updatePlaylist(settings, res);
-            };
-
-            api.Queue(req);
+                updatePlaylist(settings, set.Result);
+            }), TaskContinuationOptions.OnlyOnRanToCompletion);
         }, cancellationToken);
 
-        private void updatePlaylist(MultiplayerRoomSettings settings, APIBeatmapSet onlineSet)
+        private void updatePlaylist(MultiplayerRoomSettings settings, BeatmapSetInfo beatmapSet)
         {
             if (Room == null || !Room.Settings.Equals(settings))
                 return;
 
             Debug.Assert(apiRoom != null);
 
-            var beatmapSet = onlineSet.ToBeatmapSet(rulesets);
             var beatmap = beatmapSet.Beatmaps.Single(b => b.OnlineBeatmapID == settings.BeatmapID);
             beatmap.MD5Hash = settings.BeatmapChecksum;
 
-            var ruleset = rulesets.GetRuleset(settings.RulesetID).CreateInstance();
+            var ruleset = Rulesets.GetRuleset(settings.RulesetID).CreateInstance();
             var mods = settings.RequiredMods.Select(m => m.ToMod(ruleset));
             var allowedMods = settings.AllowedMods.Select(m => m.ToMod(ruleset));
 
@@ -567,6 +561,14 @@ namespace osu.Game.Online.Multiplayer
                 item.AllowedMods.AddRange(allowedMods);
             }
         }
+
+        /// <summary>
+        /// Retrieves a <see cref="BeatmapSetInfo"/> from an online source.
+        /// </summary>
+        /// <param name="beatmapId">The beatmap set ID.</param>
+        /// <param name="cancellationToken">A token to cancel the request.</param>
+        /// <returns>The <see cref="BeatmapSetInfo"/> retrieval task.</returns>
+        protected abstract Task<BeatmapSetInfo> GetOnlineBeatmapSet(int beatmapId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// For the provided user ID, update whether the user is included in <see cref="CurrentMatchPlayingUserIds"/>.
