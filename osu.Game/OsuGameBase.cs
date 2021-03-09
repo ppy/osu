@@ -449,7 +449,7 @@ namespace osu.Game
             foreach (var importer in fileImporters)
             {
                 if (importer.HandledExtensions.Contains(extension))
-                    await importer.Import(paths);
+                    await importer.Import(paths).ConfigureAwait(false);
             }
         }
 
@@ -460,7 +460,7 @@ namespace osu.Game
             {
                 var importer = fileImporters.FirstOrDefault(i => i.HandledExtensions.Contains(taskGroup.Key));
                 return importer?.Import(taskGroup.ToArray()) ?? Task.CompletedTask;
-            }));
+            })).ConfigureAwait(false);
         }
 
         public IEnumerable<string> HandledExtensions => fileImporters.SelectMany(i => i.HandledExtensions);

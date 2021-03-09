@@ -86,7 +86,7 @@ namespace osu.Game.Database
                 Task.Factory.StartNew(async () =>
                 {
                     // This gets scheduled back to the update thread, but we want the import to run in the background.
-                    var imported = await Import(notification, new ImportTask(filename));
+                    var imported = await Import(notification, new ImportTask(filename)).ConfigureAwait(false);
 
                     // for now a failed import will be marked as a failed download for simplicity.
                     if (!imported.Any())
