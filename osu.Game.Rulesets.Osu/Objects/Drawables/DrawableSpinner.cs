@@ -109,6 +109,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.OnFree();
 
             spinningSample.Samples = null;
+
+            // the counter handles its own fade in (when spinning begins) so we should only be responsible for resetting it here, for pooling.
+            SpmCounter.Hide();
         }
 
         protected override void LoadSamples()
