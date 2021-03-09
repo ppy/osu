@@ -77,7 +77,7 @@ namespace osu.Game.Updater
                     bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".exe", StringComparison.Ordinal));
                     break;
 
-                case RuntimeInfo.Platform.MacOsx:
+                case RuntimeInfo.Platform.macOS:
                     bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".app.zip", StringComparison.Ordinal));
                     break;
 
