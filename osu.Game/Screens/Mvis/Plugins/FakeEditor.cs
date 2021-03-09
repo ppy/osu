@@ -80,9 +80,6 @@ namespace osu.Game.Screens.Mvis.Plugins
             }
         }
 
-        [Resolved]
-        private MusicController music { get; set; }
-
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
 
         public EditorClock EditorClock;
@@ -154,10 +151,8 @@ namespace osu.Game.Screens.Mvis.Plugins
 
         protected override bool OnContentLoaded(Drawable content)
         {
-            EditorClock.ChangeSource(music.CurrentTrack);
+            EditorClock.ChangeSource(musicController.CurrentTrack);
 
-            //todo: 移除下面这一行，只保留Action触发部分
-            samplePlaybackDisabled.Value = !musicController.CurrentTrack.IsRunning;
             mvisScreen.OnTrackRunningToggle += running => samplePlaybackDisabled.Value = !running;
 
             //Logger.Log($"Clock源: {EditorClock.Source}");

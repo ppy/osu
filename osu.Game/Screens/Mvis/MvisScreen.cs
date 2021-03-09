@@ -592,6 +592,8 @@ namespace osu.Game.Screens.Mvis
 
             showOverlays(true);
 
+            OnTrackRunningToggle?.Invoke(track.IsRunning);
+
             base.LoadComplete();
         }
 
