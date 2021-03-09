@@ -18,6 +18,13 @@ namespace osu.Game.Screens.Mvis.Plugins
         [Resolved(CanBeNull = true)]
         private SideBar.Sidebar sideBar { get; set; }
 
+        public Action OnPluginListChanged;
+
+        public MvisPluginManager()
+        {
+            avaliablePlugins.BindCollectionChanged((_, __) => OnPluginListChanged?.Invoke());
+        }
+
         public bool AddPlugin(MvisPlugin pl)
         {
             if (avaliablePlugins.Contains(pl) || pl == null) return false;
@@ -78,9 +85,7 @@ namespace osu.Game.Screens.Mvis.Plugins
             return avaliablePlugins.ToList();
         }
 
-        public List<MvisPlugin> GetActivePlugins()
-        {
-            return activePlugins.ToList();
-        }
+        public List<MvisPlugin> GetActivePlugins() => activePlugins.ToList();
+        public List<MvisPlugin> GetAllPlugins() => avaliablePlugins.ToList();
     }
 }

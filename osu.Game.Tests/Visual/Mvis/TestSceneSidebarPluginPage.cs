@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Mvis
 {
-    public class TestSceneMvisPluginManager : ScreenTestScene
+    public class TestSceneSidebarPluginPage : ScreenTestScene
     {
         private DependencyContainer dependencies;
         private Sidebar sidebar;
@@ -29,6 +29,7 @@ namespace osu.Game.Tests.Visual.Mvis
         {
             var manager = new MvisPluginManager();
             dependencies.Cache(new CustomColourProvider(0, 0, 1));
+            dependencies.Cache(manager);
 
             dependencies.Cache(sidebar = new Sidebar
             {
@@ -48,6 +49,10 @@ namespace osu.Game.Tests.Visual.Mvis
             {
                 if (manager.AddPlugin(plugin))
                     Add(plugin);
+
+                var undisablePlugin = new BasicMvisPlugin(true, true);
+                manager.AddPlugin(undisablePlugin);
+                Add(undisablePlugin);
             });
             AddStep("Enable Plugin", () => manager.ActivePlugin(plugin));
             AddStep("Disable Plugin", () => manager.DisablePlugin(plugin));
@@ -61,14 +66,22 @@ namespace osu.Game.Tests.Visual.Mvis
 
                 plugin = new BasicMvisPlugin();
             });
+
+            sidebar.Add(new SidebarPluginsPage());
         }
 
         private class BasicMvisPlugin : MvisPlugin
         {
-            public BasicMvisPlugin()
+            public BasicMvisPlugin(bool enableDisable = false, bool enableUnload = false)
             {
                 page.Plugin = this;
                 Size = new Vector2(200, 100);
+
+                if (enableDisable)
+                    Flags.Add(PluginFlags.CanDisable);
+
+                if (enableUnload)
+                    Flags.Add(PluginFlags.CanUnload);
             }
 
             private readonly OsuSpriteText text = new OsuSpriteText

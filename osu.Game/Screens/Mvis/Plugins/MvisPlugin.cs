@@ -120,6 +120,6 @@ namespace osu.Game.Screens.Mvis.Plugins
             CanReload
         }
 
-        public static List<PluginFlags> Flags = new List<PluginFlags>();
+        public readonly List<PluginFlags> Flags = new List<PluginFlags>();
     }
 }

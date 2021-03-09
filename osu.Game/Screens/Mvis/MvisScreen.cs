@@ -490,7 +490,7 @@ namespace osu.Game.Screens.Mvis
                 },
             });
             sidebar.Add(collectionPanel = new CollectionSelectPanel());
-            //sidebar.Add(new SidebarPluginsPage());
+            sidebar.Add(new SidebarPluginsPage());
 
             isIdle.BindTo(idleTracker.IsIdle);
             config.BindWith(MSetting.MvisBgBlur, bgBlur);
