@@ -46,12 +46,50 @@ namespace osu.Game.Tests.Visual.Gameplay
         [TestCase(0, 0)]
         [TestCase(-1000, -1000)]
         [TestCase(-10000, -10000)]
-        public void TestStoryboardProducesCorrectStartTime(double firstStoryboardEvent, double expectedStartTime)
+        public void TestStoryboardProducesCorrectStartTimeSimpleAlpha(double firstStoryboardEvent, double expectedStartTime)
         {
             var storyboard = new Storyboard();
 
             var sprite = new StoryboardSprite("unknown", Anchor.TopLeft, Vector2.Zero);
+
             sprite.TimelineGroup.Alpha.Add(Easing.None, firstStoryboardEvent, firstStoryboardEvent + 500, 0, 1);
+
+            storyboard.GetLayer("Background").Add(sprite);
+
+            loadPlayerWithBeatmap(new TestBeatmap(new OsuRuleset().RulesetInfo), storyboard);
+
+            AddAssert($"first frame is {expectedStartTime}", () =>
+            {
+                Debug.Assert(player.FirstFrameClockTime != null);
+                return Precision.AlmostEquals(player.FirstFrameClockTime.Value, expectedStartTime, lenience_ms);
+            });
+        }
+
+        [TestCase(1000, 0, false)]
+        [TestCase(0, 0, false)]
+        [TestCase(-1000, -1000, false)]
+        [TestCase(-10000, -10000, false)]
+        [TestCase(1000, 0, true)]
+        [TestCase(0, 0, true)]
+        [TestCase(-1000, -1000, true)]
+        [TestCase(-10000, -10000, true)]
+        public void TestStoryboardProducesCorrectStartTimeFadeInAfterOtherEvents(double firstStoryboardEvent, double expectedStartTime, bool addEventToLoop)
+        {
+            var storyboard = new Storyboard();
+
+            var sprite = new StoryboardSprite("unknown", Anchor.TopLeft, Vector2.Zero);
+
+            // these should be ignored as we have an alpha visibility blocker proceeding this command.
+            sprite.TimelineGroup.Scale.Add(Easing.None, -20000, -18000, 0, 1);
+            var loopGroup = sprite.AddLoop(-20000, 50);
+            loopGroup.Scale.Add(Easing.None, -20000, -18000, 0, 1);
+
+            var target = addEventToLoop ? loopGroup : sprite.TimelineGroup;
+            target.Alpha.Add(Easing.None, firstStoryboardEvent, firstStoryboardEvent + 500, 0, 1);
+
+            // these should be ignored due to being in the future.
+            sprite.TimelineGroup.Alpha.Add(Easing.None, 18000, 20000, 0, 1);
+            loopGroup.Alpha.Add(Easing.None, 18000, 20000, 0, 1);
 
             storyboard.GetLayer("Background").Add(sprite);
 
