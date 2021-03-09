@@ -19,7 +19,6 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
@@ -31,7 +30,6 @@ using osu.Game.Screens.Mvis.BottomBar;
 using osu.Game.Screens.Mvis.BottomBar.Buttons;
 using osu.Game.Screens.Mvis.Collections;
 using osu.Game.Screens.Mvis.Collections.Interface;
-using osu.Game.Screens.Mvis.Objects;
 using osu.Game.Screens.Mvis.Plugins;
 using osu.Game.Screens.Mvis.SideBar;
 using osu.Game.Screens.Mvis.Skinning;
@@ -71,6 +69,9 @@ namespace osu.Game.Screens.Mvis
         #region 外部事件
 
         public Action<bool> OnTrackRunningToggle;
+        public Action OnScreenExiting;
+        public Action OnScreenSuspending;
+        public Action OnScreenResuming;
 
         #endregion
 
@@ -116,11 +117,9 @@ namespace osu.Game.Screens.Mvis
         private Container background;
         private BackgroundStoryBoardLoader sbLoader;
         private BgTrianglesContainer bgTriangles;
-        private Container particles;
         private FullScreenSkinnableComponent skinnableBbBackground;
 
         private Container foreground;
-        private BeatmapLogo beatmapLogo;
         private FullScreenSkinnableComponent skinnableForeground;
 
         #endregion
@@ -207,6 +206,8 @@ namespace osu.Game.Screens.Mvis
             dependencies.Cache(pluginManager = new MvisPluginManager());
             dependencies.Cache(this);
 
+            var panel = new RulesetPanel();
+
             InternalChildren = new Drawable[]
             {
                 colourProvider,
@@ -237,23 +238,8 @@ namespace osu.Game.Screens.Mvis
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Name = "Gameplay Foreground Elements Container",
                             RelativeSizeAxes = Axes.Both,
-                            Children = new Drawable[]
-                            {
-                                particles = new Container
-                                {
-                                    RelativeSizeAxes = Axes.Both
-                                },
-                                new ParallaxContainer
-                                {
-                                    ParallaxAmount = -0.0025f,
-                                    Child = beatmapLogo = new BeatmapLogo
-                                    {
-                                        Anchor = Anchor.Centre,
-                                    }
-                                }
-                            }
+                            Child = panel
                         }
                     }
                 },
@@ -474,6 +460,8 @@ namespace osu.Game.Screens.Mvis
             };
 
             dependencies.Cache(sidebar);
+            pluginManager.AddPlugin(panel);
+            pluginManager.ActivePlugin(panel);
 
             sidebar.Add(settingsScroll = new SidebarSettingsScrollContainer
             {
@@ -555,19 +543,6 @@ namespace osu.Game.Screens.Mvis
             {
                 if (v.NewValue) hideOverlays(false);
             });
-            showParticles.BindValueChanged(v =>
-            {
-                switch (v.NewValue)
-                {
-                    case true:
-                        particles.Child = new SpaceParticlesContainer();
-                        break;
-
-                    case false:
-                        particles.Clear();
-                        break;
-                }
-            }, true);
 
             inputManager = GetContainingInputManager();
 
@@ -701,7 +676,6 @@ namespace osu.Game.Screens.Mvis
             musicController.TrackAdjustTakenOver = false;
 
             //停止beatmapLogo，取消故事版家在任务以及锁定变更
-            beatmapLogo.StopResponseOnBeatmapChanges();
             lockChanges.Value = true;
 
             //非背景层的动画
@@ -709,6 +683,7 @@ namespace osu.Game.Screens.Mvis
             bottomFillFlow.MoveToY(bottomBar.Height + 30, duration, Easing.OutQuint);
 
             this.FadeOut(500, Easing.OutQuint);
+            OnScreenExiting?.Invoke();
             return base.OnExiting(next);
         }
 
@@ -723,8 +698,8 @@ namespace osu.Game.Screens.Mvis
             this.FadeOut(duration * 0.6f, Easing.OutQuint)
                 .ScaleTo(1.2f, duration * 0.6f, Easing.OutQuint);
 
-            beatmapLogo.StopResponseOnBeatmapChanges();
             Beatmap.UnbindEvents();
+            OnScreenSuspending?.Invoke();
 
             base.OnSuspending(next);
         }
@@ -745,10 +720,10 @@ namespace osu.Game.Screens.Mvis
             updateBackground(Beatmap.Value);
 
             Beatmap.BindValueChanged(OnBeatmapChanged, true);
-            beatmapLogo.ResponseOnBeatmapChanges();
 
             //背景层的动画
             background.FadeOut().Then().Delay(duration * 0.6f).FadeIn(duration / 2);
+            OnScreenResuming?.Invoke();
         }
 
         public bool OnPressed(GlobalAction action)

@@ -48,9 +48,6 @@ namespace osu.Game.Screens.Mvis.Plugins
         private readonly BindableBool enableFakeEditor = new BindableBool();
 
         [Resolved]
-        private MvisScreen mvisScreen { get; set; }
-
-        [Resolved]
         private MusicController musicController { get; set; }
 
         [BackgroundDependencyLoader]
@@ -153,7 +150,8 @@ namespace osu.Game.Screens.Mvis.Plugins
         {
             EditorClock.ChangeSource(musicController.CurrentTrack);
 
-            mvisScreen.OnTrackRunningToggle += running => samplePlaybackDisabled.Value = !running;
+            if (MvisScreen != null)
+                MvisScreen.OnTrackRunningToggle += running => samplePlaybackDisabled.Value = !running;
 
             //Logger.Log($"Clock源: {EditorClock.Source}");
             //Logger.Log($"是否不能单独操作: {EditorClock.IsCoupled}");

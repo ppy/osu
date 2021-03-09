@@ -1,10 +1,10 @@
+using System.Collections.Generic;
 using System.Threading;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Screens.Mvis.SideBar;
 
 namespace osu.Game.Screens.Mvis.Plugins
 {
@@ -23,8 +23,8 @@ namespace osu.Game.Screens.Mvis.Plugins
         [Resolved(CanBeNull = true)]
         private MvisScreen mvisScreen { get; set; }
 
-        [Resolved]
-        private Sidebar sidebar { get; set; }
+        [CanBeNull]
+        protected MvisScreen MvisScreen => mvisScreen;
 
         #region 异步加载任务
 
@@ -112,5 +112,14 @@ namespace osu.Game.Screens.Mvis.Plugins
             Disabled.Value = true;
             return true;
         }
+
+        public enum PluginFlags
+        {
+            CanDisable,
+            CanUnload,
+            CanReload
+        }
+
+        public static List<PluginFlags> Flags = new List<PluginFlags>();
     }
 }
