@@ -38,42 +38,51 @@ namespace osu.Game.Screens.Mvis.Plugins
 
         public FakeEditor(WorkingBeatmap beatmap)
         {
-            Name = "假Editor";
-            Description = "用于提供打击音效; Mfosu自带插件";
+            Name = "假Editor(Mf-osu自带插件)";
+            Description = "用于提供打击音效; 高内存占用, 不要用来尝试那些会崩掉你游戏/电脑的图";
 
             this.beatmap = beatmap;
             Masking = true;
+
+            Flags.Add(PluginFlags.CanDisable);
         }
 
-        private readonly BindableBool enableFakeEditor = new BindableBool();
+        private readonly BindableBool disableFakeEditor = new BindableBool();
 
         [Resolved]
         private MusicController musicController { get; set; }
 
+        [Resolved]
+        private MvisPluginManager manager { get; set; }
+
         [BackgroundDependencyLoader]
         private void load(MConfigManager config)
         {
-            config.BindWith(MSetting.MvisEnableFakeEditor, enableFakeEditor);
-            enableFakeEditor.BindValueChanged(onEnableFakeEditorChanged);
+            config.BindWith(MSetting.MvisDisableFakeEditor, disableFakeEditor);
+            Disabled.BindTo(disableFakeEditor);
         }
 
-        private void onEnableFakeEditorChanged(ValueChangedEvent<bool> v)
+        protected override void LoadComplete()
+        {
+            disableFakeEditor.BindValueChanged(onDisableFakeEditorChanged, true);
+            base.LoadComplete();
+        }
+
+        private void onDisableFakeEditorChanged(ValueChangedEvent<bool> v)
         {
             if (v.NewValue)
             {
+                manager.DisablePlugin(this);
+
                 if (ContentLoaded)
-                {
-                    this.FadeTo(0.01f);
-                }
-                else
-                    Load();
+                    this.FadeOut();
             }
             else
             {
+                manager.ActivePlugin(this);
+
                 if (ContentLoaded)
-                    this.FadeOut();
-                else
-                    Cancel();
+                    this.FadeTo(0.01f);
             }
         }
 
@@ -98,7 +107,7 @@ namespace osu.Game.Screens.Mvis.Plugins
 
         protected override bool PostInit()
         {
-            if (!enableFakeEditor.Value)
+            if (disableFakeEditor.Value)
                 return false;
 
             beatDivisor.Value = beatmap.BeatmapInfo.BeatDivisor;
@@ -112,8 +121,12 @@ namespace osu.Game.Screens.Mvis.Plugins
             };
 
             AddInternal(EditorClock);
-            dependencies.CacheAs(EditorClock);
-            dependencies.CacheAs(beatDivisor);
+
+            if (dependencies.Get(typeof(EditorClock)) == null)
+                dependencies.CacheAs(EditorClock);
+
+            if (dependencies.Get(typeof(BindableBeatDivisor)) == null)
+                dependencies.CacheAs(beatDivisor);
 
             var playableBeatmap = beatmap.GetPlayableBeatmap(beatmap.BeatmapInfo.Ruleset);
 
@@ -130,7 +143,8 @@ namespace osu.Game.Screens.Mvis.Plugins
                 Alpha = 0.001f
             });
 
-            dependencies.CacheAs(editorBeatmap);
+            if (dependencies.Get(typeof(EditorBeatmap)) == null)
+                dependencies.CacheAs(editorBeatmap);
 
             ruleset = beatmap.BeatmapInfo.Ruleset?.CreateInstance();
 
@@ -144,6 +158,24 @@ namespace osu.Game.Screens.Mvis.Plugins
             rulesetSkinProvider = new SkinProvidingContainer(ruleset.CreateLegacySkinProvider(beatmapSkinProvider, editorBeatmap.PlayableBeatmap));
 
             return true;
+        }
+
+        public override bool Disable()
+        {
+            disableFakeEditor.Value = true;
+            return base.Disable();
+        }
+
+        public override bool Enable()
+        {
+            disableFakeEditor.Value = false;
+            return base.Enable();
+        }
+
+        public override void UnLoad()
+        {
+            disableFakeEditor.UnbindAll();
+            base.UnLoad();
         }
 
         protected override bool OnContentLoaded(Drawable content)

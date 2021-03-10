@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Mvis.Plugins
     {
         public RulesetPanel()
         {
-            Name = "Mvis面板";
+            Name = "Mvis面板(Mf-osu自带插件)";
             Description = "用于提供Mvis面板功能(中心的谱面图及周围的粒子效果)";
 
             Flags.Add(PluginFlags.CanDisable);
@@ -42,16 +42,25 @@ namespace osu.Game.Screens.Mvis.Plugins
             Anchor = Anchor.Centre,
         };
 
+        private Bindable<bool> disablePanel;
+
         [BackgroundDependencyLoader]
         private void load(MConfigManager config)
         {
             config.BindWith(MSetting.MvisShowParticles, showParticles);
+            disablePanel = config.GetBindable<bool>(MSetting.MvisDisableRulesetPanel);
+            Disabled.BindTo(disablePanel);
         }
 
         protected override void LoadComplete()
         {
-            if (config.Get<bool>(MSetting.MvisEnableRulesetPanel))
-                manager.ActivePlugin(this);
+            disablePanel.BindValueChanged(v =>
+            {
+                if (v.NewValue)
+                    manager.DisablePlugin(this);
+                else
+                    manager.ActivePlugin(this);
+            }, true);
 
             base.LoadComplete();
         }
@@ -106,7 +115,7 @@ namespace osu.Game.Screens.Mvis.Plugins
             this.FadeOut(300, Easing.OutQuint).ScaleTo(0.8f, 400, Easing.OutQuint);
             beatmapLogo.StopResponseOnBeatmapChanges();
 
-            config.Set(MSetting.MvisEnableRulesetPanel, false);
+            disablePanel.Value = true;
             return base.Disable();
         }
 
@@ -115,8 +124,14 @@ namespace osu.Game.Screens.Mvis.Plugins
             this.FadeIn(300).ScaleTo(1, 400, Easing.OutQuint);
             beatmapLogo.ResponseOnBeatmapChanges();
 
-            config.Set(MSetting.MvisEnableRulesetPanel, true);
+            disablePanel.Value = false;
             return base.Enable();
+        }
+
+        public override void UnLoad()
+        {
+            disablePanel.UnbindAll();
+            base.UnLoad();
         }
     }
 }

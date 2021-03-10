@@ -38,7 +38,7 @@ namespace osu.Game.Configuration
             Set(MSetting.MvisParticleAmount, 350, 0, 350);
             Set(MSetting.MvisContentAlpha, 1f, 0f, 1f);
             Set(MSetting.MvisBgBlur, 0.2f, 0f, 1f);
-            Set(MSetting.MvisEnableStoryboard, true);
+            Set(MSetting.MvisDisableStoryboard, false);
             Set(MSetting.MvisStoryboardProxy, true);
             Set(MSetting.MvisUseOsuLogoVisualisation, false);
             Set(MSetting.MvisIdleBgDim, 0.8f, 0f, 1f);
@@ -62,8 +62,8 @@ namespace osu.Game.Configuration
             Set(MSetting.MvisRed, 0, 0, 255);
             Set(MSetting.MvisGreen, 0, 0, 255);
             Set(MSetting.MvisBlue, 0, 0, 255);
-            Set(MSetting.MvisEnableFakeEditor, false);
-            Set(MSetting.MvisEnableRulesetPanel, false);
+            Set(MSetting.MvisDisableFakeEditor, true);
+            Set(MSetting.MvisDisableRulesetPanel, false);
 
             //实验性功能
             Set(MSetting.CustomWindowIconPath, "");
@@ -83,7 +83,7 @@ namespace osu.Game.Configuration
         MvisParticleAmount,
         MvisBgBlur,
         MvisUseOsuLogoVisualisation,
-        MvisEnableStoryboard,
+        MvisDisableStoryboard,
         MvisStoryboardProxy,
         MvisIdleBgDim,
         MvisContentAlpha,
@@ -105,8 +105,8 @@ namespace osu.Game.Configuration
         MvisInterfaceRed,
         MvisInterfaceGreen,
         MvisInterfaceBlue,
-        MvisEnableFakeEditor,
-        MvisEnableRulesetPanel,
+        MvisDisableFakeEditor,
+        MvisDisableRulesetPanel,
         SamplePlaybackGain,
         SongSelectBgBlur,
         IntroLoadDirectToSongSelect,

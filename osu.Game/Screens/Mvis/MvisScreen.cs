@@ -993,8 +993,6 @@ namespace osu.Game.Screens.Mvis
             pluginManager.AddPlugin(fakeEditor);
             pluginManager.AddPlugin(sbLoader);
 
-            pluginManager.ActivePlugin(fakeEditor);
-
             activity.Value = new UserActivity.InMvis(beatmap.BeatmapInfo);
             prevBeatmap = beatmap;
         }

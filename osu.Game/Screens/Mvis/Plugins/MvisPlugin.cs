@@ -38,8 +38,7 @@ namespace osu.Game.Screens.Mvis.Plugins
 
         public BindableBool Disabled = new BindableBool
         {
-            Default = true,
-            Value = true
+            Default = true
         };
 
         #endregion

@@ -3,7 +3,6 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-//using osu.Framework.Logging;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -19,7 +18,7 @@ namespace osu.Game.Screens.Mvis.Plugins
     {
         public const float STORYBOARD_FADEIN_DURATION = 750;
         public const float STORYBOARD_FADEOUT_DURATION = STORYBOARD_FADEIN_DURATION / 2;
-        private readonly BindableBool enableSb = new BindableBool();
+        private Bindable<bool> disableSb;
 
         ///<summary>
         ///用于内部确定故事版是否已加载
@@ -51,7 +50,7 @@ namespace osu.Game.Screens.Mvis.Plugins
             RelativeSizeAxes = Axes.Both;
             targetBeatmap = working;
 
-            Name = "故事版加载器";
+            Name = "故事版加载器(Mf-osu自带插件)";
             Description = "用于呈现故事版; Mfosu自带插件";
 
             Flags.Add(PluginFlags.CanDisable);
@@ -60,7 +59,8 @@ namespace osu.Game.Screens.Mvis.Plugins
         [BackgroundDependencyLoader]
         private void load(MConfigManager config)
         {
-            config.BindWith(MSetting.MvisEnableStoryboard, enableSb);
+            disableSb = config.GetBindable<bool>(MSetting.MvisDisableStoryboard);
+            Disabled.BindTo(disableSb);
 
             currentBeatmap.BindValueChanged(v =>
             {
@@ -74,8 +74,7 @@ namespace osu.Game.Screens.Mvis.Plugins
 
         protected override void LoadComplete()
         {
-            if (enableSb.Value) manager.ActivePlugin(this);
-            enableSb.BindValueChanged(OnEnableSBChanged);
+            disableSb.BindValueChanged(OnDisableSBChanged, true);
             base.LoadComplete();
         }
 
@@ -87,10 +86,8 @@ namespace osu.Game.Screens.Mvis.Plugins
 
         protected override bool PostInit()
         {
-            if (!enableSb.Value)
+            if (disableSb.Value)
                 return false;
-
-            //Logger.Log("故事版PostInit");
 
             if (targetBeatmap == null)
                 throw new InvalidOperationException("currentBeatmap 不能为 null");
@@ -105,7 +102,6 @@ namespace osu.Game.Screens.Mvis.Plugins
                 DisableSourceAdjustment = true
             };
 
-            //Logger.Log("故事版PostInit - 完成");
             return true;
         }
 
@@ -123,10 +119,9 @@ namespace osu.Game.Screens.Mvis.Plugins
 
             setProxy(newStoryboard);
 
-            enableSb.TriggerChange();
+            disableSb.TriggerChange();
             OnNewStoryboardLoaded?.Invoke();
 
-            //Logger.Log("故事版OnContentLoaded - 完成");
             return true;
         }
 
@@ -140,24 +135,28 @@ namespace osu.Game.Screens.Mvis.Plugins
             StoryboardProxy = storyboard.StoryboardProxy();
         }
 
-        public void OnEnableSBChanged(ValueChangedEvent<bool> v)
+        public void OnDisableSBChanged(ValueChangedEvent<bool> v)
         {
             if (v.NewValue)
             {
+                manager.DisablePlugin(this);
+
+                if (ContentLoaded)
+                    currentStoryboard?.FadeOut(STORYBOARD_FADEOUT_DURATION, Easing.OutQuint);
+
+                StoryboardReplacesBackground.Value = false;
+                NeedToHideTriangles.Value = false;
+            }
+            else
+            {
+                manager.ActivePlugin(this);
+
                 if (ContentLoaded)
                 {
                     StoryboardReplacesBackground.Value = targetBeatmap.Storyboard.ReplacesBackground && targetBeatmap.Storyboard.HasDrawable;
                     NeedToHideTriangles.Value = targetBeatmap.Storyboard.HasDrawable;
                     currentStoryboard?.FadeIn(STORYBOARD_FADEIN_DURATION, Easing.OutQuint);
                 }
-            }
-            else
-            {
-                if (ContentLoaded)
-                    currentStoryboard?.FadeOut(STORYBOARD_FADEOUT_DURATION, Easing.OutQuint);
-
-                StoryboardReplacesBackground.Value = false;
-                NeedToHideTriangles.Value = false;
             }
         }
 
@@ -174,14 +173,20 @@ namespace osu.Game.Screens.Mvis.Plugins
 
         public override bool Disable()
         {
-            enableSb.Value = false;
+            disableSb.Value = true;
             return base.Disable();
         }
 
         public override bool Enable()
         {
-            enableSb.Value = true;
+            disableSb.Value = false;
             return base.Enable();
+        }
+
+        public override void UnLoad()
+        {
+            disableSb.UnbindAll();
+            base.UnLoad();
         }
     }
 }

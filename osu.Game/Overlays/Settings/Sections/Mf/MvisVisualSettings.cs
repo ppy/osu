@@ -114,6 +114,11 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                     LabelText = "使用lazer自带频谱效果",
                     Current = config.GetBindable<bool>(MSetting.MvisUseOsuLogoVisualisation),
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "禁用Mvis面板",
+                    Current = config.GetBindable<bool>(MSetting.MvisDisableRulesetPanel)
+                }
             };
         }
 
