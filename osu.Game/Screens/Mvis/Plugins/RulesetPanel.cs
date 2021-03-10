@@ -15,7 +15,11 @@ namespace osu.Game.Screens.Mvis.Plugins
             Name = "Mvis面板";
             Description = "用于提供Mvis面板功能(中心的谱面图及周围的粒子效果)";
 
+            Flags.Add(PluginFlags.CanDisable);
+
             RelativeSizeAxes = Axes.Both;
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
         }
 
         private readonly Bindable<bool> showParticles = new BindableBool();
@@ -72,10 +76,27 @@ namespace osu.Game.Screens.Mvis.Plugins
             {
                 MvisScreen.OnScreenExiting += beatmapLogo.StopResponseOnBeatmapChanges;
                 MvisScreen.OnScreenSuspending += beatmapLogo.StopResponseOnBeatmapChanges;
-                MvisScreen.OnScreenResuming += beatmapLogo.ResponseOnBeatmapChanges;
+                MvisScreen.OnScreenResuming += () =>
+                {
+                    if (!Disabled.Value) beatmapLogo.ResponseOnBeatmapChanges();
+                };
             }
 
             return true;
+        }
+
+        public override bool Disable()
+        {
+            Content.FadeOut(300, Easing.OutQuint).ScaleTo(0.8f, 400, Easing.OutQuint);
+            beatmapLogo.StopResponseOnBeatmapChanges();
+            return base.Disable();
+        }
+
+        public override bool Enable()
+        {
+            Content.FadeIn(300).ScaleTo(1, 400, Easing.OutQuint);
+            beatmapLogo.ResponseOnBeatmapChanges();
+            return base.Enable();
         }
     }
 }

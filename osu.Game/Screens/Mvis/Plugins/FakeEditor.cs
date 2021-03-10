@@ -150,6 +150,9 @@ namespace osu.Game.Screens.Mvis.Plugins
         {
             EditorClock.ChangeSource(musicController.CurrentTrack);
 
+            //todo: 移除下面这一行的同时确保samplePlaybackDisabled的值可以正常随音乐变动
+            samplePlaybackDisabled.Value = !musicController.CurrentTrack.IsRunning;
+
             if (MvisScreen != null)
                 MvisScreen.OnTrackRunningToggle += running => samplePlaybackDisabled.Value = !running;
 

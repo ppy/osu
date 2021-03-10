@@ -20,9 +20,10 @@ namespace osu.Game.Screens.Mvis.Plugins
 
         public Action OnPluginListChanged;
 
-        public MvisPluginManager()
+        protected override void LoadComplete()
         {
-            avaliablePlugins.BindCollectionChanged((_, __) => OnPluginListChanged?.Invoke());
+            avaliablePlugins.BindCollectionChanged((_, __) => OnPluginListChanged?.Invoke(), true);
+            base.LoadComplete();
         }
 
         public bool AddPlugin(MvisPlugin pl)

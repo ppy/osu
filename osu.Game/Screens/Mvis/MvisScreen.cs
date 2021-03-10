@@ -208,6 +208,35 @@ namespace osu.Game.Screens.Mvis
 
             var panel = new RulesetPanel();
 
+            sidebar.Add(settingsScroll = new SidebarSettingsScrollContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                Child = new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.X,
+                    Spacing = new Vector2(20),
+                    Padding = new MarginPadding { Top = 10, Left = 5, Right = 5 },
+                    Margin = new MarginPadding { Bottom = 10 },
+                    Direction = FillDirection.Vertical,
+                    Children = new Drawable[]
+                    {
+                        new MfMvisSection
+                        {
+                            Margin = new MarginPadding { Top = -15 },
+                            Padding = new MarginPadding(0)
+                        },
+                        new SettingsButton
+                        {
+                            Text = "歌曲选择",
+                            Action = () => this.Push(new MvisSongSelect())
+                        }
+                    }
+                },
+            });
+            sidebar.Add(collectionPanel = new CollectionSelectPanel());
+            sidebar.Add(new SidebarPluginsPage());
+
             InternalChildren = new Drawable[]
             {
                 colourProvider,
@@ -462,35 +491,6 @@ namespace osu.Game.Screens.Mvis
             dependencies.Cache(sidebar);
             pluginManager.AddPlugin(panel);
             pluginManager.ActivePlugin(panel);
-
-            sidebar.Add(settingsScroll = new SidebarSettingsScrollContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-                Child = new FillFlowContainer
-                {
-                    AutoSizeAxes = Axes.Y,
-                    RelativeSizeAxes = Axes.X,
-                    Spacing = new Vector2(20),
-                    Padding = new MarginPadding { Top = 10, Left = 5, Right = 5 },
-                    Margin = new MarginPadding { Bottom = 10 },
-                    Direction = FillDirection.Vertical,
-                    Children = new Drawable[]
-                    {
-                        new MfMvisSection
-                        {
-                            Margin = new MarginPadding { Top = -15 },
-                            Padding = new MarginPadding(0)
-                        },
-                        new SettingsButton
-                        {
-                            Text = "歌曲选择",
-                            Action = () => this.Push(new MvisSongSelect())
-                        }
-                    }
-                },
-            });
-            sidebar.Add(collectionPanel = new CollectionSelectPanel());
-            sidebar.Add(new SidebarPluginsPage());
 
             isIdle.BindTo(idleTracker.IsIdle);
             config.BindWith(MSetting.MvisBgBlur, bgBlur);

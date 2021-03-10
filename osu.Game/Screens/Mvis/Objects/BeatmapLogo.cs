@@ -159,12 +159,12 @@ namespace osu.Game.Screens.Mvis.Objects
 
         public override void StopResponseOnBeatmapChanges()
         {
-            updateableBg.StopResponseOnBeatmapChanges();
+            updateableBg?.StopResponseOnBeatmapChanges();
         }
 
         public override void ResponseOnBeatmapChanges()
         {
-            updateableBg.ResponseOnBeatmapChanges();
+            updateableBg?.ResponseOnBeatmapChanges();
         }
 
         protected override void Update()

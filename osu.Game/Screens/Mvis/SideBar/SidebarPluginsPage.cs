@@ -29,6 +29,12 @@ namespace osu.Game.Screens.Mvis.SideBar
             pluginManager.OnPluginListChanged += reloadPluginList;
         }
 
+        protected override void LoadComplete()
+        {
+            reloadPluginList();
+            base.LoadComplete();
+        }
+
         private void reloadPluginList()
         {
             ClearInternal();
@@ -194,8 +200,8 @@ namespace osu.Game.Screens.Mvis.SideBar
             }
             else
             {
-                toggleDisableButton.TooltipText = "目前不能通过设置禁用该插件";
-                icon.Icon = FontAwesome.Solid.Question;
+                toggleDisableButton.TooltipText = "目前不能通过此面板禁用该插件";
+                icon.Icon = FontAwesome.Solid.Ban;
             }
 
             if (plugin.Flags.Contains(MvisPlugin.PluginFlags.CanUnload))
@@ -206,8 +212,8 @@ namespace osu.Game.Screens.Mvis.SideBar
             }
             else
             {
-                unloadButton.TooltipText = "目前不能通过设置卸载该插件";
-                unloadIcon.Icon = FontAwesome.Solid.Question;
+                unloadButton.TooltipText = "目前不能通过此面板卸载该插件";
+                unloadIcon.Icon = FontAwesome.Solid.Ban;
             }
         }
     }
