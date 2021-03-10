@@ -32,15 +32,9 @@ namespace osu.Game.Screens.Mvis.Plugins
 
         private readonly Bindable<bool> showParticles = new BindableBool();
 
-        private readonly Container particles = new Container
-        {
-            RelativeSizeAxes = Axes.Both
-        };
+        private Container particles;
 
-        private readonly BeatmapLogo beatmapLogo = new BeatmapLogo
-        {
-            Anchor = Anchor.Centre,
-        };
+        private BeatmapLogo beatmapLogo;
 
         private Bindable<bool> disablePanel;
 
@@ -70,18 +64,22 @@ namespace osu.Game.Screens.Mvis.Plugins
             RelativeSizeAxes = Axes.Both,
             Children = new Drawable[]
             {
-                particles,
+                particles = new Container
+                {
+                    RelativeSizeAxes = Axes.Both
+                },
                 new ParallaxContainer
                 {
                     ParallaxAmount = -0.0025f,
-                    Child = beatmapLogo
+                    Child = beatmapLogo = new BeatmapLogo
+                    {
+                        Anchor = Anchor.Centre,
+                    }
                 }
             }
         };
 
-        protected override bool OnContentLoaded(Drawable content) => true;
-
-        protected override bool PostInit()
+        protected override bool OnContentLoaded(Drawable content)
         {
             showParticles.BindValueChanged(v =>
             {
@@ -110,10 +108,12 @@ namespace osu.Game.Screens.Mvis.Plugins
             return true;
         }
 
+        protected override bool PostInit() => true;
+
         public override bool Disable()
         {
             this.FadeOut(300, Easing.OutQuint).ScaleTo(0.8f, 400, Easing.OutQuint);
-            beatmapLogo.StopResponseOnBeatmapChanges();
+            beatmapLogo?.StopResponseOnBeatmapChanges();
 
             disablePanel.Value = true;
             return base.Disable();
@@ -122,7 +122,7 @@ namespace osu.Game.Screens.Mvis.Plugins
         public override bool Enable()
         {
             this.FadeIn(300).ScaleTo(1, 400, Easing.OutQuint);
-            beatmapLogo.ResponseOnBeatmapChanges();
+            beatmapLogo?.ResponseOnBeatmapChanges();
 
             disablePanel.Value = false;
             return base.Enable();

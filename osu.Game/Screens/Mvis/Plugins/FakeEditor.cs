@@ -181,6 +181,7 @@ namespace osu.Game.Screens.Mvis.Plugins
         protected override bool OnContentLoaded(Drawable content)
         {
             EditorClock.ChangeSource(musicController.CurrentTrack);
+            EditorClock.Start();
 
             //todo: 移除下面这一行的同时确保samplePlaybackDisabled的值可以正常随音乐变动
             samplePlaybackDisabled.Value = !musicController.CurrentTrack.IsRunning;
