@@ -8,10 +8,10 @@ namespace Gamemode
     public static class GamemodeRequest {
 
         [DllImport("libgamemode.so.0")]
-        public static extern int real_gamemode_request_start();
+        private static extern int real_gamemode_request_start();
 
         [DllImport("libgamemode.so.0")]
-        public static extern int real_gamemode_request_end();
+        private static extern int real_gamemode_request_end();
 
         public static int RequestStart()
         {
