@@ -18,11 +18,6 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "启用故事版",
-                    Current = config.GetBindable<bool>(MSetting.MvisEnableStoryboard),
-                },
-                new SettingsCheckbox
-                {
                     LabelText = "启用故事版Proxy",
                     Current = config.GetBindable<bool>(MSetting.MvisStoryboardProxy),
                     TooltipText = "可以让故事版的Overlay显示在前景"

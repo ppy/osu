@@ -63,6 +63,7 @@ namespace osu.Game.Configuration
             Set(MSetting.MvisGreen, 0, 0, 255);
             Set(MSetting.MvisBlue, 0, 0, 255);
             Set(MSetting.MvisEnableFakeEditor, false);
+            Set(MSetting.MvisEnableRulesetPanel, false);
 
             //实验性功能
             Set(MSetting.CustomWindowIconPath, "");
@@ -105,6 +106,7 @@ namespace osu.Game.Configuration
         MvisInterfaceGreen,
         MvisInterfaceBlue,
         MvisEnableFakeEditor,
+        MvisEnableRulesetPanel,
         SamplePlaybackGain,
         SongSelectBgBlur,
         IntroLoadDirectToSongSelect,

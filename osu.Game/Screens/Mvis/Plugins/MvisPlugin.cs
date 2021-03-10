@@ -121,5 +121,13 @@ namespace osu.Game.Screens.Mvis.Plugins
         }
 
         public readonly List<PluginFlags> Flags = new List<PluginFlags>();
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (isDisposing)
+                Cancel();
+        }
     }
 }

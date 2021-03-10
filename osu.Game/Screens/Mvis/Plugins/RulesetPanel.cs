@@ -5,6 +5,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Mvis.Objects;
+using osuTK;
 
 namespace osu.Game.Screens.Mvis.Plugins
 {
@@ -20,7 +21,14 @@ namespace osu.Game.Screens.Mvis.Plugins
             RelativeSizeAxes = Axes.Both;
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
+            Scale = new Vector2(0.8f);
         }
+
+        [Resolved]
+        private MConfigManager config { get; set; }
+
+        [Resolved]
+        private MvisPluginManager manager { get; set; }
 
         private readonly Bindable<bool> showParticles = new BindableBool();
 
@@ -38,6 +46,14 @@ namespace osu.Game.Screens.Mvis.Plugins
         private void load(MConfigManager config)
         {
             config.BindWith(MSetting.MvisShowParticles, showParticles);
+        }
+
+        protected override void LoadComplete()
+        {
+            if (config.Get<bool>(MSetting.MvisEnableRulesetPanel))
+                manager.ActivePlugin(this);
+
+            base.LoadComplete();
         }
 
         protected override Drawable CreateContent() => new Container
@@ -87,15 +103,19 @@ namespace osu.Game.Screens.Mvis.Plugins
 
         public override bool Disable()
         {
-            Content.FadeOut(300, Easing.OutQuint).ScaleTo(0.8f, 400, Easing.OutQuint);
+            this.FadeOut(300, Easing.OutQuint).ScaleTo(0.8f, 400, Easing.OutQuint);
             beatmapLogo.StopResponseOnBeatmapChanges();
+
+            config.Set(MSetting.MvisEnableRulesetPanel, false);
             return base.Disable();
         }
 
         public override bool Enable()
         {
-            Content.FadeIn(300).ScaleTo(1, 400, Easing.OutQuint);
+            this.FadeIn(300).ScaleTo(1, 400, Easing.OutQuint);
             beatmapLogo.ResponseOnBeatmapChanges();
+
+            config.Set(MSetting.MvisEnableRulesetPanel, true);
             return base.Enable();
         }
     }

@@ -207,6 +207,7 @@ namespace osu.Game.Screens.Mvis
             dependencies.Cache(this);
 
             var panel = new RulesetPanel();
+            pluginManager.AddPlugin(panel);
 
             sidebar.Add(settingsScroll = new SidebarSettingsScrollContainer
             {
@@ -489,8 +490,6 @@ namespace osu.Game.Screens.Mvis
             };
 
             dependencies.Cache(sidebar);
-            pluginManager.AddPlugin(panel);
-            pluginManager.ActivePlugin(panel);
 
             isIdle.BindTo(idleTracker.IsIdle);
             config.BindWith(MSetting.MvisBgBlur, bgBlur);
@@ -995,7 +994,6 @@ namespace osu.Game.Screens.Mvis
             pluginManager.AddPlugin(sbLoader);
 
             pluginManager.ActivePlugin(fakeEditor);
-            pluginManager.ActivePlugin(sbLoader);
 
             activity.Value = new UserActivity.InMvis(beatmap.BeatmapInfo);
             prevBeatmap = beatmap;

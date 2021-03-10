@@ -43,6 +43,9 @@ namespace osu.Game.Screens.Mvis.Plugins
         [Resolved]
         private Bindable<WorkingBeatmap> currentBeatmap { get; set; }
 
+        [Resolved]
+        private MvisPluginManager manager { get; set; }
+
         public BackgroundStoryBoardLoader(WorkingBeatmap working)
         {
             RelativeSizeAxes = Axes.Both;
@@ -50,12 +53,15 @@ namespace osu.Game.Screens.Mvis.Plugins
 
             Name = "故事版加载器";
             Description = "用于呈现故事版; Mfosu自带插件";
+
+            Flags.Add(PluginFlags.CanDisable);
         }
 
         [BackgroundDependencyLoader]
         private void load(MConfigManager config)
         {
             config.BindWith(MSetting.MvisEnableStoryboard, enableSb);
+
             currentBeatmap.BindValueChanged(v =>
             {
                 if (v.NewValue == targetBeatmap)
@@ -68,6 +74,7 @@ namespace osu.Game.Screens.Mvis.Plugins
 
         protected override void LoadComplete()
         {
+            if (enableSb.Value) manager.ActivePlugin(this);
             enableSb.BindValueChanged(OnEnableSBChanged);
             base.LoadComplete();
         }
@@ -143,21 +150,11 @@ namespace osu.Game.Screens.Mvis.Plugins
                     NeedToHideTriangles.Value = targetBeatmap.Storyboard.HasDrawable;
                     currentStoryboard?.FadeIn(STORYBOARD_FADEIN_DURATION, Easing.OutQuint);
                 }
-                else
-                {
-                    //Logger.Log("内容没有加载, 重新加载");
-                    Load();
-                }
             }
             else
             {
                 if (ContentLoaded)
                     currentStoryboard?.FadeOut(STORYBOARD_FADEOUT_DURATION, Easing.OutQuint);
-                else
-                {
-                    //Logger.Log("取消加载");
-                    Cancel();
-                }
 
                 StoryboardReplacesBackground.Value = false;
                 NeedToHideTriangles.Value = false;
@@ -173,6 +170,18 @@ namespace osu.Game.Screens.Mvis.Plugins
 
             if (isDisposing)
                 Cancel();
+        }
+
+        public override bool Disable()
+        {
+            enableSb.Value = false;
+            return base.Disable();
+        }
+
+        public override bool Enable()
+        {
+            enableSb.Value = true;
+            return base.Enable();
         }
     }
 }
