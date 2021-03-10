@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Mvis.Plugins
             {
                 if (ContentLoaded)
                 {
-                    this.FadeIn();
+                    this.FadeTo(0.01f);
                 }
                 else
                     Load();
