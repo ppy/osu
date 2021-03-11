@@ -142,6 +142,18 @@ namespace osu.Game.Skinning
             }
         }
 
+        protected override void PreImport(SkinInfo model)
+        {
+            var dbContext = ContextFactory.Get();
+
+            // Workaround System.InvalidOperationException
+            // The instance of entity type 'FileInfo' cannot be tracked because another instance with the same key value for {'ID'} is already being tracked.
+            foreach (var file in model.Files)
+            {
+                file.FileInfo = dbContext.FileInfo.Find(file.FileInfoID);
+            }
+        }
+
         /// <summary>
         /// Retrieve a <see cref="Skin"/> instance for the provided <see cref="SkinInfo"/>
         /// </summary>
