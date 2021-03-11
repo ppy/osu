@@ -174,6 +174,22 @@ namespace osu.Game.Beatmaps
             if (beatmapSet.Beatmaps.Any(b => b.BaseDifficulty == null))
                 throw new InvalidOperationException($"Cannot import {nameof(BeatmapInfo)} with null {nameof(BeatmapInfo.BaseDifficulty)}.");
 
+            var dbContext = ContextFactory.Get();
+
+            // Workaround System.InvalidOperationException
+            // The instance of entity type 'RulesetInfo' cannot be tracked because another instance with the same key value for {'ID'} is already being tracked.
+            foreach (var beatmap in beatmapSet.Beatmaps)
+            {
+                beatmap.Ruleset = dbContext.RulesetInfo.Find(beatmap.RulesetID);
+            }
+
+            // Workaround System.InvalidOperationException
+            // The instance of entity type 'FileInfo' cannot be tracked because another instance with the same key value for {'ID'} is already being tracked.
+            foreach (var file in beatmapSet.Files)
+            {
+                file.FileInfo = dbContext.FileInfo.Find(file.FileInfoID);
+            }
+
             // check if a set already exists with the same online id, delete if it does.
             if (beatmapSet.OnlineBeatmapSetID != null)
             {
