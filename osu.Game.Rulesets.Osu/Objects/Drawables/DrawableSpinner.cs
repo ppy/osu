@@ -109,9 +109,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.OnFree();
 
             spinningSample.Samples = null;
-
-            // the counter handles its own fade in (when spinning begins) so we should only be responsible for resetting it here, for pooling.
-            SpmCounter.Hide();
         }
 
         protected override void LoadSamples()
@@ -158,6 +155,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 case DrawableSpinnerTick tick:
                     ticks.Add(tick);
                     break;
+            }
+        }
+
+        protected override void UpdateStartTimeStateTransforms()
+        {
+            base.UpdateStartTimeStateTransforms();
+
+            if (Result?.TimeStarted is double startTime)
+            {
+                using (BeginAbsoluteSequence(startTime))
+                    fadeInCounter();
             }
         }
 
@@ -265,7 +273,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.UpdateAfterChildren();
 
             if (!SpmCounter.IsPresent && RotationTracker.Tracking)
-                SpmCounter.FadeIn(HitObject.TimeFadeIn);
+            {
+                Result.TimeStarted ??= Time.Current;
+                fadeInCounter();
+            }
 
             // don't update after end time to avoid the rate display dropping during fade out.
             // this shouldn't be limited to StartTime as it causes weirdness with the underlying calculation, which is expecting updates during that period.
@@ -274,6 +285,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             updateBonusScore();
         }
+
+        private void fadeInCounter() => SpmCounter.FadeIn(HitObject.TimeFadeIn);
 
         private int wholeSpins;
 
