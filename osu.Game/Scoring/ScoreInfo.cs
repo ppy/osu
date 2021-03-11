@@ -86,10 +86,7 @@ namespace osu.Game.Scoring
         [Column("Mods")]
         public string ModsJson
         {
-            get
-            {
-                return modsJson;
-            }
+            get => modsJson;
             set
             {
                 modsJson = value;
