@@ -5,7 +5,8 @@ using System.Runtime.InteropServices;
 
 namespace Gamemode
 {
-    public static class GamemodeRequest {
+    public static class GamemodeRequest
+    {
 
         [DllImport("libgamemode.so.0")]
         private static extern int real_gamemode_request_start();
@@ -15,18 +16,24 @@ namespace Gamemode
 
         public static int RequestStart()
         {
-            try {
+            try
+            {
                 return real_gamemode_request_start();
-            } catch {
+            }
+            catch
+            {
                 return -1;
             }
         }
 
         public static int RequestEnd()
         {
-            try {
+            try
+            {
                 return real_gamemode_request_end();
-            } catch {
+            }
+            catch
+            {
                 return -1;
             }
         }

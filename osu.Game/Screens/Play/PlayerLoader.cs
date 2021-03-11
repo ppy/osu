@@ -4,12 +4,10 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Gamemode;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
-using osu.Framework.Logging;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -197,8 +195,6 @@ namespace osu.Game.Screens.Play
             // this will continue to execute even after resuming back on restart.
             Scheduler.Add(new ScheduledDelegate(pushWhenLoaded, Clock.CurrentTime + 1800, 0));
 
-            Logger.Log($"Gamemode \"Start\" request exited with code {GamemodeRequest.RequestStart()}");
-
             showMuteWarningIfNeeded();
         }
 
@@ -237,8 +233,6 @@ namespace osu.Game.Screens.Play
 
             BackgroundBrightnessReduction = false;
             Beatmap.Value.Track.RemoveAdjustment(AdjustableProperty.Volume, volumeAdjustment);
-
-            Logger.Log($"Gamemode \"End\" request exited with code {GamemodeRequest.RequestEnd()}");
 
             return base.OnExiting(next);
         }
