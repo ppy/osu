@@ -12,28 +12,44 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class DefaultSpinnerBonusCounter : CompositeDrawable
+    public class DefaultSpinner : CompositeDrawable
     {
-        private OsuSpriteText bonusCounter;
-
         private DrawableSpinner drawableSpinner;
 
-        private IBindable<double> gainedBonus;
+        private OsuSpriteText bonusCounter;
+
+        public DefaultSpinner()
+        {
+            RelativeSizeAxes = Axes.Both;
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
+        }
 
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject drawableHitObject)
         {
             drawableSpinner = (DrawableSpinner)drawableHitObject;
 
-            InternalChild = bonusCounter = new OsuSpriteText
+            AddRangeInternal(new Drawable[]
             {
-                Alpha = 0,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Font = OsuFont.Numeric.With(size: 24),
-                Y = -120,
-            };
+                new DefaultSpinnerDisc
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                },
+                bonusCounter = new OsuSpriteText
+                {
+                    Alpha = 0,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Font = OsuFont.Numeric.With(size: 24),
+                    Y = -120,
+                }
+            });
         }
+
+        private IBindable<double> gainedBonus;
 
         protected override void LoadComplete()
         {
