@@ -18,13 +18,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
     public abstract class LegacySpinner : CompositeDrawable
     {
         /// <remarks>
-        /// osu!stable applies this adjustment conditionally, locally in the spinner.
-        /// in lazer this is handled at a higher level in <see cref="OsuPlayfieldAdjustmentContainer"/>,
-        /// therefore it's safe to apply it unconditionally in this component.
+        /// All constant spinner coordinates are in osu!stable's gamefield space, which is shifted 16px downwards.
+        /// This offset is negated in both osu!stable and osu!lazer to bring all constant coordinates into window-space.
+        /// Note: SPINNER_Y_CENTRE + SPINNER_TOP_OFFSET - Position.Y = 240 (=480/2, or half the window-space in osu!stable)
         /// </remarks>
-        protected static readonly float SPINNER_TOP_OFFSET = 45f - 16f;
+        protected const float SPINNER_TOP_OFFSET = 45f - 16f;
 
-        protected static readonly float SPINNER_Y_CENTRE = SPINNER_TOP_OFFSET + 219f;
+        protected const float SPINNER_Y_CENTRE = SPINNER_TOP_OFFSET + 219f;
 
         protected const float SPRITE_SCALE = 0.625f;
 
@@ -43,9 +43,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             Origin = Anchor.Centre;
             Size = new Vector2(640, 480);
 
-            // stable applies this adjustment conditionally, locally in the spinner.
-            // in lazer this is handled at a higher level in OsuPlayfieldAdjustmentContainer,
-            // therefore it's safe to apply it unconditionally in this component.
+            // osu!stable positions components of the spinner in window-space (as opposed to gamefield-space).
+            // in lazer, the gamefield-space transformation is applied in OsuPlayfieldAdjustmentContainer, which is inverted here to bring coordinates back into window-space.
             Position = new Vector2(0, -8f);
 
             DrawableSpinner = (DrawableSpinner)drawableHitObject;
