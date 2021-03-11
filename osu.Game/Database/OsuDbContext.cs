@@ -112,6 +112,7 @@ namespace osu.Game.Database
             base.OnConfiguring(optionsBuilder);
             optionsBuilder
                 .UseSqlite(connectionString, sqliteOptions => sqliteOptions.CommandTimeout(10))
+                .ConfigureWarnings(w => w.Ignore(RelationalEventId.MultipleCollectionIncludeWarning))
                 .UseLoggerFactory(logger.Value);
         }
 
