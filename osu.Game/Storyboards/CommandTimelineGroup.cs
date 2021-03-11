@@ -46,7 +46,7 @@ namespace osu.Game.Storyboards
         }
 
         /// <summary>
-        /// Returns the earliest visible time. Will be null unless this group has an <see cref="Alpha"/> command with a start value of zero.
+        /// Returns the earliest visible time. Will be null unless this group's first <see cref="Alpha"/> command has a start value of zero.
         /// </summary>
         public double? EarliestDisplayedTime
         {
