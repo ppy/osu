@@ -6,19 +6,12 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Skinning;
 using osuTK;
-using static osu.Game.Skinning.LegacySkinConfiguration;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     public class OsuLegacySkinTransformer : LegacySkinTransformer
     {
         private Lazy<bool> hasHitCircle;
-
-        private Lazy<SpinnerStyle> spinnerStyle;
-
-        private bool hasSpinner => spinnerStyle.Value != SpinnerStyle.Modern;
-
-        private bool hasScoreFont => this.HasFont(GetConfig<LegacySetting, string>(LegacySetting.ScorePrefix)?.Value ?? "score");
 
         /// <summary>
         /// On osu-stable, hitcircles have 5 pixels of transparent padding on each side to allow for shadows etc.
@@ -37,19 +30,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private void sourceChanged()
         {
             hasHitCircle = new Lazy<bool>(() => Source.GetTexture("hitcircle") != null);
-
-            spinnerStyle = new Lazy<SpinnerStyle>(() =>
-            {
-                bool hasBackground = Source.GetTexture("spinner-background") != null;
-
-                if (Source.GetTexture("spinner-top") != null && !hasBackground)
-                    return SpinnerStyle.NewLegacy;
-
-                if (hasBackground)
-                    return SpinnerStyle.OldLegacy;
-
-                return SpinnerStyle.Modern;
-            });
         }
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
@@ -130,16 +110,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         };
 
                 case OsuSkinComponents.SpinnerBody:
-                    if (spinnerStyle.Value == SpinnerStyle.NewLegacy)
+                    bool hasBackground = Source.GetTexture("spinner-background") != null;
+
+                    if (Source.GetTexture("spinner-top") != null && !hasBackground)
                         return new LegacyNewStyleSpinner();
-                    else if (spinnerStyle.Value == SpinnerStyle.OldLegacy)
+                    else if (hasBackground)
                         return new LegacyOldStyleSpinner();
-
-                    return null;
-
-                case OsuSkinComponents.SpinnerBonusCounter:
-                    if (hasSpinner && hasScoreFont)
-                        return new LegacySpinnerBonusCounter();
 
                     return null;
             }
@@ -174,13 +150,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             }
 
             return Source.GetConfig<TLookup, TValue>(lookup);
-        }
-
-        private enum SpinnerStyle
-        {
-            NewLegacy,
-            OldLegacy,
-            Modern,
         }
     }
 }
