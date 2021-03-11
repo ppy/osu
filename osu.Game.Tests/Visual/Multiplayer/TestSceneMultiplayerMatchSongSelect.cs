@@ -56,6 +56,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 beatmaps.Add(new BeatmapInfo
                 {
                     Ruleset = rulesets.GetRuleset(i % 4),
+                    RulesetID = i % 4,
                     OnlineBeatmapID = beatmapId,
                     Length = length,
                     BPM = bpm,
