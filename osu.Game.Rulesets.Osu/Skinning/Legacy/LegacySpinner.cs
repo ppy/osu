@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -16,7 +17,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     public abstract class LegacySpinner : CompositeDrawable
     {
-        protected static readonly float SPINNER_TOP_OFFSET = MathF.Ceiling(45f * SPRITE_SCALE);
+        /// <remarks>
+        /// osu!stable applies this adjustment conditionally, locally in the spinner.
+        /// in lazer this is handled at a higher level in <see cref="OsuPlayfieldAdjustmentContainer"/>,
+        /// therefore it's safe to apply it unconditionally in this component.
+        /// </remarks>
+        protected static readonly float SPINNER_TOP_OFFSET = 45f - 16f;
+
         protected static readonly float SPINNER_Y_CENTRE = SPINNER_TOP_OFFSET + 219f;
 
         protected const float SPRITE_SCALE = 0.625f;
