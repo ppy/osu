@@ -66,6 +66,7 @@ namespace osu.Game.Screens.Mvis.SideBar
         private OsuAnimatedButton toggleDisableButton;
         private SpriteIcon unloadIcon;
         private OsuAnimatedButton unloadButton;
+        private Color4 defaultIconColor => Color4.White.Opacity(0.5f);
 
         public PluginPiece(MvisPlugin pl)
         {
@@ -125,7 +126,7 @@ namespace osu.Game.Screens.Mvis.SideBar
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Colour = Color4.White.Opacity(0.5f),
+                            Colour = defaultIconColor,
                             Size = new Vector2(18)
                         }
                     },
@@ -179,13 +180,36 @@ namespace osu.Game.Screens.Mvis.SideBar
                     switch (v.NewValue)
                     {
                         case true:
-                            toggleDisableButton.TooltipText = "启用该插件";
-                            icon.Icon = FontAwesome.Solid.Times;
+                            if (!manager.GetActivePlugins().Contains(plugin))
+                            {
+                                toggleDisableButton.TooltipText = "启用该插件";
+                                icon.Icon = FontAwesome.Solid.Times;
+                                icon.FadeColour(defaultIconColor);
+                            }
+                            else
+                            {
+                                icon.Icon = FontAwesome.Solid.ExclamationTriangle;
+                                icon.FadeColour(Color4.Gold);
+                                toggleDisableButton.TooltipText = "该插件报告它已被禁用, 但我们在已启用的插件中找到了它。";
+                            }
+
                             break;
 
                         case false:
-                            toggleDisableButton.TooltipText = "禁用该插件";
-                            icon.Icon = FontAwesome.Solid.Check;
+
+                            if (manager.GetActivePlugins().Contains(plugin))
+                            {
+                                toggleDisableButton.TooltipText = "禁用该插件";
+                                icon.Icon = FontAwesome.Solid.Check;
+                                icon.FadeColour(defaultIconColor);
+                            }
+                            else
+                            {
+                                icon.Icon = FontAwesome.Solid.ExclamationTriangle;
+                                icon.FadeColour(Color4.Gold);
+                                toggleDisableButton.TooltipText = "该插件报告它已被启用, 但我们没有在已启用的插件中找到它。";
+                            }
+
                             break;
                     }
                 }, true);

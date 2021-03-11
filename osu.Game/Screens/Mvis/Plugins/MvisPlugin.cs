@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using JetBrains.Annotations;
@@ -5,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 
 namespace osu.Game.Screens.Mvis.Plugins
 {
@@ -38,7 +40,8 @@ namespace osu.Game.Screens.Mvis.Plugins
 
         public BindableBool Disabled = new BindableBool
         {
-            Default = true
+            Default = true,
+            Value = true
         };
 
         #endregion
@@ -47,19 +50,26 @@ namespace osu.Game.Screens.Mvis.Plugins
         {
             ContentLoaded = false;
 
-            //加载内容
-            LoadComponentAsync(CreateContent(), content =>
+            try
             {
-                ContentLoaded = true;
+                //加载内容
+                LoadComponentAsync(CreateContent(), content =>
+                {
+                    ContentLoaded = true;
 
-                //添加内容
-                Add(content);
+                    //添加内容
+                    Add(content);
 
-                //调用OnContentLoaded进行善后
-                OnContentLoaded(content);
+                    //调用OnContentLoaded进行善后
+                    OnContentLoaded(content);
 
-                mvisScreen?.RemovePluginFromLoadList(this);
-            }, cancellationTokenSource.Token);
+                    mvisScreen?.RemovePluginFromLoadList(this);
+                }, cancellationTokenSource.Token);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $"{Name}在加载内容时出现了问题");
+            }
         }
 
         public void Cancel()
@@ -74,17 +84,24 @@ namespace osu.Game.Screens.Mvis.Plugins
         {
             if (Disabled.Value) return;
 
-            //向加载列表添加这个plugin
-            mvisScreen?.AddPluginToLoadList(this);
-
-            //调用PostInit在加载内容前初始化
-            if (!PostInit())
+            try
             {
-                mvisScreen?.RemovePluginFromLoadList(this);
-                return;
-            }
+                //向加载列表添加这个plugin
+                mvisScreen?.AddPluginToLoadList(this);
 
-            createLoadTask();
+                //调用PostInit在加载内容前初始化
+                if (!PostInit())
+                {
+                    mvisScreen?.RemovePluginFromLoadList(this);
+                    return;
+                }
+
+                createLoadTask();
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $"{Name}在加载时出现了问题");
+            }
         }
 
         public virtual bool Enable()
@@ -97,11 +114,7 @@ namespace osu.Game.Screens.Mvis.Plugins
             return true;
         }
 
-        public virtual void UnLoad()
-        {
-            Disable();
-            Expire();
-        }
+        public virtual void UnLoad() => Expire();
 
         public virtual bool Disable()
         {

@@ -5,11 +5,12 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Mvis.Objects;
+using osu.Game.Screens.Mvis.Plugins.Types;
 using osuTK;
 
 namespace osu.Game.Screens.Mvis.Plugins
 {
-    public class RulesetPanel : MvisPlugin
+    public class RulesetPanel : BindableControlledPlugin
     {
         public RulesetPanel()
         {
@@ -27,36 +28,17 @@ namespace osu.Game.Screens.Mvis.Plugins
         [Resolved]
         private MConfigManager config { get; set; }
 
-        [Resolved]
-        private MvisPluginManager manager { get; set; }
-
         private readonly Bindable<bool> showParticles = new BindableBool();
 
         private Container particles;
 
         private BeatmapLogo beatmapLogo;
 
-        private Bindable<bool> disablePanel;
-
         [BackgroundDependencyLoader]
         private void load(MConfigManager config)
         {
             config.BindWith(MSetting.MvisShowParticles, showParticles);
-            disablePanel = config.GetBindable<bool>(MSetting.MvisDisableRulesetPanel);
-            Disabled.BindTo(disablePanel);
-        }
-
-        protected override void LoadComplete()
-        {
-            disablePanel.BindValueChanged(v =>
-            {
-                if (v.NewValue)
-                    manager.DisablePlugin(this);
-                else
-                    manager.ActivePlugin(this);
-            }, true);
-
-            base.LoadComplete();
+            config.BindWith(MSetting.MvisEnableRulesetPanel, Value);
         }
 
         protected override Drawable CreateContent() => new Container
@@ -115,7 +97,6 @@ namespace osu.Game.Screens.Mvis.Plugins
             this.FadeOut(300, Easing.OutQuint).ScaleTo(0.8f, 400, Easing.OutQuint);
             beatmapLogo?.StopResponseOnBeatmapChanges();
 
-            disablePanel.Value = true;
             return base.Disable();
         }
 
@@ -124,14 +105,7 @@ namespace osu.Game.Screens.Mvis.Plugins
             this.FadeIn(300).ScaleTo(1, 400, Easing.OutQuint);
             beatmapLogo?.ResponseOnBeatmapChanges();
 
-            disablePanel.Value = false;
             return base.Enable();
-        }
-
-        public override void UnLoad()
-        {
-            disablePanel.UnbindAll();
-            base.UnLoad();
         }
     }
 }

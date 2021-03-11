@@ -11,6 +11,7 @@ using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Mvis.Plugins.Types;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 
@@ -18,7 +19,7 @@ namespace osu.Game.Screens.Mvis.Plugins
 {
     [Cached(typeof(IBeatSnapProvider))]
     [Cached(typeof(ISamplePlaybackDisabler))]
-    public class FakeEditor : MvisPlugin, IBeatSnapProvider, ISamplePlaybackDisabler
+    public class FakeEditor : BindableControlledPlugin, IBeatSnapProvider, ISamplePlaybackDisabler
     {
         public IBindable<bool> SamplePlaybackDisabled => samplePlaybackDisabled;
 
@@ -47,42 +48,61 @@ namespace osu.Game.Screens.Mvis.Plugins
             Flags.Add(PluginFlags.CanDisable);
         }
 
-        private readonly BindableBool disableFakeEditor = new BindableBool();
-
         [Resolved]
         private MusicController musicController { get; set; }
-
-        [Resolved]
-        private MvisPluginManager manager { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(MConfigManager config)
         {
-            config.BindWith(MSetting.MvisDisableFakeEditor, disableFakeEditor);
-            Disabled.BindTo(disableFakeEditor);
+            config.BindWith(MSetting.MvisEnableFakeEditor, Value);
+
+            //todo: 将依赖注册挪到PostInit
+            beatDivisor.Value = beatmap.BeatmapInfo.BeatDivisor;
+
+            EditorClock = new EditorClock(beatmap, beatDivisor)
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                IsCoupled = true,
+                DisableSourceAdjustment = true
+            };
+
+            AddInternal(EditorClock);
+
+            dependencies.CacheAs(EditorClock);
+            dependencies.CacheAs(beatDivisor);
+
+            var playableBeatmap = beatmap.GetPlayableBeatmap(beatmap.BeatmapInfo.Ruleset);
+
+            AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap)
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre
+            });
+
+            AddInternal(new BlockMouseBox
+            {
+                RelativeSizeAxes = Axes.Both,
+                Depth = float.MinValue,
+                Alpha = 0.001f
+            });
+
+            dependencies.CacheAs(editorBeatmap);
         }
 
-        protected override void LoadComplete()
+        protected override void OnValueChanged(ValueChangedEvent<bool> v)
         {
-            disableFakeEditor.BindValueChanged(onDisableFakeEditorChanged, true);
-            base.LoadComplete();
-        }
+            base.OnValueChanged(v);
 
-        private void onDisableFakeEditorChanged(ValueChangedEvent<bool> v)
-        {
             if (v.NewValue)
             {
-                manager.DisablePlugin(this);
-
                 if (ContentLoaded)
-                    this.FadeOut();
+                    this.FadeTo(0.01f);
             }
             else
             {
-                manager.ActivePlugin(this);
-
                 if (ContentLoaded)
-                    this.FadeTo(0.01f);
+                    this.FadeOut();
             }
         }
 
@@ -107,44 +127,8 @@ namespace osu.Game.Screens.Mvis.Plugins
 
         protected override bool PostInit()
         {
-            if (disableFakeEditor.Value)
+            if (!Value.Value)
                 return false;
-
-            beatDivisor.Value = beatmap.BeatmapInfo.BeatDivisor;
-
-            EditorClock = new EditorClock(beatmap, beatDivisor)
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                IsCoupled = true,
-                DisableSourceAdjustment = true
-            };
-
-            AddInternal(EditorClock);
-
-            if (dependencies.Get(typeof(EditorClock)) == null)
-                dependencies.CacheAs(EditorClock);
-
-            if (dependencies.Get(typeof(BindableBeatDivisor)) == null)
-                dependencies.CacheAs(beatDivisor);
-
-            var playableBeatmap = beatmap.GetPlayableBeatmap(beatmap.BeatmapInfo.Ruleset);
-
-            AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap)
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre
-            });
-
-            AddInternal(new BlockMouseBox
-            {
-                RelativeSizeAxes = Axes.Both,
-                Depth = float.MinValue,
-                Alpha = 0.001f
-            });
-
-            if (dependencies.Get(typeof(EditorBeatmap)) == null)
-                dependencies.CacheAs(editorBeatmap);
 
             ruleset = beatmap.BeatmapInfo.Ruleset?.CreateInstance();
 
@@ -160,28 +144,9 @@ namespace osu.Game.Screens.Mvis.Plugins
             return true;
         }
 
-        public override bool Disable()
-        {
-            disableFakeEditor.Value = true;
-            return base.Disable();
-        }
-
-        public override bool Enable()
-        {
-            disableFakeEditor.Value = false;
-            return base.Enable();
-        }
-
-        public override void UnLoad()
-        {
-            disableFakeEditor.UnbindAll();
-            base.UnLoad();
-        }
-
         protected override bool OnContentLoaded(Drawable content)
         {
             EditorClock.ChangeSource(musicController.CurrentTrack);
-            EditorClock.Start();
 
             //todo: 移除下面这一行的同时确保samplePlaybackDisabled的值可以正常随音乐变动
             samplePlaybackDisabled.Value = !musicController.CurrentTrack.IsRunning;

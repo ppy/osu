@@ -8,17 +8,17 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Overlays;
 using osu.Game.Screens.Mvis.Plugins.Storyboard;
+using osu.Game.Screens.Mvis.Plugins.Types;
 
 namespace osu.Game.Screens.Mvis.Plugins
 {
     ///<summary>
     /// 负责故事版的异步加载功能
     ///</summary>
-    public class BackgroundStoryBoardLoader : MvisPlugin
+    public class BackgroundStoryBoardLoader : BindableControlledPlugin
     {
         public const float STORYBOARD_FADEIN_DURATION = 750;
         public const float STORYBOARD_FADEOUT_DURATION = STORYBOARD_FADEIN_DURATION / 2;
-        private Bindable<bool> disableSb;
 
         ///<summary>
         ///用于内部确定故事版是否已加载
@@ -42,9 +42,6 @@ namespace osu.Game.Screens.Mvis.Plugins
         [Resolved]
         private Bindable<WorkingBeatmap> currentBeatmap { get; set; }
 
-        [Resolved]
-        private MvisPluginManager manager { get; set; }
-
         public BackgroundStoryBoardLoader(WorkingBeatmap working)
         {
             RelativeSizeAxes = Axes.Both;
@@ -59,8 +56,7 @@ namespace osu.Game.Screens.Mvis.Plugins
         [BackgroundDependencyLoader]
         private void load(MConfigManager config)
         {
-            disableSb = config.GetBindable<bool>(MSetting.MvisDisableStoryboard);
-            Disabled.BindTo(disableSb);
+            config.BindWith(MSetting.MvisEnableStoryboard, Value);
 
             currentBeatmap.BindValueChanged(v =>
             {
@@ -72,10 +68,27 @@ namespace osu.Game.Screens.Mvis.Plugins
             });
         }
 
-        protected override void LoadComplete()
+        protected override void OnValueChanged(ValueChangedEvent<bool> v)
         {
-            disableSb.BindValueChanged(OnDisableSBChanged, true);
-            base.LoadComplete();
+            base.OnValueChanged(v);
+
+            if (v.NewValue)
+            {
+                if (ContentLoaded)
+                {
+                    StoryboardReplacesBackground.Value = targetBeatmap.Storyboard.ReplacesBackground && targetBeatmap.Storyboard.HasDrawable;
+                    NeedToHideTriangles.Value = targetBeatmap.Storyboard.HasDrawable;
+                    currentStoryboard?.FadeIn(STORYBOARD_FADEIN_DURATION, Easing.OutQuint);
+                }
+            }
+            else
+            {
+                if (ContentLoaded)
+                    currentStoryboard?.FadeOut(STORYBOARD_FADEOUT_DURATION, Easing.OutQuint);
+
+                StoryboardReplacesBackground.Value = false;
+                NeedToHideTriangles.Value = false;
+            }
         }
 
         protected override Drawable CreateContent() => currentStoryboard = new BackgroundStoryboard(targetBeatmap)
@@ -86,7 +99,7 @@ namespace osu.Game.Screens.Mvis.Plugins
 
         protected override bool PostInit()
         {
-            if (disableSb.Value)
+            if (Disabled.Value)
                 return false;
 
             if (targetBeatmap == null)
@@ -119,7 +132,7 @@ namespace osu.Game.Screens.Mvis.Plugins
 
             setProxy(newStoryboard);
 
-            disableSb.TriggerChange();
+            Value.TriggerChange();
             OnNewStoryboardLoaded?.Invoke();
 
             return true;
@@ -135,58 +148,7 @@ namespace osu.Game.Screens.Mvis.Plugins
             StoryboardProxy = storyboard.StoryboardProxy();
         }
 
-        public void OnDisableSBChanged(ValueChangedEvent<bool> v)
-        {
-            if (v.NewValue)
-            {
-                manager.DisablePlugin(this);
-
-                if (ContentLoaded)
-                    currentStoryboard?.FadeOut(STORYBOARD_FADEOUT_DURATION, Easing.OutQuint);
-
-                StoryboardReplacesBackground.Value = false;
-                NeedToHideTriangles.Value = false;
-            }
-            else
-            {
-                manager.ActivePlugin(this);
-
-                if (ContentLoaded)
-                {
-                    StoryboardReplacesBackground.Value = targetBeatmap.Storyboard.ReplacesBackground && targetBeatmap.Storyboard.HasDrawable;
-                    NeedToHideTriangles.Value = targetBeatmap.Storyboard.HasDrawable;
-                    currentStoryboard?.FadeIn(STORYBOARD_FADEIN_DURATION, Easing.OutQuint);
-                }
-            }
-        }
-
         public void Seek(double position) =>
             storyboardClock?.Seek(position);
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (isDisposing)
-                Cancel();
-        }
-
-        public override bool Disable()
-        {
-            disableSb.Value = true;
-            return base.Disable();
-        }
-
-        public override bool Enable()
-        {
-            disableSb.Value = false;
-            return base.Enable();
-        }
-
-        public override void UnLoad()
-        {
-            disableSb.UnbindAll();
-            base.UnLoad();
-        }
     }
 }

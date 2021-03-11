@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Visual.Mvis
             AddStep("Disable Plugin", () => manager.DisablePlugin(plugin));
             AddStep("Remove All Plugin From Manager", () =>
             {
-                foreach (var mvisPlugin in manager.GetAvaliablePlugins())
+                foreach (var mvisPlugin in manager.GetAllPlugins())
                 {
                     if (manager.UnLoadPlugin(mvisPlugin))
                         Remove(mvisPlugin);

@@ -117,7 +117,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 new SettingsCheckbox
                 {
                     LabelText = "禁用Mvis面板",
-                    Current = config.GetBindable<bool>(MSetting.MvisDisableRulesetPanel)
+                    Current = config.GetBindable<bool>(MSetting.MvisEnableRulesetPanel)
                 }
             };
         }

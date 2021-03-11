@@ -592,9 +592,9 @@ namespace osu.Game.Screens.Mvis
             if (sender is BindableList<MvisPlugin> list)
             {
                 if (list.Count > 0)
-                    loadingSpinner.Show();
+                    Schedule(loadingSpinner.Show);
                 else
-                    loadingSpinner.Hide();
+                    Schedule(loadingSpinner.Hide);
             }
         }
 
@@ -960,8 +960,7 @@ namespace osu.Game.Screens.Mvis
             {
                 pluginManager.UnLoadPlugin(sbLoader);
                 sbLoader?.FadeOut(BackgroundStoryBoardLoader.STORYBOARD_FADEOUT_DURATION, Easing.OutQuint).Expire();
-                sbLoader = null;
-                background.Add(sbLoader = new BackgroundStoryBoardLoader(beatmap)
+                sbLoader = new BackgroundStoryBoardLoader(beatmap)
                 {
                     OnNewStoryboardLoaded = () =>
                     {
@@ -976,11 +975,14 @@ namespace osu.Game.Screens.Mvis
                         if (prevProxy != null) proxyContainer.Add(prevProxy);
                         prevProxy?.Show();
                     }
-                });
+                };
+
+                pluginManager.AddPlugin(sbLoader);
+                background.Add(sbLoader);
                 reBind();
             }
 
-            AddInternal(fakeEditor = new FakeEditor(beatmap)
+            fakeEditor = new FakeEditor(beatmap)
             {
                 RelativeSizeAxes = Axes.Both,
                 Depth = float.MaxValue,
@@ -988,10 +990,10 @@ namespace osu.Game.Screens.Mvis
                 Size = new Vector2(0.01f),
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre
-            });
+            };
 
             pluginManager.AddPlugin(fakeEditor);
-            pluginManager.AddPlugin(sbLoader);
+            AddInternal(fakeEditor);
 
             activity.Value = new UserActivity.InMvis(beatmap.BeatmapInfo);
             prevBeatmap = beatmap;

@@ -41,6 +41,7 @@ namespace osu.Game.Screens.Mvis.Plugins
 
             sideBar?.Remove(pl.SidebarPage);
 
+            activePlugins.Remove(pl);
             avaliablePlugins.Remove(pl);
 
             try
@@ -61,10 +62,13 @@ namespace osu.Game.Screens.Mvis.Plugins
         {
             if (!avaliablePlugins.Contains(pl) || activePlugins.Contains(pl) || pl == null) return false;
 
+            if (!activePlugins.Contains(pl))
+                activePlugins.Add(pl);
+
             bool success = pl.Enable();
 
-            if (success)
-                activePlugins.Add(pl);
+            if (!success)
+                activePlugins.Remove(pl);
 
             return success;
         }
@@ -73,17 +77,16 @@ namespace osu.Game.Screens.Mvis.Plugins
         {
             if (!avaliablePlugins.Contains(pl) || !activePlugins.Contains(pl) || pl == null) return false;
 
+            activePlugins.Remove(pl);
             bool success = pl.Disable();
 
-            if (success)
-                activePlugins.Remove(pl);
+            if (!success)
+            {
+                activePlugins.Add(pl);
+                Logger.Log($"卸载插件\"${pl.Name}\"失败");
+            }
 
             return success;
-        }
-
-        public List<MvisPlugin> GetAvaliablePlugins()
-        {
-            return avaliablePlugins.ToList();
         }
 
         public List<MvisPlugin> GetActivePlugins() => activePlugins.ToList();

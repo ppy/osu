@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 new SettingsCheckbox
                 {
                     LabelText = "禁用故事版",
-                    Current = config.GetBindable<bool>(MSetting.MvisDisableStoryboard)
+                    Current = config.GetBindable<bool>(MSetting.MvisEnableStoryboard)
                 },
                 new SettingsCheckbox
                 {
