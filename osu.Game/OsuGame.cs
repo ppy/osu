@@ -175,10 +175,6 @@ namespace osu.Game
                     case SDL2DesktopWindow sdl2DesktopWindow:
                         sdl2DesktopWindow.SetIconFromStream(stream);
                         break;
-
-                    case OsuTKDesktopWindow osuTKDesktopWindow:
-                        osuTKDesktopWindow.SetIconFromStream(stream);
-                        break;
                 }
             }
             catch (Exception e)

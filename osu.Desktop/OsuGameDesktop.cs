@@ -139,14 +139,6 @@ namespace osu.Desktop
 
             switch (host.Window)
             {
-                // Legacy osuTK DesktopGameWindow
-                case OsuTKDesktopWindow desktopGameWindow:
-                    desktopGameWindow.CursorState |= CursorState.Hidden;
-                    desktopGameWindow.SetIconFromStream(iconStream);
-                    desktopGameWindow.Title = Name;
-                    desktopGameWindow.FileDrop += (_, e) => fileDrop(e.FileNames);
-                    break;
-
                 // SDL2 DesktopWindow
                 case SDL2DesktopWindow desktopWindow:
                     desktopWindow.CursorState |= CursorState.Hidden;
