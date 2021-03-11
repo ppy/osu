@@ -19,6 +19,5 @@ namespace osu.Game.Rulesets.Osu
         SliderBall,
         SliderBody,
         SpinnerBody,
-        SpinnerBonusCounter,
     }
 }
