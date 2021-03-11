@@ -21,11 +21,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         private readonly OsuSpriteText spmText;
 
-        public override void ApplyTransformsAt(double time, bool propagateChildren = false)
-        {
-            // handles own fade in state.
-        }
-
         public SpinnerSpmCounter()
         {
             Children = new Drawable[]
