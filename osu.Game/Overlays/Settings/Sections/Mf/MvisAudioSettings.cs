@@ -43,7 +43,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "禁用Note打击音效",
+                    LabelText = "启用Note打击音效",
                     Current = config.GetBindable<bool>(MSetting.MvisEnableFakeEditor)
                 }
             };

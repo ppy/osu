@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Mvis.Plugins
     {
         public RulesetPanel()
         {
-            Name = "Mvis面板(Mf-osu自带插件)";
+            Name = "Mvis面板(内置)";
             Description = "用于提供Mvis面板功能(中心的谱面图及周围的粒子效果)";
 
             Flags.Add(PluginFlags.CanDisable);

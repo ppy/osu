@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Mvis.Plugins
 
         public FakeEditor(WorkingBeatmap beatmap)
         {
-            Name = "假Editor(Mf-osu自带插件)";
+            Name = "假Editor(内置)";
             Description = "用于提供打击音效; 高内存占用, 不要用来尝试那些会崩掉你游戏/电脑的图";
 
             this.beatmap = beatmap;

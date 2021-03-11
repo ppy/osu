@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Mvis.Plugins
             RelativeSizeAxes = Axes.Both;
             targetBeatmap = working;
 
-            Name = "故事版加载器(Mf-osu自带插件)";
+            Name = "故事版加载器(内置)";
             Description = "用于呈现故事版; Mfosu自带插件";
 
             Flags.Add(PluginFlags.CanDisable);

@@ -140,6 +140,7 @@ namespace osu.Game.Screens.Mvis
 
         private CollectionSelectPanel collectionPanel;
         private SidebarSettingsScrollContainer settingsScroll;
+        private SidebarPluginsPage pluginsPage;
 
         #endregion
 
@@ -236,7 +237,7 @@ namespace osu.Game.Screens.Mvis
                 },
             });
             sidebar.Add(collectionPanel = new CollectionSelectPanel());
-            sidebar.Add(new SidebarPluginsPage());
+            sidebar.Add(pluginsPage = new SidebarPluginsPage());
 
             InternalChildren = new Drawable[]
             {
@@ -415,6 +416,12 @@ namespace osu.Game.Screens.Mvis
                                                             Margin = new MarginPadding { Right = 5 },
                                                             Children = new Drawable[]
                                                             {
+                                                                pluginButton = new BottomBarButton
+                                                                {
+                                                                    ButtonIcon = FontAwesome.Solid.Plug,
+                                                                    TooltipText = "查看插件",
+                                                                    Action = () => updateSidebarState(pluginsPage)
+                                                                },
                                                                 collectionButton = new BottomBarButton
                                                                 {
                                                                     ButtonIcon = FontAwesome.Solid.List,
@@ -765,6 +772,10 @@ namespace osu.Game.Screens.Mvis
                     collectionButton.Click();
                     return true;
 
+                case GlobalAction.MvisTogglePluginPage:
+                    pluginButton.Click();
+                    return true;
+
                 case GlobalAction.Back:
                     if (sidebar.IsPresent && !sidebar.Hiding)
                     {
@@ -942,6 +953,7 @@ namespace osu.Game.Screens.Mvis
 
         private FakeEditor fakeEditor;
         private MvisPluginManager pluginManager;
+        private BottomBarButton pluginButton;
 
         private void OnBeatmapChanged(ValueChangedEvent<WorkingBeatmap> v)
         {

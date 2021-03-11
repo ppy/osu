@@ -28,6 +28,11 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 },
                 new SettingsCheckbox
                 {
+                    LabelText = "启用Mvis面板",
+                    Current = config.GetBindable<bool>(MSetting.MvisEnableRulesetPanel)
+                },
+                new SettingsCheckbox
+                {
                     LabelText = "显示粒子",
                     Current = config.GetBindable<bool>(MSetting.MvisShowParticles)
                 },
@@ -113,11 +118,6 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 {
                     LabelText = "使用lazer自带频谱效果",
                     Current = config.GetBindable<bool>(MSetting.MvisUseOsuLogoVisualisation),
-                },
-                new SettingsCheckbox
-                {
-                    LabelText = "禁用Mvis面板",
-                    Current = config.GetBindable<bool>(MSetting.MvisEnableRulesetPanel)
                 }
             };
         }
