@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Humanizer;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
@@ -162,7 +163,7 @@ namespace osu.Game.Configuration
                     {
                         var val = property.GetValue(obj);
                         string description = (val as IHasDescription)?.Description ?? string.Empty;
-                        yield return (new SettingSourceAttribute(property.Name, description), property);
+                        yield return (new SettingSourceAttribute(property.Name.Humanize(), description), property);
                     }
                 }
             }
