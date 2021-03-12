@@ -5,6 +5,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Handlers;
+using osu.Framework.Input.Handlers.Joystick;
+using osu.Framework.Input.Handlers.Midi;
 using osu.Framework.Input.Handlers.Mouse;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
@@ -50,11 +52,6 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private SettingsSubsection createSectionFor(InputHandler handler)
         {
-            var settingsControls = handler.CreateSettingsControlsFromAllBindables(false);
-
-            if (settingsControls.Count == 0)
-                return null;
-
             SettingsSubsection section;
 
             switch (handler)
@@ -63,10 +60,20 @@ namespace osu.Game.Overlays.Settings.Sections
                     section = new MouseSettings(mh);
                     break;
 
-                default:
+                // whitelist the handlers which should be displayed to avoid any weird cases of users touching settings they shouldn't.
+                case JoystickHandler _:
+                case MidiHandler _:
                     section = new HandlerSection(handler);
                     break;
+
+                default:
+                    return null;
             }
+
+            var settingsControls = handler.CreateSettingsControlsFromAllBindables(false);
+
+            if (settingsControls.Count == 0)
+                return null;
 
             section.AddRange(settingsControls);
 
