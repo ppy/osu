@@ -20,6 +20,9 @@
   <ItemGroup>
     <None Include="Properties\AndroidManifest.xml" />
   </ItemGroup>
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);CA2007</NoWarn>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\osu.Game.Tests\**\Beatmaps\**\*.cs">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
@@ -71,7 +74,7 @@
   </ItemGroup>
   <ItemGroup Label="Package References">
     <PackageReference Include="DeepEqual" Version="2.0.0" />
-    <PackageReference Include="Moq" Version="4.16.0" />
+    <PackageReference Include="Moq" Version="4.16.1" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
 </Project>

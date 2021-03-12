@@ -108,7 +108,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         protected override async Task SubmitScore(Score score)
         {
-            await base.SubmitScore(score);
+            await base.SubmitScore(score).ConfigureAwait(false);
 
             Debug.Assert(Token != null);
 
@@ -128,7 +128,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             };
 
             api.Queue(request);
-            await tcs.Task;
+            await tcs.Task.ConfigureAwait(false);
         }
 
         protected override void Dispose(bool isDisposing)

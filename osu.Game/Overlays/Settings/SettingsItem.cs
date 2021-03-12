@@ -121,8 +121,10 @@ namespace osu.Game.Overlays.Settings
                 labelText.Alpha = controlWithCurrent.Current.Disabled ? 0.3f : 1;
         }
 
-        private class RestoreDefaultValueButton : Container, IHasTooltip
+        protected internal class RestoreDefaultValueButton : Container, IHasTooltip
         {
+            public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
+
             private Bindable<T> bindable;
 
             public Bindable<T> Bindable

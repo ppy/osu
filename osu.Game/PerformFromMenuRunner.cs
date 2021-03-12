@@ -5,11 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
-using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Notifications;
@@ -29,9 +27,6 @@ namespace osu.Game
 
         [Resolved]
         private DialogOverlay dialogOverlay { get; set; }
-
-        [Resolved]
-        private IBindable<WorkingBeatmap> beatmap { get; set; }
 
         [Resolved(canBeNull: true)]
         private OsuGame game { get; set; }
@@ -90,7 +85,7 @@ namespace osu.Game
             var type = current.GetType();
 
             // check if we are already at a valid target screen.
-            if (validScreens.Any(t => t.IsAssignableFrom(type)) && !beatmap.Disabled)
+            if (validScreens.Any(t => t.IsAssignableFrom(type)))
             {
                 finalAction(current);
                 Cancel();
