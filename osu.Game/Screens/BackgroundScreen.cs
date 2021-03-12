@@ -13,6 +13,8 @@ namespace osu.Game.Screens
     {
         private readonly bool animateOnEnter;
 
+        public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
+
         protected BackgroundScreen(bool animateOnEnter = true)
         {
             this.animateOnEnter = animateOnEnter;
