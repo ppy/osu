@@ -47,6 +47,8 @@ namespace osu.Game.Configuration
             Set(MSetting.MvisMusicSpeed, 1.0, 0.1, 2.0);
             Set(MSetting.MvisEnableNightcoreBeat, false);
             Set(MSetting.MvisPlayFromCollection, false);
+            Set(MSetting.MvisEnableFakeEditor, false);
+            Set(MSetting.MvisEnableRulesetPanel, true);
             Set(MSetting.MvisInterfaceRed, value: 0, 0, 255f);
             Set(MSetting.MvisInterfaceGreen, value: 119f, 0, 255f);
             Set(MSetting.MvisInterfaceBlue, value: 255f, 0, 255f);
@@ -62,8 +64,6 @@ namespace osu.Game.Configuration
             Set(MSetting.MvisRed, 0, 0, 255);
             Set(MSetting.MvisGreen, 0, 0, 255);
             Set(MSetting.MvisBlue, 0, 0, 255);
-            Set(MSetting.MvisEnableFakeEditor, true);
-            Set(MSetting.MvisEnableRulesetPanel, true);
 
             //实验性功能
             Set(MSetting.CustomWindowIconPath, "");

@@ -94,6 +94,8 @@ namespace osu.Game.Screens.Mvis.Plugins
         {
             base.OnValueChanged(v);
 
+            updateSamplePlaybackDisabled();
+
             if (v.NewValue)
             {
                 if (ContentLoaded)
@@ -144,15 +146,18 @@ namespace osu.Game.Screens.Mvis.Plugins
             return true;
         }
 
+        private void updateSamplePlaybackDisabled() =>
+            samplePlaybackDisabled.Value = !Value.Value || !musicController.CurrentTrack.IsRunning;
+
         protected override bool OnContentLoaded(Drawable content)
         {
             EditorClock.ChangeSource(musicController.CurrentTrack);
 
             //todo: 移除下面这一行的同时确保samplePlaybackDisabled的值可以正常随音乐变动
-            samplePlaybackDisabled.Value = !musicController.CurrentTrack.IsRunning;
+            updateSamplePlaybackDisabled();
 
             if (MvisScreen != null)
-                MvisScreen.OnTrackRunningToggle += running => samplePlaybackDisabled.Value = !running;
+                MvisScreen.OnTrackRunningToggle += _ => updateSamplePlaybackDisabled();
 
             //Logger.Log($"Clock源: {EditorClock.Source}");
             //Logger.Log($"是否不能单独操作: {EditorClock.IsCoupled}");
