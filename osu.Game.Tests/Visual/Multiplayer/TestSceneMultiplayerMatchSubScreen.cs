@@ -3,12 +3,10 @@
 
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Osu;
-using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Tests.Beatmaps;
@@ -19,9 +17,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
     public class TestSceneMultiplayerMatchSubScreen : MultiplayerTestScene
     {
         private MultiplayerMatchSubScreen screen;
-
-        [Cached]
-        private OngoingOperationTracker ongoingOperationTracker = new OngoingOperationTracker();
 
         public TestSceneMultiplayerMatchSubScreen()
             : base(false)

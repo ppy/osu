@@ -1,16 +1,18 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-//using osu.Framework.Logging;
+using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Skinning;
 using osu.Game.Storyboards.Drawables;
 
-namespace osu.Game.Screens.Mvis.Storyboard
+//using osu.Framework.Logging;
+
+namespace osu.Game.Screens.Mvis.Plugins.Storyboard
 {
     [LongRunningLoad]
     public class BackgroundStoryboard : BeatmapSkinProvidingContainer
     {
-        public StoryboardClock RunningClock;
+        public DecoupleableInterpolatingFramedClock RunningClock;
         private DrawableStoryboard drawableStoryboard;
 
         private readonly WorkingBeatmap working;

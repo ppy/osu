@@ -238,6 +238,12 @@ namespace osu.Game.Screens.Edit
             set => underlyingClock.IsCoupled = value;
         }
 
+        public bool DisableSourceAdjustment
+        {
+            get => underlyingClock.DisableSourceAdjustment;
+            set => underlyingClock.DisableSourceAdjustment = value;
+        }
+
         private const double transform_time = 300;
 
         protected override void Update()

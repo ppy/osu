@@ -39,7 +39,7 @@ namespace osu.Game.Configuration
             Set(MSetting.MvisContentAlpha, 1f, 0f, 1f);
             Set(MSetting.MvisBgBlur, 0.2f, 0f, 1f);
             Set(MSetting.MvisEnableStoryboard, true);
-            Set(MSetting.MvisStoryboardProxy, true);
+            Set(MSetting.MvisStoryboardProxy, false);
             Set(MSetting.MvisUseOsuLogoVisualisation, false);
             Set(MSetting.MvisIdleBgDim, 0.8f, 0f, 1f);
             Set(MSetting.MvisEnableBgTriangles, true);
@@ -47,6 +47,8 @@ namespace osu.Game.Configuration
             Set(MSetting.MvisMusicSpeed, 1.0, 0.1, 2.0);
             Set(MSetting.MvisEnableNightcoreBeat, false);
             Set(MSetting.MvisPlayFromCollection, false);
+            Set(MSetting.MvisEnableFakeEditor, false);
+            Set(MSetting.MvisEnableRulesetPanel, true);
             Set(MSetting.MvisInterfaceRed, value: 0, 0, 255f);
             Set(MSetting.MvisInterfaceGreen, value: 119f, 0, 255f);
             Set(MSetting.MvisInterfaceBlue, value: 255f, 0, 255f);
@@ -103,6 +105,8 @@ namespace osu.Game.Configuration
         MvisInterfaceRed,
         MvisInterfaceGreen,
         MvisInterfaceBlue,
+        MvisEnableFakeEditor,
+        MvisEnableRulesetPanel,
         SamplePlaybackGain,
         SongSelectBgBlur,
         IntroLoadDirectToSongSelect,

@@ -121,7 +121,7 @@ namespace osu.Game.Skinning
 
         protected override async Task Populate(SkinInfo model, ArchiveReader archive, CancellationToken cancellationToken = default)
         {
-            await base.Populate(model, archive, cancellationToken);
+            await base.Populate(model, archive, cancellationToken).ConfigureAwait(false);
 
             if (model.Name?.Contains(".osk") == true)
                 populateMetadata(model);

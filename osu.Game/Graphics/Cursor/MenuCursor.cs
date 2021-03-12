@@ -141,11 +141,6 @@ namespace osu.Game.Graphics.Cursor
         {
             switch (host.Window)
             {
-                // Legacy osuTK DesktopGameWindow
-                case OsuTKDesktopWindow tkWindow:
-                    tkWindow.CursorState = CursorState.Default;
-                    break;
-
                 // SDL2 DesktopWindow
                 case SDL2DesktopWindow desktopWindow:
                     desktopWindow.CursorState = CursorState.Default;
@@ -159,11 +154,6 @@ namespace osu.Game.Graphics.Cursor
         {
             switch (host.Window)
             {
-                // Legacy osuTK DesktopGameWindow
-                case OsuTKDesktopWindow tkWindow:
-                    tkWindow.CursorState = CursorState.Hidden;
-                    break;
-
                 // SDL2 DesktopWindow
                 case SDL2DesktopWindow desktopWindow:
                     desktopWindow.CursorState = CursorState.Hidden;

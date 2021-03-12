@@ -2,8 +2,8 @@ namespace osu.Game.Screens.Mvis.SideBar
 {
     public interface ISidebarContent
     {
-        float ResizeWidth { get; }
-        string Title { get; }
-        float ResizeHeight => 1f;
+        public float ResizeWidth { get; }
+        public string Title { get; }
+        public float ResizeHeight => 1f;
     }
 }

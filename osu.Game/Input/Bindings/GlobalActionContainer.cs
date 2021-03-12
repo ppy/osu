@@ -34,6 +34,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.Enter, GlobalAction.MvisOpenInSongSelect),
             new KeyBinding(InputKey.H, GlobalAction.MvisForceLockOverlayChanges),
             new KeyBinding(InputKey.Period, GlobalAction.MvisSelectCollection),
+            new KeyBinding(InputKey.Comma, GlobalAction.MvisTogglePluginPage),
         };
 
         public IEnumerable<KeyBinding> GlobalKeyBindings => new[]
@@ -186,16 +187,22 @@ namespace osu.Game.Input.Bindings
 
         [Description("上一首")]
         MvisMusicPrev,
+
         [Description("下一首")]
         MvisMusicNext,
+
         [Description("暂停/播放")]
         MvisTogglePause,
+
         [Description("切换锁定")]
         MvisToggleOverlayLock,
+
         [Description("切换播放列表")]
         MvisTogglePlayList,
+
         [Description("切换单曲循环")]
         MvisToggleTrackLoop,
+
         [Description("在歌曲选择中打开")]
         MvisOpenInSongSelect,
 
@@ -207,6 +214,7 @@ namespace osu.Game.Input.Bindings
 
         [Description("暂停游戏")]
         PauseGameplay,
+
         [Description("切换强制锁定")]
         MvisForceLockOverlayChanges,
 
@@ -235,7 +243,10 @@ namespace osu.Game.Input.Bindings
         [Description("暂停 / 恢复重放")]
         TogglePauseReplay,
 
-        [Description("Toggle in-game interface")]
+        [Description("切换游戏内界面")]
         ToggleInGameInterface,
+
+        [Description("打开插件列表")]
+        MvisTogglePluginPage
     }
 }

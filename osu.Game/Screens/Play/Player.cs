@@ -593,7 +593,7 @@ namespace osu.Game.Screens.Play
 
                 try
                 {
-                    await SubmitScore(score);
+                    await SubmitScore(score).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -602,7 +602,7 @@ namespace osu.Game.Screens.Play
 
                 try
                 {
-                    await ImportScore(score);
+                    await ImportScore(score).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {

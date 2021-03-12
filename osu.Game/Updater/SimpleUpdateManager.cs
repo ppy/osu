@@ -43,7 +43,7 @@ namespace osu.Game.Updater
 
                 var releases = new OsuJsonWebRequest<GitHubRelease>($"https://api.github.com/repos/{(useOfficalReleaseStream ? "ppy" : "MATRIX-feather")}/osu/releases/latest");
 
-                await releases.PerformAsync();
+                await releases.PerformAsync().ConfigureAwait(false);
 
                 var latest = releases.ResponseObject;
 
@@ -85,7 +85,7 @@ namespace osu.Game.Updater
                     bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".exe", StringComparison.Ordinal));
                     break;
 
-                case RuntimeInfo.Platform.MacOsx:
+                case RuntimeInfo.Platform.macOS:
                     bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".app.zip", StringComparison.Ordinal));
                     break;
 

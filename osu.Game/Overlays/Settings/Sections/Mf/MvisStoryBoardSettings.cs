@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 new SettingsCheckbox
                 {
                     LabelText = "启用故事版",
-                    Current = config.GetBindable<bool>(MSetting.MvisEnableStoryboard),
+                    Current = config.GetBindable<bool>(MSetting.MvisEnableStoryboard)
                 },
                 new SettingsCheckbox
                 {
