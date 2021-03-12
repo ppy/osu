@@ -63,15 +63,20 @@ namespace osu.Game.Configuration
 
     public static class SettingSourceExtensions
     {
-        public static IEnumerable<Drawable> CreateSettingsControls(this object obj) => createSettingsControls(obj, obj.GetOrderedSettingsSourceProperties());
+        public static IReadOnlyList<Drawable> CreateSettingsControls(this object obj, bool includeDisabled = true) =>
+            createSettingsControls(obj, obj.GetOrderedSettingsSourceProperties(), includeDisabled).ToArray();
 
-        public static IEnumerable<Drawable> CreateSettingsControlsFromAllBindables(this object obj) => createSettingsControls(obj, obj.GetSettingsSourcePropertiesFromBindables());
+        public static IReadOnlyList<Drawable> CreateSettingsControlsFromAllBindables(this object obj, bool includeDisabled = true) =>
+            createSettingsControls(obj, obj.GetSettingsSourcePropertiesFromBindables(), includeDisabled).ToArray();
 
-        private static IEnumerable<Drawable> createSettingsControls(object obj, IEnumerable<(SettingSourceAttribute, PropertyInfo)> sourceAttribs)
+        private static IEnumerable<Drawable> createSettingsControls(object obj, IEnumerable<(SettingSourceAttribute, PropertyInfo)> sourceAttribs, bool includeDisabled = true)
         {
             foreach (var (attr, property) in sourceAttribs)
             {
                 object value = property.GetValue(obj);
+
+                if ((value as IBindable)?.Disabled == true)
+                    continue;
 
                 switch (value)
                 {
