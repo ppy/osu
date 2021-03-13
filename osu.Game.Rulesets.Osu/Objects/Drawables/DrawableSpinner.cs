@@ -159,6 +159,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
+        protected override void UpdateStartTimeStateTransforms()
+        {
+            base.UpdateStartTimeStateTransforms();
+
+            if (Result?.TimeStarted is double startTime)
+            {
+                using (BeginAbsoluteSequence(startTime))
+                    fadeInCounter();
+            }
+        }
+
         protected override void UpdateHitStateTransforms(ArmedState state)
         {
             base.UpdateHitStateTransforms(state);
@@ -263,12 +274,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.UpdateAfterChildren();
 
             if (!SpmCounter.IsPresent && RotationTracker.Tracking)
-                SpmCounter.FadeIn(HitObject.TimeFadeIn);
+            {
+                Result.TimeStarted ??= Time.Current;
+                fadeInCounter();
+            }
 
-            SpmCounter.SetRotation(Result.RateAdjustedRotation);
+            // don't update after end time to avoid the rate display dropping during fade out.
+            // this shouldn't be limited to StartTime as it causes weirdness with the underlying calculation, which is expecting updates during that period.
+            if (Time.Current <= HitObject.EndTime)
+                SpmCounter.SetRotation(Result.RateAdjustedRotation);
 
             updateBonusScore();
         }
+
+        private void fadeInCounter() => SpmCounter.FadeIn(HitObject.TimeFadeIn);
 
         private int wholeSpins;
 

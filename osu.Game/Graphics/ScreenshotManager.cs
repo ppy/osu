@@ -103,7 +103,7 @@ namespace osu.Game.Graphics
                 }
             }
 
-            using (var image = await host.TakeScreenshotAsync())
+            using (var image = await host.TakeScreenshotAsync().ConfigureAwait(false))
             {
                 if (Interlocked.Decrement(ref screenShotTasks) == 0 && cursorVisibility.Value == false)
                     cursorVisibility.Value = true;
@@ -116,13 +116,13 @@ namespace osu.Game.Graphics
                 switch (screenshotFormat.Value)
                 {
                     case ScreenshotFormat.Png:
-                        await image.SaveAsPngAsync(stream);
+                        await image.SaveAsPngAsync(stream).ConfigureAwait(false);
                         break;
 
                     case ScreenshotFormat.Jpg:
                         const int jpeg_quality = 92;
 
-                        await image.SaveAsJpegAsync(stream, new JpegEncoder { Quality = jpeg_quality });
+                        await image.SaveAsJpegAsync(stream, new JpegEncoder { Quality = jpeg_quality }).ConfigureAwait(false);
                         break;
 
                     default:

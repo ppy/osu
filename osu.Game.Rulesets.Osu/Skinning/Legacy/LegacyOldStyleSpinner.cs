@@ -37,35 +37,34 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             {
                 new Sprite
                 {
-                    Anchor = Anchor.Centre,
+                    Anchor = Anchor.TopCentre,
                     Origin = Anchor.Centre,
                     Texture = source.GetTexture("spinner-background"),
-                    Scale = new Vector2(SPRITE_SCALE)
+                    Scale = new Vector2(SPRITE_SCALE),
+                    Y = SPINNER_Y_CENTRE,
                 },
                 disc = new Sprite
                 {
-                    Anchor = Anchor.Centre,
+                    Anchor = Anchor.TopCentre,
                     Origin = Anchor.Centre,
                     Texture = source.GetTexture("spinner-circle"),
-                    Scale = new Vector2(SPRITE_SCALE)
+                    Scale = new Vector2(SPRITE_SCALE),
+                    Y = SPINNER_Y_CENTRE,
                 },
-                new LegacyCoordinatesContainer
+                metre = new Container
                 {
-                    Child = metre = new Container
+                    AutoSizeAxes = Axes.Both,
+                    // this anchor makes no sense, but that's what stable uses.
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.TopLeft,
+                    Margin = new MarginPadding { Top = SPINNER_TOP_OFFSET },
+                    Masking = true,
+                    Child = metreSprite = new Sprite
                     {
-                        AutoSizeAxes = Axes.Both,
-                        // this anchor makes no sense, but that's what stable uses.
+                        Texture = source.GetTexture("spinner-metre"),
                         Anchor = Anchor.TopLeft,
                         Origin = Anchor.TopLeft,
-                        Margin = new MarginPadding { Top = LegacyCoordinatesContainer.SPINNER_TOP_OFFSET },
-                        Masking = true,
-                        Child = metreSprite = new Sprite
-                        {
-                            Texture = source.GetTexture("spinner-metre"),
-                            Anchor = Anchor.TopLeft,
-                            Origin = Anchor.TopLeft,
-                            Scale = new Vector2(SPRITE_SCALE)
-                        }
+                        Scale = new Vector2(SPRITE_SCALE)
                     }
                 }
             });

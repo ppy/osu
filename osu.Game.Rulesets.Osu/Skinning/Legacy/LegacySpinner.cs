@@ -16,7 +16,16 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     public abstract class LegacySpinner : CompositeDrawable
     {
-        public const float SPRITE_SCALE = 0.625f;
+        /// <remarks>
+        /// All constants are in osu!stable's gamefield space, which is shifted 16px downwards.
+        /// This offset is negated in both osu!stable and osu!lazer to bring all constants into window-space.
+        /// Note: SPINNER_Y_CENTRE + SPINNER_TOP_OFFSET - Position.Y = 240 (=480/2, or half the window-space in osu!stable)
+        /// </remarks>
+        protected const float SPINNER_TOP_OFFSET = 45f - 16f;
+
+        protected const float SPINNER_Y_CENTRE = SPINNER_TOP_OFFSET + 219f;
+
+        protected const float SPRITE_SCALE = 0.625f;
 
         protected DrawableSpinner DrawableSpinner { get; private set; }
 
@@ -26,33 +35,37 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject drawableHitObject, ISkinSource source)
         {
-            RelativeSizeAxes = Axes.Both;
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
+
+            // osu!stable positions spinner components in window-space (as opposed to gamefield-space). This is a 640x480 area taking up the entire screen.
+            // In lazer, the gamefield-space positional transformation is applied in OsuPlayfieldAdjustmentContainer, which is inverted here to make this area take up the entire window space.
+            Size = new Vector2(640, 480);
+            Position = new Vector2(0, -8f);
 
             DrawableSpinner = (DrawableSpinner)drawableHitObject;
 
-            AddInternal(new LegacyCoordinatesContainer
+            AddRangeInternal(new[]
             {
-                Depth = float.MinValue,
-                Children = new Drawable[]
+                spin = new Sprite
                 {
-                    spin = new Sprite
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.Centre,
-                        Texture = source.GetTexture("spinner-spin"),
-                        Scale = new Vector2(SPRITE_SCALE),
-                        Y = LegacyCoordinatesContainer.SPINNER_TOP_OFFSET + 335,
-                    },
-                    clear = new Sprite
-                    {
-                        Alpha = 0,
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.Centre,
-                        Texture = source.GetTexture("spinner-clear"),
-                        Scale = new Vector2(SPRITE_SCALE),
-                        Y = LegacyCoordinatesContainer.SPINNER_TOP_OFFSET + 115,
-                    },
-                }
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.Centre,
+                    Depth = float.MinValue,
+                    Texture = source.GetTexture("spinner-spin"),
+                    Scale = new Vector2(SPRITE_SCALE),
+                    Y = SPINNER_TOP_OFFSET + 335,
+                },
+                clear = new Sprite
+                {
+                    Alpha = 0,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.Centre,
+                    Depth = float.MinValue,
+                    Texture = source.GetTexture("spinner-clear"),
+                    Scale = new Vector2(SPRITE_SCALE),
+                    Y = SPINNER_TOP_OFFSET + 115,
+                },
             });
         }
 
@@ -128,34 +141,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             if (DrawableSpinner != null)
                 DrawableSpinner.ApplyCustomUpdateState -= UpdateStateTransforms;
-        }
-
-        /// <summary>
-        /// A <see cref="Container"/> simulating osu!stable's absolute screen-space,
-        /// for perfect placements of legacy spinner components with legacy coordinates.
-        /// </summary>
-        public class LegacyCoordinatesContainer : Container
-        {
-            /// <summary>
-            /// An offset that simulates stable's spinner top offset,
-            /// for positioning some legacy spinner components perfectly as in stable.
-            /// (e.g. 'spin' sprite, 'clear' sprite, metre in old-style spinners)
-            /// </summary>
-            public static readonly float SPINNER_TOP_OFFSET = (float)Math.Ceiling(45f * SPRITE_SCALE);
-
-            public LegacyCoordinatesContainer()
-            {
-                // legacy spinners relied heavily on absolute screen-space coordinate values.
-                // wrap everything in a container simulating absolute coords to preserve alignment
-                // as there are skins that depend on it.
-                Anchor = Anchor.Centre;
-                Origin = Anchor.Centre;
-                Size = new Vector2(640, 480);
-
-                // since legacy coordinates were on screen-space, they were accounting for the playfield shift offset.
-                // therefore cancel it from here.
-                Position = new Vector2(0, -8f);
-            }
         }
     }
 }
