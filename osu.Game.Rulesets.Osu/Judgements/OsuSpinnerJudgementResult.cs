@@ -39,6 +39,11 @@ namespace osu.Game.Rulesets.Osu.Judgements
         public float RateAdjustedRotation;
 
         /// <summary>
+        /// Time instant at which the spin was started (the first user input which caused an increase in spin).
+        /// </summary>
+        public double? TimeStarted;
+
+        /// <summary>
         /// Time instant at which the spinner has been completed (the user has executed all required spins).
         /// Will be null if all required spins haven't been completed.
         /// </summary>
