@@ -26,7 +26,9 @@ namespace osu.Game.Overlays.Toolbar
         /// <summary>
         /// Whether the user hid this <see cref="Toolbar"/> with <see cref="GlobalAction.ToggleToolbar"/>.
         /// </summary>
-        public bool HiddenByUser;
+        private bool hiddenByUser;
+
+        private bool userToggled;
 
         public Action OnHome;
 
@@ -149,7 +151,9 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override void UpdateState(ValueChangedEvent<Visibility> state)
         {
-            if (state.NewValue == Visibility.Visible && OverlayActivationMode.Value == OverlayActivation.Disabled)
+            var blockShow = !userToggled && hiddenByUser;
+
+            if (state.NewValue == Visibility.Visible && (OverlayActivationMode.Value == OverlayActivation.Disabled || blockShow))
             {
                 State.Value = Visibility.Hidden;
                 return;
@@ -180,8 +184,10 @@ namespace osu.Game.Overlays.Toolbar
             switch (action)
             {
                 case GlobalAction.ToggleToolbar:
+                    userToggled = true;
                     ToggleVisibility();
-                    HiddenByUser = State.Value == Visibility.Hidden;
+                    hiddenByUser = State.Value == Visibility.Hidden;
+                    userToggled = false;
                     return true;
             }
 
