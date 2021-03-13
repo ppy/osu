@@ -47,7 +47,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             DrawableSpinner = (DrawableSpinner)drawableHitObject;
 
-            AddInternal(new Container
+            Container overlayContainer;
+
+            AddInternal(overlayContainer = new Container
             {
                 Depth = float.MinValue,
                 RelativeSizeAxes = Axes.Both,
@@ -70,17 +72,21 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         Scale = new Vector2(SPRITE_SCALE),
                         Y = SPINNER_TOP_OFFSET + 115,
                     },
-                    bonusCounter = ((LegacySpriteText)source.GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ScoreText))).With(s =>
-                    {
-                        s.Alpha = 0f;
-                        s.Anchor = Anchor.TopCentre;
-                        s.Origin = Anchor.Centre;
-                        s.Font = s.Font.With(fixedWidth: false);
-                        s.Scale = new Vector2(SPRITE_SCALE);
-                        s.Y = SPINNER_TOP_OFFSET + 299;
-                    }),
                 }
             });
+
+            bonusCounter = (LegacySpriteText)source.GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ScoreText));
+
+            if (bonusCounter != null)
+            {
+                bonusCounter.Alpha = 0f;
+                bonusCounter.Anchor = Anchor.TopCentre;
+                bonusCounter.Origin = Anchor.Centre;
+                bonusCounter.Font = bonusCounter.Font.With(fixedWidth: false);
+                bonusCounter.Scale = new Vector2(SPRITE_SCALE);
+                bonusCounter.Y = SPINNER_TOP_OFFSET + 299;
+                overlayContainer.Add(bonusCounter);
+            }
         }
 
         private IBindable<double> gainedBonus;
@@ -91,13 +97,16 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         {
             base.LoadComplete();
 
-            gainedBonus = DrawableSpinner.GainedBonus.GetBoundCopy();
-            gainedBonus.BindValueChanged(bonus =>
+            if (bonusCounter != null)
             {
-                bonusCounter.Text = $"{bonus.NewValue}";
-                bonusCounter.FadeOutFromOne(800, Easing.Out);
-                bonusCounter.ScaleTo(SPRITE_SCALE * 2f).Then().ScaleTo(SPRITE_SCALE * 1.28f, 800, Easing.Out);
-            });
+                gainedBonus = DrawableSpinner.GainedBonus.GetBoundCopy();
+                gainedBonus.BindValueChanged(bonus =>
+                {
+                    bonusCounter.Text = $"{bonus.NewValue}";
+                    bonusCounter.FadeOutFromOne(800, Easing.Out);
+                    bonusCounter.ScaleTo(SPRITE_SCALE * 2f).Then().ScaleTo(SPRITE_SCALE * 1.28f, 800, Easing.Out);
+                });
+            }
 
             completed.BindValueChanged(onCompletedChanged, true);
 
