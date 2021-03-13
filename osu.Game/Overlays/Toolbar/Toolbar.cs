@@ -25,6 +25,7 @@ namespace osu.Game.Overlays.Toolbar
 
         /// <summary>
         /// Whether the user hid this <see cref="Toolbar"/> with <see cref="GlobalAction.ToggleToolbar"/>.
+        /// In this state, automatic toggles should not occur, respecting the user's preference to have no toolbar.
         /// </summary>
         private bool hiddenByUser;
 
