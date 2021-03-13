@@ -352,8 +352,7 @@ namespace osu.Game.Screens.Menu
                                 if (impact)
                                     logo.Impact();
 
-                                if (game?.Toolbar.HiddenByUser == false)
-                                    game.Toolbar.Show();
+                                game?.Toolbar.Show();
                             }, 200);
                             break;
 
