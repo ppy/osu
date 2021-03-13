@@ -163,7 +163,7 @@ namespace osu.Game.Overlays
                 await API.PerformAsync(req).ConfigureAwait(false);
 
                 return tcs.Task;
-            });
+            }).Unwrap();
         }
 
         private CancellationTokenSource loadContentCancellation;
