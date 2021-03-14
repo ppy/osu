@@ -3,7 +3,6 @@
 
 using System;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 using osu.Framework.Logging;
 using osu.Framework.Statistics;
@@ -111,8 +110,7 @@ namespace osu.Game.Database
         {
             base.OnConfiguring(optionsBuilder);
             optionsBuilder
-                .UseSqlite(connectionString, sqliteOptions => sqliteOptions.CommandTimeout(10))
-                .ConfigureWarnings(w => w.Ignore(RelationalEventId.MultipleCollectionIncludeWarning))
+                .UseSqlite(connectionString, sqliteOptions => sqliteOptions.CommandTimeout(10).UseQuerySplittingBehavior(QuerySplittingBehavior.SingleQuery))
                 .UseLoggerFactory(logger.Value);
         }
 
