@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -13,19 +14,25 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    internal class DefaultHitExplosion : CircularContainer
+    internal class DefaultHitExplosion : CircularContainer, IHitExplosion
     {
-        private readonly DrawableHitObject judgedObject;
+        public override bool RemoveWhenNotAlive => false;
+
         private readonly HitResult result;
 
-        public DefaultHitExplosion(DrawableHitObject judgedObject, HitResult result)
+        [CanBeNull]
+        private Box body;
+
+        [Resolved]
+        private OsuColour colours { get; set; }
+
+        public DefaultHitExplosion(HitResult result)
         {
-            this.judgedObject = judgedObject;
             this.result = result;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -40,26 +47,38 @@ namespace osu.Game.Rulesets.Taiko.UI
             if (!result.IsHit())
                 return;
 
-            bool isRim = (judgedObject.HitObject as Hit)?.Type == HitType.Rim;
-
             InternalChildren = new[]
             {
-                new Box
+                body = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = isRim ? colours.BlueDarker : colours.PinkDarker,
                 }
             };
+
+            updateColour();
         }
 
-        protected override void LoadComplete()
+        private void updateColour([CanBeNull] DrawableHitObject judgedObject = null)
         {
-            base.LoadComplete();
+            if (body == null)
+                return;
+
+            bool isRim = (judgedObject?.HitObject as Hit)?.Type == HitType.Rim;
+            body.Colour = isRim ? colours.BlueDarker : colours.PinkDarker;
+        }
+
+        public void Animate(DrawableHitObject drawableHitObject)
+        {
+            updateColour(drawableHitObject);
 
             this.ScaleTo(3f, 1000, Easing.OutQuint);
             this.FadeOut(500);
 
             Expire(true);
+        }
+
+        public void AnimateSecondHit()
+        {
         }
     }
 }

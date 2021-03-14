@@ -1,22 +1,24 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Taiko.Objects.Drawables;
+using osu.Game.Rulesets.Taiko.UI;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
-    public class LegacyHitExplosion : CompositeDrawable
+    public class LegacyHitExplosion : CompositeDrawable, IHitExplosion
     {
-        private readonly Drawable sprite;
-        private readonly Drawable strongSprite;
+        public override bool RemoveWhenNotAlive => false;
 
-        private DrawableStrongNestedHit nestedStrongHit;
-        private bool switchedToStrongSprite;
+        private readonly Drawable sprite;
+
+        [CanBeNull]
+        private readonly Drawable strongSprite;
 
         /// <summary>
         /// Creates a new legacy hit explosion.
@@ -27,14 +29,14 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         /// </remarks>
         /// <param name="sprite">The normal legacy explosion sprite.</param>
         /// <param name="strongSprite">The strong legacy explosion sprite.</param>
-        public LegacyHitExplosion(Drawable sprite, Drawable strongSprite = null)
+        public LegacyHitExplosion(Drawable sprite, [CanBeNull] Drawable strongSprite = null)
         {
             this.sprite = sprite;
             this.strongSprite = strongSprite;
         }
 
         [BackgroundDependencyLoader]
-        private void load(DrawableHitObject judgedObject)
+        private void load()
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
@@ -56,16 +58,14 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                     s.Origin = Anchor.Centre;
                 }));
             }
-
-            if (judgedObject is DrawableHit hit)
-                nestedStrongHit = hit.NestedHitObjects.SingleOrDefault() as DrawableStrongNestedHit;
         }
 
-        protected override void LoadComplete()
+        public void Animate(DrawableHitObject drawableHitObject)
         {
-            base.LoadComplete();
-
             const double animation_time = 120;
+
+            (sprite as IFramedAnimation)?.GotoFrame(0);
+            (strongSprite as IFramedAnimation)?.GotoFrame(0);
 
             this.FadeInFromZero(animation_time).Then().FadeOut(animation_time * 1.5);
 
@@ -77,24 +77,13 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             Expire(true);
         }
 
-        protected override void Update()
+        public void AnimateSecondHit()
         {
-            base.Update();
+            if (strongSprite == null)
+                return;
 
-            if (shouldSwitchToStrongSprite() && !switchedToStrongSprite)
-            {
-                sprite.FadeOut(50, Easing.OutQuint);
-                strongSprite.FadeIn(50, Easing.OutQuint);
-                switchedToStrongSprite = true;
-            }
-        }
-
-        private bool shouldSwitchToStrongSprite()
-        {
-            if (nestedStrongHit == null || strongSprite == null)
-                return false;
-
-            return nestedStrongHit.IsHit;
+            sprite.FadeOut(50, Easing.OutQuint);
+            strongSprite.FadeIn(50, Easing.OutQuint);
         }
     }
 }

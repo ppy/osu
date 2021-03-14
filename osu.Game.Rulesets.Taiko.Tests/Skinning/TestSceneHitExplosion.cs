@@ -38,11 +38,11 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                     // the hit needs to be added to hierarchy in order for nested objects to be created correctly.
                     // setting zero alpha is supposed to prevent the test from looking broken.
                     hit.With(h => h.Alpha = 0),
-                    new HitExplosion(hit, hit.Type)
+                    new HitExplosion(hit.Type)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                    }
+                    }.With(explosion => explosion.Apply(hit))
                 }
             };
         }
