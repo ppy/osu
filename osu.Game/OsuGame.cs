@@ -958,10 +958,6 @@ namespace osu.Game
                     frameworkConfig.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode).SetDefault();
                     return true;
 
-                case GlobalAction.ToggleToolbar:
-                    Toolbar.ToggleVisibility();
-                    return true;
-
                 case GlobalAction.ToggleGameplayMouseButtons:
                     LocalConfig.Set(OsuSetting.MouseDisableButtons, !LocalConfig.Get<bool>(OsuSetting.MouseDisableButtons));
                     return true;

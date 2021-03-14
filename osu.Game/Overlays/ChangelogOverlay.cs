@@ -21,6 +21,8 @@ namespace osu.Game.Overlays
 {
     public class ChangelogOverlay : OnlineOverlay<ChangelogHeader>
     {
+        public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
+
         public readonly Bindable<APIChangelogBuild> Current = new Bindable<APIChangelogBuild>();
 
         private Sample sampleBack;
@@ -126,8 +128,11 @@ namespace osu.Game.Overlays
 
         private Task initialFetchTask;
 
-        private void performAfterFetch(Action action) => fetchListing()?.ContinueWith(_ =>
-            Schedule(action), TaskContinuationOptions.OnlyOnRanToCompletion);
+        private void performAfterFetch(Action action) => Schedule(() =>
+        {
+            fetchListing()?.ContinueWith(_ =>
+                Schedule(action), TaskContinuationOptions.OnlyOnRanToCompletion);
+        });
 
         private Task fetchListing()
         {
@@ -163,7 +168,7 @@ namespace osu.Game.Overlays
                 await API.PerformAsync(req).ConfigureAwait(false);
 
                 return tcs.Task;
-            });
+            }).Unwrap();
         }
 
         private CancellationTokenSource loadContentCancellation;
