@@ -54,19 +54,7 @@ namespace osu.Game.Scoring
 
         protected override void PreImport(ScoreInfo model)
         {
-            var dbContext = ContextFactory.Get();
-
-            // Workaround System.InvalidOperationException
-            // The instance of entity type 'FileInfo' cannot be tracked because another instance with the same key value for {'ID'} is already being tracked.
-            foreach (var file in model.Files)
-            {
-                file.FileInfo = dbContext.FileInfo.Find(file.FileInfoID);
-            }
-
-            foreach (var file in model.Beatmap.BeatmapSet.Files)
-            {
-                file.FileInfo = dbContext.FileInfo.Find(file.FileInfoID);
-            }
+            model.Requery(ContextFactory);
         }
 
         protected override ScoreInfo CreateModel(ArchiveReader archive)
