@@ -186,7 +186,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Metadata = metadata,
                     BaseDifficulty = new BeatmapDifficulty(),
                     Ruleset = ruleset,
-                    RulesetID = ruleset.ID.GetValueOrDefault(),
+                    RulesetID = ruleset.ID.GetValueOrDefault(), // workaround for efcore 5 compatibility.
                     StarDifficulty = difficultyIndex + 1,
                     Version = $"SR{difficultyIndex + 1}"
                 }).ToList()
