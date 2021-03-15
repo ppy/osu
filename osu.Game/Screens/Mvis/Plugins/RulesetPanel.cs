@@ -17,7 +17,11 @@ namespace osu.Game.Screens.Mvis.Plugins
             Name = "Mvis面板(内置)";
             Description = "用于提供Mvis面板功能(中心的谱面图及周围的粒子效果)";
 
-            Flags.Add(PluginFlags.CanDisable);
+            Flags.AddRange(new[]
+            {
+                PluginFlags.CanDisable,
+                PluginFlags.CanUnload
+            });
 
             RelativeSizeAxes = Axes.Both;
             Anchor = Anchor.Centre;
@@ -126,6 +130,15 @@ namespace osu.Game.Screens.Mvis.Plugins
             beatmapLogo?.ResponseOnBeatmapChanges();
 
             return base.Enable();
+        }
+
+        public override void UnLoad()
+        {
+            Value.UnbindAll();
+            Disable();
+
+            //bug: 直接调用Expire会导致面板直接消失
+            this.Delay(400).Expire();
         }
     }
 }

@@ -20,6 +20,9 @@ namespace osu.Game.Tests.Visual.Mvis
         [Cached]
         private IdleTracker idle = new IdleTracker(6000);
 
+        [Cached]
+        private DialogOverlay dialog = new DialogOverlay();
+
         private DependencyContainer dependencies;
 
         [Test]
@@ -42,6 +45,7 @@ namespace osu.Game.Tests.Visual.Mvis
         {
             Add(idle);
             Add(musicController);
+            Add(dialog);
 
             CollectionManager collectionManager;
             dependencies.Cache(collectionManager = new CollectionManager(LocalStorage));
