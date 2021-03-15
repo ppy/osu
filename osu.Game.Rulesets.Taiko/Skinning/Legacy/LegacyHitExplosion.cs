@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Taiko.UI;
 
 namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
-    public class LegacyHitExplosion : CompositeDrawable, IHitExplosion
+    public class LegacyHitExplosion : CompositeDrawable, IAnimatableHitExplosion
     {
         public override bool RemoveWhenNotAlive => false;
 

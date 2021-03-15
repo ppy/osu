@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    internal class DefaultHitExplosion : CircularContainer, IHitExplosion
+    internal class DefaultHitExplosion : CircularContainer, IAnimatableHitExplosion
     {
         public override bool RemoveWhenNotAlive => false;
 

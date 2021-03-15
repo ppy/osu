@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             LifetimeStart = resultTime;
 
             using (BeginAbsoluteSequence(resultTime))
-                (skinnable.Drawable as IHitExplosion)?.Animate(JudgedObject);
+                (skinnable.Drawable as IAnimatableHitExplosion)?.Animate(JudgedObject);
 
             LifetimeEnd = skinnable.Drawable.LatestTransformEndTime;
         }
@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             using (BeginAbsoluteSequence(judgementResult.TimeAbsolute))
             {
                 this.ResizeTo(new Vector2(TaikoStrongableHitObject.DEFAULT_STRONG_SIZE), 50);
-                (skinnable.Drawable as IHitExplosion)?.AnimateSecondHit();
+                (skinnable.Drawable as IAnimatableHitExplosion)?.AnimateSecondHit();
             }
         }
     }

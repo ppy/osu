@@ -6,9 +6,9 @@ using osu.Game.Rulesets.Objects.Drawables;
 namespace osu.Game.Rulesets.Taiko.UI
 {
     /// <summary>
-    /// Interface for hit explosions shown on the playfield's hit target in taiko.
+    /// A skinnable element of a hit explosion that supports playing an animation from the current point in time.
     /// </summary>
-    public interface IHitExplosion
+    public interface IAnimatableHitExplosion
     {
         /// <summary>
         /// Shows the hit explosion for the supplied <paramref name="drawableHitObject"/>.
