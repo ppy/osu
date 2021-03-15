@@ -14,13 +14,21 @@ using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets;
 using osu.Game.Configuration;
+using osu.Framework.Input.Bindings;
+using osu.Game.Input.Bindings;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class Toolbar : VisibilityContainer
+    public class Toolbar : VisibilityContainer, IKeyBindingHandler<GlobalAction>
     {
         public const float HEIGHT = 40;
         public const float TOOLTIP_HEIGHT = 30;
+
+        /// <summary>
+        /// Whether the user hid this <see cref="Toolbar"/> with <see cref="GlobalAction.ToggleToolbar"/>.
+        /// In this state, automatic toggles should not occur, respecting the user's preference to have no toolbar.
+        /// </summary>
+        private bool hiddenByUser;
 
         public Action OnHome;
 
@@ -34,7 +42,7 @@ namespace osu.Game.Overlays.Toolbar
 
         protected readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
 
-        // Toolbar components like RulesetSelector should receive keyboard input events even when the toolbar is hidden.
+        // Toolbar and its components need keyboard input even when hidden.
         public override bool PropagateNonPositionalInputSubTree => true;
 
         public Toolbar()
@@ -170,7 +178,9 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override void UpdateState(ValueChangedEvent<Visibility> state)
         {
-            if (state.NewValue == Visibility.Visible && OverlayActivationMode.Value == OverlayActivation.Disabled)
+            bool blockShow = hiddenByUser || OverlayActivationMode.Value == OverlayActivation.Disabled;
+
+            if (state.NewValue == Visibility.Visible && blockShow)
             {
                 State.Value = Visibility.Hidden;
                 return;
@@ -191,6 +201,26 @@ namespace osu.Game.Overlays.Toolbar
 
             this.MoveToY(-DrawSize.Y, transition_time, Easing.OutQuint);
             this.FadeOut(transition_time, Easing.InQuint);
+        }
+
+        public bool OnPressed(GlobalAction action)
+        {
+            if (OverlayActivationMode.Value == OverlayActivation.Disabled)
+                return false;
+
+            switch (action)
+            {
+                case GlobalAction.ToggleToolbar:
+                    hiddenByUser = State.Value == Visibility.Visible; // set before toggling to allow the operation to always succeed.
+                    ToggleVisibility();
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(GlobalAction action)
+        {
         }
     }
 }
