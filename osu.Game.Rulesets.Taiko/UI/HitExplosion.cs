@@ -25,6 +25,8 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private readonly HitResult result;
 
+        private double? secondHitTime;
+
         [CanBeNull]
         public DrawableHitObject JudgedObject;
 
@@ -61,22 +63,13 @@ namespace osu.Game.Rulesets.Taiko.UI
         public void Apply([CanBeNull] DrawableHitObject drawableHitObject)
         {
             JudgedObject = drawableHitObject;
+            secondHitTime = null;
         }
 
         protected override void PrepareForUse()
         {
             base.PrepareForUse();
             runAnimation();
-        }
-
-        protected override void FreeAfterUse()
-        {
-            base.FreeAfterUse();
-
-            // clean up transforms on free instead of on prepare as is usually the case
-            // to avoid potentially overriding the effects of VisualiseSecondHit() in the case it is called before PrepareForUse().
-            ApplyTransformsAt(double.MinValue, true);
-            ClearTransforms(true);
         }
 
         private void runAnimation()
@@ -88,8 +81,20 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             LifetimeStart = resultTime;
 
+            ApplyTransformsAt(double.MinValue, true);
+            ClearTransforms(true);
+
             using (BeginAbsoluteSequence(resultTime))
                 (skinnable.Drawable as IAnimatableHitExplosion)?.Animate(JudgedObject);
+
+            if (secondHitTime != null)
+            {
+                using (BeginAbsoluteSequence(secondHitTime.Value))
+                {
+                    this.ResizeTo(new Vector2(TaikoStrongableHitObject.DEFAULT_STRONG_SIZE), 50);
+                    (skinnable.Drawable as IAnimatableHitExplosion)?.AnimateSecondHit();
+                }
+            }
 
             LifetimeEnd = skinnable.Drawable.LatestTransformEndTime;
         }
@@ -113,11 +118,8 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public void VisualiseSecondHit(JudgementResult judgementResult)
         {
-            using (BeginAbsoluteSequence(judgementResult.TimeAbsolute))
-            {
-                this.ResizeTo(new Vector2(TaikoStrongableHitObject.DEFAULT_STRONG_SIZE), 50);
-                (skinnable.Drawable as IAnimatableHitExplosion)?.AnimateSecondHit();
-            }
+            secondHitTime = judgementResult.TimeAbsolute;
+            runAnimation();
         }
     }
 }
