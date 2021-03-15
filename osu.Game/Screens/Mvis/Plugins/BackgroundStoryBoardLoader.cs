@@ -66,6 +66,9 @@ namespace osu.Game.Screens.Mvis.Plugins
                     storyboardClock.ChangeSource(music.CurrentTrack);
                 }
             });
+
+            if (MvisScreen != null)
+                MvisScreen.OnScreenExiting += UnLoad;
         }
 
         protected override void OnValueChanged(ValueChangedEvent<bool> v)
@@ -132,10 +135,21 @@ namespace osu.Game.Screens.Mvis.Plugins
 
             setProxy(newStoryboard);
 
+            if (MvisScreen != null)
+                MvisScreen.OnSeek += Seek;
+
             Value.TriggerChange();
             OnNewStoryboardLoaded?.Invoke();
 
             return true;
+        }
+
+        public override void UnLoad()
+        {
+            if (MvisScreen != null)
+                MvisScreen.OnSeek -= Seek;
+
+            base.UnLoad();
         }
 
         [CanBeNull]

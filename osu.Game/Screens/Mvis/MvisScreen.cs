@@ -74,6 +74,8 @@ namespace osu.Game.Screens.Mvis
         public Action OnScreenResuming;
         public Action OnIdle;
         public Action OnResumeFromIdle;
+        public Action<WorkingBeatmap> OnBeatmapChanged;
+        public Action<double> OnSeek;
 
         #endregion
 
@@ -187,6 +189,8 @@ namespace osu.Game.Screens.Mvis
 
         private readonly BindableList<MvisPlugin> loadList = new BindableList<MvisPlugin>();
 
+        private FakeEditor fakeEditor;
+
         #endregion
 
         public MvisScreen()
@@ -209,6 +213,9 @@ namespace osu.Game.Screens.Mvis
 
             var panel = new RulesetPanel();
             pluginManager.AddPlugin(panel);
+
+            fakeEditor = new FakeEditor(Beatmap.Value);
+            pluginManager.AddPlugin(fakeEditor);
 
             sidebar.Add(settingsScroll = new SidebarSettingsScrollContainer
             {
@@ -262,7 +269,8 @@ namespace osu.Game.Screens.Mvis
                             Name = "Gameplay Background Elements Container",
                             Children = new Drawable[]
                             {
-                                bgTriangles = new BgTrianglesContainer()
+                                bgTriangles = new BgTrianglesContainer(),
+                                fakeEditor
                             }
                         },
                         foreground = new Container
@@ -521,7 +529,7 @@ namespace osu.Game.Screens.Mvis
                     : Color4.White, 300);
             });
 
-            Beatmap.BindValueChanged(OnBeatmapChanged, true);
+            Beatmap.BindValueChanged(onBeatmapChanged, true);
 
             musicSpeed.BindValueChanged(_ => applyTrackAdjustments());
             adjustFreq.BindValueChanged(_ => applyTrackAdjustments());
@@ -639,8 +647,7 @@ namespace osu.Game.Screens.Mvis
         private void seekTo(double position)
         {
             musicController.SeekTo(position);
-            sbLoader?.Seek(position);
-            fakeEditor?.Seek(position);
+            OnSeek?.Invoke(position);
         }
 
         #region override事件
@@ -722,7 +729,7 @@ namespace osu.Game.Screens.Mvis
             applyTrackAdjustments();
             updateBackground(Beatmap.Value);
 
-            Beatmap.BindValueChanged(OnBeatmapChanged, true);
+            Beatmap.BindValueChanged(onBeatmapChanged, true);
 
             //背景层的动画
             background.FadeOut().Then().Delay(duration * 0.6f).FadeIn(duration / 2);
@@ -949,16 +956,13 @@ namespace osu.Game.Screens.Mvis
             sbLoader?.FadeColour(OsuColour.Gray(auto ? (OverlaysHidden ? idleBgDim.Value : 0.6f) : brightness), duration, Easing.OutQuint);
         }
 
-        private FakeEditor fakeEditor;
         private MvisPluginManager pluginManager;
         private BottomBarButton pluginButton;
 
-        private void OnBeatmapChanged(ValueChangedEvent<WorkingBeatmap> v)
+        private void onBeatmapChanged(ValueChangedEvent<WorkingBeatmap> v)
         {
             var beatmap = v.NewValue;
             playFromCollection.TriggerChange();
-
-            pluginManager.UnLoadPlugin(fakeEditor);
 
             Schedule(() =>
             {
@@ -992,21 +996,9 @@ namespace osu.Game.Screens.Mvis
                 reBind();
             }
 
-            fakeEditor = new FakeEditor(beatmap)
-            {
-                RelativeSizeAxes = Axes.Both,
-                Depth = float.MaxValue,
-                Alpha = 0.01f,
-                Size = new Vector2(0.01f),
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre
-            };
-
-            pluginManager.AddPlugin(fakeEditor);
-            AddInternal(fakeEditor);
-
             activity.Value = new UserActivity.InMvis(beatmap.BeatmapInfo);
             prevBeatmap = beatmap;
+            OnBeatmapChanged?.Invoke(beatmap);
         }
 
         private void reBind()
