@@ -642,7 +642,7 @@ namespace osu.Game.Database
                     {
                         Filename = file.Substring(prefix.Length).ToStandardisedPath(),
                         FileInfo = fileInfo,
-                        FileInfoID = fileInfo.ID
+                        FileInfoID = fileInfo.ID // workaround for efcore 5 compatibility.
                     });
                 }
             }

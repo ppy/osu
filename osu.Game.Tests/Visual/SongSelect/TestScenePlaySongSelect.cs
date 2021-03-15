@@ -915,7 +915,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 beatmaps.Add(new BeatmapInfo
                 {
                     Ruleset = ruleset,
-                    RulesetID = ruleset.ID.GetValueOrDefault(),
+                    RulesetID = ruleset.ID.GetValueOrDefault(), // workaround for efcore 5 compatibility.
                     OnlineBeatmapID = beatmapId,
                     Version = $"{beatmapId} (length {TimeSpan.FromMilliseconds(length):m\\:ss}, bpm {bpm:0.#})",
                     Length = length,
