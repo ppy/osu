@@ -462,9 +462,7 @@ namespace osu.Game.Database
                 // Dereference the existing file info, since the file model will be removed.
                 if (file.FileInfo != null)
                 {
-                    // Workaround System.InvalidOperationException
-                    // The instance of entity type 'FileInfo' cannot be tracked because another instance with the same key value for {'ID'} is already being tracked.
-                    file.FileInfo = usage.Context.FileInfo.Find(file.FileInfoID);
+                    file.Requery(usage.Context);
 
                     Files.Dereference(file.FileInfo);
 

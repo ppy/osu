@@ -49,18 +49,23 @@ namespace osu.Game.Database
                 default:
                     throw new ArgumentException($"{nameof(Requery)} does not have support for the provided model type", nameof(model));
             }
+
+            void requeryFiles<T>(List<T> files, IDatabaseContextFactory databaseContextFactory) where T : class, INamedFileInfo
+            {
+                var dbContext = databaseContextFactory.Get();
+
+                foreach (var file in files)
+                {
+                    Requery(file, dbContext);
+                }
+            }
         }
 
-        private static void requeryFiles<T>(List<T> files, IDatabaseContextFactory databaseContextFactory) where T : class, INamedFileInfo
+        public static void Requery(this INamedFileInfo file, OsuDbContext dbContext)
         {
-            var dbContext = databaseContextFactory.Get();
-
-            foreach (var file in files)
-            {
-                // Workaround System.InvalidOperationException
-                // The instance of entity type 'FileInfo' cannot be tracked because another instance with the same key value for {'ID'} is already being tracked.
-                file.FileInfo = dbContext.FileInfo.Find(file.FileInfoID);
-            }
+            // Workaround System.InvalidOperationException
+            // The instance of entity type 'FileInfo' cannot be tracked because another instance with the same key value for {'ID'} is already being tracked.
+            file.FileInfo = dbContext.FileInfo.Find(file.FileInfoID);
         }
     }
 }
