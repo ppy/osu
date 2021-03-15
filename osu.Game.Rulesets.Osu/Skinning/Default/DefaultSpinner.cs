@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Globalization;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -58,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             gainedBonus = drawableSpinner.GainedBonus.GetBoundCopy();
             gainedBonus.BindValueChanged(bonus =>
             {
-                bonusCounter.Text = $"{bonus.NewValue}";
+                bonusCounter.Text = bonus.NewValue.ToString(NumberFormatInfo.InvariantInfo);
                 bonusCounter.FadeOutFromOne(1500);
                 bonusCounter.ScaleTo(1.5f).Then().ScaleTo(1f, 1000, Easing.OutQuint);
             });
