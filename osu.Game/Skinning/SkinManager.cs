@@ -144,7 +144,7 @@ namespace osu.Game.Skinning
 
         protected override void PreImport(SkinInfo model)
         {
-            model.Files.Requery(ContextFactory);
+            model.Requery(ContextFactory);
         }
 
         /// <summary>

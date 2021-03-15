@@ -1,21 +1,36 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Scoring;
+using osu.Game.Skinning;
 
 namespace osu.Game.Database
 {
+    /// <summary>
+    /// Extension methods which contain workarounds to make EFcore 5.x work with our existing (incorrect) thread safety.
+    /// The intention is to avoid blocking package updates while we consider the future of the database backend, with a potential backend switch imminent.
+    /// </summary>
     public static class DatabaseWorkaroundExtensions
     {
+        /// <summary>
+        /// Re-query the provided model to ensure it is in a sane state. This method requires explicit implementation per model type.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="contextFactory"></param>
         public static void Requery(this IHasPrimaryKey model, IDatabaseContextFactory contextFactory)
         {
             switch (model)
             {
+                case SkinInfo skinInfo:
+                    requeryFiles(skinInfo.Files, contextFactory);
+                    break;
+
                 case ScoreInfo scoreInfo:
                     scoreInfo.Beatmap.BeatmapSet.Requery(contextFactory);
-                    scoreInfo.Files.RequeryFiles(contextFactory);
+                    requeryFiles(scoreInfo.Files, contextFactory);
                     break;
 
                 case BeatmapSetInfo beatmapSetInfo:
@@ -33,7 +48,7 @@ namespace osu.Game.Database
             }
         }
 
-        public static void RequeryFiles<T>(this List<T> files, IDatabaseContextFactory databaseContextFactory) where T : class, INamedFileInfo
+        private static void requeryFiles<T>(List<T> files, IDatabaseContextFactory databaseContextFactory) where T : class, INamedFileInfo
         {
             var dbContext = databaseContextFactory.Get();
 
