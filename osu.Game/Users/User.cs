@@ -111,9 +111,6 @@ namespace osu.Game.Users
         [JsonProperty(@"twitter")]
         public string Twitter;
 
-        [JsonProperty(@"skype")]
-        public string Skype;
-
         [JsonProperty(@"discord")]
         public string Discord;
 
