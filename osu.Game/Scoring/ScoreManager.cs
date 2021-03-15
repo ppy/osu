@@ -54,6 +54,11 @@ namespace osu.Game.Scoring
             this.configManager = configManager;
         }
 
+        protected override void PreImport(ScoreInfo model)
+        {
+            model.Requery(ContextFactory);
+        }
+
         protected override ScoreInfo CreateModel(ArchiveReader archive)
         {
             if (archive == null)
