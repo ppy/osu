@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Globalization;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -102,7 +103,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 gainedBonus = DrawableSpinner.GainedBonus.GetBoundCopy();
                 gainedBonus.BindValueChanged(bonus =>
                 {
-                    bonusCounter.Text = $"{bonus.NewValue}";
+                    bonusCounter.Text = bonus.NewValue.ToString(NumberFormatInfo.InvariantInfo);
                     bonusCounter.FadeOutFromOne(800, Easing.Out);
                     bonusCounter.ScaleTo(SPRITE_SCALE * 2f).Then().ScaleTo(SPRITE_SCALE * 1.28f, 800, Easing.Out);
                 });
