@@ -1,65 +1,46 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using NUnit.Framework;
-using OpenTabletDriver.Plugin.Tablet;
+using System.Drawing;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Handlers.Tablet;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
+
 using osuTK.Graphics;
 
-namespace osu.Game.Tests.Visual.Settings
+namespace osu.Game.Overlays.Settings.Sections.Input
 {
-    [TestFixture]
-    public class TestSceneTabletAreaSelection : OsuTestScene
+    public class TabletAreaSelection : CompositeDrawable
     {
-        private TabletAreaSelection areaSelection;
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            DigitizerIdentifier testTablet = new DigitizerIdentifier
-            {
-                // size specifications in millimetres.
-                Width = 160,
-                Height = 100,
-            };
-
-            AddRange(new[]
-            {
-                areaSelection = new TabletAreaSelection(testTablet)
-                {
-                    State = { Value = Visibility.Visible }
-                }
-            });
-        }
-    }
-
-    public class TabletAreaSelection : OsuFocusedOverlayContainer
-    {
-        private readonly DigitizerIdentifier tablet;
+        private readonly ITabletHandler handler;
 
         private readonly Container tabletContainer;
         private readonly Container usableAreaContainer;
 
-        public TabletAreaSelection(DigitizerIdentifier tablet)
-        {
-            RelativeSizeAxes = Axes.Both;
+        private readonly Bindable<Size> areaOffset = new BindableSize();
+        private readonly Bindable<Size> areaSize = new BindableSize();
+        private readonly Bindable<Size> tabletSize = new BindableSize();
 
-            this.tablet = tablet;
+        public TabletAreaSelection(ITabletHandler handler)
+        {
+            this.handler = handler;
+
+            Padding = new MarginPadding(5);
 
             InternalChildren = new Drawable[]
             {
                 tabletContainer = new Container
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Scale = new Vector2(3),
+                    Masking = true,
+                    CornerRadius = 5,
+                    BorderThickness = 2,
+                    BorderColour = Color4.Black,
                     Children = new Drawable[]
                     {
                         new Box
@@ -69,6 +50,8 @@ namespace osu.Game.Tests.Visual.Settings
                         },
                         usableAreaContainer = new Container
                         {
+                            Masking = true,
+                            CornerRadius = 5,
                             Children = new Drawable[]
                             {
                                 new Box
@@ -94,11 +77,23 @@ namespace osu.Game.Tests.Visual.Settings
         [BackgroundDependencyLoader]
         private void load()
         {
-            // TODO: handle tablet device changes etc.
-            tabletContainer.Size = new Vector2(tablet.Width, tablet.Height);
+            areaOffset.BindTo(handler.AreaOffset);
+            areaOffset.BindValueChanged(val =>
+            {
+                usableAreaContainer.MoveTo(new Vector2(val.NewValue.Width, val.NewValue.Height), 100, Easing.OutQuint);
+            }, true);
 
-            usableAreaContainer.Position = new Vector2(10, 30);
-            usableAreaContainer.Size = new Vector2(80, 60);
+            areaSize.BindTo(handler.AreaSize);
+            areaSize.BindValueChanged(val =>
+            {
+                usableAreaContainer.ResizeTo(new Vector2(val.NewValue.Width, val.NewValue.Height), 100, Easing.OutQuint);
+            }, true);
+
+            ((IBindable<Size>)tabletSize).BindTo(handler.TabletSize);
+            tabletSize.BindValueChanged(val =>
+            {
+                tabletContainer.ResizeTo(new Vector2(tabletSize.Value.Width, tabletSize.Value.Height), 100, Easing.OutQuint);
+            }, true);
         }
     }
 }
