@@ -45,6 +45,9 @@ namespace osu.Game.Database
 
                     requeryFiles(beatmapSetInfo.Files, contextFactory);
                     break;
+
+                default:
+                    throw new ArgumentException($"{nameof(Requery)} does not have support for the provided model type", nameof(model));
             }
         }
 
