@@ -1,12 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+using System.ComponentModel;
 using System.Drawing;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Handlers.Tablet;
+using osu.Framework.Platform;
+using osu.Framework.Threading;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
@@ -21,17 +23,27 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private readonly BindableNumber<int> offsetX = new BindableNumber<int> { MinValue = 0 };
         private readonly BindableNumber<int> offsetY = new BindableNumber<int> { MinValue = 0 };
 
-        private readonly BindableNumber<int> sizeX = new BindableNumber<int> { MinValue = 0 };
-        private readonly BindableNumber<int> sizeY = new BindableNumber<int> { MinValue = 0 };
+        private readonly BindableNumber<int> sizeX = new BindableNumber<int> { MinValue = 10 };
+        private readonly BindableNumber<int> sizeY = new BindableNumber<int> { MinValue = 10 };
 
-        private SettingsButton aspectResetButton;
+        [Resolved]
+        private GameHost host { get; set; }
+
+        /// <summary>
+        /// Based on the longest available smartphone.
+        /// </summary>
+        private const float largest_feasible_aspect_ratio = 20f / 9;
 
         private readonly BindableNumber<float> aspectRatio = new BindableFloat(1)
         {
-            MinValue = 0.5f,
-            MaxValue = 2,
+            MinValue = 1 / largest_feasible_aspect_ratio,
+            MaxValue = largest_feasible_aspect_ratio,
             Precision = 0.01f,
         };
+
+        private readonly BindableBool aspectLock = new BindableBool();
+
+        private ScheduledDelegate aspectRatioApplication;
 
         protected override string Header => "Tablet";
 
@@ -59,36 +71,17 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 sizeX.Value = val.NewValue.Width;
                 sizeY.Value = val.NewValue.Height;
 
-                float proposedAspectRatio = (float)sizeX.Value / sizeY.Value;
-
-                aspectRatio.Value = proposedAspectRatio;
-
-                if (proposedAspectRatio < aspectRatio.MinValue || proposedAspectRatio > aspectRatio.MaxValue)
-                {
-                    // apply aspect ratio restrictions to keep things in a usable state.
-
-                    // correction is always going to be below 1.
-                    float correction = proposedAspectRatio > aspectRatio.Value
-                        ? aspectRatio.Value / proposedAspectRatio
-                        : proposedAspectRatio / aspectRatio.Value;
-
-                    if (val.NewValue.Width != val.OldValue.Width)
-                    {
-                        if (val.NewValue.Width > val.OldValue.Width)
-                            correction = 1 / correction;
-                        areaSize.Value = new Size(areaSize.Value.Width, (int)(val.NewValue.Height * correction));
-                    }
-                    else
-                    {
-                        if (val.NewValue.Height > val.OldValue.Height)
-                            correction = 1 / correction;
-                        areaSize.Value = new Size((int)(val.NewValue.Width * correction), areaSize.Value.Height);
-                    }
-                }
+                aspectRatioApplication?.Cancel();
+                aspectRatioApplication = Schedule(() => applyAspectRatio(val));
             }, true);
 
             sizeX.BindValueChanged(val => areaSize.Value = new Size(val.NewValue, areaSize.Value.Height));
             sizeY.BindValueChanged(val => areaSize.Value = new Size(areaSize.Value.Width, val.NewValue));
+
+            aspectRatio.BindValueChanged(aspect =>
+            {
+                forceAspectRatio(aspect.NewValue);
+            });
 
             ((IBindable<Size>)tabletSize).BindTo(tabletHandler.TabletSize);
             tabletSize.BindValueChanged(val =>
@@ -109,6 +102,33 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             }, true);
         }
 
+        private void applyAspectRatio(ValueChangedEvent<Size> sizeChanged)
+        {
+            float proposedAspectRatio = (float)sizeX.Value / sizeY.Value;
+
+            if (!aspectLock.Value)
+            {
+                aspectRatio.Value = proposedAspectRatio;
+
+                // aspect ratio was in a valid range.
+                if (proposedAspectRatio >= aspectRatio.MinValue && proposedAspectRatio <= aspectRatio.MaxValue)
+                    return;
+            }
+
+            if (sizeChanged.NewValue.Width != sizeChanged.OldValue.Width)
+            {
+                areaSize.Value = new Size(areaSize.Value.Width, (int)(areaSize.Value.Width / aspectRatio.Value));
+            }
+            else
+            {
+                areaSize.Value = new Size((int)(areaSize.Value.Height * aspectRatio.Value), areaSize.Value.Height);
+            }
+
+            // cancel any event which may have fired while updating variables as a result of aspect ratio limitations.
+            // this avoids a potential feedback loop.
+            aspectRatioApplication?.Cancel();
+        }
+
         private void updateDisplay()
         {
             if (Children.Count > 0)
@@ -121,22 +141,24 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     RelativeSizeAxes = Axes.X,
                     Height = 300,
                 },
-                new SettingsButton
+                new DangerousSettingsButton
                 {
                     Text = "Reset to full area",
                     Action = () =>
                     {
+                        aspectLock.Value = false;
+
                         areaOffset.SetDefault();
                         areaSize.SetDefault();
                     },
                 },
-                new SettingsCheckbox
+                new SettingsButton
                 {
-                    LabelText = "Lock aspect ratio",
-                },
-                aspectResetButton = new SettingsButton
-                {
-                    Text = "Take aspect ratio from screen size",
+                    Text = "Conform to current game aspect ratio",
+                    Action = () =>
+                    {
+                        forceAspectRatio((float)host.Window.ClientSize.Width / host.Window.ClientSize.Height);
+                    }
                 },
                 new SettingsSlider<float>
                 {
@@ -153,6 +175,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     LabelText = "Y Offset",
                     Current = offsetY
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "Lock aspect ratio",
+                    Current = aspectLock
+                },
                 new SettingsSlider<int>
                 {
                     LabelText = "Width",
@@ -164,6 +191,21 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     Current = sizeY
                 },
             };
+        }
+
+        private void forceAspectRatio(float aspectRatio)
+        {
+            aspectLock.Value = false;
+
+            int proposedHeight = (int)(sizeX.Value / aspectRatio);
+
+            if (proposedHeight < sizeY.MaxValue)
+                sizeY.Value = proposedHeight;
+            else
+                sizeX.Value = (int)(sizeY.Value * aspectRatio);
+
+            aspectRatioApplication?.Cancel();
+            aspectLock.Value = true;
         }
     }
 }
