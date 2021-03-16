@@ -887,7 +887,6 @@ namespace osu.Game
 
                 case GlobalAction.ToggleGameplayMouseButtons:
                     var mouseDisableButtons = LocalConfig.GetBindable<bool>(OsuSetting.MouseDisableButtons);
-
                     mouseDisableButtons.Value = !mouseDisableButtons.Value;
                     return true;
 
