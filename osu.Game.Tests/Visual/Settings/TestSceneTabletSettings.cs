@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Platform;
+using osu.Framework.Utils;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings.Sections.Input;
 
@@ -39,6 +40,7 @@ namespace osu.Game.Tests.Visual.Settings
             AddStep("Test with square tablet", () => tabletHandler.SetTabletSize(new Size(300, 300)));
             AddStep("Test with tall tablet", () => tabletHandler.SetTabletSize(new Size(100, 300)));
             AddStep("Test with very tall tablet", () => tabletHandler.SetTabletSize(new Size(100, 700)));
+            AddStep("Test no tablet present", () => tabletHandler.SetTabletSize(System.Drawing.Size.Empty));
         }
 
         public class TestTabletHandler : ITabletHandler
@@ -48,10 +50,14 @@ namespace osu.Game.Tests.Visual.Settings
             public BindableSize AreaOffset { get; } = new BindableSize();
             public BindableSize AreaSize { get; } = new BindableSize();
             public IBindable<Size> TabletSize => tabletSize;
-            public string DeviceName => "test tablet T-421";
+            public string DeviceName { get; private set; }
             public BindableBool Enabled { get; } = new BindableBool(true);
 
-            public void SetTabletSize(Size size) => tabletSize.Value = size;
+            public void SetTabletSize(Size size)
+            {
+                DeviceName = size != System.Drawing.Size.Empty ? $"test tablet T-{RNG.Next(999):000}" : string.Empty;
+                tabletSize.Value = size;
+            }
         }
     }
 }
