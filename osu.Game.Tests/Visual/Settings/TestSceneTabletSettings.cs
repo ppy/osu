@@ -46,6 +46,7 @@ namespace osu.Game.Tests.Visual.Settings
             public BindableSize AreaOffset { get; } = new BindableSize();
             public BindableSize AreaSize { get; } = new BindableSize();
             public IBindable<Size> TabletSize => tabletSize;
+            public string DeviceName => "test tablet T-421";
             public BindableBool Enabled { get; } = new BindableBool(true);
 
             public void SetTabletSize(Size size) => tabletSize.Value = size;
