@@ -5,9 +5,11 @@ using System.Drawing;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
@@ -44,6 +46,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private ScheduledDelegate aspectRatioApplication;
 
+        private FillFlowContainer mainSettings;
+
+        private OsuSpriteText noTabletMessage;
+
         protected override string Header => "Tablet";
 
         public TabletSettings(ITabletHandler tabletHandler)
@@ -56,59 +62,76 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             Children = new Drawable[]
             {
-                new TabletAreaSelection(tabletHandler)
+                noTabletMessage = new OsuSpriteText
                 {
+                    Text = "No tablet detected!",
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                },
+                mainSettings = new FillFlowContainer
+                {
+                    Alpha = 0,
                     RelativeSizeAxes = Axes.X,
-                    Height = 300,
-                },
-                new DangerousSettingsButton
-                {
-                    Text = "Reset to full area",
-                    Action = () =>
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Children = new Drawable[]
                     {
-                        aspectLock.Value = false;
+                        new TabletAreaSelection(tabletHandler)
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Height = 300,
+                            Margin = new MarginPadding(10)
+                        },
+                        new DangerousSettingsButton
+                        {
+                            Text = "Reset to full area",
+                            Action = () =>
+                            {
+                                aspectLock.Value = false;
 
-                        areaOffset.SetDefault();
-                        areaSize.SetDefault();
-                    },
-                },
-                new SettingsButton
-                {
-                    Text = "Conform to current game aspect ratio",
-                    Action = () =>
-                    {
-                        forceAspectRatio((float)host.Window.ClientSize.Width / host.Window.ClientSize.Height);
+                                areaOffset.SetDefault();
+                                areaSize.SetDefault();
+                            },
+                        },
+                        new SettingsButton
+                        {
+                            Text = "Conform to current game aspect ratio",
+                            Action = () =>
+                            {
+                                forceAspectRatio((float)host.Window.ClientSize.Width / host.Window.ClientSize.Height);
+                            }
+                        },
+                        new SettingsSlider<float>
+                        {
+                            LabelText = "Aspect Ratio",
+                            Current = aspectRatio
+                        },
+                        new SettingsSlider<int>
+                        {
+                            LabelText = "X Offset",
+                            Current = offsetX
+                        },
+                        new SettingsSlider<int>
+                        {
+                            LabelText = "Y Offset",
+                            Current = offsetY
+                        },
+                        new SettingsCheckbox
+                        {
+                            LabelText = "Lock aspect ratio",
+                            Current = aspectLock
+                        },
+                        new SettingsSlider<int>
+                        {
+                            LabelText = "Width",
+                            Current = sizeX
+                        },
+                        new SettingsSlider<int>
+                        {
+                            LabelText = "Height",
+                            Current = sizeY
+                        },
                     }
-                },
-                new SettingsSlider<float>
-                {
-                    LabelText = "Aspect Ratio",
-                    Current = aspectRatio
-                },
-                new SettingsSlider<int>
-                {
-                    LabelText = "X Offset",
-                    Current = offsetX
-                },
-                new SettingsSlider<int>
-                {
-                    LabelText = "Y Offset",
-                    Current = offsetY
-                },
-                new SettingsCheckbox
-                {
-                    LabelText = "Lock aspect ratio",
-                    Current = aspectLock
-                },
-                new SettingsSlider<int>
-                {
-                    LabelText = "Width",
-                    Current = sizeX
-                },
-                new SettingsSlider<int>
-                {
-                    LabelText = "Height",
-                    Current = sizeY
                 },
             };
 
@@ -154,8 +177,17 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             tabletSize.BindTo(tabletHandler.TabletSize);
             tabletSize.BindValueChanged(val =>
             {
-                if (tabletSize.Value == System.Drawing.Size.Empty)
+                bool tabletFound = tabletSize.Value != System.Drawing.Size.Empty;
+
+                if (!tabletFound)
+                {
+                    mainSettings.Hide();
+                    noTabletMessage.Show();
                     return;
+                }
+
+                mainSettings.Show();
+                noTabletMessage.Hide();
 
                 // todo: these should propagate from a TabletChanged event or similar.
                 offsetX.MaxValue = val.NewValue.Width;
