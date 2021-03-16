@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private readonly Bindable<Size> areaOffset = new BindableSize();
         private readonly Bindable<Size> areaSize = new BindableSize();
-        private readonly Bindable<Size> tabletSize = new BindableSize();
+        private readonly IBindable<Size> tabletSize = new BindableSize();
 
         private OsuSpriteText tabletName;
 
@@ -95,7 +95,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 checkBounds();
             }, true);
 
-            ((IBindable<Size>)tabletSize).BindTo(handler.TabletSize);
+            tabletSize.BindTo(handler.TabletSize);
             tabletSize.BindValueChanged(val =>
             {
                 tabletContainer.Size = new Vector2(val.NewValue.Width, val.NewValue.Height);
@@ -122,6 +122,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             base.Update();
 
             var size = tabletSize.Value;
+
+            if (size == System.Drawing.Size.Empty)
+                return;
 
             float fitX = size.Width / DrawWidth;
             float fitY = size.Height / DrawHeight;
