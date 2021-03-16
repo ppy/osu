@@ -80,6 +80,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     },
                 }
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             areaOffset.BindTo(handler.AreaOffset);
             areaOffset.BindValueChanged(val =>
@@ -101,7 +106,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 tabletContainer.Size = new Vector2(val.NewValue.Width, val.NewValue.Height);
                 tabletName.Text = handler.DeviceName;
                 checkBounds();
-            });
+            }, true);
         }
 
         [Resolved]
