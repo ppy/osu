@@ -32,13 +32,13 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         public TabletAreaSelection(ITabletHandler handler)
         {
             this.handler = handler;
+
+            Padding = new MarginPadding { Horizontal = SettingsPanel.CONTENT_MARGINS };
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            Padding = new MarginPadding(5);
-
             InternalChild = tabletContainer = new Container
             {
                 Anchor = Anchor.Centre,
@@ -131,7 +131,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             if (size == System.Drawing.Size.Empty)
                 return;
 
-            float fitX = size.Width / DrawWidth;
+            float fitX = size.Width / (DrawWidth - Padding.Left - Padding.Right);
             float fitY = size.Height / DrawHeight;
 
             float adjust = MathF.Max(fitX, fitY);

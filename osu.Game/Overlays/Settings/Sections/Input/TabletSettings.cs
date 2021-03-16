@@ -10,6 +10,7 @@ using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Graphics.Sprites;
+using osuTK;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
@@ -67,12 +68,14 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     Text = "No tablet detected!",
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    Padding = new MarginPadding { Horizontal = SettingsPanel.CONTENT_MARGINS }
                 },
                 mainSettings = new FillFlowContainer
                 {
                     Alpha = 0,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
+                    Spacing = new Vector2(0, 8),
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
@@ -80,7 +83,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 300,
-                            Margin = new MarginPadding(10)
                         },
                         new DangerousSettingsButton
                         {
