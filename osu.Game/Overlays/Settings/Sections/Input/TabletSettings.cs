@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Drawing;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -22,6 +23,15 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private readonly BindableNumber<int> sizeX = new BindableNumber<int> { MinValue = 0 };
         private readonly BindableNumber<int> sizeY = new BindableNumber<int> { MinValue = 0 };
+
+        private SettingsButton aspectResetButton;
+
+        private readonly BindableNumber<float> aspectRatio = new BindableFloat(1)
+        {
+            MinValue = 0.5f,
+            MaxValue = 2,
+            Precision = 0.01f,
+        };
 
         protected override string Header => "Tablet";
 
@@ -48,6 +58,33 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 sizeX.Value = val.NewValue.Width;
                 sizeY.Value = val.NewValue.Height;
+
+                float proposedAspectRatio = (float)sizeX.Value / sizeY.Value;
+
+                aspectRatio.Value = proposedAspectRatio;
+
+                if (proposedAspectRatio < aspectRatio.MinValue || proposedAspectRatio > aspectRatio.MaxValue)
+                {
+                    // apply aspect ratio restrictions to keep things in a usable state.
+
+                    // correction is always going to be below 1.
+                    float correction = proposedAspectRatio > aspectRatio.Value
+                        ? aspectRatio.Value / proposedAspectRatio
+                        : proposedAspectRatio / aspectRatio.Value;
+
+                    if (val.NewValue.Width != val.OldValue.Width)
+                    {
+                        if (val.NewValue.Width > val.OldValue.Width)
+                            correction = 1 / correction;
+                        areaSize.Value = new Size(areaSize.Value.Width, (int)(val.NewValue.Height * correction));
+                    }
+                    else
+                    {
+                        if (val.NewValue.Height > val.OldValue.Height)
+                            correction = 1 / correction;
+                        areaSize.Value = new Size((int)(val.NewValue.Width * correction), areaSize.Value.Height);
+                    }
+                }
             }, true);
 
             sizeX.BindValueChanged(val => areaSize.Value = new Size(val.NewValue, areaSize.Value.Height));
@@ -96,6 +133,15 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 new SettingsCheckbox
                 {
                     LabelText = "Lock aspect ratio",
+                },
+                aspectResetButton = new SettingsButton
+                {
+                    Text = "Take aspect ratio from screen size",
+                },
+                new SettingsSlider<float>
+                {
+                    LabelText = "Aspect Ratio",
+                    Current = aspectRatio
                 },
                 new SettingsSlider<int>
                 {
