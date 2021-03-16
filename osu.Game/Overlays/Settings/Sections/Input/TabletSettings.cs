@@ -4,10 +4,8 @@
 using System.Drawing;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Handlers.Tablet;
-using osu.Game.Configuration;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
@@ -33,9 +31,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager osuConfig, FrameworkConfigManager config)
+        private void load()
         {
-            // TODO: this should all eventually be replaced with a control that handles BindableSize.
             areaOffset.BindTo(tabletHandler.AreaOffset);
             areaOffset.BindValueChanged(val =>
             {
@@ -59,6 +56,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             ((IBindable<Size>)tabletSize).BindTo(tabletHandler.TabletSize);
             tabletSize.BindValueChanged(val =>
             {
+                if (tabletSize.Value == System.Drawing.Size.Empty)
+                    return;
+
                 // todo: these should propagate from a TabletChanged event or similar.
                 offsetX.MaxValue = val.NewValue.Width;
                 sizeX.Default = sizeX.MaxValue = val.NewValue.Width;
@@ -72,11 +72,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private void updateDisplay()
         {
-            if (tabletSize.Value == System.Drawing.Size.Empty)
-            {
-                Clear();
+            if (Children.Count > 0)
                 return;
-            }
 
             Children = new Drawable[]
             {
@@ -103,7 +100,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 new TabletAreaSelection(tabletHandler)
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = 100,
+                    Height = 300,
                 }
             };
         }
