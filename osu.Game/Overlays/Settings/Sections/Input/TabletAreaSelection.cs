@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.Yellow,
+                                Colour = Color4.White,
                             },
                             new OsuSpriteText
                             {
@@ -78,19 +78,35 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             areaOffset.BindValueChanged(val =>
             {
                 usableAreaContainer.MoveTo(new Vector2(val.NewValue.Width, val.NewValue.Height), 100, Easing.OutQuint);
+                checkBounds();
             }, true);
 
             areaSize.BindTo(handler.AreaSize);
             areaSize.BindValueChanged(val =>
             {
                 usableAreaContainer.ResizeTo(new Vector2(val.NewValue.Width, val.NewValue.Height), 100, Easing.OutQuint);
+                checkBounds();
             }, true);
 
             ((IBindable<Size>)tabletSize).BindTo(handler.TabletSize);
             tabletSize.BindValueChanged(val =>
             {
                 tabletContainer.Size = new Vector2(val.NewValue.Width, val.NewValue.Height);
+                checkBounds();
             });
+        }
+
+        [Resolved]
+        private OsuColour colour { get; set; }
+
+        private void checkBounds()
+        {
+            Size areaExtent = areaOffset.Value + areaSize.Value;
+
+            bool isWithinBounds = areaExtent.Width < tabletSize.Value.Width
+                                  && areaExtent.Height < tabletSize.Value.Height;
+
+            usableAreaContainer.FadeColour(isWithinBounds ? colour.Blue : colour.RedLight, 100);
         }
 
         protected override void Update()
