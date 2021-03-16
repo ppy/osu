@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private readonly BindableSize areaOffset = new BindableSize();
         private readonly BindableSize areaSize = new BindableSize();
-        private readonly BindableSize tabletSize = new BindableSize();
+        private readonly IBindable<Size> tabletSize = new BindableSize();
 
         private readonly BindableNumber<int> offsetX = new BindableNumber<int> { MinValue = 0 };
         private readonly BindableNumber<int> offsetY = new BindableNumber<int> { MinValue = 0 };
@@ -54,99 +54,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         [BackgroundDependencyLoader]
         private void load()
         {
-            areaOffset.BindTo(tabletHandler.AreaOffset);
-            areaOffset.BindValueChanged(val =>
-            {
-                offsetX.Value = val.NewValue.Width;
-                offsetY.Value = val.NewValue.Height;
-            }, true);
-
-            offsetX.BindValueChanged(val => areaOffset.Value = new Size(val.NewValue, areaOffset.Value.Height));
-            offsetY.BindValueChanged(val => areaOffset.Value = new Size(areaOffset.Value.Width, val.NewValue));
-
-            areaSize.BindTo(tabletHandler.AreaSize);
-            areaSize.BindValueChanged(val =>
-            {
-                sizeX.Value = val.NewValue.Width;
-                sizeY.Value = val.NewValue.Height;
-
-                aspectRatioApplication?.Cancel();
-                aspectRatioApplication = Schedule(() => applyAspectRatio(val));
-            }, true);
-
-            sizeX.BindValueChanged(val => areaSize.Value = new Size(val.NewValue, areaSize.Value.Height));
-            sizeY.BindValueChanged(val => areaSize.Value = new Size(areaSize.Value.Width, val.NewValue));
-
-            aspectRatio.BindValueChanged(aspect =>
-            {
-                aspectRatioApplication?.Cancel();
-                aspectRatioApplication = Schedule(() => forceAspectRatio(aspect.NewValue));
-            });
-
-            ((IBindable<Size>)tabletSize).BindTo(tabletHandler.TabletSize);
-            tabletSize.BindValueChanged(val =>
-            {
-                if (tabletSize.Value == System.Drawing.Size.Empty)
-                    return;
-
-                // todo: these should propagate from a TabletChanged event or similar.
-                offsetX.MaxValue = val.NewValue.Width;
-                sizeX.Default = sizeX.MaxValue = val.NewValue.Width;
-
-                offsetY.MaxValue = val.NewValue.Height;
-                sizeY.Default = sizeY.MaxValue = val.NewValue.Height;
-
-                areaSize.Default = new Size(sizeX.Default, sizeY.Default);
-
-                updateDisplay();
-            }, true);
-        }
-
-        private float curentAspectRatio => (float)sizeX.Value / sizeY.Value;
-
-        private void applyAspectRatio(ValueChangedEvent<Size> sizeChanged)
-        {
-            float proposedAspectRatio = curentAspectRatio;
-
-            try
-            {
-                if (!aspectLock.Value)
-                {
-                    // aspect ratio was in a valid range.
-                    if (proposedAspectRatio >= aspectRatio.MinValue && proposedAspectRatio <= aspectRatio.MaxValue)
-                    {
-                        updateAspectRatio();
-                        return;
-                    }
-                }
-
-                if (sizeChanged.NewValue.Width != sizeChanged.OldValue.Width)
-                {
-                    areaSize.Value = new Size(areaSize.Value.Width, (int)(areaSize.Value.Width / aspectRatio.Value));
-                }
-                else
-                {
-                    areaSize.Value = new Size((int)(areaSize.Value.Height * aspectRatio.Value), areaSize.Value.Height);
-                }
-            }
-            finally
-            {
-                // cancel any event which may have fired while updating variables as a result of aspect ratio limitations.
-                // this avoids a potential feedback loop.
-                aspectRatioApplication?.Cancel();
-            }
-        }
-
-        private void updateAspectRatio()
-        {
-            aspectRatio.Value = curentAspectRatio;
-        }
-
-        private void updateDisplay()
-        {
-            if (Children.Count > 0)
-                return;
-
             Children = new Drawable[]
             {
                 new TabletAreaSelection(tabletHandler)
@@ -204,6 +111,91 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     Current = sizeY
                 },
             };
+
+            areaOffset.BindTo(tabletHandler.AreaOffset);
+            areaOffset.BindValueChanged(val =>
+            {
+                offsetX.Value = val.NewValue.Width;
+                offsetY.Value = val.NewValue.Height;
+            }, true);
+
+            offsetX.BindValueChanged(val => areaOffset.Value = new Size(val.NewValue, areaOffset.Value.Height));
+            offsetY.BindValueChanged(val => areaOffset.Value = new Size(areaOffset.Value.Width, val.NewValue));
+
+            areaSize.BindTo(tabletHandler.AreaSize);
+            areaSize.BindValueChanged(val =>
+            {
+                sizeX.Value = val.NewValue.Width;
+                sizeY.Value = val.NewValue.Height;
+            }, true);
+
+            sizeX.BindValueChanged(val =>
+            {
+                areaSize.Value = new Size(val.NewValue, areaSize.Value.Height);
+
+                aspectRatioApplication?.Cancel();
+                aspectRatioApplication = Schedule(() => applyAspectRatio(sizeX));
+            });
+
+            sizeY.BindValueChanged(val =>
+            {
+                areaSize.Value = new Size(areaSize.Value.Width, val.NewValue);
+
+                aspectRatioApplication?.Cancel();
+                aspectRatioApplication = Schedule(() => applyAspectRatio(sizeY));
+            });
+
+            aspectRatio.BindValueChanged(aspect =>
+            {
+                aspectRatioApplication?.Cancel();
+                aspectRatioApplication = Schedule(() => forceAspectRatio(aspect.NewValue));
+            });
+
+            tabletSize.BindTo(tabletHandler.TabletSize);
+            tabletSize.BindValueChanged(val =>
+            {
+                if (tabletSize.Value == System.Drawing.Size.Empty)
+                    return;
+
+                // todo: these should propagate from a TabletChanged event or similar.
+                offsetX.MaxValue = val.NewValue.Width;
+                sizeX.Default = sizeX.MaxValue = val.NewValue.Width;
+
+                offsetY.MaxValue = val.NewValue.Height;
+                sizeY.Default = sizeY.MaxValue = val.NewValue.Height;
+
+                areaSize.Default = new Size(sizeX.Default, sizeY.Default);
+            }, true);
+        }
+
+        private void applyAspectRatio(BindableNumber<int> sizeChanged)
+        {
+            try
+            {
+                if (!aspectLock.Value)
+                {
+                    float proposedAspectRatio = curentAspectRatio;
+
+                    if (proposedAspectRatio >= aspectRatio.MinValue && proposedAspectRatio <= aspectRatio.MaxValue)
+                    {
+                        // aspect ratio was in a valid range.
+                        updateAspectRatio();
+                        return;
+                    }
+                }
+
+                // if lock is applied (or the specified values were out of range) aim to adjust the axis the user was not adjusting to conform.
+                if (sizeChanged == sizeX)
+                    sizeY.Value = (int)(areaSize.Value.Width / aspectRatio.Value);
+                else
+                    sizeX.Value = (int)(areaSize.Value.Height * aspectRatio.Value);
+            }
+            finally
+            {
+                // cancel any event which may have fired while updating variables as a result of aspect ratio limitations.
+                // this avoids a potential feedback loop.
+                aspectRatioApplication?.Cancel();
+            }
         }
 
         private void forceAspectRatio(float aspectRatio)
@@ -222,5 +214,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             aspectRatioApplication?.Cancel();
             aspectLock.Value = true;
         }
+
+        private void updateAspectRatio() => aspectRatio.Value = curentAspectRatio;
+
+        private float curentAspectRatio => (float)sizeX.Value / sizeY.Value;
     }
 }
