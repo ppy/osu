@@ -66,6 +66,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 offsetY.MaxValue = val.NewValue.Height;
                 sizeY.Default = sizeY.MaxValue = val.NewValue.Height;
 
+                areaSize.Default = new Size(sizeX.Default, sizeY.Default);
+
                 updateDisplay();
             }, true);
         }
@@ -77,31 +79,44 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             Children = new Drawable[]
             {
-                new SettingsSlider<int>
-                {
-                    LabelText = "Offset X",
-                    Current = offsetX
-                },
-                new SettingsSlider<int>
-                {
-                    LabelText = "Offset Y",
-                    Current = offsetY
-                },
-                new SettingsSlider<int>
-                {
-                    LabelText = "Size X",
-                    Current = sizeX
-                },
-                new SettingsSlider<int>
-                {
-                    LabelText = "Size Y",
-                    Current = sizeY
-                },
                 new TabletAreaSelection(tabletHandler)
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = 300,
-                }
+                },
+                new SettingsButton
+                {
+                    Text = "Reset to full area",
+                    Action = () =>
+                    {
+                        areaOffset.SetDefault();
+                        areaSize.SetDefault();
+                    },
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "Lock aspect ratio",
+                },
+                new SettingsSlider<int>
+                {
+                    LabelText = "X Offset",
+                    Current = offsetX
+                },
+                new SettingsSlider<int>
+                {
+                    LabelText = "Y Offset",
+                    Current = offsetY
+                },
+                new SettingsSlider<int>
+                {
+                    LabelText = "Width",
+                    Current = sizeX
+                },
+                new SettingsSlider<int>
+                {
+                    LabelText = "Height",
+                    Current = sizeY
+                },
             };
         }
     }
