@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Platform;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Settings.Sections.Input;
 
 namespace osu.Game.Tests.Visual.Settings
@@ -30,7 +31,13 @@ namespace osu.Game.Tests.Visual.Settings
 
             AddRange(new Drawable[]
             {
-                new TabletSettings(tabletHandler),
+                new TabletSettings(tabletHandler)
+                {
+                    RelativeSizeAxes = Axes.None,
+                    Width = SettingsPanel.WIDTH,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                }
             });
 
             AddStep("Test with wide tablet", () => tabletHandler.SetTabletSize(new Size(160, 100)));
