@@ -9,6 +9,7 @@ using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using Microsoft.Win32;
 using osu.Desktop.Overlays;
+using osu.Desktop.Performance;
 using osu.Framework.Platform;
 using osu.Game;
 using osu.Desktop.Updater;

@@ -4,16 +4,13 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Logging;
 using osu.Game;
 using osu.Game.Configuration;
-using Gamemode;
 
-namespace osu.Desktop
+namespace osu.Desktop.Performance
 {
     public class HighPerformanceSession : Component
     {
-
         private Bindable<bool> localUserPlaying;
 
         [BackgroundDependencyLoader]
@@ -33,14 +30,12 @@ namespace osu.Desktop
 
         private void enableHighPerformanceSession()
         {
-            int gamemodeRequestResult = GamemodeRequest.RequestStart();
-            Logger.Log($"Gamemode \"Start\" request exited with code {gamemodeRequestResult}");
+            GamemodeRequest.RequestStart();
         }
 
         private void disableHighPerformanceSession()
         {
-            int gamemodeRequestResult = GamemodeRequest.RequestEnd();
-            Logger.Log($"Gamemode \"End\" request exited with code {gamemodeRequestResult}");
+            GamemodeRequest.RequestEnd();
         }
     }
 }
