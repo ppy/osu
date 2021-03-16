@@ -111,8 +111,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             Size areaExtent = areaOffset.Value + areaSize.Value;
 
-            bool isWithinBounds = areaExtent.Width < tabletSize.Value.Width
-                                  && areaExtent.Height < tabletSize.Value.Height;
+            bool isWithinBounds = areaExtent.Width <= tabletSize.Value.Width
+                                  && areaExtent.Height <= tabletSize.Value.Height;
 
             usableAreaContainer.FadeColour(isWithinBounds ? colour.Blue : colour.RedLight, 100);
         }
