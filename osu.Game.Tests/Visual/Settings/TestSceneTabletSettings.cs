@@ -2,9 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Drawing;
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Platform;
@@ -18,16 +18,13 @@ namespace osu.Game.Tests.Visual.Settings
         [BackgroundDependencyLoader]
         private void load(GameHost host)
         {
-            var tabletHandler = host.AvailableInputHandlers.OfType<ITabletHandler>().FirstOrDefault();
-
-            if (tabletHandler == null)
-                return;
+            var tabletHandler = new TestTabletHandler();
 
             tabletHandler.AreaOffset.MinValue = new Size(0, 0);
             tabletHandler.AreaOffset.MaxValue = new Size(160, 100);
             tabletHandler.AreaOffset.Value = new Size(10, 10);
 
-            tabletHandler.AreaSize.MinValue = new Size(0, 0);
+            tabletHandler.AreaSize.MinValue = new Size(10, 10);
             tabletHandler.AreaSize.MaxValue = new Size(160, 100);
             tabletHandler.AreaSize.Value = new Size(100, 80);
 
@@ -35,6 +32,23 @@ namespace osu.Game.Tests.Visual.Settings
             {
                 new TabletSettings(tabletHandler),
             });
+
+            AddStep("Test with wide tablet", () => tabletHandler.SetTabletSize(new Size(160, 100)));
+            AddStep("Test with square tablet", () => tabletHandler.SetTabletSize(new Size(300, 300)));
+            AddStep("Test with tall tablet", () => tabletHandler.SetTabletSize(new Size(100, 300)));
+            AddStep("Test with very tall tablet", () => tabletHandler.SetTabletSize(new Size(100, 700)));
+        }
+
+        public class TestTabletHandler : ITabletHandler
+        {
+            private readonly Bindable<Size> tabletSize = new Bindable<Size>();
+
+            public BindableSize AreaOffset { get; } = new BindableSize();
+            public BindableSize AreaSize { get; } = new BindableSize();
+            public IBindable<Size> TabletSize => tabletSize;
+            public BindableBool Enabled { get; } = new BindableBool(true);
+
+            public void SetTabletSize(Size size) => tabletSize.Value = size;
         }
     }
 }
