@@ -21,12 +21,7 @@ namespace osu.Game.Tests.Visual.Settings
         {
             var tabletHandler = new TestTabletHandler();
 
-            tabletHandler.AreaOffset.MinValue = new Size(0, 0);
-            tabletHandler.AreaOffset.MaxValue = new Size(160, 100);
             tabletHandler.AreaOffset.Value = new Size(10, 10);
-
-            tabletHandler.AreaSize.MinValue = new Size(10, 10);
-            tabletHandler.AreaSize.MaxValue = new Size(160, 100);
             tabletHandler.AreaSize.Value = new Size(100, 80);
 
             AddRange(new Drawable[]
