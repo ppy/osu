@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.ComponentModel;
 using System.Drawing;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -80,7 +79,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             aspectRatio.BindValueChanged(aspect =>
             {
-                forceAspectRatio(aspect.NewValue);
+                aspectRatioApplication?.Cancel();
+                aspectRatioApplication = Schedule(() => forceAspectRatio(aspect.NewValue));
             });
 
             ((IBindable<Size>)tabletSize).BindTo(tabletHandler.TabletSize);
@@ -102,31 +102,44 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             }, true);
         }
 
+        private float curentAspectRatio => (float)sizeX.Value / sizeY.Value;
+
         private void applyAspectRatio(ValueChangedEvent<Size> sizeChanged)
         {
-            float proposedAspectRatio = (float)sizeX.Value / sizeY.Value;
+            float proposedAspectRatio = curentAspectRatio;
 
-            if (!aspectLock.Value)
+            try
             {
-                aspectRatio.Value = proposedAspectRatio;
+                if (!aspectLock.Value)
+                {
+                    // aspect ratio was in a valid range.
+                    if (proposedAspectRatio >= aspectRatio.MinValue && proposedAspectRatio <= aspectRatio.MaxValue)
+                    {
+                        updateAspectRatio();
+                        return;
+                    }
+                }
 
-                // aspect ratio was in a valid range.
-                if (proposedAspectRatio >= aspectRatio.MinValue && proposedAspectRatio <= aspectRatio.MaxValue)
-                    return;
+                if (sizeChanged.NewValue.Width != sizeChanged.OldValue.Width)
+                {
+                    areaSize.Value = new Size(areaSize.Value.Width, (int)(areaSize.Value.Width / aspectRatio.Value));
+                }
+                else
+                {
+                    areaSize.Value = new Size((int)(areaSize.Value.Height * aspectRatio.Value), areaSize.Value.Height);
+                }
             }
-
-            if (sizeChanged.NewValue.Width != sizeChanged.OldValue.Width)
+            finally
             {
-                areaSize.Value = new Size(areaSize.Value.Width, (int)(areaSize.Value.Width / aspectRatio.Value));
+                // cancel any event which may have fired while updating variables as a result of aspect ratio limitations.
+                // this avoids a potential feedback loop.
+                aspectRatioApplication?.Cancel();
             }
-            else
-            {
-                areaSize.Value = new Size((int)(areaSize.Value.Height * aspectRatio.Value), areaSize.Value.Height);
-            }
+        }
 
-            // cancel any event which may have fired while updating variables as a result of aspect ratio limitations.
-            // this avoids a potential feedback loop.
-            aspectRatioApplication?.Cancel();
+        private void updateAspectRatio()
+        {
+            aspectRatio.Value = curentAspectRatio;
         }
 
         private void updateDisplay()
@@ -203,6 +216,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 sizeY.Value = proposedHeight;
             else
                 sizeX.Value = (int)(sizeY.Value * aspectRatio);
+
+            updateAspectRatio();
 
             aspectRatioApplication?.Cancel();
             aspectLock.Value = true;
