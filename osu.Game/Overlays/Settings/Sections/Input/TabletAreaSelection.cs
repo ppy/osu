@@ -27,6 +27,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private readonly Bindable<Size> areaSize = new BindableSize();
         private readonly Bindable<Size> tabletSize = new BindableSize();
 
+        private OsuSpriteText tabletName;
+
         public TabletAreaSelection(ITabletHandler handler)
         {
             this.handler = handler;
@@ -44,13 +46,13 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 Masking = true,
                 CornerRadius = 5,
                 BorderThickness = 2,
-                BorderColour = Color4.Black,
+                BorderColour = colour.Gray3,
                 Children = new Drawable[]
                 {
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.White,
+                        Colour = colour.Gray1,
                     },
                     usableAreaContainer = new Container
                     {
@@ -59,7 +61,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.White,
+                                Alpha = 0.6f,
                             },
                             new OsuSpriteText
                             {
@@ -70,6 +72,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                 Font = OsuFont.Default.With(size: 12)
                             }
                         }
+                    },
+                    tabletName = new OsuSpriteText
+                    {
+                        Padding = new MarginPadding(3),
+                        Font = OsuFont.Default.With(size: 8)
                     },
                 }
             };
@@ -92,6 +99,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             tabletSize.BindValueChanged(val =>
             {
                 tabletContainer.Size = new Vector2(val.NewValue.Width, val.NewValue.Height);
+                tabletName.Text = handler.DeviceName;
                 checkBounds();
             });
         }
