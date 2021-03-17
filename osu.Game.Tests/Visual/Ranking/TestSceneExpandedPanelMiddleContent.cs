@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Visual.Ranking
             }));
 
             AddAssert("mapped by text not present", () =>
-                this.ChildrenOfType<OsuSpriteText>().All(spriteText => !containsAny(spriteText.Current.Value, "mapped", "by")));
+                this.ChildrenOfType<OsuSpriteText>().All(spriteText => !containsAny(spriteText.Text.ToString(), "mapped", "by")));
         }
 
         private void showPanel(ScoreInfo score) => Child = new ExpandedPanelMiddleContentContainer(score);
