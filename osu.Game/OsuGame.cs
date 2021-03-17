@@ -884,12 +884,9 @@ namespace osu.Game
                     frameworkConfig.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode).SetDefault();
                     return true;
 
-                case GlobalAction.ToggleToolbar:
-                    Toolbar.ToggleVisibility();
-                    return true;
-
                 case GlobalAction.ToggleGameplayMouseButtons:
-                    LocalConfig.Set(OsuSetting.MouseDisableButtons, !LocalConfig.Get<bool>(OsuSetting.MouseDisableButtons));
+                    var mouseDisableButtons = LocalConfig.GetBindable<bool>(OsuSetting.MouseDisableButtons);
+                    mouseDisableButtons.Value = !mouseDisableButtons.Value;
                     return true;
 
                 case GlobalAction.RandomSkin:
