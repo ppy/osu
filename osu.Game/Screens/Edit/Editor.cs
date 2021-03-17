@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -546,14 +547,24 @@ namespace osu.Game.Screens.Edit
 
         protected void Copy()
         {
+            var builder = new StringBuilder();
+            const string suffix = " - ";
+
             if (editorBeatmap.SelectedHitObjects.Count == 0)
             {
-                host.GetClipboard()?.SetText($"{clock.CurrentTime.ToEditorFormattedString()} - ");
-                return;
+                builder.Append(clock.CurrentTime.ToEditorFormattedString());
+            }
+            else
+            {
+                var orderedHitObjects = editorBeatmap.SelectedHitObjects.OrderBy(h => h.StartTime);
+                builder.Append(orderedHitObjects.FirstOrDefault().StartTime.ToEditorFormattedString());
+                builder.Append($" ({string.Join(',', orderedHitObjects.Cast<IHasComboInformation>().Select(h => h.IndexInCurrentCombo + 1))})");
+
+                clipboard.Value = new ClipboardContent(editorBeatmap).Serialize();
             }
 
-            host.GetClipboard()?.SetText($"{editorBeatmap.SelectedHitObjects.FirstOrDefault().StartTime.ToEditorFormattedString()} ({string.Join(',', editorBeatmap.SelectedHitObjects.Select(h => ((h as IHasComboInformation)?.IndexInCurrentCombo + 1 ?? 0).ToString()))}) - ");
-            clipboard.Value = new ClipboardContent(editorBeatmap).Serialize();
+            builder.Append(suffix);
+            host.GetClipboard()?.SetText(builder.ToString());
         }
 
         protected void Paste()
