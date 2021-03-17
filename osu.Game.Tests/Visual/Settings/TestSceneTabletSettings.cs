@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Drawing;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -11,6 +10,7 @@ using osu.Framework.Platform;
 using osu.Framework.Utils;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings.Sections.Input;
+using osuTK;
 
 namespace osu.Game.Tests.Visual.Settings
 {
@@ -21,9 +21,6 @@ namespace osu.Game.Tests.Visual.Settings
         private void load(GameHost host)
         {
             var tabletHandler = new TestTabletHandler();
-
-            tabletHandler.AreaOffset.Value = new Size(10, 10);
-            tabletHandler.AreaSize.Value = new Size(100, 80);
 
             AddRange(new Drawable[]
             {
@@ -36,27 +33,40 @@ namespace osu.Game.Tests.Visual.Settings
                 }
             });
 
-            AddStep("Test with wide tablet", () => tabletHandler.SetTabletSize(new Size(160, 100)));
-            AddStep("Test with square tablet", () => tabletHandler.SetTabletSize(new Size(300, 300)));
-            AddStep("Test with tall tablet", () => tabletHandler.SetTabletSize(new Size(100, 300)));
-            AddStep("Test with very tall tablet", () => tabletHandler.SetTabletSize(new Size(100, 700)));
-            AddStep("Test no tablet present", () => tabletHandler.SetTabletSize(System.Drawing.Size.Empty));
+            AddStep("Test with wide tablet", () => tabletHandler.SetTabletSize(new Vector2(160, 100)));
+            AddStep("Test with square tablet", () => tabletHandler.SetTabletSize(new Vector2(300, 300)));
+            AddStep("Test with tall tablet", () => tabletHandler.SetTabletSize(new Vector2(100, 300)));
+            AddStep("Test with very tall tablet", () => tabletHandler.SetTabletSize(new Vector2(100, 700)));
+            AddStep("Test no tablet present", () => tabletHandler.SetTabletSize(Vector2.Zero));
         }
 
         public class TestTabletHandler : ITabletHandler
         {
-            private readonly Bindable<Size> tabletSize = new Bindable<Size>();
+            public Bindable<Vector2> AreaOffset { get; } = new Bindable<Vector2>();
+            public Bindable<Vector2> AreaSize { get; } = new Bindable<Vector2>();
 
-            public BindableSize AreaOffset { get; } = new BindableSize();
-            public BindableSize AreaSize { get; } = new BindableSize();
-            public IBindable<Size> TabletSize => tabletSize;
-            public string DeviceName { get; private set; }
+            public IBindable<TabletInfo> Tablet => tablet;
+
+            private readonly Bindable<TabletInfo> tablet = new Bindable<TabletInfo>();
+
             public BindableBool Enabled { get; } = new BindableBool(true);
 
-            public void SetTabletSize(Size size)
+            public void SetTabletSize(Vector2 size)
             {
-                DeviceName = size != System.Drawing.Size.Empty ? $"test tablet T-{RNG.Next(999):000}" : string.Empty;
-                tabletSize.Value = size;
+                tablet.Value = size != Vector2.Zero ? new TabletInfo($"test tablet T-{RNG.Next(999):000}", size) : null;
+
+                AreaSize.Default = new Vector2(size.X, size.Y);
+
+                // if it's clear the user has not configured the area, take the full area from the tablet that was just found.
+                if (AreaSize.Value == Vector2.Zero)
+                    AreaSize.SetDefault();
+
+                AreaOffset.Default = new Vector2(size.X / 2, size.Y / 2);
+
+                // likewise with the position, use the centre point if it has not been configured.
+                // it's safe to assume no user would set their centre point to 0,0 for now.
+                if (AreaOffset.Value == Vector2.Zero)
+                    AreaOffset.SetDefault();
             }
         }
     }
