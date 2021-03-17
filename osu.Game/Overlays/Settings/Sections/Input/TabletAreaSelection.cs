@@ -158,8 +158,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             var usableSsdq = usableAreaContainer.ScreenSpaceDrawQuad;
 
-            bool isWithinBounds = tabletContainer.ScreenSpaceDrawQuad.Contains(usableSsdq.TopLeft) &&
-                                  tabletContainer.ScreenSpaceDrawQuad.Contains(usableSsdq.BottomRight);
+            bool isWithinBounds = tabletContainer.ScreenSpaceDrawQuad.Contains(usableSsdq.TopLeft + new Vector2(1)) &&
+                                  tabletContainer.ScreenSpaceDrawQuad.Contains(usableSsdq.BottomRight - new Vector2(1));
 
             usableFill.FadeColour(isWithinBounds ? colour.Blue : colour.RedLight, 100);
         }
