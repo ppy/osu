@@ -21,6 +21,8 @@ namespace osu.Game.Rulesets.Mania.UI
     {
         private const float default_large_faint_size = 0.8f;
 
+        public override bool RemoveWhenNotAlive => true;
+
         [Resolved]
         private Column column { get; set; }
 

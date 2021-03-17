@@ -13,6 +13,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
     public class LegacyHitExplosion : CompositeDrawable, IAnimatableHitExplosion
     {
+        public override bool RemoveWhenNotAlive => false;
+
         private readonly Drawable sprite;
 
         [CanBeNull]
