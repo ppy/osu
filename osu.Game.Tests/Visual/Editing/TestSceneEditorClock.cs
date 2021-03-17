@@ -41,6 +41,9 @@ namespace osu.Game.Tests.Visual.Editing
         private void load()
         {
             Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+            // ensure that music controller does not change this beatmap due to it
+            // completing naturally as part of the test.
+            Beatmap.Disabled = true;
         }
 
         [Test]
