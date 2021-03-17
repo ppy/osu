@@ -207,14 +207,14 @@ namespace osu.Game.Tests.Visual.SongSelect
             addRulesetImportStep(0);
             addRulesetImportStep(0);
 
-            AddStep("change convert setting", () => config.Set(OsuSetting.ShowConvertedBeatmaps, false));
+            AddStep("change convert setting", () => config.SetValue(OsuSetting.ShowConvertedBeatmaps, false));
 
             createSongSelect();
 
             AddStep("push child screen", () => Stack.Push(new TestSceneOsuScreenStack.TestScreen("test child")));
             AddUntilStep("wait for not current", () => !songSelect.IsCurrentScreen());
 
-            AddStep("change convert setting", () => config.Set(OsuSetting.ShowConvertedBeatmaps, true));
+            AddStep("change convert setting", () => config.SetValue(OsuSetting.ShowConvertedBeatmaps, true));
 
             AddStep("return", () => songSelect.MakeCurrent());
             AddUntilStep("wait for current", () => songSelect.IsCurrentScreen());
@@ -297,13 +297,13 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddAssert("random map selected", () => songSelect.CurrentBeatmap != defaultBeatmap);
 
-            AddStep(@"Sort by Artist", () => config.Set(OsuSetting.SongSelectSortingMode, SortMode.Artist));
-            AddStep(@"Sort by Title", () => config.Set(OsuSetting.SongSelectSortingMode, SortMode.Title));
-            AddStep(@"Sort by Author", () => config.Set(OsuSetting.SongSelectSortingMode, SortMode.Author));
-            AddStep(@"Sort by DateAdded", () => config.Set(OsuSetting.SongSelectSortingMode, SortMode.DateAdded));
-            AddStep(@"Sort by BPM", () => config.Set(OsuSetting.SongSelectSortingMode, SortMode.BPM));
-            AddStep(@"Sort by Length", () => config.Set(OsuSetting.SongSelectSortingMode, SortMode.Length));
-            AddStep(@"Sort by Difficulty", () => config.Set(OsuSetting.SongSelectSortingMode, SortMode.Difficulty));
+            AddStep(@"Sort by Artist", () => config.SetValue(OsuSetting.SongSelectSortingMode, SortMode.Artist));
+            AddStep(@"Sort by Title", () => config.SetValue(OsuSetting.SongSelectSortingMode, SortMode.Title));
+            AddStep(@"Sort by Author", () => config.SetValue(OsuSetting.SongSelectSortingMode, SortMode.Author));
+            AddStep(@"Sort by DateAdded", () => config.SetValue(OsuSetting.SongSelectSortingMode, SortMode.DateAdded));
+            AddStep(@"Sort by BPM", () => config.SetValue(OsuSetting.SongSelectSortingMode, SortMode.BPM));
+            AddStep(@"Sort by Length", () => config.SetValue(OsuSetting.SongSelectSortingMode, SortMode.Length));
+            AddStep(@"Sort by Difficulty", () => config.SetValue(OsuSetting.SongSelectSortingMode, SortMode.Difficulty));
         }
 
         [Test]
@@ -470,7 +470,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             changeRuleset(0);
 
             // used for filter check below
-            AddStep("allow convert display", () => config.Set(OsuSetting.ShowConvertedBeatmaps, true));
+            AddStep("allow convert display", () => config.SetValue(OsuSetting.ShowConvertedBeatmaps, true));
 
             AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmap != null);
 
@@ -648,7 +648,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             int changeCount = 0;
 
-            AddStep("change convert setting", () => config.Set(OsuSetting.ShowConvertedBeatmaps, false));
+            AddStep("change convert setting", () => config.SetValue(OsuSetting.ShowConvertedBeatmaps, false));
             AddStep("bind beatmap changed", () =>
             {
                 Beatmap.ValueChanged += onChange;
@@ -686,7 +686,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("selection changed only fired twice", () => changeCount == 2);
 
             AddStep("unbind beatmap changed", () => Beatmap.ValueChanged -= onChange);
-            AddStep("change convert setting", () => config.Set(OsuSetting.ShowConvertedBeatmaps, true));
+            AddStep("change convert setting", () => config.SetValue(OsuSetting.ShowConvertedBeatmaps, true));
 
             // ReSharper disable once AccessToModifiedClosure
             void onChange(ValueChangedEvent<WorkingBeatmap> valueChangedEvent) => changeCount++;
