@@ -89,7 +89,7 @@ namespace osu.Game.Online.API
             thread.Start();
         }
 
-        private void onTokenChanged(ValueChangedEvent<OAuthToken> e) => config.Set(OsuSetting.Token, config.Get<bool>(OsuSetting.SavePassword) ? authentication.TokenString : string.Empty);
+        private void onTokenChanged(ValueChangedEvent<OAuthToken> e) => config.SetValue(OsuSetting.Token, config.Get<bool>(OsuSetting.SavePassword) ? authentication.TokenString : string.Empty);
 
         internal new void Schedule(Action action) => base.Schedule(action);
 
@@ -134,7 +134,7 @@ namespace osu.Game.Online.API
                         state.Value = APIState.Connecting;
 
                         // save the username at this point, if the user requested for it to be.
-                        config.Set(OsuSetting.Username, config.Get<bool>(OsuSetting.SaveUsername) ? ProvidedUsername : string.Empty);
+                        config.SetValue(OsuSetting.Username, config.Get<bool>(OsuSetting.SaveUsername) ? ProvidedUsername : string.Empty);
 
                         if (!authentication.HasValidAccessToken && !authentication.AuthenticateWithLogin(ProvidedUsername, password))
                         {

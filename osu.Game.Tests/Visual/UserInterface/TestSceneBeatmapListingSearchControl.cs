@@ -92,10 +92,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestExplicitConfig()
         {
-            AddStep("configure explicit content to allowed", () => localConfig.Set(OsuSetting.ShowOnlineExplicitContent, true));
+            AddStep("configure explicit content to allowed", () => localConfig.SetValue(OsuSetting.ShowOnlineExplicitContent, true));
             AddAssert("explicit control set to show", () => control.ExplicitContent.Value == SearchExplicit.Show);
 
-            AddStep("configure explicit content to disallowed", () => localConfig.Set(OsuSetting.ShowOnlineExplicitContent, false));
+            AddStep("configure explicit content to disallowed", () => localConfig.SetValue(OsuSetting.ShowOnlineExplicitContent, false));
             AddAssert("explicit control set to hide", () => control.ExplicitContent.Value == SearchExplicit.Hide);
         }
 

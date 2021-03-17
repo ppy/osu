@@ -70,7 +70,7 @@ namespace osu.Game.Tournament.IO
             moveFileIfExists("drawings.ini", destination);
 
             ChangeTargetStorage(newStorage);
-            storageConfig.Set(StorageConfig.CurrentTournament, default_tournament);
+            storageConfig.SetValue(StorageConfig.CurrentTournament, default_tournament);
             storageConfig.Save();
         }
 
