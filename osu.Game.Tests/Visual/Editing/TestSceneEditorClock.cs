@@ -7,7 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Screens.Edit.Components;
 using osuTK;
 
-namespace osu.Game.Tests.Visual.Editor
+namespace osu.Game.Tests.Visual.Editing
 {
     [TestFixture]
     public class TestSceneEditorClock : EditorClockTestScene
