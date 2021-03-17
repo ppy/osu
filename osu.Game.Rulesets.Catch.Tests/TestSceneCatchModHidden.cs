@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         [BackgroundDependencyLoader]
         private void load()
         {
-            LocalConfig.Set(OsuSetting.IncreaseFirstObjectVisibility, false);
+            LocalConfig.SetValue(OsuSetting.IncreaseFirstObjectVisibility, false);
         }
 
         [Test]
