@@ -56,6 +56,14 @@ namespace osu.Game.Screens.Edit.Setup
                 item.OnCommit += onCommit;
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            if (string.IsNullOrEmpty(artistTextBox.Current.Value))
+                GetContainingInputManager().ChangeFocus(artistTextBox);
+        }
+
         private void onCommit(TextBox sender, bool newText)
         {
             if (!newText) return;
