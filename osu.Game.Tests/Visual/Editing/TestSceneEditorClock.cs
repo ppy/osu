@@ -49,14 +49,33 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestStopAtTrackEnd()
         {
-            AddStep("Reset clock", () => Clock.Seek(0));
-            AddStep("Start clock", Clock.Start);
-            AddAssert("Clock running", () => Clock.IsRunning);
-            AddStep("Seek near end", () => Clock.Seek(Clock.TrackLength - 250));
-            AddUntilStep("Clock stops", () => !Clock.IsRunning);
-            AddAssert("Clock stopped at end", () => Clock.CurrentTime == Clock.TrackLength);
-            AddStep("Start clock again", Clock.Start);
-            AddAssert("Clock looped to start", () => Clock.IsRunning && Clock.CurrentTime < 500);
+            AddStep("reset clock", () => Clock.Seek(0));
+
+            AddStep("start clock", Clock.Start);
+            AddAssert("clock running", () => Clock.IsRunning);
+
+            AddStep("seek near end", () => Clock.Seek(Clock.TrackLength - 250));
+            AddUntilStep("clock stops", () => !Clock.IsRunning);
+
+            AddAssert("clock stopped at end", () => Clock.CurrentTime == Clock.TrackLength);
+
+            AddStep("start clock again", Clock.Start);
+            AddAssert("clock looped to start", () => Clock.IsRunning && Clock.CurrentTime < 500);
+        }
+
+        [Test]
+        public void TestWrapWhenStoppedAtTrackEnd()
+        {
+            AddStep("reset clock", () => Clock.Seek(0));
+
+            AddStep("stop clock", Clock.Stop);
+            AddAssert("clock stopped", () => !Clock.IsRunning);
+
+            AddStep("seek exactly to end", () => Clock.Seek(Clock.TrackLength));
+            AddAssert("clock stopped at end", () => Clock.CurrentTime == Clock.TrackLength);
+
+            AddStep("start clock again", Clock.Start);
+            AddAssert("clock looped to start", () => Clock.IsRunning && Clock.CurrentTime < 500);
         }
     }
 }

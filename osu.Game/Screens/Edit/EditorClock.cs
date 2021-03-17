@@ -172,6 +172,10 @@ namespace osu.Game.Screens.Edit
         public void Start()
         {
             ClearTransforms();
+
+            if (playbackFinished)
+                underlyingClock.Seek(0);
+
             underlyingClock.Start();
         }
 
@@ -222,21 +226,15 @@ namespace osu.Game.Screens.Edit
         {
             underlyingClock.ProcessFrame();
 
-            if (IsRunning)
-            {
-                var playbackAlreadyStopped = playbackFinished;
-                playbackFinished = CurrentTime >= TrackLength;
+            var playbackAlreadyStopped = playbackFinished;
+            playbackFinished = CurrentTime >= TrackLength;
 
-                if (playbackFinished)
-                {
-                    if (!playbackAlreadyStopped)
-                    {
-                        underlyingClock.Stop();
-                        underlyingClock.Seek(TrackLength);
-                    }
-                    else
-                        underlyingClock.Seek(0);
-                }
+            if (playbackFinished && !playbackAlreadyStopped)
+            {
+                if (IsRunning)
+                    underlyingClock.Stop();
+
+                underlyingClock.Seek(TrackLength);
             }
         }
 
