@@ -104,16 +104,19 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         },
                         new SettingsSlider<float>
                         {
+                            TransferValueOnCommit = true,
                             LabelText = "Aspect Ratio",
                             Current = aspectRatio
                         },
                         new SettingsSlider<float>
                         {
+                            TransferValueOnCommit = true,
                             LabelText = "X Offset",
                             Current = offsetX
                         },
                         new SettingsSlider<float>
                         {
+                            TransferValueOnCommit = true,
                             LabelText = "Y Offset",
                             Current = offsetY
                         },
@@ -124,11 +127,13 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         },
                         new SettingsSlider<float>
                         {
+                            TransferValueOnCommit = true,
                             LabelText = "Width",
                             Current = sizeX
                         },
                         new SettingsSlider<float>
                         {
+                            TransferValueOnCommit = true,
                             LabelText = "Height",
                             Current = sizeY
                         },
