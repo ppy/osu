@@ -21,6 +21,7 @@ using osu.Framework.Screens;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
@@ -29,6 +30,7 @@ using osu.Game.IO.Serialization;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
@@ -59,6 +61,9 @@ namespace osu.Game.Screens.Edit
         public override bool AllowRateAdjustments => false;
 
         protected bool HasUnsavedChanges => lastSavedHash != changeHandler.CurrentStateHash;
+
+        [Resolved]
+        private GameHost host { get; set; }
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
@@ -104,7 +109,7 @@ namespace osu.Game.Screens.Edit
         private MusicController music { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, GameHost host, OsuConfigManager config)
+        private void load(OsuColour colours, OsuConfigManager config)
         {
             if (Beatmap.Value is DummyWorkingBeatmap)
             {
@@ -542,8 +547,12 @@ namespace osu.Game.Screens.Edit
         protected void Copy()
         {
             if (editorBeatmap.SelectedHitObjects.Count == 0)
+            {
+                host.GetClipboard()?.SetText($"{clock.CurrentTime.ToEditorFormattedString()} - ");
                 return;
+            }
 
+            host.GetClipboard()?.SetText($"{editorBeatmap.SelectedHitObjects.FirstOrDefault().StartTime.ToEditorFormattedString()} ({string.Join(',', editorBeatmap.SelectedHitObjects.Select(h => ((h as IHasComboInformation)?.IndexInCurrentCombo + 1 ?? 0).ToString()))}) - ");
             clipboard.Value = new ClipboardContent(editorBeatmap).Serialize();
         }
 
