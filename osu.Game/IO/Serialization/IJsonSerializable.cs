@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using Newtonsoft.Json;
-using osu.Game.IO.Serialization.Converters;
 
 namespace osu.Game.IO.Serialization
 {
@@ -28,7 +27,6 @@ namespace osu.Game.IO.Serialization
             Formatting = Formatting.Indented,
             ObjectCreationHandling = ObjectCreationHandling.Replace,
             DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate,
-            Converters = new JsonConverter[] { new Vector2Converter() },
             ContractResolver = new KeyContractResolver()
         };
     }
