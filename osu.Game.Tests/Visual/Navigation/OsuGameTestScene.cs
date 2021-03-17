@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Platform;
@@ -61,10 +60,6 @@ namespace osu.Game.Tests.Visual.Navigation
                 }
 
                 RecycleLocalStorage();
-
-                // see MouseSettings
-                var frameworkConfig = host.Dependencies.Get<FrameworkConfigManager>();
-                frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity).Disabled = false;
 
                 CreateGame();
             });
