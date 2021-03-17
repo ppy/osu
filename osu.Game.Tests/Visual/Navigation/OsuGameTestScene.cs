@@ -17,6 +17,8 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using osuTK.Graphics;
@@ -33,6 +35,8 @@ namespace osu.Game.Tests.Visual.Navigation
 
         protected TestOsuGame Game;
 
+        protected override bool UseFreshStoragePerRun => true;
+
         [BackgroundDependencyLoader]
         private void load(GameHost host)
         {
@@ -46,7 +50,7 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [SetUpSteps]
-        public void SetUpSteps()
+        public virtual void SetUpSteps()
         {
             AddStep("Create new game instance", () =>
             {
@@ -100,6 +104,8 @@ namespace osu.Game.Tests.Visual.Navigation
 
             public new BeatmapManager BeatmapManager => base.BeatmapManager;
 
+            public new ScoreManager ScoreManager => base.ScoreManager;
+
             public new SettingsPanel Settings => base.Settings;
 
             public new MusicController MusicController => base.MusicController;
@@ -109,6 +115,8 @@ namespace osu.Game.Tests.Visual.Navigation
             public new Bindable<WorkingBeatmap> Beatmap => base.Beatmap;
 
             public new Bindable<RulesetInfo> Ruleset => base.Ruleset;
+
+            public new Bindable<IReadOnlyList<Mod>> SelectedMods => base.SelectedMods;
 
             // if we don't do this, when running under nUnit the version that gets populated is that of nUnit.
             public override string Version => "test game";

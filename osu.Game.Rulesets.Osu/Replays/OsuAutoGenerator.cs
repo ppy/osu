@@ -6,10 +6,12 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Replays;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Scoring;
@@ -33,11 +35,6 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         #region Constants
 
-        /// <summary>
-        /// The "reaction time" in ms between "seeing" a new hit object and moving to "react" to it.
-        /// </summary>
-        private readonly double reactionTime;
-
         private readonly HitWindows defaultHitWindows;
 
         /// <summary>
@@ -49,12 +46,9 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         #region Construction / Initialisation
 
-        public OsuAutoGenerator(IBeatmap beatmap)
-            : base(beatmap)
+        public OsuAutoGenerator(IBeatmap beatmap, IReadOnlyList<Mod> mods)
+            : base(beatmap, mods)
         {
-            // Already superhuman, but still somewhat realistic
-            reactionTime = ApplyModsToRate(100);
-
             defaultHitWindows = new OsuHitWindows();
             defaultHitWindows.SetDifficulty(Beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
         }
@@ -72,6 +66,9 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         public override Replay Generate()
         {
+            if (Beatmap.HitObjects.Count == 0)
+                return Replay;
+
             buttonIndex = 0;
 
             AddFrameToReplay(new OsuReplayFrame(-100000, new Vector2(256, 500)));
@@ -134,13 +131,13 @@ namespace osu.Game.Rulesets.Osu.Replays
                 if (!(h is Spinner))
                     AddFrameToReplay(new OsuReplayFrame(h.StartTime - hitWindows.WindowFor(HitResult.Meh), new Vector2(h.StackedPosition.X, h.StackedPosition.Y)));
             }
-            else if (h.StartTime - hitWindows.WindowFor(HitResult.Good) > endTime + hitWindows.WindowFor(HitResult.Good) + 50)
+            else if (h.StartTime - hitWindows.WindowFor(HitResult.Ok) > endTime + hitWindows.WindowFor(HitResult.Ok) + 50)
             {
                 if (!(prev is Spinner) && h.StartTime - endTime < 1000)
-                    AddFrameToReplay(new OsuReplayFrame(endTime + hitWindows.WindowFor(HitResult.Good), new Vector2(prev.StackedEndPosition.X, prev.StackedEndPosition.Y)));
+                    AddFrameToReplay(new OsuReplayFrame(endTime + hitWindows.WindowFor(HitResult.Ok), new Vector2(prev.StackedEndPosition.X, prev.StackedEndPosition.Y)));
 
                 if (!(h is Spinner))
-                    AddFrameToReplay(new OsuReplayFrame(h.StartTime - hitWindows.WindowFor(HitResult.Good), new Vector2(h.StackedPosition.X, h.StackedPosition.Y)));
+                    AddFrameToReplay(new OsuReplayFrame(h.StartTime - hitWindows.WindowFor(HitResult.Ok), new Vector2(h.StackedPosition.X, h.StackedPosition.Y)));
             }
         }
 
@@ -154,8 +151,12 @@ namespace osu.Game.Rulesets.Osu.Replays
             // The startPosition for the slider should not be its .Position, but the point on the circle whose tangent crosses the current cursor position
             // We also modify spinnerDirection so it spins in the direction it enters the spin circle, to make a smooth transition.
             // TODO: Shouldn't the spinner always spin in the same direction?
-            if (h is Spinner)
+            if (h is Spinner spinner)
             {
+                // spinners with 0 spins required will auto-complete - don't bother
+                if (spinner.SpinsRequired == 0)
+                    return;
+
                 calcSpinnerStartPosAndDirection(((OsuReplayFrame)Frames[^1]).Position, out startPosition, out spinnerDirection);
 
                 Vector2 spinCentreOffset = SPINNER_CENTRE - ((OsuReplayFrame)Frames[^1]).Position;
@@ -233,7 +234,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             OsuReplayFrame lastFrame = (OsuReplayFrame)Frames[^1];
 
             // Wait until Auto could "see and react" to the next note.
-            double waitTime = h.StartTime - Math.Max(0.0, h.TimePreempt - reactionTime);
+            double waitTime = h.StartTime - Math.Max(0.0, h.TimePreempt - getReactionTime(h.StartTime - h.TimePreempt));
 
             if (waitTime > lastFrame.Time)
             {
@@ -243,7 +244,7 @@ namespace osu.Game.Rulesets.Osu.Replays
 
             Vector2 lastPosition = lastFrame.Position;
 
-            double timeDifference = ApplyModsToTime(h.StartTime - lastFrame.Time);
+            double timeDifference = ApplyModsToTimeDelta(lastFrame.Time, h.StartTime);
 
             // Only "snap" to hitcircles if they are far enough apart. As the time between hitcircles gets shorter the snapping threshold goes up.
             if (timeDifference > 0 && // Sanity checks
@@ -251,7 +252,7 @@ namespace osu.Game.Rulesets.Osu.Replays
                  timeDifference >= 266)) // ... or the beats are slow enough to tap anyway.
             {
                 // Perform eased movement
-                for (double time = lastFrame.Time + FrameDelay; time < h.StartTime; time += FrameDelay)
+                for (double time = lastFrame.Time + GetFrameDelay(lastFrame.Time); time < h.StartTime; time += GetFrameDelay(time))
                 {
                     Vector2 currentPosition = Interpolation.ValueAt(time, lastPosition, targetPos, lastFrame.Time, h.StartTime, easing);
                     AddFrameToReplay(new OsuReplayFrame((int)time, new Vector2(currentPosition.X, currentPosition.Y)) { Actions = lastFrame.Actions });
@@ -264,6 +265,14 @@ namespace osu.Game.Rulesets.Osu.Replays
                 buttonIndex++;
             }
         }
+
+        /// <summary>
+        /// Calculates the "reaction time" in ms between "seeing" a new hit object and moving to "react" to it.
+        /// </summary>
+        /// <remarks>
+        /// Already superhuman, but still somewhat realistic.
+        /// </remarks>
+        private double getReactionTime(double timeInstant) => ApplyModsToRate(timeInstant, 100);
 
         // Add frames to click the hitobject
         private void addHitObjectClickFrames(OsuHitObject h, Vector2 startPosition, float spinnerDirection)
@@ -334,17 +343,23 @@ namespace osu.Game.Rulesets.Osu.Replays
                     float angle = radius == 0 ? 0 : MathF.Atan2(difference.Y, difference.X);
 
                     double t;
+                    double previousFrame = h.StartTime;
 
-                    for (double j = h.StartTime + FrameDelay; j < spinner.EndTime; j += FrameDelay)
+                    for (double nextFrame = h.StartTime + GetFrameDelay(h.StartTime); nextFrame < spinner.EndTime; nextFrame += GetFrameDelay(nextFrame))
                     {
-                        t = ApplyModsToTime(j - h.StartTime) * spinnerDirection;
+                        t = ApplyModsToTimeDelta(previousFrame, nextFrame) * spinnerDirection;
+                        angle += (float)t / 20;
 
-                        Vector2 pos = SPINNER_CENTRE + CirclePosition(t / 20 + angle, SPIN_RADIUS);
-                        AddFrameToReplay(new OsuReplayFrame((int)j, new Vector2(pos.X, pos.Y), action));
+                        Vector2 pos = SPINNER_CENTRE + CirclePosition(angle, SPIN_RADIUS);
+                        AddFrameToReplay(new OsuReplayFrame((int)nextFrame, new Vector2(pos.X, pos.Y), action));
+
+                        previousFrame = nextFrame;
                     }
 
-                    t = ApplyModsToTime(spinner.EndTime - h.StartTime) * spinnerDirection;
-                    Vector2 endPosition = SPINNER_CENTRE + CirclePosition(t / 20 + angle, SPIN_RADIUS);
+                    t = ApplyModsToTimeDelta(previousFrame, spinner.EndTime) * spinnerDirection;
+                    angle += (float)t / 20;
+
+                    Vector2 endPosition = SPINNER_CENTRE + CirclePosition(angle, SPIN_RADIUS);
 
                     AddFrameToReplay(new OsuReplayFrame(spinner.EndTime, new Vector2(endPosition.X, endPosition.Y), action));
 
@@ -352,7 +367,7 @@ namespace osu.Game.Rulesets.Osu.Replays
                     break;
 
                 case Slider slider:
-                    for (double j = FrameDelay; j < slider.Duration; j += FrameDelay)
+                    for (double j = GetFrameDelay(slider.StartTime); j < slider.Duration; j += GetFrameDelay(slider.StartTime + j))
                     {
                         Vector2 pos = slider.StackedPositionAt(j / slider.Duration);
                         AddFrameToReplay(new OsuReplayFrame(h.StartTime + j, new Vector2(pos.X, pos.Y), action));

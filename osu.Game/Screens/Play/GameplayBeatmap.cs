@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Screens.Play
@@ -27,7 +29,11 @@ namespace osu.Game.Screens.Play
 
         public BeatmapMetadata Metadata => PlayableBeatmap.Metadata;
 
-        public ControlPointInfo ControlPointInfo => PlayableBeatmap.ControlPointInfo;
+        public ControlPointInfo ControlPointInfo
+        {
+            get => PlayableBeatmap.ControlPointInfo;
+            set => PlayableBeatmap.ControlPointInfo = value;
+        }
 
         public List<BreakPeriod> Breaks => PlayableBeatmap.Breaks;
 
@@ -37,6 +43,14 @@ namespace osu.Game.Screens.Play
 
         public IEnumerable<BeatmapStatistic> GetStatistics() => PlayableBeatmap.GetStatistics();
 
+        public double GetMostCommonBeatLength() => PlayableBeatmap.GetMostCommonBeatLength();
+
         public IBeatmap Clone() => PlayableBeatmap.Clone();
+
+        private readonly Bindable<JudgementResult> lastJudgementResult = new Bindable<JudgementResult>();
+
+        public IBindable<JudgementResult> LastJudgementResult => lastJudgementResult;
+
+        public void ApplyResult(JudgementResult result) => lastJudgementResult.Value = result;
     }
 }

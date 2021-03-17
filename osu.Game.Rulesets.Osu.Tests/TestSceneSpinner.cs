@@ -1,70 +1,87 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
-using osu.Game.Tests.Visual;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestSceneSpinner : OsuTestScene
+    public class TestSceneSpinner : OsuSkinnableTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(SpinnerDisc),
-            typeof(DrawableSpinner),
-            typeof(DrawableOsuHitObject)
-        };
-
-        private readonly Container content;
-        protected override Container<Drawable> Content => content;
-
         private int depthIndex;
 
-        public TestSceneSpinner()
-        {
-            base.Content.Add(content = new OsuInputManager(new RulesetInfo { ID = 0 }));
+        private TestDrawableSpinner drawableSpinner;
 
-            AddStep("Miss Big", () => testSingle(2));
-            AddStep("Miss Medium", () => testSingle(5));
-            AddStep("Miss Small", () => testSingle(7));
-            AddStep("Hit Big", () => testSingle(2, true));
-            AddStep("Hit Medium", () => testSingle(5, true));
-            AddStep("Hit Small", () => testSingle(7, true));
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestVariousSpinners(bool autoplay)
+        {
+            string term = autoplay ? "Hit" : "Miss";
+            AddStep($"{term} Big", () => SetContents(() => testSingle(2, autoplay)));
+            AddStep($"{term} Medium", () => SetContents(() => testSingle(5, autoplay)));
+            AddStep($"{term} Small", () => SetContents(() => testSingle(7, autoplay)));
         }
 
-        private void testSingle(float circleSize, bool auto = false)
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestLongSpinner(bool autoplay)
         {
-            var spinner = new Spinner { StartTime = Time.Current + 1000, EndTime = Time.Current + 4000 };
+            AddStep("Very long spinner", () => SetContents(() => testSingle(5, autoplay, 4000)));
+            AddUntilStep("Wait for completion", () => drawableSpinner.Result.HasResult);
+            AddUntilStep("Check correct progress", () => drawableSpinner.Progress == (autoplay ? 1 : 0));
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestSuperShortSpinner(bool autoplay)
+        {
+            AddStep("Very short spinner", () => SetContents(() => testSingle(5, autoplay, 200)));
+            AddUntilStep("Wait for completion", () => drawableSpinner.Result.HasResult);
+            AddUntilStep("Short spinner implicitly completes", () => drawableSpinner.Progress == 1);
+        }
+
+        private Drawable testSingle(float circleSize, bool auto = false, double length = 3000)
+        {
+            const double delay = 2000;
+
+            var spinner = new Spinner
+            {
+                StartTime = Time.Current + delay,
+                EndTime = Time.Current + delay + length,
+                Samples = new List<HitSampleInfo>
+                {
+                    new HitSampleInfo("hitnormal")
+                }
+            };
 
             spinner.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = circleSize });
 
-            var drawable = new TestDrawableSpinner(spinner, auto)
+            drawableSpinner = new TestDrawableSpinner(spinner, auto)
             {
                 Anchor = Anchor.Centre,
-                Depth = depthIndex++
+                Depth = depthIndex++,
+                Scale = new Vector2(0.75f)
             };
 
             foreach (var mod in SelectedMods.Value.OfType<IApplicableToDrawableHitObjects>())
-                mod.ApplyToDrawableHitObjects(new[] { drawable });
+                mod.ApplyToDrawableHitObjects(new[] { drawableSpinner });
 
-            Add(drawable);
+            return drawableSpinner;
         }
 
         private class TestDrawableSpinner : DrawableSpinner
         {
-            private bool auto;
+            private readonly bool auto;
 
             public TestDrawableSpinner(Spinner s, bool auto)
                 : base(s)
@@ -72,16 +89,11 @@ namespace osu.Game.Rulesets.Osu.Tests
                 this.auto = auto;
             }
 
-            protected override void CheckForResult(bool userTriggered, double timeOffset)
+            protected override void Update()
             {
-                if (auto && !userTriggered && Time.Current > Spinner.StartTime + Spinner.Duration / 2 && Progress < 1)
-                {
-                    // force completion only once to not break human interaction
-                    Disc.RotationAbsolute = Spinner.SpinsRequired * 360;
-                    auto = false;
-                }
-
-                base.CheckForResult(userTriggered, timeOffset);
+                base.Update();
+                if (auto)
+                    RotationTracker.AddRotation((float)(Clock.ElapsedFrameTime * 3));
             }
         }
     }

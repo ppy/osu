@@ -7,6 +7,8 @@ namespace osu.Game.Rulesets.Mania.Scoring
 {
     internal class ManiaScoreProcessor : ScoreProcessor
     {
-        public override HitWindows CreateHitWindows() => new ManiaHitWindows();
+        protected override double DefaultAccuracyPortion => 0.95;
+
+        protected override double DefaultComboPortion => 0.05;
     }
 }

@@ -1,12 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Utils;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
@@ -16,10 +15,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestSceneLoadingLayer : OsuTestScene
     {
-        private Drawable dimContent;
-        private LoadingLayer overlay;
-
-        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(LoadingSpinner) };
+        private TestLoadingLayer overlay;
 
         private Container content;
 
@@ -33,14 +29,14 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Size = new Vector2(300),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Children = new[]
+                    Children = new Drawable[]
                     {
                         new Box
                         {
                             Colour = Color4.SlateGray,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        dimContent = new FillFlowContainer
+                        new FillFlowContainer
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -55,7 +51,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                                 new TriangleButton { Text = "puush me", Width = 200, Action = () => { } },
                             }
                         },
-                        overlay = new LoadingLayer(dimContent),
+                        overlay = new TestLoadingLayer(true),
                     }
                 },
             };
@@ -68,25 +64,11 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("show", () => overlay.Show());
 
-            AddUntilStep("wait for content dim", () => dimContent.Colour != Color4.White);
+            AddUntilStep("wait for content dim", () => overlay.BackgroundDimLayer.Alpha > 0);
 
             AddStep("hide", () => overlay.Hide());
 
-            AddUntilStep("wait for content restore", () => dimContent.Colour == Color4.White);
-        }
-
-        [Test]
-        public void TestContentRestoreOnDispose()
-        {
-            AddAssert("not visible", () => !overlay.IsPresent);
-
-            AddStep("show", () => overlay.Show());
-
-            AddUntilStep("wait for content dim", () => dimContent.Colour != Color4.White);
-
-            AddStep("expire", () => overlay.Expire());
-
-            AddUntilStep("wait for content restore", () => dimContent.Colour == Color4.White);
+            AddUntilStep("wait for content restore", () => Precision.AlmostEquals(overlay.BackgroundDimLayer.Alpha, 0));
         }
 
         [Test]
@@ -101,6 +83,16 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
 
             AddStep("hide", () => overlay.Hide());
+        }
+
+        private class TestLoadingLayer : LoadingLayer
+        {
+            public new Box BackgroundDimLayer => base.BackgroundDimLayer;
+
+            public TestLoadingLayer(bool dimBackground = false, bool withBox = true)
+                : base(dimBackground, withBox)
+            {
+            }
         }
     }
 }

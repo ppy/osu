@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
-using osu.Framework.Timing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -26,7 +25,7 @@ namespace osu.Game.Screens.Edit.Components
         private IconButton playButton;
 
         [Resolved]
-        private IAdjustableClock adjustableClock { get; set; }
+        private EditorClock editorClock { get; set; }
 
         private readonly BindableNumber<double> tempo = new BindableDouble(1);
 
@@ -63,12 +62,12 @@ namespace osu.Game.Screens.Edit.Components
                 }
             };
 
-            Track?.AddAdjustment(AdjustableProperty.Tempo, tempo);
+            Track.BindValueChanged(tr => tr.NewValue?.AddAdjustment(AdjustableProperty.Tempo, tempo), true);
         }
 
         protected override void Dispose(bool isDisposing)
         {
-            Track?.RemoveAdjustment(AdjustableProperty.Tempo, tempo);
+            Track.Value?.RemoveAdjustment(AdjustableProperty.Tempo, tempo);
 
             base.Dispose(isDisposing);
         }
@@ -87,17 +86,17 @@ namespace osu.Game.Screens.Edit.Components
 
         private void togglePause()
         {
-            if (adjustableClock.IsRunning)
-                adjustableClock.Stop();
+            if (editorClock.IsRunning)
+                editorClock.Stop();
             else
-                adjustableClock.Start();
+                editorClock.Start();
         }
 
         protected override void Update()
         {
             base.Update();
 
-            playButton.Icon = adjustableClock.IsRunning ? FontAwesome.Regular.PauseCircle : FontAwesome.Regular.PlayCircle;
+            playButton.Icon = editorClock.IsRunning ? FontAwesome.Regular.PauseCircle : FontAwesome.Regular.PlayCircle;
         }
 
         private class PlaybackTabControl : OsuTabControl<double>

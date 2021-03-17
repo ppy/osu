@@ -22,9 +22,16 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osu.Game.Users;
+using JetBrains.Annotations;
+using osu.Framework.Extensions;
+using osu.Framework.Extensions.EnumExtensions;
+using osu.Framework.Testing;
+using osu.Game.Rulesets.Filter;
+using osu.Game.Screens.Ranking.Statistics;
 
 namespace osu.Game.Rulesets
 {
+    [ExcludeFromDynamicCompile]
     public abstract class Ruleset
     {
         public RulesetInfo RulesetInfo { get; internal set; }
@@ -42,13 +49,84 @@ namespace osu.Game.Rulesets
         /// <summary>
         /// Converts mods from legacy enum values. Do not override if you're not a legacy ruleset.
         /// </summary>
-        /// <param name="mods">The legacy enum which will be converted</param>
-        /// <returns>An enumerable of constructed <see cref="Mod"/>s</returns>
-        public virtual IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods) => Array.Empty<Mod>();
+        /// <param name="mods">The legacy enum which will be converted.</param>
+        /// <returns>An enumerable of constructed <see cref="Mod"/>s.</returns>
+        public virtual IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods) => Array.Empty<Mod>();
 
-        public ModAutoplay GetAutoplayMod() => GetAllMods().OfType<ModAutoplay>().First();
+        /// <summary>
+        /// Converts mods to legacy enum values. Do not override if you're not a legacy ruleset.
+        /// </summary>
+        /// <param name="mods">The mods which will be converted.</param>
+        /// <returns>A single bitwise enumerable value representing (to the best of our ability) the mods.</returns>
+        public virtual LegacyMods ConvertToLegacyMods(Mod[] mods)
+        {
+            var value = LegacyMods.None;
 
-        public virtual ISkin CreateLegacySkinProvider(ISkinSource source) => null;
+            foreach (var mod in mods)
+            {
+                switch (mod)
+                {
+                    case ModNoFail _:
+                        value |= LegacyMods.NoFail;
+                        break;
+
+                    case ModEasy _:
+                        value |= LegacyMods.Easy;
+                        break;
+
+                    case ModHidden _:
+                        value |= LegacyMods.Hidden;
+                        break;
+
+                    case ModHardRock _:
+                        value |= LegacyMods.HardRock;
+                        break;
+
+                    case ModPerfect _:
+                        value |= LegacyMods.Perfect;
+                        break;
+
+                    case ModSuddenDeath _:
+                        value |= LegacyMods.SuddenDeath;
+                        break;
+
+                    case ModNightcore _:
+                        value |= LegacyMods.Nightcore;
+                        break;
+
+                    case ModDoubleTime _:
+                        value |= LegacyMods.DoubleTime;
+                        break;
+
+                    case ModRelax _:
+                        value |= LegacyMods.Relax;
+                        break;
+
+                    case ModHalfTime _:
+                        value |= LegacyMods.HalfTime;
+                        break;
+
+                    case ModFlashlight _:
+                        value |= LegacyMods.Flashlight;
+                        break;
+
+                    case ModCinema _:
+                        value |= LegacyMods.Cinema;
+                        break;
+
+                    case ModAutoplay _:
+                        value |= LegacyMods.Autoplay;
+                        break;
+                }
+            }
+
+            return value;
+        }
+
+        [CanBeNull]
+        public ModAutoplay GetAutoplayMod() => GetAllMods().OfType<ModAutoplay>().FirstOrDefault();
+
+        public virtual ISkin CreateLegacySkinProvider(ISkinSource source, IBeatmap beatmap) => null;
 
         protected Ruleset()
         {
@@ -99,7 +177,28 @@ namespace osu.Game.Rulesets
 
         public abstract DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap);
 
-        public virtual PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score) => null;
+        /// <summary>
+        /// Optionally creates a <see cref="PerformanceCalculator"/> to generate performance data from the provided score.
+        /// </summary>
+        /// <param name="attributes">Difficulty attributes for the beatmap related to the provided score.</param>
+        /// <param name="score">The score to be processed.</param>
+        /// <returns>A performance calculator instance for the provided score.</returns>
+        [CanBeNull]
+        public virtual PerformanceCalculator CreatePerformanceCalculator(DifficultyAttributes attributes, ScoreInfo score) => null;
+
+        /// <summary>
+        /// Optionally creates a <see cref="PerformanceCalculator"/> to generate performance data from the provided score.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to use as a source for generating <see cref="DifficultyAttributes"/>.</param>
+        /// <param name="score">The score to be processed.</param>
+        /// <returns>A performance calculator instance for the provided score.</returns>
+        [CanBeNull]
+        public PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score)
+        {
+            var difficultyCalculator = CreateDifficultyCalculator(beatmap);
+            var difficultyAttributes = difficultyCalculator.Calculate(score.Mods);
+            return CreatePerformanceCalculator(difficultyAttributes, score);
+        }
 
         public virtual HitObjectComposer CreateHitObjectComposer() => null;
 
@@ -152,5 +251,67 @@ namespace osu.Game.Rulesets
         /// </summary>
         /// <returns>An empty frame for the current ruleset, or null if unsupported.</returns>
         public virtual IConvertibleReplayFrame CreateConvertibleReplayFrame() => null;
+
+        /// <summary>
+        /// Creates the statistics for a <see cref="ScoreInfo"/> to be displayed in the results screen.
+        /// </summary>
+        /// <param name="score">The <see cref="ScoreInfo"/> to create the statistics for. The score is guaranteed to have <see cref="ScoreInfo.HitEvents"/> populated.</param>
+        /// <param name="playableBeatmap">The <see cref="IBeatmap"/>, converted for this <see cref="Ruleset"/> with all relevant <see cref="Mod"/>s applied.</param>
+        /// <returns>The <see cref="StatisticRow"/>s to display. Each <see cref="StatisticRow"/> may contain 0 or more <see cref="StatisticItem"/>.</returns>
+        [NotNull]
+        public virtual StatisticRow[] CreateStatisticsForScore(ScoreInfo score, IBeatmap playableBeatmap) => Array.Empty<StatisticRow>();
+
+        /// <summary>
+        /// Get all valid <see cref="HitResult"/>s for this ruleset.
+        /// Generally used for results display purposes, where it can't be determined if zero-count means the user has not achieved any or the type is not used by this ruleset.
+        /// </summary>
+        /// <returns>
+        /// All valid <see cref="HitResult"/>s along with a display-friendly name.
+        /// </returns>
+        public IEnumerable<(HitResult result, string displayName)> GetHitResults()
+        {
+            var validResults = GetValidHitResults();
+
+            // enumerate over ordered list to guarantee return order is stable.
+            foreach (var result in EnumExtensions.GetValuesInOrder<HitResult>())
+            {
+                switch (result)
+                {
+                    // hard blocked types, should never be displayed even if the ruleset tells us to.
+                    case HitResult.None:
+                    case HitResult.IgnoreHit:
+                    case HitResult.IgnoreMiss:
+                    // display is handled as a completion count with corresponding "hit" type.
+                    case HitResult.LargeTickMiss:
+                    case HitResult.SmallTickMiss:
+                        continue;
+                }
+
+                if (result == HitResult.Miss || validResults.Contains(result))
+                    yield return (result, GetDisplayNameForHitResult(result));
+            }
+        }
+
+        /// <summary>
+        /// Get all valid <see cref="HitResult"/>s for this ruleset.
+        /// Generally used for results display purposes, where it can't be determined if zero-count means the user has not achieved any or the type is not used by this ruleset.
+        /// </summary>
+        /// <remarks>
+        /// <see cref="HitResult.Miss"/> is implicitly included. Special types like <see cref="HitResult.IgnoreHit"/> are ignored even when specified.
+        /// </remarks>
+        protected virtual IEnumerable<HitResult> GetValidHitResults() => EnumExtensions.GetValuesInOrder<HitResult>();
+
+        /// <summary>
+        /// Get a display friendly name for the specified result type.
+        /// </summary>
+        /// <param name="result">The result type to get the name for.</param>
+        /// <returns>The display name.</returns>
+        public virtual string GetDisplayNameForHitResult(HitResult result) => result.GetDescription();
+
+        /// <summary>
+        /// Creates ruleset-specific beatmap filter criteria to be used on the song select screen.
+        /// </summary>
+        [CanBeNull]
+        public virtual IRulesetFilterCriteria CreateRulesetFilterCriteria() => null;
     }
 }

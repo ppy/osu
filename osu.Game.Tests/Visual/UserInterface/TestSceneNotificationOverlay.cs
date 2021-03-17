@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -18,16 +17,6 @@ namespace osu.Game.Tests.Visual.UserInterface
     [TestFixture]
     public class TestSceneNotificationOverlay : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(NotificationSection),
-            typeof(SimpleNotification),
-            typeof(ProgressNotification),
-            typeof(ProgressCompletionNotification),
-            typeof(IHasCompletionTarget),
-            typeof(Notification)
-        };
-
         private NotificationOverlay notificationOverlay;
 
         private readonly List<ProgressNotification> progressingNotifications = new List<ProgressNotification>();
@@ -117,6 +106,15 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestError()
+        {
+            setState(Visibility.Visible);
+            AddStep(@"error #1", sendErrorNotification);
+            AddAssert("Is visible", () => notificationOverlay.State.Value == Visibility.Visible);
+            checkDisplayedCount(1);
+        }
+
+        [Test]
         public void TestSpam()
         {
             setState(Visibility.Visible);
@@ -190,7 +188,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private void sendBarrage()
         {
-            switch (RNG.Next(0, 4))
+            switch (RNG.Next(0, 5))
             {
                 case 0:
                     sendHelloNotification();
@@ -206,6 +204,10 @@ namespace osu.Game.Tests.Visual.UserInterface
 
                 case 3:
                     sendDownloadProgress();
+                    break;
+
+                case 4:
+                    sendErrorNotification();
                     break;
             }
         }
@@ -223,6 +225,11 @@ namespace osu.Game.Tests.Visual.UserInterface
         private void sendBackgroundNotification()
         {
             notificationOverlay.Post(new BackgroundNotification { Text = @"Welcome to osu!. Enjoy your stay!" });
+        }
+
+        private void sendErrorNotification()
+        {
+            notificationOverlay.Post(new SimpleErrorNotification { Text = @"Rut roh!. Something went wrong!" });
         }
 
         private void sendManyNotifications()

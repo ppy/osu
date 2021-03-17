@@ -9,7 +9,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Changelog
@@ -50,8 +49,6 @@ namespace osu.Game.Overlays.Changelog
             streamsBackground.Colour = colourProvider.Background5;
         }
 
-        private ChangelogHeaderTitle title;
-
         private void showBuild(ValueChangedEvent<APIChangelogBuild> e)
         {
             if (e.OldValue != null)
@@ -63,14 +60,11 @@ namespace osu.Game.Overlays.Changelog
                 Current.Value = e.NewValue.ToString();
 
                 updateCurrentStream();
-
-                title.Version = e.NewValue.UpdateStream.DisplayName;
             }
             else
             {
                 Current.Value = listing_string;
                 Streams.Current.Value = null;
-                title.Version = null;
             }
         }
 
@@ -100,7 +94,7 @@ namespace osu.Game.Overlays.Changelog
             }
         };
 
-        protected override ScreenTitle CreateTitle() => title = new ChangelogHeaderTitle();
+        protected override OverlayTitle CreateTitle() => new ChangelogHeaderTitle();
 
         public void Populate(List<APIUpdateStream> streams)
         {
@@ -116,20 +110,14 @@ namespace osu.Game.Overlays.Changelog
             Streams.Current.Value = Streams.Items.FirstOrDefault(s => s.Name == Build.Value.UpdateStream.Name);
         }
 
-        private class ChangelogHeaderTitle : ScreenTitle
+        private class ChangelogHeaderTitle : OverlayTitle
         {
-            public string Version
-            {
-                set => Section = value ?? listing_string;
-            }
-
             public ChangelogHeaderTitle()
             {
                 Title = "changelog";
-                Version = null;
+                Description = "track recent dev updates in the osu! ecosystem";
+                IconTexture = "Icons/Hexacons/devtools";
             }
-
-            protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/changelog");
         }
     }
 }

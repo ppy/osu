@@ -3,7 +3,6 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Bindables;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Users;
 
@@ -18,33 +17,22 @@ namespace osu.Game.Overlays.Rankings
         private OverlayRulesetSelector rulesetSelector;
         private CountryFilter countryFilter;
 
-        protected override ScreenTitle CreateTitle() => new RankingsTitle
-        {
-            Scope = { BindTarget = Current }
-        };
+        protected override OverlayTitle CreateTitle() => new RankingsTitle();
 
         protected override Drawable CreateTitleContent() => rulesetSelector = new OverlayRulesetSelector();
 
         protected override Drawable CreateContent() => countryFilter = new CountryFilter();
 
-        protected override Drawable CreateBackground() => new OverlayHeaderBackground(@"Headers/rankings");
+        protected override Drawable CreateBackground() => new OverlayHeaderBackground("Headers/rankings");
 
-        private class RankingsTitle : ScreenTitle
+        private class RankingsTitle : OverlayTitle
         {
-            public readonly Bindable<RankingsScope> Scope = new Bindable<RankingsScope>();
-
             public RankingsTitle()
             {
                 Title = "ranking";
+                Description = "find out who's the best right now";
+                IconTexture = "Icons/Hexacons/rankings";
             }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                Scope.BindValueChanged(scope => Section = scope.NewValue.ToString().ToLowerInvariant(), true);
-            }
-
-            protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/rankings");
         }
     }
 

@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Video;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 
 namespace osu.Game.Storyboards.Drawables
@@ -16,7 +15,7 @@ namespace osu.Game.Storyboards.Drawables
     public class DrawableStoryboardVideo : CompositeDrawable
     {
         public readonly StoryboardVideo Video;
-        private VideoSprite videoSprite;
+        private Video video;
 
         public override bool RemoveWhenNotAlive => false;
 
@@ -40,14 +39,13 @@ namespace osu.Game.Storyboards.Drawables
             if (stream == null)
                 return;
 
-            InternalChild = videoSprite = new VideoSprite(stream, false)
+            InternalChild = video = new Video(stream, false)
             {
                 RelativeSizeAxes = Axes.Both,
                 FillMode = FillMode.Fill,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Alpha = 0,
-                Clock = new FramedOffsetClock(Clock) { Offset = -Video.StartTime }
             };
         }
 
@@ -55,8 +53,13 @@ namespace osu.Game.Storyboards.Drawables
         {
             base.LoadComplete();
 
-            using (videoSprite.BeginAbsoluteSequence(0))
-                videoSprite.FadeIn(500);
+            if (video == null) return;
+
+            using (video.BeginAbsoluteSequence(Video.StartTime))
+            {
+                Schedule(() => video.PlaybackPosition = Time.Current - Video.StartTime);
+                video.FadeIn(500);
+            }
         }
     }
 }

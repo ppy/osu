@@ -4,17 +4,11 @@
 using NUnit.Framework;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public class TestSceneOsuModDoubleTime : ModTestScene
+    public class TestSceneOsuModDoubleTime : OsuModTestScene
     {
-        public TestSceneOsuModDoubleTime()
-            : base(new OsuRuleset())
-        {
-        }
-
         [TestCase(0.5)]
         [TestCase(1.01)]
         [TestCase(1.5)]

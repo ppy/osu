@@ -6,11 +6,13 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
+using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Users;
 
 namespace osu.Game.Beatmaps
 {
+    [ExcludeFromDynamicCompile]
     [Serializable]
     public class BeatmapMetadata : IEquatable<BeatmapMetadata>, IHasPrimaryKey
     {
@@ -49,11 +51,20 @@ namespace osu.Game.Beatmaps
         [JsonProperty(@"tags")]
         public string Tags { get; set; }
 
+        /// <summary>
+        /// The time in milliseconds to begin playing the track for preview purposes.
+        /// If -1, the track should begin playing at 40% of its length.
+        /// </summary>
         public int PreviewTime { get; set; }
+
         public string AudioFile { get; set; }
         public string BackgroundFile { get; set; }
 
-        public override string ToString() => $"{Artist} - {Title} ({Author})";
+        public override string ToString()
+        {
+            string author = Author == null ? string.Empty : $"({Author})";
+            return $"{Artist} - {Title} {author}".Trim();
+        }
 
         [JsonIgnore]
         public string[] SearchableTerms => new[]

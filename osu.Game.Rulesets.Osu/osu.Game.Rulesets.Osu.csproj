@@ -5,6 +5,13 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Description>click the circles. to the beat.</Description>
   </PropertyGroup>
+
+  <PropertyGroup Label="Nuget">
+    <Title>osu! (ruleset)</Title>
+    <PackageId>ppy.osu.Game.Rulesets.Osu</PackageId>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
   <ItemGroup Label="Project References">
     <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
   </ItemGroup>

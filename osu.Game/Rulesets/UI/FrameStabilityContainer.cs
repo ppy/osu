@@ -2,7 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
@@ -13,7 +16,7 @@ namespace osu.Game.Rulesets.UI
 {
     /// <summary>
     /// A container which consumes a parent gameplay clock and standardises frame counts for children.
-    /// Will ensure a minimum of 40 frames per clock second is maintained, regardless of any system lag or seeks.
+    /// Will ensure a minimum of 50 frames per clock second is maintained, regardless of any system lag or seeks.
     /// </summary>
     public class FrameStabilityContainer : Container, IHasReplayHandler
     {
@@ -29,14 +32,16 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         internal bool FrameStablePlayback = true;
 
-        [Cached]
-        public GameplayClock GameplayClock { get; }
+        public IFrameStableClock FrameStableClock => frameStableClock;
+
+        [Cached(typeof(GameplayClock))]
+        private readonly FrameStabilityClock frameStableClock;
 
         public FrameStabilityContainer(double gameplayStartTime = double.MinValue)
         {
             RelativeSizeAxes = Axes.Both;
 
-            GameplayClock = new GameplayClock(framedClock = new FramedClock(manualClock = new ManualClock()));
+            frameStableClock = new FrameStabilityClock(framedClock = new FramedClock(manualClock = new ManualClock()));
 
             this.gameplayStartTime = gameplayStartTime;
         }
@@ -53,12 +58,12 @@ namespace osu.Game.Rulesets.UI
         private int direction;
 
         [BackgroundDependencyLoader(true)]
-        private void load(GameplayClock clock)
+        private void load(GameplayClock clock, ISamplePlaybackDisabler sampleDisabler)
         {
             if (clock != null)
             {
-                parentGameplayClock = clock;
-                GameplayClock.IsPaused.BindTo(clock.IsPaused);
+                parentGameplayClock = frameStableClock.ParentGameplayClock = clock;
+                frameStableClock.IsPaused.BindTo(clock.IsPaused);
             }
         }
 
@@ -68,21 +73,11 @@ namespace osu.Game.Rulesets.UI
             setClock();
         }
 
-        /// <summary>
-        /// Whether we are running up-to-date with our parent clock.
-        /// If not, we will need to keep processing children until we catch up.
-        /// </summary>
-        private bool requireMoreUpdateLoops;
+        private PlaybackState state;
 
-        /// <summary>
-        /// Whether we are in a valid state (ie. should we keep processing children frames).
-        /// This should be set to false when the replay is, for instance, waiting for future frames to arrive.
-        /// </summary>
-        private bool validState;
+        protected override bool RequiresChildrenUpdate => base.RequiresChildrenUpdate && state != PlaybackState.NotValid;
 
-        protected override bool RequiresChildrenUpdate => base.RequiresChildrenUpdate && validState;
-
-        private bool isAttached => ReplayInputHandler != null;
+        private bool hasReplayAttached => ReplayInputHandler != null;
 
         private const double sixty_frame_time = 1000.0 / 60;
 
@@ -90,102 +85,199 @@ namespace osu.Game.Rulesets.UI
 
         public override bool UpdateSubTree()
         {
-            requireMoreUpdateLoops = true;
-            validState = !GameplayClock.IsPaused.Value;
+            int loops = MaxCatchUpFrames;
 
-            int loops = 0;
-
-            while (validState && requireMoreUpdateLoops && loops++ < MaxCatchUpFrames)
+            do
             {
+                // update clock is always trying to approach the aim time.
+                // it should be provided as the original value each loop.
                 updateClock();
 
-                if (validState)
-                {
-                    base.UpdateSubTree();
-                    UpdateSubTreeMasking(this, ScreenSpaceDrawQuad.AABBFloat);
-                }
-            }
+                if (state == PlaybackState.NotValid)
+                    break;
+
+                base.UpdateSubTree();
+                UpdateSubTreeMasking(this, ScreenSpaceDrawQuad.AABBFloat);
+            } while (state == PlaybackState.RequiresCatchUp && loops-- > 0);
 
             return true;
         }
 
         private void updateClock()
         {
+            if (frameStableClock.WaitingOnFrames.Value)
+            {
+                // if waiting on frames, run one update loop to determine if frames have arrived.
+                state = PlaybackState.Valid;
+            }
+            else if (frameStableClock.IsPaused.Value)
+            {
+                // time should not advance while paused, nor should anything run.
+                state = PlaybackState.NotValid;
+                return;
+            }
+            else
+            {
+                state = PlaybackState.Valid;
+            }
+
             if (parentGameplayClock == null)
                 setClock(); // LoadComplete may not be run yet, but we still want the clock.
 
-            validState = true;
-            requireMoreUpdateLoops = false;
+            double proposedTime = parentGameplayClock.CurrentTime;
 
-            var newProposedTime = parentGameplayClock.CurrentTime;
+            if (FrameStablePlayback)
+                // if we require frame stability, the proposed time will be adjusted to move at most one known
+                // frame interval in the current direction.
+                applyFrameStability(ref proposedTime);
 
-            try
+            if (hasReplayAttached)
             {
-                if (!FrameStablePlayback)
-                    return;
+                bool valid = updateReplay(ref proposedTime);
 
-                if (firstConsumption)
+                if (!valid)
+                    state = PlaybackState.NotValid;
+            }
+
+            if (state == PlaybackState.Valid)
+                direction = proposedTime >= manualClock.CurrentTime ? 1 : -1;
+
+            double timeBehind = Math.Abs(proposedTime - parentGameplayClock.CurrentTime);
+
+            frameStableClock.IsCatchingUp.Value = timeBehind > 200;
+            frameStableClock.WaitingOnFrames.Value = state == PlaybackState.NotValid;
+
+            manualClock.CurrentTime = proposedTime;
+            manualClock.Rate = Math.Abs(parentGameplayClock.Rate) * direction;
+            manualClock.IsRunning = parentGameplayClock.IsRunning;
+
+            // determine whether catch-up is required.
+            if (state == PlaybackState.Valid && timeBehind > 0)
+                state = PlaybackState.RequiresCatchUp;
+
+            // The manual clock time has changed in the above code. The framed clock now needs to be updated
+            // to ensure that the its time is valid for our children before input is processed
+            framedClock.ProcessFrame();
+        }
+
+        /// <summary>
+        /// Attempt to advance replay playback for a given time.
+        /// </summary>
+        /// <param name="proposedTime">The time which is to be displayed.</param>
+        /// <returns>Whether playback is still valid.</returns>
+        private bool updateReplay(ref double proposedTime)
+        {
+            double? newTime;
+
+            if (FrameStablePlayback)
+            {
+                // when stability is turned on, we shouldn't execute for time values the replay is unable to satisfy.
+                newTime = ReplayInputHandler.SetFrameFromTime(proposedTime);
+            }
+            else
+            {
+                // when stability is disabled, we don't really care about accuracy.
+                // looping over the replay will allow it to catch up and feed out the required values
+                // for the current time.
+                while ((newTime = ReplayInputHandler.SetFrameFromTime(proposedTime)) != proposedTime)
                 {
-                    // On the first update, frame-stability seeking would result in unexpected/unwanted behaviour.
-                    // Instead we perform an initial seek to the proposed time.
-
-                    // process frame (in addition to finally clause) to clear out ElapsedTime
-                    manualClock.CurrentTime = newProposedTime;
-                    framedClock.ProcessFrame();
-
-                    firstConsumption = false;
-                }
-                else if (manualClock.CurrentTime < gameplayStartTime)
-                    manualClock.CurrentTime = newProposedTime = Math.Min(gameplayStartTime, newProposedTime);
-                else if (Math.Abs(manualClock.CurrentTime - newProposedTime) > sixty_frame_time * 1.2f)
-                {
-                    newProposedTime = newProposedTime > manualClock.CurrentTime
-                        ? Math.Min(newProposedTime, manualClock.CurrentTime + sixty_frame_time)
-                        : Math.Max(newProposedTime, manualClock.CurrentTime - sixty_frame_time);
-                }
-
-                if (isAttached)
-                {
-                    double? newTime = ReplayInputHandler.SetFrameFromTime(newProposedTime);
-
                     if (newTime == null)
                     {
-                        // we shouldn't execute for this time value. probably waiting on more replay data.
-                        validState = false;
-                        requireMoreUpdateLoops = true;
-                        return;
+                        // special case for when the replay actually can't arrive at the required time.
+                        // protects from potential endless loop.
+                        break;
                     }
-
-                    newProposedTime = newTime.Value;
                 }
             }
-            finally
+
+            if (newTime == null)
+                return false;
+
+            proposedTime = newTime.Value;
+            return true;
+        }
+
+        /// <summary>
+        /// Apply frame stability modifier to a time.
+        /// </summary>
+        /// <param name="proposedTime">The time which is to be displayed.</param>
+        private void applyFrameStability(ref double proposedTime)
+        {
+            if (firstConsumption)
             {
-                if (newProposedTime != manualClock.CurrentTime)
-                    direction = newProposedTime > manualClock.CurrentTime ? 1 : -1;
+                // On the first update, frame-stability seeking would result in unexpected/unwanted behaviour.
+                // Instead we perform an initial seek to the proposed time.
 
-                manualClock.CurrentTime = newProposedTime;
-                manualClock.Rate = Math.Abs(parentGameplayClock.Rate) * direction;
-                manualClock.IsRunning = parentGameplayClock.IsRunning;
-
-                requireMoreUpdateLoops |= manualClock.CurrentTime != parentGameplayClock.CurrentTime;
-
-                // The manual clock time has changed in the above code. The framed clock now needs to be updated
-                // to ensure that the its time is valid for our children before input is processed
+                // process frame (in addition to finally clause) to clear out ElapsedTime
+                manualClock.CurrentTime = proposedTime;
                 framedClock.ProcessFrame();
+
+                firstConsumption = false;
+                return;
+            }
+
+            if (manualClock.CurrentTime < gameplayStartTime)
+                manualClock.CurrentTime = proposedTime = Math.Min(gameplayStartTime, proposedTime);
+            else if (Math.Abs(manualClock.CurrentTime - proposedTime) > sixty_frame_time * 1.2f)
+            {
+                proposedTime = proposedTime > manualClock.CurrentTime
+                    ? Math.Min(proposedTime, manualClock.CurrentTime + sixty_frame_time)
+                    : Math.Max(proposedTime, manualClock.CurrentTime - sixty_frame_time);
             }
         }
 
         private void setClock()
         {
-            // in case a parent gameplay clock isn't available, just use the parent clock.
             if (parentGameplayClock == null)
-                parentGameplayClock = Clock;
-
-            Clock = GameplayClock;
-            ProcessCustomClock = false;
+            {
+                // in case a parent gameplay clock isn't available, just use the parent clock.
+                parentGameplayClock ??= Clock;
+            }
+            else
+            {
+                Clock = frameStableClock;
+            }
         }
 
         public ReplayInputHandler ReplayInputHandler { get; set; }
+
+        private enum PlaybackState
+        {
+            /// <summary>
+            /// Playback is not possible. Child hierarchy should not be processed.
+            /// </summary>
+            NotValid,
+
+            /// <summary>
+            /// Playback is running behind real-time. Catch-up will be attempted by processing more than once per
+            /// game loop (limited to a sane maximum to avoid frame drops).
+            /// </summary>
+            RequiresCatchUp,
+
+            /// <summary>
+            /// In a valid state, progressing one child hierarchy loop per game loop.
+            /// </summary>
+            Valid
+        }
+
+        private class FrameStabilityClock : GameplayClock, IFrameStableClock
+        {
+            public GameplayClock ParentGameplayClock;
+
+            public readonly Bindable<bool> IsCatchingUp = new Bindable<bool>();
+
+            public readonly Bindable<bool> WaitingOnFrames = new Bindable<bool>();
+
+            public override IEnumerable<Bindable<double>> NonGameplayAdjustments => ParentGameplayClock?.NonGameplayAdjustments ?? Enumerable.Empty<Bindable<double>>();
+
+            public FrameStabilityClock(FramedClock underlyingClock)
+                : base(underlyingClock)
+            {
+            }
+
+            IBindable<bool> IFrameStableClock.IsCatchingUp => IsCatchingUp;
+
+            IBindable<bool> IFrameStableClock.WaitingOnFrames => WaitingOnFrames;
+        }
     }
 }

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Beatmaps.Timing;
@@ -16,8 +17,6 @@ namespace osu.Game.Beatmaps.Formats
 {
     public class LegacyBeatmapDecoder : LegacyDecoder<Beatmap>
     {
-        public const int LATEST_VERSION = 14;
-
         private Beatmap beatmap;
 
         private ConvertHitObjectParser parser;
@@ -175,6 +174,10 @@ namespace osu.Game.Beatmaps.Formats
                 case @"WidescreenStoryboard":
                     beatmap.BeatmapInfo.WidescreenStoryboard = Parsing.ParseInt(pair.Value) == 1;
                     break;
+
+                case @"EpilepsyWarning":
+                    beatmap.BeatmapInfo.EpilepsyWarning = Parsing.ParseInt(pair.Value) == 1;
+                    break;
             }
         }
 
@@ -305,17 +308,9 @@ namespace osu.Game.Beatmaps.Formats
 
                 case LegacyEventType.Break:
                     double start = getOffsetTime(Parsing.ParseDouble(split[1]));
+                    double end = Math.Max(start, getOffsetTime(Parsing.ParseDouble(split[2])));
 
-                    var breakEvent = new BreakPeriod
-                    {
-                        StartTime = start,
-                        EndTime = Math.Max(start, getOffsetTime(Parsing.ParseDouble(split[2])))
-                    };
-
-                    if (!breakEvent.HasEffect)
-                        return;
-
-                    beatmap.Breaks.Add(breakEvent);
+                    beatmap.Breaks.Add(new BreakPeriod(start, end));
                     break;
             }
         }
@@ -354,8 +349,8 @@ namespace osu.Game.Beatmaps.Formats
             if (split.Length >= 8)
             {
                 LegacyEffectFlags effectFlags = (LegacyEffectFlags)Parsing.ParseInt(split[7]);
-                kiaiMode = effectFlags.HasFlag(LegacyEffectFlags.Kiai);
-                omitFirstBarSignature = effectFlags.HasFlag(LegacyEffectFlags.OmitFirstBarLine);
+                kiaiMode = effectFlags.HasFlagFast(LegacyEffectFlags.Kiai);
+                omitFirstBarSignature = effectFlags.HasFlagFast(LegacyEffectFlags.OmitFirstBarLine);
             }
 
             string stringSampleSet = sampleSet.ToString().ToLowerInvariant();
@@ -372,7 +367,9 @@ namespace osu.Game.Beatmaps.Formats
                 addControlPoint(time, controlPoint, true);
             }
 
-            addControlPoint(time, new LegacyDifficultyControlPoint
+#pragma warning disable 618
+            addControlPoint(time, new LegacyDifficultyControlPoint(beatLength)
+#pragma warning restore 618
             {
                 SpeedMultiplier = speedMultiplier,
             }, timingChange);
@@ -389,17 +386,10 @@ namespace osu.Game.Beatmaps.Formats
                 SampleVolume = sampleVolume,
                 CustomSampleBank = customSampleBank,
             }, timingChange);
-
-            // To handle the scenario where a non-timing line shares the same time value as a subsequent timing line but
-            // appears earlier in the file, we buffer non-timing control points and rewrite them *after* control points from the timing line
-            // with the same time value (allowing them to overwrite as necessary).
-            //
-            // The expected outcome is that we prefer the non-timing line's adjustments over the timing line's adjustments when time is equal.
-            if (timingChange)
-                flushPendingPoints();
         }
 
         private readonly List<ControlPoint> pendingControlPoints = new List<ControlPoint>();
+        private readonly HashSet<Type> pendingControlPointTypes = new HashSet<Type>();
         private double pendingControlPointsTime;
 
         private void addControlPoint(double time, ControlPoint point, bool timingChange)
@@ -408,28 +398,34 @@ namespace osu.Game.Beatmaps.Formats
                 flushPendingPoints();
 
             if (timingChange)
-            {
-                beatmap.ControlPointInfo.Add(time, point);
-                return;
-            }
+                pendingControlPoints.Insert(0, point);
+            else
+                pendingControlPoints.Add(point);
 
-            pendingControlPoints.Add(point);
             pendingControlPointsTime = time;
         }
 
         private void flushPendingPoints()
         {
-            foreach (var p in pendingControlPoints)
-                beatmap.ControlPointInfo.Add(pendingControlPointsTime, p);
+            // Changes from non-timing-points are added to the end of the list (see addControlPoint()) and should override any changes from timing-points (added to the start of the list).
+            for (int i = pendingControlPoints.Count - 1; i >= 0; i--)
+            {
+                var type = pendingControlPoints[i].GetType();
+                if (pendingControlPointTypes.Contains(type))
+                    continue;
+
+                pendingControlPointTypes.Add(type);
+                beatmap.ControlPointInfo.Add(pendingControlPointsTime, pendingControlPoints[i]);
+            }
 
             pendingControlPoints.Clear();
+            pendingControlPointTypes.Clear();
         }
 
         private void handleHitObject(string line)
         {
             // If the ruleset wasn't specified, assume the osu!standard ruleset.
-            if (parser == null)
-                parser = new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser(getOffsetTime(), FormatVersion);
+            parser ??= new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser(getOffsetTime(), FormatVersion);
 
             var obj = parser.Parse(line);
             if (obj != null)

@@ -22,7 +22,7 @@ namespace osu.Game.Overlays
         {
             AutoSizeAxes = Axes.Both,
             Direction = FillDirection.Horizontal,
-            Spacing = new Vector2(25, 0),
+            Spacing = new Vector2(20, 0),
         };
     }
 }

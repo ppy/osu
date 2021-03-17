@@ -1,15 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Online;
-using osu.Game.Overlays.Direct;
+using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Tests.Resources;
 using osuTK;
@@ -18,11 +16,6 @@ namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneDirectDownloadButton : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(PanelDownloadButton)
-        };
-
         private TestDownloadButton downloadButton;
 
         [Resolved]
@@ -49,7 +42,7 @@ namespace osu.Game.Tests.Visual.Online
             ensureSoleilyRemoved();
             createButtonWithBeatmap(createSoleily());
             AddAssert("button state not downloaded", () => downloadButton.DownloadState == DownloadState.NotDownloaded);
-            AddStep("import soleily", () => beatmaps.Import(new[] { TestResources.GetTestBeatmapForImport() }));
+            AddStep("import soleily", () => beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()));
             AddUntilStep("wait for beatmap import", () => beatmaps.GetAllUsableBeatmapSets().Any(b => b.OnlineBeatmapSetID == 241526));
             createButtonWithBeatmap(createSoleily());
             AddAssert("button state downloaded", () => downloadButton.DownloadState == DownloadState.LocallyAvailable);
@@ -143,14 +136,14 @@ namespace osu.Game.Tests.Visual.Online
             return beatmap;
         }
 
-        private class TestDownloadButton : PanelDownloadButton
+        private class TestDownloadButton : BeatmapPanelDownloadButton
         {
             public new bool DownloadEnabled => base.DownloadEnabled;
 
             public DownloadState DownloadState => State.Value;
 
-            public TestDownloadButton(BeatmapSetInfo beatmapSet, bool noVideo = false)
-                : base(beatmapSet, noVideo)
+            public TestDownloadButton(BeatmapSetInfo beatmapSet)
+                : base(beatmapSet)
             {
             }
         }

@@ -4,7 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Mania.Skinning.Default;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints.Components
 {
@@ -12,12 +12,12 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints.Components
     {
         public EditNotePiece()
         {
-            Height = NotePiece.NOTE_HEIGHT;
+            Height = DefaultNotePiece.NOTE_HEIGHT;
 
             CornerRadius = 5;
             Masking = true;
 
-            InternalChild = new NotePiece();
+            InternalChild = new DefaultNotePiece();
         }
 
         [BackgroundDependencyLoader]

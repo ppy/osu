@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 {
     public class CatchDifficultyCalculator : DifficultyCalculator
     {
-        private const double star_scaling_factor = 0.145;
+        private const double star_scaling_factor = 0.153;
 
         protected override int SectionLength => 750;
 
@@ -69,17 +69,16 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             }
         }
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap)
+        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods)
         {
-            using (var catcher = new Catcher(beatmap.BeatmapInfo.BaseDifficulty))
-            {
-                halfCatcherWidth = catcher.CatchWidth * 0.5f;
-                halfCatcherWidth *= 0.8f; // We're only using 80% of the catcher's width to simulate imperfect gameplay.
-            }
+            halfCatcherWidth = Catcher.CalculateCatchWidth(beatmap.BeatmapInfo.BaseDifficulty) * 0.5f;
+
+            // For circle sizes above 5.5, reduce the catcher width further to simulate imperfect gameplay.
+            halfCatcherWidth *= 1 - (Math.Max(0, beatmap.BeatmapInfo.BaseDifficulty.CircleSize - 5.5f) * 0.0625f);
 
             return new Skill[]
             {
-                new Movement(halfCatcherWidth),
+                new Movement(mods, halfCatcherWidth),
             };
         }
 

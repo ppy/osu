@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -17,11 +16,6 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestSceneUserProfilePreviousUsernames : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(PreviousUsernames)
-        };
-
         [Resolved]
         private IAPIProvider api { get; set; }
 

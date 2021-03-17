@@ -60,6 +60,7 @@ namespace osu.Game.Graphics.Backgrounds
         /// <summary>
         /// Whether we want to expire triangles as they exit our draw area completely.
         /// </summary>
+        [Obsolete("Unused.")] // Can be removed 20210518
         protected virtual bool ExpireOffScreenTriangles => true;
 
         /// <summary>
@@ -88,11 +89,19 @@ namespace osu.Game.Graphics.Backgrounds
 
         private readonly SortedList<TriangleParticle> parts = new SortedList<TriangleParticle>(Comparer<TriangleParticle>.Default);
 
+        private Random stableRandom;
         private IShader shader;
         private readonly Texture texture;
 
-        public Triangles()
+        /// <summary>
+        /// Construct a new triangle visualisation.
+        /// </summary>
+        /// <param name="seed">An optional seed to stabilise random positions / attributes. Note that this does not guarantee stable playback when seeking in time.</param>
+        public Triangles(int? seed = null)
         {
+            if (seed != null)
+                stableRandom = new Random(seed.Value);
+
             texture = Texture.WhitePixel;
         }
 
@@ -161,7 +170,20 @@ namespace osu.Game.Graphics.Backgrounds
             }
         }
 
-        protected int AimCount;
+        /// <summary>
+        /// Clears and re-initialises triangles according to a given seed.
+        /// </summary>
+        /// <param name="seed">An optional seed to stabilise random positions / attributes. Note that this does not guarantee stable playback when seeking in time.</param>
+        public void Reset(int? seed = null)
+        {
+            if (seed != null)
+                stableRandom = new Random(seed.Value);
+
+            parts.Clear();
+            addTriangles(true);
+        }
+
+        protected int AimCount { get; private set; }
 
         private void addTriangles(bool randomY)
         {
@@ -175,8 +197,8 @@ namespace osu.Game.Graphics.Backgrounds
         {
             TriangleParticle particle = CreateTriangle();
 
-            particle.Position = new Vector2(RNG.NextSingle(), randomY ? RNG.NextSingle() : 1);
-            particle.ColourShade = RNG.NextSingle();
+            particle.Position = new Vector2(nextRandom(), randomY ? nextRandom() : 1);
+            particle.ColourShade = nextRandom();
             particle.Colour = CreateTriangleShade(particle.ColourShade);
 
             return particle;
@@ -191,10 +213,10 @@ namespace osu.Game.Graphics.Backgrounds
             const float std_dev = 0.16f;
             const float mean = 0.5f;
 
-            float u1 = 1 - RNG.NextSingle(); //uniform(0,1] random floats
-            float u2 = 1 - RNG.NextSingle();
-            float randStdNormal = (float)(Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2)); //random normal(0,1)
-            var scale = Math.Max(triangleScale * (mean + std_dev * randStdNormal), 0.1f); //random normal(mean,stdDev^2)
+            float u1 = 1 - nextRandom(); //uniform(0,1] random floats
+            float u2 = 1 - nextRandom();
+            float randStdNormal = (float)(Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2)); // random normal(0,1)
+            var scale = Math.Max(triangleScale * (mean + std_dev * randStdNormal), 0.1f); // random normal(mean,stdDev^2)
 
             return new TriangleParticle { Scale = scale };
         }
@@ -214,6 +236,8 @@ namespace osu.Game.Graphics.Backgrounds
                 parts[i] = newParticle;
             }
         }
+
+        private float nextRandom() => (float)(stableRandom?.NextDouble() ?? RNG.NextSingle());
 
         protected override DrawNode CreateDrawNode() => new TrianglesDrawNode(this);
 

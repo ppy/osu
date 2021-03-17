@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public CatcherSprite(CatcherAnimationState state)
             : base(new CatchSkinComponent(componentFromState(state)), _ =>
-                new DefaultCatcherSprite(state), confineMode: ConfineMode.ScaleDownToFit)
+                new DefaultCatcherSprite(state), confineMode: ConfineMode.ScaleToFit)
         {
             RelativeSizeAxes = Axes.None;
             Size = new Vector2(CatcherArea.CATCHER_SIZE);

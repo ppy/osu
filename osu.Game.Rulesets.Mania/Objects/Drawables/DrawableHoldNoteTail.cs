@@ -18,6 +18,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// </summary>
         private const double release_window_lenience = 1.5;
 
+        protected override ManiaSkinComponents Component => ManiaSkinComponents.HoldNoteTail;
+
         private readonly DrawableHoldNote holdNote;
 
         public DrawableHoldNoteTail(DrawableHoldNote holdNote)
@@ -27,6 +29,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         }
 
         public void UpdateResult() => base.UpdateResult(true);
+
+        protected override double MaximumJudgementOffset => base.MaximumJudgementOffset * release_window_lenience;
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
@@ -38,7 +42,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    ApplyResult(r => r.Type = HitResult.Miss);
+                    ApplyResult(r => r.Type = r.Judgement.MinResult);
 
                 return;
             }
@@ -50,7 +54,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             ApplyResult(r =>
             {
                 // If the head wasn't hit or the hold note was broken, cap the max score to Meh.
-                if (result > HitResult.Meh && (!holdNote.Head.IsHit || holdNote.HasBroken))
+                if (result > HitResult.Meh && (!holdNote.Head.IsHit || holdNote.HoldBrokenTime != null))
                     result = HitResult.Meh;
 
                 r.Type = result;

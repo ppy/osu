@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             var beatmap = Beatmap.Value.GetPlayableBeatmap(ruleset.RulesetInfo, Array.Empty<Mod>());
 
-            return new ScoreAccessibleReplayPlayer(ruleset.GetAutoplayMod().CreateReplayScore(beatmap));
+            return new ScoreAccessibleReplayPlayer(ruleset.GetAutoplayMod()?.CreateReplayScore(beatmap, Array.Empty<Mod>()));
         }
 
         protected override void AddCheckSteps()
@@ -33,7 +33,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
             public new HUDOverlay HUDOverlay => base.HUDOverlay;
-            public new bool AllowFail => base.AllowFail;
+
+            public bool AllowFail => base.CheckModsAllowFailure();
 
             protected override bool PauseOnFocusLost => false;
 

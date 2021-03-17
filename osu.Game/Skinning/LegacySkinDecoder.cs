@@ -44,6 +44,12 @@ namespace osu.Game.Skinning
                         }
 
                         break;
+
+                    // osu!catch section only has colour settings
+                    // so no harm in handling the entire section
+                    case Section.CatchTheBeat:
+                        HandleColours(skin, line);
+                        return;
                 }
 
                 if (!string.IsNullOrEmpty(pair.Key))
@@ -51,6 +57,13 @@ namespace osu.Game.Skinning
             }
 
             base.ParseLine(skin, section, line);
+        }
+
+        protected override LegacySkinConfiguration CreateTemplateObject()
+        {
+            var config = base.CreateTemplateObject();
+            config.LegacyVersion = 1.0m;
+            return config;
         }
     }
 }

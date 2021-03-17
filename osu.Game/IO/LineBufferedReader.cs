@@ -17,9 +17,9 @@ namespace osu.Game.IO
         private readonly StreamReader streamReader;
         private readonly Queue<string> lineBuffer;
 
-        public LineBufferedReader(Stream stream)
+        public LineBufferedReader(Stream stream, bool leaveOpen = false)
         {
-            streamReader = new StreamReader(stream);
+            streamReader = new StreamReader(stream, Encoding.UTF8, true, 1024, leaveOpen);
             lineBuffer = new Queue<string>();
         }
 

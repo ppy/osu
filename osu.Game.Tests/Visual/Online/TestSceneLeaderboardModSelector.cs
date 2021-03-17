@@ -2,8 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Overlays.BeatmapSet;
-using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Graphics;
@@ -23,11 +21,6 @@ namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneLeaderboardModSelector : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(LeaderboardModSelector),
-        };
-
         public TestSceneLeaderboardModSelector()
         {
             LeaderboardModSelector modSelector;

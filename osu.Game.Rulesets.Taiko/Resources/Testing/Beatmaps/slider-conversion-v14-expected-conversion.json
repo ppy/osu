@@ -1,0 +1,96 @@
+{
+    "Mappings": [
+        {
+            "StartTime": 2000,
+            "Objects": [
+                {
+                    "StartTime": 2000,
+                    "EndTime": 2000,
+                    "IsRim": false,
+                    "IsCentre": true,
+                    "IsDrumRoll": false,
+                    "IsSwell": false,
+                    "IsStrong": true
+                },
+                {
+                    "StartTime": 2173,
+                    "EndTime": 2173,
+                    "IsRim": true,
+                    "IsCentre": false,
+                    "IsDrumRoll": false,
+                    "IsSwell": false,
+                    "IsStrong": false
+                }
+            ]
+        },
+        {
+            "StartTime": 4000,
+            "Objects": [
+                {
+                    "StartTime": 4000,
+                    "EndTime": 4000,
+                    "IsRim": false,
+                    "IsCentre": true,
+                    "IsDrumRoll": false,
+                    "IsSwell": false,
+                    "IsStrong": false
+                },
+                {
+                    "StartTime": 4173,
+                    "EndTime": 4173,
+                    "IsRim": true,
+                    "IsCentre": false,
+                    "IsDrumRoll": false,
+                    "IsSwell": false,
+                    "IsStrong": false
+                }
+            ]
+        },
+        {
+            "StartTime": 6000,
+            "Objects": [
+                {
+                    "StartTime": 6000,
+                    "EndTime": 6000,
+                    "IsRim": true,
+                    "IsCentre": false,
+                    "IsDrumRoll": false,
+                    "IsSwell": false,
+                    "IsStrong": false
+                },
+                {
+                    "StartTime": 6271,
+                    "EndTime": 6271,
+                    "IsRim": true,
+                    "IsCentre": false,
+                    "IsDrumRoll": false,
+                    "IsSwell": false,
+                    "IsStrong": false
+                },
+                {
+                    "StartTime": 6542,
+                    "EndTime": 6542,
+                    "IsRim": false,
+                    "IsCentre": true,
+                    "IsDrumRoll": false,
+                    "IsSwell": false,
+                    "IsStrong": false
+                }
+            ]
+        },
+        {
+            "StartTime": 8000,
+            "Objects": [
+                {
+                    "StartTime": 8000,
+                    "EndTime": 8857,
+                    "IsRim": false,
+                    "IsCentre": false,
+                    "IsDrumRoll": true,
+                    "IsSwell": false,
+                    "IsStrong": false
+                }
+            ]
+        }
+    ]
+}

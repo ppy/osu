@@ -6,6 +6,8 @@ using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Objects;
 using System.Linq;
+using System.Threading;
+using Newtonsoft.Json;
 using osu.Framework.Caching;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -16,15 +18,16 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
-    public class Slider : OsuHitObject, IHasCurve
+    public class Slider : OsuHitObject, IHasPathWithRepeats
     {
-        public double EndTime
+        public double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
+
+        [JsonIgnore]
+        public double Duration
         {
-            get => StartTime + this.SpanCount() * Path.Distance / Velocity;
+            get => EndTime - StartTime;
             set => throw new System.NotSupportedException($"Adjust via {nameof(RepeatCount)} instead"); // can be implemented if/when needed.
         }
-
-        public double Duration => EndTime - StartTime;
 
         private readonly Cached<Vector2> endPositionCache = new Cached<Vector2>();
 
@@ -111,8 +114,17 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         public double TickDistanceMultiplier = 1;
 
-        public HitCircle HeadCircle;
-        public SliderTailCircle TailCircle;
+        /// <summary>
+        /// Whether this <see cref="Slider"/>'s judgement is fully handled by its nested <see cref="HitObject"/>s.
+        /// If <c>false</c>, this <see cref="Slider"/> will be judged proportionally to the number of nested <see cref="HitObject"/>s hit.
+        /// </summary>
+        public bool OnlyJudgeNestedObjects = true;
+
+        [JsonIgnore]
+        public SliderHeadCircle HeadCircle { get; protected set; }
+
+        [JsonIgnore]
+        public SliderTailCircle TailCircle { get; protected set; }
 
         public Slider()
         {
@@ -131,14 +143,19 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             Velocity = scoringDistance / timingPoint.BeatLength;
             TickDistance = scoringDistance / difficulty.SliderTickRate * TickDistanceMultiplier;
+
+            // The samples should be attached to the slider tail, however this can only be done after LegacyLastTick is removed otherwise they would play earlier than they're intended to.
+            // For now, the samples are attached to and played by the slider itself at the correct end time.
+            // ToArray call is required as GetNodeSamples may fallback to Samples itself (without it it will get cleared due to the list reference being live).
+            Samples = this.GetNodeSamples(repeatCount + 1).ToArray();
         }
 
-        protected override void CreateNestedHitObjects()
+        protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
         {
-            base.CreateNestedHitObjects();
+            base.CreateNestedHitObjects(cancellationToken);
 
             foreach (var e in
-                SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset))
+                SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset, cancellationToken))
             {
                 switch (e.Type)
                 {
@@ -155,7 +172,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                         break;
 
                     case SliderEventType.Head:
-                        AddNested(HeadCircle = new SliderCircle
+                        AddNested(HeadCircle = new SliderHeadCircle
                         {
                             StartTime = e.Time,
                             Position = Position,
@@ -170,6 +187,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                         // if this is to change, we should revisit this.
                         AddNested(TailCircle = new SliderTailCircle(this)
                         {
+                            RepeatIndex = e.SpanIndex,
                             StartTime = e.Time,
                             Position = EndPosition,
                             StackHeight = StackHeight
@@ -177,10 +195,9 @@ namespace osu.Game.Rulesets.Osu.Objects
                         break;
 
                     case SliderEventType.Repeat:
-                        AddNested(new SliderRepeat
+                        AddNested(new SliderRepeat(this)
                         {
                             RepeatIndex = e.SpanIndex,
-                            SpanDuration = SpanDuration,
                             StartTime = StartTime + (e.SpanIndex + 1) * SpanDuration,
                             Position = Position + Path.PositionAt(e.PathProgress),
                             StackHeight = StackHeight,
@@ -211,29 +228,19 @@ namespace osu.Game.Rulesets.Osu.Objects
             var sampleList = new List<HitSampleInfo>();
 
             if (firstSample != null)
-            {
-                sampleList.Add(new HitSampleInfo
-                {
-                    Bank = firstSample.Bank,
-                    Volume = firstSample.Volume,
-                    Name = @"slidertick",
-                });
-            }
+                sampleList.Add(firstSample.With("slidertick"));
 
             foreach (var tick in NestedHitObjects.OfType<SliderTick>())
                 tick.Samples = sampleList;
 
             foreach (var repeat in NestedHitObjects.OfType<SliderRepeat>())
-                repeat.Samples = getNodeSamples(repeat.RepeatIndex + 1);
+                repeat.Samples = this.GetNodeSamples(repeat.RepeatIndex + 1);
 
             if (HeadCircle != null)
-                HeadCircle.Samples = getNodeSamples(0);
+                HeadCircle.Samples = this.GetNodeSamples(0);
         }
 
-        private IList<HitSampleInfo> getNodeSamples(int nodeIndex) =>
-            nodeIndex < NodeSamples.Count ? NodeSamples[nodeIndex] : Samples;
-
-        public override Judgement CreateJudgement() => new OsuIgnoreJudgement();
+        public override Judgement CreateJudgement() => OnlyJudgeNestedObjects ? new OsuIgnoreJudgement() : new OsuJudgement();
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }

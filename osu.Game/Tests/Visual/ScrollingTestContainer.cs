@@ -30,6 +30,11 @@ namespace osu.Game.Tests.Visual
             set => scrollingInfo.TimeRange.Value = value;
         }
 
+        public ScrollingDirection Direction
+        {
+            set => scrollingInfo.Direction.Value = value;
+        }
+
         public IScrollingInfo ScrollingInfo => scrollingInfo;
 
         [Cached(Type = typeof(IScrollingInfo))]
@@ -42,7 +47,7 @@ namespace osu.Game.Tests.Visual
 
         public void Flip() => scrollingInfo.Direction.Value = scrollingInfo.Direction.Value == ScrollingDirection.Up ? ScrollingDirection.Down : ScrollingDirection.Up;
 
-        private class TestScrollingInfo : IScrollingInfo
+        public class TestScrollingInfo : IScrollingInfo
         {
             public readonly Bindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
             IBindable<ScrollingDirection> IScrollingInfo.Direction => Direction;
@@ -54,7 +59,7 @@ namespace osu.Game.Tests.Visual
             IScrollAlgorithm IScrollingInfo.Algorithm => Algorithm;
         }
 
-        private class TestScrollAlgorithm : IScrollAlgorithm
+        public class TestScrollAlgorithm : IScrollAlgorithm
         {
             public readonly SortedList<MultiplierControlPoint> ControlPoints = new SortedList<MultiplierControlPoint>();
 

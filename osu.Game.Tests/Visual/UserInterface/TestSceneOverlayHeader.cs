@@ -3,12 +3,9 @@
 
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays;
-using System;
-using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Allocation;
-using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Shapes;
 using osuTK.Graphics;
 
@@ -16,18 +13,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestSceneOverlayHeader : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(OverlayHeader),
-            typeof(TabControlOverlayHeader<>),
-            typeof(BreadcrumbControlOverlayHeader),
-            typeof(TestNoControlHeader),
-            typeof(TestStringTabControlHeader),
-            typeof(TestEnumTabControlHeader),
-            typeof(TestBreadcrumbControlHeader),
-            typeof(OverlayHeaderBackground)
-        };
-
         private readonly FillFlowContainer flow;
 
         public TestSceneOverlayHeader()
@@ -51,11 +36,11 @@ namespace osu.Game.Tests.Visual.UserInterface
                 }
             });
 
-            addHeader("Orange OverlayHeader (no background)", new TestNoBackgroundHeader(), OverlayColourScheme.Orange);
-            addHeader("Blue OverlayHeader", new TestNoControlHeader(), OverlayColourScheme.Blue);
+            addHeader("Orange OverlayHeader (no background, 100 padding)", new TestNoBackgroundHeader(), OverlayColourScheme.Orange);
+            addHeader("Blue OverlayHeader (default 50 padding)", new TestNoControlHeader(), OverlayColourScheme.Blue);
             addHeader("Green TabControlOverlayHeader (string) with ruleset selector", new TestStringTabControlHeader(), OverlayColourScheme.Green);
-            addHeader("Pink TabControlOverlayHeader (enum)", new TestEnumTabControlHeader(), OverlayColourScheme.Pink);
-            addHeader("Red BreadcrumbControlOverlayHeader (no background)", new TestBreadcrumbControlHeader(), OverlayColourScheme.Red);
+            addHeader("Pink TabControlOverlayHeader (enum, 30 padding)", new TestEnumTabControlHeader(), OverlayColourScheme.Pink);
+            addHeader("Red BreadcrumbControlOverlayHeader (no background, 10 padding)", new TestBreadcrumbControlHeader(), OverlayColourScheme.Red);
         }
 
         private void addHeader(string name, OverlayHeader header, OverlayColourScheme colourScheme)
@@ -100,21 +85,26 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private class TestNoBackgroundHeader : OverlayHeader
         {
-            protected override ScreenTitle CreateTitle() => new TestTitle();
+            protected override OverlayTitle CreateTitle() => new TestTitle();
+
+            public TestNoBackgroundHeader()
+            {
+                ContentSidePadding = 100;
+            }
         }
 
         private class TestNoControlHeader : OverlayHeader
         {
             protected override Drawable CreateBackground() => new OverlayHeaderBackground(@"Headers/changelog");
 
-            protected override ScreenTitle CreateTitle() => new TestTitle();
+            protected override OverlayTitle CreateTitle() => new TestTitle();
         }
 
         private class TestStringTabControlHeader : TabControlOverlayHeader<string>
         {
             protected override Drawable CreateBackground() => new OverlayHeaderBackground(@"Headers/news");
 
-            protected override ScreenTitle CreateTitle() => new TestTitle();
+            protected override OverlayTitle CreateTitle() => new TestTitle();
 
             protected override Drawable CreateTitleContent() => new OverlayRulesetSelector();
 
@@ -127,9 +117,14 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private class TestEnumTabControlHeader : TabControlOverlayHeader<TestEnum>
         {
+            public TestEnumTabControlHeader()
+            {
+                ContentSidePadding = 30;
+            }
+
             protected override Drawable CreateBackground() => new OverlayHeaderBackground(@"Headers/rankings");
 
-            protected override ScreenTitle CreateTitle() => new TestTitle();
+            protected override OverlayTitle CreateTitle() => new TestTitle();
         }
 
         private enum TestEnum
@@ -141,25 +136,25 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private class TestBreadcrumbControlHeader : BreadcrumbControlOverlayHeader
         {
-            protected override ScreenTitle CreateTitle() => new TestTitle();
+            protected override OverlayTitle CreateTitle() => new TestTitle();
 
             public TestBreadcrumbControlHeader()
             {
+                ContentSidePadding = 10;
+
                 TabControl.AddItem("tab1");
                 TabControl.AddItem("tab2");
                 TabControl.Current.Value = "tab2";
             }
         }
 
-        private class TestTitle : ScreenTitle
+        private class TestTitle : OverlayTitle
         {
             public TestTitle()
             {
                 Title = "title";
-                Section = "section";
+                IconTexture = "Icons/changelog";
             }
-
-            protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/changelog");
         }
     }
 }

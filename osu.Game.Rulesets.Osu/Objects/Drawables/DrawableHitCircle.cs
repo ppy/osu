@@ -3,39 +3,48 @@
 
 using System;
 using System.Diagnostics;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Osu.Judgements;
+using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Rulesets.Scoring;
-using osuTK;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableHitCircle : DrawableOsuHitObject, IDrawableHitObjectWithProxiedApproach
+    public class DrawableHitCircle : DrawableOsuHitObject
     {
-        public ApproachCircle ApproachCircle { get; }
-
-        private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
-        private readonly IBindable<int> stackHeightBindable = new Bindable<int>();
-        private readonly IBindable<float> scaleBindable = new BindableFloat();
-
         public OsuAction? HitAction => HitArea.HitAction;
+        protected virtual OsuSkinComponents CirclePieceComponent => OsuSkinComponents.HitCircle;
 
-        public readonly HitReceptor HitArea;
-        public readonly SkinnableDrawable CirclePiece;
-        private readonly Container scaleContainer;
+        public ApproachCircle ApproachCircle { get; private set; }
+        public HitReceptor HitArea { get; private set; }
+        public SkinnableDrawable CirclePiece { get; private set; }
 
-        public DrawableHitCircle(HitCircle h)
+        private Container scaleContainer;
+        private InputManager inputManager;
+
+        public DrawableHitCircle()
+            : this(null)
+        {
+        }
+
+        public DrawableHitCircle([CanBeNull] HitCircle h = null)
             : base(h)
         {
-            Origin = Anchor.Centre;
+        }
 
-            Position = HitObject.StackedPosition;
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Origin = Anchor.Centre;
 
             InternalChildren = new Drawable[]
             {
@@ -57,7 +66,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                                 return true;
                             },
                         },
-                        CirclePiece = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.HitCircle), _ => new MainCirclePiece()),
+                        CirclePiece = new SkinnableDrawable(new OsuSkinComponent(CirclePieceComponent), _ => new MainCirclePiece()),
                         ApproachCircle = new ApproachCircle
                         {
                             Alpha = 0,
@@ -68,20 +77,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             };
 
             Size = HitArea.DrawSize;
+
+            PositionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
+            StackHeightBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
+            ScaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue));
+            AccentColour.BindValueChanged(accent => ApproachCircle.Colour = accent.NewValue);
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void LoadComplete()
         {
-            positionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
-            stackHeightBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
-            scaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue), true);
+            base.LoadComplete();
 
-            positionBindable.BindTo(HitObject.PositionBindable);
-            stackHeightBindable.BindTo(HitObject.StackHeightBindable);
-            scaleBindable.BindTo(HitObject.ScaleBindable);
-
-            AccentColour.BindValueChanged(accent => ApproachCircle.Colour = accent.NewValue, true);
+            inputManager = GetContainingInputManager();
         }
 
         public override double LifetimeStart
@@ -111,21 +118,40 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    ApplyResult(r => r.Type = HitResult.Miss);
+                    ApplyResult(r => r.Type = r.Judgement.MinResult);
 
                 return;
             }
 
-            var result = HitObject.HitWindows.ResultFor(timeOffset);
+            var result = ResultFor(timeOffset);
 
-            if (result == HitResult.None)
+            if (result == HitResult.None || CheckHittable?.Invoke(this, Time.Current) == false)
             {
                 Shake(Math.Abs(timeOffset) - HitObject.HitWindows.WindowFor(HitResult.Miss));
                 return;
             }
 
-            ApplyResult(r => r.Type = result);
+            ApplyResult(r =>
+            {
+                var circleResult = (OsuHitCircleJudgementResult)r;
+
+                // Todo: This should also consider misses, but they're a little more interesting to handle, since we don't necessarily know the position at the time of a miss.
+                if (result.IsHit())
+                {
+                    var localMousePosition = ToLocalSpace(inputManager.CurrentState.Mouse.Position);
+                    circleResult.CursorPositionAtHit = HitObject.StackedPosition + (localMousePosition - DrawSize / 2);
+                }
+
+                circleResult.Type = result;
+            });
         }
+
+        /// <summary>
+        /// Retrieves the <see cref="HitResult"/> for a time offset.
+        /// </summary>
+        /// <param name="timeOffset">The time offset.</param>
+        /// <returns>The hit result, or <see cref="HitResult.None"/> if <paramref name="timeOffset"/> doesn't result in a judgement.</returns>
+        protected virtual HitResult ResultFor(double timeOffset) => HitObject.HitWindows.ResultFor(timeOffset);
 
         protected override void UpdateInitialTransforms()
         {
@@ -138,19 +164,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             ApproachCircle.Expire(true);
         }
 
-        protected override void UpdateStateTransforms(ArmedState state)
+        protected override void UpdateHitStateTransforms(ArmedState state)
         {
-            base.UpdateStateTransforms(state);
-
             Debug.Assert(HitObject.HitWindows != null);
 
             switch (state)
             {
                 case ArmedState.Idle:
                     this.Delay(HitObject.TimePreempt).FadeOut(500);
-
-                    Expire(true);
-
                     HitArea.HitAction = null;
                     break;
 
@@ -166,9 +187,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     this.Delay(800).FadeOut();
                     break;
             }
+
+            Expire();
         }
 
         public Drawable ProxiedLayer => ApproachCircle;
+
+        protected override JudgementResult CreateResult(Judgement judgement) => new OsuHitCircleJudgementResult(HitObject, judgement);
 
         public class HitReceptor : CompositeDrawable, IKeyBindingHandler<OsuAction>
         {

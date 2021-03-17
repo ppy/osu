@@ -13,8 +13,10 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
 {
     public class TestSceneCatchModPerfect : ModPerfectTestScene
     {
+        protected override Ruleset CreatePlayerRuleset() => new CatchRuleset();
+
         public TestSceneCatchModPerfect()
-            : base(new CatchRuleset(), new CatchModPerfect())
+            : base(new CatchModPerfect())
         {
         }
 

@@ -48,11 +48,10 @@ namespace osu.Game.Overlays.KeyBinding
         public bool FilteringActive { get; set; }
 
         private OsuSpriteText text;
-        private Drawable pressAKey;
-
+        private FillFlowContainer cancelAndClearButtons;
         private FillFlowContainer<KeyButton> buttons;
 
-        public IEnumerable<string> FilterTerms => bindings.Select(b => b.KeyCombination.ReadableString()).Prepend((string)text.Text);
+        public IEnumerable<string> FilterTerms => bindings.Select(b => b.KeyCombination.ReadableString()).Prepend(text.Text.ToString());
 
         public KeyBindingRow(object action, IEnumerable<Framework.Input.Bindings.KeyBinding> bindings)
         {
@@ -80,7 +79,7 @@ namespace osu.Game.Overlays.KeyBinding
                 Hollow = true,
             };
 
-            Children = new[]
+            Children = new Drawable[]
             {
                 new Box
                 {
@@ -99,7 +98,7 @@ namespace osu.Game.Overlays.KeyBinding
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight
                 },
-                pressAKey = new FillFlowContainer
+                cancelAndClearButtons = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
                     Padding = new MarginPadding(padding) { Top = height + padding * 2 },
@@ -187,7 +186,8 @@ namespace osu.Game.Overlays.KeyBinding
 
             if (bindTarget.IsHovered)
                 finalise();
-            else
+            // prevent updating bind target before clear button's action
+            else if (!cancelAndClearButtons.Any(b => b.IsHovered))
                 updateBindTarget();
         }
 
@@ -250,8 +250,33 @@ namespace osu.Game.Overlays.KeyBinding
             finalise();
         }
 
+        protected override bool OnMidiDown(MidiDownEvent e)
+        {
+            if (!HasFocus)
+                return false;
+
+            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
+            finalise();
+
+            return true;
+        }
+
+        protected override void OnMidiUp(MidiUpEvent e)
+        {
+            if (!HasFocus)
+            {
+                base.OnMidiUp(e);
+                return;
+            }
+
+            finalise();
+        }
+
         private void clear()
         {
+            if (bindTarget == null)
+                return;
+
             bindTarget.UpdateKeyCombination(InputKey.None);
             finalise();
         }
@@ -273,8 +298,8 @@ namespace osu.Game.Overlays.KeyBinding
             if (HasFocus)
                 GetContainingInputManager().ChangeFocus(null);
 
-            pressAKey.FadeOut(300, Easing.OutQuint);
-            pressAKey.BypassAutoSizeAxes |= Axes.Y;
+            cancelAndClearButtons.FadeOut(300, Easing.OutQuint);
+            cancelAndClearButtons.BypassAutoSizeAxes |= Axes.Y;
         }
 
         protected override void OnFocus(FocusEvent e)
@@ -282,8 +307,8 @@ namespace osu.Game.Overlays.KeyBinding
             AutoSizeDuration = 500;
             AutoSizeEasing = Easing.OutQuint;
 
-            pressAKey.FadeIn(300, Easing.OutQuint);
-            pressAKey.BypassAutoSizeAxes &= ~Axes.Y;
+            cancelAndClearButtons.FadeIn(300, Easing.OutQuint);
+            cancelAndClearButtons.BypassAutoSizeAxes &= ~Axes.Y;
 
             updateBindTarget();
             base.OnFocus(e);
@@ -295,6 +320,9 @@ namespace osu.Game.Overlays.KeyBinding
             base.OnFocusLost(e);
         }
 
+        /// <summary>
+        /// Updates the bind target to the currently hovered key button or the first if clicked anywhere else.
+        /// </summary>
         private void updateBindTarget()
         {
             if (bindTarget != null) bindTarget.IsBinding = false;
@@ -311,7 +339,7 @@ namespace osu.Game.Overlays.KeyBinding
             }
         }
 
-        private class ClearButton : TriangleButton
+        public class ClearButton : TriangleButton
         {
             public ClearButton()
             {
@@ -329,7 +357,7 @@ namespace osu.Game.Overlays.KeyBinding
             }
         }
 
-        private class KeyButton : Container
+        public class KeyButton : Container
         {
             public readonly Framework.Input.Bindings.KeyBinding KeyBinding;
 

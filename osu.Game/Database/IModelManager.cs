@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Database
 {
@@ -9,11 +10,11 @@ namespace osu.Game.Database
     /// Represents a model manager that publishes events when <typeparamref name="TModel"/>s are added or removed.
     /// </summary>
     /// <typeparam name="TModel">The model type.</typeparam>
-    public interface IModelManager<out TModel>
+    public interface IModelManager<TModel>
         where TModel : class
     {
-        event Action<TModel> ItemAdded;
+        IBindable<WeakReference<TModel>> ItemUpdated { get; }
 
-        event Action<TModel> ItemRemoved;
+        IBindable<WeakReference<TModel>> ItemRemoved { get; }
     }
 }

@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 
@@ -29,7 +30,17 @@ namespace osu.Game.Skinning
         /// <param name="componentName">The requested texture.</param>
         /// <returns>A matching texture, or null if unavailable.</returns>
         [CanBeNull]
-        Texture GetTexture(string componentName);
+        Texture GetTexture(string componentName) => GetTexture(componentName, default, default);
+
+        /// <summary>
+        /// Retrieve a <see cref="Texture"/>.
+        /// </summary>
+        /// <param name="componentName">The requested texture.</param>
+        /// <param name="wrapModeS">The texture wrap mode in horizontal direction.</param>
+        /// <param name="wrapModeT">The texture wrap mode in vertical direction.</param>
+        /// <returns>A matching texture, or null if unavailable.</returns>
+        [CanBeNull]
+        Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT);
 
         /// <summary>
         /// Retrieve a <see cref="SampleChannel"/>.
@@ -37,7 +48,7 @@ namespace osu.Game.Skinning
         /// <param name="sampleInfo">The requested sample.</param>
         /// <returns>A matching sample channel, or null if unavailable.</returns>
         [CanBeNull]
-        SampleChannel GetSample(ISampleInfo sampleInfo);
+        Sample GetSample(ISampleInfo sampleInfo);
 
         /// <summary>
         /// Retrieve a configuration value.

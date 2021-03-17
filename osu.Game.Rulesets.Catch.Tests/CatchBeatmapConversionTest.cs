@@ -8,13 +8,13 @@ using NUnit.Framework;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Catch.Mods;
 using osu.Game.Rulesets.Catch.Objects;
-using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
+    [Timeout(10000)]
     public class CatchBeatmapConversionTest : BeatmapConversionTest<ConvertValue>
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Catch";
@@ -26,6 +26,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         [TestCase("hardrock-stream", new[] { typeof(CatchModHardRock) })]
         [TestCase("hardrock-repeat-slider", new[] { typeof(CatchModHardRock) })]
         [TestCase("hardrock-spinner", new[] { typeof(CatchModHardRock) })]
+        [TestCase("right-bound-hr-offset", new[] { typeof(CatchModHardRock) })]
         public new void Test(string name, params Type[] mods) => base.Test(name, mods);
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)
@@ -83,7 +84,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         public float Position
         {
-            get => HitObject?.X * CatchPlayfield.BASE_WIDTH ?? position;
+            get => HitObject?.EffectiveX ?? position;
             set => position = value;
         }
 

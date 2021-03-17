@@ -17,9 +17,11 @@ namespace osu.Game.Rulesets.Mods
         public override string Description => "Everything just got a bit harder...";
         public override Type[] IncompatibleMods => new[] { typeof(ModEasy), typeof(ModDifficultyAdjust) };
 
-        public void ReadFromDifficulty(BeatmapDifficulty difficulty) { }
+        public void ReadFromDifficulty(BeatmapDifficulty difficulty)
+        {
+        }
 
-        public void ApplyToDifficulty(BeatmapDifficulty difficulty)
+        public virtual void ApplyToDifficulty(BeatmapDifficulty difficulty)
         {
             const float ratio = 1.4f;
             difficulty.CircleSize = Math.Min(difficulty.CircleSize * 1.3f, 10.0f); // CS uses a custom 1.3 ratio.

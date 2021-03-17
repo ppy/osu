@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.Legacy;
@@ -23,15 +24,15 @@ namespace osu.Game.Beatmaps.Formats
 
         private readonly Dictionary<string, string> variables = new Dictionary<string, string>();
 
-        public LegacyStoryboardDecoder()
-            : base(0)
+        public LegacyStoryboardDecoder(int version = LATEST_VERSION)
+            : base(version)
         {
         }
 
         public static void Register()
         {
             // note that this isn't completely correct
-            AddDecoder<Storyboard>(@"osu file format v", m => new LegacyStoryboardDecoder());
+            AddDecoder<Storyboard>(@"osu file format v", m => new LegacyStoryboardDecoder(Parsing.ParseInt(m.Split('v').Last())));
             AddDecoder<Storyboard>(@"[Events]", m => new LegacyStoryboardDecoder());
             SetFallbackDecoder<Storyboard>(() => new LegacyStoryboardDecoder());
         }
@@ -48,6 +49,10 @@ namespace osu.Game.Beatmaps.Formats
 
             switch (section)
             {
+                case Section.General:
+                    handleGeneral(storyboard, line);
+                    return;
+
                 case Section.Events:
                     handleEvents(line);
                     return;
@@ -58,6 +63,18 @@ namespace osu.Game.Beatmaps.Formats
             }
 
             base.ParseLine(storyboard, section, line);
+        }
+
+        private void handleGeneral(Storyboard storyboard, string line)
+        {
+            var pair = SplitKeyVal(line);
+
+            switch (pair.Key)
+            {
+                case "UseSkinSprites":
+                    storyboard.UseSkinSprites = pair.Value == "1";
+                    break;
+            }
         }
 
         private void handleEvents(string line)
@@ -117,7 +134,12 @@ namespace osu.Game.Beatmaps.Formats
                         var y = Parsing.ParseFloat(split[5], Parsing.MAX_COORDINATE_VALUE);
                         var frameCount = Parsing.ParseInt(split[6]);
                         var frameDelay = Parsing.ParseDouble(split[7]);
-                        var loopType = split.Length > 8 ? (AnimationLoopType)Enum.Parse(typeof(AnimationLoopType), split[8]) : AnimationLoopType.LoopForever;
+
+                        if (FormatVersion < 6)
+                            // this is random as hell but taken straight from osu-stable.
+                            frameDelay = Math.Round(0.015 * frameDelay) * 1.186 * (1000 / 60f);
+
+                        var loopType = split.Length > 8 ? parseAnimationLoopType(split[8]) : AnimationLoopType.LoopForever;
                         storyboardSprite = new StoryboardAnimation(path, origin, new Vector2(x, y), frameCount, frameDelay, loopType);
                         storyboard.GetLayer(layer).Add(storyboardSprite);
                         break;
@@ -319,6 +341,12 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
+        private AnimationLoopType parseAnimationLoopType(string value)
+        {
+            var parsed = (AnimationLoopType)Enum.Parse(typeof(AnimationLoopType), value);
+            return Enum.IsDefined(typeof(AnimationLoopType), parsed) ? parsed : AnimationLoopType.LoopForever;
+        }
+
         private void handleVariables(string line)
         {
             var pair = SplitKeyVal(line, '=');
@@ -331,7 +359,7 @@ namespace osu.Game.Beatmaps.Formats
         /// <param name="line">The line which may contains variables.</param>
         private void decodeVariables(ref string line)
         {
-            while (line.IndexOf('$') >= 0)
+            while (line.Contains('$'))
             {
                 string origLine = line;
 

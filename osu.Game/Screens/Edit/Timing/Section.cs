@@ -7,7 +7,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -27,10 +26,13 @@ namespace osu.Game.Screens.Edit.Timing
         private const float header_height = 20;
 
         [Resolved]
-        protected IBindable<WorkingBeatmap> Beatmap { get; private set; }
+        protected EditorBeatmap Beatmap { get; private set; }
 
         [Resolved]
         protected Bindable<ControlPointGroup> SelectedGroup { get; private set; }
+
+        [Resolved(canBeNull: true)]
+        protected IEditorChangeHandler ChangeHandler { get; private set; }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -57,7 +59,7 @@ namespace osu.Game.Screens.Edit.Timing
                     {
                         checkbox = new OsuCheckbox
                         {
-                            LabelText = typeof(T).Name.Replace(typeof(ControlPoint).Name, string.Empty)
+                            LabelText = typeof(T).Name.Replace(nameof(Beatmaps.ControlPoints.ControlPoint), string.Empty)
                         }
                     }
                 },

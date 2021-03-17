@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -15,13 +13,6 @@ namespace osu.Game.Tests.Visual.Gameplay
     [TestFixture]
     public class TestSceneKeyCounter : OsuManualInputManagerTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(KeyCounterKeyboard),
-            typeof(KeyCounterMouse),
-            typeof(KeyCounterDisplay)
-        };
-
         public TestSceneKeyCounter()
         {
             KeyCounterKeyboard testCounter;
@@ -49,11 +40,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             void addPressKeyStep()
             {
-                AddStep($"Press {testKey} key", () =>
-                {
-                    InputManager.PressKey(testKey);
-                    InputManager.ReleaseKey(testKey);
-                });
+                AddStep($"Press {testKey} key", () => InputManager.Key(testKey));
             }
 
             addPressKeyStep();

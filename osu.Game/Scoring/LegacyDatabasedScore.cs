@@ -16,10 +16,13 @@ namespace osu.Game.Scoring
         {
             ScoreInfo = score;
 
-            var replayFilename = score.Files.First(f => f.Filename.EndsWith(".osr", StringComparison.InvariantCultureIgnoreCase)).FileInfo.StoragePath;
+            var replayFilename = score.Files.FirstOrDefault(f => f.Filename.EndsWith(".osr", StringComparison.InvariantCultureIgnoreCase))?.FileInfo.StoragePath;
+
+            if (replayFilename == null)
+                return;
 
             using (var stream = store.GetStream(replayFilename))
-                Replay = new DatabasedLegacyScoreParser(rulesets, beatmaps).Parse(stream).Replay;
+                Replay = new DatabasedLegacyScoreDecoder(rulesets, beatmaps).Parse(stream).Replay;
         }
     }
 }

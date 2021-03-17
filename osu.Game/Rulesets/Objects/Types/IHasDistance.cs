@@ -6,7 +6,7 @@ namespace osu.Game.Rulesets.Objects.Types
     /// <summary>
     /// A HitObject that has a positional length.
     /// </summary>
-    public interface IHasDistance : IHasEndTime
+    public interface IHasDistance : IHasDuration
     {
         /// <summary>
         /// The positional length of the HitObject.
