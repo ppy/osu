@@ -29,6 +29,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private OsuSpriteText tabletName;
 
+        private Box usableFill;
+        private OsuSpriteText usableAreaText;
+
         public TabletAreaSelection(ITabletHandler handler)
         {
             this.handler = handler;
@@ -59,17 +62,16 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         Origin = Anchor.Centre,
                         Children = new Drawable[]
                         {
-                            new Box
+                            usableFill = new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Alpha = 0.6f,
                             },
-                            new OsuSpriteText
+                            usableAreaText = new OsuSpriteText
                             {
-                                Text = "usable area",
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Colour = Color4.Black,
+                                Colour = Color4.White,
                                 Font = OsuFont.Default.With(size: 12)
                             }
                         }
@@ -99,6 +101,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 usableAreaContainer.ResizeTo(val.NewValue, 100, Easing.OutQuint)
                                    .OnComplete(_ => checkBounds()); // required as we are using SSDQ.
+
+                int x = (int)val.NewValue.X;
+                int y = (int)val.NewValue.Y;
+                int commonDivider = greatestCommonDivider(x, y);
+
+                usableAreaText.Text = $"{(float)x / commonDivider}:{(float)y / commonDivider}";
             }, true);
 
             tablet.BindTo(handler.Tablet);
@@ -111,6 +119,18 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             // initial animation should be instant.
             FinishTransforms(true);
+        }
+
+        private static int greatestCommonDivider(int a, int b)
+        {
+            while (b != 0)
+            {
+                int remainder = a % b;
+                a = b;
+                b = remainder;
+            }
+
+            return a;
         }
 
         [Resolved]
@@ -126,7 +146,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             bool isWithinBounds = tabletContainer.ScreenSpaceDrawQuad.Contains(usableSsdq.TopLeft) &&
                                   tabletContainer.ScreenSpaceDrawQuad.Contains(usableSsdq.BottomRight);
 
-            usableAreaContainer.FadeColour(isWithinBounds ? colour.Blue : colour.RedLight, 100);
+            usableFill.FadeColour(isWithinBounds ? colour.Blue : colour.RedLight, 100);
         }
 
         protected override void Update()
