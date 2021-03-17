@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Drawing;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -18,15 +17,15 @@ namespace osu.Game.Overlays.Settings.Sections.Input
     {
         private readonly ITabletHandler tabletHandler;
 
-        private readonly BindableSize areaOffset = new BindableSize();
-        private readonly BindableSize areaSize = new BindableSize();
-        private readonly IBindable<Size> tabletSize = new BindableSize();
+        private readonly Bindable<Vector2> areaOffset = new Bindable<Vector2>();
+        private readonly Bindable<Vector2> areaSize = new Bindable<Vector2>();
+        private readonly IBindable<TabletInfo> tablet = new Bindable<TabletInfo>();
 
-        private readonly BindableNumber<int> offsetX = new BindableNumber<int> { MinValue = 0 };
-        private readonly BindableNumber<int> offsetY = new BindableNumber<int> { MinValue = 0 };
+        private readonly BindableNumber<float> offsetX = new BindableNumber<float> { MinValue = 0 };
+        private readonly BindableNumber<float> offsetY = new BindableNumber<float> { MinValue = 0 };
 
-        private readonly BindableNumber<int> sizeX = new BindableNumber<int> { MinValue = 10 };
-        private readonly BindableNumber<int> sizeY = new BindableNumber<int> { MinValue = 10 };
+        private readonly BindableNumber<float> sizeX = new BindableNumber<float> { MinValue = 10 };
+        private readonly BindableNumber<float> sizeY = new BindableNumber<float> { MinValue = 10 };
 
         [Resolved]
         private GameHost host { get; set; }
@@ -108,12 +107,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             LabelText = "Aspect Ratio",
                             Current = aspectRatio
                         },
-                        new SettingsSlider<int>
+                        new SettingsSlider<float>
                         {
                             LabelText = "X Offset",
                             Current = offsetX
                         },
-                        new SettingsSlider<int>
+                        new SettingsSlider<float>
                         {
                             LabelText = "Y Offset",
                             Current = offsetY
@@ -123,12 +122,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             LabelText = "Lock aspect ratio",
                             Current = aspectLock
                         },
-                        new SettingsSlider<int>
+                        new SettingsSlider<float>
                         {
                             LabelText = "Width",
                             Current = sizeX
                         },
-                        new SettingsSlider<int>
+                        new SettingsSlider<float>
                         {
                             LabelText = "Height",
                             Current = sizeY
@@ -140,23 +139,23 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             areaOffset.BindTo(tabletHandler.AreaOffset);
             areaOffset.BindValueChanged(val =>
             {
-                offsetX.Value = val.NewValue.Width;
-                offsetY.Value = val.NewValue.Height;
+                offsetX.Value = val.NewValue.X;
+                offsetY.Value = val.NewValue.Y;
             }, true);
 
-            offsetX.BindValueChanged(val => areaOffset.Value = new Size(val.NewValue, areaOffset.Value.Height));
-            offsetY.BindValueChanged(val => areaOffset.Value = new Size(areaOffset.Value.Width, val.NewValue));
+            offsetX.BindValueChanged(val => areaOffset.Value = new Vector2(val.NewValue, areaOffset.Value.Y));
+            offsetY.BindValueChanged(val => areaOffset.Value = new Vector2(areaOffset.Value.X, val.NewValue));
 
             areaSize.BindTo(tabletHandler.AreaSize);
             areaSize.BindValueChanged(val =>
             {
-                sizeX.Value = val.NewValue.Width;
-                sizeY.Value = val.NewValue.Height;
+                sizeX.Value = val.NewValue.X;
+                sizeY.Value = val.NewValue.Y;
             }, true);
 
             sizeX.BindValueChanged(val =>
             {
-                areaSize.Value = new Size(val.NewValue, areaSize.Value.Height);
+                areaSize.Value = new Vector2(val.NewValue, areaSize.Value.Y);
 
                 aspectRatioApplication?.Cancel();
                 aspectRatioApplication = Schedule(() => applyAspectRatio(sizeX));
@@ -164,7 +163,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             sizeY.BindValueChanged(val =>
             {
-                areaSize.Value = new Size(areaSize.Value.Width, val.NewValue);
+                areaSize.Value = new Vector2(areaSize.Value.X, val.NewValue);
 
                 aspectRatioApplication?.Cancel();
                 aspectRatioApplication = Schedule(() => applyAspectRatio(sizeY));
@@ -176,10 +175,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 aspectRatioApplication = Schedule(() => forceAspectRatio(aspect.NewValue));
             });
 
-            tabletSize.BindTo(tabletHandler.TabletSize);
-            tabletSize.BindValueChanged(val =>
+            tablet.BindTo(tabletHandler.Tablet);
+            tablet.BindValueChanged(val =>
             {
-                bool tabletFound = tabletSize.Value != System.Drawing.Size.Empty;
+                var tab = val.NewValue;
+
+                bool tabletFound = tab != null;
 
                 if (!tabletFound)
                 {
@@ -192,17 +193,19 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 noTabletMessage.Hide();
 
                 // todo: these should propagate from a TabletChanged event or similar.
-                offsetX.MaxValue = val.NewValue.Width;
-                sizeX.Default = sizeX.MaxValue = val.NewValue.Width;
+                offsetX.MaxValue = tab.Size.X;
+                offsetX.Default = tab.Size.X / 2;
+                sizeX.Default = sizeX.MaxValue = tab.Size.X;
 
-                offsetY.MaxValue = val.NewValue.Height;
-                sizeY.Default = sizeY.MaxValue = val.NewValue.Height;
+                offsetY.MaxValue = tab.Size.Y;
+                offsetY.Default = tab.Size.Y / 2;
+                sizeY.Default = sizeY.MaxValue = tab.Size.Y;
 
-                areaSize.Default = new Size(sizeX.Default, sizeY.Default);
+                areaSize.Default = new Vector2(sizeX.Default, sizeY.Default);
             }, true);
         }
 
-        private void applyAspectRatio(BindableNumber<int> sizeChanged)
+        private void applyAspectRatio(BindableNumber<float> sizeChanged)
         {
             try
             {
@@ -220,9 +223,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
                 // if lock is applied (or the specified values were out of range) aim to adjust the axis the user was not adjusting to conform.
                 if (sizeChanged == sizeX)
-                    sizeY.Value = (int)(areaSize.Value.Width / aspectRatio.Value);
+                    sizeY.Value = (int)(areaSize.Value.X / aspectRatio.Value);
                 else
-                    sizeX.Value = (int)(areaSize.Value.Height * aspectRatio.Value);
+                    sizeX.Value = (int)(areaSize.Value.Y * aspectRatio.Value);
             }
             finally
             {
@@ -251,6 +254,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private void updateAspectRatio() => aspectRatio.Value = curentAspectRatio;
 
-        private float curentAspectRatio => (float)sizeX.Value / sizeY.Value;
+        private float curentAspectRatio => sizeX.Value / sizeY.Value;
     }
 }

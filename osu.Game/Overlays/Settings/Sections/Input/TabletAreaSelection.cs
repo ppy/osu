@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Drawing;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -23,9 +22,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private Container tabletContainer;
         private Container usableAreaContainer;
 
-        private readonly Bindable<Size> areaOffset = new BindableSize();
-        private readonly Bindable<Size> areaSize = new BindableSize();
-        private readonly IBindable<Size> tabletSize = new BindableSize();
+        private readonly Bindable<Vector2> areaOffset = new Bindable<Vector2>();
+        private readonly Bindable<Vector2> areaSize = new Bindable<Vector2>();
+
+        private readonly IBindable<TabletInfo> tablet = new Bindable<TabletInfo>();
 
         private OsuSpriteText tabletName;
 
@@ -56,6 +56,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     },
                     usableAreaContainer = new Container
                     {
+                        Origin = Anchor.Centre,
                         Children = new Drawable[]
                         {
                             new Box
@@ -89,24 +90,27 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             areaOffset.BindTo(handler.AreaOffset);
             areaOffset.BindValueChanged(val =>
             {
-                usableAreaContainer.MoveTo(new Vector2(val.NewValue.Width, val.NewValue.Height), 100, Easing.OutQuint);
-                checkBounds();
+                usableAreaContainer.MoveTo(val.NewValue, 100, Easing.OutQuint)
+                                   .OnComplete(_ => checkBounds()); // required as we are using SSDQ.
             }, true);
 
             areaSize.BindTo(handler.AreaSize);
             areaSize.BindValueChanged(val =>
             {
-                usableAreaContainer.ResizeTo(new Vector2(val.NewValue.Width, val.NewValue.Height), 100, Easing.OutQuint);
+                usableAreaContainer.ResizeTo(val.NewValue, 100, Easing.OutQuint)
+                                   .OnComplete(_ => checkBounds()); // required as we are using SSDQ.
+            }, true);
+
+            tablet.BindTo(handler.Tablet);
+            tablet.BindValueChanged(val =>
+            {
+                tabletContainer.Size = val.NewValue?.Size ?? Vector2.Zero;
+                tabletName.Text = val.NewValue?.Name ?? string.Empty;
                 checkBounds();
             }, true);
 
-            tabletSize.BindTo(handler.TabletSize);
-            tabletSize.BindValueChanged(val =>
-            {
-                tabletContainer.Size = new Vector2(val.NewValue.Width, val.NewValue.Height);
-                tabletName.Text = handler.DeviceName;
-                checkBounds();
-            }, true);
+            // initial animation should be instant.
+            FinishTransforms(true);
         }
 
         [Resolved]
@@ -114,10 +118,13 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private void checkBounds()
         {
-            Size areaExtent = areaOffset.Value + areaSize.Value;
+            if (tablet.Value == null)
+                return;
 
-            bool isWithinBounds = areaExtent.Width <= tabletSize.Value.Width
-                                  && areaExtent.Height <= tabletSize.Value.Height;
+            var usableSsdq = usableAreaContainer.ScreenSpaceDrawQuad;
+
+            bool isWithinBounds = tabletContainer.ScreenSpaceDrawQuad.Contains(usableSsdq.TopLeft) &&
+                                  tabletContainer.ScreenSpaceDrawQuad.Contains(usableSsdq.BottomRight);
 
             usableAreaContainer.FadeColour(isWithinBounds ? colour.Blue : colour.RedLight, 100);
         }
@@ -126,13 +133,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             base.Update();
 
-            var size = tabletSize.Value;
-
-            if (size == System.Drawing.Size.Empty)
+            if (!(tablet.Value?.Size is Vector2 size))
                 return;
 
-            float fitX = size.Width / (DrawWidth - Padding.Left - Padding.Right);
-            float fitY = size.Height / DrawHeight;
+            float fitX = size.X / (DrawWidth - Padding.Left - Padding.Right);
+            float fitY = size.Y / DrawHeight;
 
             float adjust = MathF.Max(fitX, fitY);
 
