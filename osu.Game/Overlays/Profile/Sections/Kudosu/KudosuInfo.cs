@@ -103,7 +103,6 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
             private void load(OverlayColourProvider colourProvider)
             {
                 lineBackground.Colour = colourProvider.Highlight1;
-                DescriptionText.Colour = colourProvider.Foreground1;
             }
         }
     }
