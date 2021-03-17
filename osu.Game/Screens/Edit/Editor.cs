@@ -74,7 +74,6 @@ namespace osu.Game.Screens.Edit
 
         private string lastSavedHash;
 
-        private Box bottomBackground;
         private Container<EditorScreen> screenContainer;
 
         private EditorScreen currentScreen;
@@ -242,7 +241,7 @@ namespace osu.Game.Screens.Edit
                         Height = 60,
                         Children = new Drawable[]
                         {
-                            bottomBackground = new Box
+                            new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Colour = colours.Gray2
