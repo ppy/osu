@@ -5,12 +5,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Users;
 using osuTK;
 
@@ -26,34 +26,37 @@ namespace osu.Game.Overlays.Dashboard.Friends
             set
             {
                 users = value;
-
                 onlineStreamControl.Populate(value);
             }
         }
 
-        [Resolved]
-        private IAPIProvider api { get; set; }
-
-        private GetFriendsRequest request;
         private CancellationTokenSource cancellationToken;
 
         private Drawable currentContent;
 
-        private readonly FriendOnlineStreamControl onlineStreamControl;
-        private readonly Box background;
-        private readonly Box controlBackground;
-        private readonly UserListToolbar userListToolbar;
-        private readonly Container itemsPlaceholder;
-        private readonly LoadingLayer loading;
+        private FriendOnlineStreamControl onlineStreamControl;
+        private Box background;
+        private Box controlBackground;
+        private UserListToolbar userListToolbar;
+        private Container itemsPlaceholder;
+        private LoadingLayer loading;
+
+        private readonly IBindableList<User> apiFriends = new BindableList<User>();
 
         public FriendDisplay()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(OverlayColourProvider colourProvider, IAPIProvider api)
+        {
             InternalChild = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Vertical,
                 Children = new Drawable[]
                 {
                     new Container
@@ -125,7 +128,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
                                                 AutoSizeAxes = Axes.Y,
                                                 Padding = new MarginPadding { Horizontal = 50 }
                                             },
-                                            loading = new LoadingLayer(itemsPlaceholder)
+                                            loading = new LoadingLayer(true)
                                         }
                                     }
                                 }
@@ -134,13 +137,12 @@ namespace osu.Game.Overlays.Dashboard.Friends
                     }
                 }
             };
-        }
 
-        [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
-        {
             background.Colour = colourProvider.Background4;
             controlBackground.Colour = colourProvider.Background5;
+
+            apiFriends.BindTo(api.Friends);
+            apiFriends.BindCollectionChanged((_, __) => Schedule(() => Users = apiFriends.ToList()), true);
         }
 
         protected override void LoadComplete()
@@ -150,16 +152,6 @@ namespace osu.Game.Overlays.Dashboard.Friends
             onlineStreamControl.Current.BindValueChanged(_ => recreatePanels());
             userListToolbar.DisplayStyle.BindValueChanged(_ => recreatePanels());
             userListToolbar.SortCriteria.BindValueChanged(_ => recreatePanels());
-        }
-
-        public void Fetch()
-        {
-            if (!api.IsLoggedIn)
-                return;
-
-            request = new GetFriendsRequest();
-            request.Success += response => Schedule(() => Users = response);
-            api.Queue(request);
         }
 
         private void recreatePanels()
@@ -237,6 +229,9 @@ namespace osu.Game.Overlays.Dashboard.Friends
 
                 case OverlayPanelDisplayStyle.List:
                     return new UserListPanel(user);
+
+                case OverlayPanelDisplayStyle.Brick:
+                    return new UserBrickPanel(user);
             }
         }
 
@@ -249,7 +244,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
                     return unsorted.OrderByDescending(u => u.LastVisit).ToList();
 
                 case UserSortCriteria.Rank:
-                    return unsorted.OrderByDescending(u => u.CurrentModeRank.HasValue).ThenBy(u => u.CurrentModeRank ?? 0).ToList();
+                    return unsorted.OrderByDescending(u => u.Statistics.GlobalRank.HasValue).ThenBy(u => u.Statistics.GlobalRank ?? 0).ToList();
 
                 case UserSortCriteria.Username:
                     return unsorted.OrderBy(u => u.Username).ToList();
@@ -258,9 +253,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
 
         protected override void Dispose(bool isDisposing)
         {
-            request?.Cancel();
             cancellationToken?.Cancel();
-
             base.Dispose(isDisposing);
         }
     }

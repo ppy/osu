@@ -9,20 +9,23 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Mania.Objects.Drawables;
-using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Skinning;
 using osuTK;
+using osu.Game.Rulesets.Mania.Beatmaps;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
+    [Cached]
     public class Column : ScrollingPlayfield, IKeyBindingHandler<ManiaAction>, IHasAccentColour
     {
         public const float COLUMN_WIDTH = 80;
-        private const float special_column_width = 70;
+        public const float SPECIAL_COLUMN_WIDTH = 70;
 
         /// <summary>
         /// The index of this column as part of the whole playfield.
@@ -31,12 +34,12 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public readonly Bindable<ManiaAction> Action = new Bindable<ManiaAction>();
 
-        private readonly ColumnBackground background;
-        private readonly ColumnKeyArea keyArea;
-        private readonly ColumnHitObjectArea hitObjectArea;
-
+        public readonly ColumnHitObjectArea HitObjectArea;
         internal readonly Container TopLevelContainer;
-        private readonly Container explosionContainer;
+        private readonly DrawablePool<PoolableHitExplosion> hitExplosionPool;
+        private readonly OrderedHitPolicy hitPolicy;
+
+        public Container UnderlayElements => HitObjectArea.UnderlayElements;
 
         public Column(int index)
         {
@@ -45,95 +48,35 @@ namespace osu.Game.Rulesets.Mania.UI
             RelativeSizeAxes = Axes.Y;
             Width = COLUMN_WIDTH;
 
-            background = new ColumnBackground { RelativeSizeAxes = Axes.Both };
-
-            Container hitTargetContainer;
+            Drawable background = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ColumnBackground, Index), _ => new DefaultColumnBackground())
+            {
+                RelativeSizeAxes = Axes.Both
+            };
 
             InternalChildren = new[]
             {
+                hitExplosionPool = new DrawablePool<PoolableHitExplosion>(5),
                 // For input purposes, the background is added at the highest depth, but is then proxied back below all other elements
                 background.CreateProxy(),
-                hitTargetContainer = new Container
+                HitObjectArea = new ColumnHitObjectArea(Index, HitObjectContainer) { RelativeSizeAxes = Axes.Both },
+                new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.KeyArea, Index), _ => new DefaultKeyArea())
                 {
-                    Name = "Hit target + hit objects",
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        hitObjectArea = new ColumnHitObjectArea(HitObjectContainer)
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                        explosionContainer = new Container
-                        {
-                            Name = "Hit explosions",
-                            RelativeSizeAxes = Axes.Both,
-                        }
-                    }
-                },
-                keyArea = new ColumnKeyArea
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Height = ManiaStage.HIT_TARGET_POSITION,
+                    RelativeSizeAxes = Axes.Both
                 },
                 background,
                 TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
             };
 
-            TopLevelContainer.Add(explosionContainer.CreateProxy());
+            hitPolicy = new OrderedHitPolicy(HitObjectContainer);
 
-            Direction.BindValueChanged(dir =>
-            {
-                hitTargetContainer.Padding = new MarginPadding
-                {
-                    Top = dir.NewValue == ScrollingDirection.Up ? ManiaStage.HIT_TARGET_POSITION : 0,
-                    Bottom = dir.NewValue == ScrollingDirection.Down ? ManiaStage.HIT_TARGET_POSITION : 0,
-                };
-
-                explosionContainer.Padding = new MarginPadding
-                {
-                    Top = dir.NewValue == ScrollingDirection.Up ? NotePiece.NOTE_HEIGHT / 2 : 0,
-                    Bottom = dir.NewValue == ScrollingDirection.Down ? NotePiece.NOTE_HEIGHT / 2 : 0
-                };
-
-                keyArea.Anchor = keyArea.Origin = dir.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
-            }, true);
+            TopLevelContainer.Add(HitObjectArea.Explosions.CreateProxy());
         }
 
-        public override Axes RelativeSizeAxes => Axes.Y;
+        public ColumnType ColumnType { get; set; }
 
-        private bool isSpecial;
+        public bool IsSpecial => ColumnType == ColumnType.Special;
 
-        public bool IsSpecial
-        {
-            get => isSpecial;
-            set
-            {
-                if (isSpecial == value)
-                    return;
-
-                isSpecial = value;
-
-                Width = isSpecial ? special_column_width : COLUMN_WIDTH;
-            }
-        }
-
-        private Color4 accentColour;
-
-        public Color4 AccentColour
-        {
-            get => accentColour;
-            set
-            {
-                if (accentColour == value)
-                    return;
-
-                accentColour = value;
-
-                background.AccentColour = value;
-                keyArea.AccentColour = value;
-                hitObjectArea.AccentColour = value;
-            }
-        }
+        public Color4 AccentColour { get; set; }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -151,7 +94,10 @@ namespace osu.Game.Rulesets.Mania.UI
             hitObject.AccentColour.Value = AccentColour;
             hitObject.OnNewResult += OnNewResult;
 
-            HitObjectContainer.Add(hitObject);
+            DrawableManiaHitObject maniaObject = (DrawableManiaHitObject)hitObject;
+            maniaObject.CheckHittable = hitPolicy.IsHittable;
+
+            base.Add(hitObject);
         }
 
         public override bool Remove(DrawableHitObject h)
@@ -165,14 +111,13 @@ namespace osu.Game.Rulesets.Mania.UI
 
         internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
+            if (result.IsHit)
+                hitPolicy.HandleHit(judgedObject);
+
             if (!result.IsHit || !judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
 
-            explosionContainer.Add(new HitExplosion(judgedObject.AccentColour.Value, judgedObject is DrawableHoldNoteTick)
-            {
-                Anchor = Direction.Value == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre,
-                Origin = Anchor.Centre
-            });
+            HitObjectArea.Explosions.Add(hitExplosionPool.Get(e => e.Apply(result)));
         }
 
         public bool OnPressed(ManiaAction action)
@@ -197,6 +142,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
             // This probably shouldn't exist as is, but the columns in the stage are separated by a 1px border
-            => DrawRectangle.Inflate(new Vector2(ManiaStage.COLUMN_SPACING / 2, 0)).Contains(ToLocalSpace(screenSpacePos));
+            => DrawRectangle.Inflate(new Vector2(Stage.COLUMN_SPACING / 2, 0)).Contains(ToLocalSpace(screenSpacePos));
     }
 }

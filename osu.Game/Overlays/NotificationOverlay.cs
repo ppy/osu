@@ -6,18 +6,22 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays.Notifications;
-using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Threading;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class NotificationOverlay : OsuFocusedOverlayContainer
+    public class NotificationOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
     {
+        public string IconTexture => "Icons/Hexacons/notification";
+        public string Title => "notifications";
+        public string Description => "waiting for 'ya";
+
         private const float width = 320;
 
         public const float TRANSITION_LENGTH = 600;
@@ -40,8 +44,7 @@ namespace osu.Game.Overlays
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                    Alpha = 0.6f
+                    Colour = OsuColour.Gray(0.05f),
                 },
                 new OsuScrollContainer
                 {

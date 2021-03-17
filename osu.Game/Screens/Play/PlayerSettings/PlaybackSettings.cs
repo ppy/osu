@@ -13,8 +13,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
     {
         private const int padding = 10;
 
-        protected override string Title => @"playback";
-
         public readonly Bindable<double> UserPlaybackRate = new BindableDouble(1)
         {
             Default = 1,
@@ -28,6 +26,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
         private readonly OsuSpriteText multiplierText;
 
         public PlaybackSettings()
+            : base("playback")
         {
             Children = new Drawable[]
             {
@@ -52,14 +51,14 @@ namespace osu.Game.Screens.Play.PlayerSettings
                         }
                     },
                 },
-                rateSlider = new PlayerSliderBar<double> { Bindable = UserPlaybackRate }
+                rateSlider = new PlayerSliderBar<double> { Current = UserPlaybackRate }
             };
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            rateSlider.Bindable.BindValueChanged(multiplier => multiplierText.Text = $"{multiplier.NewValue:0.0}x", true);
+            rateSlider.Current.BindValueChanged(multiplier => multiplierText.Text = $"{multiplier.NewValue:0.0}x", true);
         }
     }
 }

@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Online.API;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
@@ -26,6 +27,9 @@ namespace osu.Game.Overlays.Profile.Header
         private LinkFlowContainer bottomLinkContainer;
 
         private Color4 iconColour;
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
         public BottomHeaderContainer()
         {
@@ -109,7 +113,7 @@ namespace osu.Game.Overlays.Profile.Header
             }
 
             topLinkContainer.AddText("Contributed ");
-            topLinkContainer.AddLink($@"{user.PostCount:#,##0} forum posts", $"https://osu.ppy.sh/users/{user.Id}/posts", creationParameters: embolden);
+            topLinkContainer.AddLink($@"{user.PostCount:#,##0} forum posts", $"{api.WebsiteRootUrl}/users/{user.Id}/posts", creationParameters: embolden);
 
             string websiteWithoutProtocol = user.Website;
 
@@ -134,8 +138,6 @@ namespace osu.Game.Overlays.Profile.Header
             if (!string.IsNullOrEmpty(user.Twitter))
                 anyInfoAdded |= tryAddInfo(FontAwesome.Brands.Twitter, "@" + user.Twitter, $@"https://twitter.com/{user.Twitter}");
             anyInfoAdded |= tryAddInfo(FontAwesome.Brands.Discord, user.Discord);
-            anyInfoAdded |= tryAddInfo(FontAwesome.Brands.Skype, user.Skype, @"skype:" + user.Skype + @"?chat");
-            anyInfoAdded |= tryAddInfo(FontAwesome.Brands.Lastfm, user.Lastfm, $@"https://last.fm/users/{user.Lastfm}");
             anyInfoAdded |= tryAddInfo(FontAwesome.Solid.Link, websiteWithoutProtocol, user.Website);
 
             // If no information was added to the bottomLinkContainer, hide it to avoid unwanted padding
@@ -149,7 +151,7 @@ namespace osu.Game.Overlays.Profile.Header
             if (string.IsNullOrEmpty(content)) return false;
 
             // newlines could be contained in API returned user content.
-            content = content.Replace("\n", " ");
+            content = content.Replace('\n', ' ');
 
             bottomLinkContainer.AddIcon(icon, text =>
             {

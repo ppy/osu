@@ -8,6 +8,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing;
 using osu.Game.Audio;
@@ -80,8 +81,8 @@ namespace osu.Game.Tests.Gameplay
 
         private class TestHitObjectWithCombo : ConvertHitObject, IHasComboInformation
         {
-            public bool NewCombo { get; } = false;
-            public int ComboOffset { get; } = 0;
+            public bool NewCombo { get; set; }
+            public int ComboOffset => 0;
 
             public Bindable<int> IndexInCurrentComboBindable { get; } = new Bindable<int>();
 
@@ -118,9 +119,9 @@ namespace osu.Game.Tests.Gameplay
 
             public Drawable GetDrawableComponent(ISkinComponent component) => throw new NotImplementedException();
 
-            public Texture GetTexture(string componentName) => throw new NotImplementedException();
+            public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => throw new NotImplementedException();
 
-            public SampleChannel GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
+            public Sample GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
             {

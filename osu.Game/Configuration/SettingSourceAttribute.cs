@@ -8,6 +8,7 @@ using System.Reflection;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Configuration
@@ -22,9 +23,9 @@ namespace osu.Game.Configuration
     /// </remarks>
     [MeansImplicitUse]
     [AttributeUsage(AttributeTargets.Property)]
-    public class SettingSourceAttribute : Attribute
+    public class SettingSourceAttribute : Attribute, IComparable<SettingSourceAttribute>
     {
-        public string Label { get; }
+        public LocalisableString Label { get; }
 
         public string Description { get; }
 
@@ -40,6 +41,21 @@ namespace osu.Game.Configuration
             : this(label, description)
         {
             OrderPosition = orderPosition;
+        }
+
+        public int CompareTo(SettingSourceAttribute other)
+        {
+            if (OrderPosition == other.OrderPosition)
+                return 0;
+
+            // unordered items come last (are greater than any ordered items).
+            if (OrderPosition == null)
+                return 1;
+            if (other.OrderPosition == null)
+                return -1;
+
+            // ordered items are sorted by the order value.
+            return OrderPosition.Value.CompareTo(other.OrderPosition);
         }
     }
 
@@ -57,7 +73,8 @@ namespace osu.Game.Configuration
                         yield return new SettingsSlider<float>
                         {
                             LabelText = attr.Label,
-                            Bindable = bNumber,
+                            TooltipText = attr.Description,
+                            Current = bNumber,
                             KeyboardStep = 0.1f,
                         };
 
@@ -67,7 +84,8 @@ namespace osu.Game.Configuration
                         yield return new SettingsSlider<double>
                         {
                             LabelText = attr.Label,
-                            Bindable = bNumber,
+                            TooltipText = attr.Description,
+                            Current = bNumber,
                             KeyboardStep = 0.1f,
                         };
 
@@ -77,7 +95,8 @@ namespace osu.Game.Configuration
                         yield return new SettingsSlider<int>
                         {
                             LabelText = attr.Label,
-                            Bindable = bNumber
+                            TooltipText = attr.Description,
+                            Current = bNumber
                         };
 
                         break;
@@ -86,7 +105,8 @@ namespace osu.Game.Configuration
                         yield return new SettingsCheckbox
                         {
                             LabelText = attr.Label,
-                            Bindable = bBool
+                            TooltipText = attr.Description,
+                            Current = bBool
                         };
 
                         break;
@@ -95,7 +115,8 @@ namespace osu.Game.Configuration
                         yield return new SettingsTextBox
                         {
                             LabelText = attr.Label,
-                            Bindable = bString
+                            TooltipText = attr.Description,
+                            Current = bString
                         };
 
                         break;
@@ -105,7 +126,8 @@ namespace osu.Game.Configuration
                         var dropdown = (Drawable)Activator.CreateInstance(dropdownType);
 
                         dropdownType.GetProperty(nameof(SettingsDropdown<object>.LabelText))?.SetValue(dropdown, attr.Label);
-                        dropdownType.GetProperty(nameof(SettingsDropdown<object>.Bindable))?.SetValue(dropdown, bindable);
+                        dropdownType.GetProperty(nameof(SettingsDropdown<object>.TooltipText))?.SetValue(dropdown, attr.Description);
+                        dropdownType.GetProperty(nameof(SettingsDropdown<object>.Current))?.SetValue(dropdown, bindable);
 
                         yield return dropdown;
 
@@ -130,14 +152,9 @@ namespace osu.Game.Configuration
             }
         }
 
-        public static IEnumerable<(SettingSourceAttribute, PropertyInfo)> GetOrderedSettingsSourceProperties(this object obj)
-        {
-            var original = obj.GetSettingsSourceProperties();
-
-            var orderedRelative = original.Where(attr => attr.Item1.OrderPosition != null).OrderBy(attr => attr.Item1.OrderPosition);
-            var unordered = original.Except(orderedRelative);
-
-            return orderedRelative.Concat(unordered);
-        }
+        public static ICollection<(SettingSourceAttribute, PropertyInfo)> GetOrderedSettingsSourceProperties(this object obj)
+            => obj.GetSettingsSourceProperties()
+                  .OrderBy(attr => attr.Item1)
+                  .ToArray();
     }
 }

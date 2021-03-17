@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Rulesets;
@@ -72,7 +73,7 @@ namespace osu.Game.Scoring
             }
             set
             {
-                modsJson = null;
+                modsJson = JsonConvert.SerializeObject(value.Select(m => new DeserializedMod { Acronym = m.Acronym }));
                 mods = value;
             }
         }
@@ -85,16 +86,7 @@ namespace osu.Game.Scoring
         [Column("Mods")]
         public string ModsJson
         {
-            get
-            {
-                if (modsJson != null)
-                    return modsJson;
-
-                if (mods == null)
-                    return null;
-
-                return modsJson = JsonConvert.SerializeObject(mods.Select(m => new DeserializedMod { Acronym = m.Acronym }));
-            }
+            get => modsJson;
             set
             {
                 modsJson = value;
@@ -115,23 +107,19 @@ namespace osu.Game.Scoring
             get => User?.Username;
             set
             {
-                if (User == null)
-                    User = new User();
-
+                User ??= new User();
                 User.Username = value;
             }
         }
 
         [JsonIgnore]
         [Column("UserID")]
-        public long? UserID
+        public int? UserID
         {
             get => User?.Id ?? 1;
             set
             {
-                if (User == null)
-                    User = new User();
-
+                User ??= new User();
                 User.Id = value ?? 1;
             }
         }
@@ -151,8 +139,6 @@ namespace osu.Game.Scoring
         [JsonProperty("statistics")]
         public Dictionary<HitResult, int> Statistics = new Dictionary<HitResult, int>();
 
-        public IOrderedEnumerable<KeyValuePair<HitResult, int>> SortedStatistics => Statistics.OrderByDescending(pair => pair.Key);
-
         [JsonIgnore]
         [Column("Statistics")]
         public string StatisticsJson
@@ -170,6 +156,10 @@ namespace osu.Game.Scoring
             }
         }
 
+        [NotMapped]
+        [JsonIgnore]
+        public List<HitEvent> HitEvents { get; set; }
+
         [JsonIgnore]
         public List<ScoreFileInfo> Files { get; set; }
 
@@ -178,6 +168,79 @@ namespace osu.Game.Scoring
 
         [JsonIgnore]
         public bool DeletePending { get; set; }
+
+        /// <summary>
+        /// The position of this score, starting at 1.
+        /// </summary>
+        [NotMapped]
+        [JsonProperty("position")]
+        public int? Position { get; set; }
+
+        private bool isLegacyScore;
+
+        /// <summary>
+        /// Whether this <see cref="ScoreInfo"/> represents a legacy (osu!stable) score.
+        /// </summary>
+        [JsonIgnore]
+        [NotMapped]
+        public bool IsLegacyScore
+        {
+            get
+            {
+                if (isLegacyScore)
+                    return true;
+
+                // The above check will catch legacy online scores that have an appropriate UserString + UserId.
+                // For non-online scores such as those imported in, a heuristic is used based on the following table:
+                //
+                //       Mode      | UserString | UserId
+                // --------------- | ---------- | ---------
+                // stable          | <username> | 1
+                // lazer           | <username> | <userid>
+                // lazer (offline) | Guest      | 1
+
+                return ID > 0 && UserID == 1 && UserString != "Guest";
+            }
+            set => isLegacyScore = value;
+        }
+
+        public IEnumerable<HitResultDisplayStatistic> GetStatisticsForDisplay()
+        {
+            foreach (var r in Ruleset.CreateInstance().GetHitResults())
+            {
+                int value = Statistics.GetOrDefault(r.result);
+
+                switch (r.result)
+                {
+                    case HitResult.SmallTickHit:
+                    {
+                        int total = value + Statistics.GetOrDefault(HitResult.SmallTickMiss);
+                        if (total > 0)
+                            yield return new HitResultDisplayStatistic(r.result, value, total, r.displayName);
+
+                        break;
+                    }
+
+                    case HitResult.LargeTickHit:
+                    {
+                        int total = value + Statistics.GetOrDefault(HitResult.LargeTickMiss);
+                        if (total > 0)
+                            yield return new HitResultDisplayStatistic(r.result, value, total, r.displayName);
+
+                        break;
+                    }
+
+                    case HitResult.SmallTickMiss:
+                    case HitResult.LargeTickMiss:
+                        break;
+
+                    default:
+                        yield return new HitResultDisplayStatistic(r.result, value, null, r.displayName);
+
+                        break;
+                }
+            }
+        }
 
         [Serializable]
         protected class DeserializedMod : IMod

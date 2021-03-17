@@ -6,7 +6,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using osu.Framework;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Game.Database;
 
 namespace osu.Game.Rulesets
@@ -17,16 +19,24 @@ namespace osu.Game.Rulesets
 
         private readonly Dictionary<Assembly, Type> loadedAssemblies = new Dictionary<Assembly, Type>();
 
-        public RulesetStore(IDatabaseContextFactory factory)
+        private readonly Storage rulesetStorage;
+
+        public RulesetStore(IDatabaseContextFactory factory, Storage storage = null)
             : base(factory)
         {
+            rulesetStorage = storage?.GetStorageForDirectory("rulesets");
+
             // On android in release configuration assemblies are loaded from the apk directly into memory.
             // We cannot read assemblies from cwd, so should check loaded assemblies instead.
             loadFromAppDomain();
             loadFromDisk();
-            addMissingRulesets();
 
-            AppDomain.CurrentDomain.AssemblyResolve += resolveRulesetAssembly;
+            // the event handler contains code for resolving dependency on the game assembly for rulesets located outside the base game directory.
+            // It needs to be attached to the assembly lookup event before the actual call to loadUserRulesets() else rulesets located out of the base game directory will fail
+            // to load as unable to locate the game core assembly.
+            AppDomain.CurrentDomain.AssemblyResolve += resolveRulesetDependencyAssembly;
+            loadUserRulesets();
+            addMissingRulesets();
         }
 
         /// <summary>
@@ -48,7 +58,25 @@ namespace osu.Game.Rulesets
         /// </summary>
         public IEnumerable<RulesetInfo> AvailableRulesets { get; private set; }
 
-        private Assembly resolveRulesetAssembly(object sender, ResolveEventArgs args) => loadedAssemblies.Keys.FirstOrDefault(a => a.FullName == args.Name);
+        private Assembly resolveRulesetDependencyAssembly(object sender, ResolveEventArgs args)
+        {
+            var asm = new AssemblyName(args.Name);
+
+            // the requesting assembly may be located out of the executable's base directory, thus requiring manual resolving of its dependencies.
+            // this attempts resolving the ruleset dependencies on game core and framework assemblies by returning assemblies with the same assembly name
+            // already loaded in the AppDomain.
+            var domainAssembly = AppDomain.CurrentDomain.GetAssemblies()
+                                          // Given name is always going to be equally-or-more qualified than the assembly name.
+                                          .Where(a => args.Name.Contains(a.GetName().Name, StringComparison.Ordinal))
+                                          // Pick the greatest assembly version.
+                                          .OrderByDescending(a => a.GetName().Version)
+                                          .FirstOrDefault();
+
+            if (domainAssembly != null)
+                return domainAssembly;
+
+            return loadedAssemblies.Keys.FirstOrDefault(a => a.FullName == asm.FullName);
+        }
 
         private void addMissingRulesets()
         {
@@ -58,7 +86,7 @@ namespace osu.Game.Rulesets
 
                 var instances = loadedAssemblies.Values.Select(r => (Ruleset)Activator.CreateInstance(r)).ToList();
 
-                //add all legacy rulesets first to ensure they have exclusive choice of primary key.
+                // add all legacy rulesets first to ensure they have exclusive choice of primary key.
                 foreach (var r in instances.Where(r => r is ILegacyRuleset))
                 {
                     if (context.RulesetInfo.SingleOrDefault(dbRuleset => dbRuleset.ID == r.RulesetInfo.ID) == null)
@@ -67,27 +95,23 @@ namespace osu.Game.Rulesets
 
                 context.SaveChanges();
 
-                //add any other modes
+                // add any other modes
+                var existingRulesets = context.RulesetInfo.ToList();
+
                 foreach (var r in instances.Where(r => !(r is ILegacyRuleset)))
                 {
-                    if (context.RulesetInfo.FirstOrDefault(ri => ri.InstantiationInfo == r.RulesetInfo.InstantiationInfo) == null)
+                    if (existingRulesets.FirstOrDefault(ri => ri.InstantiationInfo.Equals(r.RulesetInfo.InstantiationInfo, StringComparison.Ordinal)) == null)
                         context.RulesetInfo.Add(r.RulesetInfo);
                 }
 
                 context.SaveChanges();
 
-                //perform a consistency check
+                // perform a consistency check
                 foreach (var r in context.RulesetInfo)
                 {
                     try
                     {
-                        var instanceInfo = ((Ruleset)Activator.CreateInstance(Type.GetType(r.InstantiationInfo, asm =>
-                        {
-                            // for the time being, let's ignore the version being loaded.
-                            // this allows for debug builds to successfully load rulesets (even though debug rulesets have a 0.0.0 version).
-                            asm.Version = null;
-                            return Assembly.Load(asm);
-                        }, null))).RulesetInfo;
+                        var instanceInfo = ((Ruleset)Activator.CreateInstance(Type.GetType(r.InstantiationInfo))).RulesetInfo;
 
                         r.Name = instanceInfo.Name;
                         r.ShortName = instanceInfo.ShortName;
@@ -120,18 +144,28 @@ namespace osu.Game.Rulesets
             }
         }
 
+        private void loadUserRulesets()
+        {
+            if (rulesetStorage == null) return;
+
+            var rulesets = rulesetStorage.GetFiles(".", $"{ruleset_library_prefix}.*.dll");
+
+            foreach (var ruleset in rulesets.Where(f => !f.Contains("Tests")))
+                loadRulesetFromFile(rulesetStorage.GetFullPath(ruleset));
+        }
+
         private void loadFromDisk()
         {
             try
             {
-                string[] files = Directory.GetFiles(Environment.CurrentDirectory, $"{ruleset_library_prefix}.*.dll");
+                var files = Directory.GetFiles(RuntimeInfo.StartupDirectory, $"{ruleset_library_prefix}.*.dll");
 
                 foreach (string file in files.Where(f => !Path.GetFileName(f).Contains("Tests")))
                     loadRulesetFromFile(file);
             }
             catch (Exception e)
             {
-                Logger.Error(e, $"Could not load rulesets from directory {Environment.CurrentDirectory}");
+                Logger.Error(e, $"Could not load rulesets from directory {RuntimeInfo.StartupDirectory}");
             }
         }
 
@@ -157,6 +191,11 @@ namespace osu.Game.Rulesets
             if (loadedAssemblies.ContainsKey(assembly))
                 return;
 
+            // the same assembly may be loaded twice in the same AppDomain (currently a thing in certain Rider versions https://youtrack.jetbrains.com/issue/RIDER-48799).
+            // as a failsafe, also compare by FullName.
+            if (loadedAssemblies.Any(a => a.Key.FullName == assembly.FullName))
+                return;
+
             try
             {
                 loadedAssemblies[assembly] = assembly.GetTypes().First(t => t.IsPublic && t.IsSubclassOf(typeof(Ruleset)));
@@ -175,7 +214,7 @@ namespace osu.Game.Rulesets
 
         protected virtual void Dispose(bool disposing)
         {
-            AppDomain.CurrentDomain.AssemblyResolve -= resolveRulesetAssembly;
+            AppDomain.CurrentDomain.AssemblyResolve -= resolveRulesetDependencyAssembly;
         }
     }
 }

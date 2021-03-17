@@ -18,13 +18,13 @@ namespace osu.Game.Tests.Visual.Ranking
                 Origin = Anchor.Centre,
                 Children = new Drawable[]
                 {
-                    new StarRatingDisplay(new BeatmapInfo { StarDifficulty = 1.23 }),
-                    new StarRatingDisplay(new BeatmapInfo { StarDifficulty = 2.34 }),
-                    new StarRatingDisplay(new BeatmapInfo { StarDifficulty = 3.45 }),
-                    new StarRatingDisplay(new BeatmapInfo { StarDifficulty = 4.56 }),
-                    new StarRatingDisplay(new BeatmapInfo { StarDifficulty = 5.67 }),
-                    new StarRatingDisplay(new BeatmapInfo { StarDifficulty = 6.78 }),
-                    new StarRatingDisplay(new BeatmapInfo { StarDifficulty = 10.11 }),
+                    new StarRatingDisplay(new StarDifficulty(1.23, 0)),
+                    new StarRatingDisplay(new StarDifficulty(2.34, 0)),
+                    new StarRatingDisplay(new StarDifficulty(3.45, 0)),
+                    new StarRatingDisplay(new StarDifficulty(4.56, 0)),
+                    new StarRatingDisplay(new StarDifficulty(5.67, 0)),
+                    new StarRatingDisplay(new StarDifficulty(6.78, 0)),
+                    new StarRatingDisplay(new StarDifficulty(10.11, 0)),
                 }
             };
         }

@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -18,14 +20,18 @@ using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API;
+using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.UI;
 using osu.Game.Screens;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual
 {
+    [ExcludeFromDynamicCompile]
     public abstract class OsuTestScene : TestScene
     {
         protected Bindable<WorkingBeatmap> Beatmap { get; private set; }
@@ -36,10 +42,12 @@ namespace osu.Game.Tests.Visual
 
         protected new OsuScreenDependencies Dependencies { get; private set; }
 
+        private DrawableRulesetDependencies rulesetDependencies;
+
         private Lazy<Storage> localStorage;
         protected Storage LocalStorage => localStorage.Value;
 
-        private readonly Lazy<DatabaseContextFactory> contextFactory;
+        private Lazy<DatabaseContextFactory> contextFactory;
 
         protected IAPIProvider API
         {
@@ -62,9 +70,40 @@ namespace osu.Game.Tests.Visual
         /// </summary>
         protected virtual bool UseOnlineAPI => false;
 
+        /// <summary>
+        /// When running headless, there is an opportunity to use the host storage rather than creating a second isolated one.
+        /// This is because the host is recycled per TestScene execution in headless at an nunit level.
+        /// </summary>
+        private Storage isolatedHostStorage;
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            Dependencies = new OsuScreenDependencies(false, base.CreateChildDependencies(parent));
+            if (!UseFreshStoragePerRun)
+                isolatedHostStorage = (parent.Get<GameHost>() as HeadlessGameHost)?.Storage;
+
+            contextFactory = new Lazy<DatabaseContextFactory>(() =>
+            {
+                var factory = new DatabaseContextFactory(LocalStorage);
+
+                // only reset the database if not using the host storage.
+                // if we reset the host storage, it will delete global key bindings.
+                if (isolatedHostStorage == null)
+                    factory.ResetDatabase();
+
+                using (var usage = factory.Get())
+                    usage.Migrate();
+                return factory;
+            });
+
+            RecycleLocalStorage();
+
+            var baseDependencies = base.CreateChildDependencies(parent);
+
+            var providedRuleset = CreateRuleset();
+            if (providedRuleset != null)
+                baseDependencies = rulesetDependencies = new DrawableRulesetDependencies(providedRuleset, baseDependencies);
+
+            Dependencies = new OsuScreenDependencies(false, baseDependencies);
 
             Beatmap = Dependencies.Beatmap;
             Beatmap.SetDefault();
@@ -91,18 +130,10 @@ namespace osu.Game.Tests.Visual
 
         protected OsuTestScene()
         {
-            RecycleLocalStorage();
-            contextFactory = new Lazy<DatabaseContextFactory>(() =>
-            {
-                var factory = new DatabaseContextFactory(LocalStorage);
-                factory.ResetDatabase();
-                using (var usage = factory.Get())
-                    usage.Migrate();
-                return factory;
-            });
-
             base.Content.Add(content = new DrawSizePreservingFillContainer());
         }
+
+        protected virtual bool UseFreshStoragePerRun => false;
 
         public virtual void RecycleLocalStorage()
         {
@@ -118,11 +149,24 @@ namespace osu.Game.Tests.Visual
                 }
             }
 
-            localStorage = new Lazy<Storage>(() => new NativeStorage($"{GetType().Name}-{Guid.NewGuid()}"));
+            localStorage =
+                new Lazy<Storage>(() => isolatedHostStorage ?? new NativeStorage(Path.Combine(RuntimeInfo.StartupDirectory, $"{GetType().Name}-{Guid.NewGuid()}")));
         }
 
         [Resolved]
         protected AudioManager Audio { get; private set; }
+
+        [Resolved]
+        protected MusicController MusicController { get; private set; }
+
+        /// <summary>
+        /// Creates the ruleset to be used for this test scene.
+        /// </summary>
+        /// <remarks>
+        /// When testing against ruleset-specific components, this method must be overriden to their corresponding ruleset.
+        /// </remarks>
+        [CanBeNull]
+        protected virtual Ruleset CreateRuleset() => null;
 
         protected virtual IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset);
 
@@ -135,17 +179,19 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
-            Ruleset.Value = rulesets.AvailableRulesets.First();
+            Ruleset.Value = CreateRuleset()?.RulesetInfo ?? rulesets.AvailableRulesets.First();
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
 
-            if (Beatmap?.Value.TrackLoaded == true)
-                Beatmap.Value.Track.Stop();
+            rulesetDependencies?.Dispose();
 
-            if (contextFactory.IsValueCreated)
+            if (MusicController?.TrackLoaded == true)
+                MusicController.Stop();
+
+            if (contextFactory?.IsValueCreated == true)
                 contextFactory.Value.ResetDatabase();
 
             RecycleLocalStorage();
@@ -177,18 +223,23 @@ namespace osu.Game.Tests.Visual
             /// <param name="storyboard">The storyboard.</param>
             /// <param name="referenceClock">An optional clock which should be used instead of a stopwatch for virtual time progression.</param>
             /// <param name="audio">Audio manager. Required if a reference clock isn't provided.</param>
-            /// <param name="length">The length of the returned virtual track.</param>
-            public ClockBackedTestWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard, IFrameBasedClock referenceClock, AudioManager audio, double length = 60000)
-                : base(beatmap, storyboard)
+            public ClockBackedTestWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard, IFrameBasedClock referenceClock, AudioManager audio)
+                : base(beatmap, storyboard, audio)
             {
+                double trackLength = 60000;
+
+                if (beatmap.HitObjects.Count > 0)
+                    // add buffer after last hitobject to allow for final replay frames etc.
+                    trackLength = Math.Max(trackLength, beatmap.HitObjects.Max(h => h.GetEndTime()) + 2000);
+
                 if (referenceClock != null)
                 {
                     store = new TrackVirtualStore(referenceClock);
                     audio.AddItem(store);
-                    track = store.GetVirtual(length);
+                    track = store.GetVirtual(trackLength);
                 }
                 else
-                    track = audio?.Tracks.GetVirtual(length);
+                    track = audio?.Tracks.GetVirtual(trackLength);
             }
 
             ~ClockBackedTestWorkingBeatmap()
@@ -197,7 +248,7 @@ namespace osu.Game.Tests.Visual
                 store?.Dispose();
             }
 
-            protected override Track GetTrack() => track;
+            protected override Track GetBeatmapTrack() => track;
 
             public class TrackVirtualStore : AudioCollectionManager<Track>, ITrackStore
             {
@@ -283,8 +334,10 @@ namespace osu.Game.Tests.Visual
                     {
                         double refTime = referenceClock.CurrentTime;
 
-                        if (lastReferenceTime.HasValue)
-                            accumulated += (refTime - lastReferenceTime.Value) * Rate;
+                        double? lastRefTime = lastReferenceTime;
+
+                        if (lastRefTime != null)
+                            accumulated += (refTime - lastRefTime.Value) * Rate;
 
                         lastReferenceTime = refTime;
                     }

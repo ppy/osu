@@ -17,9 +17,11 @@ namespace osu.Game.Rulesets.Catch.Mods
         private const double fade_out_offset_multiplier = 0.6;
         private const double fade_out_duration_multiplier = 0.44;
 
-        protected override void ApplyHiddenState(DrawableHitObject drawable, ArmedState state)
+        protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
-            if (!(drawable is DrawableCatchHitObject catchDrawable))
+            base.ApplyNormalVisibilityState(hitObject, state);
+
+            if (!(hitObject is DrawableCatchHitObject catchDrawable))
                 return;
 
             if (catchDrawable.NestedHitObjects.Any())

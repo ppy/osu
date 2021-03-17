@@ -3,16 +3,26 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
+using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using static osu.Game.Skinning.LegacySkinConfiguration;
 
 namespace osu.Game.Skinning
 {
     public static class LegacySkinExtensions
     {
-        public static Drawable GetAnimation(this ISkin source, string componentName, bool animatable, bool looping, bool applyConfigFrameRate = false, string animationSeparator = "-")
+        public static Drawable GetAnimation(this ISkin source, string componentName, bool animatable, bool looping, bool applyConfigFrameRate = false, string animationSeparator = "-",
+                                            bool startAtCurrentTime = true, double? frameLength = null)
+            => source.GetAnimation(componentName, default, default, animatable, looping, applyConfigFrameRate, animationSeparator, startAtCurrentTime, frameLength);
+
+        public static Drawable GetAnimation(this ISkin source, string componentName, WrapMode wrapModeS, WrapMode wrapModeT, bool animatable, bool looping, bool applyConfigFrameRate = false,
+                                            string animationSeparator = "-",
+                                            bool startAtCurrentTime = true, double? frameLength = null)
         {
             Texture texture;
 
@@ -22,10 +32,10 @@ namespace osu.Game.Skinning
 
                 if (textures.Length > 0)
                 {
-                    var animation = new TextureAnimation
+                    var animation = new SkinnableTextureAnimation(startAtCurrentTime)
                     {
-                        DefaultFrameLength = getFrameLength(source, applyConfigFrameRate, textures),
-                        Repeat = looping,
+                        DefaultFrameLength = frameLength ?? getFrameLength(source, applyConfigFrameRate, textures),
+                        Loop = looping,
                     };
 
                     foreach (var t in textures)
@@ -36,7 +46,7 @@ namespace osu.Game.Skinning
             }
 
             // if an animation was not allowed or not found, fall back to a sprite retrieval.
-            if ((texture = source.GetTexture(componentName)) != null)
+            if ((texture = source.GetTexture(componentName, wrapModeS, wrapModeT)) != null)
                 return new Sprite { Texture = texture };
 
             return null;
@@ -45,11 +55,48 @@ namespace osu.Game.Skinning
             {
                 for (int i = 0; true; i++)
                 {
-                    if ((texture = source.GetTexture($"{componentName}{animationSeparator}{i}")) == null)
+                    if ((texture = source.GetTexture($"{componentName}{animationSeparator}{i}", wrapModeS, wrapModeT)) == null)
                         break;
 
                     yield return texture;
                 }
+            }
+        }
+
+        public static bool HasFont(this ISkin source, string fontPrefix)
+            => source.GetTexture($"{fontPrefix}-0") != null;
+
+        public class SkinnableTextureAnimation : TextureAnimation
+        {
+            [Resolved(canBeNull: true)]
+            private IAnimationTimeReference timeReference { get; set; }
+
+            private readonly Bindable<double> animationStartTime = new BindableDouble();
+
+            public SkinnableTextureAnimation(bool startAtCurrentTime = true)
+                : base(startAtCurrentTime)
+            {
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                if (timeReference != null)
+                {
+                    Clock = timeReference.Clock;
+                    animationStartTime.BindTo(timeReference.AnimationStartTime);
+                }
+
+                animationStartTime.BindValueChanged(_ => updatePlaybackPosition(), true);
+            }
+
+            private void updatePlaybackPosition()
+            {
+                if (timeReference == null)
+                    return;
+
+                PlaybackPosition = timeReference.Clock.CurrentTime - timeReference.AnimationStartTime.Value;
             }
         }
 
@@ -59,7 +106,7 @@ namespace osu.Game.Skinning
         {
             if (applyConfigFrameRate)
             {
-                var iniRate = source.GetConfig<GlobalSkinConfiguration, int>(GlobalSkinConfiguration.AnimationFramerate);
+                var iniRate = source.GetConfig<LegacySetting, int>(LegacySetting.AnimationFramerate);
 
                 if (iniRate?.Value > 0)
                     return 1000f / iniRate.Value;

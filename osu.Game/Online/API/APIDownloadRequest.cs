@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.IO;
 using osu.Framework.IO.Network;
 
@@ -28,13 +29,19 @@ namespace osu.Game.Online.API
 
         private void request_Progress(long current, long total) => API.Schedule(() => Progressed?.Invoke(current, total));
 
-        protected APIDownloadRequest()
+        protected void TriggerSuccess(string filename)
         {
-            base.Success += onSuccess;
+            if (this.filename != null)
+                throw new InvalidOperationException("Attempted to trigger success more than once");
+
+            this.filename = filename;
+
+            TriggerSuccess();
         }
 
-        private void onSuccess()
+        internal override void TriggerSuccess()
         {
+            base.TriggerSuccess();
             Success?.Invoke(filename);
         }
 

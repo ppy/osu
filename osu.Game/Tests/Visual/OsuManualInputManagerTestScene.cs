@@ -26,16 +26,16 @@ namespace osu.Game.Tests.Visual
 
         protected OsuManualInputManagerTestScene()
         {
+            MenuCursorContainer cursorContainer;
+
             base.Content.AddRange(new Drawable[]
             {
                 InputManager = new ManualInputManager
                 {
                     UseParentInput = true,
                     Child = new GlobalActionContainer(null)
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Child = content = new MenuCursorContainer { RelativeSizeAxes = Axes.Both }
-                    },
+                        .WithChild((cursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both })
+                            .WithChild(content = new OsuTooltipContainer(cursorContainer.Cursor) { RelativeSizeAxes = Axes.Both }))
                 },
                 new Container
                 {

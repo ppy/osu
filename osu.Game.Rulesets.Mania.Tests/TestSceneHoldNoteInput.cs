@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -10,6 +11,8 @@ using osu.Game.Replays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Replays;
+using osu.Game.Rulesets.Mania.Scoring;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -27,7 +30,6 @@ namespace osu.Game.Rulesets.Mania.Tests
         private const double time_after_tail = 5250;
 
         private List<JudgementResult> judgementResults;
-        private bool allJudgedFired;
 
         /// <summary>
         ///     -----[           ]-----
@@ -43,9 +45,9 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
 
             assertHeadJudgement(HitResult.Miss);
-            assertTickJudgement(HitResult.Miss);
+            assertTickJudgement(HitResult.LargeTickMiss);
             assertTailJudgement(HitResult.Miss);
-            assertNoteJudgement(HitResult.Perfect);
+            assertNoteJudgement(HitResult.IgnoreHit);
         }
 
         /// <summary>
@@ -62,7 +64,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
 
             assertHeadJudgement(HitResult.Miss);
-            assertTickJudgement(HitResult.Miss);
+            assertTickJudgement(HitResult.LargeTickMiss);
             assertTailJudgement(HitResult.Miss);
         }
 
@@ -80,7 +82,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
 
             assertHeadJudgement(HitResult.Miss);
-            assertTickJudgement(HitResult.Miss);
+            assertTickJudgement(HitResult.LargeTickMiss);
             assertTailJudgement(HitResult.Miss);
         }
 
@@ -100,7 +102,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
 
             assertHeadJudgement(HitResult.Perfect);
-            assertTickJudgement(HitResult.Perfect);
+            assertTickJudgement(HitResult.LargeTickHit);
             assertTailJudgement(HitResult.Miss);
         }
 
@@ -120,7 +122,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
 
             assertHeadJudgement(HitResult.Perfect);
-            assertTickJudgement(HitResult.Perfect);
+            assertTickJudgement(HitResult.LargeTickHit);
             assertTailJudgement(HitResult.Perfect);
         }
 
@@ -139,7 +141,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
 
             assertHeadJudgement(HitResult.Perfect);
-            assertTickJudgement(HitResult.Miss);
+            assertTickJudgement(HitResult.LargeTickMiss);
             assertTailJudgement(HitResult.Miss);
         }
 
@@ -159,7 +161,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
 
             assertHeadJudgement(HitResult.Perfect);
-            assertTickJudgement(HitResult.Perfect);
+            assertTickJudgement(HitResult.LargeTickHit);
             assertTailJudgement(HitResult.Miss);
         }
 
@@ -179,7 +181,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
 
             assertHeadJudgement(HitResult.Perfect);
-            assertTickJudgement(HitResult.Perfect);
+            assertTickJudgement(HitResult.LargeTickHit);
             assertTailJudgement(HitResult.Meh);
         }
 
@@ -197,7 +199,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
 
             assertHeadJudgement(HitResult.Miss);
-            assertTickJudgement(HitResult.Perfect);
+            assertTickJudgement(HitResult.LargeTickHit);
             assertTailJudgement(HitResult.Miss);
         }
 
@@ -215,7 +217,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
 
             assertHeadJudgement(HitResult.Miss);
-            assertTickJudgement(HitResult.Perfect);
+            assertTickJudgement(HitResult.LargeTickHit);
             assertTailJudgement(HitResult.Meh);
         }
 
@@ -233,8 +235,55 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
 
             assertHeadJudgement(HitResult.Miss);
-            assertTickJudgement(HitResult.Miss);
+            assertTickJudgement(HitResult.LargeTickMiss);
             assertTailJudgement(HitResult.Meh);
+        }
+
+        [Test]
+        public void TestMissReleaseAndHitSecondRelease()
+        {
+            var windows = new ManiaHitWindows();
+            windows.SetDifficulty(10);
+
+            var beatmap = new Beatmap<ManiaHitObject>
+            {
+                HitObjects =
+                {
+                    new HoldNote
+                    {
+                        StartTime = 1000,
+                        Duration = 500,
+                        Column = 0,
+                    },
+                    new HoldNote
+                    {
+                        StartTime = 1000 + 500 + windows.WindowFor(HitResult.Miss) + 10,
+                        Duration = 500,
+                        Column = 0,
+                    },
+                },
+                BeatmapInfo =
+                {
+                    BaseDifficulty = new BeatmapDifficulty
+                    {
+                        SliderTickRate = 4,
+                        OverallDifficulty = 10,
+                    },
+                    Ruleset = new ManiaRuleset().RulesetInfo
+                },
+            };
+
+            performTest(new List<ReplayFrame>
+            {
+                new ManiaReplayFrame(beatmap.HitObjects[1].StartTime, ManiaAction.Key1),
+                new ManiaReplayFrame(beatmap.HitObjects[1].GetEndTime()),
+            }, beatmap);
+
+            AddAssert("first hold note missed", () => judgementResults.Where(j => beatmap.HitObjects[0].NestedHitObjects.Contains(j.HitObject))
+                                                                      .All(j => !j.Type.IsHit()));
+
+            AddAssert("second hold note missed", () => judgementResults.Where(j => beatmap.HitObjects[1].NestedHitObjects.Contains(j.HitObject))
+                                                                       .All(j => j.Type.IsHit()));
         }
 
         private void assertHeadJudgement(HitResult result)
@@ -251,11 +300,11 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         private ScoreAccessibleReplayPlayer currentPlayer;
 
-        private void performTest(List<ReplayFrame> frames)
+        private void performTest(List<ReplayFrame> frames, Beatmap<ManiaHitObject> beatmap = null)
         {
-            AddStep("load player", () =>
+            if (beatmap == null)
             {
-                Beatmap.Value = CreateWorkingBeatmap(new Beatmap<ManiaHitObject>
+                beatmap = new Beatmap<ManiaHitObject>
                 {
                     HitObjects =
                     {
@@ -271,9 +320,14 @@ namespace osu.Game.Rulesets.Mania.Tests
                         BaseDifficulty = new BeatmapDifficulty { SliderTickRate = 4 },
                         Ruleset = new ManiaRuleset().RulesetInfo
                     },
-                });
+                };
 
-                Beatmap.Value.Beatmap.ControlPointInfo.Add(0, new DifficultyControlPoint { SpeedMultiplier = 0.1f });
+                beatmap.ControlPointInfo.Add(0, new DifficultyControlPoint { SpeedMultiplier = 0.1f });
+            }
+
+            AddStep("load player", () =>
+            {
+                Beatmap.Value = CreateWorkingBeatmap(beatmap);
 
                 var p = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = frames } });
 
@@ -283,20 +337,15 @@ namespace osu.Game.Rulesets.Mania.Tests
                     {
                         if (currentPlayer == p) judgementResults.Add(result);
                     };
-                    p.ScoreProcessor.AllJudged += () =>
-                    {
-                        if (currentPlayer == p) allJudgedFired = true;
-                    };
                 };
 
                 LoadScreen(currentPlayer = p);
-                allJudgedFired = false;
                 judgementResults = new List<JudgementResult>();
             });
 
             AddUntilStep("Beatmap at 0", () => Beatmap.Value.Track.CurrentTime == 0);
             AddUntilStep("Wait until player is loaded", () => currentPlayer.IsCurrentScreen());
-            AddUntilStep("Wait for all judged", () => allJudgedFired);
+            AddUntilStep("Wait for completion", () => currentPlayer.ScoreProcessor.HasCompleted.Value);
         }
 
         private class ScoreAccessibleReplayPlayer : ReplayPlayer
@@ -306,7 +355,11 @@ namespace osu.Game.Rulesets.Mania.Tests
             protected override bool PauseOnFocusLost => false;
 
             public ScoreAccessibleReplayPlayer(Score score)
-                : base(score, false, false)
+                : base(score, new PlayerConfiguration
+                {
+                    AllowPause = false,
+                    ShowResults = false,
+                })
             {
             }
         }

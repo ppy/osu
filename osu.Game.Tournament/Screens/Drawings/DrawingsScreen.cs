@@ -47,8 +47,7 @@ namespace osu.Game.Tournament.Screens.Drawings
 
             this.storage = storage;
 
-            if (TeamList == null)
-                TeamList = new StorageBackedTeamList(storage);
+            TeamList ??= new StorageBackedTeamList(storage);
 
             if (!TeamList.Teams.Any())
             {
@@ -235,7 +234,7 @@ namespace osu.Game.Tournament.Screens.Drawings
                             if (string.IsNullOrEmpty(line))
                                 continue;
 
-                            if (line.ToUpperInvariant().StartsWith("GROUP"))
+                            if (line.ToUpperInvariant().StartsWith("GROUP", StringComparison.Ordinal))
                                 continue;
 
                             // ReSharper disable once AccessToModifiedClosure

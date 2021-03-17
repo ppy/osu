@@ -3,25 +3,18 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Overlays.Dashboard.Friends;
-using osu.Framework.Graphics;
-using osu.Game.Users;
-using osu.Game.Overlays;
-using osu.Framework.Allocation;
 using NUnit.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Dashboard.Friends;
+using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneFriendDisplay : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(FriendDisplay),
-            typeof(FriendOnlineStreamControl),
-            typeof(UserListToolbar)
-        };
-
         protected override bool UseOnlineAPI => true;
 
         [Cached]
@@ -42,13 +35,13 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestOffline()
         {
-            AddStep("Populate", () => display.Users = getUsers());
+            AddStep("Populate with offline test users", () => display.Users = getUsers());
         }
 
         [Test]
         public void TestOnline()
         {
-            AddStep("Fetch online", () => display?.Fetch());
+            // No need to do anything, fetch is performed automatically.
         }
 
         private List<User> getUsers() => new List<User>
@@ -58,7 +51,7 @@ namespace osu.Game.Tests.Visual.Online
                 Username = "flyte",
                 Id = 3103765,
                 IsOnline = true,
-                CurrentModeRank = 1111,
+                Statistics = new UserStatistics { GlobalRank = 1111 },
                 Country = new Country { FlagName = "JP" },
                 CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
             },
@@ -67,7 +60,7 @@ namespace osu.Game.Tests.Visual.Online
                 Username = "peppy",
                 Id = 2,
                 IsOnline = false,
-                CurrentModeRank = 2222,
+                Statistics = new UserStatistics { GlobalRank = 2222 },
                 Country = new Country { FlagName = "AU" },
                 CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
                 IsSupporter = true,

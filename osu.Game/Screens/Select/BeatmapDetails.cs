@@ -63,8 +63,6 @@ namespace osu.Game.Screens.Select
 
         public BeatmapDetails()
         {
-            Container content;
-
             Children = new Drawable[]
             {
                 new Box
@@ -72,7 +70,7 @@ namespace osu.Game.Screens.Select
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black.Opacity(0.5f),
                 },
-                content = new Container
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Horizontal = spacing },
@@ -159,7 +157,7 @@ namespace osu.Game.Screens.Select
                         },
                     },
                 },
-                loading = new LoadingLayer(content),
+                loading = new LoadingLayer(true),
             };
         }
 
@@ -201,7 +199,7 @@ namespace osu.Game.Screens.Select
                 Schedule(() =>
                 {
                     if (beatmap != requestedBeatmap)
-                        //the beatmap has been changed since we started the lookup.
+                        // the beatmap has been changed since we started the lookup.
                         return;
 
                     var b = res.ToBeatmap(rulesets);
@@ -222,7 +220,7 @@ namespace osu.Game.Screens.Select
                 Schedule(() =>
                 {
                     if (beatmap != requestedBeatmap)
-                        //the beatmap has been changed since we started the lookup.
+                        // the beatmap has been changed since we started the lookup.
                         return;
 
                     updateMetrics();
@@ -236,7 +234,7 @@ namespace osu.Game.Screens.Select
         private void updateMetrics()
         {
             var hasRatings = beatmap?.BeatmapSet?.Metrics?.Ratings?.Any() ?? false;
-            var hasRetriesFails = (beatmap?.Metrics?.Retries?.Any() ?? false) && (beatmap?.Metrics.Fails?.Any() ?? false);
+            var hasRetriesFails = (beatmap?.Metrics?.Retries?.Any() ?? false) || (beatmap?.Metrics?.Fails?.Any() ?? false);
 
             if (hasRatings)
             {
@@ -300,6 +298,7 @@ namespace osu.Game.Screens.Select
 
             public MetadataSection(string title)
             {
+                Alpha = 0;
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
 

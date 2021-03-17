@@ -1,15 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
-using osu.Framework.Timing;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose;
 using osuTK;
 
@@ -28,11 +30,14 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// The <see cref="HitObject"/> that is being placed.
         /// </summary>
-        protected readonly HitObject HitObject;
+        public readonly HitObject HitObject;
 
-        protected IClock EditorClock { get; private set; }
+        [Resolved(canBeNull: true)]
+        protected EditorClock EditorClock { get; private set; }
 
         private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+
+        private Bindable<double> startTimeBindable;
 
         [Resolved]
         private IPlacementHandler placementHandler { get; set; }
@@ -40,6 +45,9 @@ namespace osu.Game.Rulesets.Edit
         protected PlacementBlueprint(HitObject hitObject)
         {
             HitObject = hitObject;
+
+            // adding the default hit sample should be the case regardless of the ruleset.
+            HitObject.Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_NORMAL));
 
             RelativeSizeAxes = Axes.Both;
 
@@ -49,23 +57,20 @@ namespace osu.Game.Rulesets.Edit
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap, IAdjustableClock clock)
+        private void load(IBindable<WorkingBeatmap> beatmap)
         {
             this.beatmap.BindTo(beatmap);
 
-            EditorClock = clock;
-
-            ApplyDefaultsToHitObject();
+            startTimeBindable = HitObject.StartTimeBindable.GetBoundCopy();
+            startTimeBindable.BindValueChanged(_ => ApplyDefaultsToHitObject(), true);
         }
 
         /// <summary>
         /// Signals that the placement of <see cref="HitObject"/> has started.
         /// </summary>
-        /// <param name="startTime">The start time of <see cref="HitObject"/> at the placement point. If null, the current clock time is used.</param>
         /// <param name="commitStart">Whether this call is committing a value for HitObject.StartTime and continuing with further adjustments.</param>
-        protected void BeginPlacement(double? startTime = null, bool commitStart = false)
+        protected void BeginPlacement(bool commitStart = false)
         {
-            HitObject.StartTime = startTime ?? EditorClock.CurrentTime;
             placementHandler.BeginPlacement(HitObject);
             PlacementActive |= commitStart;
         }
@@ -84,13 +89,17 @@ namespace osu.Game.Rulesets.Edit
         }
 
         /// <summary>
-        /// Updates the position of this <see cref="PlacementBlueprint"/> to a new screen-space position.
+        /// Updates the time and position of this <see cref="PlacementBlueprint"/> based on the provided snap information.
         /// </summary>
-        /// <param name="screenSpacePosition">The screen-space position.</param>
-        public abstract void UpdatePosition(Vector2 screenSpacePosition);
+        /// <param name="result">The snap result information.</param>
+        public virtual void UpdateTimeAndPosition(SnapResult result)
+        {
+            if (!PlacementActive)
+                HitObject.StartTime = result.Time ?? EditorClock?.CurrentTime ?? Time.Current;
+        }
 
         /// <summary>
-        /// Invokes <see cref="Objects.HitObject.ApplyDefaults(ControlPointInfo,BeatmapDifficulty)"/>,
+        /// Invokes <see cref="Objects.HitObject.ApplyDefaults(ControlPointInfo,BeatmapDifficulty, CancellationToken)"/>,
         /// refreshing <see cref="Objects.HitObject.NestedHitObjects"/> and parameters for the <see cref="HitObject"/>.
         /// </summary>
         protected void ApplyDefaultsToHitObject() => HitObject.ApplyDefaults(beatmap.Value.Beatmap.ControlPointInfo, beatmap.Value.Beatmap.BeatmapInfo.BaseDifficulty);
@@ -104,6 +113,9 @@ namespace osu.Game.Rulesets.Edit
             switch (e)
             {
                 case ScrollEvent _:
+                    return false;
+
+                case DoubleClickEvent _:
                     return false;
 
                 case MouseButtonEvent _:

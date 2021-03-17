@@ -3,15 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Configuration;
@@ -20,15 +19,22 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
+using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.RadioButtons;
+using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
-using Key = osuTK.Input.Key;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Edit
 {
+    /// <summary>
+    /// Top level container for editor compose mode.
+    /// Responsible for providing snapping and generally gluing components together.
+    /// </summary>
+    /// <typeparam name="TObject">The base type of supported objects.</typeparam>
     [Cached(Type = typeof(IPlacementHandler))]
     public abstract class HitObjectComposer<TObject> : HitObjectComposer, IPlacementHandler
         where TObject : HitObject
@@ -38,128 +44,107 @@ namespace osu.Game.Rulesets.Edit
         protected readonly Ruleset Ruleset;
 
         [Resolved]
-        protected IFrameBasedClock EditorClock { get; private set; }
+        protected EditorClock EditorClock { get; private set; }
 
         [Resolved]
         protected EditorBeatmap EditorBeatmap { get; private set; }
 
         [Resolved]
-        private IAdjustableClock adjustableClock { get; set; }
-
-        [Resolved]
-        private IBeatSnapProvider beatSnapProvider { get; set; }
+        protected IBeatSnapProvider BeatSnapProvider { get; private set; }
 
         protected ComposeBlueprintContainer BlueprintContainer { get; private set; }
 
         private DrawableEditRulesetWrapper<TObject> drawableRulesetWrapper;
-        private Container distanceSnapGridContainer;
-        private DistanceSnapGrid distanceSnapGrid;
-        private readonly List<Container> layerContainers = new List<Container>();
+
+        protected readonly Container LayerBelowRuleset = new Container { RelativeSizeAxes = Axes.Both };
 
         private InputManager inputManager;
 
         private RadioButtonCollection toolboxCollection;
 
+        private FillFlowContainer togglesCollection;
+
         protected HitObjectComposer(Ruleset ruleset)
         {
             Ruleset = ruleset;
-            RelativeSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
-        private void load(IFrameBasedClock framedClock)
+        private void load()
         {
-            EditorBeatmap.HitObjectAdded += addHitObject;
-            EditorBeatmap.HitObjectRemoved += removeHitObject;
-            EditorBeatmap.StartTimeChanged += UpdateHitObject;
-
             Config = Dependencies.Get<RulesetConfigCache>().GetConfigFor(Ruleset);
 
             try
             {
-                drawableRulesetWrapper = new DrawableEditRulesetWrapper<TObject>(CreateDrawableRuleset(Ruleset, EditorBeatmap.PlayableBeatmap))
+                drawableRulesetWrapper = new DrawableEditRulesetWrapper<TObject>(CreateDrawableRuleset(Ruleset, EditorBeatmap.PlayableBeatmap, new[] { Ruleset.GetAutoplayMod() }))
                 {
-                    Clock = framedClock,
+                    Clock = EditorClock,
                     ProcessCustomClock = false
                 };
             }
             catch (Exception e)
             {
-                Logger.Error(e, "Could not load beatmap sucessfully!");
+                Logger.Error(e, "Could not load beatmap successfully!");
                 return;
             }
 
-            var layerBelowRuleset = drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChildren(new Drawable[]
+            const float toolbar_width = 200;
+
+            InternalChildren = new Drawable[]
             {
-                distanceSnapGridContainer = new Container { RelativeSizeAxes = Axes.Both },
-                new EditorPlayfieldBorder { RelativeSizeAxes = Axes.Both }
-            });
-
-            var layerAboveRuleset = drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChild(BlueprintContainer = CreateBlueprintContainer());
-
-            layerContainers.Add(layerBelowRuleset);
-            layerContainers.Add(layerAboveRuleset);
-
-            InternalChild = new GridContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-                Content = new[]
+                new Container
                 {
-                    new Drawable[]
+                    Name = "Content",
+                    Padding = new MarginPadding { Left = toolbar_width },
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
                     {
-                        new FillFlowContainer
-                        {
-                            Name = "Sidebar",
-                            RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Right = 10 },
-                            Children = new Drawable[]
-                            {
-                                new ToolboxGroup { Child = toolboxCollection = new RadioButtonCollection { RelativeSizeAxes = Axes.X } }
-                            }
-                        },
-                        new Container
-                        {
-                            Name = "Content",
-                            RelativeSizeAxes = Axes.Both,
-                            Children = new Drawable[]
-                            {
-                                layerBelowRuleset,
-                                drawableRulesetWrapper,
-                                layerAboveRuleset
-                            }
-                        }
-                    },
+                        // layers below playfield
+                        drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChild(LayerBelowRuleset),
+                        drawableRulesetWrapper,
+                        // layers above playfield
+                        drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer()
+                                              .WithChild(BlueprintContainer = CreateBlueprintContainer())
+                    }
                 },
-                ColumnDimensions = new[]
+                new FillFlowContainer
                 {
-                    new Dimension(GridSizeMode.Absolute, 200),
-                }
+                    Name = "Sidebar",
+                    RelativeSizeAxes = Axes.Y,
+                    Width = toolbar_width,
+                    Padding = new MarginPadding { Right = 10 },
+                    Spacing = new Vector2(10),
+                    Children = new Drawable[]
+                    {
+                        new ToolboxGroup("toolbox (1-9)")
+                        {
+                            Child = toolboxCollection = new RadioButtonCollection { RelativeSizeAxes = Axes.X }
+                        },
+                        new ToolboxGroup("toggles (Q~P)")
+                        {
+                            Child = togglesCollection = new FillFlowContainer
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Direction = FillDirection.Vertical,
+                                Spacing = new Vector2(0, 5),
+                            },
+                        }
+                    }
+                },
             };
 
             toolboxCollection.Items = CompositionTools
                                       .Prepend(new SelectTool())
-                                      .Select(t => new RadioButton(t.Name, () => toolSelected(t)))
+                                      .Select(t => new RadioButton(t.Name, () => toolSelected(t), t.CreateIcon))
                                       .ToList();
+
+            TernaryStates = CreateTernaryButtons().ToArray();
+            togglesCollection.AddRange(TernaryStates.Select(b => new DrawableTernaryButton(b)));
 
             setSelectTool();
 
-            BlueprintContainer.SelectionChanged += selectionChanged;
-        }
-
-        protected override bool OnKeyDown(KeyDownEvent e)
-        {
-            if (e.Key >= Key.Number1 && e.Key <= Key.Number9)
-            {
-                var item = toolboxCollection.Items.ElementAtOrDefault(e.Key - Key.Number1);
-
-                if (item != null)
-                {
-                    item.Select();
-                    return true;
-                }
-            }
-
-            return base.OnKeyDown(e);
+            EditorBeatmap.SelectedHitObjects.CollectionChanged += selectionChanged;
         }
 
         protected override void LoadComplete()
@@ -169,42 +154,154 @@ namespace osu.Game.Rulesets.Edit
             inputManager = GetContainingInputManager();
         }
 
-        private double lastGridUpdateTime;
+        public override Playfield Playfield => drawableRulesetWrapper.Playfield;
 
-        protected override void Update()
+        public override IEnumerable<DrawableHitObject> HitObjects => drawableRulesetWrapper.Playfield.AllHitObjects;
+
+        public override bool CursorInPlacementArea => drawableRulesetWrapper.Playfield.ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position);
+
+        /// <summary>
+        /// Defines all available composition tools, listed on the left side of the editor screen as button controls.
+        /// This should usually define one tool for each <see cref="HitObject"/> type used in the target ruleset.
+        /// </summary>
+        /// <remarks>
+        /// A "select" tool is automatically added as the first tool.
+        /// </remarks>
+        protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
+
+        /// <summary>
+        /// A collection of states which will be displayed to the user in the toolbox.
+        /// </summary>
+        public TernaryButton[] TernaryStates { get; private set; }
+
+        /// <summary>
+        /// Create all ternary states required to be displayed to the user.
+        /// </summary>
+        protected virtual IEnumerable<TernaryButton> CreateTernaryButtons() => BlueprintContainer.TernaryStates;
+
+        /// <summary>
+        /// Construct a relevant blueprint container. This will manage hitobject selection/placement input handling and display logic.
+        /// </summary>
+        protected virtual ComposeBlueprintContainer CreateBlueprintContainer()
+            => new ComposeBlueprintContainer(this);
+
+        /// <summary>
+        /// Construct a drawable ruleset for the provided ruleset.
+        /// </summary>
+        /// <remarks>
+        /// Can be overridden to add editor-specific logical changes to a <see cref="Ruleset"/>'s standard <see cref="DrawableRuleset{TObject}"/>.
+        /// For example, hit animations or judgement logic may be changed to give a better editor user experience.
+        /// </remarks>
+        /// <param name="ruleset">The ruleset used to construct its drawable counterpart.</param>
+        /// <param name="beatmap">The loaded beatmap.</param>
+        /// <param name="mods">The mods to be applied.</param>
+        /// <returns>An editor-relevant <see cref="DrawableRuleset{TObject}"/>.</returns>
+        protected virtual DrawableRuleset<TObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
+            => (DrawableRuleset<TObject>)ruleset.CreateDrawableRulesetWith(beatmap, mods);
+
+        #region Tool selection logic
+
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
-            base.Update();
+            if (e.ControlPressed || e.AltPressed || e.SuperPressed)
+                return false;
 
-            if (EditorClock.CurrentTime != lastGridUpdateTime && !(BlueprintContainer.CurrentTool is SelectTool))
-                showGridFor(Enumerable.Empty<HitObject>());
-        }
-
-        protected override void UpdateAfterChildren()
-        {
-            base.UpdateAfterChildren();
-
-            layerContainers.ForEach(l =>
+            if (checkLeftToggleFromKey(e.Key, out var leftIndex))
             {
-                l.Anchor = drawableRulesetWrapper.Playfield.Anchor;
-                l.Origin = drawableRulesetWrapper.Playfield.Origin;
-                l.Position = drawableRulesetWrapper.Playfield.Position;
-                l.Size = drawableRulesetWrapper.Playfield.Size;
-            });
+                var item = toolboxCollection.Items.ElementAtOrDefault(leftIndex);
+
+                if (item != null)
+                {
+                    item.Select();
+                    return true;
+                }
+            }
+
+            if (checkRightToggleFromKey(e.Key, out var rightIndex))
+            {
+                var item = togglesCollection.ElementAtOrDefault(rightIndex);
+
+                if (item is DrawableTernaryButton button)
+                {
+                    button.Button.Toggle();
+                    return true;
+                }
+            }
+
+            return base.OnKeyDown(e);
         }
 
-        private void selectionChanged(IEnumerable<HitObject> selectedHitObjects)
+        private bool checkLeftToggleFromKey(Key key, out int index)
         {
-            var hitObjects = selectedHitObjects.ToArray();
+            if (key < Key.Number1 || key > Key.Number9)
+            {
+                index = -1;
+                return false;
+            }
 
-            if (hitObjects.Any())
+            index = key - Key.Number1;
+            return true;
+        }
+
+        private bool checkRightToggleFromKey(Key key, out int index)
+        {
+            switch (key)
+            {
+                case Key.Q:
+                    index = 0;
+                    break;
+
+                case Key.W:
+                    index = 1;
+                    break;
+
+                case Key.E:
+                    index = 2;
+                    break;
+
+                case Key.R:
+                    index = 3;
+                    break;
+
+                case Key.T:
+                    index = 4;
+                    break;
+
+                case Key.Y:
+                    index = 5;
+                    break;
+
+                case Key.U:
+                    index = 6;
+                    break;
+
+                case Key.I:
+                    index = 7;
+                    break;
+
+                case Key.O:
+                    index = 8;
+                    break;
+
+                case Key.P:
+                    index = 9;
+                    break;
+
+                default:
+                    index = -1;
+                    break;
+            }
+
+            return index >= 0;
+        }
+
+        private void selectionChanged(object sender, NotifyCollectionChangedEventArgs changedArgs)
+        {
+            if (EditorBeatmap.SelectedHitObjects.Any())
             {
                 // ensure in selection mode if a selection is made.
                 setSelectTool();
-
-                showGridFor(hitObjects);
             }
-            else
-                distanceSnapGridContainer.Hide();
         }
 
         private void setSelectTool() => toolboxCollection.Items.First().Select();
@@ -213,48 +310,17 @@ namespace osu.Game.Rulesets.Edit
         {
             BlueprintContainer.CurrentTool = tool;
 
-            if (tool is SelectTool)
-                distanceSnapGridContainer.Hide();
-            else
-            {
+            if (!(tool is SelectTool))
                 EditorBeatmap.SelectedHitObjects.Clear();
-                showGridFor(Enumerable.Empty<HitObject>());
-            }
         }
 
-        private void showGridFor(IEnumerable<HitObject> selectedHitObjects)
-        {
-            distanceSnapGridContainer.Clear();
-            distanceSnapGrid = CreateDistanceSnapGrid(selectedHitObjects);
+        #endregion
 
-            if (distanceSnapGrid != null)
-            {
-                distanceSnapGridContainer.Child = distanceSnapGrid;
-                distanceSnapGridContainer.Show();
-            }
-
-            lastGridUpdateTime = EditorClock.CurrentTime;
-        }
-
-        private void addHitObject(HitObject hitObject) => UpdateHitObject(hitObject);
-
-        private void removeHitObject(HitObject hitObject) => UpdateHitObject(null);
-
-        public override IEnumerable<DrawableHitObject> HitObjects => drawableRulesetWrapper.Playfield.AllHitObjects;
-        public override bool CursorInPlacementArea => drawableRulesetWrapper.Playfield.ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position);
-
-        protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
-
-        protected abstract ComposeBlueprintContainer CreateBlueprintContainer();
-
-        protected abstract DrawableRuleset<TObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null);
+        #region IPlacementHandler
 
         public void BeginPlacement(HitObject hitObject)
         {
             EditorBeatmap.PlacementObject.Value = hitObject;
-
-            if (distanceSnapGrid != null)
-                hitObject.StartTime = GetSnappedPosition(distanceSnapGrid.ToLocalSpace(inputManager.CurrentState.Mouse.Position), hitObject.StartTime).time;
         }
 
         public void EndPlacement(HitObject hitObject, bool commit)
@@ -265,69 +331,105 @@ namespace osu.Game.Rulesets.Edit
             {
                 EditorBeatmap.Add(hitObject);
 
-                adjustableClock.Seek(hitObject.GetEndTime());
+                if (EditorClock.CurrentTime < hitObject.StartTime)
+                    EditorClock.SeekSmoothlyTo(hitObject.StartTime);
             }
-
-            showGridFor(Enumerable.Empty<HitObject>());
         }
 
         public void Delete(HitObject hitObject) => EditorBeatmap.Remove(hitObject);
 
-        public override (Vector2 position, double time) GetSnappedPosition(Vector2 position, double time) => distanceSnapGrid?.GetSnappedPosition(position) ?? (position, time);
+        #endregion
+
+        #region IPositionSnapProvider
+
+        /// <summary>
+        /// Retrieve the relevant <see cref="Playfield"/> at a specified screen-space position.
+        /// In cases where a ruleset doesn't require custom logic (due to nested playfields, for example)
+        /// this will return the ruleset's main playfield.
+        /// </summary>
+        /// <param name="screenSpacePosition">The screen-space position to query.</param>
+        /// <returns>The most relevant <see cref="Playfield"/>.</returns>
+        protected virtual Playfield PlayfieldAtScreenSpacePosition(Vector2 screenSpacePosition) => drawableRulesetWrapper.Playfield;
+
+        public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
+        {
+            var playfield = PlayfieldAtScreenSpacePosition(screenSpacePosition);
+            double? targetTime = null;
+
+            if (playfield is ScrollingPlayfield scrollingPlayfield)
+            {
+                targetTime = scrollingPlayfield.TimeAtScreenSpacePosition(screenSpacePosition);
+
+                // apply beat snapping
+                targetTime = BeatSnapProvider.SnapTime(targetTime.Value);
+
+                // convert back to screen space
+                screenSpacePosition = scrollingPlayfield.ScreenSpacePositionAtTime(targetTime.Value);
+            }
+
+            return new SnapResult(screenSpacePosition, targetTime, playfield);
+        }
 
         public override float GetBeatSnapDistanceAt(double referenceTime)
         {
             DifficultyControlPoint difficultyPoint = EditorBeatmap.ControlPointInfo.DifficultyPointAt(referenceTime);
-            return (float)(100 * EditorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier / beatSnapProvider.BeatDivisor);
+            return (float)(100 * EditorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier / BeatSnapProvider.BeatDivisor);
         }
 
         public override float DurationToDistance(double referenceTime, double duration)
         {
-            double beatLength = beatSnapProvider.GetBeatLengthAtTime(referenceTime);
+            double beatLength = BeatSnapProvider.GetBeatLengthAtTime(referenceTime);
             return (float)(duration / beatLength * GetBeatSnapDistanceAt(referenceTime));
         }
 
         public override double DistanceToDuration(double referenceTime, float distance)
         {
-            double beatLength = beatSnapProvider.GetBeatLengthAtTime(referenceTime);
+            double beatLength = BeatSnapProvider.GetBeatLengthAtTime(referenceTime);
             return distance / GetBeatSnapDistanceAt(referenceTime) * beatLength;
         }
 
         public override double GetSnappedDurationFromDistance(double referenceTime, float distance)
-            => beatSnapProvider.SnapTime(referenceTime + DistanceToDuration(referenceTime, distance), referenceTime) - referenceTime;
+            => BeatSnapProvider.SnapTime(referenceTime + DistanceToDuration(referenceTime, distance), referenceTime) - referenceTime;
 
         public override float GetSnappedDistanceFromDistance(double referenceTime, float distance)
         {
-            var snappedEndTime = beatSnapProvider.SnapTime(referenceTime + DistanceToDuration(referenceTime, distance), referenceTime);
+            double actualDuration = referenceTime + DistanceToDuration(referenceTime, distance);
+
+            double snappedEndTime = BeatSnapProvider.SnapTime(actualDuration, referenceTime);
+
+            double beatLength = BeatSnapProvider.GetBeatLengthAtTime(referenceTime);
+
+            // we don't want to exceed the actual duration and snap to a point in the future.
+            // as we are snapping to beat length via SnapTime (which will round-to-nearest), check for snapping in the forward direction and reverse it.
+            if (snappedEndTime > actualDuration + 1)
+                snappedEndTime -= beatLength;
 
             return DurationToDistance(referenceTime, snappedEndTime - referenceTime);
         }
 
-        public override void UpdateHitObject(HitObject hitObject) => EditorBeatmap.UpdateHitObject(hitObject);
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (EditorBeatmap != null)
-            {
-                EditorBeatmap.HitObjectAdded -= addHitObject;
-                EditorBeatmap.HitObjectRemoved -= removeHitObject;
-            }
-        }
+        #endregion
     }
 
+    /// <summary>
+    /// A non-generic definition of a HitObject composer class.
+    /// Generally used to access certain methods without requiring a generic type for <see cref="HitObjectComposer{T}" />.
+    /// </summary>
     [Cached(typeof(HitObjectComposer))]
-    [Cached(typeof(IDistanceSnapProvider))]
-    public abstract class HitObjectComposer : CompositeDrawable, IDistanceSnapProvider
+    [Cached(typeof(IPositionSnapProvider))]
+    public abstract class HitObjectComposer : CompositeDrawable, IPositionSnapProvider
     {
-        internal HitObjectComposer()
+        protected HitObjectComposer()
         {
             RelativeSizeAxes = Axes.Both;
         }
 
         /// <summary>
-        /// All the <see cref="DrawableHitObject"/>s.
+        /// The target ruleset's playfield.
+        /// </summary>
+        public abstract Playfield Playfield { get; }
+
+        /// <summary>
+        /// All <see cref="DrawableHitObject"/>s in currently loaded beatmap.
         /// </summary>
         public abstract IEnumerable<DrawableHitObject> HitObjects { get; }
 
@@ -336,21 +438,12 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         public abstract bool CursorInPlacementArea { get; }
 
-        /// <summary>
-        /// Creates the <see cref="DistanceSnapGrid"/> applicable for a <see cref="HitObject"/> selection.
-        /// </summary>
-        /// <param name="selectedHitObjects">The <see cref="HitObject"/> selection.</param>
-        /// <returns>The <see cref="DistanceSnapGrid"/> for <paramref name="selectedHitObjects"/>. If empty, a grid is returned for the current point in time.</returns>
-        [CanBeNull]
-        protected virtual DistanceSnapGrid CreateDistanceSnapGrid([NotNull] IEnumerable<HitObject> selectedHitObjects) => null;
+        #region IPositionSnapProvider
 
-        /// <summary>
-        /// Updates a <see cref="HitObject"/>, invoking <see cref="HitObject.ApplyDefaults"/> and re-processing the beatmap.
-        /// </summary>
-        /// <param name="hitObject">The <see cref="HitObject"/> to update.</param>
-        public abstract void UpdateHitObject([CanBeNull] HitObject hitObject);
+        public abstract SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition);
 
-        public abstract (Vector2 position, double time) GetSnappedPosition(Vector2 position, double time);
+        public virtual SnapResult SnapScreenSpacePositionToValidPosition(Vector2 screenSpacePosition) =>
+            new SnapResult(screenSpacePosition, null);
 
         public abstract float GetBeatSnapDistanceAt(double referenceTime);
 
@@ -361,5 +454,7 @@ namespace osu.Game.Rulesets.Edit
         public abstract double GetSnappedDurationFromDistance(double referenceTime, float distance);
 
         public abstract float GetSnappedDistanceFromDistance(double referenceTime, float distance);
+
+        #endregion
     }
 }

@@ -13,7 +13,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online;
 using osu.Game.Online.API;
-using osu.Game.Overlays.Direct;
+using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
@@ -126,7 +126,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                         };
                         break;
 
-                    case DownloadState.Downloaded:
+                    case DownloadState.Importing:
                         textSprites.Children = new Drawable[]
                         {
                             new OsuSpriteText

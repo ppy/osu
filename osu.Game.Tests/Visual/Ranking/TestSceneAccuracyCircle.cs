@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -23,15 +22,6 @@ namespace osu.Game.Tests.Visual.Ranking
 {
     public class TestSceneAccuracyCircle : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(AccuracyCircle),
-            typeof(RankBadge),
-            typeof(RankNotch),
-            typeof(RankText),
-            typeof(SmoothCircularProgress)
-        };
-
         [Test]
         public void TestLowDRank()
         {
@@ -130,7 +120,7 @@ namespace osu.Game.Tests.Visual.Ranking
                         }
                     }
                 },
-                new AccuracyCircle(score)
+                new AccuracyCircle(score, true)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

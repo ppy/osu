@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Drawing;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -16,7 +17,6 @@ using osu.Game.Tournament.Screens.Ladder;
 using osu.Game.Tournament.Screens.Ladder.Components;
 using osuTK;
 using osuTK.Graphics;
-using SixLabors.Primitives;
 
 namespace osu.Game.Tournament.Screens.Editors
 {
@@ -25,6 +25,8 @@ namespace osu.Game.Tournament.Screens.Editors
     {
         [Cached]
         private LadderEditorInfo editorInfo = new LadderEditorInfo();
+
+        private WarningBox rightClickMessage;
 
         protected override bool DrawLoserPaths => true;
 
@@ -37,6 +39,16 @@ namespace osu.Game.Tournament.Screens.Editors
                 Origin = Anchor.TopRight,
                 Margin = new MarginPadding(5)
             });
+
+            AddInternal(rightClickMessage = new WarningBox("Right click to place and link matches"));
+
+            LadderInfo.Matches.CollectionChanged += (_, __) => updateMessage();
+            updateMessage();
+        }
+
+        private void updateMessage()
+        {
+            rightClickMessage.Alpha = LadderInfo.Matches.Count > 0 ? 0 : 1;
         }
 
         public void BeginJoin(TournamentMatch match, bool losers)

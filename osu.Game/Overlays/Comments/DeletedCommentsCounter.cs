@@ -23,8 +23,6 @@ namespace osu.Game.Overlays.Comments
         public DeletedCommentsCounter()
         {
             AutoSizeAxes = Axes.Both;
-            Margin = new MarginPadding { Vertical = 10, Left = 80 };
-
             InternalChild = new FillFlowContainer
             {
                 AutoSizeAxes = Axes.Both,

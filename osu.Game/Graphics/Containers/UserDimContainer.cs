@@ -40,7 +40,7 @@ namespace osu.Game.Graphics.Containers
 
         /// <summary>
         /// Whether player is in break time.
-        /// Must be bound to <see cref="BreakOverlay.IsBreakTime"/> to allow for dim adjustments in gameplay.
+        /// Must be bound to <see cref="BreakTracker.IsBreakTime"/> to allow for dim adjustments in gameplay.
         /// </summary>
         public readonly IBindable<bool> IsBreakTime = new Bindable<bool>();
 

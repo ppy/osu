@@ -12,9 +12,26 @@ namespace osu.Game.Screens.Select.Carousel
 {
     public class CarouselBeatmapSet : CarouselGroupEagerSelect
     {
+        public override float TotalHeight
+        {
+            get
+            {
+                switch (State.Value)
+                {
+                    case CarouselItemState.Selected:
+                        return DrawableCarouselBeatmapSet.HEIGHT + Children.Count(c => c.Visible) * DrawableCarouselBeatmap.HEIGHT;
+
+                    default:
+                        return DrawableCarouselBeatmapSet.HEIGHT;
+                }
+            }
+        }
+
         public IEnumerable<CarouselBeatmap> Beatmaps => InternalChildren.OfType<CarouselBeatmap>();
 
         public BeatmapSetInfo BeatmapSet;
+
+        public Func<IEnumerable<BeatmapInfo>, BeatmapInfo> GetRecommendedBeatmap;
 
         public CarouselBeatmapSet(BeatmapSetInfo beatmapSet)
         {
@@ -26,7 +43,16 @@ namespace osu.Game.Screens.Select.Carousel
                       .ForEach(AddChild);
         }
 
-        protected override DrawableCarouselItem CreateDrawableRepresentation() => new DrawableCarouselBeatmapSet(this);
+        protected override CarouselItem GetNextToSelect()
+        {
+            if (LastSelected == null || LastSelected.Filtered.Value)
+            {
+                if (GetRecommendedBeatmap?.Invoke(Children.OfType<CarouselBeatmap>().Where(b => !b.Filtered.Value).Select(b => b.Beatmap)) is BeatmapInfo recommended)
+                    return Children.OfType<CarouselBeatmap>().First(b => b.Beatmap == recommended);
+            }
+
+            return base.GetNextToSelect();
+        }
 
         public override int CompareTo(FilterCriteria criteria, CarouselItem other)
         {

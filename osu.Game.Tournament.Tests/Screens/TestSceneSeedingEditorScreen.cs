@@ -7,7 +7,7 @@ using osu.Game.Tournament.Screens.Editors;
 
 namespace osu.Game.Tournament.Tests.Screens
 {
-    public class TestSceneSeedingEditorScreen : LadderTestScene
+    public class TestSceneSeedingEditorScreen : TournamentTestScene
     {
         [Cached]
         private readonly LadderInfo ladder = new LadderInfo();
@@ -16,7 +16,7 @@ namespace osu.Game.Tournament.Tests.Screens
         {
             var match = CreateSampleMatch();
 
-            Add(new SeedingEditorScreen(match.Team1.Value)
+            Add(new SeedingEditorScreen(match.Team1.Value, new TeamEditorScreen())
             {
                 Width = 0.85f // create room for control panel
             });
