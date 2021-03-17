@@ -28,25 +28,25 @@ namespace osu.Game.Screens.Edit.Setup
                 },
                 artistTextBox = new LabelledTextBox
                 {
-                    PlaceholderText = "Artist",
+                    Label = "Artist",
                     Current = { Value = Beatmap.Metadata.Artist },
                     TabbableContentContainer = this
                 },
                 titleTextBox = new LabelledTextBox
                 {
-                    PlaceholderText = "Title",
+                    Label = "Title",
                     Current = { Value = Beatmap.Metadata.Title },
                     TabbableContentContainer = this
                 },
                 creatorTextBox = new LabelledTextBox
                 {
-                    PlaceholderText = "Creator",
+                    Label = "Creator",
                     Current = { Value = Beatmap.Metadata.AuthorString },
                     TabbableContentContainer = this
                 },
                 difficultyTextBox = new LabelledTextBox
                 {
-                    PlaceholderText = "Difficulty Name",
+                    Label = "Difficulty Name",
                     Current = { Value = Beatmap.BeatmapInfo.Version },
                     TabbableContentContainer = this
                 },
