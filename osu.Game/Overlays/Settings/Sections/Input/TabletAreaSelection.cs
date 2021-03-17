@@ -67,12 +67,27 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                 RelativeSizeAxes = Axes.Both,
                                 Alpha = 0.6f,
                             },
+                            new Box
+                            {
+                                Colour = Color4.White,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Height = 5,
+                            },
+                            new Box
+                            {
+                                Colour = Color4.White,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Width = 5,
+                            },
                             usableAreaText = new OsuSpriteText
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 Colour = Color4.White,
-                                Font = OsuFont.Default.With(size: 12)
+                                Font = OsuFont.Default.With(size: 12),
+                                Y = 10
                             }
                         }
                     },
