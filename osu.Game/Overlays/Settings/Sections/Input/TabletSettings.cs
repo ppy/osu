@@ -202,7 +202,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 mainSettings.Show();
                 noTabletMessage.Hide();
 
-                // todo: these should propagate from a TabletChanged event or similar.
                 offsetX.MaxValue = tab.Size.X;
                 offsetX.Default = tab.Size.X / 2;
                 sizeX.Default = sizeX.MaxValue = tab.Size.X;
