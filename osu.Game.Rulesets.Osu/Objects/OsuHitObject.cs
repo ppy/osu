@@ -130,5 +130,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         }
 
         protected override HitWindows CreateHitWindows() => new OsuHitWindows();
+
+        public override string ToEditorString() => (IndexInCurrentCombo + 1).ToString();
     }
 }

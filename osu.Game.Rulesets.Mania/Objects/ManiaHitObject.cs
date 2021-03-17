@@ -22,6 +22,8 @@ namespace osu.Game.Rulesets.Mania.Objects
 
         protected override HitWindows CreateHitWindows() => new ManiaHitWindows();
 
+        public override string ToEditorString() => $"{StartTime}|{Column}";
+
         #region LegacyBeatmapEncoder
 
         float IHasXPosition.X => Column;

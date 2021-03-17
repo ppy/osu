@@ -558,7 +558,7 @@ namespace osu.Game.Screens.Edit
             {
                 var orderedHitObjects = editorBeatmap.SelectedHitObjects.OrderBy(h => h.StartTime);
                 builder.Append(orderedHitObjects.FirstOrDefault().StartTime.ToEditorFormattedString());
-                builder.Append($" ({string.Join(',', orderedHitObjects.Cast<IHasComboInformation>().Select(h => h.IndexInCurrentCombo + 1))})");
+                builder.Append($" ({string.Join(',', orderedHitObjects.Select(h => h.ToEditorString()))})");
 
                 clipboard.Value = new ClipboardContent(editorBeatmap).Serialize();
             }
