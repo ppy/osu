@@ -216,7 +216,13 @@ namespace osu.Game.Screens.Edit
 
         public bool IsRunning => underlyingClock.IsRunning;
 
-        public void ProcessFrame() => underlyingClock.ProcessFrame();
+        public void ProcessFrame()
+        {
+            if (underlyingClock.CurrentTime >= TrackLength)
+                underlyingClock.Stop();
+            else
+                underlyingClock.ProcessFrame();
+        }
 
         public double ElapsedFrameTime => underlyingClock.ElapsedFrameTime;
 
