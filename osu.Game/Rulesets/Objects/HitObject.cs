@@ -168,6 +168,8 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         [NotNull]
         protected virtual HitWindows CreateHitWindows() => new HitWindows();
+
+        public virtual string ToEditorString() => string.Empty;
     }
 
     public static class HitObjectExtensions

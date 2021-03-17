@@ -120,5 +120,7 @@ namespace osu.Game.Rulesets.Catch.Objects
         }
 
         protected override HitWindows CreateHitWindows() => HitWindows.Empty;
+
+        public override string ToEditorString() => (IndexInCurrentCombo + 1).ToString();
     }
 }
