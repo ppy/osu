@@ -140,6 +140,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     }
                 },
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             areaOffset.BindTo(tabletHandler.AreaOffset);
             areaOffset.BindValueChanged(val =>
