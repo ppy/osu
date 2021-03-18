@@ -36,6 +36,8 @@ namespace osu.Game.Beatmaps.Formats
                 if (ShouldSkipLine(line))
                     continue;
 
+                line = line.Trim();
+
                 if (line.StartsWith('[') && line.EndsWith(']'))
                 {
                     if (!Enum.TryParse(line[1..^1], out section))
