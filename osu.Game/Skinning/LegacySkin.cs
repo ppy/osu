@@ -506,7 +506,7 @@ namespace osu.Game.Skinning
             Samples?.Dispose();
         }
 
-          /// <summary>
+        /// <summary>
         /// A sample wrapper which keeps a reference to the contained skin to avoid finalizer garbage collection of the managing SampleStore.
         /// </summary>
         private class LegacySkinSample : ISample
