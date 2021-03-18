@@ -24,13 +24,46 @@ namespace osu.Game.Storyboards
 
         public readonly CommandTimelineGroup TimelineGroup = new CommandTimelineGroup();
 
-        public double StartTime => Math.Min(
-            TimelineGroup.HasCommands ? TimelineGroup.CommandsStartTime : double.MaxValue,
-            loops.Any(l => l.HasCommands) ? loops.Where(l => l.HasCommands).Min(l => l.StartTime) : double.MaxValue);
+        public double StartTime
+        {
+            get
+            {
+                // check for presence affecting commands as an initial pass.
+                double earliestStartTime = TimelineGroup.EarliestDisplayedTime ?? double.MaxValue;
 
-        public double EndTime => Math.Max(
-            TimelineGroup.HasCommands ? TimelineGroup.CommandsEndTime : double.MinValue,
-            loops.Any(l => l.HasCommands) ? loops.Where(l => l.HasCommands).Max(l => l.EndTime) : double.MinValue);
+                foreach (var l in loops)
+                {
+                    if (!(l.EarliestDisplayedTime is double lEarliest))
+                        continue;
+
+                    earliestStartTime = Math.Min(earliestStartTime, lEarliest);
+                }
+
+                if (earliestStartTime < double.MaxValue)
+                    return earliestStartTime;
+
+                // if an alpha-affecting command was not found, use the earliest of any command.
+                earliestStartTime = TimelineGroup.StartTime;
+
+                foreach (var l in loops)
+                    earliestStartTime = Math.Min(earliestStartTime, l.StartTime);
+
+                return earliestStartTime;
+            }
+        }
+
+        public double EndTime
+        {
+            get
+            {
+                double latestEndTime = TimelineGroup.EndTime;
+
+                foreach (var l in loops)
+                    latestEndTime = Math.Max(latestEndTime, l.EndTime);
+
+                return latestEndTime;
+            }
+        }
 
         public bool HasCommands => TimelineGroup.HasCommands || loops.Any(l => l.HasCommands);
 

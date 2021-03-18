@@ -120,7 +120,7 @@ namespace osu.Game.Skinning
 
         protected override async Task Populate(SkinInfo model, ArchiveReader archive, CancellationToken cancellationToken = default)
         {
-            await base.Populate(model, archive, cancellationToken);
+            await base.Populate(model, archive, cancellationToken).ConfigureAwait(false);
 
             if (model.Name?.Contains(".osk") == true)
                 populateMetadata(model);
@@ -140,6 +140,11 @@ namespace osu.Game.Skinning
                 item.Name = item.Name.Replace(".osk", "");
                 item.Creator ??= unknown_creator_string;
             }
+        }
+
+        protected override void PreImport(SkinInfo model)
+        {
+            model.Requery(ContextFactory);
         }
 
         /// <summary>

@@ -22,7 +22,6 @@ using osu.Game.IO.Archives;
 using osu.Game.IPC;
 using osu.Game.Overlays.Notifications;
 using SharpCompress.Archives.Zip;
-using FileInfo = osu.Game.IO.FileInfo;
 
 namespace osu.Game.Database
 {
@@ -141,6 +140,13 @@ namespace osu.Game.Database
 
         protected async Task<IEnumerable<TModel>> Import(ProgressNotification notification, params ImportTask[] tasks)
         {
+            if (tasks.Length == 0)
+            {
+                notification.CompletionText = $"No {HumanisedModelName}s were found to import!";
+                notification.State = ProgressNotificationState.Completed;
+                return Enumerable.Empty<TModel>();
+            }
+
             notification.Progress = 0;
             notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is initialising...";
 
@@ -156,7 +162,7 @@ namespace osu.Game.Database
 
                 try
                 {
-                    var model = await Import(task, isLowPriorityImport, notification.CancellationToken);
+                    var model = await Import(task, isLowPriorityImport, notification.CancellationToken).ConfigureAwait(false);
 
                     lock (imported)
                     {
@@ -176,7 +182,7 @@ namespace osu.Game.Database
                 {
                     Logger.Error(e, $@"Could not import ({task})", LoggingTarget.Database);
                 }
-            }));
+            })).ConfigureAwait(false);
 
             if (imported.Count == 0)
             {
@@ -219,7 +225,7 @@ namespace osu.Game.Database
 
             TModel import;
             using (ArchiveReader reader = task.GetReader())
-                import = await Import(reader, lowPriority, cancellationToken);
+                import = await Import(reader, lowPriority, cancellationToken).ConfigureAwait(false);
 
             // We may or may not want to delete the file depending on where it is stored.
             //  e.g. reconstructing/repairing database with items from default storage.
@@ -351,7 +357,7 @@ namespace osu.Game.Database
                 item.Files = archive != null ? createFileInfos(archive, Files) : new List<TFileModel>();
                 item.Hash = ComputeHash(item, archive);
 
-                await Populate(item, archive, cancellationToken);
+                await Populate(item, archive, cancellationToken).ConfigureAwait(false);
 
                 using (var write = ContextFactory.GetForWrite()) // used to share a context for full import. keep in mind this will block all writes.
                 {
@@ -403,7 +409,7 @@ namespace osu.Game.Database
 
             flushEvents(true);
             return item;
-        }, cancellationToken, TaskCreationOptions.HideScheduler, lowPriority ? import_scheduler_low_priority : import_scheduler).Unwrap();
+        }, cancellationToken, TaskCreationOptions.HideScheduler, lowPriority ? import_scheduler_low_priority : import_scheduler).Unwrap().ConfigureAwait(false);
 
         /// <summary>
         /// Exports an item to a legacy (.zip based) package.
@@ -456,6 +462,8 @@ namespace osu.Game.Database
                 // Dereference the existing file info, since the file model will be removed.
                 if (file.FileInfo != null)
                 {
+                    file.Requery(usage.Context);
+
                     Files.Dereference(file.FileInfo);
 
                     // This shouldn't be required, but here for safety in case the provided TModel is not being change tracked
@@ -614,7 +622,7 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Create all required <see cref="FileInfo"/>s for the provided archive, adding them to the global file store.
+        /// Create all required <see cref="IO.FileInfo"/>s for the provided archive, adding them to the global file store.
         /// </summary>
         private List<TFileModel> createFileInfos(ArchiveReader reader, FileStore files)
         {
@@ -629,10 +637,12 @@ namespace osu.Game.Database
             {
                 using (Stream s = reader.GetStream(file))
                 {
+                    var fileInfo = files.Add(s);
                     fileInfos.Add(new TFileModel
                     {
                         Filename = file.Substring(prefix.Length).ToStandardisedPath(),
-                        FileInfo = files.Add(s)
+                        FileInfo = fileInfo,
+                        FileInfoID = fileInfo.ID // workaround for efcore 5 compatibility.
                     });
                 }
             }
@@ -692,7 +702,7 @@ namespace osu.Game.Database
                 return Task.CompletedTask;
             }
 
-            return Task.Run(async () => await Import(GetStableImportPaths(storage).ToArray()));
+            return Task.Run(async () => await Import(GetStableImportPaths(storage).ToArray()).ConfigureAwait(false));
         }
 
         /// <summary>

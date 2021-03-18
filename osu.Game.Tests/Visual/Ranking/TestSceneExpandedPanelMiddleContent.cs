@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 Beatmap = createTestBeatmap(author)
             }));
 
-            AddAssert("mapper name present", () => this.ChildrenOfType<OsuSpriteText>().Any(spriteText => spriteText.Text == "mapper_name"));
+            AddAssert("mapper name present", () => this.ChildrenOfType<OsuSpriteText>().Any(spriteText => spriteText.Current.Value == "mapper_name"));
         }
 
         [Test]
@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Visual.Ranking
             }));
 
             AddAssert("mapped by text not present", () =>
-                this.ChildrenOfType<OsuSpriteText>().All(spriteText => !containsAny(spriteText.Text, "mapped", "by")));
+                this.ChildrenOfType<OsuSpriteText>().All(spriteText => !containsAny(spriteText.Text.ToString(), "mapped", "by")));
         }
 
         private void showPanel(ScoreInfo score) => Child = new ExpandedPanelMiddleContentContainer(score);

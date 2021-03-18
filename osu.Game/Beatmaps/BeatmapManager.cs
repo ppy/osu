@@ -20,6 +20,7 @@ using osu.Framework.IO.Stores;
 using osu.Framework.Lists;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Framework.Statistics;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
@@ -112,8 +113,6 @@ namespace osu.Game.Beatmaps
         {
             var metadata = new BeatmapMetadata
             {
-                Artist = "artist",
-                Title = "title",
                 Author = user,
             };
 
@@ -127,7 +126,6 @@ namespace osu.Game.Beatmaps
                         BaseDifficulty = new BeatmapDifficulty(),
                         Ruleset = ruleset,
                         Metadata = metadata,
-                        Version = "difficulty"
                     }
                 }
             };
@@ -155,7 +153,7 @@ namespace osu.Game.Beatmaps
             bool hadOnlineBeatmapIDs = beatmapSet.Beatmaps.Any(b => b.OnlineBeatmapID > 0);
 
             if (onlineLookupQueue != null)
-                await onlineLookupQueue.UpdateAsync(beatmapSet, cancellationToken);
+                await onlineLookupQueue.UpdateAsync(beatmapSet, cancellationToken).ConfigureAwait(false);
 
             // ensure at least one beatmap was able to retrieve or keep an online ID, else drop the set ID.
             if (hadOnlineBeatmapIDs && !beatmapSet.Beatmaps.Any(b => b.OnlineBeatmapID > 0))
@@ -172,6 +170,8 @@ namespace osu.Game.Beatmaps
         {
             if (beatmapSet.Beatmaps.Any(b => b.BaseDifficulty == null))
                 throw new InvalidOperationException($"Cannot import {nameof(BeatmapInfo)} with null {nameof(BeatmapInfo.BaseDifficulty)}.");
+
+            beatmapSet.Requery(ContextFactory);
 
             // check if a set already exists with the same online id, delete if it does.
             if (beatmapSet.OnlineBeatmapSetID != null)
@@ -310,6 +310,9 @@ namespace osu.Game.Beatmaps
                 beatmapInfo.Metadata ??= beatmapInfo.BeatmapSet.Metadata;
 
                 workingCache.Add(working = new BeatmapManagerWorkingBeatmap(beatmapInfo, this));
+
+                // best effort; may be higher than expected.
+                GlobalStatistics.Get<int>(nameof(Beatmaps), $"Cached {nameof(WorkingBeatmap)}s").Value = workingCache.Count();
 
                 return working;
             }
