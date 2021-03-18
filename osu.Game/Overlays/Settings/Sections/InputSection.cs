@@ -9,7 +9,6 @@ using osu.Framework.Input.Handlers.Joystick;
 using osu.Framework.Input.Handlers.Midi;
 using osu.Framework.Input.Handlers.Mouse;
 using osu.Framework.Platform;
-using osu.Game.Configuration;
 using osu.Game.Overlays.Settings.Sections.Input;
 
 namespace osu.Game.Overlays.Settings.Sections
@@ -70,13 +69,6 @@ namespace osu.Game.Overlays.Settings.Sections
                     return null;
             }
 
-            var settingsControls = handler.CreateSettingsControlsFromAllBindables(false);
-
-            if (settingsControls.Count == 0)
-                return null;
-
-            section.AddRange(settingsControls);
-
             return section;
         }
 
@@ -87,6 +79,19 @@ namespace osu.Game.Overlays.Settings.Sections
             public HandlerSection(InputHandler handler)
             {
                 this.handler = handler;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                Children = new Drawable[]
+                {
+                    new SettingsCheckbox
+                    {
+                        LabelText = "Enabled",
+                        Current = handler.Enabled
+                    },
+                };
             }
 
             protected override string Header => handler.Description;
