@@ -5,10 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Humanizer;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Overlays.Settings;
@@ -63,20 +61,11 @@ namespace osu.Game.Configuration
 
     public static class SettingSourceExtensions
     {
-        public static IReadOnlyList<Drawable> CreateSettingsControls(this object obj, bool includeDisabled = true) =>
-            createSettingsControls(obj, obj.GetOrderedSettingsSourceProperties(), includeDisabled).ToArray();
-
-        public static IReadOnlyList<Drawable> CreateSettingsControlsFromAllBindables(this object obj, bool includeDisabled = true) =>
-            createSettingsControls(obj, obj.GetSettingsSourcePropertiesFromBindables(), includeDisabled).ToArray();
-
-        private static IEnumerable<Drawable> createSettingsControls(object obj, IEnumerable<(SettingSourceAttribute, PropertyInfo)> sourceAttribs, bool includeDisabled = true)
+        public static IEnumerable<Drawable> CreateSettingsControls(this object obj)
         {
-            foreach (var (attr, property) in sourceAttribs)
+            foreach (var (attr, property) in obj.GetOrderedSettingsSourceProperties())
             {
                 object value = property.GetValue(obj);
-
-                if ((value as IBindable)?.Disabled == true)
-                    continue;
 
                 switch (value)
                 {
@@ -146,30 +135,6 @@ namespace osu.Game.Configuration
 
                     default:
                         throw new InvalidOperationException($"{nameof(SettingSourceAttribute)} was attached to an unsupported type ({value})");
-                }
-            }
-        }
-
-        public static IEnumerable<(SettingSourceAttribute, PropertyInfo)> GetSettingsSourcePropertiesFromBindables(this object obj)
-        {
-            HashSet<string> handledProperties = new HashSet<string>();
-
-            // reverse and de-dupe properties to surface base class settings to the top of return order.
-            foreach (var type in obj.GetType().EnumerateBaseTypes().Reverse())
-            {
-                foreach (var property in type.GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance))
-                {
-                    if (handledProperties.Contains(property.Name))
-                        continue;
-
-                    handledProperties.Add(property.Name);
-
-                    if (typeof(IBindable).IsAssignableFrom(property.PropertyType))
-                    {
-                        var val = property.GetValue(obj);
-                        string description = (val as IHasDescription)?.Description ?? string.Empty;
-                        yield return (new SettingSourceAttribute(property.Name.Humanize(), description), property);
-                    }
                 }
             }
         }
