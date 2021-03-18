@@ -16,8 +16,6 @@ namespace osu.Game.Rulesets.Taiko.UI
 {
     internal class DefaultHitExplosion : CircularContainer, IAnimatableHitExplosion
     {
-        public override bool RemoveWhenNotAlive => false;
-
         private readonly HitResult result;
 
         [CanBeNull]
@@ -73,8 +71,6 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             this.ScaleTo(3f, 1000, Easing.OutQuint);
             this.FadeOut(500);
-
-            Expire(true);
         }
 
         public void AnimateSecondHit()

@@ -13,8 +13,6 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 {
     public class LegacyHitExplosion : CompositeDrawable, IAnimatableHitExplosion
     {
-        public override bool RemoveWhenNotAlive => false;
-
         private readonly Drawable sprite;
 
         [CanBeNull]
@@ -73,8 +71,6 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                 .Then().ScaleTo(1.1f, animation_time * 0.8)
                 .Then().ScaleTo(0.9f, animation_time * 0.4)
                 .Then().ScaleTo(1f, animation_time * 0.2);
-
-            Expire(true);
         }
 
         public void AnimateSecondHit()
