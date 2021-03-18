@@ -164,7 +164,9 @@ namespace osu.Game.Scoring
                 {
                     if (score.RulesetID == 3)
                     {
-                        // Recalculate mania's accuracy based on hit statistics.
+                        // In osu!stable, a full-GREAT score has 100% accuracy in mania. Along with a full combo, the score becomes indistinguishable from a full-PERFECT score.
+                        // To get around this, recalculate accuracy based on the hit statistics.
+                        // Note: This cannot be applied universally to all legacy scores, as some rulesets (e.g. catch) group multiple judgements together.
                         double maxBaseScore = score.Statistics.Select(kvp => kvp.Value).Sum() * Judgement.ToNumericResult(HitResult.Perfect);
                         double baseScore = score.Statistics.Select(kvp => Judgement.ToNumericResult(kvp.Key) * kvp.Value).Sum();
                         if (maxBaseScore > 0)
