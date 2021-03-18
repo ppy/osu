@@ -113,8 +113,6 @@ namespace osu.Game.Beatmaps
         {
             var metadata = new BeatmapMetadata
             {
-                Artist = "artist",
-                Title = "title",
                 Author = user,
             };
 
@@ -128,7 +126,6 @@ namespace osu.Game.Beatmaps
                         BaseDifficulty = new BeatmapDifficulty(),
                         Ruleset = ruleset,
                         Metadata = metadata,
-                        Version = "difficulty"
                     }
                 }
             };
@@ -173,6 +170,8 @@ namespace osu.Game.Beatmaps
         {
             if (beatmapSet.Beatmaps.Any(b => b.BaseDifficulty == null))
                 throw new InvalidOperationException($"Cannot import {nameof(BeatmapInfo)} with null {nameof(BeatmapInfo.BaseDifficulty)}.");
+
+            beatmapSet.Requery(ContextFactory);
 
             // check if a set already exists with the same online id, delete if it does.
             if (beatmapSet.OnlineBeatmapSetID != null)
