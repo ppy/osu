@@ -6,6 +6,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -97,7 +98,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         }
 
         private bool verifyAnchors(DrawableHitObject hitObject, Anchor expectedAnchor)
-            => hitObject.Anchor.HasFlag(expectedAnchor) && hitObject.Origin.HasFlag(expectedAnchor);
+            => hitObject.Anchor.HasFlagFast(expectedAnchor) && hitObject.Origin.HasFlagFast(expectedAnchor);
 
         private bool verifyAnchors(DrawableHoldNote holdNote, Anchor expectedAnchor)
             => verifyAnchors((DrawableHitObject)holdNote, expectedAnchor) && holdNote.NestedHitObjects.All(n => verifyAnchors(n, expectedAnchor));

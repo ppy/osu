@@ -63,6 +63,7 @@ namespace osu.Game.Rulesets.UI
 
         ~DrawableRulesetDependencies()
         {
+            // required to potentially clean up sample store from audio hierarchy.
             Dispose(false);
         }
 

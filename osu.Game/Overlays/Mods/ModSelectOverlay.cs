@@ -456,6 +456,7 @@ namespace osu.Game.Overlays.Mods
             }
 
             updateSelectedButtons();
+            OnAvailableModsChanged();
         }
 
         /// <summary>
@@ -532,6 +533,13 @@ namespace osu.Game.Overlays.Mods
 
         private void playSelectedSound() => sampleOn?.Play();
         private void playDeselectedSound() => sampleOff?.Play();
+
+        /// <summary>
+        /// Invoked after <see cref="availableMods"/> has changed.
+        /// </summary>
+        protected virtual void OnAvailableModsChanged()
+        {
+        }
 
         /// <summary>
         /// Invoked when a new <see cref="Mod"/> has been selected.

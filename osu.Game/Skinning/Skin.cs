@@ -36,6 +36,7 @@ namespace osu.Game.Skinning
 
         ~Skin()
         {
+            // required to potentially clean up sample store from audio hierarchy.
             Dispose(false);
         }
 

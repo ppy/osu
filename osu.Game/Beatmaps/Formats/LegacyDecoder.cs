@@ -36,6 +36,8 @@ namespace osu.Game.Beatmaps.Formats
                 if (ShouldSkipLine(line))
                     continue;
 
+                line = StripComments(line).TrimEnd();
+
                 if (line.StartsWith('[') && line.EndsWith(']'))
                 {
                     if (!Enum.TryParse(line[1..^1], out section))
@@ -71,8 +73,6 @@ namespace osu.Game.Beatmaps.Formats
 
         protected virtual void ParseLine(T output, Section section, string line)
         {
-            line = StripComments(line);
-
             switch (section)
             {
                 case Section.Colours:

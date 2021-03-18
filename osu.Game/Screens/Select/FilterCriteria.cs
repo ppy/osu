@@ -8,6 +8,7 @@ using JetBrains.Annotations;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Filter;
 using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Screens.Select
@@ -68,6 +69,9 @@ namespace osu.Game.Screens.Select
         /// </summary>
         [CanBeNull]
         public BeatmapCollection Collection;
+
+        [CanBeNull]
+        public IRulesetFilterCriteria RulesetCriteria { get; set; }
 
         public struct OptionalRange<T> : IEquatable<OptionalRange<T>>
             where T : struct
