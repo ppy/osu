@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddSliderStep("circle size", 0f, 10f, 0f, val =>
             {
-                config.Set(OsuSetting.AutoCursorSize, true);
+                config.SetValue(OsuSetting.AutoCursorSize, true);
                 gameplayBeatmap.BeatmapInfo.BaseDifficulty.CircleSize = val;
                 Scheduler.AddOnce(recreate);
             });
@@ -64,21 +64,21 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(10, 1.5f)]
         public void TestSizing(int circleSize, float userScale)
         {
-            AddStep($"set user scale to {userScale}", () => config.Set(OsuSetting.GameplayCursorSize, userScale));
+            AddStep($"set user scale to {userScale}", () => config.SetValue(OsuSetting.GameplayCursorSize, userScale));
             AddStep($"adjust cs to {circleSize}", () => gameplayBeatmap.BeatmapInfo.BaseDifficulty.CircleSize = circleSize);
-            AddStep("turn on autosizing", () => config.Set(OsuSetting.AutoCursorSize, true));
+            AddStep("turn on autosizing", () => config.SetValue(OsuSetting.AutoCursorSize, true));
 
             AddStep("load content", loadContent);
 
             AddUntilStep("cursor size correct", () => lastContainer.ActiveCursor.Scale.X == OsuCursorContainer.GetScaleForCircleSize(circleSize) * userScale);
 
-            AddStep("set user scale to 1", () => config.Set(OsuSetting.GameplayCursorSize, 1f));
+            AddStep("set user scale to 1", () => config.SetValue(OsuSetting.GameplayCursorSize, 1f));
             AddUntilStep("cursor size correct", () => lastContainer.ActiveCursor.Scale.X == OsuCursorContainer.GetScaleForCircleSize(circleSize));
 
-            AddStep("turn off autosizing", () => config.Set(OsuSetting.AutoCursorSize, false));
+            AddStep("turn off autosizing", () => config.SetValue(OsuSetting.AutoCursorSize, false));
             AddUntilStep("cursor size correct", () => lastContainer.ActiveCursor.Scale.X == 1);
 
-            AddStep($"set user scale to {userScale}", () => config.Set(OsuSetting.GameplayCursorSize, userScale));
+            AddStep($"set user scale to {userScale}", () => config.SetValue(OsuSetting.GameplayCursorSize, userScale));
             AddUntilStep("cursor size correct", () => lastContainer.ActiveCursor.Scale.X == userScale);
         }
 

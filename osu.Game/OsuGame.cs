@@ -880,8 +880,7 @@ namespace osu.Game
             switch (action)
             {
                 case GlobalAction.ResetInputSettings:
-                    frameworkConfig.GetBindable<string>(FrameworkSetting.IgnoredInputHandlers).SetDefault();
-                    frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity).SetDefault();
+                    Host.ResetInputHandlers();
                     frameworkConfig.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode).SetDefault();
                     return true;
 
