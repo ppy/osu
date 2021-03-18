@@ -31,8 +31,6 @@ namespace osu.Game.Skinning
 
         protected override void ParseLine(List<LegacyManiaSkinConfiguration> output, Section section, string line)
         {
-            line = StripComments(line);
-
             switch (section)
             {
                 case Section.Mania:

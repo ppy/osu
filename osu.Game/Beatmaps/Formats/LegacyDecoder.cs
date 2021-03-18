@@ -36,7 +36,7 @@ namespace osu.Game.Beatmaps.Formats
                 if (ShouldSkipLine(line))
                     continue;
 
-                line = line.Trim();
+                line = StripComments(line).TrimEnd();
 
                 if (line.StartsWith('[') && line.EndsWith(']'))
                 {
@@ -73,8 +73,6 @@ namespace osu.Game.Beatmaps.Formats
 
         protected virtual void ParseLine(T output, Section section, string line)
         {
-            line = StripComments(line);
-
             switch (section)
             {
                 case Section.Colours:
