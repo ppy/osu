@@ -226,15 +226,15 @@ namespace osu.Game.Screens.Edit
         {
             underlyingClock.ProcessFrame();
 
-            var playbackAlreadyStopped = playbackFinished;
             playbackFinished = CurrentTime >= TrackLength;
 
-            if (playbackFinished && !playbackAlreadyStopped)
+            if (playbackFinished)
             {
                 if (IsRunning)
                     underlyingClock.Stop();
 
-                underlyingClock.Seek(TrackLength);
+                if (CurrentTime > TrackLength)
+                    underlyingClock.Seek(TrackLength);
             }
         }
 
