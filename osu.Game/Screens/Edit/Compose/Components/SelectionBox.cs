@@ -113,16 +113,25 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (e.Repeat || !e.ControlPressed)
                 return false;
 
+            bool runOperationFromHotkey(Func<bool> operation)
+            {
+                operationStarted();
+                bool result = operation?.Invoke() ?? false;
+                operationEnded();
+
+                return result;
+            }
+
             switch (e.Key)
             {
                 case Key.G:
-                    return CanReverse && OnReverse?.Invoke() == true;
+                    return CanReverse && runOperationFromHotkey(OnReverse);
 
                 case Key.H:
-                    return CanScaleX && OnFlip?.Invoke(Direction.Horizontal) == true;
+                    return CanScaleX && runOperationFromHotkey(() => OnFlip?.Invoke(Direction.Horizontal) ?? false);
 
                 case Key.J:
-                    return CanScaleY && OnFlip?.Invoke(Direction.Vertical) == true;
+                    return CanScaleY && runOperationFromHotkey(() => OnFlip?.Invoke(Direction.Vertical) ?? false);
             }
 
             return base.OnKeyDown(e);
