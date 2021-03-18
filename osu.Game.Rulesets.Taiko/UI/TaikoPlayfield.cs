@@ -42,6 +42,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         private SkinnableDrawable mascot;
 
         private readonly IDictionary<HitResult, DrawablePool<DrawableTaikoJudgement>> judgementPools = new Dictionary<HitResult, DrawablePool<DrawableTaikoJudgement>>();
+        private readonly IDictionary<HitResult, HitExplosionPool> explosionPools = new Dictionary<HitResult, HitExplosionPool>();
 
         private ProxyContainer topLevelHitContainer;
         private Container rightArea;
@@ -166,10 +167,15 @@ namespace osu.Game.Rulesets.Taiko.UI
             RegisterPool<SwellTick, DrawableSwellTick>(100);
 
             var hitWindows = new TaikoHitWindows();
+
             foreach (var result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => hitWindows.IsHitResultAllowed(r)))
+            {
                 judgementPools.Add(result, new DrawablePool<DrawableTaikoJudgement>(15));
+                explosionPools.Add(result, new HitExplosionPool(result));
+            }
 
             AddRangeInternal(judgementPools.Values);
+            AddRangeInternal(explosionPools.Values);
         }
 
         protected override void LoadComplete()
@@ -281,7 +287,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             {
                 case TaikoStrongJudgement _:
                     if (result.IsHit)
-                        hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongNestedHit)judgedObject).ParentHitObject)?.VisualiseSecondHit();
+                        hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongNestedHit)judgedObject).ParentHitObject)?.VisualiseSecondHit(result);
                     break;
 
                 case TaikoDrumRollTickJudgement _:
@@ -315,7 +321,8 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private void addExplosion(DrawableHitObject drawableObject, HitResult result, HitType type)
         {
-            hitExplosionContainer.Add(new HitExplosion(drawableObject, result));
+            hitExplosionContainer.Add(explosionPools[result]
+                .Get(explosion => explosion.Apply(drawableObject)));
             if (drawableObject.HitObject.Kiai)
                 kiaiExplosionContainer.Add(new KiaiHitExplosion(drawableObject, type));
         }
