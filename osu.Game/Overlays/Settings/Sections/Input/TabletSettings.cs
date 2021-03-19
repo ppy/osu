@@ -62,11 +62,18 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             Children = new Drawable[]
             {
+                new SettingsCheckbox
+                {
+                    LabelText = "Enabled",
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Current = tabletHandler.Enabled
+                },
                 noTabletMessage = new OsuSpriteText
                 {
                     Text = "No tablet detected!",
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
                     Padding = new MarginPadding { Horizontal = SettingsPanel.CONTENT_MARGINS }
                 },
                 mainSettings = new FillFlowContainer
