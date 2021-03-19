@@ -94,21 +94,21 @@ namespace osu.Game.Skinning
             sampleContainer.Clear();
             Sample = null;
 
-            var ch = CurrentSkin.GetSample(sampleInfo);
+            var sample = CurrentSkin.GetSample(sampleInfo);
 
-            if (ch == null && AllowDefaultFallback)
+            if (sample == null && AllowDefaultFallback)
             {
                 foreach (var lookup in sampleInfo.LookupNames)
                 {
-                    if ((ch = sampleStore.Get(lookup)) != null)
+                    if ((sample = sampleStore.Get(lookup)) != null)
                         break;
                 }
             }
 
-            if (ch == null)
+            if (sample == null)
                 return;
 
-            sampleContainer.Add(Sample = new DrawableSample(ch));
+            sampleContainer.Add(Sample = new DrawableSample(sample));
 
             // Start playback internally for the new sample if the previous one was playing beforehand.
             if (wasPlaying && Looping)
