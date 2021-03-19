@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
@@ -24,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
     /// <summary>
     /// A visualisation of a single <see cref="PathControlPoint"/> in a <see cref="Slider"/>.
     /// </summary>
-    public class PathControlPointPiece : BlueprintPiece<Slider>
+    public class PathControlPointPiece : BlueprintPiece<Slider>, IHasTooltip
     {
         public Action<PathControlPointPiece, MouseButtonEvent> RequestSelection;
 
@@ -225,5 +226,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     return colours.Red;
             }
         }
+
+        public string TooltipText => ControlPoint.Type.Value.ToString() ?? string.Empty;
     }
 }
