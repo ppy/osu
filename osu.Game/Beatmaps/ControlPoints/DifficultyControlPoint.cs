@@ -19,7 +19,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         public readonly BindableDouble SpeedMultiplierBindable = new BindableDouble(1)
         {
-            Precision = 0.1,
+            Precision = 0.01,
             Default = 1,
             MinValue = 0.1,
             MaxValue = 10
