@@ -177,7 +177,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             if (!track.IsLoaded)
                 return;
 
-            editorClock.Seek(Current / Content.DrawWidth * track.Length);
+            double target = Current / Content.DrawWidth * track.Length;
+            editorClock.Seek(Math.Min(track.Length, target));
         }
 
         private void scrollToTrackTime()
