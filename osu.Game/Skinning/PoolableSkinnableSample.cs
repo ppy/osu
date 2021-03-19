@@ -83,14 +83,6 @@ namespace osu.Game.Skinning
 
             bool wasPlaying = Playing;
 
-            if (activeChannel != null)
-            {
-                // when switching away from previous samples, we don't want to call Stop() on them as it sounds better to let them play out.
-                // this may change in the future if we use PoolableSkinSample in more locations than gameplay.
-                // we *do* want to turn off looping, else we end up with an infinite looping sample running in the background.
-                activeChannel.Looping = false;
-            }
-
             sampleContainer.Clear();
             Sample = null;
 
