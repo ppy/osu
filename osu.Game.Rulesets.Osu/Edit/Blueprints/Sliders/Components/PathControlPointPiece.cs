@@ -12,6 +12,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
 using osuTK;
@@ -195,13 +196,34 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             markerRing.Alpha = IsSelected.Value ? 1 : 0;
 
-            Color4 colour = ControlPoint.Type.Value != null ? colours.Red : colours.Yellow;
+            Color4 colour = getColourFromNodeType();
 
             if (IsHovered || IsSelected.Value)
                 colour = colour.Lighten(1);
 
             marker.Colour = colour;
             marker.Scale = new Vector2(slider.Scale);
+        }
+
+        private Color4 getColourFromNodeType()
+        {
+            if (!(ControlPoint.Type.Value is PathType pathType))
+                return colours.Yellow;
+
+            switch (pathType)
+            {
+                case PathType.Catmull:
+                    return colours.Seafoam;
+
+                case PathType.Bezier:
+                    return colours.Pink;
+
+                case PathType.PerfectCurve:
+                    return colours.PurpleDark;
+
+                default:
+                    return colours.Red;
+            }
         }
     }
 }
