@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -121,6 +123,46 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
 
             base.Update();
+
+            updateStacking();
+        }
+
+        private void updateStacking()
+        {
+            // because only blueprints of objects which are alive (via pooling) are displayed in the timeline, it's feasible to do this every-update.
+
+            const int stack_offset = 5;
+
+            // after the stack gets this tall, we can presume there is space underneath to draw subsequent blueprints.
+            const int stack_reset_count = 3;
+
+            Stack<double> currentConcurrentObjects = new Stack<double>();
+
+            foreach (var b in SelectionBlueprints.Reverse())
+            {
+                while (currentConcurrentObjects.TryPeek(out double stackEndTime))
+                {
+                    if (Precision.AlmostBigger(stackEndTime, b.HitObject.StartTime, 1))
+                        break;
+
+                    currentConcurrentObjects.Pop();
+                }
+
+                b.Y = -(stack_offset * currentConcurrentObjects.Count);
+
+                var bEndTime = b.HitObject.GetEndTime();
+
+                // if the stack gets too high, we should have space below it to display the next batch of objects.
+                // importantly, we only do this if time has incremented, else a stack of hitobjects all at the same time value would start to overlap themselves.
+                if (!currentConcurrentObjects.TryPeek(out double nextStackEndTime) ||
+                    !Precision.AlmostEquals(nextStackEndTime, bEndTime, 1))
+                {
+                    if (currentConcurrentObjects.Count >= stack_reset_count)
+                        currentConcurrentObjects.Clear();
+                }
+
+                currentConcurrentObjects.Push(bEndTime);
+            }
         }
 
         protected override SelectionHandler CreateSelectionHandler() => new TimelineSelectionHandler();
@@ -203,7 +245,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 Box.X = Math.Min(rescaledStart, rescaledEnd);
                 Box.Width = Math.Abs(rescaledStart - rescaledEnd);
 
-                PerformSelection?.Invoke(Box.ScreenSpaceDrawQuad.AABBFloat);
+                var boxScreenRect = Box.ScreenSpaceDrawQuad.AABBFloat;
+
+                // we don't care about where the hitobjects are vertically. in cases like stacking display, they may be outside the box without this adjustment.
+                boxScreenRect.Y -= boxScreenRect.Height;
+                boxScreenRect.Height *= 2;
+
+                PerformSelection?.Invoke(boxScreenRect);
             }
 
             public override void Hide()
