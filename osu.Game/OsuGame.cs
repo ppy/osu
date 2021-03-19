@@ -756,6 +756,10 @@ namespace osu.Game
 
         private void showOverlayAboveOthers(OverlayContainer overlay, OverlayContainer[] otherOverlays)
         {
+            // generally shouldn't ever hit this state, but protects against a crash on attempting to change ChildDepth.
+            if (overlay.LoadState < LoadState.Ready)
+                return;
+
             otherOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
 
             // show above others if not visible at all, else leave at current depth.
