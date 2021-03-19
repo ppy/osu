@@ -186,6 +186,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 aspectRatioApplication = Schedule(() => applyAspectRatio(sizeY));
             });
 
+            updateAspectRatio();
             aspectRatio.BindValueChanged(aspect =>
             {
                 aspectRatioApplication?.Cancel();
