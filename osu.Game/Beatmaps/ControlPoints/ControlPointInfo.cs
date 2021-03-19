@@ -102,13 +102,6 @@ namespace osu.Game.Beatmaps.ControlPoints
             60000 / (TimingPoints.OrderByDescending(c => c.BeatLength).FirstOrDefault() ?? TimingControlPoint.DEFAULT).BeatLength;
 
         /// <summary>
-        /// Finds the mode BPM (most common BPM) represented by the control points.
-        /// </summary>
-        [JsonIgnore]
-        public double BPMMode =>
-            60000 / (TimingPoints.GroupBy(c => c.BeatLength).OrderByDescending(grp => grp.Count()).FirstOrDefault()?.FirstOrDefault() ?? TimingControlPoint.DEFAULT).BeatLength;
-
-        /// <summary>
         /// Remove all <see cref="ControlPointGroup"/>s and return to a pristine state.
         /// </summary>
         public void Clear()

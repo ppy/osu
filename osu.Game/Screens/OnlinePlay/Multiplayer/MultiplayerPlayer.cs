@@ -89,6 +89,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             Debug.Assert(client.Room != null);
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            ((IBindable<bool>)leaderboard.Expanded).BindTo(IsBreakTime);
+        }
+
         protected override void StartGameplay()
         {
             // block base call, but let the server know we are ready to start.
@@ -130,13 +137,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         protected override async Task SubmitScore(Score score)
         {
-            await base.SubmitScore(score);
+            await base.SubmitScore(score).ConfigureAwait(false);
 
-            await client.ChangeState(MultiplayerUserState.FinishedPlay);
+            await client.ChangeState(MultiplayerUserState.FinishedPlay).ConfigureAwait(false);
 
             // Await up to 60 seconds for results to become available (6 api request timeouts).
             // This is arbitrary just to not leave the player in an essentially deadlocked state if any connection issues occur.
-            await Task.WhenAny(resultsReady.Task, Task.Delay(TimeSpan.FromSeconds(60)));
+            await Task.WhenAny(resultsReady.Task, Task.Delay(TimeSpan.FromSeconds(60))).ConfigureAwait(false);
         }
 
         protected override ResultsScreen CreateResults(ScoreInfo score)

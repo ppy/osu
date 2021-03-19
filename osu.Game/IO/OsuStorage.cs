@@ -63,7 +63,7 @@ namespace osu.Game.IO
         /// </summary>
         public void ResetCustomStoragePath()
         {
-            storageConfig.Set(StorageConfig.FullPath, string.Empty);
+            storageConfig.SetValue(StorageConfig.FullPath, string.Empty);
             storageConfig.Save();
 
             ChangeTargetStorage(defaultStorage);
@@ -108,7 +108,7 @@ namespace osu.Game.IO
         public override void Migrate(Storage newStorage)
         {
             base.Migrate(newStorage);
-            storageConfig.Set(StorageConfig.FullPath, newStorage.GetFullPath("."));
+            storageConfig.SetValue(StorageConfig.FullPath, newStorage.GetFullPath("."));
             storageConfig.Save();
         }
     }

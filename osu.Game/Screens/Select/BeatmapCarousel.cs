@@ -918,14 +918,9 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        protected class CarouselScrollContainer : OsuScrollContainer<DrawableCarouselItem>
+        protected class CarouselScrollContainer : UserTrackingScrollContainer<DrawableCarouselItem>
         {
             private bool rightMouseScrollBlocked;
-
-            /// <summary>
-            /// Whether the last scroll event was user triggered, directly on the scroll container.
-            /// </summary>
-            public bool UserScrolling { get; private set; }
 
             public CarouselScrollContainer()
             {
@@ -934,18 +929,6 @@ namespace osu.Game.Screens.Select
 
                 // the scroll container may get pushed off-screen by global screen changes, but we still want panels to display outside of the bounds.
                 Masking = false;
-            }
-
-            protected override void OnUserScroll(float value, bool animated = true, double? distanceDecay = default)
-            {
-                UserScrolling = true;
-                base.OnUserScroll(value, animated, distanceDecay);
-            }
-
-            public new void ScrollTo(float value, bool animated = true, double? distanceDecay = null)
-            {
-                UserScrolling = false;
-                base.ScrollTo(value, animated, distanceDecay);
             }
 
             protected override bool OnMouseDown(MouseDownEvent e)

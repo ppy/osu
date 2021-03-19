@@ -24,7 +24,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         public Action Exited;
 
         [Resolved(typeof(Room), nameof(Room.RoomID))]
-        protected Bindable<int?> RoomId { get; private set; }
+        protected Bindable<long?> RoomId { get; private set; }
 
         protected readonly PlaylistItem PlaylistItem;
 
@@ -65,7 +65,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             {
                 failed = true;
 
-                Logger.Error(e, "Failed to retrieve a score submission token.\n\nThis may happen if you are running an old or non-official release of osu! (ie. you are self-compiling).");
+                if (string.IsNullOrEmpty(e.Message))
+                    Logger.Error(e, "Failed to retrieve a score submission token.");
+                else
+                    Logger.Log($"You are not able to submit a score: {e.Message}", level: LogLevel.Important);
 
                 Schedule(() =>
                 {
@@ -105,7 +108,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         protected override async Task SubmitScore(Score score)
         {
-            await base.SubmitScore(score);
+            await base.SubmitScore(score).ConfigureAwait(false);
 
             Debug.Assert(Token != null);
 
@@ -125,7 +128,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             };
 
             api.Queue(request);
-            await tcs.Task;
+            await tcs.Task.ConfigureAwait(false);
         }
 
         protected override void Dispose(bool isDisposing)

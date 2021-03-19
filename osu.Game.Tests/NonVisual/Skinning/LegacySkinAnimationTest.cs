@@ -59,7 +59,7 @@ namespace osu.Game.Tests.NonVisual.Skinning
             }
 
             public Drawable GetDrawableComponent(ISkinComponent component) => throw new NotSupportedException();
-            public SampleChannel GetSample(ISampleInfo sampleInfo) => throw new NotSupportedException();
+            public Sample GetSample(ISampleInfo sampleInfo) => throw new NotSupportedException();
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotSupportedException();
         }
 

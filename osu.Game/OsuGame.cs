@@ -28,7 +28,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
@@ -52,6 +51,7 @@ using osu.Game.Updater;
 using osu.Game.Utils;
 using LogLevel = osu.Framework.Logging.LogLevel;
 using osu.Game.Database;
+using osu.Game.IO;
 
 namespace osu.Game
 {
@@ -88,7 +88,7 @@ namespace osu.Game
 
         protected SentryLogger SentryLogger;
 
-        public virtual Storage GetStorageForStableInstall() => null;
+        public virtual StableStorage GetStorageForStableInstall() => null;
 
         public float ToolbarOffset => (Toolbar?.Position.Y ?? 0) + (Toolbar?.DrawHeight ?? 0);
 
@@ -361,14 +361,6 @@ namespace osu.Game
 
             PerformFromScreen(screen =>
             {
-                // we might already be at song select, so a check is required before performing the load to solo.
-                if (screen is MainMenu)
-                    menuScreen.LoadToSolo();
-
-                // we might even already be at the song
-                if (Beatmap.Value.BeatmapSetInfo.Hash == databasedSet.Hash && (difficultyCriteria?.Invoke(Beatmap.Value.BeatmapInfo) ?? true))
-                    return;
-
                 // Find beatmaps that match our predicate.
                 var beatmaps = databasedSet.Beatmaps.Where(b => difficultyCriteria?.Invoke(b) ?? true).ToList();
 
@@ -381,9 +373,16 @@ namespace osu.Game
                                 ?? beatmaps.FirstOrDefault(b => b.Ruleset.Equals(Ruleset.Value))
                                 ?? beatmaps.First();
 
-                Ruleset.Value = selection.Ruleset;
-                Beatmap.Value = BeatmapManager.GetWorkingBeatmap(selection);
-            }, validScreens: new[] { typeof(PlaySongSelect) });
+                if (screen is IHandlePresentBeatmap presentableScreen)
+                {
+                    presentableScreen.PresentBeatmap(BeatmapManager.GetWorkingBeatmap(selection), selection.Ruleset);
+                }
+                else
+                {
+                    Ruleset.Value = selection.Ruleset;
+                    Beatmap.Value = BeatmapManager.GetWorkingBeatmap(selection);
+                }
+            }, validScreens: new[] { typeof(SongSelect), typeof(IHandlePresentBeatmap) });
         }
 
         /// <summary>
@@ -441,7 +440,7 @@ namespace osu.Game
         public override Task Import(params ImportTask[] imports)
         {
             // encapsulate task as we don't want to begin the import process until in a ready state.
-            var importTask = new Task(async () => await base.Import(imports));
+            var importTask = new Task(async () => await base.Import(imports).ConfigureAwait(false));
 
             waitForReady(() => this, _ => importTask.Start());
 
@@ -468,6 +467,16 @@ namespace osu.Game
         private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
             updateModDefaults();
+
+            // a lease may be taken on the mods bindable, at which point we can't really ensure valid mods.
+            if (SelectedMods.Disabled)
+                return;
+
+            if (!ModUtils.CheckValidForGameplay(mods.NewValue, out var invalid))
+            {
+                // ensure we always have a valid set of mods.
+                SelectedMods.Value = mods.NewValue.Except(invalid).ToArray();
+            }
         }
 
         private void updateModDefaults()
@@ -768,7 +777,7 @@ namespace osu.Game
 
                 if (recentLogCount < short_term_display_limit)
                 {
-                    Schedule(() => notifications.Post(new SimpleNotification
+                    Schedule(() => notifications.Post(new SimpleErrorNotification
                     {
                         Icon = entry.Level == LogLevel.Important ? FontAwesome.Solid.ExclamationCircle : FontAwesome.Solid.Bomb,
                         Text = entry.Message.Truncate(256) + (entry.Exception != null && IsDeployedBuild ? "\n\nThis error has been automatically reported to the devs." : string.Empty),
@@ -822,7 +831,7 @@ namespace osu.Game
                 asyncLoadStream = Task.Run(async () =>
                 {
                     if (previousLoadStream != null)
-                        await previousLoadStream;
+                        await previousLoadStream.ConfigureAwait(false);
 
                     try
                     {
@@ -836,7 +845,7 @@ namespace osu.Game
 
                         // The delegate won't complete if OsuGame has been disposed in the meantime
                         while (!IsDisposed && !del.Completed)
-                            await Task.Delay(10);
+                            await Task.Delay(10).ConfigureAwait(false);
 
                         // Either we're disposed or the load process has started successfully
                         if (IsDisposed)
@@ -844,7 +853,7 @@ namespace osu.Game
 
                         Debug.Assert(task != null);
 
-                        await task;
+                        await task.ConfigureAwait(false);
 
                         Logger.Log($"Loaded {component}!", level: LogLevel.Debug);
                     }
@@ -871,22 +880,13 @@ namespace osu.Game
             switch (action)
             {
                 case GlobalAction.ResetInputSettings:
-                    var sensitivity = frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity);
-
-                    sensitivity.Disabled = false;
-                    sensitivity.Value = 1;
-                    sensitivity.Disabled = true;
-
-                    frameworkConfig.Set(FrameworkSetting.IgnoredInputHandlers, string.Empty);
+                    Host.ResetInputHandlers();
                     frameworkConfig.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode).SetDefault();
                     return true;
 
-                case GlobalAction.ToggleToolbar:
-                    Toolbar.ToggleVisibility();
-                    return true;
-
                 case GlobalAction.ToggleGameplayMouseButtons:
-                    LocalConfig.Set(OsuSetting.MouseDisableButtons, !LocalConfig.Get<bool>(OsuSetting.MouseDisableButtons));
+                    var mouseDisableButtons = LocalConfig.GetBindable<bool>(OsuSetting.MouseDisableButtons);
+                    mouseDisableButtons.Value = !mouseDisableButtons.Value;
                     return true;
 
                 case GlobalAction.RandomSkin:

@@ -59,9 +59,9 @@ namespace osu.Game.Skinning
             return fallbackSource?.GetTexture(componentName, wrapModeS, wrapModeT);
         }
 
-        public SampleChannel GetSample(ISampleInfo sampleInfo)
+        public Sample GetSample(ISampleInfo sampleInfo)
         {
-            SampleChannel sourceChannel;
+            Sample sourceChannel;
             if (AllowSampleLookup(sampleInfo) && (sourceChannel = skin?.GetSample(sampleInfo)) != null)
                 return sourceChannel;
 

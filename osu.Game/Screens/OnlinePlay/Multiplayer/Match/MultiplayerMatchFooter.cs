@@ -3,13 +3,11 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Online.Rooms;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
@@ -17,8 +15,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
     public class MultiplayerMatchFooter : CompositeDrawable
     {
         public const float HEIGHT = 50;
-
-        public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
         public Action OnReadyClick
         {
@@ -41,7 +37,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Size = new Vector2(600, 50),
-                    SelectedItem = { BindTarget = SelectedItem }
                 }
             };
         }

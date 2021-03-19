@@ -123,7 +123,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 return;
             }
 
-            var result = HitObject.HitWindows.ResultFor(timeOffset);
+            var result = ResultFor(timeOffset);
 
             if (result == HitResult.None || CheckHittable?.Invoke(this, Time.Current) == false)
             {
@@ -145,6 +145,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 circleResult.Type = result;
             });
         }
+
+        /// <summary>
+        /// Retrieves the <see cref="HitResult"/> for a time offset.
+        /// </summary>
+        /// <param name="timeOffset">The time offset.</param>
+        /// <returns>The hit result, or <see cref="HitResult.None"/> if <paramref name="timeOffset"/> doesn't result in a judgement.</returns>
+        protected virtual HitResult ResultFor(double timeOffset) => HitObject.HitWindows.ResultFor(timeOffset);
 
         protected override void UpdateInitialTransforms()
         {

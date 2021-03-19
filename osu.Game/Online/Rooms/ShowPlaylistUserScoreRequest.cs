@@ -7,11 +7,11 @@ namespace osu.Game.Online.Rooms
 {
     public class ShowPlaylistUserScoreRequest : APIRequest<MultiplayerScore>
     {
-        private readonly int roomId;
-        private readonly int playlistItemId;
+        private readonly long roomId;
+        private readonly long playlistItemId;
         private readonly long userId;
 
-        public ShowPlaylistUserScoreRequest(int roomId, int playlistItemId, long userId)
+        public ShowPlaylistUserScoreRequest(long roomId, long playlistItemId, long userId)
         {
             this.roomId = roomId;
             this.playlistItemId = playlistItemId;
