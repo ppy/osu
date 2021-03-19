@@ -6,7 +6,9 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
@@ -124,25 +126,28 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         if (beat == 0 && i == 0)
                             nextMinTick = float.MinValue;
 
-                        var indexInBar = beat % ((int)point.TimeSignature * beatDivisor.Value);
+                        int indexInBar = beat % ((int)point.TimeSignature * beatDivisor.Value);
 
                         var divisor = BindableBeatDivisor.GetDivisorForBeatIndex(beat, beatDivisor.Value);
                         var colour = BindableBeatDivisor.GetColourFor(divisor, colours);
 
+                        bool isMainBeat = indexInBar == 0;
+
                         // even though "bar lines" take up the full vertical space, we render them in two pieces because it allows for less anchor/origin churn.
-                        var height = indexInBar == 0 ? 0.5f : 0.1f - (float)divisor / highestDivisor * 0.08f;
+                        float height = isMainBeat ? 0.5f : 0.4f - (float)divisor / highestDivisor * 0.2f;
+                        float gradientOpacity = isMainBeat ? 1 : 0;
 
                         var topPoint = getNextUsablePoint();
                         topPoint.X = xPos;
-                        topPoint.Colour = colour;
                         topPoint.Height = height;
+                        topPoint.Colour = ColourInfo.GradientVertical(colour, colour.Opacity(gradientOpacity));
                         topPoint.Anchor = Anchor.TopLeft;
                         topPoint.Origin = Anchor.TopCentre;
 
                         var bottomPoint = getNextUsablePoint();
                         bottomPoint.X = xPos;
-                        bottomPoint.Colour = colour;
                         bottomPoint.Anchor = Anchor.BottomLeft;
+                        bottomPoint.Colour = ColourInfo.GradientVertical(colour.Opacity(gradientOpacity), colour);
                         bottomPoint.Origin = Anchor.BottomCentre;
                         bottomPoint.Height = height;
                     }
