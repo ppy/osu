@@ -31,9 +31,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private GameHost host { get; set; }
 
         /// <summary>
-        /// Based on the longest available smartphone.
+        /// Based on ultrawide monitor configurations.
         /// </summary>
-        private const float largest_feasible_aspect_ratio = 20f / 9;
+        private const float largest_feasible_aspect_ratio = 21f / 9;
 
         private readonly BindableNumber<float> aspectRatio = new BindableFloat(1)
         {
