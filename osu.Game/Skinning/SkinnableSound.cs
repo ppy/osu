@@ -131,6 +131,14 @@ namespace osu.Game.Skinning
             });
         }
 
+        protected override void LoadAsyncComplete()
+        {
+            base.LoadAsyncComplete();
+
+            if (!samplesContainer.Any())
+                updateSamples();
+        }
+
         /// <summary>
         /// Stops the samples.
         /// </summary>
