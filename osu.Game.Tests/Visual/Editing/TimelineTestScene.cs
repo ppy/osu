@@ -110,8 +110,6 @@ namespace osu.Game.Tests.Visual.Editing
             [Resolved]
             private EditorClock editorClock { get; set; }
 
-            private bool started;
-
             public StartStopButton()
             {
                 BackgroundColour = Color4.SlateGray;
@@ -123,18 +121,17 @@ namespace osu.Game.Tests.Visual.Editing
 
             private void onClick()
             {
-                if (started)
-                {
+                if (editorClock.IsRunning)
                     editorClock.Stop();
-                    Text = "Start";
-                }
                 else
-                {
                     editorClock.Start();
-                    Text = "Stop";
-                }
+            }
 
-                started = !started;
+            protected override void Update()
+            {
+                base.Update();
+
+                Text = editorClock.IsRunning ? "Stop" : "Start";
             }
         }
     }
