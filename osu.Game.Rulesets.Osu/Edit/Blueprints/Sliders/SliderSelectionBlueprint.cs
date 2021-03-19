@@ -114,6 +114,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             // throw away frame buffers on deselection.
             ControlPointVisualiser?.Expire();
+            ControlPointVisualiser = null;
+
             BodyPiece.RecyclePath();
         }
 
