@@ -86,7 +86,7 @@ namespace osu.Game.Skinning
         public void SelectRandomSkin()
         {
             // choose from only user skins, removing the current selection to ensure a new one is chosen.
-            var randomChoices = GetAllUsableSkins().Where(s => s.ID > 0 && s.ID != CurrentSkinInfo.Value.ID).ToArray();
+            var randomChoices = GetAllUsableSkins().Where(s => s.ID != CurrentSkinInfo.Value.ID).ToArray();
 
             if (randomChoices.Length == 0)
             {
