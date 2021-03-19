@@ -509,7 +509,7 @@ namespace osu.Game.Skinning
         /// <summary>
         /// A sample wrapper which keeps a reference to the contained skin to avoid finalizer garbage collection of the managing SampleStore.
         /// </summary>
-        private class LegacySkinSample : ISample
+        private class LegacySkinSample : ISample, IDisposable
         {
             private readonly Sample sample;
 
@@ -575,6 +575,8 @@ namespace osu.Game.Skinning
             public IBindable<double> AggregateFrequency => sample.AggregateFrequency;
 
             public IBindable<double> AggregateTempo => sample.AggregateTempo;
+
+            public void Dispose() => sample.Dispose();
         }
     }
 }
