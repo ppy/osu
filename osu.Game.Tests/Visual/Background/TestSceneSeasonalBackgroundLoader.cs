@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Visual.Background
         public void SetUp() => Schedule(() =>
         {
             // reset API response in statics to avoid test crosstalk.
-            statics.Set<APISeasonalBackgrounds>(Static.SeasonalBackgrounds, null);
+            statics.SetValue<APISeasonalBackgrounds>(Static.SeasonalBackgrounds, null);
             textureStore.PerformedLookups.Clear();
             dummyAPI.SetState(APIState.Online);
 
@@ -146,7 +146,7 @@ namespace osu.Game.Tests.Visual.Background
             });
 
         private void setSeasonalBackgroundMode(SeasonalBackgroundMode mode)
-            => AddStep($"set seasonal mode to {mode}", () => config.Set(OsuSetting.SeasonalBackgroundMode, mode));
+            => AddStep($"set seasonal mode to {mode}", () => config.SetValue(OsuSetting.SeasonalBackgroundMode, mode));
 
         private void createLoader()
             => AddStep("create loader", () =>

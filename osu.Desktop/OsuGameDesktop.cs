@@ -18,6 +18,7 @@ using osu.Framework.Screens;
 using osu.Game.Screens.Menu;
 using osu.Game.Updater;
 using osu.Desktop.Windows;
+using osu.Game.IO;
 
 namespace osu.Desktop
 {
@@ -32,7 +33,7 @@ namespace osu.Desktop
             noVersionOverlay = args?.Any(a => a == "--no-version-overlay") ?? false;
         }
 
-        public override Storage GetStorageForStableInstall()
+        public override StableStorage GetStorageForStableInstall()
         {
             try
             {
@@ -40,7 +41,7 @@ namespace osu.Desktop
                 {
                     string stablePath = getStableInstallPath();
                     if (!string.IsNullOrEmpty(stablePath))
-                        return new DesktopStorage(stablePath, desktopHost);
+                        return new StableStorage(stablePath, desktopHost);
                 }
             }
             catch (Exception)
@@ -135,24 +136,12 @@ namespace osu.Desktop
 
             var iconStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico");
 
-            switch (host.Window)
-            {
-                // Legacy osuTK DesktopGameWindow
-                case OsuTKDesktopWindow desktopGameWindow:
-                    desktopGameWindow.CursorState |= CursorState.Hidden;
-                    desktopGameWindow.SetIconFromStream(iconStream);
-                    desktopGameWindow.Title = Name;
-                    desktopGameWindow.FileDrop += (_, e) => fileDrop(e.FileNames);
-                    break;
+            var desktopWindow = (SDL2DesktopWindow)host.Window;
 
-                // SDL2 DesktopWindow
-                case SDL2DesktopWindow desktopWindow:
-                    desktopWindow.CursorState |= CursorState.Hidden;
-                    desktopWindow.SetIconFromStream(iconStream);
-                    desktopWindow.Title = Name;
-                    desktopWindow.DragDrop += f => fileDrop(new[] { f });
-                    break;
-            }
+            desktopWindow.CursorState |= CursorState.Hidden;
+            desktopWindow.SetIconFromStream(iconStream);
+            desktopWindow.Title = Name;
+            desktopWindow.DragDrop += f => fileDrop(new[] { f });
         }
 
         private void fileDrop(string[] filePaths)

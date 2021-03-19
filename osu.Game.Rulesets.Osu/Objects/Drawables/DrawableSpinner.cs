@@ -130,7 +130,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             if (tracking.NewValue)
             {
-                spinningSample?.Play(!spinningSample.IsPlaying);
+                if (!spinningSample.IsPlaying)
+                    spinningSample?.Play();
                 spinningSample?.VolumeTo(1, 300);
             }
             else
@@ -154,6 +155,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 case DrawableSpinnerTick tick:
                     ticks.Add(tick);
                     break;
+            }
+        }
+
+        protected override void UpdateStartTimeStateTransforms()
+        {
+            base.UpdateStartTimeStateTransforms();
+
+            if (Result?.TimeStarted is double startTime)
+            {
+                using (BeginAbsoluteSequence(startTime))
+                    fadeInCounter();
             }
         }
 
@@ -243,7 +255,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.Update();
 
             if (HandleUserInput)
-                RotationTracker.Tracking = !Result.HasResult && (OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false);
+            {
+                bool isValidSpinningTime = Time.Current >= HitObject.StartTime && Time.Current <= HitObject.EndTime;
+                bool correctButtonPressed = (OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false);
+
+                RotationTracker.Tracking = !Result.HasResult
+                                           && correctButtonPressed
+                                           && isValidSpinningTime;
+            }
 
             if (spinningSample != null && spinnerFrequencyModulate)
                 spinningSample.Frequency.Value = spinning_sample_modulated_base_frequency + Progress;
@@ -254,11 +273,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.UpdateAfterChildren();
 
             if (!SpmCounter.IsPresent && RotationTracker.Tracking)
-                SpmCounter.FadeIn(HitObject.TimeFadeIn);
-            SpmCounter.SetRotation(Result.RateAdjustedRotation);
+            {
+                Result.TimeStarted ??= Time.Current;
+                fadeInCounter();
+            }
+
+            // don't update after end time to avoid the rate display dropping during fade out.
+            // this shouldn't be limited to StartTime as it causes weirdness with the underlying calculation, which is expecting updates during that period.
+            if (Time.Current <= HitObject.EndTime)
+                SpmCounter.SetRotation(Result.RateAdjustedRotation);
 
             updateBonusScore();
         }
+
+        private void fadeInCounter() => SpmCounter.FadeIn(HitObject.TimeFadeIn);
 
         private int wholeSpins;
 

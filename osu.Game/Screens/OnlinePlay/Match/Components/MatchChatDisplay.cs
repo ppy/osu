@@ -11,7 +11,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
     public class MatchChatDisplay : StandAloneChatDisplay
     {
         [Resolved(typeof(Room), nameof(Room.RoomID))]
-        private Bindable<int?> roomId { get; set; }
+        private Bindable<long?> roomId { get; set; }
 
         [Resolved(typeof(Room), nameof(Room.ChannelId))]
         private Bindable<int> channelId { get; set; }
@@ -37,6 +37,12 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
                 return;
 
             Channel.Value = channelManager?.JoinChannel(new Channel { Id = channelId.Value, Type = ChannelType.Multiplayer, Name = $"#lazermp_{roomId.Value}" });
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            channelManager?.LeaveChannel(Channel.Value);
         }
     }
 }

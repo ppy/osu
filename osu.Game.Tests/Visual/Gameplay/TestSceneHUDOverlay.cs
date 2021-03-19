@@ -81,7 +81,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("get original config value", () => originalConfigValue = config.Get<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode));
 
-            AddStep("set hud to never show", () => config.Set(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Never));
+            AddStep("set hud to never show", () => config.SetValue(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Never));
 
             AddUntilStep("wait for fade", () => !hideTarget.IsPresent);
 
@@ -91,7 +91,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("stop trigering", () => InputManager.ReleaseKey(Key.ControlLeft));
             AddUntilStep("wait for fade", () => !hideTarget.IsPresent);
 
-            AddStep("set original config value", () => config.Set(OsuSetting.HUDVisibilityMode, originalConfigValue));
+            AddStep("set original config value", () => config.SetValue(OsuSetting.HUDVisibilityMode, originalConfigValue));
         }
 
         [Test]
@@ -120,7 +120,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("set keycounter visible false", () =>
             {
-                config.Set<bool>(OsuSetting.KeyOverlay, false);
+                config.SetValue(OsuSetting.KeyOverlay, false);
                 hudOverlay.KeyCounter.AlwaysVisible.Value = false;
             });
 
@@ -132,7 +132,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("hidetarget is visible", () => hideTarget.IsPresent);
             AddAssert("key counters still hidden", () => !keyCounterFlow.IsPresent);
 
-            AddStep("return value", () => config.Set<bool>(OsuSetting.KeyOverlay, keyCounterVisibleValue));
+            AddStep("return value", () => config.SetValue(OsuSetting.KeyOverlay, keyCounterVisibleValue));
         }
 
         private void createNew(Action<HUDOverlay> action = null)

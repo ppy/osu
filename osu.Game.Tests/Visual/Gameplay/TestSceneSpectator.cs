@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -242,11 +241,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             public TestSpectatorStreamingClient()
                 : base(new DevelopmentEndpointConfiguration())
             {
-            }
-
-            protected override Task Connect()
-            {
-                return Task.CompletedTask;
             }
 
             public void StartPlay(int beatmapId)

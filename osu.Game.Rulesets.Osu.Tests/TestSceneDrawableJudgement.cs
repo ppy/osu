@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestHitLightingDisabled()
         {
-            AddStep("hit lighting disabled", () => config.Set(OsuSetting.HitLighting, false));
+            AddStep("hit lighting disabled", () => config.SetValue(OsuSetting.HitLighting, false));
 
             showResult(HitResult.Great);
 
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestHitLightingEnabled()
         {
-            AddStep("hit lighting enabled", () => config.Set(OsuSetting.HitLighting, true));
+            AddStep("hit lighting enabled", () => config.SetValue(OsuSetting.HitLighting, true));
 
             showResult(HitResult.Great);
 

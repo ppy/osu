@@ -74,7 +74,11 @@ namespace osu.Game.Screens.Edit
 
         public BeatmapMetadata Metadata => PlayableBeatmap.Metadata;
 
-        public ControlPointInfo ControlPointInfo => PlayableBeatmap.ControlPointInfo;
+        public ControlPointInfo ControlPointInfo
+        {
+            get => PlayableBeatmap.ControlPointInfo;
+            set => PlayableBeatmap.ControlPointInfo = value;
+        }
 
         public List<BreakPeriod> Breaks => PlayableBeatmap.Breaks;
 
@@ -83,6 +87,8 @@ namespace osu.Game.Screens.Edit
         public IReadOnlyList<HitObject> HitObjects => PlayableBeatmap.HitObjects;
 
         public IEnumerable<BeatmapStatistic> GetStatistics() => PlayableBeatmap.GetStatistics();
+
+        public double GetMostCommonBeatLength() => PlayableBeatmap.GetMostCommonBeatLength();
 
         public IBeatmap Clone() => (EditorBeatmap)MemberwiseClone();
 
@@ -93,6 +99,22 @@ namespace osu.Game.Screens.Edit
         private readonly List<HitObject> batchPendingDeletes = new List<HitObject>();
 
         private readonly HashSet<HitObject> batchPendingUpdates = new HashSet<HitObject>();
+
+        /// <summary>
+        /// Perform the provided action on every selected hitobject.
+        /// Changes will be grouped as one history action.
+        /// </summary>
+        /// <param name="action">The action to perform.</param>
+        public void PerformOnSelection(Action<HitObject> action)
+        {
+            if (SelectedHitObjects.Count == 0)
+                return;
+
+            BeginChange();
+            foreach (var h in SelectedHitObjects)
+                action(h);
+            EndChange();
+        }
 
         /// <summary>
         /// Adds a collection of <see cref="HitObject"/>s to this <see cref="EditorBeatmap"/>.

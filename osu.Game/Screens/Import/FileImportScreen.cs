@@ -154,7 +154,7 @@ namespace osu.Game.Screens.Import
 
             Task.Factory.StartNew(async () =>
             {
-                await game.Import(path);
+                await game.Import(path).ConfigureAwait(false);
 
                 // some files will be deleted after successful import, so we want to refresh the view.
                 Schedule(() =>

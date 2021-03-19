@@ -12,7 +12,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
 {
     public class ModeTypeInfo : OnlinePlayComposite
     {
-        private const float height = 30;
+        private const float height = 28;
         private const float transition_duration = 100;
 
         private Container drawableRuleset;

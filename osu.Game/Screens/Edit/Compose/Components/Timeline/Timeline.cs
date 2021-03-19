@@ -155,12 +155,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 seekTrackToCurrent();
             else if (!editorClock.IsRunning)
             {
-                // The track isn't running. There are two cases we have to be wary of:
-                // 1) The user flick-drags on this timeline: We want the track to follow us
-                // 2) The user changes the track time through some other means (scrolling in the editor or overview timeline): We want to follow the track time
+                // The track isn't running. There are three cases we have to be wary of:
+                // 1) The user flick-drags on this timeline and we are applying an interpolated seek on the clock, until interrupted by 2 or 3.
+                // 2) The user changes the track time through some other means (scrolling in the editor or overview timeline; clicking a hitobject etc.). We want the timeline to track the clock's time.
+                // 3) An ongoing seek transform is running from an external seek. We want the timeline to track the clock's time.
 
-                // The simplest way to cover both cases is by checking whether the scroll position has changed and the audio hasn't been changed externally
-                if (Current != lastScrollPosition && editorClock.CurrentTime == lastTrackTime)
+                // The simplest way to cover the first two cases is by checking whether the scroll position has changed and the audio hasn't been changed externally
+                // Checking IsSeeking covers the third case, where the transform may not have been applied yet.
+                if (Current != lastScrollPosition && editorClock.CurrentTime == lastTrackTime && !editorClock.IsSeeking)
                     seekTrackToCurrent();
                 else
                     scrollToTrackTime();
@@ -175,7 +177,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             if (!track.IsLoaded)
                 return;
 
-            editorClock.Seek(Current / Content.DrawWidth * track.Length);
+            double target = Current / Content.DrawWidth * track.Length;
+            editorClock.Seek(Math.Min(track.Length, target));
         }
 
         private void scrollToTrackTime()
