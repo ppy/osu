@@ -56,7 +56,8 @@ namespace osu.Game.Screens.Mvis.Objects
                 placeholder = new Container
                 {
                     Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre
+                    Origin = Anchor.Centre,
+                    Alpha = 0
                 },
                 updateableBg = new UpdateableBeatmapBackground
                 {
@@ -89,7 +90,7 @@ namespace osu.Game.Screens.Mvis.Objects
             config?.BindWith(MSetting.MvisBlue, blue);
             config?.BindWith(MSetting.MvisUseCustomColour, useCustomColour);
 
-            useOsuLogoVisuals.ValueChanged += _ => updateVisuals();
+            useOsuLogoVisuals.BindValueChanged(_ => updateVisuals());
             barCount.BindValueChanged(_ => updateVisuals());
             visuals.BindValueChanged(_ => updateVisuals(), true);
             rotation.BindValueChanged(e => placeholder.Rotation = e.NewValue, true);

@@ -7,6 +7,8 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Screens.Mvis.Plugins;
 using osuTK;
 using osuTK.Graphics;
@@ -80,6 +82,9 @@ namespace osu.Game.Screens.Mvis.SideBar
 
         [Resolved]
         private CustomColourProvider colourProvider { get; set; }
+
+        [Resolved]
+        private DialogOverlay dialog { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(MvisPluginManager manager)
@@ -230,9 +235,15 @@ namespace osu.Game.Screens.Mvis.SideBar
 
             if (plugin.Flags.Contains(MvisPlugin.PluginFlags.CanUnload))
             {
-                unloadButton.Action = () => manager.UnLoadPlugin(plugin);
+                unloadButton.Action = () =>
+                {
+                    dialog.Push(new ConfirmDialog($"你确定要卸载{plugin.Name}吗?", () => manager.UnLoadPlugin(plugin))
+                    {
+                        BodyText = "卸载后该插件在本次Mvis会话中将不再可用!"
+                    });
+                };
                 unloadButton.TooltipText = "卸载此插件";
-                unloadIcon.Icon = FontAwesome.Solid.SignOutAlt;
+                unloadIcon.Icon = FontAwesome.Solid.TrashAlt;
             }
             else
             {

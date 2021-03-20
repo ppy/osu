@@ -17,7 +17,11 @@ namespace osu.Game.Screens.Mvis.Plugins
             Name = "Mvis面板(内置)";
             Description = "用于提供Mvis面板功能(中心的谱面图及周围的粒子效果)";
 
-            Flags.Add(PluginFlags.CanDisable);
+            Flags.AddRange(new[]
+            {
+                PluginFlags.CanDisable,
+                PluginFlags.CanUnload
+            });
 
             RelativeSizeAxes = Axes.Both;
             Anchor = Anchor.Centre;
@@ -29,6 +33,7 @@ namespace osu.Game.Screens.Mvis.Plugins
         private MConfigManager config { get; set; }
 
         private readonly Bindable<bool> showParticles = new BindableBool();
+        private readonly BindableFloat idleAlpha = new BindableFloat();
 
         private Container particles;
 
@@ -39,6 +44,24 @@ namespace osu.Game.Screens.Mvis.Plugins
         {
             config.BindWith(MSetting.MvisShowParticles, showParticles);
             config.BindWith(MSetting.MvisEnableRulesetPanel, Value);
+            config.BindWith(MSetting.MvisContentAlpha, idleAlpha);
+            idleAlpha.BindValueChanged(onIdleAlphaChanged);
+
+            if (MvisScreen != null)
+            {
+                MvisScreen.OnIdle += () => idleAlpha.TriggerChange();
+                MvisScreen.OnResumeFromIdle += () =>
+                {
+                    if (Value.Value)
+                        this.FadeTo(1, 750, Easing.OutQuint);
+                };
+            }
+        }
+
+        private void onIdleAlphaChanged(ValueChangedEvent<float> v)
+        {
+            if ((MvisScreen?.OverlaysHidden ?? true) && Value.Value)
+                this.FadeTo(v.NewValue, 750, Easing.OutQuint);
         }
 
         protected override Drawable CreateContent() => new Container
@@ -102,10 +125,20 @@ namespace osu.Game.Screens.Mvis.Plugins
 
         public override bool Enable()
         {
-            this.FadeIn(300).ScaleTo(1, 400, Easing.OutQuint);
+            this.FadeTo(MvisScreen?.OverlaysHidden ?? false ? idleAlpha.Value : 1, 300).ScaleTo(1, 400, Easing.OutQuint);
+
             beatmapLogo?.ResponseOnBeatmapChanges();
 
             return base.Enable();
+        }
+
+        public override void UnLoad()
+        {
+            Value.UnbindAll();
+            Disable();
+
+            //bug: 直接调用Expire会导致面板直接消失
+            this.Delay(400).Expire();
         }
     }
 }

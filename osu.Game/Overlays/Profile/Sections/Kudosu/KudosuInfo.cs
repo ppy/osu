@@ -23,43 +23,16 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
         {
             this.user.BindTo(user);
             CountSection total;
-            CountSection avaliable;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Masking = true;
             CornerRadius = 3;
-            Children = new Drawable[]
-            {
-                new FillFlowContainer
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Horizontal,
-                    Spacing = new Vector2(5, 0),
-                    Children = new[]
-                    {
-                        total = new CountTotal(),
-                        avaliable = new CountAvailable()
-                    }
-                }
-            };
-            this.user.ValueChanged += u =>
-            {
-                total.Count = u.NewValue?.Kudosu.Total ?? 0;
-                avaliable.Count = u.NewValue?.Kudosu.Available ?? 0;
-            };
+            Child = total = new CountTotal();
+
+            this.user.ValueChanged += u => total.Count = u.NewValue?.Kudosu.Total ?? 0;
         }
 
         protected override bool OnClick(ClickEvent e) => true;
-
-        private class CountAvailable : CountSection
-        {
-            public CountAvailable()
-                : base("可用的Kudosu")
-            {
-                DescriptionText.Text = "kudosu 可以兑换为 kudosu 星,它可以让你的谱面更引人注意。这是该玩家还没有兑换的 kudosu 数。";//改自官网
-            }
-        }
 
         private class CountTotal : CountSection
         {
@@ -80,13 +53,12 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
 
             public new int Count
             {
-                set => valueText.Text = value.ToString();
+                set => valueText.Text = value.ToString("N0");
             }
 
             public CountSection(string header)
             {
                 RelativeSizeAxes = Axes.X;
-                Width = 0.5f;
                 AutoSizeAxes = Axes.Y;
                 Padding = new MarginPadding { Top = 10, Bottom = 20 };
                 Child = new FillFlowContainer
@@ -131,7 +103,6 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
             private void load(OverlayColourProvider colourProvider)
             {
                 lineBackground.Colour = colourProvider.Highlight1;
-                DescriptionText.Colour = colourProvider.Foreground1;
             }
         }
     }

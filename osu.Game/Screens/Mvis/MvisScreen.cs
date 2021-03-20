@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Mvis
         public override bool HideOverlaysOnEnter => true;
         public override bool AllowBackButton => false;
 
-        public override bool CursorVisible => !overlaysHidden || sidebar.State.Value == Visibility.Visible; //隐藏界面或侧边栏可见，显示光标
+        public override bool CursorVisible => !OverlaysHidden || sidebar.State.Value == Visibility.Visible; //隐藏界面或侧边栏可见，显示光标
 
         public override bool AllowRateAdjustments => true;
 
@@ -72,6 +72,10 @@ namespace osu.Game.Screens.Mvis
         public Action OnScreenExiting;
         public Action OnScreenSuspending;
         public Action OnScreenResuming;
+        public Action OnIdle;
+        public Action OnResumeFromIdle;
+        public Action<WorkingBeatmap> OnBeatmapChanged;
+        public Action<double> OnSeek;
 
         #endregion
 
@@ -147,10 +151,8 @@ namespace osu.Game.Screens.Mvis
         #region 设置
 
         private readonly BindableBool trackRunning = new BindableBool();
-        private readonly BindableBool showParticles = new BindableBool();
         private readonly BindableFloat bgBlur = new BindableFloat();
         private readonly BindableFloat idleBgDim = new BindableFloat();
-        private readonly BindableFloat contentAlpha = new BindableFloat();
         private readonly BindableDouble musicSpeed = new BindableDouble();
         private readonly BindableBool adjustFreq = new BindableBool();
         private readonly BindableBool nightcoreBeat = new BindableBool();
@@ -175,7 +177,7 @@ namespace osu.Game.Screens.Mvis
 
         private const float duration = 750;
 
-        private bool overlaysHidden;
+        public bool OverlaysHidden { get; private set; }
         private readonly BindableBool lockChanges = new BindableBool();
         private readonly IBindable<bool> isIdle = new BindableBool();
 
@@ -186,6 +188,8 @@ namespace osu.Game.Screens.Mvis
         private WorkingBeatmap prevBeatmap;
 
         private readonly BindableList<MvisPlugin> loadList = new BindableList<MvisPlugin>();
+
+        private FakeEditor fakeEditor;
 
         #endregion
 
@@ -209,6 +213,9 @@ namespace osu.Game.Screens.Mvis
 
             var panel = new RulesetPanel();
             pluginManager.AddPlugin(panel);
+
+            fakeEditor = new FakeEditor(Beatmap.Value);
+            pluginManager.AddPlugin(fakeEditor);
 
             sidebar.Add(settingsScroll = new SidebarSettingsScrollContainer
             {
@@ -262,7 +269,8 @@ namespace osu.Game.Screens.Mvis
                             Name = "Gameplay Background Elements Container",
                             Children = new Drawable[]
                             {
-                                bgTriangles = new BgTrianglesContainer()
+                                bgTriangles = new BgTrianglesContainer(),
+                                fakeEditor
                             }
                         },
                         foreground = new Container
@@ -501,8 +509,6 @@ namespace osu.Game.Screens.Mvis
             isIdle.BindTo(idleTracker.IsIdle);
             config.BindWith(MSetting.MvisBgBlur, bgBlur);
             config.BindWith(MSetting.MvisIdleBgDim, idleBgDim);
-            config.BindWith(MSetting.MvisContentAlpha, contentAlpha);
-            config.BindWith(MSetting.MvisShowParticles, showParticles);
             config.BindWith(MSetting.MvisMusicSpeed, musicSpeed);
             config.BindWith(MSetting.MvisAdjustMusicWithFreq, adjustFreq);
             config.BindWith(MSetting.MvisEnableNightcoreBeat, nightcoreBeat);
@@ -515,7 +521,6 @@ namespace osu.Game.Screens.Mvis
             loadList.BindCollectionChanged(onLoadListChanged);
 
             bgBlur.BindValueChanged(v => updateBackground(Beatmap.Value));
-            contentAlpha.BindValueChanged(_ => updateIdleVisuals());
             idleBgDim.BindValueChanged(_ => updateIdleVisuals());
             lockChanges.BindValueChanged(v =>
             {
@@ -524,7 +529,7 @@ namespace osu.Game.Screens.Mvis
                     : Color4.White, 300);
             });
 
-            Beatmap.BindValueChanged(OnBeatmapChanged, true);
+            Beatmap.BindValueChanged(onBeatmapChanged, true);
 
             musicSpeed.BindValueChanged(_ => applyTrackAdjustments());
             adjustFreq.BindValueChanged(_ => applyTrackAdjustments());
@@ -642,8 +647,7 @@ namespace osu.Game.Screens.Mvis
         private void seekTo(double position)
         {
             musicController.SeekTo(position);
-            sbLoader?.Seek(position);
-            fakeEditor?.Seek(position);
+            OnSeek?.Invoke(position);
         }
 
         #region override事件
@@ -725,7 +729,7 @@ namespace osu.Game.Screens.Mvis
             applyTrackAdjustments();
             updateBackground(Beatmap.Value);
 
-            Beatmap.BindValueChanged(OnBeatmapChanged, true);
+            Beatmap.BindValueChanged(onBeatmapChanged, true);
 
             //背景层的动画
             background.FadeOut().Then().Delay(duration * 0.6f).FadeIn(duration / 2);
@@ -783,7 +787,7 @@ namespace osu.Game.Screens.Mvis
                         return true;
                     }
 
-                    if (!overlaysHidden)
+                    if (!OverlaysHidden)
                         this.Exit();
 
                     return true;
@@ -812,7 +816,7 @@ namespace osu.Game.Screens.Mvis
         //当有弹窗或游戏失去焦点时要进行的动作
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (lockButton.ToggleableValue.Value && overlaysHidden)
+            if (lockButton.ToggleableValue.Value && OverlaysHidden)
                 lockButton.Toggle();
 
             showOverlays(false);
@@ -840,14 +844,15 @@ namespace osu.Game.Screens.Mvis
             progressBar.MoveToY(5, duration, Easing.OutQuint);
             bottomBar.FadeOut(duration, Easing.OutQuint);
 
-            overlaysHidden = true;
+            OverlaysHidden = true;
             updateIdleVisuals();
+            OnIdle?.Invoke();
         }
 
         private void showOverlays(bool force)
         {
             //在有锁并且悬浮界面已隐藏或悬浮界面可见的情况下显示悬浮锁
-            if (!force && (lockButton.ToggleableValue.Value && overlaysHidden || !overlaysHidden || lockChanges.Value))
+            if (!force && (lockButton.ToggleableValue.Value && OverlaysHidden || !OverlaysHidden || lockChanges.Value))
             {
                 lockButton.FadeIn(500, Easing.OutQuint).Then().Delay(2500).FadeOut(500, Easing.OutQuint);
                 return;
@@ -861,9 +866,10 @@ namespace osu.Game.Screens.Mvis
             progressBar.MoveToY(0, duration, Easing.OutQuint);
             bottomBar.FadeIn(duration, Easing.OutQuint);
 
-            overlaysHidden = false;
+            OverlaysHidden = false;
 
             applyBackgroundBrightness();
+            OnResumeFromIdle?.Invoke();
         }
 
         private void togglePause()
@@ -894,11 +900,10 @@ namespace osu.Game.Screens.Mvis
 
         private void updateIdleVisuals()
         {
-            if (!overlaysHidden)
+            if (!OverlaysHidden)
                 return;
 
             applyBackgroundBrightness(true, idleBgDim.Value);
-            foreground.FadeTo(contentAlpha.Value, duration, Easing.OutQuint);
         }
 
         private void applyTrackAdjustments()
@@ -940,7 +945,7 @@ namespace osu.Game.Screens.Mvis
             {
                 if (auto)
                 {
-                    b.FadeColour((sbLoader?.StoryboardReplacesBackground.Value ?? false) ? Color4.Black : OsuColour.Gray(overlaysHidden ? idleBgDim.Value : 0.6f),
+                    b.FadeColour((sbLoader?.StoryboardReplacesBackground.Value ?? false) ? Color4.Black : OsuColour.Gray(OverlaysHidden ? idleBgDim.Value : 0.6f),
                         duration,
                         Easing.OutQuint);
                 }
@@ -948,19 +953,16 @@ namespace osu.Game.Screens.Mvis
                     b.FadeColour(OsuColour.Gray(brightness), duration, Easing.OutQuint);
             });
 
-            sbLoader?.FadeColour(OsuColour.Gray(auto ? (overlaysHidden ? idleBgDim.Value : 0.6f) : brightness), duration, Easing.OutQuint);
+            sbLoader?.FadeColour(OsuColour.Gray(auto ? (OverlaysHidden ? idleBgDim.Value : 0.6f) : brightness), duration, Easing.OutQuint);
         }
 
-        private FakeEditor fakeEditor;
         private MvisPluginManager pluginManager;
         private BottomBarButton pluginButton;
 
-        private void OnBeatmapChanged(ValueChangedEvent<WorkingBeatmap> v)
+        private void onBeatmapChanged(ValueChangedEvent<WorkingBeatmap> v)
         {
             var beatmap = v.NewValue;
             playFromCollection.TriggerChange();
-
-            pluginManager.UnLoadPlugin(fakeEditor);
 
             Schedule(() =>
             {
@@ -994,21 +996,9 @@ namespace osu.Game.Screens.Mvis
                 reBind();
             }
 
-            fakeEditor = new FakeEditor(beatmap)
-            {
-                RelativeSizeAxes = Axes.Both,
-                Depth = float.MaxValue,
-                Alpha = 0.01f,
-                Size = new Vector2(0.01f),
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre
-            };
-
-            pluginManager.AddPlugin(fakeEditor);
-            AddInternal(fakeEditor);
-
             activity.Value = new UserActivity.InMvis(beatmap.BeatmapInfo);
             prevBeatmap = beatmap;
+            OnBeatmapChanged?.Invoke(beatmap);
         }
 
         private void reBind()
