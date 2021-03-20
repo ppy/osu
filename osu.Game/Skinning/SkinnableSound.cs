@@ -133,10 +133,11 @@ namespace osu.Game.Skinning
 
         protected override void LoadAsyncComplete()
         {
-            base.LoadAsyncComplete();
-
+            // ensure samples are constructed before SkinChanged() is called via base.LoadAsyncComplete().
             if (!samplesContainer.Any())
                 updateSamples();
+
+            base.LoadAsyncComplete();
         }
 
         /// <summary>
