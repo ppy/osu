@@ -176,7 +176,7 @@ namespace osu.Game.Skinning
 
         public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => CurrentSkin.Value.GetTexture(componentName, wrapModeS, wrapModeT);
 
-        public Sample GetSample(ISampleInfo sampleInfo) => CurrentSkin.Value.GetSample(sampleInfo);
+        public ISample GetSample(ISampleInfo sampleInfo) => CurrentSkin.Value.GetSample(sampleInfo);
 
         public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => CurrentSkin.Value.GetConfig<TLookup, TValue>(lookup);
 
