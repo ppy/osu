@@ -196,19 +196,13 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             tablet.BindTo(tabletHandler.Tablet);
             tablet.BindValueChanged(val =>
             {
+                Scheduler.AddOnce(toggleVisibility);
+
                 var tab = val.NewValue;
 
                 bool tabletFound = tab != null;
-
                 if (!tabletFound)
-                {
-                    mainSettings.Hide();
-                    noTabletMessage.Show();
                     return;
-                }
-
-                mainSettings.Show();
-                noTabletMessage.Hide();
 
                 offsetX.MaxValue = tab.Size.X;
                 offsetX.Default = tab.Size.X / 2;
@@ -222,13 +216,28 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             }, true);
         }
 
+        private void toggleVisibility()
+        {
+            bool tabletFound = tablet.Value != null;
+
+            if (!tabletFound)
+            {
+                mainSettings.Hide();
+                noTabletMessage.Show();
+                return;
+            }
+
+            mainSettings.Show();
+            noTabletMessage.Hide();
+        }
+
         private void applyAspectRatio(BindableNumber<float> sizeChanged)
         {
             try
             {
                 if (!aspectLock.Value)
                 {
-                    float proposedAspectRatio = curentAspectRatio;
+                    float proposedAspectRatio = currentAspectRatio;
 
                     if (proposedAspectRatio >= aspectRatio.MinValue && proposedAspectRatio <= aspectRatio.MaxValue)
                     {
@@ -269,8 +278,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             aspectLock.Value = true;
         }
 
-        private void updateAspectRatio() => aspectRatio.Value = curentAspectRatio;
+        private void updateAspectRatio() => aspectRatio.Value = currentAspectRatio;
 
-        private float curentAspectRatio => sizeX.Value / sizeY.Value;
+        private float currentAspectRatio => sizeX.Value / sizeY.Value;
     }
 }

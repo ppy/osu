@@ -125,15 +125,18 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             }, true);
 
             tablet.BindTo(handler.Tablet);
-            tablet.BindValueChanged(val =>
-            {
-                tabletContainer.Size = val.NewValue?.Size ?? Vector2.Zero;
-                tabletName.Text = val.NewValue?.Name ?? string.Empty;
-                checkBounds();
-            }, true);
+            tablet.BindValueChanged(_ => Scheduler.AddOnce(updateTabletDetails));
 
+            updateTabletDetails();
             // initial animation should be instant.
             FinishTransforms(true);
+        }
+
+        private void updateTabletDetails()
+        {
+            tabletContainer.Size = tablet.Value?.Size ?? Vector2.Zero;
+            tabletName.Text = tablet.Value?.Name ?? string.Empty;
+            checkBounds();
         }
 
         private static int greatestCommonDivider(int a, int b)
