@@ -94,7 +94,7 @@ namespace osu.Game.Overlays.Settings.Sections
                 {
                     new SettingsCheckbox
                     {
-                        LabelText = "Enabled",
+                        LabelText = "启用",
                         Current = handler.Enabled
                     },
                 };

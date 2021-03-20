@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private OsuSpriteText noTabletMessage;
 
-        protected override string Header => "Tablet";
+        protected override string Header => "数位板";
 
         public TabletSettings(ITabletHandler tabletHandler)
         {
@@ -64,14 +64,14 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "Enabled",
+                    LabelText = "启用",
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Current = tabletHandler.Enabled
                 },
                 noTabletMessage = new OsuSpriteText
                 {
-                    Text = "No tablet detected!",
+                    Text = "没有找到任何数位板!",
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Padding = new MarginPadding { Horizontal = SettingsPanel.CONTENT_MARGINS }
@@ -92,7 +92,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         },
                         new DangerousSettingsButton
                         {
-                            Text = "Reset to full area",
+                            Text = "重置为全板映射",
                             Action = () =>
                             {
                                 aspectLock.Value = false;
@@ -103,7 +103,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         },
                         new SettingsButton
                         {
-                            Text = "Conform to current game aspect ratio",
+                            Text = "调整至当前游戏长宽比",
                             Action = () =>
                             {
                                 forceAspectRatio((float)host.Window.ClientSize.Width / host.Window.ClientSize.Height);
@@ -112,36 +112,36 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,
-                            LabelText = "Aspect Ratio",
+                            LabelText = "长宽比例",
                             Current = aspectRatio
                         },
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,
-                            LabelText = "X Offset",
+                            LabelText = "X位移",
                             Current = offsetX
                         },
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,
-                            LabelText = "Y Offset",
+                            LabelText = "Y位移",
                             Current = offsetY
                         },
                         new SettingsCheckbox
                         {
-                            LabelText = "Lock aspect ratio",
+                            LabelText = "锁定长宽比",
                             Current = aspectLock
                         },
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,
-                            LabelText = "Width",
+                            LabelText = "宽度",
                             Current = sizeX
                         },
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,
-                            LabelText = "Height",
+                            LabelText = "高度",
                             Current = sizeY
                         },
                     }
