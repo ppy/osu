@@ -237,7 +237,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 if (!aspectLock.Value)
                 {
-                    float proposedAspectRatio = curentAspectRatio;
+                    float proposedAspectRatio = currentAspectRatio;
 
                     if (proposedAspectRatio >= aspectRatio.MinValue && proposedAspectRatio <= aspectRatio.MaxValue)
                     {
@@ -278,8 +278,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             aspectLock.Value = true;
         }
 
-        private void updateAspectRatio() => aspectRatio.Value = curentAspectRatio;
+        private void updateAspectRatio() => aspectRatio.Value = currentAspectRatio;
 
-        private float curentAspectRatio => sizeX.Value / sizeY.Value;
+        private float currentAspectRatio => sizeX.Value / sizeY.Value;
     }
 }
