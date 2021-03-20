@@ -137,38 +137,34 @@ namespace osu.Desktop
 
             var iconStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico");
 
-            switch (host.Window)
-            {
-                // SDL2 DesktopWindow
-                case SDL2DesktopWindow desktopWindow:
-                    desktopWindow.CursorState |= CursorState.Hidden;
-                    desktopWindow.SetIconFromStream(iconStream);
-                    desktopWindow.Title = Name;
-                    desktopWindow.DragDrop += f => fileDrop(new[] { f });
-                    desktopWindow.OnTextEdit += s =>
-                    {
-                        if (textEditIndicator != null)
-                        {
-                            textEditIndicator.Text = s;
+            var desktopWindow = (SDL2DesktopWindow)host.Window;
 
-                            if (textEditIndicator.State.Value != Visibility.Visible)
-                                Schedule(() => textEditIndicator.Show());
-                        }
-                    };
-                    desktopWindow.OnTextInput += () =>
-                    {
-                        if (textEditIndicator != null)
+            desktopWindow.CursorState |= CursorState.Hidden;
+            desktopWindow.SetIconFromStream(iconStream);
+            desktopWindow.Title = Name;
+            desktopWindow.DragDrop += f => fileDrop(new[] { f });
+            desktopWindow.OnTextEdit += s =>
+            {
+                if (textEditIndicator != null)
+                {
+                    textEditIndicator.Text = s;
+
+                    if (textEditIndicator.State.Value != Visibility.Visible)
+                        Schedule(() => textEditIndicator.Show());
+                }
+            };
+            desktopWindow.OnTextInput += () =>
+            {
+                if (textEditIndicator != null)
+                {
+                    if (textEditIndicator.State.Value != Visibility.Hidden)
+                        Schedule(() =>
                         {
-                            if (textEditIndicator.State.Value != Visibility.Hidden)
-                                Schedule(() =>
-                                {
-                                    textEditIndicator.Flash();
-                                    textEditIndicator.Hide();
-                                });
-                        }
-                    };
-                    break;
-            }
+                            textEditIndicator.Flash();
+                            textEditIndicator.Hide();
+                        });
+                }
+            };
         }
 
         private void fileDrop(string[] filePaths)

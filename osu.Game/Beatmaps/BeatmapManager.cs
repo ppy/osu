@@ -113,8 +113,6 @@ namespace osu.Game.Beatmaps
         {
             var metadata = new BeatmapMetadata
             {
-                Artist = "艺术家",
-                Title = "标题",
                 Author = user,
             };
 
@@ -128,7 +126,6 @@ namespace osu.Game.Beatmaps
                         BaseDifficulty = new BeatmapDifficulty(),
                         Ruleset = ruleset,
                         Metadata = metadata,
-                        Version = "难度"
                     }
                 }
             };

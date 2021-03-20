@@ -21,22 +21,22 @@ namespace osu.Game.Rulesets.Osu.Configuration
         protected override void InitialiseDefaults()
         {
             base.InitialiseDefaults();
-            Set(OsuRulesetSetting.SnakingInSliders, true);
-            Set(OsuRulesetSetting.SnakingOutSliders, true);
-            Set(OsuRulesetSetting.ShowCursorTrail, true);
-            Set(OsuRulesetSetting.ReplayFramerate, 120f, 24f, 990f, 2f);
-            Set(OsuRulesetSetting.DanceMover, OsuDanceMover.Momentum);
-            Set(OsuRulesetSetting.AngleOffset, 8f / 18f, 0f, 2f, float.Epsilon);
-            Set(OsuRulesetSetting.JumpMulti, 2f / 3f, 0f, 2f, float.Epsilon);
-            Set(OsuRulesetSetting.NextJumpMulti, 2f / 3f, 0f, 2f, float.Epsilon);
-            Set(OsuRulesetSetting.SkipStackAngles, true);
-            Set(OsuRulesetSetting.BorderBounce, true);
-            Set(OsuRulesetSetting.PlayfieldBorderStyle, PlayfieldBorderStyle.None);
+            SetDefault(OsuRulesetSetting.SnakingInSliders, true);
+            SetDefault(OsuRulesetSetting.SnakingOutSliders, true);
+            SetDefault(OsuRulesetSetting.ShowCursorTrail, true);
+            SetDefault(OsuRulesetSetting.PlayfieldBorderStyle, PlayfieldBorderStyle.None);
 
-            Set(OsuRulesetSetting.SpinnerDance, true);
-            Set(OsuRulesetSetting.SliderDance, true);
-            Set(OsuRulesetSetting.SpinnerRadiusStart, 235f, 10f, 350f, 1f);
-            Set(OsuRulesetSetting.SpinnerRadiusEnd, 15f, 10f, 250f, 1f);
+            SetDefault(OsuRulesetSetting.ReplayFramerate, 120f, 24f, 990f, 2f);
+            SetDefault(OsuRulesetSetting.DanceMover, OsuDanceMover.Momentum);
+            SetDefault(OsuRulesetSetting.AngleOffset, 8f / 18f, 0f, 2f, float.Epsilon);
+            SetDefault(OsuRulesetSetting.JumpMulti, 2f / 3f, 0f, 2f, float.Epsilon);
+            SetDefault(OsuRulesetSetting.NextJumpMulti, 2f / 3f, 0f, 2f, float.Epsilon);
+            SetDefault(OsuRulesetSetting.SkipStackAngles, true);
+            SetDefault(OsuRulesetSetting.BorderBounce, true);
+            SetDefault(OsuRulesetSetting.SpinnerDance, true);
+            SetDefault(OsuRulesetSetting.SliderDance, true);
+            SetDefault(OsuRulesetSetting.SpinnerRadiusStart, 235f, 10f, 350f, 1f);
+            SetDefault(OsuRulesetSetting.SpinnerRadiusEnd, 15f, 10f, 250f, 1f);
         }
     }
 

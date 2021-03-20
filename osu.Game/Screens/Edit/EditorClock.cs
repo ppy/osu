@@ -31,6 +31,8 @@ namespace osu.Game.Screens.Edit
 
         private readonly DecoupleableInterpolatingFramedClock underlyingClock;
 
+        private bool playbackFinished;
+
         public IBindable<bool> SeekingOrStopped => seekingOrStopped;
 
         private readonly Bindable<bool> seekingOrStopped = new Bindable<bool>(true);
@@ -170,6 +172,10 @@ namespace osu.Game.Screens.Edit
         public void Start()
         {
             ClearTransforms();
+
+            if (playbackFinished)
+                underlyingClock.Seek(0);
+
             underlyingClock.Start();
         }
 
@@ -216,7 +222,21 @@ namespace osu.Game.Screens.Edit
 
         public bool IsRunning => underlyingClock.IsRunning;
 
-        public void ProcessFrame() => underlyingClock.ProcessFrame();
+        public void ProcessFrame()
+        {
+            underlyingClock.ProcessFrame();
+
+            playbackFinished = CurrentTime >= TrackLength;
+
+            if (playbackFinished)
+            {
+                if (IsRunning)
+                    underlyingClock.Stop();
+
+                if (CurrentTime > TrackLength)
+                    underlyingClock.Seek(TrackLength);
+            }
+        }
 
         public double ElapsedFrameTime => underlyingClock.ElapsedFrameTime;
 

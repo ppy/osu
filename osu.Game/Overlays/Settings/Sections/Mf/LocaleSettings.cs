@@ -51,7 +51,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
 
         private void setLocale(TextBox sender, bool newtext)
         {
-            config.Set(FrameworkSetting.Locale, sender.Text);
+            config.SetValue(FrameworkSetting.Locale, sender.Text);
         }
     }
 }

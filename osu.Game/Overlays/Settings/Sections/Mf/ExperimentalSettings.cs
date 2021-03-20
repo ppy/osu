@@ -108,7 +108,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
 
             dropDown.Items = fonts;
             currentFont.Value = fonts.Find(f => f.FamilyName == mConfig.Get<string>(MSetting.PreferredFont));
-            currentFont.BindValueChanged(v => mConfig.Set(MSetting.PreferredFont, v.NewValue.FamilyName));
+            currentFont.BindValueChanged(v => mConfig.SetValue(MSetting.PreferredFont, v.NewValue.FamilyName));
             dropDown.Current = currentFont;
 
             foreach (var font in customStorage.ActiveFonts)
@@ -172,7 +172,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
 
             private void applySetting(TextBox sender, bool newtext)
             {
-                mConfg.Set(lookup, sender.Text);
+                mConfg.SetValue(lookup, sender.Text);
             }
         }
 

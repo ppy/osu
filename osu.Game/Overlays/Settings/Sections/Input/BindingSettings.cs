@@ -5,18 +5,18 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
-    public class KeyboardSettings : SettingsSubsection
+    public class BindingSettings : SettingsSubsection
     {
-        protected override string Header => "键盘";
+        protected override string Header => "快捷键和键位设定";
 
-        public KeyboardSettings(KeyBindingPanel keyConfig)
+        public BindingSettings(KeyBindingPanel keyConfig)
         {
             Children = new Drawable[]
             {
                 new SettingsButton
                 {
-                    Text = "按键设置",
-                    TooltipText = "更改快捷键和键位设定",
+                    Text = "配置",
+                    TooltipText = "更改全局快捷键和键位设定",
                     Action = keyConfig.ToggleVisibility
                 },
             };
