@@ -196,19 +196,13 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             tablet.BindTo(tabletHandler.Tablet);
             tablet.BindValueChanged(val =>
             {
+                Scheduler.AddOnce(toggleVisibility);
+
                 var tab = val.NewValue;
 
                 bool tabletFound = tab != null;
-
                 if (!tabletFound)
-                {
-                    mainSettings.Hide();
-                    noTabletMessage.Show();
                     return;
-                }
-
-                mainSettings.Show();
-                noTabletMessage.Hide();
 
                 offsetX.MaxValue = tab.Size.X;
                 offsetX.Default = tab.Size.X / 2;
@@ -220,6 +214,21 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
                 areaSize.Default = new Vector2(sizeX.Default, sizeY.Default);
             }, true);
+        }
+
+        private void toggleVisibility()
+        {
+            bool tabletFound = tablet.Value != null;
+
+            if (!tabletFound)
+            {
+                mainSettings.Hide();
+                noTabletMessage.Show();
+                return;
+            }
+
+            mainSettings.Show();
+            noTabletMessage.Hide();
         }
 
         private void applyAspectRatio(BindableNumber<float> sizeChanged)
