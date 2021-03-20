@@ -338,7 +338,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private bool beginClickSelection(MouseButtonEvent e)
         {
             // Iterate from the top of the input stack (blueprints closest to the front of the screen first).
-            foreach (SelectionBlueprint blueprint in SelectionBlueprints.AliveChildren.Reverse())
+            // Priority is given to already-selected blueprints.
+            foreach (SelectionBlueprint blueprint in SelectionBlueprints.AliveChildren.Reverse().OrderByDescending(b => b.IsSelected))
             {
                 if (!blueprint.IsHovered) continue;
 
