@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
+using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -98,13 +99,6 @@ namespace osu.Game.Skinning
             hasKeyTexture = new Lazy<bool>(() => this.GetAnimation(
                 lookupForMania<string>(new LegacyManiaSkinConfigurationLookup(4, LegacyManiaSkinConfigurationLookups.KeyImage, 0))?.Value ?? "mania-key1", true,
                 true) != null);
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            Textures?.Dispose();
-            Samples?.Dispose();
         }
 
         public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
@@ -452,7 +446,7 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        public override Sample GetSample(ISampleInfo sampleInfo)
+        public override ISample GetSample(ISampleInfo sampleInfo)
         {
             IEnumerable<string> lookupNames;
 
@@ -468,7 +462,7 @@ namespace osu.Game.Skinning
                 var sample = Samples?.Get(lookup);
 
                 if (sample != null)
-                    return sample;
+                    return new LegacySkinSample(sample, this);
             }
 
             return null;
@@ -503,6 +497,86 @@ namespace osu.Game.Skinning
             // Fall back to using the last piece for components coming from lazer (e.g. "Gameplay/osu/approachcircle" -> "approachcircle").
             string lastPiece = componentName.Split('/').Last();
             yield return componentName.StartsWith("Gameplay/taiko/", StringComparison.Ordinal) ? "taiko-" + lastPiece : lastPiece;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            Textures?.Dispose();
+            Samples?.Dispose();
+        }
+
+        /// <summary>
+        /// A sample wrapper which keeps a reference to the contained skin to avoid finalizer garbage collection of the managing SampleStore.
+        /// </summary>
+        private class LegacySkinSample : ISample, IDisposable
+        {
+            private readonly Sample sample;
+
+            [UsedImplicitly]
+            private readonly LegacySkin skin;
+
+            public LegacySkinSample(Sample sample, LegacySkin skin)
+            {
+                this.sample = sample;
+                this.skin = skin;
+            }
+
+            public SampleChannel Play()
+            {
+                return sample.Play();
+            }
+
+            public SampleChannel GetChannel()
+            {
+                return sample.GetChannel();
+            }
+
+            public double Length => sample.Length;
+
+            public Bindable<int> PlaybackConcurrency => sample.PlaybackConcurrency;
+            public BindableNumber<double> Volume => sample.Volume;
+
+            public BindableNumber<double> Balance => sample.Balance;
+
+            public BindableNumber<double> Frequency => sample.Frequency;
+
+            public BindableNumber<double> Tempo => sample.Tempo;
+
+            public void BindAdjustments(IAggregateAudioAdjustment component)
+            {
+                sample.BindAdjustments(component);
+            }
+
+            public void UnbindAdjustments(IAggregateAudioAdjustment component)
+            {
+                sample.UnbindAdjustments(component);
+            }
+
+            public void AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable)
+            {
+                sample.AddAdjustment(type, adjustBindable);
+            }
+
+            public void RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable)
+            {
+                sample.RemoveAdjustment(type, adjustBindable);
+            }
+
+            public void RemoveAllAdjustments(AdjustableProperty type)
+            {
+                sample.RemoveAllAdjustments(type);
+            }
+
+            public IBindable<double> AggregateVolume => sample.AggregateVolume;
+
+            public IBindable<double> AggregateBalance => sample.AggregateBalance;
+
+            public IBindable<double> AggregateFrequency => sample.AggregateFrequency;
+
+            public IBindable<double> AggregateTempo => sample.AggregateTempo;
+
+            public void Dispose() => sample.Dispose();
         }
     }
 }
