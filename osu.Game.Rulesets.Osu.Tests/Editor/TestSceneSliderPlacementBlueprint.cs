@@ -276,6 +276,24 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             assertControlPointType(0, PathType.Linear);
         }
 
+        [Test]
+        public void TestPlacePerfectCurveSegmentAlmostLinearly()
+        {
+            addMovementStep(new Vector2(0));
+            addClickStep(MouseButton.Left);
+
+            addMovementStep(new Vector2(61.382935f, 6.423767f));
+            addClickStep(MouseButton.Left);
+
+            addMovementStep(new Vector2(217.69522f, 22.84021f));
+            addClickStep(MouseButton.Right);
+
+            assertPlaced(true);
+            assertControlPointCount(3);
+            // Will be > 10000 if not falling back to Bezier path calc.
+            assertLength(218.8901f);
+        }
+
         private void addMovementStep(Vector2 position) => AddStep($"move mouse to {position}", () => InputManager.MoveMouseTo(InputManager.ToScreenSpace(position)));
 
         private void addClickStep(MouseButton button)
