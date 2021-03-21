@@ -114,7 +114,7 @@ namespace osu.Game.Overlays.Profile.Header
             }
 
             topLinkContainer.AddText("Contributed ");
-            topLinkContainer.AddLink($@"{user.PostCount:#,##0} forum posts", $"{api.WebsiteRootUrl}/users/{user.Id}/posts", creationParameters: embolden);
+            topLinkContainer.AddLink("forum post".ToQuantity(user.PostCount, "#,##0"), $"{api.WebsiteRootUrl}/users/{user.Id}/posts", creationParameters: embolden);
 
             addSpacer(topLinkContainer);
 
