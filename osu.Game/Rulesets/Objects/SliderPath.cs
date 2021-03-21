@@ -219,8 +219,10 @@ namespace osu.Game.Rulesets.Objects
 
                     List<Vector2> subpath = PathApproximator.ApproximateCircularArc(subControlPoints);
 
-                    // If for some reason a circular arc could not be fit to the 3 given points, fall back to a numerically stable bezier approximation.
-                    if (subpath.Count == 0)
+                    // If for some reason a circular arc could not be fit to the 3 given points, or the
+                    // resulting radius is too large (e.g. points arranged almost linearly), fall back
+                    // to a numerically stable bezier approximation.
+                    if (subpath.Count == 0 || subpath.Count > 400)
                         break;
 
                     return subpath;
