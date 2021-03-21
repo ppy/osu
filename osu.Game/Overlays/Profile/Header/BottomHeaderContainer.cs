@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -114,6 +115,11 @@ namespace osu.Game.Overlays.Profile.Header
 
             topLinkContainer.AddText("Contributed ");
             topLinkContainer.AddLink($@"{user.PostCount:#,##0} forum posts", $"{api.WebsiteRootUrl}/users/{user.Id}/posts", creationParameters: embolden);
+
+            addSpacer(topLinkContainer);
+
+            topLinkContainer.AddText("Posted ");
+            topLinkContainer.AddLink("comment".ToQuantity(user.CommentsCount, "#,##0"), $"{api.WebsiteRootUrl}/comments?user_id={user.Id}", creationParameters: embolden);
 
             string websiteWithoutProtocol = user.Website;
 

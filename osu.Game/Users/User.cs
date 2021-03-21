@@ -120,6 +120,9 @@ namespace osu.Game.Users
         [JsonProperty(@"post_count")]
         public int PostCount;
 
+        [JsonProperty(@"comments_count")]
+        public int CommentsCount;
+
         [JsonProperty(@"follower_count")]
         public int FollowerCount;
 
