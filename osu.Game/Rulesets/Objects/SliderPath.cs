@@ -211,12 +211,10 @@ namespace osu.Game.Rulesets.Objects
 
             // An almost linear arrangement of points results in radius approaching infinity,
             // we should prevent that to avoid memory exhaustion when drawing / approximating
-            if (pathType != PathType.PerfectCurve)
+            if (pathType != PathType.PerfectCurve || pointsInSegment.Count != 3)
                 return;
 
             Vector2[] points = pointsInSegment.Select(point => point.Position.Value).ToArray();
-            if (points.Length < 3)
-                return;
 
             Vector2 a = points[0];
             Vector2 b = points[1];
