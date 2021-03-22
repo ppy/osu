@@ -54,13 +54,19 @@ namespace osu.Game.Rulesets.Objects
                 {
                     case NotifyCollectionChangedAction.Add:
                         foreach (var c in args.NewItems.Cast<PathControlPoint>())
+                        {
                             c.Changed += invalidate;
+                            c.Changed += updatePathTypes;
+                        }
                         break;
 
                     case NotifyCollectionChangedAction.Reset:
                     case NotifyCollectionChangedAction.Remove:
                         foreach (var c in args.OldItems.Cast<PathControlPoint>())
+                        {
                             c.Changed -= invalidate;
+                            c.Changed -= updatePathTypes;
+                        }
                         break;
                 }
 
@@ -186,6 +192,53 @@ namespace osu.Game.Rulesets.Objects
             }
 
             return pointsInCurrentSegment;
+        }
+
+        private void updatePathTypes()
+        {
+            // Updates each segment of the slider once
+            foreach (PathControlPoint controlPoint in ControlPoints.Where(p => p.Type.Value is PathType))
+                updatePathType(controlPoint);
+        }
+
+        private void updatePathType(PathControlPoint controlPoint)
+        {
+            List<PathControlPoint> pointsInSegment = PointsInSegment(controlPoint);
+            PathType? pathType = pointsInSegment[0].Type.Value;
+
+            // An almost linear arrangement of points results in radius approaching infinity,
+            // we should prevent that to avoid memory exhaustion when drawing / approximating
+            if (pathType == PathType.PerfectCurve)
+            {
+                Vector2[] points = pointsInSegment.Select(point => point.Position.Value).ToArray();
+                if (points.Length < 3)
+                    return;
+
+                Vector2 a = points[0];
+                Vector2 b = points[1];
+                Vector2 c = points[2];
+
+                float maxLength = points.Max(p => p.Length);
+
+                Vector2 normA = new Vector2(a.X / maxLength, a.Y / maxLength);
+                Vector2 normB = new Vector2(b.X / maxLength, b.Y / maxLength);
+                Vector2 normC = new Vector2(c.X / maxLength, c.Y / maxLength);
+
+                float det = (normA.X - normB.X) * (normB.Y - normC.Y) - (normB.X - normC.X) * (normA.Y - normB.Y);
+
+                float acSq = (a - c).LengthSquared;
+                float abSq = (a - b).LengthSquared;
+                float bcSq = (b - c).LengthSquared;
+
+                // Exterior = curve wraps around the long way between end-points
+                // Exterior bottleneck is drawing-related, interior bottleneck is approximation-related,
+                // where the latter is much faster, hence differing thresholds
+                bool exterior = abSq > acSq || bcSq > acSq;
+                float threshold = exterior ? 0.05f : 0.001f;
+
+                if (Math.Abs(det) < threshold)
+                    pointsInSegment[0].Type.Value = PathType.Bezier;
+            }
         }
 
         private void invalidate()
