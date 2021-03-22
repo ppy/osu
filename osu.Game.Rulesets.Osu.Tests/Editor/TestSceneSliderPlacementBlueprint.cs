@@ -290,6 +290,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             assertPlaced(true);
             assertControlPointCount(3);
+            assertControlPointType(0, PathType.Bezier);
             // Will be > 10000 if not falling back to Bezier path calc.
             assertLength(218.8901f);
         }
