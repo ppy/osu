@@ -197,6 +197,9 @@ namespace osu.Game.Rulesets.Objects
             return pointsInCurrentSegment;
         }
 
+        /// <summary>
+        /// Handles correction of invalid path types.
+        /// </summary>
         private void updatePathTypes()
         {
             foreach (PathControlPoint segmentStartPoint in ControlPoints.Where(p => p.Type.Value != null))
@@ -210,6 +213,13 @@ namespace osu.Game.Rulesets.Objects
             }
         }
 
+        /// <summary>
+        /// Returns whether the given points are arranged in a valid way. Invalid if points
+        /// are almost entirely linear - as this causes the radius to approach infinity,
+        /// which would exhaust memory when drawing / approximating.
+        /// </summary>
+        /// <param name="points">The three points that make up this circular arc segment.</param>
+        /// <returns></returns>
         private bool validCircularArcSegment(IReadOnlyList<Vector2> points)
         {
             Vector2 a = points[0];
