@@ -295,6 +295,25 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             assertLength(218.8901f);
         }
 
+        [Test]
+        public void TestPlacePerfectCurveSegmentAlmostLinearlyRecovery()
+        {
+            addMovementStep(new Vector2(0));
+            addClickStep(MouseButton.Left);
+
+            addMovementStep(new Vector2(61.382935f, 6.423767f));
+            addClickStep(MouseButton.Left);
+
+            addMovementStep(new Vector2(217.69522f, 22.84021f));  // Should convert to bezier
+            addMovementStep(new Vector2(210.0f, 30.0f));          // Should convert back to perfect
+            addClickStep(MouseButton.Right);
+
+            assertPlaced(true);
+            assertControlPointCount(3);
+            assertControlPointType(0, PathType.PerfectCurve);
+            assertLength(212.2276f);
+        }
+
         private void addMovementStep(Vector2 position) => AddStep($"move mouse to {position}", () => InputManager.MoveMouseTo(InputManager.ToScreenSpace(position)));
 
         private void addClickStep(MouseButton button)
