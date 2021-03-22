@@ -126,6 +126,8 @@ namespace osu.Game
 
         private Bindable<int> configSkin;
 
+        private Bindable<WindowMode> windowMode;
+
         private readonly string[] args;
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
@@ -630,6 +632,12 @@ namespace osu.Game
             }, topMostOverlayContent.Add);
 
             loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add, true);
+
+            frameworkConfig.GetBindable<WindowMode>(FrameworkSetting.WindowMode);
+            windowMode.BindValueChanged(mode => ScheduleAfterChildren(() =>
+            {
+                    windowMode.Value = WindowMode.Windowed;
+            }), true);
 
             var onScreenDisplay = new OnScreenDisplay();
 
