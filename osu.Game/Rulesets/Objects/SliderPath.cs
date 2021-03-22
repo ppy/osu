@@ -211,37 +211,31 @@ namespace osu.Game.Rulesets.Objects
 
             // An almost linear arrangement of points results in radius approaching infinity,
             // we should prevent that to avoid memory exhaustion when drawing / approximating
-            if (pathType == PathType.PerfectCurve)
-            {
-                Vector2[] points = pointsInSegment.Select(point => point.Position.Value).ToArray();
-                if (points.Length < 3)
-                    return;
+            if (pathType != PathType.PerfectCurve)
+                return;
 
-                Vector2 a = points[0];
-                Vector2 b = points[1];
-                Vector2 c = points[2];
+            Vector2[] points = pointsInSegment.Select(point => point.Position.Value).ToArray();
+            if (points.Length < 3)
+                return;
 
-                float maxLength = points.Max(p => p.Length);
+            Vector2 a = points[0];
+            Vector2 b = points[1];
+            Vector2 c = points[2];
 
-                Vector2 normA = new Vector2(a.X / maxLength, a.Y / maxLength);
-                Vector2 normB = new Vector2(b.X / maxLength, b.Y / maxLength);
-                Vector2 normC = new Vector2(c.X / maxLength, c.Y / maxLength);
+            float maxLength = points.Max(p => p.Length);
 
-                float det = (normA.X - normB.X) * (normB.Y - normC.Y) - (normB.X - normC.X) * (normA.Y - normB.Y);
+            Vector2 normA = new Vector2(a.X / maxLength, a.Y / maxLength);
+            Vector2 normB = new Vector2(b.X / maxLength, b.Y / maxLength);
+            Vector2 normC = new Vector2(c.X / maxLength, c.Y / maxLength);
 
-                float acSq = (a - c).LengthSquared;
-                float abSq = (a - b).LengthSquared;
-                float bcSq = (b - c).LengthSquared;
+            float det = (normA.X - normB.X) * (normB.Y - normC.Y) - (normB.X - normC.X) * (normA.Y - normB.Y);
 
-                // Exterior = curve wraps around the long way between end-points
-                // Exterior bottleneck is drawing-related, interior bottleneck is approximation-related,
-                // where the latter is much faster, hence differing thresholds
-                bool exterior = abSq > acSq || bcSq > acSq;
-                float threshold = exterior ? 0.05f : 0.001f;
+            float acSq = (a - c).LengthSquared;
+            float abSq = (a - b).LengthSquared;
+            float bcSq = (b - c).LengthSquared;
 
-                if (Math.Abs(det) < threshold)
-                    pointsInSegment[0].Type.Value = PathType.Bezier;
-            }
+            // Exterior = curve wraps around the long way between end-points
+            // Exterior bottleneck is drawing-related, interior bottleneck is approximation-related,
             // where the latter is much faster, hence differing thresholds
             bool exterior = abSq > acSq || bcSq > acSq;
             float threshold = exterior ? 0.05f : 0.001f;
