@@ -174,6 +174,7 @@ namespace osu.Game.Rulesets.Objects
         {
             bool found = false;
             List<PathControlPoint> pointsInCurrentSegment = new List<PathControlPoint>();
+
             foreach (PathControlPoint point in ControlPoints)
             {
                 if (point.Type.Value != null)
@@ -241,6 +242,12 @@ namespace osu.Game.Rulesets.Objects
                 if (Math.Abs(det) < threshold)
                     pointsInSegment[0].Type.Value = PathType.Bezier;
             }
+            // where the latter is much faster, hence differing thresholds
+            bool exterior = abSq > acSq || bcSq > acSq;
+            float threshold = exterior ? 0.05f : 0.001f;
+
+            if (Math.Abs(det) < threshold)
+                pointsInSegment[0].Type.Value = PathType.Bezier;
         }
 
         private void invalidate()
