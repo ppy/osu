@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
             (explosion as IFramedAnimation)?.GotoFrame(0);
 
-            explosion?.FadeInFromZero(fade_in_duration)
+            explosion?.FadeInFromZero(FADE_IN_DURATION)
                      .Then().FadeOut(120);
         }
     }
