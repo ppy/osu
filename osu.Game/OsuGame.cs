@@ -234,6 +234,9 @@ namespace osu.Game
 
             SelectedMods.BindValueChanged(modsChanged);
             Beatmap.BindValueChanged(beatmapChanged, true);
+
+            windowMode = LocalConfig.GetBindable<WindowMode>(OsuSetting.WindowSetting);
+            frameworkConfig.GetBindable<WindowMode>(FrameworkSetting.WindowMode).Value = windowMode.Value;
         }
 
         private ExternalLinkOpener externalLinkOpener;
@@ -632,12 +635,6 @@ namespace osu.Game
             }, topMostOverlayContent.Add);
 
             loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add, true);
-
-            frameworkConfig.GetBindable<WindowMode>(FrameworkSetting.WindowMode);
-            windowMode.BindValueChanged(mode => ScheduleAfterChildren(() =>
-            {
-                    windowMode.Value = WindowMode.Windowed;
-            }), true);
 
             var onScreenDisplay = new OnScreenDisplay();
 
