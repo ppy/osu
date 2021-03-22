@@ -244,7 +244,7 @@ namespace osu.Game.Rulesets.Objects
             bool exterior = abSq > acSq || bcSq > acSq;
             float threshold = exterior ? 0.05f : 0.001f;
 
-            return Math.Abs(det) < threshold;
+            return Math.Abs(det) >= threshold;
         }
 
         private void invalidate()
