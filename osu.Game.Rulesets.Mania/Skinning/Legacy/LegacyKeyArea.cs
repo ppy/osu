@@ -101,8 +101,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         {
             if (action == column.Action.Value)
             {
-                upSprite.FadeTo(1);
-                downSprite.FadeTo(0);
+                upSprite.Delay(80).FadeTo(1);
+                downSprite.Delay(80).FadeTo(0);
             }
         }
     }
