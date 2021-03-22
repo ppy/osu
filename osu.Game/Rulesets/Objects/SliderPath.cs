@@ -58,6 +58,7 @@ namespace osu.Game.Rulesets.Objects
                             c.Changed += invalidate;
                             c.Changed += updatePathTypes;
                         }
+
                         break;
 
                     case NotifyCollectionChangedAction.Reset:
@@ -67,6 +68,7 @@ namespace osu.Game.Rulesets.Objects
                             c.Changed -= invalidate;
                             c.Changed -= updatePathTypes;
                         }
+
                         break;
                 }
 
