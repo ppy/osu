@@ -31,6 +31,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private Bindable<ScalingMode> scalingMode;
         private Bindable<Size> sizeFullscreen;
+        private Bindable<WindowMode> windowMode;
 
         private readonly BindableList<Size> resolutions = new BindableList<Size>(new[] { new Size(9999, 9999) });
 
@@ -56,6 +57,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             scalingSizeY = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeY);
             scalingPositionX = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionX);
             scalingPositionY = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionY);
+            windowMode = osuConfig.GetBindable<WindowMode>(OsuSetting.WindowSetting);
 
             if (host.Window != null)
             {
@@ -141,7 +143,10 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             scalingSettings.ForEach(s => bindPreviewEvent(s.Current));
 
-            windowModeDropdown.Current.ValueChanged += _ => updateResolutionDropdown();
+            windowModeDropdown.Current.ValueChanged += mode => {
+                windowMode.Value = mode.NewValue;
+                updateResolutionDropdown();
+            };
 
             windowModes.BindCollectionChanged((sender, args) =>
             {
