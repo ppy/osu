@@ -17,6 +17,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 {
     public class LegacyHitExplosion : LegacyManiaColumnElement, IHitExplosion
     {
+        public const double FADE_IN_DURATION = 80;
+
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
         private Drawable explosion;
@@ -72,7 +74,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
 
             (explosion as IFramedAnimation)?.GotoFrame(0);
 
-            explosion?.FadeInFromZero(80)
+            explosion?.FadeInFromZero(fade_in_duration)
                      .Then().FadeOut(120);
         }
     }
