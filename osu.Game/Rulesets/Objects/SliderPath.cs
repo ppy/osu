@@ -199,23 +199,19 @@ namespace osu.Game.Rulesets.Objects
 
         private void updatePathTypes()
         {
-            // Updates each segment of the slider once
-            foreach (PathControlPoint controlPoint in ControlPoints.Where(p => p.Type.Value != null))
-                updatePathType(controlPoint);
+            foreach (PathControlPoint segmentStartPoint in ControlPoints.Where(p => p.Type.Value != null))
+            {
+                if (segmentStartPoint.Type.Value != PathType.PerfectCurve)
+                    continue;
+
+                Vector2[] points = PointsInSegment(segmentStartPoint).Select(p => p.Position.Value).ToArray();
+                if (points.Length == 3 && !validCircularArcSegment(points))
+                    segmentStartPoint.Type.Value = PathType.Bezier;
+            }
         }
 
-        private void updatePathType(PathControlPoint controlPoint)
+        private bool validCircularArcSegment(IReadOnlyList<Vector2> points)
         {
-            List<PathControlPoint> pointsInSegment = PointsInSegment(controlPoint);
-            PathType? pathType = pointsInSegment[0].Type.Value;
-
-            // An almost linear arrangement of points results in radius approaching infinity,
-            // we should prevent that to avoid memory exhaustion when drawing / approximating
-            if (pathType != PathType.PerfectCurve || pointsInSegment.Count != 3)
-                return;
-
-            Vector2[] points = pointsInSegment.Select(point => point.Position.Value).ToArray();
-
             Vector2 a = points[0];
             Vector2 b = points[1];
             Vector2 c = points[2];
@@ -238,8 +234,7 @@ namespace osu.Game.Rulesets.Objects
             bool exterior = abSq > acSq || bcSq > acSq;
             float threshold = exterior ? 0.05f : 0.001f;
 
-            if (Math.Abs(det) < threshold)
-                pointsInSegment[0].Type.Value = PathType.Bezier;
+            return Math.Abs(det) < threshold;
         }
 
         private void invalidate()
