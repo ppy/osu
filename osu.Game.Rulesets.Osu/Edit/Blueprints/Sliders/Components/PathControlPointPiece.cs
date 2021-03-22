@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -31,6 +32,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         public readonly BindableBool IsSelected = new BindableBool();
         public readonly PathControlPoint ControlPoint;
+        public readonly List<PathControlPoint> PointsInSegment;
 
         private readonly Slider slider;
         private readonly Container marker;
@@ -53,6 +55,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             this.slider = slider;
             ControlPoint = controlPoint;
+            PointsInSegment = slider.Path.PointsInSegment(controlPoint);
 
             controlPoint.Type.BindValueChanged(_ => updateMarkerDisplay());
 
@@ -150,6 +153,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         protected override bool OnClick(ClickEvent e) => RequestSelection != null;
 
         private Vector2 dragStartPosition;
+        private PathType? dragPathType;
 
         protected override bool OnDragStart(DragStartEvent e)
         {
@@ -159,6 +163,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             if (e.Button == MouseButton.Left)
             {
                 dragStartPosition = ControlPoint.Position.Value;
+                dragPathType = PointsInSegment[0].Type.Value;
+
                 changeHandler?.BeginChange();
                 return true;
             }
@@ -184,6 +190,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             }
             else
                 ControlPoint.Position.Value = dragStartPosition + (e.MousePosition - e.MouseDownPosition);
+
+            // Maintain the path type in case it got defaulted to bezier at some point during the drag.
+            if (PointsInSegment[0].Type.Value != dragPathType)
+                PointsInSegment[0].Type.Value = dragPathType;
         }
 
         protected override void OnDragEnd(DragEndEvent e) => changeHandler?.EndChange();
