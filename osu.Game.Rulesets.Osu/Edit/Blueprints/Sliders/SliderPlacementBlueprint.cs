@@ -142,6 +142,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             base.Update();
             updateSlider();
+
+            // Maintain the path type in case it got defaulted to bezier at some point during the drag.
+            updatePathType();
         }
 
         private void updatePathType()
