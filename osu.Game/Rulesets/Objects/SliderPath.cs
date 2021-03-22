@@ -176,7 +176,7 @@ namespace osu.Game.Rulesets.Objects
             List<PathControlPoint> pointsInCurrentSegment = new List<PathControlPoint>();
             foreach (PathControlPoint point in ControlPoints)
             {
-                if (point.Type.Value is PathType)
+                if (point.Type.Value != null)
                 {
                     if (!found)
                         pointsInCurrentSegment.Clear();
@@ -199,7 +199,7 @@ namespace osu.Game.Rulesets.Objects
         private void updatePathTypes()
         {
             // Updates each segment of the slider once
-            foreach (PathControlPoint controlPoint in ControlPoints.Where(p => p.Type.Value is PathType))
+            foreach (PathControlPoint controlPoint in ControlPoints.Where(p => p.Type.Value != null))
                 updatePathType(controlPoint);
         }
 
