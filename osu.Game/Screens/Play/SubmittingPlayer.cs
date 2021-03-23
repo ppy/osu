@@ -1,8 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Diagnostics;
-using System.Threading;
+using System;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Logging;
@@ -30,40 +29,70 @@ namespace osu.Game.Screens.Play
 
         protected override void LoadAsyncComplete()
         {
-            base.LoadAsyncComplete();
-
             // Token request construction should happen post-load to allow derived classes to potentially prepare DI backings that are used to create the request.
-            bool failed = false;
+            var tcs = new TaskCompletionSource<bool>();
+
+            if (!api.IsLoggedIn)
+            {
+                fail(new InvalidOperationException("API is not online."));
+                return;
+            }
 
             var req = CreateTokenRequestRequest();
-            req.Success += r => Token = r.ID;
-            req.Failure += e =>
+
+            if (req == null)
             {
-                failed = true;
+                fail(new InvalidOperationException("Request could not be constructed."));
+                return;
+            }
 
-                if (string.IsNullOrEmpty(e.Message))
-                    Logger.Error(e, "Failed to retrieve a score submission token.");
-                else
-                    Logger.Log($"You are not able to submit a score: {e.Message}", level: LogLevel.Important);
-
-                Schedule(() =>
-                {
-                    ValidForResume = false;
-                    this.Exit();
-                });
+            req.Success += r =>
+            {
+                Token = r.ID;
+                tcs.SetResult(true);
             };
+            req.Failure += fail;
 
             api.Queue(req);
 
-            while (!failed && !Token.HasValue)
-                Thread.Sleep(1000);
+            tcs.Task.Wait();
+
+            void fail(Exception exception)
+            {
+                if (HandleTokenRetrievalFailure(exception))
+                {
+                    if (string.IsNullOrEmpty(exception.Message))
+                        Logger.Error(exception, "Failed to retrieve a score submission token.");
+                    else
+                        Logger.Log($"You are not able to submit a score: {exception.Message}", level: LogLevel.Important);
+
+                    Schedule(() =>
+                    {
+                        ValidForResume = false;
+                        this.Exit();
+                    });
+                }
+
+                tcs.SetResult(false);
+            }
+
+            base.LoadAsyncComplete();
         }
+
+        /// <summary>
+        /// Called when a token could not be retrieved for submission.
+        /// </summary>
+        /// <param name="exception">The error causing the failure.</param>
+        /// <returns>Whether gameplay should be immediately exited as a result. Returning false allows the gameplay session to continue. Defaults to true.</returns>
+        protected virtual bool HandleTokenRetrievalFailure(Exception exception) => true;
 
         protected override async Task PrepareScoreForResultsAsync(Score score)
         {
             await base.PrepareScoreForResultsAsync(score).ConfigureAwait(false);
 
-            Debug.Assert(Token != null);
+            // token may be null if the request failed but gameplay was still allowed (see HandleTokenRetrievalFailure).
+            if (Token == null)
+                return;
 
             var tcs = new TaskCompletionSource<bool>();
             var request = CreateSubmissionRequest(score, Token.Value);
