@@ -91,8 +91,6 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.MenuParallax, true);
 
-            Set(OsuSetting.WindowSetting, WindowMode.Fullscreen);
-
             // Gameplay
             Set(OsuSetting.DimLevel, 0.8, 0, 1, 0.01);
             Set(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
@@ -235,7 +233,6 @@ namespace osu.Game.Configuration
         MenuVoice,
         CursorRotation,
         MenuParallax,
-        WindowSetting,
         BeatmapDetailTab,
         BeatmapDetailModsFilter,
         Username,

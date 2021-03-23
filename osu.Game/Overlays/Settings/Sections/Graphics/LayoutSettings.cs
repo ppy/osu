@@ -12,7 +12,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
-using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
@@ -32,7 +31,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private Bindable<ScalingMode> scalingMode;
         private Bindable<Size> sizeFullscreen;
-        private Bindable<WindowMode> windowMode;
 
         private readonly BindableList<Size> resolutions = new BindableList<Size>(new[] { new Size(9999, 9999) });
 
@@ -58,8 +56,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             scalingSizeY = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeY);
             scalingPositionX = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionX);
             scalingPositionY = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionY);
-            windowMode = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode);
-            Logger.Log($"windowMode {windowMode.Value}");
 
             if (host.Window != null)
             {
@@ -73,7 +69,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 {
                     LabelText = "Screen mode",
                     ItemSource = windowModes,
-                    Current = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode)
+                    Current = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode),
                 },
                 resolutionDropdown = new ResolutionSettingsDropdown
                 {
@@ -145,10 +141,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             scalingSettings.ForEach(s => bindPreviewEvent(s.Current));
 
-            windowModeDropdown.Current.ValueChanged += mode => {
-                windowMode.Value = mode.NewValue;
-                updateResolutionDropdown();
-            };
+            windowModeDropdown.Current.ValueChanged += _ => updateResolutionDropdown();
 
             windowModes.BindCollectionChanged((sender, args) =>
             {
