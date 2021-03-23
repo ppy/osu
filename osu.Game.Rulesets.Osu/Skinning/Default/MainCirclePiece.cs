@@ -74,10 +74,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
 
         private void updateState(DrawableHitObject drawableObject, ArmedState state)
         {
-            using (BeginAbsoluteSequence(drawableObject.HitStateUpdateTime, true))
-            {
+            using (BeginAbsoluteSequence(drawableObject.StateUpdateTime))
                 glow.FadeOut(400);
 
+            using (BeginAbsoluteSequence(drawableObject.HitStateUpdateTime))
+            {
                 switch (state)
                 {
                     case ArmedState.Hit:
