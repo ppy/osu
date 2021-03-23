@@ -12,6 +12,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
@@ -57,7 +58,8 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             scalingSizeY = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeY);
             scalingPositionX = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionX);
             scalingPositionY = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionY);
-            windowMode = osuConfig.GetBindable<WindowMode>(OsuSetting.WindowSetting);
+            windowMode = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode);
+            Logger.Log($"windowMode {windowMode.Value}");
 
             if (host.Window != null)
             {
@@ -71,7 +73,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 {
                     LabelText = "Screen mode",
                     ItemSource = windowModes,
-                    Current = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode),
+                    Current = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode)
                 },
                 resolutionDropdown = new ResolutionSettingsDropdown
                 {

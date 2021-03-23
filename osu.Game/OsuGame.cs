@@ -126,7 +126,7 @@ namespace osu.Game
 
         private Bindable<int> configSkin;
 
-        private Bindable<WindowMode> windowMode;
+        // private Bindable<WindowMode> windowMode;
 
         private readonly string[] args;
 
@@ -573,8 +573,8 @@ namespace osu.Game
 
             dependencies.CacheAs(idleTracker = new GameIdleTracker(6000));
 
-            windowMode = LocalConfig.GetBindable<WindowMode>(OsuSetting.WindowSetting);
-            frameworkConfig.GetBindable<WindowMode>(FrameworkSetting.WindowMode).Value = windowMode.Value;
+            // windowMode = LocalConfig.GetBindable<WindowMode>(OsuSetting.WindowSetting);
+            // frameworkConfig.GetBindable<WindowMode>(FrameworkSetting.WindowMode).Value = windowMode.Value;
 
             AddRange(new Drawable[]
             {
