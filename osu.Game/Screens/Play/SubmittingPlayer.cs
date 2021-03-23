@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Online.API;
@@ -14,17 +13,9 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Play
 {
-    public abstract class RoomSubmittingPlayer : SubmittingPlayer
-    {
-        [Resolved(typeof(Room), nameof(Room.RoomID))]
-        protected Bindable<long?> RoomId { get; private set; }
-
-        protected RoomSubmittingPlayer(PlayerConfiguration configuration)
-            : base(configuration)
-        {
-        }
-    }
-
+    /// <summary>
+    /// A player instance which supports submitting scores to an online store.
+    /// </summary>
     public abstract class SubmittingPlayer : Player
     {
         protected long? Token { get; private set; }
