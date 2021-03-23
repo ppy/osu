@@ -181,9 +181,13 @@ namespace osu.Game.Online.API
         /// <returns>Whether we are in a failed or cancelled state.</returns>
         private bool checkAndScheduleFailure()
         {
-            if (API == null || pendingFailure == null) return cancelled;
+            if (pendingFailure == null) return cancelled;
 
-            API.Schedule(pendingFailure);
+            if (API == null)
+                pendingFailure();
+            else
+                API.Schedule(pendingFailure);
+
             pendingFailure = null;
             return true;
         }
