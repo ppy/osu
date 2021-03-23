@@ -126,8 +126,6 @@ namespace osu.Game
 
         private Bindable<int> configSkin;
 
-        // private Bindable<WindowMode> windowMode;
-
         private readonly string[] args;
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
@@ -573,9 +571,6 @@ namespace osu.Game
 
             dependencies.CacheAs(idleTracker = new GameIdleTracker(6000));
 
-            // windowMode = LocalConfig.GetBindable<WindowMode>(OsuSetting.WindowSetting);
-            // frameworkConfig.GetBindable<WindowMode>(FrameworkSetting.WindowMode).Value = windowMode.Value;
-
             AddRange(new Drawable[]
             {
                 new VolumeControlReceptor
@@ -1011,6 +1006,12 @@ namespace osu.Game
 
             if (newScreen == null)
                 Exit();
+        }
+
+        protected override IDictionary<FrameworkSetting, object> GetFrameworkConfigDefaults() {
+            IDictionary<FrameworkSetting, object> defaultOverrides = new Dictionary<FrameworkSetting, object>();
+            defaultOverrides.Add(FrameworkSetting.WindowMode, WindowMode.Fullscreen);
+            return defaultOverrides;
         }
     }
 }
