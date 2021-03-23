@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Visual.Navigation
         public void TestPerformAtSongSelectFromPlayerLoader()
         {
             PushAndConfirm(() => new PlaySongSelect());
-            PushAndConfirm(() => new PlayerLoader(() => new Player()));
+            PushAndConfirm(() => new PlayerLoader(() => new SoloPlayer()));
 
             AddStep("try to perform", () => Game.PerformFromScreen(_ => actionPerformed = true, new[] { typeof(PlaySongSelect) }));
             AddUntilStep("returned to song select", () => Game.ScreenStack.CurrentScreen is PlaySongSelect);
@@ -69,7 +69,7 @@ namespace osu.Game.Tests.Visual.Navigation
         public void TestPerformAtMenuFromPlayerLoader()
         {
             PushAndConfirm(() => new PlaySongSelect());
-            PushAndConfirm(() => new PlayerLoader(() => new Player()));
+            PushAndConfirm(() => new PlayerLoader(() => new SoloPlayer()));
 
             AddStep("try to perform", () => Game.PerformFromScreen(_ => actionPerformed = true));
             AddUntilStep("returned to song select", () => Game.ScreenStack.CurrentScreen is MainMenu);
