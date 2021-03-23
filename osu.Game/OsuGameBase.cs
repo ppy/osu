@@ -120,7 +120,6 @@ namespace osu.Game
         protected Bindable<WorkingBeatmap> Beatmap { get; private set; } // cached via load() method
 
         private Bindable<bool> fpsDisplayVisible;
-        private Bindable<WindowMode> windowMode;
 
         public virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
 
@@ -362,9 +361,6 @@ namespace osu.Game
             fpsDisplayVisible = LocalConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay);
             fpsDisplayVisible.ValueChanged += visible => { FrameStatistics.Value = visible.NewValue ? FrameStatisticsMode.Minimal : FrameStatisticsMode.None; };
             fpsDisplayVisible.TriggerChange();
-
-            windowMode = LocalConfig.GetBindable<WindowMode>(OsuSetting.WindowSetting);
-            windowMode.Value = WindowMode.Fullscreen;
 
             FrameStatistics.ValueChanged += e => fpsDisplayVisible.Value = e.NewValue != FrameStatisticsMode.None;
         }
