@@ -55,7 +55,12 @@ namespace osu.Game.Online.API
 
         public virtual void Queue(APIRequest request)
         {
-            HandleRequest?.Invoke(request);
+            if (HandleRequest != null)
+                HandleRequest.Invoke(request);
+            else
+                // this will fail due to not receiving an APIAccess, and trigger a failure on the request.
+                // this is intended - any request in testing that needs non-failures should use HandleRequest.
+                request.Perform(this);
         }
 
         public void Perform(APIRequest request) => HandleRequest?.Invoke(request);
