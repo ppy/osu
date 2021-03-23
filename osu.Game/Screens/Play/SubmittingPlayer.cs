@@ -59,9 +59,9 @@ namespace osu.Game.Screens.Play
                 Thread.Sleep(1000);
         }
 
-        protected override async Task SubmitScore(Score score)
+        protected override async Task PrepareScoreForResultsAsync(Score score)
         {
-            await base.SubmitScore(score).ConfigureAwait(false);
+            await base.PrepareScoreForResultsAsync(score).ConfigureAwait(false);
 
             Debug.Assert(Token != null);
 

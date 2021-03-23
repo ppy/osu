@@ -133,9 +133,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private void onResultsReady() => resultsReady.SetResult(true);
 
-        protected override async Task SubmitScore(Score score)
+        protected override async Task PrepareScoreForResultsAsync(Score score)
         {
-            await base.SubmitScore(score).ConfigureAwait(false);
+            await base.PrepareScoreForResultsAsync(score).ConfigureAwait(false);
 
             await client.ChangeState(MultiplayerUserState.FinishedPlay).ConfigureAwait(false);
 
