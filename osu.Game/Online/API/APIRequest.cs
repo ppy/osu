@@ -131,8 +131,11 @@ namespace osu.Game.Online.API
         {
         }
 
+        private bool succeeded;
+
         internal virtual void TriggerSuccess()
         {
+            succeeded = true;
             Success?.Invoke();
         }
 
@@ -145,10 +148,7 @@ namespace osu.Game.Online.API
 
         public void Fail(Exception e)
         {
-            if (WebRequest?.Completed == true)
-                return;
-
-            if (cancelled)
+            if (succeeded || cancelled)
                 return;
 
             cancelled = true;
