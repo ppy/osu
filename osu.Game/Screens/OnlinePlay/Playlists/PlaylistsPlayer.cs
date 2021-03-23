@@ -7,7 +7,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Screens;
-using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
@@ -20,12 +19,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
     {
         public Action Exited;
 
-        protected readonly PlaylistItem PlaylistItem;
-
         public PlaylistsPlayer(PlaylistItem playlistItem, PlayerConfiguration configuration = null)
-            : base(configuration)
+            : base(playlistItem, configuration)
         {
-            PlaylistItem = playlistItem;
         }
 
         [BackgroundDependencyLoader]
@@ -41,10 +37,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             if (!PlaylistItem.RequiredMods.All(m => Mods.Value.Any(m.Equals)))
                 throw new InvalidOperationException("Current Mods do not match PlaylistItem's RequiredMods");
         }
-
-        protected override APIRequest<APIScoreToken> CreateTokenRequestRequest() => new CreateRoomScoreRequest(RoomId.Value ?? 0, PlaylistItem.ID, Game.VersionHash);
-
-        public override APIRequest<MultiplayerScore> CreateSubmissionRequest(Score score, int token) => new SubmitRoomScoreRequest(token, RoomId.Value ?? 0, PlaylistItem.ID, score.ScoreInfo);
 
         public override bool OnExiting(IScreen next)
         {
