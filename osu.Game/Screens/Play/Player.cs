@@ -559,7 +559,7 @@ namespace osu.Game.Screens.Play
         }
 
         private ScheduledDelegate completionProgressDelegate;
-        private Task<ScoreInfo> scoreSubmissionTask;
+        private Task<ScoreInfo> prepareScoreForDisplayTask;
 
         private void updateCompletionState(ValueChangedEvent<bool> completionState)
         {
@@ -586,17 +586,17 @@ namespace osu.Game.Screens.Play
 
             if (!Configuration.ShowResults) return;
 
-            scoreSubmissionTask ??= Task.Run(async () =>
+            prepareScoreForDisplayTask ??= Task.Run(async () =>
             {
                 var score = CreateScore();
 
                 try
                 {
-                    await SubmitScore(score).ConfigureAwait(false);
+                    await PrepareScoreForResultsAsync(score).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error(ex, "Score submission failed!");
+                    Logger.Error(ex, "Score preparation failed!");
                 }
 
                 try
@@ -617,7 +617,7 @@ namespace osu.Game.Screens.Play
 
         private void scheduleCompletion() => completionProgressDelegate = Schedule(() =>
         {
-            if (!scoreSubmissionTask.IsCompleted)
+            if (!prepareScoreForDisplayTask.IsCompleted)
             {
                 scheduleCompletion();
                 return;
@@ -625,7 +625,7 @@ namespace osu.Game.Screens.Play
 
             // screen may be in the exiting transition phase.
             if (this.IsCurrentScreen())
-                this.Push(CreateResults(scoreSubmissionTask.Result));
+                this.Push(CreateResults(prepareScoreForDisplayTask.Result));
         });
 
         protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !GameplayClockContainer.IsPaused.Value;
@@ -895,11 +895,11 @@ namespace osu.Game.Screens.Play
         }
 
         /// <summary>
-        /// Submits the player's <see cref="Score"/>.
+        /// Prepare the <see cref="Score"/> for display at results.
         /// </summary>
-        /// <param name="score">The <see cref="Score"/> to submit.</param>
-        /// <returns>The submitted score.</returns>
-        protected virtual Task SubmitScore(Score score) => Task.CompletedTask;
+        /// <param name="score">The <see cref="Score"/> to prepare.</param>
+        /// <returns>A task that prepares the provided score. On completion, the score is assumed to be ready for display.</returns>
+        protected virtual Task PrepareScoreForResultsAsync(Score score) => Task.CompletedTask;
 
         /// <summary>
         /// Creates the <see cref="ResultsScreen"/> for a <see cref="ScoreInfo"/>.
