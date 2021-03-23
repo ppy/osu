@@ -28,11 +28,11 @@ namespace osu.Game.Screens.Play
         {
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void LoadAsyncComplete()
         {
-            Token = null;
+            base.LoadAsyncComplete();
 
+            // Token request construction should happen post-load to allow derived classes to potentially prepare DI backings that are used to create the request.
             bool failed = false;
 
             var req = CreateTokenRequestRequest();

@@ -61,6 +61,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(ScoreProcessor, userIds), HUDOverlay.Add);
 
             HUDOverlay.Add(loadingDisplay = new LoadingLayer(true) { Depth = float.MaxValue });
+        }
+
+        protected override void LoadAsyncComplete()
+        {
+            base.LoadAsyncComplete();
 
             if (Token == null)
                 return; // Todo: Somehow handle token retrieval failure.
