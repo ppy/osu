@@ -234,9 +234,6 @@ namespace osu.Game
 
             SelectedMods.BindValueChanged(modsChanged);
             Beatmap.BindValueChanged(beatmapChanged, true);
-
-            windowMode = LocalConfig.GetBindable<WindowMode>(OsuSetting.WindowSetting);
-            frameworkConfig.GetBindable<WindowMode>(FrameworkSetting.WindowMode).Value = windowMode.Value;
         }
 
         private ExternalLinkOpener externalLinkOpener;
@@ -575,6 +572,9 @@ namespace osu.Game
             BackButton.Receptor receptor;
 
             dependencies.CacheAs(idleTracker = new GameIdleTracker(6000));
+
+            windowMode = LocalConfig.GetBindable<WindowMode>(OsuSetting.WindowSetting);
+            frameworkConfig.GetBindable<WindowMode>(FrameworkSetting.WindowMode).Value = windowMode.Value;
 
             AddRange(new Drawable[]
             {
