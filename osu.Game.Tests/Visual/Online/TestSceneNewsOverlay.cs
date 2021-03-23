@@ -33,9 +33,10 @@ namespace osu.Game.Tests.Visual.Online
                 dummyAPI.HandleRequest = request =>
                 {
                     if (!(request is GetNewsRequest getNewsRequest))
-                        return;
+                        return false;
 
                     getNewsRequest.TriggerSuccess(r);
+                    return true;
                 };
             });
 
