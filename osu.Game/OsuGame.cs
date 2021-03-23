@@ -1007,7 +1007,6 @@ namespace osu.Game
             if (newScreen == null)
                 Exit();
         }
-
         protected override IDictionary<FrameworkSetting, object> GetFrameworkConfigDefaults() {
             IDictionary<FrameworkSetting, object> defaultOverrides = new Dictionary<FrameworkSetting, object>();
             defaultOverrides.Add(FrameworkSetting.WindowMode, WindowMode.Fullscreen);
