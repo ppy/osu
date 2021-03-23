@@ -215,23 +215,23 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private bool scaleHitObjects(OsuHitObject[] hitObjects, Anchor reference, Vector2 scale)
         {
+            scale = getClampedScale(hitObjects, reference, scale);
+
             // move the selection before scaling if dragging from top or left anchors.
             float xOffset = ((reference & Anchor.x0) > 0) ? -scale.X : 0;
             float yOffset = ((reference & Anchor.y0) > 0) ? -scale.Y : 0;
 
             Quad selectionQuad = getSurroundingQuad(hitObjects);
-            Quad scaledQuad = new Quad(selectionQuad.TopLeft.X + xOffset, selectionQuad.TopLeft.Y + yOffset, selectionQuad.Width + scale.X, selectionQuad.Height + scale.Y);
-            (bool xInBounds, bool yInBounds) = isQuadInBounds(scaledQuad);
 
             foreach (var h in hitObjects)
             {
                 var newPosition = h.Position;
 
                 // guard against no-ops and NaN.
-                if (scale.X != 0 && selectionQuad.Width > 0 && xInBounds)
+                if (scale.X != 0 && selectionQuad.Width > 0)
                     newPosition.X = selectionQuad.TopLeft.X + xOffset + (h.X - selectionQuad.TopLeft.X) / selectionQuad.Width * (selectionQuad.Width + scale.X);
 
-                if (scale.Y != 0 && selectionQuad.Height > 0 && yInBounds)
+                if (scale.Y != 0 && selectionQuad.Height > 0)
                     newPosition.Y = selectionQuad.TopLeft.Y + yOffset + (h.Y - selectionQuad.TopLeft.Y) / selectionQuad.Height * (selectionQuad.Height + scale.Y);
 
                 h.Position = newPosition;
@@ -267,6 +267,43 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             foreach (var h in hitObjects)
                 h.Position += delta;
+        }
+
+        /// <summary>
+        /// Clamp scale where selection does not exceed playfield bounds or flip.
+        /// </summary>
+        /// <param name="hitObjects">The hitobjects to be scaled</param>
+        /// <param name="reference">The anchor from which the scale operation is performed</param>
+        /// <param name="scale">The scale to be clamped</param>
+        /// <returns>The clamped scale vector</returns>
+        private Vector2 getClampedScale(OsuHitObject[] hitObjects, Anchor reference, Vector2 scale)
+        {
+            float xOffset = ((reference & Anchor.x0) > 0) ? -scale.X : 0;
+            float yOffset = ((reference & Anchor.y0) > 0) ? -scale.Y : 0;
+
+            Quad selectionQuad = getSurroundingQuad(hitObjects);
+
+            //todo: this is not always correct for selections involving sliders
+            Quad scaledQuad = new Quad(selectionQuad.TopLeft.X + xOffset, selectionQuad.TopLeft.Y + yOffset, selectionQuad.Width + scale.X, selectionQuad.Height + scale.Y);
+
+            //max Size -> playfield bounds
+            if (scaledQuad.TopLeft.X < 0)
+                scale.X += scaledQuad.TopLeft.X;
+            if (scaledQuad.TopLeft.Y < 0)
+                scale.Y += scaledQuad.TopLeft.Y;
+
+            if (scaledQuad.BottomRight.X > DrawWidth)
+                scale.X -= scaledQuad.BottomRight.X - DrawWidth;
+            if (scaledQuad.BottomRight.Y > DrawHeight)
+                scale.Y -= scaledQuad.BottomRight.Y - DrawHeight;
+
+            //min Size -> almost 0. Less than 0 causes the quad to flip, exactly 0 causes scaling to get stuck at minimum scale.
+            Vector2 scaledSize = selectionQuad.Size + scale;
+            Vector2 minSize = new Vector2(Precision.FLOAT_EPSILON);
+
+            scale = Vector2.ComponentMax(minSize, scaledSize) - selectionQuad.Size;
+
+            return scale;
         }
 
         /// <summary>
