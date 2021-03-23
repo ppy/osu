@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Play
 {
     [Cached]
     [Cached(typeof(ISamplePlaybackDisabler))]
-    public class Player : ScreenWithBeatmapBackground, ISamplePlaybackDisabler
+    public abstract class Player : ScreenWithBeatmapBackground, ISamplePlaybackDisabler
     {
         /// <summary>
         /// The delay upon completion of the beatmap before displaying the results screen.
@@ -135,7 +135,7 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Create a new player instance.
         /// </summary>
-        public Player(PlayerConfiguration configuration = null)
+        protected Player(PlayerConfiguration configuration = null)
         {
             Configuration = configuration ?? new PlayerConfiguration();
         }
