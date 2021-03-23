@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        protected SubmittingPlayer(PlayerConfiguration configuration)
+        protected SubmittingPlayer(PlayerConfiguration configuration = null)
             : base(configuration)
         {
         }
