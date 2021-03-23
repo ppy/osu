@@ -19,7 +19,6 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    // Todo: The "room" part of PlaylistsPlayer should be split out into an abstract player class to be inherited instead.
     public class MultiplayerPlayer : PlaylistsPlayer
     {
         protected override bool PauseOnFocusLost => false;
