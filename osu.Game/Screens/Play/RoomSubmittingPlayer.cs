@@ -27,6 +27,6 @@ namespace osu.Game.Screens.Play
 
         protected override APIRequest<APIScoreToken> CreateTokenRequestRequest() => new CreateRoomScoreRequest(RoomId.Value ?? 0, PlaylistItem.ID, Game.VersionHash);
 
-        public override APIRequest<MultiplayerScore> CreateSubmissionRequest(Score score, int token) => new SubmitRoomScoreRequest(token, RoomId.Value ?? 0, PlaylistItem.ID, score.ScoreInfo);
+        protected override APIRequest<MultiplayerScore> CreateSubmissionRequest(Score score, long token) => new SubmitRoomScoreRequest(token, RoomId.Value ?? 0, PlaylistItem.ID, score.ScoreInfo);
     }
 }
