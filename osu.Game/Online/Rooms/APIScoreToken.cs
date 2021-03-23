@@ -8,6 +8,6 @@ namespace osu.Game.Online.Rooms
     public class APIScoreToken
     {
         [JsonProperty("id")]
-        public int ID { get; set; }
+        public long ID { get; set; }
     }
 }
