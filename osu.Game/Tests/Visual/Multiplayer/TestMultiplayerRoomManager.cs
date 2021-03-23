@@ -52,15 +52,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                         Rooms.Add(createdRoom);
                         createRoomRequest.TriggerSuccess(createdRoom);
-                        break;
+                        return true;
 
                     case JoinRoomRequest joinRoomRequest:
                         joinRoomRequest.TriggerSuccess();
-                        break;
+                        return true;
 
                     case PartRoomRequest partRoomRequest:
                         partRoomRequest.TriggerSuccess();
-                        break;
+                        return true;
 
                     case GetRoomsRequest getRoomsRequest:
                         var roomsWithoutParticipants = new List<Room>();
@@ -76,11 +76,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         }
 
                         getRoomsRequest.TriggerSuccess(roomsWithoutParticipants);
-                        break;
+                        return true;
 
                     case GetRoomRequest getRoomRequest:
                         getRoomRequest.TriggerSuccess(Rooms.Single(r => r.RoomID.Value == getRoomRequest.RoomId));
-                        break;
+                        return true;
 
                     case GetBeatmapSetRequest getBeatmapSetRequest:
                         var onlineReq = new GetBeatmapSetRequest(getBeatmapSetRequest.ID, getBeatmapSetRequest.Type);
@@ -89,11 +89,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                         // Get the online API from the game's dependencies.
                         game.Dependencies.Get<IAPIProvider>().Queue(onlineReq);
-                        break;
+                        return true;
 
                     case CreateRoomScoreRequest createRoomScoreRequest:
                         createRoomScoreRequest.TriggerSuccess(new APIScoreToken { ID = 1 });
-                        break;
+                        return true;
 
                     case SubmitRoomScoreRequest submitRoomScoreRequest:
                         submitRoomScoreRequest.TriggerSuccess(new MultiplayerScore
@@ -108,8 +108,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             User = api.LocalUser.Value,
                             Statistics = new Dictionary<HitResult, int>()
                         });
-                        break;
+                        return true;
                 }
+
+                return false;
             };
         }
 
