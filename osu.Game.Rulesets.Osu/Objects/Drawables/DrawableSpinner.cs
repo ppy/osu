@@ -133,15 +133,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (tracking.NewValue)
             {
                 if (!spinningSample.IsPlaying)
-                    spinningSample?.Play();
-                spinningSample?.VolumeTo(1, 300);
+                    spinningSample.Play();
+
+                spinningSample.VolumeTo(1, 300);
             }
             else
             {
-                if (spinningSample != null)
-                    spinningSample.Volume.Value = 0;
-
-                spinningSample?.VolumeTo(0, fade_out_duration);
+                spinningSample.VolumeTo(0, fade_out_duration);
             }
         }
 
