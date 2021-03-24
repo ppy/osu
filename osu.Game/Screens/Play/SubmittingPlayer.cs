@@ -17,6 +17,9 @@ namespace osu.Game.Screens.Play
     /// </summary>
     public abstract class SubmittingPlayer : Player
     {
+        /// <summary>
+        /// The token to be used for the current submission. This is fetched via a request created by <see cref="CreateTokenRequestRequest"/>.
+        /// </summary>
         protected long? Token { get; private set; }
 
         [Resolved]
