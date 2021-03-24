@@ -191,7 +191,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             // Exterior bottleneck is drawing-related, interior bottleneck is approximation-related,
             // where the latter is much faster, hence differing thresholds
             bool exterior = abSq > acSq || bcSq > acSq;
-            float threshold = exterior ? 0.05f : 0.001f;
+            float threshold = exterior ? 0.35f : 0.001f;
 
             return Math.Abs(det) >= threshold;
         }
