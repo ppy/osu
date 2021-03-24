@@ -337,13 +337,17 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [Test]
         public void TestPlacePerfectCurveSegmentLarge()
         {
-            addMovementStep(new Vector2(200));
+            Vector2 startPosition = new Vector2(400);
+
+            addMovementStep(startPosition);
             addClickStep(MouseButton.Left);
 
-            addMovementStep(new Vector2(200, 800));
+            addMovementStep(startPosition + new Vector2(240, 240));
             addClickStep(MouseButton.Left);
 
-            addMovementStep(new Vector2(600, 200));
+            // Playfield dimensions are 640 x 480.
+            // So a 480 * 480 bounding box area should be ok.
+            addMovementStep(startPosition + new Vector2(-240, 240));
             addClickStep(MouseButton.Right);
 
             assertPlaced(true);
@@ -354,13 +358,17 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [Test]
         public void TestPlacePerfectCurveSegmentTooLarge()
         {
-            addMovementStep(new Vector2(200));
+            Vector2 startPosition = new Vector2(480, 200);
+
+            addMovementStep(startPosition);
             addClickStep(MouseButton.Left);
 
-            addMovementStep(new Vector2(200, 800));
+            addMovementStep(startPosition + new Vector2(400, 400));
             addClickStep(MouseButton.Left);
 
-            addMovementStep(new Vector2(400, 200));
+            // Playfield dimensions are 640 x 480.
+            // So an 800 * 800 bounding box area should not be ok.
+            addMovementStep(startPosition + new Vector2(-400, 400));
             addClickStep(MouseButton.Right);
 
             assertPlaced(true);
