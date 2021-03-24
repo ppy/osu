@@ -25,7 +25,13 @@ namespace osu.Game.Screens.Play
             PlaylistItem = playlistItem;
         }
 
-        protected override APIRequest<APIScoreToken> CreateTokenRequest() => new CreateRoomScoreRequest(RoomId.Value ?? 0, PlaylistItem.ID, Game.VersionHash);
+        protected override APIRequest<APIScoreToken> CreateTokenRequest()
+        {
+            if (!(RoomId.Value is long roomId))
+                return null;
+
+            return new CreateRoomScoreRequest(roomId, PlaylistItem.ID, Game.VersionHash);
+        }
 
         protected override APIRequest<MultiplayerScore> CreateSubmissionRequest(Score score, long token) => new SubmitRoomScoreRequest(token, RoomId.Value ?? 0, PlaylistItem.ID, score.ScoreInfo);
     }
