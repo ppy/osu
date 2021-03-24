@@ -195,8 +195,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 ControlPoint.Position.Value = dragStartPosition + (e.MousePosition - e.MouseDownPosition);
 
             // Maintain the path type in case it got defaulted to bezier at some point during the drag.
-            if (PointsInSegment[0].Type.Value != dragPathType)
-                PointsInSegment[0].Type.Value = dragPathType;
+            PointsInSegment[0].Type.Value = dragPathType;
         }
 
         protected override void OnDragEnd(DragEndEvent e) => changeHandler?.EndChange();
