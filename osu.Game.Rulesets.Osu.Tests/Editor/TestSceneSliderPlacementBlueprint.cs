@@ -334,6 +334,40 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             assertControlPointType(0, PathType.PerfectCurve);
         }
 
+        [Test]
+        public void TestPlacePerfectCurveSegmentLarge()
+        {
+            addMovementStep(new Vector2(200));
+            addClickStep(MouseButton.Left);
+
+            addMovementStep(new Vector2(200, 800));
+            addClickStep(MouseButton.Left);
+
+            addMovementStep(new Vector2(600, 200));
+            addClickStep(MouseButton.Right);
+
+            assertPlaced(true);
+            assertControlPointCount(3);
+            assertControlPointType(0, PathType.PerfectCurve);
+        }
+
+        [Test]
+        public void TestPlacePerfectCurveSegmentTooLarge()
+        {
+            addMovementStep(new Vector2(200));
+            addClickStep(MouseButton.Left);
+
+            addMovementStep(new Vector2(200, 800));
+            addClickStep(MouseButton.Left);
+
+            addMovementStep(new Vector2(400, 200));
+            addClickStep(MouseButton.Right);
+
+            assertPlaced(true);
+            assertControlPointCount(3);
+            assertControlPointType(0, PathType.Bezier);
+        }
+
         private void addMovementStep(Vector2 position) => AddStep($"move mouse to {position}", () => InputManager.MoveMouseTo(InputManager.ToScreenSpace(position)));
 
         private void addClickStep(MouseButton button)
