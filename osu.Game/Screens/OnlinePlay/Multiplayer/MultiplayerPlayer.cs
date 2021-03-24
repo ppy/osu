@@ -67,8 +67,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             base.LoadAsyncComplete();
 
-            if (Token == null)
-                return; // Todo: Somehow handle token retrieval failure.
+            if (!ValidForResume)
+                return; // token retrieval may have failed.
 
             client.MatchStarted += onMatchStarted;
             client.ResultsReady += onResultsReady;

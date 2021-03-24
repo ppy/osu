@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// The token to be used for the current submission. This is fetched via a request created by <see cref="CreateTokenRequest"/>.
         /// </summary>
-        protected long? Token { get; private set; }
+        private long? token;
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Play
 
             if (!api.IsLoggedIn)
             {
-                handleFailure(new InvalidOperationException("API is not online."));
+                handleTokenFailure(new InvalidOperationException("API is not online."));
                 return;
             }
 
@@ -46,22 +46,24 @@ namespace osu.Game.Screens.Play
 
             if (req == null)
             {
-                handleFailure(new InvalidOperationException("Request could not be constructed."));
+                handleTokenFailure(new InvalidOperationException("Request could not be constructed."));
                 return;
             }
 
             req.Success += r =>
             {
-                Token = r.ID;
+                token = r.ID;
                 tcs.SetResult(true);
             };
-            req.Failure += handleFailure;
+            req.Failure += handleTokenFailure;
 
             api.Queue(req);
 
             tcs.Task.Wait();
 
-            void handleFailure(Exception exception)
+            base.LoadAsyncComplete();
+
+            void handleTokenFailure(Exception exception)
             {
                 if (HandleTokenRetrievalFailure(exception))
                 {
@@ -79,8 +81,6 @@ namespace osu.Game.Screens.Play
 
                 tcs.SetResult(false);
             }
-
-            base.LoadAsyncComplete();
         }
 
         /// <summary>
@@ -95,11 +95,11 @@ namespace osu.Game.Screens.Play
             await base.PrepareScoreForResultsAsync(score).ConfigureAwait(false);
 
             // token may be null if the request failed but gameplay was still allowed (see HandleTokenRetrievalFailure).
-            if (Token == null)
+            if (token == null)
                 return;
 
             var tcs = new TaskCompletionSource<bool>();
-            var request = CreateSubmissionRequest(score, Token.Value);
+            var request = CreateSubmissionRequest(score, token.Value);
 
             request.Success += s =>
             {
