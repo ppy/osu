@@ -279,13 +279,15 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [Test]
         public void TestPlacePerfectCurveSegmentAlmostLinearly()
         {
-            addMovementStep(new Vector2(0));
+            Vector2 startPosition = new Vector2(200);
+
+            addMovementStep(startPosition);
             addClickStep(MouseButton.Left);
 
-            addMovementStep(new Vector2(61.382935f, 6.423767f));
+            addMovementStep(startPosition + new Vector2(300, 0));
             addClickStep(MouseButton.Left);
 
-            addMovementStep(new Vector2(217.69522f, 22.84021f));
+            addMovementStep(startPosition + new Vector2(150, 0.1f));
             addClickStep(MouseButton.Right);
 
             assertPlaced(true);
@@ -296,14 +298,16 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         [Test]
         public void TestPlacePerfectCurveSegmentAlmostLinearlyRecovery()
         {
-            addMovementStep(new Vector2(0));
+            Vector2 startPosition = new Vector2(200);
+
+            addMovementStep(startPosition);
             addClickStep(MouseButton.Left);
 
-            addMovementStep(new Vector2(61.382935f, 6.423767f));
+            addMovementStep(startPosition + new Vector2(61.382935f, 6.423767f));
             addClickStep(MouseButton.Left);
 
-            addMovementStep(new Vector2(217.69522f, 22.84021f)); // Should convert to bezier
-            addMovementStep(new Vector2(210.0f, 30.0f)); // Should convert back to perfect
+            addMovementStep(startPosition + new Vector2(217.69522f, 22.84021f)); // Should convert to bezier
+            addMovementStep(startPosition + new Vector2(210.0f, 0.0f)); // Should convert back to perfect
             addClickStep(MouseButton.Right);
 
             assertPlaced(true);
