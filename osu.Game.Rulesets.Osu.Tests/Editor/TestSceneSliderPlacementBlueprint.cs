@@ -296,7 +296,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         }
 
         [Test]
-        public void TestPlacePerfectCurveSegmentAlmostLinearlyRecovery()
+        public void TestPlacePerfectCurveSegmentRecovery()
         {
             Vector2 startPosition = new Vector2(200);
 
