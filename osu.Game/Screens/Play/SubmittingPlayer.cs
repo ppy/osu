@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Play
     public abstract class SubmittingPlayer : Player
     {
         /// <summary>
-        /// The token to be used for the current submission. This is fetched via a request created by <see cref="CreateTokenRequestRequest"/>.
+        /// The token to be used for the current submission. This is fetched via a request created by <see cref="CreateTokenRequest"/>.
         /// </summary>
         protected long? Token { get; private set; }
 
@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            var req = CreateTokenRequestRequest();
+            var req = CreateTokenRequest();
 
             if (req == null)
             {
@@ -118,6 +118,6 @@ namespace osu.Game.Screens.Play
 
         protected abstract APIRequest<MultiplayerScore> CreateSubmissionRequest(Score score, long token);
 
-        protected abstract APIRequest<APIScoreToken> CreateTokenRequestRequest();
+        protected abstract APIRequest<APIScoreToken> CreateTokenRequest();
     }
 }

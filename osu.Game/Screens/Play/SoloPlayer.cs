@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Play
             return new SubmitSoloScoreRequest(beatmapId, token, score.ScoreInfo);
         }
 
-        protected override APIRequest<APIScoreToken> CreateTokenRequestRequest()
+        protected override APIRequest<APIScoreToken> CreateTokenRequest()
         {
             if (!(Beatmap.Value.BeatmapInfo.OnlineBeatmapID is int beatmapId))
                 return null;
