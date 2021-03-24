@@ -51,8 +51,12 @@ namespace osu.Game.Tournament
                 Margin = new MarginPadding(40),
             });
 
-            var m = (MouseHandler)host.AvailableInputHandlers.Single(t => t is MouseHandler);
-            m.UseRelativeMode.Value = false;
+            // in order to have the OS mouse cursor visible, relative mode needs to be disabled.
+            // can potentially be removed when https://github.com/ppy/osu-framework/issues/4309 is resolved.
+            var mouseHandler = host.AvailableInputHandlers.OfType<MouseHandler>().FirstOrDefault();
+
+            if (mouseHandler != null)
+                mouseHandler.UseRelativeMode.Value = false;
 
             loadingSpinner.Show();
 
