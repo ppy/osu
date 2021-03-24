@@ -1,11 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Handlers.Mouse;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
@@ -14,45 +14,44 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 {
     public class MouseSettings : SettingsSubsection
     {
+        private readonly MouseHandler mouseHandler;
+
         protected override string Header => "Mouse";
 
-        private readonly BindableBool rawInputToggle = new BindableBool();
-
-        private Bindable<double> configSensitivity;
+        private Bindable<double> handlerSensitivity;
 
         private Bindable<double> localSensitivity;
 
-        private Bindable<string> ignoredInputHandlers;
-
         private Bindable<WindowMode> windowMode;
         private SettingsEnumDropdown<OsuConfineMouseMode> confineMouseModeSetting;
+        private Bindable<bool> relativeMode;
+
+        public MouseSettings(MouseHandler mouseHandler)
+        {
+            this.mouseHandler = mouseHandler;
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager osuConfig, FrameworkConfigManager config)
         {
             // use local bindable to avoid changing enabled state of game host's bindable.
-            configSensitivity = config.GetBindable<double>(FrameworkSetting.CursorSensitivity);
-            localSensitivity = configSensitivity.GetUnboundCopy();
+            handlerSensitivity = mouseHandler.Sensitivity.GetBoundCopy();
+            localSensitivity = handlerSensitivity.GetUnboundCopy();
 
+            relativeMode = mouseHandler.UseRelativeMode.GetBoundCopy();
             windowMode = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode);
-            ignoredInputHandlers = config.GetBindable<string>(FrameworkSetting.IgnoredInputHandlers);
 
             Children = new Drawable[]
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "Raw input",
-                    Current = rawInputToggle
+                    LabelText = "High precision mouse",
+                    Current = relativeMode
                 },
                 new SensitivitySetting
                 {
                     LabelText = "Cursor sensitivity",
                     Current = localSensitivity
-                },
-                new SettingsCheckbox
-                {
-                    LabelText = "Map absolute input to window",
-                    Current = config.GetBindable<bool>(FrameworkSetting.MapAbsoluteInputToWindow)
                 },
                 confineMouseModeSetting = new SettingsEnumDropdown<OsuConfineMouseMode>
                 {
@@ -76,7 +75,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             base.LoadComplete();
 
-            configSensitivity.BindValueChanged(val =>
+            relativeMode.BindValueChanged(relative => localSensitivity.Disabled = !relative.NewValue, true);
+
+            handlerSensitivity.BindValueChanged(val =>
             {
                 var disabled = localSensitivity.Disabled;
 
@@ -85,7 +86,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 localSensitivity.Disabled = disabled;
             }, true);
 
-            localSensitivity.BindValueChanged(val => configSensitivity.Value = val.NewValue);
+            localSensitivity.BindValueChanged(val => handlerSensitivity.Value = val.NewValue);
 
             windowMode.BindValueChanged(mode =>
             {
@@ -102,32 +103,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     confineMouseModeSetting.TooltipText = string.Empty;
                 }
             }, true);
-
-            if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows)
-            {
-                rawInputToggle.Disabled = true;
-                localSensitivity.Disabled = true;
-            }
-            else
-            {
-                rawInputToggle.ValueChanged += enabled =>
-                {
-                    // this is temporary until we support per-handler settings.
-                    const string raw_mouse_handler = @"OsuTKRawMouseHandler";
-                    const string standard_mouse_handlers = @"OsuTKMouseHandler MouseHandler";
-
-                    ignoredInputHandlers.Value = enabled.NewValue ? standard_mouse_handlers : raw_mouse_handler;
-                };
-
-                ignoredInputHandlers.ValueChanged += handler =>
-                {
-                    bool raw = !handler.NewValue.Contains("Raw");
-                    rawInputToggle.Value = raw;
-                    localSensitivity.Disabled = !raw;
-                };
-
-                ignoredInputHandlers.TriggerChange();
-            }
         }
 
         private class SensitivitySetting : SettingsSlider<double, SensitivitySlider>
@@ -141,7 +116,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private class SensitivitySlider : OsuSliderBar<double>
         {
-            public override string TooltipText => Current.Disabled ? "enable raw input to adjust sensitivity" : $"{base.TooltipText}x";
+            public override string TooltipText => Current.Disabled ? "enable high precision mouse to adjust sensitivity" : $"{base.TooltipText}x";
         }
     }
 }

@@ -50,7 +50,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
                 storage.DeleteDirectory(string.Empty);
 
                 using (var storageConfig = new TournamentStorageManager(storage))
-                    storageConfig.Set(StorageConfig.CurrentTournament, custom_tournament);
+                    storageConfig.SetValue(StorageConfig.CurrentTournament, custom_tournament);
 
                 try
                 {
