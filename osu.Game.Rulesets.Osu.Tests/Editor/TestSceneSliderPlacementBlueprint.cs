@@ -284,6 +284,25 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             addMovementStep(startPosition);
             addClickStep(MouseButton.Left);
 
+            addMovementStep(startPosition + new Vector2(61.382935f, 6.423767f));
+            addClickStep(MouseButton.Left);
+
+            addMovementStep(startPosition + new Vector2(217.69522f, 22.84021f));
+            addClickStep(MouseButton.Right);
+
+            assertPlaced(true);
+            assertControlPointCount(3);
+            assertControlPointType(0, PathType.Bezier);
+        }
+
+        [Test]
+        public void TestPlacePerfectCurveSegmentAlmostLinearlyExterior()
+        {
+            Vector2 startPosition = new Vector2(200);
+
+            addMovementStep(startPosition);
+            addClickStep(MouseButton.Left);
+
             addMovementStep(startPosition + new Vector2(300, 0));
             addClickStep(MouseButton.Left);
 
