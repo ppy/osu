@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Comments
                 {
                     new SpriteIcon
                     {
-                        Icon = FontAwesome.Solid.Trash,
+                        Icon = FontAwesome.Regular.TrashAlt,
                         Size = new Vector2(14),
                     },
                     countText = new OsuSpriteText

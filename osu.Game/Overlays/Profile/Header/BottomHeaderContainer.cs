@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
@@ -113,7 +114,12 @@ namespace osu.Game.Overlays.Profile.Header
             }
 
             topLinkContainer.AddText("发表了");
-            topLinkContainer.AddLink($@"{user.PostCount:#,##0} 篇论坛帖子", $"{api.WebsiteRootUrl}/users/{user.Id}/posts", creationParameters: embolden);
+            topLinkContainer.AddLink($"{user.PostCount:#,##0} 篇论坛帖子", $"{api.WebsiteRootUrl}/users/{user.Id}/posts", creationParameters: embolden);
+
+            addSpacer(topLinkContainer);
+
+            topLinkContainer.AddText("发表了");
+            topLinkContainer.AddLink($"{user.CommentsCount:#,##0} 条评论", $"{api.WebsiteRootUrl}/comments?user_id={user.Id}", creationParameters: embolden);
 
             string websiteWithoutProtocol = user.Website;
 
