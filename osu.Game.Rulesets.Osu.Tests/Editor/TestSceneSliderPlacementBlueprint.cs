@@ -376,6 +376,23 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             assertControlPointType(0, PathType.Bezier);
         }
 
+        [Test]
+        public void TestPlacePerfectCurveSegmentCompleteArc()
+        {
+            addMovementStep(new Vector2(400));
+            addClickStep(MouseButton.Left);
+
+            addMovementStep(new Vector2(600, 400));
+            addClickStep(MouseButton.Left);
+
+            addMovementStep(new Vector2(400, 410));
+            addClickStep(MouseButton.Right);
+
+            assertPlaced(true);
+            assertControlPointCount(3);
+            assertControlPointType(0, PathType.PerfectCurve);
+        }
+
         private void addMovementStep(Vector2 position) => AddStep($"move mouse to {position}", () => InputManager.MoveMouseTo(InputManager.ToScreenSpace(position)));
 
         private void addClickStep(MouseButton button)
