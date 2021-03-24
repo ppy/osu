@@ -13,9 +13,6 @@ namespace osu.Game.Screens.Edit.Setup
 {
     internal class DifficultySection : SetupSection
     {
-        [Resolved]
-        private EditorBeatmap editorBeatmap { get; set; }
-
         private LabelledSliderBar<float> circleSizeSlider;
         private LabelledSliderBar<float> healthDrainSlider;
         private LabelledSliderBar<float> approachRateSlider;
@@ -34,7 +31,7 @@ namespace osu.Game.Screens.Edit.Setup
                 {
                     Label = "Object Size",
                     Description = "The size of all hit objects",
-                    Current = new BindableFloat(Beatmap.Value.BeatmapInfo.BaseDifficulty.CircleSize)
+                    Current = new BindableFloat(Beatmap.BeatmapInfo.BaseDifficulty.CircleSize)
                     {
                         Default = BeatmapDifficulty.DEFAULT_DIFFICULTY,
                         MinValue = 0,
@@ -46,7 +43,7 @@ namespace osu.Game.Screens.Edit.Setup
                 {
                     Label = "Health Drain",
                     Description = "The rate of passive health drain throughout playable time",
-                    Current = new BindableFloat(Beatmap.Value.BeatmapInfo.BaseDifficulty.DrainRate)
+                    Current = new BindableFloat(Beatmap.BeatmapInfo.BaseDifficulty.DrainRate)
                     {
                         Default = BeatmapDifficulty.DEFAULT_DIFFICULTY,
                         MinValue = 0,
@@ -58,7 +55,7 @@ namespace osu.Game.Screens.Edit.Setup
                 {
                     Label = "Approach Rate",
                     Description = "The speed at which objects are presented to the player",
-                    Current = new BindableFloat(Beatmap.Value.BeatmapInfo.BaseDifficulty.ApproachRate)
+                    Current = new BindableFloat(Beatmap.BeatmapInfo.BaseDifficulty.ApproachRate)
                     {
                         Default = BeatmapDifficulty.DEFAULT_DIFFICULTY,
                         MinValue = 0,
@@ -70,7 +67,7 @@ namespace osu.Game.Screens.Edit.Setup
                 {
                     Label = "Overall Difficulty",
                     Description = "The harshness of hit windows and difficulty of special objects (ie. spinners)",
-                    Current = new BindableFloat(Beatmap.Value.BeatmapInfo.BaseDifficulty.OverallDifficulty)
+                    Current = new BindableFloat(Beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty)
                     {
                         Default = BeatmapDifficulty.DEFAULT_DIFFICULTY,
                         MinValue = 0,
@@ -88,12 +85,12 @@ namespace osu.Game.Screens.Edit.Setup
         {
             // for now, update these on commit rather than making BeatmapMetadata bindables.
             // after switching database engines we can reconsider if switching to bindables is a good direction.
-            Beatmap.Value.BeatmapInfo.BaseDifficulty.CircleSize = circleSizeSlider.Current.Value;
-            Beatmap.Value.BeatmapInfo.BaseDifficulty.DrainRate = healthDrainSlider.Current.Value;
-            Beatmap.Value.BeatmapInfo.BaseDifficulty.ApproachRate = approachRateSlider.Current.Value;
-            Beatmap.Value.BeatmapInfo.BaseDifficulty.OverallDifficulty = overallDifficultySlider.Current.Value;
+            Beatmap.BeatmapInfo.BaseDifficulty.CircleSize = circleSizeSlider.Current.Value;
+            Beatmap.BeatmapInfo.BaseDifficulty.DrainRate = healthDrainSlider.Current.Value;
+            Beatmap.BeatmapInfo.BaseDifficulty.ApproachRate = approachRateSlider.Current.Value;
+            Beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty = overallDifficultySlider.Current.Value;
 
-            editorBeatmap.UpdateAllHitObjects();
+            Beatmap.UpdateAllHitObjects();
         }
     }
 }

@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.UI
         protected IRulesetConfigManager Config { get; private set; }
 
         [Cached(typeof(IReadOnlyList<Mod>))]
-        protected override IReadOnlyList<Mod> Mods { get; }
+        public sealed override IReadOnlyList<Mod> Mods { get; }
 
         private FrameStabilityContainer frameStabilityContainer;
 
@@ -434,7 +434,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The mods which are to be applied.
         /// </summary>
-        protected abstract IReadOnlyList<Mod> Mods { get; }
+        public abstract IReadOnlyList<Mod> Mods { get; }
 
         /// <summary>~
         /// The associated ruleset.

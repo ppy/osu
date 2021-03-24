@@ -18,7 +18,8 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 multiplierSlider = new SliderWithTextBoxInput<double>("Speed Multiplier")
                 {
-                    Current = new DifficultyControlPoint().SpeedMultiplierBindable
+                    Current = new DifficultyControlPoint().SpeedMultiplierBindable,
+                    KeyboardStep = 0.1f
                 }
             });
         }
@@ -34,7 +35,7 @@ namespace osu.Game.Screens.Edit.Timing
 
         protected override DifficultyControlPoint CreatePoint()
         {
-            var reference = Beatmap.Value.Beatmap.ControlPointInfo.DifficultyPointAt(SelectedGroup.Value.Time);
+            var reference = Beatmap.ControlPointInfo.DifficultyPointAt(SelectedGroup.Value.Time);
 
             return new DifficultyControlPoint
             {

@@ -128,7 +128,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
                                                 AutoSizeAxes = Axes.Y,
                                                 Padding = new MarginPadding { Horizontal = 50 }
                                             },
-                                            loading = new LoadingLayer(itemsPlaceholder)
+                                            loading = new LoadingLayer(true)
                                         }
                                     }
                                 }
@@ -244,7 +244,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
                     return unsorted.OrderByDescending(u => u.LastVisit).ToList();
 
                 case UserSortCriteria.Rank:
-                    return unsorted.OrderByDescending(u => u.CurrentModeRank.HasValue).ThenBy(u => u.CurrentModeRank ?? 0).ToList();
+                    return unsorted.OrderByDescending(u => u.Statistics.GlobalRank.HasValue).ThenBy(u => u.Statistics.GlobalRank ?? 0).ToList();
 
                 case UserSortCriteria.Username:
                     return unsorted.OrderBy(u => u.Username).ToList();

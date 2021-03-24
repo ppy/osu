@@ -39,6 +39,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Bindable<bool> isSpinning;
         private bool spinnerFrequencyModulate;
 
+        private const double fade_out_duration = 160;
+
         public DrawableSpinner()
             : this(null)
         {
@@ -130,12 +132,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             if (tracking.NewValue)
             {
-                spinningSample?.Play();
-                spinningSample?.VolumeTo(1, 200);
+                if (!spinningSample.IsPlaying)
+                    spinningSample.Play();
+
+                spinningSample.VolumeTo(1, 300);
             }
             else
             {
-                spinningSample?.VolumeTo(0, 200).Finally(_ => spinningSample.Stop());
+                spinningSample.VolumeTo(0, fade_out_duration);
             }
         }
 
@@ -157,11 +161,29 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
+        protected override void UpdateStartTimeStateTransforms()
+        {
+            base.UpdateStartTimeStateTransforms();
+
+            if (Result?.TimeStarted is double startTime)
+            {
+                using (BeginAbsoluteSequence(startTime))
+                    fadeInCounter();
+            }
+        }
+
         protected override void UpdateHitStateTransforms(ArmedState state)
         {
             base.UpdateHitStateTransforms(state);
 
-            this.FadeOut(160).Expire();
+            this.FadeOut(fade_out_duration).OnComplete(_ =>
+            {
+                // looping sample should be stopped here as it is safer than running in the OnComplete
+                // of the volume transition above.
+                spinningSample.Stop();
+            });
+
+            Expire();
 
             // skin change does a rewind of transforms, which will stop the spinning sound from playing if it's currently in playback.
             isSpinning?.TriggerChange();
@@ -243,7 +265,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.Update();
 
             if (HandleUserInput)
-                RotationTracker.Tracking = !Result.HasResult && (OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false);
+            {
+                bool isValidSpinningTime = Time.Current >= HitObject.StartTime && Time.Current <= HitObject.EndTime;
+                bool correctButtonPressed = (OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false);
+
+                RotationTracker.Tracking = !Result.HasResult
+                                           && correctButtonPressed
+                                           && isValidSpinningTime;
+            }
 
             if (spinningSample != null && spinnerFrequencyModulate)
                 spinningSample.Frequency.Value = spinning_sample_modulated_base_frequency + Progress;
@@ -254,11 +283,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.UpdateAfterChildren();
 
             if (!SpmCounter.IsPresent && RotationTracker.Tracking)
-                SpmCounter.FadeIn(HitObject.TimeFadeIn);
-            SpmCounter.SetRotation(Result.RateAdjustedRotation);
+            {
+                Result.TimeStarted ??= Time.Current;
+                fadeInCounter();
+            }
+
+            // don't update after end time to avoid the rate display dropping during fade out.
+            // this shouldn't be limited to StartTime as it causes weirdness with the underlying calculation, which is expecting updates during that period.
+            if (Time.Current <= HitObject.EndTime)
+                SpmCounter.SetRotation(Result.RateAdjustedRotation);
 
             updateBonusScore();
         }
+
+        private void fadeInCounter() => SpmCounter.FadeIn(HitObject.TimeFadeIn);
 
         private int wholeSpins;
 

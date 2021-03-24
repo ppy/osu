@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Menu
         public Action OnSolo;
         public Action OnSettings;
         public Action OnMultiplayer;
-        public Action OnTimeshift;
+        public Action OnPlaylists;
 
         public const float BUTTON_WIDTH = 140f;
         public const float WEDGE_WIDTH = 20;
@@ -81,7 +81,7 @@ namespace osu.Game.Screens.Menu
         private readonly List<Button> buttonsTopLevel = new List<Button>();
         private readonly List<Button> buttonsPlay = new List<Button>();
 
-        private SampleChannel sampleBack;
+        private Sample sampleBack;
 
         private readonly LogoTrackingContainer logoTrackingContainer;
 
@@ -125,12 +125,12 @@ namespace osu.Game.Screens.Menu
         {
             buttonsPlay.Add(new Button(@"solo", @"button-solo-select", FontAwesome.Solid.User, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
             buttonsPlay.Add(new Button(@"multi", @"button-generic-select", FontAwesome.Solid.Users, new Color4(94, 63, 186, 255), onMultiplayer, 0, Key.M));
-            buttonsPlay.Add(new Button(@"timeshift", @"button-generic-select", OsuIcon.Charts, new Color4(94, 63, 186, 255), onTimeshift, 0, Key.L));
+            buttonsPlay.Add(new Button(@"playlists", @"button-generic-select", OsuIcon.Charts, new Color4(94, 63, 186, 255), onPlaylists, 0, Key.L));
             buttonsPlay.ForEach(b => b.VisibleState = ButtonSystemState.Play);
 
             buttonsTopLevel.Add(new Button(@"play", @"button-play-select", OsuIcon.Logo, new Color4(102, 68, 204, 255), () => State = ButtonSystemState.Play, WEDGE_WIDTH, Key.P));
-            buttonsTopLevel.Add(new Button(@"osu!editor", @"button-generic-select", OsuIcon.EditCircle, new Color4(238, 170, 0, 255), () => OnEdit?.Invoke(), 0, Key.E));
-            buttonsTopLevel.Add(new Button(@"osu!direct", @"button-direct-select", OsuIcon.ChevronDownCircle, new Color4(165, 204, 0, 255), () => OnBeatmapListing?.Invoke(), 0, Key.D));
+            buttonsTopLevel.Add(new Button(@"edit", @"button-edit-select", OsuIcon.EditCircle, new Color4(238, 170, 0, 255), () => OnEdit?.Invoke(), 0, Key.E));
+            buttonsTopLevel.Add(new Button(@"browse", @"button-direct-select", OsuIcon.ChevronDownCircle, new Color4(165, 204, 0, 255), () => OnBeatmapListing?.Invoke(), 0, Key.D));
 
             if (host.CanExit)
                 buttonsTopLevel.Add(new Button(@"exit", string.Empty, OsuIcon.CrossCircle, new Color4(238, 51, 153, 255), () => OnExit?.Invoke(), 0, Key.Q));
@@ -156,11 +156,11 @@ namespace osu.Game.Screens.Menu
 
         private void onMultiplayer()
         {
-            if (!api.IsLoggedIn)
+            if (api.State.Value != APIState.Online)
             {
                 notifications?.Post(new SimpleNotification
                 {
-                    Text = "You gotta be logged in to multi 'yo!",
+                    Text = "You gotta be online to multi 'yo!",
                     Icon = FontAwesome.Solid.Globe,
                     Activated = () =>
                     {
@@ -175,13 +175,13 @@ namespace osu.Game.Screens.Menu
             OnMultiplayer?.Invoke();
         }
 
-        private void onTimeshift()
+        private void onPlaylists()
         {
-            if (!api.IsLoggedIn)
+            if (api.State.Value != APIState.Online)
             {
                 notifications?.Post(new SimpleNotification
                 {
-                    Text = "You gotta be logged in to multi 'yo!",
+                    Text = "You gotta be online to view playlists 'yo!",
                     Icon = FontAwesome.Solid.Globe,
                     Activated = () =>
                     {
@@ -193,7 +193,7 @@ namespace osu.Game.Screens.Menu
                 return;
             }
 
-            OnTimeshift?.Invoke();
+            OnPlaylists?.Invoke();
         }
 
         private void updateIdleState(bool isIdle)

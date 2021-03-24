@@ -20,6 +20,7 @@ using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring.Legacy;
 
@@ -71,8 +72,9 @@ namespace osu.Game.Scoring
             }
         }
 
-        protected override IEnumerable<string> GetStableImportPaths(Storage stableStorage)
-            => stableStorage.GetFiles(ImportFromStablePath).Where(p => HandledExtensions.Any(ext => Path.GetExtension(p)?.Equals(ext, StringComparison.OrdinalIgnoreCase) ?? false));
+        protected override IEnumerable<string> GetStableImportPaths(Storage storage)
+            => storage.GetFiles(ImportFromStablePath).Where(p => HandledExtensions.Any(ext => Path.GetExtension(p)?.Equals(ext, StringComparison.OrdinalIgnoreCase) ?? false))
+                      .Select(path => storage.GetFullPath(path));
 
         public Score GetScore(ScoreInfo score) => new LegacyDatabasedScore(score, rulesets, beatmaps(), Files.Store);
 
@@ -136,7 +138,7 @@ namespace osu.Game.Scoring
                 ScoringMode.BindValueChanged(onScoringModeChanged, true);
             }
 
-            private IBindable<StarDifficulty> difficultyBindable;
+            private IBindable<StarDifficulty?> difficultyBindable;
             private CancellationTokenSource difficultyCancellationSource;
 
             private void onScoringModeChanged(ValueChangedEvent<ScoringMode> mode)
@@ -151,9 +153,21 @@ namespace osu.Game.Scoring
                 }
 
                 int beatmapMaxCombo;
+                double accuracy = score.Accuracy;
 
                 if (score.IsLegacyScore)
                 {
+                    if (score.RulesetID == 3)
+                    {
+                        // In osu!stable, a full-GREAT score has 100% accuracy in mania. Along with a full combo, the score becomes indistinguishable from a full-PERFECT score.
+                        // To get around this, recalculate accuracy based on the hit statistics.
+                        // Note: This cannot be applied universally to all legacy scores, as some rulesets (e.g. catch) group multiple judgements together.
+                        double maxBaseScore = score.Statistics.Select(kvp => kvp.Value).Sum() * Judgement.ToNumericResult(HitResult.Perfect);
+                        double baseScore = score.Statistics.Select(kvp => Judgement.ToNumericResult(kvp.Key) * kvp.Value).Sum();
+                        if (maxBaseScore > 0)
+                            accuracy = baseScore / maxBaseScore;
+                    }
+
                     // This score is guaranteed to be an osu!stable score.
                     // The combo must be determined through either the beatmap's max combo value or the difficulty calculator, as lazer's scoring has changed and the score statistics cannot be used.
                     if (score.Beatmap.MaxCombo == null)
@@ -167,7 +181,11 @@ namespace osu.Game.Scoring
 
                         // We can compute the max combo locally after the async beatmap difficulty computation.
                         difficultyBindable = difficulties().GetBindableDifficulty(score.Beatmap, score.Ruleset, score.Mods, (difficultyCancellationSource = new CancellationTokenSource()).Token);
-                        difficultyBindable.BindValueChanged(d => updateScore(d.NewValue.MaxCombo), true);
+                        difficultyBindable.BindValueChanged(d =>
+                        {
+                            if (d.NewValue is StarDifficulty diff)
+                                updateScore(diff.MaxCombo, accuracy);
+                        }, true);
 
                         return;
                     }
@@ -181,10 +199,10 @@ namespace osu.Game.Scoring
                     beatmapMaxCombo = Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r.AffectsCombo()).Select(r => score.Statistics.GetOrDefault(r)).Sum();
                 }
 
-                updateScore(beatmapMaxCombo);
+                updateScore(beatmapMaxCombo, accuracy);
             }
 
-            private void updateScore(int beatmapMaxCombo)
+            private void updateScore(int beatmapMaxCombo, double accuracy)
             {
                 if (beatmapMaxCombo == 0)
                 {
@@ -197,7 +215,7 @@ namespace osu.Game.Scoring
 
                 scoreProcessor.Mods.Value = score.Mods;
 
-                Value = (long)Math.Round(scoreProcessor.GetScore(ScoringMode.Value, beatmapMaxCombo, score.Accuracy, (double)score.MaxCombo / beatmapMaxCombo, score.Statistics));
+                Value = (long)Math.Round(scoreProcessor.GetScore(ScoringMode.Value, beatmapMaxCombo, accuracy, (double)score.MaxCombo / beatmapMaxCombo, score.Statistics));
             }
         }
 

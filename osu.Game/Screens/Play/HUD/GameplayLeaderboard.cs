@@ -3,6 +3,9 @@
 
 using System;
 using System.Linq;
+using JetBrains.Annotations;
+using osu.Framework.Bindables;
+using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Users;
@@ -12,6 +15,10 @@ namespace osu.Game.Screens.Play.HUD
 {
     public class GameplayLeaderboard : FillFlowContainer<GameplayLeaderboardScore>
     {
+        private readonly Cached sorting = new Cached();
+
+        public Bindable<bool> Expanded = new Bindable<bool>();
+
         public GameplayLeaderboard()
         {
             Width = GameplayLeaderboardScore.EXTENDED_WIDTH + GameplayLeaderboardScore.SHEAR_WIDTH;
@@ -24,6 +31,13 @@ namespace osu.Game.Screens.Play.HUD
             LayoutEasing = Easing.OutQuint;
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Scheduler.AddDelayed(sort, 1000, true);
+        }
+
         /// <summary>
         /// Adds a player to the leaderboard.
         /// </summary>
@@ -32,16 +46,15 @@ namespace osu.Game.Screens.Play.HUD
         /// Whether the player should be tracked on the leaderboard.
         /// Set to <c>true</c> for the local player or a player whose replay is currently being played.
         /// </param>
-        public ILeaderboardScore AddPlayer(User user, bool isTracked)
+        public ILeaderboardScore AddPlayer([CanBeNull] User user, bool isTracked)
         {
             var drawable = new GameplayLeaderboardScore(user, isTracked)
             {
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
+                Expanded = { BindTarget = Expanded },
             };
 
             base.Add(drawable);
-            drawable.TotalScore.BindValueChanged(_ => Scheduler.AddOnce(sort), true);
+            drawable.TotalScore.BindValueChanged(_ => sorting.Invalidate(), true);
 
             Height = Count * (GameplayLeaderboardScore.PANEL_HEIGHT + Spacing.Y);
 
@@ -55,6 +68,9 @@ namespace osu.Game.Screens.Play.HUD
 
         private void sort()
         {
+            if (sorting.IsValid)
+                return;
+
             var orderedByScore = this.OrderByDescending(i => i.TotalScore.Value).ToList();
 
             for (int i = 0; i < Count; i++)
@@ -62,6 +78,8 @@ namespace osu.Game.Screens.Play.HUD
                 SetLayoutPosition(orderedByScore[i], i);
                 orderedByScore[i].ScorePosition = i + 1;
             }
+
+            sorting.Validate();
         }
     }
 }

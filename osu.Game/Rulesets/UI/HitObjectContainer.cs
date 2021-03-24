@@ -17,19 +17,10 @@ using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.UI
 {
-    public class HitObjectContainer : LifetimeManagementContainer
+    public class HitObjectContainer : LifetimeManagementContainer, IHitObjectContainer
     {
-        /// <summary>
-        /// All currently in-use <see cref="DrawableHitObject"/>s.
-        /// </summary>
         public IEnumerable<DrawableHitObject> Objects => InternalChildren.Cast<DrawableHitObject>().OrderBy(h => h.HitObject.StartTime);
 
-        /// <summary>
-        /// All currently in-use <see cref="DrawableHitObject"/>s that are alive.
-        /// </summary>
-        /// <remarks>
-        /// If this <see cref="HitObjectContainer"/> uses pooled objects, this is equivalent to <see cref="Objects"/>.
-        /// </remarks>
         public IEnumerable<DrawableHitObject> AliveObjects => AliveInternalChildren.Cast<DrawableHitObject>().OrderBy(h => h.HitObject.StartTime);
 
         /// <summary>
@@ -124,9 +115,11 @@ namespace osu.Game.Rulesets.UI
             Debug.Assert(drawableMap.ContainsKey(entry));
 
             var drawable = drawableMap[entry];
+
+            // OnKilled can potentially change the hitobject's result, so it needs to run first before unbinding.
+            drawable.OnKilled();
             drawable.OnNewResult -= onNewResult;
             drawable.OnRevertResult -= onRevertResult;
-            drawable.OnKilled();
 
             drawableMap.Remove(entry);
 

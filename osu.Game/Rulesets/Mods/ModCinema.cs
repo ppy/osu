@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public virtual void ApplyToDrawableRuleset(DrawableRuleset<T> drawableRuleset)
         {
-            drawableRuleset.SetReplayScore(CreateReplayScore(drawableRuleset.Beatmap));
+            drawableRuleset.SetReplayScore(CreateReplayScore(drawableRuleset.Beatmap, drawableRuleset.Mods));
 
             // AlwaysPresent required for hitsounds
             drawableRuleset.Playfield.AlwaysPresent = true;
@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToPlayer(Player player)
         {
-            player.Background.EnableUserDim.Value = false;
+            player.ApplyToBackground(b => b.EnableUserDim.Value = false);
 
             player.DimmableStoryboard.IgnoreUserSettings.Value = true;
 

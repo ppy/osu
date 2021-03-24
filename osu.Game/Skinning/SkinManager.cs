@@ -86,7 +86,7 @@ namespace osu.Game.Skinning
         public void SelectRandomSkin()
         {
             // choose from only user skins, removing the current selection to ensure a new one is chosen.
-            var randomChoices = GetAllUsableSkins().Where(s => s.ID > 0 && s.ID != CurrentSkinInfo.Value.ID).ToArray();
+            var randomChoices = GetAllUsableSkins().Where(s => s.ID != CurrentSkinInfo.Value.ID).ToArray();
 
             if (randomChoices.Length == 0)
             {
@@ -120,7 +120,7 @@ namespace osu.Game.Skinning
 
         protected override async Task Populate(SkinInfo model, ArchiveReader archive, CancellationToken cancellationToken = default)
         {
-            await base.Populate(model, archive, cancellationToken);
+            await base.Populate(model, archive, cancellationToken).ConfigureAwait(false);
 
             if (model.Name?.Contains(".osk") == true)
                 populateMetadata(model);
@@ -171,7 +171,7 @@ namespace osu.Game.Skinning
 
         public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => CurrentSkin.Value.GetTexture(componentName, wrapModeS, wrapModeT);
 
-        public SampleChannel GetSample(ISampleInfo sampleInfo) => CurrentSkin.Value.GetSample(sampleInfo);
+        public ISample GetSample(ISampleInfo sampleInfo) => CurrentSkin.Value.GetSample(sampleInfo);
 
         public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => CurrentSkin.Value.GetConfig<TLookup, TValue>(lookup);
 

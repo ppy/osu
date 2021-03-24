@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -12,6 +11,7 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Online;
 using osu.Game.Online.Spectator;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Osu;
@@ -238,9 +238,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             private int beatmapId;
 
-            protected override Task Connect()
+            public TestSpectatorStreamingClient()
+                : base(new DevelopmentEndpointConfiguration())
             {
-                return Task.CompletedTask;
             }
 
             public void StartPlay(int beatmapId)

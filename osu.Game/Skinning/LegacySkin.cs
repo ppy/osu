@@ -29,7 +29,7 @@ namespace osu.Game.Skinning
         protected TextureStore Textures;
 
         [CanBeNull]
-        protected IResourceStore<SampleChannel> Samples;
+        protected ISampleStore Samples;
 
         /// <summary>
         /// Whether texture for the keys exists.
@@ -98,13 +98,6 @@ namespace osu.Game.Skinning
             hasKeyTexture = new Lazy<bool>(() => this.GetAnimation(
                 lookupForMania<string>(new LegacyManiaSkinConfigurationLookup(4, LegacyManiaSkinConfigurationLookups.KeyImage, 0))?.Value ?? "mania-key1", true,
                 true) != null);
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            Textures?.Dispose();
-            Samples?.Dispose();
         }
 
         public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
@@ -378,8 +371,10 @@ namespace osu.Game.Skinning
                     // kind of wasteful that we throw this away, but should do for now.
                     if (createDrawable() != null)
                     {
-                        if (Configuration.LegacyVersion > 1)
-                            return new LegacyJudgementPieceNew(resultComponent.Component, createDrawable, getParticleTexture(resultComponent.Component));
+                        var particle = getParticleTexture(resultComponent.Component);
+
+                        if (particle != null)
+                            return new LegacyJudgementPieceNew(resultComponent.Component, createDrawable, particle);
                         else
                             return new LegacyJudgementPieceOld(resultComponent.Component, createDrawable);
                     }
@@ -450,7 +445,7 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        public override SampleChannel GetSample(ISampleInfo sampleInfo)
+        public override ISample GetSample(ISampleInfo sampleInfo)
         {
             IEnumerable<string> lookupNames;
 
@@ -501,6 +496,13 @@ namespace osu.Game.Skinning
             // Fall back to using the last piece for components coming from lazer (e.g. "Gameplay/osu/approachcircle" -> "approachcircle").
             string lastPiece = componentName.Split('/').Last();
             yield return componentName.StartsWith("Gameplay/taiko/", StringComparison.Ordinal) ? "taiko-" + lastPiece : lastPiece;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            Textures?.Dispose();
+            Samples?.Dispose();
         }
     }
 }

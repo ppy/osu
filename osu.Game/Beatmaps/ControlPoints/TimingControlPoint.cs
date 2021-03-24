@@ -69,5 +69,13 @@ namespace osu.Game.Beatmaps.ControlPoints
 
         // Timing points are never redundant as they can change the time signature.
         public override bool IsRedundant(ControlPoint existing) => false;
+
+        public override void CopyFrom(ControlPoint other)
+        {
+            TimeSignature = ((TimingControlPoint)other).TimeSignature;
+            BeatLength = ((TimingControlPoint)other).BeatLength;
+
+            base.CopyFrom(other);
+        }
     }
 }

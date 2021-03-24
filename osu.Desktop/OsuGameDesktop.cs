@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using Microsoft.Win32;
 using osu.Desktop.Overlays;
@@ -17,6 +18,7 @@ using osu.Framework.Screens;
 using osu.Game.Screens.Menu;
 using osu.Game.Updater;
 using osu.Desktop.Windows;
+using osu.Game.IO;
 
 namespace osu.Desktop
 {
@@ -31,7 +33,7 @@ namespace osu.Desktop
             noVersionOverlay = args?.Any(a => a == "--no-version-overlay") ?? false;
         }
 
-        public override Storage GetStorageForStableInstall()
+        public override StableStorage GetStorageForStableInstall()
         {
             try
             {
@@ -39,7 +41,7 @@ namespace osu.Desktop
                 {
                     string stablePath = getStableInstallPath();
                     if (!string.IsNullOrEmpty(stablePath))
-                        return new DesktopStorage(stablePath, desktopHost);
+                        return new StableStorage(stablePath, desktopHost);
                 }
             }
             catch (Exception)
@@ -56,16 +58,16 @@ namespace osu.Desktop
 
             string stableInstallPath;
 
-            try
+            if (OperatingSystem.IsWindows())
             {
-                using (RegistryKey key = Registry.ClassesRoot.OpenSubKey("osu"))
-                    stableInstallPath = key?.OpenSubKey(@"shell\open\command")?.GetValue(string.Empty)?.ToString()?.Split('"')[1].Replace("osu!.exe", "");
+                try
+                {
+                    stableInstallPath = getStableInstallPathFromRegistry();
 
-                if (checkExists(stableInstallPath))
-                    return stableInstallPath;
-            }
-            catch
-            {
+                    if (!string.IsNullOrEmpty(stableInstallPath) && checkExists(stableInstallPath))
+                        return stableInstallPath;
+                }
+                catch { }
             }
 
             stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"osu!");
@@ -77,6 +79,13 @@ namespace osu.Desktop
                 return stableInstallPath;
 
             return null;
+        }
+
+        [SupportedOSPlatform("windows")]
+        private string getStableInstallPathFromRegistry()
+        {
+            using (RegistryKey key = Registry.ClassesRoot.OpenSubKey("osu"))
+                return key?.OpenSubKey(@"shell\open\command")?.GetValue(string.Empty)?.ToString()?.Split('"')[1].Replace("osu!.exe", "");
         }
 
         protected override UpdateManager CreateUpdateManager()
@@ -127,24 +136,12 @@ namespace osu.Desktop
 
             var iconStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico");
 
-            switch (host.Window)
-            {
-                // Legacy osuTK DesktopGameWindow
-                case OsuTKDesktopWindow desktopGameWindow:
-                    desktopGameWindow.CursorState |= CursorState.Hidden;
-                    desktopGameWindow.SetIconFromStream(iconStream);
-                    desktopGameWindow.Title = Name;
-                    desktopGameWindow.FileDrop += (_, e) => fileDrop(e.FileNames);
-                    break;
+            var desktopWindow = (SDL2DesktopWindow)host.Window;
 
-                // SDL2 DesktopWindow
-                case SDL2DesktopWindow desktopWindow:
-                    desktopWindow.CursorState |= CursorState.Hidden;
-                    desktopWindow.SetIconFromStream(iconStream);
-                    desktopWindow.Title = Name;
-                    desktopWindow.DragDrop += f => fileDrop(new[] { f });
-                    break;
-            }
+            desktopWindow.CursorState |= CursorState.Hidden;
+            desktopWindow.SetIconFromStream(iconStream);
+            desktopWindow.Title = Name;
+            desktopWindow.DragDrop += f => fileDrop(new[] { f });
         }
 
         private void fileDrop(string[] filePaths)

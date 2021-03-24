@@ -221,7 +221,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         public void TestHitLightingColour()
         {
             var fruitColour = SkinConfiguration.DefaultComboColours[1];
-            AddStep("enable hit lighting", () => config.Set(OsuSetting.HitLighting, true));
+            AddStep("enable hit lighting", () => config.SetValue(OsuSetting.HitLighting, true));
             AddStep("catch fruit", () => attemptCatch(new Fruit()));
             AddAssert("correct hit lighting colour", () =>
                 catcher.ChildrenOfType<HitExplosion>().First()?.ObjectColour == fruitColour);
@@ -230,7 +230,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         [Test]
         public void TestHitLightingDisabled()
         {
-            AddStep("disable hit lighting", () => config.Set(OsuSetting.HitLighting, false));
+            AddStep("disable hit lighting", () => config.SetValue(OsuSetting.HitLighting, false));
             AddStep("catch fruit", () => attemptCatch(new Fruit()));
             AddAssert("no hit lighting", () => !catcher.ChildrenOfType<HitExplosion>().Any());
         }
