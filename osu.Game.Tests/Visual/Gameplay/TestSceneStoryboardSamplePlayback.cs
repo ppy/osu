@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            config.Set(OsuSetting.ShowStoryboard, true);
+            config.SetValue(OsuSetting.ShowStoryboard, true);
 
             storyboard = new Storyboard();
             var backgroundLayer = storyboard.GetLayer("Background");

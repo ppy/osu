@@ -100,13 +100,6 @@ namespace osu.Game.Skinning
                 true) != null);
         }
 
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            Textures?.Dispose();
-            Samples?.Dispose();
-        }
-
         public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
         {
             switch (lookup)
@@ -452,7 +445,7 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        public override Sample GetSample(ISampleInfo sampleInfo)
+        public override ISample GetSample(ISampleInfo sampleInfo)
         {
             IEnumerable<string> lookupNames;
 
@@ -503,6 +496,13 @@ namespace osu.Game.Skinning
             // Fall back to using the last piece for components coming from lazer (e.g. "Gameplay/osu/approachcircle" -> "approachcircle").
             string lastPiece = componentName.Split('/').Last();
             yield return componentName.StartsWith("Gameplay/taiko/", StringComparison.Ordinal) ? "taiko-" + lastPiece : lastPiece;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            Textures?.Dispose();
+            Samples?.Dispose();
         }
     }
 }

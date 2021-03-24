@@ -471,9 +471,6 @@ namespace osu.Game.Beatmaps.Formats
 
         private string toLegacyCustomSampleBank(HitSampleInfo hitSampleInfo)
         {
-            if (hitSampleInfo == null)
-                return "0";
-
             if (hitSampleInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacy)
                 return legacy.CustomSampleBank.ToString(CultureInfo.InvariantCulture);
 

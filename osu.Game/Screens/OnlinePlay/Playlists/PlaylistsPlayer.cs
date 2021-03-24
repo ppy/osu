@@ -28,7 +28,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         protected readonly PlaylistItem PlaylistItem;
 
-        protected int? Token { get; private set; }
+        protected long? Token { get; private set; }
 
         [Resolved]
         private IAPIProvider api { get; set; }
