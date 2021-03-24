@@ -531,6 +531,13 @@ namespace osu.Game
             SentryLogger.Dispose();
         }
 
+        protected override IDictionary<FrameworkSetting, object> GetFrameworkConfigDefaults()
+            => new Dictionary<FrameworkSetting, object>
+            {
+                // General expectation that osu! starts in fullscreen by default (also gives the most predictable performance)
+                { FrameworkSetting.WindowMode, WindowMode.Fullscreen }
+            };
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -1012,14 +1019,6 @@ namespace osu.Game
 
             if (newScreen == null)
                 Exit();
-        }
-
-        protected override IDictionary<FrameworkSetting, object> GetFrameworkConfigDefaults()
-        {
-            // Overriding config defaults determined by Framework
-            IDictionary<FrameworkSetting, object> defaultOverrides = new Dictionary<FrameworkSetting, object>();
-            defaultOverrides.Add(FrameworkSetting.WindowMode, WindowMode.Fullscreen);
-            return defaultOverrides;
         }
     }
 }
