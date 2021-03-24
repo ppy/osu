@@ -1008,6 +1008,7 @@ namespace osu.Game
                 Exit();
         }
         protected override IDictionary<FrameworkSetting, object> GetFrameworkConfigDefaults() {
+            // Overriding settings determined by Framework
             IDictionary<FrameworkSetting, object> defaultOverrides = new Dictionary<FrameworkSetting, object>();
             defaultOverrides.Add(FrameworkSetting.WindowMode, WindowMode.Fullscreen);
             return defaultOverrides;
