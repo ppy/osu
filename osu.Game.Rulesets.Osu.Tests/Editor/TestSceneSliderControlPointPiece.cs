@@ -112,10 +112,10 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             addMovementStep(new Vector2(350, 0));
             assertControlPointType(2, PathType.Bezier);
 
-            addMovementStep(new Vector2(150, 150));
+            addMovementStep(new Vector2(400, 50));
             AddStep("release", () => InputManager.ReleaseButton(MouseButton.Left));
 
-            assertControlPointPosition(1, new Vector2(150, 150));
+            assertControlPointPosition(4, new Vector2(400, 50));
             assertControlPointType(2, PathType.PerfectCurve);
         }
 
