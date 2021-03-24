@@ -3,6 +3,7 @@
 
 using System;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
@@ -37,7 +38,7 @@ namespace osu.Game.Screens.Play
 
             if (!api.IsLoggedIn)
             {
-                fail(new InvalidOperationException("API is not online."));
+                handleFailure(new InvalidOperationException("API is not online."));
                 return;
             }
 
@@ -45,7 +46,7 @@ namespace osu.Game.Screens.Play
 
             if (req == null)
             {
-                fail(new InvalidOperationException("Request could not be constructed."));
+                handleFailure(new InvalidOperationException("Request could not be constructed."));
                 return;
             }
 
@@ -54,13 +55,13 @@ namespace osu.Game.Screens.Play
                 Token = r.ID;
                 tcs.SetResult(true);
             };
-            req.Failure += fail;
+            req.Failure += handleFailure;
 
             api.Queue(req);
 
             tcs.Task.Wait();
 
-            void fail(Exception exception)
+            void handleFailure(Exception exception)
             {
                 if (HandleTokenRetrievalFailure(exception))
                 {
@@ -116,8 +117,19 @@ namespace osu.Game.Screens.Play
             await tcs.Task.ConfigureAwait(false);
         }
 
-        protected abstract APIRequest<MultiplayerScore> CreateSubmissionRequest(Score score, long token);
-
+        /// <summary>
+        /// Construct a request to be used for retrieval of the score token.
+        /// Can return null, at which point <see cref="HandleTokenRetrievalFailure"/> will be fired.
+        /// </summary>
+        [CanBeNull]
         protected abstract APIRequest<APIScoreToken> CreateTokenRequest();
+
+        /// <summary>
+        /// Construct a request to submit the score.
+        /// Will only be invoked if the request constructed via <see cref="CreateTokenRequest"/> was successful.
+        /// </summary>
+        /// <param name="score">The score to be submitted.</param>
+        /// <param name="token">The submission token.</param>
+        protected abstract APIRequest<MultiplayerScore> CreateSubmissionRequest(Score score, long token);
     }
 }
