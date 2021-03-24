@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// Invoked when any property of this <see cref="PathControlPoint"/> is changed.
         /// </summary>
-        internal event Action Changed;
+        public event Action Changed;
 
         /// <summary>
         /// Creates a new <see cref="PathControlPoint"/>.

@@ -54,21 +54,13 @@ namespace osu.Game.Rulesets.Objects
                 {
                     case NotifyCollectionChangedAction.Add:
                         foreach (var c in args.NewItems.Cast<PathControlPoint>())
-                        {
                             c.Changed += invalidate;
-                            c.Changed += updatePathTypes;
-                        }
-
                         break;
 
                     case NotifyCollectionChangedAction.Reset:
                     case NotifyCollectionChangedAction.Remove:
                         foreach (var c in args.OldItems.Cast<PathControlPoint>())
-                        {
                             c.Changed -= invalidate;
-                            c.Changed -= updatePathTypes;
-                        }
-
                         break;
                 }
 
@@ -195,56 +187,6 @@ namespace osu.Game.Rulesets.Objects
             }
 
             return pointsInCurrentSegment;
-        }
-
-        /// <summary>
-        /// Handles correction of invalid path types.
-        /// </summary>
-        private void updatePathTypes()
-        {
-            foreach (PathControlPoint segmentStartPoint in ControlPoints.Where(p => p.Type.Value != null))
-            {
-                if (segmentStartPoint.Type.Value != PathType.PerfectCurve)
-                    continue;
-
-                Vector2[] points = PointsInSegment(segmentStartPoint).Select(p => p.Position.Value).ToArray();
-                if (points.Length == 3 && !validCircularArcSegment(points))
-                    segmentStartPoint.Type.Value = PathType.Bezier;
-            }
-        }
-
-        /// <summary>
-        /// Returns whether the given points are arranged in a valid way. Invalid if points
-        /// are almost entirely linear - as this causes the radius to approach infinity,
-        /// which would exhaust memory when drawing / approximating.
-        /// </summary>
-        /// <param name="points">The three points that make up this circular arc segment.</param>
-        /// <returns></returns>
-        private bool validCircularArcSegment(IReadOnlyList<Vector2> points)
-        {
-            Vector2 a = points[0];
-            Vector2 b = points[1];
-            Vector2 c = points[2];
-
-            float maxLength = points.Max(p => p.Length);
-
-            Vector2 normA = new Vector2(a.X / maxLength, a.Y / maxLength);
-            Vector2 normB = new Vector2(b.X / maxLength, b.Y / maxLength);
-            Vector2 normC = new Vector2(c.X / maxLength, c.Y / maxLength);
-
-            float det = (normA.X - normB.X) * (normB.Y - normC.Y) - (normB.X - normC.X) * (normA.Y - normB.Y);
-
-            float acSq = (a - c).LengthSquared;
-            float abSq = (a - b).LengthSquared;
-            float bcSq = (b - c).LengthSquared;
-
-            // Exterior = curve wraps around the long way between end-points
-            // Exterior bottleneck is drawing-related, interior bottleneck is approximation-related,
-            // where the latter is much faster, hence differing thresholds
-            bool exterior = abSq > acSq || bcSq > acSq;
-            float threshold = exterior ? 0.05f : 0.001f;
-
-            return Math.Abs(det) >= threshold;
         }
 
         private void invalidate()
