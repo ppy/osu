@@ -29,10 +29,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
     public class PathControlPointPiece : BlueprintPiece<Slider>, IHasTooltip
     {
         public Action<PathControlPointPiece, MouseButtonEvent> RequestSelection;
+        public List<PathControlPoint> PointsInSegment;
 
         public readonly BindableBool IsSelected = new BindableBool();
         public readonly PathControlPoint ControlPoint;
-        public readonly List<PathControlPoint> PointsInSegment;
 
         private readonly Slider slider;
         private readonly Container marker;
@@ -55,7 +55,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             this.slider = slider;
             ControlPoint = controlPoint;
-            PointsInSegment = slider.Path.PointsInSegment(controlPoint);
+            slider.Path.ControlPoints.BindCollectionChanged((_, args) =>
+            {
+                PointsInSegment = slider.Path.PointsInSegment(controlPoint);
+            }, runOnceImmediately: true);
 
             controlPoint.Type.BindValueChanged(_ => updateMarkerDisplay());
 
