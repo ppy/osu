@@ -74,7 +74,6 @@ namespace osu.Game.Screens.Edit
 
         private string lastSavedHash;
 
-        private Box bottomBackground;
         private Container<EditorScreen> screenContainer;
 
         private EditorScreen currentScreen;
@@ -106,26 +105,29 @@ namespace osu.Game.Screens.Edit
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, GameHost host, OsuConfigManager config)
         {
-            if (Beatmap.Value is DummyWorkingBeatmap)
+            var loadableBeatmap = Beatmap.Value;
+
+            if (loadableBeatmap is DummyWorkingBeatmap)
             {
                 isNewBeatmap = true;
 
-                var newBeatmap = beatmapManager.CreateNew(Ruleset.Value, api.LocalUser.Value);
+                loadableBeatmap = beatmapManager.CreateNew(Ruleset.Value, api.LocalUser.Value);
+
+                // required so we can get the track length in EditorClock.
+                // this is safe as nothing has yet got a reference to this new beatmap.
+                loadableBeatmap.LoadTrack();
 
                 // this is a bit haphazard, but guards against setting the lease Beatmap bindable if
                 // the editor has already been exited.
                 if (!ValidForPush)
                     return;
-
-                // this probably shouldn't be set in the asynchronous load method, but everything following relies on it.
-                Beatmap.Value = newBeatmap;
             }
 
-            beatDivisor.Value = Beatmap.Value.BeatmapInfo.BeatDivisor;
-            beatDivisor.BindValueChanged(divisor => Beatmap.Value.BeatmapInfo.BeatDivisor = divisor.NewValue);
+            beatDivisor.Value = loadableBeatmap.BeatmapInfo.BeatDivisor;
+            beatDivisor.BindValueChanged(divisor => loadableBeatmap.BeatmapInfo.BeatDivisor = divisor.NewValue);
 
             // Todo: should probably be done at a DrawableRuleset level to share logic with Player.
-            clock = new EditorClock(Beatmap.Value, beatDivisor) { IsCoupled = false };
+            clock = new EditorClock(loadableBeatmap, beatDivisor) { IsCoupled = false };
 
             UpdateClockSource();
 
@@ -139,7 +141,7 @@ namespace osu.Game.Screens.Edit
 
             try
             {
-                playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Beatmap.Value.BeatmapInfo.Ruleset);
+                playableBeatmap = loadableBeatmap.GetPlayableBeatmap(loadableBeatmap.BeatmapInfo.Ruleset);
 
                 // clone these locally for now to avoid incurring overhead on GetPlayableBeatmap usages.
                 // eventually we will want to improve how/where this is done as there are issues with *not* cloning it in all cases.
@@ -153,12 +155,20 @@ namespace osu.Game.Screens.Edit
                 return;
             }
 
-            AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap, Beatmap.Value.Skin));
+            AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap, loadableBeatmap.Skin));
             dependencies.CacheAs(editorBeatmap);
             changeHandler = new EditorChangeHandler(editorBeatmap);
             dependencies.CacheAs<IEditorChangeHandler>(changeHandler);
 
             updateLastSavedHash();
+
+            Schedule(() =>
+            {
+                // we need to avoid changing the beatmap from an asynchronous load thread. it can potentially cause weirdness including crashes.
+                // this assumes that nothing during the rest of this load() method is accessing Beatmap.Value (loadableBeatmap should be preferred).
+                // generally this is quite safe, as the actual load of editor content comes after menuBar.Mode.ValueChanged is fired in its own LoadComplete.
+                Beatmap.Value = loadableBeatmap;
+            });
 
             OsuMenuItem undoMenuItem;
             OsuMenuItem redoMenuItem;
@@ -166,17 +176,6 @@ namespace osu.Game.Screens.Edit
             EditorMenuItem cutMenuItem;
             EditorMenuItem copyMenuItem;
             EditorMenuItem pasteMenuItem;
-
-            var fileMenuItems = new List<MenuItem>
-            {
-                new EditorMenuItem("Save", MenuItemType.Standard, Save)
-            };
-
-            if (RuntimeInfo.IsDesktop)
-                fileMenuItems.Add(new EditorMenuItem("Export package", MenuItemType.Standard, exportBeatmap));
-
-            fileMenuItems.Add(new EditorMenuItemSpacer());
-            fileMenuItems.Add(new EditorMenuItem("Exit", MenuItemType.Standard, this.Exit));
 
             AddInternal(new OsuContextMenuContainer
             {
@@ -209,7 +208,7 @@ namespace osu.Game.Screens.Edit
                             {
                                 new MenuItem("File")
                                 {
-                                    Items = fileMenuItems
+                                    Items = createFileMenuItems()
                                 },
                                 new MenuItem("Edit")
                                 {
@@ -242,7 +241,11 @@ namespace osu.Game.Screens.Edit
                         Height = 60,
                         Children = new Drawable[]
                         {
-                            bottomBackground = new Box { RelativeSizeAxes = Axes.Both },
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = colours.Gray2
+                            },
                             new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
@@ -299,8 +302,6 @@ namespace osu.Game.Screens.Edit
             clipboard.BindValueChanged(content => pasteMenuItem.Action.Disabled = string.IsNullOrEmpty(content.NewValue));
 
             menuBar.Mode.ValueChanged += onModeChanged;
-
-            bottomBackground.Colour = colours.Gray2;
         }
 
         /// <summary>
@@ -679,6 +680,21 @@ namespace osu.Game.Screens.Edit
         private void updateLastSavedHash()
         {
             lastSavedHash = changeHandler.CurrentStateHash;
+        }
+
+        private List<MenuItem> createFileMenuItems()
+        {
+            var fileMenuItems = new List<MenuItem>
+            {
+                new EditorMenuItem("Save", MenuItemType.Standard, Save)
+            };
+
+            if (RuntimeInfo.IsDesktop)
+                fileMenuItems.Add(new EditorMenuItem("Export package", MenuItemType.Standard, exportBeatmap));
+
+            fileMenuItems.Add(new EditorMenuItemSpacer());
+            fileMenuItems.Add(new EditorMenuItem("Exit", MenuItemType.Standard, this.Exit));
+            return fileMenuItems;
         }
 
         public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);

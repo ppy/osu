@@ -63,13 +63,15 @@ namespace osu.Game.Tests.Visual.Online
                             Builds = builds.Values.ToList()
                         };
                         changelogRequest.TriggerSuccess(changelogResponse);
-                        break;
+                        return true;
 
                     case GetChangelogBuildRequest buildRequest:
                         if (requestedBuild != null)
                             buildRequest.TriggerSuccess(requestedBuild);
-                        break;
+                        return true;
                 }
+
+                return false;
             };
 
             Child = changelog = new TestChangelogOverlay();
