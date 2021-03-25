@@ -242,7 +242,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             Add(drawableObject);
             drawableObject.OnLoadComplete += _ =>
             {
-                catcher.OnNewResult(drawableObject, result);
+                catcher.OnNewResult(drawableObject, result, true);
                 drawableObject.Expire();
             };
         }
