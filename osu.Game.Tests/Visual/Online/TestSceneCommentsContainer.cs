@@ -85,9 +85,10 @@ namespace osu.Game.Tests.Visual.Online
                 dummyAPI.HandleRequest = request =>
                 {
                     if (!(request is GetCommentsRequest getCommentsRequest))
-                        return;
+                        return false;
 
                     getCommentsRequest.TriggerSuccess(commentBundle);
+                    return true;
                 };
             });
 

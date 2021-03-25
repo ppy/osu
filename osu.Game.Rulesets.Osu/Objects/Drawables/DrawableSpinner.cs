@@ -45,6 +45,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private readonly Bindable<double> gainedBonus = new Bindable<double>();
 
+        private const double fade_out_duration = 160;
+
         public DrawableSpinner()
             : this(null)
         {
@@ -131,12 +133,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (tracking.NewValue)
             {
                 if (!spinningSample.IsPlaying)
-                    spinningSample?.Play();
-                spinningSample?.VolumeTo(1, 300);
+                    spinningSample.Play();
+
+                spinningSample.VolumeTo(1, 300);
             }
             else
             {
-                spinningSample?.VolumeTo(0, 300).OnComplete(_ => spinningSample.Stop());
+                spinningSample.VolumeTo(0, fade_out_duration);
             }
         }
 
@@ -173,7 +176,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdateHitStateTransforms(state);
 
-            this.FadeOut(160).Expire();
+            this.FadeOut(fade_out_duration).OnComplete(_ =>
+            {
+                // looping sample should be stopped here as it is safer than running in the OnComplete
+                // of the volume transition above.
+                spinningSample.Stop();
+            });
+
+            Expire();
 
             // skin change does a rewind of transforms, which will stop the spinning sound from playing if it's currently in playback.
             isSpinning?.TriggerChange();
