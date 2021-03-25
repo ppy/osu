@@ -223,7 +223,7 @@ namespace osu.Game.Rulesets.Catch.UI
                    catchObjectPosition <= catcherPosition + halfCatchWidth;
         }
 
-        public void OnNewResult(DrawableCatchHitObject drawableObject, JudgementResult result)
+        public void OnNewResult(DrawableCatchHitObject drawableObject, JudgementResult result, bool placeOnPlate)
         {
             var catchResult = (CatchJudgementResult)result;
             catchResult.CatcherAnimationState = CurrentState;
@@ -237,7 +237,8 @@ namespace osu.Game.Rulesets.Catch.UI
             {
                 var positionInStack = computePositionInStack(new Vector2(palpableObject.X - X, 0), palpableObject.DisplaySize.X / 2);
 
-                placeCaughtObject(palpableObject, positionInStack);
+                if (placeOnPlate)
+                    placeCaughtObject(palpableObject, positionInStack);
 
                 if (hitLighting.Value)
                     addLighting(hitObject, positionInStack.X, drawableObject.AccentColour.Value);
