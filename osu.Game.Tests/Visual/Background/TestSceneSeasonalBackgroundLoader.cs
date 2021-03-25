@@ -135,13 +135,15 @@ namespace osu.Game.Tests.Visual.Background
                 dummyAPI.HandleRequest = request =>
                 {
                     if (dummyAPI.State.Value != APIState.Online || !(request is GetSeasonalBackgroundsRequest backgroundsRequest))
-                        return;
+                        return false;
 
                     backgroundsRequest.TriggerSuccess(new APISeasonalBackgrounds
                     {
                         Backgrounds = seasonal_background_urls.Select(url => new APISeasonalBackground { Url = url }).ToList(),
                         EndDate = endDate
                     });
+
+                    return true;
                 };
             });
 

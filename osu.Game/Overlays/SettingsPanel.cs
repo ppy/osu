@@ -27,7 +27,7 @@ namespace osu.Game.Overlays
 
         private const float sidebar_width = Sidebar.DEFAULT_WIDTH;
 
-        protected const float WIDTH = 400;
+        public const float WIDTH = 400;
 
         protected Container<Drawable> ContentContainer;
 

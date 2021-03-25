@@ -462,8 +462,6 @@ namespace osu.Game.Database
                 // Dereference the existing file info, since the file model will be removed.
                 if (file.FileInfo != null)
                 {
-                    file.Requery(usage.Context);
-
                     Files.Dereference(file.FileInfo);
 
                     // This shouldn't be required, but here for safety in case the provided TModel is not being change tracked
@@ -637,12 +635,10 @@ namespace osu.Game.Database
             {
                 using (Stream s = reader.GetStream(file))
                 {
-                    var fileInfo = files.Add(s);
                     fileInfos.Add(new TFileModel
                     {
                         Filename = file.Substring(prefix.Length).ToStandardisedPath(),
-                        FileInfo = fileInfo,
-                        FileInfoID = fileInfo.ID // workaround for efcore 5 compatibility.
+                        FileInfo = files.Add(s)
                     });
                 }
             }
