@@ -76,18 +76,18 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 }
             });
 
-            bonusCounter = (LegacySpriteText)source.GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ScoreText));
+            bonusCounter = (source.GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ScoreText)) as LegacySpriteText)?.With(c =>
+            {
+                c.Alpha = 0f;
+                c.Anchor = Anchor.TopCentre;
+                c.Origin = Anchor.Centre;
+                c.Font = c.Font.With(fixedWidth: false);
+                c.Scale = new Vector2(SPRITE_SCALE);
+                c.Y = SPINNER_TOP_OFFSET + 299;
+            });
 
             if (bonusCounter != null)
-            {
-                bonusCounter.Alpha = 0f;
-                bonusCounter.Anchor = Anchor.TopCentre;
-                bonusCounter.Origin = Anchor.Centre;
-                bonusCounter.Font = bonusCounter.Font.With(fixedWidth: false);
-                bonusCounter.Scale = new Vector2(SPRITE_SCALE);
-                bonusCounter.Y = SPINNER_TOP_OFFSET + 299;
                 overlayContainer.Add(bonusCounter);
-            }
         }
 
         private IBindable<double> gainedBonus;
