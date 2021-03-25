@@ -33,11 +33,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public SpinnerSpmCounter SpmCounter { get; private set; }
 
         private Container<DrawableSpinnerTick> ticks;
-        private SpinnerBonusDisplay bonusDisplay;
         private PausableSkinnableSound spinningSample;
 
         private Bindable<bool> isSpinning;
         private bool spinnerFrequencyModulate;
+
+        /// <summary>
+        /// The amount of bonus score gained from spinning after the required number of spins, for display purposes.
+        /// </summary>
+        public IBindable<double> GainedBonus => gainedBonus;
+
+        private readonly Bindable<double> gainedBonus = new Bindable<double>();
 
         private const double fade_out_duration = 160;
 
@@ -67,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     RelativeSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SpinnerBody), _ => new DefaultSpinnerDisc()),
+                        new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SpinnerBody), _ => new DefaultSpinner()),
                         RotationTracker = new SpinnerRotationTracker(this)
                     }
                 },
@@ -77,12 +83,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Origin = Anchor.Centre,
                     Y = 120,
                     Alpha = 0
-                },
-                bonusDisplay = new SpinnerBonusDisplay
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Y = -120,
                 },
                 spinningSample = new PausableSkinnableSound
                 {
@@ -298,6 +298,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private void fadeInCounter() => SpmCounter.FadeIn(HitObject.TimeFadeIn);
 
+        private static readonly int score_per_tick = new SpinnerBonusTick.OsuSpinnerBonusTickJudgement().MaxNumericResult;
+
         private int wholeSpins;
 
         private void updateBonusScore()
@@ -322,8 +324,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 if (tick != null)
                 {
                     tick.TriggerResult(true);
+
                     if (tick is DrawableSpinnerBonusTick)
-                        bonusDisplay.SetBonusCount(spins - HitObject.SpinsRequired);
+                        gainedBonus.Value = score_per_tick * (spins - HitObject.SpinsRequired);
                 }
 
                 wholeSpins++;
