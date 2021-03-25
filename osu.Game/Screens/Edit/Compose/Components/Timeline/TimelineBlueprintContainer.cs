@@ -136,41 +136,42 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             // after the stack gets this tall, we can presume there is space underneath to draw subsequent blueprints.
             const int stack_reset_count = 3;
 
-            Stack<double> currentConcurrentObjects = new Stack<double>();
+            Stack<HitObject> currentConcurrentObjects = new Stack<HitObject>();
 
             foreach (var b in SelectionBlueprints.OrderBy(b => b.HitObject.StartTime).ThenBy(b => b.HitObject.GetEndTime()))
             {
-                while (currentConcurrentObjects.TryPeek(out double stackEndTime))
+                // remove objects from the stack as long as their end time is in the past.
+                while (currentConcurrentObjects.TryPeek(out HitObject hitObject))
                 {
-                    if (Precision.AlmostBigger(stackEndTime, b.HitObject.StartTime, 1))
+                    if (Precision.AlmostBigger(hitObject.GetEndTime(), b.HitObject.StartTime, 1))
                         break;
 
                     currentConcurrentObjects.Pop();
                 }
 
-                b.Y = -(stack_offset * currentConcurrentObjects.Count);
-
-                var bEndTime = b.HitObject.GetEndTime();
-
                 // if the stack gets too high, we should have space below it to display the next batch of objects.
                 // importantly, we only do this if time has incremented, else a stack of hitobjects all at the same time value would start to overlap themselves.
-                if (!currentConcurrentObjects.TryPeek(out double nextStackEndTime) ||
-                    !Precision.AlmostEquals(nextStackEndTime, bEndTime, 1))
+                if (currentConcurrentObjects.TryPeek(out HitObject h) && !Precision.AlmostEquals(h.StartTime, b.HitObject.StartTime, 1))
                 {
                     if (currentConcurrentObjects.Count >= stack_reset_count)
                         currentConcurrentObjects.Clear();
                 }
 
-                currentConcurrentObjects.Push(bEndTime);
+                b.Y = -(stack_offset * currentConcurrentObjects.Count);
+
+                currentConcurrentObjects.Push(b.HitObject);
             }
         }
 
         protected override SelectionHandler CreateSelectionHandler() => new TimelineSelectionHandler();
 
-        protected override SelectionBlueprint CreateBlueprintFor(HitObject hitObject) => new TimelineHitObjectBlueprint(hitObject)
+        protected override SelectionBlueprint CreateBlueprintFor(HitObject hitObject)
         {
-            OnDragHandled = handleScrollViaDrag
-        };
+            return new TimelineHitObjectBlueprint(hitObject)
+            {
+                OnDragHandled = handleScrollViaDrag
+            };
+        }
 
         protected override DragBox CreateDragBox(Action<RectangleF> performSelect) => new TimelineDragBox(performSelect);
 
