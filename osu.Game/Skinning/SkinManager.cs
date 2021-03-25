@@ -104,7 +104,7 @@ namespace osu.Game.Skinning
         protected override string ComputeHash(SkinInfo item, ArchiveReader reader = null)
         {
             // we need to populate early to create a hash based off skin.ini contents
-            if (item.Name?.EndsWith(".osk", StringComparison.OrdinalIgnoreCase) == true)
+            if (item.Name?.Contains(".osk", StringComparison.OrdinalIgnoreCase) == true)
                 populateMetadata(item);
 
             if (item.Creator != null && item.Creator != unknown_creator_string)
@@ -122,7 +122,7 @@ namespace osu.Game.Skinning
         {
             await base.Populate(model, archive, cancellationToken).ConfigureAwait(false);
 
-            if (model.Name?.EndsWith(".osk", StringComparison.OrdinalIgnoreCase) == true)
+            if (model.Name?.Contains(".osk", StringComparison.OrdinalIgnoreCase) == true)
                 populateMetadata(model);
         }
 
