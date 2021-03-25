@@ -138,8 +138,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             Stack<double> currentConcurrentObjects = new Stack<double>();
 
-            // Reversing is done to enumerate in order of increasing StartTime.
-            foreach (var b in SelectionBlueprints.Reverse())
+            foreach (var b in SelectionBlueprints.OrderBy(b => b.HitObject.StartTime).ThenBy(b => b.HitObject.GetEndTime()))
             {
                 while (currentConcurrentObjects.TryPeek(out double stackEndTime))
                 {
