@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using Humanizer;
 
 namespace osu.Game.Utils
@@ -12,14 +13,14 @@ namespace osu.Game.Utils
         /// </summary>
         /// <param name="accuracy">The accuracy to be formatted</param>
         /// <returns>formatted accuracy in percentage</returns>
-        public static string FormatAccuracy(this double accuracy) => $"{accuracy:0.00%}";
+        public static string FormatAccuracy(this double accuracy)
+        {
+            // we don't ever want to show 100% when the accuracy is below perfect, even if it rounds to 100%.
+            if (accuracy < 1 && accuracy > 0.9999)
+                accuracy = 0.9999;
 
-        /// <summary>
-        /// Turns the provided accuracy into a percentage with 2 decimal places.
-        /// </summary>
-        /// <param name="accuracy">The accuracy to be formatted</param>
-        /// <returns>formatted accuracy in percentage</returns>
-        public static string FormatAccuracy(this decimal accuracy) => $"{accuracy:0.00}%";
+            return $"{accuracy:0.00%}";
+        }
 
         /// <summary>
         /// Formats the supplied rank/leaderboard position in a consistent, simplified way.
