@@ -158,46 +158,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     continue;
 
                 Vector2[] points = slider.Path.PointsInSegment(segmentStartPoint).Select(p => p.Position.Value).ToArray();
-                if (points.Length == 3 && !validCircularArcSegment(points))
+                if (points.Length == 3 && circularArcBoundingBox(points).Area >= 640 * 480)
                     segmentStartPoint.Type.Value = PathType.Bezier;
             }
-        }
-
-        /// <summary>
-        /// Returns whether the given points are arranged in a valid way. Invalid if points
-        /// are almost entirely linear - as this causes the radius to approach infinity,
-        /// or if the bounding box of the arc is too large.
-        /// </summary>
-        /// <param name="points">The three points that make up this circular arc segment.</param>
-        /// <returns></returns>
-        private bool validCircularArcSegment(IReadOnlyList<Vector2> points)
-        {
-            float det = circularArcDeterminant(points);
-            RectangleF boundingBox = circularArcBoundingBox(points);
-
-            // Determinant limit prevents memory exhaustion as a result of approximating the subpath.
-            // Bounding box area limit prevents memory exhaustion as a result of drawing the texture.
-            return Math.Abs(det) > 0.001f && boundingBox.Area < 640 * 480;
-        }
-
-        /// <summary>
-        /// Computes the determinant of the circular arc segment defined by the given points.
-        /// </summary>
-        /// <param name="points">The three points defining the circular arc.</param>
-        /// <returns></returns>
-        private float circularArcDeterminant(IReadOnlyList<Vector2> points)
-        {
-            Vector2 a = points[0];
-            Vector2 b = points[1];
-            Vector2 c = points[2];
-
-            float maxLength = points.Max(p => p.Length);
-
-            Vector2 normA = new Vector2(a.X / maxLength, a.Y / maxLength);
-            Vector2 normB = new Vector2(b.X / maxLength, b.Y / maxLength);
-            Vector2 normC = new Vector2(c.X / maxLength, c.Y / maxLength);
-
-            return (normA.X - normB.X) * (normB.Y - normC.Y) - (normB.X - normC.X) * (normA.Y - normB.Y);
         }
 
         /// <summary>
