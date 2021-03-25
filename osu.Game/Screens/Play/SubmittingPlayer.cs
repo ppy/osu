@@ -33,13 +33,20 @@ namespace osu.Game.Screens.Play
 
         protected override void LoadAsyncComplete()
         {
+            if (!handleTokenRetrieval()) return;
+
+            base.LoadAsyncComplete();
+        }
+
+        private bool handleTokenRetrieval()
+        {
             // Token request construction should happen post-load to allow derived classes to potentially prepare DI backings that are used to create the request.
             var tcs = new TaskCompletionSource<bool>();
 
             if (!api.IsLoggedIn)
             {
                 handleTokenFailure(new InvalidOperationException("API is not online."));
-                return;
+                return false;
             }
 
             var req = CreateTokenRequest();
@@ -47,7 +54,7 @@ namespace osu.Game.Screens.Play
             if (req == null)
             {
                 handleTokenFailure(new InvalidOperationException("Request could not be constructed."));
-                return;
+                return false;
             }
 
             req.Success += r =>
@@ -60,8 +67,7 @@ namespace osu.Game.Screens.Play
             api.Queue(req);
 
             tcs.Task.Wait();
-
-            base.LoadAsyncComplete();
+            return true;
 
             void handleTokenFailure(Exception exception)
             {
