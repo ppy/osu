@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Gameplay
         public void TestRetrieveTopLevelSample()
         {
             ISkin skin = null;
-            Sample channel = null;
+            ISample channel = null;
 
             AddStep("create skin", () => skin = new TestSkin("test-sample", this));
             AddStep("retrieve sample", () => channel = skin.GetSample(new SampleInfo("test-sample")));
@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Gameplay
         public void TestRetrieveSampleInSubFolder()
         {
             ISkin skin = null;
-            Sample channel = null;
+            ISample channel = null;
 
             AddStep("create skin", () => skin = new TestSkin("folder/test-sample", this));
             AddStep("retrieve sample", () => channel = skin.GetSample(new SampleInfo("folder/test-sample")));
