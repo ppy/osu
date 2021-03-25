@@ -8,6 +8,7 @@ using osu.Framework.Input.Handlers;
 using osu.Framework.Input.Handlers.Joystick;
 using osu.Framework.Input.Handlers.Midi;
 using osu.Framework.Input.Handlers.Mouse;
+using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Platform;
 using osu.Game.Overlays.Settings.Sections.Input;
 
@@ -55,6 +56,11 @@ namespace osu.Game.Overlays.Settings.Sections
 
             switch (handler)
             {
+                // ReSharper disable once SuspiciousTypeConversion.Global (net standard fuckery)
+                case ITabletHandler th:
+                    section = new TabletSettings(th);
+                    break;
+
                 case MouseHandler mh:
                     section = new MouseSettings(mh);
                     break;

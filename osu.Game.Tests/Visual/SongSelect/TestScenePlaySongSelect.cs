@@ -911,11 +911,9 @@ namespace osu.Game.Tests.Visual.SongSelect
                 int length = RNG.Next(30000, 200000);
                 double bpm = RNG.NextSingle(80, 200);
 
-                var ruleset = getRuleset();
                 beatmaps.Add(new BeatmapInfo
                 {
-                    Ruleset = ruleset,
-                    RulesetID = ruleset.ID.GetValueOrDefault(), // workaround for efcore 5 compatibility.
+                    Ruleset = getRuleset(),
                     OnlineBeatmapID = beatmapId,
                     Version = $"{beatmapId} (length {TimeSpan.FromMilliseconds(length):m\\:ss}, bpm {bpm:0.#})",
                     Length = length,

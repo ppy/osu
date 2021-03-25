@@ -32,8 +32,10 @@ namespace osu.Game.Tests.Visual.SongSelect
                     {
                         case GetUserRequest userRequest:
                             userRequest.TriggerSuccess(getUser(userRequest.Ruleset.ID));
-                            break;
+                            return true;
                     }
+
+                    return false;
                 };
             });
 
@@ -186,7 +188,6 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Metadata = metadata,
                     BaseDifficulty = new BeatmapDifficulty(),
                     Ruleset = ruleset,
-                    RulesetID = ruleset.ID.GetValueOrDefault(), // workaround for efcore 5 compatibility.
                     StarDifficulty = difficultyIndex + 1,
                     Version = $"SR{difficultyIndex + 1}"
                 }).ToList()
