@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Edit.Compose
             {
                 builder.Append($"{clock.CurrentTime.ToEditorFormattedString()}{separator}");
                 return builder.ToString();
-            };
+            }
 
             builder.Append(editorBeatmap.SelectedHitObjects.First().StartTime.ToEditorFormattedString());
             builder.Append($" ({string.Join(',', composer.ConvertSelectionToString())}){separator}");
