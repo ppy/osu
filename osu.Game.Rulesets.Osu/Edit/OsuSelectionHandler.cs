@@ -197,8 +197,13 @@ namespace osu.Game.Rulesets.Osu.Edit
             Quad sliderQuad = getSurroundingQuad(slider.Path.ControlPoints.Select(p => p.Position.Value));
             Vector2 pathRelativeDeltaScale = new Vector2(1 + scale.X / sliderQuad.Width, 1 + scale.Y / sliderQuad.Height);
 
+            Queue<Vector2> oldControlPoints = new Queue<Vector2>();
+
             foreach (var point in slider.Path.ControlPoints)
+            {
+                oldControlPoints.Enqueue(point.Position.Value);
                 point.Position.Value *= pathRelativeDeltaScale;
+            }
 
             //if sliderhead or sliderend end up outside playfield, revert scaling.
             Quad scaledQuad = getSurroundingQuad(new OsuHitObject[] { slider });
@@ -207,8 +212,8 @@ namespace osu.Game.Rulesets.Osu.Edit
             if (xInBounds && yInBounds)
                 return true;
 
-            foreach (var point in slider.Path.ControlPoints)
-                point.Position.Value *= new Vector2(1 / pathRelativeDeltaScale.X, 1 / pathRelativeDeltaScale.Y);
+            foreach(var point in slider.Path.ControlPoints)
+                point.Position.Value = oldControlPoints.Dequeue();
 
             return true;
         }
