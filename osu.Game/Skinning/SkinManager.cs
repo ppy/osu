@@ -104,7 +104,7 @@ namespace osu.Game.Skinning
         protected override string ComputeHash(SkinInfo item, ArchiveReader reader = null)
         {
             // we need to populate early to create a hash based off skin.ini contents
-            if (item.Name?.Contains(".osk") == true)
+            if (item.Name?.Contains(".osk", StringComparison.OrdinalIgnoreCase) == true)
                 populateMetadata(item);
 
             if (item.Creator != null && item.Creator != unknown_creator_string)
@@ -122,7 +122,7 @@ namespace osu.Game.Skinning
         {
             await base.Populate(model, archive, cancellationToken).ConfigureAwait(false);
 
-            if (model.Name?.Contains(".osk") == true)
+            if (model.Name?.Contains(".osk", StringComparison.OrdinalIgnoreCase) == true)
                 populateMetadata(model);
         }
 
@@ -137,14 +137,9 @@ namespace osu.Game.Skinning
             }
             else
             {
-                item.Name = item.Name.Replace(".osk", "");
+                item.Name = item.Name.Replace(".osk", "", StringComparison.OrdinalIgnoreCase);
                 item.Creator ??= unknown_creator_string;
             }
-        }
-
-        protected override void PreImport(SkinInfo model)
-        {
-            model.Requery(ContextFactory);
         }
 
         /// <summary>
@@ -176,7 +171,7 @@ namespace osu.Game.Skinning
 
         public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => CurrentSkin.Value.GetTexture(componentName, wrapModeS, wrapModeT);
 
-        public Sample GetSample(ISampleInfo sampleInfo) => CurrentSkin.Value.GetSample(sampleInfo);
+        public ISample GetSample(ISampleInfo sampleInfo) => CurrentSkin.Value.GetSample(sampleInfo);
 
         public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => CurrentSkin.Value.GetConfig<TLookup, TValue>(lookup);
 

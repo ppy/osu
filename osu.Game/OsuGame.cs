@@ -531,6 +531,13 @@ namespace osu.Game
             SentryLogger.Dispose();
         }
 
+        protected override IDictionary<FrameworkSetting, object> GetFrameworkConfigDefaults()
+            => new Dictionary<FrameworkSetting, object>
+            {
+                // General expectation that osu! starts in fullscreen by default (also gives the most predictable performance)
+                { FrameworkSetting.WindowMode, WindowMode.Fullscreen }
+            };
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -758,9 +765,15 @@ namespace osu.Game
         {
             otherOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
 
-            // show above others if not visible at all, else leave at current depth.
-            if (!overlay.IsPresent)
+            // Partially visible so leave it at the current depth.
+            if (overlay.IsPresent)
+                return;
+
+            // Show above all other overlays.
+            if (overlay.IsLoaded)
                 overlayContent.ChangeChildDepth(overlay, (float)-Clock.CurrentTime);
+            else
+                overlay.Depth = (float)-Clock.CurrentTime;
         }
 
         private void forwardLoggedErrorsToNotifications()

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Globalization;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -32,6 +33,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private Sprite spin;
         private Sprite clear;
 
+        private LegacySpriteText bonusCounter;
+
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject drawableHitObject, ISkinSource source)
         {
@@ -45,35 +48,66 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             DrawableSpinner = (DrawableSpinner)drawableHitObject;
 
-            AddRangeInternal(new[]
+            Container overlayContainer;
+
+            AddInternal(overlayContainer = new Container
             {
-                spin = new Sprite
+                Depth = float.MinValue,
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
                 {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.Centre,
-                    Depth = float.MinValue,
-                    Texture = source.GetTexture("spinner-spin"),
-                    Scale = new Vector2(SPRITE_SCALE),
-                    Y = SPINNER_TOP_OFFSET + 335,
-                },
-                clear = new Sprite
-                {
-                    Alpha = 0,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.Centre,
-                    Depth = float.MinValue,
-                    Texture = source.GetTexture("spinner-clear"),
-                    Scale = new Vector2(SPRITE_SCALE),
-                    Y = SPINNER_TOP_OFFSET + 115,
-                },
+                    spin = new Sprite
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.Centre,
+                        Texture = source.GetTexture("spinner-spin"),
+                        Scale = new Vector2(SPRITE_SCALE),
+                        Y = SPINNER_TOP_OFFSET + 335,
+                    },
+                    clear = new Sprite
+                    {
+                        Alpha = 0,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.Centre,
+                        Texture = source.GetTexture("spinner-clear"),
+                        Scale = new Vector2(SPRITE_SCALE),
+                        Y = SPINNER_TOP_OFFSET + 115,
+                    },
+                }
             });
+
+            bonusCounter = (source.GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ScoreText)) as LegacySpriteText)?.With(c =>
+            {
+                c.Alpha = 0f;
+                c.Anchor = Anchor.TopCentre;
+                c.Origin = Anchor.Centre;
+                c.Font = c.Font.With(fixedWidth: false);
+                c.Scale = new Vector2(SPRITE_SCALE);
+                c.Y = SPINNER_TOP_OFFSET + 299;
+            });
+
+            if (bonusCounter != null)
+                overlayContainer.Add(bonusCounter);
         }
+
+        private IBindable<double> gainedBonus;
 
         private readonly Bindable<bool> completed = new Bindable<bool>();
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            if (bonusCounter != null)
+            {
+                gainedBonus = DrawableSpinner.GainedBonus.GetBoundCopy();
+                gainedBonus.BindValueChanged(bonus =>
+                {
+                    bonusCounter.Text = bonus.NewValue.ToString(NumberFormatInfo.InvariantInfo);
+                    bonusCounter.FadeOutFromOne(800, Easing.Out);
+                    bonusCounter.ScaleTo(SPRITE_SCALE * 2f).Then().ScaleTo(SPRITE_SCALE * 1.28f, 800, Easing.Out);
+                });
+            }
 
             completed.BindValueChanged(onCompletedChanged, true);
 
