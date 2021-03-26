@@ -143,19 +143,18 @@ namespace osu.Game.Rulesets.Osu.Edit
             adjustScaleFromAnchor(ref scale, reference);
 
             var hitObjects = selectedMovableObjects;
-            bool result;
 
             // for the time being, allow resizing of slider paths only if the slider is
             // the only hit object selected. with a group selection, it's likely the user
             // is not looking to change the duration of the slider but expand the whole pattern.
             if (hitObjects.Length == 1 && hitObjects.First() is Slider slider)
-                result = scaleSlider(slider, scale);
+                scaleSlider(slider, scale);
             else
-                result = scaleHitObjects(hitObjects, reference, scale);
+                scaleHitObjects(hitObjects, reference, scale);
 
             moveSelectionInBounds();
 
-            return result;
+            return true;
         }
 
         private static void adjustScaleFromAnchor(ref Vector2 scale, Anchor reference)
@@ -192,7 +191,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             return true;
         }
 
-        private bool scaleSlider(Slider slider, Vector2 scale)
+        private void scaleSlider(Slider slider, Vector2 scale)
         {
             Quad sliderQuad = getSurroundingQuad(slider.Path.ControlPoints.Select(p => p.Position.Value));
             Vector2 pathRelativeDeltaScale = new Vector2(1 + scale.X / sliderQuad.Width, 1 + scale.Y / sliderQuad.Height);
@@ -210,15 +209,13 @@ namespace osu.Game.Rulesets.Osu.Edit
             (bool xInBounds, bool yInBounds) = isQuadInBounds(scaledQuad);
 
             if (xInBounds && yInBounds)
-                return true;
+                return;
 
             foreach(var point in slider.Path.ControlPoints)
                 point.Position.Value = oldControlPoints.Dequeue();
-
-            return true;
         }
 
-        private bool scaleHitObjects(OsuHitObject[] hitObjects, Anchor reference, Vector2 scale)
+        private void scaleHitObjects(OsuHitObject[] hitObjects, Anchor reference, Vector2 scale)
         {
             scale = getClampedScale(hitObjects, reference, scale);
 
@@ -241,8 +238,6 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                 h.Position = newPosition;
             }
-
-            return true;
         }
 
         private (bool X, bool Y) isQuadInBounds(Quad quad)
