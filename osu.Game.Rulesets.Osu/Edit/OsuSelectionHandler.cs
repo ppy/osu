@@ -211,7 +211,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             if (xInBounds && yInBounds)
                 return;
 
-            foreach(var point in slider.Path.ControlPoints)
+            foreach (var point in slider.Path.ControlPoints)
                 point.Position.Value = oldControlPoints.Dequeue();
         }
 
