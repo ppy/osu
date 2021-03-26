@@ -212,7 +212,7 @@ namespace osu.Game.Tests.NonVisual
                 throw new NotImplementedException();
             }
 
-            protected override Skill[] CreateSkills(IBeatmap beatmap)
+            protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods)
             {
                 throw new NotImplementedException();
             }

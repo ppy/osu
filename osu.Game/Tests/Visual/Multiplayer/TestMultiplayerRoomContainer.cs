@@ -32,11 +32,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             RelativeSizeAxes = Axes.Both;
 
+            RoomManager = new TestMultiplayerRoomManager();
+            Client = new TestMultiplayerClient(RoomManager);
+            OngoingOperationTracker = new OngoingOperationTracker();
+
             AddRangeInternal(new Drawable[]
             {
-                Client = new TestMultiplayerClient(),
-                RoomManager = new TestMultiplayerRoomManager(),
-                OngoingOperationTracker = new OngoingOperationTracker(),
+                Client,
+                RoomManager,
+                OngoingOperationTracker,
                 content = new Container { RelativeSizeAxes = Axes.Both }
             });
         }

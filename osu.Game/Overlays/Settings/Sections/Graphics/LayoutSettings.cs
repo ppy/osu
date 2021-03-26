@@ -11,6 +11,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
@@ -234,7 +235,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             private class ResolutionDropdownControl : DropdownControl
             {
-                protected override string GenerateItemText(Size item)
+                protected override LocalisableString GenerateItemText(Size item)
                 {
                     if (item == new Size(9999, 9999))
                         return "Default";

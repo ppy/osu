@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Difficulty.Skills
 {
@@ -46,9 +47,21 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         protected double CurrentStrain { get; private set; } = 1;
 
+        /// <summary>
+        /// Mods for use in skill calculations.
+        /// </summary>
+        protected IReadOnlyList<Mod> Mods => mods;
+
         private double currentSectionPeak = 1; // We also keep track of the peak strain level in the current section.
 
         private readonly List<double> strainPeaks = new List<double>();
+
+        private readonly Mod[] mods;
+
+        protected Skill(Mod[] mods)
+        {
+            this.mods = mods;
+        }
 
         /// <summary>
         /// Process a <see cref="DifficultyHitObject"/> and update current strain values accordingly.
