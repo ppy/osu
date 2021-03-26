@@ -32,8 +32,10 @@ namespace osu.Game.Tests.Visual.SongSelect
                     {
                         case GetUserRequest userRequest:
                             userRequest.TriggerSuccess(getUser(userRequest.Ruleset.ID));
-                            break;
+                            return true;
                     }
+
+                    return false;
                 };
             });
 

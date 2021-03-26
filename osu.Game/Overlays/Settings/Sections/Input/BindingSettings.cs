@@ -5,17 +5,17 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
-    public class KeyboardSettings : SettingsSubsection
+    public class BindingSettings : SettingsSubsection
     {
-        protected override string Header => "Keyboard";
+        protected override string Header => "Shortcut and gameplay bindings";
 
-        public KeyboardSettings(KeyBindingPanel keyConfig)
+        public BindingSettings(KeyBindingPanel keyConfig)
         {
             Children = new Drawable[]
             {
                 new SettingsButton
                 {
-                    Text = "Key configuration",
+                    Text = "Configure",
                     TooltipText = "change global shortcut keys and gameplay bindings",
                     Action = keyConfig.ToggleVisibility
                 },

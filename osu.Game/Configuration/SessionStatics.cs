@@ -14,10 +14,10 @@ namespace osu.Game.Configuration
     {
         protected override void InitialiseDefaults()
         {
-            Set(Static.LoginOverlayDisplayed, false);
-            Set(Static.MutedAudioNotificationShownOnce, false);
-            Set(Static.LastHoverSoundPlaybackTime, (double?)null);
-            Set<APISeasonalBackgrounds>(Static.SeasonalBackgrounds, null);
+            SetDefault(Static.LoginOverlayDisplayed, false);
+            SetDefault(Static.MutedAudioNotificationShownOnce, false);
+            SetDefault(Static.LastHoverSoundPlaybackTime, (double?)null);
+            SetDefault<APISeasonalBackgrounds>(Static.SeasonalBackgrounds, null);
         }
     }
 
