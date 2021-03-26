@@ -119,5 +119,8 @@ namespace osu.Game.Rulesets.Mania.Edit
                     beatSnapGrid.SelectionTimeRange = null;
             }
         }
+
+        public override IEnumerable<string> ConvertSelectionToString()
+            => EditorBeatmap.SelectedHitObjects.Cast<ManiaHitObject>().Select(h => $"{h.StartTime}|{h.Column}");
     }
 }

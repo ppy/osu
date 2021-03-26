@@ -6,6 +6,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
+using osu.Framework.Input.Bindings;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
@@ -14,16 +16,19 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Edit.Compose
 {
-    public class ComposeScreen : EditorScreenWithTimeline
+    public class ComposeScreen : EditorScreenWithTimeline, IKeyBindingHandler<PlatformAction>
     {
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; }
 
         private HitObjectComposer composer;
 
+        private SelectionHelper helper;
+
         public ComposeScreen()
             : base(EditorScreenMode.Compose)
         {
+            Add(helper = new SelectionHelper());
         }
 
         private Ruleset ruleset;
@@ -71,6 +76,22 @@ namespace osu.Game.Screens.Edit.Compose
             // load the skinning hierarchy first.
             // this is intentionally done in two stages to ensure things are in a loaded state before exposing the ruleset to skin sources.
             return beatmapSkinProvider.WithChild(rulesetSkinProvider.WithChild(content));
+        }
+
+        public bool OnPressed(PlatformAction action)
+        {
+            switch (action.ActionType)
+            {
+                case PlatformActionType.Copy:
+                    helper.CopySelectionToClipboard();
+                    return false;
+                default:
+                    return false;
+            };
+        }
+
+        public void OnReleased(PlatformAction action)
+        {
         }
     }
 }

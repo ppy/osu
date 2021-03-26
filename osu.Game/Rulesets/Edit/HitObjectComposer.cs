@@ -438,6 +438,8 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         public abstract bool CursorInPlacementArea { get; }
 
+        public virtual IEnumerable<string> ConvertSelectionToString() => Array.Empty<string>();
+
         #region IPositionSnapProvider
 
         public abstract SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition);
