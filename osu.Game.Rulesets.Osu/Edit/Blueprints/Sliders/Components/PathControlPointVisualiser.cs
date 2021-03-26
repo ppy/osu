@@ -16,6 +16,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -157,85 +158,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 if (segmentStartPoint.Type.Value != PathType.PerfectCurve)
                     continue;
 
-                Vector2[] points = slider.Path.PointsInSegment(segmentStartPoint).Select(p => p.Position.Value).ToArray();
-                if (points.Length == 3 && circularArcBoundingBox(points).Area >= 640 * 480)
+                ReadOnlySpan<Vector2> points = slider.Path.PointsInSegment(segmentStartPoint).Select(p => p.Position.Value).ToArray();
+                RectangleF boundingBox = PathApproximator.CircularArcBoundingBox(points);
+                if (points.Length == 3 && boundingBox.Area >= 640 * 480)
                     segmentStartPoint.Type.Value = PathType.Bezier;
             }
-        }
-
-        /// <summary>
-        /// Computes the bounding box of the circular arc segment defined by the given points.
-        /// </summary>
-        /// <param name="points">The three points defining the circular arc.</param>
-        /// <returns></returns>
-        private RectangleF circularArcBoundingBox(IReadOnlyList<Vector2> points)
-        {
-            Vector2 a = points[0];
-            Vector2 b = points[1];
-            Vector2 c = points[2];
-
-            // See: https://en.wikipedia.org/wiki/Circumscribed_circle#Cartesian_coordinates_2
-            float d = 2 * (a.X * (b - c).Y + b.X * (c - a).Y + c.X * (a - b).Y);
-            float aSq = a.LengthSquared;
-            float bSq = b.LengthSquared;
-            float cSq = c.LengthSquared;
-
-            Vector2 center = new Vector2(
-                aSq * (b - c).Y + bSq * (c - a).Y + cSq * (a - b).Y,
-                aSq * (c - b).X + bSq * (a - c).X + cSq * (b - a).X) / d;
-
-            Vector2 dA = a - center;
-            Vector2 dC = c - center;
-
-            float r = dA.Length;
-
-            double thetaStart = Math.Atan2(dA.Y, dA.X);
-            double thetaEnd = Math.Atan2(dC.Y, dC.X);
-
-            while (thetaEnd < thetaStart)
-                thetaEnd += 2 * Math.PI;
-
-            // Decide in which direction to draw the circle, depending on which side of
-            // AC B lies.
-            Vector2 orthoAtoC = c - a;
-            orthoAtoC = new Vector2(orthoAtoC.Y, -orthoAtoC.X);
-            bool clockwise = Vector2.Dot(orthoAtoC, b - a) >= 0;
-
-            if (clockwise)
-            {
-                if (thetaEnd < thetaStart)
-                    thetaEnd += Math.PI * 2;
-            }
-            else
-            {
-                if (thetaStart < thetaEnd)
-                    thetaStart += Math.PI * 2;
-            }
-
-            List<Vector2> boundingBoxPoints = new List<Vector2>(points);
-
-            bool includes0Degrees = 0 > thetaStart && 0 < thetaEnd;
-            bool includes90Degrees = Math.PI / 2 > thetaStart && Math.PI / 2 < thetaEnd;
-            bool includes180Degrees = Math.PI > thetaStart && Math.PI < thetaEnd;
-            bool includes270Degrees = Math.PI * 1.5f > thetaStart && Math.PI * 1.5f < thetaEnd;
-
-            if (!clockwise)
-            {
-                includes0Degrees = 0 < thetaStart && 0 > thetaEnd;
-                includes90Degrees = Math.PI / 2 < thetaStart && Math.PI / 2 > thetaEnd;
-                includes180Degrees = Math.PI < thetaStart && Math.PI > thetaEnd;
-                includes270Degrees = Math.PI * 1.5f < thetaStart && Math.PI * 1.5f > thetaEnd;
-            }
-
-            if (includes0Degrees) boundingBoxPoints.Add(center + new Vector2(1, 0) * r);
-            if (includes90Degrees) boundingBoxPoints.Add(center + new Vector2(0, 1) * r);
-            if (includes180Degrees) boundingBoxPoints.Add(center + new Vector2(-1, 0) * r);
-            if (includes270Degrees) boundingBoxPoints.Add(center + new Vector2(0, -1) * r);
-
-            float width = Math.Abs(boundingBoxPoints.Max(p => p.X) - boundingBoxPoints.Min(p => p.X));
-            float height = Math.Abs(boundingBoxPoints.Max(p => p.Y) - boundingBoxPoints.Min(p => p.Y));
-
-            return new RectangleF(slider.Position, new Vector2(width, height));
         }
 
         private void selectPiece(PathControlPointPiece piece, MouseButtonEvent e)
