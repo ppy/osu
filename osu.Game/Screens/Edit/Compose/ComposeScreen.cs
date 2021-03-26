@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Edit.Compose
 
         private HitObjectComposer composer;
 
-        private SelectionHelper helper;
+        private readonly SelectionHelper helper;
 
         public ComposeScreen()
             : base(EditorScreenMode.Compose)
@@ -85,6 +85,7 @@ namespace osu.Game.Screens.Edit.Compose
                 case PlatformActionType.Copy:
                     helper.CopySelectionToClipboard();
                     return false;
+
                 default:
                     return false;
             }
