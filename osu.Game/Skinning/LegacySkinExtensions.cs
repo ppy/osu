@@ -97,10 +97,10 @@ namespace osu.Game.Skinning
             switch (font)
             {
                 case LegacyFont.Score:
-                    return source.GetConfig<LegacySetting, float>(LegacySetting.ScoreOverlap)?.Value ?? -2f;
+                    return source.GetConfig<LegacySetting, float>(LegacySetting.ScoreOverlap)?.Value ?? 0f;
 
                 case LegacyFont.Combo:
-                    return source.GetConfig<LegacySetting, float>(LegacySetting.ComboOverlap)?.Value ?? -2f;
+                    return source.GetConfig<LegacySetting, float>(LegacySetting.ComboOverlap)?.Value ?? 0f;
 
                 case LegacyFont.HitCircle:
                     return source.GetConfig<LegacySetting, float>(LegacySetting.HitCircleOverlap)?.Value ?? -2f;
