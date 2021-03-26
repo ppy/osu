@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Globalization;
 using NUnit.Framework;
 using osu.Game.Utils;
 
@@ -19,7 +20,7 @@ namespace osu.Game.Tests.NonVisual
         [TestCase(1, "100.00%")]
         public void TestAccuracyFormatting(double input, string expectedOutput)
         {
-            Assert.AreEqual(expectedOutput, input.FormatAccuracy());
+            Assert.AreEqual(expectedOutput, input.FormatAccuracy(CultureInfo.InvariantCulture));
         }
     }
 }
