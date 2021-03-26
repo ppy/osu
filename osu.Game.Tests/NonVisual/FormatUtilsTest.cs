@@ -12,7 +12,7 @@ namespace osu.Game.Tests.NonVisual
         [TestCase(0, "0.00%")]
         [TestCase(0.01, "1.00%")]
         [TestCase(0.9899, "98.99%")]
-        [TestCase(0.989999, "99.00%")]
+        [TestCase(0.989999, "98.99%")]
         [TestCase(0.99, "99.00%")]
         [TestCase(0.9999, "99.99%")]
         [TestCase(0.999999, "99.99%")]

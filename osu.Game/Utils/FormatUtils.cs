@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using Humanizer;
 
 namespace osu.Game.Utils
@@ -14,9 +15,11 @@ namespace osu.Game.Utils
         /// <returns>formatted accuracy in percentage</returns>
         public static string FormatAccuracy(this double accuracy)
         {
-            // we don't ever want to show 100% when the accuracy is below perfect, even if it rounds to 100%.
-            if (accuracy < 1 && accuracy > 0.9999)
-                accuracy = 0.9999;
+            // for the sake of display purposes, we don't want to show a user a "rounded up" percentage to the next whole number.
+            // ie. a score which gets 89.99999% shouldn't ever show as 90%.
+            // the reasoning for this is that cutoffs for grade increases are at whole numbers and displaying the required
+            // percentile with a non-matching grade is confusing.
+            accuracy = Math.Floor(accuracy * 10000) / 10000;
 
             return $"{accuracy:0.00%}";
         }
