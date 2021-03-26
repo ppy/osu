@@ -82,6 +82,9 @@ namespace osu.Game.Rulesets.Osu.Edit
         protected override ComposeBlueprintContainer CreateBlueprintContainer()
             => new OsuBlueprintContainer(this);
 
+        public override IEnumerable<string> ConvertSelectionToString()
+            => selectedHitObjects.Cast<OsuHitObject>().Select(h => (h.IndexInCurrentCombo + 1).ToString());
+
         private DistanceSnapGrid distanceSnapGrid;
         private Container distanceSnapGridContainer;
 
