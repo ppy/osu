@@ -87,7 +87,7 @@ namespace osu.Game.Screens.Edit.Compose
                     return false;
                 default:
                     return false;
-            };
+            }
         }
 
         public void OnReleased(PlatformAction action)
