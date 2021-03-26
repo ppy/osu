@@ -138,7 +138,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             Stack<HitObject> currentConcurrentObjects = new Stack<HitObject>();
 
-            foreach (var b in SelectionBlueprints.OrderBy(b => b.HitObject.StartTime).ThenBy(b => b.HitObject.GetEndTime()))
+            foreach (var b in SelectionBlueprints.Reverse())
             {
                 // remove objects from the stack as long as their end time is in the past.
                 while (currentConcurrentObjects.TryPeek(out HitObject hitObject))
