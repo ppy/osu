@@ -170,7 +170,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         private void joinRequested(Room room)
         {
-            Debug.Assert(joiningRoomOperation == null);
+            if (joiningRoomOperation != null)
+                return;
+
             joiningRoomOperation = ongoingOperationTracker?.BeginOperation();
 
             RoomManager?.JoinRoom(room, r =>
