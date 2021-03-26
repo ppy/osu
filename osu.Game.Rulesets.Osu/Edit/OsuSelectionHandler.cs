@@ -283,7 +283,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             Quad selectionQuad = getSurroundingQuad(hitObjects);
 
-            //todo: this is not always correct for selections involving sliders
+            //todo: this is not always correct for selections involving sliders. This approximation assumes each point is scaled independently, but sliderends move with the sliderhead.
             Quad scaledQuad = new Quad(selectionQuad.TopLeft.X + xOffset, selectionQuad.TopLeft.Y + yOffset, selectionQuad.Width + scale.X, selectionQuad.Height + scale.Y);
 
             //max Size -> playfield bounds
