@@ -123,13 +123,13 @@ namespace osu.Game.Online
             {
                 if (attachedRequest.Progress == 1)
                 {
-                    State.Value = DownloadState.Importing;
                     Progress.Value = 1;
+                    State.Value = DownloadState.Importing;
                 }
                 else
                 {
-                    State.Value = DownloadState.Downloading;
                     Progress.Value = attachedRequest.Progress;
+                    State.Value = DownloadState.Downloading;
 
                     attachedRequest.Failure += onRequestFailure;
                     attachedRequest.DownloadProgressed += onRequestProgress;
