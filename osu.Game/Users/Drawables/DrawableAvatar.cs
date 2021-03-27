@@ -14,7 +14,7 @@ namespace osu.Game.Users.Drawables
     {
         private readonly User user;
 
-        [Resolved(CanBeNull=true)]
+        [Resolved(CanBeNull = true)]
         private IAPIProvider api { get; set; }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace osu.Game.Users.Drawables
                 Texture = textures.Get(user.AvatarUrl.StartsWith('/') ? $"{api.WebsiteRootUrl}{user.AvatarUrl}" : user.AvatarUrl);
             else if (user != null && user.Id > 1)
                 Texture = textures.Get($@"https://a.ppy.sh/{user.Id}");
-            
+
             Texture ??= textures.Get(@"Online/avatar-guest");
         }
 
