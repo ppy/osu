@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
         public readonly double DeltaTime;
 
         /// <summary>
-        /// Start time of <see cref="BaseObject"/>.
+        /// Clockrate adjusted start time of <see cref="BaseObject"/>.
         /// </summary>
         public readonly double StartTime;
 
