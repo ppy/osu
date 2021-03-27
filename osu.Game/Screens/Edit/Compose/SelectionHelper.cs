@@ -41,8 +41,10 @@ namespace osu.Game.Screens.Edit.Compose
                 return builder.ToString();
             }
 
-            builder.Append(editorBeatmap.SelectedHitObjects.First().StartTime.ToEditorFormattedString());
-            builder.Append($" ({string.Join(',', composer.ConvertSelectionToString())}){separator}");
+            string hitObjects = composer != null ? string.Join(',', composer.ConvertSelectionToString()) : string.Empty;
+
+            builder.Append(editorBeatmap.SelectedHitObjects.Min(h => h.StartTime).ToEditorFormattedString());
+            builder.Append($" ({hitObjects}){separator}");
             return builder.ToString();
         }
     }
