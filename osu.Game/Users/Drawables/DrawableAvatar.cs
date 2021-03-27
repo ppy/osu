@@ -34,8 +34,9 @@ namespace osu.Game.Users.Drawables
         [BackgroundDependencyLoader]
         private void load(LargeTextureStore textures)
         {
-            if (api != null && user?.AvatarUrl != null)
-                Texture = textures.Get(user.AvatarUrl.StartsWith('/') ? $"{api.WebsiteRootUrl}{user.AvatarUrl}" : user.AvatarUrl);
+            string avatarUrl = user?.AvatarUrl;
+            if (api != null && avatarUrl != null)
+                Texture = textures.Get(avatarUrl.StartsWith('/') ? $"{api.WebsiteRootUrl}{avatarUrl}" : avatarUrl);
             else if (user != null && user.Id > 1)
                 Texture = textures.Get($@"https://a.ppy.sh/{user.Id}");
 
