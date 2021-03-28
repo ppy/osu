@@ -193,6 +193,9 @@ namespace osu.Game.Input.Bindings
         [Description("Timing mode")]
         EditorTimingMode,
 
+        [Description("Verify mode")]
+        EditorVerifyMode,
+
         [Description("Hold for HUD")]
         HoldForHUD,
 

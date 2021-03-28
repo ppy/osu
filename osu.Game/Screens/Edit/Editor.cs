@@ -36,6 +36,7 @@ using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Design;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Edit.Timing;
+using osu.Game.Screens.Edit.Verify;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
 using osuTK.Graphics;
@@ -445,6 +446,10 @@ namespace osu.Game.Screens.Edit
                     menuBar.Mode.Value = EditorScreenMode.SongSetup;
                     return true;
 
+                case GlobalAction.EditorVerifyMode:
+                    menuBar.Mode.Value = EditorScreenMode.Verify;
+                    return true;
+
                 default:
                     return false;
             }
@@ -631,6 +636,10 @@ namespace osu.Game.Screens.Edit
 
                     case EditorScreenMode.Timing:
                         currentScreen = new TimingScreen();
+                        break;
+
+                    case EditorScreenMode.Verify:
+                        currentScreen = new VerifyScreen();
                         break;
                 }
 
