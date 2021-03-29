@@ -4,7 +4,6 @@
 using System;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osuTK;
 
 namespace osu.Game.Skinning
 {
@@ -14,9 +13,7 @@ namespace osu.Game.Skinning
     public class LegacyRollingCounter : RollingCounter<int>
     {
         private readonly ISkin skin;
-
-        private readonly string fontName;
-        private readonly float fontOverlap;
+        private readonly LegacyFont font;
 
         protected override bool IsRollingProportional => true;
 
@@ -24,17 +21,11 @@ namespace osu.Game.Skinning
         /// Creates a new <see cref="LegacyRollingCounter"/>.
         /// </summary>
         /// <param name="skin">The <see cref="ISkin"/> from which to get counter number sprites.</param>
-        /// <param name="fontName">The name of the legacy font to use.</param>
-        /// <param name="fontOverlap">
-        /// The numeric overlap of number sprites to use.
-        /// A positive number will bring the number sprites closer together, while a negative number
-        /// will split them apart more.
-        /// </param>
-        public LegacyRollingCounter(ISkin skin, string fontName, float fontOverlap)
+        /// <param name="font">The legacy font to use for the counter.</param>
+        public LegacyRollingCounter(ISkin skin, LegacyFont font)
         {
             this.skin = skin;
-            this.fontName = fontName;
-            this.fontOverlap = fontOverlap;
+            this.font = font;
         }
 
         protected override double GetProportionalDuration(int currentValue, int newValue)
@@ -42,10 +33,6 @@ namespace osu.Game.Skinning
             return Math.Abs(newValue - currentValue) * 75.0;
         }
 
-        protected sealed override OsuSpriteText CreateSpriteText() =>
-            new LegacySpriteText(skin, fontName)
-            {
-                Spacing = new Vector2(-fontOverlap, 0f)
-            };
+        protected sealed override OsuSpriteText CreateSpriteText() => new LegacySpriteText(skin, font);
     }
 }
