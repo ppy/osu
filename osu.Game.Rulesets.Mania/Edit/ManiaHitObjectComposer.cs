@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Mania.Edit
             }
         }
 
-        public override IEnumerable<string> ConvertSelectionToString()
-            => EditorBeatmap.SelectedHitObjects.Cast<ManiaHitObject>().Select(h => $"{h.StartTime}|{h.Column}");
+        public override string ConvertSelectionToString()
+            => string.Join(',', EditorBeatmap.SelectedHitObjects.Cast<ManiaHitObject>().OrderBy(h => h.StartTime).Select(h => $"{h.StartTime}|{h.Column}"));
     }
 }
