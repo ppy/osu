@@ -438,7 +438,7 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         public abstract bool CursorInPlacementArea { get; }
 
-        public virtual IEnumerable<string> ConvertSelectionToString() => Array.Empty<string>();
+        public virtual string ConvertSelectionToString() => string.Empty;
 
         #region IPositionSnapProvider
 
