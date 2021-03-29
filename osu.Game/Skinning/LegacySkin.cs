@@ -18,7 +18,6 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Skinning
@@ -320,19 +319,13 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        private string scorePrefix => GetConfig<LegacySkinConfiguration.LegacySetting, string>(LegacySkinConfiguration.LegacySetting.ScorePrefix)?.Value ?? "score";
-
-        private string comboPrefix => GetConfig<LegacySkinConfiguration.LegacySetting, string>(LegacySkinConfiguration.LegacySetting.ComboPrefix)?.Value ?? "score";
-
-        private bool hasScoreFont => this.HasFont(scorePrefix);
-
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {
             switch (component)
             {
                 case HUDSkinComponent hudComponent:
                 {
-                    if (!hasScoreFont)
+                    if (!this.HasFont(LegacyFont.Score))
                         return null;
 
                     switch (hudComponent.Component)
@@ -348,18 +341,6 @@ namespace osu.Game.Skinning
 
                         case HUDSkinComponents.HealthDisplay:
                             return new LegacyHealthDisplay(this);
-
-                        case HUDSkinComponents.ComboText:
-                            return new LegacySpriteText(this, comboPrefix)
-                            {
-                                Spacing = new Vector2(-(GetConfig<LegacySkinConfiguration.LegacySetting, int>(LegacySkinConfiguration.LegacySetting.ComboOverlap)?.Value ?? -2), 0)
-                            };
-
-                        case HUDSkinComponents.ScoreText:
-                            return new LegacySpriteText(this, scorePrefix)
-                            {
-                                Spacing = new Vector2(-(GetConfig<LegacySkinConfiguration.LegacySetting, int>(LegacySkinConfiguration.LegacySetting.ScoreOverlap)?.Value ?? -2), 0)
-                            };
                     }
 
                     return null;
