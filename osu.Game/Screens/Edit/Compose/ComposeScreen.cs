@@ -85,6 +85,20 @@ namespace osu.Game.Screens.Edit.Compose
             return beatmapSkinProvider.WithChild(rulesetSkinProvider.WithChild(content));
         }
 
+        #region Input Handling
+
+        public bool OnPressed(PlatformAction action)
+        {
+            if (action.ActionType == PlatformActionType.Copy)
+                host.GetClipboard().SetText(formatSelectionAsString());
+
+            return false;
+        }
+
+        public void OnReleased(PlatformAction action)
+        {
+        }
+
         private string formatSelectionAsString()
         {
             var builder = new StringBuilder();
@@ -98,16 +112,6 @@ namespace osu.Game.Screens.Edit.Compose
             return builder.ToString();
         }
 
-        public bool OnPressed(PlatformAction action)
-        {
-            if (action.ActionType == PlatformActionType.Copy)
-                host.GetClipboard().SetText(formatSelectionAsString());
-
-            return false;
-        }
-
-        public void OnReleased(PlatformAction action)
-        {
-        }
+        #endregion
     }
 }
