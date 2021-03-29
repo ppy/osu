@@ -5,7 +5,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Skinning;
 using osuTK.Graphics;
-using static osu.Game.Skinning.LegacySkinConfiguration;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
@@ -14,7 +13,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
         /// <summary>
         /// For simplicity, let's use legacy combo font texture existence as a way to identify legacy skins from default.
         /// </summary>
-        private bool providesComboCounter => this.HasFont(GetConfig<LegacySetting, string>(LegacySetting.ComboPrefix)?.Value ?? "score");
+        private bool providesComboCounter => this.HasFont(LegacyFont.Combo);
 
         public CatchLegacySkinTransformer(ISkinSource source)
             : base(source)
@@ -69,7 +68,6 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                            this.GetAnimation("fruit-ryuuta", true, true, true);
 
                 case CatchSkinComponents.CatchComboCounter:
-
                     if (providesComboCounter)
                         return new LegacyCatchComboCounter(Source);
 
