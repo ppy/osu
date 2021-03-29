@@ -36,7 +36,7 @@ namespace osu.Game.Users.Drawables
         {
             string avatarUrl = user?.AvatarUrl;
             if (api != null && avatarUrl != null)
-                Texture = textures.Get(avatarUrl.StartsWith('/') ? $"{api.WebsiteRootUrl}{avatarUrl}" : avatarUrl);
+                Texture = textures.Get(avatarUrl);
             else if (user != null && user.Id > 1)
                 Texture = textures.Get($@"https://a.ppy.sh/{user.Id}");
 
