@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Text;
 using osu.Game.Graphics.Sprites;
+using osuTK;
 
 namespace osu.Game.Skinning
 {
@@ -16,12 +17,14 @@ namespace osu.Game.Skinning
 
         protected override char[] FixedWidthExcludeCharacters => new[] { ',', '.', '%', 'x' };
 
-        public LegacySpriteText(ISkin skin, string font = "score")
+        public LegacySpriteText(ISkin skin, LegacyFont font)
         {
             Shadow = false;
             UseFullGlyphHeight = false;
 
-            Font = new FontUsage(font, 1, fixedWidth: true);
+            Font = new FontUsage(skin.GetFontPrefix(font), 1, fixedWidth: true);
+            Spacing = new Vector2(-skin.GetFontOverlap(font), 0);
+
             glyphStore = new LegacyGlyphStore(skin);
         }
 
