@@ -3,7 +3,6 @@
 
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -101,15 +100,15 @@ namespace osu.Game.Screens.Edit.Compose
 
         private string formatSelectionAsString()
         {
-            var builder = new StringBuilder();
-            builder.Append(EditorBeatmap.SelectedHitObjects.OrderBy(h => h.StartTime).FirstOrDefault()?.StartTime.ToEditorFormattedString() ?? clock.CurrentTime.ToEditorFormattedString());
+            if (composer == null)
+                return string.Empty;
 
-            if (EditorBeatmap.SelectedHitObjects.Any() && composer != null)
-                builder.Append($" ({composer.ConvertSelectionToString()})");
+            double displayTime = EditorBeatmap.SelectedHitObjects.OrderBy(h => h.StartTime).FirstOrDefault()?.StartTime ?? clock.CurrentTime;
+            string selectionAsString = composer.ConvertSelectionToString();
 
-            builder.Append(" - ");
-
-            return builder.ToString();
+            return !string.IsNullOrEmpty(selectionAsString)
+                ? $"{displayTime.ToEditorFormattedString()} ({selectionAsString}) - "
+                : $"{displayTime.ToEditorFormattedString()} - ";
         }
 
         #endregion
