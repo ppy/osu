@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
         public readonly double StartTime;
 
         /// <summary>
-        /// Clockrate adjusted start time of <see cref="BaseObject"/>.
+        /// Clockrate adjusted end time of <see cref="BaseObject"/>.
         /// </summary>
         public readonly double EndTime;
 
