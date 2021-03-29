@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Game.Online.API;
 
 namespace osu.Game.Users.Drawables
 {
@@ -13,9 +12,6 @@ namespace osu.Game.Users.Drawables
     public class DrawableAvatar : Sprite
     {
         private readonly User user;
-
-        [Resolved(CanBeNull = true)]
-        private IAPIProvider api { get; set; }
 
         /// <summary>
         /// A simple, non-interactable avatar sprite for the specified user.
@@ -35,7 +31,7 @@ namespace osu.Game.Users.Drawables
         private void load(LargeTextureStore textures)
         {
             string avatarUrl = user?.AvatarUrl;
-            if (api != null && avatarUrl != null)
+            if (avatarUrl != null)
                 Texture = textures.Get(avatarUrl);
             else if (user != null && user.Id > 1)
                 Texture = textures.Get($@"https://a.ppy.sh/{user.Id}");
