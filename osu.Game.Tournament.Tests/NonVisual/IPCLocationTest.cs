@@ -38,6 +38,8 @@ namespace osu.Game.Tournament.Tests.NonVisual
                     TournamentStorage storage = (TournamentStorage)osu.Dependencies.Get<Storage>();
                     FileBasedIPC ipc = (FileBasedIPC)osu.Dependencies.Get<MatchIPCInfo>();
 
+                    waitForOrAssert(() => ipc != null, @"ipc could not be populated in a reasonable amount of time");
+
                     Assert.True(ipc.SetIPCLocation(testCeDir));
                     Assert.True(storage.AllTournaments.Exists("stable.json"));
                 }
