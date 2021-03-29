@@ -2,13 +2,17 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Diagnostics;
+using System.Linq;
+using System.Text;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Platform;
 using osu.Game.Beatmaps;
+using osu.Game.Extensions;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
@@ -21,14 +25,17 @@ namespace osu.Game.Screens.Edit.Compose
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; }
 
-        private HitObjectComposer composer;
+        [Resolved]
+        private GameHost host { get; set; }
 
-        private readonly SelectionHelper helper;
+        [Resolved]
+        private EditorClock clock { get; set; }
+
+        private HitObjectComposer composer;
 
         public ComposeScreen()
             : base(EditorScreenMode.Compose)
         {
-            Add(helper = new SelectionHelper());
         }
 
         private Ruleset ruleset;
@@ -78,17 +85,25 @@ namespace osu.Game.Screens.Edit.Compose
             return beatmapSkinProvider.WithChild(rulesetSkinProvider.WithChild(content));
         }
 
+        private string formatSelectionAsString()
+        {
+            var builder = new StringBuilder();
+            builder.Append(EditorBeatmap.SelectedHitObjects.OrderBy(h => h.StartTime).FirstOrDefault()?.StartTime.ToEditorFormattedString() ?? clock.CurrentTime.ToEditorFormattedString());
+
+            if (EditorBeatmap.SelectedHitObjects.Any() && composer != null)
+                builder.Append($" ({composer.ConvertSelectionToString()})");
+
+            builder.Append(" - ");
+
+            return builder.ToString();
+        }
+
         public bool OnPressed(PlatformAction action)
         {
-            switch (action.ActionType)
-            {
-                case PlatformActionType.Copy:
-                    helper.CopySelectionToClipboard();
-                    return false;
+            if (action.ActionType == PlatformActionType.Copy)
+                host.GetClipboard().SetText(formatSelectionAsString());
 
-                default:
-                    return false;
-            }
+            return false;
         }
 
         public void OnReleased(PlatformAction action)
