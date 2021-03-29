@@ -33,6 +33,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             base.OnOperationEnded();
             referenceOrigin = null;
+            referencePathTypes = null;
         }
 
         public override bool HandleMovement(MoveSelectionEvent moveEvent) =>
@@ -42,6 +43,12 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// During a transform, the initial origin is stored so it can be used throughout the operation.
         /// </summary>
         private Vector2? referenceOrigin;
+
+        /// <summary>
+        /// During a transform, the initial path types of a single selected slider are stored so they
+        /// can be maintained throughout the operation.
+        /// </summary>
+        private List<PathType?> referencePathTypes;
 
         public override bool HandleReverse()
         {
@@ -141,11 +148,17 @@ namespace osu.Game.Rulesets.Osu.Edit
             // is not looking to change the duration of the slider but expand the whole pattern.
             if (hitObjects.Length == 1 && hitObjects.First() is Slider slider)
             {
+                referencePathTypes ??= slider.Path.ControlPoints.Select(p => p.Type.Value).ToList();
+
                 Quad quad = getSurroundingQuad(slider.Path.ControlPoints.Select(p => p.Position.Value));
                 Vector2 pathRelativeDeltaScale = new Vector2(1 + scale.X / quad.Width, 1 + scale.Y / quad.Height);
 
                 foreach (var point in slider.Path.ControlPoints)
                     point.Position.Value *= pathRelativeDeltaScale;
+
+                // Maintain the path types in case they were defaulted to bezier at some point during scaling
+                for (int i = 0; i < slider.Path.ControlPoints.Count; ++i)
+                    slider.Path.ControlPoints[i].Type.Value = referencePathTypes[i];
             }
             else
             {
