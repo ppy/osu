@@ -274,7 +274,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         }
 
         /// <summary>
-        /// Clamp scale where selection does not exceed playfield bounds or flip.
+        /// Clamp scale for multi-object-scaling where selection does not exceed playfield bounds or flip.
         /// </summary>
         /// <param name="hitObjects">The hitobjects to be scaled</param>
         /// <param name="reference">The anchor from which the scale operation is performed</param>
