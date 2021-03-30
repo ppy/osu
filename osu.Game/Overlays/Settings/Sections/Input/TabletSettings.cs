@@ -112,12 +112,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,
-                            LabelText = "Aspect Ratio",
-                            Current = aspectRatio
-                        },
-                        new SettingsSlider<float>
-                        {
-                            TransferValueOnCommit = true,
                             LabelText = "X Offset",
                             Current = offsetX
                         },
@@ -126,6 +120,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             TransferValueOnCommit = true,
                             LabelText = "Y Offset",
                             Current = offsetY
+                        },
+                        new SettingsSlider<float>
+                        {
+                            TransferValueOnCommit = true,
+                            LabelText = "Aspect Ratio",
+                            Current = aspectRatio
                         },
                         new SettingsCheckbox
                         {
