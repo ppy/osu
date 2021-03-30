@@ -115,11 +115,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(h => h is OsuModFlashlight))
             {
                 // Apply object-based bonus for flashlight.
-                aimValue *= 1.0 + 0.35 * Math.Min(1.0, totalHits / 200.0) +
-                            (totalHits > 200
-                                ? 0.3 * Math.Min(1.0, (totalHits - 200) / 300.0) +
-                                  (totalHits > 500 ? (totalHits - 500) / 1200.0 : 0.0)
-                                : 0.0);
+                double baseFLMultiplier = 1.0 + 0.35 * Math.Min(1.0, totalHits / 200.0) +
+											(totalHits > 200
+												? 0.3 * Math.Min(1.0, (totalHits - 200) / 300.0) +
+												  (totalHits > 500 ? (totalHits - 500) / 1200.0 : 0.0)
+												: 0.0);
+				
+				// Nerf bonus based on combo. Combo below 200 receives a harsher nerf.
+                double adjustedCombo = Math.Min(scoreMaxCombo, Math.Pow(scoreMaxCombo, 2.0) / 200.0);
+                double adjustedMaxCombo = Math.Min(Attributes.MaxCombo, Math.Pow(Attributes.MaxCombo, 2.0) / 200.0);
+                baseFLMultiplier *= Math.Pow(adjustedCombo / adjustedMaxCombo, 2.0);
+
+                // Apply harsher nerf with misses.
+                baseFLMultiplier *= Math.Pow(0.97, countMiss);
+
+                // Apply extra buff when Flashlight is combined with Hidden, based on Approach Rate.
+                if (mods.Any(h => h is OsuModHidden))
+                    baseFLMultiplier *= 1.45 - 0.01 * Math.Pow(1.4, Attributes.ApproachRate);
+
+                aimValue *= 1.0 + baseFLMultiplier;
             }
 
             // Scale the aim value with accuracy _slightly_
