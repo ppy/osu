@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -14,11 +15,13 @@ namespace osu.Game.Input.Bindings
     {
         private readonly Drawable handler;
 
-        public GlobalActionContainer(OsuGameBase game)
+        public GlobalActionContainer(OsuGameBase game, bool nested = false)
             : base(matchingMode: KeyCombinationMatchingMode.Modifiers)
         {
             if (game is IKeyBindingHandler<GlobalAction>)
                 handler = game;
+
+            GetInputQueue = () => base.KeyBindingInputQueue.ToArray();
         }
 
         public override IEnumerable<IKeyBinding> DefaultKeyBindings => GlobalKeyBindings.Concat(InGameKeyBindings).Concat(AudioControlKeyBindings).Concat(EditorKeyBindings);
@@ -91,8 +94,10 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.F3, GlobalAction.MusicPlay)
         };
 
+        public Func<Drawable[]> GetInputQueue { get; set; }
+
         protected override IEnumerable<Drawable> KeyBindingInputQueue =>
-            handler == null ? base.KeyBindingInputQueue : base.KeyBindingInputQueue.Prepend(handler);
+            handler == null ? GetInputQueue() : GetInputQueue().Prepend(handler);
     }
 
     public enum GlobalAction
