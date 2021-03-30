@@ -3,11 +3,13 @@
 
 namespace osu.Game.Skinning
 {
-    public enum HUDSkinComponents
+    /// <summary>
+    /// The type of legacy font to use for <see cref="LegacySpriteText"/>s.
+    /// </summary>
+    public enum LegacyFont
     {
-        ComboCounter,
-        ScoreCounter,
-        AccuracyCounter,
-        HealthDisplay,
+        Score,
+        Combo,
+        HitCircle,
     }
 }
