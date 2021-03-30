@@ -1,42 +1,40 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup Label="Project">
-        <TargetFramework>netstandard2.1</TargetFramework>
-        <OutputType>Library</OutputType>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    </PropertyGroup>
-    <PropertyGroup Label="Nuget">
-        <Title>osu!</Title>
-        <PackageId>ppy.osu.Game</PackageId>
-        <Version>0.0.0</Version>
-        <PackageIcon>icon.png</PackageIcon>
-        <IsPackable>true</IsPackable>
-    </PropertyGroup>
-    <ItemGroup Label="Icon">
-        <None Include="..\assets\lazer-nuget.png">
-            <Pack>True</Pack>
-            <PackagePath>icon.png</PackagePath>
-        </None>
-    </ItemGroup>
-    <ItemGroup Label="Package References">
-        <PackageReference Include="AutoMapper" Version="10.1.1"/>
-        <PackageReference Include="Dapper" Version="2.0.78"/>
-        <PackageReference Include="DiffPlex" Version="1.7.0"/>
-        <PackageReference Include="Humanizer" Version="2.8.26"/>
-        <PackageReference Include="MessagePack" Version="2.2.85"/>
-        <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.4"/>
-        <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="5.0.4"/>
-        <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="5.0.4"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.6"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="2.2.6"/>
-        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0"/>
-        <PackageReference Include="Microsoft.NETCore.Targets" Version="3.1.0"/>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.1"/>
-        <PackageReference Include="ppy.osu.Framework" Version="2021.329.0"/>
-        <PackageReference Include="ppy.osu.Game.Resources" Version="2021.211.1"/>
-        <PackageReference Include="Realm" Version="10.1.2"/>
-        <PackageReference Include="Sentry" Version="3.2.0"/>
-        <PackageReference Include="SharpCompress" Version="0.28.1"/>
-        <PackageReference Include="NUnit" Version="3.13.1"/>
-        <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0"/>
-    </ItemGroup>
+  <PropertyGroup Label="Project">
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <OutputType>Library</OutputType>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Label="Nuget">
+    <Title>osu!</Title>
+    <PackageId>ppy.osu.Game</PackageId>
+    <Version>0.0.0</Version>
+    <PackageIcon>icon.png</PackageIcon>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+  <ItemGroup Label="Icon">
+    <None Include="..\assets\lazer-nuget.png">
+      <Pack>True</Pack>
+      <PackagePath>icon.png</PackagePath>
+    </None>
+  </ItemGroup>
+  <ItemGroup Label="Package References">
+    <PackageReference Include="DiffPlex" Version="1.7.0" />
+    <PackageReference Include="Humanizer" Version="2.8.26" />
+    <PackageReference Include="MessagePack" Version="2.2.85" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="5.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="5.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="2.2.6" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
+    <PackageReference Include="Microsoft.NETCore.Targets" Version="3.1.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="ppy.osu.Framework" Version="2021.330.0" />
+    <PackageReference Include="ppy.osu.Game.Resources" Version="2021.211.1" />
+    <PackageReference Include="Realm" Version="10.1.2"/>
+    <PackageReference Include="Sentry" Version="3.2.0" />
+    <PackageReference Include="SharpCompress" Version="0.28.1" />
+    <PackageReference Include="NUnit" Version="3.13.1" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+  </ItemGroup>
 </Project>
