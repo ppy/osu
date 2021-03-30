@@ -44,6 +44,11 @@ namespace osu.Game.Rulesets.Catch.UI
         public bool HyperDashing => hyperDashModifier != 1;
 
         /// <summary>
+        /// Whether <see cref="DrawablePalpableCatchHitObject"/> fruit should appear on the plate.
+        /// </summary>
+        public bool CatchFruitOnPlate { get; set; } = true;
+
+        /// <summary>
         /// The relative space to cover in 1 millisecond. based on 1 game pixel per millisecond as in osu-stable.
         /// </summary>
         public const double BASE_SPEED = 1.0;
@@ -223,7 +228,7 @@ namespace osu.Game.Rulesets.Catch.UI
                    catchObjectPosition <= catcherPosition + halfCatchWidth;
         }
 
-        public void OnNewResult(DrawableCatchHitObject drawableObject, JudgementResult result, bool placeOnPlate)
+        public void OnNewResult(DrawableCatchHitObject drawableObject, JudgementResult result)
         {
             var catchResult = (CatchJudgementResult)result;
             catchResult.CatcherAnimationState = CurrentState;
@@ -237,7 +242,7 @@ namespace osu.Game.Rulesets.Catch.UI
             {
                 var positionInStack = computePositionInStack(new Vector2(palpableObject.X - X, 0), palpableObject.DisplaySize.X / 2);
 
-                if (placeOnPlate)
+                if (CatchFruitOnPlate)
                     placeCaughtObject(palpableObject, positionInStack);
 
                 if (hitLighting.Value)

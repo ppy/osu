@@ -21,11 +21,6 @@ namespace osu.Game.Rulesets.Catch.UI
         public readonly Catcher MovableCatcher;
         private readonly CatchComboDisplay comboDisplay;
 
-        /// <summary>
-        /// Whether <see cref="DrawablePalpableCatchHitObject"/> fruit should appear on the plate.
-        /// </summary>
-        public bool CatchFruitOnPlate { get; set; } = true;
-
         public CatcherArea(Container<CaughtObject> droppedObjectContainer, BeatmapDifficulty difficulty = null)
         {
             Size = new Vector2(CatchPlayfield.WIDTH, CATCHER_SIZE);
@@ -46,7 +41,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public void OnNewResult(DrawableCatchHitObject hitObject, JudgementResult result)
         {
-            MovableCatcher.OnNewResult(hitObject, result, CatchFruitOnPlate);
+            MovableCatcher.OnNewResult(hitObject, result);
 
             if (!result.Type.IsScorable())
                 return;
