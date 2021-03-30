@@ -30,7 +30,7 @@ namespace osu.Game.Scoring
         public long TotalScore { get; set; }
 
         [JsonProperty("accuracy")]
-        [Column(TypeName = "DECIMAL(1,4)")]
+        [Column(TypeName = "DECIMAL(1,4)")] // TODO: This data type is wrong (should contain more precision). But at the same time, we probably don't need to be storing this in the database.
         public double Accuracy { get; set; }
 
         [JsonIgnore]
