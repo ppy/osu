@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
@@ -48,11 +49,10 @@ namespace osu.Game.Tournament.Screens.Editors
             using (var sr = new StreamReader(stream))
                 countries = JsonConvert.DeserializeObject<List<TournamentTeam>>(sr.ReadToEnd());
 
-            if (countries != null)
-            {
-                foreach (var c in countries)
-                    Storage.Add(c);
-            }
+            Debug.Assert(countries != null);
+
+            foreach (var c in countries)
+                Storage.Add(c);
         }
 
         public class TeamRow : CompositeDrawable, IModelBacked<TournamentTeam>
