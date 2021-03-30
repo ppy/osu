@@ -115,7 +115,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(h => h is OsuModFlashlight))
             {
                 // Apply object-based bonus for flashlight.
-                double baseFLMultiplier = 1.0 + 0.35 * Math.Min(1.0, totalHits / 200.0) +
+                double baseFLMultiplier = 0.35 * Math.Min(1.0, totalHits / 200.0) +
 											(totalHits > 200
 												? 0.3 * Math.Min(1.0, (totalHits - 200) / 300.0) +
 												  (totalHits > 500 ? (totalHits - 500) / 1200.0 : 0.0)
