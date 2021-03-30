@@ -34,8 +34,6 @@ namespace osu.Game.Input.Handlers
 
         public override bool IsActive => true;
 
-        public override int Priority => 0;
-
         public class ReplayState<T> : IInput
             where T : struct
         {
