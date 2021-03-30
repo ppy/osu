@@ -39,9 +39,11 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             var hitObjects = selectedMovableObjects;
 
+            // this will potentially move the selection out of bounds...
             foreach (var h in hitObjects)
                 h.Position += moveEvent.InstantDelta;
 
+            // but this will be corrected.
             moveSelectionInBounds();
             return true;
         }
@@ -153,7 +155,6 @@ namespace osu.Game.Rulesets.Osu.Edit
                 scaleHitObjects(hitObjects, reference, scale);
 
             moveSelectionInBounds();
-
             return true;
         }
 
@@ -257,7 +258,8 @@ namespace osu.Game.Rulesets.Osu.Edit
             var hitObjects = selectedMovableObjects;
 
             Quad quad = getSurroundingQuad(hitObjects);
-            Vector2 delta = new Vector2(0);
+
+            Vector2 delta = Vector2.Zero;
 
             if (quad.TopLeft.X < 0)
                 delta.X -= quad.TopLeft.X;
