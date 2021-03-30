@@ -17,7 +17,7 @@ namespace osu.Game.Skinning
     /// <summary>
     /// A sample corresponding to an <see cref="ISampleInfo"/> that supports being pooled and responding to skin changes.
     /// </summary>
-    public class PoolableSkinnableSample : SkinReloadableDrawable, IAggregateAudioAdjustment, IAdjustableAudioComponent
+    public class PoolableSkinnableSample : SkinReloadableDrawable, IAdjustableAudioComponent
     {
         /// <summary>
         /// The currently-loaded <see cref="DrawableSample"/>.
@@ -86,21 +86,21 @@ namespace osu.Game.Skinning
             sampleContainer.Clear();
             Sample = null;
 
-            var ch = CurrentSkin.GetSample(sampleInfo);
+            var sample = CurrentSkin.GetSample(sampleInfo);
 
-            if (ch == null && AllowDefaultFallback)
+            if (sample == null && AllowDefaultFallback)
             {
                 foreach (var lookup in sampleInfo.LookupNames)
                 {
-                    if ((ch = sampleStore.Get(lookup)) != null)
+                    if ((sample = sampleStore.Get(lookup)) != null)
                         break;
                 }
             }
 
-            if (ch == null)
+            if (sample == null)
                 return;
 
-            sampleContainer.Add(Sample = new DrawableSample(ch));
+            sampleContainer.Add(Sample = new DrawableSample(sample));
 
             // Start playback internally for the new sample if the previous one was playing beforehand.
             if (wasPlaying && Looping)
@@ -164,6 +164,10 @@ namespace osu.Game.Skinning
         public BindableNumber<double> Frequency => sampleContainer.Frequency;
 
         public BindableNumber<double> Tempo => sampleContainer.Tempo;
+
+        public void BindAdjustments(IAggregateAudioAdjustment component) => sampleContainer.BindAdjustments(component);
+
+        public void UnbindAdjustments(IAggregateAudioAdjustment component) => sampleContainer.UnbindAdjustments(component);
 
         public void AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => sampleContainer.AddAdjustment(type, adjustBindable);
 

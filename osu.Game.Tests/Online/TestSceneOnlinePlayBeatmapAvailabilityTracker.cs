@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Online
         {
             beatmaps.AllowImport = new TaskCompletionSource<bool>();
 
-            testBeatmapFile = TestResources.GetTestBeatmapForImport();
+            testBeatmapFile = TestResources.GetQuickTestBeatmapForImport();
 
             testBeatmapInfo = getTestBeatmapInfo(testBeatmapFile);
             testBeatmapSet = testBeatmapInfo.BeatmapSet;

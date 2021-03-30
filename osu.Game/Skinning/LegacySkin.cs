@@ -18,7 +18,6 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Skinning
@@ -98,13 +97,6 @@ namespace osu.Game.Skinning
             hasKeyTexture = new Lazy<bool>(() => this.GetAnimation(
                 lookupForMania<string>(new LegacyManiaSkinConfigurationLookup(4, LegacyManiaSkinConfigurationLookups.KeyImage, 0))?.Value ?? "mania-key1", true,
                 true) != null);
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            Textures?.Dispose();
-            Samples?.Dispose();
         }
 
         public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
@@ -327,19 +319,13 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        private string scorePrefix => GetConfig<LegacySkinConfiguration.LegacySetting, string>(LegacySkinConfiguration.LegacySetting.ScorePrefix)?.Value ?? "score";
-
-        private string comboPrefix => GetConfig<LegacySkinConfiguration.LegacySetting, string>(LegacySkinConfiguration.LegacySetting.ComboPrefix)?.Value ?? "score";
-
-        private bool hasScoreFont => this.HasFont(scorePrefix);
-
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {
             switch (component)
             {
                 case HUDSkinComponent hudComponent:
                 {
-                    if (!hasScoreFont)
+                    if (!this.HasFont(LegacyFont.Score))
                         return null;
 
                     switch (hudComponent.Component)
@@ -355,18 +341,6 @@ namespace osu.Game.Skinning
 
                         case HUDSkinComponents.HealthDisplay:
                             return new LegacyHealthDisplay(this);
-
-                        case HUDSkinComponents.ComboText:
-                            return new LegacySpriteText(this, comboPrefix)
-                            {
-                                Spacing = new Vector2(-(GetConfig<LegacySkinConfiguration.LegacySetting, int>(LegacySkinConfiguration.LegacySetting.ComboOverlap)?.Value ?? -2), 0)
-                            };
-
-                        case HUDSkinComponents.ScoreText:
-                            return new LegacySpriteText(this, scorePrefix)
-                            {
-                                Spacing = new Vector2(-(GetConfig<LegacySkinConfiguration.LegacySetting, int>(LegacySkinConfiguration.LegacySetting.ScoreOverlap)?.Value ?? -2), 0)
-                            };
                     }
 
                     return null;
@@ -452,7 +426,7 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        public override Sample GetSample(ISampleInfo sampleInfo)
+        public override ISample GetSample(ISampleInfo sampleInfo)
         {
             IEnumerable<string> lookupNames;
 
@@ -503,6 +477,13 @@ namespace osu.Game.Skinning
             // Fall back to using the last piece for components coming from lazer (e.g. "Gameplay/osu/approachcircle" -> "approachcircle").
             string lastPiece = componentName.Split('/').Last();
             yield return componentName.StartsWith("Gameplay/taiko/", StringComparison.Ordinal) ? "taiko-" + lastPiece : lastPiece;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            Textures?.Dispose();
+            Samples?.Dispose();
         }
     }
 }

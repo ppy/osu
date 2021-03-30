@@ -34,6 +34,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void SetUp() => Schedule(() =>
         {
             OsuSpriteText query;
+            OsuSpriteText general;
             OsuSpriteText ruleset;
             OsuSpriteText category;
             OsuSpriteText genre;
@@ -58,6 +59,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Children = new Drawable[]
                     {
                         query = new OsuSpriteText(),
+                        general = new OsuSpriteText(),
                         ruleset = new OsuSpriteText(),
                         category = new OsuSpriteText(),
                         genre = new OsuSpriteText(),
@@ -71,6 +73,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             };
 
             control.Query.BindValueChanged(q => query.Text = $"Query: {q.NewValue}", true);
+            control.General.BindCollectionChanged((u, v) => general.Text = $"General: {(control.General.Any() ? string.Join('.', control.General.Select(i => i.ToString().ToLowerInvariant())) : "")}", true);
             control.Ruleset.BindValueChanged(r => ruleset.Text = $"Ruleset: {r.NewValue}", true);
             control.Category.BindValueChanged(c => category.Text = $"Category: {c.NewValue}", true);
             control.Genre.BindValueChanged(g => genre.Text = $"Genre: {g.NewValue}", true);
@@ -92,10 +95,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestExplicitConfig()
         {
-            AddStep("configure explicit content to allowed", () => localConfig.Set(OsuSetting.ShowOnlineExplicitContent, true));
+            AddStep("configure explicit content to allowed", () => localConfig.SetValue(OsuSetting.ShowOnlineExplicitContent, true));
             AddAssert("explicit control set to show", () => control.ExplicitContent.Value == SearchExplicit.Show);
 
-            AddStep("configure explicit content to disallowed", () => localConfig.Set(OsuSetting.ShowOnlineExplicitContent, false));
+            AddStep("configure explicit content to disallowed", () => localConfig.SetValue(OsuSetting.ShowOnlineExplicitContent, false));
             AddAssert("explicit control set to hide", () => control.ExplicitContent.Value == SearchExplicit.Hide);
         }
 

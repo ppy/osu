@@ -131,18 +131,21 @@ namespace osu.Game.Skinning
             });
         }
 
+        protected override void LoadAsyncComplete()
+        {
+            // ensure samples are constructed before SkinChanged() is called via base.LoadAsyncComplete().
+            if (!samplesContainer.Any())
+                updateSamples();
+
+            base.LoadAsyncComplete();
+        }
+
         /// <summary>
         /// Stops the samples.
         /// </summary>
         public virtual void Stop()
         {
             samplesContainer.ForEach(c => c.Stop());
-        }
-
-        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
-        {
-            base.SkinChanged(skin, allowFallback);
-            updateSamples();
         }
 
         private void updateSamples()
@@ -176,14 +179,15 @@ namespace osu.Game.Skinning
 
         public BindableNumber<double> Tempo => samplesContainer.Tempo;
 
-        public void AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable)
-            => samplesContainer.AddAdjustment(type, adjustBindable);
+        public void BindAdjustments(IAggregateAudioAdjustment component) => samplesContainer.BindAdjustments(component);
 
-        public void RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable)
-            => samplesContainer.RemoveAdjustment(type, adjustBindable);
+        public void UnbindAdjustments(IAggregateAudioAdjustment component) => samplesContainer.UnbindAdjustments(component);
 
-        public void RemoveAllAdjustments(AdjustableProperty type)
-            => samplesContainer.RemoveAllAdjustments(type);
+        public void AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => samplesContainer.AddAdjustment(type, adjustBindable);
+
+        public void RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => samplesContainer.RemoveAdjustment(type, adjustBindable);
+
+        public void RemoveAllAdjustments(AdjustableProperty type) => samplesContainer.RemoveAllAdjustments(type);
 
         /// <summary>
         /// Whether any samples are currently playing.
@@ -191,6 +195,14 @@ namespace osu.Game.Skinning
         public bool IsPlaying => samplesContainer.Any(s => s.Playing);
 
         public bool IsPlayed => samplesContainer.Any(s => s.Played);
+
+        public IBindable<double> AggregateVolume => samplesContainer.AggregateVolume;
+
+        public IBindable<double> AggregateBalance => samplesContainer.AggregateBalance;
+
+        public IBindable<double> AggregateFrequency => samplesContainer.AggregateFrequency;
+
+        public IBindable<double> AggregateTempo => samplesContainer.AggregateTempo;
 
         #endregion
     }

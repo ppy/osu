@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Globalization;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -16,6 +17,15 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     public abstract class LegacySpinner : CompositeDrawable
     {
+        /// <remarks>
+        /// All constants are in osu!stable's gamefield space, which is shifted 16px downwards.
+        /// This offset is negated in both osu!stable and osu!lazer to bring all constants into window-space.
+        /// Note: SPINNER_Y_CENTRE + SPINNER_TOP_OFFSET - Position.Y = 240 (=480/2, or half the window-space in osu!stable)
+        /// </remarks>
+        protected const float SPINNER_TOP_OFFSET = 45f - 16f;
+
+        protected const float SPINNER_Y_CENTRE = SPINNER_TOP_OFFSET + 219f;
+
         protected const float SPRITE_SCALE = 0.625f;
 
         protected DrawableSpinner DrawableSpinner { get; private set; }
@@ -23,42 +33,71 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private Sprite spin;
         private Sprite clear;
 
+        private LegacySpriteText bonusCounter;
+
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject drawableHitObject, ISkinSource source)
         {
-            RelativeSizeAxes = Axes.Both;
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
+
+            // osu!stable positions spinner components in window-space (as opposed to gamefield-space). This is a 640x480 area taking up the entire screen.
+            // In lazer, the gamefield-space positional transformation is applied in OsuPlayfieldAdjustmentContainer, which is inverted here to make this area take up the entire window space.
+            Size = new Vector2(640, 480);
+            Position = new Vector2(0, -8f);
 
             DrawableSpinner = (DrawableSpinner)drawableHitObject;
 
-            AddRangeInternal(new[]
+            AddInternal(new Container
             {
-                spin = new Sprite
+                Depth = float.MinValue,
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Depth = float.MinValue,
-                    Texture = source.GetTexture("spinner-spin"),
-                    Scale = new Vector2(SPRITE_SCALE),
-                    Y = 120 - 45 // offset temporarily to avoid overlapping default spin counter
-                },
-                clear = new Sprite
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Depth = float.MinValue,
-                    Alpha = 0,
-                    Texture = source.GetTexture("spinner-clear"),
-                    Scale = new Vector2(SPRITE_SCALE),
-                    Y = -60
-                },
+                    spin = new Sprite
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.Centre,
+                        Texture = source.GetTexture("spinner-spin"),
+                        Scale = new Vector2(SPRITE_SCALE),
+                        Y = SPINNER_TOP_OFFSET + 335,
+                    },
+                    clear = new Sprite
+                    {
+                        Alpha = 0,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.Centre,
+                        Texture = source.GetTexture("spinner-clear"),
+                        Scale = new Vector2(SPRITE_SCALE),
+                        Y = SPINNER_TOP_OFFSET + 115,
+                    },
+                    bonusCounter = new LegacySpriteText(source, LegacyFont.Score)
+                    {
+                        Alpha = 0f,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.Centre,
+                        Scale = new Vector2(SPRITE_SCALE),
+                        Y = SPINNER_TOP_OFFSET + 299,
+                    }.With(s => s.Font = s.Font.With(fixedWidth: false)),
+                }
             });
         }
+
+        private IBindable<double> gainedBonus;
 
         private readonly Bindable<bool> completed = new Bindable<bool>();
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            gainedBonus = DrawableSpinner.GainedBonus.GetBoundCopy();
+            gainedBonus.BindValueChanged(bonus =>
+            {
+                bonusCounter.Text = bonus.NewValue.ToString(NumberFormatInfo.InvariantInfo);
+                bonusCounter.FadeOutFromOne(800, Easing.Out);
+                bonusCounter.ScaleTo(SPRITE_SCALE * 2f).Then().ScaleTo(SPRITE_SCALE * 1.28f, 800, Easing.Out);
+            });
 
             completed.BindValueChanged(onCompletedChanged, true);
 

@@ -4,6 +4,7 @@
 using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
 
@@ -16,6 +17,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     {
         private const double angle_bonus_begin = Math.PI / 3;
         private const double timing_threshold = 107;
+
+        public Aim(Mod[] mods)
+            : base(mods)
+        {
+        }
 
         protected override double SkillMultiplier => 26.25;
         protected override double StrainDecayBase => 0.15;

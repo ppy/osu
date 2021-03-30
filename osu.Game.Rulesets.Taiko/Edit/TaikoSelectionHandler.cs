@@ -52,32 +52,24 @@ namespace osu.Game.Rulesets.Taiko.Edit
 
         public void SetStrongState(bool state)
         {
-            var hits = EditorBeatmap.SelectedHitObjects.OfType<Hit>();
-
-            EditorBeatmap.BeginChange();
-
-            foreach (var h in hits)
+            EditorBeatmap.PerformOnSelection(h =>
             {
-                if (h.IsStrong != state)
-                {
-                    h.IsStrong = state;
-                    EditorBeatmap.Update(h);
-                }
-            }
+                if (!(h is Hit taikoHit)) return;
 
-            EditorBeatmap.EndChange();
+                if (taikoHit.IsStrong != state)
+                {
+                    taikoHit.IsStrong = state;
+                    EditorBeatmap.Update(taikoHit);
+                }
+            });
         }
 
         public void SetRimState(bool state)
         {
-            var hits = EditorBeatmap.SelectedHitObjects.OfType<Hit>();
-
-            EditorBeatmap.BeginChange();
-
-            foreach (var h in hits)
-                h.Type = state ? HitType.Rim : HitType.Centre;
-
-            EditorBeatmap.EndChange();
+            EditorBeatmap.PerformOnSelection(h =>
+            {
+                if (h is Hit taikoHit) taikoHit.Type = state ? HitType.Rim : HitType.Centre;
+            });
         }
 
         protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint> selection)

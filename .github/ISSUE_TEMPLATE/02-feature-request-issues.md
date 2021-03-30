@@ -1,6 +1,6 @@
 ---
 name: Feature Request
-about: Features you would like to see in the game!
+about: Propose a feature you would like to see in the game!
 ---
 **Describe the new feature:** 
 
