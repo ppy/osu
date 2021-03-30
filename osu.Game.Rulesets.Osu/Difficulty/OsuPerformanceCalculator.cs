@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                                                 ? 0.3 * Math.Min(1.0, (totalHits - 200) / 300.0) +
                                                   (totalHits > 500 ? (totalHits - 500) / 1200.0 : 0.0)
                                                 : 0.0);
-                
+
                 // Nerf bonus based on combo. Combo below 200 receives a harsher nerf.
                 double adjustedCombo = Math.Min(scoreMaxCombo, Math.Pow(scoreMaxCombo, 2.0) / 200.0);
                 double adjustedMaxCombo = Math.Min(Attributes.MaxCombo, Math.Pow(Attributes.MaxCombo, 2.0) / 200.0);
