@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -22,14 +20,12 @@ namespace osu.Game.Screens.Play
         private Container textLayer;
         private SpriteText countSpriteText;
 
-        private readonly List<KeyCounterState> states = new List<KeyCounterState>();
-        private KeyCounterState currentState;
-
         public bool IsCounting { get; set; } = true;
         private int countPresses;
+
         public int CountPresses
         {
-            get { return countPresses; }
+            get => countPresses;
             private set
             {
                 if (countPresses != value)
@@ -41,35 +37,47 @@ namespace osu.Game.Screens.Play
         }
 
         private bool isLit;
+
         public bool IsLit
         {
-            get { return isLit; }
+            get => isLit;
             protected set
             {
                 if (isLit != value)
                 {
                     isLit = value;
                     updateGlowSprite(value);
-                    if (value && IsCounting)
-                    {
-                        CountPresses++;
-                        saveState();
-                    }
                 }
             }
+        }
+
+        public void Increment()
+        {
+            if (!IsCounting)
+                return;
+
+            CountPresses++;
+        }
+
+        public void Decrement()
+        {
+            if (!IsCounting)
+                return;
+
+            CountPresses--;
         }
 
         //further: change default values here and in KeyCounterCollection if needed, instead of passing them in every constructor
         public Color4 KeyDownTextColor { get; set; } = Color4.DarkGray;
         public Color4 KeyUpTextColor { get; set; } = Color4.White;
-        public int FadeTime { get; set; }
+        public double FadeTime { get; set; }
 
         protected KeyCounter(string name)
         {
             Name = name;
         }
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(TextureStore textures)
         {
             Children = new Drawable[]
@@ -116,8 +124,8 @@ namespace osu.Game.Screens.Play
                     }
                 }
             };
-            //Set this manually because an element with Alpha=0 won't take it size to AutoSizeContainer,
-            //so the size can be changing between buttonSprite and glowSprite.
+            // Set this manually because an element with Alpha=0 won't take it size to AutoSizeContainer,
+            // so the size can be changing between buttonSprite and glowSprite.
             Height = buttonSprite.DrawHeight;
             Width = buttonSprite.DrawWidth;
         }
@@ -126,42 +134,16 @@ namespace osu.Game.Screens.Play
         {
             if (show)
             {
-                glowSprite.FadeIn(FadeTime);
-                textLayer.FadeColour(KeyDownTextColor, FadeTime);
+                double remainingFadeTime = FadeTime * (1 - glowSprite.Alpha);
+                glowSprite.FadeIn(remainingFadeTime, Easing.OutQuint);
+                textLayer.FadeColour(KeyDownTextColor, remainingFadeTime, Easing.OutQuint);
             }
             else
             {
-                glowSprite.FadeOut(FadeTime);
-                textLayer.FadeColour(KeyUpTextColor, FadeTime);
+                double remainingFadeTime = 8 * FadeTime * glowSprite.Alpha;
+                glowSprite.FadeOut(remainingFadeTime, Easing.OutQuint);
+                textLayer.FadeColour(KeyUpTextColor, remainingFadeTime, Easing.OutQuint);
             }
-        }
-
-        public void ResetCount()
-        {
-            CountPresses = 0;
-            states.Clear();
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (currentState?.Time > Clock.CurrentTime)
-                restoreStateTo(Clock.CurrentTime);
-        }
-
-        private void saveState()
-        {
-            if (currentState == null || currentState.Time < Clock.CurrentTime)
-                states.Add(currentState = new KeyCounterState(Clock.CurrentTime, CountPresses));
-        }
-
-        private void restoreStateTo(double time)
-        {
-            states.RemoveAll(state => state.Time > time);
-
-            currentState = states.LastOrDefault();
-            CountPresses = currentState?.Count ?? 0;
         }
     }
 }

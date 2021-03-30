@@ -9,11 +9,10 @@ namespace osu.Game.Screens.Play.PlayerSettings
 {
     public class InputSettings : PlayerSettingsGroup
     {
-        protected override string Title => "Input settings";
-
         private readonly PlayerCheckbox mouseButtonsCheckbox;
 
         public InputSettings()
+            : base("Input Settings")
         {
             Children = new Drawable[]
             {
@@ -25,6 +24,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config) => mouseButtonsCheckbox.Bindable = config.GetBindable<bool>(OsuSetting.MouseDisableButtons);
+        private void load(OsuConfigManager config) => mouseButtonsCheckbox.Current = config.GetBindable<bool>(OsuSetting.MouseDisableButtons);
     }
 }

@@ -4,6 +4,7 @@
 using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
 
@@ -27,6 +28,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double max_speed_bonus = 45; // ~330BPM
         private const double speed_balancing_factor = 40;
 
+        public Speed(Mod[] mods)
+            : base(mods)
+        {
+        }
+
         protected override double StrainValueOf(DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner)
@@ -42,9 +48,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 speedBonus = 1 + Math.Pow((min_speed_bonus - deltaTime) / speed_balancing_factor, 2);
 
             double angleBonus = 1.0;
+
             if (osuCurrent.Angle != null && osuCurrent.Angle.Value < angle_bonus_begin)
             {
                 angleBonus = 1 + Math.Pow(Math.Sin(1.5 * (angle_bonus_begin - osuCurrent.Angle.Value)), 2) / 3.57;
+
                 if (osuCurrent.Angle.Value < pi_over_2)
                 {
                     angleBonus = 1.28;

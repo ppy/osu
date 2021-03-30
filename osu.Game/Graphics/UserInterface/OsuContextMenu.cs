@@ -5,7 +5,8 @@ using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -25,6 +26,8 @@ namespace osu.Game.Graphics.UserInterface
             };
 
             ItemsContainer.Padding = new MarginPadding { Vertical = DrawableOsuMenuItem.MARGIN_VERTICAL };
+
+            MaxHeight = 250;
         }
 
         [BackgroundDependencyLoader]
@@ -35,5 +38,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void AnimateOpen() => this.FadeIn(fade_duration, Easing.OutQuint);
         protected override void AnimateClose() => this.FadeOut(fade_duration, Easing.OutQuint);
+
+        protected override Menu CreateSubMenu() => new OsuContextMenu();
     }
 }

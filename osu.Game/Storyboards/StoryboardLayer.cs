@@ -8,26 +8,31 @@ namespace osu.Game.Storyboards
 {
     public class StoryboardLayer
     {
-        public string Name;
-        public int Depth;
-        public bool EnabledWhenPassing = true;
-        public bool EnabledWhenFailing = true;
+        public readonly string Name;
 
-        private readonly List<IStoryboardElement> elements = new List<IStoryboardElement>();
-        public IEnumerable<IStoryboardElement> Elements => elements;
+        public readonly int Depth;
 
-        public StoryboardLayer(string name, int depth)
+        public readonly bool Masking;
+
+        public bool VisibleWhenPassing = true;
+
+        public bool VisibleWhenFailing = true;
+
+        public List<IStoryboardElement> Elements = new List<IStoryboardElement>();
+
+        public StoryboardLayer(string name, int depth, bool masking = true)
         {
             Name = name;
             Depth = depth;
+            Masking = masking;
         }
 
         public void Add(IStoryboardElement element)
         {
-            elements.Add(element);
+            Elements.Add(element);
         }
 
         public DrawableStoryboardLayer CreateDrawable()
-            => new DrawableStoryboardLayer(this) { Depth = Depth, };
+            => new DrawableStoryboardLayer(this) { Depth = Depth, Name = Name };
     }
 }

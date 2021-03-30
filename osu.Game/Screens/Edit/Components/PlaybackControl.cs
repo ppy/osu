@@ -1,15 +1,18 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
-using osu.Framework.Timing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -21,26 +24,24 @@ namespace osu.Game.Screens.Edit.Components
     {
         private IconButton playButton;
 
-        private IAdjustableClock adjustableClock;
+        [Resolved]
+        private EditorClock editorClock { get; set; }
+
+        private readonly BindableNumber<double> freqAdjust = new BindableDouble(1);
 
         [BackgroundDependencyLoader]
-        private void load(IAdjustableClock adjustableClock)
+        private void load()
         {
-            this.adjustableClock = adjustableClock;
-
-            PlaybackTabControl tabs;
-
             Children = new Drawable[]
             {
                 playButton = new IconButton
                 {
                     Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.Centre,
+                    Origin = Anchor.CentreLeft,
                     Scale = new Vector2(1.4f),
                     IconScale = new Vector2(1.4f),
-                    Icon = FontAwesome.fa_play_circle_o,
+                    Icon = FontAwesome.Regular.PlayCircle,
                     Action = togglePause,
-                    Padding = new MarginPadding { Left = 20 }
                 },
                 new OsuSpriteText
                 {
@@ -57,11 +58,18 @@ namespace osu.Game.Screens.Edit.Components
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.5f,
                     Padding = new MarginPadding { Left = 45 },
-                    Child = tabs = new PlaybackTabControl(),
+                    Child = new PlaybackTabControl { Current = freqAdjust },
                 }
             };
 
-            tabs.Current.ValueChanged += tempo => Beatmap.Value.Track.Tempo.Value = tempo.NewValue;
+            Track.BindValueChanged(tr => tr.NewValue?.AddAdjustment(AdjustableProperty.Frequency, freqAdjust), true);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            Track.Value?.RemoveAdjustment(AdjustableProperty.Frequency, freqAdjust);
+
+            base.Dispose(isDisposing);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -78,22 +86,22 @@ namespace osu.Game.Screens.Edit.Components
 
         private void togglePause()
         {
-            if (adjustableClock.IsRunning)
-                adjustableClock.Stop();
+            if (editorClock.IsRunning)
+                editorClock.Stop();
             else
-                adjustableClock.Start();
+                editorClock.Start();
         }
 
         protected override void Update()
         {
             base.Update();
 
-            playButton.Icon = adjustableClock.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
+            playButton.Icon = editorClock.IsRunning ? FontAwesome.Regular.PauseCircle : FontAwesome.Regular.PlayCircle;
         }
 
         private class PlaybackTabControl : OsuTabControl<double>
         {
-            private static readonly double[] tempo_values = { 0.5, 0.75, 1 };
+            private static readonly double[] tempo_values = { 0.25, 0.5, 0.75, 1 };
 
             protected override TabItem<double> CreateTabItem(double value) => new PlaybackTabItem(value);
 
@@ -105,6 +113,8 @@ namespace osu.Game.Screens.Edit.Components
                 TabContainer.Spacing = Vector2.Zero;
 
                 tempo_values.ForEach(AddItem);
+
+                Current.Value = tempo_values.Last();
             }
 
             public class PlaybackTabItem : TabItem<double>
@@ -114,7 +124,8 @@ namespace osu.Game.Screens.Edit.Components
                 private readonly OsuSpriteText text;
                 private readonly OsuSpriteText textBold;
 
-                public PlaybackTabItem(double value) : base(value)
+                public PlaybackTabItem(double value)
+                    : base(value)
                 {
                     RelativeSizeAxes = Axes.Both;
 

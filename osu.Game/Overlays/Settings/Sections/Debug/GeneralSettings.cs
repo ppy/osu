@@ -4,6 +4,8 @@
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Screens;
+using osu.Game.Screens.Import;
 
 namespace osu.Game.Overlays.Settings.Sections.Debug
 {
@@ -11,27 +13,27 @@ namespace osu.Game.Overlays.Settings.Sections.Debug
     {
         protected override string Header => "General";
 
-        [BackgroundDependencyLoader]
-        private void load(FrameworkDebugConfigManager config, FrameworkConfigManager frameworkConfig)
+        [BackgroundDependencyLoader(true)]
+        private void load(FrameworkDebugConfigManager config, FrameworkConfigManager frameworkConfig, OsuGame game)
         {
             Children = new Drawable[]
             {
                 new SettingsCheckbox
                 {
                     LabelText = "Show log overlay",
-                    Bindable = frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowLogOverlay)
+                    Current = frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowLogOverlay)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Performance logging",
-                    Bindable = frameworkConfig.GetBindable<bool>(FrameworkSetting.PerformanceLogging)
-                },
-                new SettingsCheckbox
-                {
-                    LabelText = "Bypass caching (slow)",
-                    Bindable = config.GetBindable<bool>(DebugSetting.BypassCaching)
-                },
+                    LabelText = "Bypass front-to-back render pass",
+                    Current = config.GetBindable<bool>(DebugSetting.BypassFrontToBackPass)
+                }
             };
+            Add(new SettingsButton
+            {
+                Text = "Import files",
+                Action = () => game?.PerformFromScreen(menu => menu.Push(new FileImportScreen()))
+            });
         }
     }
 }

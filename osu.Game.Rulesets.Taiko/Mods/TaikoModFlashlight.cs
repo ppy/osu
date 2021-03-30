@@ -2,8 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
-using osu.Framework.Caching;
 using osu.Framework.Graphics;
+using osu.Framework.Layout;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.UI;
@@ -22,21 +22,23 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         private TaikoPlayfield playfield;
 
-        public override void ApplyToRulesetContainer(RulesetContainer<TaikoHitObject> rulesetContainer)
+        public override void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
         {
-            playfield = (TaikoPlayfield)rulesetContainer.Playfield;
-            base.ApplyToRulesetContainer(rulesetContainer);
+            playfield = (TaikoPlayfield)drawableRuleset.Playfield;
+            base.ApplyToDrawableRuleset(drawableRuleset);
         }
 
         private class TaikoFlashlight : Flashlight
         {
-            private readonly Cached flashlightProperties = new Cached();
+            private readonly LayoutValue flashlightProperties = new LayoutValue(Invalidation.DrawSize);
             private readonly TaikoPlayfield taikoPlayfield;
 
             public TaikoFlashlight(TaikoPlayfield taikoPlayfield)
             {
                 this.taikoPlayfield = taikoPlayfield;
                 FlashlightSize = new Vector2(0, getSizeFor(0));
+
+                AddLayout(flashlightProperties);
             }
 
             private float getSizeFor(int combo)
@@ -55,16 +57,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
             }
 
             protected override string FragmentShader => "CircularFlashlight";
-
-            public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
-            {
-                if ((invalidation & Invalidation.DrawSize) > 0)
-                {
-                    flashlightProperties.Invalidate();
-                }
-
-                return base.Invalidate(invalidation, source, shallPropagate);
-            }
 
             protected override void Update()
             {

@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -9,17 +10,19 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 
 namespace osu.Game.Overlays.Settings
 {
-    public abstract class SettingsItem<T> : Container, IFilterable
+    public abstract class SettingsItem<T> : Container, IFilterable, ISettingsItem, IHasCurrentValue<T>, IHasTooltip
     {
         protected abstract Drawable CreateControl();
 
@@ -31,63 +34,62 @@ namespace osu.Game.Overlays.Settings
 
         protected readonly FillFlowContainer FlowContent;
 
-        private SpriteText text;
-
-        private readonly RestoreDefaultValueButton restoreDefaultButton;
+        private SpriteText labelText;
 
         public bool ShowsDefaultIndicator = true;
 
-        public virtual string LabelText
+        public string TooltipText { get; set; }
+
+        public virtual LocalisableString LabelText
         {
-            get { return text?.Text ?? string.Empty; }
+            get => labelText?.Text ?? string.Empty;
             set
             {
-                if (text == null)
+                if (labelText == null)
                 {
                     // construct lazily for cases where the label is not needed (may be provided by the Control).
-                    Add(text = new OsuSpriteText());
-                    FlowContent.SetLayoutPosition(text, -1);
+                    FlowContent.Insert(-1, labelText = new OsuSpriteText());
+
+                    updateDisabled();
                 }
 
-                text.Text = value;
+                labelText.Text = value;
             }
         }
 
-        // hold a reference to the provided bindable so we don't have to in every settings section.
-        private Bindable<T> bindable;
-
-        public virtual Bindable<T> Bindable
+        [Obsolete("Use Current instead")] // Can be removed 20210406
+        public Bindable<T> Bindable
         {
-            get { return bindable; }
-
-            set
-            {
-                bindable = value;
-                controlWithCurrent?.Current.BindTo(bindable);
-                if (ShowsDefaultIndicator)
-                {
-                    restoreDefaultButton.Bindable = bindable.GetBoundCopy();
-                    restoreDefaultButton.Bindable.TriggerChange();
-                }
-            }
+            get => Current;
+            set => Current = value;
         }
 
-        public virtual IEnumerable<string> FilterTerms => new[] { LabelText };
+        public virtual Bindable<T> Current
+        {
+            get => controlWithCurrent.Current;
+            set => controlWithCurrent.Current = value;
+        }
+
+        public virtual IEnumerable<string> FilterTerms => Keywords == null ? new[] { LabelText.ToString() } : new List<string>(Keywords) { LabelText.ToString() }.ToArray();
+
+        public IEnumerable<string> Keywords { get; set; }
 
         public bool MatchingFilter
         {
-            set
-            {
-                // probably needs a better transition.
-                this.FadeTo(value ? 1 : 0);
-            }
+            set => this.FadeTo(value ? 1 : 0);
         }
+
+        public bool FilteringActive { get; set; }
+
+        public event Action SettingChanged;
 
         protected SettingsItem()
         {
+            RestoreDefaultValueButton restoreDefaultButton;
+
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Padding = new MarginPadding { Right = SettingsOverlay.CONTENT_MARGINS };
+            Padding = new MarginPadding { Right = SettingsPanel.CONTENT_MARGINS };
 
             InternalChildren = new Drawable[]
             {
@@ -96,31 +98,45 @@ namespace osu.Game.Overlays.Settings
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Left = SettingsOverlay.CONTENT_MARGINS },
+                    Padding = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS },
                     Child = Control = CreateControl()
                 },
             };
-        }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
+            // all bindable logic is in constructor intentionally to support "CreateSettingsControls" being used in a context it is
+            // never loaded, but requires bindable storage.
             if (controlWithCurrent != null)
-                controlWithCurrent.Current.DisabledChanged += disabled => { Colour = disabled ? Color4.Gray : Color4.White; };
+            {
+                controlWithCurrent.Current.ValueChanged += _ => SettingChanged?.Invoke();
+                controlWithCurrent.Current.DisabledChanged += _ => updateDisabled();
+
+                if (ShowsDefaultIndicator)
+                    restoreDefaultButton.Bindable = controlWithCurrent.Current;
+            }
         }
 
-        private class RestoreDefaultValueButton : Container, IHasTooltip
+        private void updateDisabled()
         {
+            if (labelText != null)
+                labelText.Alpha = controlWithCurrent.Current.Disabled ? 0.3f : 1;
+        }
+
+        protected internal class RestoreDefaultValueButton : Container, IHasTooltip
+        {
+            public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
+
             private Bindable<T> bindable;
 
             public Bindable<T> Bindable
             {
-                get { return bindable; }
+                get => bindable;
                 set
                 {
                     bindable = value;
                     bindable.ValueChanged += _ => UpdateState();
                     bindable.DisabledChanged += _ => UpdateState();
+                    bindable.DefaultChanged += _ => UpdateState();
+                    UpdateState();
                 }
             }
 
@@ -131,7 +147,7 @@ namespace osu.Game.Overlays.Settings
             public RestoreDefaultValueButton()
             {
                 RelativeSizeAxes = Axes.Y;
-                Width = SettingsOverlay.CONTENT_MARGINS;
+                Width = SettingsPanel.CONTENT_MARGINS;
                 Alpha = 0f;
             }
 
@@ -165,11 +181,7 @@ namespace osu.Game.Overlays.Settings
                 UpdateState();
             }
 
-            public string TooltipText => "Revert to default";
-
-            protected override bool OnMouseDown(MouseDownEvent e) => true;
-
-            protected override bool OnMouseUp(MouseUpEvent e) => true;
+            public string TooltipText => "revert to default";
 
             protected override bool OnClick(ClickEvent e)
             {
@@ -197,7 +209,9 @@ namespace osu.Game.Overlays.Settings
                 UpdateState();
             }
 
-            public void UpdateState()
+            public void UpdateState() => Scheduler.AddOnce(updateState);
+
+            private void updateState()
             {
                 if (bindable == null)
                     return;

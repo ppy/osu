@@ -3,22 +3,34 @@
 
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public abstract class HealthDisplay : Container
+    /// <summary>
+    /// A container for components displaying the current player health.
+    /// Gets bound automatically to the <see cref="HealthProcessor"/> when inserted to <see cref="DrawableRuleset.Overlays"/> hierarchy.
+    /// </summary>
+    public abstract class HealthDisplay : Container, IHealthDisplay
     {
-        public readonly BindableDouble Current = new BindableDouble
+        public Bindable<double> Current { get; } = new BindableDouble(1)
         {
             MinValue = 0,
             MaxValue = 1
         };
 
-        protected HealthDisplay()
+        public virtual void Flash(JudgementResult result)
         {
-            Current.ValueChanged += health => SetHealth((float)health.NewValue);
         }
 
-        protected abstract void SetHealth(float value);
+        /// <summary>
+        /// Bind the tracked fields of <see cref="HealthProcessor"/> to this health display.
+        /// </summary>
+        public virtual void BindHealthProcessor(HealthProcessor processor)
+        {
+            Current.BindTo(processor.Health);
+        }
     }
 }

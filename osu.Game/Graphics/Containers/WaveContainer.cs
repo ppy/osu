@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osuTK.Graphics;
 
@@ -27,6 +28,8 @@ namespace osu.Game.Graphics.Containers
         private readonly Container contentContainer;
 
         protected override Container<Drawable> Content => contentContainer;
+
+        protected override bool StartHidden => true;
 
         public Color4 FirstWaveColour
         {
@@ -94,6 +97,7 @@ namespace osu.Game.Graphics.Containers
             AddInternal(contentContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
+                RelativePositionAxes = Axes.Both,
                 Anchor = Anchor.BottomCentre,
                 Origin = Anchor.BottomCentre,
             });
@@ -102,23 +106,17 @@ namespace osu.Game.Graphics.Containers
         protected override void PopIn()
         {
             foreach (var w in wavesContainer.Children)
-                w.State = Visibility.Visible;
+                w.Show();
 
-            this.FadeIn(100, Easing.OutQuint);
             contentContainer.MoveToY(0, APPEAR_DURATION, Easing.OutQuint);
-
-            this.FadeIn(100, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
-            this.FadeOut(DISAPPEAR_DURATION, Easing.InQuint);
-            contentContainer.MoveToY(DrawHeight * 2f, DISAPPEAR_DURATION, Easing.In);
-
             foreach (var w in wavesContainer.Children)
-                w.State = Visibility.Hidden;
+                w.Hide();
 
-            this.FadeOut(DISAPPEAR_DURATION, Easing.InQuint);
+            contentContainer.MoveToY(2, DISAPPEAR_DURATION, Easing.In);
         }
 
         protected override void UpdateAfterChildren()
@@ -127,7 +125,8 @@ namespace osu.Game.Graphics.Containers
 
             // This is done as an optimization, such that invisible parts of the waves
             // are masked away, and thus do not consume fill rate.
-            wavesContainer.Height = Math.Max(0, DrawHeight - (contentContainer.DrawHeight - contentContainer.Y));
+            // todo: revert https://github.com/ppy/osu/commit/aff9e3617da0c8fe252169fae287e39b44575b5e after FTB is fixed on iOS.
+            wavesContainer.Height = Math.Max(0, DrawHeight - (contentContainer.DrawHeight - contentContainer.Y * DrawHeight));
         }
 
         private class Wave : VisibilityContainer
@@ -160,8 +159,15 @@ namespace osu.Game.Graphics.Containers
                 Height = Parent.Parent.DrawSize.Y * 1.5f;
             }
 
-            protected override void PopIn() => this.MoveToY(FinalPosition, APPEAR_DURATION, easing_show);
-            protected override void PopOut() => this.MoveToY(Parent.Parent.DrawSize.Y, DISAPPEAR_DURATION, easing_hide);
+            protected override void PopIn() => Schedule(() => this.MoveToY(FinalPosition, APPEAR_DURATION, easing_show));
+
+            protected override void PopOut()
+            {
+                double duration = IsLoaded ? DISAPPEAR_DURATION : 0;
+
+                // scheduling is required as parent may not be present at the time this is called.
+                Schedule(() => this.MoveToY(Parent.Parent.DrawSize.Y, duration, easing_hide));
+            }
         }
     }
 }

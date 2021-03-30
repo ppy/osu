@@ -20,14 +20,15 @@ namespace osu.Game.Screens.Select.Details
         private readonly Container graphContainer;
         private readonly BarGraph graph;
 
-        private BeatmapMetrics metrics;
+        private BeatmapSetMetrics metrics;
 
-        public BeatmapMetrics Metrics
+        public BeatmapSetMetrics Metrics
         {
-            get { return metrics; }
+            get => metrics;
             set
             {
                 if (value == metrics) return;
+
                 metrics = value;
 
                 const int rating_range = 10;
@@ -70,31 +71,32 @@ namespace osu.Game.Screens.Select.Details
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Text = "User Rating",
-                            Font = OsuFont.GetFont(size: 13)
+                            Font = OsuFont.GetFont(size: 12),
+                            Margin = new MarginPadding { Bottom = 5 },
                         },
                         ratingsBar = new Bar
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 5,
-                            Margin = new MarginPadding { Top = 5 },
                         },
                         new Container
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
+                            Margin = new MarginPadding { Bottom = 10 },
                             Children = new[]
                             {
                                 negativeRatings = new OsuSpriteText
                                 {
                                     Text = "0",
-                                    Font = OsuFont.GetFont(size: 13)
+                                    Font = OsuFont.GetFont(size: 12)
                                 },
                                 positiveRatings = new OsuSpriteText
                                 {
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
                                     Text = @"0",
-                                    Font = OsuFont.GetFont(size: 13)
+                                    Font = OsuFont.GetFont(size: 12)
                                 },
                             },
                         },
@@ -103,8 +105,8 @@ namespace osu.Game.Screens.Select.Details
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Text = "Rating Spread",
-                            Font = OsuFont.GetFont(size: 13),
-                            Margin = new MarginPadding { Top = 10, Bottom = 5 },
+                            Font = OsuFont.GetFont(size: 12),
+                            Margin = new MarginPadding { Bottom = 5 },
                         },
                     },
                 },

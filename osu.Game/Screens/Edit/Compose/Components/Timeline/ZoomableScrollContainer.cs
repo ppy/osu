@@ -2,16 +2,19 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input.Events;
-using osu.Framework.MathUtils;
+using osu.Framework.Timing;
+using osu.Framework.Utils;
+using osu.Game.Graphics.Containers;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class ZoomableScrollContainer : ScrollContainer
+    public class ZoomableScrollContainer : OsuScrollContainer
     {
         /// <summary>
         /// The time to zoom into/out of a point.
@@ -26,8 +29,16 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private readonly Container zoomedContent;
         protected override Container<Drawable> Content => zoomedContent;
-
         private float currentZoom = 1;
+
+        /// <summary>
+        /// The current zoom level of <see cref="ZoomableScrollContainer" />.
+        /// It may differ from <see cref="Zoom" /> during transitions.
+        /// </summary>
+        public float CurrentZoom => currentZoom;
+
+        [Resolved(canBeNull: true)]
+        private IFrameBasedClock editorClock { get; set; }
 
         public ZoomableScrollContainer()
             : base(Direction.Horizontal)
@@ -35,18 +46,19 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             base.Content.Add(zoomedContent = new Container { RelativeSizeAxes = Axes.Y });
         }
 
-        private int minZoom = 1;
+        private float minZoom = 1;
 
         /// <summary>
         /// The minimum zoom level allowed.
         /// </summary>
-        public int MinZoom
+        public float MinZoom
         {
             get => minZoom;
             set
             {
                 if (value < 1)
                     throw new ArgumentException($"{nameof(MinZoom)} must be >= 1.", nameof(value));
+
                 minZoom = value;
 
                 if (Zoom < value)
@@ -54,18 +66,19 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
         }
 
-        private int maxZoom = 60;
+        private float maxZoom = 60;
 
         /// <summary>
         /// The maximum zoom level allowed.
         /// </summary>
-        public int MaxZoom
+        public float MaxZoom
         {
             get => maxZoom;
             set
             {
                 if (value < 1)
                     throw new ArgumentException($"{nameof(MaxZoom)} must be >= 1.", nameof(value));
+
                 maxZoom = value;
 
                 if (Zoom > value)
@@ -81,7 +94,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             get => zoomTarget;
             set
             {
-                value = MathHelper.Clamp(value, MinZoom, MaxZoom);
+                value = Math.Clamp(value, MinZoom, MaxZoom);
 
                 if (IsLoaded)
                     setZoomTarget(value, ToSpaceOfOtherDrawable(new Vector2(DrawWidth / 2, 0), zoomedContent).X);
@@ -90,27 +103,38 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
         }
 
-        protected override void Update()
+        protected override void LoadComplete()
         {
-            base.Update();
+            base.LoadComplete();
 
-            zoomedContent.Width = DrawWidth * currentZoom;
+            // This width only gets updated on the application of a transform, so this needs to be initialized here.
+            updateZoomedContentWidth();
         }
 
         protected override bool OnScroll(ScrollEvent e)
         {
-            if (e.IsPrecise)
-                // for now, we don't support zoom when using a precision scroll device. this needs gesture support.
-                return base.OnScroll(e);
+            if (e.AltPressed)
+            {
+                // zoom when holding alt.
+                setZoomTarget(zoomTarget + e.ScrollDelta.Y, zoomedContent.ToLocalSpace(e.ScreenSpaceMousePosition).X);
+                return true;
+            }
 
-            setZoomTarget(zoomTarget + e.ScrollDelta.Y, zoomedContent.ToLocalSpace(e.ScreenSpaceMousePosition).X);
-            return true;
+            // can't handle scroll correctly while playing.
+            // the editor will handle this case for us.
+            if (editorClock?.IsRunning == true)
+                return false;
+
+            return base.OnScroll(e);
         }
 
+        private void updateZoomedContentWidth() => zoomedContent.Width = DrawWidth * currentZoom;
+
         private float zoomTarget = 1;
+
         private void setZoomTarget(float newZoom, float focusPoint)
         {
-            zoomTarget = MathHelper.Clamp(newZoom, MinZoom, MaxZoom);
+            zoomTarget = Math.Clamp(newZoom, MinZoom, MaxZoom);
             transformZoomTo(zoomTarget, focusPoint, ZoomDuration, ZoomEasing);
         }
 
@@ -135,7 +159,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             private readonly float scrollOffset;
 
             /// <summary>
-            /// Transforms <see cref="TimeTimelinem"/> to a new value.
+            /// Transforms <see cref="ZoomableScrollContainer.currentZoom"/> to a new value.
             /// </summary>
             /// <param name="focusPoint">The focus point in absolute coordinates local to the content.</param>
             /// <param name="contentSize">The size of the content.</param>
@@ -166,6 +190,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 float targetOffset = expectedWidth * (focusPoint / contentSize) - focusOffset;
 
                 d.currentZoom = newZoom;
+
+                d.updateZoomedContentWidth();
+                // Temporarily here to make sure ScrollTo gets the correct DrawSize for scrollable area.
+                // TODO: Make sure draw size gets invalidated properly on the framework side, and remove this once it is.
+                d.Invalidate(Invalidation.DrawSize);
                 d.ScrollTo(targetOffset, false);
             }
 

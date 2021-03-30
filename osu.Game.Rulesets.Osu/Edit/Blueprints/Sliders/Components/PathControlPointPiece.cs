@@ -1,112 +1,232 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Lines;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Screens.Edit;
 using osuTK;
+using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
-    public class PathControlPointPiece : CompositeDrawable
+    /// <summary>
+    /// A visualisation of a single <see cref="PathControlPoint"/> in a <see cref="Slider"/>.
+    /// </summary>
+    public class PathControlPointPiece : BlueprintPiece<Slider>, IHasTooltip
     {
-        private readonly Slider slider;
-        private readonly int index;
+        public Action<PathControlPointPiece, MouseButtonEvent> RequestSelection;
 
-        private readonly Path path;
-        private readonly CircularContainer marker;
+        public readonly BindableBool IsSelected = new BindableBool();
+        public readonly PathControlPoint ControlPoint;
+
+        private readonly Slider slider;
+        private readonly Container marker;
+        private readonly Drawable markerRing;
+
+        [Resolved(CanBeNull = true)]
+        private IEditorChangeHandler changeHandler { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private IPositionSnapProvider snapProvider { get; set; }
 
         [Resolved]
         private OsuColour colours { get; set; }
 
-        public PathControlPointPiece(Slider slider, int index)
+        private IBindable<Vector2> sliderPosition;
+        private IBindable<float> sliderScale;
+        private IBindable<Vector2> controlPointPosition;
+
+        public PathControlPointPiece(Slider slider, PathControlPoint controlPoint)
         {
             this.slider = slider;
-            this.index = index;
+            ControlPoint = controlPoint;
+
+            controlPoint.Type.BindValueChanged(_ => updateMarkerDisplay());
 
             Origin = Anchor.Centre;
             AutoSizeAxes = Axes.Both;
 
             InternalChildren = new Drawable[]
             {
-                path = new SmoothPath
-                {
-                    Anchor = Anchor.Centre,
-                    PathWidth = 1
-                },
-                marker = new CircularContainer
+                marker = new Container
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(10),
-                    Masking = true,
-                    Child = new Box { RelativeSizeAxes = Axes.Both }
+                    AutoSizeAxes = Axes.Both,
+                    Children = new[]
+                    {
+                        new Circle
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Size = new Vector2(20),
+                        },
+                        markerRing = new CircularContainer
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Size = new Vector2(28),
+                            Masking = true,
+                            BorderThickness = 2,
+                            BorderColour = Color4.White,
+                            Alpha = 0,
+                            Child = new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Alpha = 0,
+                                AlwaysPresent = true
+                            }
+                        }
+                    }
                 }
             };
         }
 
-        protected override void Update()
+        protected override void LoadComplete()
         {
-            base.Update();
+            base.LoadComplete();
 
-            Position = slider.StackedPosition + slider.Path.ControlPoints[index];
+            sliderPosition = slider.PositionBindable.GetBoundCopy();
+            sliderPosition.BindValueChanged(_ => updateMarkerDisplay());
 
-            marker.Colour = isSegmentSeparator ? colours.Red : colours.Yellow;
+            controlPointPosition = ControlPoint.Position.GetBoundCopy();
+            controlPointPosition.BindValueChanged(_ => updateMarkerDisplay());
 
-            path.ClearVertices();
+            sliderScale = slider.ScaleBindable.GetBoundCopy();
+            sliderScale.BindValueChanged(_ => updateMarkerDisplay());
 
-            if (index != slider.Path.ControlPoints.Length - 1)
-            {
-                path.AddVertex(Vector2.Zero);
-                path.AddVertex(slider.Path.ControlPoints[index + 1] - slider.Path.ControlPoints[index]);
-            }
+            IsSelected.BindValueChanged(_ => updateMarkerDisplay());
 
-            path.OriginPosition = path.PositionInBoundingBox(Vector2.Zero);
+            updateMarkerDisplay();
         }
 
+        // The connecting path is excluded from positional input
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => marker.ReceivePositionalInputAt(screenSpacePos);
 
-        protected override bool OnDragStart(DragStartEvent e) => true;
-
-        protected override bool OnDrag(DragEvent e)
+        protected override bool OnHover(HoverEvent e)
         {
-            var newControlPoints = slider.Path.ControlPoints.ToArray();
-
-            if (index == 0)
-            {
-                // Special handling for the head - only the position of the slider changes
-                slider.Position += e.Delta;
-
-                // Since control points are relative to the position of the slider, they all need to be offset backwards by the delta
-                for (int i = 1; i < newControlPoints.Length; i++)
-                    newControlPoints[i] -= e.Delta;
-            }
-            else
-                newControlPoints[index] += e.Delta;
-
-            if (isSegmentSeparatorWithNext)
-                newControlPoints[index + 1] = newControlPoints[index];
-
-            if (isSegmentSeparatorWithPrevious)
-                newControlPoints[index - 1] = newControlPoints[index];
-
-            slider.Path = new SliderPath(slider.Path.Type, newControlPoints);
-
-            return true;
+            updateMarkerDisplay();
+            return false;
         }
 
-        protected override bool OnDragEnd(DragEndEvent e) => true;
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            updateMarkerDisplay();
+        }
 
-        private bool isSegmentSeparator => isSegmentSeparatorWithNext || isSegmentSeparatorWithPrevious;
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            if (RequestSelection == null)
+                return false;
 
-        private bool isSegmentSeparatorWithNext => index < slider.Path.ControlPoints.Length - 1 && slider.Path.ControlPoints[index + 1] == slider.Path.ControlPoints[index];
+            switch (e.Button)
+            {
+                case MouseButton.Left:
+                    RequestSelection.Invoke(this, e);
+                    return true;
 
-        private bool isSegmentSeparatorWithPrevious => index > 0 && slider.Path.ControlPoints[index - 1] == slider.Path.ControlPoints[index];
+                case MouseButton.Right:
+                    if (!IsSelected.Value)
+                        RequestSelection.Invoke(this, e);
+                    return false; // Allow context menu to show
+            }
+
+            return false;
+        }
+
+        protected override bool OnClick(ClickEvent e) => RequestSelection != null;
+
+        private Vector2 dragStartPosition;
+
+        protected override bool OnDragStart(DragStartEvent e)
+        {
+            if (RequestSelection == null)
+                return false;
+
+            if (e.Button == MouseButton.Left)
+            {
+                dragStartPosition = ControlPoint.Position.Value;
+                changeHandler?.BeginChange();
+                return true;
+            }
+
+            return false;
+        }
+
+        protected override void OnDrag(DragEvent e)
+        {
+            if (ControlPoint == slider.Path.ControlPoints[0])
+            {
+                // Special handling for the head control point - the position of the slider changes which means the snapped position and time have to be taken into account
+                var result = snapProvider?.SnapScreenSpacePositionToValidTime(e.ScreenSpaceMousePosition);
+
+                Vector2 movementDelta = Parent.ToLocalSpace(result?.ScreenSpacePosition ?? e.ScreenSpaceMousePosition) - slider.Position;
+
+                slider.Position += movementDelta;
+                slider.StartTime = result?.Time ?? slider.StartTime;
+
+                // Since control points are relative to the position of the slider, they all need to be offset backwards by the delta
+                for (int i = 1; i < slider.Path.ControlPoints.Count; i++)
+                    slider.Path.ControlPoints[i].Position.Value -= movementDelta;
+            }
+            else
+                ControlPoint.Position.Value = dragStartPosition + (e.MousePosition - e.MouseDownPosition);
+        }
+
+        protected override void OnDragEnd(DragEndEvent e) => changeHandler?.EndChange();
+
+        /// <summary>
+        /// Updates the state of the circular control point marker.
+        /// </summary>
+        private void updateMarkerDisplay()
+        {
+            Position = slider.StackedPosition + ControlPoint.Position.Value;
+
+            markerRing.Alpha = IsSelected.Value ? 1 : 0;
+
+            Color4 colour = getColourFromNodeType();
+
+            if (IsHovered || IsSelected.Value)
+                colour = colour.Lighten(1);
+
+            marker.Colour = colour;
+            marker.Scale = new Vector2(slider.Scale);
+        }
+
+        private Color4 getColourFromNodeType()
+        {
+            if (!(ControlPoint.Type.Value is PathType pathType))
+                return colours.Yellow;
+
+            switch (pathType)
+            {
+                case PathType.Catmull:
+                    return colours.Seafoam;
+
+                case PathType.Bezier:
+                    return colours.Pink;
+
+                case PathType.PerfectCurve:
+                    return colours.PurpleDark;
+
+                default:
+                    return colours.Red;
+            }
+        }
+
+        public string TooltipText => ControlPoint.Type.Value.ToString() ?? string.Empty;
     }
 }

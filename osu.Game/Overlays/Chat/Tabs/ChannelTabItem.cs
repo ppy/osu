@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -15,6 +16,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Overlays.Chat.Tabs
 {
@@ -27,7 +29,6 @@ namespace osu.Game.Overlays.Chat.Tabs
         public override bool IsRemovable => !Pinned;
 
         protected readonly SpriteText Text;
-        protected readonly SpriteText TextBold;
         protected readonly ClickableContainer CloseButton;
         private readonly Box box;
         private readonly Box highlightBox;
@@ -86,20 +87,17 @@ namespace osu.Game.Overlays.Chat.Tabs
                         },
                         Text = new OsuSpriteText
                         {
-                            Margin = new MarginPadding(5),
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.CentreLeft,
                             Text = value.ToString(),
-                            Font = OsuFont.GetFont(size: 18)
-                        },
-                        TextBold = new OsuSpriteText
-                        {
-                            Alpha = 0,
-                            Margin = new MarginPadding(5),
-                            Origin = Anchor.CentreLeft,
-                            Anchor = Anchor.CentreLeft,
-                            Text = value.ToString(),
-                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold)
+                            Font = OsuFont.GetFont(size: 18),
+                            Padding = new MarginPadding(5)
+                            {
+                                Left = LeftTextPadding,
+                                Right = RightTextPadding,
+                            },
+                            RelativeSizeAxes = Axes.X,
+                            Truncate = true,
                         },
                         CloseButton = new TabCloseButton
                         {
@@ -117,9 +115,15 @@ namespace osu.Game.Overlays.Chat.Tabs
             };
         }
 
-        protected virtual FontAwesome DisplayIcon => FontAwesome.fa_hashtag;
+        protected virtual float LeftTextPadding => 5;
+
+        protected virtual float RightTextPadding => IsRemovable ? 40 : 5;
+
+        protected virtual IconUsage DisplayIcon => FontAwesome.Solid.Hashtag;
 
         protected virtual bool ShowCloseOnHover => true;
+
+        protected virtual bool IsBoldWhenActive => true;
 
         protected override bool OnHover(HoverEvent e)
         {
@@ -135,6 +139,16 @@ namespace osu.Game.Overlays.Chat.Tabs
         {
             CloseButton.FadeOut(200, Easing.OutQuint);
             updateState();
+        }
+
+        protected override void OnMouseUp(MouseUpEvent e)
+        {
+            switch (e.Button)
+            {
+                case MouseButton.Middle:
+                    CloseButton.Click();
+                    break;
+            }
         }
 
         [BackgroundDependencyLoader]
@@ -188,8 +202,7 @@ namespace osu.Game.Overlays.Chat.Tabs
             box.FadeColour(BackgroundActive, TRANSITION_LENGTH, Easing.OutQuint);
             highlightBox.FadeIn(TRANSITION_LENGTH, Easing.OutQuint);
 
-            Text.FadeOut(TRANSITION_LENGTH, Easing.OutQuint);
-            TextBold.FadeIn(TRANSITION_LENGTH, Easing.OutQuint);
+            if (IsBoldWhenActive) Text.Font = Text.Font.With(weight: FontWeight.Bold);
         }
 
         protected virtual void FadeInactive()
@@ -198,11 +211,10 @@ namespace osu.Game.Overlays.Chat.Tabs
 
             TweenEdgeEffectTo(deactivateEdgeEffect, TRANSITION_LENGTH);
 
-            box.FadeColour(BackgroundInactive, TRANSITION_LENGTH, Easing.OutQuint);
+            box.FadeColour(IsHovered ? backgroundHover : BackgroundInactive, TRANSITION_LENGTH, Easing.OutQuint);
             highlightBox.FadeOut(TRANSITION_LENGTH, Easing.OutQuint);
 
-            Text.FadeIn(TRANSITION_LENGTH, Easing.OutQuint);
-            TextBold.FadeOut(TRANSITION_LENGTH, Easing.OutQuint);
+            Text.Font = Text.Font.With(weight: FontWeight.Medium);
         }
 
         protected override void OnActivated() => updateState();

@@ -8,12 +8,10 @@ namespace osu.Game.Rulesets.Objects.Legacy.Taiko
     /// <summary>
     /// Legacy osu!taiko Spinner-type, used for parsing Beatmaps.
     /// </summary>
-    internal sealed class ConvertSpinner : HitObject, IHasEndTime
+    internal sealed class ConvertSpinner : ConvertHitObject, IHasDuration
     {
-        public double EndTime { get; set; }
+        public double Duration { get; set; }
 
-        public double Duration => EndTime - StartTime;
-
-        protected override HitWindows CreateHitWindows() => null;
+        public double EndTime => StartTime + Duration;
     }
 }

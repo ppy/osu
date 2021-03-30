@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays.Settings.Sections.Online;
 
 namespace osu.Game.Overlays.Settings.Sections
@@ -10,13 +10,18 @@ namespace osu.Game.Overlays.Settings.Sections
     public class OnlineSection : SettingsSection
     {
         public override string Header => "Online";
-        public override FontAwesome Icon => FontAwesome.fa_globe;
+
+        public override Drawable CreateIcon() => new SpriteIcon
+        {
+            Icon = FontAwesome.Solid.GlobeAsia
+        };
 
         public OnlineSection()
         {
             Children = new Drawable[]
             {
-                new WebSettings()
+                new WebSettings(),
+                new IntegrationSettings()
             };
         }
     }

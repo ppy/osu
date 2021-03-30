@@ -5,26 +5,26 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Osu.Skinning.Default;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
-    public class SliderBodyPiece : SliderPiece
+    public class SliderBodyPiece : BlueprintPiece<Slider>
     {
-        private readonly Slider slider;
         private readonly ManualSliderBody body;
 
-        public SliderBodyPiece(Slider slider)
-            : base(slider)
-        {
-            this.slider = slider;
+        /// <summary>
+        /// Offset in absolute (local) coordinates from the start of the curve.
+        /// </summary>
+        public Vector2 PathStartLocation => body.PathOffset;
 
+        public SliderBodyPiece()
+        {
             InternalChild = body = new ManualSliderBody
             {
-                AccentColour = Color4.Transparent,
-                PathWidth = slider.Scale * 64
+                AccentColour = Color4.Transparent
             };
         }
 
@@ -32,24 +32,25 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private void load(OsuColour colours)
         {
             body.BorderColour = colours.Yellow;
-
-            PositionBindable.BindValueChanged(_ => updatePosition(), true);
-            ScaleBindable.BindValueChanged(scale => body.PathWidth = scale.NewValue * 64, true);
         }
 
-        private void updatePosition() => Position = slider.StackedPosition;
-
-        protected override void Update()
+        public override void UpdateFrom(Slider hitObject)
         {
-            base.Update();
+            base.UpdateFrom(hitObject);
+
+            body.PathRadius = hitObject.Scale * OsuHitObject.OBJECT_RADIUS;
 
             var vertices = new List<Vector2>();
-            slider.Path.GetPathToProgress(vertices, 0, 1);
+            hitObject.Path.GetPathToProgress(vertices, 0, 1);
 
             body.SetVertices(vertices);
 
             Size = body.Size;
             OriginPosition = body.PathOffset;
         }
+
+        public void RecyclePath() => body.RecyclePath();
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => body.ReceivePositionalInputAt(screenSpacePos);
     }
 }

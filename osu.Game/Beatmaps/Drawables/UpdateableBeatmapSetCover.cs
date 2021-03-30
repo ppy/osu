@@ -4,7 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osuTK.Graphics;
+using osu.Game.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
@@ -13,12 +13,14 @@ namespace osu.Game.Beatmaps.Drawables
         private Drawable displayedCover;
 
         private BeatmapSetInfo beatmapSet;
+
         public BeatmapSetInfo BeatmapSet
         {
-            get { return beatmapSet; }
+            get => beatmapSet;
             set
             {
                 if (value == beatmapSet) return;
+
                 beatmapSet = value;
 
                 if (IsLoaded)
@@ -27,12 +29,14 @@ namespace osu.Game.Beatmaps.Drawables
         }
 
         private BeatmapSetCoverType coverType = BeatmapSetCoverType.Cover;
+
         public BeatmapSetCoverType CoverType
         {
-            get { return coverType; }
+            get => coverType;
             set
             {
                 if (value == coverType) return;
+
                 coverType = value;
 
                 if (IsLoaded)
@@ -45,7 +49,7 @@ namespace osu.Game.Beatmaps.Drawables
             Child = new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Colour = Color4.Black,
+                Colour = OsuColour.Gray(0.2f),
             };
         }
 
@@ -63,16 +67,18 @@ namespace osu.Game.Beatmaps.Drawables
 
             if (beatmapSet != null)
             {
-                Add(displayedCover = new DelayedLoadWrapper(
-                    new BeatmapSetCover(beatmapSet, coverType)
+                Add(displayedCover = new DelayedLoadUnloadWrapper(() =>
+                {
+                    var cover = new BeatmapSetCover(beatmapSet, coverType)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
                         FillMode = FillMode.Fill,
-                        OnLoadComplete = d => d.FadeInFromZero(400, Easing.Out),
-                    })
-                );
+                    };
+                    cover.OnLoadComplete += d => d.FadeInFromZero(400, Easing.Out);
+                    return cover;
+                }));
             }
         }
     }

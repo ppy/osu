@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -24,7 +25,7 @@ namespace osu.Game.Overlays.Chat.Selection
         private const float text_size = 15;
         private const float transition_duration = 100;
 
-        private readonly Channel channel;
+        public readonly Channel Channel;
 
         private readonly Bindable<bool> joinedBind = new Bindable<bool>();
         private readonly OsuSpriteText name;
@@ -35,21 +36,21 @@ namespace osu.Game.Overlays.Chat.Selection
         private Color4 topicColour;
         private Color4 hoverColour;
 
-        public IEnumerable<string> FilterTerms => new[] { channel.Name };
+        public IEnumerable<string> FilterTerms => new[] { Channel.Name, Channel.Topic ?? string.Empty };
+
         public bool MatchingFilter
         {
-            set
-            {
-                this.FadeTo(value ? 1f : 0f, 100);
-            }
+            set => this.FadeTo(value ? 1f : 0f, 100);
         }
+
+        public bool FilteringActive { get; set; }
 
         public Action<Channel> OnRequestJoin;
         public Action<Channel> OnRequestLeave;
 
         public ChannelListItem(Channel channel)
         {
-            this.channel = channel;
+            Channel = channel;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -73,7 +74,7 @@ namespace osu.Game.Overlays.Chat.Selection
                                 {
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
-                                    Icon = FontAwesome.fa_check_circle,
+                                    Icon = FontAwesome.Solid.CheckCircle,
                                     Size = new Vector2(text_size),
                                     Shadow = false,
                                     Margin = new MarginPadding { Right = 10f },
@@ -120,10 +121,11 @@ namespace osu.Game.Overlays.Chat.Selection
                             {
                                 new SpriteIcon
                                 {
-                                    Icon = FontAwesome.fa_user,
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Icon = FontAwesome.Solid.User,
                                     Size = new Vector2(text_size - 2),
                                     Shadow = false,
-                                    Margin = new MarginPadding { Top = 1 },
                                 },
                                 new OsuSpriteText
                                 {
@@ -146,7 +148,7 @@ namespace osu.Game.Overlays.Chat.Selection
             hoverColour = colours.Yellow;
 
             joinedBind.ValueChanged += joined => updateColour(joined.NewValue);
-            joinedBind.BindTo(channel.Joined);
+            joinedBind.BindTo(Channel.Joined);
 
             joinedBind.TriggerChange();
             FinishTransforms(true);
@@ -154,7 +156,7 @@ namespace osu.Game.Overlays.Chat.Selection
 
         protected override bool OnHover(HoverEvent e)
         {
-            if (!channel.Joined.Value)
+            if (!Channel.Joined.Value)
                 name.FadeColour(hoverColour, 50, Easing.OutQuint);
 
             return base.OnHover(e);
@@ -162,7 +164,7 @@ namespace osu.Game.Overlays.Chat.Selection
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (!channel.Joined.Value)
+            if (!Channel.Joined.Value)
                 name.FadeColour(Color4.White, transition_duration);
         }
 

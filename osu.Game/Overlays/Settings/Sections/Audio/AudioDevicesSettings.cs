@@ -6,6 +6,7 @@ using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings.Sections.Audio
@@ -14,14 +15,10 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
     {
         protected override string Header => "Devices";
 
-        private AudioManager audio;
-        private SettingsDropdown<string> dropdown;
+        [Resolved]
+        private AudioManager audio { get; set; }
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
-        {
-            this.audio = audio;
-        }
+        private SettingsDropdown<string> dropdown;
 
         protected override void Dispose(bool isDisposing)
         {
@@ -60,12 +57,15 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
             Children = new Drawable[]
             {
-                dropdown = new AudioDeviceSettingsDropdown()
+                dropdown = new AudioDeviceSettingsDropdown
+                {
+                    Keywords = new[] { "speaker", "headphone", "output" }
+                }
             };
 
             updateItems();
 
-            dropdown.Bindable = audio.AudioDevice;
+            dropdown.Current = audio.AudioDevice;
 
             audio.OnNewDevice += onDeviceChanged;
             audio.OnLostDevice += onDeviceChanged;
@@ -73,11 +73,11 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
         private class AudioDeviceSettingsDropdown : SettingsDropdown<string>
         {
-            protected override OsuDropdown<string> CreateDropdown() => new AudioDeviceDropdownControl { Items = Items };
+            protected override OsuDropdown<string> CreateDropdown() => new AudioDeviceDropdownControl();
 
             private class AudioDeviceDropdownControl : DropdownControl
             {
-                protected override string GenerateItemText(string item)
+                protected override LocalisableString GenerateItemText(string item)
                     => string.IsNullOrEmpty(item) ? "Default" : base.GenerateItemText(item);
             }
         }

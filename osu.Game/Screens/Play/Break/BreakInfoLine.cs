@@ -1,12 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Utils;
 
 namespace osu.Game.Screens.Play.Break
 {
@@ -60,7 +63,13 @@ namespace osu.Game.Screens.Play.Break
             valueText.Text = newText;
         }
 
-        protected virtual string Format(T count) => count.ToString();
+        protected virtual string Format(T count)
+        {
+            if (count is Enum countEnum)
+                return countEnum.GetDescription();
+
+            return count.ToString();
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -72,10 +81,11 @@ namespace osu.Game.Screens.Play.Break
 
     public class PercentageBreakInfoLine : BreakInfoLine<double>
     {
-        public PercentageBreakInfoLine(string name, string prefix = "") : base(name, prefix)
+        public PercentageBreakInfoLine(string name, string prefix = "")
+            : base(name, prefix)
         {
         }
 
-        protected override string Format(double count) => $@"{count:P2}";
+        protected override string Format(double count) => count.FormatAccuracy();
     }
 }

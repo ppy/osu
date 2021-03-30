@@ -4,20 +4,20 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Volume
 {
-    public class MuteButton : Container, IHasCurrentValue<bool>
+    public class MuteButton : OsuButton, IHasCurrentValue<bool>
     {
         private readonly Bindable<bool> current = new Bindable<bool>();
 
@@ -35,63 +35,57 @@ namespace osu.Game.Overlays.Volume
         }
 
         private Color4 hoveredColour, unhoveredColour;
+
         private const float width = 100;
         public const float HEIGHT = 35;
 
         public MuteButton()
         {
-            Masking = true;
-            BorderThickness = 3;
-            CornerRadius = HEIGHT / 2;
+            Content.BorderThickness = 3;
+            Content.CornerRadius = HEIGHT / 2;
+            Content.CornerExponent = 2;
+
             Size = new Vector2(width, HEIGHT);
+
+            Action = () => Current.Value = !Current.Value;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             hoveredColour = colours.YellowDark;
-            BorderColour = unhoveredColour = colours.Gray1.Opacity(0.9f);
+
+            Content.BorderColour = unhoveredColour = colours.Gray1;
+            BackgroundColour = colours.Gray1;
 
             SpriteIcon icon;
+
             AddRange(new Drawable[]
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colours.Gray1,
-                    Alpha = 0.9f,
-                },
                 icon = new SpriteIcon
                 {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    Size = new Vector2(20),
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                 }
             });
 
-            Current.ValueChanged += muted =>
+            Current.BindValueChanged(muted =>
             {
-                icon.Icon = muted.NewValue ? FontAwesome.fa_volume_off : FontAwesome.fa_volume_up;
-                icon.Margin = new MarginPadding { Left = muted.NewValue ? width / 2 - 15 : width / 2 - 10 }; //Magic numbers to line up both icons because they're different widths
-            };
-            Current.TriggerChange();
+                icon.Icon = muted.NewValue ? FontAwesome.Solid.VolumeMute : FontAwesome.Solid.VolumeUp;
+                icon.Size = new Vector2(muted.NewValue ? 18 : 20);
+                icon.Margin = new MarginPadding { Right = muted.NewValue ? 2 : 0 };
+            }, true);
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            this.TransformTo<MuteButton, SRGBColour>("BorderColour", hoveredColour, 500, Easing.OutQuint);
+            Content.TransformTo<Container<Drawable>, SRGBColour>("BorderColour", hoveredColour, 500, Easing.OutQuint);
             return false;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            this.TransformTo<MuteButton, SRGBColour>("BorderColour", unhoveredColour, 500, Easing.OutQuint);
-        }
-
-        protected override bool OnClick(ClickEvent e)
-        {
-            Current.Value = !Current.Value;
-            return true;
+            Content.TransformTo<Container<Drawable>, SRGBColour>("BorderColour", unhoveredColour, 500, Easing.OutQuint);
         }
     }
 }

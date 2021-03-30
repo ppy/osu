@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Chat.Selection
 {
     public class ChannelSelectionOverlay : WaveOverlayContainer
     {
-        public static readonly float WIDTH_PADDING = 170;
+        public new const float WIDTH_PADDING = 170;
 
         private const float transition_duration = 500;
 
@@ -32,6 +32,8 @@ namespace osu.Game.Overlays.Chat.Selection
         private readonly SearchTextBox search;
         private readonly SearchContainer<ChannelSection> sectionsFlow;
 
+        protected override bool DimMainContent => false;
+
         public Action<Channel> OnRequestJoin;
         public Action<Channel> OnRequestLeave;
 
@@ -39,10 +41,10 @@ namespace osu.Game.Overlays.Chat.Selection
         {
             RelativeSizeAxes = Axes.X;
 
-            Waves.FirstWaveColour = OsuColour.FromHex("353535");
-            Waves.SecondWaveColour = OsuColour.FromHex("434343");
-            Waves.ThirdWaveColour = OsuColour.FromHex("515151");
-            Waves.FourthWaveColour = OsuColour.FromHex("595959");
+            Waves.FirstWaveColour = Color4Extensions.FromHex("353535");
+            Waves.SecondWaveColour = Color4Extensions.FromHex("434343");
+            Waves.ThirdWaveColour = Color4Extensions.FromHex("515151");
+            Waves.FourthWaveColour = Color4Extensions.FromHex("595959");
 
             Children = new Drawable[]
             {
@@ -113,12 +115,7 @@ namespace osu.Game.Overlays.Chat.Selection
                                     Font = OsuFont.GetFont(size: 20),
                                     Shadow = false,
                                 },
-                                search = new HeaderSearchTextBox
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    PlaceholderText = @"Search",
-                                    Exit = Hide,
-                                },
+                                search = new HeaderSearchTextBox { RelativeSizeAxes = Axes.X },
                             },
                         },
                     },
@@ -134,11 +131,7 @@ namespace osu.Game.Overlays.Chat.Selection
             {
                 sectionsFlow.ChildrenEnumerable = new[]
                 {
-                    new ChannelSection
-                    {
-                        Header = "All Channels",
-                        Channels = channels,
-                    },
+                    new ChannelSection { Channels = channels, },
                 };
 
                 foreach (ChannelSection s in sectionsFlow.Children)
@@ -157,7 +150,7 @@ namespace osu.Game.Overlays.Chat.Selection
         {
             bg.Colour = colours.Gray3;
             triangles.ColourDark = colours.Gray3;
-            triangles.ColourLight = OsuColour.FromHex(@"353535");
+            triangles.ColourLight = Color4Extensions.FromHex(@"353535");
 
             headerBg.Colour = colours.Gray2.Opacity(0.75f);
         }
@@ -190,8 +183,12 @@ namespace osu.Game.Overlays.Chat.Selection
 
         private class HeaderSearchTextBox : SearchTextBox
         {
-            protected override Color4 BackgroundFocused => Color4.Black.Opacity(0.2f);
-            protected override Color4 BackgroundUnfocused => Color4.Black.Opacity(0.2f);
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                BackgroundFocused = Color4.Black.Opacity(0.2f);
+                BackgroundUnfocused = Color4.Black.Opacity(0.2f);
+            }
         }
     }
 }

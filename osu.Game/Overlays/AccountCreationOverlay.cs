@@ -2,11 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
+using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
@@ -16,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class AccountCreationOverlay : OsuFocusedOverlayContainer, IOnlineComponent
+    public class AccountCreationOverlay : OsuFocusedOverlayContainer
     {
         private const float transition_time = 400;
 
@@ -29,10 +32,13 @@ namespace osu.Game.Overlays
             Origin = Anchor.Centre;
         }
 
+        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, APIAccess api)
+        private void load(OsuColour colours, IAPIProvider api)
         {
-            api.Register(this);
+            apiState.BindTo(api.State);
+            apiState.BindValueChanged(apiStateChanged, true);
 
             Children = new Drawable[]
             {
@@ -88,6 +94,11 @@ namespace osu.Game.Overlays
 
             if (welcomeScreen.GetChildScreen() != null)
                 welcomeScreen.MakeCurrent();
+
+            // there might be a stale scheduled hide from a previous API state change.
+            // cancel it here so that the overlay is not hidden again after one frame.
+            scheduledHide?.Cancel();
+            scheduledHide = null;
         }
 
         protected override void PopOut()
@@ -96,17 +107,22 @@ namespace osu.Game.Overlays
             this.FadeOut(100);
         }
 
-        public void APIStateChanged(APIAccess api, APIState state)
+        private ScheduledDelegate scheduledHide;
+
+        private void apiStateChanged(ValueChangedEvent<APIState> state)
         {
-            switch (state)
+            switch (state.NewValue)
             {
                 case APIState.Offline:
                 case APIState.Failing:
                     break;
+
                 case APIState.Connecting:
                     break;
+
                 case APIState.Online:
-                    State = Visibility.Hidden;
+                    scheduledHide?.Cancel();
+                    scheduledHide = Schedule(Hide);
                     break;
             }
         }

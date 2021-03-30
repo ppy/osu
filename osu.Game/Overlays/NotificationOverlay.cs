@@ -6,18 +6,22 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays.Notifications;
-using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Threading;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class NotificationOverlay : OsuFocusedOverlayContainer
+    public class NotificationOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
     {
+        public string IconTexture => "Icons/Hexacons/notification";
+        public string Title => "notifications";
+        public string Description => "waiting for 'ya";
+
         private const float width = 320;
 
         public const float TRANSITION_LENGTH = 600;
@@ -35,15 +39,12 @@ namespace osu.Game.Overlays
             Width = width;
             RelativeSizeAxes = Axes.Y;
 
-            AlwaysPresent = true;
-
             Children = new Drawable[]
             {
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                    Alpha = 0.6f
+                    Colour = OsuColour.Gray(0.05f),
                 },
                 new OsuScrollContainer
                 {
@@ -58,16 +59,12 @@ namespace osu.Game.Overlays
                             RelativeSizeAxes = Axes.X,
                             Children = new[]
                             {
-                                new NotificationSection
+                                new NotificationSection(@"Notifications", @"Clear All")
                                 {
-                                    Title = @"Notifications",
-                                    ClearText = @"Clear All",
                                     AcceptTypes = new[] { typeof(SimpleNotification) }
                                 },
-                                new NotificationSection
+                                new NotificationSection(@"Running Tasks", @"Cancel All")
                                 {
-                                    Title = @"Running Tasks",
-                                    ClearText = @"Cancel All",
                                     AcceptTypes = new[] { typeof(ProgressNotification) }
                                 }
                             }
@@ -78,15 +75,16 @@ namespace osu.Game.Overlays
         }
 
         private ScheduledDelegate notificationsEnabler;
+
         private void updateProcessingMode()
         {
-            bool enabled = OverlayActivationMode.Value == OverlayActivation.All || State == Visibility.Visible;
+            bool enabled = OverlayActivationMode.Value == OverlayActivation.All || State.Value == Visibility.Visible;
 
             notificationsEnabler?.Cancel();
 
             if (enabled)
                 // we want a slight delay before toggling notifications on to avoid the user becoming overwhelmed.
-                notificationsEnabler = Scheduler.AddDelayed(() => processingPosts = true, State == Visibility.Visible ? 0 : 1000);
+                notificationsEnabler = Scheduler.AddDelayed(() => processingPosts = true, State.Value == Visibility.Visible ? 0 : 1000);
             else
                 processingPosts = false;
         }
@@ -95,12 +93,9 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
-            StateChanged += _ => updateProcessingMode();
+            State.ValueChanged += _ => updateProcessingMode();
             OverlayActivationMode.BindValueChanged(_ => updateProcessingMode(), true);
         }
-
-        private int totalCount => sections.Select(c => c.DisplayedCount).Sum();
-        private int unreadCount => sections.Select(c => c.UnreadCount).Sum();
 
         public readonly BindableInt UnreadCount = new BindableInt();
 
@@ -110,6 +105,8 @@ namespace osu.Game.Overlays
 
         private readonly Scheduler postScheduler = new Scheduler();
 
+        public override bool IsPresent => base.IsPresent || postScheduler.HasPendingTasks;
+
         private bool processingPosts = true;
 
         public void Post(Notification notification) => postScheduler.Add(() =>
@@ -118,8 +115,7 @@ namespace osu.Game.Overlays
 
             notification.Closed += notificationClosed;
 
-            var hasCompletionTarget = notification as IHasCompletionTarget;
-            if (hasCompletionTarget != null)
+            if (notification is IHasCompletionTarget hasCompletionTarget)
                 hasCompletionTarget.CompletionTarget = Post;
 
             var ourType = notification.GetType();
@@ -128,7 +124,7 @@ namespace osu.Game.Overlays
             section?.Add(notification, notification.DisplayOnTop ? -runningDepth : runningDepth);
 
             if (notification.IsImportant)
-                State = Visibility.Visible;
+                Show();
 
             updateCounts();
         });
@@ -160,7 +156,7 @@ namespace osu.Game.Overlays
 
         private void updateCounts()
         {
-            UnreadCount.Value = unreadCount;
+            UnreadCount.Value = sections.Select(c => c.UnreadCount).Sum();
         }
 
         private void markAllRead()

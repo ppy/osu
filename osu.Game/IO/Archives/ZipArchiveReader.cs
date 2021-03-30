@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using osu.Framework.IO.Stores;
 using SharpCompress.Archives.Zip;
 
 namespace osu.Game.IO.Archives
@@ -43,8 +44,6 @@ namespace osu.Game.IO.Archives
             archiveStream.Dispose();
         }
 
-        public override IEnumerable<string> Filenames => archive.Entries.Select(e => e.Key).ToArray();
-
-        public override Stream GetUnderlyingStream() => archiveStream;
+        public override IEnumerable<string> Filenames => archive.Entries.Select(e => e.Key).ExcludeSystemFileNames();
     }
 }

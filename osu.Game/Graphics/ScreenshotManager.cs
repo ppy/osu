@@ -9,7 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
@@ -19,10 +19,11 @@ using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Jpeg;
 
 namespace osu.Game.Graphics
 {
-    public class ScreenshotManager : Container, IKeyBindingHandler<GlobalAction>, IHandleGlobalInput
+    public class ScreenshotManager : Component, IKeyBindingHandler<GlobalAction>, IHandleGlobalKeyboardInput
     {
         private readonly BindableBool cursorVisibility = new BindableBool(true);
 
@@ -35,23 +36,25 @@ namespace osu.Game.Graphics
         private Bindable<ScreenshotFormat> screenshotFormat;
         private Bindable<bool> captureMenuCursor;
 
-        private GameHost host;
-        private Storage storage;
-        private NotificationOverlay notificationOverlay;
+        [Resolved]
+        private GameHost host { get; set; }
 
-        private SampleChannel shutter;
+        private Storage storage;
+
+        [Resolved]
+        private NotificationOverlay notificationOverlay { get; set; }
+
+        private Sample shutter;
 
         [BackgroundDependencyLoader]
-        private void load(GameHost host, OsuConfigManager config, Storage storage, NotificationOverlay notificationOverlay, AudioManager audio)
+        private void load(OsuConfigManager config, Storage storage, AudioManager audio)
         {
-            this.host = host;
             this.storage = storage.GetStorageForDirectory(@"screenshots");
-            this.notificationOverlay = notificationOverlay;
 
             screenshotFormat = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat);
             captureMenuCursor = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor);
 
-            shutter = audio.Sample.Get("UI/shutter");
+            shutter = audio.Samples.Get("UI/shutter");
         }
 
         public bool OnPressed(GlobalAction action)
@@ -67,7 +70,9 @@ namespace osu.Game.Graphics
             return false;
         }
 
-        public bool OnReleased(GlobalAction action) => false;
+        public void OnReleased(GlobalAction action)
+        {
+        }
 
         private volatile int screenShotTasks;
 
@@ -83,16 +88,25 @@ namespace osu.Game.Graphics
                 const int frames_to_wait = 3;
 
                 int framesWaited = 0;
-                ScheduledDelegate waitDelegate = host.DrawThread.Scheduler.AddDelayed(() => framesWaited++, 0, true);
-                while (framesWaited < frames_to_wait)
-                    Thread.Sleep(10);
 
-                waitDelegate.Cancel();
+                using (var framesWaitedEvent = new ManualResetEventSlim(false))
+                {
+                    ScheduledDelegate waitDelegate = host.DrawThread.Scheduler.AddDelayed(() =>
+                    {
+                        if (framesWaited++ >= frames_to_wait)
+                            // ReSharper disable once AccessToDisposedClosure
+                            framesWaitedEvent.Set();
+                    }, 10, true);
+
+                    framesWaitedEvent.Wait();
+                    waitDelegate.Cancel();
+                }
             }
 
-            using (var image = await host.TakeScreenshotAsync())
+            using (var image = await host.TakeScreenshotAsync().ConfigureAwait(false))
             {
-                Interlocked.Decrement(ref screenShotTasks);
+                if (Interlocked.Decrement(ref screenShotTasks) == 0 && cursorVisibility.Value == false)
+                    cursorVisibility.Value = true;
 
                 var fileName = getFileName();
                 if (fileName == null) return;
@@ -102,13 +116,17 @@ namespace osu.Game.Graphics
                 switch (screenshotFormat.Value)
                 {
                     case ScreenshotFormat.Png:
-                        image.SaveAsPng(stream);
+                        await image.SaveAsPngAsync(stream).ConfigureAwait(false);
                         break;
+
                     case ScreenshotFormat.Jpg:
-                        image.SaveAsJpeg(stream);
+                        const int jpeg_quality = 92;
+
+                        await image.SaveAsJpegAsync(stream, new JpegEncoder { Quality = jpeg_quality }).ConfigureAwait(false);
                         break;
+
                     default:
-                        throw new ArgumentOutOfRangeException(nameof(screenshotFormat));
+                        throw new InvalidOperationException($"Unknown enum member {nameof(ScreenshotFormat)} {screenshotFormat.Value}.");
                 }
 
                 notificationOverlay.Post(new SimpleNotification
@@ -122,14 +140,6 @@ namespace osu.Game.Graphics
                 });
             }
         });
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (cursorVisibility.Value == false && Interlocked.CompareExchange(ref screenShotTasks, 0, 0) == 0)
-                cursorVisibility.Value = true;
-        }
 
         private string getFileName()
         {

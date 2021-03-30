@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Tests.Resources;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.IO;
 using osu.Game.IO.Archives;
 
 namespace osu.Game.Tests.Beatmaps.IO
@@ -50,7 +51,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                 Beatmap beatmap;
 
-                using (var stream = new StreamReader(reader.GetStream("Soleily - Renatus (Deif) [Platter].osu")))
+                using (var stream = new LineBufferedReader(reader.GetStream("Soleily - Renatus (Deif) [Platter].osu")))
                     beatmap = Decoder.GetDecoder<Beatmap>(stream).Decode(stream);
 
                 var meta = beatmap.Metadata;
@@ -75,6 +76,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             using (var osz = TestResources.GetTestBeatmapStream())
             {
                 var reader = new ZipArchiveReader(osz);
+
                 using (var stream = new StreamReader(
                     reader.GetStream("Soleily - Renatus (Deif) [Platter].osu")))
                 {

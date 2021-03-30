@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 
 namespace osu.Game.Screens.Edit.Components.RadioButtons
 {
@@ -15,33 +16,43 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
         public readonly BindableBool Selected;
 
         /// <summary>
-        /// The text that should be displayed in this button.
+        /// The item related to this button.
         /// </summary>
-        public string Text;
+        public object Item;
 
         /// <summary>
-        /// The <see cref="Action"/> that should be invoked when this button is selected.
+        /// A function which creates a drawable icon to represent this item. If null, a sane default should be used.
         /// </summary>
-        public Action Action;
+        public readonly Func<Drawable> CreateIcon;
 
-        public RadioButton(string text, Action action)
+        private readonly Action action;
+
+        public RadioButton(object item, Action action, Func<Drawable> createIcon = null)
         {
-            Text = text;
-            Action = action;
+            Item = item;
+            CreateIcon = createIcon;
+            this.action = action;
             Selected = new BindableBool();
         }
 
-        public RadioButton(string text)
-            : this(text, null)
+        public RadioButton(string item)
+            : this(item, null)
         {
-            Text = text;
-            Action = null;
+            Item = item;
+            action = null;
         }
 
         /// <summary>
         /// Selects this <see cref="RadioButton"/>.
         /// </summary>
-        public void Select() => Selected.Value = true;
+        public void Select()
+        {
+            if (!Selected.Value)
+            {
+                Selected.Value = true;
+                action?.Invoke();
+            }
+        }
 
         /// <summary>
         /// Deselects this <see cref="RadioButton"/>.

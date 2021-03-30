@@ -6,15 +6,17 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
-using osuTK.Graphics;
 using System;
-using osu.Framework.Bindables;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Music
 {
     public class FilterControl : Container
     {
+        public Action<FilterCriteria> FilterChanged;
+
         public readonly FilterTextBox Search;
+        private readonly CollectionDropdown collectionDropdown;
 
         public FilterControl()
         {
@@ -31,37 +33,41 @@ namespace osu.Game.Overlays.Music
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 40,
-                            Exit = () => ExitRequested?.Invoke(),
                         },
-                        new CollectionsDropdown<PlaylistCollection>
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Items = new[] { PlaylistCollection.All },
-                        }
+                        collectionDropdown = new CollectionDropdown { RelativeSizeAxes = Axes.X }
                     },
                 },
             };
-
-            Search.Current.ValueChanged += current_ValueChanged;
         }
 
-        private void current_ValueChanged(ValueChangedEvent<string> e) => FilterChanged?.Invoke(e.NewValue);
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
-        public Action ExitRequested;
+            Search.Current.BindValueChanged(_ => updateCriteria());
+            collectionDropdown.Current.BindValueChanged(_ => updateCriteria(), true);
+        }
 
-        public Action<string> FilterChanged;
+        private void updateCriteria() => FilterChanged?.Invoke(createCriteria());
+
+        private FilterCriteria createCriteria() => new FilterCriteria
+        {
+            SearchText = Search.Current.Value,
+            Collection = collectionDropdown.Current.Value?.Collection
+        };
 
         public class FilterTextBox : SearchTextBox
         {
-            protected override Color4 BackgroundUnfocused => OsuColour.Gray(0.06f);
-            protected override Color4 BackgroundFocused => OsuColour.Gray(0.12f);
-
             protected override bool AllowCommit => true;
 
-            public FilterTextBox()
+            [BackgroundDependencyLoader]
+            private void load()
             {
                 Masking = true;
                 CornerRadius = 5;
+
+                BackgroundUnfocused = OsuColour.Gray(0.06f);
+                BackgroundFocused = OsuColour.Gray(0.12f);
             }
         }
     }

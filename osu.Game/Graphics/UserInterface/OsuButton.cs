@@ -1,14 +1,17 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 using osuTK.Graphics;
 
@@ -19,53 +22,106 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public class OsuButton : Button
     {
-        private Box hover;
+        public LocalisableString Text
+        {
+            get => SpriteText?.Text ?? default;
+            set
+            {
+                if (SpriteText != null)
+                    SpriteText.Text = value;
+            }
+        }
 
-        public OsuButton()
+        private Color4? backgroundColour;
+
+        public Color4 BackgroundColour
+        {
+            set
+            {
+                backgroundColour = value;
+                Background.FadeColour(value);
+            }
+        }
+
+        protected override Container<Drawable> Content { get; }
+
+        protected Box Hover;
+        protected Box Background;
+        protected SpriteText SpriteText;
+
+        public OsuButton(HoverSampleSet? hoverSounds = HoverSampleSet.Loud)
         {
             Height = 40;
 
-            Content.Masking = true;
-            Content.CornerRadius = 5;
+            AddInternal(Content = new Container
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Masking = true,
+                CornerRadius = 5,
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
+                {
+                    Background = new Box
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    Hover = new Box
+                    {
+                        Alpha = 0,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.White.Opacity(.1f),
+                        Blending = BlendingParameters.Additive,
+                        Depth = float.MinValue
+                    },
+                    SpriteText = CreateText(),
+                }
+            });
+
+            if (hoverSounds.HasValue)
+                AddInternal(new HoverClickSounds(hoverSounds.Value));
+
+            Enabled.BindValueChanged(enabledChanged, true);
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            BackgroundColour = colours.BlueDark;
-
-            AddRange(new Drawable[]
-            {
-                hover = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Blending = BlendingMode.Additive,
-                    Colour = Color4.White.Opacity(0.1f),
-                    Alpha = 0,
-                    Depth = -1
-                },
-                new HoverClickSounds(HoverSampleSet.Loud),
-            });
+            if (backgroundColour == null)
+                BackgroundColour = colours.BlueDark;
 
             Enabled.ValueChanged += enabledChanged;
             Enabled.TriggerChange();
         }
 
-        private void enabledChanged(ValueChangedEvent<bool> e)
+        protected override bool OnClick(ClickEvent e)
         {
-            this.FadeColour(e.NewValue ? Color4.White : Color4.Gray, 200, Easing.OutQuint);
+            if (Enabled.Value)
+            {
+                Debug.Assert(backgroundColour != null);
+                Background.FlashColour(backgroundColour.Value, 200);
+            }
+
+            return base.OnClick(e);
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            hover.FadeIn(200);
+            if (Enabled.Value)
+                Hover.FadeIn(200, Easing.OutQuint);
+
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            hover.FadeOut(200);
             base.OnHoverLost(e);
+
+            Hover.FadeOut(300);
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
@@ -74,18 +130,23 @@ namespace osu.Game.Graphics.UserInterface
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             Content.ScaleTo(1, 1000, Easing.OutElastic);
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
-        protected override SpriteText CreateText() => new OsuSpriteText
+        protected virtual SpriteText CreateText() => new OsuSpriteText
         {
             Depth = -1,
             Origin = Anchor.Centre,
             Anchor = Anchor.Centre,
             Font = OsuFont.GetFont(weight: FontWeight.Bold)
         };
+
+        private void enabledChanged(ValueChangedEvent<bool> e)
+        {
+            this.FadeColour(e.NewValue ? Color4.White : Color4.Gray, 200, Easing.OutQuint);
+        }
     }
 }

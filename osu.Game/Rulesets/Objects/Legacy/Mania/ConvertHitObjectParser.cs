@@ -3,7 +3,6 @@
 
 using osuTK;
 using osu.Game.Audio;
-using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Objects.Legacy.Mania
@@ -26,32 +25,33 @@ namespace osu.Game.Rulesets.Objects.Legacy.Mania
             };
         }
 
-        protected override HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, Vector2[] controlPoints, double length, PathType pathType, int repeatCount, List<List<SampleInfo>> nodeSamples)
+        protected override HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, PathControlPoint[] controlPoints, double? length, int repeatCount,
+                                                  List<IList<HitSampleInfo>> nodeSamples)
         {
             return new ConvertSlider
             {
                 X = position.X,
-                Path = new SliderPath(pathType, controlPoints, length),
+                Path = new SliderPath(controlPoints, length),
                 NodeSamples = nodeSamples,
                 RepeatCount = repeatCount
             };
         }
 
-        protected override HitObject CreateSpinner(Vector2 position, bool newCombo, int comboOffset, double endTime)
+        protected override HitObject CreateSpinner(Vector2 position, bool newCombo, int comboOffset, double duration)
         {
             return new ConvertSpinner
             {
                 X = position.X,
-                EndTime = endTime
+                Duration = duration
             };
         }
 
-        protected override HitObject CreateHold(Vector2 position, bool newCombo, int comboOffset, double endTime)
+        protected override HitObject CreateHold(Vector2 position, bool newCombo, int comboOffset, double duration)
         {
             return new ConvertHold
             {
                 X = position.X,
-                EndTime = endTime
+                Duration = duration
             };
         }
     }

@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
+using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
@@ -14,6 +15,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Beatmaps
 {
+    [ExcludeFromDynamicCompile]
     [Serializable]
     public class BeatmapInfo : IEquatable<BeatmapInfo>, IJsonSerializable, IHasPrimaryKey
     {
@@ -51,6 +53,19 @@ namespace osu.Game.Beatmaps
         [NotMapped]
         public BeatmapOnlineInfo OnlineInfo { get; set; }
 
+        [NotMapped]
+        public int? MaxCombo { get; set; }
+
+        /// <summary>
+        /// The playable length in milliseconds of this beatmap.
+        /// </summary>
+        public double Length { get; set; }
+
+        /// <summary>
+        /// The most common BPM of this beatmap.
+        /// </summary>
+        public double BPM { get; set; }
+
         public string Path { get; set; }
 
         [JsonProperty("file_sha2")]
@@ -66,7 +81,7 @@ namespace osu.Game.Beatmaps
         public string MD5Hash { get; set; }
 
         // General
-        public int AudioLeadIn { get; set; }
+        public double AudioLeadIn { get; set; }
         public bool Countdown { get; set; } = true;
         public float StackLeniency { get; set; } = 0.7f;
         public bool SpecialStyle { get; set; }
@@ -77,18 +92,19 @@ namespace osu.Game.Beatmaps
 
         public bool LetterboxInBreaks { get; set; }
         public bool WidescreenStoryboard { get; set; }
+        public bool EpilepsyWarning { get; set; }
 
         // Editor
         // This bookmarks stuff is necessary because DB doesn't know how to store int[]
         [JsonIgnore]
         public string StoredBookmarks
         {
-            get => string.Join(",", Bookmarks);
+            get => string.Join(',', Bookmarks);
             set
             {
                 if (string.IsNullOrEmpty(value))
                 {
-                    Bookmarks = new int[0];
+                    Bookmarks = Array.Empty<int>();
                     return;
                 }
 
@@ -101,7 +117,7 @@ namespace osu.Game.Beatmaps
         }
 
         [NotMapped]
-        public int[] Bookmarks { get; set; } = new int[0];
+        public int[] Bookmarks { get; set; } = Array.Empty<int>();
 
         public double DistanceSpacing { get; set; }
         public int BeatDivisor { get; set; }
@@ -119,7 +135,20 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public List<ScoreInfo> Scores { get; set; }
 
-        public override string ToString() => $"{Metadata} [{Version}]";
+        [JsonIgnore]
+        public DifficultyRating DifficultyRating => BeatmapDifficultyCache.GetDifficultyRating(StarDifficulty);
+
+        public string[] SearchableTerms => new[]
+        {
+            Version
+        }.Concat(Metadata?.SearchableTerms ?? Enumerable.Empty<string>()).Where(s => !string.IsNullOrEmpty(s)).ToArray();
+
+        public override string ToString()
+        {
+            string version = string.IsNullOrEmpty(Version) ? string.Empty : $"[{Version}]";
+
+            return $"{Metadata} {version}".Trim();
+        }
 
         public bool Equals(BeatmapInfo other)
         {

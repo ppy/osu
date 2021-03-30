@@ -7,28 +7,6 @@ namespace osu.Game.Rulesets.Catch.Judgements
 {
     public class CatchTinyDropletJudgement : CatchJudgement
     {
-        public override bool AffectsCombo => false;
-
-        protected override int NumericResultFor(HitResult result)
-        {
-            switch (result)
-            {
-                default:
-                    return 0;
-                case HitResult.Perfect:
-                    return 10;
-            }
-        }
-
-        protected override double HealthIncreaseFor(HitResult result)
-        {
-            switch (result)
-            {
-                default:
-                    return 0;
-                case HitResult.Perfect:
-                    return 4;
-            }
-        }
+        public override HitResult MaxResult => HitResult.SmallTickHit;
     }
 }

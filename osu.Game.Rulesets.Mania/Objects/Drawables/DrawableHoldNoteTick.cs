@@ -3,12 +3,11 @@
 
 using System;
 using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -22,18 +21,18 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// </summary>
         public Func<double?> HoldStartTime;
 
-        private readonly Container glowContainer;
-
         public DrawableHoldNoteTick(HoldNoteTick hitObject)
             : base(hitObject)
         {
+            Container glowContainer;
+
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
 
             RelativeSizeAxes = Axes.X;
             Size = new Vector2(1);
 
-            InternalChildren = new[]
+            AddRangeInternal(new[]
             {
                 glowContainer = new CircularContainer
                 {
@@ -51,24 +50,18 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                         }
                     }
                 }
-            };
-        }
+            });
 
-        public override Color4 AccentColour
-        {
-            get { return base.AccentColour; }
-            set
+            AccentColour.BindValueChanged(colour =>
             {
-                base.AccentColour = value;
-
                 glowContainer.EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Glow,
                     Radius = 2f,
                     Roundness = 15f,
-                    Colour = value.Opacity(0.3f)
+                    Colour = colour.NewValue.Opacity(0.3f)
                 };
-            }
+            }, true);
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
@@ -79,9 +72,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             var startTime = HoldStartTime?.Invoke();
 
             if (startTime == null || startTime > HitObject.StartTime)
-                ApplyResult(r => r.Type = HitResult.Miss);
+                ApplyResult(r => r.Type = r.Judgement.MinResult);
             else
-                ApplyResult(r => r.Type = HitResult.Perfect);
+                ApplyResult(r => r.Type = r.Judgement.MaxResult);
         }
     }
 }

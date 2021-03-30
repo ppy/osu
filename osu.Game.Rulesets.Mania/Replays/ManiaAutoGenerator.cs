@@ -6,12 +6,12 @@ using System.Linq;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
-using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Rulesets.Mania.Replays
 {
-    internal class ManiaAutoGenerator : AutoGenerator<ManiaHitObject>
+    internal class ManiaAutoGenerator : AutoGenerator
     {
         public const double RELEASE_DELAY = 20;
 
@@ -29,6 +29,7 @@ namespace osu.Game.Rulesets.Mania.Replays
             var normalAction = ManiaAction.Key1;
             var specialAction = ManiaAction.Special1;
             int totalCounter = 0;
+
             foreach (var stage in Beatmap.Stages)
             {
                 for (int i = 0; i < stage.Columns; i++)
@@ -46,12 +47,13 @@ namespace osu.Game.Rulesets.Mania.Replays
 
         public override Replay Generate()
         {
-            // Todo: Realistically this shouldn't be needed, but the first frame is skipped with the way replays are currently handled
-            Replay.Frames.Add(new ManiaReplayFrame(-100000, 0));
+            if (Beatmap.HitObjects.Count == 0)
+                return Replay;
 
             var pointGroups = generateActionPoints().GroupBy(a => a.Time).OrderBy(g => g.First().Time);
 
             var actions = new List<ManiaAction>();
+
             foreach (var group in pointGroups)
             {
                 foreach (var point in group)
@@ -61,11 +63,16 @@ namespace osu.Game.Rulesets.Mania.Replays
                         case HitPoint _:
                             actions.Add(columnActions[point.Column]);
                             break;
+
                         case ReleasePoint _:
                             actions.Remove(columnActions[point.Column]);
                             break;
                     }
                 }
+
+                // todo: can be removed once FramedReplayInputHandler correctly handles rewinding before first frame.
+                if (Replay.Frames.Count == 0)
+                    Replay.Frames.Add(new ManiaReplayFrame(group.First().Time - 1));
 
                 Replay.Frames.Add(new ManiaReplayFrame(group.First().Time, actions.ToArray()));
             }
@@ -75,11 +82,43 @@ namespace osu.Game.Rulesets.Mania.Replays
 
         private IEnumerable<IActionPoint> generateActionPoints()
         {
-            foreach (var obj in Beatmap.HitObjects)
+            for (int i = 0; i < Beatmap.HitObjects.Count; i++)
             {
-                yield return new HitPoint { Time = obj.StartTime, Column = obj.Column };
-                yield return new ReleasePoint { Time = ((obj as IHasEndTime)?.EndTime ?? obj.StartTime) + RELEASE_DELAY, Column = obj.Column };
+                var currentObject = Beatmap.HitObjects[i];
+                var nextObjectInColumn = GetNextObject(i); // Get the next object that requires pressing the same button
+                var releaseTime = calculateReleaseTime(currentObject, nextObjectInColumn);
+
+                yield return new HitPoint { Time = currentObject.StartTime, Column = currentObject.Column };
+
+                yield return new ReleasePoint { Time = releaseTime, Column = currentObject.Column };
             }
+        }
+
+        private double calculateReleaseTime(HitObject currentObject, HitObject nextObject)
+        {
+            double endTime = currentObject.GetEndTime();
+
+            if (currentObject is HoldNote)
+                // hold note releases must be timed exactly.
+                return endTime;
+
+            bool canDelayKeyUpFully = nextObject == null ||
+                                      nextObject.StartTime > endTime + RELEASE_DELAY;
+
+            return endTime + (canDelayKeyUpFully ? RELEASE_DELAY : (nextObject.StartTime - endTime) * 0.9);
+        }
+
+        protected override HitObject GetNextObject(int currentIndex)
+        {
+            int desiredColumn = Beatmap.HitObjects[currentIndex].Column;
+
+            for (int i = currentIndex + 1; i < Beatmap.HitObjects.Count; i++)
+            {
+                if (Beatmap.HitObjects[i].Column == desiredColumn)
+                    return Beatmap.HitObjects[i];
+            }
+
+            return null;
         }
 
         private interface IActionPoint

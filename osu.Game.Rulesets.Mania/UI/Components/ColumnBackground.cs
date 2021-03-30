@@ -35,14 +35,13 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                 {
                     Name = "Background",
                     RelativeSizeAxes = Axes.Both,
-                    Alpha = 0.3f
                 },
                 backgroundOverlay = new Box
                 {
                     Name = "Background Gradient Overlay",
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.5f,
-                    Blending = BlendingMode.Additive,
+                    Blending = BlendingParameters.Additive,
                     Alpha = 0
                 }
             };
@@ -70,6 +69,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
             {
                 if (accentColour == value)
                     return;
+
                 accentColour = value;
 
                 updateColours();
@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
             if (!IsLoaded)
                 return;
 
-            background.Colour = AccentColour;
+            background.Colour = AccentColour.Darken(5);
 
             var brightPoint = AccentColour.Opacity(0.6f);
             var dimPoint = AccentColour.Opacity(0);
@@ -98,11 +98,10 @@ namespace osu.Game.Rulesets.Mania.UI.Components
             return false;
         }
 
-        public bool OnReleased(ManiaAction action)
+        public void OnReleased(ManiaAction action)
         {
             if (action == this.action.Value)
                 backgroundOverlay.FadeTo(0, 250, Easing.OutQuint);
-            return false;
         }
     }
 }

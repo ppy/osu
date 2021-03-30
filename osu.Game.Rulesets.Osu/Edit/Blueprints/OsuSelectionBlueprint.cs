@@ -7,12 +7,15 @@ using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints
 {
-    public class OsuSelectionBlueprint : SelectionBlueprint
+    public abstract class OsuSelectionBlueprint<T> : OverlaySelectionBlueprint
+        where T : OsuHitObject
     {
-        protected OsuHitObject OsuObject => (OsuHitObject)HitObject.HitObject;
+        protected new T HitObject => (T)DrawableObject.HitObject;
 
-        public OsuSelectionBlueprint(DrawableHitObject hitObject)
-            : base(hitObject)
+        protected override bool AlwaysShowWhenSelected => true;
+
+        protected OsuSelectionBlueprint(DrawableHitObject drawableObject)
+            : base(drawableObject)
         {
         }
     }

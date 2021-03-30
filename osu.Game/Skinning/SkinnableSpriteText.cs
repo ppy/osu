@@ -3,13 +3,14 @@
 
 using System;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Skinning
 {
-    public class SkinnableSpriteText : SkinnableDrawable<SpriteText>, IHasText
+    public class SkinnableSpriteText : SkinnableDrawable, IHasText
     {
-        public SkinnableSpriteText(string name, Func<string, SpriteText> defaultImplementation, Func<ISkinSource, bool> allowFallback = null, bool restrictSize = true)
-            : base(name, defaultImplementation, allowFallback, restrictSize)
+        public SkinnableSpriteText(ISkinComponent component, Func<ISkinComponent, SpriteText> defaultImplementation, Func<ISkinSource, bool> allowFallback = null, ConfineMode confineMode = ConfineMode.NoScaling)
+            : base(component, defaultImplementation, allowFallback, confineMode)
         {
         }
 
@@ -21,15 +22,16 @@ namespace osu.Game.Skinning
                 textDrawable.Text = Text;
         }
 
-        private string text;
+        private LocalisableString text;
 
-        public string Text
+        public LocalisableString Text
         {
             get => text;
             set
             {
                 if (text == value)
                     return;
+
                 text = value;
 
                 if (Drawable is IHasText textDrawable)

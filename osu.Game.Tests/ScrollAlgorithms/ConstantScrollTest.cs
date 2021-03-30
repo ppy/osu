@@ -18,12 +18,21 @@ namespace osu.Game.Tests.ScrollAlgorithms
         }
 
         [Test]
-        public void TestDisplayStartTime()
+        public void TestPointDisplayStartTime()
         {
-            Assert.AreEqual(-8000, algorithm.GetDisplayStartTime(2000, 10000));
-            Assert.AreEqual(-3000, algorithm.GetDisplayStartTime(2000, 5000));
-            Assert.AreEqual(2000, algorithm.GetDisplayStartTime(7000, 5000));
-            Assert.AreEqual(7000, algorithm.GetDisplayStartTime(17000, 10000));
+            Assert.AreEqual(-8000, algorithm.GetDisplayStartTime(2000, 0, 10000, 1));
+            Assert.AreEqual(-3000, algorithm.GetDisplayStartTime(2000, 0, 5000, 1));
+            Assert.AreEqual(2000, algorithm.GetDisplayStartTime(7000, 0, 5000, 1));
+            Assert.AreEqual(7000, algorithm.GetDisplayStartTime(17000, 0, 10000, 1));
+        }
+
+        [Test]
+        public void TestObjectDisplayStartTime()
+        {
+            Assert.AreEqual(900, algorithm.GetDisplayStartTime(2000, 50, 1000, 500)); // 2000 - (1 + 50 / 500) * 1000
+            Assert.AreEqual(8900, algorithm.GetDisplayStartTime(10000, 50, 1000, 500)); // 10000 - (1 + 50 / 500) * 1000
+            Assert.AreEqual(13500, algorithm.GetDisplayStartTime(15000, 250, 1000, 500)); // 15000 - (1 + 250 / 500) * 1000
+            Assert.AreEqual(19000, algorithm.GetDisplayStartTime(25000, 100, 5000, 500)); // 25000 - (1 + 100 / 500) * 5000
         }
 
         [Test]

@@ -9,6 +9,7 @@ namespace osu.Game.Configuration
     {
         Off,
         Everything,
+
         [Description("Excluding overlays")]
         ExcludeOverlays,
         Gameplay,

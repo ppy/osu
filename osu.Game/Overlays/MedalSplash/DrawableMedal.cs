@@ -16,6 +16,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Overlays.MedalSplash
 {
+    [LongRunningLoad]
     public class DrawableMedal : Container, IStateful<DisplayState>
     {
         private const float scale_when_unlocked = 0.76f;
@@ -29,6 +30,7 @@ namespace osu.Game.Overlays.MedalSplash
         private readonly OsuSpriteText unlocked, name;
         private readonly TextFlowContainer description;
         private DisplayState state;
+
         public DrawableMedal(Medal medal)
         {
             this.medal = medal;
@@ -49,7 +51,7 @@ namespace osu.Game.Overlays.MedalSplash
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Scale = new Vector2(0.81f),
+                            Scale = new Vector2(0.41f),
                         },
                         medalGlow = new Sprite
                         {
@@ -108,7 +110,7 @@ namespace osu.Game.Overlays.MedalSplash
                 s.Font = s.Font.With(size: 16);
             });
 
-            medalContainer.OnLoadComplete = d =>
+            medalContainer.OnLoadComplete += d =>
             {
                 unlocked.Position = new Vector2(0f, medalContainer.DrawSize.Y / 2 + 10);
                 infoFlow.Position = new Vector2(0f, unlocked.Position.Y + 90);
@@ -132,7 +134,7 @@ namespace osu.Game.Overlays.MedalSplash
 
         public DisplayState State
         {
-            get { return state; }
+            get => state;
             set
             {
                 if (state == value) return;
@@ -155,11 +157,13 @@ namespace osu.Game.Overlays.MedalSplash
                 case DisplayState.None:
                     medalContainer.ScaleTo(0);
                     break;
+
                 case DisplayState.Icon:
                     medalContainer
                         .FadeIn(duration)
                         .ScaleTo(1, duration, Easing.OutElastic);
                     break;
+
                 case DisplayState.MedalUnlocked:
                     medalContainer
                         .FadeTo(1)
@@ -169,6 +173,7 @@ namespace osu.Game.Overlays.MedalSplash
                     this.MoveToY(MedalOverlay.DISC_SIZE / 2 - 30, duration, Easing.OutExpo);
                     unlocked.FadeInFromZero(duration);
                     break;
+
                 case DisplayState.Full:
                     medalContainer
                         .FadeTo(1)

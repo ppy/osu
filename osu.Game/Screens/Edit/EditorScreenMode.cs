@@ -9,10 +9,13 @@ namespace osu.Game.Screens.Edit
     {
         [Description("setup")]
         SongSetup,
+
         [Description("compose")]
         Compose,
+
         [Description("design")]
         Design,
+
         [Description("timing")]
         Timing,
     }

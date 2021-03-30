@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
 
@@ -23,9 +24,7 @@ namespace osu.Game.Overlays.Toolbar
 
         public ToolbarNotificationButton()
         {
-            Icon = FontAwesome.fa_bars;
-            TooltipMain = "Notifications";
-            TooltipSub = "Waiting for 'ya";
+            Hotkey = GlobalAction.ToggleNotifications;
 
             Add(countDisplay = new CountCircle
             {
@@ -66,7 +65,7 @@ namespace osu.Game.Overlays.Toolbar
 
             public int Count
             {
-                get { return count; }
+                get => count;
                 set
                 {
                     if (count == value)

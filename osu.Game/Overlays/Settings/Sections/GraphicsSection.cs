@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays.Settings.Sections.Graphics;
 
 namespace osu.Game.Overlays.Settings.Sections
@@ -10,7 +10,11 @@ namespace osu.Game.Overlays.Settings.Sections
     public class GraphicsSection : SettingsSection
     {
         public override string Header => "Graphics";
-        public override FontAwesome Icon => FontAwesome.fa_laptop;
+
+        public override Drawable CreateIcon() => new SpriteIcon
+        {
+            Icon = FontAwesome.Solid.Laptop
+        };
 
         public GraphicsSection()
         {
@@ -19,7 +23,6 @@ namespace osu.Game.Overlays.Settings.Sections
                 new RendererSettings(),
                 new LayoutSettings(),
                 new DetailSettings(),
-                new MainMenuSettings(),
             };
         }
     }

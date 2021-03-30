@@ -56,6 +56,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         {
             // We will scale distances by this factor, so we can assume a uniform CircleSize among beatmaps.
             float scalingFactor = normalized_radius / (float)BaseObject.Radius;
+
             if (BaseObject.Radius < 30)
             {
                 float smallCircleBonus = Math.Min(30 - (float)BaseObject.Radius, 5) / 50;
@@ -92,6 +93,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         {
             if (slider.LazyEndPosition != null)
                 return;
+
             slider.LazyEndPosition = slider.StackedPosition;
 
             float approxFollowCircleRadius = (float)(slider.Radius * 3);
@@ -101,7 +103,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 if (progress % 2 >= 1)
                     progress = 1 - progress % 1;
                 else
-                    progress = progress % 1;
+                    progress %= 1;
 
                 // ReSharper disable once PossibleInvalidOperationException (bugged in current r# version)
                 var diff = slider.StackedPosition + slider.Path.PositionAt(progress) - slider.LazyEndPosition.Value;
@@ -127,8 +129,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         {
             Vector2 pos = hitObject.StackedPosition;
 
-            var slider = hitObject as Slider;
-            if (slider != null)
+            if (hitObject is Slider slider)
             {
                 computeSliderCursorPosition(slider);
                 pos = slider.LazyEndPosition ?? pos;

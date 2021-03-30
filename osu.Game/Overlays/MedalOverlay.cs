@@ -19,8 +19,9 @@ using osu.Framework.Graphics.Textures;
 using osuTK.Input;
 using osu.Framework.Graphics.Shapes;
 using System;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Input.Events;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 
 namespace osu.Game.Overlays
 {
@@ -38,113 +39,122 @@ namespace osu.Game.Overlays
         private readonly Sprite innerSpin, outerSpin;
         private DrawableMedal drawableMedal;
 
-        private SampleChannel getSample;
+        private Sample getSample;
+
+        private readonly Container content;
 
         public MedalOverlay(Medal medal)
         {
             this.medal = medal;
             RelativeSizeAxes = Axes.Both;
 
-            Children = new Drawable[]
+            Child = content = new Container
             {
-                background = new Box
+                Alpha = 0,
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black.Opacity(60),
-                },
-                outerSpin = new Sprite
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Size = new Vector2(DISC_SIZE + 500),
-                    Alpha = 0f,
-                },
-                backgroundStrip = new Container
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.X,
-                    Height = border_width,
-                    Alpha = 0f,
-                    Children = new[]
+                    background = new Box
                     {
-                        new Container
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.Black.Opacity(60),
+                    },
+                    outerSpin = new Sprite
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Size = new Vector2(DISC_SIZE + 500),
+                        Alpha = 0f,
+                    },
+                    backgroundStrip = new Container
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.X,
+                        Height = border_width,
+                        Alpha = 0f,
+                        Children = new[]
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.CentreRight,
-                            Width = 0.5f,
-                            Padding = new MarginPadding { Right = DISC_SIZE / 2 },
-                            Children = new[]
+                            new Container
                             {
-                                leftStrip = new BackgroundStrip(0f, 1f)
+                                RelativeSizeAxes = Axes.Both,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.CentreRight,
+                                Width = 0.5f,
+                                Padding = new MarginPadding { Right = DISC_SIZE / 2 },
+                                Children = new[]
                                 {
-                                    Anchor = Anchor.TopRight,
-                                    Origin = Anchor.TopRight,
+                                    leftStrip = new BackgroundStrip(0f, 1f)
+                                    {
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
+                                    },
+                                },
+                            },
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.CentreLeft,
+                                Width = 0.5f,
+                                Padding = new MarginPadding { Left = DISC_SIZE / 2 },
+                                Children = new[]
+                                {
+                                    rightStrip = new BackgroundStrip(1f, 0f),
                                 },
                             },
                         },
-                        new Container
+                    },
+                    particleContainer = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0f,
+                    },
+                    disc = new CircularContainer
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Alpha = 0f,
+                        Masking = true,
+                        AlwaysPresent = true,
+                        BorderColour = Color4.White,
+                        BorderThickness = border_width,
+                        Size = new Vector2(DISC_SIZE),
+                        Scale = new Vector2(0.8f),
+                        Children = new Drawable[]
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.CentreLeft,
-                            Width = 0.5f,
-                            Padding = new MarginPadding { Left = DISC_SIZE / 2 },
-                            Children = new[]
+                            new Box
                             {
-                                rightStrip = new BackgroundStrip(1f, 0f),
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = Color4Extensions.FromHex(@"05262f"),
+                            },
+                            new Triangles
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                TriangleScale = 2,
+                                ColourDark = Color4Extensions.FromHex(@"04222b"),
+                                ColourLight = Color4Extensions.FromHex(@"052933"),
+                            },
+                            innerSpin = new Sprite
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                RelativeSizeAxes = Axes.Both,
+                                Size = new Vector2(1.05f),
+                                Alpha = 0.25f,
                             },
                         },
                     },
-                },
-                particleContainer = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Alpha = 0f,
-                },
-                disc = new CircularContainer
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Alpha = 0f,
-                    Masking = true,
-                    AlwaysPresent = true,
-                    BorderColour = Color4.White,
-                    BorderThickness = border_width,
-                    Size = new Vector2(DISC_SIZE),
-                    Scale = new Vector2(0.8f),
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = OsuColour.FromHex(@"05262f"),
-                        },
-                        new Triangles
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            TriangleScale = 2,
-                            ColourDark = OsuColour.FromHex(@"04222b"),
-                            ColourLight = OsuColour.FromHex(@"052933"),
-                        },
-                        innerSpin = new Sprite
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            RelativeSizeAxes = Axes.Both,
-                            Size = new Vector2(1.05f),
-                            Alpha = 0.25f,
-                        },
-                    },
-                },
+                }
             };
+
+            Show();
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, TextureStore textures, AudioManager audio)
         {
-            getSample = audio.Sample.Get(@"MedalSplash/medal-get");
+            getSample = audio.Samples.Get(@"MedalSplash/medal-get");
             innerSpin.Texture = outerSpin.Texture = textures.Get(@"MedalSplash/disc-spin");
 
             disc.EdgeEffect = leftStrip.EdgeEffect = rightStrip.EdgeEffect = new EdgeEffectParameters
@@ -153,19 +163,22 @@ namespace osu.Game.Overlays
                 Colour = colours.Blue.Opacity(0.5f),
                 Radius = 50,
             };
-
-            disc.Add(drawableMedal = new DrawableMedal(medal)
-            {
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre,
-                RelativeSizeAxes = Axes.Both,
-            });
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Show();
+
+            LoadComponentAsync(drawableMedal = new DrawableMedal(medal)
+            {
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+                RelativeSizeAxes = Axes.Both,
+            }, loaded =>
+            {
+                disc.Add(loaded);
+                startAnimation();
+            });
         }
 
         protected override void Update()
@@ -189,11 +202,10 @@ namespace osu.Game.Overlays
         private const double initial_duration = 400;
         private const double step_duration = 900;
 
-        protected override void PopIn()
+        private void startAnimation()
         {
-            base.PopIn();
+            content.Show();
 
-            this.FadeIn(200);
             background.FlashColour(Color4.White.Opacity(0.25f), 400);
 
             getSample.Play();
@@ -219,13 +231,11 @@ namespace osu.Game.Overlays
                     {
                         if (drawableMedal.State != DisplayState.Full)
                             drawableMedal.State = DisplayState.Icon;
-                    })
-                    .Delay(step_duration).Schedule(() =>
+                    }).Delay(step_duration).Schedule(() =>
                     {
                         if (drawableMedal.State != DisplayState.Full)
                             drawableMedal.State = DisplayState.MedalUnlocked;
-                    })
-                    .Delay(step_duration).Schedule(() =>
+                    }).Delay(step_duration).Schedule(() =>
                     {
                         if (drawableMedal.State != DisplayState.Full)
                             drawableMedal.State = DisplayState.Full;

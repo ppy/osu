@@ -5,55 +5,59 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shaders;
+using osu.Framework.Utils;
 using osu.Game.Screens.Menu;
-using osuTK;
 using osu.Framework.Screens;
-using osu.Game.Overlays;
+using osu.Framework.Threading;
+using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterface;
+using IntroSequence = osu.Game.Configuration.IntroSequence;
 
 namespace osu.Game.Screens
 {
-    public class Loader : OsuScreen
+    public class Loader : StartupScreen
     {
         private bool showDisclaimer;
-
-        public override bool HideOverlaysOnEnter => true;
-
-        public override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
-
-        public override bool CursorVisible => false;
-
-        protected override bool AllowBackButton => false;
 
         public Loader()
         {
             ValidForResume = false;
         }
 
-        protected override void LogoArriving(OsuLogo logo, bool resuming)
-        {
-            base.LogoArriving(logo, resuming);
-
-            logo.BeatMatching = false;
-            logo.Triangles = false;
-            logo.Origin = Anchor.BottomRight;
-            logo.Anchor = Anchor.BottomRight;
-            logo.Position = new Vector2(-40);
-            logo.Scale = new Vector2(0.2f);
-
-            logo.Delay(500).FadeInFromZero(1000, Easing.OutQuint);
-        }
-
-        protected override void LogoSuspending(OsuLogo logo)
-        {
-            base.LogoSuspending(logo);
-            logo.FadeOut(logo.Alpha * 400);
-        }
-
         private OsuScreen loadableScreen;
         private ShaderPrecompiler precompiler;
 
-        protected virtual OsuScreen CreateLoadableScreen() => showDisclaimer ? (OsuScreen)new Disclaimer() : new Intro();
+        private IntroSequence introSequence;
+        private LoadingSpinner spinner;
+        private ScheduledDelegate spinnerShow;
+
+        protected virtual OsuScreen CreateLoadableScreen()
+        {
+            if (showDisclaimer)
+                return new Disclaimer(getIntroSequence());
+
+            return getIntroSequence();
+        }
+
+        private IntroScreen getIntroSequence()
+        {
+            if (introSequence == IntroSequence.Random)
+                introSequence = (IntroSequence)RNG.Next(0, (int)IntroSequence.Random);
+
+            switch (introSequence)
+            {
+                case IntroSequence.Circles:
+                    return new IntroCircles();
+
+                case IntroSequence.Welcome:
+                    return new IntroWelcome();
+
+                default:
+                    return new IntroTriangles();
+            }
+        }
 
         protected virtual ShaderPrecompiler CreateShaderPrecompiler() => new ShaderPrecompiler();
 
@@ -63,6 +67,17 @@ namespace osu.Game.Screens
 
             LoadComponentAsync(precompiler = CreateShaderPrecompiler(), AddInternal);
             LoadComponentAsync(loadableScreen = CreateLoadableScreen());
+
+            LoadComponentAsync(spinner = new LoadingSpinner(true, true)
+            {
+                Anchor = Anchor.BottomRight,
+                Origin = Anchor.BottomRight,
+                Margin = new MarginPadding(40),
+            }, _ =>
+            {
+                AddInternal(spinner);
+                spinnerShow = Scheduler.AddDelayed(spinner.Show, 200);
+            });
 
             checkIfLoaded();
         }
@@ -75,13 +90,22 @@ namespace osu.Game.Screens
                 return;
             }
 
-            this.Push(loadableScreen);
+            spinnerShow?.Cancel();
+
+            if (spinner.State.Value == Visibility.Visible)
+            {
+                spinner.Hide();
+                Scheduler.AddDelayed(() => this.Push(loadableScreen), LoadingSpinner.TRANSITION_DURATION);
+            }
+            else
+                this.Push(loadableScreen);
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game)
+        private void load(OsuGameBase game, OsuConfigManager config)
         {
             showDisclaimer = game.IsDeployedBuild;
+            introSequence = config.Get<IntroSequence>(OsuSetting.IntroSequence);
         }
 
         /// <summary>
@@ -89,7 +113,7 @@ namespace osu.Game.Screens
         /// </summary>
         public class ShaderPrecompiler : Drawable
         {
-            private readonly List<Shader> loadTargets = new List<Shader>();
+            private readonly List<IShader> loadTargets = new List<IShader>();
 
             public bool FinishedCompiling { get; private set; }
 
@@ -106,7 +130,7 @@ namespace osu.Game.Screens
                 loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_3, FragmentShaderDescriptor.TEXTURE));
             }
 
-            protected virtual bool AllLoaded => loadTargets.All(s => s.Loaded);
+            protected virtual bool AllLoaded => loadTargets.All(s => s.IsLoaded);
 
             protected override void Update()
             {

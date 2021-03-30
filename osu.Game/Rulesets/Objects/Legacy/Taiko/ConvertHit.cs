@@ -6,8 +6,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Taiko
     /// <summary>
     /// Legacy osu!taiko Hit-type, used for parsing Beatmaps.
     /// </summary>
-    internal sealed class ConvertHit : HitObject
+    internal sealed class ConvertHit : ConvertHitObject
     {
-        protected override HitWindows CreateHitWindows() => null;
     }
 }

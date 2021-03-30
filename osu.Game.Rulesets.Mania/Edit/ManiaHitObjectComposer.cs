@@ -5,51 +5,91 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mania.Objects;
-using osu.Game.Rulesets.Mania.Objects.Drawables;
-using osu.Game.Rulesets.Objects.Drawables;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
-using osu.Game.Rulesets.Mania.Edit.Blueprints;
+using osu.Framework.Input;
+using osu.Game.Rulesets.Mania.Skinning.Default;
 using osu.Game.Rulesets.Mania.UI;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
+using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
-    [Cached(Type = typeof(IManiaHitObjectComposer))]
-    public class ManiaHitObjectComposer : HitObjectComposer<ManiaHitObject>, IManiaHitObjectComposer
+    public class ManiaHitObjectComposer : HitObjectComposer<ManiaHitObject>
     {
-        protected new ManiaEditRulesetContainer RulesetContainer { get; private set; }
+        private DrawableManiaEditRuleset drawableRuleset;
+        private ManiaBeatSnapGrid beatSnapGrid;
+        private InputManager inputManager;
 
         public ManiaHitObjectComposer(Ruleset ruleset)
             : base(ruleset)
         {
         }
 
-        /// <summary>
-        /// Retrieves the column that intersects a screen-space position.
-        /// </summary>
-        /// <param name="screenSpacePosition">The screen-space position.</param>
-        /// <returns>The column which intersects with <paramref name="screenSpacePosition"/>.</returns>
-        public Column ColumnAt(Vector2 screenSpacePosition) => RulesetContainer.GetColumnByPosition(screenSpacePosition);
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            AddInternal(beatSnapGrid = new ManiaBeatSnapGrid());
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            inputManager = GetContainingInputManager();
+        }
 
         private DependencyContainer dependencies;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
             => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-        public int TotalColumns => ((ManiaPlayfield)RulesetContainer.Playfield).TotalColumns;
+        public new ManiaPlayfield Playfield => ((ManiaPlayfield)drawableRuleset.Playfield);
 
-        protected override RulesetContainer<ManiaHitObject> CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
+        public IScrollingInfo ScrollingInfo => drawableRuleset.ScrollingInfo;
+
+        protected override Playfield PlayfieldAtScreenSpacePosition(Vector2 screenSpacePosition) =>
+            Playfield.GetColumnByPosition(screenSpacePosition);
+
+        public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
         {
-            RulesetContainer = new ManiaEditRulesetContainer(ruleset, beatmap);
+            var result = base.SnapScreenSpacePositionToValidTime(screenSpacePosition);
+
+            switch (ScrollingInfo.Direction.Value)
+            {
+                case ScrollingDirection.Down:
+                    result.ScreenSpacePosition -= new Vector2(0, getNoteHeight() / 2);
+                    break;
+
+                case ScrollingDirection.Up:
+                    result.ScreenSpacePosition += new Vector2(0, getNoteHeight() / 2);
+                    break;
+            }
+
+            return result;
+        }
+
+        private float getNoteHeight() =>
+            Playfield.GetColumn(0).ToScreenSpace(new Vector2(DefaultNotePiece.NOTE_HEIGHT)).Y -
+            Playfield.GetColumn(0).ToScreenSpace(Vector2.Zero).Y;
+
+        protected override DrawableRuleset<ManiaHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
+        {
+            drawableRuleset = new DrawableManiaEditRuleset(ruleset, beatmap, mods);
 
             // This is the earliest we can cache the scrolling info to ourselves, before masks are added to the hierarchy and inject it
-            dependencies.CacheAs(RulesetContainer.ScrollingInfo);
+            dependencies.CacheAs(drawableRuleset.ScrollingInfo);
 
-            return RulesetContainer;
+            return drawableRuleset;
         }
+
+        protected override ComposeBlueprintContainer CreateBlueprintContainer()
+            => new ManiaBlueprintContainer(this);
 
         protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
         {
@@ -57,19 +97,30 @@ namespace osu.Game.Rulesets.Mania.Edit
             new HoldNoteCompositionTool()
         };
 
-        public override SelectionHandler CreateSelectionHandler() => new ManiaSelectionHandler();
-
-        public override SelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject)
+        protected override void UpdateAfterChildren()
         {
-            switch (hitObject)
-            {
-                case DrawableNote note:
-                    return new NoteSelectionBlueprint(note);
-                case DrawableHoldNote holdNote:
-                    return new HoldNoteSelectionBlueprint(holdNote);
-            }
+            base.UpdateAfterChildren();
 
-            return base.CreateBlueprintFor(hitObject);
+            if (BlueprintContainer.CurrentTool is SelectTool)
+            {
+                if (EditorBeatmap.SelectedHitObjects.Any())
+                {
+                    beatSnapGrid.SelectionTimeRange = (EditorBeatmap.SelectedHitObjects.Min(h => h.StartTime), EditorBeatmap.SelectedHitObjects.Max(h => h.GetEndTime()));
+                }
+                else
+                    beatSnapGrid.SelectionTimeRange = null;
+            }
+            else
+            {
+                var result = SnapScreenSpacePositionToValidTime(inputManager.CurrentState.Mouse.Position);
+                if (result.Time is double time)
+                    beatSnapGrid.SelectionTimeRange = (time, time);
+                else
+                    beatSnapGrid.SelectionTimeRange = null;
+            }
         }
+
+        public override string ConvertSelectionToString()
+            => string.Join(',', EditorBeatmap.SelectedHitObjects.Cast<ManiaHitObject>().OrderBy(h => h.StartTime).Select(h => $"{h.StartTime}|{h.Column}"));
     }
 }

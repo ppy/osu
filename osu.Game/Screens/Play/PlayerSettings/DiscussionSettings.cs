@@ -10,7 +10,10 @@ namespace osu.Game.Screens.Play.PlayerSettings
 {
     public class DiscussionSettings : PlayerSettingsGroup
     {
-        protected override string Title => @"discussions";
+        public DiscussionSettings()
+            : base("discussions")
+        {
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -20,7 +23,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 new PlayerCheckbox
                 {
                     LabelText = "Show floating comments",
-                    Bindable = config.GetBindable<bool>(OsuSetting.FloatingComments)
+                    Current = config.GetBindable<bool>(OsuSetting.FloatingComments)
                 },
                 new FocusedTextBox
                 {

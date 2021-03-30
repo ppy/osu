@@ -11,7 +11,8 @@ namespace osu.Game.Screens.Play
     {
         public MouseButton Button { get; }
 
-        public KeyCounterMouse(MouseButton button) : base(getStringRepresentation(button))
+        public KeyCounterMouse(MouseButton button)
+            : base(getStringRepresentation(button))
         {
             Button = button;
         }
@@ -24,8 +25,10 @@ namespace osu.Game.Screens.Play
             {
                 default:
                     return button.ToString();
+
                 case MouseButton.Left:
                     return @"M1";
+
                 case MouseButton.Right:
                     return @"M2";
             }
@@ -33,14 +36,19 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            if (e.Button == Button) IsLit = true;
+            if (e.Button == Button)
+            {
+                IsLit = true;
+                Increment();
+            }
+
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             if (e.Button == Button) IsLit = false;
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
     }
 }

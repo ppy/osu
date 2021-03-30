@@ -6,9 +6,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.IO.Stores;
@@ -24,15 +27,21 @@ using osu.Framework.Input;
 using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Database;
-using osu.Game.Graphics.Containers;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
+using osu.Game.Online;
+using osu.Game.Online.Chat;
+using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Spectator;
+using osu.Game.Overlays;
+using osu.Game.Resources;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osuTK.Input;
-using DebugUtils = osu.Game.Utils.DebugUtils;
+using RuntimeInfo = osu.Framework.RuntimeInfo;
 
 namespace osu.Game
 {
@@ -43,11 +52,21 @@ namespace osu.Game
     /// </summary>
     public class OsuGameBase : Framework.Game, ICanAcceptFiles
     {
+        public const string CLIENT_STREAM_NAME = "lazer";
+
+        public const int SAMPLE_CONCURRENCY = 6;
+
+        public bool UseDevelopmentServer { get; }
+
         protected OsuConfigManager LocalConfig;
 
         protected BeatmapManager BeatmapManager;
 
         protected ScoreManager ScoreManager;
+
+        protected BeatmapDifficultyCache DifficultyCache;
+
+        protected UserLookupCache UserCache;
 
         protected SkinManager SkinManager;
 
@@ -61,38 +80,70 @@ namespace osu.Game
 
         protected RulesetConfigCache RulesetConfigCache;
 
-        protected APIAccess API;
+        protected IAPIProvider API;
+
+        private SpectatorStreamingClient spectatorStreaming;
+        private StatefulMultiplayerClient multiplayerClient;
 
         protected MenuCursorContainer MenuCursorContainer;
+
+        protected MusicController MusicController;
 
         private Container content;
 
         protected override Container<Drawable> Content => content;
 
-        private Bindable<WorkingBeatmap> beatmap;
+        protected Storage Storage { get; set; }
 
-        protected Bindable<WorkingBeatmap> Beatmap => beatmap;
+        [Cached]
+        [Cached(typeof(IBindable<RulesetInfo>))]
+        protected readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+
+        /// <summary>
+        /// The current mod selection for the local user.
+        /// </summary>
+        /// <remarks>
+        /// If a mod select overlay is present, mod instances set to this value are not guaranteed to remain as the provided instance and will be overwritten by a copy.
+        /// In such a case, changes to settings of a mod will *not* propagate after a mod is added to this collection.
+        /// As such, all settings should be finalised before adding a mod to this collection.
+        /// </remarks>
+        [Cached]
+        [Cached(typeof(IBindable<IReadOnlyList<Mod>>))]
+        protected readonly Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+
+        /// <summary>
+        /// Mods available for the current <see cref="Ruleset"/>.
+        /// </summary>
+        public readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> AvailableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>();
+
+        protected Bindable<WorkingBeatmap> Beatmap { get; private set; } // cached via load() method
 
         private Bindable<bool> fpsDisplayVisible;
 
-        protected AssemblyName AssemblyName => Assembly.GetEntryAssembly()?.GetName() ?? new AssemblyName { Version = new Version() };
+        public virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
 
-        public bool IsDeployedBuild => AssemblyName.Version.Major > 0;
+        /// <summary>
+        /// MD5 representation of the game executable.
+        /// </summary>
+        public string VersionHash { get; private set; }
 
-        public string Version
+        public bool IsDeployedBuild => AssemblyVersion.Major > 0;
+
+        public virtual string Version
         {
             get
             {
                 if (!IsDeployedBuild)
-                    return @"local " + (DebugUtils.IsDebug ? @"debug" : @"release");
+                    return @"local " + (DebugUtils.IsDebugBuild ? @"debug" : @"release");
 
-                var assembly = AssemblyName;
-                return $@"{assembly.Version.Major}.{assembly.Version.Minor}.{assembly.Version.Build}";
+                var version = AssemblyVersion;
+                return $@"{version.Major}.{version.Minor}.{version.Build}";
             }
         }
 
         public OsuGameBase()
         {
+            UseDevelopmentServer = DebugUtils.IsDebugBuild;
             Name = @"osu!lazer";
         }
 
@@ -105,102 +156,200 @@ namespace osu.Game
 
         protected override UserInputManager CreateUserInputManager() => new OsuUserInputManager();
 
+        /// <summary>
+        /// The maximum volume at which audio tracks should playback. This can be set lower than 1 to create some head-room for sound effects.
+        /// </summary>
+        internal const double GLOBAL_TRACK_VOLUME_ADJUST = 0.5;
+
+        private readonly BindableNumber<double> globalTrackVolumeAdjust = new BindableNumber<double>(GLOBAL_TRACK_VOLUME_ADJUST);
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            Resources.AddStore(new DllResourceStore(@"osu.Game.Resources.dll"));
+            try
+            {
+                using (var str = File.OpenRead(typeof(OsuGameBase).Assembly.Location))
+                    VersionHash = str.ComputeMD5Hash();
+            }
+            catch
+            {
+                // special case for android builds, which can't read DLLs from a packed apk.
+                // should eventually be handled in a better way.
+                VersionHash = $"{Version}-{RuntimeInfo.OS}".ComputeMD5Hash();
+            }
 
-            dependencies.Cache(contextFactory = new DatabaseContextFactory(Host.Storage));
+            Resources.AddStore(new DllResourceStore(OsuResources.ResourceAssembly));
+
+            dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
+
+            dependencies.CacheAs(Storage);
 
             var largeStore = new LargeTextureStore(Host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures")));
             largeStore.AddStore(Host.CreateTextureLoaderStore(new OnlineStore()));
             dependencies.Cache(largeStore);
 
             dependencies.CacheAs(this);
-            dependencies.Cache(LocalConfig);
+            dependencies.CacheAs(LocalConfig);
 
-            //this completely overrides the framework default. will need to change once we make a proper FontStore.
-            dependencies.Cache(Fonts = new FontStore(new GlyphStore(Resources, @"Fonts/FontAwesome")));
+            AddFont(Resources, @"Fonts/osuFont");
 
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/osuFont"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Medium"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-MediumItalic"));
+            AddFont(Resources, @"Fonts/Torus-Regular");
+            AddFont(Resources, @"Fonts/Torus-Light");
+            AddFont(Resources, @"Fonts/Torus-SemiBold");
+            AddFont(Resources, @"Fonts/Torus-Bold");
 
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Noto-Basic"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Noto-Hangul"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Noto-CJK-Basic"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Noto-CJK-Compatibility"));
+            AddFont(Resources, @"Fonts/Noto-Basic");
+            AddFont(Resources, @"Fonts/Noto-Hangul");
+            AddFont(Resources, @"Fonts/Noto-CJK-Basic");
+            AddFont(Resources, @"Fonts/Noto-CJK-Compatibility");
+            AddFont(Resources, @"Fonts/Noto-Thai");
 
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Regular"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-RegularItalic"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-SemiBold"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-SemiBoldItalic"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Bold"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-BoldItalic"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Light"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-LightItalic"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Black"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-BlackItalic"));
+            AddFont(Resources, @"Fonts/Venera-Light");
+            AddFont(Resources, @"Fonts/Venera-Bold");
+            AddFont(Resources, @"Fonts/Venera-Black");
 
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera-Light"));
+            Audio.Samples.PlaybackConcurrency = SAMPLE_CONCURRENCY;
 
             runMigrations();
 
-            dependencies.Cache(SkinManager = new SkinManager(Host.Storage, contextFactory, Host, Audio));
+            dependencies.Cache(SkinManager = new SkinManager(Storage, contextFactory, Host, Audio, new NamespacedResourceStore<byte[]>(Resources, "Skins/Legacy")));
             dependencies.CacheAs<ISkinSource>(SkinManager);
 
-            API = new APIAccess(LocalConfig);
+            // needs to be done here rather than inside SkinManager to ensure thread safety of CurrentSkinInfo.
+            SkinManager.ItemRemoved.BindValueChanged(weakRemovedInfo =>
+            {
+                if (weakRemovedInfo.NewValue.TryGetTarget(out var removedInfo))
+                {
+                    Schedule(() =>
+                    {
+                        // check the removed skin is not the current user choice. if it is, switch back to default.
+                        if (removedInfo.ID == SkinManager.CurrentSkinInfo.Value.ID)
+                            SkinManager.CurrentSkinInfo.Value = SkinInfo.Default;
+                    });
+                }
+            });
 
-            dependencies.Cache(API);
-            dependencies.CacheAs<IAPIProvider>(API);
+            EndpointConfiguration endpoints = UseDevelopmentServer ? (EndpointConfiguration)new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
 
-            var defaultBeatmap = new DummyWorkingBeatmap(this);
+            MessageFormatter.WebsiteRootUrl = endpoints.WebsiteRootUrl;
 
-            dependencies.Cache(RulesetStore = new RulesetStore(contextFactory));
-            dependencies.Cache(FileStore = new FileStore(contextFactory, Host.Storage));
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, contextFactory, RulesetStore, API, Audio, Host, defaultBeatmap));
-            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, BeatmapManager, Host.Storage, contextFactory, Host));
+            dependencies.CacheAs(API ??= new APIAccess(LocalConfig, endpoints, VersionHash));
+
+            dependencies.CacheAs(spectatorStreaming = new SpectatorStreamingClient(endpoints));
+            dependencies.CacheAs(multiplayerClient = new MultiplayerClient(endpoints));
+
+            var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
+
+            dependencies.Cache(RulesetStore = new RulesetStore(contextFactory, Storage));
+            dependencies.Cache(FileStore = new FileStore(contextFactory, Storage));
+
+            // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
+            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, API, contextFactory, Host, () => DifficultyCache, LocalConfig));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, RulesetStore, API, Audio, Host, defaultBeatmap, true));
+
+            // this should likely be moved to ArchiveModelManager when another case appers where it is necessary
+            // to have inter-dependent model managers. this could be obtained with an IHasForeign<T> interface to
+            // allow lookups to be done on the child (ScoreManager in this case) to perform the cascading delete.
+            List<ScoreInfo> getBeatmapScores(BeatmapSetInfo set)
+            {
+                var beatmapIds = BeatmapManager.QueryBeatmaps(b => b.BeatmapSetInfoID == set.ID).Select(b => b.ID).ToList();
+                return ScoreManager.QueryScores(s => beatmapIds.Contains(s.Beatmap.ID)).ToList();
+            }
+
+            BeatmapManager.ItemRemoved.BindValueChanged(i =>
+            {
+                if (i.NewValue.TryGetTarget(out var item))
+                    ScoreManager.Delete(getBeatmapScores(item), true);
+            });
+
+            BeatmapManager.ItemUpdated.BindValueChanged(i =>
+            {
+                if (i.NewValue.TryGetTarget(out var item))
+                    ScoreManager.Undelete(getBeatmapScores(item), true);
+            });
+
+            dependencies.Cache(DifficultyCache = new BeatmapDifficultyCache());
+            AddInternal(DifficultyCache);
+
+            dependencies.Cache(UserCache = new UserLookupCache());
+            AddInternal(UserCache);
+
+            var scorePerformanceManager = new ScorePerformanceCache();
+            dependencies.Cache(scorePerformanceManager);
+            AddInternal(scorePerformanceManager);
+
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
             dependencies.Cache(RulesetConfigCache = new RulesetConfigCache(SettingsStore));
+            dependencies.Cache(new SessionStatics());
             dependencies.Cache(new OsuColour());
 
-            fileImporters.Add(BeatmapManager);
-            fileImporters.Add(ScoreManager);
-            fileImporters.Add(SkinManager);
+            RegisterImportHandler(BeatmapManager);
+            RegisterImportHandler(ScoreManager);
+            RegisterImportHandler(SkinManager);
 
-            // tracks play so loud our samples can't keep up.
-            // this adds a global reduction of track volume for the time being.
-            Audio.Track.AddAdjustment(AdjustableProperty.Volume, new BindableDouble(0.8));
+            // drop track volume game-wide to leave some head-room for UI effects / samples.
+            // this means that for the time being, gameplay sample playback is louder relative to the audio track, compared to stable.
+            // we may want to revisit this if users notice or complain about the difference (consider this a bit of a trial).
+            Audio.Tracks.AddAdjustment(AdjustableProperty.Volume, globalTrackVolumeAdjust);
 
-            beatmap = new OsuBindableBeatmap(defaultBeatmap, Audio);
+            Beatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
 
-            dependencies.CacheAs<IBindable<WorkingBeatmap>>(beatmap);
-            dependencies.CacheAs(beatmap);
+            dependencies.CacheAs<IBindable<WorkingBeatmap>>(Beatmap);
+            dependencies.CacheAs(Beatmap);
 
             FileStore.Cleanup();
 
-            AddInternal(API);
+            // add api components to hierarchy.
+            if (API is APIAccess apiAccess)
+                AddInternal(apiAccess);
+            AddInternal(spectatorStreaming);
+            AddInternal(multiplayerClient);
 
-            GlobalActionContainer globalBinding;
+            AddInternal(RulesetConfigCache);
 
             MenuCursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both };
-            MenuCursorContainer.Child = globalBinding = new GlobalActionContainer(this)
+
+            GlobalActionContainer globalBindings;
+
+            MenuCursorContainer.Child = globalBindings = new GlobalActionContainer(this)
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = content = new OsuTooltipContainer(MenuCursorContainer.Cursor) { RelativeSizeAxes = Axes.Both }
             };
 
-            base.Content.Add(new ScalingContainer(ScalingMode.Everything) { Child = MenuCursorContainer });
+            base.Content.Add(CreateScalingContainer().WithChild(MenuCursorContainer));
 
-            KeyBindingStore.Register(globalBinding);
-            dependencies.Cache(globalBinding);
+            KeyBindingStore.Register(globalBindings);
+            dependencies.Cache(globalBindings);
 
             PreviewTrackManager previewTrackManager;
             dependencies.Cache(previewTrackManager = new PreviewTrackManager());
             Add(previewTrackManager);
+
+            AddInternal(MusicController = new MusicController());
+            dependencies.CacheAs(MusicController);
+
+            Ruleset.BindValueChanged(onRulesetChanged);
         }
+
+        private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)
+        {
+            var dict = new Dictionary<ModType, IReadOnlyList<Mod>>();
+
+            if (r.NewValue?.Available == true)
+            {
+                foreach (ModType type in Enum.GetValues(typeof(ModType)))
+                    dict[type] = r.NewValue.CreateInstance().GetModsFor(type).ToList();
+            }
+
+            if (!SelectedMods.Disabled)
+                SelectedMods.Value = Array.Empty<Mod>();
+
+            AvailableMods.Value = dict;
+        }
+
+        protected virtual Container CreateScalingContainer() => new DrawSizePreservingFillContainer();
 
         protected override void LoadComplete()
         {
@@ -209,8 +358,10 @@ namespace osu.Game
             // TODO: This is temporary until we reimplement the local FPS display.
             // It's just to allow end-users to access the framework FPS display without knowing the shortcut key.
             fpsDisplayVisible = LocalConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay);
-            fpsDisplayVisible.ValueChanged += visible => { FrameStatisticsMode = visible.NewValue ? FrameStatisticsMode.Minimal : FrameStatisticsMode.None; };
+            fpsDisplayVisible.ValueChanged += visible => { FrameStatistics.Value = visible.NewValue ? FrameStatisticsMode.Minimal : FrameStatisticsMode.None; };
             fpsDisplayVisible.TriggerChange();
+
+            FrameStatistics.ValueChanged += e => fpsDisplayVisible.Value = e.NewValue != FrameStatisticsMode.None;
         }
 
         private void runMigrations()
@@ -238,48 +389,81 @@ namespace osu.Game
 
         public override void SetHost(GameHost host)
         {
-            if (LocalConfig == null)
-                LocalConfig = new OsuConfigManager(host.Storage);
             base.SetHost(host);
+
+            // may be non-null for certain tests
+            Storage ??= host.Storage;
+
+            LocalConfig ??= UseDevelopmentServer
+                ? new DevelopmentOsuConfigManager(Storage)
+                : new OsuConfigManager(Storage);
         }
+
+        /// <summary>
+        /// Use to programatically exit the game as if the user was triggering via alt-f4.
+        /// Will keep persisting until an exit occurs (exit may be blocked multiple times).
+        /// </summary>
+        public void GracefullyExit()
+        {
+            if (!OnExiting())
+                Exit();
+            else
+                Scheduler.AddDelayed(GracefullyExit, 2000);
+        }
+
+        protected override Storage CreateStorage(GameHost host, Storage defaultStorage) => new OsuStorage(host, defaultStorage);
 
         private readonly List<ICanAcceptFiles> fileImporters = new List<ICanAcceptFiles>();
 
-        public void Import(params string[] paths)
+        /// <summary>
+        /// Register a global handler for file imports. Most recently registered will have precedence.
+        /// </summary>
+        /// <param name="handler">The handler to register.</param>
+        public void RegisterImportHandler(ICanAcceptFiles handler) => fileImporters.Insert(0, handler);
+
+        /// <summary>
+        /// Unregister a global handler for file imports.
+        /// </summary>
+        /// <param name="handler">The previously registered handler.</param>
+        public void UnregisterImportHandler(ICanAcceptFiles handler) => fileImporters.Remove(handler);
+
+        public async Task Import(params string[] paths)
         {
             var extension = Path.GetExtension(paths.First())?.ToLowerInvariant();
 
             foreach (var importer in fileImporters)
+            {
                 if (importer.HandledExtensions.Contains(extension))
-                    importer.Import(paths);
+                    await importer.Import(paths).ConfigureAwait(false);
+            }
         }
 
-        public string[] HandledExtensions => fileImporters.SelectMany(i => i.HandledExtensions).ToArray();
-
-        private class OsuBindableBeatmap : BindableBeatmap
+        public virtual async Task Import(params ImportTask[] tasks)
         {
-            public OsuBindableBeatmap(WorkingBeatmap defaultValue, AudioManager audioManager)
-                : this(defaultValue)
+            var tasksPerExtension = tasks.GroupBy(t => Path.GetExtension(t.Path).ToLowerInvariant());
+            await Task.WhenAll(tasksPerExtension.Select(taskGroup =>
             {
-                RegisterAudioManager(audioManager);
-            }
+                var importer = fileImporters.FirstOrDefault(i => i.HandledExtensions.Contains(taskGroup.Key));
+                return importer?.Import(taskGroup.ToArray()) ?? Task.CompletedTask;
+            })).ConfigureAwait(false);
+        }
 
-            public OsuBindableBeatmap(WorkingBeatmap defaultValue)
-                : base(defaultValue)
-            {
-            }
+        public IEnumerable<string> HandledExtensions => fileImporters.SelectMany(i => i.HandledExtensions);
 
-            public override BindableBeatmap GetBoundCopy()
-            {
-                var copy = new OsuBindableBeatmap(Default);
-                copy.BindTo(this);
-                return copy;
-            }
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            RulesetStore?.Dispose();
+            BeatmapManager?.Dispose();
+            LocalConfig?.Dispose();
+
+            contextFactory.FlushConnections();
         }
 
         private class OsuUserInputManager : UserInputManager
         {
-            protected override MouseButtonEventManager CreateButtonManagerFor(MouseButton button)
+            protected override MouseButtonEventManager CreateButtonEventManagerFor(MouseButton button)
             {
                 switch (button)
                 {
@@ -287,7 +471,7 @@ namespace osu.Game
                         return new RightMouseManager(button);
                 }
 
-                return base.CreateButtonManagerFor(button);
+                return base.CreateButtonEventManagerFor(button);
             }
 
             private class RightMouseManager : MouseButtonEventManager
@@ -301,6 +485,12 @@ namespace osu.Game
                 public override bool EnableClick => false;
                 public override bool ChangeFocusOnClick => false;
             }
+        }
+
+        public void Migrate(string path)
+        {
+            contextFactory.FlushConnections();
+            (Storage as OsuStorage)?.Migrate(Host.GetStorage(path));
         }
     }
 }

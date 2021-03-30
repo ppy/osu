@@ -5,14 +5,12 @@ using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Objects.Legacy.Mania
 {
-    internal sealed class ConvertHold : HitObject, IHasXPosition, IHasEndTime
+    internal sealed class ConvertHold : ConvertHitObject, IHasXPosition, IHasDuration
     {
         public float X { get; set; }
 
-        public double EndTime { get; set; }
+        public double Duration { get; set; }
 
-        public double Duration => EndTime - StartTime;
-
-        protected override HitWindows CreateHitWindows() => null;
+        public double EndTime => StartTime + Duration;
     }
 }

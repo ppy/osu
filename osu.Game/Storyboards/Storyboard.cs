@@ -1,36 +1,61 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Game.Beatmaps;
-using osu.Game.Storyboards.Drawables;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
+using osu.Game.Beatmaps;
+using osu.Game.Skinning;
+using osu.Game.Storyboards.Drawables;
 
 namespace osu.Game.Storyboards
 {
-    public class Storyboard : IDisposable
+    public class Storyboard
     {
         private readonly Dictionary<string, StoryboardLayer> layers = new Dictionary<string, StoryboardLayer>();
         public IEnumerable<StoryboardLayer> Layers => layers.Values;
 
         public BeatmapInfo BeatmapInfo = new BeatmapInfo();
 
+        /// <summary>
+        /// Whether the storyboard can fall back to skin sprites in case no matching storyboard sprites are found.
+        /// </summary>
+        public bool UseSkinSprites { get; set; }
+
         public bool HasDrawable => Layers.Any(l => l.Elements.Any(e => e.IsDrawable));
+
+        /// <summary>
+        /// Across all layers, find the earliest point in time that a storyboard element exists at.
+        /// Will return null if there are no elements.
+        /// </summary>
+        /// <remarks>
+        /// This iterates all elements and as such should be used sparingly or stored locally.
+        /// </remarks>
+        public double? EarliestEventTime => Layers.SelectMany(l => l.Elements).OrderBy(e => e.StartTime).FirstOrDefault()?.StartTime;
+
+        /// <summary>
+        /// Depth of the currently front-most storyboard layer, excluding the overlay layer.
+        /// </summary>
+        private int minimumLayerDepth;
 
         public Storyboard()
         {
+            layers.Add("Video", new StoryboardLayer("Video", 4, false));
             layers.Add("Background", new StoryboardLayer("Background", 3));
-            layers.Add("Fail", new StoryboardLayer("Fail", 2) { EnabledWhenPassing = false, });
-            layers.Add("Pass", new StoryboardLayer("Pass", 1) { EnabledWhenFailing = false, });
-            layers.Add("Foreground", new StoryboardLayer("Foreground", 0));
+            layers.Add("Fail", new StoryboardLayer("Fail", 2) { VisibleWhenPassing = false, });
+            layers.Add("Pass", new StoryboardLayer("Pass", 1) { VisibleWhenFailing = false, });
+            layers.Add("Foreground", new StoryboardLayer("Foreground", minimumLayerDepth = 0));
+
+            layers.Add("Overlay", new StoryboardLayer("Overlay", int.MinValue));
         }
 
         public StoryboardLayer GetLayer(string name)
         {
-            StoryboardLayer layer;
-            if (!layers.TryGetValue(name, out layer))
-                layers[name] = layer = new StoryboardLayer(name, layers.Values.Min(l => l.Depth) - 1);
+            if (!layers.TryGetValue(name, out var layer))
+                layers[name] = layer = new StoryboardLayer(name, --minimumLayerDepth);
 
             return layer;
         }
@@ -57,28 +82,18 @@ namespace osu.Game.Storyboards
             return drawable;
         }
 
-        #region Disposal
-
-        ~Storyboard()
+        public Drawable CreateSpriteFromResourcePath(string path, TextureStore textureStore)
         {
-            Dispose(false);
+            Drawable drawable = null;
+            var storyboardPath = BeatmapInfo.BeatmapSet?.Files?.Find(f => f.Filename.Equals(path, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
+
+            if (storyboardPath != null)
+                drawable = new Sprite { Texture = textureStore.Get(storyboardPath) };
+            // if the texture isn't available locally in the beatmap, some storyboards choose to source from the underlying skin lookup hierarchy.
+            else if (UseSkinSprites)
+                drawable = new SkinnableSprite(path);
+
+            return drawable;
         }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        private bool isDisposed;
-
-        protected virtual void Dispose(bool isDisposing)
-        {
-            if (isDisposed)
-                return;
-            isDisposed = true;
-        }
-
-        #endregion
     }
 }

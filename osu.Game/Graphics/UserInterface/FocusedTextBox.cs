@@ -2,25 +2,20 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osuTK.Graphics;
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 using osu.Game.Input.Bindings;
 using osuTK.Input;
+using osu.Framework.Input.Bindings;
 
 namespace osu.Game.Graphics.UserInterface
 {
     /// <summary>
     /// A textbox which holds focus eagerly.
     /// </summary>
-    public class FocusedTextBox : OsuTextBox
+    public class FocusedTextBox : OsuTextBox, IKeyBindingHandler<GlobalAction>
     {
-        protected override Color4 BackgroundUnfocused => new Color4(10, 10, 10, 255);
-        protected override Color4 BackgroundFocused => new Color4(10, 10, 10, 255);
-
-        public Action Exit;
-
         private bool focus;
 
         private bool allowImmediateFocus => host?.OnScreenKeyboardOverlapsGameWindow != true;
@@ -41,12 +36,14 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private GameHost host;
+        [Resolved]
+        private GameHost host { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(GameHost host)
+        private void load()
         {
-            this.host = host;
+            BackgroundUnfocused = new Color4(10, 10, 10, 255);
+            BackgroundFocused = new Color4(10, 10, 10, 255);
         }
 
         // We may not be focused yet, but we need to handle keyboard input to be able to request focus
@@ -63,13 +60,15 @@ namespace osu.Game.Graphics.UserInterface
             if (!HasFocus) return false;
 
             if (e.Key == Key.Escape)
-                return false; // disable the framework-level handling of escape key for confority (we use GlobalAction.Back).
+                return false; // disable the framework-level handling of escape key for conformity (we use GlobalAction.Back).
 
             return base.OnKeyDown(e);
         }
 
-        public override bool OnPressed(GlobalAction action)
+        public bool OnPressed(GlobalAction action)
         {
+            if (!HasFocus) return false;
+
             if (action == GlobalAction.Back)
             {
                 if (Text.Length > 0)
@@ -79,13 +78,11 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
-            return base.OnPressed(action);
+            return false;
         }
 
-        protected override void KillFocus()
+        public void OnReleased(GlobalAction action)
         {
-            base.KillFocus();
-            Exit?.Invoke();
         }
 
         public override bool RequestsFocus => HoldFocus;

@@ -2,9 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Input.StateChanges;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Replays;
 using osuTK;
@@ -24,26 +25,21 @@ namespace osu.Game.Rulesets.Osu.Replays
         {
             get
             {
-                if (!HasFrames)
+                var frame = CurrentFrame;
+
+                if (frame == null)
                     return null;
 
-                return Interpolation.ValueAt(CurrentTime, CurrentFrame.Position, NextFrame.Position, CurrentFrame.Time, NextFrame.Time);
+                Debug.Assert(CurrentTime != null);
+
+                return NextFrame != null ? Interpolation.ValueAt(CurrentTime.Value, frame.Position, NextFrame.Position, frame.Time, NextFrame.Time) : frame.Position;
             }
         }
 
-        public override List<IInput> GetPendingInputs()
+        public override void CollectPendingInputs(List<IInput> inputs)
         {
-            return new List<IInput>
-            {
-                new MousePositionAbsoluteInput
-                {
-                    Position = GamefieldToScreenSpace(Position ?? Vector2.Zero)
-                },
-                new ReplayState<OsuAction>
-                {
-                    PressedActions = CurrentFrame.Actions
-                }
-            };
+            inputs.Add(new MousePositionAbsoluteInput { Position = GamefieldToScreenSpace(Position ?? Vector2.Zero) });
+            inputs.Add(new ReplayState<OsuAction> { PressedActions = CurrentFrame?.Actions ?? new List<OsuAction>() });
         }
     }
 }

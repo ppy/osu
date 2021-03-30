@@ -1,17 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Input.Events;
-using osu.Framework.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit.Blueprints;
 using osu.Game.Rulesets.Mania.Objects;
-using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit.Compose.Components;
-using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
@@ -21,94 +18,35 @@ namespace osu.Game.Rulesets.Mania.Edit
         private IScrollingInfo scrollingInfo { get; set; }
 
         [Resolved]
-        private IManiaHitObjectComposer composer { get; set; }
+        private HitObjectComposer composer { get; set; }
 
-        private IClock editorClock;
-
-        [BackgroundDependencyLoader]
-        private void load(IAdjustableClock clock)
+        public override bool HandleMovement(MoveSelectionEvent moveEvent)
         {
-            editorClock = clock;
+            var maniaBlueprint = (ManiaSelectionBlueprint)moveEvent.Blueprint;
+            int lastColumn = maniaBlueprint.DrawableObject.HitObject.Column;
+
+            performColumnMovement(lastColumn, moveEvent);
+
+            return true;
         }
 
-        public override void HandleDrag(SelectionBlueprint blueprint, DragEvent dragEvent)
+        private void performColumnMovement(int lastColumn, MoveSelectionEvent moveEvent)
         {
-            adjustOrigins((ManiaSelectionBlueprint)blueprint);
-            performDragMovement(dragEvent);
-            performColumnMovement(dragEvent);
+            var maniaPlayfield = ((ManiaHitObjectComposer)composer).Playfield;
 
-            base.HandleDrag(blueprint, dragEvent);
-        }
-
-        /// <summary>
-        /// Ensures that the position of hitobjects remains centred to the mouse position.
-        /// E.g. The hitobject position will change if the editor scrolls while a hitobject is dragged.
-        /// </summary>
-        /// <param name="reference">The <see cref="ManiaSelectionBlueprint"/> that received the drag event.</param>
-        private void adjustOrigins(ManiaSelectionBlueprint reference)
-        {
-            var referenceParent = (HitObjectContainer)reference.HitObject.Parent;
-
-            float offsetFromReferenceOrigin = reference.DragPosition.Y - reference.HitObject.OriginPosition.Y;
-            float targetPosition = referenceParent.ToLocalSpace(reference.ScreenSpaceDragPosition).Y - offsetFromReferenceOrigin;
-
-            // Flip the vertical coordinate space when scrolling downwards
-            if (scrollingInfo.Direction.Value == ScrollingDirection.Down)
-                targetPosition = targetPosition - referenceParent.DrawHeight;
-
-            float movementDelta = targetPosition - reference.HitObject.Position.Y;
-
-            foreach (var b in SelectedBlueprints.OfType<ManiaSelectionBlueprint>())
-                b.HitObject.Y += movementDelta;
-        }
-
-        private void performDragMovement(DragEvent dragEvent)
-        {
-            foreach (var b in SelectedBlueprints)
-            {
-                var hitObject = b.HitObject;
-
-                var objectParent = (HitObjectContainer)hitObject.Parent;
-
-                // Using the hitobject position is required since AdjustPosition can be invoked multiple times per frame
-                // without the position having been updated by the parenting ScrollingHitObjectContainer
-                hitObject.Y += dragEvent.Delta.Y;
-
-                float targetPosition;
-
-                // If we're scrolling downwards, a position of 0 is actually further away from the hit target
-                // so we need to flip the vertical coordinate in the hitobject container's space
-                if (scrollingInfo.Direction.Value == ScrollingDirection.Down)
-                    targetPosition = -hitObject.Position.Y;
-                else
-                    targetPosition = hitObject.Position.Y;
-
-                objectParent.Remove(hitObject);
-
-                hitObject.HitObject.StartTime = scrollingInfo.Algorithm.TimeAt(targetPosition,
-                    editorClock.CurrentTime,
-                    scrollingInfo.TimeRange.Value,
-                    objectParent.DrawHeight);
-
-                objectParent.Add(hitObject);
-            }
-        }
-
-        private void performColumnMovement(DragEvent dragEvent)
-        {
-            var lastColumn = composer.ColumnAt(dragEvent.ScreenSpaceLastMousePosition);
-            var currentColumn = composer.ColumnAt(dragEvent.ScreenSpaceMousePosition);
-            if (lastColumn == null || currentColumn == null)
+            var currentColumn = maniaPlayfield.GetColumnByPosition(moveEvent.ScreenSpacePosition);
+            if (currentColumn == null)
                 return;
 
-            int columnDelta = currentColumn.Index - lastColumn.Index;
+            int columnDelta = currentColumn.Index - lastColumn;
             if (columnDelta == 0)
                 return;
 
             int minColumn = int.MaxValue;
             int maxColumn = int.MinValue;
 
-            foreach (var obj in SelectedHitObjects.OfType<ManiaHitObject>())
+            // find min/max in an initial pass before actually performing the movement.
+            foreach (var obj in EditorBeatmap.SelectedHitObjects.OfType<ManiaHitObject>())
             {
                 if (obj.Column < minColumn)
                     minColumn = obj.Column;
@@ -116,10 +54,13 @@ namespace osu.Game.Rulesets.Mania.Edit
                     maxColumn = obj.Column;
             }
 
-            columnDelta = MathHelper.Clamp(columnDelta, -minColumn, composer.TotalColumns - 1 - maxColumn);
+            columnDelta = Math.Clamp(columnDelta, -minColumn, maniaPlayfield.TotalColumns - 1 - maxColumn);
 
-            foreach (var obj in SelectedHitObjects.OfType<ManiaHitObject>())
-                obj.Column += columnDelta;
+            EditorBeatmap.PerformOnSelection(h =>
+            {
+                if (h is ManiaHitObject maniaObj)
+                    maniaObj.Column += columnDelta;
+            });
         }
     }
 }

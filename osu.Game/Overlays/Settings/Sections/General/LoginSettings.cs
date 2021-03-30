@@ -13,9 +13,12 @@ using osu.Game.Online.API;
 using osuTK;
 using osu.Game.Users;
 using System.ComponentModel;
+using osu.Framework.Bindables;
 using osu.Game.Graphics;
 using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using RectangleF = osu.Framework.Graphics.Primitives.RectangleF;
@@ -23,13 +26,15 @@ using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Overlays.Settings.Sections.General
 {
-    public class LoginSettings : FillFlowContainer, IOnlineComponent
+    public class LoginSettings : FillFlowContainer
     {
         private bool bounding = true;
         private LoginForm form;
-        private OsuColour colours;
 
-        private UserPanel panel;
+        [Resolved]
+        private OsuColour colours { get; set; }
+
+        private UserGridPanel panel;
         private UserDropdown dropdown;
 
         /// <summary>
@@ -37,11 +42,16 @@ namespace osu.Game.Overlays.Settings.Sections.General
         /// </summary>
         public Action RequestHide;
 
+        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
         public override RectangleF BoundingBox => bounding ? base.BoundingBox : RectangleF.Empty;
 
         public bool Bounding
         {
-            get { return bounding; }
+            get => bounding;
             set
             {
                 bounding = value;
@@ -57,19 +67,18 @@ namespace osu.Game.Overlays.Settings.Sections.General
             Spacing = new Vector2(0f, 5f);
         }
 
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours, APIAccess api)
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            this.colours = colours;
-
-            api?.Register(this);
+            apiState.BindTo(api.State);
+            apiState.BindValueChanged(onlineStateChanged, true);
         }
 
-        public void APIStateChanged(APIAccess api, APIState state)
+        private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
         {
             form = null;
 
-            switch (state)
+            switch (state.NewValue)
             {
                 case APIState.Offline:
                     Children = new Drawable[]
@@ -78,7 +87,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         {
                             Text = "ACCOUNT",
                             Margin = new MarginPadding { Bottom = 5 },
-                            Font = OsuFont.GetFont(weight: FontWeight.Black),
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold),
                         },
                         form = new LoginForm
                         {
@@ -86,15 +95,16 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         }
                     };
                     break;
+
                 case APIState.Failing:
                 case APIState.Connecting:
                     LinkFlowContainer linkFlow;
 
                     Children = new Drawable[]
                     {
-                        new LoadingAnimation
+                        new LoadingSpinner
                         {
-                            State = Visibility.Visible,
+                            State = { Value = Visibility.Visible },
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                         },
@@ -104,13 +114,14 @@ namespace osu.Game.Overlays.Settings.Sections.General
                             Origin = Anchor.TopCentre,
                             TextAnchor = Anchor.TopCentre,
                             AutoSizeAxes = Axes.Both,
-                            Text = state == APIState.Failing ? "Connection is failing, will attempt to reconnect... " : "Attempting to connect... ",
+                            Text = state.NewValue == APIState.Failing ? "Connection is failing, will attempt to reconnect... " : "Attempting to connect... ",
                             Margin = new MarginPadding { Top = 10, Bottom = 10 },
                         },
                     };
 
                     linkFlow.AddLink("cancel", api.Logout, string.Empty);
                     break;
+
                 case APIState.Online:
                     Children = new Drawable[]
                     {
@@ -139,7 +150,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                                         },
                                     },
                                 },
-                                panel = new UserPanel(api.LocalUser.Value)
+                                panel = new UserGridPanel(api.LocalUser.Value)
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     Action = RequestHide
@@ -150,8 +161,9 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     };
 
                     panel.Status.BindTo(api.LocalUser.Value.Status);
+                    panel.Activity.BindTo(api.LocalUser.Value.Activity);
 
-                    dropdown.Current.ValueChanged += action =>
+                    dropdown.Current.BindValueChanged(action =>
                     {
                         switch (action.NewValue)
                         {
@@ -159,26 +171,27 @@ namespace osu.Game.Overlays.Settings.Sections.General
                                 api.LocalUser.Value.Status.Value = new UserStatusOnline();
                                 dropdown.StatusColour = colours.Green;
                                 break;
+
                             case UserAction.DoNotDisturb:
                                 api.LocalUser.Value.Status.Value = new UserStatusDoNotDisturb();
                                 dropdown.StatusColour = colours.Red;
                                 break;
+
                             case UserAction.AppearOffline:
                                 api.LocalUser.Value.Status.Value = new UserStatusOffline();
                                 dropdown.StatusColour = colours.Gray7;
                                 break;
+
                             case UserAction.SignOut:
                                 api.Logout();
                                 break;
                         }
-                    };
-                    dropdown.Current.TriggerChange();
-
+                    }, true);
                     break;
             }
 
             if (form != null) GetContainingInputManager()?.ChangeFocus(form);
-        }
+        });
 
         public override bool AcceptsFocus => true;
 
@@ -194,20 +207,24 @@ namespace osu.Game.Overlays.Settings.Sections.General
         {
             private TextBox username;
             private TextBox password;
-            private APIAccess api;
+            private ShakeContainer shakeSignIn;
+
+            [Resolved(CanBeNull = true)]
+            private IAPIProvider api { get; set; }
 
             public Action RequestHide;
 
             private void performLogin()
             {
                 if (!string.IsNullOrEmpty(username.Text) && !string.IsNullOrEmpty(password.Text))
-                    api.Login(username.Text, password.Text);
+                    api?.Login(username.Text, password.Text);
+                else
+                    shakeSignIn.Shake();
             }
 
             [BackgroundDependencyLoader(permitNulls: true)]
-            private void load(APIAccess api, OsuConfigManager config, AccountCreationOverlay accountCreation)
+            private void load(OsuConfigManager config, AccountCreationOverlay accountCreation)
             {
-                this.api = api;
                 Direction = FillDirection.Vertical;
                 Spacing = new Vector2(0, 5);
                 AutoSizeAxes = Axes.Y;
@@ -216,7 +233,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 {
                     username = new OsuTextBox
                     {
-                        PlaceholderText = "email address",
+                        PlaceholderText = "username",
                         RelativeSizeAxes = Axes.X,
                         Text = api?.ProvidedUsername ?? string.Empty,
                         TabbableContentContainer = this
@@ -226,22 +243,34 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         PlaceholderText = "password",
                         RelativeSizeAxes = Axes.X,
                         TabbableContentContainer = this,
-                        OnCommit = (sender, newText) => performLogin()
                     },
                     new SettingsCheckbox
                     {
-                        LabelText = "Remember email address",
-                        Bindable = config.GetBindable<bool>(OsuSetting.SaveUsername),
+                        LabelText = "Remember username",
+                        Current = config.GetBindable<bool>(OsuSetting.SaveUsername),
                     },
                     new SettingsCheckbox
                     {
                         LabelText = "Stay signed in",
-                        Bindable = config.GetBindable<bool>(OsuSetting.SavePassword),
+                        Current = config.GetBindable<bool>(OsuSetting.SavePassword),
                     },
-                    new SettingsButton
+                    new Container
                     {
-                        Text = "Sign in",
-                        Action = performLogin
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Children = new Drawable[]
+                        {
+                            shakeSignIn = new ShakeContainer
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Child = new SettingsButton
+                                {
+                                    Text = "Sign in",
+                                    Action = performLogin
+                                },
+                            }
+                        }
                     },
                     new SettingsButton
                     {
@@ -253,6 +282,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         }
                     }
                 };
+
+                password.OnCommit += (sender, newText) => performLogin();
             }
 
             public override bool AcceptsFocus => true;
@@ -275,9 +306,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
             {
                 set
                 {
-                    var h = Header as UserDropdownHeader;
-                    if (h == null) return;
-                    h.StatusColour = value;
+                    if (Header is UserDropdownHeader h)
+                        h.StatusColour = value;
                 }
             }
 
@@ -302,8 +332,6 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         Colour = Color4.Black.Opacity(0.25f),
                         Radius = 4,
                     };
-
-                    ItemsContainer.Padding = new MarginPadding();
                 }
 
                 [BackgroundDependencyLoader]
@@ -312,7 +340,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     BackgroundColour = colours.Gray3;
                 }
 
-                protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableUserDropdownMenuItem(item);
+                protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new DrawableUserDropdownMenuItem(item);
 
                 private class DrawableUserDropdownMenuItem : DrawableOsuDropdownMenuItem
                 {
@@ -338,7 +366,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
                 public Color4 StatusColour
                 {
-                    set { statusIcon.FadeColour(value, 500, Easing.OutQuint); }
+                    set => statusIcon.FadeColour(value, 500, Easing.OutQuint);
                 }
 
                 public UserDropdownHeader()
@@ -361,7 +389,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Icon = FontAwesome.fa_circle_o,
+                        Icon = FontAwesome.Regular.Circle,
                         Size = new Vector2(14),
                     });
 

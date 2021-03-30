@@ -9,21 +9,35 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Catch.Difficulty;
+using osu.Game.Rulesets.Catch.Scoring;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
+using System;
+using osu.Framework.Extensions.EnumExtensions;
+using osu.Game.Rulesets.Catch.Skinning.Legacy;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Catch
 {
-    public class CatchRuleset : Ruleset
+    public class CatchRuleset : Ruleset, ILegacyRuleset
     {
-        public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap) => new CatchRulesetContainer(this, beatmap);
-        public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new CatchBeatmapConverter(beatmap);
+        public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableCatchRuleset(this, beatmap, mods);
+
+        public override ScoreProcessor CreateScoreProcessor() => new CatchScoreProcessor();
+
+        public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new CatchBeatmapConverter(beatmap, this);
+
         public override IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => new CatchBeatmapProcessor(beatmap);
+
+        public const string SHORT_NAME = "fruits";
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
@@ -35,42 +49,43 @@ namespace osu.Game.Rulesets.Catch
             new KeyBinding(InputKey.Shift, CatchAction.Dash),
         };
 
-        public override IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods)
+        public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
         {
-            if (mods.HasFlag(LegacyMods.Nightcore))
+            if (mods.HasFlagFast(LegacyMods.Nightcore))
                 yield return new CatchModNightcore();
-            else if (mods.HasFlag(LegacyMods.DoubleTime))
+            else if (mods.HasFlagFast(LegacyMods.DoubleTime))
                 yield return new CatchModDoubleTime();
 
-            if (mods.HasFlag(LegacyMods.Autoplay))
+            if (mods.HasFlagFast(LegacyMods.Perfect))
+                yield return new CatchModPerfect();
+            else if (mods.HasFlagFast(LegacyMods.SuddenDeath))
+                yield return new CatchModSuddenDeath();
+
+            if (mods.HasFlagFast(LegacyMods.Cinema))
+                yield return new CatchModCinema();
+            else if (mods.HasFlagFast(LegacyMods.Autoplay))
                 yield return new CatchModAutoplay();
 
-            if (mods.HasFlag(LegacyMods.Easy))
+            if (mods.HasFlagFast(LegacyMods.Easy))
                 yield return new CatchModEasy();
 
-            if (mods.HasFlag(LegacyMods.Flashlight))
+            if (mods.HasFlagFast(LegacyMods.Flashlight))
                 yield return new CatchModFlashlight();
 
-            if (mods.HasFlag(LegacyMods.HalfTime))
+            if (mods.HasFlagFast(LegacyMods.HalfTime))
                 yield return new CatchModHalfTime();
 
-            if (mods.HasFlag(LegacyMods.HardRock))
+            if (mods.HasFlagFast(LegacyMods.HardRock))
                 yield return new CatchModHardRock();
 
-            if (mods.HasFlag(LegacyMods.Hidden))
+            if (mods.HasFlagFast(LegacyMods.Hidden))
                 yield return new CatchModHidden();
 
-            if (mods.HasFlag(LegacyMods.NoFail))
+            if (mods.HasFlagFast(LegacyMods.NoFail))
                 yield return new CatchModNoFail();
 
-            if (mods.HasFlag(LegacyMods.Perfect))
-                yield return new CatchModPerfect();
-
-            if (mods.HasFlag(LegacyMods.Relax))
+            if (mods.HasFlagFast(LegacyMods.Relax))
                 yield return new CatchModRelax();
-
-            if (mods.HasFlag(LegacyMods.SuddenDeath))
-                yield return new CatchModSuddenDeath();
         }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
@@ -84,6 +99,7 @@ namespace osu.Game.Rulesets.Catch
                         new CatchModNoFail(),
                         new MultiMod(new CatchModHalfTime(), new CatchModDaycore())
                     };
+
                 case ModType.DifficultyIncrease:
                     return new Mod[]
                     {
@@ -93,32 +109,76 @@ namespace osu.Game.Rulesets.Catch
                         new CatchModHidden(),
                         new CatchModFlashlight(),
                     };
+
+                case ModType.Conversion:
+                    return new Mod[]
+                    {
+                        new CatchModDifficultyAdjust(),
+                    };
+
                 case ModType.Automation:
                     return new Mod[]
                     {
-                        new MultiMod(new CatchModAutoplay(), new ModCinema()),
+                        new MultiMod(new CatchModAutoplay(), new CatchModCinema()),
                         new CatchModRelax(),
                     };
+
+                case ModType.Fun:
+                    return new Mod[]
+                    {
+                        new MultiMod(new ModWindUp(), new ModWindDown())
+                    };
+
                 default:
-                    return new Mod[] { };
+                    return Array.Empty<Mod>();
             }
         }
 
         public override string Description => "osu!catch";
 
-        public override string ShortName => "fruits";
+        public override string ShortName => SHORT_NAME;
 
-        public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_fruits_o };
+        public override string PlayingVerb => "Catching fruit";
+
+        public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetCatch };
+
+        protected override IEnumerable<HitResult> GetValidHitResults()
+        {
+            return new[]
+            {
+                HitResult.Great,
+
+                HitResult.LargeTickHit,
+                HitResult.SmallTickHit,
+                HitResult.LargeBonus,
+            };
+        }
+
+        public override string GetDisplayNameForHitResult(HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.LargeTickHit:
+                    return "large droplet";
+
+                case HitResult.SmallTickHit:
+                    return "small droplet";
+
+                case HitResult.LargeBonus:
+                    return "banana";
+            }
+
+            return base.GetDisplayNameForHitResult(result);
+        }
 
         public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new CatchDifficultyCalculator(this, beatmap);
 
-        public override int? LegacyID => 2;
+        public override ISkin CreateLegacySkinProvider(ISkinSource source, IBeatmap beatmap) => new CatchLegacySkinTransformer(source);
+
+        public override PerformanceCalculator CreatePerformanceCalculator(DifficultyAttributes attributes, ScoreInfo score) => new CatchPerformanceCalculator(this, attributes, score);
+
+        public int LegacyID => 2;
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new CatchReplayFrame();
-
-        public CatchRuleset(RulesetInfo rulesetInfo = null)
-            : base(rulesetInfo)
-        {
-        }
     }
 }

@@ -6,24 +6,22 @@ using System.Linq;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
-using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Overlays.Dialog
 {
-    public class PopupDialog : OsuFocusedOverlayContainer
+    public abstract class PopupDialog : VisibilityContainer
     {
-        public static readonly float ENTER_DURATION = 500;
-        public static readonly float EXIT_DURATION = 200;
-
-        protected override bool BlockPositionalInput => false;
+        public const float ENTER_DURATION = 500;
+        public const float EXIT_DURATION = 200;
 
         private readonly Vector2 ringSize = new Vector2(100f);
         private readonly Vector2 ringMinifiedSize = new Vector2(20f);
@@ -38,30 +36,40 @@ namespace osu.Game.Overlays.Dialog
 
         private bool actionInvoked;
 
-        public FontAwesome Icon
+        public IconUsage Icon
         {
             get => icon.Icon;
             set => icon.Icon = value;
         }
 
-        private string text;
+        private string headerText;
 
         public string HeaderText
         {
-            get => text;
+            get => headerText;
             set
             {
-                if (text == value)
+                if (headerText == value)
                     return;
-                text = value;
 
+                headerText = value;
                 header.Text = value;
             }
         }
 
+        private string bodyText;
+
         public string BodyText
         {
-            set => body.Text = value;
+            get => bodyText;
+            set
+            {
+                if (bodyText == value)
+                    return;
+
+                bodyText = value;
+                body.Text = value;
+            }
         }
 
         public IEnumerable<PopupDialogButton> Buttons
@@ -70,6 +78,7 @@ namespace osu.Game.Overlays.Dialog
             set
             {
                 buttonsContainer.ChildrenEnumerable = value;
+
                 foreach (PopupDialogButton b in value)
                 {
                     var action = b.Action;
@@ -86,7 +95,7 @@ namespace osu.Game.Overlays.Dialog
             }
         }
 
-        public PopupDialog()
+        protected PopupDialog()
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -113,13 +122,13 @@ namespace osu.Game.Overlays.Dialog
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = OsuColour.FromHex(@"221a21"),
+                                    Colour = Color4Extensions.FromHex(@"221a21"),
                                 },
                                 new Triangles
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    ColourLight = OsuColour.FromHex(@"271e26"),
-                                    ColourDark = OsuColour.FromHex(@"1e171e"),
+                                    ColourLight = Color4Extensions.FromHex(@"271e26"),
+                                    ColourDark = Color4Extensions.FromHex(@"1e171e"),
                                     TriangleScale = 4,
                                 },
                             },
@@ -130,9 +139,9 @@ namespace osu.Game.Overlays.Dialog
                             Origin = Anchor.BottomCentre,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Position = new Vector2(0f, -50f),
                             Direction = FillDirection.Vertical,
                             Spacing = new Vector2(0f, 10f),
+                            Padding = new MarginPadding { Bottom = 10 },
                             Children = new Drawable[]
                             {
                                 new Container
@@ -140,10 +149,6 @@ namespace osu.Game.Overlays.Dialog
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     Size = ringSize,
-                                    Margin = new MarginPadding
-                                    {
-                                        Bottom = 30,
-                                    },
                                     Children = new Drawable[]
                                     {
                                         ring = new CircularContainer
@@ -164,7 +169,7 @@ namespace osu.Game.Overlays.Dialog
                                                 {
                                                     Origin = Anchor.Centre,
                                                     Anchor = Anchor.Centre,
-                                                    Icon = FontAwesome.fa_close,
+                                                    Icon = FontAwesome.Solid.TimesCircle,
                                                     Size = new Vector2(50),
                                                 },
                                             },
@@ -177,15 +182,15 @@ namespace osu.Game.Overlays.Dialog
                                     Anchor = Anchor.TopCentre,
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Padding = new MarginPadding(15),
                                     TextAnchor = Anchor.TopCentre,
                                 },
                                 body = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 18))
                                 {
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    TextAnchor = Anchor.TopCentre,
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Padding = new MarginPadding(15),
-                                    TextAnchor = Anchor.TopCentre,
                                 },
                             },
                         },
@@ -202,24 +207,13 @@ namespace osu.Game.Overlays.Dialog
             };
         }
 
-        public override bool OnPressed(GlobalAction action)
-        {
-            switch (action)
-            {
-                case GlobalAction.Select:
-                    Buttons.OfType<PopupDialogOkButton>().FirstOrDefault()?.Click();
-                    return true;
-            }
-
-            return base.OnPressed(action);
-        }
-
         protected override bool OnKeyDown(KeyDownEvent e)
         {
             if (e.Repeat) return false;
 
             // press button at number if 1-9 on number row or keypad are pressed
             var k = e.Key;
+
             if (k >= Key.Number1 && k <= Key.Number9)
             {
                 pressButtonAtIndex(k - Key.Number1);
@@ -237,8 +231,6 @@ namespace osu.Game.Overlays.Dialog
 
         protected override void PopIn()
         {
-            base.PopIn();
-
             actionInvoked = false;
 
             // Reset various animations but only if the dialog animation fully completed
@@ -257,12 +249,11 @@ namespace osu.Game.Overlays.Dialog
 
         protected override void PopOut()
         {
-            if (!actionInvoked)
+            if (!actionInvoked && content.IsPresent)
                 // In the case a user did not choose an action before a hide was triggered, press the last button.
                 // This is presumed to always be a sane default "cancel" action.
                 buttonsContainer.Last().Click();
 
-            base.PopOut();
             content.FadeOut(EXIT_DURATION, Easing.InSine);
         }
 

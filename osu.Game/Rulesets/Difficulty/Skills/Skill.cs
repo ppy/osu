@@ -3,8 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Difficulty.Skills
 {
@@ -17,7 +19,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// The peak strain for each <see cref="DifficultyCalculator.SectionLength"/> section of the beatmap.
         /// </summary>
-        public IList<double> StrainPeaks => strainPeaks;
+        public IReadOnlyList<double> StrainPeaks => strainPeaks;
 
         /// <summary>
         /// Strain values are multiplied by this number for the given skill. Used to balance the value of different skills between each other.
@@ -40,20 +42,36 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         protected readonly LimitedCapacityStack<DifficultyHitObject> Previous = new LimitedCapacityStack<DifficultyHitObject>(2); // Contained objects not used yet
 
-        private double currentStrain = 1; // We keep track of the strain level at all times throughout the beatmap.
+        /// <summary>
+        /// The current strain level.
+        /// </summary>
+        protected double CurrentStrain { get; private set; } = 1;
+
+        /// <summary>
+        /// Mods for use in skill calculations.
+        /// </summary>
+        protected IReadOnlyList<Mod> Mods => mods;
+
         private double currentSectionPeak = 1; // We also keep track of the peak strain level in the current section.
 
         private readonly List<double> strainPeaks = new List<double>();
+
+        private readonly Mod[] mods;
+
+        protected Skill(Mod[] mods)
+        {
+            this.mods = mods;
+        }
 
         /// <summary>
         /// Process a <see cref="DifficultyHitObject"/> and update current strain values accordingly.
         /// </summary>
         public void Process(DifficultyHitObject current)
         {
-            currentStrain *= strainDecay(current.DeltaTime);
-            currentStrain += StrainValueOf(current) * SkillMultiplier;
+            CurrentStrain *= strainDecay(current.DeltaTime);
+            CurrentStrain += StrainValueOf(current) * SkillMultiplier;
 
-            currentSectionPeak = Math.Max(currentStrain, currentSectionPeak);
+            currentSectionPeak = Math.Max(CurrentStrain, currentSectionPeak);
 
             Previous.Push(current);
         }
@@ -70,27 +88,33 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Sets the initial strain level for a new section.
         /// </summary>
-        /// <param name="offset">The beginning of the new section in milliseconds.</param>
-        public void StartNewSectionFrom(double offset)
+        /// <param name="time">The beginning of the new section in milliseconds.</param>
+        public void StartNewSectionFrom(double time)
         {
             // The maximum strain of the new section is not zero by default, strain decays as usual regardless of section boundaries.
             // This means we need to capture the strain level at the beginning of the new section, and use that as the initial peak level.
             if (Previous.Count > 0)
-                currentSectionPeak = currentStrain * strainDecay(offset - Previous[0].BaseObject.StartTime);
+                currentSectionPeak = GetPeakStrain(time);
         }
+
+        /// <summary>
+        /// Retrieves the peak strain at a point in time.
+        /// </summary>
+        /// <param name="time">The time to retrieve the peak strain at.</param>
+        /// <returns>The peak strain.</returns>
+        protected virtual double GetPeakStrain(double time) => CurrentStrain * strainDecay(time - Previous[0].BaseObject.StartTime);
 
         /// <summary>
         /// Returns the calculated difficulty value representing all processed <see cref="DifficultyHitObject"/>s.
         /// </summary>
         public double DifficultyValue()
         {
-            strainPeaks.Sort((a, b) => b.CompareTo(a)); // Sort from highest to lowest strain.
-
             double difficulty = 0;
             double weight = 1;
 
             // Difficulty is the weighted sum of the highest strains from every section.
-            foreach (double strain in strainPeaks)
+            // We're sorting from highest to lowest strain.
+            foreach (double strain in strainPeaks.OrderByDescending(d => d))
             {
                 difficulty += strain * weight;
                 weight *= DecayWeight;

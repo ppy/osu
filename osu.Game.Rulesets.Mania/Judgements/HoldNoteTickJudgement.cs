@@ -7,8 +7,6 @@ namespace osu.Game.Rulesets.Mania.Judgements
 {
     public class HoldNoteTickJudgement : ManiaJudgement
     {
-        public override bool AffectsCombo => false;
-
-        protected override int NumericResultFor(HitResult result) => 20;
+        public override HitResult MaxResult => HitResult.LargeTickHit;
     }
 }

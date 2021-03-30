@@ -3,33 +3,33 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
+using osu.Game.IO.Archives;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
-using osu.Game.Tests.Resources;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Scores.IO
 {
-    public class ImportScoreTest
+    public class ImportScoreTest : ImportTest
     {
         [Test]
-        public void TestBasicImport()
+        public async Task TestBasicImport()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost("TestBasicImport"))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
                 {
-                    var osu = loadOsu(host);
+                    var osu = LoadOsuIntoHost(host, true);
 
                     var toImport = new ScoreInfo
                     {
@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Scores.IO
                         OnlineScoreID = 12345,
                     };
 
-                    var imported = loadIntoOsu(osu, toImport);
+                    var imported = await loadScoreIntoOsu(osu, toImport);
 
                     Assert.AreEqual(toImport.Rank, imported.Rank);
                     Assert.AreEqual(toImport.TotalScore, imported.TotalScore);
@@ -62,20 +62,20 @@ namespace osu.Game.Tests.Scores.IO
         }
 
         [Test]
-        public void TestImportMods()
+        public async Task TestImportMods()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost("TestImportMods"))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
                 {
-                    var osu = loadOsu(host);
+                    var osu = LoadOsuIntoHost(host, true);
 
                     var toImport = new ScoreInfo
                     {
                         Mods = new Mod[] { new OsuModHardRock(), new OsuModDoubleTime() },
                     };
 
-                    var imported = loadIntoOsu(osu, toImport);
+                    var imported = await loadScoreIntoOsu(osu, toImport);
 
                     Assert.IsTrue(imported.Mods.Any(m => m is OsuModHardRock));
                     Assert.IsTrue(imported.Mods.Any(m => m is OsuModDoubleTime));
@@ -88,13 +88,13 @@ namespace osu.Game.Tests.Scores.IO
         }
 
         [Test]
-        public void TestImportStatistics()
+        public async Task TestImportStatistics()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost("TestImportStatistics"))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
                 {
-                    var osu = loadOsu(host);
+                    var osu = LoadOsuIntoHost(host, true);
 
                     var toImport = new ScoreInfo
                     {
@@ -105,7 +105,7 @@ namespace osu.Game.Tests.Scores.IO
                         }
                     };
 
-                    var imported = loadIntoOsu(osu, toImport);
+                    var imported = await loadScoreIntoOsu(osu, toImport);
 
                     Assert.AreEqual(toImport.Statistics[HitResult.Perfect], imported.Statistics[HitResult.Perfect]);
                     Assert.AreEqual(toImport.Statistics[HitResult.Miss], imported.Statistics[HitResult.Miss]);
@@ -117,40 +117,93 @@ namespace osu.Game.Tests.Scores.IO
             }
         }
 
-        private ScoreInfo loadIntoOsu(OsuGameBase osu, ScoreInfo score)
+        [Test]
+        public async Task TestImportWithDeletedBeatmapSet()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            {
+                try
+                {
+                    var osu = LoadOsuIntoHost(host, true);
+
+                    var toImport = new ScoreInfo
+                    {
+                        Hash = Guid.NewGuid().ToString(),
+                        Statistics = new Dictionary<HitResult, int>
+                        {
+                            { HitResult.Perfect, 100 },
+                            { HitResult.Miss, 50 }
+                        }
+                    };
+
+                    var imported = await loadScoreIntoOsu(osu, toImport);
+
+                    var beatmapManager = osu.Dependencies.Get<BeatmapManager>();
+                    var scoreManager = osu.Dependencies.Get<ScoreManager>();
+
+                    beatmapManager.Delete(beatmapManager.QueryBeatmapSet(s => s.Beatmaps.Any(b => b.ID == imported.Beatmap.ID)));
+                    Assert.That(scoreManager.Query(s => s.ID == imported.ID).DeletePending, Is.EqualTo(true));
+
+                    var secondImport = await loadScoreIntoOsu(osu, imported);
+                    Assert.That(secondImport, Is.Null);
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
+        public async Task TestOnlineScoreIsAvailableLocally()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
+            {
+                try
+                {
+                    var osu = LoadOsuIntoHost(host, true);
+
+                    await loadScoreIntoOsu(osu, new ScoreInfo { OnlineScoreID = 2 }, new TestArchiveReader());
+
+                    var scoreManager = osu.Dependencies.Get<ScoreManager>();
+
+                    // Note: A new score reference is used here since the import process mutates the original object to set an ID
+                    Assert.That(scoreManager.IsAvailableLocally(new ScoreInfo { OnlineScoreID = 2 }));
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        private async Task<ScoreInfo> loadScoreIntoOsu(OsuGameBase osu, ScoreInfo score, ArchiveReader archive = null)
         {
             var beatmapManager = osu.Dependencies.Get<BeatmapManager>();
 
-            score.Beatmap = beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps.First();
-            score.Ruleset = new OsuRuleset().RulesetInfo;
+            score.Beatmap ??= beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps.First();
+            score.Ruleset ??= new OsuRuleset().RulesetInfo;
 
             var scoreManager = osu.Dependencies.Get<ScoreManager>();
-            scoreManager.Import(score);
+            await scoreManager.Import(score, archive);
 
-            return scoreManager.GetAllUsableScores().First();
+            return scoreManager.GetAllUsableScores().FirstOrDefault();
         }
 
-        private OsuGameBase loadOsu(GameHost host)
+        private class TestArchiveReader : ArchiveReader
         {
-            var osu = new OsuGameBase();
-            Task.Run(() => host.Run(osu));
-            waitForOrAssert(() => osu.IsLoaded, @"osu! failed to start in a reasonable amount of time");
-
-            var beatmapFile = TestResources.GetTestBeatmapForImport();
-            var beatmapManager = osu.Dependencies.Get<BeatmapManager>();
-            beatmapManager.Import(beatmapFile);
-
-            return osu;
-        }
-
-        private void waitForOrAssert(Func<bool> result, string failureMessage, int timeout = 60000)
-        {
-            Task task = Task.Run(() =>
+            public TestArchiveReader()
+                : base("test_archive")
             {
-                while (!result()) Thread.Sleep(200);
-            });
+            }
 
-            Assert.IsTrue(task.Wait(timeout), failureMessage);
+            public override Stream GetStream(string name) => new MemoryStream();
+
+            public override void Dispose()
+            {
+            }
+
+            public override IEnumerable<string> Filenames => new[] { "test_file.osr" };
         }
     }
 }

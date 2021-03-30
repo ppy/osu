@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osuTK;
 
@@ -13,10 +14,10 @@ namespace osu.Game.Screens.Play.Break
     {
         private readonly SpriteIcon icon;
 
-        public FontAwesome Icon
+        public IconUsage Icon
         {
-            set { icon.Icon = value; }
-            get { return icon.Icon; }
+            set => icon.Icon = value;
+            get => icon.Icon;
         }
 
         public override Vector2 Size
@@ -27,7 +28,7 @@ namespace osu.Game.Screens.Play.Break
                 base.Size = value + BlurSigma * 2.5f;
                 ForceRedraw();
             }
-            get { return base.Size; }
+            get => base.Size;
         }
 
         public BlurredIcon()

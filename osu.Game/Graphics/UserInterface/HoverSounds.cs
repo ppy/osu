@@ -7,8 +7,8 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.Events;
+using osu.Game.Configuration;
+using osu.Framework.Utils;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -16,9 +16,9 @@ namespace osu.Game.Graphics.UserInterface
     /// Adds hover sounds to a drawable.
     /// Does not draw anything.
     /// </summary>
-    public class HoverSounds : CompositeDrawable
+    public class HoverSounds : HoverSampleDebounceComponent
     {
-        private SampleChannel sampleHover;
+        private Sample sampleHover;
 
         protected readonly HoverSampleSet SampleSet;
 
@@ -28,16 +28,16 @@ namespace osu.Game.Graphics.UserInterface
             RelativeSizeAxes = Axes.Both;
         }
 
-        protected override bool OnHover(HoverEvent e)
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio, SessionStatics statics)
         {
-            sampleHover?.Play();
-            return base.OnHover(e);
+            sampleHover = audio.Samples.Get($@"UI/generic-hover{SampleSet.GetDescription()}");
         }
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        public override void PlayHoverSample()
         {
-            sampleHover = audio.Sample.Get($@"UI/generic-hover{SampleSet.GetDescription()}");
+            sampleHover.Frequency.Value = 0.96 + RNG.NextDouble(0.08);
+            sampleHover.Play();
         }
     }
 
@@ -45,9 +45,14 @@ namespace osu.Game.Graphics.UserInterface
     {
         [Description("")]
         Loud,
+
         [Description("-soft")]
         Normal,
+
         [Description("-softer")]
-        Soft
+        Soft,
+
+        [Description("-toolbar")]
+        Toolbar
     }
 }

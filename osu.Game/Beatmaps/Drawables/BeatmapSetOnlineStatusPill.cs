@@ -13,6 +13,7 @@ namespace osu.Game.Beatmaps.Drawables
     public class BeatmapSetOnlineStatusPill : CircularContainer
     {
         private readonly OsuSpriteText statusText;
+        private readonly Box background;
 
         private BeatmapSetOnlineStatus status;
 
@@ -23,6 +24,7 @@ namespace osu.Game.Beatmaps.Drawables
             {
                 if (status == value)
                     return;
+
                 status = value;
 
                 Alpha = value == BeatmapSetOnlineStatus.None ? 0 : 1;
@@ -42,6 +44,12 @@ namespace osu.Game.Beatmaps.Drawables
             set => statusText.Padding = value;
         }
 
+        public Color4 BackgroundColour
+        {
+            get => background.Colour;
+            set => background.Colour = value;
+        }
+
         public BeatmapSetOnlineStatusPill()
         {
             AutoSizeAxes = Axes.Both;
@@ -49,7 +57,7 @@ namespace osu.Game.Beatmaps.Drawables
 
             Children = new Drawable[]
             {
-                new Box
+                background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black,

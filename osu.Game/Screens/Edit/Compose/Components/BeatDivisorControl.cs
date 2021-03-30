@@ -94,13 +94,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
                                                 {
                                                     new DivisorButton
                                                     {
-                                                        Icon = FontAwesome.fa_chevron_left,
+                                                        Icon = FontAwesome.Solid.ChevronLeft,
                                                         Action = beatDivisor.Previous
                                                     },
                                                     new DivisorText(beatDivisor),
                                                     new DivisorButton
                                                     {
-                                                        Icon = FontAwesome.fa_chevron_right,
+                                                        Icon = FontAwesome.Solid.ChevronRight,
                                                         Action = beatDivisor.Next
                                                     }
                                                 },
@@ -171,7 +171,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 // Small offset to look a bit better centered along with the divisor text
                 Y = 1;
 
-                ButtonSize = new Vector2(20);
+                Size = new Vector2(20);
                 IconScale = new Vector2(0.6f);
             }
 
@@ -187,6 +187,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private class TickSliderBar : SliderBar<int>
         {
             private Marker marker;
+
+            [Resolved]
+            private OsuColour colours { get; set; }
 
             private readonly BindableBeatDivisor beatDivisor;
             private readonly int[] availableDivisors;
@@ -204,22 +207,28 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 foreach (var t in availableDivisors)
                 {
-                    AddInternal(new Tick(t)
+                    AddInternal(new Tick
                     {
                         Anchor = Anchor.TopLeft,
                         Origin = Anchor.TopCentre,
                         RelativePositionAxes = Axes.X,
+                        Colour = BindableBeatDivisor.GetColourFor(t, colours),
                         X = getMappedPosition(t)
                     });
                 }
 
                 AddInternal(marker = new Marker());
+            }
 
-                CurrentNumber.ValueChanged += div =>
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                CurrentNumber.BindValueChanged(div =>
                 {
                     marker.MoveToX(getMappedPosition(div.NewValue), 100, Easing.OutQuint);
                     marker.Flash();
-                };
+                }, true);
             }
 
             protected override void UpdateValue(float value)
@@ -236,10 +245,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         beatDivisor.Next();
                         OnUserChange(Current.Value);
                         return true;
+
                     case Key.Left:
                         beatDivisor.Previous();
                         OnUserChange(Current.Value);
                         return true;
+
                     default:
                         return false;
                 }
@@ -251,10 +262,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 return base.OnMouseDown(e);
             }
 
-            protected override bool OnMouseUp(MouseUpEvent e)
+            protected override void OnMouseUp(MouseUpEvent e)
             {
                 marker.Active = false;
-                return base.OnMouseUp(e);
+                base.OnMouseUp(e);
             }
 
             protected override bool OnClick(ClickEvent e)
@@ -263,10 +274,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 return true;
             }
 
-            protected override bool OnDrag(DragEvent e)
+            protected override void OnDrag(DragEvent e)
             {
                 handleMouseInput(e.ScreenSpaceMousePosition);
-                return true;
+            }
+
+            protected override void OnDragEnd(DragEndEvent e)
+            {
+                handleMouseInput(e.ScreenSpaceMousePosition);
             }
 
             private void handleMouseInput(Vector2 screenSpaceMousePosition)
@@ -278,50 +293,18 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 OnUserChange(Current.Value);
             }
 
-            private float getMappedPosition(float divisor) => (float)Math.Pow((divisor - 1) / (availableDivisors.Last() - 1), 0.90f);
+            private float getMappedPosition(float divisor) => MathF.Pow((divisor - 1) / (availableDivisors.Last() - 1), 0.90f);
 
             private class Tick : CompositeDrawable
             {
-                private readonly int divisor;
-
-                public Tick(int divisor)
+                public Tick()
                 {
-                    this.divisor = divisor;
                     Size = new Vector2(2.5f, 10);
 
                     InternalChild = new Box { RelativeSizeAxes = Axes.Both };
 
                     CornerRadius = 0.5f;
                     Masking = true;
-                }
-
-                [BackgroundDependencyLoader]
-                private void load(OsuColour colours)
-                {
-                    Colour = getColourForDivisor(divisor, colours);
-                }
-
-                private ColourInfo getColourForDivisor(int divisor, OsuColour colours)
-                {
-                    switch (divisor)
-                    {
-                        case 2:
-                            return colours.BlueLight;
-                        case 4:
-                            return colours.Blue;
-                        case 8:
-                            return colours.BlueDarker;
-                        case 16:
-                            return colours.PurpleDark;
-                        case 3:
-                            return colours.YellowLight;
-                        case 6:
-                            return colours.Yellow;
-                        case 12:
-                            return colours.YellowDarker;
-                        default:
-                            return Color4.White;
-                    }
                 }
             }
 
@@ -351,7 +334,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                             Origin = Anchor.BottomCentre,
                             Anchor = Anchor.BottomCentre,
                             Colour = ColourInfo.GradientVertical(Color4.White.Opacity(0.2f), Color4.White),
-                            Blending = BlendingMode.Additive,
+                            Blending = BlendingParameters.Additive,
                         },
                         new EquilateralTriangle
                         {

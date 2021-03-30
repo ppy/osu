@@ -7,16 +7,18 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Users;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Users;
+using osu.Game.Utils;
 
 namespace osu.Game.Scoring
 {
-    public class ScoreInfo : IHasFiles<ScoreFileInfo>, IHasPrimaryKey, ISoftDelete
+    public class ScoreInfo : IHasFiles<ScoreFileInfo>, IHasPrimaryKey, ISoftDelete, IEquatable<ScoreInfo>
     {
         public int ID { get; set; }
 
@@ -25,11 +27,14 @@ namespace osu.Game.Scoring
         public ScoreRank Rank { get; set; }
 
         [JsonProperty("total_score")]
-        public int TotalScore { get; set; }
+        public long TotalScore { get; set; }
 
         [JsonProperty("accuracy")]
-        [Column(TypeName="DECIMAL(1,4)")]
+        [Column(TypeName = "DECIMAL(1,4)")] // TODO: This data type is wrong (should contain more precision). But at the same time, we probably don't need to be storing this in the database.
         public double Accuracy { get; set; }
+
+        [JsonIgnore]
+        public string DisplayAccuracy => Accuracy.FormatAccuracy();
 
         [JsonProperty(@"pp")]
         public double? PP { get; set; }
@@ -89,7 +94,7 @@ namespace osu.Game.Scoring
                 if (mods == null)
                     return null;
 
-                return modsJson = JsonConvert.SerializeObject(mods);
+                return modsJson = JsonConvert.SerializeObject(mods.Select(m => new DeserializedMod { Acronym = m.Acronym }));
             }
             set
             {
@@ -109,7 +114,23 @@ namespace osu.Game.Scoring
         public string UserString
         {
             get => User?.Username;
-            set => User = new User { Username = value };
+            set
+            {
+                User ??= new User();
+                User.Username = value;
+            }
+        }
+
+        [JsonIgnore]
+        [Column("UserID")]
+        public int? UserID
+        {
+            get => User?.Id ?? 1;
+            set
+            {
+                User ??= new User();
+                User.Id = value ?? 1;
+            }
         }
 
         [JsonIgnore]
@@ -144,6 +165,10 @@ namespace osu.Game.Scoring
             }
         }
 
+        [NotMapped]
+        [JsonIgnore]
+        public List<HitEvent> HitEvents { get; set; }
+
         [JsonIgnore]
         public List<ScoreFileInfo> Files { get; set; }
 
@@ -153,10 +178,104 @@ namespace osu.Game.Scoring
         [JsonIgnore]
         public bool DeletePending { get; set; }
 
+        /// <summary>
+        /// The position of this score, starting at 1.
+        /// </summary>
+        [NotMapped]
+        [JsonProperty("position")]
+        public int? Position { get; set; }
+
+        private bool isLegacyScore;
+
+        /// <summary>
+        /// Whether this <see cref="ScoreInfo"/> represents a legacy (osu!stable) score.
+        /// </summary>
+        [JsonIgnore]
+        [NotMapped]
+        public bool IsLegacyScore
+        {
+            get
+            {
+                if (isLegacyScore)
+                    return true;
+
+                // The above check will catch legacy online scores that have an appropriate UserString + UserId.
+                // For non-online scores such as those imported in, a heuristic is used based on the following table:
+                //
+                //       Mode      | UserString | UserId
+                // --------------- | ---------- | ---------
+                // stable          | <username> | 1
+                // lazer           | <username> | <userid>
+                // lazer (offline) | Guest      | 1
+
+                return ID > 0 && UserID == 1 && UserString != "Guest";
+            }
+            set => isLegacyScore = value;
+        }
+
+        public IEnumerable<HitResultDisplayStatistic> GetStatisticsForDisplay()
+        {
+            foreach (var r in Ruleset.CreateInstance().GetHitResults())
+            {
+                int value = Statistics.GetOrDefault(r.result);
+
+                switch (r.result)
+                {
+                    case HitResult.SmallTickHit:
+                    {
+                        int total = value + Statistics.GetOrDefault(HitResult.SmallTickMiss);
+                        if (total > 0)
+                            yield return new HitResultDisplayStatistic(r.result, value, total, r.displayName);
+
+                        break;
+                    }
+
+                    case HitResult.LargeTickHit:
+                    {
+                        int total = value + Statistics.GetOrDefault(HitResult.LargeTickMiss);
+                        if (total > 0)
+                            yield return new HitResultDisplayStatistic(r.result, value, total, r.displayName);
+
+                        break;
+                    }
+
+                    case HitResult.SmallTickMiss:
+                    case HitResult.LargeTickMiss:
+                        break;
+
+                    default:
+                        yield return new HitResultDisplayStatistic(r.result, value, null, r.displayName);
+
+                        break;
+                }
+            }
+        }
+
         [Serializable]
         protected class DeserializedMod : IMod
         {
             public string Acronym { get; set; }
+
+            public bool Equals(IMod other) => Acronym == other?.Acronym;
+        }
+
+        public override string ToString() => $"{User} playing {Beatmap}";
+
+        public bool Equals(ScoreInfo other)
+        {
+            if (other == null)
+                return false;
+
+            if (ID != 0 && other.ID != 0)
+                return ID == other.ID;
+
+            if (OnlineScoreID.HasValue && other.OnlineScoreID.HasValue)
+                return OnlineScoreID == other.OnlineScoreID;
+
+            if (!string.IsNullOrEmpty(Hash) && !string.IsNullOrEmpty(other.Hash))
+                return Hash == other.Hash;
+
+            return ReferenceEquals(this, other);
         }
     }
 }

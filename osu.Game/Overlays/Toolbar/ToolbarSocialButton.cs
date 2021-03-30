@@ -2,21 +2,24 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Game.Graphics;
+using osu.Framework.Graphics;
+using osu.Game.Input.Bindings;
 
 namespace osu.Game.Overlays.Toolbar
 {
     public class ToolbarSocialButton : ToolbarOverlayToggleButton
     {
+        protected override Anchor TooltipAnchor => Anchor.TopRight;
+
         public ToolbarSocialButton()
         {
-            Icon = FontAwesome.fa_users;
+            Hotkey = GlobalAction.ToggleSocial;
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(SocialOverlay chat)
+        private void load(DashboardOverlay dashboard)
         {
-            StateContainer = chat;
+            StateContainer = dashboard;
         }
     }
 }

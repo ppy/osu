@@ -12,7 +12,8 @@ namespace osu.Game.Graphics.Containers
 {
     public class OsuTextFlowContainer : TextFlowContainer
     {
-        public OsuTextFlowContainer(Action<SpriteText> defaultCreationParameters = null) : base(defaultCreationParameters)
+        public OsuTextFlowContainer(Action<SpriteText> defaultCreationParameters = null)
+            : base(defaultCreationParameters)
         {
         }
 
@@ -20,6 +21,6 @@ namespace osu.Game.Graphics.Containers
 
         public void AddArbitraryDrawable(Drawable drawable) => AddInternal(drawable);
 
-        public IEnumerable<Drawable> AddIcon(FontAwesome icon, Action<SpriteText> creationParameters = null) => AddText(((char)icon).ToString(), creationParameters);
+        public IEnumerable<Drawable> AddIcon(IconUsage icon, Action<SpriteText> creationParameters = null) => AddText(icon.Icon.ToString(), creationParameters);
     }
 }

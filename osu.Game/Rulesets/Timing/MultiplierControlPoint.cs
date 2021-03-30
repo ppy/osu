@@ -20,7 +20,13 @@ namespace osu.Game.Rulesets.Timing
         /// <summary>
         /// The aggregate multiplier which this <see cref="MultiplierControlPoint"/> provides.
         /// </summary>
-        public double Multiplier => Velocity * DifficultyPoint.SpeedMultiplier * 1000 / TimingPoint.BeatLength;
+        public double Multiplier => Velocity * DifficultyPoint.SpeedMultiplier * BaseBeatLength / TimingPoint.BeatLength;
+
+        /// <summary>
+        /// The base beat length to scale the <see cref="TimingPoint"/> provided multiplier relative to.
+        /// </summary>
+        /// <example>For a <see cref="BaseBeatLength"/> of 1000, a <see cref="TimingPoint"/> with a beat length of 500 will increase the multiplier by 2.</example>
+        public double BaseBeatLength = TimingControlPoint.DEFAULT_BEAT_LENGTH;
 
         /// <summary>
         /// The velocity multiplier.

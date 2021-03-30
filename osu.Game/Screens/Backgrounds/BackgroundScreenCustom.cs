@@ -17,10 +17,10 @@ namespace osu.Game.Screens.Backgrounds
 
         public override bool Equals(BackgroundScreen other)
         {
-            var backgroundScreenCustom = other as BackgroundScreenCustom;
-            if (backgroundScreenCustom == null) return false;
+            if (other is BackgroundScreenCustom backgroundScreenCustom)
+                return base.Equals(other) && textureName == backgroundScreenCustom.textureName;
 
-            return base.Equals(other) && textureName == backgroundScreenCustom.textureName;
+            return false;
         }
     }
 }

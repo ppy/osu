@@ -3,10 +3,9 @@
 
 using System;
 using osu.Game.Rulesets.Catch.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
-using osuTK;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 {
@@ -14,24 +13,32 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
     {
         private const float absolute_player_positioning_error = 16f;
         private const float normalized_hitobject_radius = 41.0f;
-        private const double direction_change_bonus = 12.5;
+        private const double direction_change_bonus = 21.0;
 
-        protected override double SkillMultiplier => 850;
+        protected override double SkillMultiplier => 900;
         protected override double StrainDecayBase => 0.2;
 
         protected override double DecayWeight => 0.94;
 
+        protected readonly float HalfCatcherWidth;
+
         private float? lastPlayerPosition;
         private float lastDistanceMoved;
+        private double lastStrainTime;
+
+        public Movement(Mod[] mods, float halfCatcherWidth)
+            : base(mods)
+        {
+            HalfCatcherWidth = halfCatcherWidth;
+        }
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {
             var catchCurrent = (CatchDifficultyHitObject)current;
 
-            if (lastPlayerPosition == null)
-                lastPlayerPosition = catchCurrent.LastNormalizedPosition;
+            lastPlayerPosition ??= catchCurrent.LastNormalizedPosition;
 
-            float playerPosition = MathHelper.Clamp(
+            float playerPosition = Math.Clamp(
                 lastPlayerPosition.Value,
                 catchCurrent.NormalizedPosition - (normalized_hitobject_radius - absolute_player_positioning_error),
                 catchCurrent.NormalizedPosition + (normalized_hitobject_radius - absolute_player_positioning_error)
@@ -39,47 +46,47 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 
             float distanceMoved = playerPosition - lastPlayerPosition.Value;
 
-            double distanceAddition = Math.Pow(Math.Abs(distanceMoved), 1.3) / 500;
-            double sqrtStrain = Math.Sqrt(catchCurrent.StrainTime);
+            double weightedStrainTime = catchCurrent.StrainTime + 13 + (3 / catchCurrent.ClockRate);
 
-            double bonus = 0;
+            double distanceAddition = (Math.Pow(Math.Abs(distanceMoved), 1.3) / 510);
+            double sqrtStrain = Math.Sqrt(weightedStrainTime);
 
-            // Direction changes give an extra point!
+            double edgeDashBonus = 0;
+
+            // Direction change bonus.
             if (Math.Abs(distanceMoved) > 0.1)
             {
                 if (Math.Abs(lastDistanceMoved) > 0.1 && Math.Sign(distanceMoved) != Math.Sign(lastDistanceMoved))
                 {
-                    double bonusFactor = Math.Min(absolute_player_positioning_error, Math.Abs(distanceMoved)) / absolute_player_positioning_error;
+                    double bonusFactor = Math.Min(50, Math.Abs(distanceMoved)) / 50;
+                    double antiflowFactor = Math.Max(Math.Min(70, Math.Abs(lastDistanceMoved)) / 70, 0.38);
 
-                    distanceAddition += direction_change_bonus / sqrtStrain * bonusFactor;
-
-                    // Bonus for tougher direction switches and "almost" hyperdashes at this point
-                    if (catchCurrent.LastObject.DistanceToHyperDash <= 10 / CatchPlayfield.BASE_WIDTH)
-                        bonus = 0.3 * bonusFactor;
+                    distanceAddition += direction_change_bonus / Math.Sqrt(lastStrainTime + 16) * bonusFactor * antiflowFactor * Math.Max(1 - Math.Pow(weightedStrainTime / 1000, 3), 0);
                 }
 
                 // Base bonus for every movement, giving some weight to streams.
-                distanceAddition += 7.5 * Math.Min(Math.Abs(distanceMoved), normalized_hitobject_radius * 2) / (normalized_hitobject_radius * 6) / sqrtStrain;
+                distanceAddition += 12.5 * Math.Min(Math.Abs(distanceMoved), normalized_hitobject_radius * 2) / (normalized_hitobject_radius * 6) / sqrtStrain;
             }
 
-            // Bonus for "almost" hyperdashes at corner points
-            if (catchCurrent.LastObject.DistanceToHyperDash <= 10.0f / CatchPlayfield.BASE_WIDTH)
+            // Bonus for edge dashes.
+            if (catchCurrent.LastObject.DistanceToHyperDash <= 20.0f)
             {
                 if (!catchCurrent.LastObject.HyperDash)
-                    bonus += 1.0;
+                    edgeDashBonus += 5.7;
                 else
                 {
                     // After a hyperdash we ARE in the correct position. Always!
                     playerPosition = catchCurrent.NormalizedPosition;
                 }
 
-                distanceAddition *= 1.0 + bonus * ((10 - catchCurrent.LastObject.DistanceToHyperDash * CatchPlayfield.BASE_WIDTH) / 10);
+                distanceAddition *= 1.0 + edgeDashBonus * ((20 - catchCurrent.LastObject.DistanceToHyperDash) / 20) * Math.Pow((Math.Min(catchCurrent.StrainTime * catchCurrent.ClockRate, 265) / 265), 1.5); // Edge Dashes are easier at lower ms values
             }
 
             lastPlayerPosition = playerPosition;
             lastDistanceMoved = distanceMoved;
+            lastStrainTime = catchCurrent.StrainTime;
 
-            return distanceAddition / catchCurrent.StrainTime;
+            return distanceAddition / weightedStrainTime;
         }
     }
 }

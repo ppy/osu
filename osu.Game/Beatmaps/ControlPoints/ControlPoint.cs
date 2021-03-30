@@ -1,28 +1,48 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Game.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
-    public class ControlPoint : IComparable<ControlPoint>, IEquatable<ControlPoint>
+    public abstract class ControlPoint : IComparable<ControlPoint>
     {
         /// <summary>
         /// The time at which the control point takes effect.
         /// </summary>
-        public double Time;
+        public double Time => controlPointGroup?.Time ?? 0;
+
+        private ControlPointGroup controlPointGroup;
+
+        public void AttachGroup(ControlPointGroup pointGroup) => controlPointGroup = pointGroup;
 
         public int CompareTo(ControlPoint other) => Time.CompareTo(other.Time);
 
-        /// <summary>
-        /// Whether this <see cref="ControlPoint"/> provides the same parametric changes as another <see cref="ControlPoint"/>.
-        /// Basically an equality check without considering the <see cref="Time"/>.
-        /// </summary>
-        /// <param name="other">The <see cref="ControlPoint"/> to compare to.</param>
-        /// <returns>Whether this <see cref="ControlPoint"/> is equivalent to <paramref name="other"/>.</returns>
-        public virtual bool EquivalentTo(ControlPoint other) => true;
+        public virtual Color4 GetRepresentingColour(OsuColour colours) => colours.Yellow;
 
-        public bool Equals(ControlPoint other)
-            => EquivalentTo(other) && Time.Equals(other?.Time);
+        /// <summary>
+        /// Determines whether this <see cref="ControlPoint"/> results in a meaningful change when placed alongside another.
+        /// </summary>
+        /// <param name="existing">An existing control point to compare with.</param>
+        /// <returns>Whether this <see cref="ControlPoint"/> is redundant when placed alongside <paramref name="existing"/>.</returns>
+        public abstract bool IsRedundant(ControlPoint existing);
+
+        /// <summary>
+        /// Create an unbound copy of this control point.
+        /// </summary>
+        public ControlPoint CreateCopy()
+        {
+            var copy = (ControlPoint)Activator.CreateInstance(GetType());
+
+            copy.CopyFrom(this);
+
+            return copy;
+        }
+
+        public virtual void CopyFrom(ControlPoint other)
+        {
+        }
     }
 }

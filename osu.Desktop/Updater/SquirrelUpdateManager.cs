@@ -1,14 +1,13 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.IO;
-using System.Reflection;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Logging;
 using osu.Game;
 using osu.Game.Graphics;
@@ -21,42 +20,53 @@ using LogLevel = Splat.LogLevel;
 
 namespace osu.Desktop.Updater
 {
-    public class SquirrelUpdateManager : Component
+    public class SquirrelUpdateManager : osu.Game.Updater.UpdateManager
     {
         private UpdateManager updateManager;
         private NotificationOverlay notificationOverlay;
 
-        public void PrepareUpdate()
-        {
-            // Squirrel returns execution to us after the update process is started, so it's safe to use Wait() here
-            UpdateManager.RestartAppWhenExited().Wait();
-        }
+        public Task PrepareUpdateAsync() => UpdateManager.RestartAppWhenExited();
+
+        private static readonly Logger logger = Logger.GetLogger("updater");
+
+        /// <summary>
+        /// Whether an update has been downloaded but not yet applied.
+        /// </summary>
+        private bool updatePending;
 
         [BackgroundDependencyLoader]
-        private void load(NotificationOverlay notification, OsuGameBase game)
+        private void load(NotificationOverlay notification)
         {
             notificationOverlay = notification;
 
-            if (game.IsDeployedBuild)
-            {
-                Splat.Locator.CurrentMutable.Register(() => new SquirrelLogger(), typeof(Splat.ILogger));
-                Schedule(() => Task.Run(() => checkForUpdateAsync()));
-            }
+            Splat.Locator.CurrentMutable.Register(() => new SquirrelLogger(), typeof(Splat.ILogger));
         }
 
-        private async void checkForUpdateAsync(bool useDeltaPatching = true, UpdateProgressNotification notification = null)
+        protected override async Task<bool> PerformUpdateCheck() => await checkForUpdateAsync().ConfigureAwait(false);
+
+        private async Task<bool> checkForUpdateAsync(bool useDeltaPatching = true, UpdateProgressNotification notification = null)
         {
-            //should we schedule a retry on completion of this check?
-            bool scheduleRetry = true;
+            // should we schedule a retry on completion of this check?
+            bool scheduleRecheck = true;
 
             try
             {
-                if (updateManager == null) updateManager = await UpdateManager.GitHubUpdateManager(@"https://github.com/ppy/osu", @"osulazer", null, null, true);
+                updateManager ??= await UpdateManager.GitHubUpdateManager(@"https://github.com/ppy/osu", @"osulazer", null, null, true).ConfigureAwait(false);
 
-                var info = await updateManager.CheckForUpdate(!useDeltaPatching);
+                var info = await updateManager.CheckForUpdate(!useDeltaPatching).ConfigureAwait(false);
+
                 if (info.ReleasesToApply.Count == 0)
-                    //no updates available. bail and retry later.
-                    return;
+                {
+                    if (updatePending)
+                    {
+                        // the user may have dismissed the completion notice, so show it again.
+                        notificationOverlay.Post(new UpdateCompleteNotification(this));
+                        return true;
+                    }
+
+                    // no updates available. bail and retry later.
+                    return false;
+                }
 
                 if (notification == null)
                 {
@@ -69,28 +79,30 @@ namespace osu.Desktop.Updater
 
                 try
                 {
-                    await updateManager.DownloadReleases(info.ReleasesToApply, p => notification.Progress = p / 100f);
+                    await updateManager.DownloadReleases(info.ReleasesToApply, p => notification.Progress = p / 100f).ConfigureAwait(false);
 
                     notification.Progress = 0;
                     notification.Text = @"Installing update...";
 
-                    await updateManager.ApplyReleases(info, p => notification.Progress = p / 100f);
+                    await updateManager.ApplyReleases(info, p => notification.Progress = p / 100f).ConfigureAwait(false);
 
                     notification.State = ProgressNotificationState.Completed;
+                    updatePending = true;
                 }
                 catch (Exception e)
                 {
                     if (useDeltaPatching)
                     {
-                        Logger.Error(e, @"delta patching failed!");
+                        logger.Add(@"delta patching failed; will attempt full download!");
 
-                        //could fail if deltas are unavailable for full update path (https://github.com/Squirrel/Squirrel.Windows/issues/959)
-                        //try again without deltas.
-                        checkForUpdateAsync(false, notification);
-                        scheduleRetry = false;
+                        // could fail if deltas are unavailable for full update path (https://github.com/Squirrel/Squirrel.Windows/issues/959)
+                        // try again without deltas.
+                        await checkForUpdateAsync(false, notification).ConfigureAwait(false);
+                        scheduleRecheck = false;
                     }
                     else
                     {
+                        notification.State = ProgressNotificationState.Cancelled;
                         Logger.Error(e, @"update failed!");
                     }
                 }
@@ -101,15 +113,14 @@ namespace osu.Desktop.Updater
             }
             finally
             {
-                if (scheduleRetry)
+                if (scheduleRecheck)
                 {
-                    if (notification != null)
-                        notification.State = ProgressNotificationState.Cancelled;
-
-                    //check again in 30 minutes.
-                    Scheduler.AddDelayed(() => checkForUpdateAsync(), 60000 * 30);
+                    // check again in 30 minutes.
+                    Scheduler.AddDelayed(async () => await checkForUpdateAsync().ConfigureAwait(false), 60000 * 30);
                 }
             }
+
+            return true;
         }
 
         protected override void Dispose(bool isDisposing)
@@ -118,10 +129,27 @@ namespace osu.Desktop.Updater
             updateManager?.Dispose();
         }
 
+        private class UpdateCompleteNotification : ProgressCompletionNotification
+        {
+            [Resolved]
+            private OsuGame game { get; set; }
+
+            public UpdateCompleteNotification(SquirrelUpdateManager updateManager)
+            {
+                Text = @"Update ready to install. Click to restart!";
+
+                Activated = () =>
+                {
+                    updateManager.PrepareUpdateAsync()
+                                 .ContinueWith(_ => updateManager.Schedule(() => game.GracefullyExit()));
+                    return true;
+                };
+            }
+        }
+
         private class UpdateProgressNotification : ProgressNotification
         {
             private readonly SquirrelUpdateManager updateManager;
-            private OsuGame game;
 
             public UpdateProgressNotification(SquirrelUpdateManager updateManager)
             {
@@ -130,23 +158,12 @@ namespace osu.Desktop.Updater
 
             protected override Notification CreateCompletionNotification()
             {
-                return new ProgressCompletionNotification
-                {
-                    Text = @"Update ready to install. Click to restart!",
-                    Activated = () =>
-                    {
-                        updateManager.PrepareUpdate();
-                        game.GracefullyExit();
-                        return true;
-                    }
-                };
+                return new UpdateCompleteNotification(updateManager);
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, OsuGame game)
+            private void load(OsuColour colours)
             {
-                this.game = game;
-
                 IconContent.AddRange(new Drawable[]
                 {
                     new Box
@@ -158,7 +175,7 @@ namespace osu.Desktop.Updater
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Icon = FontAwesome.fa_upload,
+                        Icon = FontAwesome.Solid.Upload,
                         Colour = Color4.White,
                         Size = new Vector2(20),
                     }
@@ -168,23 +185,14 @@ namespace osu.Desktop.Updater
 
         private class SquirrelLogger : Splat.ILogger, IDisposable
         {
-            private readonly string path;
-            private readonly object locker = new object();
             public LogLevel Level { get; set; } = LogLevel.Info;
-
-            public SquirrelLogger()
-            {
-                var file = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "SquirrelSetupUpdater.log");
-                if (File.Exists(file)) File.Delete(file);
-                path = file;
-            }
 
             public void Write(string message, LogLevel logLevel)
             {
                 if (logLevel < Level)
                     return;
 
-                lock (locker) File.AppendAllText(path, message + "\r\n");
+                logger.Add(message);
             }
 
             public void Dispose()
