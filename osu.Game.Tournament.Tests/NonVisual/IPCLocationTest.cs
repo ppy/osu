@@ -26,26 +26,26 @@ namespace osu.Game.Tournament.Tests.NonVisual
                 string basePath = Path.Combine(RuntimeInfo.StartupDirectory, "headless", nameof(CheckIPCLocation));
 
                 // Set up a fake IPC client for the IPC Storage to switch to.
-                string testCeDir = Path.Combine(basePath, "stable-ce");
-                Directory.CreateDirectory(testCeDir);
+                string testStableInstallDirectory = Path.Combine(basePath, "stable-ce");
+                Directory.CreateDirectory(testStableInstallDirectory);
 
-                string ipcFile = Path.Combine(testCeDir, "ipc.txt");
+                string ipcFile = Path.Combine(testStableInstallDirectory, "ipc.txt");
                 File.WriteAllText(ipcFile, string.Empty);
 
                 try
                 {
                     var osu = loadOsu(host);
                     TournamentStorage storage = (TournamentStorage)osu.Dependencies.Get<Storage>();
-                    FileBasedIPC ipc = (FileBasedIPC)osu.Dependencies.Get<MatchIPCInfo>();
+                    FileBasedIPC ipc = null;
 
-                    waitForOrAssert(() => ipc != null, @"ipc could not be populated in a reasonable amount of time");
+                    waitForOrAssert(() => (ipc = osu.Dependencies.Get<MatchIPCInfo>() as FileBasedIPC) != null, @"ipc could not be populated in a reasonable amount of time");
 
-                    Assert.True(ipc.SetIPCLocation(testCeDir));
+                    Assert.True(ipc.SetIPCLocation(testStableInstallDirectory));
                     Assert.True(storage.AllTournaments.Exists("stable.json"));
                 }
                 finally
                 {
-                    host.Storage.DeleteDirectory(testCeDir);
+                    host.Storage.DeleteDirectory(testStableInstallDirectory);
                     host.Storage.DeleteDirectory("tournaments");
                     host.Exit();
                 }
