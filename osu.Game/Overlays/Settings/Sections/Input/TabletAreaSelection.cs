@@ -25,6 +25,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private readonly Bindable<Vector2> areaOffset = new Bindable<Vector2>();
         private readonly Bindable<Vector2> areaSize = new Bindable<Vector2>();
 
+        private readonly BindableNumber<float> rotation = new BindableNumber<float>();
+
         private readonly IBindable<TabletInfo> tablet = new Bindable<TabletInfo>();
 
         private OsuSpriteText tabletName;
@@ -123,6 +125,13 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
                 usableAreaText.Text = $"{(float)x / commonDivider}:{(float)y / commonDivider}";
             }, true);
+
+            rotation.BindTo(handler.Rotation);
+            rotation.BindValueChanged(val =>
+            {
+                usableAreaContainer.RotateTo(val.NewValue, 100, Easing.OutQuint)
+                                   .OnComplete(_ => checkBounds()); // required as we are using SSDQ.
+            });
 
             tablet.BindTo(handler.Tablet);
             tablet.BindValueChanged(_ => Scheduler.AddOnce(updateTabletDetails));
