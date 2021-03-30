@@ -129,6 +129,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             LabelText = "Rotation",
                             Current = rotation
                         },
+                        new RotationPresetButtons(tabletHandler),
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,
