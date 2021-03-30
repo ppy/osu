@@ -27,6 +27,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private readonly BindableNumber<float> sizeX = new BindableNumber<float> { MinValue = 10 };
         private readonly BindableNumber<float> sizeY = new BindableNumber<float> { MinValue = 10 };
 
+        private readonly BindableNumber<float> rotation = new BindableNumber<float> { MinValue = 0, MaxValue = 360 };
+
         [Resolved]
         private GameHost host { get; set; }
 
@@ -124,6 +126,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,
+                            LabelText = "Rotation",
+                            Current = rotation
+                        },
+                        new SettingsSlider<float>
+                        {
+                            TransferValueOnCommit = true,
                             LabelText = "Aspect Ratio",
                             Current = aspectRatio
                         },
@@ -152,6 +160,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            rotation.BindTo(tabletHandler.Rotation);
 
             areaOffset.BindTo(tabletHandler.AreaOffset);
             areaOffset.BindValueChanged(val =>
