@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Online
 
             var deserialized = JsonConvert.DeserializeObject<APIMod>(JsonConvert.SerializeObject(apiMod));
 
-            Assert.That(deserialized.Acronym, Is.EqualTo(apiMod.Acronym));
+            Assert.That(deserialized?.Acronym, Is.EqualTo(apiMod.Acronym));
         }
 
         [Test]
@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Online
 
             var deserialized = JsonConvert.DeserializeObject<APIMod>(JsonConvert.SerializeObject(apiMod));
 
-            Assert.That(deserialized.Settings, Contains.Key("test_setting").With.ContainValue(2.0));
+            Assert.That(deserialized?.Settings, Contains.Key("test_setting").With.ContainValue(2.0));
         }
 
         [Test]
@@ -44,9 +44,9 @@ namespace osu.Game.Tests.Online
             var apiMod = new APIMod(new TestMod { TestSetting = { Value = 2 } });
 
             var deserialized = JsonConvert.DeserializeObject<APIMod>(JsonConvert.SerializeObject(apiMod));
-            var converted = (TestMod)deserialized.ToMod(new TestRuleset());
+            var converted = (TestMod)deserialized?.ToMod(new TestRuleset());
 
-            Assert.That(converted.TestSetting.Value, Is.EqualTo(2));
+            Assert.That(converted?.TestSetting.Value, Is.EqualTo(2));
         }
 
         [Test]
@@ -61,11 +61,11 @@ namespace osu.Game.Tests.Online
             });
 
             var deserialised = JsonConvert.DeserializeObject<APIMod>(JsonConvert.SerializeObject(apiMod));
-            var converted = (TestModTimeRamp)deserialised.ToMod(new TestRuleset());
+            var converted = (TestModTimeRamp)deserialised?.ToMod(new TestRuleset());
 
-            Assert.That(converted.AdjustPitch.Value, Is.EqualTo(false));
-            Assert.That(converted.InitialRate.Value, Is.EqualTo(1.25));
-            Assert.That(converted.FinalRate.Value, Is.EqualTo(0.25));
+            Assert.That(converted?.AdjustPitch.Value, Is.EqualTo(false));
+            Assert.That(converted?.InitialRate.Value, Is.EqualTo(1.25));
+            Assert.That(converted?.FinalRate.Value, Is.EqualTo(0.25));
         }
 
         [Test]
@@ -78,10 +78,10 @@ namespace osu.Game.Tests.Online
             });
 
             var deserialised = JsonConvert.DeserializeObject<APIMod>(JsonConvert.SerializeObject(apiMod));
-            var converted = (TestModDifficultyAdjust)deserialised.ToMod(new TestRuleset());
+            var converted = (TestModDifficultyAdjust)deserialised?.ToMod(new TestRuleset());
 
-            Assert.That(converted.ExtendedLimits.Value, Is.True);
-            Assert.That(converted.OverallDifficulty.Value, Is.EqualTo(11));
+            Assert.That(converted?.ExtendedLimits.Value, Is.True);
+            Assert.That(converted?.OverallDifficulty.Value, Is.EqualTo(11));
         }
 
         private class TestRuleset : Ruleset

@@ -29,9 +29,11 @@ namespace osu.Game.Skinning
         [Resolved(canBeNull: true)]
         private HUDOverlay hud { get; set; }
 
-        protected sealed override OsuSpriteText CreateSpriteText()
-            => (OsuSpriteText)skin?.GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ScoreText))
-                                  ?.With(s => s.Anchor = s.Origin = Anchor.TopRight);
+        protected sealed override OsuSpriteText CreateSpriteText() => new LegacySpriteText(skin, LegacyFont.Score)
+        {
+            Anchor = Anchor.TopRight,
+            Origin = Anchor.TopRight,
+        };
 
         protected override void Update()
         {
