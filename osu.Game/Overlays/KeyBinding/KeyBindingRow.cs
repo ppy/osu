@@ -131,7 +131,7 @@ namespace osu.Game.Overlays.KeyBinding
 
                 using (var usage = realmFactory.GetForWrite())
                 {
-                    var binding = usage.Realm.Find<RealmKeyBinding>(((IHasGuidPrimaryKey)button.KeyBinding).ID);
+                    var binding = usage.Realm.Find<RealmKeyBinding>(((IHasGuidPrimaryKey)button.KeyBinding).ID.ToString());
                     binding.KeyCombinationString = button.KeyBinding.KeyCombinationString;
 
                     usage.Commit();
@@ -296,7 +296,7 @@ namespace osu.Game.Overlays.KeyBinding
             {
                 using (var write = realmFactory.GetForWrite())
                 {
-                    var binding = write.Realm.Find<RealmKeyBinding>(((IHasGuidPrimaryKey)bindTarget.KeyBinding).ID);
+                    var binding = write.Realm.Find<RealmKeyBinding>(((IHasGuidPrimaryKey)bindTarget.KeyBinding).ID.ToString());
                     binding.KeyCombinationString = bindTarget.KeyBinding.KeyCombinationString;
 
                     write.Commit();
