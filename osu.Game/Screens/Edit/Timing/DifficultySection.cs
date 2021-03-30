@@ -18,7 +18,8 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 multiplierSlider = new SliderWithTextBoxInput<double>("Speed Multiplier")
                 {
-                    Current = new DifficultyControlPoint().SpeedMultiplierBindable
+                    Current = new DifficultyControlPoint().SpeedMultiplierBindable,
+                    KeyboardStep = 0.1f
                 }
             });
         }

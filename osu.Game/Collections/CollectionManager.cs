@@ -124,7 +124,7 @@ namespace osu.Game.Collections
             return Task.Run(async () =>
             {
                 using (var stream = stable.GetStream(database_name))
-                    await Import(stream);
+                    await Import(stream).ConfigureAwait(false);
             });
         }
 
@@ -138,10 +138,10 @@ namespace osu.Game.Collections
 
             PostNotification?.Invoke(notification);
 
-            var collection = readCollections(stream, notification);
-            await importCollections(collection);
+            var collections = readCollections(stream, notification);
+            await importCollections(collections).ConfigureAwait(false);
 
-            notification.CompletionText = $"Imported {collection.Count} collections";
+            notification.CompletionText = $"Imported {collections.Count} collections";
             notification.State = ProgressNotificationState.Completed;
         }
 
@@ -155,7 +155,7 @@ namespace osu.Game.Collections
                 {
                     foreach (var newCol in newCollections)
                     {
-                        var existing = Collections.FirstOrDefault(c => c.Name == newCol.Name);
+                        var existing = Collections.FirstOrDefault(c => c.Name.Value == newCol.Name.Value);
                         if (existing == null)
                             Collections.Add(existing = new BeatmapCollection { Name = { Value = newCol.Name.Value } });
 

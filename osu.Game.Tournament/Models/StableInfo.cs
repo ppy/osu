@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using Newtonsoft.Json;
 using osu.Framework.Platform;
+using osu.Game.Tournament.IO;
 
 namespace osu.Game.Tournament.Models
 {
@@ -24,13 +25,14 @@ namespace osu.Game.Tournament.Models
         /// </summary>
         public event Action OnStableInfoSaved;
 
-        private const string config_path = "tournament/stable.json";
+        private const string config_path = "stable.json";
 
         private readonly Storage storage;
 
         public StableInfo(Storage storage)
         {
-            this.storage = storage;
+            TournamentStorage tStorage = (TournamentStorage)storage;
+            this.storage = tStorage.AllTournaments;
 
             if (!storage.Exists(config_path))
                 return;

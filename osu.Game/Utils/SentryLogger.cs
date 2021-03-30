@@ -86,11 +86,6 @@ namespace osu.Game.Utils
 
         #region Disposal
 
-        ~SentryLogger()
-        {
-            Dispose(false);
-        }
-
         public void Dispose()
         {
             Dispose(true);

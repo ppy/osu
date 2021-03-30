@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 Room.RecentParticipants.Add(new User
                 {
                     Username = "peppy",
-                    CurrentModeRank = 1234,
+                    Statistics = new UserStatistics { GlobalRank = 1234 },
                     Id = 2
                 });
             }

@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
@@ -178,7 +179,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
             private class SkinDropdownControl : DropdownControl
             {
-                protected override string GenerateItemText(SkinInfo item) => item.ToString();
+                protected override LocalisableString GenerateItemText(SkinInfo item) => item.ToString();
             }
         }
 
