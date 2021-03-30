@@ -1,12 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using System.IO;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.IO;
-using System.IO;
-using System.Collections.Generic;
 using osu.Game.Tournament.Configuration;
 
 namespace osu.Game.Tournament.IO
@@ -15,7 +15,12 @@ namespace osu.Game.Tournament.IO
     {
         private const string default_tournament = "default";
         private readonly Storage storage;
-        private readonly Storage allTournaments;
+
+        /// <summary>
+        /// The storage where all tournaments are located.
+        /// </summary>
+        public readonly Storage AllTournaments;
+
         private readonly TournamentStorageManager storageConfig;
         public readonly Bindable<string> CurrentTournament;
 
@@ -23,16 +28,16 @@ namespace osu.Game.Tournament.IO
             : base(storage.GetStorageForDirectory("tournaments"), string.Empty)
         {
             this.storage = storage;
-            allTournaments = UnderlyingStorage;
+            AllTournaments = UnderlyingStorage;
 
             storageConfig = new TournamentStorageManager(storage);
 
             if (storage.Exists("tournament.ini"))
             {
-                ChangeTargetStorage(allTournaments.GetStorageForDirectory(storageConfig.Get<string>(StorageConfig.CurrentTournament)));
+                ChangeTargetStorage(AllTournaments.GetStorageForDirectory(storageConfig.Get<string>(StorageConfig.CurrentTournament)));
             }
             else
-                Migrate(allTournaments.GetStorageForDirectory(default_tournament));
+                Migrate(AllTournaments.GetStorageForDirectory(default_tournament));
 
             CurrentTournament = storageConfig.GetBindable<string>(StorageConfig.CurrentTournament);
             Logger.Log("Using tournament storage: " + GetFullPath(string.Empty));
@@ -42,11 +47,11 @@ namespace osu.Game.Tournament.IO
 
         private void updateTournament(ValueChangedEvent<string> newTournament)
         {
-            ChangeTargetStorage(allTournaments.GetStorageForDirectory(newTournament.NewValue));
+            ChangeTargetStorage(AllTournaments.GetStorageForDirectory(newTournament.NewValue));
             Logger.Log("Changing tournament storage: " + GetFullPath(string.Empty));
         }
 
-        public IEnumerable<string> ListTournaments() => allTournaments.GetDirectories(string.Empty);
+        public IEnumerable<string> ListTournaments() => AllTournaments.GetDirectories(string.Empty);
 
         public override void Migrate(Storage newStorage)
         {
