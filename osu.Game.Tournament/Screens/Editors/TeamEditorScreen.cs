@@ -43,12 +43,16 @@ namespace osu.Game.Tournament.Screens.Editors
         private void addAllCountries()
         {
             List<TournamentTeam> countries;
+
             using (Stream stream = game.Resources.GetStream("Resources/countries.json"))
             using (var sr = new StreamReader(stream))
                 countries = JsonConvert.DeserializeObject<List<TournamentTeam>>(sr.ReadToEnd());
 
-            foreach (var c in countries)
-                Storage.Add(c);
+            if (countries != null)
+            {
+                foreach (var c in countries)
+                    Storage.Add(c);
+            }
         }
 
         public class TeamRow : CompositeDrawable, IModelBacked<TournamentTeam>
