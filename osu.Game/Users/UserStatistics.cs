@@ -42,7 +42,7 @@ namespace osu.Game.Users
         public long RankedScore;
 
         [JsonProperty(@"hit_accuracy")]
-        public decimal Accuracy;
+        public double Accuracy;
 
         [JsonIgnore]
         public string DisplayAccuracy => Accuracy.FormatAccuracy();
