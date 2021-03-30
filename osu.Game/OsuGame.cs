@@ -879,13 +879,6 @@ namespace osu.Game
             return component;
         }
 
-        protected override bool OnScroll(ScrollEvent e)
-        {
-            // forward any unhandled mouse scroll events to the volume control.
-            volume.Adjust(GlobalAction.IncreaseVolume, e.ScrollDelta.Y, e.IsPrecise);
-            return true;
-        }
-
         public bool OnPressed(GlobalAction action)
         {
             if (introScreen == null) return false;
