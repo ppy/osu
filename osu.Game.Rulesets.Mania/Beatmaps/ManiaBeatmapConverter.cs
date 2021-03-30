@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             originalTargetColumns = TargetColumns;
         }
 
-        internal static int GetColumnCountForNonConvert(BeatmapInfo beatmap)
+        public static int GetColumnCountForNonConvert(BeatmapInfo beatmap)
         {
             var roundedCircleSize = Math.Round(beatmap.BaseDifficulty.CircleSize);
             return (int)Math.Max(1, roundedCircleSize);
