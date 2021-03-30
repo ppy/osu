@@ -69,13 +69,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Origin = Anchor.Centre;
             RelativeSizeAxes = Axes.Both;
 
-            AddInternal(spmCalculator = new SpinnerSpmCalculator
-            {
-                Result = { BindTarget = SpinsPerMinute },
-            });
-
             AddRangeInternal(new Drawable[]
             {
+                spmCalculator = new SpinnerSpmCalculator
+                {
+                    Result = { BindTarget = SpinsPerMinute },
+                },
                 ticks = new Container<DrawableSpinnerTick>(),
                 new AspectContainer
                 {
