@@ -26,6 +26,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private readonly BindableNumber<float> sizeX = new BindableNumber<float> { MinValue = 10 };
         private readonly BindableNumber<float> sizeY = new BindableNumber<float> { MinValue = 10 };
+        private readonly Bindable<string> sizeXinput = new Bindable<string>(string.Empty);
+        private readonly Bindable<string> sizeYinput = new Bindable<string>(string.Empty);
+        private readonly Bindable<string> offsetXinput = new Bindable<string>(string.Empty);
+        private readonly Bindable<string> offsetYinput = new Bindable<string>(string.Empty);
 
         private readonly BindableNumber<float> rotation = new BindableNumber<float> { MinValue = 0, MaxValue = 360 };
 
@@ -153,6 +157,31 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             LabelText = "Height",
                             Current = sizeY
                         },
+                        new SettingsFloatBox
+                        {
+                            LabelText = "Width",
+                            TooltipText = "Width",
+                            Current = sizeXinput
+                        },
+                        new SettingsFloatBox
+                        {
+                            LabelText = "Height",
+                            TooltipText = "Height",
+                            Current = sizeYinput
+                        },
+                        new SettingsFloatBox
+                        {
+                            LabelText = "X Offset",
+                            TooltipText = "X Offset",
+                            Current = offsetXinput
+                        },
+                        new SettingsFloatBox
+                        {
+                            LabelText = "Y Offset",
+                            TooltipText = "Y Offset",
+                            Current = offsetYinput
+
+                        }
                     }
                 },
             };
@@ -169,6 +198,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 offsetX.Value = val.NewValue.X;
                 offsetY.Value = val.NewValue.Y;
+
+                offsetXinput.Value = val.NewValue.X.ToString();
+                offsetYinput.Value = val.NewValue.Y.ToString();
             }, true);
 
             offsetX.BindValueChanged(val => areaOffset.Value = new Vector2(val.NewValue, areaOffset.Value.Y));
@@ -179,6 +211,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 sizeX.Value = val.NewValue.X;
                 sizeY.Value = val.NewValue.Y;
+
+                sizeXinput.Value = val.NewValue.X.ToString();
+                sizeYinput.Value = val.NewValue.Y.ToString();
             }, true);
 
             sizeX.BindValueChanged(val =>
@@ -195,6 +230,55 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
                 aspectRatioApplication?.Cancel();
                 aspectRatioApplication = Schedule(() => applyAspectRatio(sizeY));
+            });
+
+            sizeXinput.BindValueChanged(val =>
+            {
+                float f;
+                if (float.TryParse(val.NewValue, out f))
+                {
+                    if (f >= sizeX.MinValue & f <= sizeX.MaxValue)
+                    {
+                        sizeX.Value = f;
+                    }
+                }
+            });
+
+            sizeYinput.BindValueChanged(val =>
+            {
+                float f;
+                if (float.TryParse(val.NewValue, out f))
+                {
+                    if (f >= sizeY.MinValue & f <= sizeY.MaxValue)
+                    {
+                        sizeY.Value = f;
+                    }
+                }
+            });
+
+            offsetXinput.BindValueChanged(val =>
+            {
+                float f;
+                if (float.TryParse(val.NewValue, out f))
+                {
+                    if (f >= offsetX.MinValue & f <= offsetX.MaxValue)
+                    {
+
+                        offsetX.Value = f;
+                    }
+                }
+            });
+
+            offsetYinput.BindValueChanged(val =>
+            {
+                float f;
+                if (float.TryParse(val.NewValue, out f))
+                {
+                    if (f >= offsetY.MinValue & f <= offsetY.MaxValue)
+                    {
+                        offsetY.Value = f;
+                    }
+                }
             });
 
             updateAspectRatio();
