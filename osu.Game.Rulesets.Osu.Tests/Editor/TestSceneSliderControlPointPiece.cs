@@ -62,19 +62,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         }
 
         [Test]
-        public void TestDragControlPointAlmostLinearly()
-        {
-            moveMouseToControlPoint(1);
-            AddStep("hold", () => InputManager.PressButton(MouseButton.Left));
-
-            addMovementStep(new Vector2(150, 0.01f));
-            AddStep("release", () => InputManager.ReleaseButton(MouseButton.Left));
-
-            assertControlPointPosition(1, new Vector2(150, 0.01f));
-            assertControlPointType(0, PathType.Bezier);
-        }
-
-        [Test]
         public void TestDragControlPointAlmostLinearlyExterior()
         {
             moveMouseToControlPoint(1);
@@ -93,7 +80,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             moveMouseToControlPoint(1);
             AddStep("hold", () => InputManager.PressButton(MouseButton.Left));
 
-            addMovementStep(new Vector2(150, 0.01f));
+            addMovementStep(new Vector2(400, 0.01f));
             assertControlPointType(0, PathType.Bezier);
 
             addMovementStep(new Vector2(150, 50));
@@ -109,7 +96,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             moveMouseToControlPoint(4);
             AddStep("hold", () => InputManager.PressButton(MouseButton.Left));
 
-            addMovementStep(new Vector2(350, 0));
+            addMovementStep(new Vector2(350, 0.01f));
             assertControlPointType(2, PathType.Bezier);
 
             addMovementStep(new Vector2(150, 150));
