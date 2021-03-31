@@ -3,14 +3,17 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -47,6 +50,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         [Resolved]
         private OsuColour colours { get; set; }
 
+        private IBindable<int> sliderVersion;
         private IBindable<Vector2> sliderPosition;
         private IBindable<float> sliderScale;
         private IBindable<Vector2> controlPointPosition;
@@ -104,6 +108,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            sliderVersion = slider.Path.Version.GetBoundCopy();
+            sliderVersion.BindValueChanged(_ => updatePathType());
 
             sliderPosition = slider.PositionBindable.GetBoundCopy();
             sliderPosition.BindValueChanged(_ => updateMarkerDisplay());
@@ -199,6 +206,23 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         }
 
         protected override void OnDragEnd(DragEndEvent e) => changeHandler?.EndChange();
+
+        /// <summary>
+        /// Handles correction of invalid path types.
+        /// </summary>
+        private void updatePathType()
+        {
+            if (PointsInSegment[0].Type.Value != PathType.PerfectCurve)
+                return;
+
+            ReadOnlySpan<Vector2> points = PointsInSegment.Select(p => p.Position.Value).ToArray();
+            if (points.Length != 3)
+                return;
+
+            RectangleF boundingBox = PathApproximator.CircularArcBoundingBox(points);
+            if (boundingBox.Width >= 640 || boundingBox.Height >= 480)
+                PointsInSegment[0].Type.Value = PathType.Bezier;
+        }
 
         /// <summary>
         /// Updates the state of the circular control point marker.
