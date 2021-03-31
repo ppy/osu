@@ -11,12 +11,10 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.Utils;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -93,8 +91,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                         }));
 
                         Connections.Add(new PathControlPointConnectionPiece(slider, e.NewStartingIndex + i));
-
-                        point.Changed += updatePathTypes;
                     }
 
                     break;
@@ -104,8 +100,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     {
                         Pieces.RemoveAll(p => p.ControlPoint == point);
                         Connections.RemoveAll(c => c.ControlPoint == point);
-
-                        point.Changed -= updatePathTypes;
                     }
 
                     // If removing before the end of the path,
@@ -146,23 +140,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         public void OnReleased(PlatformAction action)
         {
-        }
-
-        /// <summary>
-        /// Handles correction of invalid path types.
-        /// </summary>
-        private void updatePathTypes()
-        {
-            foreach (PathControlPoint segmentStartPoint in slider.Path.ControlPoints.Where(p => p.Type.Value != null))
-            {
-                if (segmentStartPoint.Type.Value != PathType.PerfectCurve)
-                    continue;
-
-                ReadOnlySpan<Vector2> points = slider.Path.PointsInSegment(segmentStartPoint).Select(p => p.Position.Value).ToArray();
-                RectangleF boundingBox = PathApproximator.CircularArcBoundingBox(points);
-                if (points.Length == 3 && boundingBox.Area >= 640 * 480)
-                    segmentStartPoint.Type.Value = PathType.Bezier;
-            }
         }
 
         private void selectPiece(PathControlPointPiece piece, MouseButtonEvent e)
