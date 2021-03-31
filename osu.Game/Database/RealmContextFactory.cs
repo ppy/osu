@@ -152,6 +152,7 @@ namespace osu.Game.Database
 
             internal RealmUsage(RealmContextFactory factory)
             {
+                active_usages.Value++;
                 Factory = factory;
                 Realm = factory.createContext();
             }
