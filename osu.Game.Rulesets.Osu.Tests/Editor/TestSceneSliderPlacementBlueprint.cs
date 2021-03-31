@@ -277,25 +277,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         }
 
         [Test]
-        public void TestPlacePerfectCurveSegmentAlmostLinearly()
-        {
-            Vector2 startPosition = new Vector2(200);
-
-            addMovementStep(startPosition);
-            addClickStep(MouseButton.Left);
-
-            addMovementStep(startPosition + new Vector2(61.382935f, 6.423767f));
-            addClickStep(MouseButton.Left);
-
-            addMovementStep(startPosition + new Vector2(217.69522f, 22.84021f));
-            addClickStep(MouseButton.Right);
-
-            assertPlaced(true);
-            assertControlPointCount(3);
-            assertControlPointType(0, PathType.Bezier);
-        }
-
-        [Test]
         public void TestPlacePerfectCurveSegmentAlmostLinearlyExterior()
         {
             Vector2 startPosition = new Vector2(200);
@@ -322,10 +303,10 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             addMovementStep(startPosition);
             addClickStep(MouseButton.Left);
 
-            addMovementStep(startPosition + new Vector2(61.382935f, 6.423767f));
+            addMovementStep(startPosition + new Vector2(300, 0));
             addClickStep(MouseButton.Left);
 
-            addMovementStep(startPosition + new Vector2(217.69522f, 22.84021f)); // Should convert to bezier
+            addMovementStep(startPosition + new Vector2(150, 0.1f)); // Should convert to bezier
             addMovementStep(startPosition + new Vector2(210.0f, 0.0f)); // Should convert back to perfect
             addClickStep(MouseButton.Right);
 
@@ -346,7 +327,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             addClickStep(MouseButton.Left);
 
             // Playfield dimensions are 640 x 480.
-            // So a 480 * 480 bounding box area should be ok.
+            // So a 480 x 480 bounding box should be ok.
             addMovementStep(startPosition + new Vector2(-240, 240));
             addClickStep(MouseButton.Right);
 
