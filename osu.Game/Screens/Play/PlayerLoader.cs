@@ -310,7 +310,7 @@ namespace osu.Game.Screens.Play
                 return;
 
             player = createPlayer();
-            player.RestartCount = ++restartCount;
+            player.RestartCount = restartCount++;
             player.RestartRequested = restartRequested;
 
             LoadTask = LoadComponentAsync(player, _ => MetadataInfo.Loading = false);
