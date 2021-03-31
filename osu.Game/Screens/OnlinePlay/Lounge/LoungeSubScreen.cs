@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -170,7 +169,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         private void joinRequested(Room room)
         {
-            Debug.Assert(joiningRoomOperation == null);
+            if (joiningRoomOperation != null)
+                return;
+
             joiningRoomOperation = ongoingOperationTracker?.BeginOperation();
 
             RoomManager?.JoinRoom(room, r =>

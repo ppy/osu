@@ -29,6 +29,8 @@ namespace osu.Game.Overlays.BeatmapListing
 
         public Bindable<string> Query => textBox.Current;
 
+        public BindableList<SearchGeneral> General => generalFilter.Current;
+
         public Bindable<RulesetInfo> Ruleset => modeFilter.Current;
 
         public Bindable<SearchCategory> Category => categoryFilter.Current;
@@ -61,6 +63,7 @@ namespace osu.Game.Overlays.BeatmapListing
         }
 
         private readonly BeatmapSearchTextBox textBox;
+        private readonly BeatmapSearchMultipleSelectionFilterRow<SearchGeneral> generalFilter;
         private readonly BeatmapSearchRulesetFilterRow modeFilter;
         private readonly BeatmapSearchFilterRow<SearchCategory> categoryFilter;
         private readonly BeatmapSearchFilterRow<SearchGenre> genreFilter;
@@ -123,6 +126,7 @@ namespace osu.Game.Overlays.BeatmapListing
                                 Padding = new MarginPadding { Horizontal = 10 },
                                 Children = new Drawable[]
                                 {
+                                    generalFilter = new BeatmapSearchMultipleSelectionFilterRow<SearchGeneral>(@"整体"),
                                     modeFilter = new BeatmapSearchRulesetFilterRow(),
                                     categoryFilter = new BeatmapSearchFilterRow<SearchCategory>(@"分类"),
                                     genreFilter = new BeatmapSearchFilterRow<SearchGenre>(@"流派"),

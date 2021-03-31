@@ -27,6 +27,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private readonly BindableNumber<float> sizeX = new BindableNumber<float> { MinValue = 10 };
         private readonly BindableNumber<float> sizeY = new BindableNumber<float> { MinValue = 10 };
 
+        private readonly BindableNumber<float> rotation = new BindableNumber<float> { MinValue = 0, MaxValue = 360 };
+
         [Resolved]
         private GameHost host { get; set; }
 
@@ -112,12 +114,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,
-                            LabelText = "长宽比例",
-                            Current = aspectRatio
-                        },
-                        new SettingsSlider<float>
-                        {
-                            TransferValueOnCommit = true,
                             LabelText = "X位移",
                             Current = offsetX
                         },
@@ -126,6 +122,19 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             TransferValueOnCommit = true,
                             LabelText = "Y位移",
                             Current = offsetY
+                        },
+                        new SettingsSlider<float>
+                        {
+                            TransferValueOnCommit = true,
+                            LabelText = "旋转",
+                            Current = rotation
+                        },
+                        new RotationPresetButtons(tabletHandler),
+                        new SettingsSlider<float>
+                        {
+                            TransferValueOnCommit = true,
+                            LabelText = "长宽比例",
+                            Current = aspectRatio
                         },
                         new SettingsCheckbox
                         {
@@ -152,6 +161,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            rotation.BindTo(tabletHandler.Rotation);
 
             areaOffset.BindTo(tabletHandler.AreaOffset);
             areaOffset.BindValueChanged(val =>

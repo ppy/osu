@@ -268,6 +268,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void addBlueprintFor(HitObject hitObject)
         {
+            if (hitObject is IBarLine)
+                return;
+
             if (blueprintMap.ContainsKey(hitObject))
                 return;
 

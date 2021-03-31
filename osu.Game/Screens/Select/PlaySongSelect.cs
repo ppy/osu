@@ -112,7 +112,7 @@ namespace osu.Game.Screens.Select
 
             SampleConfirm?.Play();
 
-            this.Push(player = new PlayerLoader(() => new Player()));
+            this.Push(player = new PlayerLoader(() => new SoloPlayer()));
 
             return true;
         }

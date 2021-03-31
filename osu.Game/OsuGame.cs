@@ -590,6 +590,13 @@ namespace osu.Game
             SentryLogger.Dispose();
         }
 
+        protected override IDictionary<FrameworkSetting, object> GetFrameworkConfigDefaults()
+            => new Dictionary<FrameworkSetting, object>
+            {
+                // General expectation that osu! starts in fullscreen by default (also gives the most predictable performance)
+                { FrameworkSetting.WindowMode, WindowMode.Fullscreen }
+            };
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -780,7 +787,7 @@ namespace osu.Game
             }
 
             // eventually informational overlays should be displayed in a stack, but for now let's only allow one to stay open at a time.
-            var informationalOverlays = new OverlayContainer[] { beatmapSetOverlay, userProfile };
+            var informationalOverlays = new OverlayContainer[] { beatmapSetOverlay, userProfile, Picture };
 
             foreach (var overlay in informationalOverlays)
             {

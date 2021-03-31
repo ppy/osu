@@ -167,8 +167,8 @@ namespace osu.Game.Overlays
             this.ScaleTo(0.9f, duration, Easing.OutQuint);
         }
 
-        DelayedLoadWrapper delayedLoadWrapper;
-        UpdateableOnlinePicture pict;
+        private DelayedLoadWrapper delayedLoadWrapper;
+        private UpdateableOnlinePicture pict;
 
         private void OnOptUIChanged(ValueChangedEvent<bool> v)
         {
@@ -189,7 +189,7 @@ namespace osu.Game.Overlays
 
         public void UpdateImage(string newUri, bool popIn, bool canOpenInBrowser = true, string title = null)
         {
-            target = newUri;
+            target = newUri.Replace("http://", "https://");
             this.canOpenInBrowser = canOpenInBrowser;
 
             if (optUI.Value != true && canOpenInBrowser)
