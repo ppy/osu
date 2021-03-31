@@ -3,13 +3,7 @@
 
 using System.Collections.Generic;
 using AutoMapper;
-using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
-using osu.Game.IO;
-using osu.Game.Rulesets;
-using osu.Game.Scoring;
-using osu.Game.Skinning;
 using Realms;
 
 namespace osu.Game.Database
@@ -21,22 +15,7 @@ namespace osu.Game.Database
             c.ShouldMapField = fi => false;
             c.ShouldMapProperty = pi => pi.SetMethod != null && pi.SetMethod.IsPublic;
 
-            c.CreateMap<BeatmapDifficulty, BeatmapDifficulty>();
-            c.CreateMap<BeatmapInfo, BeatmapInfo>();
-            c.CreateMap<BeatmapMetadata, BeatmapMetadata>();
-            c.CreateMap<BeatmapSetFileInfo, BeatmapSetFileInfo>();
-
-            c.CreateMap<BeatmapSetInfo, BeatmapSetInfo>()
-             .ForMember(s => s.Beatmaps, d => d.MapFrom(s => s.Beatmaps))
-             .ForMember(s => s.Files, d => d.MapFrom(s => s.Files))
-             .MaxDepth(2);
-
             c.CreateMap<RealmKeyBinding, RealmKeyBinding>();
-            c.CreateMap<DatabasedSetting, DatabasedSetting>();
-            c.CreateMap<FileInfo, FileInfo>();
-            c.CreateMap<ScoreFileInfo, ScoreFileInfo>();
-            c.CreateMap<SkinInfo, SkinInfo>();
-            c.CreateMap<RulesetInfo, RulesetInfo>();
         }).CreateMapper();
 
         /// <summary>
