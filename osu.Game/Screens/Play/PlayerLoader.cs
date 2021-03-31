@@ -309,10 +309,8 @@ namespace osu.Game.Screens.Play
             if (!this.IsCurrentScreen())
                 return;
 
-            var restartCount = player?.RestartCount + 1 ?? 0;
-
             player = createPlayer();
-            player.RestartCount = restartCount;
+            player.RestartCount = restartCount++;
             player.RestartRequested = restartRequested;
 
             LoadTask = LoadComponentAsync(player, _ => MetadataInfo.Loading = false);
@@ -427,6 +425,8 @@ namespace osu.Game.Screens.Play
         #region Mute warning
 
         private Bindable<bool> muteWarningShownOnce;
+
+        private int restartCount;
 
         private void showMuteWarningIfNeeded()
         {
