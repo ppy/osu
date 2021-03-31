@@ -307,7 +307,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             addClickStep(MouseButton.Left);
 
             addMovementStep(startPosition + new Vector2(150, 0.1f)); // Should convert to bezier
-            addMovementStep(startPosition + new Vector2(210.0f, 0.0f)); // Should convert back to perfect
+            addMovementStep(startPosition + new Vector2(400.0f, 50.0f)); // Should convert back to perfect
             addClickStep(MouseButton.Right);
 
             assertPlaced(true);
