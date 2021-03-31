@@ -16,7 +16,6 @@ using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
-using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
@@ -103,7 +102,7 @@ namespace osu.Game.Screens.Edit
         private MusicController music { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, GameHost host, OsuConfigManager config)
+        private void load(OsuColour colours, OsuConfigManager config)
         {
             var loadableBeatmap = Beatmap.Value;
 

@@ -22,6 +22,7 @@ using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Filter;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Difficulty;
@@ -383,6 +384,11 @@ namespace osu.Game.Rulesets.Mania
                 }
             }
         };
+
+        public override IRulesetFilterCriteria CreateRulesetFilterCriteria()
+        {
+            return new ManiaFilterCriteria();
+        }
     }
 
     public enum PlayfieldType

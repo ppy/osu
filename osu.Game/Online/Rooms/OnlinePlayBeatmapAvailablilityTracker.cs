@@ -45,6 +45,9 @@ namespace osu.Game.Online.Rooms
 
             Progress.BindValueChanged(_ =>
             {
+                if (State.Value != DownloadState.Downloading)
+                    return;
+
                 // incoming progress changes are going to be at a very high rate.
                 // we don't want to flood the network with this, so rate limit how often we send progress updates.
                 if (progressUpdate?.Completed != false)
