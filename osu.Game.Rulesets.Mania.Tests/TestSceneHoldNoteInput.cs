@@ -320,21 +320,24 @@ namespace osu.Game.Rulesets.Mania.Tests
             }, beatmap);
 
             assertHeadJudgement(HitResult.Perfect);
-            AddAssert("one tick missed", () => judgementResults.Where(j => j.HitObject is HoldNoteTick).Count(j => j.Type == HitResult.LargeTickMiss) == 1);
+            assertLastTickJudgement(HitResult.LargeTickMiss);
             assertTailJudgement(HitResult.Ok);
         }
 
         private void assertHeadJudgement(HitResult result)
-            => AddAssert($"head judged as {result}", () => judgementResults[0].Type == result);
+            => AddAssert($"head judged as {result}", () => judgementResults.First(j => j.HitObject is Note).Type == result);
 
         private void assertTailJudgement(HitResult result)
-            => AddAssert($"tail judged as {result}", () => judgementResults[^2].Type == result);
+            => AddAssert($"tail judged as {result}", () => judgementResults.Single(j => j.HitObject is TailNote).Type == result);
 
         private void assertNoteJudgement(HitResult result)
-            => AddAssert($"hold note judged as {result}", () => judgementResults[^1].Type == result);
+            => AddAssert($"hold note judged as {result}", () => judgementResults.Single(j => j.HitObject is HoldNote).Type == result);
 
         private void assertTickJudgement(HitResult result)
-            => AddAssert($"tick judged as {result}", () => judgementResults[6].Type == result); // arbitrary tick
+            => AddAssert($"any tick judged as {result}", () => judgementResults.Where(j => j.HitObject is HoldNoteTick).Any(j => j.Type == result));
+
+        private void assertLastTickJudgement(HitResult result)
+            => AddAssert($"last tick judged as {result}", () => judgementResults.Last(j => j.HitObject is HoldNoteTick).Type == result);
 
         private ScoreAccessibleReplayPlayer currentPlayer;
 
