@@ -288,6 +288,42 @@ namespace osu.Game.Rulesets.Mania.Tests
                                                                        .All(j => j.Type.IsHit()));
         }
 
+        [Test]
+        public void TestHitTailBeforeLastTick()
+        {
+            const int tick_rate = 8;
+            const double tick_spacing = TimingControlPoint.DEFAULT_BEAT_LENGTH / tick_rate;
+            const double time_last_tick = time_head + tick_spacing * (int)((time_tail - time_head) / tick_spacing - 1);
+
+            var beatmap = new Beatmap<ManiaHitObject>
+            {
+                HitObjects =
+                {
+                    new HoldNote
+                    {
+                        StartTime = time_head,
+                        Duration = time_tail - time_head,
+                        Column = 0,
+                    }
+                },
+                BeatmapInfo =
+                {
+                    BaseDifficulty = new BeatmapDifficulty { SliderTickRate = tick_rate },
+                    Ruleset = new ManiaRuleset().RulesetInfo
+                },
+            };
+
+            performTest(new List<ReplayFrame>
+            {
+                new ManiaReplayFrame(time_head, ManiaAction.Key1),
+                new ManiaReplayFrame(time_last_tick - 5)
+            }, beatmap);
+
+            assertHeadJudgement(HitResult.Perfect);
+            AddAssert("one tick missed", () => judgementResults.Where(j => j.HitObject is HoldNoteTick).Count(j => j.Type == HitResult.LargeTickMiss) == 1);
+            assertTailJudgement(HitResult.Ok);
+        }
+
         private void assertHeadJudgement(HitResult result)
             => AddAssert($"head judged as {result}", () => judgementResults[0].Type == result);
 
