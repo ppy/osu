@@ -212,7 +212,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         /// </summary>
         private void updatePathType()
         {
-            if (PointsInSegment[0].Type.Value != PathType.PerfectCurve)
+            if (ControlPoint.Type.Value != PathType.PerfectCurve)
                 return;
 
             ReadOnlySpan<Vector2> points = PointsInSegment.Select(p => p.Position.Value).ToArray();
@@ -221,7 +221,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             RectangleF boundingBox = PathApproximator.CircularArcBoundingBox(points);
             if (boundingBox.Width >= 640 || boundingBox.Height >= 480)
-                PointsInSegment[0].Type.Value = PathType.Bezier;
+                ControlPoint.Type.Value = PathType.Bezier;
         }
 
         /// <summary>
