@@ -233,6 +233,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             if (Tail.AllJudged)
             {
+                foreach (var tick in tickContainer)
+                {
+                    if (!tick.Judged)
+                        tick.MissForcefully();
+                }
+
                 ApplyResult(r => r.Type = r.Judgement.MaxResult);
                 endHold();
             }

@@ -36,7 +36,13 @@ namespace osu.Game.Beatmaps.Formats
                 if (ShouldSkipLine(line))
                     continue;
 
-                line = StripComments(line).TrimEnd();
+                if (section != Section.Metadata)
+                {
+                    // comments should not be stripped from metadata lines, as the song metadata may contain "//" as valid data.
+                    line = StripComments(line);
+                }
+
+                line = line.TrimEnd();
 
                 if (line.StartsWith('[') && line.EndsWith(']'))
                 {
