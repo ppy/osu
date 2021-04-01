@@ -37,7 +37,7 @@ using osuTK;
 namespace osu.Game.Screens.Play
 {
     [Cached(typeof(IPreviewTrackOwner))]
-    public class Spectator : OsuScreen, IPreviewTrackOwner
+    public class SoloSpectator : OsuScreen, IPreviewTrackOwner
     {
         private readonly User targetUser;
 
@@ -88,7 +88,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         private bool newStatePending;
 
-        public Spectator([NotNull] User targetUser)
+        public SoloSpectator([NotNull] User targetUser)
         {
             this.targetUser = targetUser ?? throw new ArgumentNullException(nameof(targetUser));
         }
