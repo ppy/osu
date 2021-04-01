@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         // used just to show beatmap card for the time being.
         protected override bool UseOnlineAPI => true;
 
-        private Spectator spectatorScreen;
+        private SoloSpectator spectatorScreen;
 
         [Resolved]
         private OsuGameBase game { get; set; }
@@ -69,7 +69,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             loadSpectatingScreen();
 
-            AddAssert("screen hasn't changed", () => Stack.CurrentScreen is Spectator);
+            AddAssert("screen hasn't changed", () => Stack.CurrentScreen is SoloSpectator);
 
             start();
             sendFrames();
@@ -195,7 +195,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             start(-1234);
             sendFrames();
 
-            AddAssert("screen didn't change", () => Stack.CurrentScreen is Spectator);
+            AddAssert("screen didn't change", () => Stack.CurrentScreen is SoloSpectator);
         }
 
         private OsuFramedReplayInputHandler replayHandler =>
@@ -226,7 +226,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void loadSpectatingScreen()
         {
-            AddStep("load screen", () => LoadScreen(spectatorScreen = new Spectator(testSpectatorStreamingClient.StreamingUser)));
+            AddStep("load screen", () => LoadScreen(spectatorScreen = new SoloSpectator(testSpectatorStreamingClient.StreamingUser)));
             AddUntilStep("wait for screen load", () => spectatorScreen.LoadState == LoadState.Loaded);
         }
 
