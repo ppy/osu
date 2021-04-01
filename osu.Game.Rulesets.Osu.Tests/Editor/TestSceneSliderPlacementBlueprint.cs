@@ -323,12 +323,12 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             addMovementStep(startPosition);
             addClickStep(MouseButton.Left);
 
-            addMovementStep(startPosition + new Vector2(240, 240));
+            addMovementStep(startPosition + new Vector2(220, 220));
             addClickStep(MouseButton.Left);
 
             // Playfield dimensions are 640 x 480.
-            // So a 480 x 480 bounding box should be ok.
-            addMovementStep(startPosition + new Vector2(-240, 240));
+            // So a 440 x 440 bounding box should be ok.
+            addMovementStep(startPosition + new Vector2(-220, 220));
             addClickStep(MouseButton.Right);
 
             assertPlaced(true);
