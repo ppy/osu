@@ -22,7 +22,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
     {
         private Slider slider;
         private DrawableSlider drawableObject;
-        private TestSliderBlueprint blueprint;
 
         [SetUp]
         public void Setup() => Schedule(() =>
@@ -45,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             slider.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = 2 });
 
             Add(drawableObject = new DrawableSlider(slider));
-            AddBlueprint(blueprint = new TestSliderBlueprint(drawableObject));
+            AddBlueprint(new TestSliderBlueprint(drawableObject));
         });
 
         [Test]
