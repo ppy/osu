@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
-using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -19,7 +18,6 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Skinning
@@ -321,19 +319,13 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        private string scorePrefix => GetConfig<LegacySkinConfiguration.LegacySetting, string>(LegacySkinConfiguration.LegacySetting.ScorePrefix)?.Value ?? "score";
-
-        private string comboPrefix => GetConfig<LegacySkinConfiguration.LegacySetting, string>(LegacySkinConfiguration.LegacySetting.ComboPrefix)?.Value ?? "score";
-
-        private bool hasScoreFont => this.HasFont(scorePrefix);
-
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {
             switch (component)
             {
                 case HUDSkinComponent hudComponent:
                 {
-                    if (!hasScoreFont)
+                    if (!this.HasFont(LegacyFont.Score))
                         return null;
 
                     switch (hudComponent.Component)
@@ -349,18 +341,6 @@ namespace osu.Game.Skinning
 
                         case HUDSkinComponents.HealthDisplay:
                             return new LegacyHealthDisplay(this);
-
-                        case HUDSkinComponents.ComboText:
-                            return new LegacySpriteText(this, comboPrefix)
-                            {
-                                Spacing = new Vector2(-(GetConfig<LegacySkinConfiguration.LegacySetting, int>(LegacySkinConfiguration.LegacySetting.ComboOverlap)?.Value ?? -2), 0)
-                            };
-
-                        case HUDSkinComponents.ScoreText:
-                            return new LegacySpriteText(this, scorePrefix)
-                            {
-                                Spacing = new Vector2(-(GetConfig<LegacySkinConfiguration.LegacySetting, int>(LegacySkinConfiguration.LegacySetting.ScoreOverlap)?.Value ?? -2), 0)
-                            };
                     }
 
                     return null;
@@ -462,7 +442,7 @@ namespace osu.Game.Skinning
                 var sample = Samples?.Get(lookup);
 
                 if (sample != null)
-                    return new LegacySkinSample(sample, this);
+                    return sample;
             }
 
             return null;
@@ -504,79 +484,6 @@ namespace osu.Game.Skinning
             base.Dispose(isDisposing);
             Textures?.Dispose();
             Samples?.Dispose();
-        }
-
-        /// <summary>
-        /// A sample wrapper which keeps a reference to the contained skin to avoid finalizer garbage collection of the managing SampleStore.
-        /// </summary>
-        private class LegacySkinSample : ISample, IDisposable
-        {
-            private readonly Sample sample;
-
-            [UsedImplicitly]
-            private readonly LegacySkin skin;
-
-            public LegacySkinSample(Sample sample, LegacySkin skin)
-            {
-                this.sample = sample;
-                this.skin = skin;
-            }
-
-            public SampleChannel Play()
-            {
-                return sample.Play();
-            }
-
-            public SampleChannel GetChannel()
-            {
-                return sample.GetChannel();
-            }
-
-            public double Length => sample.Length;
-
-            public Bindable<int> PlaybackConcurrency => sample.PlaybackConcurrency;
-            public BindableNumber<double> Volume => sample.Volume;
-
-            public BindableNumber<double> Balance => sample.Balance;
-
-            public BindableNumber<double> Frequency => sample.Frequency;
-
-            public BindableNumber<double> Tempo => sample.Tempo;
-
-            public void BindAdjustments(IAggregateAudioAdjustment component)
-            {
-                sample.BindAdjustments(component);
-            }
-
-            public void UnbindAdjustments(IAggregateAudioAdjustment component)
-            {
-                sample.UnbindAdjustments(component);
-            }
-
-            public void AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable)
-            {
-                sample.AddAdjustment(type, adjustBindable);
-            }
-
-            public void RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable)
-            {
-                sample.RemoveAdjustment(type, adjustBindable);
-            }
-
-            public void RemoveAllAdjustments(AdjustableProperty type)
-            {
-                sample.RemoveAllAdjustments(type);
-            }
-
-            public IBindable<double> AggregateVolume => sample.AggregateVolume;
-
-            public IBindable<double> AggregateBalance => sample.AggregateBalance;
-
-            public IBindable<double> AggregateFrequency => sample.AggregateFrequency;
-
-            public IBindable<double> AggregateTempo => sample.AggregateTempo;
-
-            public void Dispose() => sample.Dispose();
         }
     }
 }

@@ -429,6 +429,9 @@ namespace osu.Game
 
         public async Task Import(params string[] paths)
         {
+            if (paths.Length == 0)
+                return;
+
             var extension = Path.GetExtension(paths.First())?.ToLowerInvariant();
 
             foreach (var importer in fileImporters)

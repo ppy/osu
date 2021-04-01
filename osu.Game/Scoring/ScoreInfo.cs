@@ -30,7 +30,7 @@ namespace osu.Game.Scoring
         public long TotalScore { get; set; }
 
         [JsonProperty("accuracy")]
-        [Column(TypeName = "DECIMAL(1,4)")]
+        [Column(TypeName = "DECIMAL(1,4)")] // TODO: This data type is wrong (should contain more precision). But at the same time, we probably don't need to be storing this in the database.
         public double Accuracy { get; set; }
 
         [JsonIgnore]
@@ -73,7 +73,7 @@ namespace osu.Game.Scoring
             }
             set
             {
-                modsJson = JsonConvert.SerializeObject(value.Select(m => new DeserializedMod { Acronym = m.Acronym }));
+                modsJson = null;
                 mods = value;
             }
         }
@@ -86,7 +86,16 @@ namespace osu.Game.Scoring
         [Column("Mods")]
         public string ModsJson
         {
-            get => modsJson;
+            get
+            {
+                if (modsJson != null)
+                    return modsJson;
+
+                if (mods == null)
+                    return null;
+
+                return modsJson = JsonConvert.SerializeObject(mods.Select(m => new DeserializedMod { Acronym = m.Acronym }));
+            }
             set
             {
                 modsJson = value;
