@@ -44,6 +44,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         [SettingSource("Use fixed slider follow circle hit area", "Makes the slider follow circle track its final size at all times.")]
         public Bindable<bool> FixedFollowCircleHitArea { get; } = new BindableBool(true);
 
+        [SettingSource("Always play a slider's tail sample", "Always plays a slider's tail sample regardless of whether it was hit or not.")]
+        public Bindable<bool> AlwaysPlayTailSample { get; } = new BindableBool(true);
+
         public void ApplyToHitObject(HitObject hitObject)
         {
             switch (hitObject)
@@ -81,7 +84,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                         break;
 
                     case DrawableSliderTail tail:
-                        tail.AlwaysPlaySample = true;
+                        tail.AlwaysPlaySample = AlwaysPlayTailSample.Value;
                         break;
                 }
             }
