@@ -27,7 +27,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public override bool DisplayResult => false;
 
         /// <summary>
-        /// Whether the hit sample should always be played, regardless of whether the tail was actually hit.
+        /// Whether the hit samples only play on successful hits.
+        /// If <c>false</c>, the hit samples will also play on misses.
         /// </summary>
         public bool SamplePlaysOnlyOnHit { get; set; } = true;
 
