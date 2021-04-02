@@ -223,9 +223,11 @@ namespace osu.Game.Screens.Select
                     if (beatmap != requestedBeatmap)
                         // the beatmap has been changed since we started the lookup.
                         return;
+
                     updateMetrics();
                 });
             };
+
             api.Queue(lookup);
             loading.Show();
         }
