@@ -44,6 +44,29 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
+        public void TestRetryCountIncrements()
+        {
+            Player player = null;
+
+            PushAndConfirm(() => new TestSongSelect());
+
+            AddStep("import beatmap", () => ImportBeatmapTest.LoadQuickOszIntoOsu(Game).Wait());
+
+            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
+
+            AddStep("press enter", () => InputManager.Key(Key.Enter));
+
+            AddUntilStep("wait for player", () => (player = Game.ScreenStack.CurrentScreen as Player) != null);
+            AddAssert("retry count is 0", () => player.RestartCount == 0);
+
+            AddStep("attempt to retry", () => player.ChildrenOfType<HotkeyRetryOverlay>().First().Action());
+            AddUntilStep("wait for old player gone", () => Game.ScreenStack.CurrentScreen != player);
+
+            AddUntilStep("get new player", () => (player = Game.ScreenStack.CurrentScreen as Player) != null);
+            AddAssert("retry count is 1", () => player.RestartCount == 1);
+        }
+
+        [Test]
         public void TestRetryFromResults()
         {
             Player player = null;
