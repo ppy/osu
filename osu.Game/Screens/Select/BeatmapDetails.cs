@@ -19,6 +19,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
+using osu.Game.Online;
 
 namespace osu.Game.Screens.Select
 {
@@ -136,7 +137,7 @@ namespace osu.Game.Screens.Select
                                 },
                             },
                         },
-                        failRetryContainer = new Container
+                        failRetryContainer = new OnlineViewContainer("Sign in to view more details")
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
@@ -153,11 +154,11 @@ namespace osu.Game.Screens.Select
                                     RelativeSizeAxes = Axes.Both,
                                     Padding = new MarginPadding { Top = 14 + spacing / 2 },
                                 },
+                                loading = new LoadingLayer(true)
                             },
                         },
                     },
                 },
-                loading = new LoadingLayer(true),
             };
         }
 
@@ -222,11 +223,9 @@ namespace osu.Game.Screens.Select
                     if (beatmap != requestedBeatmap)
                         // the beatmap has been changed since we started the lookup.
                         return;
-
                     updateMetrics();
                 });
             };
-
             api.Queue(lookup);
             loading.Show();
         }
@@ -236,7 +235,9 @@ namespace osu.Game.Screens.Select
             var hasRatings = beatmap?.BeatmapSet?.Metrics?.Ratings?.Any() ?? false;
             var hasRetriesFails = (beatmap?.Metrics?.Retries?.Any() ?? false) || (beatmap?.Metrics?.Fails?.Any() ?? false);
 
-            if (hasRatings)
+            bool isOnline = api.State.Value == APIState.Online;
+
+            if (hasRatings && isOnline)
             {
                 ratings.Metrics = beatmap.BeatmapSet.Metrics;
                 ratingsContainer.FadeIn(transition_duration);
@@ -244,7 +245,7 @@ namespace osu.Game.Screens.Select
             else
             {
                 ratings.Metrics = new BeatmapSetMetrics { Ratings = new int[10] };
-                ratingsContainer.FadeTo(0.25f, transition_duration);
+                ratingsContainer.FadeTo(isOnline ? 0.25f : 0, transition_duration);
             }
 
             if (hasRetriesFails)
@@ -259,7 +260,6 @@ namespace osu.Game.Screens.Select
                     Fails = new int[100],
                     Retries = new int[100],
                 };
-                failRetryContainer.FadeOut(transition_duration);
             }
 
             loading.Hide();
