@@ -40,6 +40,7 @@ namespace osu.Game.Screens.Spectate
         [Resolved]
         private UserLookupCache userLookupCache { get; set; }
 
+        // A lock is used to synchronise access to spectator/gameplay states, since this class is a screen which may become non-current and stop receiving updates at any point.
         private readonly object stateLock = new object();
 
         private readonly Dictionary<int, User> userMap = new Dictionary<int, User>();
