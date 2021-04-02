@@ -79,6 +79,10 @@ namespace osu.Game.Rulesets.Osu.Mods
                     case DrawableSliderHead head:
                         head.TrackFollowCircle = !NoSliderHeadMovement.Value;
                         break;
+
+                    case DrawableSliderTail tail:
+                        tail.AlwaysPlaySample = true;
+                        break;
                 }
             }
         }
