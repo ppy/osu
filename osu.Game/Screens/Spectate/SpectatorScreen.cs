@@ -110,7 +110,7 @@ namespace osu.Game.Screens.Spectate
                     return;
 
                 spectatorStates[userId] = state;
-                OnUserStateChanged(userId, state);
+                Schedule(() => OnUserStateChanged(userId, state));
 
                 updateGameplayState(userId);
             }
@@ -148,7 +148,7 @@ namespace osu.Game.Screens.Spectate
                 var gameplayState = new GameplayState(score, resolvedRuleset, beatmaps.GetWorkingBeatmap(resolvedBeatmap));
 
                 gameplayStates[userId] = gameplayState;
-                StartGameplay(userId, gameplayState);
+                Schedule(() => StartGameplay(userId, gameplayState));
             }
         }
 
@@ -191,7 +191,7 @@ namespace osu.Game.Screens.Spectate
                 gameplayState.Score.Replay.HasReceivedAllFrames = true;
 
                 gameplayStates.Remove(userId);
-                EndGameplay(userId);
+                Schedule(() => EndGameplay(userId));
             }
         }
 
