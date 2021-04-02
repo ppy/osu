@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                         break;
 
                     case DrawableSliderTail tail:
-                        tail.AlwaysPlaySample = AlwaysPlayTailSample.Value;
+                        tail.SamplePlaysOnlyOnHit = !AlwaysPlayTailSample.Value;
                         break;
                 }
             }
