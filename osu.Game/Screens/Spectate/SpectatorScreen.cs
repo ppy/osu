@@ -83,9 +83,9 @@ namespace osu.Game.Screens.Spectate
             managerUpdated.BindValueChanged(beatmapUpdated);
         }
 
-        private void beatmapUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> beatmap)
+        private void beatmapUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> e)
         {
-            if (!beatmap.NewValue.TryGetTarget(out var beatmapSet))
+            if (!e.NewValue.TryGetTarget(out var beatmapSet))
                 return;
 
             lock (stateLock)
