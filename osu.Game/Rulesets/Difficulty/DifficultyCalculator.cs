@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Difficulty
                     foreach (Skill s in skills)
                     {
                         s.SaveCurrentPeak();
-                        s.StartNewSectionFrom(currentSectionEnd);
+                        s.StartNewSectionFrom(currentSectionEnd / clockRate);
                     }
 
                     currentSectionEnd += sectionLength;
