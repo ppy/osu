@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// <summary>
         /// Whether the hit sample should always be played, regardless of whether the tail was actually hit.
         /// </summary>
-        public bool AlwaysPlaySample { get; set; }
+        public bool SamplePlaysOnlyOnHit { get; set; } = true;
 
         public bool Tracking { get; set; }
 
@@ -49,7 +49,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load()
         {
-            AlwaysPlaySample = false;
             Origin = Anchor.Centre;
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
 
