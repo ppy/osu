@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
         public readonly HitObject LastObject;
 
         /// <summary>
-        /// Amount of time elapsed between <see cref="BaseObject"/> and <see cref="LastObject"/>.
+        /// Amount of time elapsed between <see cref="BaseObject"/> and <see cref="LastObject"/>, adjusted by clockrate.
         /// </summary>
         public readonly double DeltaTime;
 
