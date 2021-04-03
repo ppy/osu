@@ -14,6 +14,9 @@ namespace osu.Game.Rulesets.Osu.Replays
 {
     public class OsuFramedReplayInputHandler : FramedReplayInputHandler<OsuReplayFrame>
     {
+        public bool HandlePositionalInput = true;
+        public bool HandleActionInput = true;
+
         public OsuFramedReplayInputHandler(Replay replay)
             : base(replay)
         {
@@ -38,8 +41,8 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         public override void CollectPendingInputs(List<IInput> inputs)
         {
-            inputs.Add(new MousePositionAbsoluteInput { Position = GamefieldToScreenSpace(Position ?? Vector2.Zero) });
-            inputs.Add(new ReplayState<OsuAction> { PressedActions = CurrentFrame?.Actions ?? new List<OsuAction>() });
+            if (HandlePositionalInput) inputs.Add(new MousePositionAbsoluteInput { Position = GamefieldToScreenSpace(Position ?? Vector2.Zero) });
+            if (HandleActionInput) inputs.Add(new ReplayState<OsuAction> { PressedActions = CurrentFrame?.Actions ?? new List<OsuAction>() });
         }
     }
 }

@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
@@ -30,6 +31,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         private bool wasLeft;
 
         private OsuInputManager osuInputManager;
+        private OsuFramedReplayInputHandler replayInputHandler;
 
         private ReplayState<OsuAction> state;
         private double lastStateChangeTime;
@@ -44,7 +46,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToPlayer(Player player)
         {
-            if (osuInputManager.ReplayInputHandler != null)
+            replayInputHandler = (OsuFramedReplayInputHandler)osuInputManager.ReplayInputHandler;
+
+            if (replayInputHandler != null)
             {
                 hasReplay = true;
                 return;
@@ -56,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public void Update(Playfield playfield)
         {
             if (hasReplay)
-                return;
+                replayInputHandler.HandleActionInput = false;
 
             bool requiresHold = false;
             bool requiresHit = false;
