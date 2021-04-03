@@ -11,12 +11,12 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 
@@ -26,6 +26,8 @@ namespace osu.Game.Screens.Edit.Setup
     {
         private LabelledTextBox audioTrackTextBox;
         private Container backgroundSpriteContainer;
+
+        public override LocalisableString Title => "Resources";
 
         public IEnumerable<string> HandledExtensions => ImageExtensions.Concat(AudioExtensions);
 
@@ -65,10 +67,6 @@ namespace osu.Game.Screens.Edit.Setup
                     Height = 250,
                     Masking = true,
                     CornerRadius = 10,
-                },
-                new OsuSpriteText
-                {
-                    Text = "Resources"
                 },
                 audioTrackTextBox = new FileChooserLabelledTextBox
                 {
