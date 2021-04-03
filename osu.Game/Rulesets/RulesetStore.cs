@@ -173,7 +173,7 @@ namespace osu.Game.Rulesets
         {
             var filename = Path.GetFileNameWithoutExtension(file);
 
-            if (loadedAssemblies.Values.Any(t => t.Namespace == filename))
+            if (loadedAssemblies.Values.Any(t => Path.GetFileNameWithoutExtension(t.Assembly.Location) == filename))
                 return;
 
             try
