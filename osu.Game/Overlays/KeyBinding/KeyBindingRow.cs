@@ -129,13 +129,7 @@ namespace osu.Game.Overlays.KeyBinding
                 var button = buttons[i++];
                 button.UpdateKeyCombination(d);
 
-                using (var usage = realmFactory.GetForWrite())
-                {
-                    var binding = usage.Realm.Find<RealmKeyBinding>(((IHasGuidPrimaryKey)button.KeyBinding).ID.ToString());
-                    binding.KeyCombinationString = button.KeyBinding.KeyCombinationString;
-
-                    usage.Commit();
-                }
+                updateStoreFromButton(button);
             }
         }
 
@@ -294,13 +288,7 @@ namespace osu.Game.Overlays.KeyBinding
         {
             if (bindTarget != null)
             {
-                using (var write = realmFactory.GetForWrite())
-                {
-                    var binding = write.Realm.Find<RealmKeyBinding>(((IHasGuidPrimaryKey)bindTarget.KeyBinding).ID.ToString());
-                    binding.KeyCombinationString = bindTarget.KeyBinding.KeyCombinationString;
-
-                    write.Commit();
-                }
+                updateStoreFromButton(bindTarget);
 
                 bindTarget.IsBinding = false;
                 Schedule(() =>
@@ -343,6 +331,17 @@ namespace osu.Game.Overlays.KeyBinding
             if (bindTarget != null) bindTarget.IsBinding = false;
             bindTarget = buttons.FirstOrDefault(b => b.IsHovered) ?? buttons.FirstOrDefault();
             if (bindTarget != null) bindTarget.IsBinding = true;
+        }
+
+        private void updateStoreFromButton(KeyButton button)
+        {
+            using (var usage = realmFactory.GetForWrite())
+            {
+                var binding = usage.Realm.Find<RealmKeyBinding>(((IHasGuidPrimaryKey)button.KeyBinding).ID.ToString());
+                binding.KeyCombinationString = button.KeyBinding.KeyCombinationString;
+
+                usage.Commit();
+            }
         }
 
         private class CancelButton : TriangleButton
