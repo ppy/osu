@@ -17,11 +17,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Online.API;
 using osu.Game.Rulesets;
+using osu.Game.Users;
 
 namespace osu.Desktop
 {
-    public class GameStateBroadcaster : Component
+    internal class GameStateBroadcaster : Component
     {
         private readonly List<WebSocketClient> clients = new List<WebSocketClient>();
 
@@ -29,11 +31,15 @@ namespace osu.Desktop
 
         private CancellationTokenSource cancellationToken;
 
+        private IBindable<User> user;
+
         private readonly Bindable<bool> enabled = new Bindable<bool>();
 
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+
+        private readonly Bindable<UserActivity> activity = new Bindable<UserActivity>();
 
         private ScheduledDelegate broadcastSchedule;
 
@@ -43,13 +49,20 @@ namespace osu.Desktop
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, Bindable<RulesetInfo> ruleset, Bindable<WorkingBeatmap> beatmap)
+        private void load(OsuConfigManager config, IAPIProvider provider, Bindable<RulesetInfo> ruleset, Bindable<WorkingBeatmap> beatmap)
         {
             this.ruleset.BindTo(ruleset);
             this.beatmap.BindTo(beatmap);
 
+            (user = provider.LocalUser.GetBoundCopy()).BindValueChanged(u =>
+            {
+               activity.UnbindBindings();
+               activity.BindTo(u.NewValue.Activity);
+            });
+
             this.ruleset.ValueChanged += _ => broadcast();
             this.beatmap.ValueChanged += _ => broadcast();
+            activity.ValueChanged += _ => broadcast();
 
             config.BindWith(OsuSetting.PublishGameState, enabled);
 
@@ -109,6 +122,7 @@ namespace osu.Desktop
                 string state = JsonConvert.SerializeObject(new GameState
                 {
                     Ruleset = ruleset.Value,
+                    Activity = activity.Value,
                     BeatmapMetadata = beatmap.Value.Metadata,
                 });
 
@@ -137,14 +151,6 @@ namespace osu.Desktop
         {
             base.Dispose(isDisposing);
             stop(true);
-        }
-
-        [Serializable]
-        public class GameState
-        {
-            public RulesetInfo Ruleset { get; set; }
-
-            public BeatmapMetadata BeatmapMetadata { get; set; }
         }
 
         private sealed class WebSocketClient
