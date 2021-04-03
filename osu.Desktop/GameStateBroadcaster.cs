@@ -20,7 +20,6 @@ using osu.Game.Configuration;
 using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Users;
 
 namespace osu.Desktop
 {
@@ -28,11 +27,9 @@ namespace osu.Desktop
     {
         private readonly List<WebSocketClient> clients = new List<WebSocketClient>();
 
-        private HttpListener listener = new HttpListener();
+        private readonly HttpListener listener = new HttpListener();
 
         private CancellationTokenSource cancellationToken;
-
-        private IBindable<User> user;
 
         private readonly Bindable<bool> enabled = new Bindable<bool>();
 
@@ -40,9 +37,11 @@ namespace osu.Desktop
 
         private ScheduledDelegate broadcastSchedule;
 
+        private readonly SemaphoreSlim locker = new SemaphoreSlim(1);
+
         public GameStateBroadcaster()
         {
-            listener.Prefixes.Add($"http://localhost:7270/");
+            listener.Prefixes.Add("http://localhost:7270/");
         }
 
         [BackgroundDependencyLoader]
@@ -52,10 +51,10 @@ namespace osu.Desktop
             state.Beatmap.BindTo(beatmap);
             state.Mods.BindTo(mods);
 
-            (user = provider.LocalUser.GetBoundCopy()).BindValueChanged(u =>
+            provider.LocalUser.GetBoundCopy().BindValueChanged(u =>
             {
-               state.Activity.UnbindBindings();
-               state.Activity.BindTo(u.NewValue.Activity);
+                state.Activity.UnbindBindings();
+                state.Activity.BindTo(u.NewValue.Activity);
             });
 
             state.Mods.ValueChanged += _ => broadcast();
@@ -118,11 +117,16 @@ namespace osu.Desktop
             broadcastSchedule?.Cancel();
             broadcastSchedule = Scheduler.AddDelayed(() =>
             {
-                foreach (var client in clients)
-                    client.Enqueue(JsonConvert.SerializeObject(state, new JsonSerializerSettings
+                lock (clients)
+                {
+                    foreach (var client in clients)
                     {
-                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                    }));
+                        client.Enqueue(JsonConvert.SerializeObject(state, new JsonSerializerSettings
+                        {
+                            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                        }));
+                    }
+                }
             }, 200);
         }
 
@@ -132,13 +136,23 @@ namespace osu.Desktop
             broadcastSchedule?.Cancel();
             Task.Run(async () =>
             {
-                await Task.WhenAll(clients.ToArray().Select(c => c.Close())).ConfigureAwait(false);
+                await locker.WaitAsync().ConfigureAwait(false);
 
-                if (listener.IsListening)
-                    listener.Stop();
+                try
+                {
+                    var tasks = clients.Select(c => c.Close());
+                    await Task.WhenAll(tasks).ConfigureAwait(false);
 
-                if (closing)
-                    listener.Close();
+                    if (listener.IsListening)
+                        listener.Stop();
+
+                    if (closing)
+                        listener.Close();
+                }
+                finally
+                {
+                    locker.Release();
+                }
             });
         }
 
