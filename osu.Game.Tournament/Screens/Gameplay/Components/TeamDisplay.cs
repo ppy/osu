@@ -14,9 +14,21 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
     {
         private readonly TeamScore score;
 
+        private bool showScore;
+
         public bool ShowScore
         {
-            set => score.FadeTo(value ? 1 : 0, 200);
+            get => showScore;
+            set
+            {
+                if (showScore == value)
+                    return;
+
+                showScore = value;
+
+                if (IsLoaded)
+                    score.FadeTo(value ? 1 : 0, 200);
+            }
         }
 
         public TeamDisplay(TournamentTeam team, TeamColour colour, Bindable<int?> currentTeamScore, int pointsToWin)
@@ -91,6 +103,12 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                     },
                 }
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            score.Alpha = ShowScore ? 1 : 0;
         }
     }
 }
