@@ -38,8 +38,6 @@ namespace osu.Desktop
 
         private ScheduledDelegate broadcastSchedule;
 
-        private readonly SemaphoreSlim locker = new SemaphoreSlim(1);
-
         private IBindable<User> user;
 
         public GameStateBroadcaster()
@@ -136,23 +134,17 @@ namespace osu.Desktop
             broadcastSchedule?.Cancel();
             Task.Run(async () =>
             {
-                await locker.WaitAsync().ConfigureAwait(false);
+                IEnumerable<Task> closeTasks;
+                lock (clients)
+                    closeTasks = clients.Select(c => c.Close());
 
-                try
-                {
-                    var tasks = clients.Select(c => c.Close());
-                    await Task.WhenAll(tasks).ConfigureAwait(false);
+                await Task.WhenAll(closeTasks).ConfigureAwait(false);
 
-                    if (listener.IsListening)
-                        listener.Stop();
+                if (listener.IsListening)
+                    listener.Stop();
 
-                    if (closing)
-                        listener.Close();
-                }
-                finally
-                {
-                    locker.Release();
-                }
+                if (closing)
+                    listener.Close();
             });
         }
 
