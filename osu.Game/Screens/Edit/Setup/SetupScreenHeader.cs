@@ -25,12 +25,24 @@ namespace osu.Game.Screens.Edit.Setup
         {
             RelativeSizeAxes = Axes.X,
             AutoSizeAxes = Axes.Y,
-            Children = new Drawable[]
+            // reverse flow is used to ensure that the tab control's expandable bars extend over the background chooser.
+            Child = new ReverseChildIDFillFlowContainer<Drawable>
             {
-                tabControl = new SetupScreenTabControl
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Vertical,
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Height = 30
+                    tabControl = new SetupScreenTabControl
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 30
+                    },
+                    new BackgroundChooser
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 120
+                    }
                 }
             }
         };
