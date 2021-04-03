@@ -20,7 +20,12 @@ namespace osu.Game.Overlays.Settings.Sections.Online
                 {
                     LabelText = "Discord Rich Presence",
                     Current = config.GetBindable<DiscordRichPresenceMode>(OsuSetting.DiscordRichPresence)
-                }
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "Publish Game State",
+                    Current = config.GetBindable<bool>(OsuSetting.PublishGameState)
+                },
             };
         }
     }

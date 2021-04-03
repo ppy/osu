@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.WebSockets;
 using System.Text;
@@ -14,17 +16,20 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Rulesets;
 
 namespace osu.Desktop
 {
     public class GameStateBroadcaster : Component
     {
-        private readonly ConcurrentBag<WebSocketClient> clients = new ConcurrentBag<WebSocketClient>();
+        private readonly List<WebSocketClient> clients = new List<WebSocketClient>();
 
-        private readonly HttpListener listener = new HttpListener();
+        private HttpListener listener = new HttpListener();
 
-        private readonly CancellationTokenSource cancellationToken = new CancellationTokenSource();
+        private CancellationTokenSource cancellationToken;
+
+        private readonly Bindable<bool> enabled = new Bindable<bool>();
 
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
@@ -34,30 +39,70 @@ namespace osu.Desktop
 
         public GameStateBroadcaster()
         {
-            listener.Prefixes.Add("http://localhost:8080/");
-            listener.Start();
-
-            var thread = new Thread(() => handleConnections().Wait())
-            {
-                Name = "GameStateBroadcaster",
-                IsBackground = true,
-            };
-
-            thread.Start();
+            listener.Prefixes.Add($"http://localhost:7270/");
         }
 
         [BackgroundDependencyLoader]
-        private void load(Bindable<RulesetInfo> ruleset, Bindable<WorkingBeatmap> beatmap)
+        private void load(OsuConfigManager config, Bindable<RulesetInfo> ruleset, Bindable<WorkingBeatmap> beatmap)
         {
             this.ruleset.BindTo(ruleset);
             this.beatmap.BindTo(beatmap);
 
             this.ruleset.ValueChanged += _ => broadcast();
             this.beatmap.ValueChanged += _ => broadcast();
+
+            config.BindWith(OsuSetting.PublishGameState, enabled);
+
+            enabled.BindValueChanged(state =>
+            {
+                if (state.NewValue)
+                    Task.Factory.StartNew(start, TaskCreationOptions.LongRunning);
+                else
+                    stop();
+            }, true);
+        }
+
+        private async Task start()
+        {
+            cancellationToken = new CancellationTokenSource();
+            listener.Start();
+
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                try
+                {
+                    var context = await listener.GetContextAsync().ConfigureAwait(false);
+                    var wsContext = await context.AcceptWebSocketAsync(null).ConfigureAwait(false);
+
+                    var client = new WebSocketClient(wsContext.WebSocket);
+                    client.OnStart += add;
+                    client.OnClose += remove;
+
+                    client.Start();
+                }
+                catch (HttpListenerException)
+                {
+                }
+            }
+        }
+
+        private void add(WebSocketClient client)
+        {
+            lock (clients)
+                clients.Add(client);
+        }
+
+        private void remove(WebSocketClient client)
+        {
+            lock (clients)
+                clients.Remove(client);
         }
 
         private void broadcast()
         {
+            if (!enabled.Value)
+                return;
+
             broadcastSchedule?.Cancel();
             broadcastSchedule = Scheduler.AddDelayed(() =>
             {
@@ -72,36 +117,25 @@ namespace osu.Desktop
             }, 200);
         }
 
-        public async Task Close()
+        private void stop(bool closing = false)
         {
-            foreach (var client in clients)
-                await client.Close().ConfigureAwait(false);
-        }
-
-        private async Task handleConnections()
-        {
-            while (!cancellationToken.IsCancellationRequested)
+            cancellationToken?.Cancel();
+            Task.Run(async () =>
             {
-                var context = await listener.GetContextAsync().ConfigureAwait(false);
-                var wsContext = await context.AcceptWebSocketAsync(null).ConfigureAwait(false);
+                await Task.WhenAll(clients.ToArray().Select(c => c.Close())).ConfigureAwait(false);
 
-                var client = new WebSocketClient(wsContext.WebSocket);
-                clients.Add(client);
+                if (listener.IsListening)
+                    listener.Stop();
 
-                var thread = new Thread(() => client.Handle().Wait())
-                {
-                    Name = $"GameStateBroadcaster_Socket-{clients.Count}",
-                    IsBackground = true,
-                };
-
-                thread.Start();
-            };
+                if (closing)
+                    listener.Close();
+            });
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            Close().Wait();
+            stop(true);
         }
 
         [Serializable]
@@ -120,16 +154,30 @@ namespace osu.Desktop
 
             private readonly BlockingCollection<string> queue = new BlockingCollection<string>();
 
+            public event Action<WebSocketClient> OnClose;
+
+            public event Action<WebSocketClient> OnStart;
+
             public WebSocketClient(WebSocket socket)
             {
                 this.socket = socket;
             }
 
-            public async Task Handle() => await Task.WhenAll(receive(), send()).ConfigureAwait(false);
+            public void Start()
+            {
+                OnStart?.Invoke(this);
+                Task.WhenAll(receive(), send()).ConfigureAwait(false);
+            }
 
             public void Enqueue(string message)
             {
-                queue.Add(message, cancellationToken.Token);
+                try
+                {
+                    queue.Add(message, cancellationToken.Token);
+                }
+                catch (OperationCanceledException)
+                {
+                }
             }
 
             public async Task Close()
@@ -139,6 +187,8 @@ namespace osu.Desktop
 
                 cancellationToken.Cancel();
                 await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None).ConfigureAwait(false);
+
+                OnClose?.Invoke(this);
 
                 cancellationToken.Dispose();
                 socket.Dispose();
