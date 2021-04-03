@@ -5,7 +5,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Pooling;
-using osu.Framework.Logging;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Skinning.Default;
@@ -28,7 +27,10 @@ namespace osu.Game.Rulesets.Catch.UI
             {
                 hitObject = value;
 
-                (Drawable as ICatchHitExplosion).HitObject = value;
+                if (Drawable is ICatchHitExplosion hitExplosion)
+                {
+                    hitExplosion.HitObject = value;
+                }
             }
         }
 
@@ -54,7 +56,10 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 objectColour = value;
 
-                (Drawable as ICatchHitExplosion).ObjectColour = value;
+                if (Drawable is ICatchHitExplosion hitExplosion)
+                {
+                    hitExplosion.ObjectColour = value;
+                }
             }
         }
     }
@@ -93,8 +98,6 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             base.PrepareForUse();
 
-            Logger.Log("New!");
-
             const double duration = 400;
 
             largeFaint.Size = new Vector2(0.8f);
@@ -115,7 +118,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private void onColourChanged()
         {
-            Logger.Log("Chagned");
             const float roundness = 100;
 
             largeFaint.EdgeEffect = new EdgeEffectParameters
