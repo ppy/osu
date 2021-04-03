@@ -54,11 +54,6 @@ namespace osu.Game.Screens.Edit.Setup
 
             Children = new Drawable[]
             {
-                new BackgroundChooser
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Height = 250,
-                },
                 audioTrackTextBox = new FileChooserLabelledTextBox
                 {
                     Label = "Audio Track",
