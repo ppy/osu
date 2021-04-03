@@ -36,8 +36,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         private ReplayState<OsuAction> state;
         private double lastStateChangeTime;
 
-        private bool hasReplay;
-
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
             // grab the input manager for future use.
@@ -50,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             if (replayInputHandler != null)
             {
-                hasReplay = true;
+                replayInputHandler.HandleActionInput = false;
                 return;
             }
 
@@ -59,9 +57,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void Update(Playfield playfield)
         {
-            if (hasReplay)
-                replayInputHandler.HandleActionInput = false;
-
             bool requiresHold = false;
             bool requiresHit = false;
 
