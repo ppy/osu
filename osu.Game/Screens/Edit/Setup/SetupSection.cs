@@ -33,6 +33,10 @@ namespace osu.Game.Screens.Edit.Setup
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Spacing = new Vector2(20),
+                Padding = new MarginPadding
+                {
+                    Horizontal = 90
+                },
                 Direction = FillDirection.Vertical,
             };
         }
