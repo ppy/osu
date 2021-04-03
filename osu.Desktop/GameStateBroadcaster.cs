@@ -19,6 +19,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Online.API;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Users;
 
 namespace osu.Desktop
@@ -35,11 +36,7 @@ namespace osu.Desktop
 
         private readonly Bindable<bool> enabled = new Bindable<bool>();
 
-        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
-
-        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
-
-        private readonly Bindable<UserActivity> activity = new Bindable<UserActivity>();
+        private readonly GameState state = new GameState();
 
         private ScheduledDelegate broadcastSchedule;
 
@@ -49,20 +46,22 @@ namespace osu.Desktop
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, IAPIProvider provider, Bindable<RulesetInfo> ruleset, Bindable<WorkingBeatmap> beatmap)
+        private void load(OsuConfigManager config, IAPIProvider provider, Bindable<RulesetInfo> ruleset, Bindable<WorkingBeatmap> beatmap, Bindable<IReadOnlyList<Mod>> mods)
         {
-            this.ruleset.BindTo(ruleset);
-            this.beatmap.BindTo(beatmap);
+            state.Ruleset.BindTo(ruleset);
+            state.Beatmap.BindTo(beatmap);
+            state.Mods.BindTo(mods);
 
             (user = provider.LocalUser.GetBoundCopy()).BindValueChanged(u =>
             {
-               activity.UnbindBindings();
-               activity.BindTo(u.NewValue.Activity);
+               state.Activity.UnbindBindings();
+               state.Activity.BindTo(u.NewValue.Activity);
             });
 
-            this.ruleset.ValueChanged += _ => broadcast();
-            this.beatmap.ValueChanged += _ => broadcast();
-            activity.ValueChanged += _ => broadcast();
+            state.Mods.ValueChanged += _ => broadcast();
+            state.Ruleset.ValueChanged += _ => broadcast();
+            state.Beatmap.ValueChanged += _ => broadcast();
+            state.Activity.ValueChanged += _ => broadcast();
 
             config.BindWith(OsuSetting.PublishGameState, enabled);
 
@@ -119,15 +118,11 @@ namespace osu.Desktop
             broadcastSchedule?.Cancel();
             broadcastSchedule = Scheduler.AddDelayed(() =>
             {
-                string state = JsonConvert.SerializeObject(new GameState
-                {
-                    Ruleset = ruleset.Value,
-                    Activity = activity.Value,
-                    BeatmapMetadata = beatmap.Value.Metadata,
-                });
-
                 foreach (var client in clients)
-                    client.Enqueue(state);
+                    client.Enqueue(JsonConvert.SerializeObject(state, new JsonSerializerSettings
+                    {
+                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                    }));
             }, 200);
         }
 

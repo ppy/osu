@@ -2,9 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
+using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Users;
 
 namespace osu.Desktop
@@ -13,24 +17,55 @@ namespace osu.Desktop
     internal class GameState
     {
         [JsonConverter(typeof(UserActivityConverter))]
-        public UserActivity Activity { get; set; }
+        public Bindable<UserActivity> Activity = new Bindable<UserActivity>();
 
-        public RulesetInfo Ruleset { get; set; }
+        public Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
-        public BeatmapMetadata BeatmapMetadata { get; set; }
+        [JsonConverter(typeof(WorkingBeatmapConverter))]
+        public Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
-        private class UserActivityConverter : JsonConverter<UserActivity>
+        [JsonConverter(typeof(ModsConverter))]
+        public Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>();
+
+        private class ModsConverter : JsonConverter<Bindable<IReadOnlyList<Mod>>>
         {
-            public override UserActivity ReadJson(JsonReader reader, Type objectType, UserActivity existingValue, bool hasExistingValue, JsonSerializer serializer)
+            public override Bindable<IReadOnlyList<Mod>> ReadJson(JsonReader reader, Type objectType, Bindable<IReadOnlyList<Mod>> existingValue, bool hasExistingValue, JsonSerializer serializer)
             {
                 throw new NotImplementedException();
             }
 
-            public override void WriteJson(JsonWriter writer, UserActivity value, JsonSerializer serializer)
+            public override void WriteJson(JsonWriter writer, Bindable<IReadOnlyList<Mod>> value, JsonSerializer serializer)
+            {
+                serializer.Serialize(writer, value.Value.Select(m => m.Acronym));
+            }
+        }
+
+        private class WorkingBeatmapConverter : JsonConverter<Bindable<WorkingBeatmap>>
+        {
+            public override Bindable<WorkingBeatmap> ReadJson(JsonReader reader, Type objectType, Bindable<WorkingBeatmap> existingValue, bool hasExistingValue, JsonSerializer serializer)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override void WriteJson(JsonWriter writer, Bindable<WorkingBeatmap> value, JsonSerializer serializer)
+            {
+                var beatmap = value.Value;
+                serializer.Serialize(writer, beatmap.BeatmapInfo);
+            }
+        }
+
+        private class UserActivityConverter : JsonConverter<Bindable<UserActivity>>
+        {
+            public override Bindable<UserActivity> ReadJson(JsonReader reader, Type objectType, Bindable<UserActivity> existingValue, bool hasExistingValue, JsonSerializer serializer)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override void WriteJson(JsonWriter writer, Bindable<UserActivity> value, JsonSerializer serializer)
             {
                 string status = null;
 
-                switch (value)
+                switch (value.Value)
                 {
                     case UserActivity.Modding _:
                         status = "modding";
