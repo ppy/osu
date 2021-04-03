@@ -20,6 +20,7 @@ using osu.Game.Configuration;
 using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Users;
 
 namespace osu.Desktop
 {
@@ -39,6 +40,8 @@ namespace osu.Desktop
 
         private readonly SemaphoreSlim locker = new SemaphoreSlim(1);
 
+        private IBindable<User> user;
+
         public GameStateBroadcaster()
         {
             listener.Prefixes.Add("http://localhost:7270/");
@@ -51,11 +54,12 @@ namespace osu.Desktop
             state.Beatmap.BindTo(beatmap);
             state.Mods.BindTo(mods);
 
-            provider.LocalUser.GetBoundCopy().BindValueChanged(u =>
+            user = provider.LocalUser.GetBoundCopy();
+            user.BindValueChanged(u =>
             {
                 state.Activity.UnbindBindings();
                 state.Activity.BindTo(u.NewValue.Activity);
-            });
+            }, true);
 
             state.Mods.ValueChanged += _ => broadcast();
             state.Ruleset.ValueChanged += _ => broadcast();
@@ -88,6 +92,7 @@ namespace osu.Desktop
                     var client = new WebSocketClient(wsContext.WebSocket);
                     client.OnStart += add;
                     client.OnClose += remove;
+                    client.OnReady += () => client.Enqueue(getStateAsString());
 
                     client.Start();
                 }
@@ -120,12 +125,7 @@ namespace osu.Desktop
                 lock (clients)
                 {
                     foreach (var client in clients)
-                    {
-                        client.Enqueue(JsonConvert.SerializeObject(state, new JsonSerializerSettings
-                        {
-                            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-                        }));
-                    }
+                        client.Enqueue(getStateAsString());
                 }
             }, 200);
         }
@@ -156,6 +156,14 @@ namespace osu.Desktop
             });
         }
 
+        private string getStateAsString()
+        {
+            return JsonConvert.SerializeObject(state, new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            });
+        }
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
@@ -173,6 +181,10 @@ namespace osu.Desktop
             public event Action<WebSocketClient> OnClose;
 
             public event Action<WebSocketClient> OnStart;
+
+            public event Action OnReady;
+
+            private bool hasStarted;
 
             public WebSocketClient(WebSocket socket)
             {
@@ -221,6 +233,12 @@ namespace osu.Desktop
 
                         if (socket.State == WebSocketState.Open && queue.TryTake(out string message))
                             await socket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(message)), WebSocketMessageType.Text, true, cancellationToken.Token).ConfigureAwait(false);
+
+                        if (!hasStarted)
+                        {
+                            OnReady?.Invoke();
+                            hasStarted = true;
+                        }
                     }
                     catch (OperationCanceledException)
                     {
