@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Edit.Setup
         public SetupScreen()
             : base(EditorScreenMode.SongSetup)
         {
-            ColourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
+            ColourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
         }
 
         [BackgroundDependencyLoader]
@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Edit.Setup
                     {
                         new Box
                         {
-                            Colour = colours.GreySeafoamDark,
+                            Colour = ColourProvider.Dark4,
                             RelativeSizeAxes = Axes.Both,
                         },
                         new SectionsContainer<SetupSection>
