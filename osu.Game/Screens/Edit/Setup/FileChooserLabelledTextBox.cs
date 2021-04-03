@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Edit.Setup
         {
             FileSelector fileSelector;
 
-            Target.Child = fileSelector = new FileSelector(validFileExtensions: ResourcesSection.AudioExtensions)
+            Target.Child = fileSelector = new FileSelector(currentFile.Value?.DirectoryName, ResourcesSection.AudioExtensions)
             {
                 RelativeSizeAxes = Axes.X,
                 Height = 400,
