@@ -116,8 +116,8 @@ namespace osu.Game.Rulesets.Catch.UI
         private float hyperDashTargetPosition;
         private Bindable<bool> hitLighting;
 
-        private readonly DrawablePool<HitExplosion> hitExplosionPool;
-        private readonly Container<HitExplosion> hitExplosionContainer;
+        private readonly DrawablePool<CatchHitExplosion> hitExplosionPool;
+        private readonly Container<CatchHitExplosion> hitExplosionContainer;
 
         private readonly DrawablePool<CaughtFruit> caughtFruitPool;
         private readonly DrawablePool<CaughtBanana> caughtBananaPool;
@@ -138,7 +138,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             InternalChildren = new Drawable[]
             {
-                hitExplosionPool = new DrawablePool<HitExplosion>(10),
+                hitExplosionPool = new DrawablePool<CatchHitExplosion>(10),
                 caughtFruitPool = new DrawablePool<CaughtFruit>(50),
                 caughtBananaPool = new DrawablePool<CaughtBanana>(100),
                 // less capacity is needed compared to fruit because droplet is not stacked
@@ -163,7 +163,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     Anchor = Anchor.TopCentre,
                     Alpha = 0,
                 },
-                hitExplosionContainer = new Container<HitExplosion>
+                hitExplosionContainer = new Container<CatchHitExplosion>
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.BottomCentre,
@@ -507,7 +507,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private void addLighting(CatchHitObject hitObject, float x, Color4 colour)
         {
-            HitExplosion hitExplosion = hitExplosionPool.Get();
+            CatchHitExplosion hitExplosion = hitExplosionPool.Get();
             hitExplosion.HitObject = hitObject;
             hitExplosion.X = x;
             hitExplosion.Scale = new Vector2(hitObject.Scale);

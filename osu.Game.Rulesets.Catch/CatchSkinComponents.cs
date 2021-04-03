@@ -11,6 +11,7 @@ namespace osu.Game.Rulesets.Catch
         CatcherIdle,
         CatcherFail,
         CatcherKiai,
-        CatchComboCounter
+        CatchComboCounter,
+        LightingGlow
     }
 }

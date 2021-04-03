@@ -3,89 +3,83 @@
 
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Pooling;
-using osu.Framework.Logging;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Catch.Objects;
-using osu.Game.Rulesets.Catch.Skinning.Default;
-using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class CatchHitExplosion : SkinnableDrawable
+    public class HitExplosion : PoolableDrawable
     {
-        protected override bool ApplySizeRestrictionsToDefault => true;
-
-        private CatchHitObject hitObject;
-
-        public CatchHitObject HitObject
-        {
-            get => hitObject;
-            set
-            {
-                hitObject = value;
-
-                (Drawable as ICatchHitExplosion).HitObject = value;
-            }
-        }
-
-        public CatchHitExplosion()
-            : base(new CatchSkinComponent(CatchSkinComponents.LightingGlow), _ => new DefaultHitExplosion())
-        {
-            RelativeSizeAxes = Axes.None;
-
-            Size = new Vector2(20);
-            Anchor = Anchor.TopCentre;
-            Origin = Anchor.BottomCentre;
-        }
-
         private Color4 objectColour;
+        public CatchHitObject HitObject;
 
         public Color4 ObjectColour
         {
             get => objectColour;
             set
             {
-                if (objectColour == value)
-                    return;
+                if (objectColour == value) return;
 
                 objectColour = value;
-
-                (Drawable as ICatchHitExplosion).ObjectColour = value;
+                onColourChanged();
             }
         }
-    }
 
-    public class DefaultHitExplosion : PoolableDrawable, ICatchHitExplosion
-    {
-        private readonly FadePiece largeFaint;
-        private readonly FadePiece smallFaint;
-        private readonly GlowPiece directionalGlow1;
-        private readonly GlowPiece directionalGlow2;
+        private readonly CircularContainer largeFaint;
+        private readonly CircularContainer smallFaint;
+        private readonly CircularContainer directionalGlow1;
+        private readonly CircularContainer directionalGlow2;
 
-        public DefaultHitExplosion()
+        public HitExplosion()
         {
             Size = new Vector2(20);
             Anchor = Anchor.TopCentre;
             Origin = Anchor.BottomCentre;
 
+            // scale roughly in-line with visual appearance of notes
             const float initial_height = 10;
 
             InternalChildren = new Drawable[]
             {
-                directionalGlow1 = new GlowPiece()
+                largeFaint = new CircularContainer
                 {
-                    Size = new Vector2(0.01f, initial_height),
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    Blending = BlendingParameters.Additive,
                 },
-                directionalGlow2 = new GlowPiece()
+                smallFaint = new CircularContainer
                 {
-                    Size = new Vector2(0.01f, initial_height),
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    Blending = BlendingParameters.Additive,
                 },
-                largeFaint = new FadePiece(),
-                smallFaint = new FadePiece()
+                directionalGlow1 = new CircularContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    Size = new Vector2(0.01f, initial_height),
+                    Blending = BlendingParameters.Additive,
+                },
+                directionalGlow2 = new CircularContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    Size = new Vector2(0.01f, initial_height),
+                    Blending = BlendingParameters.Additive,
+                }
             };
         }
 
@@ -93,29 +87,24 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             base.PrepareForUse();
 
-            Logger.Log("New!");
-
             const double duration = 400;
 
+            // we want our size to be very small so the glow dominates it.
             largeFaint.Size = new Vector2(0.8f);
             largeFaint
                 .ResizeTo(largeFaint.Size * new Vector2(5, 1), duration, Easing.OutQuint)
                 .FadeOut(duration * 2);
 
             const float angle_variangle = 15; // should be less than 45
-
             directionalGlow1.Rotation = RNG.NextSingle(-angle_variangle, angle_variangle);
             directionalGlow2.Rotation = RNG.NextSingle(-angle_variangle, angle_variangle);
 
             this.FadeInFromZero(50).Then().FadeOut(duration, Easing.Out);
-
             Expire(true);
         }
 
-
         private void onColourChanged()
         {
-            Logger.Log("Chagned");
             const float roundness = 100;
 
             largeFaint.EdgeEffect = new EdgeEffectParameters
@@ -142,22 +131,5 @@ namespace osu.Game.Rulesets.Catch.UI
                 Radius = 40,
             };
         }
-
-        private Color4 objectColour;
-
-        public Color4 ObjectColour
-        {
-            get => objectColour;
-            set
-            {
-                // We know this is a different value because we would
-                // not be sent the update if it wasn't
-                objectColour = value;
-
-                onColourChanged();
-            }
-        }
-
-        public CatchHitObject HitObject { get; set; }
     }
 }
