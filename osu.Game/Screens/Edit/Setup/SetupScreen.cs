@@ -13,11 +13,16 @@ namespace osu.Game.Screens.Edit.Setup
 {
     public class SetupScreen : EditorScreen
     {
+        public const int HORIZONTAL_PADDING = 100;
+
         [Resolved]
         private OsuColour colours { get; set; }
 
         [Cached]
         protected readonly OverlayColourProvider ColourProvider;
+
+        [Cached]
+        private SectionsContainer<SetupSection> sections = new SectionsContainer<SetupSection>();
 
         public SetupScreen()
             : base(EditorScreenMode.SongSetup)
@@ -44,7 +49,7 @@ namespace osu.Game.Screens.Edit.Setup
                             Colour = ColourProvider.Dark4,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        new SectionsContainer<SetupSection>
+                        sections = new SectionsContainer<SetupSection>
                         {
                             FixedHeader = new SetupScreenHeader(),
                             RelativeSizeAxes = Axes.Both,
@@ -58,21 +63,6 @@ namespace osu.Game.Screens.Edit.Setup
                     }
                 }
             };
-        }
-    }
-
-    internal class SetupScreenHeader : OverlayHeader
-    {
-        protected override OverlayTitle CreateTitle() => new SetupScreenTitle();
-
-        private class SetupScreenTitle : OverlayTitle
-        {
-            public SetupScreenTitle()
-            {
-                Title = "beatmap setup";
-                Description = "change general settings of your beatmap";
-                IconTexture = "Icons/Hexacons/social";
-            }
         }
     }
 }
