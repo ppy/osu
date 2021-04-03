@@ -120,6 +120,7 @@ namespace osu.Desktop
         private void stop(bool closing = false)
         {
             cancellationToken?.Cancel();
+            broadcastSchedule?.Cancel();
             Task.Run(async () =>
             {
                 await Task.WhenAll(clients.ToArray().Select(c => c.Close())).ConfigureAwait(false);
