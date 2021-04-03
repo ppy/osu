@@ -10,13 +10,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 
@@ -25,13 +21,10 @@ namespace osu.Game.Screens.Edit.Setup
     internal class ResourcesSection : SetupSection, ICanAcceptFiles
     {
         private LabelledTextBox audioTrackTextBox;
-        private Container backgroundSpriteContainer;
 
         public override LocalisableString Title => "Resources";
 
-        public IEnumerable<string> HandledExtensions => ImageExtensions.Concat(AudioExtensions);
-
-        public static string[] ImageExtensions { get; } = { ".jpg", ".jpeg", ".png" };
+        public IEnumerable<string> HandledExtensions => AudioExtensions;
 
         public static string[] AudioExtensions { get; } = { ".mp3", ".ogg" };
 
@@ -61,12 +54,10 @@ namespace osu.Game.Screens.Edit.Setup
 
             Children = new Drawable[]
             {
-                backgroundSpriteContainer = new Container
+                new BackgroundChooser
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = 250,
-                    Masking = true,
-                    CornerRadius = 10,
                 },
                 audioTrackTextBox = new FileChooserLabelledTextBox
                 {
@@ -79,8 +70,6 @@ namespace osu.Game.Screens.Edit.Setup
                 audioTrackFileChooserContainer,
             };
 
-            updateBackgroundSprite();
-
             audioTrackTextBox.Current.BindValueChanged(audioTrackChanged);
         }
 
@@ -90,14 +79,7 @@ namespace osu.Game.Screens.Edit.Setup
             {
                 var firstFile = new FileInfo(paths.First());
 
-                if (ImageExtensions.Contains(firstFile.Extension))
-                {
-                    ChangeBackgroundImage(firstFile.FullName);
-                }
-                else if (AudioExtensions.Contains(firstFile.Extension))
-                {
-                    audioTrackTextBox.Text = firstFile.FullName;
-                }
+                audioTrackTextBox.Text = firstFile.FullName;
             });
             return Task.CompletedTask;
         }
@@ -108,33 +90,6 @@ namespace osu.Game.Screens.Edit.Setup
         {
             base.LoadComplete();
             game.RegisterImportHandler(this);
-        }
-
-        public bool ChangeBackgroundImage(string path)
-        {
-            var info = new FileInfo(path);
-
-            if (!info.Exists)
-                return false;
-
-            var set = working.Value.BeatmapSetInfo;
-
-            // remove the previous background for now.
-            // in the future we probably want to check if this is being used elsewhere (other difficulties?)
-            var oldFile = set.Files.FirstOrDefault(f => f.Filename == working.Value.Metadata.BackgroundFile);
-
-            using (var stream = info.OpenRead())
-            {
-                if (oldFile != null)
-                    beatmaps.ReplaceFile(set, oldFile, stream, info.Name);
-                else
-                    beatmaps.AddFile(set, stream, info.Name);
-            }
-
-            working.Value.Metadata.BackgroundFile = info.Name;
-            updateBackgroundSprite();
-
-            return true;
         }
 
         protected override void Dispose(bool isDisposing)
@@ -176,41 +131,6 @@ namespace osu.Game.Screens.Edit.Setup
         {
             if (!ChangeAudioTrack(filePath.NewValue))
                 audioTrackTextBox.Current.Value = filePath.OldValue;
-        }
-
-        private void updateBackgroundSprite()
-        {
-            LoadComponentAsync(new BeatmapBackgroundSprite(working.Value)
-            {
-                RelativeSizeAxes = Axes.Both,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                FillMode = FillMode.Fill,
-            }, background =>
-            {
-                if (background.Texture != null)
-                    backgroundSpriteContainer.Child = background;
-                else
-                {
-                    backgroundSpriteContainer.Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            Colour = Colours.GreySeafoamDarker,
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                        new OsuTextFlowContainer(t => t.Font = OsuFont.Default.With(size: 24))
-                        {
-                            Text = "Drag image here to set beatmap background!",
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            AutoSizeAxes = Axes.X,
-                        }
-                    };
-                }
-
-                background.FadeInFromZero(500);
-            });
         }
     }
 }
