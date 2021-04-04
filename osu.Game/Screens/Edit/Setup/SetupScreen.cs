@@ -24,6 +24,9 @@ namespace osu.Game.Screens.Edit.Setup
         [Cached]
         private SectionsContainer<SetupSection> sections = new SectionsContainer<SetupSection>();
 
+        [Cached]
+        private SetupScreenHeader header = new SetupScreenHeader();
+
         public SetupScreen()
             : base(EditorScreenMode.SongSetup)
         {
@@ -51,7 +54,7 @@ namespace osu.Game.Screens.Edit.Setup
                         },
                         sections = new SectionsContainer<SetupSection>
                         {
-                            FixedHeader = new SetupScreenHeader(),
+                            FixedHeader = header,
                             RelativeSizeAxes = Axes.Both,
                             Children = new SetupSection[]
                             {

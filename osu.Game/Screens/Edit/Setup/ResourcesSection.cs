@@ -17,6 +17,7 @@ namespace osu.Game.Screens.Edit.Setup
     internal class ResourcesSection : SetupSection
     {
         private LabelledTextBox audioTrackTextBox;
+        private LabelledTextBox backgroundTextBox;
 
         public override LocalisableString Title => "Resources";
 
@@ -32,17 +33,26 @@ namespace osu.Game.Screens.Edit.Setup
         [Resolved(canBeNull: true)]
         private Editor editor { get; set; }
 
+        [Resolved]
+        private SetupScreenHeader header { get; set; }
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            Container audioTrackFileChooserContainer = new Container
-            {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-            };
+            Container audioTrackFileChooserContainer = createFileChooserContainer();
+            Container backgroundFileChooserContainer = createFileChooserContainer();
 
             Children = new Drawable[]
             {
+                backgroundTextBox = new FileChooserLabelledTextBox(".jpg", ".jpeg", ".png")
+                {
+                    Label = "Background",
+                    PlaceholderText = "Click to select a background image",
+                    Current = { Value = working.Value.Metadata.BackgroundFile },
+                    Target = backgroundFileChooserContainer,
+                    TabbableContentContainer = this
+                },
+                backgroundFileChooserContainer,
                 audioTrackTextBox = new FileChooserLabelledTextBox(".mp3", ".ogg")
                 {
                     Label = "Audio Track",
@@ -54,8 +64,16 @@ namespace osu.Game.Screens.Edit.Setup
                 audioTrackFileChooserContainer,
             };
 
+            backgroundTextBox.Current.BindValueChanged(backgroundChanged);
             audioTrackTextBox.Current.BindValueChanged(audioTrackChanged);
         }
+
+        private static Container createFileChooserContainer() =>
+            new Container
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+            };
 
         public bool ChangeAudioTrack(string path)
         {
@@ -84,6 +102,39 @@ namespace osu.Game.Screens.Edit.Setup
 
             editor?.UpdateClockSource();
             return true;
+        }
+
+        public bool ChangeBackgroundImage(string path)
+        {
+            var info = new FileInfo(path);
+
+            if (!info.Exists)
+                return false;
+
+            var set = working.Value.BeatmapSetInfo;
+
+            // remove the previous background for now.
+            // in the future we probably want to check if this is being used elsewhere (other difficulties?)
+            var oldFile = set.Files.FirstOrDefault(f => f.Filename == working.Value.Metadata.BackgroundFile);
+
+            using (var stream = info.OpenRead())
+            {
+                if (oldFile != null)
+                    beatmaps.ReplaceFile(set, oldFile, stream, info.Name);
+                else
+                    beatmaps.AddFile(set, stream, info.Name);
+            }
+
+            working.Value.Metadata.BackgroundFile = info.Name;
+            header.Background.UpdateBackground();
+
+            return true;
+        }
+
+        private void backgroundChanged(ValueChangedEvent<string> filePath)
+        {
+            if (!ChangeBackgroundImage(filePath.NewValue))
+                backgroundTextBox.Current.Value = filePath.OldValue;
         }
 
         private void audioTrackChanged(ValueChangedEvent<string> filePath)
