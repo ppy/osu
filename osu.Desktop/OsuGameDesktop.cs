@@ -110,6 +110,7 @@ namespace osu.Desktop
                 LoadComponentAsync(versionManager = new VersionManager { Depth = int.MinValue }, Add);
 
             LoadComponentAsync(new DiscordRichPresence(), Add);
+            LoadComponentAsync(new GameStateBroadcaster(), Add);
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
                 LoadComponentAsync(new GameplayWinKeyBlocker(), Add);

@@ -11,7 +11,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Users;
 
-namespace osu.Game.Online
+namespace osu.Desktop
 {
     [Serializable]
     public class GameState

@@ -31,6 +31,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.2.6" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
     <PackageReference Include="DiscordRichPresence" Version="1.0.175" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup Label="Resources">
     <EmbeddedResource Include="lazer.ico" />
