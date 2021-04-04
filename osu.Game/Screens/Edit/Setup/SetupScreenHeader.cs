@@ -14,6 +14,8 @@ namespace osu.Game.Screens.Edit.Setup
 {
     internal class SetupScreenHeader : OverlayHeader
     {
+        public SetupScreenHeaderBackground Background { get; private set; }
+
         [Resolved]
         private SectionsContainer<SetupSection> sections { get; set; }
 
@@ -38,7 +40,7 @@ namespace osu.Game.Screens.Edit.Setup
                         RelativeSizeAxes = Axes.X,
                         Height = 30
                     },
-                    new BackgroundChooser
+                    Background = new SetupScreenHeaderBackground
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = 120
