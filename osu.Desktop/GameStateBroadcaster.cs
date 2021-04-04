@@ -1,19 +1,19 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
-// See the LICENCE file in the repository root for full licence text.
-
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -26,23 +26,32 @@ namespace osu.Desktop
 {
     internal class GameStateBroadcaster : Component
     {
+        private const double debounce_time = 100;
+
+        private readonly IWebHost host;
+
+        private ScheduledDelegate broadcastSchedule;
+
         private readonly List<WebSocketClient> clients = new List<WebSocketClient>();
-
-        private readonly HttpListener listener = new HttpListener();
-
-        private CancellationTokenSource cancellationToken;
 
         private readonly Bindable<bool> enabled = new Bindable<bool>();
 
         private readonly GameState state = new GameState();
 
-        private ScheduledDelegate broadcastSchedule;
-
         private IBindable<User> user;
 
         public GameStateBroadcaster()
         {
-            listener.Prefixes.Add("http://localhost:7270/");
+            host = new WebHostBuilder()
+                .ConfigureServices(s =>
+                {
+                    s.AddSingleton(this);
+                    s.AddTransient<WebSocketMiddleware>();
+                })
+                .UseKestrel()
+                .UseUrls("http://localhost:7270")
+                .UseStartup<Startup>()
+                .Build();
         }
 
         [BackgroundDependencyLoader]
@@ -69,44 +78,19 @@ namespace osu.Desktop
             enabled.BindValueChanged(state =>
             {
                 if (state.NewValue)
-                    Task.Factory.StartNew(start, TaskCreationOptions.LongRunning);
+                    host.Start();
                 else
                     stop();
             }, true);
         }
 
-        private async Task start()
-        {
-            cancellationToken = new CancellationTokenSource();
-            listener.Start();
-
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                try
-                {
-                    var context = await listener.GetContextAsync().ConfigureAwait(false);
-                    var wsContext = await context.AcceptWebSocketAsync(null).ConfigureAwait(false);
-
-                    var client = new WebSocketClient(wsContext.WebSocket);
-                    client.OnStart += add;
-                    client.OnClose += remove;
-                    client.OnReady += () => client.Enqueue(getStateAsString());
-
-                    client.Start();
-                }
-                catch (HttpListenerException)
-                {
-                }
-            }
-        }
-
-        private void add(WebSocketClient client)
+        public void AddWebSocketClient(WebSocketClient client)
         {
             lock (clients)
                 clients.Add(client);
         }
 
-        private void remove(WebSocketClient client)
+        public void RemoveWebSocketClient(WebSocketClient client)
         {
             lock (clients)
                 clients.Remove(client);
@@ -114,9 +98,6 @@ namespace osu.Desktop
 
         private void broadcast()
         {
-            if (!enabled.Value)
-                return;
-
             broadcastSchedule?.Cancel();
             broadcastSchedule = Scheduler.AddDelayed(() =>
             {
@@ -125,27 +106,7 @@ namespace osu.Desktop
                     foreach (var client in clients)
                         client.Enqueue(getStateAsString());
                 }
-            }, 200);
-        }
-
-        private void stop(bool closing = false)
-        {
-            cancellationToken?.Cancel();
-            broadcastSchedule?.Cancel();
-            Task.Run(async () =>
-            {
-                IEnumerable<Task> closeTasks;
-                lock (clients)
-                    closeTasks = clients.Select(c => c.Close());
-
-                await Task.WhenAll(closeTasks).ConfigureAwait(false);
-
-                if (listener.IsListening)
-                    listener.Stop();
-
-                if (closing)
-                    listener.Close();
-            });
+            }, debounce_time);
         }
 
         private string getStateAsString()
@@ -156,27 +117,86 @@ namespace osu.Desktop
             });
         }
 
-        protected override void Dispose(bool isDisposing)
+        private void stop()
         {
-            base.Dispose(isDisposing);
-            stop(true);
+            broadcastSchedule?.Cancel();
+            Task.Run(async () =>
+            {
+                IEnumerable<Task> closeTasks;
+                lock (clients)
+                    closeTasks = clients.Select(c => c.Close());
+
+                await Task.WhenAll(closeTasks).ConfigureAwait(false);
+                await host.StopAsync().ConfigureAwait(false);
+            });
         }
 
-        private sealed class WebSocketClient
+        private class Startup
+        {
+            private readonly GameStateBroadcaster component;
+
+            public Startup(GameStateBroadcaster component)
+            {
+                this.component = component;
+            }
+
+            public void Configure(IApplicationBuilder app)
+            {
+                app.UseWebSockets();
+                app.UseMiddleware<WebSocketMiddleware>(component);
+            }
+        }
+
+        public class WebSocketMiddleware
+        {
+            private readonly RequestDelegate next;
+
+            private readonly GameStateBroadcaster component;
+
+            public WebSocketMiddleware(RequestDelegate next, GameStateBroadcaster component)
+            {
+                this.component = component;
+                this.next = next;
+            }
+
+            public async Task InvokeAsync(HttpContext context)
+            {
+                try
+                {
+                    if (context.WebSockets.IsWebSocketRequest)
+                    {
+                        var socket = await context.WebSockets.AcceptWebSocketAsync().ConfigureAwait(false);
+                        var client = new WebSocketClient(socket);
+                        client.OnStart += component.AddWebSocketClient;
+                        client.OnClose += component.RemoveWebSocketClient;
+                        client.Start();
+
+                        await client.CompletionSource.Task.ConfigureAwait(false);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.Log($"An exception occured in the WebSocket\n{e.GetType().Name}\n{e.StackTrace}", LoggingTarget.Network);
+                    throw;
+                }
+
+                await next(context).ConfigureAwait(false);
+            }
+        }
+
+        public class WebSocketClient
         {
             private readonly WebSocket socket;
 
             private readonly CancellationTokenSource cancellationToken = new CancellationTokenSource();
 
-            private readonly BlockingCollection<string> queue = new BlockingCollection<string>();
-
-            public event Action<WebSocketClient> OnClose;
+            private readonly Queue<string> queue = new Queue<string>();
 
             public event Action<WebSocketClient> OnStart;
 
-            public event Action OnReady;
+            public event Action<WebSocketClient> OnClose;
 
-            private bool hasStarted;
+            public readonly TaskCompletionSource<bool> CompletionSource = new TaskCompletionSource<bool>();
 
             public WebSocketClient(WebSocket socket)
             {
@@ -191,27 +211,24 @@ namespace osu.Desktop
 
             public void Enqueue(string message)
             {
-                try
-                {
-                    queue.Add(message, cancellationToken.Token);
-                }
-                catch (OperationCanceledException)
-                {
-                }
+                lock (queue)
+                    queue.Enqueue(message);
             }
 
-            public async Task Close()
+            public async Task Close(bool graceful = false)
             {
-                if (socket.State != WebSocketState.Open)
-                    return;
+                if (graceful)
+                    await socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None).ConfigureAwait(false);
+                else
+                    await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None).ConfigureAwait(false);
 
                 cancellationToken.Cancel();
-                await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None).ConfigureAwait(false);
+                cancellationToken.Dispose();
 
                 OnClose?.Invoke(this);
-
-                cancellationToken.Dispose();
                 socket.Dispose();
+
+                CompletionSource.SetResult(true);
             }
 
             private async Task send()
@@ -223,14 +240,14 @@ namespace osu.Desktop
                         if (socket.State == WebSocketState.Closed || socket.State == WebSocketState.Aborted)
                             break;
 
-                        if (socket.State == WebSocketState.Open && queue.TryTake(out string message))
-                            await socket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(message)), WebSocketMessageType.Text, true, cancellationToken.Token).ConfigureAwait(false);
+                        bool success = false;
+                        string message = null;
 
-                        if (!hasStarted)
-                        {
-                            OnReady?.Invoke();
-                            hasStarted = true;
-                        }
+                        lock (queue)
+                            success = queue.TryDequeue(out message);
+
+                        if (socket.State == WebSocketState.Open && success)
+                            await socket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(message)), WebSocketMessageType.Text, true, cancellationToken.Token).ConfigureAwait(false);
                     }
                     catch (OperationCanceledException)
                     {
@@ -251,7 +268,7 @@ namespace osu.Desktop
                         var received = await socket.ReceiveAsync(buffer, cancellationToken.Token).ConfigureAwait(false);
 
                         if (socket.State == WebSocketState.CloseReceived && received.MessageType == WebSocketMessageType.Close)
-                            await socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None).ConfigureAwait(false);
+                            await Close(true).ConfigureAwait(false);
                     }
                     catch (OperationCanceledException)
                     {
