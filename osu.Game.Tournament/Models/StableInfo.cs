@@ -29,10 +29,9 @@ namespace osu.Game.Tournament.Models
 
         private readonly Storage configStorage;
 
-        public StableInfo(Storage storage)
+        public StableInfo(TournamentStorage storage)
         {
-            TournamentStorage tStorage = (TournamentStorage)storage;
-            configStorage = tStorage.AllTournaments;
+            configStorage = storage.AllTournaments;
 
             if (!configStorage.Exists(config_path))
                 return;
