@@ -138,7 +138,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             InternalChildren = new Drawable[]
             {
-                hitExplosionPool = new DrawablePool<PoolableHitExplosion>(10),
+                hitExplosionPool = new DrawablePool<PoolableHitExplosion>(2),
                 caughtFruitPool = new DrawablePool<CaughtFruit>(50),
                 caughtBananaPool = new DrawablePool<CaughtBanana>(100),
                 // less capacity is needed compared to fruit because droplet is not stacked
@@ -510,7 +510,6 @@ namespace osu.Game.Rulesets.Catch.UI
             PoolableHitExplosion hitExplosion = hitExplosionPool.Get();
             hitExplosion.HitObject = hitObject;
             hitExplosion.CatchPosition = catchPosition;
-            hitExplosion.Scale = new Vector2(0.45f, 0.45f);
             hitExplosion.ObjectColour = colour;
             hitExplosion.JudgementResult = result;
             hitExplosion.CatcherWidth = catchWidth;

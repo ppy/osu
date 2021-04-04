@@ -50,6 +50,8 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
         {
             explosion1.Colour = explosion2.Colour = ObjectColour;
 
+            Scale = new Vector2(0.40f, 0.40f);
+
             float catcherWidthHalf = CatcherWidth * 0.5f;
 
             float explosionOffset = Math.Clamp(CatchPosition, -catcherWidthHalf + CatcherMargin * 3, catcherWidthHalf - CatcherMargin * 3);
@@ -62,18 +64,16 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                 explosion1.Alpha = 1;
                 explosion1.Position = new Vector2(explosionOffset, 0);
 
-                explosion1.FadeOut(300);
-                explosion1.ScaleTo(new Vector2(16 * scale, 1.1f), 160, Easing.Out);
+                explosion1.ScaleTo(new Vector2(20 * scale, 1.1f), 160, Easing.Out).Then().FadeOut(140);
             }
 
             explosion2.Scale = new Vector2(0.9f, 1f);
             explosion2.Alpha = 1;
             explosion2.Position = new Vector2(explosionOffset, 0);
 
-            explosion2.FadeOut(700);
-            explosion2.ScaleTo(new Vector2(0.9f, 1.3f), 500, Easing.Out);
+            explosion2.ScaleTo(new Vector2(0.9f, 1.3f), 500, Easing.Out).Then().FadeOut(200);
 
-            this.FadeInFromZero(20).Then().FadeOut(1000, Easing.Out);
+            this.FadeInFromZero(5).Then().FadeOut(1000, Easing.Out);
 
             Expire(true);
         }

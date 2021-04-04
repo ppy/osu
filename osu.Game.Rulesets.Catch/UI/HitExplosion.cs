@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Catch.UI
             {
                 directionalGlow1 = new GlowPiece()
                 {
-                    Size = new Vector2(0.01f, initial_height),
+                    Size = new Vector2(0.01f, initial_height)
                 },
                 directionalGlow2 = new GlowPiece()
                 {
@@ -75,34 +75,26 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public override void Animate()
         {
-            // If the color has changed since last time this was animated
-            // or has never been assigned.
-            if (lastColor != ObjectColour)
-            {
-                lastColor = ObjectColour;
-                onColourChanged();
-            }
+            Scale = new Vector2(HitObject.Scale);
 
-            if ((HitObject is Droplet))
-            {
-                const double duration = 1000;
+            const double duration = 800;
 
-                // This is a hack to prevent invalid objects? I don't know why
-                this.Delay(50).Then().FadeOut(duration, Easing.Out);
-
-                Expire(true);
-            }
-            else
+            if (!(HitObject is Droplet))
             {
-                const double duration = 1000;
+                // If the color has changed since last time this was animated
+                // or has never been assigned.
+                if (lastColor != ObjectColour)
+                {
+                    lastColor = ObjectColour;
+                    onColourChanged();
+                }
 
                 X = CatchPosition;
 
                 largeFaint.Size = new Vector2(0.8f);
-                largeFaint.Alpha = 1;
                 largeFaint
                     .ResizeTo(largeFaint.Size * new Vector2(5, 1), duration, Easing.OutQuint)
-                    .FadeOut(duration * 2);
+                    .FadeOutFromOne(duration * 2);
 
                 const float angle_variangle = 15; // should be less than 45
 
@@ -110,8 +102,10 @@ namespace osu.Game.Rulesets.Catch.UI
                 directionalGlow2.Rotation = RNG.NextSingle(-angle_variangle, angle_variangle);
 
                 this.FadeInFromZero(50).Then().FadeOut(duration, Easing.Out);
-
-                Expire(true);
+            }
+            else
+            {
+                this.Delay(50).Then().Delay(duration);
             }
         }
     }

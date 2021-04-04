@@ -13,6 +13,9 @@ namespace osu.Game.Rulesets.Catch.UI
     /// </summary>
     public abstract class CatchHitExplosion : CompositeDrawable, ICatchHitExplosion
     {
+        public override bool RemoveWhenNotAlive => true;
+        public override bool RemoveCompletedTransforms => false;
+
         public Color4 ObjectColour { get; set; }
         public PalpableCatchHitObject HitObject { get; set; }
         public JudgementResult JudgementResult { get; set; }
@@ -20,6 +23,23 @@ namespace osu.Game.Rulesets.Catch.UI
         public float CatcherWidth { get; set; }
         public float CatchPosition { get; set; }
         public abstract void Animate();
+
+        public void RunAnimation()
+        {
+            var resultTime = JudgementResult.TimeAbsolute;
+
+            LifetimeStart = resultTime;
+
+            ApplyTransformsAt(double.MinValue, true);
+            ClearTransforms(true);
+
+            using (BeginAbsoluteSequence(resultTime))
+            {
+                Animate();
+            }
+
+            LifetimeEnd = LatestTransformEndTime;
+        }
     }
 
     /// <summary>

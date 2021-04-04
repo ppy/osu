@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             base.PrepareForUse();
 
-            if (skinnableExplosion?.Drawable is ICatchHitExplosion explosion)
+            if (skinnableExplosion?.Drawable is CatchHitExplosion explosion)
             {
                 explosion.JudgementResult = JudgementResult;
                 explosion.ObjectColour = ObjectColour;
@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 explosion.CatcherMargin = CatcherMargin;
                 explosion.CatcherWidth = CatcherWidth;
 
-                explosion.Animate();
+                explosion.RunAnimation();
             }
 
             this.Delay(DURATION).Then().Expire(true);
