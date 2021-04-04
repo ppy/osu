@@ -44,24 +44,42 @@ namespace osu.Game.Screens.Edit.Setup
 
             Children = new Drawable[]
             {
-                backgroundTextBox = new FileChooserLabelledTextBox(".jpg", ".jpeg", ".png")
+                new FillFlowContainer
                 {
-                    Label = "Background",
-                    PlaceholderText = "Click to select a background image",
-                    Current = { Value = working.Value.Metadata.BackgroundFile },
-                    Target = backgroundFileChooserContainer,
-                    TabbableContentContainer = this
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Children = new Drawable[]
+                    {
+                        backgroundTextBox = new FileChooserLabelledTextBox(".jpg", ".jpeg", ".png")
+                        {
+                            Label = "Background",
+                            PlaceholderText = "Click to select a background image",
+                            Current = { Value = working.Value.Metadata.BackgroundFile },
+                            Target = backgroundFileChooserContainer,
+                            TabbableContentContainer = this
+                        },
+                        backgroundFileChooserContainer,
+                    }
                 },
-                backgroundFileChooserContainer,
-                audioTrackTextBox = new FileChooserLabelledTextBox(".mp3", ".ogg")
+                new FillFlowContainer
                 {
-                    Label = "Audio Track",
-                    PlaceholderText = "Click to select a track",
-                    Current = { Value = working.Value.Metadata.AudioFile },
-                    Target = audioTrackFileChooserContainer,
-                    TabbableContentContainer = this
-                },
-                audioTrackFileChooserContainer,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Children = new Drawable[]
+                    {
+                        audioTrackTextBox = new FileChooserLabelledTextBox(".mp3", ".ogg")
+                        {
+                            Label = "Audio Track",
+                            PlaceholderText = "Click to select a track",
+                            Current = { Value = working.Value.Metadata.AudioFile },
+                            Target = audioTrackFileChooserContainer,
+                            TabbableContentContainer = this
+                        },
+                        audioTrackFileChooserContainer,
+                    }
+                }
             };
 
             backgroundTextBox.Current.BindValueChanged(backgroundChanged);
