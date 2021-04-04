@@ -199,6 +199,7 @@ namespace osu.Desktop
                         var client = new WebSocketClient(socket);
                         client.OnStart += component.AddWebSocketClient;
                         client.OnClose += component.RemoveWebSocketClient;
+                        client.OnReady += component.Broadcast;
                         client.Start();
 
                         await client.CompletionSource.Task.ConfigureAwait(false);
@@ -225,6 +226,10 @@ namespace osu.Desktop
             public event Action<WebSocketClient> OnStart;
 
             public event Action<WebSocketClient> OnClose;
+
+            public event Action OnReady;
+
+            private bool isReady;
 
             public readonly TaskCompletionSource<bool> CompletionSource = new TaskCompletionSource<bool>();
 
@@ -278,6 +283,12 @@ namespace osu.Desktop
 
                         if (socket.State == WebSocketState.Open && success)
                             await socket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(message)), WebSocketMessageType.Text, true, cancellationToken.Token).ConfigureAwait(false);
+
+                        if (!isReady)
+                        {
+                            OnReady?.Invoke();
+                            isReady = true;
+                        }
                     }
                     catch (OperationCanceledException)
                     {
