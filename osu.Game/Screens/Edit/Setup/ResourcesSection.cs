@@ -93,6 +93,33 @@ namespace osu.Game.Screens.Edit.Setup
                 AutoSizeAxes = Axes.Y,
             };
 
+        public bool ChangeBackgroundImage(string path)
+        {
+            var info = new FileInfo(path);
+
+            if (!info.Exists)
+                return false;
+
+            var set = working.Value.BeatmapSetInfo;
+
+            // remove the previous background for now.
+            // in the future we probably want to check if this is being used elsewhere (other difficulties?)
+            var oldFile = set.Files.FirstOrDefault(f => f.Filename == working.Value.Metadata.BackgroundFile);
+
+            using (var stream = info.OpenRead())
+            {
+                if (oldFile != null)
+                    beatmaps.ReplaceFile(set, oldFile, stream, info.Name);
+                else
+                    beatmaps.AddFile(set, stream, info.Name);
+            }
+
+            working.Value.Metadata.BackgroundFile = info.Name;
+            header.Background.UpdateBackground();
+
+            return true;
+        }
+
         public bool ChangeAudioTrack(string path)
         {
             var info = new FileInfo(path);
@@ -119,33 +146,6 @@ namespace osu.Game.Screens.Edit.Setup
             music.ReloadCurrentTrack();
 
             editor?.UpdateClockSource();
-            return true;
-        }
-
-        public bool ChangeBackgroundImage(string path)
-        {
-            var info = new FileInfo(path);
-
-            if (!info.Exists)
-                return false;
-
-            var set = working.Value.BeatmapSetInfo;
-
-            // remove the previous background for now.
-            // in the future we probably want to check if this is being used elsewhere (other difficulties?)
-            var oldFile = set.Files.FirstOrDefault(f => f.Filename == working.Value.Metadata.BackgroundFile);
-
-            using (var stream = info.OpenRead())
-            {
-                if (oldFile != null)
-                    beatmaps.ReplaceFile(set, oldFile, stream, info.Name);
-                else
-                    beatmaps.AddFile(set, stream, info.Name);
-            }
-
-            working.Value.Metadata.BackgroundFile = info.Name;
-            header.Background.UpdateBackground();
-
             return true;
         }
 
