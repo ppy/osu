@@ -27,17 +27,17 @@ namespace osu.Game.Tournament.Models
 
         private const string config_path = "stable.json";
 
-        private readonly Storage storage;
+        private readonly Storage configStorage;
 
         public StableInfo(Storage storage)
         {
             TournamentStorage tStorage = (TournamentStorage)storage;
-            this.storage = tStorage.AllTournaments;
+            configStorage = tStorage.AllTournaments;
 
-            if (!this.storage.Exists(config_path))
+            if (!configStorage.Exists(config_path))
                 return;
 
-            using (Stream stream = this.storage.GetStream(config_path, FileAccess.Read, FileMode.Open))
+            using (Stream stream = configStorage.GetStream(config_path, FileAccess.Read, FileMode.Open))
             using (var sr = new StreamReader(stream))
             {
                 JsonConvert.PopulateObject(sr.ReadToEnd(), this);
@@ -46,7 +46,7 @@ namespace osu.Game.Tournament.Models
 
         public void SaveChanges()
         {
-            using (var stream = storage.GetStream(config_path, FileAccess.Write, FileMode.Create))
+            using (var stream = configStorage.GetStream(config_path, FileAccess.Write, FileMode.Create))
             using (var sw = new StreamWriter(stream))
             {
                 sw.Write(JsonConvert.SerializeObject(this,
