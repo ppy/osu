@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
-    public class LegacyCatchHitLighting : CatchHitExplosion
+    public class LegacyCatchHitExplosion : CatchHitExplosion
     {
         private readonly Sprite explosion1;
         private readonly Sprite explosion2;
@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
         [Resolved]
         protected ISkinSource Skin { get; private set; }
 
-        public LegacyCatchHitLighting(Texture explosionTexture1, Texture explosionTexture2)
+        public LegacyCatchHitExplosion(Texture explosionTexture1, Texture explosionTexture2)
         {
             Anchor = Anchor.CentreLeft;
             Origin = Anchor.BottomCentre;

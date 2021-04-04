@@ -510,11 +510,11 @@ namespace osu.Game.Rulesets.Catch.UI
             PoolableHitExplosion hitExplosion = hitExplosionPool.Get();
             hitExplosion.HitObject = hitObject;
             hitExplosion.CatchPosition = catchPosition;
-            hitExplosion.Scale = new Vector2(hitObject.Scale);
+            hitExplosion.Scale = new Vector2(0.45f, 0.45f);
             hitExplosion.ObjectColour = colour;
             hitExplosion.JudgementResult = result;
             hitExplosion.CatcherWidth = catchWidth;
-            hitExplosion.CatcherMargin = ALLOWED_CATCH_RANGE;
+            hitExplosion.CatcherMargin = (1 - ALLOWED_CATCH_RANGE) / 2;
             hitExplosionContainer.Add(hitExplosion);
         }
 

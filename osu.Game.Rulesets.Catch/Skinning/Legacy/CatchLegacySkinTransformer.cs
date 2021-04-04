@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
                 case CatchSkinComponents.LightingGlow:
                     if (GetTexture("scoreboard-explosion-2") != null && GetTexture("scoreboard-explosion-1") != null)
-                        return new LegacyCatchHitLighting(GetTexture("scoreboard-explosion-2"), GetTexture("scoreboard-explosion-1"));
+                        return new LegacyCatchHitExplosion(GetTexture("scoreboard-explosion-2"), GetTexture("scoreboard-explosion-1"));
 
                     break;
             }
