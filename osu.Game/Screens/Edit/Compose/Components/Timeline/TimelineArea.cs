@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
@@ -15,7 +16,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
     public class TimelineArea : Container
     {
         public readonly Timeline Timeline = new Timeline { RelativeSizeAxes = Axes.Both };
-
+        
         protected override Container<Drawable> Content => Timeline;
 
         [BackgroundDependencyLoader]
@@ -33,7 +34,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4Extensions.FromHex("111")
+                    Colour = Color4Extensions.FromHex("111"),
                 },
                 new GridContainer
                 {
@@ -138,8 +139,22 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             Timeline.WaveformVisible.BindTo(waveformCheckbox.Current);
             Timeline.ControlPointsVisible.BindTo(controlPointsCheckbox.Current);
             Timeline.TicksVisible.BindTo(ticksCheckbox.Current);
+
+            Timeline.ChildTimelineBlueprintContainer = getTimelineBlueprint();
+            Timeline.TimelineBlueprintMouseDown = getTimelineBlueprint().PublicMouseDown;
+            Timeline.TimelineBlueprintMouseUp = getTimelineBlueprint().PublicMouseUp;
+            Timeline.TimelineBlueprintDragStart = getTimelineBlueprint().PublicDragStart;
+            Timeline.TimelineBlueprintDrag = getTimelineBlueprint().PublicDrag;
+            Timeline.TimelineBlueprintEndDrag = getTimelineBlueprint().PublicDragEnd;
         }
 
         private void changeZoom(float change) => Timeline.Zoom += change;
+
+        private TimelineBlueprintContainer getTimelineBlueprint()
+        {
+            BeatmapSkinProvidingContainer firstChild = (BeatmapSkinProvidingContainer)AliveChildren[0];
+            SkinProvidingContainer secondChild = (SkinProvidingContainer)firstChild.AliveChildren[0];
+            return (TimelineBlueprintContainer)secondChild.AliveChildren[0];
+        }
     }
 }

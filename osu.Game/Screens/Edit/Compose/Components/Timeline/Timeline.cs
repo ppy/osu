@@ -33,6 +33,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [Resolved]
         private EditorClock editorClock { get; set; }
 
+        public BlueprintContainer ChildTimelineBlueprintContainer;
+        public delegate bool MouseDownDelegate(MouseDownEvent e);
+        public delegate bool DragStartDelegate(DragStartEvent e);
+        public MouseDownDelegate TimelineBlueprintMouseDown = null;
+        public Action<MouseUpEvent> TimelineBlueprintMouseUp = null;
+        public DragStartDelegate TimelineBlueprintDragStart = null;
+        public Action<DragEvent> TimelineBlueprintDrag = null;
+        public Action<DragEndEvent> TimelineBlueprintEndDrag = null;
+
         /// <summary>
         /// The timeline's scroll position in the last frame.
         /// </summary>
@@ -194,21 +203,83 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             ScrollTo((float)(editorClock.CurrentTime / track.Length) * Content.DrawWidth, false);
         }
 
+        private bool isMouseInTimelineContainer(Vector2 mousePos)
+        {
+            Vector2 timelineContainerPos = ChildTimelineBlueprintContainer.AnchorPosition;
+            return mousePos.Y < timelineContainerPos.Y + ChildTimelineBlueprintContainer.DrawHeight / 2 &&
+                     mousePos.Y > timelineContainerPos.Y - ChildTimelineBlueprintContainer.DrawHeight / 2;
+        }
+
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            if (base.OnMouseDown(e))
+            if (isMouseInTimelineContainer(e.MouseDownPosition))
             {
-                beginUserDrag();
-                return true;
+                e.Target = ChildTimelineBlueprintContainer;
+                return TimelineBlueprintMouseDown(e);
             }
+            else
+            {
+                if (base.OnMouseDown(e))
+                {
+                    beginUserDrag();
+                    return true;
+                }
 
-            return false;
+                return false;
+            }
         }
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            endUserDrag();
-            base.OnMouseUp(e);
+            if (isMouseInTimelineContainer(e.MouseDownPosition))
+            {
+                e.Target = ChildTimelineBlueprintContainer;
+                TimelineBlueprintMouseUp(e);
+            }
+            else
+            {
+                endUserDrag();
+                base.OnMouseUp(e);
+            }
+        }
+
+        protected override bool OnDragStart(DragStartEvent e)
+        {
+            if (isMouseInTimelineContainer(e.MouseDownPosition))
+            {
+                e.Target = ChildTimelineBlueprintContainer;
+                return TimelineBlueprintDragStart(e);
+            }
+            else
+            {
+                return base.OnDragStart(e);
+            }
+        }
+
+        protected override void OnDrag(DragEvent e)
+        {
+            if (isMouseInTimelineContainer(e.MouseDownPosition))
+            {
+                e.Target = ChildTimelineBlueprintContainer;
+                TimelineBlueprintDrag(e);
+            }
+            else
+            {
+                base.OnDrag(e);
+            }
+        }
+
+        protected override void OnDragEnd(DragEndEvent e)
+        {
+            if (isMouseInTimelineContainer(e.MouseDownPosition))
+            {
+                e.Target = ChildTimelineBlueprintContainer;
+                TimelineBlueprintEndDrag(e);
+            }
+            else
+            {
+                base.OnDragEnd(e);
+            }
         }
 
         private void beginUserDrag()

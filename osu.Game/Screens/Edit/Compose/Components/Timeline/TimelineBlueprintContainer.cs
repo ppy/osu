@@ -85,6 +85,31 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         protected override Container<SelectionBlueprint> CreateSelectionBlueprintContainer() => new TimelineSelectionBlueprintContainer { RelativeSizeAxes = Axes.Both };
 
+        public bool PublicMouseDown(MouseDownEvent e)
+        {
+            return base.OnMouseDown(e);
+        }
+
+        public void PublicMouseUp(MouseUpEvent e)
+        {
+            base.OnMouseUp(e);
+        }
+
+        public bool PublicDragStart(DragStartEvent e)
+        {
+            return OnDragStart(e);
+        }
+
+        public void PublicDrag(DragEvent e)
+        {
+            OnDrag(e);
+        }
+
+        public void PublicDragEnd(DragEndEvent e)
+        {
+            OnDragEnd(e);
+        }
+
         protected override bool OnHover(HoverEvent e)
         {
             backgroundBox.FadeColour(colours.BlueLighter, 120, Easing.OutQuint);
