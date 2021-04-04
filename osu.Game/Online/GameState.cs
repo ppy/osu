@@ -11,10 +11,10 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Users;
 
-namespace osu.Desktop
+namespace osu.Game.Online
 {
     [Serializable]
-    internal class GameState
+    public class GameState
     {
         [JsonConverter(typeof(UserActivityConverter))]
         public Bindable<UserActivity> Activity = new Bindable<UserActivity>();
