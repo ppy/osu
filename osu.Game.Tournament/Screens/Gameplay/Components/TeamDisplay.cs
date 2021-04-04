@@ -27,7 +27,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                 showScore = value;
 
                 if (IsLoaded)
-                    score.FadeTo(value ? 1 : 0, 200);
+                    updateDisplay();
             }
         }
 
@@ -108,7 +108,14 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            score.Alpha = ShowScore ? 1 : 0;
+
+            updateDisplay();
+            FinishTransforms(true);
+        }
+
+        private void updateDisplay()
+        {
+            score.FadeTo(ShowScore ? 1 : 0, 200);
         }
     }
 }
