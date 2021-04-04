@@ -29,9 +29,13 @@ namespace osu.Game.Online
 {
     public class GameStateBroadcaster : Component
     {
+        public IReadOnlyList<WebSocketClient> Clients => clients;
+
+        public bool IsListening { get; private set; }
+
         private const double debounce_time = 100;
 
-        private readonly IWebHost host;
+        private IWebHost host;
 
         private ScheduledDelegate broadcastSchedule;
 
@@ -42,20 +46,6 @@ namespace osu.Game.Online
         private readonly GameState state = new GameState();
 
         private IBindable<User> user;
-
-        public GameStateBroadcaster()
-        {
-            host = new WebHostBuilder()
-                .ConfigureServices(s =>
-                {
-                    s.AddSingleton(this);
-                    s.AddTransient<WebSocketMiddleware>();
-                })
-                .UseKestrel()
-                .UseUrls("http://localhost:7270")
-                .UseStartup<Startup>()
-                .Build();
-        }
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, IAPIProvider provider, Bindable<RulesetInfo> ruleset, Bindable<WorkingBeatmap> beatmap, Bindable<IReadOnlyList<Mod>> mods)
@@ -71,17 +61,17 @@ namespace osu.Game.Online
                 state.Activity.BindTo(u.NewValue.Activity);
             }, true);
 
-            state.Mods.ValueChanged += _ => broadcast();
-            state.Ruleset.ValueChanged += _ => broadcast();
-            state.Beatmap.ValueChanged += _ => broadcast();
-            state.Activity.ValueChanged += _ => broadcast();
+            state.Mods.ValueChanged += _ => Broadcast();
+            state.Ruleset.ValueChanged += _ => Broadcast();
+            state.Beatmap.ValueChanged += _ => Broadcast();
+            state.Activity.ValueChanged += _ => Broadcast();
 
             config.BindWith(OsuSetting.PublishGameState, enabled);
 
             enabled.BindValueChanged(state =>
             {
                 if (state.NewValue)
-                    host.Start();
+                    start();
                 else
                     stop();
             }, true);
@@ -99,7 +89,7 @@ namespace osu.Game.Online
                 clients.Remove(client);
         }
 
-        private void broadcast()
+        public void Broadcast()
         {
             broadcastSchedule?.Cancel();
             broadcastSchedule = Scheduler.AddDelayed(() =>
@@ -120,8 +110,34 @@ namespace osu.Game.Online
             });
         }
 
+        private void start()
+        {
+            if (IsListening)
+                return;
+
+            host = new WebHostBuilder()
+                .ConfigureServices(s =>
+                {
+                    s.AddSingleton(this);
+                    s.AddTransient<WebSocketMiddleware>();
+                })
+                .UseKestrel()
+                .UseUrls("http://localhost:7270")
+                .UseStartup<Startup>()
+                .Build();
+
+            host.Start();
+
+            IsListening = true;
+        }
+
         private void stop()
         {
+            if (!IsListening)
+                return;
+
+            enabled.Disabled = true;
+
             broadcastSchedule?.Cancel();
             Task.Run(async () =>
             {
@@ -131,7 +147,18 @@ namespace osu.Game.Online
 
                 await Task.WhenAll(closeTasks).ConfigureAwait(false);
                 await host.StopAsync().ConfigureAwait(false);
+
+                host = null;
+                IsListening = false;
+
+                enabled.Disabled = false;
             });
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            stop();
         }
 
         private class Startup
