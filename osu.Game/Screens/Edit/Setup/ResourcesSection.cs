@@ -1,35 +1,24 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    internal class ResourcesSection : SetupSection, ICanAcceptFiles
+    internal class ResourcesSection : SetupSection
     {
         private LabelledTextBox audioTrackTextBox;
 
         public override LocalisableString Title => "Resources";
-
-        public IEnumerable<string> HandledExtensions => AudioExtensions;
-
-        public static string[] AudioExtensions { get; } = { ".mp3", ".ogg" };
-
-        [Resolved]
-        private OsuGameBase game { get; set; }
 
         [Resolved]
         private MusicController music { get; set; }
@@ -54,7 +43,7 @@ namespace osu.Game.Screens.Edit.Setup
 
             Children = new Drawable[]
             {
-                audioTrackTextBox = new FileChooserLabelledTextBox
+                audioTrackTextBox = new FileChooserLabelledTextBox(".mp3", ".ogg")
                 {
                     Label = "Audio Track",
                     PlaceholderText = "Click to select a track",
@@ -66,31 +55,6 @@ namespace osu.Game.Screens.Edit.Setup
             };
 
             audioTrackTextBox.Current.BindValueChanged(audioTrackChanged);
-        }
-
-        Task ICanAcceptFiles.Import(params string[] paths)
-        {
-            Schedule(() =>
-            {
-                var firstFile = new FileInfo(paths.First());
-
-                audioTrackTextBox.Text = firstFile.FullName;
-            });
-            return Task.CompletedTask;
-        }
-
-        Task ICanAcceptFiles.Import(params ImportTask[] tasks) => throw new NotImplementedException();
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            game.RegisterImportHandler(this);
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            game?.UnregisterImportHandler(this);
         }
 
         public bool ChangeAudioTrack(string path)
