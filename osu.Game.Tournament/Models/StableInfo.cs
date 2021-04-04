@@ -34,10 +34,10 @@ namespace osu.Game.Tournament.Models
             TournamentStorage tStorage = (TournamentStorage)storage;
             this.storage = tStorage.AllTournaments;
 
-            if (!storage.Exists(config_path))
+            if (!this.storage.Exists(config_path))
                 return;
 
-            using (Stream stream = storage.GetStream(config_path, FileAccess.Read, FileMode.Open))
+            using (Stream stream = this.storage.GetStream(config_path, FileAccess.Read, FileMode.Open))
             using (var sr = new StreamReader(stream))
             {
                 JsonConvert.PopulateObject(sr.ReadToEnd(), this);
