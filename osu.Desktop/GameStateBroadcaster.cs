@@ -29,10 +29,6 @@ namespace osu.Desktop
 {
     public class GameStateBroadcaster : Component
     {
-        public IReadOnlyList<WebSocketClient> Clients => clients;
-
-        public bool IsListening { get; private set; }
-
         private const double debounce_time = 100;
 
         private IWebHost host;
@@ -112,7 +108,7 @@ namespace osu.Desktop
 
         private void start()
         {
-            if (IsListening)
+            if (host != null)
                 return;
 
             host = new WebHostBuilder()
@@ -127,17 +123,11 @@ namespace osu.Desktop
                 .Build();
 
             host.Start();
-
-            IsListening = true;
         }
 
         private void stop()
         {
-            if (!IsListening)
-                return;
-
             enabled.Disabled = true;
-
             broadcastSchedule?.Cancel();
             Task.Run(async () =>
             {
@@ -149,8 +139,6 @@ namespace osu.Desktop
                 await host.StopAsync().ConfigureAwait(false);
 
                 host = null;
-                IsListening = false;
-
                 enabled.Disabled = false;
             });
         }
