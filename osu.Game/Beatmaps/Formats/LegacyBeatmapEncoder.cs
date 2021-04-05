@@ -333,7 +333,7 @@ namespace osu.Game.Beatmaps.Formats
 
                     // Explicit segments have a new format in which the type is injected into the middle of the control point string.
                     // To preserve compatibility with osu-stable as much as possible, explicit segments with the same type are converted to use implicit segments by duplicating the control point.
-                    // One exception are consecutive perfect curves, which aren't supported in osu-stable
+                    // One exception are consecutive perfect curves, which aren't supported in osu!stable and can lead to decoding issues if encoded as implicit segments
                     bool needsExplicitSegment = point.Type.Value != lastType || point.Type.Value == PathType.PerfectCurve;
 
                     // Another exception to this is when the last two control points of the last segment were duplicated. This is not a scenario supported by osu!stable.
