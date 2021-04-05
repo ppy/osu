@@ -12,6 +12,6 @@ namespace osu.Game.Rulesets.Catch
         CatcherFail,
         CatcherKiai,
         CatchComboCounter,
-        LightingGlow
+        HitExplosion
     }
 }
