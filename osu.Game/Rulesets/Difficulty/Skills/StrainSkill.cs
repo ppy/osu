@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Process a <see cref="DifficultyHitObject"/> and update current strain values accordingly.
         /// </summary>
-        public sealed override void Process(DifficultyHitObject current)
+        protected sealed override void Process(DifficultyHitObject current)
         {
             // The first object doesn't generate a strain, so we begin with an incremented section end
             if (Previous.Count == 0)
@@ -72,8 +72,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             CurrentStrain += StrainValueOf(current) * SkillMultiplier;
 
             currentSectionPeak = Math.Max(CurrentStrain, currentSectionPeak);
-
-            base.Process(current);
         }
 
         /// <summary>

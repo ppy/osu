@@ -30,14 +30,17 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             this.mods = mods;
         }
 
+        internal void ProcessInternal(DifficultyHitObject current)
+        {
+            Process(current);
+            Previous.Push(current);
+        }
+
         /// <summary>
         /// Process a <see cref="DifficultyHitObject"/>.
         /// </summary>
         /// <param name="current">The <see cref="DifficultyHitObject"/> to process.</param>
-        public virtual void Process(DifficultyHitObject current)
-        {
-            Previous.Push(current);
-        }
+        protected abstract void Process(DifficultyHitObject current);
 
         /// <summary>
         /// Returns the calculated difficulty value representing all <see cref="DifficultyHitObject"/>s that have been processed up to this point.

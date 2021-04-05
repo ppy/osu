@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Difficulty
             {
                 foreach (var skill in skills)
                 {
-                    skill.Process(hitObject);
+                    skill.ProcessInternal(hitObject);
                 }
             }
 
