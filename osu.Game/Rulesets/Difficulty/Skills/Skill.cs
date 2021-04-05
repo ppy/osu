@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Sets the initial strain level for a new section.
         /// </summary>
-        /// <param name="time">The beginning of the new section in milliseconds.</param>
+        /// <param name="time">The beginning of the new section in milliseconds, adjusted by clockrate.</param>
         public void StartNewSectionFrom(double time)
         {
             // The maximum strain of the new section is not zero by default, strain decays as usual regardless of section boundaries.
@@ -100,9 +100,9 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Retrieves the peak strain at a point in time.
         /// </summary>
-        /// <param name="time">The time to retrieve the peak strain at.</param>
+        /// <param name="time">The time to retrieve the peak strain at, adjusted by clockrate.</param>
         /// <returns>The peak strain.</returns>
-        protected virtual double GetPeakStrain(double time) => CurrentStrain * strainDecay(time - Previous[0].BaseObject.StartTime);
+        protected virtual double GetPeakStrain(double time) => CurrentStrain * strainDecay(time - Previous[0].StartTime);
 
         /// <summary>
         /// Returns the calculated difficulty value representing all processed <see cref="DifficultyHitObject"/>s.
