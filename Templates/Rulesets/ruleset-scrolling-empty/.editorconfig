@@ -1,0 +1,27 @@
+# EditorConfig is awesome: http://editorconfig.org
+root = true
+
+[*.cs]
+end_of_line = crlf
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+
+#Roslyn naming styles
+
+#PascalCase for public and protected members
+dotnet_naming_style.pascalcase.capitalization = pascal_case
+dotnet_naming_symbols.public_members.applicable_accessibilities = public,internal,protected,protected_internal
+dotnet_naming_symbols.public_members.applicable_kinds = property,method,field,event,delegate
+dotnet_naming_rule.public_members_pascalcase.severity = suggestion
+dotnet_naming_rule.public_members_pascalcase.symbols = public_members
+dotnet_naming_rule.public_members_pascalcase.style = pascalcase
+
+#camelCase for private members
+dotnet_naming_style.camelcase.capitalization = camel_case
+dotnet_naming_symbols.private_members.applicable_accessibilities = private
+dotnet_naming_symbols.private_members.applicable_kinds = property,method,field,event,delegate
+dotnet_naming_rule.private_members_camelcase.severity = suggestion
+dotnet_naming_rule.private_members_camelcase.symbols = private_members
+dotnet_naming_rule.private_members_camelcase.style = camelcase
