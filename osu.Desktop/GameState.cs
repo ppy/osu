@@ -17,8 +17,5 @@ namespace osu.Desktop
         public BeatmapInfo Beatmap { get; set; }
 
         public IEnumerable<string> Mods { get; set; }
-
-        // TODO: Figure out
-        // public object Play { get; set; }
     }
 }
