@@ -10,6 +10,6 @@
     <EmbeddedResource Include="Resources\**" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ppy.osu.Game" Version="2021.331.0" />
+    <ProjectReference Include="..\..\..\..\osu.Game\osu.Game.csproj" />
   </ItemGroup>
 </Project>
