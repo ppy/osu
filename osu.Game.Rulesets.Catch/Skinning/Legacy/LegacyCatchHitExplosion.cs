@@ -29,14 +29,14 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
             InternalChildren = new Drawable[]
             {
-                explosion1 = new Sprite()
+                explosion1 = new Sprite
                 {
                     Origin = Anchor.CentreLeft,
                     Texture = explosionTexture1,
                     Blending = BlendingParameters.Additive,
                     Rotation = -90,
                 },
-                explosion2 = new Sprite()
+                explosion2 = new Sprite
                 {
                     Origin = Anchor.CentreLeft,
                     Texture = explosionTexture2,
@@ -73,9 +73,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
             explosion2.ScaleTo(new Vector2(0.9f, 1.3f), 500, Easing.Out).Then().FadeOut(200);
 
-            this.FadeInFromZero(5).Then().FadeOut(1000, Easing.Out);
-
-            Expire(true);
+            this.FadeInFromZero().Then().Delay(700).Then().FadeOut(0, Easing.Out);
         }
     }
 }

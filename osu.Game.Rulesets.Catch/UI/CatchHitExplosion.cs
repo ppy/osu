@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Catch.UI
     /// </summary>
     public abstract class CatchHitExplosion : CompositeDrawable, ICatchHitExplosion
     {
-        public override bool RemoveWhenNotAlive => true;
+        public override bool RemoveWhenNotAlive => false;
         public override bool RemoveCompletedTransforms => false;
 
         public Color4 ObjectColour { get; set; }

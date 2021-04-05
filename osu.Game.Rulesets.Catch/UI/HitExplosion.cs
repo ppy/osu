@@ -31,11 +31,11 @@ namespace osu.Game.Rulesets.Catch.UI
 
             InternalChildren = new Drawable[]
             {
-                directionalGlow1 = new GlowPiece()
+                directionalGlow1 = new GlowPiece
                 {
                     Size = new Vector2(0.01f, initial_height)
                 },
-                directionalGlow2 = new GlowPiece()
+                directionalGlow2 = new GlowPiece
                 {
                     Size = new Vector2(0.01f, initial_height),
                 },
@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             Scale = new Vector2(HitObject.Scale);
 
-            const double duration = 800;
+            const double duration = 400;
 
             if (!(HitObject is Droplet))
             {
