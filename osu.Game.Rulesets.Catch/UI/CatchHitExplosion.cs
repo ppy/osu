@@ -19,9 +19,9 @@ namespace osu.Game.Rulesets.Catch.UI
         public Color4 ObjectColour { get; set; }
         public PalpableCatchHitObject HitObject { get; set; }
         public JudgementResult JudgementResult { get; set; }
-        public float CatcherMargin { get; set; }
         public float CatcherWidth { get; set; }
         public float CatchPosition { get; set; }
+
         public abstract void Animate();
 
         public void RunAnimation()
@@ -50,46 +50,25 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <summary>
         /// Color of the object the hit explosion is attached to.
         /// </summary>
-        public Color4 ObjectColour
-        {
-            set;
-        }
+        public Color4 ObjectColour { get; set; }
 
         /// <summary>
         /// Catch hitobject the explosion was created from.
         /// </summary>
-        public PalpableCatchHitObject HitObject
-        {
-            set;
-        }
+        public PalpableCatchHitObject HitObject { get; set; }
 
         /// <summary>
         /// Judgement attached to the hit explosion.
         /// </summary>
-        public JudgementResult JudgementResult
-        {
-            set;
-        }
-
-        /// <inheritdoc cref="Catcher.ALLOWED_CATCH_RANGE"/>
-        public float CatcherMargin
-        {
-            set;
-        }
+        public JudgementResult JudgementResult { set; get; }
 
         /// <inheritdoc cref="Catcher.catchWidth"/>
-        public float CatcherWidth
-        {
-            set;
-        }
+        public float CatcherWidth { get; set; }
 
         /// <summary>
         /// Position on the catcher where the hitobject lands.
         /// </summary>
-        public float CatchPosition
-        {
-            set;
-        }
+        public float CatchPosition { get; set; }
 
         public void Animate();
     }

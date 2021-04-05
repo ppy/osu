@@ -38,8 +38,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public JudgementResult JudgementResult;
 
-        public float CatcherMargin;
-
         public float CatcherWidth;
 
         public float CatchPosition;
@@ -67,7 +65,6 @@ namespace osu.Game.Rulesets.Catch.UI
                 explosion.ObjectColour = ObjectColour;
                 explosion.HitObject = HitObject;
                 explosion.CatchPosition = CatchPosition;
-                explosion.CatcherMargin = CatcherMargin;
                 explosion.CatcherWidth = CatcherWidth;
 
                 explosion.RunAnimation();

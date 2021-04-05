@@ -513,7 +513,6 @@ namespace osu.Game.Rulesets.Catch.UI
             hitExplosion.ObjectColour = colour;
             hitExplosion.JudgementResult = result;
             hitExplosion.CatcherWidth = catchWidth;
-            hitExplosion.CatcherMargin = (1 - ALLOWED_CATCH_RANGE) / 2;
             hitExplosionContainer.Add(hitExplosion);
         }
 

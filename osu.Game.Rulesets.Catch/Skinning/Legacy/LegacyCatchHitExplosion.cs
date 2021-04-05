@@ -5,7 +5,6 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Skinning;
@@ -18,10 +17,13 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
         private readonly Sprite explosion1;
         private readonly Sprite explosion2;
 
+        /// <inheritdoc cref="Catcher.ALLOWED_CATCH_RANGE"/>
+        private const float catcher_margin = (1 - Catcher.ALLOWED_CATCH_RANGE) / 2;
+
         [Resolved]
         protected ISkinSource Skin { get; private set; }
 
-        public LegacyCatchHitExplosion(Texture explosionTexture1, Texture explosionTexture2)
+        public LegacyCatchHitExplosion(ISkinSource source)
         {
             Anchor = Anchor.CentreLeft;
             Origin = Anchor.BottomCentre;
@@ -32,14 +34,14 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                 explosion1 = new Sprite
                 {
                     Origin = Anchor.CentreLeft,
-                    Texture = explosionTexture1,
+                    Texture = source.GetTexture("scoreboard-explosion-2"),
                     Blending = BlendingParameters.Additive,
                     Rotation = -90,
                 },
                 explosion2 = new Sprite
                 {
                     Origin = Anchor.CentreLeft,
-                    Texture = explosionTexture2,
+                    Texture = source.GetTexture("scoreboard-explosion-2"),
                     Blending = BlendingParameters.Additive,
                     Rotation = -90,
                 }
@@ -54,7 +56,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
             float catcherWidthHalf = CatcherWidth * 0.5f;
 
-            float explosionOffset = Math.Clamp(CatchPosition, -catcherWidthHalf + CatcherMargin * 3, catcherWidthHalf - CatcherMargin * 3);
+            float explosionOffset = Math.Clamp(CatchPosition, -catcherWidthHalf + catcher_margin * 3, catcherWidthHalf - catcher_margin * 3);
 
             if (!(HitObject is Droplet))
             {
