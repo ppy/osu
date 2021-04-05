@@ -77,5 +77,11 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("start clock again", Clock.Start);
             AddAssert("clock looped to start", () => Clock.IsRunning && Clock.CurrentTime < 500);
         }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            Beatmap.Disabled = false;
+            base.Dispose(isDisposing);
+        }
     }
 }
