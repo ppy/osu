@@ -707,6 +707,39 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(third.ControlPoints[5].Type.Value, Is.EqualTo(null));
                 Assert.That(third.ControlPoints[6].Position.Value, Is.EqualTo(new Vector2(480, 0)));
                 Assert.That(third.ControlPoints[6].Type.Value, Is.EqualTo(null));
+
+                // Last control point duplicated
+                var fourth = ((IHasPath)decoded.HitObjects[3]).Path;
+
+                Assert.That(fourth.ControlPoints[0].Position.Value, Is.EqualTo(Vector2.Zero));
+                Assert.That(fourth.ControlPoints[0].Type.Value, Is.EqualTo(PathType.Bezier));
+                Assert.That(fourth.ControlPoints[1].Position.Value, Is.EqualTo(new Vector2(1, 1)));
+                Assert.That(fourth.ControlPoints[1].Type.Value, Is.EqualTo(null));
+                Assert.That(fourth.ControlPoints[2].Position.Value, Is.EqualTo(new Vector2(2, 2)));
+                Assert.That(fourth.ControlPoints[2].Type.Value, Is.EqualTo(null));
+                Assert.That(fourth.ControlPoints[3].Position.Value, Is.EqualTo(new Vector2(3, 3)));
+                Assert.That(fourth.ControlPoints[3].Type.Value, Is.EqualTo(null));
+                Assert.That(fourth.ControlPoints[4].Position.Value, Is.EqualTo(new Vector2(3, 3)));
+                Assert.That(fourth.ControlPoints[4].Type.Value, Is.EqualTo(null));
+
+                // Last control point in segment duplicated
+                var fifth = ((IHasPath)decoded.HitObjects[4]).Path;
+
+                Assert.That(fifth.ControlPoints[0].Position.Value, Is.EqualTo(Vector2.Zero));
+                Assert.That(fifth.ControlPoints[0].Type.Value, Is.EqualTo(PathType.Bezier));
+                Assert.That(fifth.ControlPoints[1].Position.Value, Is.EqualTo(new Vector2(1, 1)));
+                Assert.That(fifth.ControlPoints[1].Type.Value, Is.EqualTo(null));
+                Assert.That(fifth.ControlPoints[2].Position.Value, Is.EqualTo(new Vector2(2, 2)));
+                Assert.That(fifth.ControlPoints[2].Type.Value, Is.EqualTo(null));
+                Assert.That(fifth.ControlPoints[3].Position.Value, Is.EqualTo(new Vector2(3, 3)));
+                Assert.That(fifth.ControlPoints[3].Type.Value, Is.EqualTo(null));
+                Assert.That(fifth.ControlPoints[4].Position.Value, Is.EqualTo(new Vector2(3, 3)));
+                Assert.That(fifth.ControlPoints[4].Type.Value, Is.EqualTo(null));
+
+                Assert.That(fifth.ControlPoints[5].Position.Value, Is.EqualTo(new Vector2(4, 4)));
+                Assert.That(fifth.ControlPoints[5].Type.Value, Is.EqualTo(PathType.Bezier));
+                Assert.That(fifth.ControlPoints[6].Position.Value, Is.EqualTo(new Vector2(5, 5)));
+                Assert.That(fifth.ControlPoints[6].Type.Value, Is.EqualTo(null));
             }
         }
     }
