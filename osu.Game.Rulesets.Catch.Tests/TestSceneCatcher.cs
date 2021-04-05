@@ -213,7 +213,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             AddStep("disable hit lighting", () => config.SetValue(OsuSetting.HitLighting, false));
             AddStep("catch fruit", () => attemptCatch(new Fruit()));
-            AddAssert("no hit lighting", () => !catcher.ChildrenOfType<HitExplosion>().Any());
+            AddAssert("no hit lighting", () => !catcher.ChildrenOfType<PoolableHitExplosion>().Any());
         }
 
         private void checkPlate(int count) => AddAssert($"{count} objects on the plate", () => catcher.CaughtObjects.Count() == count);
