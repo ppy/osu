@@ -73,13 +73,13 @@ namespace osu.Desktop
             }, true);
         }
 
-        public void AddWebSocketClient(WebSocketClient client)
+        private void add(WebSocketClient client)
         {
             lock (clients)
                 clients.Add(client);
         }
 
-        public void RemoveWebSocketClient(WebSocketClient client)
+        private void remove(WebSocketClient client)
         {
             lock (clients)
                 clients.Remove(client);
@@ -114,7 +114,9 @@ namespace osu.Desktop
             host = new WebHostBuilder()
                 .ConfigureServices(s =>
                 {
-                    s.AddSingleton(this);
+                    s.AddTransient<WebSocketStart>(p => add);
+                    s.AddTransient<WebSocketClose>(p => remove);
+                    s.AddTransient<WebSocketReady>(p => () => Broadcast());
                     s.AddTransient<WebSocketMiddleware>();
                 })
                 .UseKestrel()
@@ -149,19 +151,31 @@ namespace osu.Desktop
             stop();
         }
 
+        public delegate void WebSocketStart(WebSocketClient client);
+
+        public delegate void WebSocketClose(WebSocketClient client);
+
+        public delegate void WebSocketReady();
+
         private class Startup
         {
-            private readonly GameStateBroadcaster component;
+            private readonly WebSocketStart start;
 
-            public Startup(GameStateBroadcaster component)
+            private readonly WebSocketClose close;
+
+            private readonly WebSocketReady ready;
+
+            public Startup(WebSocketStart start, WebSocketClose close, WebSocketReady ready)
             {
-                this.component = component;
+                this.start = start;
+                this.close = close;
+                this.ready = ready;
             }
 
             public void Configure(IApplicationBuilder app)
             {
                 app.UseWebSockets();
-                app.UseMiddleware<WebSocketMiddleware>(component);
+                app.UseMiddleware<WebSocketMiddleware>(start, close, ready);
             }
         }
 
@@ -169,11 +183,17 @@ namespace osu.Desktop
         {
             private readonly RequestDelegate next;
 
-            private readonly GameStateBroadcaster component;
+            private readonly WebSocketStart start;
 
-            public WebSocketMiddleware(RequestDelegate next, GameStateBroadcaster component)
+            private readonly WebSocketClose close;
+
+            private readonly WebSocketReady ready;
+
+            public WebSocketMiddleware(RequestDelegate next, WebSocketStart start, WebSocketClose close, WebSocketReady ready)
             {
-                this.component = component;
+                this.start = start;
+                this.close = close;
+                this.ready = ready;
                 this.next = next;
             }
 
@@ -185,9 +205,9 @@ namespace osu.Desktop
                     {
                         var socket = await context.WebSockets.AcceptWebSocketAsync().ConfigureAwait(false);
                         var client = new WebSocketClient(socket);
-                        client.OnStart += component.AddWebSocketClient;
-                        client.OnClose += component.RemoveWebSocketClient;
-                        client.OnReady += component.Broadcast;
+                        client.OnStart = new Action<WebSocketClient>(start);
+                        client.OnClose = new Action<WebSocketClient>(close);
+                        client.OnReady = new Action(ready);
                         client.Start();
 
                         await client.CompletionSource.Task.ConfigureAwait(false);
@@ -211,11 +231,11 @@ namespace osu.Desktop
 
             private readonly Queue<string> queue = new Queue<string>();
 
-            public event Action<WebSocketClient> OnStart;
+            public Action<WebSocketClient> OnStart;
 
-            public event Action<WebSocketClient> OnClose;
+            public Action<WebSocketClient> OnClose;
 
-            public event Action OnReady;
+            public Action OnReady;
 
             private bool isReady;
 
