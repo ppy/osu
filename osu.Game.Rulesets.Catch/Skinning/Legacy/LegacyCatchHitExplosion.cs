@@ -3,12 +3,15 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Skinning;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 {
@@ -17,6 +20,21 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
         private readonly Sprite explosion1;
         private readonly Sprite explosion2;
 
+        [Resolved]
+        private Bindable<Color4> objectColour { get; set; }
+
+        [Resolved(Name = "CatcherWidth")]
+        private Bindable<float> catcherWidth { get; set; }
+
+        [Resolved]
+        private Bindable<float> catchPosition { get; set; }
+
+        [Resolved]
+        private Bindable<JudgementResult> judgementResult { get; set; }
+
+        [Resolved]
+        private Bindable<PalpableCatchHitObject> hitObject { get; set; }
+
         private const float catcher_margin = (1 - Catcher.ALLOWED_CATCH_RANGE) / 2;
 
         public LegacyCatchHitExplosion()
@@ -24,6 +42,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
             Anchor = Anchor.CentreLeft;
             Origin = Anchor.BottomCentre;
             RelativeSizeAxes = Axes.Both;
+            Scale = new Vector2(0.40f, 0.40f);
 
             InternalChildren = new Drawable[]
             {
@@ -47,21 +66,19 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
         {
             explosion1.Texture = source.GetTexture("scoreboard-explosion-2");
             explosion2.Texture = source.GetTexture("scoreboard-explosion-1");
+
+            objectColour.BindValueChanged(colour => explosion1.Colour = explosion2.Colour = colour.NewValue);
         }
 
         public override void Animate()
         {
-            explosion1.Colour = explosion2.Colour = ObjectColour;
+            float catcherWidthHalf = catcherWidth.Value * 0.5f;
 
-            Scale = new Vector2(0.40f, 0.40f);
+            float explosionOffset = Math.Clamp(catchPosition.Value, -catcherWidthHalf + catcher_margin * 3, catcherWidthHalf - catcher_margin * 3);
 
-            float catcherWidthHalf = CatcherWidth * 0.5f;
-
-            float explosionOffset = Math.Clamp(CatchPosition, -catcherWidthHalf + catcher_margin * 3, catcherWidthHalf - catcher_margin * 3);
-
-            if (!(HitObject is Droplet))
+            if (!(hitObject.Value is Droplet))
             {
-                var scale = Math.Clamp(JudgementResult.ComboAtJudgement / 200f, 0.35f, 1.125f);
+                var scale = Math.Clamp(judgementResult.Value.ComboAtJudgement / 200f, 0.35f, 1.125f);
 
                 explosion1.Scale = new Vector2(1, 0.9f);
                 explosion1.Position = new Vector2(explosionOffset, 0);

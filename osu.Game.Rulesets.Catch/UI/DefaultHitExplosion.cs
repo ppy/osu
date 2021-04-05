@@ -1,11 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Utils;
+using osu.Game.Rulesets.Catch.Objects;
 using osuTK;
 using osuTK.Graphics;
 
@@ -18,7 +21,14 @@ namespace osu.Game.Rulesets.Catch.UI
         private readonly CircularContainer directionalGlow1;
         private readonly CircularContainer directionalGlow2;
 
-        private Color4 lastColor;
+        [Resolved]
+        private Bindable<Color4> objectColour { get; set; }
+
+        [Resolved]
+        private Bindable<PalpableCatchHitObject> hitObject { get; set; }
+
+        [Resolved]
+        private Bindable<float> catchPosition { get; set; }
 
         public DefaultHitExplosion()
         {
@@ -74,7 +84,7 @@ namespace osu.Game.Rulesets.Catch.UI
             largeFaint.EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Glow,
-                Colour = Interpolation.ValueAt(0.1f, ObjectColour, Color4.White, 0, 1).Opacity(0.3f),
+                Colour = Interpolation.ValueAt(0.1f, objectColour.Value, Color4.White, 0, 1).Opacity(0.3f),
                 Roundness = 160,
                 Radius = 200,
             };
@@ -82,7 +92,7 @@ namespace osu.Game.Rulesets.Catch.UI
             smallFaint.EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Glow,
-                Colour = Interpolation.ValueAt(0.6f, ObjectColour, Color4.White, 0, 1),
+                Colour = Interpolation.ValueAt(0.6f, objectColour.Value, Color4.White, 0, 1),
                 Roundness = 20,
                 Radius = 50,
             };
@@ -90,27 +100,23 @@ namespace osu.Game.Rulesets.Catch.UI
             directionalGlow1.EdgeEffect = directionalGlow2.EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Glow,
-                Colour = Interpolation.ValueAt(0.4f, ObjectColour, Color4.White, 0, 1),
+                Colour = Interpolation.ValueAt(0.4f, objectColour.Value, Color4.White, 0, 1),
                 Roundness = roundness,
                 Radius = 40,
             };
         }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            objectColour.BindValueChanged(_ => onColourChanged());
+            hitObject.BindValueChanged(hitObject => Scale = new Vector2(hitObject.NewValue.Scale));
+            catchPosition.BindValueChanged(position => X = position.NewValue);
+        }
+
         public override void Animate()
         {
-            Scale = new Vector2(HitObject.Scale);
-
             const double duration = 400;
-
-            // If the color has changed since last time this was animated
-            // or has never been assigned.
-            if (lastColor != ObjectColour)
-            {
-                lastColor = ObjectColour;
-                onColourChanged();
-            }
-
-            X = CatchPosition;
 
             largeFaint.Size = new Vector2(0.8f);
             largeFaint

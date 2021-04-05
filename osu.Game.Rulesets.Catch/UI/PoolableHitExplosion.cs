@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Pooling;
 using osu.Game.Rulesets.Catch.Objects;
@@ -15,15 +16,20 @@ namespace osu.Game.Rulesets.Catch.UI
     {
         public const double DURATION = 1000;
 
-        public Color4 ObjectColour;
+        [Cached]
+        public readonly Bindable<Color4> ObjectColour = new Bindable<Color4>();
 
-        public PalpableCatchHitObject HitObject { get; set; }
+        [Cached]
+        public readonly Bindable<PalpableCatchHitObject> HitObject = new Bindable<PalpableCatchHitObject>();
 
-        public JudgementResult JudgementResult { get; set; }
+        [Cached]
+        public readonly Bindable<JudgementResult> JudgementResult = new Bindable<JudgementResult>();
 
-        public float CatcherWidth { get; set; }
+        [Cached(Name = "CatcherWidth")]
+        public readonly Bindable<float> CatcherWidth = new Bindable<float>();
 
-        public float CatchPosition { get; set; }
+        [Cached]
+        public readonly Bindable<float> CatchPosition = new Bindable<float>();
 
         private SkinnableDrawable skinnableExplosion { get; set; }
 
@@ -44,12 +50,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
             if (skinnableExplosion?.Drawable is CatchHitExplosion explosion)
             {
-                explosion.JudgementResult = JudgementResult;
-                explosion.ObjectColour = ObjectColour;
-                explosion.HitObject = HitObject;
-                explosion.CatchPosition = CatchPosition;
-                explosion.CatcherWidth = CatcherWidth;
-
                 explosion.RunAnimation();
             }
 

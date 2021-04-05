@@ -1,10 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Judgements;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
@@ -16,17 +16,14 @@ namespace osu.Game.Rulesets.Catch.UI
         public override bool RemoveWhenNotAlive => false;
         public override bool RemoveCompletedTransforms => false;
 
-        public Color4 ObjectColour { get; set; }
-        public PalpableCatchHitObject HitObject { get; set; }
-        public JudgementResult JudgementResult { get; set; }
-        public float CatcherWidth { get; set; }
-        public float CatchPosition { get; set; }
+        [Resolved]
+        private Bindable<JudgementResult> judgementResult { get; set; }
 
         public abstract void Animate();
 
         public void RunAnimation()
         {
-            var resultTime = JudgementResult.TimeAbsolute;
+            var resultTime = judgementResult.Value.TimeAbsolute;
 
             LifetimeStart = resultTime;
 

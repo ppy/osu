@@ -287,7 +287,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             caughtObjectContainer.RemoveAll(d => d.HitObject == drawableObject.HitObject);
             droppedObjectTarget.RemoveAll(d => d.HitObject == drawableObject.HitObject);
-            hitExplosionContainer.RemoveAll(d => d.HitObject == drawableObject.HitObject);
+            hitExplosionContainer.RemoveAll(d => d.HitObject.Value == drawableObject.HitObject);
         }
 
         /// <summary>
@@ -508,11 +508,11 @@ namespace osu.Game.Rulesets.Catch.UI
         private void addLighting(PalpableCatchHitObject hitObject, float catchPosition, Color4 colour, JudgementResult result)
         {
             PoolableHitExplosion hitExplosion = hitExplosionPool.Get();
-            hitExplosion.HitObject = hitObject;
-            hitExplosion.CatchPosition = catchPosition;
-            hitExplosion.ObjectColour = colour;
-            hitExplosion.JudgementResult = result;
-            hitExplosion.CatcherWidth = catchWidth;
+            hitExplosion.HitObject.Value = hitObject;
+            hitExplosion.CatchPosition.Value = catchPosition;
+            hitExplosion.ObjectColour.Value = colour;
+            hitExplosion.JudgementResult.Value = result;
+            hitExplosion.CatcherWidth.Value = catchWidth;
             hitExplosionContainer.Add(hitExplosion);
         }
 
