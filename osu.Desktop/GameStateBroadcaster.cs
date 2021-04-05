@@ -111,11 +111,13 @@ namespace osu.Desktop
 
         private string getStateAsString()
         {
-            var state = new GameState();
-            state.Mods = mods.Value.Select(m => m.Acronym);
-            state.Ruleset = ruleset.Value.Name;
-            state.Beatmap = beatmap.Value.BeatmapInfo;
-            state.Activity = activity.Value?.GetType().Name ?? null;
+            var state = new GameState
+            {
+                Mods = mods.Value.Select(m => m.Acronym),
+                Ruleset = ruleset.Value.Name,
+                Beatmap = beatmap.Value.BeatmapInfo,
+                Activity = activity.Value?.GetType().Name,
+            };
 
             return JsonConvert.SerializeObject(state, new JsonSerializerSettings
             {
@@ -130,17 +132,17 @@ namespace osu.Desktop
                 return;
 
             host = new WebHostBuilder()
-                .ConfigureServices(s =>
-                {
-                    s.AddTransient<WebSocketStart>(p => add);
-                    s.AddTransient<WebSocketClose>(p => remove);
-                    s.AddTransient<WebSocketReady>(p => () => Broadcast());
-                    s.AddTransient<WebSocketMiddleware>();
-                })
-                .UseKestrel()
-                .UseUrls("http://localhost:7270")
-                .UseStartup<Startup>()
-                .Build();
+                   .ConfigureServices(s =>
+                   {
+                       s.AddTransient<WebSocketStart>(p => add);
+                       s.AddTransient<WebSocketClose>(p => remove);
+                       s.AddTransient<WebSocketReady>(p => Broadcast);
+                       s.AddTransient<WebSocketMiddleware>();
+                   })
+                   .UseKestrel()
+                   .UseUrls("http://localhost:7270")
+                   .UseStartup<Startup>()
+                   .Build();
 
             host.Start();
         }
@@ -228,12 +230,14 @@ namespace osu.Desktop
                     if (context.WebSockets.IsWebSocketRequest)
                     {
                         var socket = await context.WebSockets.AcceptWebSocketAsync().ConfigureAwait(false);
-                        var client = new WebSocketClient(socket);
-                        client.OnStart = new Action<WebSocketClient>(start);
-                        client.OnClose = new Action<WebSocketClient>(close);
-                        client.OnReady = new Action(ready);
-                        client.Start();
+                        var client = new WebSocketClient(socket)
+                        {
+                            OnStart = new Action<WebSocketClient>(start),
+                            OnClose = new Action<WebSocketClient>(close),
+                            OnReady = new Action(ready),
+                        };
 
+                        client.Start();
                         await client.CompletionSource.Task.ConfigureAwait(false);
                     }
                 }
@@ -311,8 +315,8 @@ namespace osu.Desktop
                         if (socket.State == WebSocketState.Closed || socket.State == WebSocketState.Aborted)
                             break;
 
-                        bool success = false;
-                        string message = null;
+                        bool success;
+                        string message;
 
                         lock (queue)
                             success = queue.TryDequeue(out message);
