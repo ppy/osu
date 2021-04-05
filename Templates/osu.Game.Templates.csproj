@@ -18,7 +18,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="Templates\**\*" Exclude="Templates\**\bin\**;templates\**\obj\**" />
+    <Content Include="Rulesets\**\*" Exclude="Rulesets\**\bin\**;Rulesets\**\obj\**" />
     <Compile Remove="**\*" />
   </ItemGroup>
 </Project>
