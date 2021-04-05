@@ -29,6 +29,10 @@ namespace osu.Desktop
 {
     public class GameStateBroadcaster : Component
     {
+        public bool IsListening => host != null;
+
+        public IReadOnlyList<WebSocketClient> Clients => clients;
+
         private const double debounce_time = 100;
 
         private IWebHost host;
@@ -128,7 +132,7 @@ namespace osu.Desktop
 
         private void start()
         {
-            if (host != null)
+            if (IsListening)
                 return;
 
             host = new WebHostBuilder()
