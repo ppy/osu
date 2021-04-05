@@ -3,9 +3,9 @@
 
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Utils;
-using osu.Game.Rulesets.Catch.Skinning.Default;
 using osuTK;
 using osuTK.Graphics;
 
@@ -13,10 +13,10 @@ namespace osu.Game.Rulesets.Catch.UI
 {
     public class DefaultHitExplosion : CatchHitExplosion
     {
-        private readonly FadePiece largeFaint;
-        private readonly FadePiece smallFaint;
-        private readonly GlowPiece directionalGlow1;
-        private readonly GlowPiece directionalGlow2;
+        private readonly CircularContainer largeFaint;
+        private readonly CircularContainer smallFaint;
+        private readonly CircularContainer directionalGlow1;
+        private readonly CircularContainer directionalGlow2;
 
         private Color4 lastColor;
 
@@ -30,16 +30,40 @@ namespace osu.Game.Rulesets.Catch.UI
 
             InternalChildren = new Drawable[]
             {
-                directionalGlow1 = new GlowPiece
+                directionalGlow1 = new CircularContainer
                 {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    Blending = BlendingParameters.Additive,
                     Size = new Vector2(0.01f, initial_height)
                 },
-                directionalGlow2 = new GlowPiece
+                directionalGlow2 = new CircularContainer
                 {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    Blending = BlendingParameters.Additive,
                     Size = new Vector2(0.01f, initial_height),
                 },
-                largeFaint = new FadePiece(),
-                smallFaint = new FadePiece()
+                largeFaint = new CircularContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    Blending = BlendingParameters.Additive,
+                },
+                smallFaint = new CircularContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    Blending = BlendingParameters.Additive,
+                }
             };
         }
 
