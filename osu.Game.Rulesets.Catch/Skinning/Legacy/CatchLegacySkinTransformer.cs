@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
                 case CatchSkinComponents.HitExplosion:
                     if (GetTexture("scoreboard-explosion-2") != null)
-                        return new LegacyCatchHitExplosion(Source);
+                        return new LegacyCatchHitExplosion();
 
                     break;
             }

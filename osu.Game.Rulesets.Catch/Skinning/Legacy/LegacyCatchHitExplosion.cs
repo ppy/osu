@@ -17,13 +17,9 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
         private readonly Sprite explosion1;
         private readonly Sprite explosion2;
 
-        /// <inheritdoc cref="Catcher.ALLOWED_CATCH_RANGE"/>
         private const float catcher_margin = (1 - Catcher.ALLOWED_CATCH_RANGE) / 2;
 
-        [Resolved]
-        protected ISkinSource Skin { get; private set; }
-
-        public LegacyCatchHitExplosion(ISkinSource source)
+        public LegacyCatchHitExplosion()
         {
             Anchor = Anchor.CentreLeft;
             Origin = Anchor.BottomCentre;
@@ -34,18 +30,23 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                 explosion1 = new Sprite
                 {
                     Origin = Anchor.CentreLeft,
-                    Texture = source.GetTexture("scoreboard-explosion-2"),
                     Blending = BlendingParameters.Additive,
                     Rotation = -90,
                 },
                 explosion2 = new Sprite
                 {
                     Origin = Anchor.CentreLeft,
-                    Texture = source.GetTexture("scoreboard-explosion-2"),
                     Blending = BlendingParameters.Additive,
                     Rotation = -90,
                 }
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(ISkinSource source)
+        {
+            explosion1.Texture = source.GetTexture("scoreboard-explosion-2");
+            explosion2.Texture = source.GetTexture("scoreboard-explosion-1");
         }
 
         public override void Animate()
@@ -63,19 +64,17 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                 var scale = Math.Clamp(JudgementResult.ComboAtJudgement / 200f, 0.35f, 1.125f);
 
                 explosion1.Scale = new Vector2(1, 0.9f);
-                explosion1.Alpha = 1;
                 explosion1.Position = new Vector2(explosionOffset, 0);
 
                 explosion1.ScaleTo(new Vector2(20 * scale, 1.1f), 160, Easing.Out).Then().FadeOut(140);
             }
 
             explosion2.Scale = new Vector2(0.9f, 1f);
-            explosion2.Alpha = 1;
             explosion2.Position = new Vector2(explosionOffset, 0);
 
             explosion2.ScaleTo(new Vector2(0.9f, 1.3f), 500, Easing.Out).Then().FadeOut(200);
 
-            this.FadeInFromZero().Then().Delay(700).Then().FadeOut(0, Easing.Out);
+            this.FadeInFromZero().Then().Delay(700).Then().FadeOut();
         }
     }
 }

@@ -5,7 +5,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Utils;
-using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Skinning.Default;
 using osuTK;
 using osuTK.Graphics;
@@ -79,34 +78,27 @@ namespace osu.Game.Rulesets.Catch.UI
 
             const double duration = 400;
 
-            if (!(HitObject is Droplet))
+            // If the color has changed since last time this was animated
+            // or has never been assigned.
+            if (lastColor != ObjectColour)
             {
-                // If the color has changed since last time this was animated
-                // or has never been assigned.
-                if (lastColor != ObjectColour)
-                {
-                    lastColor = ObjectColour;
-                    onColourChanged();
-                }
-
-                X = CatchPosition;
-
-                largeFaint.Size = new Vector2(0.8f);
-                largeFaint
-                    .ResizeTo(largeFaint.Size * new Vector2(5, 1), duration, Easing.OutQuint)
-                    .FadeOutFromOne(duration * 2);
-
-                const float angle_variangle = 15; // should be less than 45
-
-                directionalGlow1.Rotation = RNG.NextSingle(-angle_variangle, angle_variangle);
-                directionalGlow2.Rotation = RNG.NextSingle(-angle_variangle, angle_variangle);
-
-                this.FadeInFromZero(50).Then().FadeOut(duration, Easing.Out);
+                lastColor = ObjectColour;
+                onColourChanged();
             }
-            else
-            {
-                this.Delay(50).Then().Delay(duration);
-            }
+
+            X = CatchPosition;
+
+            largeFaint.Size = new Vector2(0.8f);
+            largeFaint
+                .ResizeTo(largeFaint.Size * new Vector2(5, 1), duration, Easing.OutQuint)
+                .FadeOutFromOne(duration * 2);
+
+            const float angle_variangle = 15; // should be less than 45
+
+            directionalGlow1.Rotation = RNG.NextSingle(-angle_variangle, angle_variangle);
+            directionalGlow2.Rotation = RNG.NextSingle(-angle_variangle, angle_variangle);
+
+            this.FadeInFromZero(50).Then().FadeOut(duration, Easing.Out);
         }
     }
 }

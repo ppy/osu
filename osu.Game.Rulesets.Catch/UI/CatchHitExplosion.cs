@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Catch.UI
     /// <summary>
     /// The base for hit explosion types used with <see cref="PoolableHitExplosion"/>.
     /// </summary>
-    public abstract class CatchHitExplosion : CompositeDrawable, ICatchHitExplosion
+    public abstract class CatchHitExplosion : CompositeDrawable
     {
         public override bool RemoveWhenNotAlive => false;
         public override bool RemoveCompletedTransforms => false;
@@ -40,36 +40,5 @@ namespace osu.Game.Rulesets.Catch.UI
 
             LifetimeEnd = LatestTransformEndTime;
         }
-    }
-
-    /// <summary>
-    /// Provides properties hit explosions can use.
-    /// </summary>
-    public interface ICatchHitExplosion
-    {
-        /// <summary>
-        /// Color of the object the hit explosion is attached to.
-        /// </summary>
-        public Color4 ObjectColour { get; set; }
-
-        /// <summary>
-        /// Catch hitobject the explosion was created from.
-        /// </summary>
-        public PalpableCatchHitObject HitObject { get; set; }
-
-        /// <summary>
-        /// Judgement attached to the hit explosion.
-        /// </summary>
-        public JudgementResult JudgementResult { set; get; }
-
-        /// <inheritdoc cref="Catcher.catchWidth"/>
-        public float CatcherWidth { get; set; }
-
-        /// <summary>
-        /// Position on the catcher where the hitobject lands.
-        /// </summary>
-        public float CatchPosition { get; set; }
-
-        public void Animate();
     }
 }

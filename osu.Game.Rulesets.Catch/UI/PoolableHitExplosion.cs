@@ -15,34 +15,17 @@ namespace osu.Game.Rulesets.Catch.UI
     {
         public const double DURATION = 1000;
 
-        private Color4 objectColour;
+        public Color4 ObjectColour;
 
-        public Color4 ObjectColour
-        {
-            get => objectColour;
-            set
-            {
-                if (objectColour == value)
-                    return;
+        public PalpableCatchHitObject HitObject { get; set; }
 
-                objectColour = value;
+        public JudgementResult JudgementResult { get; set; }
 
-                if (skinnableExplosion.Drawable is ICatchHitExplosion hitExplosion)
-                {
-                    hitExplosion.ObjectColour = value;
-                }
-            }
-        }
+        public float CatcherWidth { get; set; }
 
-        public PalpableCatchHitObject HitObject;
+        public float CatchPosition { get; set; }
 
-        public JudgementResult JudgementResult;
-
-        public float CatcherWidth;
-
-        public float CatchPosition;
-
-        private SkinnableDrawable skinnableExplosion;
+        private SkinnableDrawable skinnableExplosion { get; set; }
 
         public PoolableHitExplosion()
         {
