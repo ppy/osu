@@ -37,30 +37,40 @@ namespace osu.Desktop
 
         private readonly List<WebSocketClient> clients = new List<WebSocketClient>();
 
+        #region Bindables
+
         private readonly Bindable<bool> enabled = new Bindable<bool>();
 
-        private readonly GameState state = new GameState();
+        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
+
+        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+
+        private readonly Bindable<IReadOnlyList<Mod>> mods = new Bindable<IReadOnlyList<Mod>>();
+
+        private readonly Bindable<UserActivity> activity = new Bindable<UserActivity>();
 
         private IBindable<User> user;
+
+        #endregion
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, IAPIProvider provider, Bindable<RulesetInfo> ruleset, Bindable<WorkingBeatmap> beatmap, Bindable<IReadOnlyList<Mod>> mods)
         {
-            state.Ruleset.BindTo(ruleset);
-            state.Beatmap.BindTo(beatmap);
-            state.Mods.BindTo(mods);
+            this.ruleset.BindTo(ruleset);
+            this.beatmap.BindTo(beatmap);
+            this.mods.BindTo(mods);
 
             user = provider.LocalUser.GetBoundCopy();
             user.BindValueChanged(u =>
             {
-                state.Activity.UnbindBindings();
-                state.Activity.BindTo(u.NewValue.Activity);
+                activity.UnbindBindings();
+                activity.BindTo(u.NewValue.Activity);
             }, true);
 
-            state.Mods.ValueChanged += _ => Broadcast();
-            state.Ruleset.ValueChanged += _ => Broadcast();
-            state.Beatmap.ValueChanged += _ => Broadcast();
-            state.Activity.ValueChanged += _ => Broadcast();
+            this.mods.ValueChanged += _ => Broadcast();
+            this.ruleset.ValueChanged += _ => Broadcast();
+            this.beatmap.ValueChanged += _ => Broadcast();
+            activity.ValueChanged += _ => Broadcast();
 
             config.BindWith(OsuSetting.PublishGameState, enabled);
 
@@ -92,17 +102,25 @@ namespace osu.Desktop
             {
                 lock (clients)
                 {
+                    string state = getStateAsString();
                     foreach (var client in clients)
-                        client.Enqueue(getStateAsString());
+                        client.Enqueue(state);
                 }
             }, debounce_time);
         }
 
         private string getStateAsString()
         {
+            var state = new GameState();
+            state.Mods = mods.Value.Select(m => m.Acronym);
+            state.Ruleset = ruleset.Value.Name;
+            state.Beatmap = beatmap.Value.BeatmapInfo;
+            state.Activity = activity.Value?.GetType().Name ?? null;
+
             return JsonConvert.SerializeObject(state, new JsonSerializerSettings
             {
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                DefaultValueHandling = DefaultValueHandling.Ignore,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
             });
         }
 
@@ -157,6 +175,8 @@ namespace osu.Desktop
 
         public delegate void WebSocketReady();
 
+        #region IWebHost Startup
+
         private class Startup
         {
             private readonly WebSocketStart start;
@@ -178,6 +198,10 @@ namespace osu.Desktop
                 app.UseMiddleware<WebSocketMiddleware>(start, close, ready);
             }
         }
+
+        #endregion
+
+        #region WebSocketMiddleware
 
         public class WebSocketMiddleware
         {
@@ -215,13 +239,17 @@ namespace osu.Desktop
                 }
                 catch (Exception e)
                 {
-                    Logger.Log($"An exception occured in the WebSocket\n{e.GetType().Name}\n{e.StackTrace}", LoggingTarget.Network);
+                    Logger.Log($"An exception occured in the WebSocket\n{e}", LoggingTarget.Network);
                     throw;
                 }
 
                 await next(context).ConfigureAwait(false);
             }
         }
+
+        #endregion
+
+        #region WebSocketClient
 
         public class WebSocketClient
         {
@@ -325,5 +353,7 @@ namespace osu.Desktop
                 }
             }
         }
+
+        #endregion
     }
 }
