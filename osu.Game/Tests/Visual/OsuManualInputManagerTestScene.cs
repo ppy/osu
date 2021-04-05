@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual
                 InputManager = new ManualInputManager
                 {
                     UseParentInput = true,
-                    Child = new GlobalActionContainer(null)
+                    Child = new GlobalActionContainer(null, null)
                         .WithChild((cursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both })
                             .WithChild(content = new OsuTooltipContainer(cursorContainer.Cursor) { RelativeSizeAxes = Axes.Both }))
                 },
