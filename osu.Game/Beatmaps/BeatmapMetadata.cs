@@ -19,8 +19,13 @@ namespace osu.Game.Beatmaps
         public int ID { get; set; }
 
         public string Title { get; set; }
+
+        [JsonProperty("title_unicode")]
         public string TitleUnicode { get; set; }
+
         public string Artist { get; set; }
+
+        [JsonProperty("artist_unicode")]
         public string ArtistUnicode { get; set; }
 
         [JsonIgnore]
