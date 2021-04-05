@@ -18,13 +18,13 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         protected readonly LimitedCapacityStack<DifficultyHitObject> Previous = new LimitedCapacityStack<DifficultyHitObject>(2); // Contained objects not used yet
 
-        
         /// <summary>
         /// Mods for use in skill calculations.
         /// </summary>
         protected IReadOnlyList<Mod> Mods => mods;
 
         private readonly Mod[] mods;
+
         protected Skill(Mod[] mods)
         {
             this.mods = mods;
