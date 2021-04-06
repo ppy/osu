@@ -25,6 +25,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
+    [Cached]
     public class Catcher : SkinReloadableDrawable, IKeyBindingHandler<CatchAction>
     {
         /// <summary>
@@ -98,7 +99,7 @@ namespace osu.Game.Rulesets.Catch.UI
         /// <summary>
         /// Width of the area that can be used to attempt catches during gameplay.
         /// </summary>
-        private readonly float catchWidth;
+        public readonly float CatchWidth;
 
         private readonly CatcherSprite catcherIdle;
         private readonly CatcherSprite catcherKiai;
@@ -134,7 +135,7 @@ namespace osu.Game.Rulesets.Catch.UI
             if (difficulty != null)
                 Scale = calculateScale(difficulty);
 
-            catchWidth = CalculateCatchWidth(Scale);
+            CatchWidth = CalculateCatchWidth(Scale);
 
             InternalChildren = new Drawable[]
             {
@@ -218,7 +219,7 @@ namespace osu.Game.Rulesets.Catch.UI
             if (!(hitObject is PalpableCatchHitObject fruit))
                 return false;
 
-            var halfCatchWidth = catchWidth * 0.5f;
+            var halfCatchWidth = CatchWidth * 0.5f;
 
             // this stuff wil disappear once we move fruit to non-relative coordinate space in the future.
             var catchObjectPosition = fruit.EffectiveX;
@@ -246,7 +247,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     placeCaughtObject(palpableObject, positionInStack);
 
                 if (hitLighting.Value)
-                    addLighting(hitObject, positionInStack.X, drawableObject.AccentColour.Value, result);
+                    addLighting(positionInStack.X, drawableObject.AccentColour.Value, result);
             }
 
             // droplet doesn't affect the catcher state
@@ -287,7 +288,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             caughtObjectContainer.RemoveAll(d => d.HitObject == drawableObject.HitObject);
             droppedObjectTarget.RemoveAll(d => d.HitObject == drawableObject.HitObject);
-            hitExplosionContainer.RemoveAll(d => d.HitObject.Value == drawableObject.HitObject);
+            hitExplosionContainer.RemoveAll(d => d.JudgementResult.Value.HitObject == drawableObject.HitObject);
         }
 
         /// <summary>
@@ -505,14 +506,12 @@ namespace osu.Game.Rulesets.Catch.UI
             return position;
         }
 
-        private void addLighting(PalpableCatchHitObject hitObject, float catchPosition, Color4 colour, JudgementResult result)
+        private void addLighting(float catchPosition, Color4 colour, JudgementResult result)
         {
             PoolableHitExplosion hitExplosion = hitExplosionPool.Get();
-            hitExplosion.HitObject.Value = hitObject;
             hitExplosion.CatchPosition.Value = catchPosition;
             hitExplosion.ObjectColour.Value = colour;
             hitExplosion.JudgementResult.Value = result;
-            hitExplosion.CatcherWidth.Value = catchWidth;
             hitExplosionContainer.Add(hitExplosion);
         }
 

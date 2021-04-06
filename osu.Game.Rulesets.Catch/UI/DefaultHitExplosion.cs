@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Catch.Objects;
+using osu.Game.Rulesets.Judgements;
 using osuTK;
 using osuTK.Graphics;
 
@@ -25,7 +26,7 @@ namespace osu.Game.Rulesets.Catch.UI
         private Bindable<Color4> objectColour { get; set; }
 
         [Resolved]
-        private Bindable<PalpableCatchHitObject> hitObject { get; set; }
+        private Bindable<JudgementResult> judgementResult { get; set; }
 
         [Resolved]
         private Bindable<float> catchPosition { get; set; }
@@ -110,7 +111,13 @@ namespace osu.Game.Rulesets.Catch.UI
         private void load()
         {
             objectColour.BindValueChanged(_ => onColourChanged());
-            hitObject.BindValueChanged(hitObject => Scale = new Vector2(hitObject.NewValue.Scale));
+            judgementResult.BindValueChanged(judgement =>
+            {
+                if (judgement.NewValue.HitObject is PalpableCatchHitObject hitObject)
+                {
+                    Scale = new Vector2(hitObject.Scale);
+                }
+            });
             catchPosition.BindValueChanged(position => X = position.NewValue);
         }
 

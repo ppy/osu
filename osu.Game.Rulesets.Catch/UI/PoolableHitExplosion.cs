@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Pooling;
-using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Skinning;
 using osuTK.Graphics;
@@ -20,13 +19,7 @@ namespace osu.Game.Rulesets.Catch.UI
         public readonly Bindable<Color4> ObjectColour = new Bindable<Color4>();
 
         [Cached]
-        public readonly Bindable<PalpableCatchHitObject> HitObject = new Bindable<PalpableCatchHitObject>();
-
-        [Cached]
         public readonly Bindable<JudgementResult> JudgementResult = new Bindable<JudgementResult>();
-
-        [Cached(Name = "CatcherWidth")]
-        public readonly Bindable<float> CatcherWidth = new Bindable<float>();
 
         [Cached]
         public readonly Bindable<float> CatchPosition = new Bindable<float>();

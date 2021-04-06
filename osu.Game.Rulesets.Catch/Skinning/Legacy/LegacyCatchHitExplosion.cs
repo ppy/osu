@@ -23,9 +23,6 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
         [Resolved]
         private Bindable<Color4> objectColour { get; set; }
 
-        [Resolved(Name = "CatcherWidth")]
-        private Bindable<float> catcherWidth { get; set; }
-
         [Resolved]
         private Bindable<float> catchPosition { get; set; }
 
@@ -33,7 +30,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
         private Bindable<JudgementResult> judgementResult { get; set; }
 
         [Resolved]
-        private Bindable<PalpableCatchHitObject> hitObject { get; set; }
+        private Catcher catcher { get; set; }
 
         private const float catcher_margin = (1 - Catcher.ALLOWED_CATCH_RANGE) / 2;
 
@@ -72,11 +69,11 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
         public override void Animate()
         {
-            float catcherWidthHalf = catcherWidth.Value * 0.5f;
+            float catcherWidthHalf = catcher.CatchWidth * 0.5f;
 
             float explosionOffset = Math.Clamp(catchPosition.Value, -catcherWidthHalf + catcher_margin * 3, catcherWidthHalf - catcher_margin * 3);
 
-            if (!(hitObject.Value is Droplet))
+            if (!(judgementResult.Value.HitObject is Droplet))
             {
                 var scale = Math.Clamp(judgementResult.Value.ComboAtJudgement / 200f, 0.35f, 1.125f);
 
