@@ -184,7 +184,7 @@ namespace osu.Game.Screens.Select
             }
 
             // for now, let's early abort if an OnlineBeatmapID is not present (should have been populated at import time).
-            if (Beatmap?.OnlineBeatmapID == null)
+            if (Beatmap?.OnlineBeatmapID == null || api.State.Value == APIState.Offline)
             {
                 updateMetrics();
                 return;
