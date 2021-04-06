@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
@@ -16,6 +17,7 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
@@ -35,7 +37,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private Bindable<HitObject> placement;
         private SelectionBlueprint placementBlueprint;
 
-        private readonly Box backgroundBox;
+        private Box backgroundBox;
+        private Box backgroundBoxIntro;
+
         // we only care about checking vertical validity.
         // this allows selecting and dragging selections before time=0.
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
@@ -52,12 +56,26 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             Origin = Anchor.Centre;
 
             Height = 0.6f;
+        }
 
-            AddInternal(backgroundBox = new Box
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            AddRangeInternal(new[]
             {
-                Colour = Color4.Black,
-                RelativeSizeAxes = Axes.Both,
-                Alpha = 0.1f,
+                backgroundBoxIntro = new Box
+                {
+                    RelativeSizeAxes = Axes.Y,
+                    Width = 200,
+                    Origin = Anchor.TopRight,
+                    Alpha = 0.1f,
+                },
+                backgroundBox = new Box
+                {
+                    Colour = Color4.Black,
+                    RelativeSizeAxes = Axes.Both,
+                    Alpha = 0.1f,
+                }
             });
         }
 
@@ -68,6 +86,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             placement = beatmap.PlacementObject.GetBoundCopy();
             placement.ValueChanged += placementChanged;
+
+            updateHoverState();
+            FinishTransforms(true);
         }
 
         private void placementChanged(ValueChangedEvent<HitObject> obj)
@@ -94,13 +115,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         protected override bool OnHover(HoverEvent e)
         {
-            backgroundBox.FadeColour(colours.BlueLighter, 120, Easing.OutQuint);
+            updateHoverState();
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            backgroundBox.FadeColour(Color4.Black, 600, Easing.OutQuint);
+            updateHoverState();
             base.OnHoverLost(e);
         }
 
@@ -132,6 +153,20 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             base.Update();
 
             updateStacking();
+        }
+
+        private void updateHoverState()
+        {
+            if (IsHovered)
+            {
+                backgroundBox.FadeColour(colours.BlueLighter, 120, Easing.OutQuint);
+                backgroundBoxIntro.FadeColour(ColourInfo.GradientHorizontal(Color4.Black, colours.BlueLighter), 120, Easing.OutQuint);
+            }
+            else
+            {
+                backgroundBox.FadeColour(Color4.Black, 600, Easing.OutQuint);
+                backgroundBoxIntro.FadeColour(Color4.Black, 600, Easing.OutQuint);
+            }
         }
 
         private void updateStacking()
