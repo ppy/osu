@@ -19,12 +19,9 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         protected readonly ReverseQueue<DifficultyHitObject> Previous;
 
         /// <summary>
-        /// Soft capacity of the <see cref="Previous"/> queue.
-        /// <see cref="Previous"/> will automatically resize if it exceeds capacity, but will do so at a very slight performance impact.
-        /// The actual capacity will be set to this value + 1 to allow for storage of the current object before the next can be processed.
-        /// Setting to zero (default) will cause <see cref="Previous"/> to be uninstanciated.
+        /// Number of previous <see cref="DifficultyHitObject"/>s to keep inside the <see cref="Previous"/> queue.
         /// </summary>
-        protected virtual int PreviousCollectionSoftCapacity => 0;
+        protected virtual int HistoryLength => 1;
 
         /// <summary>
         /// Mods for use in skill calculations.
@@ -36,32 +33,17 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         protected Skill(Mod[] mods)
         {
             this.mods = mods;
-
-            if (PreviousCollectionSoftCapacity > 0)
-                Previous = new ReverseQueue<DifficultyHitObject>(PreviousCollectionSoftCapacity + 1);
+            Previous = new ReverseQueue<DifficultyHitObject>(HistoryLength + 1);
         }
 
         internal void ProcessInternal(DifficultyHitObject current)
         {
-            RemoveExtraneousHistory(current);
+            while (Previous.Count > HistoryLength)
+                Previous.Dequeue();
+
             Process(current);
-            AddToHistory(current);
-        }
 
-        /// <summary>
-        /// Remove objects from <see cref="Previous"/> that are no longer needed for calculations from the current object onwards.
-        /// </summary>
-        /// <param name="current">The <see cref="DifficultyHitObject"/> to be processed.</param>
-        protected virtual void RemoveExtraneousHistory(DifficultyHitObject current)
-        {
-        }
-
-        /// <summary>
-        /// Add the current <see cref="DifficultyHitObject"/> to the <see cref="Previous"/> queue (if required).
-        /// </summary>
-        /// <param name="current">The <see cref="DifficultyHitObject"/> that was just processed.</param>
-        protected virtual void AddToHistory(DifficultyHitObject current)
-        {
+            Previous.Enqueue(current);
         }
 
         /// <summary>
