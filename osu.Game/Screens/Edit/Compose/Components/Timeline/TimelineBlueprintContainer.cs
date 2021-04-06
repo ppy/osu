@@ -74,8 +74,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             placement = beatmap.PlacementObject.GetBoundCopy();
             placement.ValueChanged += placementChanged;
-
-            FinishTransforms(true);
         }
 
         private void placementChanged(ValueChangedEvent<HitObject> obj)
