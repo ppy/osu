@@ -163,9 +163,9 @@ namespace osu.Game.Screens.Select
                                 }
                             }
                         },
-                        loading = new LoadingLayer(true)
-                    }
+                    },
                 },
+                loading = new LoadingLayer(true)
             };
         }
 
