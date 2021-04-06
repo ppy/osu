@@ -5,8 +5,8 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Screens.Edit.Setup
@@ -18,15 +18,13 @@ namespace osu.Game.Screens.Edit.Setup
         private LabelledSliderBar<float> approachRateSlider;
         private LabelledSliderBar<float> overallDifficultySlider;
 
+        public override LocalisableString Title => "Difficulty";
+
         [BackgroundDependencyLoader]
         private void load()
         {
             Children = new Drawable[]
             {
-                new OsuSpriteText
-                {
-                    Text = "Difficulty settings"
-                },
                 circleSizeSlider = new LabelledSliderBar<float>
                 {
                     Label = "Object Size",
