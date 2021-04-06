@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Toolbar;
@@ -146,7 +147,7 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("Move mouse to backButton", () => InputManager.MoveMouseTo(backButtonPosition));
 
             // BackButton handles hover using its child button, so this checks whether or not any of BackButton's children are hovered.
-            AddUntilStep("Back button is hovered", () => InputManager.HoveredDrawables.Any(d => d.Parent == Game.BackButton));
+            AddUntilStep("Back button is hovered", () => Game.ChildrenOfType<BackButton>().First().Children.Any(c => c.IsHovered));
 
             AddStep("Click back button", () => InputManager.Click(MouseButton.Left));
             AddUntilStep("Overlay was hidden", () => songSelect.ModSelectOverlay.State.Value == Visibility.Hidden);

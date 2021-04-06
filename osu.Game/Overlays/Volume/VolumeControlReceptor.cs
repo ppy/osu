@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
 
 namespace osu.Game.Overlays.Volume
@@ -16,6 +17,13 @@ namespace osu.Game.Overlays.Volume
 
         public bool OnPressed(GlobalAction action) =>
             ActionRequested?.Invoke(action) ?? false;
+
+        protected override bool OnScroll(ScrollEvent e)
+        {
+            // forward any unhandled mouse scroll events to the volume control.
+            ScrollActionRequested?.Invoke(GlobalAction.IncreaseVolume, e.ScrollDelta.Y, e.IsPrecise);
+            return true;
+        }
 
         public bool OnScroll(GlobalAction action, float amount, bool isPrecise) =>
             ScrollActionRequested?.Invoke(action, amount, isPrecise) ?? false;

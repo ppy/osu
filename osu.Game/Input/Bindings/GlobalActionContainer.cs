@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -12,11 +13,16 @@ namespace osu.Game.Input.Bindings
 {
     public class GlobalActionContainer : DatabasedKeyBindingContainer<GlobalAction>, IHandleGlobalKeyboardInput
     {
+        [CanBeNull]
+        private readonly GlobalInputManager globalInputManager;
+
         private readonly Drawable handler;
 
-        public GlobalActionContainer(OsuGameBase game)
+        public GlobalActionContainer(OsuGameBase game, [CanBeNull] GlobalInputManager globalInputManager)
             : base(matchingMode: KeyCombinationMatchingMode.Modifiers)
         {
+            this.globalInputManager = globalInputManager;
+
             if (game is IKeyBindingHandler<GlobalAction>)
                 handler = game;
         }
@@ -91,8 +97,15 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.F3, GlobalAction.MusicPlay)
         };
 
-        protected override IEnumerable<Drawable> KeyBindingInputQueue =>
-            handler == null ? base.KeyBindingInputQueue : base.KeyBindingInputQueue.Prepend(handler);
+        protected override IEnumerable<Drawable> KeyBindingInputQueue
+        {
+            get
+            {
+                var inputQueue = globalInputManager?.NonPositionalInputQueue ?? base.KeyBindingInputQueue;
+
+                return handler != null ? inputQueue.Prepend(handler) : inputQueue;
+            }
+        }
     }
 
     public enum GlobalAction
