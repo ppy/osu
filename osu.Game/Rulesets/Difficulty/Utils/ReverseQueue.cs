@@ -9,6 +9,8 @@ namespace osu.Game.Rulesets.Difficulty.Utils
 {
     /// <summary>
     /// An indexed queue where items are indexed beginning from the most recently enqueued item.
+    /// Enqueuing an item pushes all existing indexes up by one and inserts the item at index 0.
+    /// Dequeuing an item removes the item from the highest index and returns it.
     /// </summary>
     public class ReverseQueue<T> : IEnumerable<T>
     {
