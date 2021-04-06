@@ -8,7 +8,7 @@ using System.Collections.Generic;
 namespace osu.Game.Rulesets.Difficulty.Utils
 {
     /// <summary>
-    /// An indexed queue where items are indexed beginning from the end instead of the start.
+    /// An indexed queue where items are indexed beginning from the most recently enqueued item.
     /// </summary>
     public class ReverseQueue<T> : IEnumerable<T>
     {
@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Difficulty.Utils
         }
 
         /// <summary>
-        /// Dequeues an item from the <see cref="ReverseQueue{T}"/> and returns it.
+        /// Dequeues the least recently enqueued item from the <see cref="ReverseQueue{T}"/> and returns it.
         /// </summary>
         /// <returns>The item dequeued from the <see cref="ReverseQueue{T}"/>.</returns>
         public T Dequeue()
@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Difficulty.Utils
         }
 
         /// <summary>
-        /// Returns an enumerator which enumerates items in the <see cref="ReverseQueue{T}"/> starting from the most recently enqueued one.
+        /// Returns an enumerator which enumerates items in the <see cref="ReverseQueue{T}"/> starting from the most recently enqueued item.
         /// </summary>
         public IEnumerator<T> GetEnumerator()
         {
