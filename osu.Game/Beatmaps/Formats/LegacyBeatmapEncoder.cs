@@ -329,7 +329,13 @@ namespace osu.Game.Beatmaps.Formats
 
                 if (point.Type.Value != null)
                 {
-                    if (point.Type.Value != lastType)
+                    // We've reached a new segment!
+
+                    // To preserve compatibility with osu-stable as much as possible, segments with the same type are converted to use implicit segments by duplicating the control point.
+                    // One exception to this is when the last control point of the last segment was itself a duplicate, which can't be supported by osu-stable.
+                    bool lastPointWasDuplicate = i > 1 && pathData.Path.ControlPoints[i - 1].Position.Value == pathData.Path.ControlPoints[i - 2].Position.Value;
+
+                    if (lastPointWasDuplicate || point.Type.Value != lastType)
                     {
                         switch (point.Type.Value)
                         {
