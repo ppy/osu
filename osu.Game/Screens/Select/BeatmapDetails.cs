@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using System.Linq;
-using osu.Framework.Bindables;
 using osu.Game.Online.API;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions.Color4Extensions;
@@ -167,19 +166,6 @@ namespace osu.Game.Screens.Select
             };
         }
 
-        private IBindable<APIState> apiOnlineState;
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            apiOnlineState = api.State.GetBoundCopy();
-            apiOnlineState.BindValueChanged(state =>
-            {
-                Scheduler.AddOnce(updateStatistics);
-            });
-        }
-
         private void updateStatistics()
         {
             advanced.Beatmap = Beatmap;
@@ -195,7 +181,7 @@ namespace osu.Game.Screens.Select
             }
 
             // for now, let's early abort if an OnlineBeatmapID is not present (should have been populated at import time).
-            if (Beatmap?.OnlineBeatmapID == null || apiOnlineState.Value != APIState.Online)
+            if (Beatmap?.OnlineBeatmapID == null)
             {
                 updateMetrics();
                 return;
