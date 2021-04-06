@@ -329,7 +329,25 @@ namespace osu.Game.Beatmaps.Formats
 
                 if (point.Type.Value != null)
                 {
-                    if (point.Type.Value != lastType)
+                    // We've reached a new (explicit) segment!
+
+                    // Explicit segments have a new format in which the type is injected into the middle of the control point string.
+                    // To preserve compatibility with osu-stable as much as possible, explicit segments with the same type are converted to use implicit segments by duplicating the control point.
+                    bool needsExplicitSegment = point.Type.Value != lastType;
+
+                    // One exception to this is when the last two control points of the last segment were duplicated. This is not a scenario supported by osu!stable.
+                    // Lazer does not add implicit segments for the last two control points of _any_ explicit segment, so an explicit segment is forced in order to maintain consistency with the decoder.
+                    if (i > 1)
+                    {
+                        // We need to use the absolute control point position to determine equality, otherwise floating point issues may arise.
+                        Vector2 p1 = position + pathData.Path.ControlPoints[i - 1].Position.Value;
+                        Vector2 p2 = position + pathData.Path.ControlPoints[i - 2].Position.Value;
+
+                        if ((int)p1.X == (int)p2.X && (int)p1.Y == (int)p2.Y)
+                            needsExplicitSegment = true;
+                    }
+
+                    if (needsExplicitSegment)
                     {
                         switch (point.Type.Value)
                         {

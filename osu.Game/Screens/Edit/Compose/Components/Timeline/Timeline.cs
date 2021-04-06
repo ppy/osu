@@ -9,6 +9,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -91,6 +92,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         },
                         ticks = new TimelineTickDisplay(),
                         controlPoints = new TimelineControlPointDisplay(),
+                        new Box
+                        {
+                            Name = "zero marker",
+                            RelativeSizeAxes = Axes.Y,
+                            Width = 2,
+                            Origin = Anchor.TopCentre,
+                            Colour = colours.YellowDarker,
+                        },
                     }
                 },
             });
