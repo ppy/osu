@@ -22,8 +22,9 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// Soft capacity of the <see cref="Previous"/> queue.
         /// <see cref="Previous"/> will automatically resize if it exceeds capacity, but will do so at a very slight performance impact.
         /// The actual capacity will be set to this value + 1 to allow for storage of the current object before the next can be processed.
+        /// Setting to zero (default) will cause <see cref="Previous"/> to be uninstanciated.
         /// </summary>
-        protected virtual int PreviousCollectionSoftCapacity => 1;
+        protected virtual int PreviousCollectionSoftCapacity => 0;
 
         /// <summary>
         /// Mods for use in skill calculations.
@@ -35,7 +36,9 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         protected Skill(Mod[] mods)
         {
             this.mods = mods;
-            Previous = new ReverseQueue<DifficultyHitObject>(PreviousCollectionSoftCapacity + 1);
+
+            if (PreviousCollectionSoftCapacity > 0)
+                Previous = new ReverseQueue<DifficultyHitObject>(PreviousCollectionSoftCapacity + 1);
         }
 
         internal void ProcessInternal(DifficultyHitObject current)
@@ -51,8 +54,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <param name="current">The <see cref="DifficultyHitObject"/> to be processed.</param>
         protected virtual void RemoveExtraneousHistory(DifficultyHitObject current)
         {
-            while (Previous.Count > 1)
-                Previous.Dequeue();
         }
 
         /// <summary>
@@ -61,7 +62,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <param name="current">The <see cref="DifficultyHitObject"/> that was just processed.</param>
         protected virtual void AddToHistory(DifficultyHitObject current)
         {
-            Previous.Enqueue(current);
         }
 
         /// <summary>

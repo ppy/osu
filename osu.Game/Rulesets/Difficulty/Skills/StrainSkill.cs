@@ -20,6 +20,8 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         protected abstract double SkillMultiplier { get; }
 
+        protected override int PreviousCollectionSoftCapacity => 1;
+
         /// <summary>
         /// Determines how quickly strain decays for the given skill.
         /// For example a value of 0.15 indicates that strain decays to 15% of its original value in one second.
@@ -50,6 +52,17 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         protected StrainSkill(Mod[] mods)
             : base(mods)
         {
+        }
+
+        protected override void RemoveExtraneousHistory(DifficultyHitObject current)
+        {
+            while (Previous.Count > 1)
+                Previous.Dequeue();
+        }
+
+        protected override void AddToHistory(DifficultyHitObject current)
+        {
+            Previous.Enqueue(current);
         }
 
         /// <summary>
