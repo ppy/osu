@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -12,11 +13,12 @@ namespace osu.Game.Input.Bindings
 {
     public class GlobalActionContainer : DatabasedKeyBindingContainer<GlobalAction>, IHandleGlobalKeyboardInput
     {
+        [CanBeNull]
         private readonly GlobalInputManager globalInputManager;
 
         private readonly Drawable handler;
 
-        public GlobalActionContainer(OsuGameBase game, GlobalInputManager globalInputManager)
+        public GlobalActionContainer(OsuGameBase game, [CanBeNull] GlobalInputManager globalInputManager)
             : base(matchingMode: KeyCombinationMatchingMode.Modifiers)
         {
             this.globalInputManager = globalInputManager;
