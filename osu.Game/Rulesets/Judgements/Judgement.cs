@@ -181,7 +181,7 @@ namespace osu.Game.Rulesets.Judgements
                     return 300;
 
                 case HitResult.Perfect:
-                    return 350;
+                    return 315;
 
                 case HitResult.SmallBonus:
                     return SMALL_BONUS_SCORE;
