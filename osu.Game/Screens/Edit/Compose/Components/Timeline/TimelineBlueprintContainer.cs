@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -37,8 +38,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private Bindable<HitObject> placement;
         private SelectionBlueprint placementBlueprint;
 
-        private Box backgroundBox;
-        private Box backgroundBoxIntro;
+        private SelectableAreaBackground backgroundBox;
 
         // we only care about checking vertical validity.
         // this allows selecting and dragging selections before time=0.
@@ -61,21 +61,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddRangeInternal(new[]
+            AddInternal(backgroundBox = new SelectableAreaBackground
             {
-                backgroundBoxIntro = new Box
-                {
-                    RelativeSizeAxes = Axes.Y,
-                    Width = 200,
-                    Origin = Anchor.TopRight,
-                    Alpha = 0.1f,
-                },
-                backgroundBox = new Box
-                {
-                    Colour = Color4.Black,
-                    RelativeSizeAxes = Axes.Both,
-                    Alpha = 0.1f,
-                }
+                Colour = Color4.Black
             });
         }
 
@@ -87,7 +75,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             placement = beatmap.PlacementObject.GetBoundCopy();
             placement.ValueChanged += placementChanged;
 
-            updateHoverState();
             FinishTransforms(true);
         }
 
@@ -115,13 +102,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         protected override bool OnHover(HoverEvent e)
         {
-            updateHoverState();
+            backgroundBox.FadeColour(colours.BlueLighter, 120, Easing.OutQuint);
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            updateHoverState();
+            backgroundBox.FadeColour(Color4.Black, 600, Easing.OutQuint);
             base.OnHoverLost(e);
         }
 
@@ -153,20 +140,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             base.Update();
 
             updateStacking();
-        }
-
-        private void updateHoverState()
-        {
-            if (IsHovered)
-            {
-                backgroundBox.FadeColour(colours.BlueLighter, 120, Easing.OutQuint);
-                backgroundBoxIntro.FadeColour(ColourInfo.GradientHorizontal(Color4.Black, colours.BlueLighter), 120, Easing.OutQuint);
-            }
-            else
-            {
-                backgroundBox.FadeColour(Color4.Black, 600, Easing.OutQuint);
-                backgroundBoxIntro.FadeColour(Color4.Black, 600, Easing.OutQuint);
-            }
         }
 
         private void updateStacking()
@@ -234,6 +207,33 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     timeline.ScrollBy((float)((mouseX - timelineQuad.TopRight.X) / 10 * Clock.ElapsedFrameTime));
                 else if (mouseX < timelineQuad.TopLeft.X)
                     timeline.ScrollBy((float)((mouseX - timelineQuad.TopLeft.X) / 10 * Clock.ElapsedFrameTime));
+            }
+        }
+
+        private class SelectableAreaBackground : CompositeDrawable
+        {
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                RelativeSizeAxes = Axes.Both;
+                Alpha = 0.1f;
+
+                AddRangeInternal(new[]
+                {
+                    // fade out over intro time, outside the valid time bounds.
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Y,
+                        Width = 200,
+                        Origin = Anchor.TopRight,
+                        Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0), Color4.White),
+                    },
+                    new Box
+                    {
+                        Colour = Color4.White,
+                        RelativeSizeAxes = Axes.Both,
+                    }
+                });
             }
         }
 
