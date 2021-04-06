@@ -36,6 +36,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private SelectionBlueprint placementBlueprint;
 
         private readonly Box backgroundBox;
+        // we only care about checking vertical validity.
+        // this allows selecting and dragging selections before time=0.
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
+        {
+            float localY = ToLocalSpace(screenSpacePos).Y;
+            return DrawRectangle.Top <= localY && DrawRectangle.Bottom >= localY;
+        }
 
         public TimelineBlueprintContainer(HitObjectComposer composer)
             : base(composer)
