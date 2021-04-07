@@ -206,6 +206,8 @@ namespace osu.Game.Rulesets.Osu
 
         public override HitObjectComposer CreateHitObjectComposer() => new OsuHitObjectComposer(this);
 
+        public override Checker CreateChecker() => new OsuChecker();
+
         public override string Description => "osu!";
 
         public override string ShortName => SHORT_NAME;
