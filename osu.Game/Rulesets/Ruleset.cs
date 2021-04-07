@@ -202,6 +202,8 @@ namespace osu.Game.Rulesets
 
         public virtual HitObjectComposer CreateHitObjectComposer() => null;
 
+        public virtual Checker CreateChecker() => null;
+
         public virtual Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.Solid.QuestionCircle };
 
         public virtual IResourceStore<byte[]> CreateResourceStore() => new NamespacedResourceStore<byte[]>(new DllResourceStore(GetType().Assembly), @"Resources");
