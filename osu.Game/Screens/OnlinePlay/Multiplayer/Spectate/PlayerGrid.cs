@@ -1,0 +1,142 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osuTK;
+
+namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
+{
+    public partial class PlayerGrid : CompositeDrawable
+    {
+        private const float player_spacing = 5;
+
+        public Drawable MaximisedFacade => maximisedFacade;
+
+        private readonly PlayerGridFacade maximisedFacade;
+        private readonly Container paddingContainer;
+        private readonly FillFlowContainer<PlayerGridFacade> facadeContainer;
+        private readonly Container<Cell> cellContainer;
+
+        public PlayerGrid()
+        {
+            InternalChildren = new Drawable[]
+            {
+                paddingContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding(player_spacing),
+                    Children = new Drawable[]
+                    {
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Child = facadeContainer = new FillFlowContainer<PlayerGridFacade>
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Spacing = new Vector2(player_spacing),
+                            }
+                        },
+                        maximisedFacade = new PlayerGridFacade { RelativeSizeAxes = Axes.Both }
+                    }
+                },
+                cellContainer = new Container<Cell> { RelativeSizeAxes = Axes.Both }
+            };
+        }
+
+        public void AddContent(Drawable content)
+        {
+            var facade = new PlayerGridFacade();
+            facadeContainer.Add(facade);
+
+            var cell = new Cell(content) { ToggleMaximisationState = toggleMaximisationState };
+            cell.SetFacade(facade);
+
+            cellContainer.Add(cell);
+        }
+
+        // A depth value that gets decremented every time a new instance is maximised in order to reduce underlaps.
+        private float maximisedInstanceDepth;
+
+        private void toggleMaximisationState(Cell target)
+        {
+            // Iterate through all cells to ensure only one is maximised at any time.
+            foreach (var i in cellContainer)
+            {
+                if (i == target)
+                    i.IsMaximised = !i.IsMaximised;
+                else
+                    i.IsMaximised = false;
+
+                if (i.IsMaximised)
+                {
+                    // Transfer cell to the maximised facade.
+                    i.SetFacade(maximisedFacade);
+                    cellContainer.ChangeChildDepth(i, maximisedInstanceDepth -= 0.001f);
+                }
+                else
+                {
+                    // Transfer cell back to its original facade.
+                    i.SetFacade(facadeContainer[cellContainer.IndexOf(target)]);
+                }
+            }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            Vector2 cellsPerDimension;
+
+            switch (facadeContainer.Count)
+            {
+                case 1:
+                    cellsPerDimension = Vector2.One;
+                    break;
+
+                case 2:
+                    cellsPerDimension = new Vector2(2, 1);
+                    break;
+
+                case 3:
+                case 4:
+                    cellsPerDimension = new Vector2(2);
+                    break;
+
+                case 5:
+                case 6:
+                    cellsPerDimension = new Vector2(3, 2);
+                    break;
+
+                case 7:
+                case 8:
+                case 9:
+                    // 3 rows / 3 cols.
+                    cellsPerDimension = new Vector2(3);
+                    break;
+
+                case 10:
+                case 11:
+                case 12:
+                    // 3 rows / 4 cols.
+                    cellsPerDimension = new Vector2(4, 3);
+                    break;
+
+                default:
+                    // 4 rows / 4 cols.
+                    cellsPerDimension = new Vector2(4);
+                    break;
+            }
+
+            // Total spacing between cells
+            Vector2 totalCellSpacing = player_spacing * (cellsPerDimension - Vector2.One);
+
+            Vector2 fullSize = paddingContainer.ChildSize - totalCellSpacing;
+            Vector2 cellSize = Vector2.Divide(fullSize, new Vector2(cellsPerDimension.X, cellsPerDimension.Y));
+
+            foreach (var cell in facadeContainer)
+                cell.Size = cellSize;
+        }
+    }
+}
