@@ -308,17 +308,15 @@ namespace osu.Game
 
             AddInternal(RulesetConfigCache);
 
-            MenuCursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both };
-
-            GlobalInputManager globalInput;
-
-            MenuCursorContainer.Child = globalInput = new GlobalInputManager(this)
+            var globalInput = new GlobalInputManager(this)
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = content = new OsuTooltipContainer(MenuCursorContainer.Cursor) { RelativeSizeAxes = Axes.Both }
+                Child = MenuCursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both }
             };
 
-            base.Content.Add(CreateScalingContainer().WithChild(MenuCursorContainer));
+            MenuCursorContainer.Child = content = new OsuTooltipContainer(MenuCursorContainer.Cursor) { RelativeSizeAxes = Axes.Both };
+
+            base.Content.Add(CreateScalingContainer().WithChild(globalInput));
 
             KeyBindingStore.Register(globalInput.GlobalBindings);
             dependencies.Cache(globalInput.GlobalBindings);
