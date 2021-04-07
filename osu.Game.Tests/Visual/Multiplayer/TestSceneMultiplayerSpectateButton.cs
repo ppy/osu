@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
             Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, host, Beatmap.Default));
 
-            var beatmapTracker = new OnlinePlayBeatmapAvailablilityTracker { SelectedItem = { BindTarget = selectedItem } };
+            var beatmapTracker = new OnlinePlayBeatmapAvailabilityTracker { SelectedItem = { BindTarget = selectedItem } };
             base.Content.Add(beatmapTracker);
             Dependencies.Cache(beatmapTracker);
 

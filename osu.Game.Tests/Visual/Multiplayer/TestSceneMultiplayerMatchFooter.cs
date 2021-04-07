@@ -11,7 +11,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     public class TestSceneMultiplayerMatchFooter : MultiplayerTestScene
     {
         [Cached]
-        private readonly OnlinePlayBeatmapAvailablilityTracker availablilityTracker = new OnlinePlayBeatmapAvailablilityTracker();
+        private readonly OnlinePlayBeatmapAvailabilityTracker availablilityTracker = new OnlinePlayBeatmapAvailabilityTracker();
 
         [BackgroundDependencyLoader]
         private void load()
