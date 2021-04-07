@@ -106,6 +106,7 @@ namespace osu.Game.Screens.Select
                                     AutoSizeAxes = Axes.Both,
                                     Child = SpriteText = new OsuSpriteText
                                     {
+                                        AlwaysPresent = true,
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
                                     }

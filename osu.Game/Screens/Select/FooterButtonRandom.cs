@@ -4,8 +4,11 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
+using osuTK;
 
 namespace osu.Game.Screens.Select
 {
@@ -22,10 +25,30 @@ namespace osu.Game.Screens.Select
             SelectedColour = colours.Green;
             DeselectedColour = SelectedColour.Opacity(0.5f);
             Text = @"random";
+
             Action = () =>
             {
                 if (rewindSearch)
                 {
+                    const double fade_time = 500;
+
+                    OsuSpriteText rewindSpriteText;
+
+                    TextContainer.Add(rewindSpriteText = new OsuSpriteText
+                    {
+                        Alpha = 0,
+                        Text = @"rewind",
+                        AlwaysPresent = true, // make sure the button is sized large enough to always show this
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    });
+
+                    rewindSpriteText.FadeOutFromOne(fade_time, Easing.In);
+                    rewindSpriteText.MoveTo(Vector2.Zero).MoveTo(new Vector2(0, 10), fade_time, Easing.In);
+                    rewindSpriteText.Expire();
+
+                    SpriteText.FadeInFromZero(fade_time, Easing.In);
+
                     PreviousRandom.Invoke();
                 }
                 else
