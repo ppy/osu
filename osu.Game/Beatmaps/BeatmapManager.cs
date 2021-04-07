@@ -281,8 +281,9 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="beatmapInfo">The beatmap to lookup.</param>
         /// <param name="previous">The currently loaded <see cref="WorkingBeatmap"/>. Allows for optimisation where elements are shared with the new beatmap. May be returned if beatmapInfo requested matches</param>
+        /// <param name="bypassCache">Whether to bypass the cache and return a new <see cref="WorkingBeatmap"/> instance.</param>
         /// <returns>A <see cref="WorkingBeatmap"/> instance correlating to the provided <see cref="BeatmapInfo"/>.</returns>
-        public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo, WorkingBeatmap previous = null)
+        public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo, WorkingBeatmap previous = null, bool bypassCache = false)
         {
             if (beatmapInfo?.ID > 0 && previous != null && previous.BeatmapInfo?.ID == beatmapInfo.ID)
                 return previous;
@@ -301,9 +302,14 @@ namespace osu.Game.Beatmaps
 
             lock (workingCache)
             {
-                var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == beatmapInfo.ID);
-                if (working != null)
-                    return working;
+                BeatmapManagerWorkingBeatmap working;
+
+                if (!bypassCache)
+                {
+                    working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == beatmapInfo.ID);
+                    if (working != null)
+                        return working;
+                }
 
                 beatmapInfo.Metadata ??= beatmapInfo.BeatmapSet.Metadata;
 
