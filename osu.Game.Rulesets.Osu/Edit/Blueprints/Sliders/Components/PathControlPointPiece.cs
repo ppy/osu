@@ -50,8 +50,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         [Resolved]
         private OsuColour colours { get; set; }
 
-        private readonly List<IBindable<PathType?>> pathTypes;
-
         private IBindable<int> sliderVersion;
         private IBindable<Vector2> sliderPosition;
         private IBindable<float> sliderScale;
@@ -61,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             this.slider = slider;
             ControlPoint = controlPoint;
-            pathTypes = new List<IBindable<PathType?>>();
+            var pathTypes = new List<IBindable<PathType?>>();
 
             slider.Path.ControlPoints.BindCollectionChanged((_, args) =>
             {
