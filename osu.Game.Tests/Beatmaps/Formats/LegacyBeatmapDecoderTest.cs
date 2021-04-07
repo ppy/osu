@@ -740,6 +740,36 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(fifth.ControlPoints[5].Type.Value, Is.EqualTo(PathType.Bezier));
                 Assert.That(fifth.ControlPoints[6].Position.Value, Is.EqualTo(new Vector2(5, 5)));
                 Assert.That(fifth.ControlPoints[6].Type.Value, Is.EqualTo(null));
+
+                // Implicit perfect-curve multi-segment(Should convert to bezier to match stable)
+                var sixth = ((IHasPath)decoded.HitObjects[5]).Path;
+
+                Assert.That(sixth.ControlPoints[0].Position.Value, Is.EqualTo(Vector2.Zero));
+                Assert.That(sixth.ControlPoints[0].Type.Value == PathType.Bezier);
+                Assert.That(sixth.ControlPoints[1].Position.Value, Is.EqualTo(new Vector2(75, 145)));
+                Assert.That(sixth.ControlPoints[1].Type.Value == null);
+                Assert.That(sixth.ControlPoints[2].Position.Value, Is.EqualTo(new Vector2(170, 75)));
+
+                Assert.That(sixth.ControlPoints[2].Type.Value == PathType.Bezier);
+                Assert.That(sixth.ControlPoints[3].Position.Value, Is.EqualTo(new Vector2(300, 145)));
+                Assert.That(sixth.ControlPoints[3].Type.Value == null);
+                Assert.That(sixth.ControlPoints[4].Position.Value, Is.EqualTo(new Vector2(410, 20)));
+                Assert.That(sixth.ControlPoints[4].Type.Value == null);
+
+                // Explicit perfect-curve multi-segment(Should not convert to bezier)
+                var seventh = ((IHasPath)decoded.HitObjects[6]).Path;
+
+                Assert.That(seventh.ControlPoints[0].Position.Value, Is.EqualTo(Vector2.Zero));
+                Assert.That(seventh.ControlPoints[0].Type.Value == PathType.PerfectCurve);
+                Assert.That(seventh.ControlPoints[1].Position.Value, Is.EqualTo(new Vector2(75, 145)));
+                Assert.That(seventh.ControlPoints[1].Type.Value == null);
+                Assert.That(seventh.ControlPoints[2].Position.Value, Is.EqualTo(new Vector2(170, 75)));
+
+                Assert.That(seventh.ControlPoints[2].Type.Value == PathType.PerfectCurve);
+                Assert.That(seventh.ControlPoints[3].Position.Value, Is.EqualTo(new Vector2(300, 145)));
+                Assert.That(seventh.ControlPoints[3].Type.Value == null);
+                Assert.That(seventh.ControlPoints[4].Position.Value, Is.EqualTo(new Vector2(410, 20)));
+                Assert.That(seventh.ControlPoints[4].Type.Value == null);
             }
         }
     }
