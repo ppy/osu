@@ -14,17 +14,28 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
     {
         private class Cell : CompositeDrawable
         {
+            /// <summary>
+            /// The index of the original facade of this cell.
+            /// </summary>
+            public readonly int FacadeIndex;
+
+            /// <summary>
+            /// The contained content.
+            /// </summary>
+            public readonly Drawable Content;
+
             public Action<Cell> ToggleMaximisationState;
             public bool IsMaximised;
 
-            private PlayerGridFacade facade;
+            private Facade facade;
             private bool isTracking = true;
 
-            public Cell(Drawable content)
+            public Cell(int facadeIndex, Drawable content)
             {
-                Origin = Anchor.Centre;
+                FacadeIndex = facadeIndex;
 
-                InternalChild = content;
+                Origin = Anchor.Centre;
+                InternalChild = Content = content;
             }
 
             protected override void Update()
@@ -38,9 +49,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 }
             }
 
-            public void SetFacade([NotNull] PlayerGridFacade newFacade)
+            /// <summary>
+            /// Makes this cell track a new facade.
+            /// </summary>
+            public void SetFacade([NotNull] Facade newFacade)
             {
-                PlayerGridFacade lastFacade = facade;
+                Facade lastFacade = facade;
                 facade = newFacade;
 
                 if (lastFacade == null || lastFacade == newFacade)
