@@ -105,6 +105,25 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             assertControlPointType(2, PathType.PerfectCurve);
         }
 
+        [Test]
+        public void TestDragControlPointPathAfterChangingType()
+        {
+            AddStep("change type to bezier", () => slider.Path.ControlPoints[2].Type.Value = PathType.Bezier);
+            AddStep("add point", () => slider.Path.ControlPoints.Add(new PathControlPoint(new Vector2(500, 10))));
+            AddStep("change type to perfect", () => slider.Path.ControlPoints[3].Type.Value = PathType.PerfectCurve);
+
+            moveMouseToControlPoint(4);
+            AddStep("hold", () => InputManager.PressButton(MouseButton.Left));
+
+            assertControlPointType(3, PathType.PerfectCurve);
+
+            addMovementStep(new Vector2(350, 0.01f));
+            AddStep("release", () => InputManager.ReleaseButton(MouseButton.Left));
+
+            assertControlPointPosition(4, new Vector2(350, 0.01f));
+            assertControlPointType(3, PathType.Bezier);
+        }
+
         private void addMovementStep(Vector2 relativePosition)
         {
             AddStep($"move mouse to {relativePosition}", () =>
