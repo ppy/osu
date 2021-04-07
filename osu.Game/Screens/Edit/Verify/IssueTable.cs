@@ -4,16 +4,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Input.Bindings;
+using osu.Game.Screens.Edit.Verify.Components;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Verify
@@ -33,6 +33,9 @@ namespace osu.Game.Screens.Edit.Verify
 
             Padding = new MarginPadding { Horizontal = horizontal_inset };
             RowSize = new Dimension(GridSizeMode.Absolute, row_height);
+
+            Masking = true;
+            CornerRadius = 6;
 
             AddInternal(backgroundFlow = new FillFlowContainer
             {
@@ -55,7 +58,7 @@ namespace osu.Game.Screens.Edit.Verify
 
                 foreach (var issue in value)
                 {
-                    backgroundFlow.Add(new IssueTable.RowBackground(issue));
+                    backgroundFlow.Add(new RowBackground(issue));
                 }
 
                 Columns = createHeaders();
@@ -68,9 +71,10 @@ namespace osu.Game.Screens.Edit.Verify
             var columns = new List<TableColumn>
             {
                 new TableColumn(string.Empty, Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+                new TableColumn("Type", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
                 new TableColumn("Time", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-                new TableColumn(),
-                new TableColumn("Attributes", Anchor.CentreLeft),
+                new TableColumn("Message", Anchor.CentreLeft),
+                new TableColumn("Category", Anchor.CentreRight, new Dimension(GridSizeMode.AutoSize)),
             };
 
             return columns.ToArray();
@@ -81,21 +85,36 @@ namespace osu.Game.Screens.Edit.Verify
             new OsuSpriteText
             {
                 Text = $"#{index + 1}",
+                Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Medium)
+            },
+            new OsuSpriteText
+            {
+                Text = issue.Template.Type.ToString(),
+                Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold),
+                Margin = new MarginPadding { Left = 10 },
+                Colour = issue.Template.TypeColour()
+            },
+            new OsuSpriteText
+            {
+                Text = issue.GetEditorTimestamp(),
                 Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold),
                 Margin = new MarginPadding(10)
             },
             new OsuSpriteText
             {
-                Text = issue.Time.ToEditorFormattedString(),
-                Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
+                Text = issue.ToString(),
+                Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Medium)
             },
-            null,
-            null //new ControlGroupAttributes(issue),
+            new OsuSpriteText
+            {
+                Text = issue.Template.Origin.Metadata().Category.ToString(),
+                Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold),
+                Margin = new MarginPadding(10)
+            }
         };
 
         public class RowBackground : OsuClickableContainer
         {
-            private readonly Issue issue;
             private const int fade_duration = 100;
 
             private readonly Box hoveredBackground;
@@ -104,13 +123,15 @@ namespace osu.Game.Screens.Edit.Verify
             private EditorClock clock { get; set; }
 
             [Resolved]
-            private Bindable<Issue> selectedIssue { get; set; }
+            private Editor editor { get; set; }
+
+            [Resolved]
+            private EditorBeatmap editorBeatmap { get; set; }
 
             public RowBackground(Issue issue)
             {
-                this.issue = issue;
                 RelativeSizeAxes = Axes.X;
-                Height = 25;
+                Height = row_height;
 
                 AlwaysPresent = true;
 
@@ -128,41 +149,29 @@ namespace osu.Game.Screens.Edit.Verify
 
                 Action = () =>
                 {
-                    selectedIssue.Value = issue;
-                    clock.SeekSmoothlyTo(issue.Time);
+                    // Supposed to work like clicking timestamps outside of the game.
+                    // TODO: Is there already defined behaviour for this I may be able to call?
+
+                    if (issue.Time != null)
+                    {
+                        clock.Seek(issue.Time.Value);
+                        editor.OnPressed(GlobalAction.EditorComposeMode);
+                    }
+
+                    if (!issue.HitObjects.Any())
+                        return;
+
+                    editorBeatmap.SelectedHitObjects.Clear();
+                    editorBeatmap.SelectedHitObjects.AddRange(issue.HitObjects);
                 };
             }
 
             private Color4 colourHover;
-            private Color4 colourSelected;
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
                 hoveredBackground.Colour = colourHover = colours.BlueDarker;
-                colourSelected = colours.YellowDarker;
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                selectedIssue.BindValueChanged(group => { Selected = issue == group.NewValue; }, true);
-            }
-
-            private bool selected;
-
-            protected bool Selected
-            {
-                get => selected;
-                set
-                {
-                    if (value == selected)
-                        return;
-
-                    selected = value;
-                    updateState();
-                }
             }
 
             protected override bool OnHover(HoverEvent e)
@@ -179,9 +188,9 @@ namespace osu.Game.Screens.Edit.Verify
 
             private void updateState()
             {
-                hoveredBackground.FadeColour(selected ? colourSelected : colourHover, 450, Easing.OutQuint);
+                hoveredBackground.FadeColour(colourHover, 450, Easing.OutQuint);
 
-                if (selected || IsHovered)
+                if (IsHovered)
                     hoveredBackground.FadeIn(fade_duration, Easing.OutQuint);
                 else
                     hoveredBackground.FadeOut(fade_duration, Easing.OutQuint);
