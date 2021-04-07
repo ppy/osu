@@ -77,6 +77,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     case MultiplayerUserState.Loaded:
                         if (Room.Users.All(u => u.State != MultiplayerUserState.WaitingForLoad))
                         {
+                            ChangeRoomState(MultiplayerRoomState.Playing);
                             foreach (var u in Room.Users.Where(u => u.State == MultiplayerUserState.Loaded))
                                 ChangeUserState(u.UserID, MultiplayerUserState.Playing);
 
@@ -88,6 +89,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     case MultiplayerUserState.FinishedPlay:
                         if (Room.Users.All(u => u.State != MultiplayerUserState.Playing))
                         {
+                            ChangeRoomState(MultiplayerRoomState.Open);
                             foreach (var u in Room.Users.Where(u => u.State == MultiplayerUserState.FinishedPlay))
                                 ChangeUserState(u.UserID, MultiplayerUserState.Results);
 
@@ -179,6 +181,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             Debug.Assert(Room != null);
 
+            ChangeRoomState(MultiplayerRoomState.WaitingForLoad);
             foreach (var user in Room.Users.Where(u => u.State == MultiplayerUserState.Ready))
                 ChangeUserState(user.UserID, MultiplayerUserState.WaitingForLoad);
 
