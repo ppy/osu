@@ -58,6 +58,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
         }
 
+        public void ChangeRoomState(MultiplayerRoomState newState)
+        {
+            Debug.Assert(Room != null);
+            ((IMultiplayerClient)this).RoomStateChanged(newState);
+        }
+
         public void ChangeUserState(int userId, MultiplayerUserState newState)
         {
             Debug.Assert(Room != null);
