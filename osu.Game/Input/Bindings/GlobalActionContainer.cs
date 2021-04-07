@@ -28,10 +28,10 @@ namespace osu.Game.Input.Bindings
         }
 
         public override IEnumerable<IKeyBinding> DefaultKeyBindings => GlobalKeyBindings
+                                                                       .Concat(EditorKeyBindings)
                                                                        .Concat(InGameKeyBindings)
-                                                                       .Concat(AudioControlKeyBindings)
                                                                        .Concat(SongSelectKeyBindings)
-                                                                       .Concat(EditorKeyBindings);
+                                                                       .Concat(AudioControlKeyBindings);
 
         public IEnumerable<KeyBinding> GlobalKeyBindings => new[]
         {
