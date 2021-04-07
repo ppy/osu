@@ -27,6 +27,16 @@ namespace osu.Game.Tests.Visual.Gameplay
         private OsuConfigManager config { get; set; }
 
         [Test]
+        public void TestComboCounterIncrementing()
+        {
+            createNew();
+
+            AddRepeatStep("increase combo", () => { hudOverlay.ComboCounter.Current.Value++; }, 10);
+
+            AddStep("reset combo", () => { hudOverlay.ComboCounter.Current.Value = 0; });
+        }
+
+        [Test]
         public void TestShownByDefault()
         {
             createNew();
@@ -45,7 +55,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             createNew(h => h.OnLoadComplete += _ => initialAlpha = hideTarget.Alpha);
             AddUntilStep("wait for load", () => hudOverlay.IsAlive);
-            AddAssert("initial alpha was less than 1", () => initialAlpha != null && initialAlpha < 1);
+            AddAssert("initial alpha was less than 1", () => initialAlpha < 1);
         }
 
         [Test]
@@ -63,19 +73,41 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestMomentaryShowHUD()
+        {
+            createNew();
+
+            HUDVisibilityMode originalConfigValue = HUDVisibilityMode.HideDuringGameplay;
+
+            AddStep("get original config value", () => originalConfigValue = config.Get<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode));
+
+            AddStep("set hud to never show", () => config.SetValue(OsuSetting.HUDVisibilityMode, HUDVisibilityMode.Never));
+
+            AddUntilStep("wait for fade", () => !hideTarget.IsPresent);
+
+            AddStep("trigger momentary show", () => InputManager.PressKey(Key.ControlLeft));
+            AddUntilStep("wait for visible", () => hideTarget.IsPresent);
+
+            AddStep("stop trigering", () => InputManager.ReleaseKey(Key.ControlLeft));
+            AddUntilStep("wait for fade", () => !hideTarget.IsPresent);
+
+            AddStep("set original config value", () => config.SetValue(OsuSetting.HUDVisibilityMode, originalConfigValue));
+        }
+
+        [Test]
         public void TestExternalHideDoesntAffectConfig()
         {
-            bool originalConfigValue = false;
+            HUDVisibilityMode originalConfigValue = HUDVisibilityMode.HideDuringGameplay;
 
             createNew();
 
-            AddStep("get original config value", () => originalConfigValue = config.Get<bool>(OsuSetting.ShowInterface));
+            AddStep("get original config value", () => originalConfigValue = config.Get<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode));
 
             AddStep("set showhud false", () => hudOverlay.ShowHud.Value = false);
-            AddAssert("config unchanged", () => originalConfigValue == config.Get<bool>(OsuSetting.ShowInterface));
+            AddAssert("config unchanged", () => originalConfigValue == config.Get<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode));
 
             AddStep("set showhud true", () => hudOverlay.ShowHud.Value = true);
-            AddAssert("config unchanged", () => originalConfigValue == config.Get<bool>(OsuSetting.ShowInterface));
+            AddAssert("config unchanged", () => originalConfigValue == config.Get<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode));
         }
 
         [Test]
@@ -88,7 +120,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("set keycounter visible false", () =>
             {
-                config.Set<bool>(OsuSetting.KeyOverlay, false);
+                config.SetValue(OsuSetting.KeyOverlay, false);
                 hudOverlay.KeyCounter.AlwaysVisible.Value = false;
             });
 
@@ -100,19 +132,23 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("hidetarget is visible", () => hideTarget.IsPresent);
             AddAssert("key counters still hidden", () => !keyCounterFlow.IsPresent);
 
-            AddStep("return value", () => config.Set<bool>(OsuSetting.KeyOverlay, keyCounterVisibleValue));
+            AddStep("return value", () => config.SetValue(OsuSetting.KeyOverlay, keyCounterVisibleValue));
         }
 
         private void createNew(Action<HUDOverlay> action = null)
         {
             AddStep("create overlay", () =>
             {
-                Child = hudOverlay = new HUDOverlay(null, null, null, Array.Empty<Mod>());
+                hudOverlay = new HUDOverlay(null, null, null, Array.Empty<Mod>());
 
                 // Add any key just to display the key counter visually.
                 hudOverlay.KeyCounter.Add(new KeyCounterKeyboard(Key.Space));
 
+                hudOverlay.ComboCounter.Current.Value = 1;
+
                 action?.Invoke(hudOverlay);
+
+                Child = hudOverlay;
             });
         }
     }

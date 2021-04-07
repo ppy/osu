@@ -7,13 +7,14 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Utils;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
@@ -88,6 +89,7 @@ namespace osu.Game.Tests.Visual.Editing
 
             // Scroll in at 0.25
             AddStep("Move mouse to 0.25x", () => InputManager.MoveMouseTo(new Vector2(scrollQuad.TopLeft.X + 0.25f * scrollQuad.Size.X, scrollQuad.Centre.Y)));
+            AddStep("Press alt down", () => InputManager.PressKey(Key.AltLeft));
             AddStep("Scroll by 3", () => InputManager.ScrollBy(new Vector2(0, 3)));
             AddAssert("Box not at 0", () => !Precision.AlmostEquals(boxQuad.TopLeft, scrollQuad.TopLeft));
             AddAssert("Box 1/4 at 1/4", () => Precision.AlmostEquals(boxQuad.TopLeft.X + 0.25f * boxQuad.Size.X, scrollQuad.TopLeft.X + 0.25f * scrollQuad.Size.X));
@@ -96,12 +98,33 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("Scroll by -3", () => InputManager.ScrollBy(new Vector2(0, -3)));
             AddAssert("Box at 0", () => Precision.AlmostEquals(boxQuad.TopLeft, scrollQuad.TopLeft));
             AddAssert("Box 1/4 at 1/4", () => Precision.AlmostEquals(boxQuad.TopLeft.X + 0.25f * boxQuad.Size.X, scrollQuad.TopLeft.X + 0.25f * scrollQuad.Size.X));
+            AddStep("Release alt", () => InputManager.ReleaseKey(Key.AltLeft));
+        }
+
+        [Test]
+        public void TestMouseZoomInThenScroll()
+        {
+            reset();
+
+            // Scroll in at 0.25
+            AddStep("Move mouse to 0.25x", () => InputManager.MoveMouseTo(new Vector2(scrollQuad.TopLeft.X + 0.25f * scrollQuad.Size.X, scrollQuad.Centre.Y)));
+            AddStep("Press alt down", () => InputManager.PressKey(Key.AltLeft));
+            AddStep("Zoom by 3", () => InputManager.ScrollBy(new Vector2(0, 3)));
+            AddStep("Release alt", () => InputManager.ReleaseKey(Key.AltLeft));
+
+            AddStep("Scroll far left", () => InputManager.ScrollBy(new Vector2(0, 30)));
+            AddUntilStep("Scroll is at start", () => Precision.AlmostEquals(scrollQuad.TopLeft.X, boxQuad.TopLeft.X, 1));
+
+            AddStep("Scroll far right", () => InputManager.ScrollBy(new Vector2(0, -300)));
+            AddUntilStep("Scroll is at end", () => Precision.AlmostEquals(scrollQuad.TopRight.X, boxQuad.TopRight.X, 1));
         }
 
         [Test]
         public void TestMouseZoomInTwiceOutTwice()
         {
             reset();
+
+            AddStep("Press alt down", () => InputManager.PressKey(Key.AltLeft));
 
             // Scroll in at 0.25
             AddStep("Move mouse to 0.25x", () => InputManager.MoveMouseTo(new Vector2(scrollQuad.TopLeft.X + 0.25f * scrollQuad.Size.X, scrollQuad.Centre.Y)));
@@ -124,6 +147,8 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("Move mouse to 0.25x", () => InputManager.MoveMouseTo(new Vector2(scrollQuad.TopLeft.X + 0.25f * scrollQuad.Size.X, scrollQuad.Centre.Y)));
             AddStep("Scroll by -1", () => InputManager.ScrollBy(new Vector2(0, -1)));
             AddAssert("Box at 0", () => Precision.AlmostEquals(boxQuad.TopLeft, scrollQuad.TopLeft));
+
+            AddStep("Release alt", () => InputManager.ReleaseKey(Key.AltLeft));
         }
 
         private void reset()

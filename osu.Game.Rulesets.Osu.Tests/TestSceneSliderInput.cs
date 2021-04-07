@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.RightButton }, Time = time_during_slide_2 },
             });
 
-            AddAssert("Tracking retained", assertGreatJudge);
+            AddAssert("Tracking retained", assertMaxJudge);
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.RightButton }, Time = time_during_slide_1 },
             });
 
-            AddAssert("Tracking retained", assertGreatJudge);
+            AddAssert("Tracking retained", assertMaxJudge);
         }
 
         /// <summary>
@@ -115,7 +115,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.RightButton }, Time = time_during_slide_1 },
             });
 
-            AddAssert("Tracking retained", assertGreatJudge);
+            AddAssert("Tracking retained", assertMaxJudge);
         }
 
         /// <summary>
@@ -288,7 +288,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new OsuReplayFrame { Position = new Vector2(slider_path_length, OsuHitObject.OBJECT_RADIUS * 1.199f), Actions = { OsuAction.LeftButton }, Time = time_slider_end },
             });
 
-            AddAssert("Tracking kept", assertGreatJudge);
+            AddAssert("Tracking kept", assertMaxJudge);
         }
 
         /// <summary>
@@ -312,13 +312,13 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("Tracking dropped", assertMidSliderJudgementFail);
         }
 
-        private bool assertGreatJudge() => judgementResults.Any() && judgementResults.All(t => t.Type == HitResult.Great);
+        private bool assertMaxJudge() => judgementResults.Any() && judgementResults.All(t => t.Type == t.Judgement.MaxResult);
 
-        private bool assertHeadMissTailTracked() => judgementResults[^2].Type == HitResult.Great && judgementResults.First().Type == HitResult.Miss;
+        private bool assertHeadMissTailTracked() => judgementResults[^2].Type == HitResult.SmallTickHit && !judgementResults.First().IsHit;
 
-        private bool assertMidSliderJudgements() => judgementResults[^2].Type == HitResult.Great;
+        private bool assertMidSliderJudgements() => judgementResults[^2].Type == HitResult.SmallTickHit;
 
-        private bool assertMidSliderJudgementFail() => judgementResults[^2].Type == HitResult.Miss;
+        private bool assertMidSliderJudgementFail() => judgementResults[^2].Type == HitResult.SmallTickMiss;
 
         private ScoreAccessibleReplayPlayer currentPlayer;
 
@@ -378,7 +378,11 @@ namespace osu.Game.Rulesets.Osu.Tests
             protected override bool PauseOnFocusLost => false;
 
             public ScoreAccessibleReplayPlayer(Score score)
-                : base(score, false, false)
+                : base(score, new PlayerConfiguration
+                {
+                    AllowPause = false,
+                    ShowResults = false,
+                })
             {
             }
         }

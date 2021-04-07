@@ -78,9 +78,9 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
         private double originalStartTime;
 
-        public override void UpdatePosition(SnapResult result)
+        public override void UpdateTimeAndPosition(SnapResult result)
         {
-            base.UpdatePosition(result);
+            base.UpdateTimeAndPosition(result);
 
             if (PlacementActive)
             {

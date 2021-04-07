@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Timing;
 
 namespace osu.Game.Skinning
@@ -11,7 +13,7 @@ namespace osu.Game.Skinning
     /// </summary>
     /// <remarks>
     /// This should not be used to start an animation immediately at the current time.
-    /// To do so, use <see cref="LegacySkinExtensions.GetAnimation"/> with <code>startAtCurrentTime = true</code> instead.
+    /// To do so, use <see cref="LegacySkinExtensions.GetAnimation(ISkin, string, WrapMode, WrapMode, bool, bool, bool, string, bool, double?)"/> with <code>startAtCurrentTime = true</code> instead.
     /// </remarks>
     [Cached]
     public interface IAnimationTimeReference
@@ -24,6 +26,6 @@ namespace osu.Game.Skinning
         /// <summary>
         /// The time which animations should be started from, relative to <see cref="Clock"/>.
         /// </summary>
-        double AnimationStartTime { get; }
+        Bindable<double> AnimationStartTime { get; }
     }
 }

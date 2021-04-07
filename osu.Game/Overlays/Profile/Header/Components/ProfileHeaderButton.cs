@@ -22,6 +22,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         protected ProfileHeaderButton()
         {
             AutoSizeAxes = Axes.X;
+            Height = 40;
 
             base.Content.Add(new CircularContainer
             {

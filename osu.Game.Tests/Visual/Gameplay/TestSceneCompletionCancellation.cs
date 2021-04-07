@@ -4,23 +4,21 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Audio.Track;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Scoring;
+using osu.Game.Screens.Ranking;
 using osu.Game.Storyboards;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneCompletionCancellation : PlayerTestScene
+    public class TestSceneCompletionCancellation : OsuPlayerTestScene
     {
-        private Track track;
-
         [Resolved]
         private AudioManager audio { get; set; }
 
@@ -29,18 +27,13 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override bool AllowFail => false;
 
-        public TestSceneCompletionCancellation()
-            : base(new OsuRuleset())
-        {
-        }
-
         [SetUpSteps]
         public override void SetUpSteps()
         {
             base.SetUpSteps();
 
             // Ensure track has actually running before attempting to seek
-            AddUntilStep("wait for track to start running", () => track.IsRunning);
+            AddUntilStep("wait for track to start running", () => Beatmap.Value.Track.IsRunning);
         }
 
         [Test]
@@ -59,7 +52,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             cancel();
             complete();
 
-            AddUntilStep("attempted to push ranking", () => ((FakeRankingPushPlayer)Player).GotoRankingInvoked);
+            AddUntilStep("attempted to push ranking", () => ((FakeRankingPushPlayer)Player).ResultsCreated);
         }
 
         /// <summary>
@@ -79,13 +72,13 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void complete()
         {
-            AddStep("seek to completion", () => track.Seek(5000));
+            AddStep("seek to completion", () => Beatmap.Value.Track.Seek(5000));
             AddUntilStep("completion set by processor", () => Player.ScoreProcessor.HasCompleted.Value);
         }
 
         private void cancel()
         {
-            AddStep("rewind to cancel", () => track.Seek(4000));
+            AddStep("rewind to cancel", () => Beatmap.Value.Track.Seek(4000));
             AddUntilStep("completion cleared by processor", () => !Player.ScoreProcessor.HasCompleted.Value);
         }
 
@@ -93,15 +86,11 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             // wait to ensure there was no attempt of pushing the results screen.
             AddWaitStep("wait", resultsDisplayWaitCount);
-            AddAssert("no attempt to push ranking", () => !((FakeRankingPushPlayer)Player).GotoRankingInvoked);
+            AddAssert("no attempt to push ranking", () => !((FakeRankingPushPlayer)Player).ResultsCreated);
         }
 
         protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
-        {
-            var working = new ClockBackedTestWorkingBeatmap(beatmap, storyboard, new FramedClock(new ManualClock { Rate = 1 }), audio);
-            track = working.Track;
-            return working;
-        }
+            => new ClockBackedTestWorkingBeatmap(beatmap, storyboard, new FramedClock(new ManualClock { Rate = 1 }), audio);
 
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
         {
@@ -123,16 +112,18 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         public class FakeRankingPushPlayer : TestPlayer
         {
-            public bool GotoRankingInvoked;
+            public bool ResultsCreated { get; private set; }
 
             public FakeRankingPushPlayer()
                 : base(true, true)
             {
             }
 
-            protected override void GotoRanking()
+            protected override ResultsScreen CreateResults(ScoreInfo score)
             {
-                GotoRankingInvoked = true;
+                var results = base.CreateResults(score);
+                ResultsCreated = true;
+                return results;
             }
         }
     }

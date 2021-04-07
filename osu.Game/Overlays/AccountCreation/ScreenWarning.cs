@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.AccountCreation
 
         public override void OnEntering(IScreen last)
         {
-            if (string.IsNullOrEmpty(api.ProvidedUsername))
+            if (string.IsNullOrEmpty(api?.ProvidedUsername))
             {
                 this.FadeOut();
                 this.Push(new ScreenEntry());
@@ -43,7 +43,7 @@ namespace osu.Game.Overlays.AccountCreation
         [BackgroundDependencyLoader(true)]
         private void load(OsuColour colours, OsuGame game, TextureStore textures)
         {
-            if (string.IsNullOrEmpty(api.ProvidedUsername))
+            if (string.IsNullOrEmpty(api?.ProvidedUsername))
                 return;
 
             InternalChildren = new Drawable[]

@@ -5,7 +5,7 @@ using System.Diagnostics;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
-using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Mania.Skinning.Default;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    ApplyResult(r => r.Type = HitResult.Miss);
+                    ApplyResult(r => r.Type = r.Judgement.MinResult);
                 return;
             }
 
@@ -62,6 +62,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         public virtual bool OnPressed(ManiaAction action)
         {
             if (action != Action.Value)
+                return false;
+
+            if (CheckHittable?.Invoke(this, Time.Current) == false)
                 return false;
 
             return UpdateResult(true);

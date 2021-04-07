@@ -1,9 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -22,12 +24,23 @@ namespace osu.Game.Overlays
         protected OsuTabControl<T> TabControl;
 
         private readonly Box controlBackground;
+        private readonly Container tabControlContainer;
         private readonly BindableWithCurrent<T> current = new BindableWithCurrent<T>();
 
         public Bindable<T> Current
         {
             get => current.Current;
             set => current.Current = value;
+        }
+
+        protected new float ContentSidePadding
+        {
+            get => base.ContentSidePadding;
+            set
+            {
+                base.ContentSidePadding = value;
+                tabControlContainer.Padding = new MarginPadding { Horizontal = value };
+            }
         }
 
         protected TabControlOverlayHeader()
@@ -42,11 +55,16 @@ namespace osu.Game.Overlays
                     {
                         RelativeSizeAxes = Axes.Both,
                     },
-                    TabControl = CreateTabControl().With(control =>
+                    tabControlContainer = new Container
                     {
-                        control.Margin = new MarginPadding { Left = CONTENT_X_MARGIN };
-                        control.Current = Current;
-                    })
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Padding = new MarginPadding { Horizontal = ContentSidePadding },
+                        Child = TabControl = CreateTabControl().With(control =>
+                        {
+                            control.Current = Current;
+                        })
+                    }
                 }
             });
         }
@@ -88,7 +106,7 @@ namespace osu.Game.Overlays
                 public OverlayHeaderTabItem(T value)
                     : base(value)
                 {
-                    Text.Text = value.ToString().ToLower();
+                    Text.Text = ((Value as Enum)?.GetDescription() ?? Value.ToString()).ToLower();
                     Text.Font = OsuFont.GetFont(size: 14);
                     Text.Margin = new MarginPadding { Vertical = 16.5f }; // 15px padding + 1.5px line-height difference compensation
                     Bar.Margin = new MarginPadding { Bottom = bar_height };

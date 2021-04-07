@@ -1,19 +1,17 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Graphics;
-using osu.Framework.Input.Bindings;
-using osu.Game.Rulesets.Objects.Drawables;
-using osuTK;
-using System.Linq;
-using osu.Game.Audio;
 using System.Collections.Generic;
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
+using System.Linq;
+using JetBrains.Annotations;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
-using osu.Game.Rulesets.Objects;
+using osu.Framework.Input.Bindings;
+using osu.Game.Audio;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -24,7 +22,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private readonly Container nonProxiedContent;
 
-        protected DrawableTaikoHitObject(TaikoHitObject hitObject)
+        protected DrawableTaikoHitObject([CanBeNull] TaikoHitObject hitObject)
             : base(hitObject)
         {
             AddRangeInternal(new[]
@@ -115,83 +113,37 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
     {
         public override Vector2 OriginPosition => new Vector2(DrawHeight / 2);
 
-        public new TObject HitObject;
+        public new TObject HitObject => (TObject)base.HitObject;
 
         protected Vector2 BaseSize;
         protected SkinnableDrawable MainPiece;
 
-        private Bindable<bool> isStrong;
-
-        private readonly Container<DrawableStrongNestedHit> strongHitContainer;
-
-        protected DrawableTaikoHitObject(TObject hitObject)
+        protected DrawableTaikoHitObject([CanBeNull] TObject hitObject)
             : base(hitObject)
         {
-            HitObject = hitObject;
-
             Anchor = Anchor.CentreLeft;
             Origin = Anchor.Custom;
 
             RelativeSizeAxes = Axes.Both;
-
-            AddInternal(strongHitContainer = new Container<DrawableStrongNestedHit>());
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void OnApply()
         {
-            isStrong = HitObject.IsStrongBindable.GetBoundCopy();
-            isStrong.BindValueChanged(_ => RecreatePieces(), true);
+            base.OnApply();
+            RecreatePieces();
         }
 
         protected virtual void RecreatePieces()
         {
-            Size = BaseSize = new Vector2(HitObject.IsStrong ? TaikoHitObject.DEFAULT_STRONG_SIZE : TaikoHitObject.DEFAULT_SIZE);
+            Size = BaseSize = new Vector2(TaikoHitObject.DEFAULT_SIZE);
 
             MainPiece?.Expire();
             Content.Add(MainPiece = CreateMainPiece());
-        }
-
-        protected override void AddNestedHitObject(DrawableHitObject hitObject)
-        {
-            base.AddNestedHitObject(hitObject);
-
-            switch (hitObject)
-            {
-                case DrawableStrongNestedHit strong:
-                    strongHitContainer.Add(strong);
-                    break;
-            }
-        }
-
-        protected override void ClearNestedHitObjects()
-        {
-            base.ClearNestedHitObjects();
-            strongHitContainer.Clear();
-        }
-
-        protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
-        {
-            switch (hitObject)
-            {
-                case StrongHitObject strong:
-                    return CreateStrongHit(strong);
-            }
-
-            return base.CreateNestedHitObject(hitObject);
         }
 
         // Most osu!taiko hitsounds are managed by the drum (see DrumSampleMapping).
         public override IEnumerable<HitSampleInfo> GetSamples() => Enumerable.Empty<HitSampleInfo>();
 
         protected abstract SkinnableDrawable CreateMainPiece();
-
-        /// <summary>
-        /// Creates the handler for this <see cref="DrawableHitObject"/>'s <see cref="StrongHitObject"/>.
-        /// This is only invoked if <see cref="TaikoHitObject.IsStrong"/> is true for <see cref="HitObject"/>.
-        /// </summary>
-        /// <param name="hitObject">The strong hitobject.</param>
-        /// <returns>The strong hitobject handler.</returns>
-        protected virtual DrawableStrongNestedHit CreateStrongHit(StrongHitObject hitObject) => null;
     }
 }

@@ -119,6 +119,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         /// </summary>
         protected virtual bool InterpolateMovements => true;
 
+        protected virtual float IntervalMultiplier => 1.0f;
+
         private Vector2? lastPosition;
         private readonly InputResampler resampler = new InputResampler();
 
@@ -147,7 +149,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     float distance = diff.Length;
                     Vector2 direction = diff / distance;
 
-                    float interval = partSize.X / 2.5f;
+                    float interval = partSize.X / 2.5f * IntervalMultiplier;
 
                     for (float d = interval; d < distance; d += interval)
                     {

@@ -1,15 +1,18 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Tests.Visual;
 
@@ -157,6 +160,42 @@ namespace osu.Game.Tests.Gameplay
             assertHealthNotEqualTo(1);
         }
 
+        [Test]
+        public void TestBonusObjectsExcludedFromDrain()
+        {
+            var beatmap = new Beatmap
+            {
+                BeatmapInfo = { BaseDifficulty = { DrainRate = 10 } },
+            };
+
+            beatmap.HitObjects.Add(new JudgeableHitObject { StartTime = 0 });
+            for (double time = 0; time < 5000; time += 100)
+                beatmap.HitObjects.Add(new JudgeableHitObject(HitResult.LargeBonus) { StartTime = time });
+            beatmap.HitObjects.Add(new JudgeableHitObject { StartTime = 5000 });
+
+            createProcessor(beatmap);
+            setTime(4900); // Get close to the second combo-affecting object
+            assertHealthNotEqualTo(0);
+        }
+
+        [Test]
+        public void TestSingleLongObjectDoesNotDrain()
+        {
+            var beatmap = new Beatmap
+            {
+                HitObjects = { new JudgeableLongHitObject() }
+            };
+
+            beatmap.HitObjects[0].ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+
+            createProcessor(beatmap);
+            setTime(0);
+            assertHealthEqualTo(1);
+
+            setTime(5000);
+            assertHealthEqualTo(1);
+        }
+
         private Beatmap createBeatmap(double startTime, double endTime, params BreakPeriod[] breaks)
         {
             var beatmap = new Beatmap
@@ -197,8 +236,43 @@ namespace osu.Game.Tests.Gameplay
 
         private class JudgeableHitObject : HitObject
         {
-            public override Judgement CreateJudgement() => new Judgement();
+            private readonly HitResult maxResult;
+
+            public JudgeableHitObject(HitResult maxResult = HitResult.Perfect)
+            {
+                this.maxResult = maxResult;
+            }
+
+            public override Judgement CreateJudgement() => new TestJudgement(maxResult);
             protected override HitWindows CreateHitWindows() => new HitWindows();
+
+            private class TestJudgement : Judgement
+            {
+                public override HitResult MaxResult { get; }
+
+                public TestJudgement(HitResult maxResult)
+                {
+                    MaxResult = maxResult;
+                }
+            }
+        }
+
+        private class JudgeableLongHitObject : JudgeableHitObject, IHasDuration
+        {
+            public double EndTime => StartTime + Duration;
+            public double Duration { get; set; } = 5000;
+
+            public JudgeableLongHitObject()
+                : base(HitResult.LargeBonus)
+            {
+            }
+
+            protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
+            {
+                base.CreateNestedHitObjects(cancellationToken);
+
+                AddNested(new JudgeableHitObject());
+            }
         }
     }
 }

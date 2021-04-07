@@ -3,7 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -15,6 +18,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Collections;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
@@ -27,6 +31,15 @@ namespace osu.Game.Screens.Select.Carousel
 {
     public class DrawableCarouselBeatmap : DrawableCarouselItem, IHasContextMenu
     {
+        public const float CAROUSEL_BEATMAP_SPACING = 5;
+
+        /// <summary>
+        /// The height of a carousel beatmap, including vertical spacing.
+        /// </summary>
+        public const float HEIGHT = height + CAROUSEL_BEATMAP_SPACING;
+
+        private const float height = MAX_HEIGHT * 0.6f;
+
         private readonly BeatmapInfo beatmap;
 
         private Sprite background;
@@ -41,16 +54,29 @@ namespace osu.Game.Screens.Select.Carousel
         [Resolved(CanBeNull = true)]
         private BeatmapSetOverlay beatmapOverlay { get; set; }
 
+        [Resolved]
+        private BeatmapDifficultyCache difficultyCache { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private CollectionManager collectionManager { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private ManageCollectionsDialog manageCollectionsDialog { get; set; }
+
+        private IBindable<StarDifficulty?> starDifficultyBindable;
+        private CancellationTokenSource starDifficultyCancellationSource;
+
         public DrawableCarouselBeatmap(CarouselBeatmap panel)
-            : base(panel)
         {
             beatmap = panel.Beatmap;
-            Height *= 0.60f;
+            Item = panel;
         }
 
         [BackgroundDependencyLoader(true)]
         private void load(BeatmapManager manager, SongSelect songSelect)
         {
+            Header.Height = height;
+
             if (songSelect != null)
             {
                 startRequested = b => songSelect.FinaliseSelection(b);
@@ -61,7 +87,7 @@ namespace osu.Game.Screens.Select.Carousel
             if (manager != null)
                 hideRequested = manager.Hide;
 
-            Children = new Drawable[]
+            Header.Children = new Drawable[]
             {
                 background = new Box
                 {
@@ -137,7 +163,6 @@ namespace osu.Game.Screens.Select.Carousel
                                         },
                                         starCounter = new StarCounter
                                         {
-                                            Current = (float)beatmap.StarDifficulty,
                                             Scale = new Vector2(0.8f),
                                         }
                                     }
@@ -153,6 +178,8 @@ namespace osu.Game.Screens.Select.Carousel
         {
             base.Selected();
 
+            MovementContainer.MoveToX(-50, 500, Easing.OutExpo);
+
             background.Colour = ColourInfo.GradientVertical(
                 new Color4(20, 43, 51, 255),
                 new Color4(40, 86, 102, 255));
@@ -163,6 +190,8 @@ namespace osu.Game.Screens.Select.Carousel
         protected override void Deselected()
         {
             base.Deselected();
+
+            MovementContainer.MoveToX(0, 500, Easing.OutExpo);
 
             background.Colour = new Color4(20, 43, 51, 255);
             triangles.Colour = OsuColour.Gray(0.5f);
@@ -181,6 +210,19 @@ namespace osu.Game.Screens.Select.Carousel
             if (Item.State.Value != CarouselItemState.Collapsed && Alpha == 0)
                 starCounter.ReplayAnimation();
 
+            starDifficultyCancellationSource?.Cancel();
+
+            // Only compute difficulty when the item is visible.
+            if (Item.State.Value != CarouselItemState.Collapsed)
+            {
+                // We've potentially cancelled the computation above so a new bindable is required.
+                starDifficultyBindable = difficultyCache.GetBindableDifficulty(beatmap, (starDifficultyCancellationSource = new CancellationTokenSource()).Token);
+                starDifficultyBindable.BindValueChanged(d =>
+                {
+                    starCounter.Current = (float)(d.NewValue?.Stars ?? 0);
+                }, true);
+            }
+
             base.ApplyState();
         }
 
@@ -196,14 +238,43 @@ namespace osu.Game.Screens.Select.Carousel
                 if (editRequested != null)
                     items.Add(new OsuMenuItem("Edit", MenuItemType.Standard, () => editRequested(beatmap)));
 
+                if (beatmap.OnlineBeatmapID.HasValue && beatmapOverlay != null)
+                    items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(beatmap.OnlineBeatmapID.Value)));
+
+                if (collectionManager != null)
+                {
+                    var collectionItems = collectionManager.Collections.Select(createCollectionMenuItem).ToList();
+                    if (manageCollectionsDialog != null)
+                        collectionItems.Add(new OsuMenuItem("Manage...", MenuItemType.Standard, manageCollectionsDialog.Show));
+
+                    items.Add(new OsuMenuItem("Collections") { Items = collectionItems });
+                }
+
                 if (hideRequested != null)
                     items.Add(new OsuMenuItem("Hide", MenuItemType.Destructive, () => hideRequested(beatmap)));
 
-                if (beatmap.OnlineBeatmapID.HasValue && beatmapOverlay != null)
-                    items.Add(new OsuMenuItem("Details", MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(beatmap.OnlineBeatmapID.Value)));
-
                 return items.ToArray();
             }
+        }
+
+        private MenuItem createCollectionMenuItem(BeatmapCollection collection)
+        {
+            return new ToggleMenuItem(collection.Name.Value, MenuItemType.Standard, s =>
+            {
+                if (s)
+                    collection.Beatmaps.Add(beatmap);
+                else
+                    collection.Beatmaps.Remove(beatmap);
+            })
+            {
+                State = { Value = collection.Beatmaps.Contains(beatmap) }
+            };
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            starDifficultyCancellationSource?.Cancel();
         }
     }
 }

@@ -4,19 +4,22 @@
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Allocation;
-using osu.Game.Graphics;
+using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneShowMoreButton : OsuTestScene
     {
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
+
         public TestSceneShowMoreButton()
         {
-            TestButton button = null;
+            ShowMoreButton button = null;
 
             int fireCount = 0;
 
-            Add(button = new TestButton
+            Add(button = new ShowMoreButton
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -45,17 +48,6 @@ namespace osu.Game.Tests.Visual.Online
 
             AddAssert("action fired twice", () => fireCount == 2);
             AddAssert("is in loading state", () => button.IsLoading);
-        }
-
-        private class TestButton : ShowMoreButton
-        {
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colors)
-            {
-                IdleColour = colors.YellowDark;
-                HoverColour = colors.Yellow;
-                ChevronIconColour = colors.Red;
-            }
         }
     }
 }

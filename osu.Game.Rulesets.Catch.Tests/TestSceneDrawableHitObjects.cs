@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             if (juice.NestedHitObjects.Last() is CatchHitObject tail)
                 tail.LastInCombo = true; // usually the (Catch)BeatmapProcessor would do this for us when necessary
 
-            addToPlayfield(new DrawableJuiceStream(juice, drawableRuleset.CreateDrawableRepresentation));
+            addToPlayfield(new DrawableJuiceStream(juice));
         }
 
         private void spawnBananas(bool hit = false)
@@ -158,8 +158,8 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private float getXCoords(bool hit)
         {
-            const float x_offset = 0.2f;
-            float xCoords = drawableRuleset.Playfield.Width / 2;
+            const float x_offset = 0.2f * CatchPlayfield.WIDTH;
+            float xCoords = CatchPlayfield.CENTER_X;
 
             if (drawableRuleset.Playfield is CatchPlayfield catchPlayfield)
                 catchPlayfield.CatcherArea.MovableCatcher.X = xCoords - x_offset;

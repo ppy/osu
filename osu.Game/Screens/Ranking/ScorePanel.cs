@@ -13,6 +13,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Contracted;
 using osu.Game.Screens.Ranking.Expanded;
+using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 
@@ -28,7 +29,7 @@ namespace osu.Game.Screens.Ranking
         /// <summary>
         /// Height of the panel when contracted.
         /// </summary>
-        private const float contracted_height = 355;
+        private const float contracted_height = 385;
 
         /// <summary>
         /// Width of the panel when expanded.
@@ -38,7 +39,7 @@ namespace osu.Game.Screens.Ranking
         /// <summary>
         /// Height of the panel when expanded.
         /// </summary>
-        private const float expanded_height = 560;
+        private const float expanded_height = 586;
 
         /// <summary>
         /// Height of the top layer when the panel is expanded.
@@ -76,7 +77,15 @@ namespace osu.Game.Screens.Ranking
         private static readonly Color4 contracted_middle_layer_colour = Color4Extensions.FromHex("#353535");
 
         public event Action<PanelState> StateChanged;
+
+        /// <summary>
+        /// An action to be invoked if this <see cref="ScorePanel"/> is clicked while in an expanded state.
+        /// </summary>
+        public Action PostExpandAction;
+
         public readonly ScoreInfo Score;
+
+        private bool displayWithFlair;
 
         private Container content;
 
@@ -90,19 +99,25 @@ namespace osu.Game.Screens.Ranking
         private Container middleLayerContentContainer;
         private Drawable middleLayerContent;
 
-        public ScorePanel(ScoreInfo score)
+        public ScorePanel(ScoreInfo score, bool isNewLocalScore = false)
         {
             Score = score;
+            displayWithFlair = isNewLocalScore;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            // ScorePanel doesn't include the top extruding area in its own size.
+            // Adding a manual offset here allows the expanded version to take on an "acceptable" vertical centre when at 100% UI scale.
+            const float vertical_fudge = 20;
+
             InternalChild = content = new Container
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Size = new Vector2(40),
+                Y = vertical_fudge,
                 Children = new Drawable[]
                 {
                     topLayerContainer = new Container
@@ -136,7 +151,16 @@ namespace osu.Game.Screens.Ranking
                                 CornerRadius = 20,
                                 CornerExponent = 2.5f,
                                 Masking = true,
-                                Child = middleLayerBackground = new Box { RelativeSizeAxes = Axes.Both }
+                                Children = new[]
+                                {
+                                    middleLayerBackground = new Box { RelativeSizeAxes = Axes.Both },
+                                    new UserCoverBackground
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        User = Score.User,
+                                        Colour = ColourInfo.GradientVertical(Color4.White.Opacity(0.5f), Color4Extensions.FromHex("#444").Opacity(0))
+                                    }
+                                }
                             },
                             middleLayerContentContainer = new Container { RelativeSizeAxes = Axes.Both }
                         }
@@ -149,18 +173,10 @@ namespace osu.Game.Screens.Ranking
         {
             base.LoadComplete();
 
-            if (state == PanelState.Expanded)
-            {
-                topLayerBackground.FadeColour(expanded_top_layer_colour);
-                middleLayerBackground.FadeColour(expanded_middle_layer_colour);
-            }
-            else
-            {
-                topLayerBackground.FadeColour(contracted_top_layer_colour);
-                middleLayerBackground.FadeColour(contracted_middle_layer_colour);
-            }
-
             updateState();
+
+            topLayerBackground.FinishTransforms(false, nameof(Colour));
+            middleLayerBackground.FinishTransforms(false, nameof(Colour));
         }
 
         private PanelState state = PanelState.Contracted;
@@ -175,7 +191,7 @@ namespace osu.Game.Screens.Ranking
 
                 state = value;
 
-                if (LoadState >= LoadState.Ready)
+                if (IsLoaded)
                     updateState();
 
                 StateChanged?.Invoke(value);
@@ -195,8 +211,11 @@ namespace osu.Game.Screens.Ranking
                     topLayerBackground.FadeColour(expanded_top_layer_colour, resize_duration, Easing.OutQuint);
                     middleLayerBackground.FadeColour(expanded_middle_layer_colour, resize_duration, Easing.OutQuint);
 
-                    topLayerContentContainer.Add(middleLayerContent = new ExpandedPanelTopContent(Score.User).With(d => d.Alpha = 0));
-                    middleLayerContentContainer.Add(topLayerContent = new ExpandedPanelMiddleContent(Score).With(d => d.Alpha = 0));
+                    topLayerContentContainer.Add(topLayerContent = new ExpandedPanelTopContent(Score.User).With(d => d.Alpha = 0));
+                    middleLayerContentContainer.Add(middleLayerContent = new ExpandedPanelMiddleContent(Score, displayWithFlair).With(d => d.Alpha = 0));
+
+                    // only the first expanded display should happen with flair.
+                    displayWithFlair = false;
                     break;
 
                 case PanelState.Contracted:
@@ -205,7 +224,8 @@ namespace osu.Game.Screens.Ranking
                     topLayerBackground.FadeColour(contracted_top_layer_colour, resize_duration, Easing.OutQuint);
                     middleLayerBackground.FadeColour(contracted_middle_layer_colour, resize_duration, Easing.OutQuint);
 
-                    middleLayerContentContainer.Add(topLayerContent = new ContractedPanelMiddleContent(Score).With(d => d.Alpha = 0));
+                    topLayerContentContainer.Add(topLayerContent = new ContractedPanelTopContent(Score).With(d => d.Alpha = 0));
+                    middleLayerContentContainer.Add(middleLayerContent = new ContractedPanelMiddleContent(Score).With(d => d.Alpha = 0));
                     break;
             }
 
@@ -236,10 +256,28 @@ namespace osu.Game.Screens.Ranking
             }
         }
 
+        public override Vector2 Size
+        {
+            get => base.Size;
+            set
+            {
+                base.Size = value;
+
+                // Auto-size isn't used to avoid 1-frame issues and because the score panel is removed/re-added to the container.
+                if (trackingContainer != null)
+                    trackingContainer.Size = value;
+            }
+        }
+
         protected override bool OnClick(ClickEvent e)
         {
             if (State == PanelState.Contracted)
+            {
                 State = PanelState.Expanded;
+                return true;
+            }
+
+            PostExpandAction?.Invoke();
 
             return true;
         }
@@ -248,5 +286,24 @@ namespace osu.Game.Screens.Ranking
             => base.ReceivePositionalInputAt(screenSpacePos)
                || topLayerContainer.ReceivePositionalInputAt(screenSpacePos)
                || middleLayerContainer.ReceivePositionalInputAt(screenSpacePos);
+
+        private ScorePanelTrackingContainer trackingContainer;
+
+        /// <summary>
+        /// Creates a <see cref="ScorePanelTrackingContainer"/> which this <see cref="ScorePanel"/> can reside inside.
+        /// The <see cref="ScorePanelTrackingContainer"/> will track the size of this <see cref="ScorePanel"/>.
+        /// </summary>
+        /// <remarks>
+        /// This <see cref="ScorePanel"/> is immediately added as a child of the <see cref="ScorePanelTrackingContainer"/>.
+        /// </remarks>
+        /// <returns>The <see cref="ScorePanelTrackingContainer"/>.</returns>
+        /// <exception cref="InvalidOperationException">If a <see cref="ScorePanelTrackingContainer"/> already exists.</exception>
+        public ScorePanelTrackingContainer CreateTrackingContainer()
+        {
+            if (trackingContainer != null)
+                throw new InvalidOperationException("A score panel container has already been created.");
+
+            return trackingContainer = new ScorePanelTrackingContainer(this);
+        }
     }
 }

@@ -22,7 +22,7 @@ namespace osu.Game.Online.Chat
         public readonly ObservableCollection<User> Users = new ObservableCollection<User>();
 
         [JsonProperty(@"users")]
-        private long[] userIds
+        private int[] userIds
         {
             set
             {

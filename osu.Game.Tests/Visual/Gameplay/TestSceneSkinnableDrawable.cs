@@ -10,6 +10,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
@@ -295,9 +296,9 @@ namespace osu.Game.Tests.Visual.Gameplay
                     }
                     : null;
 
-            public Texture GetTexture(string componentName) => throw new NotImplementedException();
+            public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => throw new NotImplementedException();
 
-            public SampleChannel GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
+            public ISample GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotImplementedException();
         }
@@ -306,9 +307,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             public Drawable GetDrawableComponent(ISkinComponent componentName) => new SecondarySourceBox();
 
-            public Texture GetTexture(string componentName) => throw new NotImplementedException();
+            public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => throw new NotImplementedException();
 
-            public SampleChannel GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
+            public ISample GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotImplementedException();
         }
@@ -318,9 +319,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             public Drawable GetDrawableComponent(ISkinComponent componentName) => new BaseSourceBox();
 
-            public Texture GetTexture(string componentName) => throw new NotImplementedException();
+            public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => throw new NotImplementedException();
 
-            public SampleChannel GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
+            public ISample GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotImplementedException();
 

@@ -9,6 +9,7 @@ using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
@@ -32,19 +33,17 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            BeatmapOptions.AddButton(@"Edit", @"beatmap", FontAwesome.Solid.PencilAlt, colours.Yellow, () =>
-            {
-                ValidForResume = false;
-                Edit();
-            }, Key.Number4);
+            BeatmapOptions.AddButton(@"Edit", @"beatmap", FontAwesome.Solid.PencilAlt, colours.Yellow, () => Edit());
 
             ((PlayBeatmapDetailArea)BeatmapDetails).Leaderboard.ScoreSelected += PresentScore;
         }
 
         protected void PresentScore(ScoreInfo score) =>
-            FinaliseSelection(score.Beatmap, score.Ruleset, () => this.Push(new SoloResultsScreen(score)));
+            FinaliseSelection(score.Beatmap, score.Ruleset, () => this.Push(new SoloResultsScreen(score, false)));
 
         protected override BeatmapDetailArea CreateBeatmapDetailArea() => new PlayBeatmapDetailArea();
+
+        private ModAutoplay getAutoplayMod() => Ruleset.Value.CreateInstance().GetAutoplayMod();
 
         public override void OnResuming(IScreen last)
         {
@@ -54,10 +53,10 @@ namespace osu.Game.Screens.Select
 
             if (removeAutoModOnResume)
             {
-                var autoType = Ruleset.Value.CreateInstance().GetAutoplayMod()?.GetType();
+                var autoType = getAutoplayMod()?.GetType();
 
                 if (autoType != null)
-                    ModSelect.DeselectTypes(new[] { autoType }, true);
+                    Mods.Value = Mods.Value.Where(m => m.GetType() != autoType).ToArray();
 
                 removeAutoModOnResume = false;
             }
@@ -85,12 +84,9 @@ namespace osu.Game.Screens.Select
             // Ctrl+Enter should start map with autoplay enabled.
             if (GetContainingInputManager().CurrentState?.Keyboard.ControlPressed == true)
             {
-                var auto = Ruleset.Value.CreateInstance().GetAutoplayMod();
-                var autoType = auto?.GetType();
+                var autoplayMod = getAutoplayMod();
 
-                var mods = Mods.Value;
-
-                if (autoType == null)
+                if (autoplayMod == null)
                 {
                     notifications?.Post(new SimpleNotification
                     {
@@ -99,16 +95,18 @@ namespace osu.Game.Screens.Select
                     return false;
                 }
 
-                if (mods.All(m => m.GetType() != autoType))
+                var mods = Mods.Value;
+
+                if (mods.All(m => m.GetType() != autoplayMod.GetType()))
                 {
-                    Mods.Value = mods.Append(auto).ToArray();
+                    Mods.Value = mods.Append(autoplayMod).ToArray();
                     removeAutoModOnResume = true;
                 }
             }
 
             SampleConfirm?.Play();
 
-            this.Push(player = new PlayerLoader(() => new Player()));
+            this.Push(player = new PlayerLoader(() => new SoloPlayer()));
 
             return true;
         }

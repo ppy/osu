@@ -5,9 +5,11 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Newtonsoft.Json;
+using osu.Framework.Testing;
 
 namespace osu.Game.Rulesets
 {
+    [ExcludeFromDynamicCompile]
     public class RulesetInfo : IEquatable<RulesetInfo>
     {
         public int? ID { get; set; }

@@ -10,6 +10,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing;
 using osu.Game.Audio;
@@ -216,9 +217,9 @@ namespace osu.Game.Tests.Skins
 
             public Drawable GetDrawableComponent(ISkinComponent component) => skin.GetDrawableComponent(component);
 
-            public Texture GetTexture(string componentName) => skin.GetTexture(componentName);
+            public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => skin.GetTexture(componentName, wrapModeS, wrapModeT);
 
-            public SampleChannel GetSample(ISampleInfo sampleInfo) => skin.GetSample(sampleInfo);
+            public ISample GetSample(ISampleInfo sampleInfo) => skin.GetSample(sampleInfo);
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => skin.GetConfig<TLookup, TValue>(lookup);
         }

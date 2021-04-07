@@ -57,6 +57,8 @@ namespace osu.Game.Migrations
 
                     b.Property<double>("DistanceSpacing");
 
+                    b.Property<bool>("EpilepsyWarning");
+
                     b.Property<int>("GridSize");
 
                     b.Property<string>("Hash");

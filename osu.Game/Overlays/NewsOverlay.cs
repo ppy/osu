@@ -2,86 +2,98 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Threading;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 using osu.Game.Overlays.News;
+using osu.Game.Overlays.News.Displays;
 
 namespace osu.Game.Overlays
 {
-    public class NewsOverlay : FullscreenOverlay
+    public class NewsOverlay : OnlineOverlay<NewsHeader>
     {
-        private NewsHeader header;
-
-        private Container<NewsContent> content;
-
-        public readonly Bindable<string> Current = new Bindable<string>(null);
+        private readonly Bindable<string> article = new Bindable<string>(null);
 
         public NewsOverlay()
-            : base(OverlayColourScheme.Purple)
+            : base(OverlayColourScheme.Purple, false)
         {
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        protected override void LoadComplete()
         {
-            Children = new Drawable[]
-            {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colours.PurpleDarkAlternative
-                },
-                new OverlayScrollContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Child = new FillFlowContainer
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
-                        {
-                            header = new NewsHeader
-                            {
-                                ShowFrontPage = ShowFrontPage
-                            },
-                            content = new Container<NewsContent>
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                            }
-                        },
-                    },
-                },
-            };
+            base.LoadComplete();
 
-            header.Post.BindTo(Current);
-            Current.TriggerChange();
+            // should not be run until first pop-in to avoid requesting data before user views.
+            article.BindValueChanged(onArticleChanged);
         }
 
-        private CancellationTokenSource loadContentCancellation;
-
-        protected void LoadAndShowContent(NewsContent newContent)
+        protected override NewsHeader CreateHeader() => new NewsHeader
         {
-            content.FadeTo(0.2f, 300, Easing.OutQuint);
+            ShowFrontPage = ShowFrontPage
+        };
 
-            loadContentCancellation?.Cancel();
+        private bool displayUpdateRequired = true;
 
-            LoadComponentAsync(newContent, c =>
+        protected override void PopIn()
+        {
+            base.PopIn();
+
+            if (displayUpdateRequired)
             {
-                content.Child = c;
-                content.FadeIn(300, Easing.OutQuint);
-            }, (loadContentCancellation = new CancellationTokenSource()).Token);
+                article.TriggerChange();
+                displayUpdateRequired = false;
+            }
+        }
+
+        protected override void PopOutComplete()
+        {
+            base.PopOutComplete();
+            displayUpdateRequired = true;
         }
 
         public void ShowFrontPage()
         {
-            Current.Value = null;
+            article.Value = null;
             Show();
+        }
+
+        public void ShowArticle(string slug)
+        {
+            article.Value = slug;
+            Show();
+        }
+
+        private CancellationTokenSource cancellationToken;
+
+        private void onArticleChanged(ValueChangedEvent<string> e)
+        {
+            cancellationToken?.Cancel();
+            Loading.Show();
+
+            if (e.NewValue == null)
+            {
+                Header.SetFrontPage();
+                LoadDisplay(new FrontPageDisplay());
+                return;
+            }
+
+            Header.SetArticle(e.NewValue);
+            LoadDisplay(Empty());
+        }
+
+        protected void LoadDisplay(Drawable display)
+        {
+            ScrollFlow.ScrollToStart();
+            LoadComponentAsync(display, loaded =>
+            {
+                Child = loaded;
+                Loading.Hide();
+            }, (cancellationToken = new CancellationTokenSource()).Token);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            cancellationToken?.Cancel();
+            base.Dispose(isDisposing);
         }
     }
 }

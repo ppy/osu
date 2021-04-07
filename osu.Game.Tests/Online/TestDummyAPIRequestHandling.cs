@@ -8,7 +8,6 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Tests.Visual;
-using osu.Game.Users;
 
 namespace osu.Game.Tests.Online
 {
@@ -24,8 +23,10 @@ namespace osu.Game.Tests.Online
                 {
                     case CommentVoteRequest cRequest:
                         cRequest.TriggerSuccess(new CommentBundle());
-                        break;
+                        return true;
                 }
+
+                return false;
             });
 
             CommentVoteRequest request = null;
@@ -55,7 +56,7 @@ namespace osu.Game.Tests.Online
             AddStep("fire request", () =>
             {
                 gotResponse = false;
-                request = new LeaveChannelRequest(new Channel(), new User());
+                request = new LeaveChannelRequest(new Channel());
                 request.Success += () => gotResponse = true;
                 API.Queue(request);
             });
@@ -74,7 +75,7 @@ namespace osu.Game.Tests.Online
             AddStep("fire request", () =>
             {
                 gotResponse = false;
-                request = new LeaveChannelRequest(new Channel(), new User());
+                request = new LeaveChannelRequest(new Channel());
                 request.Success += () => gotResponse = true;
                 API.Perform(request);
             });
@@ -93,7 +94,7 @@ namespace osu.Game.Tests.Online
             AddStep("fire request", () =>
             {
                 gotResponse = false;
-                request = new LeaveChannelRequest(new Channel(), new User());
+                request = new LeaveChannelRequest(new Channel());
                 request.Success += () => gotResponse = true;
                 API.PerformAsync(request);
             });
@@ -109,8 +110,10 @@ namespace osu.Game.Tests.Online
                 {
                     case LeaveChannelRequest cRequest:
                         cRequest.TriggerSuccess();
-                        break;
+                        return true;
                 }
+
+                return false;
             });
         }
     }

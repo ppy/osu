@@ -7,7 +7,7 @@ using osu.Game.Tournament.Screens.Editors;
 
 namespace osu.Game.Tournament.Tests.Screens
 {
-    public class TestSceneSeedingEditorScreen : LadderTestScene
+    public class TestSceneSeedingEditorScreen : TournamentTestScene
     {
         [Cached]
         private readonly LadderInfo ladder = new LadderInfo();

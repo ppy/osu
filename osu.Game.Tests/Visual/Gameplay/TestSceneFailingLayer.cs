@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Scoring;
@@ -14,6 +15,8 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         private FailingLayer layer;
 
+        private readonly Bindable<bool> showHealth = new Bindable<bool>();
+
         [Resolved]
         private OsuConfigManager config { get; set; }
 
@@ -24,9 +27,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 Child = layer = new FailingLayer();
                 layer.BindHealthProcessor(new DrainingHealthProcessor(1));
+                layer.ShowHealth.BindTo(showHealth);
             });
 
-            AddStep("enable layer", () => config.Set(OsuSetting.FadePlayfieldWhenHealthLow, true));
+            AddStep("show health", () => showHealth.Value = true);
+            AddStep("enable layer", () => config.SetValue(OsuSetting.FadePlayfieldWhenHealthLow, true));
             AddUntilStep("layer is visible", () => layer.IsPresent);
         }
 
@@ -48,7 +53,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestLayerDisabledViaConfig()
         {
-            AddStep("disable layer", () => config.Set(OsuSetting.FadePlayfieldWhenHealthLow, false));
+            AddStep("disable layer", () => config.SetValue(OsuSetting.FadePlayfieldWhenHealthLow, false));
             AddStep("set health to 0.10", () => layer.Current.Value = 0.1);
             AddUntilStep("layer is not visible", () => !layer.IsPresent);
         }
@@ -68,6 +73,28 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("set health to 0.10", () => layer.Current.Value = 0.1);
             AddWaitStep("wait for potential fade", 10);
             AddAssert("layer is still visible", () => layer.IsPresent);
+        }
+
+        [Test]
+        public void TestLayerVisibilityWithDifferentOptions()
+        {
+            AddStep("set health to 0.10", () => layer.Current.Value = 0.1);
+
+            AddStep("don't show health", () => showHealth.Value = false);
+            AddStep("disable FadePlayfieldWhenHealthLow", () => config.SetValue(OsuSetting.FadePlayfieldWhenHealthLow, false));
+            AddUntilStep("layer fade is invisible", () => !layer.IsPresent);
+
+            AddStep("don't show health", () => showHealth.Value = false);
+            AddStep("enable FadePlayfieldWhenHealthLow", () => config.SetValue(OsuSetting.FadePlayfieldWhenHealthLow, true));
+            AddUntilStep("layer fade is invisible", () => !layer.IsPresent);
+
+            AddStep("show health", () => showHealth.Value = true);
+            AddStep("disable FadePlayfieldWhenHealthLow", () => config.SetValue(OsuSetting.FadePlayfieldWhenHealthLow, false));
+            AddUntilStep("layer fade is invisible", () => !layer.IsPresent);
+
+            AddStep("show health", () => showHealth.Value = true);
+            AddStep("enable FadePlayfieldWhenHealthLow", () => config.SetValue(OsuSetting.FadePlayfieldWhenHealthLow, true));
+            AddUntilStep("layer fade is visible", () => layer.IsPresent);
         }
     }
 }

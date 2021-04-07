@@ -1,7 +1,4 @@
 #addin "nuget:?package=CodeFileSanity&version=0.0.36"
-#addin "nuget:?package=JetBrains.ReSharper.CommandLineTools&version=2020.1.3"
-#tool "nuget:?package=NVika.MSBuild&version=1.0.1"
-var nVikaToolPath = GetFiles("./tools/NVika.MSBuild.*/tools/NVika.exe").First();
 
 ///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -18,23 +15,15 @@ var desktopSlnf = rootDirectory.CombineWithFilePath("osu.Desktop.slnf");
 // TASKS
 ///////////////////////////////////////////////////////////////////////////////
 
-// windows only because both inspectcode and nvika depend on net45
 Task("InspectCode")
-    .WithCriteria(IsRunningOnWindows())
     .Does(() => {
-        InspectCode(desktopSlnf, new InspectCodeSettings {
-            CachesHome = "inspectcode",
-            OutputFile = "inspectcodereport.xml",
-            ArgumentCustomization = arg => {
-                if (AppVeyor.IsRunningOnAppVeyor) // Don't flood CI output
-                    arg.Append("--verbosity:WARN");
-                    return arg;
-            },
-        });
+        var inspectcodereport = "inspectcodereport.xml";
+        var cacheDir = "inspectcode";
+        var verbosity = AppVeyor.IsRunningOnAppVeyor ? "WARN" : "INFO"; // Don't flood CI output
 
-        int returnCode = StartProcess(nVikaToolPath, $@"parsereport ""inspectcodereport.xml"" --treatwarningsaserrors");
-        if (returnCode != 0)
-            throw new Exception($"inspectcode failed with return code {returnCode}");
+        DotNetCoreTool(rootDirectory.FullPath,
+            "jb", $@"inspectcode ""{desktopSlnf}"" --output=""{inspectcodereport}"" --caches-home=""{cacheDir}"" --verbosity={verbosity}");
+        DotNetCoreTool(rootDirectory.FullPath, "nvika", $@"parsereport ""{inspectcodereport}"" --treatwarningsaserrors");
     });
 
 Task("CodeFileSanity")

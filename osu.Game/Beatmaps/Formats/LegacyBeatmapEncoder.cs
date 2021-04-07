@@ -7,13 +7,16 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using JetBrains.Annotations;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Skinning;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -23,9 +26,18 @@ namespace osu.Game.Beatmaps.Formats
 
         private readonly IBeatmap beatmap;
 
-        public LegacyBeatmapEncoder(IBeatmap beatmap)
+        [CanBeNull]
+        private readonly ISkin skin;
+
+        /// <summary>
+        /// Creates a new <see cref="LegacyBeatmapEncoder"/>.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to encode.</param>
+        /// <param name="skin">The beatmap's skin, used for encoding combo colours.</param>
+        public LegacyBeatmapEncoder(IBeatmap beatmap, [CanBeNull] ISkin skin)
         {
             this.beatmap = beatmap;
+            this.skin = skin;
 
             if (beatmap.BeatmapInfo.RulesetID < 0 || beatmap.BeatmapInfo.RulesetID > 3)
                 throw new ArgumentException("Only beatmaps in the osu, taiko, catch, or mania rulesets can be encoded to the legacy beatmap format.", nameof(beatmap));
@@ -52,6 +64,9 @@ namespace osu.Game.Beatmaps.Formats
 
             writer.WriteLine();
             handleControlPoints(writer);
+
+            writer.WriteLine();
+            handleColours(writer);
 
             writer.WriteLine();
             handleHitObjects(writer);
@@ -177,7 +192,7 @@ namespace osu.Game.Beatmaps.Formats
                 var effectPoint = beatmap.ControlPointInfo.EffectPointAt(time);
 
                 // Apply the control point to a hit sample to uncover legacy properties (e.g. suffix)
-                HitSampleInfo tempHitSample = samplePoint.ApplyTo(new ConvertHitObjectParser.LegacyHitSampleInfo());
+                HitSampleInfo tempHitSample = samplePoint.ApplyTo(new ConvertHitObjectParser.LegacyHitSampleInfo(string.Empty));
 
                 // Convert effect flags to the legacy format
                 LegacyEffectFlags effectFlags = LegacyEffectFlags.None;
@@ -196,12 +211,34 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private void handleHitObjects(TextWriter writer)
+        private void handleColours(TextWriter writer)
         {
-            if (beatmap.HitObjects.Count == 0)
+            var colours = skin?.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value;
+
+            if (colours == null || colours.Count == 0)
                 return;
 
+            writer.WriteLine("[Colours]");
+
+            for (var i = 0; i < colours.Count; i++)
+            {
+                var comboColour = colours[i];
+
+                writer.Write(FormattableString.Invariant($"Combo{i}: "));
+                writer.Write(FormattableString.Invariant($"{(byte)(comboColour.R * byte.MaxValue)},"));
+                writer.Write(FormattableString.Invariant($"{(byte)(comboColour.G * byte.MaxValue)},"));
+                writer.Write(FormattableString.Invariant($"{(byte)(comboColour.B * byte.MaxValue)},"));
+                writer.Write(FormattableString.Invariant($"{(byte)(comboColour.A * byte.MaxValue)}"));
+                writer.WriteLine();
+            }
+        }
+
+        private void handleHitObjects(TextWriter writer)
+        {
             writer.WriteLine("[HitObjects]");
+
+            if (beatmap.HitObjects.Count == 0)
+                return;
 
             foreach (var h in beatmap.HitObjects)
                 handleHitObject(writer, h);
@@ -218,7 +255,7 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case 2:
-                    position.X = ((IHasXPosition)hitObject).X * 512;
+                    position.X = ((IHasXPosition)hitObject).X;
                     break;
 
                 case 3:
@@ -292,7 +329,26 @@ namespace osu.Game.Beatmaps.Formats
 
                 if (point.Type.Value != null)
                 {
-                    if (point.Type.Value != lastType)
+                    // We've reached a new (explicit) segment!
+
+                    // Explicit segments have a new format in which the type is injected into the middle of the control point string.
+                    // To preserve compatibility with osu-stable as much as possible, explicit segments with the same type are converted to use implicit segments by duplicating the control point.
+                    // One exception are consecutive perfect curves, which aren't supported in osu!stable and can lead to decoding issues if encoded as implicit segments
+                    bool needsExplicitSegment = point.Type.Value != lastType || point.Type.Value == PathType.PerfectCurve;
+
+                    // Another exception to this is when the last two control points of the last segment were duplicated. This is not a scenario supported by osu!stable.
+                    // Lazer does not add implicit segments for the last two control points of _any_ explicit segment, so an explicit segment is forced in order to maintain consistency with the decoder.
+                    if (i > 1)
+                    {
+                        // We need to use the absolute control point position to determine equality, otherwise floating point issues may arise.
+                        Vector2 p1 = position + pathData.Path.ControlPoints[i - 1].Position.Value;
+                        Vector2 p2 = position + pathData.Path.ControlPoints[i - 2].Position.Value;
+
+                        if ((int)p1.X == (int)p2.X && (int)p1.Y == (int)p2.Y)
+                            needsExplicitSegment = true;
+                    }
+
+                    if (needsExplicitSegment)
                     {
                         switch (point.Type.Value)
                         {
@@ -380,7 +436,7 @@ namespace osu.Game.Beatmaps.Formats
                 string sampleFilename = samples.FirstOrDefault(s => string.IsNullOrEmpty(s.Name))?.LookupNames.First() ?? string.Empty;
                 int volume = samples.FirstOrDefault()?.Volume ?? 100;
 
-                sb.Append(":");
+                sb.Append(':');
                 sb.Append(FormattableString.Invariant($"{customSampleBank}:"));
                 sb.Append(FormattableString.Invariant($"{volume}:"));
                 sb.Append(FormattableString.Invariant($"{sampleFilename}"));
@@ -434,9 +490,6 @@ namespace osu.Game.Beatmaps.Formats
 
         private string toLegacyCustomSampleBank(HitSampleInfo hitSampleInfo)
         {
-            if (hitSampleInfo == null)
-                return "0";
-
             if (hitSampleInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacy)
                 return legacy.CustomSampleBank.ToString(CultureInfo.InvariantCulture);
 
