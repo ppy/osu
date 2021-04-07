@@ -93,6 +93,26 @@ namespace osu.Game.Tests.Visual.Gameplay
             LoadScreen(loader = new TestPlayerLoader(() => player = new TestPlayer(interactive, interactive)));
         }
 
+        /// <summary>
+        /// Sets the input manager child to a new test player loader container instance with a custom battery level
+        /// </summary>
+        /// <param name="interactive">If the test player should behave like the production one.</param>
+        /// <param name="pluggedIn">If the player's device is plugged in.</param>
+        /// <param name="batteryLevel">A custom battery level for the test player.</param>
+        private void resetPlayerWithBattery(bool interactive, bool pluggedIn, double batteryLevel)
+        {
+            Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+            Beatmap.Value.BeatmapInfo.EpilepsyWarning = epilepsyWarning;
+
+            foreach (var mod in SelectedMods.Value.OfType<IApplicableToTrack>())
+                mod.ApplyToTrack(Beatmap.Value.Track);
+
+            loader = new TestPlayerLoader(() => player = new TestPlayer(interactive, interactive));
+            loader.batteryManager.ChargeLevel = batteryLevel;
+            loader.batteryManager.PluggedIn = pluggedIn;
+            LoadScreen(loader);
+        }
+
         [Test]
         public void TestEarlyExitBeforePlayerConstruction()
         {
@@ -270,6 +290,32 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for player load", () => player.IsLoaded);
         }
 
+        [TestCase(false, 1.0)] // not plugged in, full battery, no notification
+        [TestCase(false, 0.2)] // not plugged in, at warning level, no notification
+        [TestCase(true, 0.1)] // plugged in, charging, below warning level, no notification
+        [TestCase(false, 0.1)] // not plugged in, below warning level, notification
+        public void TestLowBatteryNotification(bool pluggedIn, double batteryLevel)
+        {
+            AddStep("reset notification lock", () => sessionStatics.GetBindable<bool>(Static.BatteryLowNotificationShownOnce).Value = false);
+
+            // mock phone on battery
+            AddStep("load player", () => resetPlayerWithBattery(false, pluggedIn, batteryLevel));
+            AddUntilStep("wait for player", () => player?.LoadState == LoadState.Ready);
+            int notificationCount = !pluggedIn && batteryLevel < PlayerLoader.battery_tolerance ? 1 : 0;
+            AddAssert("check for notification", () => notificationOverlay.UnreadCount.Value == notificationCount);
+            AddStep("click notification", () =>
+                {
+                    var scrollContainer = (OsuScrollContainer)notificationOverlay.Children.Last();
+                    var flowContainer = scrollContainer.Children.OfType<FillFlowContainer<NotificationSection>>().First();
+                    var notification = flowContainer.First();
+
+                    InputManager.MoveMouseTo(notification);
+                    InputManager.Click(MouseButton.Left);
+                });
+
+            AddUntilStep("wait for player load", () => player.IsLoaded);
+        }
+
         [TestCase(true)]
         [TestCase(false)]
         public void TestEpilepsyWarning(bool warning)
@@ -309,6 +355,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             public new Task DisposalTask => base.DisposalTask;
 
             public IReadOnlyList<Mod> DisplayedMods => MetadataInfo.Mods.Value;
+
+            public new BatteryManager batteryManager => base.batteryManager;
 
             public TestPlayerLoader(Func<Player> createPlayer)
                 : base(createPlayer)

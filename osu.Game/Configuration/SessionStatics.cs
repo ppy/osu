@@ -16,6 +16,7 @@ namespace osu.Game.Configuration
         {
             SetDefault(Static.LoginOverlayDisplayed, false);
             SetDefault(Static.MutedAudioNotificationShownOnce, false);
+            SetDefault(Static.BatteryLowNotificationShownOnce, false);
             SetDefault(Static.LastHoverSoundPlaybackTime, (double?)null);
             SetDefault<APISeasonalBackgrounds>(Static.SeasonalBackgrounds, null);
         }
@@ -25,6 +26,7 @@ namespace osu.Game.Configuration
     {
         LoginOverlayDisplayed,
         MutedAudioNotificationShownOnce,
+        BatteryLowNotificationShownOnce,
 
         /// <summary>
         /// Info about seasonal backgrounds available fetched from API - see <see cref="APISeasonalBackgrounds"/>.
