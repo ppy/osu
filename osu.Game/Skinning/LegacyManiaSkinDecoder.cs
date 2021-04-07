@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -30,8 +31,6 @@ namespace osu.Game.Skinning
 
         protected override void ParseLine(List<LegacyManiaSkinConfiguration> output, Section section, string line)
         {
-            line = StripComments(line);
-
             switch (section)
             {
                 case Section.Mania:
@@ -86,19 +85,31 @@ namespace osu.Game.Skinning
                         break;
 
                     case "HitPosition":
-                        currentConfig.HitPosition = (480 - float.Parse(pair.Value, CultureInfo.InvariantCulture)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+                        currentConfig.HitPosition = (480 - Math.Clamp(float.Parse(pair.Value, CultureInfo.InvariantCulture), 240, 480)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
                         break;
 
                     case "LightPosition":
                         currentConfig.LightPosition = (480 - float.Parse(pair.Value, CultureInfo.InvariantCulture)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
                         break;
 
+                    case "ScorePosition":
+                        currentConfig.ScorePosition = (float.Parse(pair.Value, CultureInfo.InvariantCulture)) * LegacyManiaSkinConfiguration.POSITION_SCALE_FACTOR;
+                        break;
+
                     case "JudgementLine":
                         currentConfig.ShowJudgementLine = pair.Value == "1";
                         break;
 
+                    case "KeysUnderNotes":
+                        currentConfig.KeysUnderNotes = pair.Value == "1";
+                        break;
+
                     case "LightingNWidth":
                         parseArrayValue(pair.Value, currentConfig.ExplosionWidth);
+                        break;
+
+                    case "LightingLWidth":
+                        parseArrayValue(pair.Value, currentConfig.HoldNoteLightWidth);
                         break;
 
                     case "WidthForNoteHeightScale":
@@ -107,14 +118,16 @@ namespace osu.Game.Skinning
                             currentConfig.MinimumColumnWidth = minWidth;
                         break;
 
-                    case string _ when pair.Key.StartsWith("Colour"):
+                    case string _ when pair.Key.StartsWith("Colour", StringComparison.Ordinal):
                         HandleColours(currentConfig, line);
                         break;
 
                     // Custom sprite paths
-                    case string _ when pair.Key.StartsWith("NoteImage"):
-                    case string _ when pair.Key.StartsWith("KeyImage"):
-                    case string _ when pair.Key.StartsWith("Hit"):
+                    case string _ when pair.Key.StartsWith("NoteImage", StringComparison.Ordinal):
+                    case string _ when pair.Key.StartsWith("KeyImage", StringComparison.Ordinal):
+                    case string _ when pair.Key.StartsWith("Hit", StringComparison.Ordinal):
+                    case string _ when pair.Key.StartsWith("Stage", StringComparison.Ordinal):
+                    case string _ when pair.Key.StartsWith("Lighting", StringComparison.Ordinal):
                         currentConfig.ImageLookups[pair.Key] = pair.Value;
                         break;
                 }

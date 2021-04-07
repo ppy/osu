@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
+using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
@@ -14,6 +15,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Beatmaps
 {
+    [ExcludeFromDynamicCompile]
     [Serializable]
     public class BeatmapInfo : IEquatable<BeatmapInfo>, IJsonSerializable, IHasPrimaryKey
     {
@@ -90,13 +92,14 @@ namespace osu.Game.Beatmaps
 
         public bool LetterboxInBreaks { get; set; }
         public bool WidescreenStoryboard { get; set; }
+        public bool EpilepsyWarning { get; set; }
 
         // Editor
         // This bookmarks stuff is necessary because DB doesn't know how to store int[]
         [JsonIgnore]
         public string StoredBookmarks
         {
-            get => string.Join(",", Bookmarks);
+            get => string.Join(',', Bookmarks);
             set
             {
                 if (string.IsNullOrEmpty(value))
@@ -133,21 +136,7 @@ namespace osu.Game.Beatmaps
         public List<ScoreInfo> Scores { get; set; }
 
         [JsonIgnore]
-        public DifficultyRating DifficultyRating
-        {
-            get
-            {
-                var rating = StarDifficulty;
-
-                if (rating < 2.0) return DifficultyRating.Easy;
-                if (rating < 2.7) return DifficultyRating.Normal;
-                if (rating < 4.0) return DifficultyRating.Hard;
-                if (rating < 5.3) return DifficultyRating.Insane;
-                if (rating < 6.5) return DifficultyRating.Expert;
-
-                return DifficultyRating.ExpertPlus;
-            }
-        }
+        public DifficultyRating DifficultyRating => BeatmapDifficultyCache.GetDifficultyRating(StarDifficulty);
 
         public string[] SearchableTerms => new[]
         {
@@ -158,7 +147,7 @@ namespace osu.Game.Beatmaps
         {
             string version = string.IsNullOrEmpty(Version) ? string.Empty : $"[{Version}]";
 
-            return $"{Metadata} {version}".Trim();
+            return $"{Metadata ?? BeatmapSet?.Metadata} {version}".Trim();
         }
 
         public bool Equals(BeatmapInfo other)

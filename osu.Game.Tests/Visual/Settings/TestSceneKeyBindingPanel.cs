@@ -51,8 +51,7 @@ namespace osu.Game.Tests.Visual.Settings
 
                 clickDelegate = Scheduler.AddDelayed(() =>
                 {
-                    InputManager.PressButton(MouseButton.Left);
-                    InputManager.ReleaseButton(MouseButton.Left);
+                    InputManager.Click(MouseButton.Left);
 
                     if (++buttonClicks == 2)
                     {
@@ -63,6 +62,78 @@ namespace osu.Game.Tests.Visual.Settings
                     }
                 }, 0, true);
             });
+        }
+
+        [Test]
+        public void TestClearButtonOnBindings()
+        {
+            KeyBindingRow multiBindingRow = null;
+
+            AddStep("click first row with two bindings", () =>
+            {
+                multiBindingRow = panel.ChildrenOfType<KeyBindingRow>().First(row => row.Defaults.Count() > 1);
+                InputManager.MoveMouseTo(multiBindingRow);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            clickClearButton();
+
+            AddAssert("first binding cleared", () => string.IsNullOrEmpty(multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().First().Text.Text.ToString()));
+
+            AddStep("click second binding", () =>
+            {
+                var target = multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(1);
+
+                InputManager.MoveMouseTo(target);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            clickClearButton();
+
+            AddAssert("second binding cleared", () => string.IsNullOrEmpty(multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(1).Text.Text.ToString()));
+
+            void clickClearButton()
+            {
+                AddStep("click clear button", () =>
+                {
+                    var clearButton = multiBindingRow.ChildrenOfType<KeyBindingRow.ClearButton>().Single();
+
+                    InputManager.MoveMouseTo(clearButton);
+                    InputManager.Click(MouseButton.Left);
+                });
+            }
+        }
+
+        [Test]
+        public void TestClickRowSelectsFirstBinding()
+        {
+            KeyBindingRow multiBindingRow = null;
+
+            AddStep("click first row with two bindings", () =>
+            {
+                multiBindingRow = panel.ChildrenOfType<KeyBindingRow>().First(row => row.Defaults.Count() > 1);
+                InputManager.MoveMouseTo(multiBindingRow);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("first binding selected", () => multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().First().IsBinding);
+
+            AddStep("click second binding", () =>
+            {
+                var target = multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(1);
+
+                InputManager.MoveMouseTo(target);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddStep("click back binding row", () =>
+            {
+                multiBindingRow = panel.ChildrenOfType<KeyBindingRow>().ElementAt(10);
+                InputManager.MoveMouseTo(multiBindingRow);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("first binding selected", () => multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().First().IsBinding);
         }
     }
 }

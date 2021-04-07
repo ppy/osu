@@ -44,6 +44,7 @@ namespace osu.Game.Rulesets.Scoring
         private double gameplayEndTime;
 
         private readonly double drainStartTime;
+        private readonly double drainLenience;
 
         private readonly List<(double time, double health)> healthIncreases = new List<(double, double)>();
         private double targetMinimumHealth;
@@ -55,9 +56,14 @@ namespace osu.Game.Rulesets.Scoring
         /// Creates a new <see cref="DrainingHealthProcessor"/>.
         /// </summary>
         /// <param name="drainStartTime">The time after which draining should begin.</param>
-        public DrainingHealthProcessor(double drainStartTime)
+        /// <param name="drainLenience">A lenience to apply to the default drain rate.<br />
+        /// A value of 0 uses the default drain rate.<br />
+        /// A value of 0.5 halves the drain rate.<br />
+        /// A value of 1 completely removes drain.</param>
+        public DrainingHealthProcessor(double drainStartTime, double drainLenience = 0)
         {
             this.drainStartTime = drainStartTime;
+            this.drainLenience = drainLenience;
         }
 
         protected override void Update()
@@ -96,13 +102,21 @@ namespace osu.Game.Rulesets.Scoring
 
             targetMinimumHealth = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, min_health_target, mid_health_target, max_health_target);
 
+            // Add back a portion of the amount of HP to be drained, depending on the lenience requested.
+            targetMinimumHealth += drainLenience * (1 - targetMinimumHealth);
+
+            // Ensure the target HP is within an acceptable range.
+            targetMinimumHealth = Math.Clamp(targetMinimumHealth, 0, 1);
+
             base.ApplyBeatmap(beatmap);
         }
 
         protected override void ApplyResultInternal(JudgementResult result)
         {
             base.ApplyResultInternal(result);
-            healthIncreases.Add((result.HitObject.GetEndTime() + result.TimeOffset, GetHealthIncreaseFor(result)));
+
+            if (!result.Type.IsBonus())
+                healthIncreases.Add((result.HitObject.GetEndTime() + result.TimeOffset, GetHealthIncreaseFor(result)));
         }
 
         protected override void Reset(bool storeResults)
@@ -119,7 +133,7 @@ namespace osu.Game.Rulesets.Scoring
 
         private double computeDrainRate()
         {
-            if (healthIncreases.Count == 0)
+            if (healthIncreases.Count <= 1)
                 return 0;
 
             int adjustment = 1;

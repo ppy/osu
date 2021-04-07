@@ -16,11 +16,7 @@ using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Input.Handlers;
 using osu.Game.Screens.Play;
-using osuTK.Input;
 using static osu.Game.Input.Handlers.ReplayInputHandler;
-using JoystickState = osu.Framework.Input.States.JoystickState;
-using KeyboardState = osu.Framework.Input.States.KeyboardState;
-using MouseState = osu.Framework.Input.States.MouseState;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -42,11 +38,7 @@ namespace osu.Game.Rulesets.UI
             }
         }
 
-        protected override InputState CreateInitialState()
-        {
-            var state = base.CreateInitialState();
-            return new RulesetInputManagerInputState<T>(state.Mouse, state.Keyboard, state.Joystick);
-        }
+        protected override InputState CreateInitialState() => new RulesetInputManagerInputState<T>(base.CreateInitialState());
 
         protected readonly KeyBindingContainer<T> KeyBindingContainer;
 
@@ -116,9 +108,9 @@ namespace osu.Game.Rulesets.UI
         {
             switch (e)
             {
-                case MouseDownEvent mouseDown when mouseDown.Button == MouseButton.Left || mouseDown.Button == MouseButton.Right:
+                case MouseDownEvent _:
                     if (mouseDisabled.Value)
-                        return false;
+                        return true; // importantly, block upwards propagation so global bindings also don't fire.
 
                     break;
 
@@ -143,7 +135,11 @@ namespace osu.Game.Rulesets.UI
             KeyBindingContainer.Add(receptor);
 
             keyCounter.SetReceptor(receptor);
-            keyCounter.AddRange(KeyBindingContainer.DefaultKeyBindings.Select(b => b.GetAction<T>()).Distinct().Select(b => new KeyCounterAction<T>(b)));
+            keyCounter.AddRange(KeyBindingContainer.DefaultKeyBindings
+                                                   .Select(b => b.GetAction<T>())
+                                                   .Distinct()
+                                                   .OrderBy(action => action)
+                                                   .Select(action => new KeyCounterAction<T>(action)));
         }
 
         public class ActionReceptor : KeyCounterDisplay.Receptor, IKeyBindingHandler<T>
@@ -203,8 +199,8 @@ namespace osu.Game.Rulesets.UI
     {
         public ReplayState<T> LastReplayState;
 
-        public RulesetInputManagerInputState(MouseState mouse = null, KeyboardState keyboard = null, JoystickState joystick = null)
-            : base(mouse, keyboard, joystick)
+        public RulesetInputManagerInputState(InputState state = null)
+            : base(state)
         {
         }
     }

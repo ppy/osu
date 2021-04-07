@@ -9,14 +9,15 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Pooling;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
 using osuTK;
 using osu.Game.Rulesets.Mania.Beatmaps;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -33,11 +34,12 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public readonly Bindable<ManiaAction> Action = new Bindable<ManiaAction>();
 
-        private readonly ColumnHitObjectArea hitObjectArea;
-
+        public readonly ColumnHitObjectArea HitObjectArea;
         internal readonly Container TopLevelContainer;
+        private readonly DrawablePool<PoolableHitExplosion> hitExplosionPool;
+        private readonly OrderedHitPolicy hitPolicy;
 
-        public Container UnderlayElements => hitObjectArea.UnderlayElements;
+        public Container UnderlayElements => HitObjectArea.UnderlayElements;
 
         public Column(int index)
         {
@@ -53,9 +55,10 @@ namespace osu.Game.Rulesets.Mania.UI
 
             InternalChildren = new[]
             {
+                hitExplosionPool = new DrawablePool<PoolableHitExplosion>(5),
                 // For input purposes, the background is added at the highest depth, but is then proxied back below all other elements
                 background.CreateProxy(),
-                hitObjectArea = new ColumnHitObjectArea(Index, HitObjectContainer) { RelativeSizeAxes = Axes.Both },
+                HitObjectArea = new ColumnHitObjectArea(Index, HitObjectContainer) { RelativeSizeAxes = Axes.Both },
                 new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.KeyArea, Index), _ => new DefaultKeyArea())
                 {
                     RelativeSizeAxes = Axes.Both
@@ -64,10 +67,10 @@ namespace osu.Game.Rulesets.Mania.UI
                 TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
             };
 
-            TopLevelContainer.Add(hitObjectArea.Explosions.CreateProxy());
-        }
+            hitPolicy = new OrderedHitPolicy(HitObjectContainer);
 
-        public override Axes RelativeSizeAxes => Axes.Y;
+            TopLevelContainer.Add(HitObjectArea.Explosions.CreateProxy());
+        }
 
         public ColumnType ColumnType { get; set; }
 
@@ -91,7 +94,10 @@ namespace osu.Game.Rulesets.Mania.UI
             hitObject.AccentColour.Value = AccentColour;
             hitObject.OnNewResult += OnNewResult;
 
-            HitObjectContainer.Add(hitObject);
+            DrawableManiaHitObject maniaObject = (DrawableManiaHitObject)hitObject;
+            maniaObject.CheckHittable = hitPolicy.IsHittable;
+
+            base.Add(hitObject);
         }
 
         public override bool Remove(DrawableHitObject h)
@@ -105,18 +111,13 @@ namespace osu.Game.Rulesets.Mania.UI
 
         internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
+            if (result.IsHit)
+                hitPolicy.HandleHit(judgedObject);
+
             if (!result.IsHit || !judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
 
-            var explosion = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HitExplosion, Index), _ =>
-                new DefaultHitExplosion(judgedObject.AccentColour.Value, judgedObject is DrawableHoldNoteTick))
-            {
-                RelativeSizeAxes = Axes.Both
-            };
-
-            hitObjectArea.Explosions.Add(explosion);
-
-            explosion.Delay(200).Expire(true);
+            HitObjectArea.Explosions.Add(hitExplosionPool.Get(e => e.Apply(result)));
         }
 
         public bool OnPressed(ManiaAction action)

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using DiffPlex;
@@ -34,6 +35,9 @@ namespace osu.Game.Screens.Edit
             // Find the index of [HitObject] sections. Lines changed prior to this index are ignored.
             int oldHitObjectsIndex = Array.IndexOf(result.PiecesOld, "[HitObjects]");
             int newHitObjectsIndex = Array.IndexOf(result.PiecesNew, "[HitObjects]");
+
+            Debug.Assert(oldHitObjectsIndex >= 0);
+            Debug.Assert(newHitObjectsIndex >= 0);
 
             var toRemove = new List<int>();
             var toAdd = new List<int>();
@@ -68,6 +72,8 @@ namespace osu.Game.Screens.Edit
             toRemove.Sort();
             toAdd.Sort();
 
+            editorBeatmap.BeginChange();
+
             // Apply the changes.
             for (int i = toRemove.Count - 1; i >= 0; i--)
                 editorBeatmap.RemoveAt(toRemove[i]);
@@ -78,6 +84,8 @@ namespace osu.Game.Screens.Edit
                 foreach (var i in toAdd)
                     editorBeatmap.Insert(i, newBeatmap.HitObjects[i]);
             }
+
+            editorBeatmap.EndChange();
         }
 
         private string readString(byte[] state) => Encoding.UTF8.GetString(state);
@@ -107,7 +115,7 @@ namespace osu.Game.Screens.Edit
 
             protected override Texture GetBackground() => throw new NotImplementedException();
 
-            protected override Track GetTrack() => throw new NotImplementedException();
+            protected override Track GetBeatmapTrack() => throw new NotImplementedException();
         }
     }
 }

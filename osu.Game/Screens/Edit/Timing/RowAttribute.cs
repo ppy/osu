@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Timing
 {
@@ -16,11 +17,13 @@ namespace osu.Game.Screens.Edit.Timing
     {
         private readonly string header;
         private readonly Func<string> content;
+        private readonly Color4 colour;
 
-        public RowAttribute(string header, Func<string> content)
+        public RowAttribute(string header, Func<string> content, Color4 colour)
         {
             this.header = header;
             this.content = content;
+            this.colour = colour;
         }
 
         [BackgroundDependencyLoader]
@@ -40,7 +43,7 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 new Box
                 {
-                    Colour = colours.Yellow,
+                    Colour = colour,
                     RelativeSizeAxes = Axes.Both,
                 },
                 new OsuSpriteText
@@ -50,7 +53,7 @@ namespace osu.Game.Screens.Edit.Timing
                     Origin = Anchor.Centre,
                     Font = OsuFont.Default.With(weight: FontWeight.SemiBold, size: 12),
                     Text = header,
-                    Colour = colours.Gray3
+                    Colour = colours.Gray0
                 },
             };
         }

@@ -17,8 +17,6 @@ namespace osu.Game.Skinning
         {
             if (section != Section.Colours)
             {
-                line = StripComments(line);
-
                 var pair = SplitKeyVal(line);
 
                 switch (section)

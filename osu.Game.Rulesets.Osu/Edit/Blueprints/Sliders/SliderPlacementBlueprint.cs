@@ -67,9 +67,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             inputManager = GetContainingInputManager();
         }
 
-        public override void UpdatePosition(SnapResult result)
+        public override void UpdateTimeAndPosition(SnapResult result)
         {
-            base.UpdatePosition(result);
+            base.UpdateTimeAndPosition(result);
 
             switch (state)
             {

@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.Online
             Add(rankingsOverlay = new TestRankingsOverlay
             {
                 Country = { BindTarget = countryBindable },
-                Scope = { BindTarget = scope },
+                Header = { Current = { BindTarget = scope } },
             });
         }
 
@@ -65,8 +65,6 @@ namespace osu.Game.Tests.Visual.Online
         private class TestRankingsOverlay : RankingsOverlay
         {
             public new Bindable<Country> Country => base.Country;
-
-            public new Bindable<RankingsScope> Scope => base.Scope;
         }
     }
 }

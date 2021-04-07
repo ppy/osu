@@ -23,6 +23,8 @@ namespace osu.Game.Graphics.UserInterface
     {
         private Color4 accentColour;
 
+        public const float HORIZONTAL_SPACING = 10;
+
         public virtual Color4 AccentColour
         {
             get => accentColour;
@@ -54,7 +56,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public OsuTabControl()
         {
-            TabContainer.Spacing = new Vector2(10f, 0f);
+            TabContainer.Spacing = new Vector2(HORIZONTAL_SPACING, 0f);
 
             AddInternal(strip = new Box
             {
@@ -121,8 +123,8 @@ namespace osu.Game.Graphics.UserInterface
 
             protected void FadeUnhovered()
             {
-                Bar.FadeOut(transition_length, Easing.OutQuint);
-                Text.FadeColour(AccentColour, transition_length, Easing.OutQuint);
+                Bar.FadeTo(IsHovered ? 1 : 0, transition_length, Easing.OutQuint);
+                Text.FadeColour(IsHovered ? Color4.White : AccentColour, transition_length, Easing.OutQuint);
             }
 
             protected override bool OnHover(HoverEvent e)

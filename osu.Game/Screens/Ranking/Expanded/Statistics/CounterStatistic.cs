@@ -2,9 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Ranking.Expanded.Accuracy;
 using osuTK;
 
 namespace osu.Game.Screens.Ranking.Expanded.Statistics
@@ -15,6 +16,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
     public class CounterStatistic : StatisticDisplay
     {
         private readonly int count;
+        private readonly int? maxCount;
 
         private RollingCounter<int> counter;
 
@@ -23,10 +25,12 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         /// </summary>
         /// <param name="header">The name of the statistic.</param>
         /// <param name="count">The value to display.</param>
-        public CounterStatistic(string header, int count)
+        /// <param name="maxCount">The maximum value of <paramref name="count"/>. Not displayed if null.</param>
+        public CounterStatistic(string header, int count, int? maxCount = null)
             : base(header)
         {
             this.count = count;
+            this.maxCount = maxCount;
         }
 
         public override void Appear()
@@ -35,22 +39,32 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
             counter.Current.Value = count;
         }
 
-        protected override Drawable CreateContent() => counter = new Counter();
-
-        private class Counter : RollingCounter<int>
+        protected override Drawable CreateContent()
         {
-            protected override double RollingDuration => AccuracyCircle.ACCURACY_TRANSFORM_DURATION;
-
-            protected override Easing RollingEasing => AccuracyCircle.ACCURACY_TRANSFORM_EASING;
-
-            public Counter()
+            var container = new FillFlowContainer
             {
-                DisplayedCountSpriteText.Font = OsuFont.Torus.With(size: 20, fixedWidth: true);
-                DisplayedCountSpriteText.Spacing = new Vector2(-2, 0);
+                AutoSizeAxes = Axes.Both,
+                Direction = FillDirection.Horizontal,
+                Child = counter = new StatisticCounter
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre
+                }
+            };
+
+            if (maxCount != null)
+            {
+                container.Add(new OsuSpriteText
+                {
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    Font = OsuFont.Torus.With(size: 12, fixedWidth: true),
+                    Spacing = new Vector2(-2, 0),
+                    Text = $"/{maxCount}"
+                });
             }
 
-            public override void Increment(int amount)
-                => Current.Value += amount;
+            return container;
         }
     }
 }

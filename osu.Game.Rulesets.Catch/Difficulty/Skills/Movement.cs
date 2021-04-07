@@ -3,13 +3,13 @@
 
 using System;
 using osu.Game.Rulesets.Catch.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 {
-    public class Movement : Skill
+    public class Movement : StrainSkill
     {
         private const float absolute_player_positioning_error = 16f;
         private const float normalized_hitobject_radius = 41.0f;
@@ -20,13 +20,16 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 
         protected override double DecayWeight => 0.94;
 
+        protected override int SectionLength => 750;
+
         protected readonly float HalfCatcherWidth;
 
         private float? lastPlayerPosition;
         private float lastDistanceMoved;
         private double lastStrainTime;
 
-        public Movement(float halfCatcherWidth)
+        public Movement(Mod[] mods, float halfCatcherWidth)
+            : base(mods)
         {
             HalfCatcherWidth = halfCatcherWidth;
         }
@@ -68,7 +71,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             }
 
             // Bonus for edge dashes.
-            if (catchCurrent.LastObject.DistanceToHyperDash <= 20.0f / CatchPlayfield.BASE_WIDTH)
+            if (catchCurrent.LastObject.DistanceToHyperDash <= 20.0f)
             {
                 if (!catchCurrent.LastObject.HyperDash)
                     edgeDashBonus += 5.7;
@@ -78,7 +81,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
                     playerPosition = catchCurrent.NormalizedPosition;
                 }
 
-                distanceAddition *= 1.0 + edgeDashBonus * ((20 - catchCurrent.LastObject.DistanceToHyperDash * CatchPlayfield.BASE_WIDTH) / 20) * Math.Pow((Math.Min(catchCurrent.StrainTime * catchCurrent.ClockRate, 265) / 265), 1.5); // Edge Dashes are easier at lower ms values
+                distanceAddition *= 1.0 + edgeDashBonus * ((20 - catchCurrent.LastObject.DistanceToHyperDash) / 20) * Math.Pow((Math.Min(catchCurrent.StrainTime * catchCurrent.ClockRate, 265) / 265), 1.5); // Edge Dashes are easier at lower ms values
             }
 
             lastPlayerPosition = playerPosition;

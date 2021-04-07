@@ -7,15 +7,20 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
@@ -23,22 +28,26 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     public class TimelineHitObjectBlueprint : SelectionBlueprint
     {
-        private readonly Circle circle;
+        private const float thickness = 5;
+        private const float shadow_radius = 5;
+        private const float circle_size = 34;
+
+        public Action<DragEvent> OnDragHandled;
 
         [UsedImplicitly]
         private readonly Bindable<double> startTime;
 
-        public Action<DragEvent> OnDragHandled;
+        private Bindable<int> indexInCurrentComboBindable;
+        private Bindable<int> comboIndexBindable;
 
+        private readonly Circle circle;
         private readonly DragBar dragBar;
-
         private readonly List<Container> shadowComponents = new List<Container>();
+        private readonly Container mainComponents;
+        private readonly OsuSpriteText comboIndexText;
 
-        private const float thickness = 5;
-
-        private const float shadow_radius = 5;
-
-        private const float circle_size = 16;
+        [Resolved]
+        private ISkinSource skin { get; set; }
 
         public TimelineHitObjectBlueprint(HitObject hitObject)
             : base(hitObject)
@@ -54,14 +63,28 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
+            AddRangeInternal(new Drawable[]
+            {
+                mainComponents = new Container
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                },
+                comboIndexText = new OsuSpriteText
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.Centre,
+                    Font = OsuFont.Numeric.With(size: circle_size / 2, weight: FontWeight.Black),
+                },
+            });
+
             circle = new Circle
             {
                 Size = new Vector2(circle_size),
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.Centre,
-                RelativePositionAxes = Axes.X,
-                AlwaysPresent = true,
-                Colour = Color4.White,
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Shadow,
@@ -77,7 +100,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 DragBar dragBarUnderlay;
                 Container extensionBar;
 
-                AddRangeInternal(new Drawable[]
+                mainComponents.AddRange(new Drawable[]
                 {
                     extensionBar = new Container
                     {
@@ -117,10 +140,48 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
             else
             {
-                AddInternal(circle);
+                mainComponents.Add(circle);
             }
 
             updateShadows();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            if (HitObject is IHasComboInformation comboInfo)
+            {
+                indexInCurrentComboBindable = comboInfo.IndexInCurrentComboBindable.GetBoundCopy();
+                indexInCurrentComboBindable.BindValueChanged(_ => updateComboIndex(), true);
+
+                comboIndexBindable = comboInfo.ComboIndexBindable.GetBoundCopy();
+                comboIndexBindable.BindValueChanged(_ => updateComboColour(), true);
+
+                skin.SourceChanged += updateComboColour;
+            }
+        }
+
+        private void updateComboIndex() => comboIndexText.Text = (indexInCurrentComboBindable.Value + 1).ToString();
+
+        private void updateComboColour()
+        {
+            if (!(HitObject is IHasComboInformation combo))
+                return;
+
+            var comboColours = skin.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value ?? Array.Empty<Color4>();
+            var comboColour = combo.GetComboColour(comboColours);
+
+            if (HitObject is IHasDuration)
+                mainComponents.Colour = ColourInfo.GradientHorizontal(comboColour, Color4.White);
+            else
+                mainComponents.Colour = comboColour;
+
+            var col = mainComponents.Colour.TopLeft.Linear;
+            float brightness = col.R + col.G + col.B;
+
+            // decide the combo index colour based on brightness?
+            comboIndexText.Colour = brightness > 0.5f ? Color4.Black : Color4.White;
         }
 
         protected override void Update()
@@ -128,7 +189,40 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             base.Update();
 
             // no bindable so we perform this every update
-            Width = (float)(HitObject.GetEndTime() - HitObject.StartTime);
+            float duration = (float)(HitObject.GetEndTime() - HitObject.StartTime);
+
+            if (Width != duration)
+            {
+                Width = duration;
+
+                // kind of haphazard but yeah, no bindables.
+                if (HitObject is IHasRepeats repeats)
+                    updateRepeats(repeats);
+            }
+        }
+
+        private Container repeatsContainer;
+
+        private void updateRepeats(IHasRepeats repeats)
+        {
+            repeatsContainer?.Expire();
+
+            mainComponents.Add(repeatsContainer = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+            });
+
+            for (int i = 0; i < repeats.RepeatCount; i++)
+            {
+                repeatsContainer.Add(new Circle
+                {
+                    Size = new Vector2(circle_size / 2),
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.Centre,
+                    RelativePositionAxes = Axes.X,
+                    X = (float)(i + 1) / (repeats.RepeatCount + 1),
+                });
+            }
         }
 
         protected override bool ShouldBeConsideredForInput(Drawable child) => true;
@@ -288,19 +382,19 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                 return;
 
                             repeatHitObject.RepeatCount = proposedCount;
+                            beatmap.Update(hitObject);
                             break;
 
                         case IHasDuration endTimeHitObject:
                             var snappedTime = Math.Max(hitObject.StartTime, beatSnapProvider.SnapTime(time));
 
-                            if (endTimeHitObject.EndTime == snappedTime)
+                            if (endTimeHitObject.EndTime == snappedTime || Precision.AlmostEquals(snappedTime, hitObject.StartTime, beatmap.GetBeatLengthAtTime(snappedTime)))
                                 return;
 
                             endTimeHitObject.Duration = snappedTime - hitObject.StartTime;
+                            beatmap.Update(hitObject);
                             break;
                     }
-
-                    beatmap.UpdateHitObject(hitObject);
                 }
             }
 

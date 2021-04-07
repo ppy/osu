@@ -23,8 +23,6 @@ namespace osu.Game.Overlays.Comments
         public DeletedCommentsCounter()
         {
             AutoSizeAxes = Axes.Both;
-            Margin = new MarginPadding { Vertical = 10, Left = 80 };
-
             InternalChild = new FillFlowContainer
             {
                 AutoSizeAxes = Axes.Both,
@@ -34,7 +32,7 @@ namespace osu.Game.Overlays.Comments
                 {
                     new SpriteIcon
                     {
-                        Icon = FontAwesome.Solid.Trash,
+                        Icon = FontAwesome.Regular.TrashAlt,
                         Size = new Vector2(14),
                     },
                     countText = new OsuSpriteText

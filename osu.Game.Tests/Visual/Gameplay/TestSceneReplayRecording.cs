@@ -2,17 +2,21 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.StateChanges;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Replays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
+using osu.Game.Screens.Play;
 using osu.Game.Tests.Visual.UserInterface;
 using osuTK;
 using osuTK.Graphics;
@@ -24,6 +28,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         private readonly TestRulesetInputManager playbackManager;
 
         private readonly TestRulesetInputManager recordingManager;
+
+        [Cached]
+        private GameplayBeatmap gameplayBeatmap = new GameplayBeatmap(new Beatmap());
 
         public TestSceneReplayRecording()
         {
@@ -38,7 +45,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     {
                         recordingManager = new TestRulesetInputManager(new TestSceneModSettings.TestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
                         {
-                            Recorder = new TestReplayRecorder(replay)
+                            Recorder = new TestReplayRecorder(new Score { Replay = replay })
                             {
                                 ScreenSpaceToGamefield = pos => recordingManager.ToLocalSpace(pos)
                             },
@@ -113,19 +120,10 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
         }
 
-        public override List<IInput> GetPendingInputs()
+        public override void CollectPendingInputs(List<IInput> inputs)
         {
-            return new List<IInput>
-            {
-                new MousePositionAbsoluteInput
-                {
-                    Position = GamefieldToScreenSpace(CurrentFrame?.Position ?? Vector2.Zero)
-                },
-                new ReplayState<TestAction>
-                {
-                    PressedActions = CurrentFrame?.Actions ?? new List<TestAction>()
-                }
-            };
+            inputs.Add(new MousePositionAbsoluteInput { Position = GamefieldToScreenSpace(CurrentFrame?.Position ?? Vector2.Zero) });
+            inputs.Add(new ReplayState<TestAction> { PressedActions = CurrentFrame?.Actions ?? new List<TestAction>() });
         }
     }
 
@@ -181,7 +179,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         internal class TestKeyBindingContainer : KeyBindingContainer<TestAction>
         {
-            public override IEnumerable<KeyBinding> DefaultKeyBindings => new[]
+            public override IEnumerable<IKeyBinding> DefaultKeyBindings => new[]
             {
                 new KeyBinding(InputKey.MouseLeft, TestAction.Down),
             };
@@ -209,7 +207,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
     internal class TestReplayRecorder : ReplayRecorder<TestAction>
     {
-        public TestReplayRecorder(Replay target)
+        public TestReplayRecorder(Score target)
             : base(target)
         {
         }

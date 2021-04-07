@@ -42,8 +42,11 @@ namespace osu.Game.Screens.Menu
             ValidForResume = false;
         }
 
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, IAPIProvider api)
+        private void load(OsuColour colours)
         {
             InternalChildren = new Drawable[]
             {
@@ -51,7 +54,7 @@ namespace osu.Game.Screens.Menu
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Icon = FontAwesome.Solid.Poo,
+                    Icon = FontAwesome.Solid.Flask,
                     Size = new Vector2(icon_size),
                     Y = icon_y,
                 },
@@ -104,7 +107,9 @@ namespace osu.Game.Screens.Menu
 
             iconColour = colours.Yellow;
 
-            currentUser.BindTo(api.LocalUser);
+            // manually transfer the user once, but only do the final bind in LoadComplete to avoid thread woes (API scheduler could run while this screen is still loading).
+            // the manual transfer is here to ensure all text content is loaded ahead of time as this is very early in the game load process and we want to avoid stutters.
+            currentUser.Value = api.LocalUser.Value;
             currentUser.BindValueChanged(e =>
             {
                 supportFlow.Children.ForEach(d => d.FadeOut().Expire());
@@ -141,6 +146,8 @@ namespace osu.Game.Screens.Menu
             base.LoadComplete();
             if (nextScreen != null)
                 LoadComponentAsync(nextScreen);
+
+            ((IBindable<User>)currentUser).BindTo(api.LocalUser);
         }
 
         public override void OnEntering(IScreen last)
@@ -190,18 +197,18 @@ namespace osu.Game.Screens.Menu
             {
                 "You can press Ctrl-T anywhere in the game to toggle the toolbar!",
                 "You can press Ctrl-O anywhere in the game to access options!",
-                "All settings are dynamic and take effect in real-time. Try changing the skin while playing!",
+                "All settings are dynamic and take effect in real-time. Try pausing and changing the skin while playing!",
                 "New features are coming online every update. Make sure to stay up-to-date!",
                 "If you find the UI too large or small, try adjusting UI scale in settings!",
                 "Try adjusting the \"Screen Scaling\" mode to change your gameplay or UI area, even in fullscreen!",
-                "For now, osu!direct is available to all users on lazer. You can access it anywhere using Ctrl-D!",
+                "For now, what used to be \"osu!direct\" is available to all users on lazer. You can access it anywhere using Ctrl-D!",
                 "Seeking in replays is available by dragging on the difficulty bar at the bottom of the screen!",
                 "Multithreading support means that even with low \"FPS\" your input and judgements will be accurate!",
                 "Try scrolling down in the mod select panel to find a bunch of new fun mods!",
                 "Most of the web content (profiles, rankings, etc.) are available natively in-game from the icons on the toolbar!",
                 "Get more details, hide or delete a beatmap by right-clicking on its panel at song select!",
                 "All delete operations are temporary until exiting. Restore accidentally deleted content from the maintenance settings!",
-                "Check out the \"timeshift\" multiplayer system, which has local permanent leaderboards and playlist support!",
+                "Check out the \"playlists\" system, which lets users create their own custom and permanent leaderboards!",
                 "Toggle advanced frame / thread statistics with Ctrl-F11!",
                 "Take a look under the hood at performance counters and enable verbose performance logging with Ctrl-F2!",
             };

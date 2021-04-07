@@ -48,35 +48,29 @@ namespace osu.Game.Screens.Play.HUD
         {
             AutoSizeAxes = Axes.Both;
 
-            Children = new Drawable[]
+            Child = new FillFlowContainer
             {
-                iconsContainer = new ReverseChildIDFillFlowContainer<ModIcon>
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+                AutoSizeAxes = Axes.Both,
+                Direction = FillDirection.Vertical,
+                Children = new Drawable[]
                 {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Horizontal,
+                    iconsContainer = new ReverseChildIDFillFlowContainer<ModIcon>
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Horizontal,
+                    },
+                    unrankedText = new OsuSpriteText
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Text = @"/ UNRANKED /",
+                        Font = OsuFont.Numeric.With(size: 12)
+                    }
                 },
-                unrankedText = new OsuSpriteText
-                {
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.TopCentre,
-                    Text = @"/ UNRANKED /",
-                    Font = OsuFont.Numeric.With(size: 12)
-                }
-            };
-
-            Current.ValueChanged += mods =>
-            {
-                iconsContainer.Clear();
-
-                foreach (Mod mod in mods.NewValue)
-                {
-                    iconsContainer.Add(new ModIcon(mod) { Scale = new Vector2(0.6f) });
-                }
-
-                if (IsLoaded)
-                    appearTransform();
             };
         }
 
@@ -90,7 +84,19 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
 
-            appearTransform();
+            Current.BindValueChanged(mods =>
+            {
+                iconsContainer.Clear();
+
+                if (mods.NewValue != null)
+                {
+                    foreach (Mod mod in mods.NewValue)
+                        iconsContainer.Add(new ModIcon(mod) { Scale = new Vector2(0.6f) });
+
+                    appearTransform();
+                }
+            }, true);
+
             iconsContainer.FadeInFromZero(fade_duration, Easing.OutQuint);
         }
 

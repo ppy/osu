@@ -15,13 +15,14 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 
 namespace osu.Game.Overlays.Settings
 {
-    public abstract class SettingsItem<T> : Container, IFilterable, ISettingsItem
+    public abstract class SettingsItem<T> : Container, IFilterable, ISettingsItem, IHasCurrentValue<T>, IHasTooltip
     {
         protected abstract Drawable CreateControl();
 
@@ -37,7 +38,9 @@ namespace osu.Game.Overlays.Settings
 
         public bool ShowsDefaultIndicator = true;
 
-        public virtual string LabelText
+        public string TooltipText { get; set; }
+
+        public virtual LocalisableString LabelText
         {
             get => labelText?.Text ?? string.Empty;
             set
@@ -54,13 +57,20 @@ namespace osu.Game.Overlays.Settings
             }
         }
 
-        public virtual Bindable<T> Bindable
+        [Obsolete("Use Current instead")] // Can be removed 20210406
+        public Bindable<T> Bindable
+        {
+            get => Current;
+            set => Current = value;
+        }
+
+        public virtual Bindable<T> Current
         {
             get => controlWithCurrent.Current;
             set => controlWithCurrent.Current = value;
         }
 
-        public virtual IEnumerable<string> FilterTerms => Keywords == null ? new[] { LabelText } : new List<string>(Keywords) { LabelText }.ToArray();
+        public virtual IEnumerable<string> FilterTerms => Keywords == null ? new[] { LabelText.ToString() } : new List<string>(Keywords) { LabelText.ToString() }.ToArray();
 
         public IEnumerable<string> Keywords { get; set; }
 
@@ -111,8 +121,10 @@ namespace osu.Game.Overlays.Settings
                 labelText.Alpha = controlWithCurrent.Current.Disabled ? 0.3f : 1;
         }
 
-        private class RestoreDefaultValueButton : Container, IHasTooltip
+        protected internal class RestoreDefaultValueButton : Container, IHasTooltip
         {
+            public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
+
             private Bindable<T> bindable;
 
             public Bindable<T> Bindable
@@ -197,7 +209,9 @@ namespace osu.Game.Overlays.Settings
                 UpdateState();
             }
 
-            public void UpdateState()
+            public void UpdateState() => Scheduler.AddOnce(updateState);
+
+            private void updateState()
             {
                 if (bindable == null)
                     return;

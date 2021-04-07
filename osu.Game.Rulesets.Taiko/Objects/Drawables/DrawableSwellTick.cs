@@ -1,9 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using JetBrains.Annotations;
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Taiko.Skinning.Default;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
@@ -12,17 +12,22 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
     {
         public override bool DisplayResult => false;
 
-        public DrawableSwellTick(SwellTick hitObject)
+        public DrawableSwellTick()
+            : this(null)
+        {
+        }
+
+        public DrawableSwellTick([CanBeNull] SwellTick hitObject)
             : base(hitObject)
         {
         }
 
         protected override void UpdateInitialTransforms() => this.FadeOut();
 
-        public void TriggerResult(HitResult type)
+        public void TriggerResult(bool hit)
         {
             HitObject.StartTime = Time.Current;
-            ApplyResult(r => r.Type = type);
+            ApplyResult(r => r.Type = hit ? r.Judgement.MaxResult : r.Judgement.MinResult);
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)

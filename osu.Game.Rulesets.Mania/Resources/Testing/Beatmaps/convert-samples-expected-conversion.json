@@ -6,25 +6,28 @@
       "EndTime": 2750.0,
       "Column": 1,
       "NodeSamples": [
-        ["normal-hitnormal"],
-        ["soft-hitnormal"],
-        ["drum-hitnormal"]
-      ]
+        ["Gameplay/normal-hitnormal"],
+        ["Gameplay/soft-hitnormal"],
+        ["Gameplay/drum-hitnormal"]
+      ],
+      "Samples": ["Gameplay/-hitnormal"]
     }, {
       "StartTime": 1875.0,
       "EndTime": 2750.0,
       "Column": 0,
       "NodeSamples": [
-        ["soft-hitnormal"],
-        ["drum-hitnormal"]
-      ]
+        ["Gameplay/soft-hitnormal"],
+        ["Gameplay/drum-hitnormal"]
+      ],
+      "Samples": ["Gameplay/-hitnormal"]
     }]
   }, {
     "StartTime": 3750.0,
     "Objects": [{
       "StartTime": 3750.0,
       "EndTime": 3750.0,
-      "Column": 3
+      "Column": 3,
+      "Samples": ["Gameplay/normal-hitnormal"]
     }]
   }]
 }

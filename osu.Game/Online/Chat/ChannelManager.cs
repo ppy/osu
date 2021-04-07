@@ -57,7 +57,7 @@ namespace osu.Game.Online.Chat
         {
             CurrentChannel.ValueChanged += currentChannelChanged;
 
-            HighPollRate.BindValueChanged(enabled => TimeBetweenPolls = enabled.NewValue ? 1000 : 6000, true);
+            HighPollRate.BindValueChanged(enabled => TimeBetweenPolls.Value = enabled.NewValue ? 1000 : 6000, true);
         }
 
         /// <summary>
@@ -152,7 +152,7 @@ namespace osu.Game.Online.Chat
 
                     createNewPrivateMessageRequest.Failure += exception =>
                     {
-                        Logger.Error(exception, "Posting message failed.");
+                        handlePostException(exception);
                         target.ReplaceMessage(message, null);
                         dequeueAndRun();
                     };
@@ -171,7 +171,7 @@ namespace osu.Game.Online.Chat
 
                 req.Failure += exception =>
                 {
-                    Logger.Error(exception, "Posting message failed.");
+                    handlePostException(exception);
                     target.ReplaceMessage(message, null);
                     dequeueAndRun();
                 };
@@ -182,6 +182,14 @@ namespace osu.Game.Online.Chat
             // always run if the queue is empty
             if (postQueue.Count == 1)
                 dequeueAndRun();
+        }
+
+        private static void handlePostException(Exception exception)
+        {
+            if (exception is APIException apiException)
+                Logger.Log(apiException.Message, level: LogLevel.Important);
+            else
+                Logger.Error(exception, "Posting message failed.");
         }
 
         /// <summary>
@@ -196,7 +204,7 @@ namespace osu.Game.Online.Chat
             if (target == null)
                 return;
 
-            var parameters = text.Split(new[] { ' ' }, 2);
+            var parameters = text.Split(' ', 2);
             string command = parameters[0];
             string content = parameters.Length == 2 ? parameters[1] : string.Empty;
 
@@ -339,7 +347,7 @@ namespace osu.Game.Online.Chat
         }
 
         /// <summary>
-        /// Joins a channel if it has not already been joined.
+        /// Joins a channel if it has not already been joined. Must be called from the update thread.
         /// </summary>
         /// <param name="channel">The channel to join.</param>
         /// <returns>The joined channel. Note that this may not match the parameter channel as it is a backed object.</returns>
@@ -381,7 +389,7 @@ namespace osu.Game.Online.Chat
                         break;
 
                     default:
-                        var req = new JoinChannelRequest(channel, api.LocalUser.Value);
+                        var req = new JoinChannelRequest(channel);
                         req.Success += () => joinChannel(channel, fetchInitialMessages);
                         req.Failure += ex => LeaveChannel(channel);
                         api.Queue(req);
@@ -399,7 +407,11 @@ namespace osu.Game.Online.Chat
             return channel;
         }
 
-        public void LeaveChannel(Channel channel)
+        /// <summary>
+        /// Leave the specified channel. Can be called from any thread.
+        /// </summary>
+        /// <param name="channel">The channel to leave.</param>
+        public void LeaveChannel(Channel channel) => Schedule(() =>
         {
             if (channel == null) return;
 
@@ -410,10 +422,10 @@ namespace osu.Game.Online.Chat
 
             if (channel.Joined.Value)
             {
-                api.Queue(new LeaveChannelRequest(channel, api.LocalUser.Value));
+                api.Queue(new LeaveChannelRequest(channel));
                 channel.Joined.Value = false;
             }
-        }
+        });
 
         private long lastMessageId;
 

@@ -1,10 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Caching;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
@@ -12,7 +16,7 @@ using osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class TimelineTickDisplay : TimelinePart
+    public class TimelineTickDisplay : TimelinePart<PointVisualisation>
     {
         [Resolved]
         private EditorBeatmap beatmap { get; set; }
@@ -23,6 +27,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }
 
+        [Resolved(CanBeNull = true)]
+        private IEditorChangeHandler changeHandler { get; set; }
+
         [Resolved]
         private OsuColour colours { get; set; }
 
@@ -31,15 +38,72 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             RelativeSizeAxes = Axes.Both;
         }
 
+        private readonly Cached tickCache = new Cached();
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            beatDivisor.BindValueChanged(_ => createLines(), true);
+            beatDivisor.BindValueChanged(_ => invalidateTicks());
+
+            if (changeHandler != null)
+                // currently this is the best way to handle any kind of timing changes.
+                changeHandler.OnStateChange += invalidateTicks;
         }
 
-        private void createLines()
+        private void invalidateTicks()
         {
-            Clear();
+            tickCache.Invalidate();
+        }
+
+        /// <summary>
+        /// The visible time/position range of the timeline.
+        /// </summary>
+        private (float min, float max) visibleRange = (float.MinValue, float.MaxValue);
+
+        /// <summary>
+        /// The next time/position value to the left of the display when tick regeneration needs to be run.
+        /// </summary>
+        private float? nextMinTick;
+
+        /// <summary>
+        /// The next time/position value to the right of the display when tick regeneration needs to be run.
+        /// </summary>
+        private float? nextMaxTick;
+
+        [Resolved(canBeNull: true)]
+        private Timeline timeline { get; set; }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (timeline != null)
+            {
+                var newRange = (
+                    (ToLocalSpace(timeline.ScreenSpaceDrawQuad.TopLeft).X - PointVisualisation.WIDTH * 2) / DrawWidth * Content.RelativeChildSize.X,
+                    (ToLocalSpace(timeline.ScreenSpaceDrawQuad.TopRight).X + PointVisualisation.WIDTH * 2) / DrawWidth * Content.RelativeChildSize.X);
+
+                if (visibleRange != newRange)
+                {
+                    visibleRange = newRange;
+
+                    // actual regeneration only needs to occur if we've passed one of the known next min/max tick boundaries.
+                    if (nextMinTick == null || nextMaxTick == null || (visibleRange.min < nextMinTick || visibleRange.max > nextMaxTick))
+                        tickCache.Invalidate();
+                }
+            }
+
+            if (!tickCache.IsValid)
+                createTicks();
+        }
+
+        private void createTicks()
+        {
+            int drawableIndex = 0;
+            int highestDivisor = BindableBeatDivisor.VALID_DIVISORS.Last();
+
+            nextMinTick = null;
+            nextMaxTick = null;
 
             for (var i = 0; i < beatmap.ControlPointInfo.TimingPoints.Count; i++)
             {
@@ -50,41 +114,81 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 for (double t = point.Time; t < until; t += point.BeatLength / beatDivisor.Value)
                 {
-                    var indexInBeat = beat % beatDivisor.Value;
+                    float xPos = (float)t;
 
-                    if (indexInBeat == 0)
-                    {
-                        Add(new PointVisualisation(t)
-                        {
-                            Colour = BindableBeatDivisor.GetColourFor(1, colours),
-                            Origin = Anchor.TopCentre,
-                        });
-                    }
+                    if (t < visibleRange.min)
+                        nextMinTick = xPos;
+                    else if (t > visibleRange.max)
+                        nextMaxTick ??= xPos;
                     else
                     {
+                        // if this is the first beat in the beatmap, there is no next min tick
+                        if (beat == 0 && i == 0)
+                            nextMinTick = float.MinValue;
+
+                        int indexInBar = beat % ((int)point.TimeSignature * beatDivisor.Value);
+
                         var divisor = BindableBeatDivisor.GetDivisorForBeatIndex(beat, beatDivisor.Value);
                         var colour = BindableBeatDivisor.GetColourFor(divisor, colours);
-                        var height = 0.1f - (float)divisor / BindableBeatDivisor.VALID_DIVISORS.Last() * 0.08f;
 
-                        Add(new PointVisualisation(t)
-                        {
-                            Colour = colour,
-                            Height = height,
-                            Origin = Anchor.TopCentre,
-                        });
+                        bool isMainBeat = indexInBar == 0;
 
-                        Add(new PointVisualisation(t)
-                        {
-                            Colour = colour,
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomCentre,
-                            Height = height,
-                        });
+                        // even though "bar lines" take up the full vertical space, we render them in two pieces because it allows for less anchor/origin churn.
+                        float height = isMainBeat ? 0.5f : 0.4f - (float)divisor / highestDivisor * 0.2f;
+                        float gradientOpacity = isMainBeat ? 1 : 0;
+
+                        var topPoint = getNextUsablePoint();
+                        topPoint.X = xPos;
+                        topPoint.Height = height;
+                        topPoint.Colour = ColourInfo.GradientVertical(colour, colour.Opacity(gradientOpacity));
+                        topPoint.Anchor = Anchor.TopLeft;
+                        topPoint.Origin = Anchor.TopCentre;
+
+                        var bottomPoint = getNextUsablePoint();
+                        bottomPoint.X = xPos;
+                        bottomPoint.Anchor = Anchor.BottomLeft;
+                        bottomPoint.Colour = ColourInfo.GradientVertical(colour.Opacity(gradientOpacity), colour);
+                        bottomPoint.Origin = Anchor.BottomCentre;
+                        bottomPoint.Height = height;
                     }
 
                     beat++;
                 }
             }
+
+            int usedDrawables = drawableIndex;
+
+            // save a few drawables beyond the currently used for edge cases.
+            while (drawableIndex < Math.Min(usedDrawables + 16, Count))
+                Children[drawableIndex++].Hide();
+
+            // expire any excess
+            while (drawableIndex < Count)
+                Children[drawableIndex++].Expire();
+
+            tickCache.Validate();
+
+            Drawable getNextUsablePoint()
+            {
+                PointVisualisation point;
+                if (drawableIndex >= Count)
+                    Add(point = new PointVisualisation());
+                else
+                    point = Children[drawableIndex];
+
+                drawableIndex++;
+                point.Show();
+
+                return point;
+            }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (changeHandler != null)
+                changeHandler.OnStateChange -= invalidateTicks;
         }
     }
 }

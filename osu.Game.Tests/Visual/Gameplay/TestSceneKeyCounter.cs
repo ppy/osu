@@ -40,11 +40,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             void addPressKeyStep()
             {
-                AddStep($"Press {testKey} key", () =>
-                {
-                    InputManager.PressKey(testKey);
-                    InputManager.ReleaseKey(testKey);
-                });
+                AddStep($"Press {testKey} key", () => InputManager.Key(testKey));
             }
 
             addPressKeyStep();

@@ -6,19 +6,26 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
+using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Users;
 
 namespace osu.Game.Beatmaps
 {
+    [ExcludeFromDynamicCompile]
     [Serializable]
     public class BeatmapMetadata : IEquatable<BeatmapMetadata>, IHasPrimaryKey
     {
         public int ID { get; set; }
 
         public string Title { get; set; }
+
+        [JsonProperty("title_unicode")]
         public string TitleUnicode { get; set; }
+
         public string Artist { get; set; }
+
+        [JsonProperty("artist_unicode")]
         public string ArtistUnicode { get; set; }
 
         [JsonIgnore]
@@ -49,7 +56,12 @@ namespace osu.Game.Beatmaps
         [JsonProperty(@"tags")]
         public string Tags { get; set; }
 
+        /// <summary>
+        /// The time in milliseconds to begin playing the track for preview purposes.
+        /// If -1, the track should begin playing at 40% of its length.
+        /// </summary>
         public int PreviewTime { get; set; }
+
         public string AudioFile { get; set; }
         public string BackgroundFile { get; set; }
 

@@ -12,8 +12,10 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
 {
     public class TestSceneTaikoModPerfect : ModPerfectTestScene
     {
+        protected override Ruleset CreatePlayerRuleset() => new TestTaikoRuleset();
+
         public TestSceneTaikoModPerfect()
-            : base(new TestTaikoRuleset(), new TaikoModPerfect())
+            : base(new TaikoModPerfect())
         {
         }
 

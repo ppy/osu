@@ -14,10 +14,13 @@ using osu.Framework.Bindables;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
-using osu.Game.Overlays.Settings;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.Select.Details
 {
@@ -25,6 +28,12 @@ namespace osu.Game.Screens.Select.Details
     {
         [Resolved]
         private IBindable<IReadOnlyList<Mod>> mods { get; set; }
+
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; }
+
+        [Resolved]
+        private BeatmapDifficultyCache difficultyCache { get; set; }
 
         protected readonly StatisticRow FirstValue, HpDrain, Accuracy, ApproachRate;
         private readonly StatisticRow starDifficulty;
@@ -71,35 +80,26 @@ namespace osu.Game.Screens.Select.Details
         {
             base.LoadComplete();
 
+            ruleset.BindValueChanged(_ => updateStatistics());
             mods.BindValueChanged(modsChanged, true);
         }
 
-        private readonly List<ISettingsItem> references = new List<ISettingsItem>();
+        private ModSettingChangeTracker modSettingChangeTracker;
+        private ScheduledDelegate debouncedStatisticsUpdate;
 
         private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
-            // TODO: find a more permanent solution for this if/when it is needed in other components.
-            // this is generating drawables for the only purpose of storing bindable references.
-            foreach (var r in references)
-                r.Dispose();
+            modSettingChangeTracker?.Dispose();
 
-            references.Clear();
-
-            ScheduledDelegate debounce = null;
-
-            foreach (var mod in mods.NewValue.OfType<IApplicableToDifficulty>())
+            modSettingChangeTracker = new ModSettingChangeTracker(mods.NewValue);
+            modSettingChangeTracker.SettingChanged += m =>
             {
-                foreach (var setting in mod.CreateSettingsControls().OfType<ISettingsItem>())
-                {
-                    setting.SettingChanged += () =>
-                    {
-                        debounce?.Cancel();
-                        debounce = Scheduler.AddDelayed(updateStatistics, 100);
-                    };
+                if (!(m is IApplicableToDifficulty))
+                    return;
 
-                    references.Add(setting);
-                }
-            }
+                debouncedStatisticsUpdate?.Cancel();
+                debouncedStatisticsUpdate = Scheduler.AddDelayed(updateStatistics, 100);
+            };
 
             updateStatistics();
         }
@@ -132,11 +132,38 @@ namespace osu.Game.Screens.Select.Details
                     break;
             }
 
-            starDifficulty.Value = ((float)(Beatmap?.StarDifficulty ?? 0), null);
-
             HpDrain.Value = (baseDifficulty?.DrainRate ?? 0, adjustedDifficulty?.DrainRate);
             Accuracy.Value = (baseDifficulty?.OverallDifficulty ?? 0, adjustedDifficulty?.OverallDifficulty);
             ApproachRate.Value = (baseDifficulty?.ApproachRate ?? 0, adjustedDifficulty?.ApproachRate);
+
+            updateStarDifficulty();
+        }
+
+        private CancellationTokenSource starDifficultyCancellationSource;
+
+        private void updateStarDifficulty()
+        {
+            starDifficultyCancellationSource?.Cancel();
+
+            if (Beatmap == null)
+                return;
+
+            starDifficultyCancellationSource = new CancellationTokenSource();
+
+            var normalStarDifficulty = difficultyCache.GetDifficultyAsync(Beatmap, ruleset.Value, null, starDifficultyCancellationSource.Token);
+            var moddedStarDifficulty = difficultyCache.GetDifficultyAsync(Beatmap, ruleset.Value, mods.Value, starDifficultyCancellationSource.Token);
+
+            Task.WhenAll(normalStarDifficulty, moddedStarDifficulty).ContinueWith(_ => Schedule(() =>
+            {
+                starDifficulty.Value = ((float)normalStarDifficulty.Result.Stars, (float)moddedStarDifficulty.Result.Stars);
+            }), starDifficultyCancellationSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            modSettingChangeTracker?.Dispose();
+            starDifficultyCancellationSource?.Cancel();
         }
 
         public class StatisticRow : Container, IHasAccentColour
@@ -153,7 +180,7 @@ namespace osu.Game.Screens.Select.Details
             [Resolved]
             private OsuColour colours { get; set; }
 
-            public string Title
+            public LocalisableString Title
             {
                 get => name.Text;
                 set => name.Text = value;

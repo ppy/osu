@@ -11,6 +11,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Chat.Selection;
@@ -64,6 +66,24 @@ namespace osu.Game.Tests.Visual.Online
             });
         }
 
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            AddStep("register request handling", () =>
+            {
+                ((DummyAPIAccess)API).HandleRequest = req =>
+                {
+                    switch (req)
+                    {
+                        case JoinChannelRequest _:
+                            return true;
+                    }
+
+                    return false;
+                };
+            });
+        }
+
         [Test]
         public void TestHideOverlay()
         {
@@ -103,11 +123,7 @@ namespace osu.Game.Tests.Visual.Online
         public void TestChannelShortcutKeys()
         {
             AddStep("Join channels", () => channels.ForEach(channel => channelManager.JoinChannel(channel)));
-            AddStep("Close channel selector", () =>
-            {
-                InputManager.PressKey(Key.Escape);
-                InputManager.ReleaseKey(Key.Escape);
-            });
+            AddStep("Close channel selector", () => InputManager.Key(Key.Escape));
             AddUntilStep("Wait for close", () => chatOverlay.SelectionOverlayState == Visibility.Hidden);
 
             for (int zeroBasedIndex = 0; zeroBasedIndex < 10; ++zeroBasedIndex)
@@ -216,9 +232,8 @@ namespace osu.Game.Tests.Visual.Online
         {
             var channelKey = Key.Number0 + number;
             InputManager.PressKey(Key.AltLeft);
-            InputManager.PressKey(channelKey);
+            InputManager.Key(channelKey);
             InputManager.ReleaseKey(Key.AltLeft);
-            InputManager.ReleaseKey(channelKey);
         }
 
         private void clickDrawable(Drawable d)

@@ -8,12 +8,12 @@ using osu.Game.Configuration;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Catch.Objects;
-using osu.Game.Rulesets.Catch.Objects.Drawables;
 using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new CatchFramedReplayInputHandler(replay);
 
-        protected override ReplayRecorder CreateReplayRecorder(Replay replay) => new CatchReplayRecorder(replay, (CatchPlayfield)Playfield);
+        protected override ReplayRecorder CreateReplayRecorder(Score score) => new CatchReplayRecorder(score, (CatchPlayfield)Playfield);
 
         protected override Playfield CreatePlayfield() => new CatchPlayfield(Beatmap.BeatmapInfo.BaseDifficulty, CreateDrawableRepresentation);
 
@@ -40,30 +40,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override PassThroughInputManager CreateInputManager() => new CatchInputManager(Ruleset.RulesetInfo);
 
-        public override DrawableHitObject<CatchHitObject> CreateDrawableRepresentation(CatchHitObject h)
-        {
-            switch (h)
-            {
-                case Banana banana:
-                    return new DrawableBanana(banana);
-
-                case Fruit fruit:
-                    return new DrawableFruit(fruit);
-
-                case JuiceStream stream:
-                    return new DrawableJuiceStream(stream, CreateDrawableRepresentation);
-
-                case BananaShower shower:
-                    return new DrawableBananaShower(shower, CreateDrawableRepresentation);
-
-                case TinyDroplet tiny:
-                    return new DrawableTinyDroplet(tiny);
-
-                case Droplet droplet:
-                    return new DrawableDroplet(droplet);
-            }
-
-            return null;
-        }
+        public override DrawableHitObject<CatchHitObject> CreateDrawableRepresentation(CatchHitObject h) => null;
     }
 }

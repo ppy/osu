@@ -1,7 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Game.Utils;
+using osu.Framework.Utils;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
@@ -11,8 +11,8 @@ namespace osu.Game.Overlays.BeatmapListing
         [Order(0)]
         Any,
 
-        [Order(11)]
-        Other,
+        [Order(14)]
+        Unspecified,
 
         [Order(1)]
         English,
@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.BeatmapListing
         [Order(2)]
         Chinese,
 
-        [Order(10)]
+        [Order(12)]
         Instrumental,
 
         [Order(7)]
@@ -42,6 +42,15 @@ namespace osu.Game.Overlays.BeatmapListing
         Spanish,
 
         [Order(5)]
-        Italian
+        Italian,
+
+        [Order(10)]
+        Russian,
+
+        [Order(11)]
+        Polish,
+
+        [Order(13)]
+        Other
     }
 }

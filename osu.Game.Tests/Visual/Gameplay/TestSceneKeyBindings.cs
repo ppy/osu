@@ -32,11 +32,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestDefaultsWhenNotDatabased()
         {
-            AddStep("fire key", () =>
-            {
-                InputManager.PressKey(Key.A);
-                InputManager.ReleaseKey(Key.A);
-            });
+            AddStep("fire key", () => InputManager.Key(Key.A));
 
             AddAssert("received key", () => receiver.ReceivedAction);
         }

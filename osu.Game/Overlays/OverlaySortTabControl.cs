@@ -17,6 +17,7 @@ using osu.Game.Overlays.Comments;
 using JetBrains.Annotations;
 using System;
 using osu.Framework.Extensions;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays
 {
@@ -30,6 +31,14 @@ namespace osu.Game.Overlays
             set => current.Current = value;
         }
 
+        public LocalisableString Title
+        {
+            get => text.Text;
+            set => text.Text = value;
+        }
+
+        private readonly OsuSpriteText text;
+
         public OverlaySortTabControl()
         {
             AutoSizeAxes = Axes.Both;
@@ -40,11 +49,11 @@ namespace osu.Game.Overlays
                 Spacing = new Vector2(10, 0),
                 Children = new Drawable[]
                 {
-                    new OsuSpriteText
+                    text = new OsuSpriteText
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Font = OsuFont.GetFont(size: 12),
+                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
                         Text = @"Sort by"
                     },
                     CreateControl().With(c =>
@@ -133,7 +142,7 @@ namespace osu.Game.Overlays
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = OsuFont.GetFont(size: 12),
+                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
                             Text = (value as Enum)?.GetDescription() ?? value.ToString()
                         }
                     }
@@ -163,7 +172,7 @@ namespace osu.Game.Overlays
 
                 ContentColour = Active.Value && !IsHovered ? colourProvider.Light1 : Color4.White;
 
-                text.Font = text.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.Medium);
+                text.Font = text.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.SemiBold);
             }
         }
     }

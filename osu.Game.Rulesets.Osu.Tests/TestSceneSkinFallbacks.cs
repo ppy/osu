@@ -9,6 +9,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Timing;
@@ -25,13 +26,12 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestSceneSkinFallbacks : PlayerTestScene
+    public class TestSceneSkinFallbacks : TestSceneOsuPlayer
     {
         private readonly TestSource testUserSkin;
         private readonly TestSource testBeatmapSkin;
 
         public TestSceneSkinFallbacks()
-            : base(new OsuRuleset())
         {
             testUserSkin = new TestSource("user");
             testBeatmapSkin = new TestSource("beatmap");
@@ -42,10 +42,35 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep("enable user provider", () => testUserSkin.Enabled = true);
 
-            AddStep("enable beatmap skin", () => LocalConfig.Set<bool>(OsuSetting.BeatmapSkins, true));
+            AddStep("enable beatmap skin", () => LocalConfig.SetValue(OsuSetting.BeatmapSkins, true));
             checkNextHitObject("beatmap");
 
-            AddStep("disable beatmap skin", () => LocalConfig.Set<bool>(OsuSetting.BeatmapSkins, false));
+            AddStep("disable beatmap skin", () => LocalConfig.SetValue(OsuSetting.BeatmapSkins, false));
+            checkNextHitObject("user");
+
+            AddStep("disable user provider", () => testUserSkin.Enabled = false);
+            checkNextHitObject(null);
+        }
+
+        [Test]
+        public void TestBeatmapColourDefault()
+        {
+            AddStep("enable user provider", () => testUserSkin.Enabled = true);
+
+            AddStep("enable beatmap skin", () => LocalConfig.SetValue(OsuSetting.BeatmapSkins, true));
+            AddStep("enable beatmap colours", () => LocalConfig.SetValue(OsuSetting.BeatmapColours, true));
+            checkNextHitObject("beatmap");
+
+            AddStep("enable beatmap skin", () => LocalConfig.SetValue(OsuSetting.BeatmapSkins, true));
+            AddStep("disable beatmap colours", () => LocalConfig.SetValue(OsuSetting.BeatmapColours, false));
+            checkNextHitObject("beatmap");
+
+            AddStep("disable beatmap skin", () => LocalConfig.SetValue(OsuSetting.BeatmapSkins, false));
+            AddStep("enable beatmap colours", () => LocalConfig.SetValue(OsuSetting.BeatmapColours, true));
+            checkNextHitObject("user");
+
+            AddStep("disable beatmap skin", () => LocalConfig.SetValue(OsuSetting.BeatmapSkins, false));
+            AddStep("disable beatmap colours", () => LocalConfig.SetValue(OsuSetting.BeatmapColours, false));
             checkNextHitObject("user");
 
             AddStep("disable user provider", () => testUserSkin.Enabled = false);
@@ -125,6 +150,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 if (!enabled) return null;
 
+                if (component is OsuSkinComponent osuComponent && osuComponent.Component == OsuSkinComponents.SliderBody)
+                    return null;
+
                 return new OsuSpriteText
                 {
                     Text = identifier,
@@ -132,9 +160,9 @@ namespace osu.Game.Rulesets.Osu.Tests
                 };
             }
 
-            public Texture GetTexture(string componentName) => null;
+            public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => null;
 
-            public SampleChannel GetSample(ISampleInfo sampleInfo) => null;
+            public ISample GetSample(ISampleInfo sampleInfo) => null;
 
             public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration => default;
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => null;

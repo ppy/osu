@@ -9,7 +9,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
@@ -23,7 +22,7 @@ namespace osu.Game.Tournament.Components
     public class TournamentBeatmapPanel : CompositeDrawable
     {
         public readonly BeatmapInfo Beatmap;
-        private readonly string mods;
+        private readonly string mod;
 
         private const float horizontal_padding = 10;
         private const float vertical_padding = 10;
@@ -33,12 +32,12 @@ namespace osu.Game.Tournament.Components
         private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
         private Box flash;
 
-        public TournamentBeatmapPanel(BeatmapInfo beatmap, string mods = null)
+        public TournamentBeatmapPanel(BeatmapInfo beatmap, string mod = null)
         {
             if (beatmap == null) throw new ArgumentNullException(nameof(beatmap));
 
             Beatmap = beatmap;
-            this.mods = mods;
+            this.mod = mod;
             Width = 400;
             Height = HEIGHT;
         }
@@ -75,9 +74,9 @@ namespace osu.Game.Tournament.Components
                     {
                         new TournamentSpriteText
                         {
-                            Text = new LocalisedString((
+                            Text = new RomanisableString(
                                 $"{Beatmap.Metadata.ArtistUnicode ?? Beatmap.Metadata.Artist} - {Beatmap.Metadata.TitleUnicode ?? Beatmap.Metadata.Title}",
-                                $"{Beatmap.Metadata.Artist} - {Beatmap.Metadata.Title}")),
+                                $"{Beatmap.Metadata.Artist} - {Beatmap.Metadata.Title}"),
                             Font = OsuFont.Torus.With(weight: FontWeight.Bold),
                         },
                         new FillFlowContainer
@@ -122,23 +121,15 @@ namespace osu.Game.Tournament.Components
                 },
             });
 
-            if (!string.IsNullOrEmpty(mods))
+            if (!string.IsNullOrEmpty(mod))
             {
-                AddInternal(new Container
+                AddInternal(new TournamentModIcon(mod)
                 {
-                    RelativeSizeAxes = Axes.Y,
-                    Width = 60,
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                     Margin = new MarginPadding(10),
-                    Child = new Sprite
-                    {
-                        FillMode = FillMode.Fit,
-                        RelativeSizeAxes = Axes.Both,
-                        Anchor = Anchor.CentreRight,
-                        Origin = Anchor.CentreRight,
-                        Texture = textures.Get($"mods/{mods}"),
-                    }
+                    Width = 60,
+                    RelativeSizeAxes = Axes.Y,
                 });
             }
         }

@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -73,7 +74,8 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 new TableColumn(string.Empty, Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
                 new TableColumn("Time", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-                new TableColumn("Attributes", Anchor.Centre),
+                new TableColumn(),
+                new TableColumn("Attributes", Anchor.CentreLeft),
             };
 
             return columns.ToArray();
@@ -89,33 +91,45 @@ namespace osu.Game.Screens.Edit.Timing
             },
             new OsuSpriteText
             {
-                Text = $"{group.Time:n0}ms",
+                Text = group.Time.ToEditorFormattedString(),
                 Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
             },
+            null,
             new ControlGroupAttributes(group),
         };
 
         private class ControlGroupAttributes : CompositeDrawable
         {
-            private readonly IBindableList<ControlPoint> controlPoints;
+            private readonly IBindableList<ControlPoint> controlPoints = new BindableList<ControlPoint>();
 
             private readonly FillFlowContainer fill;
 
             public ControlGroupAttributes(ControlPointGroup group)
             {
+                RelativeSizeAxes = Axes.Both;
                 InternalChild = fill = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
-                    Padding = new MarginPadding(10),
                     Spacing = new Vector2(2)
                 };
 
-                controlPoints = group.ControlPoints.GetBoundCopy();
-                controlPoints.ItemsAdded += _ => createChildren();
-                controlPoints.ItemsRemoved += _ => createChildren();
+                controlPoints.BindTo(group.ControlPoints);
+            }
 
+            [Resolved]
+            private OsuColour colours { get; set; }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
                 createChildren();
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                controlPoints.CollectionChanged += (_, __) => createChildren();
             }
 
             private void createChildren()
@@ -125,20 +139,25 @@ namespace osu.Game.Screens.Edit.Timing
 
             private Drawable createAttribute(ControlPoint controlPoint)
             {
+                Color4 colour = controlPoint.GetRepresentingColour(colours);
+
                 switch (controlPoint)
                 {
                     case TimingControlPoint timing:
-                        return new RowAttribute("timing", () => $"{60000 / timing.BeatLength:n1}bpm {timing.TimeSignature}");
+                        return new RowAttribute("timing", () => $"{60000 / timing.BeatLength:n1}bpm {timing.TimeSignature}", colour);
 
                     case DifficultyControlPoint difficulty:
 
-                        return new RowAttribute("difficulty", () => $"{difficulty.SpeedMultiplier:n2}x");
+                        return new RowAttribute("difficulty", () => $"{difficulty.SpeedMultiplier:n2}x", colour);
 
                     case EffectControlPoint effect:
-                        return new RowAttribute("effect", () => $"{(effect.KiaiMode ? "Kiai " : "")}{(effect.OmitFirstBarLine ? "NoBarLine " : "")}");
+                        return new RowAttribute("effect", () => string.Join(" ",
+                            effect.KiaiMode ? "Kiai" : string.Empty,
+                            effect.OmitFirstBarLine ? "NoBarLine" : string.Empty
+                        ).Trim(), colour);
 
                     case SampleControlPoint sample:
-                        return new RowAttribute("sample", () => $"{sample.SampleBank} {sample.SampleVolume}%");
+                        return new RowAttribute("sample", () => $"{sample.SampleBank} {sample.SampleVolume}%", colour);
                 }
 
                 return null;
@@ -164,6 +183,9 @@ namespace osu.Game.Screens.Edit.Timing
             private readonly Box hoveredBackground;
 
             [Resolved]
+            private EditorClock clock { get; set; }
+
+            [Resolved]
             private Bindable<ControlPointGroup> selectedGroup { get; set; }
 
             public RowBackground(ControlPointGroup controlGroup)
@@ -186,7 +208,11 @@ namespace osu.Game.Screens.Edit.Timing
                     },
                 };
 
-                Action = () => selectedGroup.Value = controlGroup;
+                Action = () =>
+                {
+                    selectedGroup.Value = controlGroup;
+                    clock.SeekSmoothlyTo(controlGroup.Time);
+                };
             }
 
             private Color4 colourHover;

@@ -5,6 +5,7 @@ using System;
 using Newtonsoft.Json;
 using osu.Framework.IO.Network;
 using osu.Framework.Logging;
+using osu.Game.Users;
 
 namespace osu.Game.Online.API
 {
@@ -56,10 +57,15 @@ namespace osu.Game.Online.API
 
         protected virtual WebRequest CreateWebRequest() => new OsuWebRequest(Uri);
 
-        protected virtual string Uri => $@"{API.Endpoint}/api/v2/{Target}";
+        protected virtual string Uri => $@"{API.APIEndpointUrl}/api/v2/{Target}";
 
         protected APIAccess API;
         protected WebRequest WebRequest;
+
+        /// <summary>
+        /// The currently logged in user. Note that this will only be populated during <see cref="Perform"/>.
+        /// </summary>
+        protected User User { get; private set; }
 
         /// <summary>
         /// Invoked on successful completion of an API request.
@@ -86,6 +92,7 @@ namespace osu.Game.Online.API
             }
 
             API = apiAccess;
+            User = apiAccess.LocalUser.Value;
 
             if (checkAndScheduleFailure())
                 return;
@@ -124,19 +131,24 @@ namespace osu.Game.Online.API
         {
         }
 
+        private bool succeeded;
+
         internal virtual void TriggerSuccess()
         {
+            succeeded = true;
             Success?.Invoke();
+        }
+
+        internal void TriggerFailure(Exception e)
+        {
+            Failure?.Invoke(e);
         }
 
         public void Cancel() => Fail(new OperationCanceledException(@"Request cancelled"));
 
         public void Fail(Exception e)
         {
-            if (WebRequest?.Completed == true)
-                return;
-
-            if (cancelled)
+            if (succeeded || cancelled)
                 return;
 
             cancelled = true;
@@ -159,7 +171,7 @@ namespace osu.Game.Online.API
             }
 
             Logger.Log($@"Failing request {this} ({e})", LoggingTarget.Network);
-            pendingFailure = () => Failure?.Invoke(e);
+            pendingFailure = () => TriggerFailure(e);
             checkAndScheduleFailure();
         }
 
@@ -169,9 +181,13 @@ namespace osu.Game.Online.API
         /// <returns>Whether we are in a failed or cancelled state.</returns>
         private bool checkAndScheduleFailure()
         {
-            if (API == null || pendingFailure == null) return cancelled;
+            if (pendingFailure == null) return cancelled;
 
-            API.Schedule(pendingFailure);
+            if (API == null)
+                pendingFailure();
+            else
+                API.Schedule(pendingFailure);
+
             pendingFailure = null;
             return true;
         }

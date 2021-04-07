@@ -96,6 +96,26 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
+        public void TestOutOfOrderStartTimes()
+        {
+            var decoder = new LegacyStoryboardDecoder();
+
+            using (var resStream = TestResources.OpenResource("out-of-order-starttimes.osb"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var storyboard = decoder.Decode(stream);
+
+                StoryboardLayer background = storyboard.Layers.Single(l => l.Depth == 3);
+                Assert.AreEqual(2, background.Elements.Count);
+
+                Assert.AreEqual(1500, background.Elements[0].StartTime);
+                Assert.AreEqual(1000, background.Elements[1].StartTime);
+
+                Assert.AreEqual(1000, storyboard.EarliestEventTime);
+            }
+        }
+
+        [Test]
         public void TestDecodeVariableWithSuffix()
         {
             var decoder = new LegacyStoryboardDecoder();
@@ -107,6 +127,26 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
                 StoryboardLayer background = storyboard.Layers.Single(l => l.Depth == 3);
                 Assert.AreEqual(3456, ((StoryboardSprite)background.Elements.Single()).InitialPosition.X);
+            }
+        }
+
+        [Test]
+        public void TestDecodeOutOfRangeLoopAnimationType()
+        {
+            var decoder = new LegacyStoryboardDecoder();
+
+            using (var resStream = TestResources.OpenResource("animation-types.osb"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var storyboard = decoder.Decode(stream);
+
+                StoryboardLayer foreground = storyboard.Layers.Single(l => l.Depth == 0);
+                Assert.AreEqual(AnimationLoopType.LoopForever, ((StoryboardAnimation)foreground.Elements[0]).LoopType);
+                Assert.AreEqual(AnimationLoopType.LoopOnce, ((StoryboardAnimation)foreground.Elements[1]).LoopType);
+                Assert.AreEqual(AnimationLoopType.LoopForever, ((StoryboardAnimation)foreground.Elements[2]).LoopType);
+                Assert.AreEqual(AnimationLoopType.LoopOnce, ((StoryboardAnimation)foreground.Elements[3]).LoopType);
+                Assert.AreEqual(AnimationLoopType.LoopForever, ((StoryboardAnimation)foreground.Elements[4]).LoopType);
+                Assert.AreEqual(AnimationLoopType.LoopForever, ((StoryboardAnimation)foreground.Elements[5]).LoopType);
             }
         }
     }
