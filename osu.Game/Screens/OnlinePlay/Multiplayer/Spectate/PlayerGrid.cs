@@ -1,16 +1,25 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
+    /// <summary>
+    /// A grid of players playing the multiplayer match.
+    /// </summary>
     public partial class PlayerGrid : CompositeDrawable
     {
         private const float player_spacing = 5;
 
+        /// <summary>
+        /// The currently-maximised facade.
+        /// </summary>
         public Drawable MaximisedFacade => maximisedFacade;
 
         private readonly Facade maximisedFacade;
@@ -52,6 +61,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// <exception cref="InvalidOperationException">If more than 16 cells are added.</exception>
         public void Add(Drawable content)
         {
+            if (cellContainer.Count == 16)
+                throw new InvalidOperationException("Only 16 cells are supported.");
+
             int index = cellContainer.Count;
 
             var facade = new Facade();
@@ -99,6 +111,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         {
             base.Update();
 
+            // Different layouts are used for varying cell counts in order to maximise dimensions.
             Vector2 cellsPerDimension;
 
             switch (facadeContainer.Count)
@@ -141,7 +154,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                     break;
             }
 
-            // Total spacing between cells
+            // Total inter-cell spacing.
             Vector2 totalCellSpacing = player_spacing * (cellsPerDimension - Vector2.One);
 
             Vector2 fullSize = paddingContainer.ChildSize - totalCellSpacing;

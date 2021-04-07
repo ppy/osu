@@ -12,6 +12,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
     public partial class PlayerGrid
     {
+        /// <summary>
+        /// A cell of the grid. Contains the content and tracks to the linked facade.
+        /// </summary>
         private class Cell : CompositeDrawable
         {
             /// <summary>
@@ -24,7 +27,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             /// </summary>
             public readonly Drawable Content;
 
+            /// <summary>
+            /// An action that toggles the maximisation state of this cell.
+            /// </summary>
             public Action<Cell> ToggleMaximisationState;
+
+            /// <summary>
+            /// Whether this cell is currently maximised.
+            /// </summary>
             public bool IsMaximised;
 
             private Facade facade;
