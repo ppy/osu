@@ -184,12 +184,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             InputManager.Click(MouseButton.Left);
         });
 
-        private void addClickReadyButtonStep() => AddStep("click ready button", () =>
-        {
-            InputManager.MoveMouseTo(readyButton);
-            InputManager.Click(MouseButton.Left);
-        });
-
         private void assertSpectateButtonEnablement(bool shouldBeEnabled)
             => AddAssert($"spectate button {(shouldBeEnabled ? "is" : "is not")} enabled", () => spectateButton.ChildrenOfType<OsuButton>().Single().Enabled.Value == shouldBeEnabled);
 
