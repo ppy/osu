@@ -27,7 +27,11 @@ namespace osu.Game.Input.Bindings
                 handler = game;
         }
 
-        public override IEnumerable<IKeyBinding> DefaultKeyBindings => GlobalKeyBindings.Concat(InGameKeyBindings).Concat(AudioControlKeyBindings).Concat(EditorKeyBindings);
+        public override IEnumerable<IKeyBinding> DefaultKeyBindings => GlobalKeyBindings
+                                                                       .Concat(EditorKeyBindings)
+                                                                       .Concat(InGameKeyBindings)
+                                                                       .Concat(SongSelectKeyBindings)
+                                                                       .Concat(AudioControlKeyBindings);
 
         public IEnumerable<KeyBinding> GlobalKeyBindings => new[]
         {
@@ -78,6 +82,14 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.MouseMiddle, GlobalAction.PauseGameplay),
             new KeyBinding(InputKey.Space, GlobalAction.TogglePauseReplay),
             new KeyBinding(InputKey.Control, GlobalAction.HoldForHUD),
+        };
+
+        public IEnumerable<KeyBinding> SongSelectKeyBindings => new[]
+        {
+            new KeyBinding(InputKey.F1, GlobalAction.ToggleModSelection),
+            new KeyBinding(InputKey.F2, GlobalAction.SelectNextRandom),
+            new KeyBinding(new[] { InputKey.Shift, InputKey.F2 }, GlobalAction.SelectPreviousRandom),
+            new KeyBinding(InputKey.F3, GlobalAction.ToggleBeatmapOptions)
         };
 
         public IEnumerable<KeyBinding> AudioControlKeyBindings => new[]
@@ -217,5 +229,18 @@ namespace osu.Game.Input.Bindings
 
         [Description("Toggle in-game interface")]
         ToggleInGameInterface,
+
+        // Song select keybindings
+        [Description("Toggle Mod Select")]
+        ToggleModSelection,
+
+        [Description("Random")]
+        SelectNextRandom,
+
+        [Description("Rewind")]
+        SelectPreviousRandom,
+
+        [Description("Beatmap Options")]
+        ToggleBeatmapOptions,
     }
 }
