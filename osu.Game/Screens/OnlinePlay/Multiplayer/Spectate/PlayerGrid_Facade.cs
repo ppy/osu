@@ -7,9 +7,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
     public partial class PlayerGrid
     {
-        private class PlayerGridFacade : Drawable
+        /// <summary>
+        /// A facade of the grid which is used as a dummy object to store the required position/size of cells.
+        /// </summary>
+        private class Facade : Drawable
         {
-            public PlayerGridFacade()
+            public Facade()
             {
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;

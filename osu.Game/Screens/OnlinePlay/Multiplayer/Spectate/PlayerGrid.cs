@@ -13,9 +13,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         public Drawable MaximisedFacade => maximisedFacade;
 
-        private readonly PlayerGridFacade maximisedFacade;
+        private readonly Facade maximisedFacade;
         private readonly Container paddingContainer;
-        private readonly FillFlowContainer<PlayerGridFacade> facadeContainer;
+        private readonly FillFlowContainer<Facade> facadeContainer;
         private readonly Container<Cell> cellContainer;
 
         public PlayerGrid()
@@ -31,30 +31,42 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Child = facadeContainer = new FillFlowContainer<PlayerGridFacade>
+                            Child = facadeContainer = new FillFlowContainer<Facade>
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
                                 Spacing = new Vector2(player_spacing),
                             }
                         },
-                        maximisedFacade = new PlayerGridFacade { RelativeSizeAxes = Axes.Both }
+                        maximisedFacade = new Facade { RelativeSizeAxes = Axes.Both }
                     }
                 },
                 cellContainer = new Container<Cell> { RelativeSizeAxes = Axes.Both }
             };
         }
 
-        public void AddContent(Drawable content)
+        /// <summary>
+        /// Adds a new cell with content to this grid.
+        /// </summary>
+        /// <param name="content">The content the cell should contain.</param>
+        /// <exception cref="InvalidOperationException">If more than 16 cells are added.</exception>
+        public void Add(Drawable content)
         {
-            var facade = new PlayerGridFacade();
+            int index = cellContainer.Count;
+
+            var facade = new Facade();
             facadeContainer.Add(facade);
 
-            var cell = new Cell(content) { ToggleMaximisationState = toggleMaximisationState };
+            var cell = new Cell(index, content) { ToggleMaximisationState = toggleMaximisationState };
             cell.SetFacade(facade);
 
             cellContainer.Add(cell);
         }
+
+        /// <summary>
+        /// The content added to this grid.
+        /// </summary>
+        public IEnumerable<Drawable> Content => cellContainer.OrderBy(c => c.FacadeIndex).Select(c => c.Content);
 
         // A depth value that gets decremented every time a new instance is maximised in order to reduce underlaps.
         private float maximisedInstanceDepth;
@@ -62,7 +74,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private void toggleMaximisationState(Cell target)
         {
             // Iterate through all cells to ensure only one is maximised at any time.
-            foreach (var i in cellContainer)
+            foreach (var i in cellContainer.ToList())
             {
                 if (i == target)
                     i.IsMaximised = !i.IsMaximised;
@@ -78,7 +90,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 else
                 {
                     // Transfer cell back to its original facade.
-                    i.SetFacade(facadeContainer[cellContainer.IndexOf(target)]);
+                    i.SetFacade(facadeContainer[i.FacadeIndex]);
                 }
             }
         }
