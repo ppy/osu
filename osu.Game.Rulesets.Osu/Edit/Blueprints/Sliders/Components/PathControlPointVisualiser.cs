@@ -167,13 +167,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             switch (type)
             {
                 case PathType.PerfectCurve:
-                    if (piece.PointsInSegment.Count > 3)
-                    {
-                        // Can't always create a circular arc out of 4 or more points,
-                        // so we split the segment into one 3-point circular arc segment
-                        // and one bezier segment.
-                        piece.PointsInSegment[indexInSegment + 2].Type.Value = PathType.Bezier;
-                    }
+                    // Can't always create a circular arc out of 4 or more points,
+                    // so we split the segment into one 3-point circular arc segment
+                    // and one bezier segment.
+                    int thirdPointIndex = indexInSegment + 2;
+
+                    if (piece.PointsInSegment.Count > thirdPointIndex + 1)
+                        piece.PointsInSegment[thirdPointIndex].Type.Value = PathType.Bezier;
 
                     break;
             }
