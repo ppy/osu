@@ -9,7 +9,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
-using osu.Game.Online.Rooms;
 using osu.Game.Online.Spectator;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Spectate;
@@ -29,20 +28,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         [Resolved]
         private SpectatorStreamingClient spectatorClient { get; set; }
 
-        private readonly int[] userIds;
         private readonly PlayerInstance[] instances;
-
         private PlayerGrid grid;
 
-        public MultiplayerSpectator(PlaylistItem playlistItem, int[] userIds)
-            : this(userIds.AsSpan().Slice(0, Math.Min(16, userIds.Length)).ToArray())
+        public MultiplayerSpectator(int[] userIds)
+            : base(userIds.AsSpan().Slice(0, Math.Min(16, userIds.Length)).ToArray())
         {
-        }
-
-        private MultiplayerSpectator(int[] userIds)
-            : base(userIds)
-        {
-            this.userIds = userIds;
             instances = new PlayerInstance[userIds.Length];
         }
 
@@ -141,6 +132,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             spectatorClient.StopWatchingUser(userId);
         }
 
-        private int getIndexForUser(int userId) => Array.IndexOf(userIds, userId);
+        private int getIndexForUser(int userId) => Array.IndexOf(UserIds, userId);
     }
 }
