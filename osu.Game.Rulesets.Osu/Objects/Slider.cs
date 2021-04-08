@@ -81,6 +81,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public List<IList<HitSampleInfo>> NodeSamples { get; set; } = new List<IList<HitSampleInfo>>();
 
+        [JsonIgnore]
         public IList<HitSampleInfo> OriginalSamples { get; private set; }
 
         private int repeatCount;
