@@ -50,7 +50,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         [Resolved]
         private OsuColour colours { get; set; }
 
-        private IBindable<int> sliderVersion;
         private IBindable<Vector2> sliderPosition;
         private IBindable<float> sliderScale;
         private IBindable<Vector2> controlPointPosition;
@@ -59,20 +58,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             this.slider = slider;
             ControlPoint = controlPoint;
-            var pathTypes = new List<IBindable<PathType?>>();
 
-            slider.Path.ControlPoints.BindCollectionChanged((_, args) =>
+            slider.Path.Version.BindValueChanged(_ =>
             {
-                pathTypes.Clear();
-
-                foreach (var point in slider.Path.ControlPoints)
-                {
-                    IBindable<PathType?> boundTypeCopy = point.Type.GetBoundCopy();
-                    pathTypes.Add(boundTypeCopy);
-                    boundTypeCopy.BindValueChanged(_ => PointsInSegment = slider.Path.PointsInSegment(controlPoint));
-                }
-
-                PointsInSegment = slider.Path.PointsInSegment(controlPoint);
+                PointsInSegment = slider.Path.PointsInSegment(ControlPoint);
+                updatePathType();
             }, runOnceImmediately: true);
 
             controlPoint.Type.BindValueChanged(_ => updateMarkerDisplay());
@@ -119,9 +109,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            sliderVersion = slider.Path.Version.GetBoundCopy();
-            sliderVersion.BindValueChanged(_ => updatePathType());
 
             sliderPosition = slider.PositionBindable.GetBoundCopy();
             sliderPosition.BindValueChanged(_ => updateMarkerDisplay());
