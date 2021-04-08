@@ -75,6 +75,19 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             cellContainer.Add(cell);
         }
 
+        public void Remove(Drawable content)
+        {
+            var cell = cellContainer.FirstOrDefault(c => c.Content == content);
+            if (cell == null)
+                return;
+
+            if (cell.IsMaximised)
+                toggleMaximisationState(cell);
+
+            cellContainer.Remove(cell);
+            facadeContainer.Remove(facadeContainer[cell.FacadeIndex]);
+        }
+
         /// <summary>
         /// The content added to this grid.
         /// </summary>
