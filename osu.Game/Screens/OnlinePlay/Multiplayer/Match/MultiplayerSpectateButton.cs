@@ -68,16 +68,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             {
                 default:
                     button.Text = "Spectate";
-                    button.BackgroundColour = colours.Blue;
-                    button.Triangles.ColourDark = colours.Blue;
-                    button.Triangles.ColourLight = colours.BlueLight;
+                    button.BackgroundColour = colours.BlueDark;
+                    button.Triangles.ColourDark = colours.BlueDarker;
+                    button.Triangles.ColourLight = colours.Blue;
                     break;
 
                 case MultiplayerUserState.Spectating:
                     button.Text = "Stop spectating";
-                    button.BackgroundColour = colours.Red;
-                    button.Triangles.ColourDark = colours.Red;
-                    button.Triangles.ColourLight = colours.RedLight;
+                    button.BackgroundColour = colours.Gray4;
+                    button.Triangles.ColourDark = colours.Gray5;
+                    button.Triangles.ColourLight = colours.Gray6;
                     break;
             }
 
