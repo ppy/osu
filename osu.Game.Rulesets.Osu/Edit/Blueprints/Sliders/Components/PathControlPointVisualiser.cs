@@ -162,6 +162,22 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         /// <param name="type">The path type we want to assign to the given control point piece.</param>
         private void updatePathType(PathControlPointPiece piece, PathType? type)
         {
+            int indexInSegment = piece.PointsInSegment.IndexOf(piece.ControlPoint);
+
+            switch (type)
+            {
+                case PathType.PerfectCurve:
+                    if (piece.PointsInSegment.Count > 3)
+                    {
+                        // Can't always create a circular arc out of 4 or more points,
+                        // so we split the segment into one 3-point circular arc segment
+                        // and one bezier segment.
+                        piece.PointsInSegment[indexInSegment + 2].Type.Value = PathType.Bezier;
+                    }
+
+                    break;
+            }
+
             piece.ControlPoint.Type.Value = type;
         }
 
