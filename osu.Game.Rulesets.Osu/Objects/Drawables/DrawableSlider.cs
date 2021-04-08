@@ -111,17 +111,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.LoadSamples();
 
-            var firstSample = HitObject.OriginalSamples.FirstOrDefault();
+            var slidingSamples = new List<ISampleInfo>();
 
-            if (firstSample != null)
-            {
-                var samples = new List<ISampleInfo> { HitObject.SampleControlPoint.ApplyTo(firstSample).With("sliderslide") };
+            var normalSample = HitObject.OriginalSamples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
+            if (normalSample != null)
+                slidingSamples.Add(HitObject.SampleControlPoint.ApplyTo(normalSample).With("sliderslide"));
 
-                if (HitObject.OriginalSamples.Any(s => s.Name == HitSampleInfo.HIT_WHISTLE))
-                    samples.Add(HitObject.SampleControlPoint.ApplyTo(firstSample).With("sliderwhistle"));
+            var whistleSample = HitObject.OriginalSamples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_WHISTLE);
+            if (whistleSample != null)
+                slidingSamples.Add(HitObject.SampleControlPoint.ApplyTo(whistleSample).With("sliderwhistle"));
 
-                slidingSample.Samples = samples.ToArray();
-            }
+            slidingSample.Samples = slidingSamples.ToArray();
         }
 
         public override void StopAllSamples()
