@@ -152,10 +152,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
         private void assertControlPointPathType(int controlPointIndex, PathType? type)
         {
-            AddAssert($"point {controlPointIndex} is {type}", () =>
-            {
-                return slider.Path.ControlPoints[controlPointIndex].Type.Value == type;
-            });
+            AddAssert($"point {controlPointIndex} is {type}", () => slider.Path.ControlPoints[controlPointIndex].Type.Value == type);
         }
 
         private void addContextMenuItemStep(string contextMenuText)
