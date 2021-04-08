@@ -25,6 +25,12 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 },
                 new SettingsCheckbox
                 {
+                    LabelText = "总是隐藏输入指示器",
+                    TooltipText = "如果你的窗口经常无缘无故进入编辑状态,或者只是觉得弹出来烦,那么我建议勾选此项",
+                    Current = config.GetBindable<bool>(MSetting.AlwaysHideTextIndicator)
+                },
+                new SettingsCheckbox
+                {
                     LabelText = "启用三角形粒子动画",
                     Current = config.GetBindable<bool>(MSetting.TrianglesEnabled)
                 },

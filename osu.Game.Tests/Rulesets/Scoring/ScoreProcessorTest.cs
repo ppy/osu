@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(ScoringMode.Standardised, HitResult.Miss, HitResult.Great, 0)] // (3 * 0) / (4 * 300) * 300_000 + (0 / 4) * 700_000
         [TestCase(ScoringMode.Standardised, HitResult.Meh, HitResult.Great, 387_500)] // (3 * 50) / (4 * 300) * 300_000 + (2 / 4) * 700_000
         [TestCase(ScoringMode.Standardised, HitResult.Ok, HitResult.Great, 425_000)] // (3 * 100) / (4 * 300) * 300_000 + (2 / 4) * 700_000
-        [TestCase(ScoringMode.Standardised, HitResult.Good, HitResult.Perfect, 478_571)] // (3 * 200) / (4 * 350) * 300_000 + (2 / 4) * 700_000
+        [TestCase(ScoringMode.Standardised, HitResult.Good, HitResult.Perfect, 492_857)] // (3 * 200) / (4 * 350) * 300_000 + (2 / 4) * 700_000
         [TestCase(ScoringMode.Standardised, HitResult.Great, HitResult.Great, 575_000)] // (3 * 300) / (4 * 300) * 300_000 + (2 / 4) * 700_000
         [TestCase(ScoringMode.Standardised, HitResult.Perfect, HitResult.Perfect, 575_000)] // (3 * 350) / (4 * 350) * 300_000 + (2 / 4) * 700_000
         [TestCase(ScoringMode.Standardised, HitResult.SmallTickMiss, HitResult.SmallTickHit, 700_000)] // (3 * 0) / (4 * 10) * 300_000 + 700_000 (max combo 0)
@@ -89,7 +89,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(ScoringMode.Classic, HitResult.Miss, HitResult.Great, 0)] // (0 * 4 * 300) * (1 + 0 / 25)
         [TestCase(ScoringMode.Classic, HitResult.Meh, HitResult.Great, 156)] // (((3 * 50) / (4 * 300)) * 4 * 300) * (1 + 1 / 25)
         [TestCase(ScoringMode.Classic, HitResult.Ok, HitResult.Great, 312)] // (((3 * 100) / (4 * 300)) * 4 * 300) * (1 + 1 / 25)
-        [TestCase(ScoringMode.Classic, HitResult.Good, HitResult.Perfect, 535)] // (((3 * 200) / (4 * 350)) * 4 * 300) * (1 + 1 / 25)
+        [TestCase(ScoringMode.Classic, HitResult.Good, HitResult.Perfect, 594)] // (((3 * 200) / (4 * 350)) * 4 * 300) * (1 + 1 / 25)
         [TestCase(ScoringMode.Classic, HitResult.Great, HitResult.Great, 936)] // (((3 * 300) / (4 * 300)) * 4 * 300) * (1 + 1 / 25)
         [TestCase(ScoringMode.Classic, HitResult.Perfect, HitResult.Perfect, 936)] // (((3 * 350) / (4 * 350)) * 4 * 300) * (1 + 1 / 25)
         [TestCase(ScoringMode.Classic, HitResult.SmallTickMiss, HitResult.SmallTickHit, 0)] // (0 * 1 * 300) * (1 + 0 / 25)

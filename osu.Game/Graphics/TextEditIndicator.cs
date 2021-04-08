@@ -21,7 +21,8 @@ namespace osu.Game.Graphics
         private readonly OsuSpriteText spriteText;
         private readonly ProgressBar bg;
         private readonly Box flashBox;
-        private readonly BindableBool optUI = new BindableBool();
+        private IBindable<bool> optUI;
+        private IBindable<bool> alwaysHide;
         private readonly FillFlowContainer placeHolderContainer;
         private readonly Circle bar;
 
@@ -57,8 +58,7 @@ namespace osu.Game.Graphics
                 {
                     Schedule(() =>
                     {
-                        if (bar.Width != 0.8f)
-                            abortTimeoutHide(true);
+                        abortTimeoutHide(true);
 
                         placeHolderContainer.FadeOut(150);
                         spriteText.FadeIn(150);
@@ -73,15 +73,11 @@ namespace osu.Game.Graphics
             }
         }
 
-        private void executeTimeoutHide()
-        {
+        private void executeTimeoutHide() =>
             bar.ResizeWidthTo(0, 3000).OnComplete(_ => Hide());
-        }
 
-        private void abortTimeoutHide(bool animate)
-        {
+        private void abortTimeoutHide(bool animate) =>
             bar.ResizeWidthTo(0.8f, animate ? 300 : 0, Easing.OutQuint);
-        }
 
         public TextEditIndicator()
         {
@@ -193,12 +189,18 @@ namespace osu.Game.Graphics
         [BackgroundDependencyLoader]
         private void load(MConfigManager config)
         {
-            config.BindWith(MSetting.OptUI, optUI);
+            optUI = config.GetBindable<bool>(MSetting.OptUI);
+            alwaysHide = config.GetBindable<bool>(MSetting.AlwaysHideTextIndicator);
 
             optUI.BindValueChanged(v =>
             {
                 if (!v.NewValue) Hide();
                 else if (!string.IsNullOrEmpty(Text)) Show();
+            });
+
+            alwaysHide.BindValueChanged(v =>
+            {
+                if (v.NewValue) Hide();
             });
         }
 
@@ -210,7 +212,7 @@ namespace osu.Game.Graphics
 
         public override void Show()
         {
-            if (!optUI.Value) return;
+            if (!optUI.Value || alwaysHide.Value) return;
 
             base.Show();
         }
@@ -220,7 +222,7 @@ namespace osu.Game.Graphics
             var emptyText = string.IsNullOrEmpty(Text);
             abortTimeoutHide(!emptyText);
 
-            //在w10下
+            //在某些系统下窗口会莫名进入编辑状态，此时因为没有文本，所以执行隐藏计时
             if (emptyText)
                 executeTimeoutHide();
 

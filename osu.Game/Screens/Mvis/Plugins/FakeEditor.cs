@@ -94,7 +94,7 @@ namespace osu.Game.Screens.Mvis.Plugins
 
             if (EditorClock == null)
             {
-                AddInternal(EditorClock = new EditorClock(beatmap, beatDivisor)
+                AddInternal(EditorClock = new EditorClock(beatmap.GetPlayableBeatmap(beatmap.BeatmapInfo.Ruleset), beatDivisor)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

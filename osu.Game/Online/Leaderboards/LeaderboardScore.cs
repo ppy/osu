@@ -66,6 +66,9 @@ namespace osu.Game.Online.Leaderboards
         [Resolved(CanBeNull = true)]
         private SongSelect songSelect { get; set; }
 
+        [Resolved]
+        private ScoreManager scoreManager { get; set; }
+
         public LeaderboardScore(ScoreInfo score, int? rank, bool allowHighlight = true, bool isSongSelect = false)
         {
             this.score = score;
@@ -410,6 +413,9 @@ namespace osu.Game.Online.Leaderboards
 
                 if (score.Mods.Length > 0 && modsContainer.Any(s => s.IsHovered) && songSelect != null)
                     items.Add(new OsuMenuItem("使用这些mod游玩", MenuItemType.Highlighted, () => songSelect.Mods.Value = score.Mods));
+
+                if (score.Files?.Count > 0)
+                    items.Add(new OsuMenuItem("Export", MenuItemType.Standard, () => scoreManager.Export(score)));
 
                 if (score.ID != 0)
                     items.Add(new OsuMenuItem("删除", MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(score))));
