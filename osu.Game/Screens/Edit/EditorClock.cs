@@ -42,12 +42,12 @@ namespace osu.Game.Screens.Edit
         /// </summary>
         public bool IsSeeking { get; private set; }
 
-        public EditorClock(WorkingBeatmap beatmap, BindableBeatDivisor beatDivisor)
-            : this(beatmap.Beatmap.ControlPointInfo, beatmap.Track.Length, beatDivisor)
+        public EditorClock(IBeatmap beatmap, BindableBeatDivisor beatDivisor)
+            : this(beatmap.ControlPointInfo, beatDivisor)
         {
         }
 
-        public EditorClock(ControlPointInfo controlPointInfo, double trackLength, BindableBeatDivisor beatDivisor)
+        public EditorClock(ControlPointInfo controlPointInfo, BindableBeatDivisor beatDivisor)
         {
             this.beatDivisor = beatDivisor;
 
@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Edit
         }
 
         public EditorClock()
-            : this(new ControlPointInfo(), 1000, new BindableBeatDivisor())
+            : this(new ControlPointInfo(), new BindableBeatDivisor())
         {
         }
 
