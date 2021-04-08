@@ -135,6 +135,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                     icon.Colour = colours.BlueLighter;
                     break;
 
+                case MultiplayerUserState.Spectating:
+                    text.Text = "spectating";
+                    icon.Icon = FontAwesome.Solid.Binoculars;
+                    icon.Colour = colours.BlueLight;
+                    break;
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(state), state, null);
             }
