@@ -27,6 +27,6 @@ namespace osu.Game.Online.Solo
             return req;
         }
 
-        protected override string Target => $@"solo/{beatmapId}/scores";
+        protected override string Target => $@"beatmaps/{beatmapId}/solo/scores";
     }
 }
