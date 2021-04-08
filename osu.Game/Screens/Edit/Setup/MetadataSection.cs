@@ -5,7 +5,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Screens.Edit.Setup
@@ -17,15 +17,13 @@ namespace osu.Game.Screens.Edit.Setup
         private LabelledTextBox creatorTextBox;
         private LabelledTextBox difficultyTextBox;
 
+        public override LocalisableString Title => "谱面元数据";
+
         [BackgroundDependencyLoader]
         private void load()
         {
             Children = new Drawable[]
             {
-                new OsuSpriteText
-                {
-                    Text = "谱面元数据"
-                },
                 artistTextBox = new LabelledTextBox
                 {
                     Label = "艺术家",

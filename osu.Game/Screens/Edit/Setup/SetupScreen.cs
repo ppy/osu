@@ -13,16 +13,24 @@ namespace osu.Game.Screens.Edit.Setup
 {
     public class SetupScreen : EditorScreen
     {
+        public const int HORIZONTAL_PADDING = 100;
+
         [Resolved]
         private OsuColour colours { get; set; }
 
         [Cached]
         protected readonly OverlayColourProvider ColourProvider;
 
+        [Cached]
+        private SectionsContainer<SetupSection> sections = new SectionsContainer<SetupSection>();
+
+        [Cached]
+        private SetupScreenHeader header = new SetupScreenHeader();
+
         public SetupScreen()
             : base(EditorScreenMode.SongSetup)
         {
-            ColourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
+            ColourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
         }
 
         [BackgroundDependencyLoader]
@@ -41,12 +49,12 @@ namespace osu.Game.Screens.Edit.Setup
                     {
                         new Box
                         {
-                            Colour = colours.GreySeafoamDark,
+                            Colour = ColourProvider.Dark4,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        new SectionsContainer<SetupSection>
+                        sections = new SectionsContainer<SetupSection>
                         {
-                            FixedHeader = new SetupScreenHeader(),
+                            FixedHeader = header,
                             RelativeSizeAxes = Axes.Both,
                             Children = new SetupSection[]
                             {
@@ -58,21 +66,6 @@ namespace osu.Game.Screens.Edit.Setup
                     }
                 }
             };
-        }
-    }
-
-    internal class SetupScreenHeader : OverlayHeader
-    {
-        protected override OverlayTitle CreateTitle() => new SetupScreenTitle();
-
-        private class SetupScreenTitle : OverlayTitle
-        {
-            public SetupScreenTitle()
-            {
-                Title = "谱面设置";
-                Description = "change general settings of your beatmap";
-                IconTexture = "Icons/Hexacons/social";
-            }
         }
     }
 }

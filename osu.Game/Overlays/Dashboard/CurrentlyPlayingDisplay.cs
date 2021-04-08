@@ -137,7 +137,7 @@ namespace osu.Game.Overlays.Dashboard
                                 Text = "观看",
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-                                Action = () => game?.PerformFromScreen(s => s.Push(new Spectator(User))),
+                                Action = () => game?.PerformFromScreen(s => s.Push(new SoloSpectator(User))),
                                 Enabled = { Value = User.Id != api.LocalUser.Value.Id }
                             }
                         }

@@ -68,6 +68,8 @@ namespace osu.Game.Tests.Visual.Mvis
                             getBeatmapSetRequest.TriggerSuccess(dummyBeatmapSet);
                     });
                 }
+
+                return true;
             };
         });
 

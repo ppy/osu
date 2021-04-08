@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -12,16 +13,26 @@ namespace osu.Game.Input.Bindings
 {
     public class GlobalActionContainer : DatabasedKeyBindingContainer<GlobalAction>, IHandleGlobalKeyboardInput
     {
+        [CanBeNull]
+        private readonly GlobalInputManager globalInputManager;
+
         private readonly Drawable handler;
 
-        public GlobalActionContainer(OsuGameBase game)
+        public GlobalActionContainer(OsuGameBase game, [CanBeNull] GlobalInputManager globalInputManager)
             : base(matchingMode: KeyCombinationMatchingMode.Modifiers)
         {
+            this.globalInputManager = globalInputManager;
+
             if (game is IKeyBindingHandler<GlobalAction>)
                 handler = game;
         }
 
-        public override IEnumerable<IKeyBinding> DefaultKeyBindings => GlobalKeyBindings.Concat(InGameKeyBindings).Concat(AudioControlKeyBindings).Concat(EditorKeyBindings).Concat(MvisControlKeyBindings);
+        public override IEnumerable<IKeyBinding> DefaultKeyBindings => GlobalKeyBindings
+                                                                       .Concat(EditorKeyBindings)
+                                                                       .Concat(InGameKeyBindings)
+                                                                       .Concat(SongSelectKeyBindings)
+                                                                       .Concat(AudioControlKeyBindings)
+                                                                       .Concat(MvisControlKeyBindings);
 
         public IEnumerable<KeyBinding> MvisControlKeyBindings => new[]
         {
@@ -88,6 +99,14 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.Control, GlobalAction.HoldForHUD),
         };
 
+        public IEnumerable<KeyBinding> SongSelectKeyBindings => new[]
+        {
+            new KeyBinding(InputKey.F1, GlobalAction.ToggleModSelection),
+            new KeyBinding(InputKey.F2, GlobalAction.SelectNextRandom),
+            new KeyBinding(new[] { InputKey.Shift, InputKey.F2 }, GlobalAction.SelectPreviousRandom),
+            new KeyBinding(InputKey.F3, GlobalAction.ToggleBeatmapOptions)
+        };
+
         public IEnumerable<KeyBinding> AudioControlKeyBindings => new[]
         {
             new KeyBinding(new[] { InputKey.Alt, InputKey.Up }, GlobalAction.IncreaseVolume),
@@ -105,8 +124,15 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.F3, GlobalAction.MusicPlay)
         };
 
-        protected override IEnumerable<Drawable> KeyBindingInputQueue =>
-            handler == null ? base.KeyBindingInputQueue : base.KeyBindingInputQueue.Prepend(handler);
+        protected override IEnumerable<Drawable> KeyBindingInputQueue
+        {
+            get
+            {
+                var inputQueue = globalInputManager?.NonPositionalInputQueue ?? base.KeyBindingInputQueue;
+
+                return handler != null ? inputQueue.Prepend(handler) : inputQueue;
+            }
+        }
     }
 
     public enum GlobalAction
@@ -247,6 +273,19 @@ namespace osu.Game.Input.Bindings
         ToggleInGameInterface,
 
         [Description("打开插件列表")]
-        MvisTogglePluginPage
+        MvisTogglePluginPage,
+
+        // Song select keybindings
+        [Description("切换Mod选择")]
+        ToggleModSelection,
+
+        [Description("随机选择")]
+        SelectNextRandom,
+
+        [Description("撤销随机")]
+        SelectPreviousRandom,
+
+        [Description("谱面选项")]
+        ToggleBeatmapOptions,
     }
 }

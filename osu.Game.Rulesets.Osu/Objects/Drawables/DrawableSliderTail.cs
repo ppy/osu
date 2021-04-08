@@ -26,6 +26,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// </summary>
         public override bool DisplayResult => false;
 
+        /// <summary>
+        /// Whether the hit samples only play on successful hits.
+        /// If <c>false</c>, the hit samples will also play on misses.
+        /// </summary>
+        public bool SamplePlaysOnlyOnHit { get; set; } = true;
+
         public bool Tracking { get; set; }
 
         private SkinnableDrawable circlePiece;

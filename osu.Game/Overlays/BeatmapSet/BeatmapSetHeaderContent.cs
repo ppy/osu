@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Configuration;
@@ -252,8 +253,8 @@ namespace osu.Game.Overlays.BeatmapSet
 
                     loading.Hide();
 
-                    title.Text = setInfo.NewValue.Metadata.Title ?? string.Empty;
-                    artist.Text = setInfo.NewValue.Metadata.Artist ?? string.Empty;
+                    title.Text = new RomanisableString(setInfo.NewValue.Metadata.TitleUnicode, setInfo.NewValue.Metadata.Title);
+                    artist.Text = new RomanisableString(setInfo.NewValue.Metadata.ArtistUnicode, setInfo.NewValue.Metadata.Artist);
 
                     explicitContentPill.Alpha = setInfo.NewValue.OnlineInfo.HasExplicitContent ? 1 : 0;
 

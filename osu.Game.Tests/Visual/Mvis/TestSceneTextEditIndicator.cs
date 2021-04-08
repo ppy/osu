@@ -40,6 +40,12 @@ namespace osu.Game.Tests.Visual.Mvis
                 indicator.Show();
             });
             AddStep("Flash", indicator.Flash);
+            AddStep("Test", () =>
+            {
+                indicator.Text = "测试";
+                indicator.Text = string.Empty;
+                this.Delay(3000).Schedule(() => indicator.Text = "Hey!");
+            });
         }
     }
 }

@@ -122,22 +122,6 @@ namespace osu.Game.Screens.Edit
                     return;
             }
 
-            beatDivisor.Value = loadableBeatmap.BeatmapInfo.BeatDivisor;
-            beatDivisor.BindValueChanged(divisor => loadableBeatmap.BeatmapInfo.BeatDivisor = divisor.NewValue);
-
-            // Todo: should probably be done at a DrawableRuleset level to share logic with Player.
-            clock = new EditorClock(loadableBeatmap, beatDivisor) { IsCoupled = false };
-
-            UpdateClockSource();
-
-            dependencies.CacheAs(clock);
-            AddInternal(clock);
-
-            clock.SeekingOrStopped.BindValueChanged(_ => updateSampleDisabledState());
-
-            // todo: remove caching of this and consume via editorBeatmap?
-            dependencies.Cache(beatDivisor);
-
             try
             {
                 playableBeatmap = loadableBeatmap.GetPlayableBeatmap(loadableBeatmap.BeatmapInfo.Ruleset);
@@ -153,6 +137,22 @@ namespace osu.Game.Screens.Edit
                 this.Exit();
                 return;
             }
+
+            beatDivisor.Value = playableBeatmap.BeatmapInfo.BeatDivisor;
+            beatDivisor.BindValueChanged(divisor => playableBeatmap.BeatmapInfo.BeatDivisor = divisor.NewValue);
+
+            // Todo: should probably be done at a DrawableRuleset level to share logic with Player.
+            clock = new EditorClock(playableBeatmap, beatDivisor) { IsCoupled = false };
+
+            UpdateClockSource();
+
+            dependencies.CacheAs(clock);
+            AddInternal(clock);
+
+            clock.SeekingOrStopped.BindValueChanged(_ => updateSampleDisabledState());
+
+            // todo: remove caching of this and consume via editorBeatmap?
+            dependencies.Cache(beatDivisor);
 
             AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap, loadableBeatmap.Skin));
             dependencies.CacheAs(editorBeatmap);

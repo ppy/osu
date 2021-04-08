@@ -5,8 +5,8 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Screens.Edit.Setup
@@ -18,15 +18,13 @@ namespace osu.Game.Screens.Edit.Setup
         private LabelledSliderBar<float> approachRateSlider;
         private LabelledSliderBar<float> overallDifficultySlider;
 
+        public override LocalisableString Title => "难度设置";
+
         [BackgroundDependencyLoader]
         private void load()
         {
             Children = new Drawable[]
             {
-                new OsuSpriteText
-                {
-                    Text = "难度设置"
-                },
                 circleSizeSlider = new LabelledSliderBar<float>
                 {
                     Label = "物件大小(CS)",
@@ -53,7 +51,7 @@ namespace osu.Game.Screens.Edit.Setup
                 },
                 approachRateSlider = new LabelledSliderBar<float>
                 {
-                    Label = "缩泉速度(AR)",
+                    Label = "缩圈速度(AR)",
                     Description = "这将决定缩圈速度, 数值越大, 缩圈越快",
                     Current = new BindableFloat(Beatmap.BeatmapInfo.BaseDifficulty.ApproachRate)
                     {
