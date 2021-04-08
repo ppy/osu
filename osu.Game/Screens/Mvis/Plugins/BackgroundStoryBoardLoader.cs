@@ -28,11 +28,11 @@ namespace osu.Game.Screens.Mvis.Plugins
         public readonly BindableBool NeedToHideTriangles = new BindableBool();
         public readonly BindableBool StoryboardReplacesBackground = new BindableBool();
 
-        private DecoupleableInterpolatingFramedClock storyboardClock = new DecoupleableInterpolatingFramedClock();
+        private DecoupleableInterpolatingFramedClock storyboardClock;
 
         private BackgroundStoryboard currentStoryboard;
 
-        private readonly WorkingBeatmap targetBeatmap;
+        private WorkingBeatmap targetBeatmap;
 
         public Action OnNewStoryboardLoaded;
 
@@ -42,15 +42,18 @@ namespace osu.Game.Screens.Mvis.Plugins
         [Resolved]
         private Bindable<WorkingBeatmap> currentBeatmap { get; set; }
 
-        public BackgroundStoryBoardLoader(WorkingBeatmap working)
+        public BackgroundStoryBoardLoader()
         {
             RelativeSizeAxes = Axes.Both;
-            targetBeatmap = working;
 
             Name = "故事版加载器(内置)";
             Description = "用于呈现故事版; Mfosu自带插件";
 
-            Flags.Add(PluginFlags.CanDisable);
+            Flags.AddRange(new[]
+            {
+                PluginFlags.CanDisable,
+                PluginFlags.CanUnload
+            });
         }
 
         [BackgroundDependencyLoader]
@@ -62,13 +65,16 @@ namespace osu.Game.Screens.Mvis.Plugins
             {
                 if (v.NewValue == targetBeatmap)
                 {
-                    storyboardClock.Start();
-                    storyboardClock.ChangeSource(music.CurrentTrack);
+                    storyboardClock?.Start();
+                    storyboardClock?.ChangeSource(music.CurrentTrack);
                 }
             });
 
             if (MvisScreen != null)
+            {
                 MvisScreen.OnScreenExiting += UnLoad;
+                MvisScreen.OnBeatmapChanged += refresh;
+            }
         }
 
         protected override void OnValueChanged(ValueChangedEvent<bool> v)
@@ -147,13 +153,32 @@ namespace osu.Game.Screens.Mvis.Plugins
         public override void UnLoad()
         {
             if (MvisScreen != null)
+            {
+                MvisScreen.OnBeatmapChanged -= refresh;
                 MvisScreen.OnSeek -= Seek;
+            }
+
+            NeedToHideTriangles.Value = false;
+            StoryboardReplacesBackground.Value = false;
+
+            NeedToHideTriangles.UnbindAll();
+            StoryboardReplacesBackground.UnbindAll();
 
             base.UnLoad();
         }
 
         [CanBeNull]
         public Drawable StoryboardProxy;
+
+        private void refresh(WorkingBeatmap newBeatmap)
+        {
+            if (!ContentLoaded)
+                Cancel();
+
+            ClearInternal();
+            targetBeatmap = newBeatmap;
+            Load();
+        }
 
         private void setProxy(BackgroundStoryboard storyboard)
         {

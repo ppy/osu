@@ -217,6 +217,24 @@ namespace osu.Game.Screens.Mvis
             fakeEditor = new FakeEditor(Beatmap.Value);
             pluginManager.AddPlugin(fakeEditor);
 
+            sbLoader = new BackgroundStoryBoardLoader
+            {
+                OnNewStoryboardLoaded = () =>
+                {
+                    if (prevProxy != null)
+                    {
+                        proxyContainer.Remove(prevProxy);
+                        prevProxy.Expire();
+                    }
+
+                    prevProxy = sbLoader.StoryboardProxy;
+
+                    if (prevProxy != null) proxyContainer.Add(prevProxy);
+                    prevProxy?.Show();
+                }
+            };
+            pluginManager.AddPlugin(sbLoader);
+
             sidebar.Add(settingsScroll = new SidebarSettingsScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -270,7 +288,8 @@ namespace osu.Game.Screens.Mvis
                             Children = new Drawable[]
                             {
                                 bgTriangles = new BgTrianglesContainer(),
-                                fakeEditor
+                                fakeEditor,
+                                sbLoader
                             }
                         },
                         foreground = new Container
@@ -972,27 +991,6 @@ namespace osu.Game.Screens.Mvis
 
             if (beatmap != prevBeatmap)
             {
-                pluginManager.UnLoadPlugin(sbLoader);
-                sbLoader?.FadeOut(BackgroundStoryBoardLoader.STORYBOARD_FADEOUT_DURATION, Easing.OutQuint).Expire();
-                sbLoader = new BackgroundStoryBoardLoader(beatmap)
-                {
-                    OnNewStoryboardLoaded = () =>
-                    {
-                        if (prevProxy != null)
-                        {
-                            proxyContainer.Remove(prevProxy);
-                            prevProxy.Expire();
-                        }
-
-                        prevProxy = sbLoader.StoryboardProxy;
-
-                        if (prevProxy != null) proxyContainer.Add(prevProxy);
-                        prevProxy?.Show();
-                    }
-                };
-
-                pluginManager.AddPlugin(sbLoader);
-                background.Add(sbLoader);
                 reBind();
             }
 
