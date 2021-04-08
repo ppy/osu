@@ -153,6 +153,18 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             }
         }
 
+        /// <summary>
+        /// Attempts to set the given control point piece to the given path type.
+        /// If that would fail, try to change the path such that it instead succeeds
+        /// in a UX-friendly way.
+        /// </summary>
+        /// <param name="piece">The control point piece that we want to change the path type of.</param>
+        /// <param name="type">The path type we want to assign to the given control point piece.</param>
+        private void updatePathType(PathControlPointPiece piece, PathType? type)
+        {
+            piece.ControlPoint.Type.Value = type;
+        }
+
         [Resolved(CanBeNull = true)]
         private IEditorChangeHandler changeHandler { get; set; }
 
@@ -218,7 +230,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             var item = new PathTypeMenuItem(type, () =>
             {
                 foreach (var p in Pieces.Where(p => p.IsSelected.Value))
-                    p.ControlPoint.Type.Value = type;
+                    updatePathType(p, type);
             });
 
             if (countOfState == totalCount)
