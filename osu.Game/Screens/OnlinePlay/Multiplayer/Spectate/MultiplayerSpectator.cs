@@ -98,7 +98,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 {
                     inst.ChildrenOfType<GameplayClockContainer>().Single().Start();
 
-                    if (targetTime < lastFrameTime && targetTime > currentTime + 16)
+                    if (targetTime < lastFrameTime && targetTime > currentTime + max_sync_offset)
                         inst.Beatmap.Track.AddAdjustment(AdjustableProperty.Frequency, catchupFrequencyAdjustment);
                     else
                         inst.Beatmap.Track.RemoveAdjustment(AdjustableProperty.Frequency, catchupFrequencyAdjustment);
