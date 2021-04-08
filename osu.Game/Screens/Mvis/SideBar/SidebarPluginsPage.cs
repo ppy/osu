@@ -21,6 +21,7 @@ namespace osu.Game.Screens.Mvis.SideBar
         public string Title => "插件";
 
         private MvisPluginManager manager;
+        private FillFlowContainer<PluginPiece> flow;
 
         [BackgroundDependencyLoader]
         private void load(MvisPluginManager pluginManager)
@@ -28,42 +29,51 @@ namespace osu.Game.Screens.Mvis.SideBar
             RelativeSizeAxes = Axes.Both;
 
             manager = pluginManager;
-            pluginManager.OnPluginListChanged += reloadPluginList;
+
+            AddInternal(new OsuScrollContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+                Child = flow = new FillFlowContainer<PluginPiece>
+                {
+                    AutoSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.X,
+                    Spacing = new Vector2(10),
+                    Padding = new MarginPadding(10)
+                }
+            });
+
+            pluginManager.OnPluginAdd += addPiece;
+            pluginManager.OnPluginUnLoad += removePiece;
         }
 
         protected override void LoadComplete()
         {
-            reloadPluginList();
-            base.LoadComplete();
-        }
-
-        private void reloadPluginList()
-        {
-            ClearInternal();
-            var flow = new FillFlowContainer
-            {
-                AutoSizeAxes = Axes.Y,
-                RelativeSizeAxes = Axes.X,
-                Spacing = new Vector2(10),
-                Padding = new MarginPadding(10)
-            };
-
             foreach (var pl in manager.GetAllPlugins())
             {
                 flow.Add(new PluginPiece(pl));
             }
 
-            AddInternal(new OsuScrollContainer
+            base.LoadComplete();
+        }
+
+        private void addPiece(MvisPlugin plugin) => flow.Add(new PluginPiece(plugin));
+
+        private void removePiece(MvisPlugin plugin)
+        {
+            foreach (var piece in flow)
             {
-                RelativeSizeAxes = Axes.Both,
-                Child = flow
-            });
+                if (piece.Plugin == plugin)
+                {
+                    flow.Remove(piece);
+                    break;
+                }
+            }
         }
     }
 
     public class PluginPiece : Container
     {
-        private readonly MvisPlugin plugin;
+        public readonly MvisPlugin Plugin;
         private SpriteIcon icon;
         private OsuAnimatedButton toggleDisableButton;
         private SpriteIcon unloadIcon;
@@ -72,7 +82,7 @@ namespace osu.Game.Screens.Mvis.SideBar
 
         public PluginPiece(MvisPlugin pl)
         {
-            plugin = pl;
+            Plugin = pl;
 
             Masking = true;
             CornerRadius = 10;
@@ -162,13 +172,13 @@ namespace osu.Game.Screens.Mvis.SideBar
                             {
                                 new OsuSpriteText
                                 {
-                                    Text = string.IsNullOrEmpty(plugin.Name) ? "未知名称" : plugin.Name,
+                                    Text = string.IsNullOrEmpty(Plugin.Name) ? "未知名称" : Plugin.Name,
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre
                                 },
                                 new OsuSpriteText
                                 {
-                                    Text = plugin.Description,
+                                    Text = Plugin.Description,
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre
                                 }
@@ -178,14 +188,14 @@ namespace osu.Game.Screens.Mvis.SideBar
                 },
             };
 
-            if (plugin.Flags.Contains(MvisPlugin.PluginFlags.CanDisable))
+            if (Plugin.Flags.Contains(MvisPlugin.PluginFlags.CanDisable))
             {
-                plugin.Disabled.BindValueChanged(v =>
+                Plugin.Disabled.BindValueChanged(v =>
                 {
                     switch (v.NewValue)
                     {
                         case true:
-                            if (!manager.GetActivePlugins().Contains(plugin))
+                            if (!manager.GetActivePlugins().Contains(Plugin))
                             {
                                 toggleDisableButton.TooltipText = "启用该插件";
                                 icon.Icon = FontAwesome.Solid.Times;
@@ -202,7 +212,7 @@ namespace osu.Game.Screens.Mvis.SideBar
 
                         case false:
 
-                            if (manager.GetActivePlugins().Contains(plugin))
+                            if (manager.GetActivePlugins().Contains(Plugin))
                             {
                                 toggleDisableButton.TooltipText = "禁用该插件";
                                 icon.Icon = FontAwesome.Solid.Check;
@@ -221,10 +231,10 @@ namespace osu.Game.Screens.Mvis.SideBar
 
                 toggleDisableButton.Action = () =>
                 {
-                    if (plugin.Disabled.Value)
-                        manager.ActivePlugin(plugin);
+                    if (Plugin.Disabled.Value)
+                        manager.ActivePlugin(Plugin);
                     else
-                        manager.DisablePlugin(plugin);
+                        manager.DisablePlugin(Plugin);
                 };
             }
             else
@@ -233,11 +243,11 @@ namespace osu.Game.Screens.Mvis.SideBar
                 icon.Icon = FontAwesome.Solid.Ban;
             }
 
-            if (plugin.Flags.Contains(MvisPlugin.PluginFlags.CanUnload))
+            if (Plugin.Flags.Contains(MvisPlugin.PluginFlags.CanUnload))
             {
                 unloadButton.Action = () =>
                 {
-                    dialog.Push(new ConfirmDialog($"你确定要卸载{plugin.Name}吗?", () => manager.UnLoadPlugin(plugin))
+                    dialog.Push(new ConfirmDialog($"你确定要卸载{Plugin.Name}吗?", () => manager.UnLoadPlugin(Plugin))
                     {
                         BodyText = "卸载后该插件在本次Mvis会话中将不再可用!"
                     });

@@ -18,13 +18,8 @@ namespace osu.Game.Screens.Mvis.Plugins
         [Resolved(CanBeNull = true)]
         private SideBar.Sidebar sideBar { get; set; }
 
-        public Action OnPluginListChanged;
-
-        protected override void LoadComplete()
-        {
-            avaliablePlugins.BindCollectionChanged((_, __) => OnPluginListChanged?.Invoke(), true);
-            base.LoadComplete();
-        }
+        public Action<MvisPlugin> OnPluginAdd;
+        public Action<MvisPlugin> OnPluginUnLoad;
 
         public bool AddPlugin(MvisPlugin pl)
         {
@@ -32,6 +27,7 @@ namespace osu.Game.Screens.Mvis.Plugins
 
             avaliablePlugins.Add(pl);
             sideBar?.Add(pl.SidebarPage);
+            OnPluginAdd?.Invoke(pl);
             return true;
         }
 
@@ -47,6 +43,7 @@ namespace osu.Game.Screens.Mvis.Plugins
             try
             {
                 pl.UnLoad();
+                OnPluginUnLoad?.Invoke(pl);
             }
             catch (Exception e)
             {
