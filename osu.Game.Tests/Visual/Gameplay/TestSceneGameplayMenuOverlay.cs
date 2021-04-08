@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game)
         {
-            Child = globalActionContainer = new GlobalActionContainer(game, null);
+            Child = globalActionContainer = new GlobalActionContainer(game);
         }
 
         [SetUp]
