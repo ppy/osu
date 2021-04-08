@@ -31,6 +31,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public PlayerInstance(Score score)
         {
             Score = score;
+
+            RelativeSizeAxes = Axes.Both;
+            Masking = true;
         }
 
         [BackgroundDependencyLoader]
