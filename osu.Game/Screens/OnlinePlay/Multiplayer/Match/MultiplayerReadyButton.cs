@@ -105,14 +105,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     break;
             }
 
-            button.Enabled.Value = Client.Room?.State == MultiplayerRoomState.Open && !operationInProgress.Value;
+            bool enableButton = Client.Room?.State == MultiplayerRoomState.Open && !operationInProgress.Value;
 
-            // When the local user is the host and spectating the match, the "start match" state should be enabled.
+            // When the local user is the host and spectating the match, the "start match" state should be enabled if any users are ready.
             if (localUser.State == MultiplayerUserState.Spectating)
-            {
-                button.Enabled.Value &= Room?.Host?.Equals(localUser) == true;
-                button.Enabled.Value &= newCountReady > 0;
-            }
+                enableButton &= Room?.Host?.Equals(localUser) == true && newCountReady > 0;
+
+            button.Enabled.Value = enableButton;
 
             if (newCountReady != countReady)
             {

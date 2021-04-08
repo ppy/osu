@@ -137,7 +137,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
                 case MultiplayerUserState.Spectating:
                     text.Text = "spectating";
-                    icon.Icon = FontAwesome.Solid.Eye;
+                    icon.Icon = FontAwesome.Solid.Binoculars;
                     icon.Colour = colours.BlueLight;
                     break;
 

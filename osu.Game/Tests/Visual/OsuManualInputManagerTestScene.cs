@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Visual
 
             if (CreateNestedActionContainer)
             {
-                mainContent = new GlobalActionContainer(null, null).WithChild(mainContent);
+                mainContent = new GlobalActionContainer(null).WithChild(mainContent);
             }
 
             base.Content.AddRange(new Drawable[]
