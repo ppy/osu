@@ -105,6 +105,26 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddAssert("point 3 is not inherited", () => slider.Path.ControlPoints[3].Type != null);
         }
 
+        [Test]
+        public void TestPerfectCurveChangeToBezier()
+        {
+            createVisualiser(true);
+
+            addControlPointStep(new Vector2(200), PathType.Bezier);
+            addControlPointStep(new Vector2(300), PathType.PerfectCurve);
+            addControlPointStep(new Vector2(500, 300));
+            addControlPointStep(new Vector2(700, 200), PathType.Bezier);
+            addControlPointStep(new Vector2(500, 100));
+
+            moveMouseToControlPoint(3);
+            AddStep("select control point", () => visualiser.Pieces[3].IsSelected.Value = true);
+            addContextMenuItemStep("Inherit");
+
+            assertControlPointPathType(0, PathType.Bezier);
+            assertControlPointPathType(1, PathType.Bezier);
+            assertControlPointPathType(3, null);
+        }
+
         private void createVisualiser(bool allowSelection) => AddStep("create visualiser", () => Child = visualiser = new PathControlPointVisualiser(slider, allowSelection)
         {
             Anchor = Anchor.Centre,
