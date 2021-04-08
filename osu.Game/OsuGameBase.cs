@@ -40,6 +40,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
+using osu.Game.Utils;
 using osuTK.Input;
 using RuntimeInfo = osu.Framework.RuntimeInfo;
 
@@ -94,6 +95,8 @@ namespace osu.Game
         protected override Container<Drawable> Content => content;
 
         protected Storage Storage { get; set; }
+
+        protected PowerStatus powerStatus;
 
         [Cached]
         [Cached(typeof(IBindable<RulesetInfo>))]
@@ -329,6 +332,8 @@ namespace osu.Game
             dependencies.CacheAs(MusicController);
 
             Ruleset.BindValueChanged(onRulesetChanged);
+
+            dependencies.CacheAs(powerStatus);
         }
 
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)

@@ -24,9 +24,9 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Users;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
-using Xamarin.Essentials;
 
 namespace osu.Game.Screens.Play
 {
@@ -112,6 +112,9 @@ namespace osu.Game.Screens.Play
 
         [Resolved]
         private AudioManager audioManager { get; set; }
+
+        [Resolved]
+        private PowerStatus powerStatus { get; set; }
 
         public PlayerLoader(Func<Player> createPlayer)
         {
@@ -265,7 +268,6 @@ namespace osu.Game.Screens.Play
         }
 
         #endregion
-
         protected override void Update()
         {
             base.Update();
@@ -477,42 +479,15 @@ namespace osu.Game.Screens.Play
         #region Low battery warning
         private Bindable<bool> batteryWarningShownOnce;
 
-        // Send a warning if battery is less than 20%
-        public const double battery_tolerance = 0.2;
-
         private void showBatteryWarningIfNeeded()
         {
             if (!batteryWarningShownOnce.Value)
             {
-                // Checks if the notification has not been shown yet, device is unplugged and if device battery is low.
-                if (!batteryManager.PluggedIn && batteryManager.ChargeLevel < battery_tolerance)
+                // Checks if the notification has not been shown yet, device is unplugged and if device battery is at or below the cutoff
+                if (!powerStatus.IsCharging && powerStatus.ChargeLevel <= powerStatus.BatteryCutoff)
                 {
-                    Console.WriteLine("Battery level: {0}", batteryManager.ChargeLevel);
                     notificationOverlay?.Post(new BatteryWarningNotification());
                     batteryWarningShownOnce.Value = true;
-                }
-            }
-        }
-        public BatteryManager batteryManager = new BatteryManager();
-        public class BatteryManager
-        {
-            public double ChargeLevel;
-            public bool PluggedIn;
-            public BatteryManager()
-            {
-                // Attempt to get battery information using Xamarin.Essentials
-                // Xamarin.Essentials throws a NotSupportedOrImplementedException on .NET standard so this only works on iOS/Android
-                // https://github.com/xamarin/Essentials/blob/7218ab88f7fbe00ec3379bd54e6c0ce35ffc0c22/Xamarin.Essentials/Battery/Battery.netstandard.tvos.cs
-                try
-                {
-                    ChargeLevel = Battery.ChargeLevel;
-                    PluggedIn = Battery.PowerSource == BatteryPowerSource.Battery;
-                }
-                catch (NotImplementedException e)
-                {
-                    Console.WriteLine("Could not access battery info: {0}", e);
-                    ChargeLevel = 1.0;
-                    PluggedIn = false;
                 }
             }
         }
