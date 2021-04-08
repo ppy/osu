@@ -7,6 +7,8 @@ using Android.OS;
 using osu.Framework.Allocation;
 using osu.Game;
 using osu.Game.Updater;
+using osu.Game.Utils;
+using Xamarin.Essentials;
 
 namespace osu.Android
 {
@@ -19,6 +21,7 @@ namespace osu.Android
             : base(null)
         {
             gameActivity = activity;
+            powerStatus = new AndroidPowerStatus();
         }
 
         public override Version AssemblyVersion
@@ -72,5 +75,11 @@ namespace osu.Android
         }
 
         protected override UpdateManager CreateUpdateManager() => new SimpleUpdateManager();
+        public class AndroidPowerStatus : PowerStatus
+        {
+            public override double ChargeLevel => Battery.ChargeLevel;
+
+            public override bool IsCharging => Battery.PowerSource != BatteryPowerSource.Battery;
+        }
     }
 }

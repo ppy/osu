@@ -7,11 +7,16 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Game.Screens.Backgrounds;
+using osu.Game.Utils;
 
 namespace osu.Game.Tests
 {
     public class OsuTestBrowser : OsuGameBase
     {
+        public OsuTestBrowser()
+        {
+            powerStatus = new DefaultPowerStatus();
+        }
         protected override void LoadComplete()
         {
             base.LoadComplete();
