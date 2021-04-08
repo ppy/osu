@@ -6,7 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
@@ -16,6 +18,7 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
@@ -35,7 +38,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private Bindable<HitObject> placement;
         private SelectionBlueprint placementBlueprint;
 
-        private readonly Box backgroundBox;
+        private SelectableAreaBackground backgroundBox;
+
+        // we only care about checking vertical validity.
+        // this allows selecting and dragging selections before time=0.
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
+        {
+            float localY = ToLocalSpace(screenSpacePos).Y;
+            return DrawRectangle.Top <= localY && DrawRectangle.Bottom >= localY;
+        }
 
         public TimelineBlueprintContainer(HitObjectComposer composer)
             : base(composer)
@@ -45,12 +56,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             Origin = Anchor.Centre;
 
             Height = 0.6f;
+        }
 
-            AddInternal(backgroundBox = new Box
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            AddInternal(backgroundBox = new SelectableAreaBackground
             {
-                Colour = Color4.Black,
-                RelativeSizeAxes = Axes.Both,
-                Alpha = 0.1f,
+                Colour = Color4.Black
             });
         }
 
@@ -192,6 +205,33 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     timeline.ScrollBy((float)((mouseX - timelineQuad.TopRight.X) / 10 * Clock.ElapsedFrameTime));
                 else if (mouseX < timelineQuad.TopLeft.X)
                     timeline.ScrollBy((float)((mouseX - timelineQuad.TopLeft.X) / 10 * Clock.ElapsedFrameTime));
+            }
+        }
+
+        private class SelectableAreaBackground : CompositeDrawable
+        {
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                RelativeSizeAxes = Axes.Both;
+                Alpha = 0.1f;
+
+                AddRangeInternal(new[]
+                {
+                    // fade out over intro time, outside the valid time bounds.
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Y,
+                        Width = 200,
+                        Origin = Anchor.TopRight,
+                        Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0), Color4.White),
+                    },
+                    new Box
+                    {
+                        Colour = Color4.White,
+                        RelativeSizeAxes = Axes.Both,
+                    }
+                });
             }
         }
 

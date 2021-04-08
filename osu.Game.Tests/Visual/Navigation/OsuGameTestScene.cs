@@ -36,6 +36,8 @@ namespace osu.Game.Tests.Visual.Navigation
 
         protected override bool UseFreshStoragePerRun => true;
 
+        protected override bool CreateNestedActionContainer => false;
+
         [BackgroundDependencyLoader]
         private void load(GameHost host)
         {
