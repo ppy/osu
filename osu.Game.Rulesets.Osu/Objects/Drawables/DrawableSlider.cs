@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using osuTK;
@@ -110,13 +111,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.LoadSamples();
 
-            var firstSample = HitObject.Samples.FirstOrDefault();
+            var firstSample = HitObject.OriginalSamples.FirstOrDefault();
 
             if (firstSample != null)
             {
-                var clone = HitObject.SampleControlPoint.ApplyTo(firstSample).With("sliderslide");
+                var samples = new List<ISampleInfo> { HitObject.SampleControlPoint.ApplyTo(firstSample).With("sliderslide") };
 
-                slidingSample.Samples = new ISampleInfo[] { clone };
+                if (HitObject.OriginalSamples.Any(s => s.Name == HitSampleInfo.HIT_WHISTLE))
+                    samples.Add(HitObject.SampleControlPoint.ApplyTo(firstSample).With("sliderwhistle"));
+
+                slidingSample.Samples = samples.ToArray();
             }
         }
 

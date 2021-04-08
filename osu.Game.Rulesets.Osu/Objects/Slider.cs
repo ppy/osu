@@ -81,6 +81,8 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public List<IList<HitSampleInfo>> NodeSamples { get; set; } = new List<IList<HitSampleInfo>>();
 
+        public IList<HitSampleInfo> OriginalSamples { get; private set; }
+
         private int repeatCount;
 
         public int RepeatCount
@@ -147,6 +149,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             // The samples should be attached to the slider tail, however this can only be done after LegacyLastTick is removed otherwise they would play earlier than they're intended to.
             // For now, the samples are attached to and played by the slider itself at the correct end time.
             // ToArray call is required as GetNodeSamples may fallback to Samples itself (without it it will get cleared due to the list reference being live).
+            OriginalSamples = Samples.ToList();
             Samples = this.GetNodeSamples(repeatCount + 1).ToArray();
         }
 
