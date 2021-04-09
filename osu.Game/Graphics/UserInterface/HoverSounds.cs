@@ -53,6 +53,9 @@ namespace osu.Game.Graphics.UserInterface
         Soft,
 
         [Description("-toolbar")]
-        Toolbar
+        Toolbar,
+
+        [Description("-songselect")]
+        SongSelect
     }
 }
