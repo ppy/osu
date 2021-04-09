@@ -301,7 +301,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             // set charge status and level
             AddStep("load player", () => resetPlayer(false, () =>
-            { 
+            {
                     powerStatus.IsCharging = isCharging;
                     powerStatus.ChargeLevel = chargeLevel;
             }));
