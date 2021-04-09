@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Catch.Mods
 
             protected override bool OnMouseMove(MouseMoveEvent e)
             {
-                catcher.UpdatePosition(e.MousePosition.X / DrawSize.X * CatchPlayfield.WIDTH);
+                catcher.LogicalX = e.MousePosition.X / DrawSize.X * CatchPlayfield.WIDTH;
                 return base.OnMouseMove(e);
             }
         }

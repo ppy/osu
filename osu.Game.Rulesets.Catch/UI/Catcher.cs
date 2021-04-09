@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -17,8 +18,10 @@ using osu.Game.Configuration;
 using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawables;
+using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Catch.Skinning;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -68,6 +71,9 @@ namespace osu.Game.Rulesets.Catch.UI
         /// </summary>
         private readonly Container<CaughtObject> droppedObjectTarget;
 
+        [CanBeNull]
+        private InputManager inputManager;
+
         public CatcherAnimationState CurrentState { get; private set; }
 
         /// <summary>
@@ -84,18 +90,12 @@ namespace osu.Game.Rulesets.Catch.UI
 
         /// <summary>
         /// The horizontal position of the catcher.
-        /// It is used instead of <see cref="Drawable.X"/> to stress
-        /// it is affecting the fruit catching logic, not a visual element.
+        /// The difference from <see cref="Drawable.X"/> is it is affecting the fruit catching logic, not the visual position.
         /// </summary>
         public float LogicalX
         {
             get => logicalX;
-            // TODO: check
-            set
-            {
-                logicalX = value;
-                X = LogicalX;
-            }
+            set => updatePosition(value);
         }
 
         private bool dashing;
@@ -204,6 +204,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             // don't add in above load as we may potentially modify a parent in an unsafe manner.
             trailsTarget.Add(trails);
+            inputManager = GetContainingInputManager();
         }
 
         /// <summary>
@@ -236,9 +237,10 @@ namespace osu.Game.Rulesets.Catch.UI
             if (!(hitObject is PalpableCatchHitObject fruit))
                 return false;
 
+            var catchPosition = getReplayOverride() ?? LogicalX;
             var halfCatchWidth = catchWidth * 0.5f;
-            return fruit.EffectiveX >= LogicalX - halfCatchWidth &&
-                   fruit.EffectiveX <= LogicalX + halfCatchWidth;
+            return fruit.EffectiveX >= catchPosition - halfCatchWidth &&
+                   fruit.EffectiveX <= catchPosition + halfCatchWidth;
         }
 
         public void OnNewResult(DrawableCatchHitObject drawableObject, JudgementResult result)
@@ -277,7 +279,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 SetHyperDashState(Math.Abs(velocity), target.EffectiveX);
             }
             else
-                SetHyperDashState();
+                ResetHyperDash();
 
             if (result.IsHit)
                 updateState(hitObject.Kiai ? CatcherAnimationState.Kiai : CatcherAnimationState.Idle);
@@ -294,10 +296,11 @@ namespace osu.Game.Rulesets.Catch.UI
 
             if (HyperDashing != catchResult.CatcherHyperDash)
             {
+                // Speed modifier and the target position is not relevant as only visual hyperdash animation is desired.
                 if (catchResult.CatcherHyperDash)
                     SetHyperDashState(2);
                 else
-                    SetHyperDashState();
+                    ResetHyperDash();
             }
 
             caughtObjectContainer.RemoveAll(d => d.HitObject == drawableObject.HitObject);
@@ -310,41 +313,39 @@ namespace osu.Game.Rulesets.Catch.UI
         /// </summary>
         /// <param name="modifier">The speed multiplier. If this is less or equals to 1, this catcher will be non-hyper-dashing state.</param>
         /// <param name="targetPosition">When this catcher crosses this position, this catcher ends hyper-dashing.</param>
-        public void SetHyperDashState(double modifier = 1, float targetPosition = -1)
+        public void SetHyperDashState(double modifier, float targetPosition = -1)
         {
-            var wasHyperDashing = HyperDashing;
-
             if (modifier <= 1 || LogicalX == targetPosition)
             {
-                hyperDashModifier = 1;
-                hyperDashDirection = 0;
-
-                if (wasHyperDashing)
-                    runHyperDashStateTransition(false);
+                ResetHyperDash();
+                return;
             }
-            else
-            {
-                hyperDashModifier = modifier;
-                hyperDashDirection = Math.Sign(targetPosition - LogicalX);
-                hyperDashTargetPosition = targetPosition;
 
-                if (!wasHyperDashing)
-                {
-                    trails.DisplayEndGlow();
-                    runHyperDashStateTransition(true);
-                }
+            var wasHyperDashing = HyperDashing;
+
+            hyperDashDirection = Math.Sign(targetPosition - LogicalX);
+            hyperDashModifier = modifier;
+            hyperDashTargetPosition = targetPosition;
+
+            if (!wasHyperDashing)
+            {
+                trails.DisplayEndGlow();
+                runHyperDashStateTransition(true);
             }
         }
 
-        public void UpdatePosition(float position)
+        /// <summary>
+        /// Ends the current hyperdash if any.
+        /// </summary>
+        public void ResetHyperDash()
         {
-            position = Math.Clamp(position, 0, CatchPlayfield.WIDTH);
+            var wasHyperDashing = HyperDashing;
 
-            if (position == LogicalX)
-                return;
+            hyperDashModifier = 1;
+            hyperDashDirection = 0;
 
-            Scale = new Vector2(Math.Abs(Scale.X) * (position > LogicalX ? 1 : -1), Scale.Y);
-            LogicalX = position;
+            if (wasHyperDashing)
+                runHyperDashStateTransition(false);
         }
 
         public bool OnPressed(CatchAction action)
@@ -435,22 +436,49 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             base.Update();
 
-            if (currentDirection == 0) return;
+            var replayOverride = getReplayOverride();
 
-            var direction = Math.Sign(currentDirection);
-
-            var dashModifier = Dashing ? 1 : 0.5;
-            var speed = BASE_SPEED * dashModifier * hyperDashModifier;
-
-            UpdatePosition((float)(LogicalX + direction * Clock.ElapsedFrameTime * speed));
-
-            // Correct overshooting.
-            if ((hyperDashDirection > 0 && hyperDashTargetPosition < LogicalX) ||
-                (hyperDashDirection < 0 && hyperDashTargetPosition > LogicalX))
+            if (replayOverride != null)
             {
-                LogicalX = hyperDashTargetPosition;
-                SetHyperDashState();
+                LogicalX = replayOverride.Value;
             }
+            else if (currentDirection != 0)
+            {
+                var dashModifier = Dashing ? 1 : 0.5;
+                var speed = BASE_SPEED * dashModifier * hyperDashModifier;
+
+                LogicalX = (float)(LogicalX + currentDirection * Clock.ElapsedFrameTime * speed);
+            }
+
+            X = LogicalX;
+        }
+
+        /// <summary>
+        /// If a replay is currently playing, return the catcher position recorded in the replay.
+        /// </summary>
+        private float? getReplayOverride()
+        {
+            var state = (inputManager?.CurrentState as RulesetInputManagerInputState<CatchAction>)?.LastReplayState as CatchFramedReplayInputHandler.CatchReplayState;
+            return state?.CatcherX;
+        }
+
+        private void updatePosition(float newX)
+        {
+            // When the catcher reaches the target fruit when hyperdashing, the catcher stops under the target fruit.
+            if (hyperDashDirection > 0 && hyperDashTargetPosition <= newX ||
+                hyperDashDirection < 0 && hyperDashTargetPosition >= newX)
+            {
+                ResetHyperDash();
+                newX = hyperDashTargetPosition;
+            }
+
+            newX = Math.Clamp(newX, 0, CatchPlayfield.WIDTH);
+
+            if (newX == logicalX) return;
+
+            var movingDirection = Math.Sign(newX - logicalX);
+            logicalX = newX;
+            Scale = new Vector2(Math.Abs(Scale.X) * movingDirection, Scale.Y);
         }
 
         private void updateCatcher()
