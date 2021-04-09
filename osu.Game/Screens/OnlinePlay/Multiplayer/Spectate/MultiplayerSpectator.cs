@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -16,6 +17,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
     public class MultiplayerSpectator : SpectatorScreen
     {
         private const double min_duration_to_allow_playback = 50;
+        private const double maximum_start_delay = 15000;
 
         // Isolates beatmap/ruleset to this screen.
         public override bool DisallowExternalBeatmapRulesetChanges => true;
@@ -28,6 +30,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private readonly PlayerInstance[] instances;
         private PlayerGrid grid;
         private MultiplayerSpectatorLeaderboard leaderboard;
+        private double? loadStartTime;
 
         public MultiplayerSpectator(int[] userIds)
             : base(userIds.AsSpan().Slice(0, Math.Min(16, userIds.Length)).ToArray())
@@ -72,22 +75,39 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
+
+            loadStartTime ??= Time.Current;
+
             updateGameplayPlayingState();
         }
+
+        private bool canStartGameplay =>
+            // All players must be loaded.
+            AllPlayersLoaded
+            && (
+                // All players have frames...
+                instances.All(i => i.Score.Replay.Frames.Count > 0)
+                // Or any player has frames and the maximum start delay has been exceeded.
+                || (Time.Current - loadStartTime > maximum_start_delay
+                    && instances.Any(i => i.Score.Replay.Frames.Count > 0))
+            );
 
         private void updateGameplayPlayingState()
         {
             // Make sure all players are loaded and have frames before starting any.
-            if (!AllPlayersLoaded || !instances.All(i => i.Score.Replay.Frames.Count > 0))
+            if (!canStartGameplay)
             {
                 foreach (var inst in instances)
                     inst?.PauseGameplay();
                 return;
             }
 
-            double targetTrackTime = instances.Select(i => i.GetCurrentGameplayTime()).Max();
+            // Not all instances may be in a valid gameplay state (see canStartGameplay). Only control the ones that are.
+            IEnumerable<PlayerInstance> validInstances = instances.Where(i => i.Score.Replay.Frames.Count > 0);
 
-            foreach (var inst in instances)
+            double targetTrackTime = validInstances.Select(i => i.GetCurrentTrackTime()).Max();
+
+            foreach (var inst in validInstances)
             {
                 Debug.Assert(inst != null);
 
