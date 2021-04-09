@@ -109,15 +109,23 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void LoadSamples()
         {
-            base.LoadSamples();
+            // Note: base.LoadSamples() isn't called since the slider plays the tail's hitsounds for the time being.
+
+            if (HitObject.SampleControlPoint == null)
+            {
+                throw new InvalidOperationException($"{nameof(HitObject)}s must always have an attached {nameof(HitObject.SampleControlPoint)}."
+                                                    + $" This is an indication that {nameof(HitObject.ApplyDefaults)} has not been invoked on {this}.");
+            }
+
+            Samples.Samples = HitObject.TailSamples.Select(s => HitObject.SampleControlPoint.ApplyTo(s)).Cast<ISampleInfo>().ToArray();
 
             var slidingSamples = new List<ISampleInfo>();
 
-            var normalSample = HitObject.OriginalSamples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
+            var normalSample = HitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
             if (normalSample != null)
                 slidingSamples.Add(HitObject.SampleControlPoint.ApplyTo(normalSample).With("sliderslide"));
 
-            var whistleSample = HitObject.OriginalSamples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_WHISTLE);
+            var whistleSample = HitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_WHISTLE);
             if (whistleSample != null)
                 slidingSamples.Add(HitObject.SampleControlPoint.ApplyTo(whistleSample).With("sliderwhistle"));
 
