@@ -9,7 +9,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Logging;
-using osu.Game.Extensions;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Rooms.RoomStatuses;
@@ -34,10 +33,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.LoadComplete();
 
             isConnected.BindTo(multiplayerClient.IsConnected);
-            isConnected.BindValueChanged(_ => Schedule(updatePolling));
-            JoinedRoom.BindValueChanged(_ => updatePolling());
-
-            updatePolling();
+            isConnected.BindValueChanged(_ => Scheduler.AddOnce(updatePolling));
+            JoinedRoom.BindValueChanged(_ => Scheduler.AddOnce(updatePolling), true);
         }
 
         public override void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
@@ -71,7 +68,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             base.PartRoom();
 
-            multiplayerClient.LeaveRoom().CatchUnobservedExceptions();
+            multiplayerClient.LeaveRoom();
 
             // Todo: This is not the way to do this. Basically when we're the only participant and the room closes, there's no way to know if this is actually the case.
             // This is delayed one frame because upon exiting the match subscreen, multiplayer updates the polling rate and messes with polling.
@@ -90,7 +87,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 if (t.IsCompletedSuccessfully)
                     Schedule(() => onSuccess?.Invoke(room));
-                else
+                else if (t.IsFaulted)
                 {
                     const string message = "Failed to join multiplayer room.";
 

@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.Scoring;
 using osuTK.Graphics;
 using osu.Game.Skinning;
 
@@ -30,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public SliderBall Ball { get; private set; }
         public SkinnableDrawable Body { get; private set; }
 
-        public override bool DisplayResult => false;
+        public override bool DisplayResult => !HitObject.OnlyJudgeNestedObjects;
 
         private PlaySliderBody sliderBody => Body.Drawable as PlaySliderBody;
 
@@ -249,14 +250,37 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (userTriggered || Time.Current < HitObject.EndTime)
                 return;
 
-            ApplyResult(r => r.Type = NestedHitObjects.Any(h => h.Result.IsHit) ? r.Judgement.MaxResult : r.Judgement.MinResult);
+            // If only the nested hitobjects are judged, then the slider's own judgement is ignored for scoring purposes.
+            // But the slider needs to still be judged with a reasonable hit/miss result for visual purposes (hit/miss transforms, etc).
+            if (HitObject.OnlyJudgeNestedObjects)
+            {
+                ApplyResult(r => r.Type = NestedHitObjects.Any(h => h.Result.IsHit) ? r.Judgement.MaxResult : r.Judgement.MinResult);
+                return;
+            }
+
+            // Otherwise, if this slider also needs to be judged, apply judgement proportionally to the number of nested hitobjects hit. This is the classic osu!stable scoring.
+            ApplyResult(r =>
+            {
+                int totalTicks = NestedHitObjects.Count;
+                int hitTicks = NestedHitObjects.Count(h => h.IsHit);
+
+                if (hitTicks == totalTicks)
+                    r.Type = HitResult.Great;
+                else if (hitTicks == 0)
+                    r.Type = HitResult.Miss;
+                else
+                {
+                    double hitFraction = (double)hitTicks / totalTicks;
+                    r.Type = hitFraction >= 0.5 ? HitResult.Ok : HitResult.Meh;
+                }
+            });
         }
 
         public override void PlaySamples()
         {
             // rather than doing it this way, we should probably attach the sample to the tail circle.
             // this can only be done after we stop using LegacyLastTick.
-            if (TailCircle.IsHit)
+            if (!TailCircle.SamplePlaysOnlyOnHit || TailCircle.IsHit)
                 base.PlaySamples();
         }
 

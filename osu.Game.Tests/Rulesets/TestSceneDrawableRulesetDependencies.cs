@@ -9,7 +9,6 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -106,9 +105,9 @@ namespace osu.Game.Tests.Rulesets
                 IsDisposed = true;
             }
 
-            public SampleChannel Get(string name) => null;
+            public Sample Get(string name) => null;
 
-            public Task<SampleChannel> GetAsync(string name) => null;
+            public Task<Sample> GetAsync(string name) => null;
 
             public Stream GetStream(string name) => null;
 
@@ -119,9 +118,13 @@ namespace osu.Game.Tests.Rulesets
             public BindableNumber<double> Frequency => throw new NotImplementedException();
             public BindableNumber<double> Tempo => throw new NotImplementedException();
 
-            public void AddAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => throw new NotImplementedException();
+            public void BindAdjustments(IAggregateAudioAdjustment component) => throw new NotImplementedException();
 
-            public void RemoveAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => throw new NotImplementedException();
+            public void UnbindAdjustments(IAggregateAudioAdjustment component) => throw new NotImplementedException();
+
+            public void AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => throw new NotImplementedException();
+
+            public void RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => throw new NotImplementedException();
 
             public void RemoveAllAdjustments(AdjustableProperty type) => throw new NotImplementedException();
 

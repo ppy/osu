@@ -15,10 +15,11 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
+using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
-using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.Select.Details
@@ -83,32 +84,22 @@ namespace osu.Game.Screens.Select.Details
             mods.BindValueChanged(modsChanged, true);
         }
 
-        private readonly List<ISettingsItem> references = new List<ISettingsItem>();
+        private ModSettingChangeTracker modSettingChangeTracker;
+        private ScheduledDelegate debouncedStatisticsUpdate;
 
         private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
-            // TODO: find a more permanent solution for this if/when it is needed in other components.
-            // this is generating drawables for the only purpose of storing bindable references.
-            foreach (var r in references)
-                r.Dispose();
+            modSettingChangeTracker?.Dispose();
 
-            references.Clear();
-
-            ScheduledDelegate debounce = null;
-
-            foreach (var mod in mods.NewValue.OfType<IApplicableToDifficulty>())
+            modSettingChangeTracker = new ModSettingChangeTracker(mods.NewValue);
+            modSettingChangeTracker.SettingChanged += m =>
             {
-                foreach (var setting in mod.CreateSettingsControls().OfType<ISettingsItem>())
-                {
-                    setting.SettingChanged += () =>
-                    {
-                        debounce?.Cancel();
-                        debounce = Scheduler.AddDelayed(updateStatistics, 100);
-                    };
+                if (!(m is IApplicableToDifficulty))
+                    return;
 
-                    references.Add(setting);
-                }
-            }
+                debouncedStatisticsUpdate?.Cancel();
+                debouncedStatisticsUpdate = Scheduler.AddDelayed(updateStatistics, 100);
+            };
 
             updateStatistics();
         }
@@ -148,8 +139,6 @@ namespace osu.Game.Screens.Select.Details
             updateStarDifficulty();
         }
 
-        private IBindable<StarDifficulty> normalStarDifficulty;
-        private IBindable<StarDifficulty> moddedStarDifficulty;
         private CancellationTokenSource starDifficultyCancellationSource;
 
         private void updateStarDifficulty()
@@ -161,18 +150,19 @@ namespace osu.Game.Screens.Select.Details
 
             starDifficultyCancellationSource = new CancellationTokenSource();
 
-            normalStarDifficulty = difficultyCache.GetBindableDifficulty(Beatmap, ruleset.Value, null, starDifficultyCancellationSource.Token);
-            moddedStarDifficulty = difficultyCache.GetBindableDifficulty(Beatmap, ruleset.Value, mods.Value, starDifficultyCancellationSource.Token);
+            var normalStarDifficulty = difficultyCache.GetDifficultyAsync(Beatmap, ruleset.Value, null, starDifficultyCancellationSource.Token);
+            var moddedStarDifficulty = difficultyCache.GetDifficultyAsync(Beatmap, ruleset.Value, mods.Value, starDifficultyCancellationSource.Token);
 
-            normalStarDifficulty.BindValueChanged(_ => updateDisplay());
-            moddedStarDifficulty.BindValueChanged(_ => updateDisplay(), true);
-
-            void updateDisplay() => starDifficulty.Value = ((float)normalStarDifficulty.Value.Stars, (float)moddedStarDifficulty.Value.Stars);
+            Task.WhenAll(normalStarDifficulty, moddedStarDifficulty).ContinueWith(_ => Schedule(() =>
+            {
+                starDifficulty.Value = ((float)normalStarDifficulty.Result.Stars, (float)moddedStarDifficulty.Result.Stars);
+            }), starDifficultyCancellationSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
+            modSettingChangeTracker?.Dispose();
             starDifficultyCancellationSource?.Cancel();
         }
 
@@ -190,7 +180,7 @@ namespace osu.Game.Screens.Select.Details
             [Resolved]
             private OsuColour colours { get; set; }
 
-            public string Title
+            public LocalisableString Title
             {
                 get => name.Text;
                 set => name.Text = value;

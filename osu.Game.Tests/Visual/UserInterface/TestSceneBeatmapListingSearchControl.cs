@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
@@ -19,11 +20,21 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
-        private readonly BeatmapListingSearchControl control;
+        private BeatmapListingSearchControl control;
 
-        public TestSceneBeatmapListingSearchControl()
+        private OsuConfigManager localConfig;
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Dependencies.Cache(localConfig = new OsuConfigManager(LocalStorage));
+        }
+
+        [SetUp]
+        public void SetUp() => Schedule(() =>
         {
             OsuSpriteText query;
+            OsuSpriteText general;
             OsuSpriteText ruleset;
             OsuSpriteText category;
             OsuSpriteText genre;
@@ -31,32 +42,38 @@ namespace osu.Game.Tests.Visual.UserInterface
             OsuSpriteText extra;
             OsuSpriteText ranks;
             OsuSpriteText played;
+            OsuSpriteText explicitMap;
 
-            Add(control = new BeatmapListingSearchControl
+            Children = new Drawable[]
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-            });
-
-            Add(new FillFlowContainer
-            {
-                AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Vertical,
-                Spacing = new Vector2(0, 5),
-                Children = new Drawable[]
+                control = new BeatmapListingSearchControl
                 {
-                    query = new OsuSpriteText(),
-                    ruleset = new OsuSpriteText(),
-                    category = new OsuSpriteText(),
-                    genre = new OsuSpriteText(),
-                    language = new OsuSpriteText(),
-                    extra = new OsuSpriteText(),
-                    ranks = new OsuSpriteText(),
-                    played = new OsuSpriteText()
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                },
+                new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(0, 5),
+                    Children = new Drawable[]
+                    {
+                        query = new OsuSpriteText(),
+                        general = new OsuSpriteText(),
+                        ruleset = new OsuSpriteText(),
+                        category = new OsuSpriteText(),
+                        genre = new OsuSpriteText(),
+                        language = new OsuSpriteText(),
+                        extra = new OsuSpriteText(),
+                        ranks = new OsuSpriteText(),
+                        played = new OsuSpriteText(),
+                        explicitMap = new OsuSpriteText(),
+                    }
                 }
-            });
+            };
 
             control.Query.BindValueChanged(q => query.Text = $"Query: {q.NewValue}", true);
+            control.General.BindCollectionChanged((u, v) => general.Text = $"General: {(control.General.Any() ? string.Join('.', control.General.Select(i => i.ToString().ToLowerInvariant())) : "")}", true);
             control.Ruleset.BindValueChanged(r => ruleset.Text = $"Ruleset: {r.NewValue}", true);
             control.Category.BindValueChanged(c => category.Text = $"Category: {c.NewValue}", true);
             control.Genre.BindValueChanged(g => genre.Text = $"Genre: {g.NewValue}", true);
@@ -64,7 +81,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             control.Extra.BindCollectionChanged((u, v) => extra.Text = $"Extra: {(control.Extra.Any() ? string.Join('.', control.Extra.Select(i => i.ToString().ToLowerInvariant())) : "")}", true);
             control.Ranks.BindCollectionChanged((u, v) => ranks.Text = $"Ranks: {(control.Ranks.Any() ? string.Join('.', control.Ranks.Select(i => i.ToString())) : "")}", true);
             control.Played.BindValueChanged(p => played.Text = $"Played: {p.NewValue}", true);
-        }
+            control.ExplicitContent.BindValueChanged(e => explicitMap.Text = $"Explicit Maps: {e.NewValue}", true);
+        });
 
         [Test]
         public void TestCovers()
@@ -72,6 +90,22 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("Set beatmap", () => control.BeatmapSet = beatmap_set);
             AddStep("Set beatmap (no cover)", () => control.BeatmapSet = no_cover_beatmap_set);
             AddStep("Set null beatmap", () => control.BeatmapSet = null);
+        }
+
+        [Test]
+        public void TestExplicitConfig()
+        {
+            AddStep("configure explicit content to allowed", () => localConfig.SetValue(OsuSetting.ShowOnlineExplicitContent, true));
+            AddAssert("explicit control set to show", () => control.ExplicitContent.Value == SearchExplicit.Show);
+
+            AddStep("configure explicit content to disallowed", () => localConfig.SetValue(OsuSetting.ShowOnlineExplicitContent, false));
+            AddAssert("explicit control set to hide", () => control.ExplicitContent.Value == SearchExplicit.Hide);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            localConfig?.Dispose();
+            base.Dispose(isDisposing);
         }
 
         private static readonly BeatmapSetInfo beatmap_set = new BeatmapSetInfo

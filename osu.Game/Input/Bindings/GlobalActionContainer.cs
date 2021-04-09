@@ -13,6 +13,7 @@ namespace osu.Game.Input.Bindings
     public class GlobalActionContainer : DatabasedKeyBindingContainer<GlobalAction>, IHandleGlobalKeyboardInput
     {
         private readonly Drawable handler;
+        private InputManager parentInputManager;
 
         public GlobalActionContainer(OsuGameBase game)
             : base(matchingMode: KeyCombinationMatchingMode.Modifiers)
@@ -21,7 +22,18 @@ namespace osu.Game.Input.Bindings
                 handler = game;
         }
 
-        public override IEnumerable<KeyBinding> DefaultKeyBindings => GlobalKeyBindings.Concat(InGameKeyBindings).Concat(AudioControlKeyBindings).Concat(EditorKeyBindings);
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            parentInputManager = GetContainingInputManager();
+        }
+
+        public override IEnumerable<IKeyBinding> DefaultKeyBindings => GlobalKeyBindings
+                                                                       .Concat(EditorKeyBindings)
+                                                                       .Concat(InGameKeyBindings)
+                                                                       .Concat(SongSelectKeyBindings)
+                                                                       .Concat(AudioControlKeyBindings);
 
         public IEnumerable<KeyBinding> GlobalKeyBindings => new[]
         {
@@ -34,7 +46,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.R }, GlobalAction.ResetInputSettings),
             new KeyBinding(new[] { InputKey.Control, InputKey.T }, GlobalAction.ToggleToolbar),
             new KeyBinding(new[] { InputKey.Control, InputKey.O }, GlobalAction.ToggleSettings),
-            new KeyBinding(new[] { InputKey.Control, InputKey.D }, GlobalAction.ToggleDirect),
+            new KeyBinding(new[] { InputKey.Control, InputKey.D }, GlobalAction.ToggleBeatmapListing),
             new KeyBinding(new[] { InputKey.Control, InputKey.N }, GlobalAction.ToggleNotifications),
 
             new KeyBinding(InputKey.Escape, GlobalAction.Back),
@@ -74,6 +86,14 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.Control, GlobalAction.HoldForHUD),
         };
 
+        public IEnumerable<KeyBinding> SongSelectKeyBindings => new[]
+        {
+            new KeyBinding(InputKey.F1, GlobalAction.ToggleModSelection),
+            new KeyBinding(InputKey.F2, GlobalAction.SelectNextRandom),
+            new KeyBinding(new[] { InputKey.Shift, InputKey.F2 }, GlobalAction.SelectPreviousRandom),
+            new KeyBinding(InputKey.F3, GlobalAction.ToggleBeatmapOptions)
+        };
+
         public IEnumerable<KeyBinding> AudioControlKeyBindings => new[]
         {
             new KeyBinding(new[] { InputKey.Alt, InputKey.Up }, GlobalAction.IncreaseVolume),
@@ -91,8 +111,20 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.F3, GlobalAction.MusicPlay)
         };
 
-        protected override IEnumerable<Drawable> KeyBindingInputQueue =>
-            handler == null ? base.KeyBindingInputQueue : base.KeyBindingInputQueue.Prepend(handler);
+        protected override IEnumerable<Drawable> KeyBindingInputQueue
+        {
+            get
+            {
+                // To ensure the global actions are handled with priority, this GlobalActionContainer is actually placed after game content.
+                // It does not contain children as expected, so we need to forward the NonPositionalInputQueue from the parent input manager to correctly
+                // allow the whole game to handle these actions.
+
+                // An eventual solution to this hack is to create localised action containers for individual components like SongSelect, but this will take some rearranging.
+                var inputQueue = parentInputManager?.NonPositionalInputQueue ?? base.KeyBindingInputQueue;
+
+                return handler != null ? inputQueue.Prepend(handler) : inputQueue;
+            }
+        }
     }
 
     public enum GlobalAction
@@ -112,8 +144,8 @@ namespace osu.Game.Input.Bindings
         [Description("Toggle settings")]
         ToggleSettings,
 
-        [Description("Toggle osu!direct")]
-        ToggleDirect,
+        [Description("Toggle beatmap listing")]
+        ToggleBeatmapListing,
 
         [Description("Increase volume")]
         IncreaseVolume,
@@ -204,5 +236,18 @@ namespace osu.Game.Input.Bindings
 
         [Description("Toggle in-game interface")]
         ToggleInGameInterface,
+
+        // Song select keybindings
+        [Description("Toggle Mod Select")]
+        ToggleModSelection,
+
+        [Description("Random")]
+        SelectNextRandom,
+
+        [Description("Rewind")]
+        SelectPreviousRandom,
+
+        [Description("Beatmap Options")]
+        ToggleBeatmapOptions,
     }
 }

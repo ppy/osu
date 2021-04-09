@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
+using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
@@ -93,6 +94,11 @@ namespace osu.Game.Overlays
 
             if (welcomeScreen.GetChildScreen() != null)
                 welcomeScreen.MakeCurrent();
+
+            // there might be a stale scheduled hide from a previous API state change.
+            // cancel it here so that the overlay is not hidden again after one frame.
+            scheduledHide?.Cancel();
+            scheduledHide = null;
         }
 
         protected override void PopOut()
@@ -101,7 +107,9 @@ namespace osu.Game.Overlays
             this.FadeOut(100);
         }
 
-        private void apiStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
+        private ScheduledDelegate scheduledHide;
+
+        private void apiStateChanged(ValueChangedEvent<APIState> state)
         {
             switch (state.NewValue)
             {
@@ -113,9 +121,10 @@ namespace osu.Game.Overlays
                     break;
 
                 case APIState.Online:
-                    Hide();
+                    scheduledHide?.Cancel();
+                    scheduledHide = Schedule(Hide);
                     break;
             }
-        });
+        }
     }
 }

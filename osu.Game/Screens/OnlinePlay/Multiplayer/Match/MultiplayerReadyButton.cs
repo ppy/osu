@@ -1,20 +1,18 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Diagnostics;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
 using osuTK;
 
@@ -22,18 +20,23 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
     public class MultiplayerReadyButton : MultiplayerRoomComposite
     {
-        public Bindable<PlaylistItem> SelectedItem => button.SelectedItem;
+        public Action OnReadyClick
+        {
+            set => button.Action = value;
+        }
 
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        [CanBeNull]
-        private MultiplayerRoomUser localUser;
-
         [Resolved]
         private OsuColour colours { get; set; }
 
-        private SampleChannel sampleReadyCount;
+        [Resolved]
+        private OngoingOperationTracker ongoingOperationTracker { get; set; }
+
+        private IBindable<bool> operationInProgress;
+
+        private Sample sampleReadyCount;
 
         private readonly ButtonWithTrianglesExposed button;
 
@@ -46,7 +49,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 RelativeSizeAxes = Axes.Both,
                 Size = Vector2.One,
                 Enabled = { Value = true },
-                Action = onClick
             };
         }
 
@@ -54,27 +56,31 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         private void load(AudioManager audio)
         {
             sampleReadyCount = audio.Samples.Get(@"SongSelect/select-difficulty");
+
+            operationInProgress = ongoingOperationTracker.InProgress.GetBoundCopy();
+            operationInProgress.BindValueChanged(_ => updateState());
         }
 
-        protected override void OnRoomChanged()
+        protected override void OnRoomUpdated()
         {
-            base.OnRoomChanged();
+            base.OnRoomUpdated();
 
-            localUser = Room?.Users.Single(u => u.User?.Id == api.LocalUser.Value.Id);
-            button.Enabled.Value = Client.Room?.State == MultiplayerRoomState.Open;
             updateState();
         }
 
         private void updateState()
         {
+            var localUser = Client.LocalUser;
+
             if (localUser == null)
                 return;
 
             Debug.Assert(Room != null);
 
             int newCountReady = Room.Users.Count(u => u.State == MultiplayerUserState.Ready);
+            int newCountTotal = Room.Users.Count(u => u.State != MultiplayerUserState.Spectating);
 
-            string countText = $"({newCountReady} / {Room.Users.Count} ready)";
+            string countText = $"({newCountReady} / {newCountTotal} ready)";
 
             switch (localUser.State)
             {
@@ -83,6 +89,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     updateButtonColour(true);
                     break;
 
+                case MultiplayerUserState.Spectating:
                 case MultiplayerUserState.Ready:
                     if (Room?.Host?.Equals(localUser) == true)
                     {
@@ -98,6 +105,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     break;
             }
 
+            bool enableButton = Client.Room?.State == MultiplayerRoomState.Open && !operationInProgress.Value;
+
+            // When the local user is the host and spectating the match, the "start match" state should be enabled if any users are ready.
+            if (localUser.State == MultiplayerUserState.Spectating)
+                enableButton &= Room?.Host?.Equals(localUser) == true && newCountReady > 0;
+
+            button.Enabled.Value = enableButton;
+
             if (newCountReady != countReady)
             {
                 countReady = newCountReady;
@@ -110,8 +125,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             if (sampleReadyCount == null)
                 return;
 
-            sampleReadyCount.Frequency.Value = 0.77f + countReady * 0.06f;
-            sampleReadyCount.Play();
+            var channel = sampleReadyCount.GetChannel();
+            channel.Frequency.Value = 0.77f + countReady * 0.06f;
+            channel.Play();
         }
 
         private void updateButtonColour(bool green)
@@ -127,22 +143,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 button.BackgroundColour = colours.YellowDark;
                 button.Triangles.ColourDark = colours.YellowDark;
                 button.Triangles.ColourLight = colours.Yellow;
-            }
-        }
-
-        private void onClick()
-        {
-            if (localUser == null)
-                return;
-
-            if (localUser.State == MultiplayerUserState.Idle)
-                Client.ChangeState(MultiplayerUserState.Ready).CatchUnobservedExceptions(true);
-            else
-            {
-                if (Room?.Host?.Equals(localUser) == true)
-                    Client.StartMatch().CatchUnobservedExceptions(true);
-                else
-                    Client.ChangeState(MultiplayerUserState.Idle).CatchUnobservedExceptions(true);
             }
         }
 

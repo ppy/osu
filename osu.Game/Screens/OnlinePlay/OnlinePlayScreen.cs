@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics.Containers;
@@ -27,7 +28,7 @@ using osuTK;
 namespace osu.Game.Screens.OnlinePlay
 {
     [Cached]
-    public abstract class OnlinePlayScreen : OsuScreen
+    public abstract class OnlinePlayScreen : OsuScreen, IHasSubScreenStack
     {
         public override bool CursorVisible => (screenStack.CurrentScreen as IOnlinePlaySubScreen)?.CursorVisible ?? true;
 
@@ -51,6 +52,9 @@ namespace osu.Game.Screens.OnlinePlay
 
         [Cached]
         private readonly Bindable<FilterCriteria> currentFilter = new Bindable<FilterCriteria>(new FilterCriteria());
+
+        [Cached]
+        private OngoingOperationTracker ongoingOperationTracker { get; set; }
 
         [Resolved(CanBeNull = true)]
         private MusicController music { get; set; }
@@ -140,7 +144,8 @@ namespace osu.Game.Screens.OnlinePlay
                         };
                         button.Action = () => OpenNewRoom();
                     }),
-                    RoomManager = CreateRoomManager()
+                    RoomManager = CreateRoomManager(),
+                    ongoingOperationTracker = new OngoingOperationTracker()
                 }
             };
 
@@ -165,7 +170,10 @@ namespace osu.Game.Screens.OnlinePlay
         private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
         {
             if (state.NewValue != APIState.Online)
+            {
+                Logger.Log("API connection was lost, can't continue with online play", LoggingTarget.Network, LogLevel.Important);
                 Schedule(forcefullyExit);
+            }
         });
 
         protected override void LoadComplete()
@@ -347,5 +355,7 @@ namespace osu.Game.Screens.OnlinePlay
                 protected override double TransformDuration => 200;
             }
         }
+
+        ScreenStack IHasSubScreenStack.SubScreenStack => screenStack;
     }
 }

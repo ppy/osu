@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,11 +13,14 @@ using Android.OS;
 using Android.Provider;
 using Android.Views;
 using osu.Framework.Android;
+using osu.Game.Database;
 
 namespace osu.Android
 {
-    [Activity(Theme = "@android:style/Theme.NoTitleBar", MainLauncher = true, ScreenOrientation = ScreenOrientation.FullUser, SupportsPictureInPicture = false, ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize, HardwareAccelerated = false, LaunchMode = LaunchMode.SingleInstance)]
-    [IntentFilter(new[] { Intent.ActionDefault, Intent.ActionSend }, Categories = new[] { Intent.CategoryDefault }, DataPathPatterns = new[] { ".*\\.osz", ".*\\.osk" }, DataMimeType = "application/*")]
+    [Activity(Theme = "@android:style/Theme.NoTitleBar", MainLauncher = true, ScreenOrientation = ScreenOrientation.FullUser, SupportsPictureInPicture = false, ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize, HardwareAccelerated = false, LaunchMode = LaunchMode.SingleInstance, Exported = true)]
+    [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, DataScheme = "content", DataPathPattern = ".*\\\\.osz", DataHost = "*", DataMimeType = "*/*")]
+    [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, DataScheme = "content", DataPathPattern = ".*\\\\.osk", DataHost = "*", DataMimeType = "*/*")]
+    [IntentFilter(new[] { Intent.ActionSend, Intent.ActionSendMultiple }, Categories = new[] { Intent.CategoryDefault }, DataMimeTypes = new[] { "application/zip", "application/octet-stream", "application/download", "application/x-zip", "application/x-zip-compressed" })]
     [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryBrowsable, Intent.CategoryDefault }, DataSchemes = new[] { "osu", "osump" })]
     public class OsuGameActivity : AndroidGameActivity
     {
@@ -52,43 +56,59 @@ namespace osu.Android
             {
                 case Intent.ActionDefault:
                     if (intent.Scheme == ContentResolver.SchemeContent)
-                        handleImportFromUri(intent.Data);
+                        handleImportFromUris(intent.Data);
                     else if (osu_url_schemes.Contains(intent.Scheme))
                         game.HandleLink(intent.DataString);
                     break;
 
                 case Intent.ActionSend:
+                case Intent.ActionSendMultiple:
                 {
-                    var content = intent.ClipData?.GetItemAt(0);
-                    if (content != null)
-                        handleImportFromUri(content.Uri);
+                    var uris = new List<Uri>();
+                    for (int i = 0; i < intent.ClipData?.ItemCount; i++)
+                    {
+                        var content = intent.ClipData?.GetItemAt(i);
+                        if (content != null)
+                            uris.Add(content.Uri);
+                    }
+                    handleImportFromUris(uris.ToArray());
                     break;
                 }
             }
         }
 
-        private void handleImportFromUri(Uri uri) => Task.Factory.StartNew(async () =>
+        private void handleImportFromUris(params Uri[] uris) => Task.Factory.StartNew(async () =>
         {
-            // there are more performant overloads of this method, but this one is the most backwards-compatible
-            // (dates back to API 1).
-            var cursor = ContentResolver?.Query(uri, null, null, null, null);
+            var tasks = new List<ImportTask>();
 
-            if (cursor == null)
-                return;
+            await Task.WhenAll(uris.Select(async uri =>
+            {
+                // there are more performant overloads of this method, but this one is the most backwards-compatible
+                // (dates back to API 1).
+                var cursor = ContentResolver?.Query(uri, null, null, null, null);
 
-            cursor.MoveToFirst();
+                if (cursor == null)
+                    return;
 
-            var filenameColumn = cursor.GetColumnIndex(OpenableColumns.DisplayName);
-            string filename = cursor.GetString(filenameColumn);
+                cursor.MoveToFirst();
 
-            // SharpCompress requires archive streams to be seekable, which the stream opened by
-            // OpenInputStream() seems to not necessarily be.
-            // copy to an arbitrary-access memory stream to be able to proceed with the import.
-            var copy = new MemoryStream();
-            using (var stream = ContentResolver.OpenInputStream(uri))
-                await stream.CopyToAsync(copy);
+                var filenameColumn = cursor.GetColumnIndex(OpenableColumns.DisplayName);
+                string filename = cursor.GetString(filenameColumn);
 
-            await game.Import(copy, filename);
+                // SharpCompress requires archive streams to be seekable, which the stream opened by
+                // OpenInputStream() seems to not necessarily be.
+                // copy to an arbitrary-access memory stream to be able to proceed with the import.
+                var copy = new MemoryStream();
+                using (var stream = ContentResolver.OpenInputStream(uri))
+                    await stream.CopyToAsync(copy).ConfigureAwait(false);
+
+                lock (tasks)
+                {
+                    tasks.Add(new ImportTask(copy, filename));
+                }
+            })).ConfigureAwait(false);
+
+            await game.Import(tasks.ToArray()).ConfigureAwait(false);
         }, TaskCreationOptions.LongRunning);
     }
 }

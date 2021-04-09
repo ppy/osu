@@ -131,8 +131,11 @@ namespace osu.Game.Online.API
         {
         }
 
+        private bool succeeded;
+
         internal virtual void TriggerSuccess()
         {
+            succeeded = true;
             Success?.Invoke();
         }
 
@@ -145,10 +148,7 @@ namespace osu.Game.Online.API
 
         public void Fail(Exception e)
         {
-            if (WebRequest?.Completed == true)
-                return;
-
-            if (cancelled)
+            if (succeeded || cancelled)
                 return;
 
             cancelled = true;
@@ -181,9 +181,13 @@ namespace osu.Game.Online.API
         /// <returns>Whether we are in a failed or cancelled state.</returns>
         private bool checkAndScheduleFailure()
         {
-            if (API == null || pendingFailure == null) return cancelled;
+            if (pendingFailure == null) return cancelled;
 
-            API.Schedule(pendingFailure);
+            if (API == null)
+                pendingFailure();
+            else
+                API.Schedule(pendingFailure);
+
             pendingFailure = null;
             return true;
         }

@@ -3,13 +3,21 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Tests.Beatmaps;
+using osu.Game.Tests.Resources;
+using osu.Game.Users;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
@@ -18,9 +26,23 @@ namespace osu.Game.Tests.Visual.Multiplayer
     {
         private MultiplayerMatchSubScreen screen;
 
+        private BeatmapManager beatmaps;
+        private RulesetStore rulesets;
+        private BeatmapSetInfo importedSet;
+
         public TestSceneMultiplayerMatchSubScreen()
             : base(false)
         {
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(GameHost host, AudioManager audio)
+        {
+            Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
+            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, host, Beatmap.Default));
+            beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).Wait();
+
+            importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First();
         }
 
         [SetUp]
@@ -71,7 +93,48 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddWaitStep("wait", 10);
+            AddUntilStep("wait for join", () => Client.Room != null);
+        }
+
+        [Test]
+        public void TestStartMatchWhileSpectating()
+        {
+            AddStep("set playlist", () =>
+            {
+                Room.Playlist.Add(new PlaylistItem
+                {
+                    Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First()).BeatmapInfo },
+                    Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                });
+            });
+
+            AddStep("click create button", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("wait for room join", () => Client.Room != null);
+
+            AddStep("join other user (ready)", () =>
+            {
+                Client.AddUser(new User { Id = 55 });
+                Client.ChangeUserState(55, MultiplayerUserState.Ready);
+            });
+
+            AddStep("click spectate button", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerSpectateButton>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddStep("click ready button", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerReadyButton>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("match started", () => Client.Room?.State == MultiplayerRoomState.WaitingForLoad);
         }
     }
 }

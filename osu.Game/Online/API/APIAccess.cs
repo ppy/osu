@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
@@ -23,6 +24,8 @@ namespace osu.Game.Online.API
     public class APIAccess : Component, IAPIProvider
     {
         private readonly OsuConfigManager config;
+
+        private readonly string versionHash;
 
         private readonly OAuth authentication;
 
@@ -55,9 +58,10 @@ namespace osu.Game.Online.API
 
         private readonly Logger log;
 
-        public APIAccess(OsuConfigManager config, EndpointConfiguration endpointConfiguration)
+        public APIAccess(OsuConfigManager config, EndpointConfiguration endpointConfiguration, string versionHash)
         {
             this.config = config;
+            this.versionHash = versionHash;
 
             APIEndpointUrl = endpointConfiguration.APIEndpointUrl;
             WebsiteRootUrl = endpointConfiguration.WebsiteRootUrl;
@@ -85,7 +89,7 @@ namespace osu.Game.Online.API
             thread.Start();
         }
 
-        private void onTokenChanged(ValueChangedEvent<OAuthToken> e) => config.Set(OsuSetting.Token, config.Get<bool>(OsuSetting.SavePassword) ? authentication.TokenString : string.Empty);
+        private void onTokenChanged(ValueChangedEvent<OAuthToken> e) => config.SetValue(OsuSetting.Token, config.Get<bool>(OsuSetting.SavePassword) ? authentication.TokenString : string.Empty);
 
         internal new void Schedule(Action action) => base.Schedule(action);
 
@@ -130,7 +134,7 @@ namespace osu.Game.Online.API
                         state.Value = APIState.Connecting;
 
                         // save the username at this point, if the user requested for it to be.
-                        config.Set(OsuSetting.Username, config.Get<bool>(OsuSetting.SaveUsername) ? ProvidedUsername : string.Empty);
+                        config.SetValue(OsuSetting.Username, config.Get<bool>(OsuSetting.SaveUsername) ? ProvidedUsername : string.Empty);
 
                         if (!authentication.HasValidAccessToken && !authentication.AuthenticateWithLogin(ProvidedUsername, password))
                         {
@@ -242,6 +246,9 @@ namespace osu.Game.Online.API
             this.password = password;
         }
 
+        public IHubClientConnector GetHubConnector(string clientName, string endpoint) =>
+            new HubClientConnector(clientName, endpoint, this, versionHash);
+
         public RegistrationRequest.RegistrationRequestErrors CreateAccount(string email, string username, string password)
         {
             Debug.Assert(State.Value == APIState.Offline);
@@ -293,8 +300,21 @@ namespace osu.Game.Online.API
                 failureCount = 0;
                 return true;
             }
+            catch (HttpRequestException re)
+            {
+                log.Add($"{nameof(HttpRequestException)} while performing request {req}: {re.Message}");
+                handleFailure();
+                return false;
+            }
+            catch (SocketException se)
+            {
+                log.Add($"{nameof(SocketException)} while performing request {req}: {se.Message}");
+                handleFailure();
+                return false;
+            }
             catch (WebException we)
             {
+                log.Add($"{nameof(WebException)} while performing request {req}: {we.Message}");
                 handleWebException(we);
                 return false;
             }
@@ -312,7 +332,7 @@ namespace osu.Game.Online.API
         /// </summary>
         public IBindable<APIState> State => state;
 
-        private bool handleWebException(WebException we)
+        private void handleWebException(WebException we)
         {
             HttpStatusCode statusCode = (we.Response as HttpWebResponse)?.StatusCode
                                         ?? (we.Status == WebExceptionStatus.UnknownError ? HttpStatusCode.NotAcceptable : HttpStatusCode.RequestTimeout);
@@ -330,33 +350,37 @@ namespace osu.Game.Online.API
             {
                 case HttpStatusCode.Unauthorized:
                     Logout();
-                    return true;
+                    break;
 
                 case HttpStatusCode.RequestTimeout:
-                    failureCount++;
-                    log.Add($@"API failure count is now {failureCount}");
-
-                    if (failureCount < 3)
-                        // we might try again at an api level.
-                        return false;
-
-                    if (State.Value == APIState.Online)
-                    {
-                        state.Value = APIState.Failing;
-                        flushQueue();
-                    }
-
-                    return true;
+                    handleFailure();
+                    break;
             }
+        }
 
-            return true;
+        private void handleFailure()
+        {
+            failureCount++;
+            log.Add($@"API failure count is now {failureCount}");
+
+            if (failureCount >= 3 && State.Value == APIState.Online)
+            {
+                state.Value = APIState.Failing;
+                flushQueue();
+            }
         }
 
         public bool IsLoggedIn => localUser.Value.Id > 1;
 
         public void Queue(APIRequest request)
         {
-            lock (queue) queue.Enqueue(request);
+            lock (queue)
+            {
+                if (state.Value == APIState.Offline)
+                    return;
+
+                queue.Enqueue(request);
+            }
         }
 
         private void flushQueue(bool failOldRequests = true)
@@ -377,8 +401,6 @@ namespace osu.Game.Online.API
 
         public void Logout()
         {
-            flushQueue();
-
             password = null;
             authentication.Clear();
 
@@ -390,6 +412,7 @@ namespace osu.Game.Online.API
             });
 
             state.Value = APIState.Offline;
+            flushQueue();
         }
 
         private static User createGuestUser() => new GuestUser();

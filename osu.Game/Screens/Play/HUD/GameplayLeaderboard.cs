@@ -3,6 +3,8 @@
 
 using System;
 using System.Linq;
+using JetBrains.Annotations;
+using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -14,6 +16,8 @@ namespace osu.Game.Screens.Play.HUD
     public class GameplayLeaderboard : FillFlowContainer<GameplayLeaderboardScore>
     {
         private readonly Cached sorting = new Cached();
+
+        public Bindable<bool> Expanded = new Bindable<bool>();
 
         public GameplayLeaderboard()
         {
@@ -42,12 +46,11 @@ namespace osu.Game.Screens.Play.HUD
         /// Whether the player should be tracked on the leaderboard.
         /// Set to <c>true</c> for the local player or a player whose replay is currently being played.
         /// </param>
-        public ILeaderboardScore AddPlayer(User user, bool isTracked)
+        public ILeaderboardScore AddPlayer([CanBeNull] User user, bool isTracked)
         {
             var drawable = new GameplayLeaderboardScore(user, isTracked)
             {
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
+                Expanded = { BindTarget = Expanded },
             };
 
             base.Add(drawable);

@@ -17,7 +17,7 @@ namespace osu.Game.Online.Rooms
     {
         [Cached]
         [JsonProperty("id")]
-        public readonly Bindable<int?> RoomID = new Bindable<int?>();
+        public readonly Bindable<long?> RoomID = new Bindable<long?>();
 
         [Cached]
         [JsonProperty("name")]
@@ -71,6 +71,10 @@ namespace osu.Game.Online.Rooms
         [Cached]
         [JsonIgnore]
         public readonly Bindable<int?> MaxParticipants = new Bindable<int?>();
+
+        [Cached]
+        [JsonProperty("current_user_score")]
+        public readonly Bindable<PlaylistAggregateScore> UserScore = new Bindable<PlaylistAggregateScore>();
 
         [Cached]
         [JsonProperty("recent_participants")]
@@ -131,6 +135,9 @@ namespace osu.Game.Online.Rooms
             RoomID.Value = other.RoomID.Value;
             Name.Value = other.Name.Value;
 
+            if (other.Category.Value != RoomCategory.Spotlight)
+                Category.Value = other.Category.Value;
+
             if (other.Host.Value != null && Host.Value?.Id != other.Host.Value.Id)
                 Host.Value = other.Host.Value;
 
@@ -141,9 +148,16 @@ namespace osu.Game.Online.Rooms
             MaxParticipants.Value = other.MaxParticipants.Value;
             ParticipantCount.Value = other.ParticipantCount.Value;
             EndDate.Value = other.EndDate.Value;
+            UserScore.Value = other.UserScore.Value;
 
             if (EndDate.Value != null && DateTimeOffset.Now >= EndDate.Value)
                 Status.Value = new RoomStatusEnded();
+
+            // Todo: This is not the best way/place to do this, but the intention is to display all playlist items when the room has ended,
+            // and display only the non-expired playlist items while the room is still active. In order to achieve this, all expired items are removed from the source Room.
+            // More refactoring is required before this can be done locally instead - DrawableRoomPlaylist is currently directly bound to the playlist to display items in the room.
+            if (!(Status.Value is RoomStatusEnded))
+                other.Playlist.RemoveAll(i => i.Expired);
 
             if (!Playlist.SequenceEqual(other.Playlist))
             {

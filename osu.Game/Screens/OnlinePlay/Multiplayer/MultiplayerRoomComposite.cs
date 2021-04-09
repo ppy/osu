@@ -19,18 +19,21 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             base.LoadComplete();
 
-            Client.RoomChanged += OnRoomChanged;
-            OnRoomChanged();
+            Client.RoomUpdated += OnRoomUpdated;
+            OnRoomUpdated();
         }
 
-        protected virtual void OnRoomChanged()
+        /// <summary>
+        /// Invoked when any change occurs to the multiplayer room.
+        /// </summary>
+        protected virtual void OnRoomUpdated()
         {
         }
 
         protected override void Dispose(bool isDisposing)
         {
             if (Client != null)
-                Client.RoomChanged -= OnRoomChanged;
+                Client.RoomUpdated -= OnRoomUpdated;
 
             base.Dispose(isDisposing);
         }
