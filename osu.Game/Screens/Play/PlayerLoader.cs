@@ -113,7 +113,7 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private AudioManager audioManager { get; set; }
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private PowerStatus powerStatus { get; set; }
 
         public PlayerLoader(Func<Player> createPlayer)
@@ -125,7 +125,7 @@ namespace osu.Game.Screens.Play
         private void load(SessionStatics sessionStatics)
         {
             muteWarningShownOnce = sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce);
-            batteryWarningShownOnce = sessionStatics.GetBindable<bool>(Static.BatteryLowNotificationShownOnce);
+            batteryWarningShownOnce = sessionStatics.GetBindable<bool>(Static.LowBatteryNotificationShownOnce);
 
             InternalChild = (content = new LogoTrackingContainer
             {
@@ -483,10 +483,11 @@ namespace osu.Game.Screens.Play
 
         private void showBatteryWarningIfNeeded()
         {
+            if (powerStatus == null) return;
+
             if (!batteryWarningShownOnce.Value)
             {
-                // Checks if the notification has not been shown yet, device is unplugged and if device battery is at or below the cutoff
-                if (!powerStatus.IsCharging && powerStatus.ChargeLevel <= powerStatus.BatteryCutoff)
+                if (powerStatus.IsLowBattery)
                 {
                     notificationOverlay?.Post(new BatteryWarningNotification());
                     batteryWarningShownOnce.Value = true;
@@ -500,7 +501,7 @@ namespace osu.Game.Screens.Play
 
             public BatteryWarningNotification()
             {
-                Text = "Your battery level is low! Charge your device to prevent interruptions.";
+                Text = "Your battery level is low! Charge your device to prevent interruptions during gameplay.";
             }
 
             [BackgroundDependencyLoader]

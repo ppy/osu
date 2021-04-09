@@ -21,7 +21,6 @@ using osu.Game.Updater;
 using osu.Desktop.Windows;
 using osu.Framework.Threading;
 using osu.Game.IO;
-using osu.Game.Utils;
 
 namespace osu.Desktop
 {
@@ -34,7 +33,6 @@ namespace osu.Desktop
             : base(args)
         {
             noVersionOverlay = args?.Any(a => a == "--no-version-overlay") ?? false;
-            PowerStatus = new DefaultPowerStatus();
         }
 
         public override StableStorage GetStorageForStableInstall()

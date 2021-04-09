@@ -694,6 +694,11 @@ namespace osu.Game
             loadComponentSingleFile(new AccountCreationOverlay(), topMostOverlayContent.Add, true);
             loadComponentSingleFile(new DialogOverlay(), topMostOverlayContent.Add, true);
 
+            if (CreatePowerStatus() != null)
+            {
+                dependencies.CacheAs(CreatePowerStatus());
+            }
+
             chatOverlay.State.ValueChanged += state => channelManager.HighPollRate.Value = state.NewValue == Visibility.Visible;
 
             Add(externalLinkOpener = new ExternalLinkOpener());

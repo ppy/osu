@@ -3,21 +3,27 @@
 
 namespace osu.Game.Utils
 {
+    /// <summary>
+    /// Provides access to the system's power status.
+    /// Currently implemented on iOS and Android only.
+    /// </summary>
     public abstract class PowerStatus
     {
         /// <summary>
-        /// The maximum battery level before a warning notification
-        /// is sent.
+        /// The maximum battery level considered as low, from 0 to 1.
         /// </summary>
-        public virtual double BatteryCutoff { get; } = 0.2;
+        public virtual double BatteryCutoff { get; } = 0;
 
-        public virtual double ChargeLevel { get; set; }
-        public virtual bool IsCharging { get; set; }
-    }
+        /// <summary>
+        /// The charge level of the battery, from 0 to 1.
+        /// </summary>
+        public virtual double ChargeLevel { get; } = 0;
 
-    public class DefaultPowerStatus : PowerStatus
-    {
-        public override double ChargeLevel { get; set; } = 1;
-        public override bool IsCharging { get; set; } = true;
+        public virtual bool IsCharging { get; } = false;
+
+        /// <summary>
+        /// Returns true if <see cref="IsCharging"/> = false and <see cref="ChargeLevel"/> &lt;= <see cref="BatteryCutoff"/>.
+        /// </summary>
+        public bool IsLowBattery => !IsCharging && ChargeLevel <= BatteryCutoff;
     }
 }
