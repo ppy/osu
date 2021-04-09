@@ -82,7 +82,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         }
 
         private bool canStartGameplay =>
-            // All players must be loaded.
+            // All players must be loaded, and...
             AllPlayersLoaded
             && (
                 // All players have frames...
