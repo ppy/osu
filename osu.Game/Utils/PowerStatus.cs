@@ -10,6 +10,7 @@ namespace osu.Game.Utils
         /// is sent.
         /// </summary>
         public virtual double BatteryCutoff { get; } = 0.2;
+
         public virtual double ChargeLevel { get; set; }
         public virtual bool IsCharging { get; set; }
     }

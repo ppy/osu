@@ -300,7 +300,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("reset notification lock", () => sessionStatics.GetBindable<bool>(Static.BatteryLowNotificationShownOnce).Value = false);
 
             // set charge status and level
-            AddStep("load player", () => resetPlayer(false, () => { powerStatus.IsCharging = isCharging; powerStatus.ChargeLevel = chargeLevel; }));
+            AddStep("load player", () => resetPlayer(false, () =>
+            { 
+                    powerStatus.IsCharging = isCharging;
+                    powerStatus.ChargeLevel = chargeLevel;
+            }));
             AddUntilStep("wait for player", () => player?.LoadState == LoadState.Ready);
             int notificationCount = !isCharging && chargeLevel <= powerStatus.BatteryCutoff ? 1 : 0;
             AddAssert("check for notification", () => notificationOverlay.UnreadCount.Value == notificationCount);
