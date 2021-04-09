@@ -64,9 +64,9 @@ namespace osu.Game.Rulesets.Catch.UI
             MovableCatcher.OnRevertResult(hitObject, result);
         }
 
-        protected override void Update()
+        protected override void UpdateAfterChildren()
         {
-            base.Update();
+            base.UpdateAfterChildren();
             comboDisplay.X = MovableCatcher.X;
         }
     }
