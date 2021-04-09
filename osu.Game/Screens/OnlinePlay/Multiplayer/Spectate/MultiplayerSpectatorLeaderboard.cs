@@ -40,6 +40,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             {
                 var targetTime = data.Clock.CurrentTime;
 
+                if (data.Frames.Count == 0)
+                    continue;
+
                 int frameIndex = data.Frames.BinarySearch(new TimedFrameHeader(targetTime));
                 if (frameIndex < 0)
                     frameIndex = ~frameIndex;
