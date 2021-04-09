@@ -21,7 +21,6 @@ namespace osu.Android
             : base(null)
         {
             gameActivity = activity;
-            PowerStatus = new AndroidPowerStatus();
         }
 
         public override Version AssemblyVersion
@@ -76,8 +75,12 @@ namespace osu.Android
 
         protected override UpdateManager CreateUpdateManager() => new SimpleUpdateManager();
 
-        public class AndroidPowerStatus : PowerStatus
+        protected override PowerStatus CreatePowerStatus() => new AndroidPowerStatus();
+
+        private class AndroidPowerStatus : PowerStatus
         {
+            public override double BatteryCutoff => 0.20;
+
             public override double ChargeLevel => Battery.ChargeLevel;
 
             public override bool IsCharging => Battery.PowerSource != BatteryPowerSource.Battery;

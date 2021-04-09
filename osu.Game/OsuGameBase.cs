@@ -96,7 +96,7 @@ namespace osu.Game
 
         protected Storage Storage { get; set; }
 
-        protected PowerStatus PowerStatus;
+        protected virtual PowerStatus CreatePowerStatus() => null;
 
         [Cached]
         [Cached(typeof(IBindable<RulesetInfo>))]
@@ -332,8 +332,6 @@ namespace osu.Game
             dependencies.CacheAs(MusicController);
 
             Ruleset.BindValueChanged(onRulesetChanged);
-
-            dependencies.CacheAs(PowerStatus);
         }
 
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)
