@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Online.Spectator;
@@ -30,6 +31,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         private readonly PlayerInstance[] instances;
         private PlayerGrid grid;
+        private MultiplayerSpectatorLeaderboard leaderboard;
 
         public MultiplayerSpectator(int[] userIds)
             : base(userIds.AsSpan().Slice(0, Math.Min(16, userIds.Length)).ToArray())
@@ -40,10 +42,35 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = grid = new PlayerGrid
+            Container leaderboardContainer;
+
+            InternalChild = new GridContainer
             {
-                RelativeSizeAxes = Axes.Both
+                RelativeSizeAxes = Axes.Both,
+                ColumnDimensions = new[]
+                {
+                    new Dimension(GridSizeMode.AutoSize)
+                },
+                Content = new[]
+                {
+                    new Drawable[]
+                    {
+                        leaderboardContainer = new Container
+                        {
+                            RelativeSizeAxes = Axes.Y,
+                            AutoSizeAxes = Axes.X
+                        },
+                        grid = new PlayerGrid { RelativeSizeAxes = Axes.Both }
+                    }
+                }
             };
+
+            // Todo: This is not quite correct - it should be per-user to adjust for other mod combinations.
+            var playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Ruleset.Value);
+            var scoreProcessor = Ruleset.Value.CreateInstance().CreateScoreProcessor();
+            scoreProcessor.ApplyBeatmap(playableBeatmap);
+
+            LoadComponentAsync(leaderboard = new MultiplayerSpectatorLeaderboard(scoreProcessor, UserIds) { Expanded = { Value = true } }, leaderboardContainer.Add);
         }
 
         protected override void Update()
@@ -118,18 +145,25 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             var existingInstance = instances[userIndex];
 
             if (existingInstance != null)
+            {
                 grid.Remove(existingInstance);
+                leaderboard.RemoveClock(existingInstance.User.Id);
+            }
 
             LoadComponentAsync(instances[userIndex] = new PlayerInstance(gameplayState.Score), d =>
             {
                 if (instances[userIndex] == d)
+                {
                     grid.Add(d);
+                    leaderboard.AddClock(d.User.Id, d.Beatmap.Track);
+                }
             });
         }
 
         protected override void EndGameplay(int userId)
         {
             spectatorClient.StopWatchingUser(userId);
+            leaderboard.RemoveClock(userId);
         }
 
         private int getIndexForUser(int userId) => Array.IndexOf(UserIds, userId);
