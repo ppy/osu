@@ -148,10 +148,12 @@ namespace osu.Game.Screens.OnlinePlay.Match
             return base.OnExiting(next);
         }
 
-        protected void StartPlay(Func<Player> player)
+        protected void StartPlay(Func<Player> player) => PushTopLevelScreen(() => new PlayerLoader(player));
+
+        protected void PushTopLevelScreen(Func<Screen> screen)
         {
             sampleStart?.Play();
-            ParentScreen?.Push(new PlayerLoader(player));
+            ParentScreen?.Push(screen());
         }
 
         private void selectedItemChanged()

@@ -25,6 +25,7 @@ using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Participants;
+using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Users;
 using osuTK;
@@ -405,11 +406,22 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }
         }
 
-        private void onRoomUpdated()
+        private void onRoomUpdated() => Scheduler.Add(() =>
         {
-            // user mods may have changed.
-            Scheduler.AddOnce(UpdateMods);
-        }
+            if (client.Room == null)
+                return;
+
+            Debug.Assert(client.LocalUser != null);
+
+            UpdateMods();
+
+            if (client.LocalUser.State == MultiplayerUserState.Spectating
+                && (client.Room.State == MultiplayerRoomState.Playing || client.Room.State == MultiplayerRoomState.WaitingForLoad)
+                && ParentScreen.IsCurrentScreen())
+            {
+                PushTopLevelScreen(() => new MultiplayerSpectator(client.CurrentMatchPlayingUserIds.ToArray()));
+            }
+        });
 
         private void onLoadRequested()
         {

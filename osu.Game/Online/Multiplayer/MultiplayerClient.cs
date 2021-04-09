@@ -96,9 +96,6 @@ namespace osu.Game.Online.Multiplayer
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
-            if (newState == MultiplayerUserState.Spectating)
-                return Task.CompletedTask; // Not supported yet.
-
             return connection.InvokeAsync(nameof(IMultiplayerServer.ChangeState), newState);
         }
 
