@@ -101,12 +101,33 @@ namespace osu.Game.Rulesets.Difficulty.Utils
         /// <summary>
         /// Returns an enumerator which enumerates items in the <see cref="ReverseQueue{T}"/> starting from the most recently enqueued item.
         /// </summary>
-        public IEnumerator<T> GetEnumerator()
-        {
-            for (int i = Count - 1; i >= 0; i--)
-                yield return items[(start + i) % capacity];
-        }
+        public IEnumerator<T> GetEnumerator() => new Enumerator(this);
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public struct Enumerator : IEnumerator<T>
+        {
+            private ReverseQueue<T> reverseQueue;
+            private int currentIndex;
+
+            internal Enumerator(ReverseQueue<T> reverseQueue)
+            {
+                this.reverseQueue = reverseQueue;
+                currentIndex = -1; // The first MoveNext() should bring the iterator to 0
+            }
+
+            public bool MoveNext() => ++currentIndex < reverseQueue.Count;
+
+            public void Reset() => currentIndex = -1;
+
+            public readonly T Current => reverseQueue[currentIndex];
+
+            readonly object IEnumerator.Current => Current;
+
+            public void Dispose()
+            {
+                reverseQueue = null;
+            }
+        }
     }
 }
