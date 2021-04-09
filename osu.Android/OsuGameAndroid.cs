@@ -75,6 +75,7 @@ namespace osu.Android
         }
 
         protected override UpdateManager CreateUpdateManager() => new SimpleUpdateManager();
+
         public class AndroidPowerStatus : PowerStatus
         {
             public override double ChargeLevel => Battery.ChargeLevel;

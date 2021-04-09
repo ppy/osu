@@ -302,21 +302,21 @@ namespace osu.Game.Tests.Visual.Gameplay
             // set charge status and level
             AddStep("load player", () => resetPlayer(false, () =>
             {
-                    powerStatus.IsCharging = isCharging;
-                    powerStatus.ChargeLevel = chargeLevel;
+                powerStatus.IsCharging = isCharging;
+                powerStatus.ChargeLevel = chargeLevel;
             }));
             AddUntilStep("wait for player", () => player?.LoadState == LoadState.Ready);
             int notificationCount = !isCharging && chargeLevel <= powerStatus.BatteryCutoff ? 1 : 0;
             AddAssert("check for notification", () => notificationOverlay.UnreadCount.Value == notificationCount);
             AddStep("click notification", () =>
-                {
-                    var scrollContainer = (OsuScrollContainer)notificationOverlay.Children.Last();
-                    var flowContainer = scrollContainer.Children.OfType<FillFlowContainer<NotificationSection>>().First();
-                    var notification = flowContainer.First();
+            {
+                var scrollContainer = (OsuScrollContainer)notificationOverlay.Children.Last();
+                var flowContainer = scrollContainer.Children.OfType<FillFlowContainer<NotificationSection>>().First();
+                var notification = flowContainer.First();
 
-                    InputManager.MoveMouseTo(notification);
-                    InputManager.Click(MouseButton.Left);
-                });
+                InputManager.MoveMouseTo(notification);
+                InputManager.Click(MouseButton.Left);
+            });
             AddUntilStep("wait for player load", () => player.IsLoaded);
         }
 

@@ -268,6 +268,7 @@ namespace osu.Game.Screens.Play
         }
 
         #endregion
+
         protected override void Update()
         {
             base.Update();
