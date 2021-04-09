@@ -2,16 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Online.Spectator;
-using osu.Game.Screens.Play;
 using osu.Game.Screens.Spectate;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
@@ -19,7 +16,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
     public class MultiplayerSpectator : SpectatorScreen
     {
         private const double min_duration_to_allow_playback = 50;
-        private const double max_sync_offset = 2;
 
         // Isolates beatmap/ruleset to this screen.
         public override bool DisallowExternalBeatmapRulesetChanges => true;
@@ -73,9 +69,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             LoadComponentAsync(leaderboard = new MultiplayerSpectatorLeaderboard(scoreProcessor, UserIds) { Expanded = { Value = true } }, leaderboardContainer.Add);
         }
 
-        protected override void Update()
+        protected override void UpdateAfterChildren()
         {
-            base.Update();
+            base.UpdateAfterChildren();
             updatePlayTime();
         }
 
@@ -85,7 +81,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         {
             if (gameplayStarted)
             {
-                ensurePlaying(instances.Select(i => i.Beatmap.Track.CurrentTime).Max());
+                ensurePlaying(instances.Select(i => i.GetCurrentTrackTime()).Max());
                 return;
             }
 
@@ -108,30 +104,23 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private void ensureAllStopped()
         {
             foreach (var inst in instances)
-                inst.ChildrenOfType<GameplayClockContainer>().SingleOrDefault()?.Stop();
+                inst?.PauseGameplay();
         }
 
-        private readonly BindableDouble catchupFrequencyAdjustment = new BindableDouble(2.0);
-
-        private void ensurePlaying(double targetTime)
+        private void ensurePlaying(double targetTrackTime)
         {
             foreach (var inst in instances)
             {
+                Debug.Assert(inst != null);
+
                 double lastFrameTime = inst.Score.Replay.Frames.Select(f => f.Time).Last();
-                double currentTime = inst.Beatmap.Track.CurrentTime;
+                double currentTime = inst.GetCurrentGameplayTime();
 
-                // If we have enough frames to play back, start playback.
-                if (Precision.DefinitelyBigger(lastFrameTime, currentTime, min_duration_to_allow_playback))
-                {
-                    inst.ChildrenOfType<GameplayClockContainer>().Single().Start();
+                bool canContinuePlayback = Precision.DefinitelyBigger(lastFrameTime, currentTime, min_duration_to_allow_playback);
+                if (!canContinuePlayback)
+                    continue;
 
-                    if (targetTime < lastFrameTime && targetTime > currentTime + max_sync_offset)
-                        inst.Beatmap.Track.AddAdjustment(AdjustableProperty.Frequency, catchupFrequencyAdjustment);
-                    else
-                        inst.Beatmap.Track.RemoveAdjustment(AdjustableProperty.Frequency, catchupFrequencyAdjustment);
-                }
-                else
-                    inst.Beatmap.Track.RemoveAdjustment(AdjustableProperty.Frequency, catchupFrequencyAdjustment);
+                inst.ContinueGameplay(targetTrackTime);
             }
         }
 

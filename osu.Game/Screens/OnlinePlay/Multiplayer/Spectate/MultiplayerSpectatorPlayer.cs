@@ -11,6 +11,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
     {
         public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
 
+        public new GameplayClockContainer GameplayClockContainer => base.GameplayClockContainer;
+
         public MultiplayerSpectatorPlayer(Score score)
             : base(score)
         {
