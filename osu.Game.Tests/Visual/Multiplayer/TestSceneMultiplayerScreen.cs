@@ -110,7 +110,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             loadSpectateScreen();
 
             // Send frames for one player only, both should remain paused.
-            sendFrames(55, 20);
+            sendFrames(55, 1000);
             checkPausedInstant(55, true);
             checkPausedInstant(56, true);
 
