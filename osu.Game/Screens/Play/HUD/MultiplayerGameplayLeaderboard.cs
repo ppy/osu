@@ -20,7 +20,6 @@ namespace osu.Game.Screens.Play.HUD
     public class MultiplayerGameplayLeaderboard : GameplayLeaderboard
     {
         private readonly ScoreProcessor scoreProcessor;
-
         private readonly Dictionary<int, TrackedUserData> userScores = new Dictionary<int, TrackedUserData>();
 
         [Resolved]
@@ -116,13 +115,19 @@ namespace osu.Game.Screens.Play.HUD
                 trackedData.UpdateScore(scoreProcessor, mode.NewValue);
         }
 
-        private void handleIncomingFrames(int userId, FrameDataBundle bundle)
+        private void handleIncomingFrames(int userId, FrameDataBundle bundle) => Schedule(() =>
         {
-            if (userScores.TryGetValue(userId, out var trackedData))
-            {
-                trackedData.LastHeader = bundle.Header;
-                trackedData.UpdateScore(scoreProcessor, scoringMode.Value);
-            }
+            if (userScores.ContainsKey(userId))
+                OnIncomingFrames(userId, bundle);
+        });
+
+        protected virtual void OnIncomingFrames(int userId, FrameDataBundle bundle) => SetCurrentFrame(userId, bundle.Header);
+
+        protected void SetCurrentFrame(int userId, FrameHeader header)
+        {
+            var trackedScore = userScores[userId];
+            trackedScore.LastHeader = header;
+            trackedScore.UpdateScore(scoreProcessor, scoringMode.Value);
         }
 
         protected override void Dispose(bool isDisposing)
