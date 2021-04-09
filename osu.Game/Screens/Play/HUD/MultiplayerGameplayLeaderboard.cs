@@ -20,7 +20,6 @@ namespace osu.Game.Screens.Play.HUD
     public class MultiplayerGameplayLeaderboard : GameplayLeaderboard
     {
         private readonly ScoreProcessor scoreProcessor;
-
         private readonly Dictionary<int, TrackedUserData> userScores = new Dictionary<int, TrackedUserData>();
 
         [Resolved]
@@ -116,13 +115,32 @@ namespace osu.Game.Screens.Play.HUD
                 trackedData.UpdateScore(scoreProcessor, mode.NewValue);
         }
 
-        private void handleIncomingFrames(int userId, FrameDataBundle bundle)
+        private void handleIncomingFrames(int userId, FrameDataBundle bundle) => Schedule(() =>
         {
-            if (userScores.TryGetValue(userId, out var trackedData))
-            {
-                trackedData.LastHeader = bundle.Header;
-                trackedData.UpdateScore(scoreProcessor, scoringMode.Value);
-            }
+            if (userScores.ContainsKey(userId))
+                OnIncomingFrames(userId, bundle);
+        });
+
+        /// <summary>
+        /// Invoked when new frames have arrived for a user.
+        /// </summary>
+        /// <remarks>
+        /// By default, this immediately sets the current frame to be displayed for the user.
+        /// </remarks>
+        /// <param name="userId">The user which the frames arrived for.</param>
+        /// <param name="bundle">The bundle of frames.</param>
+        protected virtual void OnIncomingFrames(int userId, FrameDataBundle bundle) => SetCurrentFrame(userId, bundle.Header);
+
+        /// <summary>
+        /// Sets the current frame to be displayed for a user.
+        /// </summary>
+        /// <param name="userId">The user to set the frame of.</param>
+        /// <param name="header">The frame to set.</param>
+        protected void SetCurrentFrame(int userId, FrameHeader header)
+        {
+            var trackedScore = userScores[userId];
+            trackedScore.LastHeader = header;
+            trackedScore.UpdateScore(scoreProcessor, scoringMode.Value);
         }
 
         protected override void Dispose(bool isDisposing)
