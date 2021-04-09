@@ -95,8 +95,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("send frames", () =>
             {
-                // For user 55, send 100 frames in sets of 1.
-                // For user 56, send 100 frames in sets of 10.
+                // For user 55, send frames in sets of 1.
+                // For user 56, send frames in sets of 10.
                 for (int i = 0; i < 100; i++)
                 {
                     streamingClient.SendFrames(55, i, 1);
@@ -109,13 +109,25 @@ namespace osu.Game.Tests.Visual.Multiplayer
             assertCombo(55, 1);
             assertCombo(56, 10);
 
+            // Advance to a point where only user 55's frame changes.
             setTime(500);
             assertCombo(55, 5);
             assertCombo(56, 10);
 
+            // Advance to a point where both user's frame changes.
             setTime(1100);
             assertCombo(55, 11);
             assertCombo(56, 20);
+
+            // Advance user 56 only to a point where its frame changes.
+            setTime(56, 2100);
+            assertCombo(55, 11);
+            assertCombo(56, 30);
+
+            // Advance both users beyond their last frame
+            setTime(101 * 100);
+            assertCombo(55, 100);
+            assertCombo(56, 100);
         }
 
         [Test]
@@ -130,6 +142,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
             foreach (var (_, clock) in clocks)
                 clock.CurrentTime = time;
         });
+
+        private void setTime(int userId, double time)
+            => AddStep($"set user {userId} time {time}", () => clocks[userId].CurrentTime = time);
 
         private void assertCombo(int userId, int expectedCombo)
             => AddUntilStep($"player {userId} has {expectedCombo} combo", () => this.ChildrenOfType<GameplayLeaderboardScore>().Single(s => s.User?.Id == userId).Combo.Value == expectedCombo);
