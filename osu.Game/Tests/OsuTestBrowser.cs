@@ -15,8 +15,9 @@ namespace osu.Game.Tests
     {
         public OsuTestBrowser()
         {
-            powerStatus = new DefaultPowerStatus();
+            PowerStatus = new DefaultPowerStatus();
         }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();

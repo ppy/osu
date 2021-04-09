@@ -477,6 +477,7 @@ namespace osu.Game.Screens.Play
         #endregion
 
         #region Low battery warning
+
         private Bindable<bool> batteryWarningShownOnce;
 
         private void showBatteryWarningIfNeeded()

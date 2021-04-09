@@ -21,7 +21,7 @@ namespace osu.Android
             : base(null)
         {
             gameActivity = activity;
-            powerStatus = new AndroidPowerStatus();
+            PowerStatus = new AndroidPowerStatus();
         }
 
         public override Version AssemblyVersion

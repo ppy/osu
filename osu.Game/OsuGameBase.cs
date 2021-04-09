@@ -96,7 +96,7 @@ namespace osu.Game
 
         protected Storage Storage { get; set; }
 
-        protected PowerStatus powerStatus;
+        protected PowerStatus PowerStatus;
 
         [Cached]
         [Cached(typeof(IBindable<RulesetInfo>))]
@@ -333,7 +333,7 @@ namespace osu.Game
 
             Ruleset.BindValueChanged(onRulesetChanged);
 
-            dependencies.CacheAs(powerStatus);
+            dependencies.CacheAs(PowerStatus);
         }
 
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)

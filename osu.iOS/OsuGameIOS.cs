@@ -15,7 +15,7 @@ namespace osu.iOS
         public OsuGameIOS()
             : base(null)
         {
-            powerStatus = new IOSPowerStatus();
+            PowerStatus = new IOSPowerStatus();
         }
         public override Version AssemblyVersion => new Version(NSBundle.MainBundle.InfoDictionary["CFBundleVersion"].ToString());
 
