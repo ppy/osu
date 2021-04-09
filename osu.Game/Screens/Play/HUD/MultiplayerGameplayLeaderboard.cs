@@ -121,8 +121,21 @@ namespace osu.Game.Screens.Play.HUD
                 OnIncomingFrames(userId, bundle);
         });
 
+        /// <summary>
+        /// Invoked when new frames have arrived for a user.
+        /// </summary>
+        /// <remarks>
+        /// By default, this immediately sets the current frame to be displayed for the user.
+        /// </remarks>
+        /// <param name="userId">The user which the frames arrived for.</param>
+        /// <param name="bundle">The bundle of frames.</param>
         protected virtual void OnIncomingFrames(int userId, FrameDataBundle bundle) => SetCurrentFrame(userId, bundle.Header);
 
+        /// <summary>
+        /// Sets the current frame to be displayed for a user.
+        /// </summary>
+        /// <param name="userId">The user to set the frame of.</param>
+        /// <param name="header">The frame to set.</param>
         protected void SetCurrentFrame(int userId, FrameHeader header)
         {
             var trackedScore = userScores[userId];
