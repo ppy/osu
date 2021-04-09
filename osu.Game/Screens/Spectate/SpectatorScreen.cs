@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Spectate
         /// <param name="userIds">The users to spectate.</param>
         protected SpectatorScreen(params int[] userIds)
         {
-            this.UserIds = userIds;
+            UserIds = userIds;
         }
 
         protected override void LoadComplete()
