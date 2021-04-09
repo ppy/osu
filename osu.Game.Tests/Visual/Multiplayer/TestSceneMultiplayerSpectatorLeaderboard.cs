@@ -122,7 +122,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestNoFrames()
         {
             assertCombo(55, 0);
-            assertCombo(56, 1);
+            assertCombo(56, 0);
         }
 
         private void setTime(double time) => AddStep($"set time {time}", () =>
