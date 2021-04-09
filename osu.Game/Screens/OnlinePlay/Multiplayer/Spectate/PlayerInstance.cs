@@ -7,7 +7,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
@@ -24,7 +23,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public User User => Score.ScoreInfo.User;
 
         public WorkingBeatmap Beatmap { get; private set; }
-        public Ruleset Ruleset { get; private set; }
 
         public readonly Score Score;
 
@@ -43,7 +41,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private void load(BeatmapManager beatmapManager)
         {
             Beatmap = beatmapManager.GetWorkingBeatmap(Score.ScoreInfo.Beatmap, bypassCache: true);
-            Ruleset = Score.ScoreInfo.Ruleset.CreateInstance();
 
             InternalChild = new GameplayIsolationContainer(Beatmap, Score.ScoreInfo.Ruleset, Score.ScoreInfo.Mods)
             {
@@ -87,15 +84,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 return;
 
             if (catchupRequired)
-            {
                 Beatmap.Track.AddAdjustment(AdjustableProperty.Frequency, catchupFrequencyAdjustment);
-                isCatchingUp = true;
-            }
             else
-            {
                 Beatmap.Track.RemoveAdjustment(AdjustableProperty.Frequency, catchupFrequencyAdjustment);
-                isCatchingUp = false;
-            }
+
+            isCatchingUp = catchupRequired;
         }
 
         public double GetCurrentGameplayTime()
