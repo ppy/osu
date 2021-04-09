@@ -17,7 +17,10 @@ namespace osu.Game.Screens.Play
             if (!(Beatmap.Value.BeatmapInfo.OnlineBeatmapID is int beatmapId))
                 return null;
 
-            return new CreateSoloScoreRequest(beatmapId, Game.VersionHash);
+            if (!(Ruleset.Value.ID is int rulesetId))
+                return null;
+
+            return new CreateSoloScoreRequest(beatmapId, rulesetId, Game.VersionHash);
         }
 
         protected override bool HandleTokenRetrievalFailure(Exception exception) => false;
