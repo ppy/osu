@@ -465,8 +465,8 @@ namespace osu.Game.Rulesets.Catch.UI
         private void updatePosition(float newX)
         {
             // When the catcher reaches the target fruit when hyperdashing, the catcher stops under the target fruit.
-            if (hyperDashDirection > 0 && hyperDashTargetPosition <= newX ||
-                hyperDashDirection < 0 && hyperDashTargetPosition >= newX)
+            if ((hyperDashDirection > 0 && hyperDashTargetPosition <= newX) ||
+                (hyperDashDirection < 0 && hyperDashTargetPosition >= newX))
             {
                 ResetHyperDash();
                 newX = hyperDashTargetPosition;
