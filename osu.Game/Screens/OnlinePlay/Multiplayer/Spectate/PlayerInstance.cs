@@ -16,7 +16,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
     public class PlayerInstance : CompositeDrawable
     {
         private const double catchup_rate = 2;
-        private const double max_sync_offset = catchup_rate * 2; // Double the catchup rate to prevent ringing.
+        private const double max_sync_offset = 50;
 
         public bool PlayerLoaded => stack?.CurrentScreen is Player;
 
