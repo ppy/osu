@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
@@ -15,10 +17,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
     public class PlayerInstance : CompositeDrawable
     {
+        private const double catchup_rate = 2;
+        private const double max_sync_offset = catchup_rate * 2; // Double the catchup rate to prevent ringing.
+
         public bool PlayerLoaded => stack?.CurrentScreen is Player;
 
         public User User => Score.ScoreInfo.User;
-        public ScoreProcessor ScoreProcessor => player?.ScoreProcessor;
 
         public WorkingBeatmap Beatmap { get; private set; }
         public Ruleset Ruleset { get; private set; }
@@ -53,6 +57,79 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             };
 
             stack.Push(new MultiplayerSpectatorPlayerLoader(Score, () => player = new MultiplayerSpectatorPlayer(Score)));
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+            updateCatchup();
+        }
+
+        private readonly BindableDouble catchupFrequencyAdjustment = new BindableDouble(catchup_rate);
+        private double targetTrackTime;
+        private bool isCatchingUp;
+
+        private void updateCatchup()
+        {
+            if (player?.IsLoaded != true)
+                return;
+
+            if (Score.Replay.Frames.Count == 0)
+                return;
+
+            if (player.GameplayClockContainer.IsPaused.Value)
+                return;
+
+            double currentTime = Beatmap.Track.CurrentTime;
+            bool catchupRequired = targetTrackTime > currentTime + max_sync_offset;
+
+            // Skip catchup if nothing needs to be done.
+            if (catchupRequired == isCatchingUp)
+                return;
+
+            if (catchupRequired)
+            {
+                Beatmap.Track.AddAdjustment(AdjustableProperty.Frequency, catchupFrequencyAdjustment);
+                isCatchingUp = true;
+            }
+            else
+            {
+                Beatmap.Track.RemoveAdjustment(AdjustableProperty.Frequency, catchupFrequencyAdjustment);
+                isCatchingUp = false;
+            }
+        }
+
+        public double GetCurrentGameplayTime()
+        {
+            if (player?.IsLoaded != true)
+                return 0;
+
+            return player.GameplayClockContainer.GameplayClock.CurrentTime;
+        }
+
+        public double GetCurrentTrackTime()
+        {
+            if (player?.IsLoaded != true)
+                return 0;
+
+            return Beatmap.Track.CurrentTime;
+        }
+
+        public void ContinueGameplay(double targetTrackTime)
+        {
+            if (player?.IsLoaded != true)
+                return;
+
+            player.GameplayClockContainer.Start();
+            this.targetTrackTime = targetTrackTime;
+        }
+
+        public void PauseGameplay()
+        {
+            if (player?.IsLoaded != true)
+                return;
+
+            player.GameplayClockContainer.Stop();
         }
     }
 }
