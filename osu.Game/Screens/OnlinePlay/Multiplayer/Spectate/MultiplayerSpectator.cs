@@ -72,43 +72,21 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
-            updatePlayTime();
+            updateGameplayPlayingState();
         }
 
-        private bool gameplayStarted;
-
-        private void updatePlayTime()
+        private void updateGameplayPlayingState()
         {
-            if (gameplayStarted)
+            // Make sure all players are loaded and have frames before starting any.
+            if (!AllPlayersLoaded || !instances.All(i => i.Score.Replay.Frames.Count > 0))
             {
-                ensurePlaying(instances.Select(i => i.GetCurrentTrackTime()).Max());
+                foreach (var inst in instances)
+                    inst?.PauseGameplay();
                 return;
             }
 
-            // Make sure all players are loaded.
-            if (!AllPlayersLoaded)
-            {
-                ensureAllStopped();
-                return;
-            }
+            double targetTrackTime = instances.Select(i => i.GetCurrentGameplayTime()).Max();
 
-            if (!instances.All(i => i.Score.Replay.Frames.Count > 0))
-            {
-                ensureAllStopped();
-                return;
-            }
-
-            gameplayStarted = true;
-        }
-
-        private void ensureAllStopped()
-        {
-            foreach (var inst in instances)
-                inst?.PauseGameplay();
-        }
-
-        private void ensurePlaying(double targetTrackTime)
-        {
             foreach (var inst in instances)
             {
                 Debug.Assert(inst != null);
