@@ -33,7 +33,10 @@ namespace osu.Game.Rulesets.Catch.UI
                     Margin = new MarginPadding { Bottom = 350f },
                     X = CatchPlayfield.CENTER_X
                 },
-                MovableCatcher = new Catcher(this, droppedObjectContainer, difficulty) { X = CatchPlayfield.CENTER_X },
+                MovableCatcher = new Catcher(this, droppedObjectContainer, difficulty)
+                {
+                    LogicalX = CatchPlayfield.CENTER_X
+                }
             };
         }
 

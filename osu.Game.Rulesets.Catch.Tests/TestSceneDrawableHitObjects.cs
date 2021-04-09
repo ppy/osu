@@ -162,7 +162,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             float xCoords = CatchPlayfield.CENTER_X;
 
             if (drawableRuleset.Playfield is CatchPlayfield catchPlayfield)
-                catchPlayfield.CatcherArea.MovableCatcher.X = xCoords - x_offset;
+                catchPlayfield.CatcherArea.MovableCatcher.LogicalX = xCoords - x_offset;
 
             if (hit)
                 xCoords -= x_offset;

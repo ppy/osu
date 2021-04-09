@@ -80,6 +80,24 @@ namespace osu.Game.Rulesets.Catch.UI
         /// </summary>
         internal Drawable CurrentDrawableCatcher => currentCatcher.Drawable;
 
+        private float logicalX;
+
+        /// <summary>
+        /// The horizontal position of the catcher.
+        /// It is used instead of <see cref="Drawable.X"/> to stress
+        /// it is affecting the fruit catching logic, not a visual element.
+        /// </summary>
+        public float LogicalX
+        {
+            get => logicalX;
+            // TODO: check
+            set
+            {
+                logicalX = value;
+                X = LogicalX;
+            }
+        }
+
         private bool dashing;
 
         public bool Dashing
@@ -219,13 +237,8 @@ namespace osu.Game.Rulesets.Catch.UI
                 return false;
 
             var halfCatchWidth = catchWidth * 0.5f;
-
-            // this stuff wil disappear once we move fruit to non-relative coordinate space in the future.
-            var catchObjectPosition = fruit.EffectiveX;
-            var catcherPosition = Position.X;
-
-            return catchObjectPosition >= catcherPosition - halfCatchWidth &&
-                   catchObjectPosition <= catcherPosition + halfCatchWidth;
+            return fruit.EffectiveX >= LogicalX - halfCatchWidth &&
+                   fruit.EffectiveX <= LogicalX + halfCatchWidth;
         }
 
         public void OnNewResult(DrawableCatchHitObject drawableObject, JudgementResult result)
@@ -240,7 +253,9 @@ namespace osu.Game.Rulesets.Catch.UI
 
             if (result.IsHit)
             {
-                var positionInStack = computePositionInStack(new Vector2(palpableObject.X - X, 0), palpableObject.DisplaySize.X / 2);
+                // it is using `X` instead of `LogicalX` because it is for visual.
+                var relativeDrawPosition = new Vector2(palpableObject.X - X, 0);
+                var positionInStack = computePositionInStack(relativeDrawPosition, palpableObject.DisplaySize.X / 2);
 
                 if (CatchFruitOnPlate)
                     placeCaughtObject(palpableObject, positionInStack);
@@ -256,7 +271,7 @@ namespace osu.Game.Rulesets.Catch.UI
             {
                 var target = hitObject.HyperDashTarget;
                 var timeDifference = target.StartTime - hitObject.StartTime;
-                double positionDifference = target.EffectiveX - X;
+                double positionDifference = target.EffectiveX - LogicalX;
                 var velocity = positionDifference / Math.Max(1.0, timeDifference - 1000.0 / 60.0);
 
                 SetHyperDashState(Math.Abs(velocity), target.EffectiveX);
@@ -299,7 +314,7 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             var wasHyperDashing = HyperDashing;
 
-            if (modifier <= 1 || X == targetPosition)
+            if (modifier <= 1 || LogicalX == targetPosition)
             {
                 hyperDashModifier = 1;
                 hyperDashDirection = 0;
@@ -310,7 +325,7 @@ namespace osu.Game.Rulesets.Catch.UI
             else
             {
                 hyperDashModifier = modifier;
-                hyperDashDirection = Math.Sign(targetPosition - X);
+                hyperDashDirection = Math.Sign(targetPosition - LogicalX);
                 hyperDashTargetPosition = targetPosition;
 
                 if (!wasHyperDashing)
@@ -325,11 +340,11 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             position = Math.Clamp(position, 0, CatchPlayfield.WIDTH);
 
-            if (position == X)
+            if (position == LogicalX)
                 return;
 
-            Scale = new Vector2(Math.Abs(Scale.X) * (position > X ? 1 : -1), Scale.Y);
-            X = position;
+            Scale = new Vector2(Math.Abs(Scale.X) * (position > LogicalX ? 1 : -1), Scale.Y);
+            LogicalX = position;
         }
 
         public bool OnPressed(CatchAction action)
@@ -427,13 +442,13 @@ namespace osu.Game.Rulesets.Catch.UI
             var dashModifier = Dashing ? 1 : 0.5;
             var speed = BASE_SPEED * dashModifier * hyperDashModifier;
 
-            UpdatePosition((float)(X + direction * Clock.ElapsedFrameTime * speed));
+            UpdatePosition((float)(LogicalX + direction * Clock.ElapsedFrameTime * speed));
 
             // Correct overshooting.
-            if ((hyperDashDirection > 0 && hyperDashTargetPosition < X) ||
-                (hyperDashDirection < 0 && hyperDashTargetPosition > X))
+            if ((hyperDashDirection > 0 && hyperDashTargetPosition < LogicalX) ||
+                (hyperDashDirection < 0 && hyperDashTargetPosition > LogicalX))
             {
-                X = hyperDashTargetPosition;
+                LogicalX = hyperDashTargetPosition;
                 SetHyperDashState();
             }
         }
