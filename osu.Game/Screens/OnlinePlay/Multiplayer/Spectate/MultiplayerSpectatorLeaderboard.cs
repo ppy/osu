@@ -22,7 +22,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         public void AddClock(int userId, IClock source) => trackedData[userId] = new TrackedUserData(source);
 
-        public void RemoveClock(int userId, IClock source) => trackedData.Remove(userId);
+        public void RemoveClock(int userId) => trackedData.Remove(userId);
 
         protected override void OnIncomingFrames(int userId, FrameDataBundle bundle)
         {
