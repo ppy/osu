@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             assertControlPointPathType(0, PathType.Bezier);
             assertControlPointPathType(1, PathType.PerfectCurve);
-            AddAssert("point 3 is not inherited", () => slider.Path.ControlPoints[3].Type != null);
+            assertControlPointPathType(3, PathType.Bezier);
         }
 
         [Test]
@@ -103,6 +103,27 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             assertControlPointPathType(0, PathType.Bezier);
             AddAssert("point 3 is not inherited", () => slider.Path.ControlPoints[3].Type != null);
+        }
+
+        [Test]
+        public void TestPerfectCurveTooManyPointsLinear()
+        {
+            createVisualiser(true);
+
+            addControlPointStep(new Vector2(200), PathType.Linear);
+            addControlPointStep(new Vector2(300));
+            addControlPointStep(new Vector2(500, 300));
+            addControlPointStep(new Vector2(700, 200));
+            addControlPointStep(new Vector2(500, 100));
+
+            // Must be both hovering and selecting the control point for the context menu to work.
+            moveMouseToControlPoint(1);
+            AddStep("select control point", () => visualiser.Pieces[1].IsSelected.Value = true);
+            addContextMenuItemStep("Perfect curve");
+
+            assertControlPointPathType(0, PathType.Linear);
+            assertControlPointPathType(1, PathType.PerfectCurve);
+            assertControlPointPathType(3, PathType.Linear);
         }
 
         [Test]
