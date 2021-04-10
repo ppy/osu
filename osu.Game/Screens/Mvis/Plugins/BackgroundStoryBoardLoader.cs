@@ -129,7 +129,6 @@ namespace osu.Game.Screens.Mvis.Plugins
 
         protected override bool OnContentLoaded(Drawable content)
         {
-            //Logger.Log("故事版OnContentLoaded");
             var newStoryboard = (BackgroundStoryboard)content;
 
             //bug: 过早Seek至歌曲时间会导致部分故事版加载过程僵死
@@ -173,9 +172,13 @@ namespace osu.Game.Screens.Mvis.Plugins
         private void refresh(WorkingBeatmap newBeatmap)
         {
             if (!ContentLoaded)
+            {
                 Cancel();
+                currentStoryboard?.Expire();
+                currentStoryboard?.Dispose();
+            }
 
-            ClearInternal();
+            currentStoryboard?.FadeOut(300).Expire();
             targetBeatmap = newBeatmap;
             Load();
         }
