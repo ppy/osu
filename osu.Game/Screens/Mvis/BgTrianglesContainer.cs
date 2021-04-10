@@ -33,6 +33,7 @@ namespace osu.Game.Screens.Mvis
                 }
             };
             config.BindWith(MSetting.MvisEnableBgTriangles, enableBgTriangles);
+            Show();
         }
 
         protected override void LoadComplete()

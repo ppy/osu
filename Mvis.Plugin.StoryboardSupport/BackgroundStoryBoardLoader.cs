@@ -155,6 +155,12 @@ namespace Mvis.Plugin.StoryboardSupport
             if (prevProxy != null) MvisScreen?.ProxyLayer.Add(prevProxy);
             prevProxy?.Show();
 
+            if (MvisScreen != null)
+            {
+                MvisScreen.HideTriangles.Value = NeedToHideTriangles.Value;
+                MvisScreen.HideScreenBackground.Value = targetBeatmap.Storyboard.ReplacesBackground;
+            }
+
             return true;
         }
 

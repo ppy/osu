@@ -68,13 +68,50 @@ namespace osu.Game.Screens.Mvis
 
         #region 外部事件
 
+        /// <summary>
+        /// 切换暂停时调用。<br/><br/>
+        /// 传递: 当前音乐是否暂停<br/>
+        /// true: 暂停<br/>
+        /// false: 播放<br/>
+        /// </summary>
         public Action<bool> OnTrackRunningToggle;
+
+        /// <summary>
+        /// 播放器屏幕退出时调用
+        /// </summary>
         public Action OnScreenExiting;
+
+        /// <summary>
+        /// 播放器屏幕进入后台时调用
+        /// </summary>
         public Action OnScreenSuspending;
+
+        /// <summary>
+        /// 播放器屏幕进入前台时调用
+        /// </summary>
         public Action OnScreenResuming;
+
+        /// <summary>
+        /// 进入空闲状态(长时间没有输入)时调用
+        /// </summary>
         public Action OnIdle;
+
+        /// <summary>
+        /// 从空闲状态退出时调用
+        /// </summary>
         public Action OnResumeFromIdle;
+
+        /// <summary>
+        /// 谱面变更时调用<br/><br/>
+        /// 传递: 当前谱面(WorkingBeatmap)<br/>
+        /// 插件开发建议使用此Action节省一系列的时间
+        /// </summary>
         public Action<WorkingBeatmap> OnBeatmapChanged;
+
+        /// <summary>
+        /// 拖动下方进度条时调用<br/><br/>
+        /// 传递: 拖动的目标时间
+        /// </summary>
         public Action<double> OnSeek;
 
         #endregion
@@ -165,6 +202,9 @@ namespace osu.Game.Screens.Mvis
 
         #region 故事版proxy
 
+        /// <summary>
+        /// 请将各种Drawable Proxy放置在此处
+        /// </summary>
         public readonly Container ProxyLayer = new Container
         {
             RelativeSizeAxes = Axes.Both,
@@ -186,6 +226,9 @@ namespace osu.Game.Screens.Mvis
         private DrawableTrack track => musicController.CurrentTrack;
 
         private readonly BindableList<MvisPlugin> loadList = new BindableList<MvisPlugin>();
+
+        public Bindable<bool> HideTriangles = new Bindable<bool>();
+        public Bindable<bool> HideScreenBackground = new Bindable<bool>();
 
         #endregion
 
@@ -558,6 +601,9 @@ namespace osu.Game.Screens.Mvis
                     background.Add(ProxyLayer);
                 }
             }, true);
+
+            HideTriangles.BindValueChanged(updateBgTriangles);
+            HideScreenBackground.BindValueChanged(_ => applyBackgroundBrightness());
 
             foreach (var pl in pluginManager.GetAllPlugins(true))
             {
@@ -948,7 +994,7 @@ namespace osu.Game.Screens.Mvis
                     ? OsuColour.Gray(OverlaysHidden ? idleBgDim.Value : 0.6f)
                     : OsuColour.Gray(brightness);
 
-                b.FadeColour(targetColor, duration, Easing.OutQuint);
+                b.FadeColour(HideScreenBackground.Value ? Color4.Black : targetColor, duration, Easing.OutQuint);
                 background.FadeColour(targetColor, duration, Easing.OutQuint);
             });
         }
