@@ -51,7 +51,8 @@
     <Reference Include="Java.Interop" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ppy.osu.Game.Resources" Version="2021.211.1" />
-    <PackageReference Include="ppy.osu.Framework.Android" Version="2021.407.0" />
+    <PackageReference Include="ppy.osu.Game.Resources" Version="2021.410.0" />
+    <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj" />
+    <ProjectReference Include="..\osu-framework\osu.Framework.Android\osu.Framework.Android.csproj" />
   </ItemGroup>
 </Project>

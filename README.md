@@ -1,8 +1,4 @@
-<p align="center">
-  <img width="500px" src="assets/lazer.png">
-</p>
-
-# 如何完整克隆本项目(需要bash):
+# 如何构建本项目:
 
 ```bash
 #!/bin/bash
@@ -20,11 +16,9 @@ cd ../osu
 dotnet run --project osu.Desktop -c Release
 ```
 
-# 更改翻译
-编辑`M.Resources/Locales/<语言代码>/M.po`，完成后保存即可。
-
-# 创建翻译
-使用`Poedit`打开`M.Resources/Locales/M.pot`，然后将创建的翻译放在`Locales/<语言代码>/下`
+<p align="center">
+  <img width="500px" src="assets/lazer.png">
+</p>
 
 # osu!
 

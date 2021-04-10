@@ -54,6 +54,7 @@ using osu.Game.Utils;
 using LogLevel = osu.Framework.Logging.LogLevel;
 using osu.Game.Database;
 using osu.Game.IO;
+using osu.Game.Screens.Mvis.Plugins;
 
 namespace osu.Game
 {
@@ -121,6 +122,8 @@ namespace osu.Game
 
         private VolumeOverlay volume;
         private OsuLogo osuLogo;
+
+        private MvisPluginManager mvisPlManager;
 
         private MainMenu menuScreen;
 
@@ -249,6 +252,8 @@ namespace osu.Game
             dependencies.Cache(SentryLogger);
 
             dependencies.Cache(osuLogo = new OsuLogo { Alpha = 0 });
+
+            dependencies.Cache(mvisPlManager = new MvisPluginManager());
 
             // bind config int to database RulesetInfo
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
@@ -696,6 +701,8 @@ namespace osu.Game
                 // Loader has to be created after the logo has finished loading as Loader performs logo transformations on entering.
                 ScreenStack.Push(CreateLoader().With(l => l.RelativeSizeAxes = Axes.Both));
             });
+
+            loadComponentSingleFile(mvisPlManager, AddInternal);
 
             loadComponentSingleFile(Toolbar = new Toolbar
             {

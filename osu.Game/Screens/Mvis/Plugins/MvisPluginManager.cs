@@ -13,17 +13,23 @@ namespace osu.Game.Screens.Mvis.Plugins
     {
         private readonly BindableList<MvisPlugin> avaliablePlugins = new BindableList<MvisPlugin>();
         private readonly BindableList<MvisPlugin> activePlugins = new BindableList<MvisPlugin>();
+        private readonly List<MvisPluginProvider> providers = new List<MvisPluginProvider>();
 
         [CanBeNull]
         [Resolved(CanBeNull = true)]
         private SideBar.Sidebar sideBar { get; set; }
 
-        public Action OnPluginListChanged;
+        public Action<MvisPlugin> OnPluginAdd;
+        public Action<MvisPlugin> OnPluginUnLoad;
 
-        protected override void LoadComplete()
+        [BackgroundDependencyLoader]
+        private void load(CustomStore customStore)
         {
-            avaliablePlugins.BindCollectionChanged((_, __) => OnPluginListChanged?.Invoke(), true);
-            base.LoadComplete();
+            foreach (var provider in customStore.LoadedPluginProviders)
+            {
+                AddPlugin(provider.CreatePlugin);
+                providers.Add(provider);
+            }
         }
 
         public bool AddPlugin(MvisPlugin pl)
@@ -32,6 +38,7 @@ namespace osu.Game.Screens.Mvis.Plugins
 
             avaliablePlugins.Add(pl);
             sideBar?.Add(pl.SidebarPage);
+            OnPluginAdd?.Invoke(pl);
             return true;
         }
 
@@ -41,17 +48,22 @@ namespace osu.Game.Screens.Mvis.Plugins
 
             sideBar?.Remove(pl.SidebarPage);
 
+            var provider = providers.Find(p => p.CreatePlugin.GetType() == pl.GetType());
+
             activePlugins.Remove(pl);
             avaliablePlugins.Remove(pl);
+            providers.Remove(provider);
 
             try
             {
                 pl.UnLoad();
+                OnPluginUnLoad?.Invoke(pl);
             }
             catch (Exception e)
             {
                 Logger.Error(e, "卸载插件时出现了问题");
                 avaliablePlugins.Add(pl);
+                providers.Add(provider);
                 throw;
             }
 
@@ -90,6 +102,36 @@ namespace osu.Game.Screens.Mvis.Plugins
         }
 
         public List<MvisPlugin> GetActivePlugins() => activePlugins.ToList();
-        public List<MvisPlugin> GetAllPlugins() => avaliablePlugins.ToList();
+
+        /// <summary>
+        /// 获取所有插件
+        /// </summary>
+        /// <param name="newInstance">是否创建新插件本体，该选项应当只用于MvisScreen启动！</param>
+        /// <returns>所有已加载且可用的插件</returns>
+        public List<MvisPlugin> GetAllPlugins(bool newInstance)
+        {
+            if (newInstance)
+            {
+                DisposeAllPlugins();
+
+                foreach (var p in providers)
+                {
+                    avaliablePlugins.Add(p.CreatePlugin);
+                }
+            }
+
+            return avaliablePlugins.ToList();
+        }
+
+        public void DisposeAllPlugins()
+        {
+            foreach (var pl in avaliablePlugins)
+            {
+                activePlugins.Remove(pl);
+                pl.Dispose();
+            }
+
+            avaliablePlugins.Clear();
+        }
     }
 }

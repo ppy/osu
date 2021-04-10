@@ -8,14 +8,17 @@ using osu.Game.Screens.Mvis.Objects;
 using osu.Game.Screens.Mvis.Plugins.Types;
 using osuTK;
 
-namespace osu.Game.Screens.Mvis.Plugins
+namespace Mvis.Plugin.RulesetPanel
 {
     public class RulesetPanel : BindableControlledPlugin
     {
+        public override TargetLayer Target => TargetLayer.Foreground;
+
         public RulesetPanel()
         {
             Name = "Mvis面板(内置)";
             Description = "用于提供Mvis面板功能(中心的谱面图及周围的粒子效果)";
+            Author = "mf-osu; EVAST9919";
 
             Flags.AddRange(new[]
             {

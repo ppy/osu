@@ -209,9 +209,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             addClickButtonStep();
             AddAssert("user waiting for load", () => Client.Room?.Users[0].State == MultiplayerUserState.WaitingForLoad);
-            AddAssert("ready button disabled", () => !button.ChildrenOfType<OsuButton>().Single().Enabled.Value);
 
+            AddAssert("ready button disabled", () => !button.ChildrenOfType<OsuButton>().Single().Enabled.Value);
             AddStep("transitioned to gameplay", () => readyClickOperation.Dispose());
+
+            AddStep("finish gameplay", () =>
+            {
+                Client.ChangeUserState(Client.Room?.Users[0].UserID ?? 0, MultiplayerUserState.Loaded);
+                Client.ChangeUserState(Client.Room?.Users[0].UserID ?? 0, MultiplayerUserState.FinishedPlay);
+            });
+
             AddAssert("ready button enabled", () => button.ChildrenOfType<OsuButton>().Single().Enabled.Value);
         }
     }

@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -13,18 +12,21 @@ namespace osu.Game.Input.Bindings
 {
     public class GlobalActionContainer : DatabasedKeyBindingContainer<GlobalAction>, IHandleGlobalKeyboardInput
     {
-        [CanBeNull]
-        private readonly GlobalInputManager globalInputManager;
-
         private readonly Drawable handler;
+        private InputManager parentInputManager;
 
-        public GlobalActionContainer(OsuGameBase game, [CanBeNull] GlobalInputManager globalInputManager)
+        public GlobalActionContainer(OsuGameBase game)
             : base(matchingMode: KeyCombinationMatchingMode.Modifiers)
         {
-            this.globalInputManager = globalInputManager;
-
             if (game is IKeyBindingHandler<GlobalAction>)
                 handler = game;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            parentInputManager = GetContainingInputManager();
         }
 
         public override IEnumerable<IKeyBinding> DefaultKeyBindings => GlobalKeyBindings
@@ -128,7 +130,12 @@ namespace osu.Game.Input.Bindings
         {
             get
             {
-                var inputQueue = globalInputManager?.NonPositionalInputQueue ?? base.KeyBindingInputQueue;
+                // To ensure the global actions are handled with priority, this GlobalActionContainer is actually placed after game content.
+                // It does not contain children as expected, so we need to forward the NonPositionalInputQueue from the parent input manager to correctly
+                // allow the whole game to handle these actions.
+
+                // An eventual solution to this hack is to create localised action containers for individual components like SongSelect, but this will take some rearranging.
+                var inputQueue = parentInputManager?.NonPositionalInputQueue ?? base.KeyBindingInputQueue;
 
                 return handler != null ? inputQueue.Prepend(handler) : inputQueue;
             }
