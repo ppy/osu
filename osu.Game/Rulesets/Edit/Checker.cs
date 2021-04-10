@@ -12,14 +12,14 @@ namespace osu.Game.Rulesets.Edit
     public abstract class Checker
     {
         // These are all ruleset-invariant, hence here instead of in e.g. `OsuChecker`.
-        private readonly List<BeatmapCheck> beatmapChecks = new List<BeatmapCheck>
+        private readonly IReadOnlyList<Check> checks = new List<Check>
         {
             new CheckBackground()
         };
 
         public virtual IEnumerable<Issue> Run(IBeatmap beatmap)
         {
-            return beatmapChecks.SelectMany(check => check.Run(beatmap));
+            return checks.SelectMany(check => check.Run(beatmap));
         }
     }
 }

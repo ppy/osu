@@ -9,7 +9,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Checks
 {
-    public class CheckOffscreenObjects : BeatmapCheck
+    public class CheckOffscreenObjects : Check
     {
         // These are close approximates to the edges of the screen
         // in gameplay on a 4:3 aspect ratio for osu!stable.

@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public class OsuChecker : Checker
     {
-        public readonly List<BeatmapCheck> beatmapChecks = new List<BeatmapCheck>
+        public readonly List<Check> beatmapChecks = new List<Check>
         {
             new CheckOffscreenObjects()
         };
