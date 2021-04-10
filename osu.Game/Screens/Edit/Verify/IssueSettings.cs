@@ -41,7 +41,6 @@ namespace osu.Game.Screens.Edit.Verify
 
         private IReadOnlyList<Drawable> createSections() => new Drawable[]
         {
-            new VisibilitySettings()
         };
     }
 }
