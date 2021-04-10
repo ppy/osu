@@ -321,18 +321,21 @@ namespace osu.Game
 
             AddInternal(RulesetConfigCache);
 
-            var globalInput = new GlobalInputManager(this)
+            GlobalActionContainer globalBindings;
+
+            var mainContent = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Child = MenuCursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both }
+                MenuCursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both },
+                // to avoid positional input being blocked by children, ensure the GlobalActionContainer is above everything.
+                globalBindings = new GlobalActionContainer(this)
             };
 
             MenuCursorContainer.Child = content = new OsuTooltipContainer(MenuCursorContainer.Cursor) { RelativeSizeAxes = Axes.Both };
 
-            base.Content.Add(CreateScalingContainer().WithChild(globalInput));
+            base.Content.Add(CreateScalingContainer().WithChildren(mainContent));
 
-            KeyBindingStore.Register(globalInput.GlobalBindings);
-            dependencies.Cache(globalInput.GlobalBindings);
+            KeyBindingStore.Register(globalBindings);
+            dependencies.Cache(globalBindings);
 
             PreviewTrackManager previewTrackManager;
             dependencies.Cache(previewTrackManager = new PreviewTrackManager());

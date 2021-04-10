@@ -347,12 +347,6 @@ namespace osu.Game.Rulesets.Scoring
 
             score.HitEvents = hitEvents;
         }
-
-        /// <summary>
-        /// Create a <see cref="HitWindows"/> for this processor.
-        /// </summary>
-        [Obsolete("Method is now unused.")] // Can be removed 20210328
-        public virtual HitWindows CreateHitWindows() => new HitWindows();
     }
 
     public enum ScoringMode

@@ -57,13 +57,6 @@ namespace osu.Game.Overlays.Settings
             }
         }
 
-        [Obsolete("Use Current instead")] // Can be removed 20210406
-        public Bindable<T> Bindable
-        {
-            get => Current;
-            set => Current = value;
-        }
-
         public virtual Bindable<T> Current
         {
             get => controlWithCurrent.Current;
