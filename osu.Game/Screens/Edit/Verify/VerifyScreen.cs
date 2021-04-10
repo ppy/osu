@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Edit.Verify
     public class VerifyScreen : EditorScreen
     {
         private Ruleset ruleset;
-        private static Checker checker; // TODO: Should not be static, but apparently needs to be?
+        private static Checker checker;
 
         [Cached]
         private Bindable<Issue> selectedIssue = new Bindable<Issue>();
