@@ -48,8 +48,11 @@ namespace osu.Game.Screens.Mvis.Plugins
 
             sideBar?.Remove(pl.SidebarPage);
 
+            var provider = providers.Find(p => p.CreatePlugin.GetType() == pl.GetType());
+
             activePlugins.Remove(pl);
             avaliablePlugins.Remove(pl);
+            providers.Remove(provider);
 
             try
             {
@@ -60,6 +63,7 @@ namespace osu.Game.Screens.Mvis.Plugins
             {
                 Logger.Error(e, "卸载插件时出现了问题");
                 avaliablePlugins.Add(pl);
+                providers.Add(provider);
                 throw;
             }
 
