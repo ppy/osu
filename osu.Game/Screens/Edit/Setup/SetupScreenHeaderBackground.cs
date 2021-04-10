@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Edit.Setup
                         },
                         new OsuTextFlowContainer(t => t.Font = OsuFont.Default.With(size: 24))
                         {
-                            Text = "Drag image here to set beatmap background!",
+                            Text = "拖拽一张图片过来即可设置背景!",
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             AutoSizeAxes = Axes.Both
