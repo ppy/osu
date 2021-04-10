@@ -1,3 +1,4 @@
+using Mvis.Plugin.FakeEditor.Editor;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -8,11 +9,10 @@ using osu.Game.Configuration;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit;
-using osu.Game.Screens.Mvis.Plugins.Editor;
 using osu.Game.Screens.Mvis.Plugins.Types;
 using osu.Game.Screens.Play;
 
-namespace osu.Game.Screens.Mvis.Plugins
+namespace Mvis.Plugin.FakeEditor
 {
     [Cached(typeof(IBeatSnapProvider))]
     [Cached(typeof(ISamplePlaybackDisabler))]
@@ -33,12 +33,12 @@ namespace osu.Game.Screens.Mvis.Plugins
 
         private WorkingBeatmap beatmap;
 
-        public FakeEditor(WorkingBeatmap beatmap)
+        public FakeEditor()
         {
             Name = "谱面编辑器(内置)";
             Description = "用于提供Note音效; 高内存占用, 不要用来尝试那些会崩掉你游戏/电脑的图";
+            Author = "mf-osu";
 
-            this.beatmap = beatmap;
             Masking = true;
 
             Flags.AddRange(new[]

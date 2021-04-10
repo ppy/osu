@@ -87,6 +87,9 @@ namespace osu.Game.Screens.Mvis
         [Resolved]
         private MusicController musicController { get; set; }
 
+        [Resolved]
+        private MvisPluginManager pluginManager { get; set; }
+
         private CollectionHelper collectionHelper;
         private CustomColourProvider colourProvider;
         private DependencyContainer dependencies;
@@ -119,7 +122,6 @@ namespace osu.Game.Screens.Mvis
         private NightcoreBeatContainer nightcoreBeatContainer;
 
         private Container background;
-        private BackgroundStoryBoardLoader sbLoader;
         private BgTrianglesContainer bgTriangles;
         private FullScreenSkinnableComponent skinnableBbBackground;
 
@@ -163,13 +165,11 @@ namespace osu.Game.Screens.Mvis
 
         #region 故事版proxy
 
-        private readonly Container proxyContainer = new Container
+        public readonly Container ProxyLayer = new Container
         {
             RelativeSizeAxes = Axes.Both,
             Depth = -1
         };
-
-        private Drawable prevProxy;
 
         #endregion
 
@@ -185,11 +185,7 @@ namespace osu.Game.Screens.Mvis
 
         private DrawableTrack track => musicController.CurrentTrack;
 
-        private WorkingBeatmap prevBeatmap;
-
         private readonly BindableList<MvisPlugin> loadList = new BindableList<MvisPlugin>();
-
-        private FakeEditor fakeEditor;
 
         #endregion
 
@@ -208,32 +204,7 @@ namespace osu.Game.Screens.Mvis
             var iB = config.Get<float>(MSetting.MvisInterfaceBlue);
             dependencies.Cache(colourProvider = new CustomColourProvider(iR, iG, iB));
             dependencies.Cache(collectionHelper = new CollectionHelper());
-            dependencies.Cache(pluginManager = new MvisPluginManager());
             dependencies.Cache(this);
-
-            var panel = new RulesetPanel();
-            pluginManager.AddPlugin(panel);
-
-            fakeEditor = new FakeEditor(Beatmap.Value);
-            pluginManager.AddPlugin(fakeEditor);
-
-            sbLoader = new BackgroundStoryBoardLoader
-            {
-                OnNewStoryboardLoaded = () =>
-                {
-                    if (prevProxy != null)
-                    {
-                        proxyContainer.Remove(prevProxy);
-                        prevProxy.Expire();
-                    }
-
-                    prevProxy = sbLoader.StoryboardProxy;
-
-                    if (prevProxy != null) proxyContainer.Add(prevProxy);
-                    prevProxy?.Show();
-                }
-            };
-            pluginManager.AddPlugin(sbLoader);
 
             sidebar.Add(settingsScroll = new SidebarSettingsScrollContainer
             {
@@ -268,7 +239,6 @@ namespace osu.Game.Screens.Mvis
             {
                 colourProvider,
                 collectionHelper,
-                pluginManager,
                 nightcoreBeatContainer = new NightcoreBeatContainer
                 {
                     Alpha = 0
@@ -281,23 +251,17 @@ namespace osu.Game.Screens.Mvis
                     Masking = true,
                     Children = new Drawable[]
                     {
+                        bgTriangles = new BgTrianglesContainer(),
                         background = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Name = "Gameplay Background Elements Container",
-                            Children = new Drawable[]
-                            {
-                                bgTriangles = new BgTrianglesContainer(),
-                                fakeEditor,
-                                sbLoader
-                            }
+                            Name = "Background Layer",
                         },
                         foreground = new Container
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            RelativeSizeAxes = Axes.Both,
-                            Child = panel
+                            RelativeSizeAxes = Axes.Both
                         }
                     }
                 },
@@ -585,15 +549,31 @@ namespace osu.Game.Screens.Mvis
                 //如果允许proxy显示
                 if (v.NewValue)
                 {
-                    background.Remove(proxyContainer);
-                    AddInternal(proxyContainer);
+                    background.Remove(ProxyLayer);
+                    AddInternal(ProxyLayer);
                 }
                 else
                 {
-                    RemoveInternal(proxyContainer);
-                    background.Add(proxyContainer);
+                    RemoveInternal(ProxyLayer);
+                    background.Add(ProxyLayer);
                 }
             }, true);
+
+            foreach (var pl in pluginManager.GetAllPlugins(true))
+            {
+                switch (pl.Target)
+                {
+                    case MvisPlugin.TargetLayer.Background:
+                        background.Add(pl);
+                        break;
+
+                    case MvisPlugin.TargetLayer.Foreground:
+                        foreground.Add(pl);
+                        break;
+                }
+            }
+
+            Beatmap.TriggerChange();
 
             showOverlays(true);
 
@@ -704,7 +684,7 @@ namespace osu.Game.Screens.Mvis
             track.Looping = false;
             musicController.TrackAdjustTakenOver = false;
 
-            //停止beatmapLogo，取消故事版家在任务以及锁定变更
+            //锁定变更
             lockChanges.Value = true;
 
             //非背景层的动画
@@ -712,7 +692,9 @@ namespace osu.Game.Screens.Mvis
             bottomFillFlow.MoveToY(bottomBar.Height + 30, duration, Easing.OutQuint);
 
             this.FadeOut(500, Easing.OutQuint);
+
             OnScreenExiting?.Invoke();
+
             return base.OnExiting(next);
         }
 
@@ -962,20 +944,15 @@ namespace osu.Game.Screens.Mvis
 
             ApplyToBackground(b =>
             {
-                if (auto)
-                {
-                    b.FadeColour((sbLoader?.StoryboardReplacesBackground.Value ?? false) ? Color4.Black : OsuColour.Gray(OverlaysHidden ? idleBgDim.Value : 0.6f),
-                        duration,
-                        Easing.OutQuint);
-                }
-                else
-                    b.FadeColour(OsuColour.Gray(brightness), duration, Easing.OutQuint);
-            });
+                Color4 targetColor = auto
+                    ? OsuColour.Gray(OverlaysHidden ? idleBgDim.Value : 0.6f)
+                    : OsuColour.Gray(brightness);
 
-            sbLoader?.FadeColour(OsuColour.Gray(auto ? (OverlaysHidden ? idleBgDim.Value : 0.6f) : brightness), duration, Easing.OutQuint);
+                b.FadeColour(targetColor, duration, Easing.OutQuint);
+                background.FadeColour(targetColor, duration, Easing.OutQuint);
+            });
         }
 
-        private MvisPluginManager pluginManager;
         private BottomBarButton pluginButton;
 
         private void onBeatmapChanged(ValueChangedEvent<WorkingBeatmap> v)
@@ -989,20 +966,8 @@ namespace osu.Game.Screens.Mvis
                 updateBackground(beatmap);
             });
 
-            if (beatmap != prevBeatmap)
-            {
-                reBind();
-            }
-
             activity.Value = new UserActivity.InMvis(beatmap.BeatmapInfo);
-            prevBeatmap = beatmap;
             OnBeatmapChanged?.Invoke(beatmap);
-        }
-
-        private void reBind()
-        {
-            sbLoader.NeedToHideTriangles.BindValueChanged(updateBgTriangles, true);
-            sbLoader.StoryboardReplacesBackground.BindValueChanged(_ => applyBackgroundBrightness());
         }
     }
 }

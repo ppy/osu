@@ -22,6 +22,9 @@
     <ProjectReference Include="..\osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj" />
     <ProjectReference Include="..\osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj" />
     <ProjectReference Include="..\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj" />
+    <ProjectReference Include="..\Mvis.Plugin.RulesetPanel\Mvis.Plugin.RulesetPanel.csproj" />
+    <ProjectReference Include="..\Mvis.Plugin.StoryboardSupport\Mvis.Plugin.StoryboardSupport.csproj" />
+    <ProjectReference Include="..\Mvis.Plugin.FakeEditor\Mvis.Plugin.FakeEditor.csproj" />
   </ItemGroup>
   <ItemGroup Label="Package References">
     <PackageReference Include="Microsoft.NETCore.Targets" Version="5.0.0" />

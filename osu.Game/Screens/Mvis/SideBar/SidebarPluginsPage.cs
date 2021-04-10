@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Mvis.SideBar
 
         protected override void LoadComplete()
         {
-            foreach (var pl in manager.GetAllPlugins())
+            foreach (var pl in manager.GetAllPlugins(false))
             {
                 flow.Add(new PluginPiece(pl));
             }
@@ -249,7 +249,7 @@ namespace osu.Game.Screens.Mvis.SideBar
                 {
                     dialog.Push(new ConfirmDialog($"你确定要卸载{Plugin.Name}吗?", () => manager.UnLoadPlugin(Plugin))
                     {
-                        BodyText = "卸载后该插件在本次Mvis会话中将不再可用!"
+                        BodyText = "卸载后该插件在本次osu!会话中将不再可用!"
                     });
                 };
                 unloadButton.TooltipText = "卸载此插件";

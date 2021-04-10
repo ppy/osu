@@ -6,7 +6,7 @@ using osu.Game.Rulesets;
 using osu.Game.Screens.Edit;
 using osu.Game.Skinning;
 
-namespace osu.Game.Screens.Mvis.Plugins.Editor
+namespace Mvis.Plugin.FakeEditor.Editor
 {
     public class EditorContainer : Container
     {

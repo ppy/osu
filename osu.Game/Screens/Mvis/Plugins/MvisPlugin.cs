@@ -17,6 +17,11 @@ namespace osu.Game.Screens.Mvis.Plugins
         protected abstract bool PostInit();
         public virtual PluginSidebarPage SidebarPage => null;
 
+        public readonly List<PluginFlags> Flags = new List<PluginFlags>();
+        public virtual TargetLayer Target => TargetLayer.Background;
+
+        public override string ToString() => $"{Author} - {Name} ({Description}) [{Version}]";
+
         public string Description = "插件描述";
         public string Author = "插件作者";
         public int Version = 0;
@@ -132,7 +137,11 @@ namespace osu.Game.Screens.Mvis.Plugins
             CanReload
         }
 
-        public readonly List<PluginFlags> Flags = new List<PluginFlags>();
+        public enum TargetLayer
+        {
+            Background,
+            Foreground
+        }
 
         protected override void Dispose(bool isDisposing)
         {

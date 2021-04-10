@@ -1,16 +1,16 @@
 using System;
-using JetBrains.Annotations;
+using Mvis.Plugin.StoryboardSupport.Storyboard;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Overlays;
-using osu.Game.Screens.Mvis.Plugins.Storyboard;
 using osu.Game.Screens.Mvis.Plugins.Types;
 
-namespace osu.Game.Screens.Mvis.Plugins
+namespace Mvis.Plugin.StoryboardSupport
 {
     ///<summary>
     /// 负责故事版的异步加载功能
@@ -34,8 +34,6 @@ namespace osu.Game.Screens.Mvis.Plugins
 
         private WorkingBeatmap targetBeatmap;
 
-        public Action OnNewStoryboardLoaded;
-
         [Resolved]
         private MusicController music { get; set; }
 
@@ -48,6 +46,7 @@ namespace osu.Game.Screens.Mvis.Plugins
 
             Name = "故事版加载器(内置)";
             Description = "用于呈现故事版; Mfosu自带插件";
+            Author = "mf-osu";
 
             Flags.AddRange(new[]
             {
@@ -127,6 +126,8 @@ namespace osu.Game.Screens.Mvis.Plugins
             return true;
         }
 
+        private Drawable prevProxy;
+
         protected override bool OnContentLoaded(Drawable content)
         {
             var newStoryboard = (BackgroundStoryboard)content;
@@ -138,22 +139,33 @@ namespace osu.Game.Screens.Mvis.Plugins
             sbLoaded.Value = true;
             NeedToHideTriangles.Value = targetBeatmap.Storyboard.HasDrawable;
 
-            setProxy(newStoryboard);
-
             if (MvisScreen != null)
                 MvisScreen.OnSeek += Seek;
 
             Value.TriggerChange();
-            OnNewStoryboardLoaded?.Invoke();
+
+            if (prevProxy != null)
+            {
+                MvisScreen?.ProxyLayer.Remove(prevProxy);
+                prevProxy.Expire();
+            }
+
+            prevProxy = getProxy(newStoryboard);
+
+            if (prevProxy != null) MvisScreen?.ProxyLayer.Add(prevProxy);
+            prevProxy?.Show();
 
             return true;
         }
 
         public override void UnLoad()
         {
+            ClearInternal();
+
             if (MvisScreen != null)
             {
                 MvisScreen.OnBeatmapChanged -= refresh;
+                MvisScreen.OnScreenExiting -= UnLoad;
                 MvisScreen.OnSeek -= Seek;
             }
 
@@ -166,9 +178,6 @@ namespace osu.Game.Screens.Mvis.Plugins
             base.UnLoad();
         }
 
-        [CanBeNull]
-        public Drawable StoryboardProxy;
-
         private void refresh(WorkingBeatmap newBeatmap)
         {
             if (!ContentLoaded)
@@ -178,16 +187,16 @@ namespace osu.Game.Screens.Mvis.Plugins
                 currentStoryboard?.Dispose();
             }
 
-            currentStoryboard?.FadeOut(300).Expire();
+            currentStoryboard?.FadeTo(0.01f, 300, Easing.OutQuint).Expire();
             targetBeatmap = newBeatmap;
             Load();
         }
 
-        private void setProxy(BackgroundStoryboard storyboard)
+        private Drawable getProxy(BackgroundStoryboard storyboard)
         {
-            if (storyboard != currentStoryboard) return;
+            if (storyboard != currentStoryboard) return new Container();
 
-            StoryboardProxy = storyboard.StoryboardProxy();
+            return storyboard.StoryboardProxy();
         }
 
         public void Seek(double position) =>

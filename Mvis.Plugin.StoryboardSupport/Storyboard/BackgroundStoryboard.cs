@@ -5,9 +5,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Skinning;
 using osu.Game.Storyboards.Drawables;
 
-//using osu.Framework.Logging;
-
-namespace osu.Game.Screens.Mvis.Plugins.Storyboard
+namespace Mvis.Plugin.StoryboardSupport.Storyboard
 {
     [LongRunningLoad]
     public class BackgroundStoryboard : BeatmapSkinProvidingContainer

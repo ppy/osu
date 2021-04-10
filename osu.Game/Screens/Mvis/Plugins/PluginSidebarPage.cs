@@ -1,9 +1,7 @@
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Mvis.SideBar;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Mvis.Plugins
 {
@@ -71,11 +69,11 @@ namespace osu.Game.Screens.Mvis.Plugins
                     Depth = float.MinValue,
                     Children = new Drawable[]
                     {
-                        new FakeEditor.BlockMouseBox
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black.Opacity(0.5f),
-                        },
+                        //new FakeEditor.BlockMouseBox
+                        //{
+                        //    RelativeSizeAxes = Axes.Both,
+                        //    Colour = Color4.Black.Opacity(0.5f),
+                        //},
                         new OsuSpriteText
                         {
                             Text = "插件已禁用",
