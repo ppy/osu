@@ -8,7 +8,7 @@ using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit.Checks
 {
-    public class CheckBackground : BeatmapCheck
+    public class CheckBackground : Check
     {
         public override CheckMetadata Metadata() => new CheckMetadata
         (

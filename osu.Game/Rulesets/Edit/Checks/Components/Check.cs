@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Rulesets.Edit.Checks.Components
 {
@@ -21,21 +22,18 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         /// <returns></returns>
         public abstract IEnumerable<IssueTemplate> Templates();
 
+        /// <summary>
+        /// Returns zero, one, or several issues detected by this
+        /// check on the given beatmap.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to run the check on.</param>
+        /// <returns></returns>
+        public abstract IEnumerable<Issue> Run(IBeatmap beatmap);
+
         protected Check()
         {
             foreach (var template in Templates())
                 template.Origin = this;
         }
-    }
-
-    public abstract class Check<T> : Check
-    {
-        /// <summary>
-        /// Returns zero, one, or several issues detected by
-        /// this check on the given object.
-        /// </summary>
-        /// <param name="obj">The object to run the check on.</param>
-        /// <returns></returns>
-        public abstract IEnumerable<Issue> Run(T obj);
     }
 }
