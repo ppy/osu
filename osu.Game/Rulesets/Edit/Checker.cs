@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Edit
 {
     public abstract class Checker
     {
-        // These are all mode-invariant, hence here instead of in e.g. `OsuChecker`.
+        // These are all ruleset-invariant, hence here instead of in e.g. `OsuChecker`.
         private readonly List<BeatmapCheck> beatmapChecks = new List<BeatmapCheck>
         {
             new CheckMetadataVowels()
