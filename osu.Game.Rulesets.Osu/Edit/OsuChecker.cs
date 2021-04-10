@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public class OsuChecker : Checker
     {
-        public readonly List<Check> beatmapChecks = new List<Check>
+        private readonly List<Check> checks = new List<Check>
         {
             new CheckOffscreenObjects()
         };
@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             foreach (var issue in base.Run(beatmap))
                 yield return issue;
 
-            foreach (var issue in beatmapChecks.SelectMany(check => check.Run(beatmap)))
+            foreach (var issue in checks.SelectMany(check => check.Run(beatmap)))
                 yield return issue;
         }
     }
