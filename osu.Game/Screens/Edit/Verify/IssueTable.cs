@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -25,6 +26,9 @@ namespace osu.Game.Screens.Edit.Verify
         private const int text_size = 14;
 
         private readonly FillFlowContainer backgroundFlow;
+
+        [Resolved]
+        private Bindable<Issue> selectedIssue { get; set; }
 
         public IssueTable()
         {
@@ -115,6 +119,7 @@ namespace osu.Game.Screens.Edit.Verify
 
         public class RowBackground : OsuClickableContainer
         {
+            private readonly Issue issue;
             private const int fade_duration = 100;
 
             private readonly Box hoveredBackground;
@@ -128,13 +133,16 @@ namespace osu.Game.Screens.Edit.Verify
             [Resolved]
             private EditorBeatmap editorBeatmap { get; set; }
 
+            [Resolved]
+            private Bindable<Issue> selectedIssue { get; set; }
+
             public RowBackground(Issue issue)
             {
+                this.issue = issue;
+
                 RelativeSizeAxes = Axes.X;
                 Height = row_height;
-
                 AlwaysPresent = true;
-
                 CornerRadius = 3;
                 Masking = true;
 
@@ -152,6 +160,8 @@ namespace osu.Game.Screens.Edit.Verify
                     // Supposed to work like clicking timestamps outside of the game.
                     // TODO: Is there already defined behaviour for this I may be able to call?
 
+                    selectedIssue.Value = issue;
+
                     if (issue.Time != null)
                     {
                         clock.Seek(issue.Time.Value);
@@ -167,11 +177,35 @@ namespace osu.Game.Screens.Edit.Verify
             }
 
             private Color4 colourHover;
+            private Color4 colourSelected;
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
                 hoveredBackground.Colour = colourHover = colours.BlueDarker;
+                colourSelected = colours.YellowDarker;
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                selectedIssue.BindValueChanged(change => { Selected = issue == change.NewValue; }, true);
+            }
+
+            private bool selected;
+
+            protected bool Selected
+            {
+                get => selected;
+                set
+                {
+                    if (value == selected)
+                        return;
+
+                    selected = value;
+                    updateState();
+                }
             }
 
             protected override bool OnHover(HoverEvent e)
@@ -188,9 +222,9 @@ namespace osu.Game.Screens.Edit.Verify
 
             private void updateState()
             {
-                hoveredBackground.FadeColour(colourHover, 450, Easing.OutQuint);
+                hoveredBackground.FadeColour(selected ? colourSelected : colourHover, 450, Easing.OutQuint);
 
-                if (IsHovered)
+                if (selected || IsHovered)
                     hoveredBackground.FadeIn(fade_duration, Easing.OutQuint);
                 else
                     hoveredBackground.FadeOut(fade_duration, Easing.OutQuint);
