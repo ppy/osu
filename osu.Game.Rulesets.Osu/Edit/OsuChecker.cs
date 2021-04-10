@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Edit
     {
         public readonly List<BeatmapCheck> beatmapChecks = new List<BeatmapCheck>
         {
-            new CheckConsecutiveCircles()
+            new CheckOffscreenObjects()
         };
 
         public override IEnumerable<Issue> Run(IBeatmap beatmap)
