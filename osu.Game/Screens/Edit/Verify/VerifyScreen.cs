@@ -13,6 +13,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Edit.Checks.Components;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Verify
@@ -21,6 +22,9 @@ namespace osu.Game.Screens.Edit.Verify
     {
         private Ruleset ruleset;
         private static Checker checker; // TODO: Should not be static, but apparently needs to be?
+
+        [Cached]
+        private Bindable<Issue> selectedIssue = new Bindable<Issue>();
 
         public VerifyScreen()
             : base(EditorScreenMode.Verify)
@@ -73,6 +77,9 @@ namespace osu.Game.Screens.Edit.Verify
 
             [Resolved]
             protected EditorBeatmap Beatmap { get; private set; }
+
+            [Resolved]
+            private Bindable<Issue> selectedIssue { get; set; }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
