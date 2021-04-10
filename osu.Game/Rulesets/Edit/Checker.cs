@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Edit
         // These are all ruleset-invariant, hence here instead of in e.g. `OsuChecker`.
         private readonly List<BeatmapCheck> beatmapChecks = new List<BeatmapCheck>
         {
-            new CheckMetadataVowels()
+            new CheckBackground()
         };
 
         public virtual IEnumerable<Issue> Run(IBeatmap beatmap)
