@@ -158,9 +158,6 @@ namespace osu.Game.Screens.Edit.Verify
 
                 Action = () =>
                 {
-                    // Supposed to work like clicking timestamps outside of the game.
-                    // TODO: Is there already defined behaviour for this I may be able to call?
-
                     selectedIssue.Value = issue;
 
                     if (issue.Time != null)
