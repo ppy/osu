@@ -13,7 +13,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
-using osu.Game.Screens.Edit.Verify.Components;
+using osu.Game.Rulesets.Edit.Checks.Components;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Verify

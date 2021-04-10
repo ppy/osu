@@ -7,7 +7,7 @@ using System.Linq;
 using osu.Game.Extensions;
 using osu.Game.Rulesets.Objects;
 
-namespace osu.Game.Screens.Edit.Verify.Components
+namespace osu.Game.Rulesets.Edit.Checks.Components
 {
     public class Issue
     {
@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Edit.Verify.Components
         public Issue(IssueTemplate template, params object[] args)
         {
             Time = null;
-            HitObjects = System.Array.Empty<HitObject>();
+            HitObjects = Array.Empty<HitObject>();
             Template = template;
             Arguments = args;
 
@@ -57,11 +57,20 @@ namespace osu.Game.Screens.Edit.Verify.Components
             Time = time;
         }
 
+        public Issue(HitObject hitObject, IssueTemplate template, params object[] args)
+            : this(template, args)
+        {
+            Time = hitObject.StartTime;
+            HitObjects = new[] { hitObject };
+        }
+
         public Issue(IEnumerable<HitObject> hitObjects, IssueTemplate template, params object[] args)
             : this(template, args)
         {
-            Time = hitObjects.FirstOrDefault()?.StartTime;
-            HitObjects = hitObjects.ToArray();
+            var hitObjectList = hitObjects.ToList();
+
+            Time = hitObjectList.FirstOrDefault()?.StartTime;
+            HitObjects = hitObjectList;
         }
 
         public override string ToString()
@@ -71,13 +80,7 @@ namespace osu.Game.Screens.Edit.Verify.Components
 
         public string GetEditorTimestamp()
         {
-            // TODO: Editor timestamp formatting is handled in https://github.com/ppy/osu/pull/12030
-            // We may be able to use that here too (if we decouple it from the HitObjectComposer class).
-
-            if (Time == null)
-                return string.Empty;
-
-            return Time.Value.ToEditorFormattedString();
+            return Time == null ? string.Empty : Time.Value.ToEditorFormattedString();
         }
     }
 }
