@@ -74,9 +74,9 @@ namespace osu.Game.Screens.Edit.Verify
         {
             var columns = new List<TableColumn>
             {
-                new TableColumn(string.Empty, Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-                new TableColumn("Type", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-                new TableColumn("Time", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+                new TableColumn(string.Empty, Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)),
+                new TableColumn("Type", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize, minSize: 60)),
+                new TableColumn("Time", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize, minSize: 60)),
                 new TableColumn("Message", Anchor.CentreLeft),
                 new TableColumn("Category", Anchor.CentreRight, new Dimension(GridSizeMode.AutoSize)),
             };
@@ -89,20 +89,21 @@ namespace osu.Game.Screens.Edit.Verify
             new OsuSpriteText
             {
                 Text = $"#{index + 1}",
-                Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Medium)
+                Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Medium),
+                Margin = new MarginPadding { Right = 10 }
             },
             new OsuSpriteText
             {
                 Text = issue.Template.Type.ToString(),
                 Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold),
-                Margin = new MarginPadding { Left = 10 },
+                Margin = new MarginPadding { Right = 10 },
                 Colour = issue.Template.TypeColour()
             },
             new OsuSpriteText
             {
                 Text = issue.GetEditorTimestamp(),
                 Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold),
-                Margin = new MarginPadding(10)
+                Margin = new MarginPadding { Right = 10 },
             },
             new OsuSpriteText
             {
