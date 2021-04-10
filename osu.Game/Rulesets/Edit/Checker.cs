@@ -4,8 +4,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
-using osu.Game.Checks;
-using osu.Game.Screens.Edit.Verify.Components;
+using osu.Game.Rulesets.Edit.Checks;
+using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit
 {

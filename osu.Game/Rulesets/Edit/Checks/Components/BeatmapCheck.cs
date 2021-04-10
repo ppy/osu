@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
 
-namespace osu.Game.Screens.Edit.Verify.Components
+namespace osu.Game.Rulesets.Edit.Checks.Components
 {
     public abstract class BeatmapCheck : Check<IBeatmap>
     {

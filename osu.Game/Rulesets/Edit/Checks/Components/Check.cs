@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 
-namespace osu.Game.Screens.Edit.Verify.Components
+namespace osu.Game.Rulesets.Edit.Checks.Components
 {
     public abstract class Check
     {

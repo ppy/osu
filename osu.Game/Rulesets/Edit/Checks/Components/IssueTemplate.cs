@@ -5,7 +5,7 @@ using Humanizer;
 using osu.Framework.Graphics;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Edit.Verify.Components
+namespace osu.Game.Rulesets.Edit.Checks.Components
 {
     public class IssueTemplate
     {
