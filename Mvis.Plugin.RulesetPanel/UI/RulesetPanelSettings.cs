@@ -32,6 +32,13 @@ namespace Mvis.Plugin.RulesetPanel.UI
                     LabelText = "启用Mvis面板",
                     Current = config.GetBindable<bool>(RulesetPanelSetting.EnableRulesetPanel)
                 },
+                new SettingsSlider<float>
+                {
+                    LabelText = "空闲时面板的不透明度",
+                    Current = config.GetBindable<float>(RulesetPanelSetting.IdleAlpha),
+                    DisplayAsPercentage = true,
+                    KeyboardStep = 0.01f,
+                },
                 new SettingsCheckbox
                 {
                     LabelText = "显示粒子",

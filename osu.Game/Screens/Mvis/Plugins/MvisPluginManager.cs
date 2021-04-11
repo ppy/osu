@@ -117,7 +117,7 @@ namespace osu.Game.Screens.Mvis.Plugins
         /// 获取所有插件
         /// </summary>
         /// <param name="newInstance">
-        /// 是否创建新插件本体,设置为true时将不会返回原本的插件列表<br/>
+        /// 是否处理当前所有插件并创建新插件本体<br/>
         /// </param>
         /// <returns>所有已加载且可用的插件</returns>
         public List<MvisPlugin> GetAllPlugins(bool newInstance)
@@ -125,14 +125,11 @@ namespace osu.Game.Screens.Mvis.Plugins
             if (newInstance)
             {
                 DisposeAllPlugins();
-                //var list = new List<MvisPlugin>();
 
                 foreach (var p in providers)
                 {
                     avaliablePlugins.Add(p.CreatePlugin);
                 }
-
-                //return list;
             }
 
             return avaliablePlugins.ToList();

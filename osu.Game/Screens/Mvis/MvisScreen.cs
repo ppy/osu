@@ -209,6 +209,7 @@ namespace osu.Game.Screens.Mvis
         public readonly Container ProxyLayer = new Container
         {
             RelativeSizeAxes = Axes.Both,
+            Name = "Proxy Layer",
             Depth = -1
         };
 
@@ -250,38 +251,52 @@ namespace osu.Game.Screens.Mvis
             dependencies.Cache(collectionHelper = new CollectionHelper());
             dependencies.Cache(this);
 
-            sidebar.Add(settingsScroll = new SidebarSettingsScrollContainer
+            sidebar.AddRange(new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Child = new FillFlowContainer
+                settingsScroll = new SidebarSettingsScrollContainer
                 {
-                    AutoSizeAxes = Axes.Y,
-                    RelativeSizeAxes = Axes.X,
-                    Spacing = new Vector2(20),
-                    Padding = new MarginPadding { Top = 10, Left = 5, Right = 5 },
-                    Margin = new MarginPadding { Bottom = 10 },
-                    Direction = FillDirection.Vertical,
-                    Children = new Drawable[]
+                    RelativeSizeAxes = Axes.Both,
+                    Child = new FillFlowContainer
                     {
-                        new MfMvisSection
+                        AutoSizeAxes = Axes.Y,
+                        RelativeSizeAxes = Axes.X,
+                        Spacing = new Vector2(20),
+                        Padding = new MarginPadding { Top = 10, Left = 5, Right = 5 },
+                        Margin = new MarginPadding { Bottom = 10 },
+                        Direction = FillDirection.Vertical,
+                        Children = new Drawable[]
                         {
-                            Margin = new MarginPadding { Top = -15 },
-                            Padding = new MarginPadding(0)
-                        },
-                        new MfMvisPluginSection
-                        {
-                            Padding = new MarginPadding(0)
-                        },
-                        new SettingsButton
-                        {
-                            Text = "歌曲选择",
-                            Action = () => this.Push(new MvisSongSelect())
+                            new MfMvisSection
+                            {
+                                Margin = new MarginPadding { Top = -15 },
+                                Padding = new MarginPadding(0)
+                            },
+                            new MfMvisPluginSection
+                            {
+                                Padding = new MarginPadding(0)
+                            },
+                            new SettingsButton
+                            {
+                                Text = "歌曲选择",
+                                Action = () => this.Push(new MvisSongSelect())
+                            }
                         }
-                    }
+                    },
                 },
+                collectionPanel = new CollectionSelectPanel(),
+                pluginsPage = new SidebarPluginsPage()
             });
-            sidebar.Add(collectionPanel = new CollectionSelectPanel());
-            sidebar.Add(pluginsPage = new SidebarPluginsPage());
+
+            dependencies.Cache(sidebar);
+
+            isIdle.BindTo(idleTracker.IsIdle);
+            config.BindWith(MSetting.MvisBgBlur, bgBlur);
+            config.BindWith(MSetting.MvisIdleBgDim, idleBgDim);
+            config.BindWith(MSetting.MvisMusicSpeed, musicSpeed);
+            config.BindWith(MSetting.MvisAdjustMusicWithFreq, adjustFreq);
+            config.BindWith(MSetting.MvisEnableNightcoreBeat, nightcoreBeat);
+            config.BindWith(MSetting.MvisPlayFromCollection, playFromCollection);
+            config.BindWith(MSetting.MvisStoryboardProxy, allowProxy);
 
             InternalChildren = new Drawable[]
             {
@@ -307,9 +322,10 @@ namespace osu.Game.Screens.Mvis
                         },
                         foreground = new Container
                         {
+                            RelativeSizeAxes = Axes.Both,
+                            Name = "Foreground Layer",
                             Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            RelativeSizeAxes = Axes.Both
+                            Origin = Anchor.Centre
                         }
                     }
                 },
@@ -324,7 +340,7 @@ namespace osu.Game.Screens.Mvis
                 },
                 new Container
                 {
-                    Name = "Overlay Container",
+                    Name = "Overlay Layer",
                     RelativeSizeAxes = Axes.Both,
                     Depth = float.MinValue,
                     Children = new Drawable[]
@@ -534,17 +550,6 @@ namespace osu.Game.Screens.Mvis
                     }
                 },
             };
-
-            dependencies.Cache(sidebar);
-
-            isIdle.BindTo(idleTracker.IsIdle);
-            config.BindWith(MSetting.MvisBgBlur, bgBlur);
-            config.BindWith(MSetting.MvisIdleBgDim, idleBgDim);
-            config.BindWith(MSetting.MvisMusicSpeed, musicSpeed);
-            config.BindWith(MSetting.MvisAdjustMusicWithFreq, adjustFreq);
-            config.BindWith(MSetting.MvisEnableNightcoreBeat, nightcoreBeat);
-            config.BindWith(MSetting.MvisPlayFromCollection, playFromCollection);
-            config.BindWith(MSetting.MvisStoryboardProxy, allowProxy);
         }
 
         protected override void LoadComplete()
@@ -607,7 +612,20 @@ namespace osu.Game.Screens.Mvis
                 }
             }, true);
 
-            HideTriangles.BindValueChanged(updateBgTriangles);
+            HideTriangles.BindValueChanged(v =>
+            {
+                switch (v.NewValue)
+                {
+                    case true:
+                        bgTriangles.Hide();
+                        break;
+
+                    case false:
+                        bgTriangles.Show();
+                        break;
+                }
+            });
+
             HideScreenBackground.BindValueChanged(_ => applyBackgroundBrightness());
 
             foreach (var pl in pluginManager.GetAllPlugins(true))
@@ -657,23 +675,6 @@ namespace osu.Game.Screens.Mvis
                     Schedule(loadingSpinner.Show);
                 else
                     Schedule(loadingSpinner.Hide);
-            }
-        }
-
-        ///<summary>
-        ///更新bgTriangles是否可见
-        ///</summary>
-        private void updateBgTriangles(ValueChangedEvent<bool> value)
-        {
-            switch (value.NewValue)
-            {
-                case true:
-                    bgTriangles.Hide();
-                    break;
-
-                case false:
-                    bgTriangles.Show();
-                    break;
             }
         }
 

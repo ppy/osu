@@ -46,13 +46,6 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 },
                 new SettingsSlider<float>
                 {
-                    LabelText = "空闲时Mvis面板的不透明度",
-                    Current = config.GetBindable<float>(MSetting.MvisContentAlpha),
-                    DisplayAsPercentage = true,
-                    KeyboardStep = 0.01f,
-                },
-                new SettingsSlider<float>
-                {
                     LabelText = "界面主题色(红)",
                     Current = iR,
                     KeyboardStep = 1,
