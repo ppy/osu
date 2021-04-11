@@ -268,6 +268,10 @@ namespace osu.Game.Screens.Mvis
                             Margin = new MarginPadding { Top = -15 },
                             Padding = new MarginPadding(0)
                         },
+                        new MfMvisPluginSection
+                        {
+                            Padding = new MarginPadding(0)
+                        },
                         new SettingsButton
                         {
                             Text = "歌曲选择",
