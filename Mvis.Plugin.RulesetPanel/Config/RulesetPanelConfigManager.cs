@@ -29,7 +29,7 @@ namespace Mvis.Plugin.RulesetPanel.Config
             SetDefault(RulesetPanelSetting.IdleAlpha, 1f, 0, 1f);
         }
 
-        protected override string ConfigName => "StoryboardSupport";
+        protected override string ConfigName => "RulesetPanel";
     }
 
     public enum RulesetPanelSetting

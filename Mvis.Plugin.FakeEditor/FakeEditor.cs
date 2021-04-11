@@ -1,14 +1,18 @@
+using Mvis.Plugin.FakeEditor.Config;
 using Mvis.Plugin.FakeEditor.Editor;
+using Mvis.Plugin.FakeEditor.UI;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Platform;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Mvis.Plugins;
+using osu.Game.Screens.Mvis.Plugins.Config;
 using osu.Game.Screens.Mvis.Plugins.Types;
 using osu.Game.Screens.Play;
 
@@ -44,7 +48,8 @@ namespace Mvis.Plugin.FakeEditor
             Flags.AddRange(new[]
             {
                 PluginFlags.CanDisable,
-                PluginFlags.CanUnload
+                PluginFlags.CanUnload,
+                PluginFlags.HasConfig
             });
         }
 
@@ -52,9 +57,10 @@ namespace Mvis.Plugin.FakeEditor
         private MusicController musicController { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(MConfigManager config)
+        private void load()
         {
-            config.BindWith(MSetting.MvisEnableFakeEditor, Value);
+            var config = (FakeEditorConfigManager)dependencies.Get<MvisPluginManager>().GetConfigManager(this);
+            config.BindWith(FakeEditorSetting.EnableFakeEditor, Value);
 
             dependencies.CacheAs(beatDivisor);
 
@@ -71,6 +77,12 @@ namespace Mvis.Plugin.FakeEditor
                 MvisScreen.OnBeatmapChanged += initDependencies;
             }
         }
+
+        public override IPluginConfigManager CreateConfigManager(Storage storage)
+            => new FakeEditorConfigManager(storage);
+
+        public override PluginSettingsSubSection CreateSettingsSubSection()
+            => new FakeEditorSettings(this);
 
         public override void UnLoad()
         {
