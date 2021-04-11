@@ -22,7 +22,8 @@ namespace osu.Game.Utils
         public virtual bool IsCharging { get; } = false;
 
         /// <summary>
-        /// Returns true if <see cref="IsCharging"/> = false and <see cref="ChargeLevel"/> &lt;= <see cref="BatteryCutoff"/>.
+        /// Whether the battery is currently low in charge.
+        /// Returns true if not charging and current charge level is lower than or equal to <see cref="BatteryCutoff"/>.
         /// </summary>
         public bool IsLowBattery => !IsCharging && ChargeLevel <= BatteryCutoff;
     }
