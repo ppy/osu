@@ -81,6 +81,9 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public List<IList<HitSampleInfo>> NodeSamples { get; set; } = new List<IList<HitSampleInfo>>();
 
+        [JsonIgnore]
+        public IList<HitSampleInfo> TailSamples { get; private set; }
+
         private int repeatCount;
 
         public int RepeatCount
@@ -143,11 +146,6 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             Velocity = scoringDistance / timingPoint.BeatLength;
             TickDistance = scoringDistance / difficulty.SliderTickRate * TickDistanceMultiplier;
-
-            // The samples should be attached to the slider tail, however this can only be done after LegacyLastTick is removed otherwise they would play earlier than they're intended to.
-            // For now, the samples are attached to and played by the slider itself at the correct end time.
-            // ToArray call is required as GetNodeSamples may fallback to Samples itself (without it it will get cleared due to the list reference being live).
-            Samples = this.GetNodeSamples(repeatCount + 1).ToArray();
         }
 
         protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
@@ -238,6 +236,10 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             if (HeadCircle != null)
                 HeadCircle.Samples = this.GetNodeSamples(0);
+
+            // The samples should be attached to the slider tail, however this can only be done after LegacyLastTick is removed otherwise they would play earlier than they're intended to.
+            // For now, the samples are played by the slider itself at the correct end time.
+            TailSamples = this.GetNodeSamples(repeatCount + 1);
         }
 
         public override Judgement CreateJudgement() => OnlyJudgeNestedObjects ? new OsuIgnoreJudgement() : new OsuJudgement();

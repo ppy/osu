@@ -14,6 +14,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Framework.Input.Bindings;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Select
 {
@@ -65,6 +66,7 @@ namespace osu.Game.Screens.Select
         private readonly Box light;
 
         public FooterButton()
+            : base(HoverSampleSet.SongSelect)
         {
             AutoSizeAxes = Axes.Both;
             Shear = SHEAR;
