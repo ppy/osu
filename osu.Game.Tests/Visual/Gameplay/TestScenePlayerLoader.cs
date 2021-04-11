@@ -292,10 +292,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
-        [TestCase(false, 1.0)] // not charging, above cutoff --> no warning
-        [TestCase(false, 0.2)] // not charging, at cutoff --> warning
-        [TestCase(true, 0.1)] // charging, below cutoff --> no warning
-        public void TestLowBatteryNotification(bool isCharging, double chargeLevel)
+        [TestCase(false, 1.0, false)] // not charging, above cutoff --> no warning
+        [TestCase(true, 0.1, false)] // charging, below cutoff --> no warning
+        [TestCase(false, 0.2, true)] // not charging, at cutoff --> warning
+        public void TestLowBatteryNotification(bool isCharging, double chargeLevel, bool shouldWarn)
         {
             AddStep("reset notification lock", () => sessionStatics.GetBindable<bool>(Static.LowBatteryNotificationShownOnce).Value = false);
 
@@ -306,8 +306,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 powerStatus.SetChargeLevel(chargeLevel);
             }));
             AddUntilStep("wait for player", () => player?.LoadState == LoadState.Ready);
-            int warning = !isCharging && chargeLevel <= powerStatus.BatteryCutoff ? 1 : 0;
-            AddAssert($"notification {(warning == 1 ? "triggered" : "not triggered")}", () => notificationOverlay.UnreadCount.Value == warning);
+            AddAssert($"notification {(shouldWarn ? "triggered" : "not triggered")}", () => notificationOverlay.UnreadCount.Value == (shouldWarn ? 1 : 0));
             AddStep("click notification", () =>
             {
                 var scrollContainer = (OsuScrollContainer)notificationOverlay.Children.Last();
