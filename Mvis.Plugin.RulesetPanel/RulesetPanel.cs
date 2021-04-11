@@ -20,7 +20,7 @@ namespace Mvis.Plugin.RulesetPanel
 
         public RulesetPanel()
         {
-            Name = "Mvis面板(内置)";
+            Name = "Mvis面板";
             Description = "用于提供Mvis面板功能(中心的谱面图及周围的粒子效果)";
             Author = "mf-osu; EVAST9919";
 

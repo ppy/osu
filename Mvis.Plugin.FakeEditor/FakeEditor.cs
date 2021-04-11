@@ -39,7 +39,7 @@ namespace Mvis.Plugin.FakeEditor
 
         public FakeEditor()
         {
-            Name = "谱面编辑器(内置)";
+            Name = "谱面编辑器";
             Description = "用于提供Note音效; 高内存占用, 不要用来尝试那些会崩掉你游戏/电脑的图";
             Author = "mf-osu";
 

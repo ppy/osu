@@ -48,7 +48,7 @@ namespace Mvis.Plugin.StoryboardSupport
         {
             RelativeSizeAxes = Axes.Both;
 
-            Name = "故事版加载器(内置)";
+            Name = "故事版加载器";
             Description = "用于呈现故事版; Mfosu自带插件";
             Author = "mf-osu";
 
