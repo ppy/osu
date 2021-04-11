@@ -1,13 +1,17 @@
 using System;
+using Mvis.Plugin.StoryboardSupport.Config;
 using Mvis.Plugin.StoryboardSupport.Storyboard;
+using Mvis.Plugin.StoryboardSupport.UI;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Platform;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Overlays;
+using osu.Game.Screens.Mvis.Plugins;
+using osu.Game.Screens.Mvis.Plugins.Config;
 using osu.Game.Screens.Mvis.Plugins.Types;
 
 namespace Mvis.Plugin.StoryboardSupport
@@ -51,14 +55,16 @@ namespace Mvis.Plugin.StoryboardSupport
             Flags.AddRange(new[]
             {
                 PluginFlags.CanDisable,
-                PluginFlags.CanUnload
+                PluginFlags.CanUnload,
+                PluginFlags.HasConfig
             });
         }
 
         [BackgroundDependencyLoader]
-        private void load(MConfigManager config)
+        private void load()
         {
-            config.BindWith(MSetting.MvisEnableStoryboard, Value);
+            var config = (SbLoaderConfigManager)DependenciesContainer.Get<MvisPluginManager>().GetConfigManager(this);
+            config.BindWith(SbLoaderSettings.EnableStoryboard, Value);
 
             currentBeatmap.BindValueChanged(v =>
             {
@@ -104,6 +110,10 @@ namespace Mvis.Plugin.StoryboardSupport
             RunningClock = storyboardClock,
             Alpha = 0.1f
         };
+
+        public override IPluginConfigManager CreateConfigManager(Storage storage) => new SbLoaderConfigManager(storage);
+
+        public override PluginSettingsSubSection CreateSettingsSubSection() => new StoryboardSettings(this);
 
         protected override bool PostInit()
         {

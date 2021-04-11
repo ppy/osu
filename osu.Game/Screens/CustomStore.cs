@@ -28,10 +28,13 @@ namespace osu.Game.Screens
         public List<MvisPluginProvider> LoadedPluginProviders = new List<MvisPluginProvider>();
         public static bool CustomFontLoaded;
 
+        private Storage storage;
+
         public CustomStore(Storage storage, OsuGameBase gameBase)
             : base(new StorageBackedResourceStore(storage), "custom")
         {
             this.gameBase = gameBase;
+            this.storage = storage;
 
             customStorage = storage.GetStorageForDirectory("custom");
 

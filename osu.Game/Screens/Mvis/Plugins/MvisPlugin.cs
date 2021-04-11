@@ -7,6 +7,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
+using osu.Game.Screens.Mvis.Plugins.Config;
 
 namespace osu.Game.Screens.Mvis.Plugins
 {
@@ -17,6 +19,10 @@ namespace osu.Game.Screens.Mvis.Plugins
         /// </summary>
         /// <returns>要加载的Drawable</returns>
         protected abstract Drawable CreateContent();
+
+        public virtual PluginSettingsSubSection CreateSettingsSubSection() => null;
+
+        public virtual IPluginConfigManager CreateConfigManager(Storage storage) => null;
 
         /// <summary>
         /// 内容加载完毕后要执行的步骤
@@ -82,6 +88,11 @@ namespace osu.Game.Screens.Mvis.Plugins
             Default = true,
             Value = true
         };
+
+        protected DependencyContainer DependenciesContainer;
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
+            DependenciesContainer = new DependencyContainer(base.CreateChildDependencies(parent));
 
         #endregion
 
@@ -174,7 +185,8 @@ namespace osu.Game.Screens.Mvis.Plugins
         {
             CanDisable,
             CanUnload,
-            CanReload
+            CanReload,
+            HasConfig
         }
 
         /// <summary>

@@ -1,29 +1,36 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
+using osu.Game.Screens.Mvis.Plugins.Config;
 
 namespace osu.Game.Screens.Mvis.Plugins
 {
-    public class MvisPluginManager : Component
+    public class MvisPluginManager : CompositeDrawable
     {
         private readonly BindableList<MvisPlugin> avaliablePlugins = new BindableList<MvisPlugin>();
         private readonly BindableList<MvisPlugin> activePlugins = new BindableList<MvisPlugin>();
         private readonly List<MvisPluginProvider> providers = new List<MvisPluginProvider>();
+        private readonly ConcurrentDictionary<Type, IPluginConfigManager> configManagers = new ConcurrentDictionary<Type, IPluginConfigManager>();
 
         [CanBeNull]
         [Resolved(CanBeNull = true)]
         private SideBar.Sidebar sideBar { get; set; }
 
+        [Resolved]
+        private Storage storage { get; set; }
+
         public Action<MvisPlugin> OnPluginAdd;
         public Action<MvisPlugin> OnPluginUnLoad;
 
         [BackgroundDependencyLoader]
-        private void load(CustomStore customStore)
+        private void load(CustomStore customStore, OsuGameBase gameBase)
         {
             foreach (var provider in customStore.LoadedPluginProviders)
             {
@@ -31,6 +38,9 @@ namespace osu.Game.Screens.Mvis.Plugins
                 providers.Add(provider);
             }
         }
+
+        public IPluginConfigManager GetConfigManager(MvisPlugin pl) =>
+            configManagers.GetOrAdd(pl.GetType(), _ => pl.CreateConfigManager(storage));
 
         public bool AddPlugin(MvisPlugin pl)
         {
@@ -106,18 +116,23 @@ namespace osu.Game.Screens.Mvis.Plugins
         /// <summary>
         /// 获取所有插件
         /// </summary>
-        /// <param name="newInstance">是否创建新插件本体，该选项应当只用于MvisScreen启动！</param>
+        /// <param name="newInstance">
+        /// 是否创建新插件本体,设置为true时将不会返回原本的插件列表<br/>
+        /// </param>
         /// <returns>所有已加载且可用的插件</returns>
         public List<MvisPlugin> GetAllPlugins(bool newInstance)
         {
             if (newInstance)
             {
                 DisposeAllPlugins();
+                //var list = new List<MvisPlugin>();
 
                 foreach (var p in providers)
                 {
                     avaliablePlugins.Add(p.CreatePlugin);
                 }
+
+                //return list;
             }
 
             return avaliablePlugins.ToList();
