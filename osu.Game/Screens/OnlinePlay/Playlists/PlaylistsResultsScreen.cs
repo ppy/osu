@@ -19,7 +19,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 {
     public class PlaylistsResultsScreen : ResultsScreen
     {
-        private readonly int roomId;
+        private readonly long roomId;
         private readonly PlaylistItem playlistItem;
 
         protected LoadingSpinner LeftSpinner { get; private set; }
@@ -32,7 +32,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        public PlaylistsResultsScreen(ScoreInfo score, int roomId, PlaylistItem playlistItem, bool allowRetry, bool allowWatchingReplay = true)
+        public PlaylistsResultsScreen(ScoreInfo score, long roomId, PlaylistItem playlistItem, bool allowRetry, bool allowWatchingReplay = true)
             : base(score, allowRetry, allowWatchingReplay)
         {
             this.roomId = roomId;

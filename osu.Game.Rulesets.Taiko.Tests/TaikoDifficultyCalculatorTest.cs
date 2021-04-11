@@ -5,6 +5,7 @@ using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Taiko.Difficulty;
+using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Rulesets.Taiko.Tests
@@ -17,6 +18,11 @@ namespace osu.Game.Rulesets.Taiko.Tests
         [TestCase(2.2867022617692685d, "diffcalc-test-strong")]
         public void Test(double expected, string name)
             => base.Test(expected, name);
+
+        [TestCase(3.1704781712282624d, "diffcalc-test")]
+        [TestCase(3.1704781712282624d, "diffcalc-test-strong")]
+        public void TestClockRateAdjusted(double expected, string name)
+            => Test(expected, name, new TaikoModDoubleTime());
 
         protected override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new TaikoDifficultyCalculator(new TaikoRuleset(), beatmap);
 

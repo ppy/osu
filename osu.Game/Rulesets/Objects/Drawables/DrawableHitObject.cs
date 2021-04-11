@@ -11,7 +11,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Judgements;
@@ -735,24 +734,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             if (!Result.HasResult)
                 throw new InvalidOperationException($"{GetType().ReadableName()} applied a {nameof(JudgementResult)} but did not update {nameof(JudgementResult.Type)}.");
-
-            // Some (especially older) rulesets use scorable judgements instead of the newer ignorehit/ignoremiss judgements.
-            // Can be removed 20210328
-            if (Result.Judgement.MaxResult == HitResult.IgnoreHit)
-            {
-                HitResult originalType = Result.Type;
-
-                if (Result.Type == HitResult.Miss)
-                    Result.Type = HitResult.IgnoreMiss;
-                else if (Result.Type >= HitResult.Meh && Result.Type <= HitResult.Perfect)
-                    Result.Type = HitResult.IgnoreHit;
-
-                if (Result.Type != originalType)
-                {
-                    Logger.Log($"{GetType().ReadableName()} applied an invalid hit result ({originalType}) when {nameof(HitResult.IgnoreMiss)} or {nameof(HitResult.IgnoreHit)} is expected.\n"
-                               + $"This has been automatically adjusted to {Result.Type}, and support will be removed from 2020-03-28 onwards.", level: LogLevel.Important);
-                }
-            }
 
             if (!Result.Type.IsValidHitResult(Result.Judgement.MinResult, Result.Judgement.MaxResult))
             {

@@ -9,7 +9,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Logging;
-using osu.Game.Extensions;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Rooms.RoomStatuses;
@@ -23,7 +22,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private StatefulMultiplayerClient multiplayerClient { get; set; }
 
         public readonly Bindable<double> TimeBetweenListingPolls = new Bindable<double>();
-
+        public readonly Bindable<double> TimeBetweenSelectionPolls = new Bindable<double>();
         private readonly IBindable<bool> isConnected = new Bindable<bool>();
         private readonly Bindable<bool> allowPolling = new Bindable<bool>();
 
@@ -34,10 +33,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.LoadComplete();
 
             isConnected.BindTo(multiplayerClient.IsConnected);
-            isConnected.BindValueChanged(_ => Schedule(updatePolling));
-            JoinedRoom.BindValueChanged(_ => updatePolling());
-
-            updatePolling();
+            isConnected.BindValueChanged(_ => Scheduler.AddOnce(updatePolling));
+            JoinedRoom.BindValueChanged(_ => Scheduler.AddOnce(updatePolling), true);
         }
 
         public override void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
@@ -71,7 +68,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             base.PartRoom();
 
-            multiplayerClient.LeaveRoom().CatchUnobservedExceptions();
+            multiplayerClient.LeaveRoom();
 
             // Todo: This is not the way to do this. Basically when we're the only participant and the room closes, there's no way to know if this is actually the case.
             // This is delayed one frame because upon exiting the match subscreen, multiplayer updates the polling rate and messes with polling.
@@ -90,7 +87,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 if (t.IsCompletedSuccessfully)
                     Schedule(() => onSuccess?.Invoke(room));
-                else
+                else if (t.IsFaulted)
                 {
                     const string message = "Failed to join multiplayer room.";
 
@@ -119,9 +116,35 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 TimeBetweenPolls = { BindTarget = TimeBetweenListingPolls },
                 AllowPolling = { BindTarget = allowPolling }
             },
+            new MultiplayerSelectionPollingComponent
+            {
+                TimeBetweenPolls = { BindTarget = TimeBetweenSelectionPolls },
+                AllowPolling = { BindTarget = allowPolling }
+            }
         };
 
         private class MultiplayerListingPollingComponent : ListingPollingComponent
+        {
+            public readonly IBindable<bool> AllowPolling = new Bindable<bool>();
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                AllowPolling.BindValueChanged(allowPolling =>
+                {
+                    if (!allowPolling.NewValue)
+                        return;
+
+                    if (IsLoaded)
+                        PollImmediately();
+                });
+            }
+
+            protected override Task Poll() => !AllowPolling.Value ? Task.CompletedTask : base.Poll();
+        }
+
+        private class MultiplayerSelectionPollingComponent : SelectionPollingComponent
         {
             public readonly IBindable<bool> AllowPolling = new Bindable<bool>();
 

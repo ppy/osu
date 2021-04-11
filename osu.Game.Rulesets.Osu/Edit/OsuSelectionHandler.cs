@@ -33,15 +33,32 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             base.OnOperationEnded();
             referenceOrigin = null;
+            referencePathTypes = null;
         }
 
-        public override bool HandleMovement(MoveSelectionEvent moveEvent) =>
-            moveSelection(moveEvent.InstantDelta);
+        public override bool HandleMovement(MoveSelectionEvent moveEvent)
+        {
+            var hitObjects = selectedMovableObjects;
+
+            // this will potentially move the selection out of bounds...
+            foreach (var h in hitObjects)
+                h.Position += moveEvent.InstantDelta;
+
+            // but this will be corrected.
+            moveSelectionInBounds();
+            return true;
+        }
 
         /// <summary>
         /// During a transform, the initial origin is stored so it can be used throughout the operation.
         /// </summary>
         private Vector2? referenceOrigin;
+
+        /// <summary>
+        /// During a transform, the initial path types of a single selected slider are stored so they
+        /// can be maintained throughout the operation.
+        /// </summary>
+        private List<PathType?> referencePathTypes;
 
         public override bool HandleReverse()
         {
@@ -140,36 +157,11 @@ namespace osu.Game.Rulesets.Osu.Edit
             // the only hit object selected. with a group selection, it's likely the user
             // is not looking to change the duration of the slider but expand the whole pattern.
             if (hitObjects.Length == 1 && hitObjects.First() is Slider slider)
-            {
-                Quad quad = getSurroundingQuad(slider.Path.ControlPoints.Select(p => p.Position.Value));
-                Vector2 pathRelativeDeltaScale = new Vector2(1 + scale.X / quad.Width, 1 + scale.Y / quad.Height);
-
-                foreach (var point in slider.Path.ControlPoints)
-                    point.Position.Value *= pathRelativeDeltaScale;
-            }
+                scaleSlider(slider, scale);
             else
-            {
-                // move the selection before scaling if dragging from top or left anchors.
-                if ((reference & Anchor.x0) > 0 && !moveSelection(new Vector2(-scale.X, 0))) return false;
-                if ((reference & Anchor.y0) > 0 && !moveSelection(new Vector2(0, -scale.Y))) return false;
+                scaleHitObjects(hitObjects, reference, scale);
 
-                Quad quad = getSurroundingQuad(hitObjects);
-
-                foreach (var h in hitObjects)
-                {
-                    var newPosition = h.Position;
-
-                    // guard against no-ops and NaN.
-                    if (scale.X != 0 && quad.Width > 0)
-                        newPosition.X = quad.TopLeft.X + (h.X - quad.TopLeft.X) / quad.Width * (quad.Width + scale.X);
-
-                    if (scale.Y != 0 && quad.Height > 0)
-                        newPosition.Y = quad.TopLeft.Y + (h.Y - quad.TopLeft.Y) / quad.Height * (quad.Height + scale.Y);
-
-                    h.Position = newPosition;
-                }
-            }
-
+            moveSelectionInBounds();
             return true;
         }
 
@@ -207,28 +199,130 @@ namespace osu.Game.Rulesets.Osu.Edit
             return true;
         }
 
-        private bool moveSelection(Vector2 delta)
+        private void scaleSlider(Slider slider, Vector2 scale)
+        {
+            referencePathTypes ??= slider.Path.ControlPoints.Select(p => p.Type.Value).ToList();
+
+            Quad sliderQuad = getSurroundingQuad(slider.Path.ControlPoints.Select(p => p.Position.Value));
+
+            // Limit minimum distance between control points  after scaling to almost 0. Less than 0 causes the slider to flip, exactly 0 causes a crash through division by 0.
+            scale = Vector2.ComponentMax(new Vector2(Precision.FLOAT_EPSILON), sliderQuad.Size + scale) - sliderQuad.Size;
+
+            Vector2 pathRelativeDeltaScale = new Vector2(1 + scale.X / sliderQuad.Width, 1 + scale.Y / sliderQuad.Height);
+
+            Queue<Vector2> oldControlPoints = new Queue<Vector2>();
+
+            foreach (var point in slider.Path.ControlPoints)
+            {
+                oldControlPoints.Enqueue(point.Position.Value);
+                point.Position.Value *= pathRelativeDeltaScale;
+            }
+
+            // Maintain the path types in case they were defaulted to bezier at some point during scaling
+            for (int i = 0; i < slider.Path.ControlPoints.Count; ++i)
+                slider.Path.ControlPoints[i].Type.Value = referencePathTypes[i];
+
+            //if sliderhead or sliderend end up outside playfield, revert scaling.
+            Quad scaledQuad = getSurroundingQuad(new OsuHitObject[] { slider });
+            (bool xInBounds, bool yInBounds) = isQuadInBounds(scaledQuad);
+
+            if (xInBounds && yInBounds)
+                return;
+
+            foreach (var point in slider.Path.ControlPoints)
+                point.Position.Value = oldControlPoints.Dequeue();
+        }
+
+        private void scaleHitObjects(OsuHitObject[] hitObjects, Anchor reference, Vector2 scale)
+        {
+            scale = getClampedScale(hitObjects, reference, scale);
+
+            // move the selection before scaling if dragging from top or left anchors.
+            float xOffset = ((reference & Anchor.x0) > 0) ? -scale.X : 0;
+            float yOffset = ((reference & Anchor.y0) > 0) ? -scale.Y : 0;
+
+            Quad selectionQuad = getSurroundingQuad(hitObjects);
+
+            foreach (var h in hitObjects)
+            {
+                var newPosition = h.Position;
+
+                // guard against no-ops and NaN.
+                if (scale.X != 0 && selectionQuad.Width > 0)
+                    newPosition.X = selectionQuad.TopLeft.X + xOffset + (h.X - selectionQuad.TopLeft.X) / selectionQuad.Width * (selectionQuad.Width + scale.X);
+
+                if (scale.Y != 0 && selectionQuad.Height > 0)
+                    newPosition.Y = selectionQuad.TopLeft.Y + yOffset + (h.Y - selectionQuad.TopLeft.Y) / selectionQuad.Height * (selectionQuad.Height + scale.Y);
+
+                h.Position = newPosition;
+            }
+        }
+
+        private (bool X, bool Y) isQuadInBounds(Quad quad)
+        {
+            bool xInBounds = (quad.TopLeft.X >= 0) && (quad.BottomRight.X <= DrawWidth);
+            bool yInBounds = (quad.TopLeft.Y >= 0) && (quad.BottomRight.Y <= DrawHeight);
+
+            return (xInBounds, yInBounds);
+        }
+
+        private void moveSelectionInBounds()
         {
             var hitObjects = selectedMovableObjects;
 
             Quad quad = getSurroundingQuad(hitObjects);
 
-            Vector2 newTopLeft = quad.TopLeft + delta;
-            if (newTopLeft.X < 0)
-                delta.X -= newTopLeft.X;
-            if (newTopLeft.Y < 0)
-                delta.Y -= newTopLeft.Y;
+            Vector2 delta = Vector2.Zero;
 
-            Vector2 newBottomRight = quad.BottomRight + delta;
-            if (newBottomRight.X > DrawWidth)
-                delta.X -= newBottomRight.X - DrawWidth;
-            if (newBottomRight.Y > DrawHeight)
-                delta.Y -= newBottomRight.Y - DrawHeight;
+            if (quad.TopLeft.X < 0)
+                delta.X -= quad.TopLeft.X;
+            if (quad.TopLeft.Y < 0)
+                delta.Y -= quad.TopLeft.Y;
+
+            if (quad.BottomRight.X > DrawWidth)
+                delta.X -= quad.BottomRight.X - DrawWidth;
+            if (quad.BottomRight.Y > DrawHeight)
+                delta.Y -= quad.BottomRight.Y - DrawHeight;
 
             foreach (var h in hitObjects)
                 h.Position += delta;
+        }
 
-            return true;
+        /// <summary>
+        /// Clamp scale for multi-object-scaling where selection does not exceed playfield bounds or flip.
+        /// </summary>
+        /// <param name="hitObjects">The hitobjects to be scaled</param>
+        /// <param name="reference">The anchor from which the scale operation is performed</param>
+        /// <param name="scale">The scale to be clamped</param>
+        /// <returns>The clamped scale vector</returns>
+        private Vector2 getClampedScale(OsuHitObject[] hitObjects, Anchor reference, Vector2 scale)
+        {
+            float xOffset = ((reference & Anchor.x0) > 0) ? -scale.X : 0;
+            float yOffset = ((reference & Anchor.y0) > 0) ? -scale.Y : 0;
+
+            Quad selectionQuad = getSurroundingQuad(hitObjects);
+
+            //todo: this is not always correct for selections involving sliders. This approximation assumes each point is scaled independently, but sliderends move with the sliderhead.
+            Quad scaledQuad = new Quad(selectionQuad.TopLeft.X + xOffset, selectionQuad.TopLeft.Y + yOffset, selectionQuad.Width + scale.X, selectionQuad.Height + scale.Y);
+
+            //max Size -> playfield bounds
+            if (scaledQuad.TopLeft.X < 0)
+                scale.X += scaledQuad.TopLeft.X;
+            if (scaledQuad.TopLeft.Y < 0)
+                scale.Y += scaledQuad.TopLeft.Y;
+
+            if (scaledQuad.BottomRight.X > DrawWidth)
+                scale.X -= scaledQuad.BottomRight.X - DrawWidth;
+            if (scaledQuad.BottomRight.Y > DrawHeight)
+                scale.Y -= scaledQuad.BottomRight.Y - DrawHeight;
+
+            //min Size -> almost 0. Less than 0 causes the quad to flip, exactly 0 causes scaling to get stuck at minimum scale.
+            Vector2 scaledSize = selectionQuad.Size + scale;
+            Vector2 minSize = new Vector2(Precision.FLOAT_EPSILON);
+
+            scale = Vector2.ComponentMax(minSize, scaledSize) - selectionQuad.Size;
+
+            return scale;
         }
 
         /// <summary>
@@ -236,7 +330,20 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// </summary>
         /// <param name="hitObjects">The hit objects to calculate a quad for.</param>
         private Quad getSurroundingQuad(OsuHitObject[] hitObjects) =>
-            getSurroundingQuad(hitObjects.SelectMany(h => new[] { h.Position, h.EndPosition }));
+            getSurroundingQuad(hitObjects.SelectMany(h =>
+            {
+                if (h is IHasPath path)
+                {
+                    return new[]
+                    {
+                        h.Position,
+                        // can't use EndPosition for reverse slider cases.
+                        h.Position + path.Path.PositionAt(1)
+                    };
+                }
+
+                return new[] { h.Position };
+            }));
 
         /// <summary>
         /// Returns a gamefield-space quad surrounding the provided points.

@@ -22,9 +22,8 @@ namespace osu.Desktop
         {
             // Back up the cwd before DesktopGameHost changes it
             var cwd = Environment.CurrentDirectory;
-            bool useOsuTK = args.Contains("--tk");
 
-            using (DesktopGameHost host = Host.GetSuitableHost(@"osu", true, useOsuTK: useOsuTK))
+            using (DesktopGameHost host = Host.GetSuitableHost(@"osu", true))
             {
                 host.ExceptionThrown += handleException;
 

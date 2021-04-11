@@ -1,8 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using Newtonsoft.Json;
-using osu.Game.IO.Serialization.Converters;
+using osu.Framework.IO.Serialization;
 
 namespace osu.Game.IO.Serialization
 {
@@ -28,7 +29,7 @@ namespace osu.Game.IO.Serialization
             Formatting = Formatting.Indented,
             ObjectCreationHandling = ObjectCreationHandling.Replace,
             DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate,
-            Converters = new JsonConverter[] { new Vector2Converter() },
+            Converters = new List<JsonConverter> { new Vector2Converter() },
             ContractResolver = new KeyContractResolver()
         };
     }

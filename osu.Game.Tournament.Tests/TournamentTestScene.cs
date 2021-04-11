@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
@@ -9,6 +10,7 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Tests.Visual;
+using osu.Game.Tournament.IO;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
 using osu.Game.Users;
@@ -27,7 +29,7 @@ namespace osu.Game.Tournament.Tests
         protected MatchIPCInfo IPCInfo { get; private set; } = new MatchIPCInfo();
 
         [BackgroundDependencyLoader]
-        private void load(Storage storage)
+        private void load(TournamentStorage storage)
         {
             Ladder.Ruleset.Value ??= rulesetStore.AvailableRulesets.First();
 
@@ -112,11 +114,11 @@ namespace osu.Game.Tournament.Tests
                     },
                     Players =
                     {
-                        new User { Username = "Hello", Statistics = new UserStatistics { Ranks = new UserStatistics.UserRanks { Global = 12 } } },
-                        new User { Username = "Hello", Statistics = new UserStatistics { Ranks = new UserStatistics.UserRanks { Global = 16 } } },
-                        new User { Username = "Hello", Statistics = new UserStatistics { Ranks = new UserStatistics.UserRanks { Global = 20 } } },
-                        new User { Username = "Hello", Statistics = new UserStatistics { Ranks = new UserStatistics.UserRanks { Global = 24 } } },
-                        new User { Username = "Hello", Statistics = new UserStatistics { Ranks = new UserStatistics.UserRanks { Global = 30 } } },
+                        new User { Username = "Hello", Statistics = new UserStatistics { GlobalRank = 12 } },
+                        new User { Username = "Hello", Statistics = new UserStatistics { GlobalRank = 16 } },
+                        new User { Username = "Hello", Statistics = new UserStatistics { GlobalRank = 20 } },
+                        new User { Username = "Hello", Statistics = new UserStatistics { GlobalRank = 24 } },
+                        new User { Username = "Hello", Statistics = new UserStatistics { GlobalRank = 30 } },
                     }
                 }
             },
@@ -154,13 +156,22 @@ namespace osu.Game.Tournament.Tests
 
             protected override void LoadAsyncComplete()
             {
-                // this has to be run here rather than LoadComplete because
-                // TestScene.cs is checking the IsLoaded state (on another thread) and expects
-                // the runner to be loaded at that point.
-                Add(runner = new TestSceneTestRunner.TestRunner());
+                BracketLoadTask.ContinueWith(_ => Schedule(() =>
+                {
+                    // this has to be run here rather than LoadComplete because
+                    // TestScene.cs is checking the IsLoaded state (on another thread) and expects
+                    // the runner to be loaded at that point.
+                    Add(runner = new TestSceneTestRunner.TestRunner());
+                }));
             }
 
-            public void RunTestBlocking(TestScene test) => runner.RunTestBlocking(test);
+            public void RunTestBlocking(TestScene test)
+            {
+                while (runner?.IsLoaded != true && Host.ExecutionState == ExecutionState.Running)
+                    Thread.Sleep(10);
+
+                runner?.RunTestBlocking(test);
+            }
         }
     }
 }

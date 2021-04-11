@@ -42,6 +42,21 @@ namespace osu.Game.Storyboards.Drawables
             }
         }
 
+        protected override void SamplePlaybackDisabledChanged(ValueChangedEvent<bool> disabled)
+        {
+            if (!RequestedPlaying) return;
+
+            if (!Looping && disabled.NewValue)
+            {
+                // the default behaviour for sample disabling is to allow one-shot samples to play out.
+                // storyboards regularly have long running samples that can cause this behaviour to lead to unintended results.
+                // for this reason, we immediately stop such samples.
+                Stop();
+            }
+
+            base.SamplePlaybackDisabledChanged(disabled);
+        }
+
         protected override void Update()
         {
             base.Update();

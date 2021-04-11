@@ -246,5 +246,32 @@ namespace osu.Game.Tests.NonVisual
             Assert.That(cpi.DifficultyPoints.Count, Is.EqualTo(0));
             Assert.That(cpi.AllControlPoints.Count, Is.EqualTo(0));
         }
+
+        [Test]
+        public void TestCreateCopyIsDeepClone()
+        {
+            var cpi = new ControlPointInfo();
+
+            cpi.Add(1000, new TimingControlPoint { BeatLength = 500 });
+
+            var cpiCopy = cpi.CreateCopy();
+
+            cpiCopy.Add(2000, new TimingControlPoint { BeatLength = 500 });
+
+            Assert.That(cpi.Groups.Count, Is.EqualTo(1));
+            Assert.That(cpiCopy.Groups.Count, Is.EqualTo(2));
+
+            Assert.That(cpi.TimingPoints.Count, Is.EqualTo(1));
+            Assert.That(cpiCopy.TimingPoints.Count, Is.EqualTo(2));
+
+            Assert.That(cpi.TimingPoints[0], Is.Not.SameAs(cpiCopy.TimingPoints[0]));
+            Assert.That(cpi.TimingPoints[0].BeatLengthBindable, Is.Not.SameAs(cpiCopy.TimingPoints[0].BeatLengthBindable));
+
+            Assert.That(cpi.TimingPoints[0].BeatLength, Is.EqualTo(cpiCopy.TimingPoints[0].BeatLength));
+
+            cpi.TimingPoints[0].BeatLength = 800;
+
+            Assert.That(cpi.TimingPoints[0].BeatLength, Is.Not.EqualTo(cpiCopy.TimingPoints[0].BeatLength));
+        }
     }
 }

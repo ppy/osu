@@ -170,7 +170,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (clickedBlueprint == null || SelectionHandler.SelectedBlueprints.FirstOrDefault(b => b.IsHovered) != clickedBlueprint)
                 return false;
 
-            EditorClock?.SeekTo(clickedBlueprint.HitObject.StartTime);
+            EditorClock?.SeekSmoothlyTo(clickedBlueprint.HitObject.StartTime);
             return true;
         }
 
@@ -268,6 +268,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void addBlueprintFor(HitObject hitObject)
         {
+            if (hitObject is IBarLine)
+                return;
+
             if (blueprintMap.ContainsKey(hitObject))
                 return;
 
@@ -338,7 +341,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private bool beginClickSelection(MouseButtonEvent e)
         {
             // Iterate from the top of the input stack (blueprints closest to the front of the screen first).
-            foreach (SelectionBlueprint blueprint in SelectionBlueprints.AliveChildren.Reverse())
+            // Priority is given to already-selected blueprints.
+            foreach (SelectionBlueprint blueprint in SelectionBlueprints.AliveChildren.Reverse().OrderByDescending(b => b.IsSelected))
             {
                 if (!blueprint.IsHovered) continue;
 
@@ -495,8 +499,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 // Apply the start time at the newly snapped-to position
                 double offset = result.Time.Value - movementBlueprints.First().HitObject.StartTime;
 
-                foreach (HitObject obj in Beatmap.SelectedHitObjects)
-                    obj.StartTime += offset;
+                Beatmap.PerformOnSelection(obj => obj.StartTime += offset);
             }
 
             return true;

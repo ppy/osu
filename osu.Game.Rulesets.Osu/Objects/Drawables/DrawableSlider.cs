@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using osuTK;
@@ -15,6 +16,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.Scoring;
 using osuTK.Graphics;
 using osu.Game.Skinning;
 
@@ -30,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public SliderBall Ball { get; private set; }
         public SkinnableDrawable Body { get; private set; }
 
-        public override bool DisplayResult => false;
+        public override bool DisplayResult => !HitObject.OnlyJudgeNestedObjects;
 
         private PlaySliderBody sliderBody => Body.Drawable as PlaySliderBody;
 
@@ -107,16 +109,27 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void LoadSamples()
         {
-            base.LoadSamples();
+            // Note: base.LoadSamples() isn't called since the slider plays the tail's hitsounds for the time being.
 
-            var firstSample = HitObject.Samples.FirstOrDefault();
-
-            if (firstSample != null)
+            if (HitObject.SampleControlPoint == null)
             {
-                var clone = HitObject.SampleControlPoint.ApplyTo(firstSample).With("sliderslide");
-
-                slidingSample.Samples = new ISampleInfo[] { clone };
+                throw new InvalidOperationException($"{nameof(HitObject)}s must always have an attached {nameof(HitObject.SampleControlPoint)}."
+                                                    + $" This is an indication that {nameof(HitObject.ApplyDefaults)} has not been invoked on {this}.");
             }
+
+            Samples.Samples = HitObject.TailSamples.Select(s => HitObject.SampleControlPoint.ApplyTo(s)).Cast<ISampleInfo>().ToArray();
+
+            var slidingSamples = new List<ISampleInfo>();
+
+            var normalSample = HitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
+            if (normalSample != null)
+                slidingSamples.Add(HitObject.SampleControlPoint.ApplyTo(normalSample).With("sliderslide"));
+
+            var whistleSample = HitObject.Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_WHISTLE);
+            if (whistleSample != null)
+                slidingSamples.Add(HitObject.SampleControlPoint.ApplyTo(whistleSample).With("sliderwhistle"));
+
+            slidingSample.Samples = slidingSamples.ToArray();
         }
 
         public override void StopAllSamples()
@@ -249,14 +262,37 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (userTriggered || Time.Current < HitObject.EndTime)
                 return;
 
-            ApplyResult(r => r.Type = NestedHitObjects.Any(h => h.Result.IsHit) ? r.Judgement.MaxResult : r.Judgement.MinResult);
+            // If only the nested hitobjects are judged, then the slider's own judgement is ignored for scoring purposes.
+            // But the slider needs to still be judged with a reasonable hit/miss result for visual purposes (hit/miss transforms, etc).
+            if (HitObject.OnlyJudgeNestedObjects)
+            {
+                ApplyResult(r => r.Type = NestedHitObjects.Any(h => h.Result.IsHit) ? r.Judgement.MaxResult : r.Judgement.MinResult);
+                return;
+            }
+
+            // Otherwise, if this slider also needs to be judged, apply judgement proportionally to the number of nested hitobjects hit. This is the classic osu!stable scoring.
+            ApplyResult(r =>
+            {
+                int totalTicks = NestedHitObjects.Count;
+                int hitTicks = NestedHitObjects.Count(h => h.IsHit);
+
+                if (hitTicks == totalTicks)
+                    r.Type = HitResult.Great;
+                else if (hitTicks == 0)
+                    r.Type = HitResult.Miss;
+                else
+                {
+                    double hitFraction = (double)hitTicks / totalTicks;
+                    r.Type = hitFraction >= 0.5 ? HitResult.Ok : HitResult.Meh;
+                }
+            });
         }
 
         public override void PlaySamples()
         {
             // rather than doing it this way, we should probably attach the sample to the tail circle.
             // this can only be done after we stop using LegacyLastTick.
-            if (TailCircle.IsHit)
+            if (!TailCircle.SamplePlaysOnlyOnHit || TailCircle.IsHit)
                 base.PlaySamples();
         }
 

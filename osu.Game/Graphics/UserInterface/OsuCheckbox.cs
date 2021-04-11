@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
@@ -17,6 +18,11 @@ namespace osu.Game.Graphics.UserInterface
         public Color4 CheckedColor { get; set; } = Color4.Cyan;
         public Color4 UncheckedColor { get; set; } = Color4.White;
         public int FadeDuration { get; set; }
+
+        /// <summary>
+        /// Whether to play sounds when the state changes as a result of user interaction.
+        /// </summary>
+        protected virtual bool PlaySoundsOnUserChange => true;
 
         public string LabelText
         {
@@ -40,10 +46,10 @@ namespace osu.Game.Graphics.UserInterface
         protected readonly Nub Nub;
 
         private readonly OsuTextFlowContainer labelText;
-        private SampleChannel sampleChecked;
-        private SampleChannel sampleUnchecked;
+        private Sample sampleChecked;
+        private Sample sampleUnchecked;
 
-        public OsuCheckbox()
+        public OsuCheckbox(bool nubOnRight = true)
         {
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
@@ -52,24 +58,40 @@ namespace osu.Game.Graphics.UserInterface
 
             Children = new Drawable[]
             {
-                labelText = new OsuTextFlowContainer
+                labelText = new OsuTextFlowContainer(ApplyLabelParameters)
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
-                    Padding = new MarginPadding { Right = Nub.EXPANDED_SIZE + nub_padding }
                 },
-                Nub = new Nub
-                {
-                    Anchor = Anchor.CentreRight,
-                    Origin = Anchor.CentreRight,
-                    Margin = new MarginPadding { Right = nub_padding },
-                },
-                new HoverClickSounds()
+                Nub = new Nub(),
+                new HoverSounds()
             };
+
+            if (nubOnRight)
+            {
+                Nub.Anchor = Anchor.CentreRight;
+                Nub.Origin = Anchor.CentreRight;
+                Nub.Margin = new MarginPadding { Right = nub_padding };
+                labelText.Padding = new MarginPadding { Right = Nub.EXPANDED_SIZE + nub_padding * 2 };
+            }
+            else
+            {
+                Nub.Anchor = Anchor.CentreLeft;
+                Nub.Origin = Anchor.CentreLeft;
+                Nub.Margin = new MarginPadding { Left = nub_padding };
+                labelText.Padding = new MarginPadding { Left = Nub.EXPANDED_SIZE + nub_padding * 2 };
+            }
 
             Nub.Current.BindTo(Current);
 
             Current.DisabledChanged += disabled => labelText.Alpha = Nub.Alpha = disabled ? 0.3f : 1;
+        }
+
+        /// <summary>
+        /// A function which can be overridden to change the parameters of the label's text.
+        /// </summary>
+        protected virtual void ApplyLabelParameters(SpriteText text)
+        {
         }
 
         [BackgroundDependencyLoader]
@@ -96,10 +118,14 @@ namespace osu.Game.Graphics.UserInterface
         protected override void OnUserChange(bool value)
         {
             base.OnUserChange(value);
-            if (value)
-                sampleChecked?.Play();
-            else
-                sampleUnchecked?.Play();
+
+            if (PlaySoundsOnUserChange)
+            {
+                if (value)
+                    sampleChecked?.Play();
+                else
+                    sampleUnchecked?.Play();
+            }
         }
     }
 }

@@ -332,7 +332,7 @@ namespace osu.Game.Rulesets.Edit
                 EditorBeatmap.Add(hitObject);
 
                 if (EditorClock.CurrentTime < hitObject.StartTime)
-                    EditorClock.SeekTo(hitObject.StartTime);
+                    EditorClock.SeekSmoothlyTo(hitObject.StartTime);
             }
         }
 
@@ -437,6 +437,8 @@ namespace osu.Game.Rulesets.Edit
         /// Whether the user's cursor is currently in an area of the <see cref="HitObjectComposer"/> that is valid for placement.
         /// </summary>
         public abstract bool CursorInPlacementArea { get; }
+
+        public virtual string ConvertSelectionToString() => string.Empty;
 
         #region IPositionSnapProvider
 
