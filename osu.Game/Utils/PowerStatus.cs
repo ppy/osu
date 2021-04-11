@@ -12,14 +12,14 @@ namespace osu.Game.Utils
         /// <summary>
         /// The maximum battery level considered as low, from 0 to 1.
         /// </summary>
-        public virtual double BatteryCutoff { get; } = 0;
+        public abstract double BatteryCutoff { get; }
 
         /// <summary>
         /// The charge level of the battery, from 0 to 1.
         /// </summary>
-        public virtual double ChargeLevel { get; } = 0;
+        public abstract double ChargeLevel { get; }
 
-        public virtual bool IsCharging { get; } = false;
+        public abstract bool IsCharging { get; }
 
         /// <summary>
         /// Whether the battery is currently low in charge.
