@@ -5,7 +5,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
 
-namespace osu.Game.Screens.Mvis.Objects
+namespace osu.Game.Screens.Mvis.Misc
 {
     public class BeatmapBackground : BufferedContainer
     {

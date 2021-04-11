@@ -1,7 +1,7 @@
 ﻿using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 
-namespace osu.Game.Screens.Mvis.Objects.Helpers
+namespace Mvis.Plugin.RulesetPanel.Objects.Helpers
 {
     public class MusicIntensityController : MusicAmplitudesProvider
     {

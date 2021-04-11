@@ -6,7 +6,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 
-namespace osu.Game.Screens.Mvis
+namespace osu.Game.Screens.Mvis.Misc
 {
     public class BgTrianglesContainer : VisibilityContainer
     {

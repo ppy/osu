@@ -2,7 +2,7 @@
 using osu.Framework.Graphics;
 using osuTK;
 
-namespace osu.Game.Screens.Mvis.Objects.MusicVisualizers
+namespace Mvis.Plugin.RulesetPanel.Objects.MusicVisualizers
 {
     public class MusicCircularVisualizer : MusicBarsVisualizer
     {

@@ -1,24 +1,25 @@
 ﻿using System;
+using Mvis.Plugin.RulesetPanel.Config;
+using Mvis.Plugin.RulesetPanel.Objects.Helpers;
+using Mvis.Plugin.RulesetPanel.Objects.MusicVisualizers.Bars;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Game.Configuration;
-using osu.Game.Screens.Mvis.Objects.Helpers;
-using osu.Game.Screens.Mvis.Objects.MusicVisualizers.Bars;
 
-namespace osu.Game.Screens.Mvis.Objects.MusicVisualizers
+namespace Mvis.Plugin.RulesetPanel.Objects.MusicVisualizers
 {
     public abstract class MusicBarsVisualizer : MusicAmplitudesProvider
     {
-        [Resolved(canBeNull: true)]
-        private MConfigManager config { get; set; }
+        [Resolved]
+        private RulesetPanelConfigManager config { get; set; }
 
         private readonly Bindable<MvisBarType> type = new Bindable<MvisBarType>(MvisBarType.Rounded);
         private readonly Bindable<double> barWidthBindable = new Bindable<double>(3.0);
 
-        public int Smoothness { get; set; } = 200;
+        public int Smoothness = 200;
 
         private float barWidth = 4.5f;
+
         public float BarWidth
         {
             get => barWidth;
@@ -43,6 +44,7 @@ namespace osu.Game.Screens.Mvis.Objects.MusicVisualizers
         }
 
         private int barsCount = 200;
+
         public int BarsCount
         {
             get => barsCount;
@@ -57,13 +59,13 @@ namespace osu.Game.Screens.Mvis.Objects.MusicVisualizers
             }
         }
 
-        public float ValueMultiplier { get; set; } = 400;
+        public float ValueMultiplier = 400;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            config?.BindWith(MSetting.MvisBarType, type);
-            config?.BindWith(MSetting.MvisBarWidth, barWidthBindable);
+            config.BindWith(RulesetPanelSetting.BarType, type);
+            config.BindWith(RulesetPanelSetting.BarWidth, barWidthBindable);
 
             barWidthBindable.BindValueChanged(width => BarWidth = (float)width.NewValue);
             type.BindValueChanged(_ => resetBars(), true);
@@ -81,6 +83,7 @@ namespace osu.Game.Screens.Mvis.Objects.MusicVisualizers
         private void rearrangeBars()
         {
             EqualizerBars = new BasicBar[barsCount];
+
             for (int i = 0; i < barsCount; i++)
             {
                 EqualizerBars[i] = getBar();

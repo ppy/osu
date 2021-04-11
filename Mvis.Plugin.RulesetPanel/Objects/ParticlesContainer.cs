@@ -1,17 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
+using Mvis.Plugin.RulesetPanel.Config;
+using Mvis.Plugin.RulesetPanel.Objects.Helpers;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Configuration;
-using osu.Game.Screens.Mvis.Objects.Helpers;
 
-namespace osu.Game.Screens.Mvis.Objects
+namespace Mvis.Plugin.RulesetPanel.Objects
 {
     public abstract class ParticlesContainer : CurrentRateContainer
     {
-        [Resolved(canBeNull: true)]
-        private MConfigManager config { get; set; }
+        [Resolved]
+        private RulesetPanelConfigManager config { get; set; }
 
         private readonly Bindable<int> countBindable = new Bindable<int>(200);
 
@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Mvis.Objects
         [BackgroundDependencyLoader]
         private void load()
         {
-            config?.BindWith(MSetting.MvisParticleAmount, countBindable);
+            config.BindWith(RulesetPanelSetting.ParticleAmount, countBindable);
             countBindable.BindValueChanged(onCountChanged, true);
         }
 

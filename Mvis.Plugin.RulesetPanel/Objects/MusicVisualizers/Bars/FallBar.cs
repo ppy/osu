@@ -5,7 +5,7 @@ using osu.Framework.Graphics.Shapes;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Mvis.Objects.MusicVisualizers.Bars
+namespace Mvis.Plugin.RulesetPanel.Objects.MusicVisualizers.Bars
 {
     public class FallBar : BasicBar
     {

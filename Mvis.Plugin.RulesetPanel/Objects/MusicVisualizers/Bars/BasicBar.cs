@@ -1,21 +1,21 @@
 ﻿using System.Collections.Generic;
+using Mvis.Plugin.RulesetPanel.Config;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Configuration;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Mvis.Objects.MusicVisualizers.Bars
+namespace Mvis.Plugin.RulesetPanel.Objects.MusicVisualizers.Bars
 {
     public class BasicBar : Container
     {
         protected virtual IEnumerable<Drawable> ColourReceptors => new[] { box };
 
-        [Resolved(canBeNull: true)]
-        private MConfigManager config { get; set; }
+        [Resolved]
+        private RulesetPanelConfigManager config { get; set; }
 
         private readonly Bindable<bool> useCustomColour = new Bindable<bool>();
         private readonly Bindable<int> red = new Bindable<int>(0);
@@ -30,10 +30,10 @@ namespace osu.Game.Screens.Mvis.Objects.MusicVisualizers.Bars
         [BackgroundDependencyLoader]
         private void load()
         {
-            config?.BindWith(MSetting.MvisRed, red);
-            config?.BindWith(MSetting.MvisGreen, green);
-            config?.BindWith(MSetting.MvisBlue, blue);
-            config?.BindWith(MSetting.MvisUseCustomColour, useCustomColour);
+            config.BindWith(RulesetPanelSetting.Red, red);
+            config.BindWith(RulesetPanelSetting.Green, green);
+            config.BindWith(RulesetPanelSetting.Blue, blue);
+            config.BindWith(RulesetPanelSetting.UseCustomColour, useCustomColour);
 
             red.BindValueChanged(_ => updateColour());
             green.BindValueChanged(_ => updateColour());

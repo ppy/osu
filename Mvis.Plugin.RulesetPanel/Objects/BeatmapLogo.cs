@@ -1,26 +1,26 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
+using Mvis.Plugin.RulesetPanel.Config;
+using Mvis.Plugin.RulesetPanel.Objects.Helpers;
+using Mvis.Plugin.RulesetPanel.Objects.MusicVisualizers;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Configuration;
 using osu.Game.Screens.Menu;
-using osu.Game.Screens.Mvis.Objects.Helpers;
-using osu.Game.Screens.Mvis.Objects.MusicVisualizers;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Mvis.Objects
+namespace Mvis.Plugin.RulesetPanel.Objects
 {
     public class BeatmapLogo : CurrentBeatmapProvider
     {
         private const int radius = 350;
 
-        [Resolved(canBeNull: true)]
-        private MConfigManager config { get; set; }
+        [Resolved]
+        private RulesetPanelConfigManager config { get; set; }
 
         private readonly Bindable<bool> useOsuLogoVisuals = new Bindable<bool>();
         private readonly Bindable<int> visuals = new Bindable<int>(3);
@@ -79,16 +79,16 @@ namespace osu.Game.Screens.Mvis.Objects
                 }),
             };
 
-            config.BindWith(MSetting.MvisUseOsuLogoVisualisation, useOsuLogoVisuals);
-            config?.BindWith(MSetting.MvisVisualizerAmount, visuals);
-            config?.BindWith(MSetting.MvisBarWidth, barWidth);
-            config?.BindWith(MSetting.MvisBarsPerVisual, barCount);
-            config?.BindWith(MSetting.MvisRotation, rotation);
+            config.BindWith(RulesetPanelSetting.UseOsuLogoVisualisation, useOsuLogoVisuals);
+            config.BindWith(RulesetPanelSetting.VisualizerAmount, visuals);
+            config.BindWith(RulesetPanelSetting.BarWidth, barWidth);
+            config.BindWith(RulesetPanelSetting.BarsPerVisual, barCount);
+            config.BindWith(RulesetPanelSetting.Rotation, rotation);
 
-            config?.BindWith(MSetting.MvisRed, red);
-            config?.BindWith(MSetting.MvisGreen, green);
-            config?.BindWith(MSetting.MvisBlue, blue);
-            config?.BindWith(MSetting.MvisUseCustomColour, useCustomColour);
+            config.BindWith(RulesetPanelSetting.Red, red);
+            config.BindWith(RulesetPanelSetting.Green, green);
+            config.BindWith(RulesetPanelSetting.Blue, blue);
+            config.BindWith(RulesetPanelSetting.UseCustomColour, useCustomColour);
 
             useOsuLogoVisuals.BindValueChanged(_ => updateVisuals());
             barCount.BindValueChanged(_ => updateVisuals());

@@ -1,7 +1,7 @@
 ﻿using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 
-namespace osu.Game.Screens.Mvis.Objects.Helpers
+namespace Mvis.Plugin.RulesetPanel.Objects.Helpers
 {
     public class CurrentRateContainer : RateAdjustableContainer
     {

@@ -3,7 +3,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 
-namespace osu.Game.Screens.Mvis.Objects.Helpers
+namespace Mvis.Plugin.RulesetPanel.Objects.Helpers
 {
     public class CurrentBeatmapProvider : Container
     {

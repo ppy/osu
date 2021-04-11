@@ -1,14 +1,14 @@
 ﻿using System;
+using Mvis.Plugin.RulesetPanel.Config;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
-using osu.Game.Configuration;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Mvis.Objects
+namespace Mvis.Plugin.RulesetPanel.Objects
 {
     public class SpaceParticlesContainer : ParticlesContainer
     {
@@ -26,8 +26,8 @@ namespace osu.Game.Screens.Mvis.Objects
 
         private class Particle : Circle
         {
-            [Resolved(canBeNull: true)]
-            private MConfigManager config { get; set; }
+            [Resolved]
+            private RulesetPanelConfigManager config { get; set; }
 
             private readonly Bindable<bool> useCustomColour = new Bindable<bool>();
             private readonly Bindable<int> red = new Bindable<int>(0);
@@ -49,10 +49,10 @@ namespace osu.Game.Screens.Mvis.Objects
             [BackgroundDependencyLoader]
             private void load()
             {
-                config?.BindWith(MSetting.MvisRed, red);
-                config?.BindWith(MSetting.MvisGreen, green);
-                config?.BindWith(MSetting.MvisBlue, blue);
-                config?.BindWith(MSetting.MvisUseCustomColour, useCustomColour);
+                config.BindWith(RulesetPanelSetting.Red, red);
+                config.BindWith(RulesetPanelSetting.Green, green);
+                config.BindWith(RulesetPanelSetting.Blue, blue);
+                config.BindWith(RulesetPanelSetting.UseCustomColour, useCustomColour);
 
                 red.BindValueChanged(_ => updateColour());
                 green.BindValueChanged(_ => updateColour());
