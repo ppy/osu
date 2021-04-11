@@ -19,8 +19,6 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
         {
             Add(new MvisUISettings());
             Add(new MvisAudioSettings());
-            Add(new MvisStoryBoardSettings());
-            Add(new MvisVisualSettings());
         }
     }
 }
