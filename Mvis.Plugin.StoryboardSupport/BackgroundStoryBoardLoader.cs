@@ -202,8 +202,9 @@ namespace Mvis.Plugin.StoryboardSupport
                 currentStoryboard?.Expire();
                 currentStoryboard?.Dispose();
             }
+            else
+                currentStoryboard?.FadeTo(0.01f, 300, Easing.OutQuint).Expire();
 
-            currentStoryboard?.FadeTo(0.01f, 300, Easing.OutQuint).Expire();
             targetBeatmap = newBeatmap;
             Load();
         }
