@@ -11,12 +11,10 @@ using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.OnlinePlay;
-using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Users;
@@ -85,8 +83,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("move mouse to create button", () =>
             {
-                var footer = match.ChildrenOfType<Footer>().Single();
-                InputManager.MoveMouseTo(footer.ChildrenOfType<OsuButton>().Single());
+                InputManager.MoveMouseTo(this.ChildrenOfType<PlaylistsMatchSettingsOverlay.CreateRoomButton>().Single());
             });
 
             AddStep("click", () => InputManager.Click(MouseButton.Left));

@@ -337,7 +337,7 @@ namespace osu.Game.Rulesets.Scoring
             score.TotalScore = (long)Math.Round(GetStandardisedScore());
             score.Combo = Combo.Value;
             score.MaxCombo = HighestCombo.Value;
-            score.Accuracy = Math.Round(Accuracy.Value, 4);
+            score.Accuracy = Accuracy.Value;
             score.Rank = Rank.Value;
             score.Date = DateTimeOffset.Now;
 
@@ -346,12 +346,6 @@ namespace osu.Game.Rulesets.Scoring
 
             score.HitEvents = hitEvents;
         }
-
-        /// <summary>
-        /// Create a <see cref="HitWindows"/> for this processor.
-        /// </summary>
-        [Obsolete("Method is now unused.")] // Can be removed 20210328
-        public virtual HitWindows CreateHitWindows() => new HitWindows();
     }
 
     public enum ScoringMode

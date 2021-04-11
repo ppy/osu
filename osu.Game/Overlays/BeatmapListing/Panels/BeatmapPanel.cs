@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.BeatmapListing.Panels
         private Container content;
 
         public PreviewTrack Preview => PlayButton.Preview;
-        public Bindable<bool> PreviewPlaying => PlayButton?.Playing;
+        public IBindable<bool> PreviewPlaying => PlayButton?.Playing;
 
         protected abstract PlayButton PlayButton { get; }
         protected abstract Box PreviewBar { get; }

@@ -32,6 +32,11 @@ namespace osu.Game.Beatmaps
         public BeatmapSetOnlineStatus Status { get; set; }
 
         /// <summary>
+        /// Whether or not this beatmap set has explicit content.
+        /// </summary>
+        public bool HasExplicitContent { get; set; }
+
+        /// <summary>
         /// Whether or not this beatmap set has a background video.
         /// </summary>
         public bool HasVideo { get; set; }

@@ -45,8 +45,8 @@ namespace osu.Game.Screens.Menu
         public ButtonSystemState VisibleState = ButtonSystemState.TopLevel;
 
         private readonly Action clickAction;
-        private SampleChannel sampleClick;
-        private SampleChannel sampleHover;
+        private Sample sampleClick;
+        private Sample sampleHover;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => box.ReceivePositionalInputAt(screenSpacePos);
 

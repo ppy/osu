@@ -8,7 +8,6 @@ using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Containers;
@@ -20,6 +19,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Skinning;
 using osuTK;
 using System.Diagnostics;
+using osu.Framework.Audio.Sample;
 
 namespace osu.Game.Rulesets.UI
 {

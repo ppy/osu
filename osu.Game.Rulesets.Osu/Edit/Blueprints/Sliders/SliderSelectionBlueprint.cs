@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -28,6 +29,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         protected SliderBodyPiece BodyPiece { get; private set; }
         protected SliderCircleSelectionBlueprint HeadBlueprint { get; private set; }
         protected SliderCircleSelectionBlueprint TailBlueprint { get; private set; }
+
+        [CanBeNull]
         protected PathControlPointVisualiser ControlPointVisualiser { get; private set; }
 
         private readonly DrawableSlider slider;
@@ -43,6 +46,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         [Resolved(CanBeNull = true)]
         private IEditorChangeHandler changeHandler { get; set; }
+
+        public override Quad SelectionQuad => BodyPiece.ScreenSpaceDrawQuad;
 
         private readonly BindableList<PathControlPoint> controlPoints = new BindableList<PathControlPoint>();
         private readonly IBindable<int> pathVersion = new Bindable<int>();
@@ -112,6 +117,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             // throw away frame buffers on deselection.
             ControlPointVisualiser?.Expire();
+            ControlPointVisualiser = null;
+
             BodyPiece.RecyclePath();
         }
 

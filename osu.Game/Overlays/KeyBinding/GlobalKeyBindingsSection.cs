@@ -21,6 +21,7 @@ namespace osu.Game.Overlays.KeyBinding
         {
             Add(new DefaultBindingsSubsection(manager));
             Add(new AudioControlKeyBindingsSubsection(manager));
+            Add(new SongSelectKeyBindingSubsection(manager));
             Add(new InGameKeyBindingsSubsection(manager));
             Add(new EditorKeyBindingsSubsection(manager));
         }
@@ -33,6 +34,17 @@ namespace osu.Game.Overlays.KeyBinding
                 : base(null)
             {
                 Defaults = manager.GlobalKeyBindings;
+            }
+        }
+
+        private class SongSelectKeyBindingSubsection : KeyBindingsSubsection
+        {
+            protected override string Header => "Song Select";
+
+            public SongSelectKeyBindingSubsection(GlobalActionContainer manager)
+                : base(null)
+            {
+                Defaults = manager.SongSelectKeyBindings;
             }
         }
 

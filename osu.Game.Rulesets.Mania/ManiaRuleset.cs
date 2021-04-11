@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
@@ -21,6 +22,7 @@ using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Filter;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Difficulty;
@@ -59,76 +61,76 @@ namespace osu.Game.Rulesets.Mania
 
         public override IEnumerable<Mod> ConvertFromLegacyMods(LegacyMods mods)
         {
-            if (mods.HasFlag(LegacyMods.Nightcore))
+            if (mods.HasFlagFast(LegacyMods.Nightcore))
                 yield return new ManiaModNightcore();
-            else if (mods.HasFlag(LegacyMods.DoubleTime))
+            else if (mods.HasFlagFast(LegacyMods.DoubleTime))
                 yield return new ManiaModDoubleTime();
 
-            if (mods.HasFlag(LegacyMods.Perfect))
+            if (mods.HasFlagFast(LegacyMods.Perfect))
                 yield return new ManiaModPerfect();
-            else if (mods.HasFlag(LegacyMods.SuddenDeath))
+            else if (mods.HasFlagFast(LegacyMods.SuddenDeath))
                 yield return new ManiaModSuddenDeath();
 
-            if (mods.HasFlag(LegacyMods.Cinema))
+            if (mods.HasFlagFast(LegacyMods.Cinema))
                 yield return new ManiaModCinema();
-            else if (mods.HasFlag(LegacyMods.Autoplay))
+            else if (mods.HasFlagFast(LegacyMods.Autoplay))
                 yield return new ManiaModAutoplay();
 
-            if (mods.HasFlag(LegacyMods.Easy))
+            if (mods.HasFlagFast(LegacyMods.Easy))
                 yield return new ManiaModEasy();
 
-            if (mods.HasFlag(LegacyMods.FadeIn))
+            if (mods.HasFlagFast(LegacyMods.FadeIn))
                 yield return new ManiaModFadeIn();
 
-            if (mods.HasFlag(LegacyMods.Flashlight))
+            if (mods.HasFlagFast(LegacyMods.Flashlight))
                 yield return new ManiaModFlashlight();
 
-            if (mods.HasFlag(LegacyMods.HalfTime))
+            if (mods.HasFlagFast(LegacyMods.HalfTime))
                 yield return new ManiaModHalfTime();
 
-            if (mods.HasFlag(LegacyMods.HardRock))
+            if (mods.HasFlagFast(LegacyMods.HardRock))
                 yield return new ManiaModHardRock();
 
-            if (mods.HasFlag(LegacyMods.Hidden))
+            if (mods.HasFlagFast(LegacyMods.Hidden))
                 yield return new ManiaModHidden();
 
-            if (mods.HasFlag(LegacyMods.Key1))
+            if (mods.HasFlagFast(LegacyMods.Key1))
                 yield return new ManiaModKey1();
 
-            if (mods.HasFlag(LegacyMods.Key2))
+            if (mods.HasFlagFast(LegacyMods.Key2))
                 yield return new ManiaModKey2();
 
-            if (mods.HasFlag(LegacyMods.Key3))
+            if (mods.HasFlagFast(LegacyMods.Key3))
                 yield return new ManiaModKey3();
 
-            if (mods.HasFlag(LegacyMods.Key4))
+            if (mods.HasFlagFast(LegacyMods.Key4))
                 yield return new ManiaModKey4();
 
-            if (mods.HasFlag(LegacyMods.Key5))
+            if (mods.HasFlagFast(LegacyMods.Key5))
                 yield return new ManiaModKey5();
 
-            if (mods.HasFlag(LegacyMods.Key6))
+            if (mods.HasFlagFast(LegacyMods.Key6))
                 yield return new ManiaModKey6();
 
-            if (mods.HasFlag(LegacyMods.Key7))
+            if (mods.HasFlagFast(LegacyMods.Key7))
                 yield return new ManiaModKey7();
 
-            if (mods.HasFlag(LegacyMods.Key8))
+            if (mods.HasFlagFast(LegacyMods.Key8))
                 yield return new ManiaModKey8();
 
-            if (mods.HasFlag(LegacyMods.Key9))
+            if (mods.HasFlagFast(LegacyMods.Key9))
                 yield return new ManiaModKey9();
 
-            if (mods.HasFlag(LegacyMods.KeyCoop))
+            if (mods.HasFlagFast(LegacyMods.KeyCoop))
                 yield return new ManiaModDualStages();
 
-            if (mods.HasFlag(LegacyMods.NoFail))
+            if (mods.HasFlagFast(LegacyMods.NoFail))
                 yield return new ManiaModNoFail();
 
-            if (mods.HasFlag(LegacyMods.Random))
+            if (mods.HasFlagFast(LegacyMods.Random))
                 yield return new ManiaModRandom();
 
-            if (mods.HasFlag(LegacyMods.Mirror))
+            if (mods.HasFlagFast(LegacyMods.Mirror))
                 yield return new ManiaModMirror();
         }
 
@@ -238,6 +240,7 @@ namespace osu.Game.Rulesets.Mania
                         new ManiaModMirror(),
                         new ManiaModDifficultyAdjust(),
                         new ManiaModInvert(),
+                        new ManiaModConstantSpeed()
                     };
 
                 case ModType.Automation:
@@ -380,6 +383,11 @@ namespace osu.Game.Rulesets.Mania
                 }
             }
         };
+
+        public override IRulesetFilterCriteria CreateRulesetFilterCriteria()
+        {
+            return new ManiaFilterCriteria();
+        }
     }
 
     public enum PlayfieldType

@@ -1,9 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Mods;
@@ -34,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(true)]
         public void TestLongSpinner(bool autoplay)
         {
-            AddStep("Very short spinner", () => SetContents(() => testSingle(5, autoplay, 2000)));
+            AddStep("Very long spinner", () => SetContents(() => testSingle(5, autoplay, 4000)));
             AddUntilStep("Wait for completion", () => drawableSpinner.Result.HasResult);
             AddUntilStep("Check correct progress", () => drawableSpinner.Progress == (autoplay ? 1 : 0));
         }
@@ -55,7 +57,11 @@ namespace osu.Game.Rulesets.Osu.Tests
             var spinner = new Spinner
             {
                 StartTime = Time.Current + delay,
-                EndTime = Time.Current + delay + length
+                EndTime = Time.Current + delay + length,
+                Samples = new List<HitSampleInfo>
+                {
+                    new HitSampleInfo("hitnormal")
+                }
             };
 
             spinner.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = circleSize });

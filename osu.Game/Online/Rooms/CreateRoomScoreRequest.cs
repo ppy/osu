@@ -9,11 +9,11 @@ namespace osu.Game.Online.Rooms
 {
     public class CreateRoomScoreRequest : APIRequest<APIScoreToken>
     {
-        private readonly int roomId;
-        private readonly int playlistItemId;
+        private readonly long roomId;
+        private readonly long playlistItemId;
         private readonly string versionHash;
 
-        public CreateRoomScoreRequest(int roomId, int playlistItemId, string versionHash)
+        public CreateRoomScoreRequest(long roomId, long playlistItemId, string versionHash)
         {
             this.roomId = roomId;
             this.playlistItemId = playlistItemId;
