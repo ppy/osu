@@ -96,8 +96,6 @@ namespace osu.Game
 
         protected Storage Storage { get; set; }
 
-        protected virtual PowerStatus CreatePowerStatus() => null;
-
         [Cached]
         [Cached(typeof(IBindable<RulesetInfo>))]
         protected readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
@@ -158,6 +156,8 @@ namespace osu.Game
         private DatabaseContextFactory contextFactory;
 
         protected override UserInputManager CreateUserInputManager() => new OsuUserInputManager();
+
+        protected virtual PowerStatus CreatePowerStatus() => null;
 
         /// <summary>
         /// The maximum volume at which audio tracks should playback. This can be set lower than 1 to create some head-room for sound effects.
