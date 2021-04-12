@@ -8,15 +8,15 @@ using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit.Checks
 {
-    public class CheckBackground : Check
+    public class CheckBackground : ICheck
     {
-        public override CheckMetadata Metadata { get; } = new CheckMetadata
+        public CheckMetadata Metadata { get; } = new CheckMetadata
         (
             category: CheckCategory.Resources,
             description: "Missing background."
         );
 
-        public override IEnumerable<IssueTemplate> PossibleTemplates => new[]
+        public IEnumerable<IssueTemplate> PossibleTemplates => new[]
         {
             templateNoneSet,
             templateDoesNotExist
@@ -34,11 +34,11 @@ namespace osu.Game.Rulesets.Edit.Checks
             unformattedMessage: "The background file \"{0}\" is does not exist."
         );
 
-        public override IEnumerable<Issue> Run(IBeatmap beatmap)
+        public IEnumerable<Issue> Run(IBeatmap beatmap)
         {
             if (beatmap.Metadata.BackgroundFile == null)
             {
-                yield return new Issue(templateNoneSet);
+                yield return new Issue(this, templateNoneSet);
 
                 yield break;
             }
@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             if (file != null)
                 yield break;
 
-            yield return new Issue(templateDoesNotExist, beatmap.Metadata.BackgroundFile);
+            yield return new Issue(this, templateDoesNotExist, beatmap.Metadata.BackgroundFile);
         }
     }
 }

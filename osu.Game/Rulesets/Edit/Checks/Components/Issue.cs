@@ -27,37 +27,40 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         public IssueTemplate Template;
 
         /// <summary>
+        /// The check that this issue originates from.
+        /// </summary>
+        public ICheck Check;
+
+        /// <summary>
         /// The arguments that give this issue its context, based on the <see cref="IssueTemplate"/>. These are then substituted into the <see cref="IssueTemplate.UnformattedMessage"/>.
         /// This could for instance include timestamps, which diff is being compared to, what some volume is, etc.
         /// </summary>
         public object[] Arguments;
 
-        public Issue(IssueTemplate template, params object[] args)
+        public Issue(ICheck check, IssueTemplate template, params object[] args)
         {
+            Check = check;
             Time = null;
             HitObjects = Array.Empty<HitObject>();
             Template = template;
             Arguments = args;
-
-            if (template.Origin == null)
-                throw new ArgumentException("A template had no origin. Make sure the `Templates()` method contains all templates used.");
         }
 
-        public Issue(double? time, IssueTemplate template, params object[] args)
-            : this(template, args)
+        public Issue(ICheck check, double? time, IssueTemplate template, params object[] args)
+            : this(check, template, args)
         {
             Time = time;
         }
 
-        public Issue(HitObject hitObject, IssueTemplate template, params object[] args)
-            : this(template, args)
+        public Issue(ICheck check, HitObject hitObject, IssueTemplate template, params object[] args)
+            : this(check, template, args)
         {
             Time = hitObject.StartTime;
             HitObjects = new[] { hitObject };
         }
 
-        public Issue(IEnumerable<HitObject> hitObjects, IssueTemplate template, params object[] args)
-            : this(template, args)
+        public Issue(ICheck check, IEnumerable<HitObject> hitObjects, IssueTemplate template, params object[] args)
+            : this(check, template, args)
         {
             var hitObjectList = hitObjects.ToList();
 
