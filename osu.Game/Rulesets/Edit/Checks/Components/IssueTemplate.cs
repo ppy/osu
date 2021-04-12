@@ -66,16 +66,28 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         /// <summary>
         /// Returns the colour corresponding to the type of this issue.
         /// </summary>
-        public Colour4 TypeColour()
+        public Colour4 Colour
         {
-            return Type switch
+            get
             {
-                IssueType.Problem => problem_red,
-                IssueType.Warning => warning_yellow,
-                IssueType.Negligible => negligible_green,
-                IssueType.Error => error_gray,
-                _ => Color4.White
-            };
+                switch (Type)
+                {
+                    case IssueType.Problem:
+                        return problem_red;
+
+                    case IssueType.Warning:
+                        return warning_yellow;
+
+                    case IssueType.Negligible:
+                        return negligible_green;
+
+                    case IssueType.Error:
+                        return error_gray;
+
+                    default:
+                        return Color4.White;
+                }
+            }
         }
     }
 }
