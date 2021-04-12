@@ -1,11 +1,15 @@
+using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Screens.Mvis.Misc;
 using osu.Game.Screens.Mvis.SideBar;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Mvis.Plugins
 {
-    public class PluginSidebarPage : Container, ISidebarContent
+    public abstract class PluginSidebarPage : Container, ISidebarContent
     {
         private readonly Container blockMouseContainer;
         private readonly Container content;
@@ -16,45 +20,13 @@ namespace osu.Game.Screens.Mvis.Plugins
         {
         }
 
-        private MvisPlugin plugin;
+        public MvisPlugin Plugin { get; }
 
-        public MvisPlugin Plugin
-        {
-            get => plugin;
-            set
-            {
-                plugin = value;
-
-                InitContent(value);
-
-                value.Disabled.BindValueChanged(v =>
-                {
-                    switch (v.NewValue)
-                    {
-                        case true:
-                            Schedule(() =>
-                            {
-                                content.FadeOut();
-                                blockMouseContainer.FadeIn(200);
-                            });
-                            break;
-
-                        case false:
-                            Schedule(() =>
-                            {
-                                content.FadeIn(200);
-                                blockMouseContainer.FadeOut(200);
-                            });
-                            break;
-                    }
-                }, true);
-            }
-        }
-
-        public PluginSidebarPage(float resizeWidth, string title)
+        protected PluginSidebarPage(MvisPlugin plugin, float resizeWidth)
         {
             ResizeWidth = resizeWidth;
-            Title = title;
+            Plugin = plugin;
+            Title = plugin.Name;
 
             InternalChildren = new Drawable[]
             {
@@ -69,11 +41,11 @@ namespace osu.Game.Screens.Mvis.Plugins
                     Depth = float.MinValue,
                     Children = new Drawable[]
                     {
-                        //new FakeEditor.BlockMouseBox
-                        //{
-                        //    RelativeSizeAxes = Axes.Both,
-                        //    Colour = Color4.Black.Opacity(0.5f),
-                        //},
+                        new BlockMouseBox
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.Black.Opacity(0.5f),
+                        },
                         new OsuSpriteText
                         {
                             Text = "插件已禁用",
@@ -83,6 +55,17 @@ namespace osu.Game.Screens.Mvis.Plugins
                     }
                 }
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            InitContent(Plugin);
+            Plugin.Disabled.BindValueChanged(v =>
+            {
+                content.FadeTo(v.NewValue ? 0 : 1);
+                blockMouseContainer.FadeTo(v.NewValue ? 1 : 0, 200);
+            }, true);
         }
 
         public float ResizeWidth { get; }

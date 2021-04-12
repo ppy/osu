@@ -4,13 +4,12 @@ using Mvis.Plugin.FakeEditor.UI;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Mvis.Misc;
 using osu.Game.Screens.Mvis.Plugins;
 using osu.Game.Screens.Mvis.Plugins.Config;
 using osu.Game.Screens.Mvis.Plugins.Types;
@@ -188,12 +187,5 @@ namespace Mvis.Plugin.FakeEditor
         public double GetBeatLengthAtTime(double referenceTime) => 0;
 
         public int BeatDivisor => beatDivisor.Value;
-
-        public class BlockMouseBox : Box
-        {
-            protected override bool OnClick(ClickEvent e) => true;
-            protected override bool OnMouseMove(MouseMoveEvent e) => true;
-            protected override bool OnMouseDown(MouseDownEvent e) => true;
-        }
     }
 }
