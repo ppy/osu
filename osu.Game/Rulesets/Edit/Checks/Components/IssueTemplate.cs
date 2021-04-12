@@ -15,6 +15,11 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         private static readonly Color4 error_gray = new Colour4(0.5f, 0.5f, 0.5f, 1.0f);
 
         /// <summary>
+        /// The check that this template originates from.
+        /// </summary>
+        public ICheck Check;
+
+        /// <summary>
         /// The type of the issue.
         /// </summary>
         public readonly IssueType Type;
@@ -26,8 +31,9 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         /// </summary>
         public readonly string UnformattedMessage;
 
-        public IssueTemplate(IssueType type, string unformattedMessage)
+        public IssueTemplate(ICheck check, IssueType type, string unformattedMessage)
         {
+            Check = check;
             Type = type;
             UnformattedMessage = unformattedMessage;
         }
