@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestQuickDeleteRemovesSliderControlPoint()
         {
-            Slider slider = new Slider { StartTime = 1000 };
+            Slider slider = null;
 
             PathControlPoint[] points =
             {
@@ -62,7 +62,12 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("add slider", () =>
             {
-                slider.Path = new SliderPath(points);
+                slider = new Slider
+                {
+                    StartTime = 1000,
+                    Path = new SliderPath(points)
+                };
+
                 EditorBeatmap.Add(slider);
             });
 
