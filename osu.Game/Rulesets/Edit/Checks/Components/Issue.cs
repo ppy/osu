@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         /// <summary>
         /// The check that this issue originates from.
         /// </summary>
-        public ICheck Check;
+        public ICheck Check => Template.Check;
 
         /// <summary>
         /// The arguments that give this issue its context, based on the <see cref="IssueTemplate"/>. These are then substituted into the <see cref="IssueTemplate.UnformattedMessage"/>.
@@ -37,30 +37,29 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         /// </summary>
         public object[] Arguments;
 
-        public Issue(ICheck check, IssueTemplate template, params object[] args)
+        public Issue(IssueTemplate template, params object[] args)
         {
-            Check = check;
             Time = null;
             HitObjects = Array.Empty<HitObject>();
             Template = template;
             Arguments = args;
         }
 
-        public Issue(ICheck check, double? time, IssueTemplate template, params object[] args)
-            : this(check, template, args)
+        public Issue(double? time, IssueTemplate template, params object[] args)
+            : this(template, args)
         {
             Time = time;
         }
 
-        public Issue(ICheck check, HitObject hitObject, IssueTemplate template, params object[] args)
-            : this(check, template, args)
+        public Issue(HitObject hitObject, IssueTemplate template, params object[] args)
+            : this(template, args)
         {
             Time = hitObject.StartTime;
             HitObjects = new[] { hitObject };
         }
 
-        public Issue(ICheck check, IEnumerable<HitObject> hitObjects, IssueTemplate template, params object[] args)
-            : this(check, template, args)
+        public Issue(IEnumerable<HitObject> hitObjects, IssueTemplate template, params object[] args)
+            : this(template, args)
         {
             var hitObjectList = hitObjects.ToList();
 
