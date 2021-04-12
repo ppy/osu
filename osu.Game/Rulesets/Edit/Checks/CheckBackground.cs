@@ -40,8 +40,8 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         private class IssueTemplateNoneSet : IssueTemplate
         {
-            public IssueTemplateNoneSet(ICheck checkOrigin)
-                : base(checkOrigin, IssueType.Problem, "No background has been set")
+            public IssueTemplateNoneSet(ICheck check)
+                : base(check, IssueType.Problem, "No background has been set")
             {
             }
 
@@ -50,8 +50,8 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         private class IssueTemplateDoesNotExist : IssueTemplate
         {
-            public IssueTemplateDoesNotExist(ICheck checkOrigin)
-                : base(checkOrigin, IssueType.Problem, "The background file \"{0}\" does not exist.")
+            public IssueTemplateDoesNotExist(ICheck check)
+                : base(check, IssueType.Problem, "The background file \"{0}\" does not exist.")
             {
             }
 
