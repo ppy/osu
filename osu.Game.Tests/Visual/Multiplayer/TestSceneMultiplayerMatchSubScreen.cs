@@ -134,7 +134,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddAssert("match started", () => Client.Room?.State == MultiplayerRoomState.WaitingForLoad);
+            AddUntilStep("match started", () => Client.Room?.State == MultiplayerRoomState.WaitingForLoad);
         }
     }
 }
