@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Replays
 
         /// <summary>
         /// The next frame of the replay.
-        /// The start time is always greater or equals to the start time of <see cref="CurrentFrame"/> regardless of the seeking direction.
+        /// The start time is always greater or equal to the start time of <see cref="CurrentFrame"/> regardless of the seeking direction.
         /// If it is before the first frame of the replay or the after the last frame of the replay, <see cref="CurrentFrame"/> and <see cref="NextFrame"/> agree.
         /// </summary>
         /// <exception cref="InvalidOperationException">The replay is empty.</exception>
@@ -83,7 +83,8 @@ namespace osu.Game.Rulesets.Replays
 
         protected FramedReplayInputHandler(Replay replay)
         {
-            // This replay frame ordering should be enforced on the Replay type
+            // TODO: This replay frame ordering should be enforced on the Replay type.
+            // Currently, the ordering can be broken if the frames are added after this construction.
             replay.Frames.Sort((x, y) => x.Time.CompareTo(y.Time));
 
             this.replay = replay;
