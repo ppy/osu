@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Online;
 using osu.Game.Online.API;
@@ -38,6 +39,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
 
+        private OsuConfigManager config;
+
         public TestSceneMultiplayerGameplayLeaderboard()
         {
             base.Content.Children = new Drawable[]
@@ -46,6 +49,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 lookupCache,
                 Content
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Dependencies.Cache(config = new OsuConfigManager(LocalStorage));
         }
 
         [SetUpSteps]
@@ -95,6 +104,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestUserQuit()
         {
             AddRepeatStep("mark user quit", () => Client.CurrentMatchPlayingUserIds.RemoveAt(0), users);
+        }
+
+        [Test]
+        public void TestChangeScoringMode()
+        {
+            AddRepeatStep("update state", () => streamingClient.RandomlyUpdateState(), 5);
+            AddStep("change to classic", () => config.SetValue(OsuSetting.ScoreDisplayMode, ScoringMode.Classic));
+            AddStep("change to standardised", () => config.SetValue(OsuSetting.ScoreDisplayMode, ScoringMode.Standardised));
         }
 
         public class TestMultiplayerStreaming : SpectatorStreamingClient
