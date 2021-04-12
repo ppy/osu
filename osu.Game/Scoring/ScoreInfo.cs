@@ -83,6 +83,7 @@ namespace osu.Game.Scoring
 
         // Used for API serialisation/deserialisation.
         [JsonProperty("mods")]
+        [NotMapped]
         private APIMod[] apiMods
         {
             get
