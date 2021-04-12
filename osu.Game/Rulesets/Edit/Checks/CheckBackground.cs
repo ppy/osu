@@ -23,11 +23,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             };
         }
 
-        public CheckMetadata Metadata { get; } = new CheckMetadata
-        (
-            category: CheckCategory.Resources,
-            description: "Missing background."
-        );
+        public CheckMetadata Metadata { get; } = new CheckMetadata(CheckCategory.Resources, "Missing background");
 
         public IEnumerable<IssueTemplate> PossibleTemplates => templates;
 

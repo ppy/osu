@@ -35,11 +35,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
             };
         }
 
-        public CheckMetadata Metadata { get; } = new CheckMetadata
-        (
-            category: CheckCategory.Compose,
-            description: "Offscreen hitobjects."
-        );
+        public CheckMetadata Metadata { get; } = new CheckMetadata(CheckCategory.Compose, "Offscreen hitobjects");
 
         public IEnumerable<IssueTemplate> PossibleTemplates => templates;
 
