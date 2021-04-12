@@ -40,11 +40,7 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
             Arguments = args;
 
             if (template.Origin == null)
-            {
-                throw new ArgumentException(
-                    "A template had no origin. Make sure the `Templates()` method contains all templates used."
-                );
-            }
+                throw new ArgumentException("A template had no origin. Make sure the `Templates()` method contains all templates used.");
         }
 
         public Issue(double? time, IssueTemplate template, params object[] args)
