@@ -108,7 +108,7 @@ namespace osu.Game.Scoring
         // Used for database serialisation/deserialisation.
         [JsonIgnore]
         [Column("Mods")]
-        public string ModsString
+        public string ModsJson
         {
             get => JsonConvert.SerializeObject(apiMods);
             set => apiMods = JsonConvert.DeserializeObject<APIMod[]>(value);
