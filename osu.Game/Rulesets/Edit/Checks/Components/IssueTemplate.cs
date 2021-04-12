@@ -9,6 +9,11 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
 {
     public class IssueTemplate
     {
+        private static readonly Color4 problem_red = new Colour4(1.0f, 0.4f, 0.4f, 1.0f);
+        private static readonly Color4 warning_yellow = new Colour4(1.0f, 0.8f, 0.2f, 1.0f);
+        private static readonly Color4 negligible_green = new Colour4(0.33f, 0.8f, 0.5f, 1.0f);
+        private static readonly Color4 error_gray = new Colour4(0.5f, 0.5f, 0.5f, 1.0f);
+
         /// <summary>
         /// The type, or severity, of an issue. This decides its priority.
         /// </summary>
@@ -58,11 +63,6 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         /// <param name="args">The arguments used to format the message.</param>
         public string Message(params object[] args) => UnformattedMessage.FormatWith(args);
 
-        public static readonly Color4 PROBLEM_RED = new Colour4(1.0f, 0.4f, 0.4f, 1.0f);
-        public static readonly Color4 WARNING_YELLOW = new Colour4(1.0f, 0.8f, 0.2f, 1.0f);
-        public static readonly Color4 NEGLIGIBLE_GREEN = new Colour4(0.33f, 0.8f, 0.5f, 1.0f);
-        public static readonly Color4 ERROR_GRAY = new Colour4(0.5f, 0.5f, 0.5f, 1.0f);
-
         /// <summary>
         /// Returns the colour corresponding to the type of this issue.
         /// </summary>
@@ -70,10 +70,10 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         {
             return Type switch
             {
-                IssueType.Problem => PROBLEM_RED,
-                IssueType.Warning => WARNING_YELLOW,
-                IssueType.Negligible => NEGLIGIBLE_GREEN,
-                IssueType.Error => ERROR_GRAY,
+                IssueType.Problem => problem_red,
+                IssueType.Warning => warning_yellow,
+                IssueType.Negligible => negligible_green,
+                IssueType.Error => error_gray,
                 _ => Color4.White
             };
         }
