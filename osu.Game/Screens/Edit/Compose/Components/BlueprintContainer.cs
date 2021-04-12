@@ -135,11 +135,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            if (!beginClickSelection(e)) return true;
+            bool selectionPerformed = beginClickSelection(e);
 
+            // even if a selection didn't occur, a drag event may still move the selection.
             prepareSelectionMovement();
 
-            return e.Button == MouseButton.Left;
+            return selectionPerformed || e.Button == MouseButton.Left;
         }
 
         private SelectionBlueprint clickedBlueprint;
@@ -154,7 +155,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             // Deselection should only occur if no selected blueprints are hovered
             // A special case for when a blueprint was selected via this click is added since OnClick() may occur outside the hitobject and should not trigger deselection
-            if (endClickSelection() || clickedBlueprint != null)
+            if (endClickSelection(e) || clickedBlueprint != null)
                 return true;
 
             deselectAll();
@@ -177,7 +178,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected override void OnMouseUp(MouseUpEvent e)
         {
             // Special case for when a drag happened instead of a click
-            Schedule(() => endClickSelection());
+            Schedule(() =>
+            {
+                endClickSelection(e);
+                clickSelectionBegan = false;
+                isDraggingBlueprint = false;
+            });
 
             finishSelectionMovement();
         }
@@ -226,7 +232,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     Beatmap.Update(obj);
 
                 changeHandler?.EndChange();
-                isDraggingBlueprint = false;
             }
 
             if (DragBox.State == Visibility.Visible)
@@ -355,13 +360,28 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Finishes the current blueprint selection.
         /// </summary>
+        /// <param name="e">The mouse event which triggered end of selection.</param>
         /// <returns>Whether a click selection was active.</returns>
-        private bool endClickSelection()
+        private bool endClickSelection(MouseButtonEvent e)
         {
-            if (!clickSelectionBegan)
-                return false;
+            if (!clickSelectionBegan && !isDraggingBlueprint)
+            {
+                // if a selection didn't occur, we may want to trigger a deselection.
+                if (e.ControlPressed && e.Button == MouseButton.Left)
+                {
+                    // Iterate from the top of the input stack (blueprints closest to the front of the screen first).
+                    // Priority is given to already-selected blueprints.
+                    foreach (SelectionBlueprint blueprint in SelectionBlueprints.AliveChildren.Reverse().OrderByDescending(b => b.IsSelected))
+                    {
+                        if (!blueprint.IsHovered) continue;
 
-            clickSelectionBegan = false;
+                        return clickSelectionBegan = SelectionHandler.HandleDeselectionRequested(blueprint, e);
+                    }
+                }
+
+                return false;
+            }
+
             return true;
         }
 
