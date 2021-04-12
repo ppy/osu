@@ -20,8 +20,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         public void Test(double expected, string name)
             => base.Test(expected, name);
 
-        [TestCase(8.6228371119271454d, "diffcalc-test")]
-        [TestCase(1.2864585280364178d, "zero-length-sliders")]
+        [TestCase(8.7212283220412345d, "diffcalc-test")]
+        [TestCase(1.3212137158641493d, "zero-length-sliders")]
         public void TestClockRateAdjusted(double expected, string name)
             => Test(expected, name, new OsuModDoubleTime());
 

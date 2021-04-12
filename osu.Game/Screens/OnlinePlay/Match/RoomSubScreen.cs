@@ -56,15 +56,15 @@ namespace osu.Game.Screens.OnlinePlay.Match
         private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
 
         [Cached]
-        protected OnlinePlayBeatmapAvailablilityTracker BeatmapAvailablilityTracker { get; }
+        protected OnlinePlayBeatmapAvailabilityTracker BeatmapAvailabilityTracker { get; }
 
-        protected IBindable<BeatmapAvailability> BeatmapAvailability => BeatmapAvailablilityTracker.Availability;
+        protected IBindable<BeatmapAvailability> BeatmapAvailability => BeatmapAvailabilityTracker.Availability;
 
         protected RoomSubScreen()
         {
             AddRangeInternal(new Drawable[]
             {
-                BeatmapAvailablilityTracker = new OnlinePlayBeatmapAvailablilityTracker
+                BeatmapAvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker
                 {
                     SelectedItem = { BindTarget = SelectedItem }
                 },

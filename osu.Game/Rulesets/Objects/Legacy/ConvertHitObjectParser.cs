@@ -336,7 +336,12 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             while (++endIndex < vertices.Length - endPointLength)
             {
+                // Keep incrementing while an implicit segment doesn't need to be started
                 if (vertices[endIndex].Position.Value != vertices[endIndex - 1].Position.Value)
+                    continue;
+
+                // The last control point of each segment is not allowed to start a new implicit segment.
+                if (endIndex == vertices.Length - endPointLength - 1)
                     continue;
 
                 // Force a type on the last point, and return the current control point set as a segment.

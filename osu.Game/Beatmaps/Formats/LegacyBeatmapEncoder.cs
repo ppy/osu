@@ -273,7 +273,7 @@ namespace osu.Game.Beatmaps.Formats
             if (hitObject is IHasPath path)
             {
                 addPathData(writer, path, position);
-                writer.Write(getSampleBank(hitObject.Samples, zeroBanks: true));
+                writer.Write(getSampleBank(hitObject.Samples));
             }
             else
             {
@@ -329,7 +329,26 @@ namespace osu.Game.Beatmaps.Formats
 
                 if (point.Type.Value != null)
                 {
-                    if (point.Type.Value != lastType)
+                    // We've reached a new (explicit) segment!
+
+                    // Explicit segments have a new format in which the type is injected into the middle of the control point string.
+                    // To preserve compatibility with osu-stable as much as possible, explicit segments with the same type are converted to use implicit segments by duplicating the control point.
+                    // One exception are consecutive perfect curves, which aren't supported in osu!stable and can lead to decoding issues if encoded as implicit segments
+                    bool needsExplicitSegment = point.Type.Value != lastType || point.Type.Value == PathType.PerfectCurve;
+
+                    // Another exception to this is when the last two control points of the last segment were duplicated. This is not a scenario supported by osu!stable.
+                    // Lazer does not add implicit segments for the last two control points of _any_ explicit segment, so an explicit segment is forced in order to maintain consistency with the decoder.
+                    if (i > 1)
+                    {
+                        // We need to use the absolute control point position to determine equality, otherwise floating point issues may arise.
+                        Vector2 p1 = position + pathData.Path.ControlPoints[i - 1].Position.Value;
+                        Vector2 p2 = position + pathData.Path.ControlPoints[i - 2].Position.Value;
+
+                        if ((int)p1.X == (int)p2.X && (int)p1.Y == (int)p2.Y)
+                            needsExplicitSegment = true;
+                    }
+
+                    if (needsExplicitSegment)
                     {
                         switch (point.Type.Value)
                         {
@@ -401,15 +420,15 @@ namespace osu.Game.Beatmaps.Formats
             writer.Write(FormattableString.Invariant($"{endTimeData.EndTime}{suffix}"));
         }
 
-        private string getSampleBank(IList<HitSampleInfo> samples, bool banksOnly = false, bool zeroBanks = false)
+        private string getSampleBank(IList<HitSampleInfo> samples, bool banksOnly = false)
         {
             LegacySampleBank normalBank = toLegacySampleBank(samples.SingleOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank);
             LegacySampleBank addBank = toLegacySampleBank(samples.FirstOrDefault(s => !string.IsNullOrEmpty(s.Name) && s.Name != HitSampleInfo.HIT_NORMAL)?.Bank);
 
             StringBuilder sb = new StringBuilder();
 
-            sb.Append(FormattableString.Invariant($"{(zeroBanks ? 0 : (int)normalBank)}:"));
-            sb.Append(FormattableString.Invariant($"{(zeroBanks ? 0 : (int)addBank)}"));
+            sb.Append(FormattableString.Invariant($"{(int)normalBank}:"));
+            sb.Append(FormattableString.Invariant($"{(int)addBank}"));
 
             if (!banksOnly)
             {

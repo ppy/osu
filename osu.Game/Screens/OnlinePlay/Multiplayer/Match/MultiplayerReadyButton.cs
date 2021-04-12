@@ -78,8 +78,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             Debug.Assert(Room != null);
 
             int newCountReady = Room.Users.Count(u => u.State == MultiplayerUserState.Ready);
+            int newCountTotal = Room.Users.Count(u => u.State != MultiplayerUserState.Spectating);
 
-            string countText = $"({newCountReady} / {Room.Users.Count} ready)";
+            string countText = $"({newCountReady} / {newCountTotal} ready)";
 
             switch (localUser.State)
             {
@@ -88,6 +89,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     updateButtonColour(true);
                     break;
 
+                case MultiplayerUserState.Spectating:
                 case MultiplayerUserState.Ready:
                     if (Room?.Host?.Equals(localUser) == true)
                     {
@@ -103,7 +105,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     break;
             }
 
-            button.Enabled.Value = Client.Room?.State == MultiplayerRoomState.Open && !operationInProgress.Value;
+            bool enableButton = Client.Room?.State == MultiplayerRoomState.Open && !operationInProgress.Value;
+
+            // When the local user is the host and spectating the match, the "start match" state should be enabled if any users are ready.
+            if (localUser.State == MultiplayerUserState.Spectating)
+                enableButton &= Room?.Host?.Equals(localUser) == true && newCountReady > 0;
+
+            button.Enabled.Value = enableButton;
 
             if (newCountReady != countReady)
             {
