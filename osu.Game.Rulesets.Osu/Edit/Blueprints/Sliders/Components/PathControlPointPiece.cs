@@ -213,10 +213,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             if (ControlPoint.Type.Value != PathType.PerfectCurve)
                 return;
 
-            ReadOnlySpan<Vector2> points = PointsInSegment.Select(p => p.Position.Value).ToArray();
-            if (points.Length != 3)
+            if (PointsInSegment.Count > 3)
+                ControlPoint.Type.Value = PathType.Bezier;
+
+            if (PointsInSegment.Count != 3)
                 return;
 
+            ReadOnlySpan<Vector2> points = PointsInSegment.Select(p => p.Position.Value).ToArray();
             RectangleF boundingBox = PathApproximator.CircularArcBoundingBox(points);
             if (boundingBox.Width >= 640 || boundingBox.Height >= 480)
                 ControlPoint.Type.Value = PathType.Bezier;
