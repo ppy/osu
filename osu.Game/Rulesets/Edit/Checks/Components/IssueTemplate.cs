@@ -15,26 +15,6 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         private static readonly Color4 error_gray = new Colour4(0.5f, 0.5f, 0.5f, 1.0f);
 
         /// <summary>
-        /// The type, or severity, of an issue. This decides its priority.
-        /// </summary>
-        public enum IssueType
-        {
-            /// <summary> A must-fix in the vast majority of cases. </summary>
-            Problem = 3,
-
-            /// <summary> A possible mistake. Often requires critical thinking.  </summary>
-            Warning = 2,
-
-            // TODO: Try/catch all checks run and return error templates if exceptions occur.
-            /// <summary> An error occurred and a complete check could not be made. </summary>
-            Error = 1,
-
-            // TODO: Negligible issues should be hidden by default.
-            /// <summary> A possible mistake so minor/unlikely that it can often be safely ignored. </summary>
-            Negligible = 0,
-        }
-
-        /// <summary>
         /// The check that this template originates from.
         /// </summary>
         public Check Origin;

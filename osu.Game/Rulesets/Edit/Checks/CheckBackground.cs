@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Edit.Checks
     {
         public override CheckMetadata Metadata() => new CheckMetadata
         (
-            category: CheckMetadata.CheckCategory.Resources,
+            category: CheckCategory.Resources,
             description: "Missing background."
         );
 
@@ -24,13 +24,13 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         private readonly IssueTemplate templateNoneSet = new IssueTemplate
         (
-            type: IssueTemplate.IssueType.Problem,
+            type: IssueType.Problem,
             unformattedMessage: "No background has been set."
         );
 
         private readonly IssueTemplate templateDoesNotExist = new IssueTemplate
         (
-            type: IssueTemplate.IssueType.Problem,
+            type: IssueType.Problem,
             unformattedMessage: "The background file \"{0}\" is does not exist."
         );
 

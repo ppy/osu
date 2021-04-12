@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         public IReadOnlyList<HitObject> HitObjects;
 
         /// <summary>
-        /// The template which this issue is using. This provides properties such as the <see cref="IssueTemplate.IssueType"/>, and the <see cref="IssueTemplate.UnformattedMessage"/>.
+        /// The template which this issue is using. This provides properties such as the <see cref="IssueType"/>, and the <see cref="IssueTemplate.UnformattedMessage"/>.
         /// </summary>
         public IssueTemplate Template;
 
