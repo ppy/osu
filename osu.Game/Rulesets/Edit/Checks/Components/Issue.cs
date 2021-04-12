@@ -69,10 +69,7 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
             HitObjects = hitObjectList;
         }
 
-        public override string ToString()
-        {
-            return Template.Message(Arguments);
-        }
+        public override string ToString() => Template.GetMessage(Arguments);
 
         public string GetEditorTimestamp()
         {

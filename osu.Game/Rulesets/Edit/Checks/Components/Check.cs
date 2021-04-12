@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         /// <summary>
         /// All possible templates for issues that this check may return.
         /// </summary>
-        public abstract IEnumerable<IssueTemplate> Templates();
+        public abstract IEnumerable<IssueTemplate> PossibleTemplates { get; }
 
         /// <summary>
         /// Runs this check and returns any issues detected for the provided beatmap.
@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
 
         protected Check()
         {
-            foreach (var template in Templates())
+            foreach (var template in PossibleTemplates)
                 template.Origin = this;
         }
     }
