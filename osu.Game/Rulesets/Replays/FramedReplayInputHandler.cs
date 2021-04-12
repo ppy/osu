@@ -17,6 +17,8 @@ namespace osu.Game.Rulesets.Replays
     public abstract class FramedReplayInputHandler<TFrame> : ReplayInputHandler
         where TFrame : ReplayFrame
     {
+        public override bool IsActive => HasFrames;
+
         private readonly Replay replay;
 
         protected List<ReplayFrame> Frames => replay.Frames;
@@ -25,7 +27,10 @@ namespace osu.Game.Rulesets.Replays
         {
             get
             {
-                if (!HasFrames || !currentFrameIndex.HasValue)
+                if (!HasFrames)
+                    throw new InvalidOperationException($"Cannot get {nameof(CurrentFrame)} of the empty replay");
+
+                if (!currentFrameIndex.HasValue)
                     return null;
 
                 return (TFrame)Frames[currentFrameIndex.Value];
@@ -37,7 +42,7 @@ namespace osu.Game.Rulesets.Replays
             get
             {
                 if (!HasFrames)
-                    return null;
+                    throw new InvalidOperationException($"Cannot get {nameof(NextFrame)} of the empty replay");
 
                 if (!currentFrameIndex.HasValue)
                     return currentDirection > 0 ? (TFrame)Frames[0] : null;
