@@ -10,28 +10,19 @@ namespace osu.Game.Rulesets.Edit.Checks
 {
     public class CheckBackground : ICheck
     {
-        private readonly IssueTemplateNoneSet templateNoneSet;
-        private readonly IssueTemplateDoesNotExist templateDoesNotExist;
-        private readonly IssueTemplate[] templates;
-
-        public CheckBackground()
-        {
-            templates = new IssueTemplate[]
-            {
-                templateNoneSet = new IssueTemplateNoneSet(this),
-                templateDoesNotExist = new IssueTemplateDoesNotExist(this)
-            };
-        }
-
         public CheckMetadata Metadata { get; } = new CheckMetadata(CheckCategory.Resources, "Missing background");
 
-        public IEnumerable<IssueTemplate> PossibleTemplates => templates;
+        public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
+        {
+            new IssueTemplateNoneSet(this),
+            new IssueTemplateDoesNotExist(this)
+        };
 
         public IEnumerable<Issue> Run(IBeatmap beatmap)
         {
             if (beatmap.Metadata.BackgroundFile == null)
             {
-                yield return templateNoneSet.Create();
+                yield return new IssueTemplateNoneSet(this).Create();
 
                 yield break;
             }
@@ -44,7 +35,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             if (file != null)
                 yield break;
 
-            yield return templateDoesNotExist.Create(beatmap.Metadata.BackgroundFile);
+            yield return new IssueTemplateDoesNotExist(this).Create(beatmap.Metadata.BackgroundFile);
         }
 
         private class IssueTemplateNoneSet : IssueTemplate
