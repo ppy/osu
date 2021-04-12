@@ -68,7 +68,7 @@ namespace osu.Game.Scoring
                 if (mods != null)
                     return mods;
 
-                if (apiMods == null)
+                if (localAPIMods == null)
                     return Array.Empty<Mod>();
 
                 var rulesetInstance = Ruleset.CreateInstance();
