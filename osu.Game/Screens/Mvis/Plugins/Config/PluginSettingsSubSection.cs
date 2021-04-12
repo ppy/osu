@@ -8,6 +8,8 @@ namespace osu.Game.Screens.Mvis.Plugins.Config
         private readonly MvisPlugin plugin;
         protected IPluginConfigManager ConfigManager;
 
+        protected override string Header => plugin.Name;
+
         protected PluginSettingsSubSection(MvisPlugin plugin)
         {
             this.plugin = plugin;

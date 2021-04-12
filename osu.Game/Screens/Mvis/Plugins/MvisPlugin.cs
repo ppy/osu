@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Mvis.Plugins
         /// <summary>
         /// 插件对应的侧边栏页面(未完全实现)
         /// </summary>
-        public virtual PluginSidebarPage SidebarPage => null;
+        public virtual PluginSidebarPage CreateSidebarPage() => null;
 
         /// <summary>
         /// 插件Flags，决定了插件的一系列属性
@@ -64,7 +64,8 @@ namespace osu.Game.Screens.Mvis.Plugins
 
         public string Description = "插件描述";
         public string Author = "插件作者";
-        public int Version = 0;
+
+        public abstract int Version { get; }
 
         [CanBeNull]
         [Resolved(CanBeNull = true)]
@@ -132,8 +133,6 @@ namespace osu.Game.Screens.Mvis.Plugins
 
         public virtual void Load()
         {
-            if (Disabled.Value) return;
-
             try
             {
                 //向加载列表添加这个plugin
@@ -156,15 +155,19 @@ namespace osu.Game.Screens.Mvis.Plugins
 
         public virtual bool Enable()
         {
-            Disabled.Value = false;
-
             if (!ContentLoaded)
                 Load();
+
+            Disabled.Value = false;
 
             return true;
         }
 
-        public virtual void UnLoad() => Expire();
+        public virtual void UnLoad()
+        {
+            Disable();
+            Expire();
+        }
 
         public virtual bool Disable()
         {

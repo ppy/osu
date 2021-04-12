@@ -13,7 +13,6 @@ namespace Mvis.Plugin.RulesetPanel.UI
     {
         private Container resizableContainer;
         private SettingsCheckbox customColourCheckbox;
-        protected override string Header => "M-vis 面板";
 
         public RulesetPanelSettings(MvisPlugin plugin)
             : base(plugin)

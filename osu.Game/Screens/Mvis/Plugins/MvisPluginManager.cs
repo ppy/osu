@@ -2,7 +2,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
@@ -19,15 +18,13 @@ namespace osu.Game.Screens.Mvis.Plugins
         private readonly List<MvisPluginProvider> providers = new List<MvisPluginProvider>();
         private readonly ConcurrentDictionary<Type, IPluginConfigManager> configManagers = new ConcurrentDictionary<Type, IPluginConfigManager>();
 
-        [CanBeNull]
-        [Resolved(CanBeNull = true)]
-        private SideBar.Sidebar sideBar { get; set; }
-
         [Resolved]
         private Storage storage { get; set; }
 
         public Action<MvisPlugin> OnPluginAdd;
         public Action<MvisPlugin> OnPluginUnLoad;
+
+        public int PLUGIN_VERSION => 1;
 
         [BackgroundDependencyLoader]
         private void load(CustomStore customStore, OsuGameBase gameBase)
@@ -46,8 +43,12 @@ namespace osu.Game.Screens.Mvis.Plugins
         {
             if (avaliablePlugins.Contains(pl) || pl == null) return false;
 
+            if (pl.Version < PLUGIN_VERSION)
+                Logger.Log($"插件 \"{pl.Name}\" 的版本已经过时, 继续使用可能会导致意外情况的发生!", LoggingTarget.Runtime, LogLevel.Important);
+            else if (pl.Version > PLUGIN_VERSION)
+                Logger.Log($"插件 \"{pl.Name}\" 是为更高版本的mf-osu打造的, 继续使用可能会导致意外情况的发生!", LoggingTarget.Runtime, LogLevel.Important);
+
             avaliablePlugins.Add(pl);
-            sideBar?.Add(pl.SidebarPage);
             OnPluginAdd?.Invoke(pl);
             return true;
         }
@@ -55,8 +56,6 @@ namespace osu.Game.Screens.Mvis.Plugins
         public bool UnLoadPlugin(MvisPlugin pl)
         {
             if (!avaliablePlugins.Contains(pl) || pl == null) return false;
-
-            sideBar?.Remove(pl.SidebarPage);
 
             var provider = providers.Find(p => p.CreatePlugin.GetType() == pl.GetType());
 

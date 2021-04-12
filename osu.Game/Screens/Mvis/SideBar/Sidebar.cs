@@ -172,7 +172,7 @@ namespace osu.Game.Screens.Mvis.SideBar
                 throw new InvalidOperationException($"组成部分中不包含{c}");
 
             if (c.ResizeWidth < 0.3f || c.ResizeHeight < 0.3f)
-                throw new InvalidOperationException("组件过小");
+                throw new InvalidOperationException("组件过小, 缩放大小不能小于30%(0.3)");
 
             startFromHiddenState = State.Value == Visibility.Hidden;
 

@@ -50,7 +50,5 @@ namespace Mvis.Plugin.Example.UI
                 }
             };
         }
-
-        protected override string Header => "插件名字";
     }
 }

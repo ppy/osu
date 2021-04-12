@@ -640,6 +640,9 @@ namespace osu.Game.Screens.Mvis
                         foreground.Add(pl);
                         break;
                 }
+
+                var pluginSidebarPage = pl.CreateSidebarPage();
+                if (pluginSidebarPage != null) sidebar.Add(pluginSidebarPage);
             }
 
             Beatmap.TriggerChange();

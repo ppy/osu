@@ -79,7 +79,13 @@ namespace Mvis.Plugin.StoryboardSupport
             {
                 MvisScreen.OnScreenExiting += UnLoad;
                 MvisScreen.OnBeatmapChanged += refresh;
+                MvisScreen.OnScreenSuspending += onScreenSuspending;
             }
+        }
+
+        private void onScreenSuspending()
+        {
+            MvisScreen.HideScreenBackground.Value = false;
         }
 
         protected override void OnValueChanged(ValueChangedEvent<bool> v)
@@ -117,9 +123,6 @@ namespace Mvis.Plugin.StoryboardSupport
 
         protected override bool PostInit()
         {
-            if (Disabled.Value)
-                return false;
-
             if (targetBeatmap == null)
                 throw new InvalidOperationException("currentBeatmap 不能为 null");
 
@@ -135,6 +138,8 @@ namespace Mvis.Plugin.StoryboardSupport
 
             return true;
         }
+
+        public override int Version => 1;
 
         private Drawable prevProxy;
 
@@ -180,6 +185,7 @@ namespace Mvis.Plugin.StoryboardSupport
 
             if (MvisScreen != null)
             {
+                MvisScreen.OnScreenSuspending -= onScreenSuspending;
                 MvisScreen.OnBeatmapChanged -= refresh;
                 MvisScreen.OnScreenExiting -= UnLoad;
                 MvisScreen.OnSeek -= Seek;
@@ -192,6 +198,28 @@ namespace Mvis.Plugin.StoryboardSupport
             StoryboardReplacesBackground.UnbindAll();
 
             base.UnLoad();
+        }
+
+        public override bool Disable()
+        {
+            if (MvisScreen != null)
+            {
+                MvisScreen.HideTriangles.Value = false;
+                MvisScreen.HideScreenBackground.Value = false;
+            }
+
+            return base.Disable();
+        }
+
+        public override bool Enable()
+        {
+            if (MvisScreen != null && ContentLoaded)
+            {
+                MvisScreen.HideTriangles.Value = NeedToHideTriangles.Value;
+                MvisScreen.HideScreenBackground.Value = targetBeatmap.Storyboard.ReplacesBackground;
+            }
+
+            return base.Enable();
         }
 
         private void refresh(WorkingBeatmap newBeatmap)

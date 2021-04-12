@@ -37,8 +37,15 @@ namespace osu.Game.Tests.Visual.Mvis
 
             AddStep("Toggle Sidebar ", sidebar.ToggleVisibility);
             AddStep("Clear Sidebar", sidebar.Clear);
-            AddStep("Random Resize", addRandom);
+            AddStep("Random Resize", () => addRandom(true)); //
             AddStep("Try Resize to 20%x20%", resize);
+            AddStep("Add Tabs", () =>
+            {
+                for (int i = 0; i < 20; i++)
+                {
+                    addRandom(false);
+                }
+            });
         }
 
         private void resize()
@@ -61,15 +68,19 @@ namespace osu.Game.Tests.Visual.Mvis
         private Drawable prevTab;
         private int num;
 
-        private void addRandom()
+        private void addRandom(bool removePreviousTab = true)
         {
             float width = RNG.NextSingle(0.3f, 1);
             num++;
             var newTab = new VoidSidebarContent(width, $"{num}");
             sidebar.Add(newTab);
-            sidebar.ShowComponent(newTab);
-            if (prevTab != null)
+
+            if (prevTab != null && removePreviousTab)
+            {
+                sidebar.ShowComponent(newTab);
                 sidebar.Remove(prevTab);
+            }
+
             prevTab = newTab;
         }
 

@@ -9,8 +9,6 @@ namespace Mvis.Plugin.FakeEditor.UI
 {
     public class FakeEditorSettings : PluginSettingsSubSection
     {
-        protected override string Header => "谱面编辑器";
-
         public FakeEditorSettings(MvisPlugin plugin)
             : base(plugin)
         {

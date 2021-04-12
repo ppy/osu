@@ -17,6 +17,7 @@ namespace Mvis.Plugin.RulesetPanel
     public class RulesetPanel : BindableControlledPlugin
     {
         public override TargetLayer Target => TargetLayer.Foreground;
+        public override int Version => 1;
 
         public RulesetPanel()
         {

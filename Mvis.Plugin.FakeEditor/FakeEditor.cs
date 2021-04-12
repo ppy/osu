@@ -122,7 +122,9 @@ namespace Mvis.Plugin.FakeEditor
         private void reload()
         {
             Clear();
-            Load();
+
+            if (!Disabled.Value)
+                Load();
         }
 
         protected override void OnValueChanged(ValueChangedEvent<bool> v)
@@ -159,6 +161,7 @@ namespace Mvis.Plugin.FakeEditor
             => new EditorContainer(beatmap);
 
         protected override bool PostInit() => true;
+        public override int Version => 1;
 
         private void updateSamplePlaybackDisabled() =>
             samplePlaybackDisabled.Value = !Value.Value || !musicController.CurrentTrack.IsRunning;

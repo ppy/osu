@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.Mvis
             AddStep("Disable Plugin", () => manager.DisablePlugin(plugin));
             AddStep("Remove All Plugin From Manager", () =>
             {
-                foreach (var mvisPlugin in manager.GetAllPlugins())
+                foreach (var mvisPlugin in manager.GetAllPlugins(false))
                 {
                     if (manager.UnLoadPlugin(mvisPlugin))
                         Remove(mvisPlugin);
@@ -67,7 +67,6 @@ namespace osu.Game.Tests.Visual.Mvis
         {
             public BasicMvisPlugin()
             {
-                page.Plugin = this;
                 Size = new Vector2(200, 100);
             }
 
@@ -82,8 +81,7 @@ namespace osu.Game.Tests.Visual.Mvis
 
             protected override bool PostInit() => true;
 
-            private readonly PluginSidebarPage page = new VoidSidebarContent(0.5f, "插件");
-            public override PluginSidebarPage SidebarPage => page;
+            public override PluginSidebarPage CreateSidebarPage() => new VoidSidebarContent(this, 0.5f);
 
             public override bool Enable()
             {
@@ -116,8 +114,8 @@ namespace osu.Game.Tests.Visual.Mvis
         {
             private readonly OsuSpriteText t;
 
-            public VoidSidebarContent(float reWidth, string tabTitle)
-                : base(reWidth, tabTitle)
+            public VoidSidebarContent(MvisPlugin plugin, float reWidth)
+                : base(plugin, reWidth)
             {
                 RelativeSizeAxes = Axes.Both;
                 Child = new FillFlowContainer
@@ -130,7 +128,7 @@ namespace osu.Game.Tests.Visual.Mvis
                     {
                         new OsuSpriteText
                         {
-                            Text = "num: " + tabTitle,
+                            Text = "num: " + plugin.Name,
                         },
                         new OsuSpriteText
                         {

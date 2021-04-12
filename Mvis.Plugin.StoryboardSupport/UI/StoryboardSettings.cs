@@ -9,8 +9,6 @@ namespace Mvis.Plugin.StoryboardSupport.UI
 {
     public class StoryboardSettings : PluginSettingsSubSection
     {
-        protected override string Header => "故事版";
-
         public StoryboardSettings(MvisPlugin plugin)
             : base(plugin)
         {

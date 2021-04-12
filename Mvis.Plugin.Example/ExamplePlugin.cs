@@ -1,4 +1,5 @@
 using Mvis.Plugin.Example.Config;
+using Mvis.Plugin.Example.Sidebar;
 using Mvis.Plugin.Example.UI;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -23,6 +24,7 @@ namespace Mvis.Plugin.Example
         private OsuSpriteText text4;
 
         public override TargetLayer Target => TargetLayer.Foreground;
+        public override int Version => 1;
 
         //只会在Flags中有HasConfig的情况下被调用
         public override IPluginConfigManager CreateConfigManager(Storage storage)
@@ -31,6 +33,9 @@ namespace Mvis.Plugin.Example
         //只会在Flags中有HasConfig的情况下被调用
         public override PluginSettingsSubSection CreateSettingsSubSection()
             => new ExampleSettings(this);
+
+        public override PluginSidebarPage CreateSidebarPage()
+            => new ExampleSidebarPage(this);
 
         public ExamplePlugin()
         {
@@ -82,8 +87,8 @@ namespace Mvis.Plugin.Example
         };
 
         private Bindable<float> bindableFloat;
-        private Bindable<string> bindableString;
         private Bindable<ExampleEnum> bindableEnum;
+        public Bindable<string> BindableString;
 
         protected override bool PostInit()
         {
@@ -91,7 +96,7 @@ namespace Mvis.Plugin.Example
 
             //从MvisPluginManager获取自己的配置管理器
             var config = (ExamplePluginConfigManager)Dependencies.Get<MvisPluginManager>().GetConfigManager(this);
-            bindableString = config.GetBindable<string>(ExamplePluginSettings.KeyString);
+            BindableString = config.GetBindable<string>(ExamplePluginSettings.KeyString);
             bindableFloat = config.GetBindable<float>(ExamplePluginSettings.KeyFloat);
             bindableEnum = config.GetBindable<ExampleEnum>(ExamplePluginSettings.keyEnum);
             return true;
@@ -99,7 +104,7 @@ namespace Mvis.Plugin.Example
 
         protected override bool OnContentLoaded(Drawable content)
         {
-            bindableString.BindValueChanged(onBindableStringValueChanged);
+            BindableString.BindValueChanged(onBindableStringValueChanged);
             bindableEnum.BindValueChanged(onBindableEnumValueChanged);
 
             //osu.Framework/Bindables/Bindable.cs#L106:
