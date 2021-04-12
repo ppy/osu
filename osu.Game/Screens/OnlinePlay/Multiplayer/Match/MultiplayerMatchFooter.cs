@@ -8,21 +8,28 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
     public class MultiplayerMatchFooter : CompositeDrawable
     {
         public const float HEIGHT = 50;
+        private const float ready_button_width = 600;
+        private const float spectate_button_width = 200;
 
         public Action OnReadyClick
         {
             set => readyButton.OnReadyClick = value;
         }
 
+        public Action OnSpectateClick
+        {
+            set => spectateButton.OnSpectateClick = value;
+        }
+
         private readonly Drawable background;
         private readonly MultiplayerReadyButton readyButton;
+        private readonly MultiplayerSpectateButton spectateButton;
 
         public MultiplayerMatchFooter()
         {
@@ -32,11 +39,34 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             InternalChildren = new[]
             {
                 background = new Box { RelativeSizeAxes = Axes.Both },
-                readyButton = new MultiplayerReadyButton
+                new GridContainer
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Size = new Vector2(600, 50),
+                    RelativeSizeAxes = Axes.Both,
+                    Content = new[]
+                    {
+                        new Drawable[]
+                        {
+                            null,
+                            spectateButton = new MultiplayerSpectateButton
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                            },
+                            null,
+                            readyButton = new MultiplayerReadyButton
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                            },
+                            null
+                        }
+                    },
+                    ColumnDimensions = new[]
+                    {
+                        new Dimension(),
+                        new Dimension(maxSize: spectate_button_width),
+                        new Dimension(GridSizeMode.Absolute, 10),
+                        new Dimension(maxSize: ready_button_width),
+                        new Dimension()
+                    }
                 }
             };
         }

@@ -36,7 +36,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public override void PlayHoverSample()
         {
-            sampleHover.Frequency.Value = 0.96 + RNG.NextDouble(0.08);
+            sampleHover.Frequency.Value = 0.98 + RNG.NextDouble(0.04);
             sampleHover.Play();
         }
     }
@@ -53,6 +53,9 @@ namespace osu.Game.Graphics.UserInterface
         Soft,
 
         [Description("-toolbar")]
-        Toolbar
+        Toolbar,
+
+        [Description("-songselect")]
+        SongSelect
     }
 }
