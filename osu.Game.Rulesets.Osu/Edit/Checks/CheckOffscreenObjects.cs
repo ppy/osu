@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
 
         public override CheckMetadata Metadata() => new CheckMetadata
         (
-            category: CheckMetadata.CheckCategory.Compose,
+            category: CheckCategory.Compose,
             description: "Offscreen hitobjects."
         );
 
@@ -36,13 +36,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
 
         private readonly IssueTemplate templateOffscreen = new IssueTemplate
         (
-            type: IssueTemplate.IssueType.Problem,
+            type: IssueType.Problem,
             unformattedMessage: "This object goes offscreen on a 4:3 aspect ratio."
         );
 
         private readonly IssueTemplate templateOffscreenSliderPath = new IssueTemplate
         (
-            type: IssueTemplate.IssueType.Problem,
+            type: IssueType.Problem,
             unformattedMessage: "This slider goes offscreen here on a 4:3 aspect ratio."
         );
 
