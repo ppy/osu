@@ -189,7 +189,6 @@ namespace osu.Game.Tests.Beatmaps
         /// <summary>
         /// Creates the <see cref="Ruleset"/> applicable to this <see cref="BeatmapConversionTest{TConvertMapping,TConvertValue}"/>.
         /// </summary>
-        /// <returns></returns>
         protected abstract Ruleset CreateRuleset();
 
         private class ConvertResult
