@@ -220,7 +220,7 @@ namespace osu.Game.Tests.NonVisual
             // no frames are arrived yet
             setTime(0, null);
             setTime(1000, null);
-            Assert.IsTrue(handler.WaitingNextFrame, "Should be waiting for the first frame");
+            Assert.IsTrue(handler.WaitingForFrame, "Should be waiting for the first frame");
 
             replay.Frames.Add(new TestReplayFrame(0));
             replay.Frames.Add(new TestReplayFrame(1000));
@@ -228,11 +228,11 @@ namespace osu.Game.Tests.NonVisual
             // should always play from beginning
             setTime(1000, 0);
             confirmCurrentFrame(0);
-            Assert.IsFalse(handler.WaitingNextFrame, "Should not be waiting yet");
+            Assert.IsFalse(handler.WaitingForFrame, "Should not be waiting yet");
             setTime(1000, 1000);
             confirmCurrentFrame(1);
             confirmNextFrame(1);
-            Assert.IsTrue(handler.WaitingNextFrame, "Should be waiting");
+            Assert.IsTrue(handler.WaitingForFrame, "Should be waiting");
 
             // cannot seek beyond the last frame
             setTime(1500, null);
