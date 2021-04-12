@@ -49,8 +49,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached]
         private readonly VolumeOverlay volumeOverlay;
 
-        [Cached(typeof(PowerStatus))]
-        private readonly LocalPowerStatus powerStatus = new LocalPowerStatus();
+        [Cached(typeof(BatteryInfo))]
+        private readonly LocalBatteryInfo batteryInfo = new LocalBatteryInfo();
 
         private readonly ChangelogOverlay changelogOverlay;
 
@@ -302,8 +302,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             // set charge status and level
             AddStep("load player", () => resetPlayer(false, () =>
             {
-                powerStatus.SetCharging(isCharging);
-                powerStatus.SetChargeLevel(chargeLevel);
+                batteryInfo.SetCharging(isCharging);
+                batteryInfo.SetChargeLevel(chargeLevel);
             }));
             AddUntilStep("wait for player", () => player?.LoadState == LoadState.Ready);
             AddAssert($"notification {(shouldWarn ? "triggered" : "not triggered")}", () => notificationOverlay.UnreadCount.Value == (shouldWarn ? 1 : 0));
@@ -381,15 +381,13 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         /// <summary>
-        /// Mutable dummy PowerStatus class for <see cref="TestScenePlayerLoader.TestLowBatteryNotification"/>
+        /// Mutable dummy BatteryInfo class for <see cref="TestScenePlayerLoader.TestLowBatteryNotification"/>
         /// </summary>
         /// <inheritdoc/>
-        private class LocalPowerStatus : PowerStatus
+        private class LocalBatteryInfo : BatteryInfo
         {
             private bool isCharging = true;
             private double chargeLevel = 1;
-
-            public override double BatteryCutoff => 0.2;
 
             public override bool IsCharging => isCharging;
 

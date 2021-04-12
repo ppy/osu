@@ -114,7 +114,7 @@ namespace osu.Game.Screens.Play
         private AudioManager audioManager { get; set; }
 
         [Resolved(CanBeNull = true)]
-        private PowerStatus powerStatus { get; set; }
+        private BatteryInfo batteryInfo { get; set; }
 
         public PlayerLoader(Func<Player> createPlayer)
         {
@@ -483,11 +483,11 @@ namespace osu.Game.Screens.Play
 
         private void showBatteryWarningIfNeeded()
         {
-            if (powerStatus == null) return;
+            if (batteryInfo == null) return;
 
             if (!batteryWarningShownOnce.Value)
             {
-                if (powerStatus.IsLowBattery)
+                if (batteryInfo.IsLowBattery)
                 {
                     notificationOverlay?.Post(new BatteryWarningNotification());
                     batteryWarningShownOnce.Value = true;

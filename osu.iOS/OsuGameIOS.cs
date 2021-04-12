@@ -16,12 +16,10 @@ namespace osu.iOS
 
         protected override UpdateManager CreateUpdateManager() => new SimpleUpdateManager();
 
-        protected override PowerStatus CreatePowerStatus() => new IOSPowerStatus();
+        protected override BatteryInfo CreateBatteryInfo() => new IOSBatteryInfo();
 
-        private class IOSPowerStatus : PowerStatus
+        private class IOSBatteryInfo : BatteryInfo
         {
-            public override double BatteryCutoff => 0.25;
-
             public override double ChargeLevel => Battery.ChargeLevel;
 
             public override bool IsCharging => Battery.PowerSource != BatteryPowerSource.Battery;
