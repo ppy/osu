@@ -83,7 +83,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             waitForPlayer();
             AddAssert("ensure frames arrived", () => replayHandler.HasFrames);
 
-            AddUntilStep("wait for frame starvation", () => replayHandler.NextFrame == null);
+            AddUntilStep("wait for frame starvation", () => replayHandler.WaitingNextFrame);
             checkPaused(true);
 
             double? pausedTime = null;
@@ -92,7 +92,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             sendFrames();
 
-            AddUntilStep("wait for frame starvation", () => replayHandler.NextFrame == null);
+            AddUntilStep("wait for frame starvation", () => replayHandler.WaitingNextFrame);
             checkPaused(true);
 
             AddAssert("time advanced", () => currentFrameStableTime > pausedTime);
