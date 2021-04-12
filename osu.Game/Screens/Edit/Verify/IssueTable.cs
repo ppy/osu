@@ -97,7 +97,7 @@ namespace osu.Game.Screens.Edit.Verify
                 Text = issue.Template.Type.ToString(),
                 Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold),
                 Margin = new MarginPadding { Right = 10 },
-                Colour = issue.Template.TypeColour()
+                Colour = issue.Template.Colour
             },
             new OsuSpriteText
             {
