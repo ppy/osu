@@ -29,18 +29,6 @@ namespace osu.Game.Rulesets.Judgements
         protected const double DEFAULT_MAX_HEALTH_INCREASE = 0.05;
 
         /// <summary>
-        /// Whether this <see cref="Judgement"/> should affect the current combo.
-        /// </summary>
-        [Obsolete("Has no effect. Use HitResult members instead (e.g. use small-tick or bonus to not affect combo).")] // Can be removed 20210328
-        public virtual bool AffectsCombo => true;
-
-        /// <summary>
-        /// Whether this <see cref="Judgement"/> should be counted as base (combo) or bonus score.
-        /// </summary>
-        [Obsolete("Has no effect. Use HitResult members instead (e.g. use small-tick or bonus to not affect combo).")] // Can be removed 20210328
-        public virtual bool IsBonus => !AffectsCombo;
-
-        /// <summary>
         /// The maximum <see cref="HitResult"/> that can be achieved.
         /// </summary>
         public virtual HitResult MaxResult => HitResult.Perfect;
@@ -181,7 +169,7 @@ namespace osu.Game.Rulesets.Judgements
                     return 300;
 
                 case HitResult.Perfect:
-                    return 350;
+                    return 315;
 
                 case HitResult.SmallBonus:
                     return SMALL_BONUS_SCORE;

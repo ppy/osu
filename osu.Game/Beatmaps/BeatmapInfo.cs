@@ -147,7 +147,7 @@ namespace osu.Game.Beatmaps
         {
             string version = string.IsNullOrEmpty(Version) ? string.Empty : $"[{Version}]";
 
-            return $"{Metadata} {version}".Trim();
+            return $"{Metadata ?? BeatmapSet?.Metadata} {version}".Trim();
         }
 
         public bool Equals(BeatmapInfo other)

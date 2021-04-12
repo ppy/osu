@@ -1,18 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
+using osu.Framework.Threading;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -24,73 +21,49 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.Spectator;
 using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Overlays.Settings;
-using osu.Game.Replays;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Replays;
-using osu.Game.Rulesets.Replays.Types;
-using osu.Game.Scoring;
 using osu.Game.Screens.OnlinePlay.Match.Components;
+using osu.Game.Screens.Spectate;
 using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Screens.Play
 {
     [Cached(typeof(IPreviewTrackOwner))]
-    public class Spectator : OsuScreen, IPreviewTrackOwner
+    public class SoloSpectator : SpectatorScreen, IPreviewTrackOwner
     {
+        [NotNull]
         private readonly User targetUser;
-
-        [Resolved]
-        private Bindable<WorkingBeatmap> beatmap { get; set; }
-
-        [Resolved]
-        private Bindable<RulesetInfo> ruleset { get; set; }
-
-        private Ruleset rulesetInstance;
-
-        [Resolved]
-        private Bindable<IReadOnlyList<Mod>> mods { get; set; }
 
         [Resolved]
         private IAPIProvider api { get; set; }
 
         [Resolved]
-        private SpectatorStreamingClient spectatorStreaming { get; set; }
-
-        [Resolved]
-        private BeatmapManager beatmaps { get; set; }
+        private PreviewTrackManager previewTrackManager { get; set; }
 
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
         [Resolved]
-        private PreviewTrackManager previewTrackManager { get; set; }
-
-        private Score score;
-
-        private readonly object scoreLock = new object();
+        private BeatmapManager beatmaps { get; set; }
 
         private Container beatmapPanelContainer;
-
-        private SpectatorState state;
-
-        private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
-
         private TriangleButton watchButton;
-
         private SettingsCheckbox automaticDownload;
-
         private BeatmapSetInfo onlineBeatmap;
 
         /// <summary>
-        /// Becomes true if a new state is waiting to be loaded (while this screen was not active).
+        /// The player's immediate online gameplay state.
+        /// This doesn't always reflect the gameplay state being watched.
         /// </summary>
-        private bool newStatePending;
+        private GameplayState immediateGameplayState;
 
-        public Spectator([NotNull] User targetUser)
+        private GetBeatmapSetRequest onlineBeatmapRequest;
+
+        public SoloSpectator([NotNull] User targetUser)
+            : base(targetUser.Id)
         {
-            this.targetUser = targetUser ?? throw new ArgumentNullException(nameof(targetUser));
+            this.targetUser = targetUser;
         }
 
         [BackgroundDependencyLoader]
@@ -173,7 +146,7 @@ namespace osu.Game.Screens.Play
                                 Width = 250,
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Action = attemptStart,
+                                Action = () => scheduleStart(immediateGameplayState),
                                 Enabled = { Value = false }
                             }
                         }
@@ -185,169 +158,76 @@ namespace osu.Game.Screens.Play
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            spectatorStreaming.OnUserBeganPlaying += userBeganPlaying;
-            spectatorStreaming.OnUserFinishedPlaying += userFinishedPlaying;
-            spectatorStreaming.OnNewFrames += userSentFrames;
-
-            spectatorStreaming.WatchUser(targetUser.Id);
-
-            managerUpdated = beatmaps.ItemUpdated.GetBoundCopy();
-            managerUpdated.BindValueChanged(beatmapUpdated);
-
             automaticDownload.Current.BindValueChanged(_ => checkForAutomaticDownload());
         }
 
-        private void beatmapUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> beatmap)
+        protected override void OnUserStateChanged(int userId, SpectatorState spectatorState)
         {
-            if (beatmap.NewValue.TryGetTarget(out var beatmapSet) && beatmapSet.Beatmaps.Any(b => b.OnlineBeatmapID == state.BeatmapID))
-                Schedule(attemptStart);
+            clearDisplay();
+            showBeatmapPanel(spectatorState);
         }
 
-        private void userSentFrames(int userId, FrameDataBundle data)
+        protected override void StartGameplay(int userId, GameplayState gameplayState)
         {
-            // this is not scheduled as it handles propagation of frames even when in a child screen (at which point we are not alive).
-            // probably not the safest way to handle this.
+            immediateGameplayState = gameplayState;
+            watchButton.Enabled.Value = true;
 
-            if (userId != targetUser.Id)
-                return;
-
-            lock (scoreLock)
-            {
-                // this should never happen as the server sends the user's state on watching,
-                // but is here as a safety measure.
-                if (score == null)
-                    return;
-
-                // rulesetInstance should be guaranteed to be in sync with the score via scoreLock.
-                Debug.Assert(rulesetInstance != null && rulesetInstance.RulesetInfo.Equals(score.ScoreInfo.Ruleset));
-
-                foreach (var frame in data.Frames)
-                {
-                    IConvertibleReplayFrame convertibleFrame = rulesetInstance.CreateConvertibleReplayFrame();
-                    convertibleFrame.FromLegacy(frame, beatmap.Value.Beatmap);
-
-                    var convertedFrame = (ReplayFrame)convertibleFrame;
-                    convertedFrame.Time = frame.Time;
-
-                    score.Replay.Frames.Add(convertedFrame);
-                }
-            }
+            scheduleStart(gameplayState);
         }
 
-        private void userBeganPlaying(int userId, SpectatorState state)
+        protected override void EndGameplay(int userId)
         {
-            if (userId != targetUser.Id)
-                return;
+            scheduledStart?.Cancel();
+            immediateGameplayState = null;
+            watchButton.Enabled.Value = false;
 
-            this.state = state;
-
-            if (this.IsCurrentScreen())
-                Schedule(attemptStart);
-            else
-                newStatePending = true;
-        }
-
-        public override void OnResuming(IScreen last)
-        {
-            base.OnResuming(last);
-
-            if (newStatePending)
-            {
-                attemptStart();
-                newStatePending = false;
-            }
-        }
-
-        private void userFinishedPlaying(int userId, SpectatorState state)
-        {
-            if (userId != targetUser.Id)
-                return;
-
-            lock (scoreLock)
-            {
-                if (score != null)
-                {
-                    score.Replay.HasReceivedAllFrames = true;
-                    score = null;
-                }
-            }
-
-            Schedule(clearDisplay);
+            clearDisplay();
         }
 
         private void clearDisplay()
         {
             watchButton.Enabled.Value = false;
+            onlineBeatmapRequest?.Cancel();
             beatmapPanelContainer.Clear();
             previewTrackManager.StopAnyPlaying(this);
         }
 
-        private void attemptStart()
+        private ScheduledDelegate scheduledStart;
+
+        private void scheduleStart(GameplayState gameplayState)
         {
-            clearDisplay();
-            showBeatmapPanel(state);
-
-            var resolvedRuleset = rulesets.AvailableRulesets.FirstOrDefault(r => r.ID == state.RulesetID)?.CreateInstance();
-
-            // ruleset not available
-            if (resolvedRuleset == null)
-                return;
-
-            if (state.BeatmapID == null)
-                return;
-
-            var resolvedBeatmap = beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == state.BeatmapID);
-
-            if (resolvedBeatmap == null)
+            // This function may be called multiple times in quick succession once the screen becomes current again.
+            scheduledStart?.Cancel();
+            scheduledStart = Schedule(() =>
             {
-                return;
-            }
+                if (this.IsCurrentScreen())
+                    start();
+                else
+                    scheduleStart(gameplayState);
+            });
 
-            lock (scoreLock)
+            void start()
             {
-                score = new Score
-                {
-                    ScoreInfo = new ScoreInfo
-                    {
-                        Beatmap = resolvedBeatmap,
-                        User = targetUser,
-                        Mods = state.Mods.Select(m => m.ToMod(resolvedRuleset)).ToArray(),
-                        Ruleset = resolvedRuleset.RulesetInfo,
-                    },
-                    Replay = new Replay { HasReceivedAllFrames = false },
-                };
+                Beatmap.Value = gameplayState.Beatmap;
+                Ruleset.Value = gameplayState.Ruleset.RulesetInfo;
 
-                ruleset.Value = resolvedRuleset.RulesetInfo;
-                rulesetInstance = resolvedRuleset;
-
-                beatmap.Value = beatmaps.GetWorkingBeatmap(resolvedBeatmap);
-                watchButton.Enabled.Value = true;
-
-                this.Push(new SpectatorPlayerLoader(score));
+                this.Push(new SpectatorPlayerLoader(gameplayState.Score));
             }
         }
 
         private void showBeatmapPanel(SpectatorState state)
         {
-            if (state?.BeatmapID == null)
-            {
-                onlineBeatmap = null;
-                return;
-            }
+            Debug.Assert(state.BeatmapID != null);
 
-            var req = new GetBeatmapSetRequest(state.BeatmapID.Value, BeatmapSetLookupType.BeatmapId);
-            req.Success += res => Schedule(() =>
+            onlineBeatmapRequest = new GetBeatmapSetRequest(state.BeatmapID.Value, BeatmapSetLookupType.BeatmapId);
+            onlineBeatmapRequest.Success += res => Schedule(() =>
             {
-                if (state != this.state)
-                    return;
-
                 onlineBeatmap = res.ToBeatmapSet(rulesets);
                 beatmapPanelContainer.Child = new GridBeatmapPanel(onlineBeatmap);
                 checkForAutomaticDownload();
             });
 
-            api.Queue(req);
+            api.Queue(onlineBeatmapRequest);
         }
 
         private void checkForAutomaticDownload()
@@ -368,22 +248,6 @@ namespace osu.Game.Screens.Play
         {
             previewTrackManager.StopAnyPlaying(this);
             return base.OnExiting(next);
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (spectatorStreaming != null)
-            {
-                spectatorStreaming.OnUserBeganPlaying -= userBeganPlaying;
-                spectatorStreaming.OnUserFinishedPlaying -= userFinishedPlaying;
-                spectatorStreaming.OnNewFrames -= userSentFrames;
-
-                spectatorStreaming.StopWatchingUser(targetUser.Id);
-            }
-
-            managerUpdated?.UnbindAll();
         }
     }
 }

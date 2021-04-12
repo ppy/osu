@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
     /// <remarks>
     /// The reference play style chosen uses two hands, with full alternating (the hand changes after every hit).
     /// </remarks>
-    public class Stamina : Skill
+    public class Stamina : StrainSkill
     {
         protected override double SkillMultiplier => 1;
         protected override double StrainDecayBase => 0.4;
