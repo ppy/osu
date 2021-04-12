@@ -102,10 +102,13 @@ namespace osu.Game.Rulesets.UI
 
         #endregion
 
+        // to avoid allocation
+        private readonly List<IInput> emptyInputList = new List<IInput>();
+
         protected override List<IInput> GetPendingInputs()
         {
             if (replayInputHandler != null && !replayInputHandler.IsActive)
-                return new List<IInput>();
+                return emptyInputList;
 
             return base.GetPendingInputs();
         }
