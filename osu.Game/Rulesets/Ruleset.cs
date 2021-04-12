@@ -202,7 +202,7 @@ namespace osu.Game.Rulesets
 
         public virtual HitObjectComposer CreateHitObjectComposer() => null;
 
-        public virtual Checker CreateChecker() => null;
+        public virtual BeatmapVerifier CreateChecker() => null;
 
         public virtual Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.Solid.QuestionCircle };
 

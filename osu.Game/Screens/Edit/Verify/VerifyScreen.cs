@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Edit.Verify
     public class VerifyScreen : EditorScreen
     {
         private Ruleset ruleset;
-        private static Checker checker;
+        private static BeatmapVerifier beatmapVerifier;
 
         [Cached]
         private Bindable<Issue> selectedIssue = new Bindable<Issue>();
@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Edit.Verify
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
             ruleset = parent.Get<IBindable<WorkingBeatmap>>().Value.BeatmapInfo.Ruleset?.CreateInstance();
-            checker = ruleset?.CreateChecker();
+            beatmapVerifier = ruleset?.CreateChecker();
 
             return dependencies;
         }
@@ -128,9 +128,9 @@ namespace osu.Game.Screens.Edit.Verify
 
             private void refresh()
             {
-                table.Issues = checker.Run(Beatmap)
-                                      .OrderByDescending(issue => issue.Template.Type)
-                                      .ThenByDescending(issue => issue.Template.Origin.Metadata().Category);
+                table.Issues = beatmapVerifier.Run(Beatmap)
+                                              .OrderByDescending(issue => issue.Template.Type)
+                                              .ThenByDescending(issue => issue.Template.Origin.Metadata().Category);
             }
         }
     }
