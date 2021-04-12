@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -10,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Input.StateChanges;
 using osu.Framework.Input.StateChanges.Events;
 using osu.Framework.Input.States;
 using osu.Game.Configuration;
@@ -99,6 +101,14 @@ namespace osu.Game.Rulesets.UI
         }
 
         #endregion
+
+        protected override List<IInput> GetPendingInputs()
+        {
+            if (replayInputHandler != null && !replayInputHandler.IsActive)
+                return new List<IInput>();
+
+            return base.GetPendingInputs();
+        }
 
         #region Setting application (disables etc.)
 
