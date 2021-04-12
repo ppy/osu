@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
         // (higher = more performant, but higher false-negative chance).
         private const int path_step_size = 5;
 
-        public override CheckMetadata Metadata() => new CheckMetadata
+        public override CheckMetadata Metadata { get; } = new CheckMetadata
         (
             category: CheckCategory.Compose,
             description: "Offscreen hitobjects."
