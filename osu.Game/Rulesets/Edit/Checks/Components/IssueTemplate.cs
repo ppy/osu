@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         /// Returns the formatted message given the arguments used to format it.
         /// </summary>
         /// <param name="args">The arguments used to format the message.</param>
-        public string Message(params object[] args) => UnformattedMessage.FormatWith(args);
+        public string GetMessage(params object[] args) => UnformattedMessage.FormatWith(args);
 
         /// <summary>
         /// Returns the colour corresponding to the type of this issue.

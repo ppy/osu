@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             description: "Missing background."
         );
 
-        public override IEnumerable<IssueTemplate> Templates() => new[]
+        public override IEnumerable<IssueTemplate> PossibleTemplates => new[]
         {
             templateNoneSet,
             templateDoesNotExist

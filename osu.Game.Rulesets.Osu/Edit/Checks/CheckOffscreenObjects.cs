@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
             description: "Offscreen hitobjects."
         );
 
-        public override IEnumerable<IssueTemplate> Templates() => new[]
+        public override IEnumerable<IssueTemplate> PossibleTemplates => new[]
         {
             templateOffscreen,
             templateOffscreenSliderPath
