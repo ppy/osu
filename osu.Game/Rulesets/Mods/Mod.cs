@@ -12,6 +12,7 @@ using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets.UI;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -173,7 +174,18 @@ namespace osu.Game.Rulesets.Mods
         }
 
         public bool Equals(IMod other) => other is Mod them && Equals(them);
-        public bool Equals(Mod other) => GetType() == other?.GetType();
+
+        public bool Equals(Mod other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+
+            return GetType() == other.GetType() &&
+                   this.GetSettingsSourceProperties().All(pair =>
+                       EqualityComparer<object>.Default.Equals(
+                           ModUtils.GetSettingUnderlyingValue(pair.Item2.GetValue(this)),
+                           ModUtils.GetSettingUnderlyingValue(pair.Item2.GetValue(other))));
+        }
 
         /// <summary>
         /// Reset all custom settings for this mod back to their defaults.
