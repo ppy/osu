@@ -14,26 +14,6 @@ namespace osu.Game.Rulesets.Edit.Checks
         private readonly IssueTemplateDoesNotExist templateDoesNotExist;
         private readonly IssueTemplate[] templates;
 
-        private class IssueTemplateNoneSet : IssueTemplate
-        {
-            public IssueTemplateNoneSet(ICheck checkOrigin)
-                : base(checkOrigin, IssueType.Problem, "No background has been set")
-            {
-            }
-
-            public Issue Create() => new Issue(this);
-        }
-
-        private class IssueTemplateDoesNotExist : IssueTemplate
-        {
-            public IssueTemplateDoesNotExist(ICheck checkOrigin)
-                : base(checkOrigin, IssueType.Problem, "The background file \"{0}\" does not exist.")
-            {
-            }
-
-            public Issue Create(string filename) => new Issue(this, filename);
-        }
-
         public CheckBackground()
         {
             templates = new IssueTemplate[]
@@ -69,6 +49,26 @@ namespace osu.Game.Rulesets.Edit.Checks
                 yield break;
 
             yield return templateDoesNotExist.Create(beatmap.Metadata.BackgroundFile);
+        }
+
+        private class IssueTemplateNoneSet : IssueTemplate
+        {
+            public IssueTemplateNoneSet(ICheck checkOrigin)
+                : base(checkOrigin, IssueType.Problem, "No background has been set")
+            {
+            }
+
+            public Issue Create() => new Issue(this);
+        }
+
+        private class IssueTemplateDoesNotExist : IssueTemplate
+        {
+            public IssueTemplateDoesNotExist(ICheck checkOrigin)
+                : base(checkOrigin, IssueType.Problem, "The background file \"{0}\" does not exist.")
+            {
+            }
+
+            public Issue Create(string filename) => new Issue(this, filename);
         }
     }
 }

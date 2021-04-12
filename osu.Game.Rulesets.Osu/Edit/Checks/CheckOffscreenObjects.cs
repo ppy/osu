@@ -26,26 +26,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
         private readonly IssueTemplateOffscreenSlider templateOffscreenSlider;
         private readonly IssueTemplate[] templates;
 
-        private class IssueTemplateOffscreenCircle : IssueTemplate
-        {
-            public IssueTemplateOffscreenCircle(ICheck checkOrigin)
-                : base(checkOrigin, IssueType.Problem, "This circle goes offscreen on a 4:3 aspect ratio.")
-            {
-            }
-
-            public Issue Create(HitCircle circle) => new Issue(circle, this);
-        }
-
-        private class IssueTemplateOffscreenSlider : IssueTemplate
-        {
-            public IssueTemplateOffscreenSlider(ICheck checkOrigin)
-                : base(checkOrigin, IssueType.Problem, "This slider goes offscreen here on a 4:3 aspect ratio.")
-            {
-            }
-
-            public Issue Create(Slider slider, double offscreenTime) => new Issue(slider, this) { Time = offscreenTime };
-        }
-
         public CheckOffscreenObjects()
         {
             templates = new IssueTemplate[]
@@ -122,6 +102,26 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
         {
             return position.X - radius < min_x || position.X + radius > max_x ||
                    position.Y - radius < min_y || position.Y + radius > max_y;
+        }
+
+        private class IssueTemplateOffscreenCircle : IssueTemplate
+        {
+            public IssueTemplateOffscreenCircle(ICheck checkOrigin)
+                : base(checkOrigin, IssueType.Problem, "This circle goes offscreen on a 4:3 aspect ratio.")
+            {
+            }
+
+            public Issue Create(HitCircle circle) => new Issue(circle, this);
+        }
+
+        private class IssueTemplateOffscreenSlider : IssueTemplate
+        {
+            public IssueTemplateOffscreenSlider(ICheck checkOrigin)
+                : base(checkOrigin, IssueType.Problem, "This slider goes offscreen here on a 4:3 aspect ratio.")
+            {
+            }
+
+            public Issue Create(Slider slider, double offscreenTime) => new Issue(slider, this) { Time = offscreenTime };
         }
     }
 }
