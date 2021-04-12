@@ -9,7 +9,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Checks
 {
-    public class CheckOffscreenObjects : Check
+    public class CheckOffscreenObjects : ICheck
     {
         // These are close approximates to the edges of the screen
         // in gameplay on a 4:3 aspect ratio for osu!stable.
@@ -22,13 +22,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
         // (higher = more performant, but higher false-negative chance).
         private const int path_step_size = 5;
 
-        public override CheckMetadata Metadata { get; } = new CheckMetadata
+        public CheckMetadata Metadata { get; } = new CheckMetadata
         (
             category: CheckCategory.Compose,
             description: "Offscreen hitobjects."
         );
 
-        public override IEnumerable<IssueTemplate> PossibleTemplates => new[]
+        public IEnumerable<IssueTemplate> PossibleTemplates => new[]
         {
             templateOffscreen,
             templateOffscreenSliderPath
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
             unformattedMessage: "This slider goes offscreen here on a 4:3 aspect ratio."
         );
 
-        public override IEnumerable<Issue> Run(IBeatmap beatmap)
+        public IEnumerable<Issue> Run(IBeatmap beatmap)
         {
             foreach (var hitobject in beatmap.HitObjects)
             {
@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
                     case HitCircle circle:
                     {
                         if (isOffscreen(circle.StackedPosition, circle.Radius))
-                            yield return new Issue(circle, templateOffscreen);
+                            yield return new Issue(this, circle, templateOffscreen);
 
                         break;
                     }
@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
 
                 // `SpanDuration` ensures we don't include reverses.
                 double time = slider.StartTime + progress * slider.SpanDuration;
-                yield return new Issue(slider, templateOffscreenSliderPath) { Time = time };
+                yield return new Issue(this, slider, templateOffscreenSliderPath) { Time = time };
 
                 yield break;
             }
@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
             if (!isOffscreen(slider.StackedEndPosition, slider.Radius))
                 yield break;
 
-            yield return new Issue(slider, templateOffscreenSliderPath) { Time = slider.EndTime };
+            yield return new Issue(this, slider, templateOffscreenSliderPath) { Time = slider.EndTime };
         }
 
         private bool isOffscreen(Vector2 position, double radius)

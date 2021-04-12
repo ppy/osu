@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Edit
         /// Checks which are performed regardless of ruleset.
         /// These handle things like beatmap metadata, timing, and other ruleset agnostic elements.
         /// </summary>
-        private readonly IReadOnlyList<Check> generalChecks = new List<Check>
+        private readonly IReadOnlyList<ICheck> generalChecks = new List<ICheck>
         {
             new CheckBackground()
         };

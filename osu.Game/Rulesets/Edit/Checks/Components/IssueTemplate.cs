@@ -15,11 +15,6 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         private static readonly Color4 error_gray = new Colour4(0.5f, 0.5f, 0.5f, 1.0f);
 
         /// <summary>
-        /// The check that this template originates from.
-        /// </summary>
-        public Check Origin;
-
-        /// <summary>
         /// The type of the issue.
         /// </summary>
         public readonly IssueType Type;

@@ -6,28 +6,22 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Rulesets.Edit.Checks.Components
 {
-    public abstract class Check
+    public interface ICheck
     {
         /// <summary>
         /// The metadata for this check.
         /// </summary>
-        public abstract CheckMetadata Metadata { get; }
+        public CheckMetadata Metadata { get; }
 
         /// <summary>
         /// All possible templates for issues that this check may return.
         /// </summary>
-        public abstract IEnumerable<IssueTemplate> PossibleTemplates { get; }
+        public IEnumerable<IssueTemplate> PossibleTemplates { get; }
 
         /// <summary>
         /// Runs this check and returns any issues detected for the provided beatmap.
         /// </summary>
         /// <param name="beatmap">The beatmap to run the check on.</param>
-        public abstract IEnumerable<Issue> Run(IBeatmap beatmap);
-
-        protected Check()
-        {
-            foreach (var template in PossibleTemplates)
-                template.Origin = this;
-        }
+        public IEnumerable<Issue> Run(IBeatmap beatmap);
     }
 }
