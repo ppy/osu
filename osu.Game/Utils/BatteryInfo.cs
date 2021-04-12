@@ -5,15 +5,9 @@ namespace osu.Game.Utils
 {
     /// <summary>
     /// Provides access to the system's power status.
-    /// Currently implemented on iOS and Android only.
     /// </summary>
-    public abstract class PowerStatus
+    public abstract class BatteryInfo
     {
-        /// <summary>
-        /// The maximum battery level considered as low, from 0 to 1.
-        /// </summary>
-        public abstract double BatteryCutoff { get; }
-
         /// <summary>
         /// The charge level of the battery, from 0 to 1.
         /// </summary>
@@ -23,8 +17,8 @@ namespace osu.Game.Utils
 
         /// <summary>
         /// Whether the battery is currently low in charge.
-        /// Returns true if not charging and current charge level is lower than or equal to <see cref="BatteryCutoff"/>.
+        /// Returns true if not charging and current charge level is lower than or equal to 25%.
         /// </summary>
-        public bool IsLowBattery => !IsCharging && ChargeLevel <= BatteryCutoff;
+        public bool IsLowBattery => !IsCharging && ChargeLevel <= 0.25;
     }
 }

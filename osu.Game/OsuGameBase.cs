@@ -157,7 +157,7 @@ namespace osu.Game
 
         protected override UserInputManager CreateUserInputManager() => new OsuUserInputManager();
 
-        protected virtual PowerStatus CreatePowerStatus() => null;
+        protected virtual BatteryInfo CreateBatteryInfo() => null;
 
         /// <summary>
         /// The maximum volume at which audio tracks should playback. This can be set lower than 1 to create some head-room for sound effects.
@@ -285,7 +285,7 @@ namespace osu.Game
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
             dependencies.Cache(RulesetConfigCache = new RulesetConfigCache(SettingsStore));
 
-            var powerStatus = CreatePowerStatus();
+            var powerStatus = CreateBatteryInfo();
             if (powerStatus != null)
                 dependencies.CacheAs(powerStatus);
 

@@ -64,7 +64,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <!-- Used for obtaining battery info. -->
     <PackageReference Include="Xamarin.Essentials" Version="1.6.1" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
