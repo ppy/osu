@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Replays
         /// <summary>
         /// Whether we are waiting for new frames to be received.
         /// </summary>
-        public bool WaitingNextFrame => !replay.HasReceivedAllFrames && currentFrameIndex == Frames.Count - 1;
+        public bool WaitingForFrame => !replay.HasReceivedAllFrames && currentFrameIndex == Frames.Count - 1;
 
         /// <summary>
         /// The current frame of the replay.
@@ -140,7 +140,7 @@ namespace osu.Game.Rulesets.Replays
             frameEnd = getFrameTime(currentFrameIndex + 1);
 
             // Pause until more frames are arrived.
-            if (WaitingNextFrame && frameStart < time)
+            if (WaitingForFrame && frameStart < time)
             {
                 CurrentTime = frameStart;
                 return null;
