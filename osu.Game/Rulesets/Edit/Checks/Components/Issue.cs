@@ -22,17 +22,13 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         public IReadOnlyList<HitObject> HitObjects;
 
         /// <summary>
-        /// The template which this issue is using. This provides properties
-        /// such as the <see cref="IssueTemplate.IssueType"/>, and the
-        /// <see cref="IssueTemplate.UnformattedMessage"/>.
+        /// The template which this issue is using. This provides properties such as the <see cref="IssueTemplate.IssueType"/>, and the <see cref="IssueTemplate.UnformattedMessage"/>.
         /// </summary>
         public IssueTemplate Template;
 
         /// <summary>
-        /// The arguments that give this issue its context, based on the
-        /// <see cref="IssueTemplate"/>. These are then substituted into the
-        /// <see cref="IssueTemplate.UnformattedMessage"/>.
-        /// E.g. timestamps, which diff is being compared to, what some volume is, etc.
+        /// The arguments that give this issue its context, based on the <see cref="IssueTemplate"/>. These are then substituted into the <see cref="IssueTemplate.UnformattedMessage"/>.
+        /// This could for instance include timestamps, which diff is being compared to, what some volume is, etc.
         /// </summary>
         public object[] Arguments;
 

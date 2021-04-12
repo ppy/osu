@@ -42,14 +42,12 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         }
 
         /// <summary>
-        /// The category this check belongs to. E.g. <see cref="CheckCategory.Metadata"/>,
-        /// <see cref="CheckCategory.Timing"/>, or <see cref="CheckCategory.Compose"/>.
+        /// The category this check belongs to. E.g. <see cref="CheckCategory.Metadata"/>, <see cref="CheckCategory.Timing"/>, or <see cref="CheckCategory.Compose"/>.
         /// </summary>
         public readonly CheckCategory Category;
 
         /// <summary>
-        /// Describes the issue(s) that this check looks for. Keep this brief, such that
-        /// it fits into "No {description}". E.g. "Offscreen objects" / "Too short sliders".
+        /// Describes the issue(s) that this check looks for. Keep this brief, such that it fits into "No {description}". E.g. "Offscreen objects" / "Too short sliders".
         /// </summary>
         public readonly string Description;
 

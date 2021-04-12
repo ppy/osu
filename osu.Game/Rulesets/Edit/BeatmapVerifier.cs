@@ -11,15 +11,18 @@ namespace osu.Game.Rulesets.Edit
 {
     public abstract class BeatmapVerifier
     {
-        // These are all ruleset-invariant, hence here instead of in e.g. `OsuChecker`.
-        private readonly IReadOnlyList<Check> checks = new List<Check>
+        /// <summary>
+        /// Checks which are performed regardless of ruleset.
+        /// These handle things like beatmap metadata, timing, and other ruleset agnostic elements.
+        /// </summary>
+        private readonly IReadOnlyList<Check> generalChecks = new List<Check>
         {
             new CheckBackground()
         };
 
         public virtual IEnumerable<Issue> Run(IBeatmap beatmap)
         {
-            return checks.SelectMany(check => check.Run(beatmap));
+            return generalChecks.SelectMany(check => check.Run(beatmap));
         }
     }
 }

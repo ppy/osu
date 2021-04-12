@@ -35,8 +35,7 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         public Check Origin;
 
         /// <summary>
-        /// The type of the issue. E.g. <see cref="IssueType.Problem"/>,
-        /// <see cref="IssueType.Warning"/>, or <see cref="IssueType.Negligible"/>.
+        /// The type of the issue.
         /// </summary>
         public readonly IssueType Type;
 
@@ -57,7 +56,6 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         /// Returns the formatted message given the arguments used to format it.
         /// </summary>
         /// <param name="args">The arguments used to format the message.</param>
-        /// <returns></returns>
         public string Message(params object[] args) => UnformattedMessage.FormatWith(args);
 
         public static readonly Color4 PROBLEM_RED = new Colour4(1.0f, 0.4f, 0.4f, 1.0f);
@@ -68,7 +66,6 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         /// <summary>
         /// Returns the colour corresponding to the type of this issue.
         /// </summary>
-        /// <returns></returns>
         public Colour4 TypeColour()
         {
             return Type switch
