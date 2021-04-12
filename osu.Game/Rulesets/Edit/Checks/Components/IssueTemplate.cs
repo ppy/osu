@@ -70,5 +70,7 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
                 }
             }
         }
+
+        public bool Equals(IssueTemplate other) => other.Type == Type && other.UnformattedMessage == UnformattedMessage;
     }
 }
