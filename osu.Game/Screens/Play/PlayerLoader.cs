@@ -487,7 +487,7 @@ namespace osu.Game.Screens.Play
 
             if (!batteryWarningShownOnce.Value)
             {
-                if (batteryInfo.IsLowBattery)
+                if (!batteryInfo.IsCharging && batteryInfo.ChargeLevel <= 0.25)
                 {
                     notificationOverlay?.Post(new BatteryWarningNotification());
                     batteryWarningShownOnce.Value = true;
