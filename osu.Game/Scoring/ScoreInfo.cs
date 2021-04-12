@@ -10,6 +10,7 @@ using Newtonsoft.Json.Converters;
 using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -55,9 +56,10 @@ namespace osu.Game.Scoring
         [JsonIgnore]
         public virtual RulesetInfo Ruleset { get; set; }
 
+        private APIMod[] localAPIMods;
         private Mod[] mods;
 
-        [JsonProperty("mods")]
+        [JsonIgnore]
         [NotMapped]
         public Mod[] Mods
         {
@@ -66,43 +68,50 @@ namespace osu.Game.Scoring
                 if (mods != null)
                     return mods;
 
-                if (modsJson == null)
+                if (localAPIMods == null)
                     return Array.Empty<Mod>();
 
-                return getModsFromRuleset(JsonConvert.DeserializeObject<DeserializedMod[]>(modsJson));
+                var rulesetInstance = Ruleset.CreateInstance();
+                return apiMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
             }
             set
             {
-                modsJson = null;
+                localAPIMods = null;
                 mods = value;
             }
         }
 
-        private Mod[] getModsFromRuleset(DeserializedMod[] mods) => Ruleset.CreateInstance().GetAllMods().Where(mod => mods.Any(d => d.Acronym == mod.Acronym)).ToArray();
+        // Used for API serialisation/deserialisation.
+        [JsonProperty("mods")]
+        [NotMapped]
+        private APIMod[] apiMods
+        {
+            get
+            {
+                if (localAPIMods != null)
+                    return localAPIMods;
 
-        private string modsJson;
+                if (mods == null)
+                    return Array.Empty<APIMod>();
 
+                return localAPIMods = mods.Select(m => new APIMod(m)).ToArray();
+            }
+            set
+            {
+                localAPIMods = value;
+
+                // We potentially can't update this yet due to Ruleset being late-bound, so instead update on read as necessary.
+                mods = null;
+            }
+        }
+
+        // Used for database serialisation/deserialisation.
         [JsonIgnore]
         [Column("Mods")]
         public string ModsJson
         {
-            get
-            {
-                if (modsJson != null)
-                    return modsJson;
-
-                if (mods == null)
-                    return null;
-
-                return modsJson = JsonConvert.SerializeObject(mods.Select(m => new DeserializedMod { Acronym = m.Acronym }));
-            }
-            set
-            {
-                modsJson = value;
-
-                // we potentially can't update this yet due to Ruleset being late-bound, so instead update on read as necessary.
-                mods = null;
-            }
+            get => JsonConvert.SerializeObject(apiMods);
+            set => apiMods = JsonConvert.DeserializeObject<APIMod[]>(value);
         }
 
         [NotMapped]
@@ -249,14 +258,6 @@ namespace osu.Game.Scoring
                         break;
                 }
             }
-        }
-
-        [Serializable]
-        protected class DeserializedMod : IMod
-        {
-            public string Acronym { get; set; }
-
-            public bool Equals(IMod other) => Acronym == other?.Acronym;
         }
 
         public override string ToString() => $"{User} playing {Beatmap}";
