@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         /// <summary>
         /// The check that this template originates from.
         /// </summary>
-        public ICheck Check;
+        public readonly ICheck Check;
 
         /// <summary>
         /// The type of the issue.
