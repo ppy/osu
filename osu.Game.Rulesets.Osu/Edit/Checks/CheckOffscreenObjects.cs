@@ -93,8 +93,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
 
         private class IssueTemplateOffscreenCircle : IssueTemplate
         {
-            public IssueTemplateOffscreenCircle(ICheck checkOrigin)
-                : base(checkOrigin, IssueType.Problem, "This circle goes offscreen on a 4:3 aspect ratio.")
+            public IssueTemplateOffscreenCircle(ICheck check)
+                : base(check, IssueType.Problem, "This circle goes offscreen on a 4:3 aspect ratio.")
             {
             }
 
@@ -103,8 +103,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
 
         private class IssueTemplateOffscreenSlider : IssueTemplate
         {
-            public IssueTemplateOffscreenSlider(ICheck checkOrigin)
-                : base(checkOrigin, IssueType.Problem, "This slider goes offscreen here on a 4:3 aspect ratio.")
+            public IssueTemplateOffscreenSlider(ICheck check)
+                : base(check, IssueType.Problem, "This slider goes offscreen here on a 4:3 aspect ratio.")
             {
             }
 
