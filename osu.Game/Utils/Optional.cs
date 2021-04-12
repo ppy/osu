@@ -37,7 +37,6 @@ namespace osu.Game.Utils
         /// Shortcase for: <c>optional.HasValue ? optional.Value : fallback</c>.
         /// </remarks>
         /// <param name="fallback">The fallback value to return if <see cref="HasValue"/> is <c>false</c>.</param>
-        /// <returns></returns>
         public T GetOr(T fallback) => HasValue ? Value : fallback;
 
         public static implicit operator Optional<T>(T value) => new Optional<T>(value);
