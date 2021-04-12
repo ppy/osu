@@ -129,8 +129,8 @@ namespace osu.Game.Screens.Edit.Verify
             private void refresh()
             {
                 table.Issues = beatmapVerifier.Run(Beatmap)
-                                              .OrderByDescending(issue => issue.Template.Type)
-                                              .ThenByDescending(issue => issue.Check.Metadata.Category);
+                                              .OrderBy(issue => issue.Template.Type)
+                                              .ThenBy(issue => issue.Check.Metadata.Category);
             }
         }
     }
