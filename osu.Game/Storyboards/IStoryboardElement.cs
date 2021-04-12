@@ -12,6 +12,8 @@ namespace osu.Game.Storyboards
 
         double StartTime { get; }
 
+        double EndTime { get; }
+
         Drawable CreateDrawable();
     }
 }

@@ -14,6 +14,8 @@ namespace osu.Game.Storyboards
 
         public double StartTime { get; }
 
+        public double EndTime => StartTime;
+
         public StoryboardVideo(string path, int offset)
         {
             Path = path;
