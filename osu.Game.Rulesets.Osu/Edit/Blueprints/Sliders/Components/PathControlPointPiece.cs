@@ -58,12 +58,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             this.slider = slider;
             ControlPoint = controlPoint;
+            PointsInSegment = slider.Path.PointsInSegment(ControlPoint);
 
             slider.Path.Version.BindValueChanged(_ =>
             {
                 PointsInSegment = slider.Path.PointsInSegment(ControlPoint);
                 updatePathType();
-            }, runOnceImmediately: true);
+            });
 
             controlPoint.Type.BindValueChanged(_ => updateMarkerDisplay());
 
