@@ -33,6 +33,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             base.OnOperationEnded();
             referenceOrigin = null;
+            referencePathTypes = null;
         }
 
         public override bool HandleMovement(MoveSelectionEvent moveEvent)
@@ -52,6 +53,12 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// During a transform, the initial origin is stored so it can be used throughout the operation.
         /// </summary>
         private Vector2? referenceOrigin;
+
+        /// <summary>
+        /// During a transform, the initial path types of a single selected slider are stored so they
+        /// can be maintained throughout the operation.
+        /// </summary>
+        private List<PathType?> referencePathTypes;
 
         public override bool HandleReverse()
         {
@@ -194,6 +201,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private void scaleSlider(Slider slider, Vector2 scale)
         {
+            referencePathTypes ??= slider.Path.ControlPoints.Select(p => p.Type.Value).ToList();
+
             Quad sliderQuad = getSurroundingQuad(slider.Path.ControlPoints.Select(p => p.Position.Value));
 
             // Limit minimum distance between control points  after scaling to almost 0. Less than 0 causes the slider to flip, exactly 0 causes a crash through division by 0.
@@ -208,6 +217,10 @@ namespace osu.Game.Rulesets.Osu.Edit
                 oldControlPoints.Enqueue(point.Position.Value);
                 point.Position.Value *= pathRelativeDeltaScale;
             }
+
+            // Maintain the path types in case they were defaulted to bezier at some point during scaling
+            for (int i = 0; i < slider.Path.ControlPoints.Count; ++i)
+                slider.Path.ControlPoints[i].Type.Value = referencePathTypes[i];
 
             //if sliderhead or sliderend end up outside playfield, revert scaling.
             Quad scaledQuad = getSurroundingQuad(new OsuHitObject[] { slider });

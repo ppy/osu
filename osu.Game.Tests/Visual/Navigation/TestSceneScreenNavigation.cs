@@ -44,6 +44,20 @@ namespace osu.Game.Tests.Visual.Navigation
             exitViaEscapeAndConfirm();
         }
 
+        /// <summary>
+        /// This tests that the F1 key will open the mod select overlay, and not be handled / blocked by the music controller (which has the same default binding
+        /// but should be handled *after* song select).
+        /// </summary>
+        [Test]
+        public void TestOpenModSelectOverlayUsingAction()
+        {
+            TestSongSelect songSelect = null;
+
+            PushAndConfirm(() => songSelect = new TestSongSelect());
+            AddStep("Show mods overlay", () => InputManager.Key(Key.F1));
+            AddAssert("Overlay was shown", () => songSelect.ModSelectOverlay.State.Value == Visibility.Visible);
+        }
+
         [Test]
         public void TestRetryCountIncrements()
         {
