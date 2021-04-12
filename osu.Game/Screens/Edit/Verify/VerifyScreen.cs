@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Edit.Verify
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
             ruleset = parent.Get<IBindable<WorkingBeatmap>>().Value.BeatmapInfo.Ruleset?.CreateInstance();
-            beatmapVerifier = ruleset?.CreateChecker();
+            beatmapVerifier = ruleset?.CreateBeatmapVerifier();
 
             return dependencies;
         }
