@@ -37,11 +37,6 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestNormalPlayback()
         {
-            Assert.IsNull(handler.CurrentFrame);
-
-            confirmCurrentFrame(null);
-            confirmNextFrame(0);
-
             setTime(0, 0);
             confirmCurrentFrame(0);
             confirmNextFrame(1);
@@ -97,22 +92,22 @@ namespace osu.Game.Tests.NonVisual
             // exited important section
             setTime(8200, 8000);
             confirmCurrentFrame(7);
-            confirmNextFrame(null);
+            confirmNextFrame(7);
 
             setTime(8200, 8200);
             confirmCurrentFrame(7);
-            confirmNextFrame(null);
+            confirmNextFrame(7);
         }
 
         [Test]
         public void TestIntroTime()
         {
             setTime(-1000, -1000);
-            confirmCurrentFrame(null);
+            confirmCurrentFrame(0);
             confirmNextFrame(0);
 
             setTime(-500, -500);
-            confirmCurrentFrame(null);
+            confirmCurrentFrame(0);
             confirmNextFrame(0);
 
             setTime(0, 0);
@@ -133,29 +128,29 @@ namespace osu.Game.Tests.NonVisual
             // pivot without crossing a frame boundary
             setTime(2700, 2700);
             confirmCurrentFrame(2);
-            confirmNextFrame(1);
+            confirmNextFrame(3);
 
-            // cross current frame boundary; should not yet update frame
-            setTime(1980, 1980);
+            // cross current frame boundary
+            setTime(1980, 2000);
             confirmCurrentFrame(2);
-            confirmNextFrame(1);
+            confirmNextFrame(3);
 
             setTime(1200, 1200);
-            confirmCurrentFrame(2);
-            confirmNextFrame(1);
+            confirmCurrentFrame(1);
+            confirmNextFrame(2);
 
             // ensure each frame plays out until start
             setTime(-500, 1000);
             confirmCurrentFrame(1);
-            confirmNextFrame(0);
+            confirmNextFrame(2);
 
             setTime(-500, 0);
             confirmCurrentFrame(0);
-            confirmNextFrame(null);
+            confirmNextFrame(1);
 
             setTime(-500, -500);
             confirmCurrentFrame(0);
-            confirmNextFrame(null);
+            confirmNextFrame(0);
         }
 
         [Test]
@@ -168,12 +163,12 @@ namespace osu.Game.Tests.NonVisual
             confirmNextFrame(5);
 
             setTime(3500, null);
-            confirmCurrentFrame(4);
-            confirmNextFrame(3);
+            confirmCurrentFrame(3);
+            confirmNextFrame(4);
 
             setTime(3000, 3000);
             confirmCurrentFrame(3);
-            confirmNextFrame(2);
+            confirmNextFrame(4);
 
             setTime(3500, null);
             confirmCurrentFrame(3);
@@ -187,17 +182,17 @@ namespace osu.Game.Tests.NonVisual
             confirmCurrentFrame(4);
             confirmNextFrame(5);
 
-            setTime(4000, null);
+            setTime(4000, 4000);
             confirmCurrentFrame(4);
             confirmNextFrame(5);
 
             setTime(3500, null);
-            confirmCurrentFrame(4);
-            confirmNextFrame(3);
+            confirmCurrentFrame(3);
+            confirmNextFrame(4);
 
             setTime(3000, 3000);
             confirmCurrentFrame(3);
-            confirmNextFrame(2);
+            confirmNextFrame(4);
         }
 
         [Test]
@@ -209,24 +204,24 @@ namespace osu.Game.Tests.NonVisual
             confirmNextFrame(4);
 
             setTime(3200, null);
-            // next frame doesn't change even though direction reversed, because of important section.
             confirmCurrentFrame(3);
             confirmNextFrame(4);
 
-            setTime(3000, null);
+            setTime(3000, 3000);
             confirmCurrentFrame(3);
             confirmNextFrame(4);
 
             setTime(2800, 2800);
-            confirmCurrentFrame(3);
-            confirmNextFrame(2);
+            confirmCurrentFrame(2);
+            confirmNextFrame(3);
         }
 
         private void fastForwardToPoint(double destination)
         {
             for (int i = 0; i < 1000; i++)
             {
-                if (handler.SetFrameFromTime(destination) == null)
+                var time = handler.SetFrameFromTime(destination);
+                if (time == null || time == destination)
                     return;
             }
 
@@ -235,33 +230,17 @@ namespace osu.Game.Tests.NonVisual
 
         private void setTime(double set, double? expect)
         {
-            Assert.AreEqual(expect, handler.SetFrameFromTime(set));
+            Assert.AreEqual(expect, handler.SetFrameFromTime(set), "Unexpected return value");
         }
 
-        private void confirmCurrentFrame(int? frame)
+        private void confirmCurrentFrame(int frame)
         {
-            if (frame.HasValue)
-            {
-                Assert.IsNotNull(handler.CurrentFrame);
-                Assert.AreEqual(replay.Frames[frame.Value].Time, handler.CurrentFrame.Time);
-            }
-            else
-            {
-                Assert.IsNull(handler.CurrentFrame);
-            }
+            Assert.AreEqual(replay.Frames[frame].Time, handler.CurrentFrame.Time, "Unexpected current frame");
         }
 
-        private void confirmNextFrame(int? frame)
+        private void confirmNextFrame(int frame)
         {
-            if (frame.HasValue)
-            {
-                Assert.IsNotNull(handler.NextFrame);
-                Assert.AreEqual(replay.Frames[frame.Value].Time, handler.NextFrame.Time);
-            }
-            else
-            {
-                Assert.IsNull(handler.NextFrame);
-            }
+            Assert.AreEqual(replay.Frames[frame].Time, handler.NextFrame.Time, "Unexpected next frame");
         }
 
         private class TestReplayFrame : ReplayFrame
