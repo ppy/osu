@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         /// <summary>
         /// The metadata for this check.
         /// </summary>
-        public abstract CheckMetadata Metadata();
+        public abstract CheckMetadata Metadata { get; }
 
         /// <summary>
         /// All possible templates for issues that this check may return.

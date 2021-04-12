@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 {
     public class CheckBackground : Check
     {
-        public override CheckMetadata Metadata() => new CheckMetadata
+        public override CheckMetadata Metadata { get; } = new CheckMetadata
         (
             category: CheckCategory.Resources,
             description: "Missing background."

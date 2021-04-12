@@ -130,7 +130,7 @@ namespace osu.Game.Screens.Edit.Verify
             {
                 table.Issues = beatmapVerifier.Run(Beatmap)
                                               .OrderByDescending(issue => issue.Template.Type)
-                                              .ThenByDescending(issue => issue.Template.Origin.Metadata().Category);
+                                              .ThenByDescending(issue => issue.Template.Origin.Metadata.Category);
             }
         }
     }
