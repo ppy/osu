@@ -20,23 +20,15 @@ namespace osu.Game.Tests.NonVisual
         {
             handler = new TestInputHandler(replay = new Replay
             {
-                Frames = new List<ReplayFrame>
-                {
-                    new TestReplayFrame(0),
-                    new TestReplayFrame(1000),
-                    new TestReplayFrame(2000),
-                    new TestReplayFrame(3000, true),
-                    new TestReplayFrame(4000, true),
-                    new TestReplayFrame(5000, true),
-                    new TestReplayFrame(7000, true),
-                    new TestReplayFrame(8000),
-                }
+                HasReceivedAllFrames = false
             });
         }
 
         [Test]
         public void TestNormalPlayback()
         {
+            setReplayFrames();
+
             setTime(0, 0);
             confirmCurrentFrame(0);
             confirmNextFrame(1);
@@ -102,6 +94,8 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestIntroTime()
         {
+            setReplayFrames();
+
             setTime(-1000, -1000);
             confirmCurrentFrame(0);
             confirmNextFrame(0);
@@ -118,6 +112,8 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestBasicRewind()
         {
+            setReplayFrames();
+
             setTime(2800, 0);
             setTime(2800, 1000);
             setTime(2800, 2000);
@@ -156,6 +152,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestRewindInsideImportantSection()
         {
+            setReplayFrames();
             fastForwardToPoint(3000);
 
             setTime(4000, 4000);
@@ -198,6 +195,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestRewindOutOfImportantSection()
         {
+            setReplayFrames();
             fastForwardToPoint(3500);
 
             confirmCurrentFrame(3);
@@ -214,6 +212,86 @@ namespace osu.Game.Tests.NonVisual
             setTime(2800, 2800);
             confirmCurrentFrame(2);
             confirmNextFrame(3);
+        }
+
+        [Test]
+        public void TestReplayStreaming()
+        {
+            // no frames are arrived yet
+            setTime(0, null);
+            setTime(1000, null);
+            Assert.IsTrue(handler.WaitingNextFrame, "Should be waiting for the first frame");
+
+            replay.Frames.Add(new TestReplayFrame(0));
+            replay.Frames.Add(new TestReplayFrame(1000));
+
+            // should always play from beginning
+            setTime(1000, 0);
+            confirmCurrentFrame(0);
+            Assert.IsFalse(handler.WaitingNextFrame, "Should not be waiting yet");
+            setTime(1000, 1000);
+            confirmCurrentFrame(1);
+            confirmNextFrame(1);
+            Assert.IsTrue(handler.WaitingNextFrame, "Should be waiting");
+
+            // cannot seek beyond the last frame
+            setTime(1500, null);
+            confirmCurrentFrame(1);
+
+            setTime(-100, 0);
+            confirmCurrentFrame(0);
+
+            // can seek to the point before the first frame, however
+            setTime(-100, -100);
+            confirmCurrentFrame(0);
+            confirmNextFrame(0);
+
+            fastForwardToPoint(1000);
+            setTime(3000, null);
+            replay.Frames.Add(new TestReplayFrame(2000));
+            confirmCurrentFrame(1);
+            setTime(1000, 1000);
+            setTime(3000, 2000);
+        }
+
+        [Test]
+        public void TestMultipleFramesSameTime()
+        {
+            replay.Frames.Add(new TestReplayFrame(0));
+            replay.Frames.Add(new TestReplayFrame(0));
+            replay.Frames.Add(new TestReplayFrame(1000));
+            replay.Frames.Add(new TestReplayFrame(1000));
+            replay.Frames.Add(new TestReplayFrame(2000));
+
+            // forward direction is prioritized when multiple frames have the same time.
+            setTime(0, 0);
+            setTime(0, 0);
+
+            setTime(2000, 1000);
+            setTime(2000, 1000);
+
+            setTime(1000, 1000);
+            setTime(1000, 1000);
+            setTime(-100, 1000);
+            setTime(-100, 0);
+            setTime(-100, 0);
+            setTime(-100, -100);
+        }
+
+        private void setReplayFrames()
+        {
+            replay.Frames = new List<ReplayFrame>
+            {
+                new TestReplayFrame(0),
+                new TestReplayFrame(1000),
+                new TestReplayFrame(2000),
+                new TestReplayFrame(3000, true),
+                new TestReplayFrame(4000, true),
+                new TestReplayFrame(5000, true),
+                new TestReplayFrame(7000, true),
+                new TestReplayFrame(8000),
+            };
+            replay.HasReceivedAllFrames = true;
         }
 
         private void fastForwardToPoint(double destination)
