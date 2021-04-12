@@ -17,7 +17,6 @@ namespace osu.Game.Tests.Beatmaps
         /// <summary>
         /// Creates the <see cref="Ruleset"/> whose legacy mod conversion is to be tested.
         /// </summary>
-        /// <returns></returns>
         protected abstract Ruleset CreateRuleset();
 
         protected void TestFromLegacy(LegacyMods legacyMods, Type[] expectedMods)
