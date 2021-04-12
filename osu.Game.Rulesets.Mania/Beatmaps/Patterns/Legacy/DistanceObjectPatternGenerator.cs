@@ -482,7 +482,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// Retrieves the sample info list at a point in time.
         /// </summary>
         /// <param name="time">The time to retrieve the sample info list from.</param>
-        /// <returns></returns>
         private IList<HitSampleInfo> sampleInfoListAt(int time) => nodeSamplesAt(time)?.First() ?? HitObject.Samples;
 
         /// <summary>
