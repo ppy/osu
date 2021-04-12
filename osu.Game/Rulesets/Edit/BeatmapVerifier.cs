@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit
 {
-    public abstract class Checker
+    public abstract class BeatmapVerifier
     {
         // These are all ruleset-invariant, hence here instead of in e.g. `OsuChecker`.
         private readonly IReadOnlyList<Check> checks = new List<Check>

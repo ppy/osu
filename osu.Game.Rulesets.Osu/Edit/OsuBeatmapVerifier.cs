@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Osu.Edit.Checks;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public class OsuChecker : Checker
+    public class OsuBeatmapVerifier : BeatmapVerifier
     {
         private readonly List<Check> checks = new List<Check>
         {
