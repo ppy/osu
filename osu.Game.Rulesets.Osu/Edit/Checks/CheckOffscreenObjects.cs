@@ -22,22 +22,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
         // (higher = more performant, but higher false-negative chance).
         private const int path_step_size = 5;
 
-        private readonly IssueTemplateOffscreenCircle templateOffscreenCircle;
-        private readonly IssueTemplateOffscreenSlider templateOffscreenSlider;
-        private readonly IssueTemplate[] templates;
-
-        public CheckOffscreenObjects()
-        {
-            templates = new IssueTemplate[]
-            {
-                templateOffscreenCircle = new IssueTemplateOffscreenCircle(this),
-                templateOffscreenSlider = new IssueTemplateOffscreenSlider(this)
-            };
-        }
-
         public CheckMetadata Metadata { get; } = new CheckMetadata(CheckCategory.Compose, "Offscreen hitobjects");
 
-        public IEnumerable<IssueTemplate> PossibleTemplates => templates;
+        public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
+        {
+            new IssueTemplateOffscreenCircle(this),
+            new IssueTemplateOffscreenSlider(this)
+        };
 
         public IEnumerable<Issue> Run(IBeatmap beatmap)
         {
@@ -56,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
                     case HitCircle circle:
                     {
                         if (isOffscreen(circle.StackedPosition, circle.Radius))
-                            yield return templateOffscreenCircle.Create(circle);
+                            yield return new IssueTemplateOffscreenCircle(this).Create(circle);
 
                         break;
                     }
@@ -82,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
 
                 // `SpanDuration` ensures we don't include reverses.
                 double time = slider.StartTime + progress * slider.SpanDuration;
-                yield return templateOffscreenSlider.Create(slider, time);
+                yield return new IssueTemplateOffscreenSlider(this).Create(slider, time);
 
                 yield break;
             }
@@ -91,7 +82,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
             if (!isOffscreen(slider.StackedEndPosition, slider.Radius))
                 yield break;
 
-            yield return templateOffscreenSlider.Create(slider, slider.EndTime);
+            yield return new IssueTemplateOffscreenSlider(this).Create(slider, slider.EndTime);
         }
 
         private bool isOffscreen(Vector2 position, double radius)
