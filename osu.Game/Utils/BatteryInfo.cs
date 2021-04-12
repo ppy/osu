@@ -14,11 +14,5 @@ namespace osu.Game.Utils
         public abstract double ChargeLevel { get; }
 
         public abstract bool IsCharging { get; }
-
-        /// <summary>
-        /// Whether the battery is currently low in charge.
-        /// Returns true if not charging and current charge level is lower than or equal to 25%.
-        /// </summary>
-        public bool IsLowBattery => !IsCharging && ChargeLevel <= 0.25;
     }
 }
