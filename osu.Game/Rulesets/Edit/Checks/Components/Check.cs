@@ -9,25 +9,19 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
     public abstract class Check
     {
         /// <summary>
-        /// Returns the <see cref="CheckMetadata"/> for this check.
-        /// Basically, its information.
+        /// The metadata for this check.
         /// </summary>
-        /// <returns></returns>
         public abstract CheckMetadata Metadata();
 
         /// <summary>
-        /// The templates for issues that this check may use.
-        /// Basically, what issues this check can detect.
+        /// All possible templates for issues that this check may return.
         /// </summary>
-        /// <returns></returns>
         public abstract IEnumerable<IssueTemplate> Templates();
 
         /// <summary>
-        /// Returns zero, one, or several issues detected by this
-        /// check on the given beatmap.
+        /// Runs this check and returns any issues detected for the provided beatmap.
         /// </summary>
         /// <param name="beatmap">The beatmap to run the check on.</param>
-        /// <returns></returns>
         public abstract IEnumerable<Issue> Run(IBeatmap beatmap);
 
         protected Check()
