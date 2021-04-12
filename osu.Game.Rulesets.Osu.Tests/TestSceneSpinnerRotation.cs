@@ -168,13 +168,13 @@ namespace osu.Game.Rulesets.Osu.Tests
             double estimatedSpm = 0;
 
             addSeekStep(1000);
-            AddStep("retrieve spm", () => estimatedSpm = drawableSpinner.SpmCounter.SpinsPerMinute);
+            AddStep("retrieve spm", () => estimatedSpm = drawableSpinner.SpinsPerMinute.Value);
 
             addSeekStep(2000);
-            AddAssert("spm still valid", () => Precision.AlmostEquals(drawableSpinner.SpmCounter.SpinsPerMinute, estimatedSpm, 1.0));
+            AddAssert("spm still valid", () => Precision.AlmostEquals(drawableSpinner.SpinsPerMinute.Value, estimatedSpm, 1.0));
 
             addSeekStep(1000);
-            AddAssert("spm still valid", () => Precision.AlmostEquals(drawableSpinner.SpmCounter.SpinsPerMinute, estimatedSpm, 1.0));
+            AddAssert("spm still valid", () => Precision.AlmostEquals(drawableSpinner.SpinsPerMinute.Value, estimatedSpm, 1.0));
         }
 
         [TestCase(0.5)]
@@ -188,7 +188,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("retrieve spinner state", () =>
             {
                 expectedProgress = drawableSpinner.Progress;
-                expectedSpm = drawableSpinner.SpmCounter.SpinsPerMinute;
+                expectedSpm = drawableSpinner.SpinsPerMinute.Value;
             });
 
             addSeekStep(0);
@@ -197,7 +197,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             addSeekStep(1000);
             AddAssert("progress almost same", () => Precision.AlmostEquals(expectedProgress, drawableSpinner.Progress, 0.05));
-            AddAssert("spm almost same", () => Precision.AlmostEquals(expectedSpm, drawableSpinner.SpmCounter.SpinsPerMinute, 2.0));
+            AddAssert("spm almost same", () => Precision.AlmostEquals(expectedSpm, drawableSpinner.SpinsPerMinute.Value, 2.0));
         }
 
         private Replay applyRateAdjustment(Replay scoreReplay, double rate) => new Replay

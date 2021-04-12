@@ -62,7 +62,6 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Retrieves a mapping of <see cref="HitResult"/>s to their timing windows for all allowed <see cref="HitResult"/>s.
         /// </summary>
-        /// <returns></returns>
         public IEnumerable<(HitResult result, double length)> GetAllAvailableWindows()
         {
             for (var result = HitResult.Meh; result <= HitResult.Perfect; ++result)
