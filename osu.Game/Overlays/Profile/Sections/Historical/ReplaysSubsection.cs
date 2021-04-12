@@ -9,6 +9,8 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 {
     public class ReplaysSubsection : ChartProfileSubsection
     {
+        protected override string GraphCounterName => "Replays Watched";
+
         public ReplaysSubsection(Bindable<User> user)
             : base(user, "Replays Watched History")
         {
