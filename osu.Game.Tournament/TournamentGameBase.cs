@@ -141,7 +141,6 @@ namespace osu.Game.Tournament
         /// <summary>
         /// Add missing player info based on user IDs.
         /// </summary>
-        /// <returns></returns>
         private bool addPlayers()
         {
             bool addedInfo = false;
