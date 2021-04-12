@@ -112,7 +112,7 @@ namespace osu.Game.Screens.Edit.Verify
             },
             new OsuSpriteText
             {
-                Text = issue.Template.Origin.Metadata.Category.ToString(),
+                Text = issue.Check.Metadata.Category.ToString(),
                 Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold),
                 Margin = new MarginPadding(10)
             }
