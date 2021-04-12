@@ -308,17 +308,18 @@ namespace osu.Game
 
             AddInternal(RulesetConfigCache);
 
-            MenuCursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both };
-
             GlobalActionContainer globalBindings;
 
-            MenuCursorContainer.Child = globalBindings = new GlobalActionContainer(this)
+            var mainContent = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Child = content = new OsuTooltipContainer(MenuCursorContainer.Cursor) { RelativeSizeAxes = Axes.Both }
+                MenuCursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both },
+                // to avoid positional input being blocked by children, ensure the GlobalActionContainer is above everything.
+                globalBindings = new GlobalActionContainer(this)
             };
 
-            base.Content.Add(CreateScalingContainer().WithChild(MenuCursorContainer));
+            MenuCursorContainer.Child = content = new OsuTooltipContainer(MenuCursorContainer.Cursor) { RelativeSizeAxes = Axes.Both };
+
+            base.Content.Add(CreateScalingContainer().WithChildren(mainContent));
 
             KeyBindingStore.Register(globalBindings);
             dependencies.Cache(globalBindings);
@@ -429,6 +430,9 @@ namespace osu.Game
 
         public async Task Import(params string[] paths)
         {
+            if (paths.Length == 0)
+                return;
+
             var extension = Path.GetExtension(paths.First())?.ToLowerInvariant();
 
             foreach (var importer in fileImporters)

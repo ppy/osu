@@ -307,7 +307,11 @@ namespace osu.Game.Screens.Select
         protected virtual IEnumerable<(FooterButton, OverlayContainer)> CreateFooterButtons() => new (FooterButton, OverlayContainer)[]
         {
             (new FooterButtonMods { Current = Mods }, ModSelect),
-            (new FooterButtonRandom { Action = triggerRandom }, null),
+            (new FooterButtonRandom
+            {
+                NextRandom = () => Carousel.SelectNextRandom(),
+                PreviousRandom = Carousel.SelectPreviousRandom
+            }, null),
             (new FooterButtonOptions(), BeatmapOptions)
         };
 
@@ -520,14 +524,6 @@ namespace osu.Game.Screens.Select
 
                 updateComponentFromBeatmap(Beatmap.Value);
             }
-        }
-
-        private void triggerRandom()
-        {
-            if (GetContainingInputManager().CurrentState.Keyboard.ShiftPressed)
-                Carousel.SelectPreviousRandom();
-            else
-                Carousel.SelectNextRandom();
         }
 
         public override void OnEntering(IScreen last)

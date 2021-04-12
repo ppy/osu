@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
             if (IsForCurrentRuleset)
             {
-                TargetColumns = (int)Math.Max(1, roundedCircleSize);
+                TargetColumns = GetColumnCountForNonConvert(beatmap.BeatmapInfo);
 
                 if (TargetColumns > ManiaRuleset.MAX_STAGE_KEYS)
                 {
@@ -69,6 +69,12 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             }
 
             originalTargetColumns = TargetColumns;
+        }
+
+        public static int GetColumnCountForNonConvert(BeatmapInfo beatmap)
+        {
+            var roundedCircleSize = Math.Round(beatmap.BaseDifficulty.CircleSize);
+            return (int)Math.Max(1, roundedCircleSize);
         }
 
         public override bool CanConvert() => Beatmap.HitObjects.All(h => h is IHasXPosition);

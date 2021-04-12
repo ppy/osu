@@ -19,8 +19,8 @@ namespace osu.Game.Rulesets.Taiko.Tests
         public void Test(double expected, string name)
             => base.Test(expected, name);
 
-        [TestCase(3.1473940254109078d, "diffcalc-test")]
-        [TestCase(3.1473940254109078d, "diffcalc-test-strong")]
+        [TestCase(3.1704781712282624d, "diffcalc-test")]
+        [TestCase(3.1704781712282624d, "diffcalc-test-strong")]
         public void TestClockRateAdjusted(double expected, string name)
             => Test(expected, name, new TaikoModDoubleTime());
 
