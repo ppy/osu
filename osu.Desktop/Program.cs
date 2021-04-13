@@ -69,7 +69,6 @@ namespace osu.Desktop
         /// Allow a maximum of one unhandled exception, per second of execution.
         /// </summary>
         /// <param name="arg"></param>
-        /// <returns></returns>
         private static bool handleException(Exception arg)
         {
             bool continueExecution = Interlocked.Decrement(ref allowableExceptions) >= 0;
