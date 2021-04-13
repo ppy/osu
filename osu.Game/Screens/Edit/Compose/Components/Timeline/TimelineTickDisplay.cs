@@ -135,6 +135,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         var line = getNextUsableLine();
                         line.X = xPos;
                         line.Width = PointVisualisation.MAX_WIDTH * getWidth(indexInBar, divisor);
+                        line.Height = 0.9f * getHeight(indexInBar, divisor);
                         line.Colour = colour;
                     }
 
@@ -190,6 +191,30 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 default:
                     return 0.3f;
+            }
+        }
+
+        private static float getHeight(int indexInBar, int divisor)
+        {
+            if (indexInBar == 0)
+                return 1;
+
+            switch (divisor)
+            {
+                case 1:
+                case 2:
+                    return 0.9f;
+
+                case 3:
+                case 4:
+                    return 0.8f;
+
+                case 6:
+                case 8:
+                    return 0.7f;
+
+                default:
+                    return 0.6f;
             }
         }
 
