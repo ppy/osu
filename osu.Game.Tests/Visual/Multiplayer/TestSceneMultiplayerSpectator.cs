@@ -199,8 +199,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             // Player 2 should catch up to player 1 after unpausing.
             AddUntilStep("player 2 not catching up", () => !getInstance(56).IsCatchingUp);
-            AddAssert("player 1 time == player 2 time", () => Math.Abs(getGameplayOffset(55, 56)) <= 2 * PlayerInstance.SYNC_TARGET);
-            AddWaitStep("wait a bit", 5);
+            AddWaitStep("wait a bit", 10);
         }
 
         private void loadSpectateScreen()

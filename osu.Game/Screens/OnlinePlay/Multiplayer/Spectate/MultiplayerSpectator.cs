@@ -30,7 +30,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private readonly PlayerInstance[] instances;
         private PlayerGrid grid;
         private MultiplayerSpectatorLeaderboard leaderboard;
-        private double? loadStartTime;
+        private double? loadFinishTime;
 
         public MultiplayerSpectator(int[] userIds)
             : base(userIds.AsSpan().Slice(0, Math.Min(16, userIds.Length)).ToArray())
@@ -76,7 +76,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         {
             base.UpdateAfterChildren();
 
-            loadStartTime ??= Time.Current;
+            if (AllPlayersLoaded)
+                loadFinishTime ??= Time.Current;
 
             updateGameplayPlayingState();
         }
@@ -88,7 +89,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 // All players have frames...
                 instances.All(i => i.Score.Replay.Frames.Count > 0)
                 // Or any player has frames and the maximum start delay has been exceeded.
-                || (Time.Current - loadStartTime > maximum_start_delay
+                || (Time.Current - loadFinishTime > maximum_start_delay
                     && instances.Any(i => i.Score.Replay.Frames.Count > 0))
             );
 
