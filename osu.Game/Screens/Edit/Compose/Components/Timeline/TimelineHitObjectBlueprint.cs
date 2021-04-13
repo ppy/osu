@@ -17,7 +17,6 @@ using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -40,9 +39,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private Bindable<int> indexInCurrentComboBindable;
         private Bindable<int> comboIndexBindable;
 
-        private readonly Container circle;
-        private readonly DragArea dragArea;
-        private readonly List<Container> shadowComponents = new List<Container>();
+        private readonly Drawable circle;
+
         private readonly Container mainComponents;
         private readonly OsuSpriteText comboIndexText;
 
@@ -93,7 +91,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             if (hitObject is IHasDuration)
             {
-                mainComponents.Add(dragArea = new DragArea(hitObject)
+                mainComponents.Add(new DragArea(hitObject)
                 {
                     OnDragHandled = e => OnDragHandled?.Invoke(e)
                 });
@@ -183,8 +181,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         protected override bool ShouldBeConsideredForInput(Drawable child) => true;
 
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => circle.Contains(screenSpacePos);
-
         protected override void OnSelected()
         {
             updateShadows();
@@ -192,33 +188,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private void updateShadows()
         {
-            foreach (var s in shadowComponents)
-            {
-                if (State == SelectionState.Selected)
-                {
-                    s.EdgeEffect = new EdgeEffectParameters
-                    {
-                        Type = EdgeEffectType.Shadow,
-                        Radius = shadow_radius / 2,
-                        Colour = Color4.Orange,
-                    };
-                }
-                else
-                {
-                    s.EdgeEffect = new EdgeEffectParameters
-                    {
-                        Type = EdgeEffectType.Shadow,
-                        Radius = shadow_radius,
-                        Colour = Color4.Black.Opacity(0.4f)
-                    };
-                }
-            }
         }
 
         protected override void OnDeselected()
         {
             updateShadows();
         }
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
+            circle.ReceivePositionalInputAt(screenSpacePos);
 
         public override Quad SelectionQuad => circle.ScreenSpaceDrawQuad;
 
@@ -351,11 +329,19 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         /// <summary>
         /// A circle with externalised end caps so it can take up the full width of a relative width area.
+        /// TODO: figure how to do this with a single circle to avoid pixel-misaligned edges.
         /// </summary>
         public class ExtendableCircle : Container
         {
             private readonly Circle rightCircle;
             private readonly Circle leftCircle;
+
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
+            {
+                return base.ReceivePositionalInputAt(screenSpacePos)
+                       || leftCircle.ReceivePositionalInputAt(screenSpacePos)
+                       || rightCircle.ReceivePositionalInputAt(screenSpacePos);
+            }
 
             public override Quad ScreenSpaceDrawQuad
             {
