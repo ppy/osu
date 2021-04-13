@@ -11,8 +11,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
 {
     public class CheckOffscreenObjects : ICheck
     {
-        // These are close approximates to the edges of the screen
-        // in gameplay on a 4:3 aspect ratio for osu!stable.
+        // A close approximation for the bounding box of the screen in gameplay on 4:3 aspect ratio.
+        // Uses gameplay space coordinates (512 x 384 playfield / 640 x 480 screen area).
+        // See https://github.com/ppy/osu/pull/12361#discussion_r612199777 for reference.
         private const int min_x = -67;
         private const int min_y = -60;
         private const int max_x = 579;
