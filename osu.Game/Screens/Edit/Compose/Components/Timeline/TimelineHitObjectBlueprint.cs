@@ -343,84 +343,31 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// <summary>
         /// A circle with externalised end caps so it can take up the full width of a relative width area.
         /// </summary>
-        public class ExtendableCircle : Container
+        public class ExtendableCircle : CompositeDrawable
         {
-            private readonly Circle rightCircle;
-            private readonly Circle leftCircle;
+            private readonly CircularContainer content;
 
-            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
-            {
-                return base.ReceivePositionalInputAt(screenSpacePos)
-                       || leftCircle.ReceivePositionalInputAt(screenSpacePos)
-                       || rightCircle.ReceivePositionalInputAt(screenSpacePos);
-            }
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => content.ReceivePositionalInputAt(screenSpacePos);
 
-            public override Quad ScreenSpaceDrawQuad
-            {
-                get
-                {
-                    var leftQuad = leftCircle.ScreenSpaceDrawQuad;
-
-                    if (Width == 0)
-                    {
-                        return leftQuad;
-                    }
-
-                    var rightQuad = rightCircle.ScreenSpaceDrawQuad;
-
-                    return new Quad(leftQuad.TopLeft, rightQuad.TopRight, leftQuad.BottomLeft, rightQuad.BottomRight);
-                }
-            }
+            public override Quad ScreenSpaceDrawQuad => content.ScreenSpaceDrawQuad;
 
             public ExtendableCircle()
             {
-                var effect = new EdgeEffectParameters
+                Padding = new MarginPadding { Horizontal = -circle_size / 2f };
+                InternalChild = content = new CircularContainer
                 {
-                    Type = EdgeEffectType.Shadow,
-                    Radius = 5,
-                    Colour = Color4.Black.Opacity(0.4f)
-                };
-
-                // TODO: figure how to do this whole thing with a single circle to avoid pixel-misaligned edges.
-                // just working with what i can make work for the time being..
-                const float fudge = 0.4f;
-
-                InternalChildren = new Drawable[]
-                {
-                    new Container
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    EdgeEffect = new EdgeEffectParameters
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Padding = new MarginPadding { Vertical = fudge },
-                        Masking = true,
-                        AlwaysPresent = true,
-                        EdgeEffect = effect,
+                        Type = EdgeEffectType.Shadow,
+                        Radius = 5,
+                        Colour = Color4.Black.Opacity(0.4f)
                     },
-                    leftCircle = new Circle
+                    Child = new Box
                     {
-                        EdgeEffect = effect,
-                        Origin = Anchor.TopCentre,
-                        Size = new Vector2(circle_size)
-                    },
-                    rightCircle = new Circle
-                    {
-                        EdgeEffect = effect,
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopCentre,
-                        Size = new Vector2(circle_size)
-                    },
-                    new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Vertical = fudge },
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Children = new Drawable[]
-                        {
-                            new Box { RelativeSizeAxes = Axes.Both, }
-                        }
-                    },
+                        RelativeSizeAxes = Axes.Both
+                    }
                 };
             }
         }
