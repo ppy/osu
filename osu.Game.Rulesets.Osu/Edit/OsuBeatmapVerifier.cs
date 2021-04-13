@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Edit.Checks;
 using osu.Game.Rulesets.Edit.Checks.Components;
 using osu.Game.Rulesets.Osu.Edit.Checks;
 
@@ -14,6 +15,10 @@ namespace osu.Game.Rulesets.Osu.Edit
     {
         private readonly List<ICheck> checks = new List<ICheck>
         {
+            // General checks
+            new CheckBackground(),
+
+            // Ruleset-specific checks
             new CheckOffscreenObjects()
         };
 
