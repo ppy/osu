@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         public class IssueTemplateNoneSet : IssueTemplate
         {
             public IssueTemplateNoneSet(ICheck check)
-                : base(check, IssueType.Problem, "No background has been set")
+                : base(check, IssueType.Problem, "No background has been set.")
             {
             }
 
