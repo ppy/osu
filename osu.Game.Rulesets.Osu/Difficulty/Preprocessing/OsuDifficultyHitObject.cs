@@ -16,6 +16,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         protected new OsuHitObject BaseObject => (OsuHitObject)base.BaseObject;
 
+        public double FlowProbability { get; private set; }
+        public double SnapProbability => 1.0 - FlowProbability;
+
+        public Vector2 DistanceVector { get; private set; }
         /// <summary>
         /// Normalized distance from the end position of the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
@@ -47,9 +51,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             this.lastObject = (OsuHitObject)lastObject;
 
             setDistances();
+            calculateFlowProbability();
 
             // Every strain interval is hard capped at the equivalent of 375 BPM streaming speed as a safety measure
             StrainTime = Math.Max(50, DeltaTime);
+        }
+        private void calculateFlowProbability()
+        {
+            double deltaTime = DeltaTime;
+            double distance = JumpDistance;
+            double angle = Angle != null ? Angle.Value : 0;
+
+            angle = Math.Clamp(angle, Math.PI / 6, Math.PI / 2);
+            double angleOffset = 10.0 * Math.Sin(1.5 * (Math.PI / 2 - angle));
+
+            double distanceOffset = Math.Pow(distance, 1.7) / 325;
+            FlowProbability = 1.0 / (1.0 + Math.Pow(Math.E, deltaTime - 126.0 + distanceOffset + angleOffset));
         }
 
         private void setDistances()
@@ -73,7 +90,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             // Don't need to jump to reach spinners
             if (!(BaseObject is Spinner))
-                JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
+            {
+                DistanceVector = BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor;
+                JumpDistance = DistanceVector.Length;
+            }
 
             if (lastLastObject != null)
             {

@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuDifficultyCalculator : DifficultyCalculator
     {
-        private const double difficulty_multiplier = 0.0675;
+        private const double difficulty_multiplier = 0.18;
 
         public OsuDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -32,8 +32,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (beatmap.HitObjects.Count == 0)
                 return new OsuDifficultyAttributes { Mods = mods, Skills = skills };
 
-            double aimRating = Math.Sqrt(skills[0].DifficultyValue()) * difficulty_multiplier;
-            double speedRating = Math.Sqrt(skills[1].DifficultyValue()) * difficulty_multiplier;
+            double aimRating = Math.Sqrt(skills[3].DifficultyValue()) * difficulty_multiplier;
+            double speedRating = Math.Sqrt(skills[2].DifficultyValue()) * difficulty_multiplier;
             double starRating = aimRating + speedRating + Math.Abs(aimRating - speedRating) / 2;
 
             HitWindows hitWindows = new OsuHitWindows();
@@ -79,12 +79,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
         }
 
-        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods) => new Skill[]
-        {
-            new Aim(mods),
-            new Speed(mods)
-        };
+        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods) {
 
+            Skill[] skills = new Skill[]
+            {
+                new Speed(mods),
+                new Stamina(mods),
+                new Tapping(mods),
+                new Aim(mods)
+            };
+
+            (skills[3] as Aim).SetTappingSkill(skills[2] as Tapping);
+            (skills[2] as Tapping).SetStrainSkills(skills[0] as Speed, skills[1] as Stamina);
+
+            return skills;
+        }
         protected override Mod[] DifficultyAdjustmentMods => new Mod[]
         {
             new OsuModDoubleTime(),
