@@ -123,5 +123,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             player.GameplayClockContainer.Stop();
         }
+
+        // Player interferes with global input, so disable input for now.
+        public override bool PropagatePositionalInputSubTree => false;
+        public override bool PropagateNonPositionalInputSubTree => false;
     }
 }
