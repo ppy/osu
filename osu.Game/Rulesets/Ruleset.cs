@@ -146,7 +146,6 @@ namespace osu.Game.Rulesets
         /// <param name="beatmap">The beatmap to create the hit renderer for.</param>
         /// <param name="mods">The <see cref="Mod"/>s to apply.</param>
         /// <exception cref="BeatmapInvalidForRulesetException">Unable to successfully load the beatmap to be usable with this ruleset.</exception>
-        /// <returns></returns>
         public abstract DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null);
 
         /// <summary>
