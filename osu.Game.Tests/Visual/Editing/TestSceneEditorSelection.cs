@@ -27,6 +27,97 @@ namespace osu.Game.Tests.Visual.Editing
         private BlueprintContainer blueprintContainer
             => Editor.ChildrenOfType<BlueprintContainer>().First();
 
+        private void moveMouseToObject(HitObject obj)
+        {
+            AddStep("move mouse to object", () =>
+            {
+                var pos = blueprintContainer.SelectionBlueprints
+                                            .First(s => s.HitObject == obj)
+                                            .ChildrenOfType<HitCirclePiece>()
+                                            .First().ScreenSpaceDrawQuad.Centre;
+
+                InputManager.MoveMouseTo(pos);
+            });
+        }
+
+        [Test]
+        public void TestBasicSelect()
+        {
+            var addedObject = new HitCircle { StartTime = 100 };
+            AddStep("add hitobject", () => EditorBeatmap.Add(addedObject));
+
+            moveMouseToObject(addedObject);
+            AddStep("left click", () => InputManager.Click(MouseButton.Left));
+
+            AddAssert("hitobject selected", () => EditorBeatmap.SelectedHitObjects.Single() == addedObject);
+
+            var addedObject2 = new HitCircle
+            {
+                StartTime = 100,
+                Position = new Vector2(100),
+            };
+
+            AddStep("add one more hitobject", () => EditorBeatmap.Add(addedObject2));
+            AddAssert("selection unchanged", () => EditorBeatmap.SelectedHitObjects.Single() == addedObject);
+
+            moveMouseToObject(addedObject2);
+            AddStep("left click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("hitobject selected", () => EditorBeatmap.SelectedHitObjects.Single() == addedObject2);
+        }
+
+        [Test]
+        public void TestMultiSelect()
+        {
+            var addedObjects = new[]
+            {
+                new HitCircle { StartTime = 100 },
+                new HitCircle { StartTime = 200, Position = new Vector2(50) },
+                new HitCircle { StartTime = 300, Position = new Vector2(100) },
+                new HitCircle { StartTime = 400, Position = new Vector2(150) },
+            };
+
+            AddStep("add hitobjects", () => EditorBeatmap.AddRange(addedObjects));
+
+            moveMouseToObject(addedObjects[0]);
+            AddStep("click first", () => InputManager.Click(MouseButton.Left));
+
+            AddAssert("hitobject selected", () => EditorBeatmap.SelectedHitObjects.Single() == addedObjects[0]);
+
+            AddStep("hold control", () => InputManager.PressKey(Key.ControlLeft));
+
+            moveMouseToObject(addedObjects[1]);
+            AddStep("click second", () => InputManager.Click(MouseButton.Left));
+            AddAssert("2 hitobjects selected", () => EditorBeatmap.SelectedHitObjects.Count == 2 && EditorBeatmap.SelectedHitObjects.Contains(addedObjects[1]));
+
+            moveMouseToObject(addedObjects[2]);
+            AddStep("click third", () => InputManager.Click(MouseButton.Left));
+            AddAssert("3 hitobjects selected", () => EditorBeatmap.SelectedHitObjects.Count == 3 && EditorBeatmap.SelectedHitObjects.Contains(addedObjects[2]));
+
+            moveMouseToObject(addedObjects[1]);
+            AddStep("click second", () => InputManager.Click(MouseButton.Left));
+            AddAssert("2 hitobjects selected", () => EditorBeatmap.SelectedHitObjects.Count == 2 && !EditorBeatmap.SelectedHitObjects.Contains(addedObjects[1]));
+        }
+
+        [Test]
+        public void TestBasicDeselect()
+        {
+            var addedObject = new HitCircle { StartTime = 100 };
+            AddStep("add hitobject", () => EditorBeatmap.Add(addedObject));
+
+            moveMouseToObject(addedObject);
+            AddStep("left click", () => InputManager.Click(MouseButton.Left));
+
+            AddAssert("hitobject selected", () => EditorBeatmap.SelectedHitObjects.Single() == addedObject);
+
+            AddStep("click away", () =>
+            {
+                InputManager.MoveMouseTo(blueprintContainer.ScreenSpaceDrawQuad.Centre);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("selection lost", () => EditorBeatmap.SelectedHitObjects.Count == 0);
+        }
+
         [Test]
         public void TestQuickDeleteRemovesObject()
         {
@@ -36,11 +127,8 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("select added object", () => EditorBeatmap.SelectedHitObjects.Add(addedObject));
 
-            AddStep("move mouse to object", () =>
-            {
-                var pos = blueprintContainer.ChildrenOfType<HitCirclePiece>().First().ScreenSpaceDrawQuad.Centre;
-                InputManager.MoveMouseTo(pos);
-            });
+            moveMouseToObject(addedObject);
+
             AddStep("hold shift", () => InputManager.PressKey(Key.ShiftLeft));
             AddStep("right click", () => InputManager.Click(MouseButton.Right));
             AddStep("release shift", () => InputManager.ReleaseKey(Key.ShiftLeft));
