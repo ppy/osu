@@ -420,6 +420,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 && ParentScreen.IsCurrentScreen())
             {
                 PushTopLevelScreen(() => new MultiplayerSpectator(client.CurrentMatchPlayingUserIds.ToArray()));
+
+                // If the current user was host, they started the match and the in-progres operation needs to be stopped now.
+                readyClickOperation?.Dispose();
+                readyClickOperation = null;
             }
         });
 
