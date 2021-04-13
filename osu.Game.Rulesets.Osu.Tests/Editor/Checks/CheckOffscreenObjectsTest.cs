@@ -246,18 +246,24 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
             assertOffscreenSlider(beatmap);
         }
 
-        private void assertOneIssue(IBeatmap beatmap, int templateIndex)
+        private void assertOffscreenCircle(IBeatmap beatmap)
         {
             var issues = check.Run(beatmap).ToList();
             var issue = issues.FirstOrDefault();
 
             Assert.That(issues.Count == 1);
             Assert.That(issue != null);
-            Assert.That(issue.Template.Equals(check.PossibleTemplates.ElementAt(templateIndex)));
+            Assert.That(issue.Template is CheckOffscreenObjects.IssueTemplateOffscreenCircle);
         }
 
-        private void assertOffscreenCircle(IBeatmap beatmap) => assertOneIssue(beatmap, 0);
+        private void assertOffscreenSlider(IBeatmap beatmap)
+        {
+            var issues = check.Run(beatmap).ToList();
+            var issue = issues.FirstOrDefault();
 
-        private void assertOffscreenSlider(IBeatmap beatmap) => assertOneIssue(beatmap, 1);
+            Assert.That(issues.Count == 1);
+            Assert.That(issue != null);
+            Assert.That(issue.Template is CheckOffscreenObjects.IssueTemplateOffscreenSlider);
+        }
     }
 }

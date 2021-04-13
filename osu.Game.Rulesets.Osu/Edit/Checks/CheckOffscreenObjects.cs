@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
                    position.Y - radius < min_y || position.Y + radius > max_y;
         }
 
-        private class IssueTemplateOffscreenCircle : IssueTemplate
+        public class IssueTemplateOffscreenCircle : IssueTemplate
         {
             public IssueTemplateOffscreenCircle(ICheck check)
                 : base(check, IssueType.Problem, "This circle goes offscreen on a 4:3 aspect ratio.")
@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
             public Issue Create(HitCircle circle) => new Issue(circle, this);
         }
 
-        private class IssueTemplateOffscreenSlider : IssueTemplate
+        public class IssueTemplateOffscreenSlider : IssueTemplate
         {
             public IssueTemplateOffscreenSlider(ICheck check)
                 : base(check, IssueType.Problem, "This slider goes offscreen here on a 4:3 aspect ratio.")
