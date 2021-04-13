@@ -45,6 +45,8 @@ namespace osu.Game.Screens.Play
         public override bool HandleNonPositionalInput => AllowSeeking.Value;
         public override bool HandlePositionalInput => AllowSeeking.Value;
 
+        protected override bool BlockScrollInput => false;
+
         private double firstHitTime => objects.First().StartTime;
 
         private IEnumerable<HitObject> objects;
