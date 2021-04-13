@@ -135,7 +135,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            bool selectionPerformed = beginClickSelection(e);
+            bool selectionPerformed = performMouseDownActions(e);
 
             // even if a selection didn't occur, a drag event may still move the selection.
             prepareSelectionMovement();
@@ -343,7 +343,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         /// <param name="e">The input event that triggered this selection.</param>
         /// <returns>Whether a selection was performed.</returns>
-        private bool beginClickSelection(MouseButtonEvent e)
+        private bool performMouseDownActions(MouseButtonEvent e)
         {
             // Iterate from the top of the input stack (blueprints closest to the front of the screen first).
             // Priority is given to already-selected blueprints.
@@ -351,7 +351,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 if (!blueprint.IsHovered) continue;
 
-                return clickSelectionBegan = SelectionHandler.HandleSelectionRequested(blueprint, e);
+                return clickSelectionBegan = SelectionHandler.MouseDownSelectionRequested(blueprint, e);
             }
 
             return false;
@@ -375,7 +375,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     {
                         if (!blueprint.IsHovered) continue;
 
-                        return clickSelectionBegan = SelectionHandler.HandleDeselectionRequested(blueprint, e);
+                        return clickSelectionBegan = SelectionHandler.MouseUpSelectionRequested(blueprint, e);
                     }
                 }
 

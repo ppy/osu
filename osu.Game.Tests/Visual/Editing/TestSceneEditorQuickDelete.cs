@@ -83,8 +83,9 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("right click", () => InputManager.Click(MouseButton.Right));
             AddAssert("slider has 2 points", () => slider.Path.ControlPoints.Count == 2);
 
-            // second click should nuke the object completely.
             AddStep("right click", () => InputManager.Click(MouseButton.Right));
+
+            // second click should nuke the object completely.
             AddAssert("no hitobjects in beatmap", () => EditorBeatmap.HitObjects.Count == 0);
 
             AddStep("release shift", () => InputManager.ReleaseKey(Key.ShiftLeft));
