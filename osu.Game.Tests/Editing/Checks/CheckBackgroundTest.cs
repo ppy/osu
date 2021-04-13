@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Editing.Checks
                     Metadata = new BeatmapMetadata { BackgroundFile = "abc123.jpg" },
                     BeatmapSet = new BeatmapSetInfo
                     {
-                        Files = new List<BeatmapSetFileInfo>(new []
+                        Files = new List<BeatmapSetFileInfo>(new[]
                         {
                             new BeatmapSetFileInfo { Filename = "abc123.jpg" }
                         })
