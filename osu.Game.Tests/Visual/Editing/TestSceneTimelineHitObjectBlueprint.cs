@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Visual.Editing
                 EditorBeatmap.Add(new Spinner
                 {
                     Position = new Vector2(256, 256),
-                    StartTime = 150,
+                    StartTime = 2700,
                     Duration = 500
                 });
             });
