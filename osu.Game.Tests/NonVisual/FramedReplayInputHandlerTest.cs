@@ -84,11 +84,11 @@ namespace osu.Game.Tests.NonVisual
             // exited important section
             setTime(8200, 8000);
             confirmCurrentFrame(7);
-            confirmNextFrame(7);
+            confirmNextFrame(null);
 
             setTime(8200, 8200);
             confirmCurrentFrame(7);
-            confirmNextFrame(7);
+            confirmNextFrame(null);
         }
 
         [Test]
@@ -97,11 +97,11 @@ namespace osu.Game.Tests.NonVisual
             setReplayFrames();
 
             setTime(-1000, -1000);
-            confirmCurrentFrame(0);
+            confirmCurrentFrame(null);
             confirmNextFrame(0);
 
             setTime(-500, -500);
-            confirmCurrentFrame(0);
+            confirmCurrentFrame(null);
             confirmNextFrame(0);
 
             setTime(0, 0);
@@ -145,7 +145,7 @@ namespace osu.Game.Tests.NonVisual
             confirmNextFrame(1);
 
             setTime(-500, -500);
-            confirmCurrentFrame(0);
+            confirmCurrentFrame(null);
             confirmNextFrame(0);
         }
 
@@ -231,7 +231,7 @@ namespace osu.Game.Tests.NonVisual
             Assert.IsFalse(handler.WaitingForFrame, "Should not be waiting yet");
             setTime(1000, 1000);
             confirmCurrentFrame(1);
-            confirmNextFrame(1);
+            confirmNextFrame(null);
             Assert.IsTrue(handler.WaitingForFrame, "Should be waiting");
 
             // cannot seek beyond the last frame
@@ -243,7 +243,7 @@ namespace osu.Game.Tests.NonVisual
 
             // can seek to the point before the first frame, however
             setTime(-100, -100);
-            confirmCurrentFrame(0);
+            confirmCurrentFrame(null);
             confirmNextFrame(0);
 
             fastForwardToPoint(1000);
@@ -311,14 +311,14 @@ namespace osu.Game.Tests.NonVisual
             Assert.AreEqual(expect, handler.SetFrameFromTime(set), "Unexpected return value");
         }
 
-        private void confirmCurrentFrame(int frame)
+        private void confirmCurrentFrame(int? frame)
         {
-            Assert.AreEqual(replay.Frames[frame].Time, handler.CurrentFrame.Time, "Unexpected current frame");
+            Assert.AreEqual(frame is int x ? replay.Frames[x].Time : (double?)null, handler.CurrentFrame?.Time, "Unexpected current frame");
         }
 
-        private void confirmNextFrame(int frame)
+        private void confirmNextFrame(int? frame)
         {
-            Assert.AreEqual(replay.Frames[frame].Time, handler.NextFrame.Time, "Unexpected next frame");
+            Assert.AreEqual(frame is int x ? replay.Frames[x].Time : (double?)null, handler.NextFrame?.Time, "Unexpected next frame");
         }
 
         private class TestReplayFrame : ReplayFrame
