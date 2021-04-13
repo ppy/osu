@@ -220,12 +220,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="blueprint">The blueprint.</param>
         /// <param name="e">The mouse event responsible for selection.</param>
         /// <returns>Whether a selection was performed.</returns>
-        internal bool HandleSelectionRequested(SelectionBlueprint blueprint, MouseButtonEvent e)
+        internal bool MouseDownSelectionRequested(SelectionBlueprint blueprint, MouseButtonEvent e)
         {
             if (e.ShiftPressed && e.Button == MouseButton.Right)
             {
                 handleQuickDeletion(blueprint);
-                return false;
+                return true;
             }
 
             // while holding control, we only want to add to selection, not replace an existing selection.
@@ -244,7 +244,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="blueprint">The blueprint.</param>
         /// <param name="e">The mouse event responsible for deselection.</param>
         /// <returns>Whether a deselection was performed.</returns>
-        internal bool HandleDeselectionRequested(SelectionBlueprint blueprint, MouseButtonEvent e)
+        internal bool MouseUpSelectionRequested(SelectionBlueprint blueprint, MouseButtonEvent e)
         {
             if (blueprint.IsSelected)
             {
