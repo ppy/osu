@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Edit.Checks;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.UI;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
@@ -16,6 +17,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
     [TestFixture]
     public class CheckOffscreenObjectsTest
     {
+        private static readonly Vector2 playfield_centre = OsuPlayfield.BASE_SIZE * 0.5f;
+
         private CheckOffscreenObjects check;
 
         [SetUp]
@@ -34,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                     new HitCircle
                     {
                         StartTime = 3000,
-                        Position = new Vector2(320, 240) // Playfield is 640 x 480.
+                        Position = playfield_centre // Playfield is 640 x 480.
                     }
                 }
             };
@@ -136,11 +139,11 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                     new Slider
                     {
                         StartTime = 3000,
-                        Position = new Vector2(320, 240),
+                        Position = playfield_centre,
                         Path = new SliderPath(new[]
                         {
                             new PathControlPoint(new Vector2(0, 0), PathType.Linear),
-                            new PathControlPoint(new Vector2(0, -235))
+                            new PathControlPoint(new Vector2(0, -playfield_centre.Y + 5))
                         }),
                     }
                 }
@@ -161,11 +164,11 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                     new Slider
                     {
                         StartTime = 3000,
-                        Position = new Vector2(320, 240),
+                        Position = playfield_centre,
                         Path = new SliderPath(new[]
                         {
                             new PathControlPoint(new Vector2(0, 0), PathType.Linear),
-                            new PathControlPoint(new Vector2(0, -235))
+                            new PathControlPoint(new Vector2(0, -playfield_centre.Y + 5))
                         }),
                         StackHeight = 5
                     }
@@ -189,7 +192,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                         Path = new SliderPath(new[]
                         {
                             new PathControlPoint(new Vector2(0, 0), PathType.Linear),
-                            new PathControlPoint(new Vector2(320, 240))
+                            new PathControlPoint(playfield_centre)
                         }),
                     }
                 }
@@ -208,11 +211,11 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                     new Slider
                     {
                         StartTime = 3000,
-                        Position = new Vector2(320, 240),
+                        Position = playfield_centre,
                         Path = new SliderPath(new[]
                         {
                             new PathControlPoint(new Vector2(0, 0), PathType.Linear),
-                            new PathControlPoint(new Vector2(-320, -240))
+                            new PathControlPoint(-playfield_centre)
                         }),
                     }
                 }
@@ -231,7 +234,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                     new Slider
                     {
                         StartTime = 3000,
-                        Position = new Vector2(320, 240),
+                        Position = playfield_centre,
                         Path = new SliderPath(new[]
                         {
                             // Circular arc shoots over the top of the screen.
