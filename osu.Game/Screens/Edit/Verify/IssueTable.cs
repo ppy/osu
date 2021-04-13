@@ -8,14 +8,10 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Events;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Edit.Checks.Components;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Verify
 {
@@ -23,6 +19,15 @@ namespace osu.Game.Screens.Edit.Verify
     {
         [Resolved]
         private Bindable<Issue> selectedIssue { get; set; }
+
+        [Resolved]
+        private EditorClock clock { get; set; }
+
+        [Resolved]
+        private EditorBeatmap editorBeatmap { get; set; }
+
+        [Resolved]
+        private Editor editor { get; set; }
 
         public IEnumerable<Issue> Issues
         {
@@ -36,12 +41,40 @@ namespace osu.Game.Screens.Edit.Verify
 
                 foreach (var issue in value)
                 {
-                    BackgroundFlow.Add(new RowBackground(issue));
+                    BackgroundFlow.Add(new RowBackground(issue)
+                    {
+                        Action = () =>
+                        {
+                            selectedIssue.Value = issue;
+
+                            if (issue.Time != null)
+                            {
+                                clock.Seek(issue.Time.Value);
+                                editor.OnPressed(GlobalAction.EditorComposeMode);
+                            }
+
+                            if (!issue.HitObjects.Any())
+                                return;
+
+                            editorBeatmap.SelectedHitObjects.Clear();
+                            editorBeatmap.SelectedHitObjects.AddRange(issue.HitObjects);
+                        },
+                    });
                 }
 
                 Columns = createHeaders();
                 Content = value.Select((g, i) => createContent(i, g)).ToArray().ToRectangular();
             }
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            selectedIssue.BindValueChanged(issue =>
+            {
+                foreach (var b in BackgroundFlow) b.Selected = b.Item == issue.NewValue;
+            }, true);
         }
 
         private TableColumn[] createHeaders()
@@ -91,116 +124,5 @@ namespace osu.Game.Screens.Edit.Verify
                 Margin = new MarginPadding(10)
             }
         };
-
-        public class RowBackground : OsuClickableContainer
-        {
-            private readonly Issue issue;
-            private const int fade_duration = 100;
-
-            private readonly Box hoveredBackground;
-
-            [Resolved]
-            private EditorClock clock { get; set; }
-
-            [Resolved]
-            private Editor editor { get; set; }
-
-            [Resolved]
-            private EditorBeatmap editorBeatmap { get; set; }
-
-            [Resolved]
-            private Bindable<Issue> selectedIssue { get; set; }
-
-            public RowBackground(Issue issue)
-            {
-                this.issue = issue;
-
-                RelativeSizeAxes = Axes.X;
-                Height = ROW_HEIGHT;
-                AlwaysPresent = true;
-                CornerRadius = 3;
-                Masking = true;
-
-                Children = new Drawable[]
-                {
-                    hoveredBackground = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Alpha = 0,
-                    },
-                };
-
-                Action = () =>
-                {
-                    selectedIssue.Value = issue;
-
-                    if (issue.Time != null)
-                    {
-                        clock.Seek(issue.Time.Value);
-                        editor.OnPressed(GlobalAction.EditorComposeMode);
-                    }
-
-                    if (!issue.HitObjects.Any())
-                        return;
-
-                    editorBeatmap.SelectedHitObjects.Clear();
-                    editorBeatmap.SelectedHitObjects.AddRange(issue.HitObjects);
-                };
-            }
-
-            private Color4 colourHover;
-            private Color4 colourSelected;
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                hoveredBackground.Colour = colourHover = colours.BlueDarker;
-                colourSelected = colours.YellowDarker;
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                selectedIssue.BindValueChanged(change => { Selected = issue == change.NewValue; }, true);
-            }
-
-            private bool selected;
-
-            protected bool Selected
-            {
-                get => selected;
-                set
-                {
-                    if (value == selected)
-                        return;
-
-                    selected = value;
-                    updateState();
-                }
-            }
-
-            protected override bool OnHover(HoverEvent e)
-            {
-                updateState();
-                return base.OnHover(e);
-            }
-
-            protected override void OnHoverLost(HoverLostEvent e)
-            {
-                updateState();
-                base.OnHoverLost(e);
-            }
-
-            private void updateState()
-            {
-                hoveredBackground.FadeColour(selected ? colourSelected : colourHover, 450, Easing.OutQuint);
-
-                if (selected || IsHovered)
-                    hoveredBackground.FadeIn(fade_duration, Easing.OutQuint);
-                else
-                    hoveredBackground.FadeOut(fade_duration, Easing.OutQuint);
-            }
-        }
     }
 }
