@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestDisallowZeroDurationObjects()
         {
-            DragBar dragBar;
+            DragArea dragArea;
 
             AddStep("add spinner", () =>
             {
@@ -37,8 +37,8 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("hold down drag bar", () =>
             {
                 // distinguishes between the actual drag bar and its "underlay shadow".
-                dragBar = this.ChildrenOfType<DragBar>().Single(bar => bar.HandlePositionalInput);
-                InputManager.MoveMouseTo(dragBar);
+                dragArea = this.ChildrenOfType<DragArea>().Single(bar => bar.HandlePositionalInput);
+                InputManager.MoveMouseTo(dragArea);
                 InputManager.PressButton(MouseButton.Left);
             });
 

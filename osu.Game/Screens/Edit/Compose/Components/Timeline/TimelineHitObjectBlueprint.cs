@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -28,9 +29,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     public class TimelineHitObjectBlueprint : SelectionBlueprint
     {
-        private const float thickness = 5;
         private const float shadow_radius = 5;
-        private const float circle_size = 34;
+        private const float circle_size = 38;
 
         public Action<DragEvent> OnDragHandled;
 
@@ -40,8 +40,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private Bindable<int> indexInCurrentComboBindable;
         private Bindable<int> comboIndexBindable;
 
-        private readonly Circle circle;
-        private readonly DragBar dragBar;
+        private readonly Container circle;
+        private readonly DragArea dragArea;
         private readonly List<Container> shadowComponents = new List<Container>();
         private readonly Container mainComponents;
         private readonly OsuSpriteText comboIndexText;
@@ -76,71 +76,27 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.Centre,
-                    Font = OsuFont.Numeric.With(size: circle_size / 2, weight: FontWeight.Black),
+                    Y = -1,
+                    Font = OsuFont.Default.With(size: circle_size * 0.5f, weight: FontWeight.Regular),
                 },
             });
 
-            circle = new Circle
+            circle = new ExtendableCircle
             {
-                Size = new Vector2(circle_size),
+                RelativeSizeAxes = Axes.X,
+                Size = new Vector2(1, circle_size),
                 Anchor = Anchor.CentreLeft,
-                Origin = Anchor.Centre,
-                EdgeEffect = new EdgeEffectParameters
-                {
-                    Type = EdgeEffectType.Shadow,
-                    Radius = shadow_radius,
-                    Colour = Color4.Black
-                },
+                Origin = Anchor.CentreLeft,
             };
 
-            shadowComponents.Add(circle);
+            mainComponents.Add(circle);
 
             if (hitObject is IHasDuration)
             {
-                DragBar dragBarUnderlay;
-                Container extensionBar;
-
-                mainComponents.AddRange(new Drawable[]
+                mainComponents.Add(dragArea = new DragArea(hitObject)
                 {
-                    extensionBar = new Container
-                    {
-                        Masking = true,
-                        Size = new Vector2(1, thickness),
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        RelativePositionAxes = Axes.X,
-                        RelativeSizeAxes = Axes.X,
-                        EdgeEffect = new EdgeEffectParameters
-                        {
-                            Type = EdgeEffectType.Shadow,
-                            Radius = shadow_radius,
-                            Colour = Color4.Black
-                        },
-                        Child = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                        }
-                    },
-                    circle,
-                    // only used for drawing the shadow
-                    dragBarUnderlay = new DragBar(null),
-                    // cover up the shadow on the join
-                    new Box
-                    {
-                        Height = thickness,
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        RelativeSizeAxes = Axes.X,
-                    },
-                    dragBar = new DragBar(hitObject) { OnDragHandled = e => OnDragHandled?.Invoke(e) },
+                    OnDragHandled = e => OnDragHandled?.Invoke(e)
                 });
-
-                shadowComponents.Add(dragBarUnderlay);
-                shadowComponents.Add(extensionBar);
-            }
-            else
-            {
-                mainComponents.Add(circle);
             }
 
             updateShadows();
@@ -173,7 +129,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             var comboColour = combo.GetComboColour(comboColours);
 
             if (HitObject is IHasDuration)
-                mainComponents.Colour = ColourInfo.GradientHorizontal(comboColour, Color4.White);
+                mainComponents.Colour = ColourInfo.GradientHorizontal(comboColour, comboColour.Lighten(0.4f));
             else
                 mainComponents.Colour = comboColour;
 
@@ -227,10 +183,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         protected override bool ShouldBeConsideredForInput(Drawable child) => true;
 
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
-            base.ReceivePositionalInputAt(screenSpacePos) ||
-            circle.ReceivePositionalInputAt(screenSpacePos) ||
-            dragBar?.ReceivePositionalInputAt(screenSpacePos) == true;
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => circle.Contains(screenSpacePos);
 
         protected override void OnSelected()
         {
@@ -256,7 +209,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     {
                         Type = EdgeEffectType.Shadow,
                         Radius = shadow_radius,
-                        Colour = State == SelectionState.Selected ? Color4.Orange : Color4.Black
+                        Colour = Color4.Black.Opacity(0.4f)
                     };
                 }
             }
@@ -267,22 +220,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             updateShadows();
         }
 
-        public override Quad SelectionQuad
-        {
-            get
-            {
-                // correctly include the circle in the selection quad region, as it is usually outside the blueprint itself.
-                var leftQuad = circle.ScreenSpaceDrawQuad;
-                var rightQuad = dragBar?.ScreenSpaceDrawQuad ?? ScreenSpaceDrawQuad;
-
-                return new Quad(leftQuad.TopLeft, Vector2.ComponentMax(rightQuad.TopRight, leftQuad.TopRight),
-                    leftQuad.BottomLeft, Vector2.ComponentMax(rightQuad.BottomRight, leftQuad.BottomRight));
-            }
-        }
+        public override Quad SelectionQuad => circle.ScreenSpaceDrawQuad;
 
         public override Vector2 ScreenSpaceSelectionPoint => ScreenSpaceDrawQuad.TopLeft;
 
-        public class DragBar : Container
+        public class DragArea : Container
         {
             private readonly HitObject hitObject;
 
@@ -293,13 +235,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             public override bool HandlePositionalInput => hitObject != null;
 
-            public DragBar(HitObject hitObject)
+            public DragArea(HitObject hitObject)
             {
                 this.hitObject = hitObject;
 
-                CornerRadius = 2;
+                CornerRadius = circle_size / 2;
                 Masking = true;
-                Size = new Vector2(5, 1);
+                Size = new Vector2(circle_size, 1);
                 Anchor = Anchor.CentreRight;
                 Origin = Anchor.Centre;
                 RelativePositionAxes = Axes.X;
@@ -404,6 +346,72 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 OnDragHandled?.Invoke(null);
                 changeHandler?.EndChange();
+            }
+        }
+
+        /// <summary>
+        /// A circle with externalised end caps so it can take up the full width of a relative width area.
+        /// </summary>
+        public class ExtendableCircle : Container
+        {
+            private readonly Circle rightCircle;
+            private readonly Circle leftCircle;
+
+            public override Quad ScreenSpaceDrawQuad
+            {
+                get
+                {
+                    var leftQuad = leftCircle.ScreenSpaceDrawQuad;
+
+                    if (Width == 0)
+                    {
+                        return leftQuad;
+                    }
+
+                    var rightQuad = rightCircle.ScreenSpaceDrawQuad;
+
+                    return new Quad(leftQuad.TopLeft, rightQuad.TopRight, leftQuad.BottomLeft, rightQuad.BottomRight);
+                }
+            }
+
+            public ExtendableCircle()
+            {
+                var effect = new EdgeEffectParameters
+                {
+                    Type = EdgeEffectType.Shadow,
+                    Radius = shadow_radius,
+                    Colour = Color4.Black.Opacity(0.4f)
+                };
+
+                InternalChildren = new Drawable[]
+                {
+                    new Container
+                    {
+                        Height = circle_size,
+                        RelativeSizeAxes = Axes.X,
+                        Masking = true,
+                        AlwaysPresent = true,
+                        EdgeEffect = effect,
+                    },
+                    leftCircle = new Circle
+                    {
+                        EdgeEffect = effect,
+                        Origin = Anchor.TopCentre,
+                        Size = new Vector2(circle_size)
+                    },
+                    rightCircle = new Circle
+                    {
+                        EdgeEffect = effect,
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopCentre,
+                        Size = new Vector2(circle_size)
+                    },
+                    new Box
+                    {
+                        Height = circle_size,
+                        RelativeSizeAxes = Axes.X,
+                    },
+                };
             }
         }
     }
