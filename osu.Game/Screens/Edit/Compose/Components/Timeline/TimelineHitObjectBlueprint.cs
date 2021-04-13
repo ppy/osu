@@ -28,7 +28,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     public class TimelineHitObjectBlueprint : SelectionBlueprint
     {
-        private const float shadow_radius = 5;
         private const float circle_size = 38;
 
         private Container repeatsContainer;
@@ -96,8 +95,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     OnDragHandled = e => OnDragHandled?.Invoke(e)
                 });
             }
-
-            updateShadows();
         }
 
         protected override void LoadComplete()
@@ -114,6 +111,16 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 skin.SourceChanged += updateComboColour;
             }
+        }
+
+        protected override void OnSelected()
+        {
+            // base logic hides selected blueprints when not selected, but timeline doesn't do that.
+        }
+
+        protected override void OnDeselected()
+        {
+            // base logic hides selected blueprints when not selected, but timeline doesn't do that.
         }
 
         private void updateComboIndex() => comboIndexText.Text = (indexInCurrentComboBindable.Value + 1).ToString();
@@ -179,20 +186,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         }
 
         protected override bool ShouldBeConsideredForInput(Drawable child) => true;
-
-        protected override void OnSelected()
-        {
-            updateShadows();
-        }
-
-        private void updateShadows()
-        {
-        }
-
-        protected override void OnDeselected()
-        {
-            updateShadows();
-        }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
             circle.ReceivePositionalInputAt(screenSpacePos);
@@ -384,7 +377,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 var effect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Shadow,
-                    Radius = shadow_radius,
+                    Radius = 5,
                     Colour = Color4.Black.Opacity(0.4f)
                 };
 
