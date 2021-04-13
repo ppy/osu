@@ -16,7 +16,12 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// <see cref="DifficultyHitObject"/>s that were processed previously. They can affect the strain values of the following objects.
         /// </summary>
-        protected readonly LimitedCapacityStack<DifficultyHitObject> Previous = new LimitedCapacityStack<DifficultyHitObject>(2); // Contained objects not used yet
+        protected readonly ReverseQueue<DifficultyHitObject> Previous;
+
+        /// <summary>
+        /// Number of previous <see cref="DifficultyHitObject"/>s to keep inside the <see cref="Previous"/> queue.
+        /// </summary>
+        protected virtual int HistoryLength => 1;
 
         /// <summary>
         /// Mods for use in skill calculations.
@@ -28,12 +33,17 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         protected Skill(Mod[] mods)
         {
             this.mods = mods;
+            Previous = new ReverseQueue<DifficultyHitObject>(HistoryLength + 1);
         }
 
         internal void ProcessInternal(DifficultyHitObject current)
         {
+            while (Previous.Count > HistoryLength)
+                Previous.Dequeue();
+
             Process(current);
-            Previous.Push(current);
+
+            Previous.Enqueue(current);
         }
 
         /// <summary>

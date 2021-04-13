@@ -574,7 +574,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Calculate the position to be used for sample playback at a specified X position (0..1).
         /// </summary>
         /// <param name="position">The lookup X position. Generally should be <see cref="SamplePlaybackPosition"/>.</param>
-        /// <returns></returns>
         protected double CalculateSamplePlaybackBalance(double position)
         {
             const float balance_adjust_amount = 0.4f;
