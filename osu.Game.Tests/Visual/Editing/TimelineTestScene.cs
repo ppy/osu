@@ -64,6 +64,13 @@ namespace osu.Game.Tests.Visual.Editing
             });
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Clock.Seek(2500);
+        }
+
         public abstract Drawable CreateTestComponent();
 
         private class AudioVisualiser : CompositeDrawable
