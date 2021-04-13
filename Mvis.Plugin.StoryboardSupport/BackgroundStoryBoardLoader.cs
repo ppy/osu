@@ -55,8 +55,7 @@ namespace Mvis.Plugin.StoryboardSupport
             Flags.AddRange(new[]
             {
                 PluginFlags.CanDisable,
-                PluginFlags.CanUnload,
-                PluginFlags.HasConfig
+                PluginFlags.CanUnload
             });
         }
 
@@ -233,8 +232,12 @@ namespace Mvis.Plugin.StoryboardSupport
             else
                 currentStoryboard?.FadeTo(0.01f, 300, Easing.OutQuint).Expire();
 
+            if (Disabled.Value && newBeatmap != targetBeatmap) ContentLoaded = false;
+
             targetBeatmap = newBeatmap;
-            Load();
+
+            if (!Disabled.Value)
+                Load();
         }
 
         private Drawable getProxy(BackgroundStoryboard storyboard)

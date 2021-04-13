@@ -4,6 +4,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
@@ -19,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Mvis.SideBar.PluginsPage
 {
-    public class PluginPiece : Container
+    public class PluginPiece : Container, IHasTooltip
     {
         public readonly MvisPlugin Plugin;
         private SpriteIcon unloadIcon;
@@ -70,8 +71,8 @@ namespace osu.Game.Screens.Mvis.SideBar.PluginsPage
                 },
                 new DelayedLoadUnloadWrapper(() =>
                 {
-                    var coverName = Plugin.GetType().Namespace?.Replace(".", "") ?? string.Empty;
-                    var s = new PluginBackgroundSprite(coverName)
+                    var coverName = Plugin.GetType().Namespace?.Replace(".", "") ?? "Plugin";
+                    var s = new PluginBackgroundSprite($"{coverName}/{Plugin.GetType().Name}")
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
@@ -258,5 +259,7 @@ namespace osu.Game.Screens.Mvis.SideBar.PluginsPage
                 Texture = textures.Get(target);
             }
         }
+
+        public string TooltipText => Plugin.Description;
     }
 }

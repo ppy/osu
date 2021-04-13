@@ -13,7 +13,6 @@ namespace osu.Game.Screens.Mvis.Plugins.Types
         protected override void LoadComplete()
         {
             Value.BindValueChanged(OnValueChanged, true);
-
             base.LoadComplete();
         }
 

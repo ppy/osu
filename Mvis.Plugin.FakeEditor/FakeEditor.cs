@@ -47,8 +47,7 @@ namespace Mvis.Plugin.FakeEditor
             Flags.AddRange(new[]
             {
                 PluginFlags.CanDisable,
-                PluginFlags.CanUnload,
-                PluginFlags.HasConfig
+                PluginFlags.CanUnload
             });
         }
 

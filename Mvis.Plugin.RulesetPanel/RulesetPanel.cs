@@ -28,8 +28,7 @@ namespace Mvis.Plugin.RulesetPanel
             Flags.AddRange(new[]
             {
                 PluginFlags.CanDisable,
-                PluginFlags.CanUnload,
-                PluginFlags.HasConfig
+                PluginFlags.CanUnload
             });
 
             RelativeSizeAxes = Axes.Both;

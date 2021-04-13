@@ -1,7 +1,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Logging;
 using osu.Game.Screens.Mvis.Plugins;
 
 namespace osu.Game.Overlays.Settings.Sections.Mf
@@ -16,16 +15,11 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
         [BackgroundDependencyLoader]
         private void load(MvisPluginManager manager)
         {
-            Logger.Log("插件设置Load!");
-
             foreach (var pl in manager.GetAllPlugins(false))
             {
-                if (pl.Flags.Contains(MvisPlugin.PluginFlags.HasConfig))
-                {
-                    var section = pl.CreateSettingsSubSection();
-                    if (section != null)
-                        Add(section);
-                }
+                var section = pl.CreateSettingsSubSection();
+                if (section != null)
+                    Add(section);
             }
         }
 

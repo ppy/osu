@@ -624,7 +624,7 @@ namespace osu.Game.Screens.Mvis
                         bgTriangles.Show();
                         break;
                 }
-            });
+            }, true);
 
             HideScreenBackground.BindValueChanged(_ => applyBackgroundBrightness());
 

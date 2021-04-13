@@ -26,11 +26,9 @@ namespace Mvis.Plugin.Example
         public override TargetLayer Target => TargetLayer.Foreground;
         public override int Version => 1;
 
-        //只会在Flags中有HasConfig的情况下被调用
         public override IPluginConfigManager CreateConfigManager(Storage storage)
             => new ExamplePluginConfigManager(storage);
 
-        //只会在Flags中有HasConfig的情况下被调用
         public override PluginSettingsSubSection CreateSettingsSubSection()
             => new ExampleSettings(this);
 
@@ -46,8 +44,7 @@ namespace Mvis.Plugin.Example
             Flags.AddRange(new[]
             {
                 PluginFlags.CanDisable,
-                PluginFlags.CanUnload,
-                PluginFlags.HasConfig //声明该插件有配置相关的功能
+                PluginFlags.CanUnload
             });
 
             RelativeSizeAxes = Axes.Both;

@@ -188,8 +188,7 @@ namespace osu.Game.Screens.Mvis.Plugins
         {
             CanDisable,
             CanUnload,
-            CanReload,
-            HasConfig
+            CanReload
         }
 
         /// <summary>

@@ -43,6 +43,8 @@ namespace osu.Game.Tests.Visual.Mvis
                 manager
             };
 
+            Logger.Log($"命名空间: {GetType().Namespace}; class名: {GetType().Name}");
+
             AddStep("Toggle Sidebar ", sidebar.ToggleVisibility);
             AddStep("Add Plugin To Manager", () =>
             {
@@ -82,6 +84,7 @@ namespace osu.Game.Tests.Visual.Mvis
             protected override bool PostInit() => true;
 
             public override PluginSidebarPage CreateSidebarPage() => new VoidSidebarContent(this, 0.5f);
+            public override int Version => 1;
 
             public override bool Enable()
             {
