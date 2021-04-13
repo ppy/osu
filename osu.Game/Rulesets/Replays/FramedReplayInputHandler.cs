@@ -30,6 +30,7 @@ namespace osu.Game.Rulesets.Replays
         /// The current frame of the replay.
         /// The current time is always between the start and the end time of the current frame.
         /// </summary>
+        /// <remarks>Returns null if the current time is strictly before the first frame.</remarks>
         /// <exception cref="InvalidOperationException">The replay is empty.</exception>
         public TFrame CurrentFrame
         {
@@ -38,15 +39,15 @@ namespace osu.Game.Rulesets.Replays
                 if (!HasFrames)
                     throw new InvalidOperationException($"Attempted to get {nameof(CurrentFrame)} of an empty replay");
 
-                return (TFrame)Frames[Math.Max(0, currentFrameIndex)];
+                return currentFrameIndex == -1 ? null : (TFrame)Frames[currentFrameIndex];
             }
         }
 
         /// <summary>
         /// The next frame of the replay.
         /// The start time is always greater or equal to the start time of <see cref="CurrentFrame"/> regardless of the seeking direction.
-        /// If it is before the first frame of the replay or the after the last frame of the replay, <see cref="CurrentFrame"/> and <see cref="NextFrame"/> agree.
         /// </summary>
+        /// <remarks>Returns null if the current frame is the last frame.</remarks>
         /// <exception cref="InvalidOperationException">The replay is empty.</exception>
         public TFrame NextFrame
         {
@@ -55,7 +56,7 @@ namespace osu.Game.Rulesets.Replays
                 if (!HasFrames)
                     throw new InvalidOperationException($"Attempted to get {nameof(NextFrame)} of an empty replay");
 
-                return (TFrame)Frames[Math.Min(currentFrameIndex + 1, Frames.Count - 1)];
+                return currentFrameIndex == Frames.Count - 1 ? null : (TFrame)Frames[currentFrameIndex + 1];
             }
         }
 
@@ -96,7 +97,7 @@ namespace osu.Game.Rulesets.Replays
         {
             get
             {
-                if (!HasFrames || !FrameAccuratePlayback)
+                if (!HasFrames || !FrameAccuratePlayback || CurrentFrame == null)
                     return false;
 
                 return IsImportant(CurrentFrame) && // a button is in a pressed state
