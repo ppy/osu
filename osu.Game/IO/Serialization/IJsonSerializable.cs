@@ -22,7 +22,6 @@ namespace osu.Game.IO.Serialization
         /// <summary>
         /// Creates the default <see cref="JsonSerializerSettings"/> that should be used for all <see cref="IJsonSerializable"/>s.
         /// </summary>
-        /// <returns></returns>
         public static JsonSerializerSettings CreateGlobalSettings() => new JsonSerializerSettings
         {
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
