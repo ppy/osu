@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             yield return new IssueTemplateDoesNotExist(this).Create(beatmap.Metadata.BackgroundFile);
         }
 
-        private class IssueTemplateNoneSet : IssueTemplate
+        public class IssueTemplateNoneSet : IssueTemplate
         {
             public IssueTemplateNoneSet(ICheck check)
                 : base(check, IssueType.Problem, "No background has been set")
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             public Issue Create() => new Issue(this);
         }
 
-        private class IssueTemplateDoesNotExist : IssueTemplate
+        public class IssueTemplateDoesNotExist : IssueTemplate
         {
             public IssueTemplateDoesNotExist(ICheck check)
                 : base(check, IssueType.Problem, "The background file \"{0}\" does not exist.")

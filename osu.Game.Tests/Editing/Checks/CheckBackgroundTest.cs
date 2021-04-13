@@ -54,7 +54,7 @@ namespace osu.Game.Tests.Editing.Checks
 
             Assert.That(issues.Count == 1);
             Assert.That(issue != null);
-            Assert.That(issue.Template.Equals(check.PossibleTemplates.ElementAt(1)));
+            Assert.That(issue.Template is CheckBackground.IssueTemplateDoesNotExist);
         }
 
         [Test]
@@ -67,7 +67,7 @@ namespace osu.Game.Tests.Editing.Checks
 
             Assert.That(issues.Count == 1);
             Assert.That(issue != null);
-            Assert.That(issue.Template.Equals(check.PossibleTemplates.ElementAt(0)));
+            Assert.That(issue.Template is CheckBackground.IssueTemplateNoneSet);
         }
     }
 }
