@@ -220,20 +220,39 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="blueprint">The blueprint.</param>
         /// <param name="e">The mouse event responsible for selection.</param>
         /// <returns>Whether a selection was performed.</returns>
-        internal bool HandleSelectionRequested(SelectionBlueprint blueprint, MouseButtonEvent e)
+        internal bool MouseDownSelectionRequested(SelectionBlueprint blueprint, MouseButtonEvent e)
         {
             if (e.ShiftPressed && e.Button == MouseButton.Right)
             {
                 handleQuickDeletion(blueprint);
-                return false;
+                return true;
             }
 
-            if (e.ControlPressed && e.Button == MouseButton.Left)
+            // while holding control, we only want to add to selection, not replace an existing selection.
+            if (e.ControlPressed && e.Button == MouseButton.Left && !blueprint.IsSelected)
+            {
                 blueprint.ToggleSelection();
-            else
-                ensureSelected(blueprint);
+                return true;
+            }
 
-            return true;
+            return ensureSelected(blueprint);
+        }
+
+        /// <summary>
+        /// Handle a blueprint requesting selection.
+        /// </summary>
+        /// <param name="blueprint">The blueprint.</param>
+        /// <param name="e">The mouse event responsible for deselection.</param>
+        /// <returns>Whether a deselection was performed.</returns>
+        internal bool MouseUpSelectionRequested(SelectionBlueprint blueprint, MouseButtonEvent e)
+        {
+            if (blueprint.IsSelected)
+            {
+                blueprint.ToggleSelection();
+                return true;
+            }
+
+            return false;
         }
 
         private void handleQuickDeletion(SelectionBlueprint blueprint)
@@ -247,13 +266,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 deleteSelected();
         }
 
-        private void ensureSelected(SelectionBlueprint blueprint)
+        /// <summary>
+        /// Ensure the blueprint is in a selected state.
+        /// </summary>
+        /// <param name="blueprint">The blueprint to select.</param>
+        /// <returns>Whether selection state was changed.</returns>
+        private bool ensureSelected(SelectionBlueprint blueprint)
         {
             if (blueprint.IsSelected)
-                return;
+                return false;
 
             DeselectAll?.Invoke();
             blueprint.Select();
+            return true;
         }
 
         private void deleteSelected()
