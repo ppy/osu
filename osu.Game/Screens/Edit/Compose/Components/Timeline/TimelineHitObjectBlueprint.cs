@@ -31,6 +31,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private const float shadow_radius = 5;
         private const float circle_size = 38;
 
+        private Container repeatsContainer;
+
         public Action<DragEvent> OnDragHandled;
 
         [UsedImplicitly]
@@ -41,7 +43,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private readonly Drawable circle;
 
-        private readonly Container mainComponents;
+        private readonly Container colouredComponents;
         private readonly OsuSpriteText comboIndexText;
 
         [Resolved]
@@ -59,39 +61,37 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             RelativePositionAxes = Axes.X;
 
             RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
+            Height = circle_size;
 
-            AddRangeInternal(new Drawable[]
+            AddRangeInternal(new[]
             {
-                mainComponents = new Container
+                circle = new ExtendableCircle
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                },
+                colouredComponents = new Container
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                },
-                comboIndexText = new OsuSpriteText
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.Centre,
-                    Y = -1,
-                    Font = OsuFont.Default.With(size: circle_size * 0.5f, weight: FontWeight.Regular),
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        comboIndexText = new OsuSpriteText
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.Centre,
+                            Y = -1,
+                            Font = OsuFont.Default.With(size: circle_size * 0.5f, weight: FontWeight.Regular),
+                        },
+                    }
                 },
             });
 
-            circle = new ExtendableCircle
-            {
-                RelativeSizeAxes = Axes.X,
-                Size = new Vector2(1, circle_size),
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
-            };
-
-            mainComponents.Add(circle);
-
             if (hitObject is IHasDuration)
             {
-                mainComponents.Add(new DragArea(hitObject)
+                colouredComponents.Add(new DragArea(hitObject)
                 {
                     OnDragHandled = e => OnDragHandled?.Invoke(e)
                 });
@@ -127,15 +127,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             var comboColour = combo.GetComboColour(comboColours);
 
             if (HitObject is IHasDuration)
-                mainComponents.Colour = ColourInfo.GradientHorizontal(comboColour, comboColour.Lighten(0.4f));
+                circle.Colour = ColourInfo.GradientHorizontal(comboColour, comboColour.Lighten(0.4f));
             else
-                mainComponents.Colour = comboColour;
+                circle.Colour = comboColour;
 
-            var col = mainComponents.Colour.TopLeft.Linear;
+            var col = circle.Colour.TopLeft.Linear;
             float brightness = col.R + col.G + col.B;
 
             // decide the combo index colour based on brightness?
-            comboIndexText.Colour = brightness > 0.5f ? Color4.Black : Color4.White;
+            colouredComponents.Colour = OsuColour.Gray(brightness > 0.5f ? 0.2f : 0.9f);
         }
 
         protected override void Update()
@@ -155,13 +155,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
         }
 
-        private Container repeatsContainer;
-
         private void updateRepeats(IHasRepeats repeats)
         {
             repeatsContainer?.Expire();
 
-            mainComponents.Add(repeatsContainer = new Container
+            colouredComponents.Add(repeatsContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
             });
@@ -170,7 +168,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 repeatsContainer.Add(new Circle
                 {
-                    Size = new Vector2(circle_size / 2),
+                    Size = new Vector2(circle_size / 3),
+                    Alpha = 0.2f,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.Centre,
                     RelativePositionAxes = Axes.X,
@@ -224,7 +223,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 Origin = Anchor.Centre;
                 RelativePositionAxes = Axes.X;
                 RelativeSizeAxes = Axes.Y;
-                Colour = OsuColour.Gray(0.2f);
 
                 InternalChildren = new Drawable[]
                 {
@@ -351,7 +349,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         /// <summary>
         /// A circle with externalised end caps so it can take up the full width of a relative width area.
-        /// TODO: figure how to do this with a single circle to avoid pixel-misaligned edges.
         /// </summary>
         public class ExtendableCircle : Container
         {
@@ -391,7 +388,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     Colour = Color4.Black.Opacity(0.4f)
                 };
 
-                const float fudge = 0.97f;
+                // TODO: figure how to do this whole thing with a single circle to avoid pixel-misaligned edges.
+                // just working with what i can make work for the time being..
+                const float fudge = 0.4f;
 
                 InternalChildren = new Drawable[]
                 {
@@ -400,7 +399,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Height = fudge,
+                        Padding = new MarginPadding { Vertical = fudge },
                         Masking = true,
                         AlwaysPresent = true,
                         EdgeEffect = effect,
@@ -418,12 +417,16 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         Origin = Anchor.TopCentre,
                         Size = new Vector2(circle_size)
                     },
-                    new Box
+                    new Container
                     {
                         RelativeSizeAxes = Axes.Both,
+                        Padding = new MarginPadding { Vertical = fudge },
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Height = fudge,
+                        Children = new Drawable[]
+                        {
+                            new Box { RelativeSizeAxes = Axes.Both, }
+                        }
                     },
                 };
             }
