@@ -38,9 +38,6 @@ namespace osu.Game.Screens.Edit.Verify
             Padding = new MarginPadding { Horizontal = horizontal_inset };
             RowSize = new Dimension(GridSizeMode.Absolute, row_height);
 
-            Masking = true;
-            CornerRadius = 6;
-
             AddInternal(backgroundFlow = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -117,6 +114,17 @@ namespace osu.Game.Screens.Edit.Verify
                 Margin = new MarginPadding(10)
             }
         };
+
+        protected override Drawable CreateHeader(int index, TableColumn column) => new HeaderText(column?.Header ?? string.Empty);
+
+        private class HeaderText : OsuSpriteText
+        {
+            public HeaderText(string text)
+            {
+                Text = text.ToUpper();
+                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold);
+            }
+        }
 
         public class RowBackground : OsuClickableContainer
         {
