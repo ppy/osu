@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Edit.Verify
     public class VerifyScreen : EditorScreen
     {
         private Ruleset ruleset;
-        private static BeatmapVerifier beatmapVerifier;
+        private static IBeatmapVerifier beatmapVerifier;
 
         [Cached]
         private Bindable<Issue> selectedIssue = new Bindable<Issue>();
