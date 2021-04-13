@@ -166,7 +166,9 @@ namespace osu.Game.Screens.Backgrounds
                 BlurAmount.ValueChanged += _ => UpdateVisuals();
             }
 
-            protected override bool ShowDimContent => !ShowStoryboard.Value || !StoryboardReplacesBackground.Value; // The background needs to be hidden in the case of it being replaced by the storyboard
+            protected override bool ShowDimContent
+                // The background needs to be hidden in the case of it being replaced by the storyboard
+                => (!ShowStoryboard.Value && !IgnoreUserSettings.Value) || !StoryboardReplacesBackground.Value;
 
             protected override void UpdateVisuals()
             {
