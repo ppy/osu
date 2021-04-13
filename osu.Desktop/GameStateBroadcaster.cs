@@ -1,0 +1,367 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.WebSockets;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Logging;
+using osu.Framework.Threading;
+using osu.Game.Beatmaps;
+using osu.Game.Configuration;
+using osu.Game.Online.API;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Users;
+
+namespace osu.Desktop
+{
+    public class GameStateBroadcaster : Component
+    {
+        public bool IsListening => host != null;
+
+        public IReadOnlyList<WebSocketClient> Clients => clients;
+
+        private const double debounce_time = 100;
+
+        private IWebHost host;
+
+        private ScheduledDelegate broadcastSchedule;
+
+        private readonly List<WebSocketClient> clients = new List<WebSocketClient>();
+
+        #region Bindables
+
+        private readonly Bindable<bool> enabled = new Bindable<bool>();
+
+        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
+
+        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+
+        private readonly Bindable<IReadOnlyList<Mod>> mods = new Bindable<IReadOnlyList<Mod>>();
+
+        private readonly Bindable<UserActivity> activity = new Bindable<UserActivity>();
+
+        private IBindable<User> user;
+
+        #endregion
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config, IAPIProvider provider, Bindable<RulesetInfo> ruleset, Bindable<WorkingBeatmap> beatmap, Bindable<IReadOnlyList<Mod>> mods)
+        {
+            this.ruleset.BindTo(ruleset);
+            this.beatmap.BindTo(beatmap);
+            this.mods.BindTo(mods);
+
+            user = provider.LocalUser.GetBoundCopy();
+            user.BindValueChanged(u =>
+            {
+                activity.UnbindBindings();
+                activity.BindTo(u.NewValue.Activity);
+            }, true);
+
+            this.mods.ValueChanged += _ => Broadcast();
+            this.ruleset.ValueChanged += _ => Broadcast();
+            this.beatmap.ValueChanged += _ => Broadcast();
+            activity.ValueChanged += _ => Broadcast();
+
+            config.BindWith(OsuSetting.PublishGameState, enabled);
+
+            enabled.BindValueChanged(state =>
+            {
+                if (state.NewValue)
+                    start();
+                else
+                    stop();
+            }, true);
+        }
+
+        private void add(WebSocketClient client)
+        {
+            lock (clients)
+                clients.Add(client);
+        }
+
+        private void remove(WebSocketClient client)
+        {
+            lock (clients)
+                clients.Remove(client);
+        }
+
+        public void Broadcast()
+        {
+            broadcastSchedule?.Cancel();
+            broadcastSchedule = Scheduler.AddDelayed(() =>
+            {
+                lock (clients)
+                {
+                    string state = getStateAsString();
+                    foreach (var client in clients)
+                        client.Enqueue(state);
+                }
+            }, debounce_time);
+        }
+
+        private string getStateAsString()
+        {
+            var state = new GameState
+            {
+                Mods = mods.Value.Select(m => m.Acronym),
+                Ruleset = ruleset.Value.Name,
+                Beatmap = beatmap.Value.BeatmapInfo,
+                Activity = activity.Value?.GetType().Name,
+            };
+
+            return JsonConvert.SerializeObject(state, new JsonSerializerSettings
+            {
+                DefaultValueHandling = DefaultValueHandling.Ignore,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            });
+        }
+
+        private void start()
+        {
+            if (IsListening)
+                return;
+
+            host = new WebHostBuilder()
+                   .ConfigureServices(s =>
+                   {
+                       s.AddTransient<WebSocketStart>(p => add);
+                       s.AddTransient<WebSocketClose>(p => remove);
+                       s.AddTransient<WebSocketReady>(p => Broadcast);
+                       s.AddTransient<WebSocketMiddleware>();
+                   })
+                   .UseKestrel()
+                   .UseUrls("http://localhost:7270")
+                   .UseStartup<Startup>()
+                   .Build();
+
+            host.Start();
+        }
+
+        private void stop()
+        {
+            enabled.Disabled = true;
+            broadcastSchedule?.Cancel();
+            Task.Run(async () =>
+            {
+                IEnumerable<Task> closeTasks;
+                lock (clients)
+                    closeTasks = clients.Select(c => c.Close());
+
+                await Task.WhenAll(closeTasks).ConfigureAwait(false);
+                await host.StopAsync().ConfigureAwait(false);
+
+                host = null;
+                enabled.Disabled = false;
+            });
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            stop();
+        }
+
+        public delegate void WebSocketStart(WebSocketClient client);
+
+        public delegate void WebSocketClose(WebSocketClient client);
+
+        public delegate void WebSocketReady();
+
+        #region IWebHost Startup
+
+        private class Startup
+        {
+            private readonly WebSocketStart start;
+
+            private readonly WebSocketClose close;
+
+            private readonly WebSocketReady ready;
+
+            public Startup(WebSocketStart start, WebSocketClose close, WebSocketReady ready)
+            {
+                this.start = start;
+                this.close = close;
+                this.ready = ready;
+            }
+
+            public void Configure(IApplicationBuilder app)
+            {
+                app.UseWebSockets();
+                app.UseMiddleware<WebSocketMiddleware>(start, close, ready);
+            }
+        }
+
+        #endregion
+
+        #region WebSocketMiddleware
+
+        public class WebSocketMiddleware
+        {
+            private readonly RequestDelegate next;
+
+            private readonly WebSocketStart start;
+
+            private readonly WebSocketClose close;
+
+            private readonly WebSocketReady ready;
+
+            public WebSocketMiddleware(RequestDelegate next, WebSocketStart start, WebSocketClose close, WebSocketReady ready)
+            {
+                this.start = start;
+                this.close = close;
+                this.ready = ready;
+                this.next = next;
+            }
+
+            public async Task InvokeAsync(HttpContext context)
+            {
+                try
+                {
+                    if (context.WebSockets.IsWebSocketRequest)
+                    {
+                        var socket = await context.WebSockets.AcceptWebSocketAsync().ConfigureAwait(false);
+                        var client = new WebSocketClient(socket)
+                        {
+                            OnStart = new Action<WebSocketClient>(start),
+                            OnClose = new Action<WebSocketClient>(close),
+                            OnReady = new Action(ready),
+                        };
+
+                        client.Start();
+                        await client.CompletionSource.Task.ConfigureAwait(false);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.Log($"An exception occured in the WebSocket\n{e}", LoggingTarget.Network);
+                    throw;
+                }
+
+                await next(context).ConfigureAwait(false);
+            }
+        }
+
+        #endregion
+
+        #region WebSocketClient
+
+        public class WebSocketClient
+        {
+            private readonly WebSocket socket;
+
+            private readonly CancellationTokenSource cancellationToken = new CancellationTokenSource();
+
+            private readonly Queue<string> queue = new Queue<string>();
+
+            public Action<WebSocketClient> OnStart;
+
+            public Action<WebSocketClient> OnClose;
+
+            public Action OnReady;
+
+            private bool isReady;
+
+            public readonly TaskCompletionSource<bool> CompletionSource = new TaskCompletionSource<bool>();
+
+            public WebSocketClient(WebSocket socket)
+            {
+                this.socket = socket;
+            }
+
+            public void Start()
+            {
+                OnStart?.Invoke(this);
+                Task.WhenAll(receive(), send()).ConfigureAwait(false);
+            }
+
+            public void Enqueue(string message)
+            {
+                lock (queue)
+                    queue.Enqueue(message);
+            }
+
+            public async Task Close(bool graceful = false)
+            {
+                if (graceful)
+                    await socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None).ConfigureAwait(false);
+                else
+                    await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None).ConfigureAwait(false);
+
+                cancellationToken.Cancel();
+                cancellationToken.Dispose();
+
+                OnClose?.Invoke(this);
+                socket.Dispose();
+
+                CompletionSource.SetResult(true);
+            }
+
+            private async Task send()
+            {
+                while (!cancellationToken.IsCancellationRequested)
+                {
+                    try
+                    {
+                        if (socket.State == WebSocketState.Closed || socket.State == WebSocketState.Aborted)
+                            break;
+
+                        bool success;
+                        string message;
+
+                        lock (queue)
+                            success = queue.TryDequeue(out message);
+
+                        if (socket.State == WebSocketState.Open && success)
+                            await socket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(message)), WebSocketMessageType.Text, true, cancellationToken.Token).ConfigureAwait(false);
+
+                        if (!isReady)
+                        {
+                            OnReady?.Invoke();
+                            isReady = true;
+                        }
+                    }
+                    catch (OperationCanceledException)
+                    {
+                    }
+                }
+            }
+
+            private async Task receive()
+            {
+                while (!cancellationToken.IsCancellationRequested)
+                {
+                    try
+                    {
+                        if (socket.State == WebSocketState.Closed || socket.State == WebSocketState.Aborted)
+                            break;
+
+                        var buffer = WebSocket.CreateServerBuffer(4096);
+                        var received = await socket.ReceiveAsync(buffer, cancellationToken.Token).ConfigureAwait(false);
+
+                        if (socket.State == WebSocketState.CloseReceived && received.MessageType == WebSocketMessageType.Close)
+                            await Close(true).ConfigureAwait(false);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                    }
+                }
+            }
+        }
+
+        #endregion
+    }
+}

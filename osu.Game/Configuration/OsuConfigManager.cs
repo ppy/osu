@@ -144,6 +144,8 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.DiscordRichPresence, DiscordRichPresenceMode.Full);
 
             SetDefault(OsuSetting.EditorWaveformOpacity, 1f);
+
+            SetDefault(OsuSetting.PublishGameState, false);
         }
 
         public OsuConfigManager(Storage storage)
@@ -275,5 +277,6 @@ namespace osu.Game.Configuration
         DiscordRichPresence,
         AutomaticallyDownloadWhenSpectating,
         ShowOnlineExplicitContent,
+        PublishGameState,
     }
 }
