@@ -11,7 +11,10 @@ using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 
 namespace osu.Game.Tests.Online
 {
@@ -82,6 +85,36 @@ namespace osu.Game.Tests.Online
 
             Assert.That(converted?.ExtendedLimits.Value, Is.True);
             Assert.That(converted?.OverallDifficulty.Value, Is.EqualTo(11));
+        }
+
+        [Test]
+        public void TestDeserialiseScoreInfoWithEmptyMods()
+        {
+            var score = new ScoreInfo { Ruleset = new OsuRuleset().RulesetInfo };
+
+            var deserialised = JsonConvert.DeserializeObject<ScoreInfo>(JsonConvert.SerializeObject(score));
+
+            if (deserialised != null)
+                deserialised.Ruleset = new OsuRuleset().RulesetInfo;
+
+            Assert.That(deserialised?.Mods.Length, Is.Zero);
+        }
+
+        [Test]
+        public void TestDeserialiseScoreInfoWithCustomModSetting()
+        {
+            var score = new ScoreInfo
+            {
+                Ruleset = new OsuRuleset().RulesetInfo,
+                Mods = new Mod[] { new OsuModDoubleTime { SpeedChange = { Value = 2 } } }
+            };
+
+            var deserialised = JsonConvert.DeserializeObject<ScoreInfo>(JsonConvert.SerializeObject(score));
+
+            if (deserialised != null)
+                deserialised.Ruleset = new OsuRuleset().RulesetInfo;
+
+            Assert.That(((OsuModDoubleTime)deserialised?.Mods[0])?.SpeedChange.Value, Is.EqualTo(2));
         }
 
         private class TestRuleset : Ruleset
