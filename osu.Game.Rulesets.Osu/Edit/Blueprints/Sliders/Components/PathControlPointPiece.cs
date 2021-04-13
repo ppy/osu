@@ -58,11 +58,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             this.slider = slider;
             ControlPoint = controlPoint;
-            PointsInSegment = slider.Path.PointsInSegment(ControlPoint);
+
+            // we don't want to run the path type update on construction as it may inadvertently change the slider.
+            cachePoints(slider);
 
             slider.Path.Version.BindValueChanged(_ =>
             {
-                PointsInSegment = slider.Path.PointsInSegment(ControlPoint);
+                cachePoints(slider);
                 updatePathType();
             });
 
@@ -205,6 +207,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         }
 
         protected override void OnDragEnd(DragEndEvent e) => changeHandler?.EndChange();
+
+        private void cachePoints(Slider slider) => PointsInSegment = slider.Path.PointsInSegment(ControlPoint);
 
         /// <summary>
         /// Handles correction of invalid path types.
