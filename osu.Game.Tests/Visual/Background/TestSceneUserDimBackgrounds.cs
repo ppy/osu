@@ -168,6 +168,29 @@ namespace osu.Game.Tests.Visual.Background
             AddUntilStep("Storyboard is visible", () => player.IsStoryboardVisible);
         }
 
+        [Test]
+        public void TestStoryboardIgnoreUserSettings()
+        {
+            performFullSetup();
+            createFakeStoryboard();
+            AddStep("Enable replacing background", () => player.ReplacesBackground.Value = true);
+
+            AddUntilStep("Storyboard is invisible", () => !player.IsStoryboardVisible);
+            AddUntilStep("Background is visible", () => songSelect.IsBackgroundVisible());
+
+            AddStep("Ignore user settings", () =>
+            {
+                player.ApplyToBackground(b => b.IgnoreUserSettings.Value = true);
+                player.DimmableStoryboard.IgnoreUserSettings.Value = true;
+            });
+            AddUntilStep("Storyboard is visible", () => player.IsStoryboardVisible);
+            AddUntilStep("Background is invisible", () => songSelect.IsBackgroundInvisible());
+
+            AddStep("Disable background replacement", () => player.ReplacesBackground.Value = false);
+            AddUntilStep("Storyboard is visible", () => player.IsStoryboardVisible);
+            AddUntilStep("Background is visible", () => songSelect.IsBackgroundVisible());
+        }
+
         /// <summary>
         /// Check if the visual settings container retains dim and blur when pausing
         /// </summary>
