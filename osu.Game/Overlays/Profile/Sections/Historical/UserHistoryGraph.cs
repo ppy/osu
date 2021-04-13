@@ -32,6 +32,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         {
             return new TooltipDisplayContent
             {
+                Name = tooltipCounterName,
                 Count = playCount.ToString("N0"),
                 Date = date.ToString("MMMM yyyy")
             };
@@ -39,14 +40,17 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 
         protected class HistoryGraphTooltip : UserGraphTooltip
         {
+            private readonly string tooltipCounterName;
+
             public HistoryGraphTooltip(string tooltipCounterName)
                 : base(tooltipCounterName)
             {
+                this.tooltipCounterName = tooltipCounterName;
             }
 
             public override bool SetContent(object content)
             {
-                if (!(content is TooltipDisplayContent info))
+                if (!(content is TooltipDisplayContent info) || info.Name != tooltipCounterName)
                     return false;
 
                 Counter.Text = info.Count;
@@ -57,6 +61,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 
         private class TooltipDisplayContent
         {
+            public string Name;
             public string Count;
             public string Date;
         }
