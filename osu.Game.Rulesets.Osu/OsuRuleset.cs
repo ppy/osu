@@ -206,7 +206,7 @@ namespace osu.Game.Rulesets.Osu
 
         public override HitObjectComposer CreateHitObjectComposer() => new OsuHitObjectComposer(this);
 
-        public override BeatmapVerifier CreateBeatmapVerifier() => new OsuBeatmapVerifier();
+        public override IBeatmapVerifier CreateBeatmapVerifier() => new OsuBeatmapVerifier();
 
         public override string Description => "osu!";
 

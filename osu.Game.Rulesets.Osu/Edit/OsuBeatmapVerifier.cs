@@ -10,21 +10,13 @@ using osu.Game.Rulesets.Osu.Edit.Checks;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public class OsuBeatmapVerifier : BeatmapVerifier
+    public class OsuBeatmapVerifier : IBeatmapVerifier
     {
         private readonly List<ICheck> checks = new List<ICheck>
         {
             new CheckOffscreenObjects()
         };
 
-        public override IEnumerable<Issue> Run(IBeatmap beatmap)
-        {
-            // Also run mode-invariant checks.
-            foreach (var issue in base.Run(beatmap))
-                yield return issue;
-
-            foreach (var issue in checks.SelectMany(check => check.Run(beatmap)))
-                yield return issue;
-        }
+        public IEnumerable<Issue> Run(IBeatmap beatmap) => checks.SelectMany(check => check.Run(beatmap));
     }
 }
