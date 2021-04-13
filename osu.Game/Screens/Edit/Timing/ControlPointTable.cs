@@ -20,47 +20,24 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    public class ControlPointTable : TableContainer
+    public class ControlPointTable : EditorTable
     {
-        private const float horizontal_inset = 20;
-        private const float row_height = 25;
-        private const int text_size = 14;
-
-        private readonly FillFlowContainer backgroundFlow;
-
         [Resolved]
         private Bindable<ControlPointGroup> selectedGroup { get; set; }
-
-        public ControlPointTable()
-        {
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
-
-            Padding = new MarginPadding { Horizontal = horizontal_inset };
-            RowSize = new Dimension(GridSizeMode.Absolute, row_height);
-
-            AddInternal(backgroundFlow = new FillFlowContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-                Depth = 1f,
-                Padding = new MarginPadding { Horizontal = -horizontal_inset },
-                Margin = new MarginPadding { Top = row_height }
-            });
-        }
 
         public IEnumerable<ControlPointGroup> ControlGroups
         {
             set
             {
                 Content = null;
-                backgroundFlow.Clear();
+                BackgroundFlow.Clear();
 
                 if (value?.Any() != true)
                     return;
 
                 foreach (var group in value)
                 {
-                    backgroundFlow.Add(new RowBackground(group));
+                    BackgroundFlow.Add(new RowBackground(group));
                 }
 
                 Columns = createHeaders();
@@ -86,13 +63,13 @@ namespace osu.Game.Screens.Edit.Timing
             new OsuSpriteText
             {
                 Text = $"#{index + 1}",
-                Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold),
+                Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Bold),
                 Margin = new MarginPadding(10)
             },
             new OsuSpriteText
             {
                 Text = group.Time.ToEditorFormattedString(),
-                Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
+                Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Bold)
             },
             null,
             new ControlGroupAttributes(group),
@@ -161,17 +138,6 @@ namespace osu.Game.Screens.Edit.Timing
                 }
 
                 return null;
-            }
-        }
-
-        protected override Drawable CreateHeader(int index, TableColumn column) => new HeaderText(column?.Header ?? string.Empty);
-
-        private class HeaderText : OsuSpriteText
-        {
-            public HeaderText(string text)
-            {
-                Text = text.ToUpper();
-                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold);
             }
         }
 
