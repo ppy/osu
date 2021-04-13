@@ -202,7 +202,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         public override Vector2 ScreenSpaceSelectionPoint => ScreenSpaceDrawQuad.TopLeft;
 
-        public class DragArea : Container
+        public class DragArea : Circle
         {
             private readonly HitObject hitObject;
 
@@ -224,6 +224,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 Origin = Anchor.Centre;
                 RelativePositionAxes = Axes.X;
                 RelativeSizeAxes = Axes.Y;
+                Colour = OsuColour.Gray(0.2f);
 
                 InternalChildren = new Drawable[]
                 {
@@ -232,6 +233,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         RelativeSizeAxes = Axes.Both,
                     }
                 };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                updateState();
+                FinishTransforms();
             }
 
             protected override bool OnHover(HoverEvent e)
@@ -265,7 +274,20 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             private void updateState()
             {
-                Colour = IsHovered || hasMouseDown ? Color4.OrangeRed : Color4.White;
+                if (hasMouseDown)
+                {
+                    this.ScaleTo(0.7f, 200, Easing.OutQuint);
+                }
+                else if (IsHovered)
+                {
+                    this.ScaleTo(0.8f, 200, Easing.OutQuint);
+                }
+                else
+                {
+                    this.ScaleTo(0.6f, 200, Easing.OutQuint);
+                }
+
+                this.FadeTo(IsHovered || hasMouseDown ? 0.8f : 0.2f, 200, Easing.OutQuint);
             }
 
             [Resolved]
@@ -369,12 +391,16 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     Colour = Color4.Black.Opacity(0.4f)
                 };
 
+                const float fudge = 0.97f;
+
                 InternalChildren = new Drawable[]
                 {
                     new Container
                     {
-                        Height = circle_size,
-                        RelativeSizeAxes = Axes.X,
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Height = fudge,
                         Masking = true,
                         AlwaysPresent = true,
                         EdgeEffect = effect,
@@ -394,8 +420,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     },
                     new Box
                     {
-                        Height = circle_size,
-                        RelativeSizeAxes = Axes.X,
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Height = fudge,
                     },
                 };
             }
