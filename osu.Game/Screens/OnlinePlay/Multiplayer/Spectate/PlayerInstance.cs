@@ -6,6 +6,7 @@ using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
@@ -15,8 +16,20 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
     public class PlayerInstance : CompositeDrawable
     {
+        /// <summary>
+        /// The rate at which a user catches up after becoming desynchronised.
+        /// </summary>
         private const double catchup_rate = 2;
-        private const double max_sync_offset = 50;
+
+        /// <summary>
+        /// The offset from the expected time at which to START synchronisation.
+        /// </summary>
+        public const double MAX_OFFSET = 50;
+
+        /// <summary>
+        /// The maximum offset from the expected time at which to STOP synchronisation.
+        /// </summary>
+        public const double SYNC_TARGET = 16;
 
         public bool PlayerLoaded => stack?.CurrentScreen is Player;
 
@@ -25,6 +38,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public WorkingBeatmap Beatmap { get; private set; }
 
         public readonly Score Score;
+
+        public bool IsCatchingUp { get; private set; }
 
         private OsuScreenStack stack;
         private MultiplayerSpectatorPlayer player;
@@ -63,7 +78,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         private readonly BindableDouble catchupFrequencyAdjustment = new BindableDouble(catchup_rate);
         private double targetTrackTime;
-        private bool isCatchingUp;
 
         private void updateCatchup()
         {
@@ -77,18 +91,27 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 return;
 
             double currentTime = Beatmap.Track.CurrentTime;
-            bool catchupRequired = targetTrackTime > currentTime + max_sync_offset;
+            double timeBehind = targetTrackTime - currentTime;
 
-            // Skip catchup if nothing needs to be done.
-            if (catchupRequired == isCatchingUp)
+            double offsetForCatchup = IsCatchingUp ? SYNC_TARGET : MAX_OFFSET;
+            bool catchupRequired = timeBehind > offsetForCatchup;
+
+            // Skip catchup if no work needs to be done.
+            if (catchupRequired == IsCatchingUp)
                 return;
 
             if (catchupRequired)
+            {
                 Beatmap.Track.AddAdjustment(AdjustableProperty.Frequency, catchupFrequencyAdjustment);
+                Logger.Log($"{User.Id} catchup started (behind: {timeBehind})");
+            }
             else
+            {
                 Beatmap.Track.RemoveAdjustment(AdjustableProperty.Frequency, catchupFrequencyAdjustment);
+                Logger.Log($"{User.Id} catchup finished (behind: {timeBehind})");
+            }
 
-            isCatchingUp = catchupRequired;
+            IsCatchingUp = catchupRequired;
         }
 
         public double GetCurrentGameplayTime()
