@@ -208,7 +208,6 @@ namespace osu.Game.Overlays.Profile
 
         protected abstract class UserGraphTooltip : VisibilityContainer, ITooltip
         {
-            protected new readonly OsuSpriteText Name;
             protected readonly OsuSpriteText Counter, BottomText;
             private readonly Box background;
 
@@ -238,7 +237,7 @@ namespace osu.Game.Overlays.Profile
                                 Spacing = new Vector2(3, 0),
                                 Children = new Drawable[]
                                 {
-                                    Name = new OsuSpriteText
+                                    new OsuSpriteText
                                     {
                                         Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
                                         Text = tooltipCounterName
