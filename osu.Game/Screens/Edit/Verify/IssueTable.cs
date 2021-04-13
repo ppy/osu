@@ -19,47 +19,24 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Verify
 {
-    public class IssueTable : TableContainer
+    public class IssueTable : EditorTable
     {
-        private const float horizontal_inset = 20;
-        private const float row_height = 25;
-        private const int text_size = 14;
-
-        private readonly FillFlowContainer backgroundFlow;
-
         [Resolved]
         private Bindable<Issue> selectedIssue { get; set; }
-
-        public IssueTable()
-        {
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
-
-            Padding = new MarginPadding { Horizontal = horizontal_inset };
-            RowSize = new Dimension(GridSizeMode.Absolute, row_height);
-
-            AddInternal(backgroundFlow = new FillFlowContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-                Depth = 1f,
-                Padding = new MarginPadding { Horizontal = -horizontal_inset },
-                Margin = new MarginPadding { Top = row_height }
-            });
-        }
 
         public IEnumerable<Issue> Issues
         {
             set
             {
                 Content = null;
-                backgroundFlow.Clear();
+                BackgroundFlow.Clear();
 
                 if (value == null)
                     return;
 
                 foreach (var issue in value)
                 {
-                    backgroundFlow.Add(new RowBackground(issue));
+                    BackgroundFlow.Add(new RowBackground(issue));
                 }
 
                 Columns = createHeaders();
@@ -86,45 +63,34 @@ namespace osu.Game.Screens.Edit.Verify
             new OsuSpriteText
             {
                 Text = $"#{index + 1}",
-                Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Medium),
+                Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Medium),
                 Margin = new MarginPadding { Right = 10 }
             },
             new OsuSpriteText
             {
                 Text = issue.Template.Type.ToString(),
-                Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold),
+                Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Bold),
                 Margin = new MarginPadding { Right = 10 },
                 Colour = issue.Template.Colour
             },
             new OsuSpriteText
             {
                 Text = issue.GetEditorTimestamp(),
-                Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold),
+                Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Bold),
                 Margin = new MarginPadding { Right = 10 },
             },
             new OsuSpriteText
             {
                 Text = issue.ToString(),
-                Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Medium)
+                Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Medium)
             },
             new OsuSpriteText
             {
                 Text = issue.Check.Metadata.Category.ToString(),
-                Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold),
+                Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Bold),
                 Margin = new MarginPadding(10)
             }
         };
-
-        protected override Drawable CreateHeader(int index, TableColumn column) => new HeaderText(column?.Header ?? string.Empty);
-
-        private class HeaderText : OsuSpriteText
-        {
-            public HeaderText(string text)
-            {
-                Text = text.ToUpper();
-                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold);
-            }
-        }
 
         public class RowBackground : OsuClickableContainer
         {
@@ -150,7 +116,7 @@ namespace osu.Game.Screens.Edit.Verify
                 this.issue = issue;
 
                 RelativeSizeAxes = Axes.X;
-                Height = row_height;
+                Height = ROW_HEIGHT;
                 AlwaysPresent = true;
                 CornerRadius = 3;
                 Masking = true;
