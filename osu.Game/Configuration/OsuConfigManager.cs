@@ -143,7 +143,7 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.DiscordRichPresence, DiscordRichPresenceMode.Full);
 
-            SetDefault(OsuSetting.EditorWaveformOpacity, 1f);
+            SetDefault(OsuSetting.EditorWaveformOpacity, 0.25f);
         }
 
         public OsuConfigManager(Storage storage)
