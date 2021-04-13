@@ -7,11 +7,9 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks.Components;
 using osuTK;
@@ -20,25 +18,12 @@ namespace osu.Game.Screens.Edit.Verify
 {
     public class VerifyScreen : EditorScreen
     {
-        private Ruleset ruleset;
-        private static IBeatmapVerifier beatmapVerifier;
-
         [Cached]
         private Bindable<Issue> selectedIssue = new Bindable<Issue>();
 
         public VerifyScreen()
             : base(EditorScreenMode.Verify)
         {
-        }
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-
-            ruleset = parent.Get<IBindable<WorkingBeatmap>>().Value.BeatmapInfo.Ruleset?.CreateInstance();
-            beatmapVerifier = ruleset?.CreateBeatmapVerifier();
-
-            return dependencies;
         }
 
         [BackgroundDependencyLoader]
@@ -81,9 +66,15 @@ namespace osu.Game.Screens.Edit.Verify
             [Resolved]
             private Bindable<Issue> selectedIssue { get; set; }
 
+            private IBeatmapVerifier rulesetVerifier;
+            private BeatmapVerifier generalVerifier;
+
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
+                generalVerifier = new BeatmapVerifier();
+                rulesetVerifier = Beatmap.BeatmapInfo.Ruleset?.CreateInstance()?.CreateBeatmapVerifier();
+
                 RelativeSizeAxes = Axes.Both;
 
                 InternalChildren = new Drawable[]
@@ -128,9 +119,14 @@ namespace osu.Game.Screens.Edit.Verify
 
             private void refresh()
             {
-                table.Issues = beatmapVerifier.Run(Beatmap)
-                                              .OrderBy(issue => issue.Template.Type)
-                                              .ThenBy(issue => issue.Check.Metadata.Category);
+                var issues = generalVerifier.Run(Beatmap);
+
+                if (rulesetVerifier != null)
+                    issues = issues.Concat(rulesetVerifier.Run(Beatmap));
+
+                table.Issues = issues
+                               .OrderBy(issue => issue.Template.Type)
+                               .ThenBy(issue => issue.Check.Metadata.Category);
             }
         }
     }
