@@ -39,9 +39,7 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestBackgroundSetAndInFiles()
         {
-            var issues = check.Run(beatmap);
-
-            Assert.That(!issues.Any());
+            Assert.That(check.Run(beatmap), Is.Empty);
         }
 
         [Test]
@@ -50,11 +48,9 @@ namespace osu.Game.Tests.Editing.Checks
             beatmap.BeatmapInfo.BeatmapSet.Files.Clear();
 
             var issues = check.Run(beatmap).ToList();
-            var issue = issues.FirstOrDefault();
 
-            Assert.That(issues.Count == 1);
-            Assert.That(issue != null);
-            Assert.That(issue.Template is CheckBackground.IssueTemplateDoesNotExist);
+            Assert.That(issues, Has.Count.EqualTo(1));
+            Assert.That(issues.Single().Template is CheckBackground.IssueTemplateDoesNotExist);
         }
 
         [Test]
@@ -63,11 +59,9 @@ namespace osu.Game.Tests.Editing.Checks
             beatmap.Metadata.BackgroundFile = null;
 
             var issues = check.Run(beatmap).ToList();
-            var issue = issues.FirstOrDefault();
 
-            Assert.That(issues.Count == 1);
-            Assert.That(issue != null);
-            Assert.That(issue.Template is CheckBackground.IssueTemplateNoneSet);
+            Assert.That(issues, Has.Count.EqualTo(1));
+            Assert.That(issues.Single().Template is CheckBackground.IssueTemplateNoneSet);
         }
     }
 }

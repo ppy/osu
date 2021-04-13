@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Edit.Checks.Components;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Edit.Checks;
@@ -42,9 +43,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                 }
             };
 
-            var issues = check.Run(beatmap);
-
-            Assert.That(!issues.Any());
+            Assert.That(check.Run(beatmap), Is.Empty);
         }
 
         [Test]
@@ -62,9 +61,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                 }
             };
 
-            var issues = check.Run(beatmap);
-
-            Assert.That(!issues.Any());
+            Assert.That(check.Run(beatmap), Is.Empty);
         }
 
         [Test]
@@ -124,9 +121,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                 }
             };
 
-            var issues = check.Run(beatmap);
-
-            Assert.That(!issues.Any());
+            Assert.That(check.Run(beatmap), Is.Empty);
         }
 
         [Test]
@@ -149,9 +144,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                 }
             };
 
-            var issues = check.Run(beatmap);
-
-            Assert.That(!issues.Any());
+            Assert.That(check.Run(beatmap), Is.Empty);
         }
 
         [Test]
@@ -252,21 +245,17 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
         private void assertOffscreenCircle(IBeatmap beatmap)
         {
             var issues = check.Run(beatmap).ToList();
-            var issue = issues.FirstOrDefault();
 
-            Assert.That(issues.Count == 1);
-            Assert.That(issue != null);
-            Assert.That(issue.Template is CheckOffscreenObjects.IssueTemplateOffscreenCircle);
+            Assert.That(issues, Has.Count.EqualTo(1));
+            Assert.That(issues.Single().Template is CheckOffscreenObjects.IssueTemplateOffscreenCircle);
         }
 
         private void assertOffscreenSlider(IBeatmap beatmap)
         {
             var issues = check.Run(beatmap).ToList();
-            var issue = issues.FirstOrDefault();
 
-            Assert.That(issues.Count == 1);
-            Assert.That(issue != null);
-            Assert.That(issue.Template is CheckOffscreenObjects.IssueTemplateOffscreenSlider);
+            Assert.That(issues, Has.Count.EqualTo(1));
+            Assert.That(issues.Single().Template is CheckOffscreenObjects.IssueTemplateOffscreenSlider);
         }
     }
 }
