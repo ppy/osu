@@ -11,7 +11,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations
     /// </summary>
     public class PointVisualisation : Box
     {
-        public const float MAX_WIDTH = 5;
+        public const float MAX_WIDTH = 4;
 
         public PointVisualisation(double startTime)
             : this()
