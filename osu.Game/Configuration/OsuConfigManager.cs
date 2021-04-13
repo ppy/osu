@@ -3,7 +3,6 @@
 
 using System;
 using System.Diagnostics;
-using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
 using osu.Framework.Extensions;
