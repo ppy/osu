@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         private readonly Container<TickLine> rowLinesContainer;
         private readonly Container<TickLine> columnLinesContainer;
 
-        public ProfileLineChart()
+        public ProfileLineChart(string graphCounterName)
         {
             RelativeSizeAxes = Axes.X;
             Height = 250;
@@ -88,7 +88,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                                         }
                                     }
                                 },
-                                graph = new UserHistoryGraph
+                                graph = new UserHistoryGraph(graphCounterName)
                                 {
                                     RelativeSizeAxes = Axes.Both
                                 }
