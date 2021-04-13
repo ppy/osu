@@ -103,12 +103,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             if (catchupRequired)
             {
                 Beatmap.Track.AddAdjustment(AdjustableProperty.Frequency, catchupFrequencyAdjustment);
-                Logger.Log($"{User.Id} catchup started (behind: {timeBehind})");
+                Logger.Log($"{User.Id} catchup started (behind: {(int)timeBehind})");
             }
             else
             {
                 Beatmap.Track.RemoveAdjustment(AdjustableProperty.Frequency, catchupFrequencyAdjustment);
-                Logger.Log($"{User.Id} catchup finished (behind: {timeBehind})");
+                Logger.Log($"{User.Id} catchup finished (behind: {(int)timeBehind})");
             }
 
             IsCatchingUp = catchupRequired;
