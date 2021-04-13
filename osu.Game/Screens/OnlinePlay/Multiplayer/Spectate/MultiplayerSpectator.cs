@@ -8,6 +8,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Framework.Utils;
 using osu.Game.Online.Spectator;
 using osu.Game.Screens.Spectate;
@@ -107,6 +108,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             IEnumerable<PlayerInstance> validInstances = instances.Where(i => i.Score.Replay.Frames.Count > 0);
 
             double targetTrackTime = validInstances.Select(i => i.GetCurrentTrackTime()).Max();
+
+            var instanceTimes = string.Join(',', validInstances.Select(i => $" {i.User.Id}: {(int)i.GetCurrentTrackTime()}"));
+            Logger.Log($"target: {(int)targetTrackTime},{instanceTimes}");
 
             foreach (var inst in validInstances)
             {
