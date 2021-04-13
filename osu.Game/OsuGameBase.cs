@@ -433,12 +433,15 @@ namespace osu.Game
             if (paths.Length == 0)
                 return;
 
-            var extension = Path.GetExtension(paths.First())?.ToLowerInvariant();
+            var filesPerExtension = paths.GroupBy(p => Path.GetExtension(p).ToLowerInvariant());
 
-            foreach (var importer in fileImporters)
+            foreach (var groups in filesPerExtension)
             {
-                if (importer.HandledExtensions.Contains(extension))
-                    await importer.Import(paths).ConfigureAwait(false);
+                foreach (var importer in fileImporters)
+                {
+                    if (importer.HandledExtensions.Contains(groups.Key))
+                        await importer.Import(groups.ToArray()).ConfigureAwait(false);
+                }
             }
         }
 
