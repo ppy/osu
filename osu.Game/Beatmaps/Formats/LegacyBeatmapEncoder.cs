@@ -273,7 +273,7 @@ namespace osu.Game.Beatmaps.Formats
             if (hitObject is IHasPath path)
             {
                 addPathData(writer, path, position);
-                writer.Write(getSampleBank(hitObject.Samples, zeroBanks: true));
+                writer.Write(getSampleBank(hitObject.Samples));
             }
             else
             {
@@ -420,15 +420,15 @@ namespace osu.Game.Beatmaps.Formats
             writer.Write(FormattableString.Invariant($"{endTimeData.EndTime}{suffix}"));
         }
 
-        private string getSampleBank(IList<HitSampleInfo> samples, bool banksOnly = false, bool zeroBanks = false)
+        private string getSampleBank(IList<HitSampleInfo> samples, bool banksOnly = false)
         {
             LegacySampleBank normalBank = toLegacySampleBank(samples.SingleOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank);
             LegacySampleBank addBank = toLegacySampleBank(samples.FirstOrDefault(s => !string.IsNullOrEmpty(s.Name) && s.Name != HitSampleInfo.HIT_NORMAL)?.Bank);
 
             StringBuilder sb = new StringBuilder();
 
-            sb.Append(FormattableString.Invariant($"{(zeroBanks ? 0 : (int)normalBank)}:"));
-            sb.Append(FormattableString.Invariant($"{(zeroBanks ? 0 : (int)addBank)}"));
+            sb.Append(FormattableString.Invariant($"{(int)normalBank}:"));
+            sb.Append(FormattableString.Invariant($"{(int)addBank}"));
 
             if (!banksOnly)
             {

@@ -89,9 +89,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             private Vector2 getFinalSize() => facade.DrawSize;
 
-            // Todo: Temporary?
-            protected override bool ShouldBeConsideredForInput(Drawable child) => false;
-
             protected override bool OnClick(ClickEvent e)
             {
                 ToggleMaximisationState(this);
