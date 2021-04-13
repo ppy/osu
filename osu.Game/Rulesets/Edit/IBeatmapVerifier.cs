@@ -7,6 +7,9 @@ using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit
 {
+    /// <summary>
+    /// A class which can run against a beatmap and surface issues to the user which could go against known criteria or hinder gameplay.
+    /// </summary>
     public interface IBeatmapVerifier
     {
         public IEnumerable<Issue> Run(IBeatmap beatmap);

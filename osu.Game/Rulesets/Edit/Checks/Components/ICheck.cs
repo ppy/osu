@@ -6,6 +6,9 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Rulesets.Edit.Checks.Components
 {
+    /// <summary>
+    /// A specific check that can be run on a beatmap to verify or find issues.
+    /// </summary>
     public interface ICheck
     {
         /// <summary>
