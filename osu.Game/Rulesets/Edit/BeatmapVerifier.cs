@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Edit.Checks.Components;
 namespace osu.Game.Rulesets.Edit
 {
     /// <summary>
-    /// A ruleset-agnostic beatmap converter that identifies issues in common metadata or mapping standards.
+    /// A ruleset-agnostic beatmap verifier that identifies issues in common metadata or mapping standards.
     /// </summary>
     public class BeatmapVerifier : IBeatmapVerifier
     {
