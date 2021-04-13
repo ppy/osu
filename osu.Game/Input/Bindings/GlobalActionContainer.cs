@@ -70,6 +70,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.F2 }, GlobalAction.EditorDesignMode),
             new KeyBinding(new[] { InputKey.F3 }, GlobalAction.EditorTimingMode),
             new KeyBinding(new[] { InputKey.F4 }, GlobalAction.EditorSetupMode),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.A }, GlobalAction.EditorVerifyMode),
         };
 
         public IEnumerable<KeyBinding> InGameKeyBindings => new[]
@@ -247,5 +248,8 @@ namespace osu.Game.Input.Bindings
 
         [Description("Beatmap Options")]
         ToggleBeatmapOptions,
+
+        [Description("Verify mode")]
+        EditorVerifyMode,
     }
 }
