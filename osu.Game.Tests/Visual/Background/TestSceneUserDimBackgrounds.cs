@@ -142,9 +142,9 @@ namespace osu.Game.Tests.Visual.Background
         {
             performFullSetup();
             AddUntilStep("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
-            AddStep("Enable user dim", () => songSelect.DimEnabled.Value = false);
+            AddStep("Disable user dim", () => songSelect.IgnoreUserSettings.Value = true);
             AddUntilStep("Screen is undimmed and user blur removed", () => songSelect.IsBackgroundUndimmed() && songSelect.IsUserBlurDisabled());
-            AddStep("Disable user dim", () => songSelect.DimEnabled.Value = true);
+            AddStep("Enable user dim", () => songSelect.IgnoreUserSettings.Value = false);
             AddUntilStep("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
         }
 
@@ -161,11 +161,34 @@ namespace osu.Game.Tests.Visual.Background
                 player.ReplacesBackground.Value = true;
                 player.StoryboardEnabled.Value = true;
             });
-            AddStep("Enable user dim", () => player.DimmableStoryboard.EnableUserDim.Value = true);
+            AddStep("Enable user dim", () => player.DimmableStoryboard.IgnoreUserSettings.Value = false);
             AddStep("Set dim level to 1", () => songSelect.DimLevel.Value = 1f);
             AddUntilStep("Storyboard is invisible", () => !player.IsStoryboardVisible);
-            AddStep("Disable user dim", () => player.DimmableStoryboard.EnableUserDim.Value = false);
+            AddStep("Disable user dim", () => player.DimmableStoryboard.IgnoreUserSettings.Value = true);
             AddUntilStep("Storyboard is visible", () => player.IsStoryboardVisible);
+        }
+
+        [Test]
+        public void TestStoryboardIgnoreUserSettings()
+        {
+            performFullSetup();
+            createFakeStoryboard();
+            AddStep("Enable replacing background", () => player.ReplacesBackground.Value = true);
+
+            AddUntilStep("Storyboard is invisible", () => !player.IsStoryboardVisible);
+            AddUntilStep("Background is visible", () => songSelect.IsBackgroundVisible());
+
+            AddStep("Ignore user settings", () =>
+            {
+                player.ApplyToBackground(b => b.IgnoreUserSettings.Value = true);
+                player.DimmableStoryboard.IgnoreUserSettings.Value = true;
+            });
+            AddUntilStep("Storyboard is visible", () => player.IsStoryboardVisible);
+            AddUntilStep("Background is invisible", () => songSelect.IsBackgroundInvisible());
+
+            AddStep("Disable background replacement", () => player.ReplacesBackground.Value = false);
+            AddUntilStep("Storyboard is visible", () => player.IsStoryboardVisible);
+            AddUntilStep("Background is visible", () => songSelect.IsBackgroundVisible());
         }
 
         /// <summary>
@@ -281,11 +304,11 @@ namespace osu.Game.Tests.Visual.Background
             protected override BackgroundScreen CreateBackground()
             {
                 background = new FadeAccessibleBackground(Beatmap.Value);
-                DimEnabled.BindTo(background.EnableUserDim);
+                IgnoreUserSettings.BindTo(background.IgnoreUserSettings);
                 return background;
             }
 
-            public readonly Bindable<bool> DimEnabled = new Bindable<bool>();
+            public readonly Bindable<bool> IgnoreUserSettings = new Bindable<bool>();
             public readonly Bindable<double> DimLevel = new BindableDouble();
             public readonly Bindable<double> BlurLevel = new BindableDouble();
 
