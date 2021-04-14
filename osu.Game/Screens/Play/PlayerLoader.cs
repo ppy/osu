@@ -229,7 +229,7 @@ namespace osu.Game.Screens.Play
             content.ScaleTo(0.7f, 150, Easing.InQuint);
             this.FadeOut(150);
 
-            ApplyToBackground(b => b.IgnoreUserSettings.Value = true);
+            ApplyToBackground(b => b.ApplyUserSettings.Value = false);
 
             BackgroundBrightnessReduction = false;
             Beatmap.Value.Track.RemoveAdjustment(AdjustableProperty.Volume, volumeAdjustment);
@@ -277,7 +277,7 @@ namespace osu.Game.Screens.Play
                 // Preview user-defined background dim and blur when hovered on the visual settings panel.
                 ApplyToBackground(b =>
                 {
-                    b.IgnoreUserSettings.Value = false;
+                    b.ApplyUserSettings.Value = true;
                     b.BlurAmount.Value = 0;
                 });
 
@@ -288,7 +288,7 @@ namespace osu.Game.Screens.Play
                 ApplyToBackground(b =>
                 {
                     // Returns background dim and blur to the values specified by PlayerLoader.
-                    b.IgnoreUserSettings.Value = true;
+                    b.ApplyUserSettings.Value = false;
                     b.BlurAmount.Value = BACKGROUND_BLUR;
                 });
 

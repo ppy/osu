@@ -467,7 +467,7 @@ namespace osu.Game.Screens.Edit
                 // todo: temporary. we want to be applying dim using the UserDimContainer eventually.
                 b.FadeColour(Color4.DarkGray, 500);
 
-                b.IgnoreUserSettings.Value = true;
+                b.ApplyUserSettings.Value = false;
                 b.BlurAmount.Value = 0;
             });
 

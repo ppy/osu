@@ -764,7 +764,7 @@ namespace osu.Game.Screens.Play
 
             ApplyToBackground(b =>
             {
-                b.IgnoreUserSettings.Value = false;
+                b.ApplyUserSettings.Value = true;
                 b.BlurAmount.Value = 0;
 
                 // bind component bindables.
@@ -913,7 +913,7 @@ namespace osu.Game.Screens.Play
             float fadeOutDuration = instant ? 0 : 250;
             this.FadeOut(fadeOutDuration);
 
-            ApplyToBackground(b => b.IgnoreUserSettings.Value = true);
+            ApplyToBackground(b => b.ApplyUserSettings.Value = false);
             storyboardReplacesBackground.Value = false;
         }
 

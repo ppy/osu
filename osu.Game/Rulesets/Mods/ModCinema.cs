@@ -37,8 +37,8 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToPlayer(Player player)
         {
-            player.ApplyToBackground(b => b.IgnoreUserSettings.Value = true);
-            player.DimmableStoryboard.IgnoreUserSettings.Value = true;
+            player.ApplyToBackground(b => b.ApplyUserSettings.Value = false);
+            player.DimmableStoryboard.ApplyUserSettings.Value = false;
 
             player.BreakOverlay.Hide();
         }
