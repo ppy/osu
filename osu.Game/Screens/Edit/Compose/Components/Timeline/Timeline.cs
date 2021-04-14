@@ -56,8 +56,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private Track track;
 
+        private const float timeline_height = 90;
+
         public Timeline()
         {
+            RelativeSizeAxes = Axes.X;
+            Height = timeline_height;
+
             ZoomDuration = 200;
             ZoomEasing = Easing.OutQuint;
             ScrollbarVisible = false;
