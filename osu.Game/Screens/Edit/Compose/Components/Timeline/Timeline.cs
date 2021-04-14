@@ -23,6 +23,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
     [Cached]
     public class Timeline : ZoomableScrollContainer, IPositionSnapProvider
     {
+        private readonly Drawable userContent;
         public readonly Bindable<bool> WaveformVisible = new Bindable<bool>();
 
         public readonly Bindable<bool> ControlPointsVisible = new Bindable<bool>();
@@ -57,10 +58,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private Track track;
 
         private const float timeline_height = 72;
-        private const float timeline_expanded_height = 150;
+        private const float timeline_expanded_height = 156;
 
-        public Timeline()
+        public Timeline(Drawable userContent)
         {
+            this.userContent = userContent;
+
             RelativeSizeAxes = Axes.X;
 
             ZoomDuration = 200;
@@ -118,6 +121,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             Origin = Anchor.TopCentre,
                             Colour = colours.YellowDarker,
                         },
+                        userContent,
                     }
                 },
             });
