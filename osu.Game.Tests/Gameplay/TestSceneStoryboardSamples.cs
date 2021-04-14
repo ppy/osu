@@ -67,7 +67,7 @@ namespace osu.Game.Tests.Gameplay
                 var working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
                 working.LoadTrack();
 
-                Add(gameplayContainer = new GameplayClockContainer(working, 0));
+                Add(gameplayContainer = new MasterGameplayClockContainer(working, 0));
 
                 gameplayContainer.Add(sample = new DrawableStoryboardSample(new StoryboardSampleInfo(string.Empty, 0, 1))
                 {
@@ -114,7 +114,7 @@ namespace osu.Game.Tests.Gameplay
 
                 var beatmapSkinSourceContainer = new BeatmapSkinProvidingContainer(Beatmap.Value.Skin);
 
-                Add(gameplayContainer = new GameplayClockContainer(Beatmap.Value, 0)
+                Add(gameplayContainer = new MasterGameplayClockContainer(Beatmap.Value, 0)
                 {
                     Child = beatmapSkinSourceContainer
                 });

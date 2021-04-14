@@ -3,9 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -19,27 +17,90 @@ using osu.Game.Configuration;
 
 namespace osu.Game.Screens.Play
 {
-    /// <summary>
-    /// Encapsulates gameplay timing logic and provides a <see cref="Play.GameplayClock"/> for children.
-    /// </summary>
-    public class GameplayClockContainer : Container
+    public abstract class GameplayClockContainer : Container
     {
-        private readonly WorkingBeatmap beatmap;
-
-        [NotNull]
-        private ITrack track;
+        /// <summary>
+        /// The final clock which is exposed to underlying components.
+        /// </summary>
+        public GameplayClock GameplayClock { get; private set; }
 
         public readonly BindableBool IsPaused = new BindableBool();
 
         /// <summary>
         /// The decoupled clock used for gameplay. Should be used for seeks and clock control.
         /// </summary>
-        private readonly DecoupleableInterpolatingFramedClock adjustableClock;
+        protected readonly DecoupleableInterpolatingFramedClock AdjustableClock;
 
-        private readonly double gameplayStartTime;
-        private readonly bool startAtGameplayStart;
+        protected readonly IClock SourceClock;
 
-        private readonly double firstHitObjectTime;
+        protected GameplayClockContainer(IClock sourceClock)
+        {
+            SourceClock = sourceClock;
+
+            RelativeSizeAxes = Axes.Both;
+
+            AdjustableClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
+            AdjustableClock.ChangeSource(SourceClock);
+
+            IsPaused.BindValueChanged(OnPauseChanged);
+        }
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+            dependencies.CacheAs(GameplayClock = CreateGameplayClock(AdjustableClock));
+
+            return dependencies;
+        }
+
+        public virtual void Start()
+        {
+            if (!AdjustableClock.IsRunning)
+            {
+                // Seeking the decoupled clock to its current time ensures that its source clock will be seeked to the same time
+                // This accounts for the clock source potentially taking time to enter a completely stopped state
+                Seek(GameplayClock.CurrentTime);
+
+                AdjustableClock.Start();
+            }
+
+            IsPaused.Value = false;
+        }
+
+        /// <summary>
+        /// Seek to a specific time in gameplay.
+        /// <remarks>
+        /// Adjusts for any offsets which have been applied (so the seek may not be the expected point in time on the underlying audio track).
+        /// </remarks>
+        /// </summary>
+        /// <param name="time">The destination time to seek to.</param>
+        public virtual void Seek(double time) => AdjustableClock.Seek(time);
+
+        public virtual void Stop() => IsPaused.Value = true;
+
+        public virtual void Restart()
+        {
+            AdjustableClock.Seek(0);
+            AdjustableClock.Stop();
+
+            if (!IsPaused.Value)
+                Start();
+        }
+
+        protected abstract void OnPauseChanged(ValueChangedEvent<bool> isPaused);
+
+        protected abstract GameplayClock CreateGameplayClock(IClock source);
+    }
+
+    public class MasterGameplayClockContainer : GameplayClockContainer
+    {
+        /// <summary>
+        /// Duration before gameplay start time required before skip button displays.
+        /// </summary>
+        public const double MINIMUM_SKIP_TIME = 1000;
+
+        protected new DecoupleableInterpolatingFramedClock SourceClock => (DecoupleableInterpolatingFramedClock)base.SourceClock;
 
         public readonly BindableNumber<double> UserPlaybackRate = new BindableDouble(1)
         {
@@ -49,72 +110,31 @@ namespace osu.Game.Screens.Play
             Precision = 0.1,
         };
 
-        /// <summary>
-        /// The final clock which is exposed to underlying components.
-        /// </summary>
-        public GameplayClock GameplayClock => localGameplayClock;
+        private double totalOffset => userOffsetClock.Offset + platformOffsetClock.Offset;
 
-        [Cached(typeof(GameplayClock))]
-        private readonly LocalGameplayClock localGameplayClock;
+        private readonly BindableDouble pauseFreqAdjust = new BindableDouble(1);
 
+        private readonly WorkingBeatmap beatmap;
+        private readonly double gameplayStartTime;
+        private readonly bool startAtGameplayStart;
+        private readonly double firstHitObjectTime;
+
+        private FramedOffsetClock userOffsetClock;
+        private FramedOffsetClock platformOffsetClock;
+        private LocalGameplayClock localGameplayClock;
         private Bindable<double> userAudioOffset;
 
-        private readonly FramedOffsetClock userOffsetClock;
-
-        private readonly FramedOffsetClock platformOffsetClock;
-
-        /// <summary>
-        /// Creates a new <see cref="GameplayClockContainer"/>.
-        /// </summary>
-        /// <param name="beatmap">The beatmap being played.</param>
-        /// <param name="gameplayStartTime">The suggested time to start gameplay at.</param>
-        /// <param name="startAtGameplayStart">
-        /// Whether <paramref name="gameplayStartTime"/> should be used regardless of when storyboard events and hitobjects are supposed to start.
-        /// </param>
-        public GameplayClockContainer(WorkingBeatmap beatmap, double gameplayStartTime, bool startAtGameplayStart = false)
+        public MasterGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStartTime, bool startAtGameplayStart = false)
+            : base(new DecoupleableInterpolatingFramedClock())
         {
             this.beatmap = beatmap;
             this.gameplayStartTime = gameplayStartTime;
             this.startAtGameplayStart = startAtGameplayStart;
-            track = beatmap.Track;
 
             firstHitObjectTime = beatmap.Beatmap.HitObjects.First().StartTime;
 
-            RelativeSizeAxes = Axes.Both;
-
-            adjustableClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
-
-            // Lazer's audio timings in general doesn't match stable. This is the result of user testing, albeit limited.
-            // This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
-            platformOffsetClock = new HardwareCorrectionOffsetClock(adjustableClock) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 15 : 0 };
-
-            // the final usable gameplay clock with user-set offsets applied.
-            userOffsetClock = new HardwareCorrectionOffsetClock(platformOffsetClock);
-
-            // the clock to be exposed via DI to children.
-            localGameplayClock = new LocalGameplayClock(userOffsetClock);
-
-            GameplayClock.IsPaused.BindTo(IsPaused);
-
-            IsPaused.BindValueChanged(onPauseChanged);
+            SourceClock.ChangeSource(beatmap.Track);
         }
-
-        private void onPauseChanged(ValueChangedEvent<bool> isPaused)
-        {
-            if (isPaused.NewValue)
-                this.TransformBindableTo(pauseFreqAdjust, 0, 200, Easing.Out).OnComplete(_ => adjustableClock.Stop());
-            else
-                this.TransformBindableTo(pauseFreqAdjust, 1, 200, Easing.In);
-        }
-
-        private double totalOffset => userOffsetClock.Offset + platformOffsetClock.Offset;
-
-        /// <summary>
-        /// Duration before gameplay start time required before skip button displays.
-        /// </summary>
-        public const double MINIMUM_SKIP_TIME = 1000;
-
-        private readonly BindableDouble pauseFreqAdjust = new BindableDouble(1);
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -143,39 +163,31 @@ namespace osu.Game.Screens.Play
 
             Seek(startTime);
 
-            adjustableClock.ProcessFrame();
+            AdjustableClock.ProcessFrame();
         }
 
-        public void Restart()
+        protected override void OnPauseChanged(ValueChangedEvent<bool> isPaused)
         {
-            Task.Run(() =>
-            {
-                track.Seek(0);
-                track.Stop();
-
-                Schedule(() =>
-                {
-                    adjustableClock.ChangeSource(track);
-                    updateRate();
-
-                    if (!IsPaused.Value)
-                        Start();
-                });
-            });
+            if (isPaused.NewValue)
+                this.TransformBindableTo(pauseFreqAdjust, 0, 200, Easing.Out).OnComplete(_ => AdjustableClock.Stop());
+            else
+                this.TransformBindableTo(pauseFreqAdjust, 1, 200, Easing.In);
         }
 
-        public void Start()
+        public override void Seek(double time)
         {
-            if (!adjustableClock.IsRunning)
-            {
-                // Seeking the decoupled clock to its current time ensures that its source clock will be seeked to the same time
-                // This accounts for the audio clock source potentially taking time to enter a completely stopped state
-                Seek(GameplayClock.CurrentTime);
+            // remove the offset component here because most of the time we want the seek to be aligned to gameplay, not the audio track.
+            // we may want to consider reversing the application of offsets in the future as it may feel more correct.
+            base.Seek(time - totalOffset);
 
-                adjustableClock.Start();
-            }
+            // manually process frame to ensure GameplayClock is correctly updated after a seek.
+            userOffsetClock.ProcessFrame();
+        }
 
-            IsPaused.Value = false;
+        public override void Restart()
+        {
+            updateRate();
+            base.Restart();
         }
 
         /// <summary>
@@ -195,26 +207,24 @@ namespace osu.Game.Screens.Play
             Seek(skipTarget);
         }
 
-        /// <summary>
-        /// Seek to a specific time in gameplay.
-        /// <remarks>
-        /// Adjusts for any offsets which have been applied (so the seek may not be the expected point in time on the underlying audio track).
-        /// </remarks>
-        /// </summary>
-        /// <param name="time">The destination time to seek to.</param>
-        public void Seek(double time)
+        protected override GameplayClock CreateGameplayClock(IClock source)
         {
-            // remove the offset component here because most of the time we want the seek to be aligned to gameplay, not the audio track.
-            // we may want to consider reversing the application of offsets in the future as it may feel more correct.
-            adjustableClock.Seek(time - totalOffset);
+            // Lazer's audio timings in general doesn't match stable. This is the result of user testing, albeit limited.
+            // This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
+            platformOffsetClock = new HardwareCorrectionOffsetClock(source) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 15 : 0 };
 
-            // manually process frame to ensure GameplayClock is correctly updated after a seek.
-            userOffsetClock.ProcessFrame();
+            // the final usable gameplay clock with user-set offsets applied.
+            userOffsetClock = new HardwareCorrectionOffsetClock(platformOffsetClock);
+
+            return localGameplayClock = new LocalGameplayClock(userOffsetClock);
         }
 
-        public void Stop()
+        protected override void Update()
         {
-            IsPaused.Value = true;
+            if (!IsPaused.Value)
+                userOffsetClock.ProcessFrame();
+
+            base.Update();
         }
 
         /// <summary>
@@ -223,19 +233,7 @@ namespace osu.Game.Screens.Play
         public void StopUsingBeatmapClock()
         {
             removeSourceClockAdjustments();
-
-            track = new TrackVirtual(track.Length);
-            adjustableClock.ChangeSource(track);
-        }
-
-        protected override void Update()
-        {
-            if (!IsPaused.Value)
-            {
-                userOffsetClock.ProcessFrame();
-            }
-
-            base.Update();
+            SourceClock.ChangeSource(new TrackVirtual(beatmap.Track.Length));
         }
 
         private bool speedAdjustmentsApplied;
@@ -244,6 +242,8 @@ namespace osu.Game.Screens.Play
         {
             if (speedAdjustmentsApplied)
                 return;
+
+            var track = (Track)SourceClock.Source;
 
             track.AddAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
             track.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
@@ -254,15 +254,12 @@ namespace osu.Game.Screens.Play
             speedAdjustmentsApplied = true;
         }
 
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            removeSourceClockAdjustments();
-        }
-
         private void removeSourceClockAdjustments()
         {
-            if (!speedAdjustmentsApplied) return;
+            if (!speedAdjustmentsApplied)
+                return;
+
+            var track = (Track)SourceClock.Source;
 
             track.RemoveAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
             track.RemoveAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
@@ -273,16 +270,10 @@ namespace osu.Game.Screens.Play
             speedAdjustmentsApplied = false;
         }
 
-        private class LocalGameplayClock : GameplayClock
+        protected override void Dispose(bool isDisposing)
         {
-            public readonly List<Bindable<double>> MutableNonGameplayAdjustments = new List<Bindable<double>>();
-
-            public override IEnumerable<Bindable<double>> NonGameplayAdjustments => MutableNonGameplayAdjustments;
-
-            public LocalGameplayClock(FramedOffsetClock underlyingClock)
-                : base(underlyingClock)
-            {
-            }
+            base.Dispose(isDisposing);
+            removeSourceClockAdjustments();
         }
 
         private class HardwareCorrectionOffsetClock : FramedOffsetClock
@@ -293,6 +284,18 @@ namespace osu.Game.Screens.Play
 
             public HardwareCorrectionOffsetClock(IClock source, bool processSource = true)
                 : base(source, processSource)
+            {
+            }
+        }
+
+        private class LocalGameplayClock : GameplayClock
+        {
+            public readonly List<Bindable<double>> MutableNonGameplayAdjustments = new List<Bindable<double>>();
+
+            public override IEnumerable<Bindable<double>> NonGameplayAdjustments => MutableNonGameplayAdjustments;
+
+            public LocalGameplayClock(FramedOffsetClock underlyingClock)
+                : base(underlyingClock)
             {
             }
         }
