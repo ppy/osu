@@ -105,6 +105,7 @@ namespace osu.Game.Screens.Edit
                         {
                             Name = "Main content",
                             RelativeSizeAxes = Axes.Both,
+                            Depth = float.MaxValue,
                             Padding = new MarginPadding
                             {
                                 Horizontal = horizontal_margins,
