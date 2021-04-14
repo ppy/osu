@@ -12,11 +12,19 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class TimelineArea : Container
+    public class TimelineArea : CompositeDrawable
     {
-        public readonly Timeline Timeline = new Timeline();
+        public Timeline Timeline;
 
-        protected override Container<Drawable> Content => Timeline;
+        private readonly Drawable userContent;
+
+        public TimelineArea(Drawable content = null)
+        {
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
+
+            userContent = content ?? Drawable.Empty();
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -122,7 +130,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                     }
                                 }
                             },
-                            Timeline
+                            Timeline = new Timeline(userContent),
                         },
                     },
                     RowDimensions = new[]
