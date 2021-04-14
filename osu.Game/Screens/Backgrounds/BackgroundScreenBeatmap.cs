@@ -50,6 +50,9 @@ namespace osu.Game.Screens.Backgrounds
 
             InternalChild = dimmable = CreateFadeContainer();
 
+            // Beatmap background screens should not apply user settings by default.
+            IgnoreUserSettings.Value = true;
+
             dimmable.IgnoreUserSettings.BindTo(IgnoreUserSettings);
             dimmable.IsBreakTime.BindTo(IsBreakTime);
             dimmable.BlurAmount.BindTo(BlurAmount);
