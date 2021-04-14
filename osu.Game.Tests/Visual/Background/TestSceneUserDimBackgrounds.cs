@@ -72,8 +72,8 @@ namespace osu.Game.Tests.Visual.Background
         public void TestUserSettingsIgnoredOnSongSelect()
         {
             setupUserSettings();
-            AddAssert("Screen is undimmed", () => songSelect.IsBackgroundUndimmed());
-            AddAssert("Screen using background blur", () => songSelect.IsBackgroundBlur());
+            AddUntilStep("Screen is undimmed", () => songSelect.IsBackgroundUndimmed());
+            AddUntilStep("Screen using background blur", () => songSelect.IsBackgroundBlur());
             performFullSetup();
             AddStep("Exit to song select", () => player.Exit());
             AddUntilStep("Screen is undimmed", () => songSelect.IsBackgroundUndimmed());
