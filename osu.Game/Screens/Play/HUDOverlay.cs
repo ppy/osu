@@ -24,9 +24,9 @@ namespace osu.Game.Screens.Play
     [Cached]
     public class HUDOverlay : Container, IKeyBindingHandler<GlobalAction>
     {
-        public const float FADE_DURATION = 400;
+        public const float FADE_DURATION = 300;
 
-        public const Easing FADE_EASING = Easing.Out;
+        public const Easing FADE_EASING = Easing.OutQuint;
 
         /// <summary>
         /// The total height of all the top of screen scoring elements.
