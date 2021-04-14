@@ -74,13 +74,18 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [BackgroundDependencyLoader]
         private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours, OsuConfigManager config)
         {
+            CentreMarker centreMarker;
+
+            // We don't want the centre marker to scroll
+            AddInternal(centreMarker = new CentreMarker());
+
             AddRange(new Drawable[]
             {
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Depth = float.MaxValue,
-                    Children = new Drawable[]
+                    Children = new[]
                     {
                         waveform = new WaveformGraph
                         {
@@ -90,6 +95,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             MidColour = colours.BlueDark,
                             HighColour = colours.BlueDarker,
                         },
+                        centreMarker.CreateProxy(),
                         ticks = new TimelineTickDisplay(),
                         controlPoints = new TimelineControlPointDisplay(),
                         new Box
@@ -103,9 +109,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     }
                 },
             });
-
-            // We don't want the centre marker to scroll
-            AddInternal(new CentreMarker { Depth = float.MaxValue });
 
             waveformOpacity = config.GetBindable<float>(OsuSetting.EditorWaveformOpacity);
             waveformOpacity.BindValueChanged(_ => updateWaveformOpacity(), true);
