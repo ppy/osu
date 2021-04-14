@@ -56,8 +56,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private Track track;
 
-        private const float timeline_height = 90;
-        private const float timeline_expanded_height = 180;
+        private const float timeline_height = 72;
+        private const float timeline_expanded_height = 150;
 
         public Timeline()
         {
@@ -73,6 +73,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private TimelineTickDisplay ticks;
 
         private TimelineControlPointDisplay controlPoints;
+
+        private Container mainContent;
 
         private Bindable<float> waveformOpacity;
 
@@ -91,11 +93,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     RelativeSizeAxes = Axes.X,
                     Height = timeline_expanded_height,
                 },
-                new Container
+                mainContent = new Container
                 {
                     RelativeSizeAxes = Axes.X,
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
                     Height = timeline_height,
                     Depth = float.MaxValue,
                     Children = new[]
@@ -139,6 +139,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 if (visible.NewValue)
                 {
                     this.ResizeHeightTo(timeline_expanded_height, 200, Easing.OutQuint);
+                    mainContent.MoveToY(36, 200, Easing.OutQuint);
 
                     // delay the fade in else masking looks weird.
                     controlPoints.Delay(180).FadeIn(400, Easing.OutQuint);
@@ -149,6 +150,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                     // likewise, delay the resize until the fade is complete.
                     this.Delay(180).ResizeHeightTo(timeline_height, 200, Easing.OutQuint);
+                    mainContent.Delay(180).MoveToY(0, 200, Easing.OutQuint);
                 }
             }, true);
 
