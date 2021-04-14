@@ -31,16 +31,12 @@ namespace osu.Game.Screens.Play
         /// </summary>
         protected readonly DecoupleableInterpolatingFramedClock AdjustableClock;
 
-        protected readonly IClock SourceClock;
-
         protected GameplayClockContainer(IClock sourceClock)
         {
-            SourceClock = sourceClock;
-
             RelativeSizeAxes = Axes.Both;
 
             AdjustableClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
-            AdjustableClock.ChangeSource(SourceClock);
+            AdjustableClock.ChangeSource(sourceClock);
 
             IsPaused.BindValueChanged(OnPauseChanged);
         }
@@ -101,7 +97,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public const double MINIMUM_SKIP_TIME = 1000;
 
-        protected new DecoupleableInterpolatingFramedClock SourceClock => (DecoupleableInterpolatingFramedClock)base.SourceClock;
+        protected Track Track => (Track)AdjustableClock.Source;
 
         public readonly BindableNumber<double> UserPlaybackRate = new BindableDouble(1)
         {
@@ -126,15 +122,13 @@ namespace osu.Game.Screens.Play
         private Bindable<double> userAudioOffset;
 
         public MasterGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStartTime, bool startAtGameplayStart = false)
-            : base(new DecoupleableInterpolatingFramedClock())
+            : base(beatmap.Track)
         {
             this.beatmap = beatmap;
             this.gameplayStartTime = gameplayStartTime;
             this.startAtGameplayStart = startAtGameplayStart;
 
             firstHitObjectTime = beatmap.Beatmap.HitObjects.First().StartTime;
-
-            SourceClock.ChangeSource(beatmap.Track);
         }
 
         [BackgroundDependencyLoader]
@@ -234,7 +228,7 @@ namespace osu.Game.Screens.Play
         public void StopUsingBeatmapClock()
         {
             removeSourceClockAdjustments();
-            SourceClock.ChangeSource(new TrackVirtual(beatmap.Track.Length));
+            AdjustableClock.ChangeSource(new TrackVirtual(beatmap.Track.Length));
         }
 
         private bool speedAdjustmentsApplied;
@@ -244,10 +238,8 @@ namespace osu.Game.Screens.Play
             if (speedAdjustmentsApplied)
                 return;
 
-            var track = (Track)SourceClock.Source;
-
-            track.AddAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
-            track.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
+            Track.AddAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
+            Track.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
 
             localGameplayClock.MutableNonGameplayAdjustments.Add(pauseFreqAdjust);
             localGameplayClock.MutableNonGameplayAdjustments.Add(UserPlaybackRate);
@@ -260,10 +252,8 @@ namespace osu.Game.Screens.Play
             if (!speedAdjustmentsApplied)
                 return;
 
-            var track = (Track)SourceClock.Source;
-
-            track.RemoveAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
-            track.RemoveAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
+            Track.RemoveAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
+            Track.RemoveAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
 
             localGameplayClock.MutableNonGameplayAdjustments.Remove(pauseFreqAdjust);
             localGameplayClock.MutableNonGameplayAdjustments.Remove(UserPlaybackRate);
