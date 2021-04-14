@@ -56,11 +56,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                     },
                                     new FillFlowContainer
                                     {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
                                         AutoSizeAxes = Axes.Y,
                                         Width = 160,
-                                        Padding = new MarginPadding { Horizontal = 10 },
+                                        Padding = new MarginPadding(10),
                                         Direction = FillDirection.Vertical,
                                         Spacing = new Vector2(0, 4),
                                         Children = new[]
