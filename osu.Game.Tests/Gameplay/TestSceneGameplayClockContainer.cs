@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Gameplay
                 var working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
                 working.LoadTrack();
 
-                Add(gcc = new GameplayClockContainer(working, 0));
+                Add(gcc = new MasterGameplayClockContainer(working, 0));
             });
 
             AddStep("start track", () => gcc.Start());
