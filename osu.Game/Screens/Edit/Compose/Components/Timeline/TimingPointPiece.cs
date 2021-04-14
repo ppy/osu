@@ -3,15 +3,12 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
@@ -31,26 +28,27 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Origin = Anchor.CentreLeft;
-            Anchor = Anchor.CentreLeft;
+            Margin = new MarginPadding { Vertical = 10 };
+
+            const float corner_radius = 5;
 
             AutoSizeAxes = Axes.Both;
-
-            Color4 colour = point.GetRepresentingColour(colours);
+            Masking = true;
+            CornerRadius = corner_radius;
 
             InternalChildren = new Drawable[]
             {
                 new Box
                 {
-                    Alpha = 0.9f,
-                    Colour = ColourInfo.GradientHorizontal(colour, colour.Opacity(0.5f)),
+                    Colour = point.GetRepresentingColour(colours),
                     RelativeSizeAxes = Axes.Both,
                 },
                 bpmText = new OsuSpriteText
                 {
                     Alpha = 0.9f,
-                    Padding = new MarginPadding(3),
-                    Font = OsuFont.Default.With(size: 40)
+                    Padding = new MarginPadding { Vertical = 3, Horizontal = 6 },
+                    Font = OsuFont.Default.With(size: 20, weight: FontWeight.SemiBold),
+                    Colour = colours.B5,
                 }
             };
 
