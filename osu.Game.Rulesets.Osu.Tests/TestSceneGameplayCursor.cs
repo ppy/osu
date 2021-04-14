@@ -93,7 +93,6 @@ namespace osu.Game.Rulesets.Osu.Tests
         public void TestTopLeftOrigin()
         {
             AddStep("load content", () => loadContent(false, () => new SkinProvidingContainer(new TopLeftCursorSkin())));
-            AddAssert("cursor top left", () => lastContainer.ActiveCursor.Origin == Anchor.TopLeft);
         }
 
         private void loadContent(bool automated = true, Func<SkinProvidingContainer> skinProvider = null)
