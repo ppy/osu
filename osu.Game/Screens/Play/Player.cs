@@ -74,6 +74,8 @@ namespace osu.Game.Screens.Play
 
         private Bindable<bool> mouseWheelDisabled;
 
+        private Bindable<bool> storyboardEnabled;
+
         private readonly Bindable<bool> storyboardReplacesBackground = new Bindable<bool>();
 
         protected readonly Bindable<bool> LocalUserPlaying = new Bindable<bool>();
@@ -105,6 +107,8 @@ namespace osu.Game.Screens.Play
         private BreakTracker breakTracker;
 
         private SkipOverlay skipOverlay;
+
+        private SkipOverlay skipOutroOverlay;
 
         protected ScoreProcessor ScoreProcessor { get; private set; }
 
@@ -189,6 +193,8 @@ namespace osu.Game.Screens.Play
             sampleRestart = audio.Samples.Get(@"Gameplay/restart");
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
+
+            storyboardEnabled = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
 
             if (game != null)
                 gameActive.BindTo(game.IsActive);
@@ -285,6 +291,9 @@ namespace osu.Game.Screens.Play
             ScoreProcessor.HasCompleted.ValueChanged += updateCompletionState;
             HealthProcessor.Failed += onFail;
 
+            // Keep track of whether the storyboard ended after the playable portion
+            GameplayClockContainer.HasStoryboardEnded.ValueChanged += updateCompletionState;
+
             foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
                 mod.ApplyToScoreProcessor(ScoreProcessor);
 
@@ -360,6 +369,10 @@ namespace osu.Game.Screens.Play
                     {
                         RequestSkip = performUserRequestedSkip
                     },
+                    skipOutroOverlay = new SkipOverlay(GameplayClockContainer.StoryboardEndTime)
+                    {
+                        RequestSkip = scheduleCompletion
+                    },
                     FailOverlay = new FailOverlay
                     {
                         OnRetry = Restart,
@@ -389,6 +402,9 @@ namespace osu.Game.Screens.Play
             if (!Configuration.AllowSkippingIntro)
                 skipOverlay.Expire();
 
+            if (!Configuration.AllowSkippingOutro)
+                skipOutroOverlay.Expire();
+
             if (Configuration.AllowRestart)
             {
                 container.Add(new HotkeyRetryOverlay
@@ -402,6 +418,8 @@ namespace osu.Game.Screens.Play
                     },
                 });
             }
+
+            skipOutroOverlay.Hide();
 
             return container;
         }
@@ -523,6 +541,14 @@ namespace osu.Game.Screens.Play
                     Pause();
                     return;
                 }
+
+                // show the score if in storyboard outro (score has been set)
+                bool scoreReady = prepareScoreForDisplayTask != null && prepareScoreForDisplayTask.IsCompleted;
+
+                if (scoreReady)
+                {
+                    scheduleCompletion();
+                }
             }
 
             this.Exit();
@@ -610,6 +636,14 @@ namespace osu.Game.Screens.Play
 
                 return score.ScoreInfo;
             });
+
+            // show skip overlay if storyboard is enabled and has an outro
+            if (storyboardEnabled.Value && GameplayClockContainer.HasTimeLeftInStoryboard)
+            {
+                skipOutroOverlay.Show();
+                completionProgressDelegate = null;
+                return;
+            }
 
             using (BeginDelayedSequence(RESULTS_DISPLAY_DELAY))
                 scheduleCompletion();

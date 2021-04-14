@@ -228,12 +228,19 @@ namespace osu.Game.Screens.Play
             adjustableClock.ChangeSource(track);
         }
 
+        /// <summary>
+        /// Gets the endtime of the last element in the storyboard in ms, or start time of the last hitobject if there's no storyboard.
+        /// </summary>
+        public double StoryboardEndTime => beatmap.Storyboard.LatestEventTime ?? 0;
+
         protected override void Update()
         {
             if (!IsPaused.Value)
             {
                 userOffsetClock.ProcessFrame();
             }
+
+            updateHasStoryboardEnded();
 
             base.Update();
         }
@@ -296,5 +303,23 @@ namespace osu.Game.Screens.Play
             {
             }
         }
+
+        # region Storyboard outro logic
+
+        public IBindable<bool> HasStoryboardEnded => hasStoryboardEnded;
+
+        public bool HasTimeLeftInStoryboard => GameplayClock.CurrentTime <= StoryboardEndTime;
+
+        private readonly BindableBool hasStoryboardEnded = new BindableBool(true);
+
+        private void updateHasStoryboardEnded()
+        {
+            if (StoryboardEndTime == 0)
+                return;
+
+            hasStoryboardEnded.Value = GameplayClock.CurrentTime >= StoryboardEndTime;
+        }
+
+        # endregion
     }
 }

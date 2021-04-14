@@ -24,5 +24,10 @@ namespace osu.Game.Screens.Play
         /// Whether the player should be allowed to skip the intro, advancing to the start of gameplay.
         /// </summary>
         public bool AllowSkippingIntro { get; set; } = true;
+
+        /// <summary>
+        /// Whether the player should be allowed to skip the outro, advancing to the end of a storyboard.
+        /// </summary>
+        public bool AllowSkippingOutro { get; set; } = true;
     }
 }
