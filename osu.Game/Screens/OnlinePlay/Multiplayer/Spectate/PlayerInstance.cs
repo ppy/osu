@@ -2,8 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
@@ -38,15 +36,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public WorkingBeatmap Beatmap { get; private set; }
 
         public readonly Score Score;
+        private readonly GameplayClock gameplayClock;
 
         public bool IsCatchingUp { get; private set; }
 
         private OsuScreenStack stack;
         private MultiplayerSpectatorPlayer player;
 
-        public PlayerInstance(Score score)
+        public PlayerInstance(Score score, GameplayClock gameplayClock)
         {
             Score = score;
+            this.gameplayClock = gameplayClock;
 
             RelativeSizeAxes = Axes.Both;
             Masking = true;
@@ -67,7 +67,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 }
             };
 
-            stack.Push(new MultiplayerSpectatorPlayerLoader(Score, () => player = new MultiplayerSpectatorPlayer(Score)));
+            stack.Push(new MultiplayerSpectatorPlayerLoader(Score, () => player = new MultiplayerSpectatorPlayer(Score, gameplayClock)));
         }
 
         protected override void UpdateAfterChildren()
@@ -76,8 +76,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             updateCatchup();
         }
 
-        private readonly BindableDouble catchupFrequencyAdjustment = new BindableDouble(catchup_rate);
-        private double targetTrackTime;
+        private double targetGameplayTime;
 
         private void updateCatchup()
         {
@@ -91,7 +90,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 return;
 
             double currentTime = Beatmap.Track.CurrentTime;
-            double timeBehind = targetTrackTime - currentTime;
+            double timeBehind = targetGameplayTime - currentTime;
 
             double offsetForCatchup = IsCatchingUp ? SYNC_TARGET : MAX_OFFSET;
             bool catchupRequired = timeBehind > offsetForCatchup;
@@ -102,12 +101,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             if (catchupRequired)
             {
-                Beatmap.Track.AddAdjustment(AdjustableProperty.Frequency, catchupFrequencyAdjustment);
+                // player.GameplayClockContainer.AdjustableClock.Rate = catchup_rate;
                 Logger.Log($"{User.Id} catchup started (behind: {(int)timeBehind})");
             }
             else
             {
-                Beatmap.Track.RemoveAdjustment(AdjustableProperty.Frequency, catchupFrequencyAdjustment);
+                // player.GameplayClockContainer.AdjustableClock.Rate = 1;
                 Logger.Log($"{User.Id} catchup finished (behind: {(int)timeBehind})");
             }
 
@@ -122,21 +121,21 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             return player.GameplayClockContainer.GameplayClock.CurrentTime;
         }
 
-        public double GetCurrentTrackTime()
+        public bool IsPlaying()
         {
-            if (player?.IsLoaded != true)
-                return 0;
+            if (player.IsLoaded != true)
+                return false;
 
-            return Beatmap.Track.CurrentTime;
+            return player.GameplayClockContainer.GameplayClock.IsRunning;
         }
 
-        public void ContinueGameplay(double targetTrackTime)
+        public void ContinueGameplay(double targetGameplayTime)
         {
             if (player?.IsLoaded != true)
                 return;
 
             player.GameplayClockContainer.Start();
-            this.targetTrackTime = targetTrackTime;
+            this.targetGameplayTime = targetGameplayTime;
         }
 
         public void PauseGameplay()

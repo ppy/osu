@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Utils;
 using osu.Game.Online.Spectator;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Spectate;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
@@ -29,6 +30,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private SpectatorStreamingClient spectatorClient { get; set; }
 
         private readonly PlayerInstance[] instances;
+        private GameplayClockContainer gameplayClockContainer;
         private PlayerGrid grid;
         private MultiplayerSpectatorLeaderboard leaderboard;
         private double? loadFinishTime;
@@ -44,23 +46,26 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         {
             Container leaderboardContainer;
 
-            InternalChild = new GridContainer
+            InternalChild = gameplayClockContainer = new MasterGameplayClockContainer(Beatmap.Value, 0)
             {
-                RelativeSizeAxes = Axes.Both,
-                ColumnDimensions = new[]
+                Child = new GridContainer
                 {
-                    new Dimension(GridSizeMode.AutoSize)
-                },
-                Content = new[]
-                {
-                    new Drawable[]
+                    RelativeSizeAxes = Axes.Both,
+                    ColumnDimensions = new[]
                     {
-                        leaderboardContainer = new Container
+                        new Dimension(GridSizeMode.AutoSize)
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
                         {
-                            RelativeSizeAxes = Axes.Y,
-                            AutoSizeAxes = Axes.X
-                        },
-                        grid = new PlayerGrid { RelativeSizeAxes = Axes.Both }
+                            leaderboardContainer = new Container
+                            {
+                                RelativeSizeAxes = Axes.Y,
+                                AutoSizeAxes = Axes.X
+                            },
+                            grid = new PlayerGrid { RelativeSizeAxes = Axes.Both }
+                        }
                     }
                 }
             };
@@ -94,6 +99,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                     && instances.Any(i => i.Score.Replay.Frames.Count > 0))
             );
 
+        private bool firstStartFrame = true;
+
         private void updateGameplayPlayingState()
         {
             // Make sure all players are loaded and have frames before starting any.
@@ -104,13 +111,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 return;
             }
 
+            if (firstStartFrame)
+                gameplayClockContainer.Restart();
+
             // Not all instances may be in a valid gameplay state (see canStartGameplay). Only control the ones that are.
             IEnumerable<PlayerInstance> validInstances = instances.Where(i => i.Score.Replay.Frames.Count > 0);
 
-            double targetTrackTime = validInstances.Select(i => i.GetCurrentTrackTime()).Max();
+            double targetGameplayTime = gameplayClockContainer.GameplayClock.CurrentTime;
 
-            var instanceTimes = string.Join(',', validInstances.Select(i => $" {i.User.Id}: {(int)i.GetCurrentTrackTime()}"));
-            Logger.Log($"target: {(int)targetTrackTime},{instanceTimes}");
+            var instanceTimes = string.Join(',', validInstances.Select(i => $" {i.User.Id}: {(int)i.GetCurrentGameplayTime()}"));
+            Logger.Log($"target: {(int)targetGameplayTime},{instanceTimes}");
 
             foreach (var inst in validInstances)
             {
@@ -123,8 +133,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 if (!canContinuePlayback)
                     continue;
 
-                inst.ContinueGameplay(targetTrackTime);
+                inst.ContinueGameplay(targetGameplayTime);
             }
+
+            firstStartFrame = false;
         }
 
         protected override void OnUserStateChanged(int userId, SpectatorState spectatorState)
@@ -142,7 +154,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 leaderboard.RemoveClock(existingInstance.User.Id);
             }
 
-            LoadComponentAsync(instances[userIndex] = new PlayerInstance(gameplayState.Score), d =>
+            LoadComponentAsync(instances[userIndex] = new PlayerInstance(gameplayState.Score, gameplayClockContainer.GameplayClock), d =>
             {
                 if (instances[userIndex] == d)
                 {
