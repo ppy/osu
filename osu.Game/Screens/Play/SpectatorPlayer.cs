@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Play
             if (firstFrameTime == null || firstFrameTime <= gameplayStart + 5000)
                 return base.CreateGameplayClockContainer(beatmap, gameplayStart);
 
-            return new GameplayClockContainer(beatmap, firstFrameTime.Value, true);
+            return new MasterGameplayClockContainer(beatmap, firstFrameTime.Value, true);
         }
 
         public override bool OnExiting(IScreen next)
