@@ -66,6 +66,21 @@ namespace osu.Game.Tests.Visual.Background
         });
 
         /// <summary>
+        /// User settings should always be ignored on song select screen.
+        /// </summary>
+        [Test]
+        public void TestUserSettingsIgnoredOnSongSelect()
+        {
+            setupUserSettings();
+            AddAssert("Screen is undimmed", () => songSelect.IsBackgroundUndimmed());
+            AddAssert("Screen using background blur", () => songSelect.IsBackgroundBlur());
+            performFullSetup();
+            AddStep("Exit to song select", () => player.Exit());
+            AddUntilStep("Screen is undimmed", () => songSelect.IsBackgroundUndimmed());
+            AddUntilStep("Screen using background blur", () => songSelect.IsBackgroundBlur());
+        }
+
+        /// <summary>
         /// Check if <see cref="PlayerLoader"/> properly triggers the visual settings preview when a user hovers over the visual settings panel.
         /// </summary>
         [Test]
@@ -228,17 +243,6 @@ namespace osu.Game.Tests.Visual.Background
         }
 
         /// <summary>
-        /// Check if background gets undimmed and unblurred when leaving <see cref="Player"/>  for <see cref="PlaySongSelect"/>
-        /// </summary>
-        [Test]
-        public void TestTransitionOut()
-        {
-            performFullSetup();
-            AddStep("Exit to song select", () => player.Exit());
-            AddUntilStep("Screen is undimmed and user blur removed", () => songSelect.IsBackgroundUndimmed() && songSelect.IsBlurCorrect());
-        }
-
-        /// <summary>
         /// Check if hovering on the visual settings dialogue after resuming from player still previews the background dim.
         /// </summary>
         [Test]
@@ -333,7 +337,7 @@ namespace osu.Game.Tests.Visual.Background
 
             public bool IsBackgroundVisible() => background.CurrentAlpha == 1;
 
-            public bool IsBlurCorrect() => background.CurrentBlur == new Vector2(BACKGROUND_BLUR);
+            public bool IsBackgroundBlur() => background.CurrentBlur == new Vector2(BACKGROUND_BLUR);
 
             public bool CheckBackgroundBlur(Vector2 expected) => background.CurrentBlur == expected;
 
