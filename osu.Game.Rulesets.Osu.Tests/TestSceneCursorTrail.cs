@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 RelativeSizeAxes = Axes.Both;
             }
 
-            public Drawable GetDrawableComponent(ISkinComponent component) => throw new NotImplementedException();
+            public Drawable GetDrawableComponent(ISkinComponent component) => null;
 
             public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
             {
@@ -98,9 +98,9 @@ namespace osu.Game.Rulesets.Osu.Tests
                 return null;
             }
 
-            public ISample GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
+            public ISample GetSample(ISampleInfo sampleInfo) => null;
 
-            public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotImplementedException();
+            public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => null;
 
             public event Action SourceChanged
             {
