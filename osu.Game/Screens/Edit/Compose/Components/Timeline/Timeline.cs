@@ -57,11 +57,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private Track track;
 
         private const float timeline_height = 90;
+        private const float timeline_expanded_height = 180;
 
         public Timeline()
         {
             RelativeSizeAxes = Axes.X;
-            Height = timeline_height;
 
             ZoomDuration = 200;
             ZoomEasing = Easing.OutQuint;
@@ -86,9 +86,17 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             AddRange(new Drawable[]
             {
+                controlPoints = new TimelineControlPointDisplay
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = timeline_expanded_height,
+                },
                 new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.X,
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    Height = timeline_height,
                     Depth = float.MaxValue,
                     Children = new[]
                     {
@@ -102,7 +110,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         },
                         centreMarker.CreateProxy(),
                         ticks = new TimelineTickDisplay(),
-                        controlPoints = new TimelineControlPointDisplay(),
                         new Box
                         {
                             Name = "zero marker",
@@ -116,13 +123,35 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             });
 
             waveformOpacity = config.GetBindable<float>(OsuSetting.EditorWaveformOpacity);
+            Beatmap.BindTo(beatmap);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
             waveformOpacity.BindValueChanged(_ => updateWaveformOpacity(), true);
 
             WaveformVisible.ValueChanged += _ => updateWaveformOpacity();
-            ControlPointsVisible.ValueChanged += visible => controlPoints.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
             TicksVisible.ValueChanged += visible => ticks.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
+            ControlPointsVisible.BindValueChanged(visible =>
+            {
+                if (visible.NewValue)
+                {
+                    this.ResizeHeightTo(timeline_expanded_height, 200, Easing.OutQuint);
 
-            Beatmap.BindTo(beatmap);
+                    // delay the fade in else masking looks weird.
+                    controlPoints.Delay(180).FadeIn(400, Easing.OutQuint);
+                }
+                else
+                {
+                    controlPoints.FadeOut(200, Easing.OutQuint);
+
+                    // likewise, delay the resize until the fade is complete.
+                    this.Delay(180).ResizeHeightTo(timeline_height, 200, Easing.OutQuint);
+                }
+            }, true);
+
             Beatmap.BindValueChanged(b =>
             {
                 waveform.Waveform = b.NewValue.Waveform;
