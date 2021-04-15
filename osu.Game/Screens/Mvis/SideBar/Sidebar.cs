@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Mvis.SideBar
         [Resolved]
         private CustomColourProvider colourProvider { get; set; }
 
-        private readonly List<ISidebarContent> components = new List<ISidebarContent>();
+        public readonly List<ISidebarContent> Components = new List<ISidebarContent>();
         private readonly TabHeader header;
         private const float duration = 400;
         private HeaderTabItem prevTab;
@@ -168,7 +168,7 @@ namespace osu.Game.Screens.Mvis.SideBar
             if (!(d is ISidebarContent c))
                 throw new InvalidOperationException($"{d}不是{typeof(ISidebarContent)}");
 
-            if (!components.Contains(c))
+            if (!Components.Contains(c))
                 throw new InvalidOperationException($"组成部分中不包含{c}");
 
             if (c.ResizeWidth < 0.3f || c.ResizeHeight < 0.3f)
@@ -207,7 +207,7 @@ namespace osu.Game.Screens.Mvis.SideBar
             if (d is ISidebarContent s)
             {
                 d.Alpha = 0;
-                components.Add(s);
+                Components.Add(s);
                 header.Tabs.Add(new HeaderTabItem(s)
                 {
                     Action = () => ShowComponent(d)

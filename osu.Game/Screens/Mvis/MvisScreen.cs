@@ -645,6 +645,8 @@ namespace osu.Game.Screens.Mvis
                 if (pluginSidebarPage != null) sidebar.Add(pluginSidebarPage);
             }
 
+            pluginManager.OnPluginUnLoad += onPluginUnLoad;
+
             Beatmap.TriggerChange();
 
             showOverlays(true);
@@ -652,6 +654,15 @@ namespace osu.Game.Screens.Mvis
             OnTrackRunningToggle?.Invoke(track.IsRunning);
 
             base.LoadComplete();
+        }
+
+        private void onPluginUnLoad(MvisPlugin pl)
+        {
+            foreach (var sc in sidebar.Components)
+            {
+                if (sc is PluginSidebarPage plsp && plsp.Plugin == pl)
+                    sidebar.Remove(plsp);
+            }
         }
 
         internal bool RemovePluginFromLoadList(MvisPlugin pl)
@@ -749,6 +760,7 @@ namespace osu.Game.Screens.Mvis
             this.FadeOut(500, Easing.OutQuint);
 
             OnScreenExiting?.Invoke();
+            pluginManager.OnPluginUnLoad -= onPluginUnLoad;
 
             return base.OnExiting(next);
         }
