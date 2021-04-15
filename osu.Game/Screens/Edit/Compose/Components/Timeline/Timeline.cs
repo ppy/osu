@@ -128,7 +128,21 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             });
 
             waveformOpacity = config.GetBindable<float>(OsuSetting.EditorWaveformOpacity);
+
             Beatmap.BindTo(beatmap);
+            Beatmap.BindValueChanged(b =>
+            {
+                waveform.Waveform = b.NewValue.Waveform;
+                track = b.NewValue.Track;
+
+                // todo: i don't think this is safe, the track may not be loaded yet.
+                if (track.Length > 0)
+                {
+                    MaxZoom = getZoomLevelForVisibleMilliseconds(500);
+                    MinZoom = getZoomLevelForVisibleMilliseconds(10000);
+                    Zoom = getZoomLevelForVisibleMilliseconds(2000);
+                }
+            }, true);
         }
 
         protected override void LoadComplete()
@@ -156,20 +170,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     // likewise, delay the resize until the fade is complete.
                     this.Delay(180).ResizeHeightTo(timeline_height, 200, Easing.OutQuint);
                     mainContent.Delay(180).MoveToY(0, 200, Easing.OutQuint);
-                }
-            }, true);
-
-            Beatmap.BindValueChanged(b =>
-            {
-                waveform.Waveform = b.NewValue.Waveform;
-                track = b.NewValue.Track;
-
-                // todo: i don't think this is safe, the track may not be loaded yet.
-                if (track.Length > 0)
-                {
-                    MaxZoom = getZoomLevelForVisibleMilliseconds(500);
-                    MinZoom = getZoomLevelForVisibleMilliseconds(10000);
-                    Zoom = getZoomLevelForVisibleMilliseconds(2000);
                 }
             }, true);
         }
