@@ -31,10 +31,12 @@ namespace osu.Game.Tests.Visual.Mvis
         private void load(Storage storage, OsuGameBase gameBase)
         {
             var manager = new MvisPluginManager();
+            var dialog = new DialogOverlay();
+            var customStore = dependencies.Get<CustomStore>() ?? new CustomStore(storage, gameBase);
+
             dependencies.Cache(new CustomColourProvider(0, 0, 1));
             dependencies.Cache(manager);
-            dependencies.Cache(new DialogOverlay());
-            var customStore = dependencies.Get<CustomStore>() ?? new CustomStore(storage, gameBase);
+            dependencies.Cache(dialog);
             dependencies.Cache(customStore);
 
             dependencies.Cache(sidebar = new Sidebar
@@ -47,7 +49,8 @@ namespace osu.Game.Tests.Visual.Mvis
             Children = new Drawable[]
             {
                 sidebar,
-                manager
+                manager,
+                dialog
             };
 
             AddStep("Toggle Sidebar ", sidebar.ToggleVisibility);

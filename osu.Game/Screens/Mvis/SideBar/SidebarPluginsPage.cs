@@ -92,16 +92,19 @@ namespace osu.Game.Screens.Mvis.SideBar
 
         private void removePiece(MvisPlugin plugin)
         {
+            flow.LayoutEasing = Easing.OutQuint;
+            flow.LayoutDuration = 250;
+
             foreach (var piece in flow)
             {
                 if (piece.Plugin == plugin)
                 {
-                    flow.Remove(piece);
+                    piece.Hide();
                     break;
                 }
             }
 
-            if (flow.Children.Count == 0) placeholder.FadeIn(300, Easing.OutQuint);
+            if (flow.Children.Count - 1 <= 0) placeholder.FadeIn(300, Easing.OutQuint);
         }
     }
 }
