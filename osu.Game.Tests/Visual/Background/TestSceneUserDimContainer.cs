@@ -94,7 +94,7 @@ namespace osu.Game.Tests.Visual.Background
             AddStep("set dim level 0.6", () => userDimContainer.UserDimLevel.Value = test_user_dim);
             AddUntilStep("dim reached", () => userDimContainer.DimEqual(test_user_dim));
 
-            AddStep("ignore settings", () => userDimContainer.ApplyUserSettings.Value = false);
+            AddStep("ignore settings", () => userDimContainer.IgnoreUserSettings.Value = true);
             AddUntilStep("no dim", () => userDimContainer.DimEqual(0));
             AddStep("set break", () => isBreakTime.Value = true);
             AddAssert("no dim", () => userDimContainer.DimEqual(0));
