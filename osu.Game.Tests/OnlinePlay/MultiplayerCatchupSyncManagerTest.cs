@@ -12,22 +12,22 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.OnlinePlay
 {
     [HeadlessTest]
-    public class MultiplayerSyncManagerTest : OsuTestScene
+    public class MultiplayerCatchupSyncManagerTest : OsuTestScene
     {
         private TestManualClock master;
-        private MultiplayerSyncManager syncManager;
+        private MultiplayerCatchupSyncManager catchupSyncManager;
 
-        private TestSlaveClock slave1;
-        private TestSlaveClock slave2;
+        private TestSpectatorSlaveClock slave1;
+        private TestSpectatorSlaveClock slave2;
 
         [SetUp]
         public void Setup()
         {
-            syncManager = new MultiplayerSyncManager(master = new TestManualClock());
-            syncManager.AddSlave(slave1 = new TestSlaveClock(1));
-            syncManager.AddSlave(slave2 = new TestSlaveClock(2));
+            catchupSyncManager = new MultiplayerCatchupSyncManager(master = new TestManualClock());
+            catchupSyncManager.AddSlave(slave1 = new TestSpectatorSlaveClock(1));
+            catchupSyncManager.AddSlave(slave2 = new TestSpectatorSlaveClock(2));
 
-            Schedule(() => Child = syncManager);
+            Schedule(() => Child = catchupSyncManager);
         }
 
         [Test]
@@ -47,7 +47,7 @@ namespace osu.Game.Tests.OnlinePlay
         [Test]
         public void TestMasterClockDoesNotStartWhenNoneReadyForMaximumDelayTime()
         {
-            AddWaitStep($"wait {MultiplayerSyncManager.MAXIMUM_START_DELAY} milliseconds", (int)Math.Ceiling(MultiplayerSyncManager.MAXIMUM_START_DELAY / TimePerAction));
+            AddWaitStep($"wait {MultiplayerCatchupSyncManager.MAXIMUM_START_DELAY} milliseconds", (int)Math.Ceiling(MultiplayerCatchupSyncManager.MAXIMUM_START_DELAY / TimePerAction));
             assertMasterState(false);
         }
 
@@ -55,7 +55,7 @@ namespace osu.Game.Tests.OnlinePlay
         public void TestMasterClockStartsWhenAnyReadyForMaximumDelayTime()
         {
             setWaiting(() => slave1, false);
-            AddWaitStep($"wait {MultiplayerSyncManager.MAXIMUM_START_DELAY} milliseconds", (int)Math.Ceiling(MultiplayerSyncManager.MAXIMUM_START_DELAY / TimePerAction));
+            AddWaitStep($"wait {MultiplayerCatchupSyncManager.MAXIMUM_START_DELAY} milliseconds", (int)Math.Ceiling(MultiplayerCatchupSyncManager.MAXIMUM_START_DELAY / TimePerAction));
             assertMasterState(true);
         }
 
@@ -64,7 +64,7 @@ namespace osu.Game.Tests.OnlinePlay
         {
             setAllWaiting(false);
 
-            setMasterTime(MultiplayerSyncManager.SYNC_TARGET + 1);
+            setMasterTime(MultiplayerCatchupSyncManager.SYNC_TARGET + 1);
             assertCatchingUp(() => slave1, false);
         }
 
@@ -73,7 +73,7 @@ namespace osu.Game.Tests.OnlinePlay
         {
             setAllWaiting(false);
 
-            setMasterTime(MultiplayerSyncManager.MAX_SYNC_OFFSET + 1);
+            setMasterTime(MultiplayerCatchupSyncManager.MAX_SYNC_OFFSET + 1);
             assertCatchingUp(() => slave1, true);
             assertCatchingUp(() => slave2, true);
         }
@@ -83,8 +83,8 @@ namespace osu.Game.Tests.OnlinePlay
         {
             setAllWaiting(false);
 
-            setMasterTime(MultiplayerSyncManager.MAX_SYNC_OFFSET + 1);
-            setSlaveTime(() => slave1, MultiplayerSyncManager.SYNC_TARGET + 1);
+            setMasterTime(MultiplayerCatchupSyncManager.MAX_SYNC_OFFSET + 1);
+            setSlaveTime(() => slave1, MultiplayerCatchupSyncManager.SYNC_TARGET + 1);
             assertCatchingUp(() => slave1, true);
         }
 
@@ -93,8 +93,8 @@ namespace osu.Game.Tests.OnlinePlay
         {
             setAllWaiting(false);
 
-            setMasterTime(MultiplayerSyncManager.MAX_SYNC_OFFSET + 2);
-            setSlaveTime(() => slave1, MultiplayerSyncManager.SYNC_TARGET);
+            setMasterTime(MultiplayerCatchupSyncManager.MAX_SYNC_OFFSET + 2);
+            setSlaveTime(() => slave1, MultiplayerCatchupSyncManager.SYNC_TARGET);
             assertCatchingUp(() => slave1, false);
             assertCatchingUp(() => slave2, true);
         }
@@ -104,7 +104,7 @@ namespace osu.Game.Tests.OnlinePlay
         {
             setAllWaiting(false);
 
-            setSlaveTime(() => slave1, -MultiplayerSyncManager.SYNC_TARGET);
+            setSlaveTime(() => slave1, -MultiplayerCatchupSyncManager.SYNC_TARGET);
             assertCatchingUp(() => slave1, false);
             assertSlaveState(() => slave1, true);
         }
@@ -114,7 +114,7 @@ namespace osu.Game.Tests.OnlinePlay
         {
             setAllWaiting(false);
 
-            setSlaveTime(() => slave1, -MultiplayerSyncManager.SYNC_TARGET - 1);
+            setSlaveTime(() => slave1, -MultiplayerCatchupSyncManager.SYNC_TARGET - 1);
 
             // This is a silent catchup, where IsCatchingUp = false but IsRunning = false also.
             assertCatchingUp(() => slave1, false);
@@ -135,7 +135,7 @@ namespace osu.Game.Tests.OnlinePlay
             assertSlaveState(() => slave1, false);
         }
 
-        private void setWaiting(Func<TestSlaveClock> slave, bool waiting)
+        private void setWaiting(Func<TestSpectatorSlaveClock> slave, bool waiting)
             => AddStep($"set slave {slave().Id} waiting = {waiting}", () => slave().WaitingOnFrames.Value = waiting);
 
         private void setAllWaiting(bool waiting) => AddStep($"set all slaves waiting = {waiting}", () =>
@@ -150,28 +150,28 @@ namespace osu.Game.Tests.OnlinePlay
         /// <summary>
         /// slave.Time = master.Time - offsetFromMaster
         /// </summary>
-        private void setSlaveTime(Func<TestSlaveClock> slave, double offsetFromMaster)
+        private void setSlaveTime(Func<TestSpectatorSlaveClock> slave, double offsetFromMaster)
             => AddStep($"set slave {slave().Id} = master - {offsetFromMaster}", () => slave().Seek(master.CurrentTime - offsetFromMaster));
 
         private void assertMasterState(bool running)
             => AddAssert($"master clock {(running ? "is" : "is not")} running", () => master.IsRunning == running);
 
-        private void assertCatchingUp(Func<TestSlaveClock> slave, bool catchingUp) =>
+        private void assertCatchingUp(Func<TestSpectatorSlaveClock> slave, bool catchingUp) =>
             AddAssert($"slave {slave().Id} {(catchingUp ? "is" : "is not")} catching up", () => slave().IsCatchingUp == catchingUp);
 
-        private void assertSlaveState(Func<TestSlaveClock> slave, bool running)
+        private void assertSlaveState(Func<TestSpectatorSlaveClock> slave, bool running)
             => AddAssert($"slave {slave().Id} {(running ? "is" : "is not")} running", () => slave().IsRunning == running);
 
-        private class TestSlaveClock : TestManualClock, IMultiplayerSlaveClock
+        private class TestSpectatorSlaveClock : TestManualClock, IMultiplayerSpectatorSlaveClock
         {
             public readonly Bindable<bool> WaitingOnFrames = new Bindable<bool>(true);
-            IBindable<bool> IMultiplayerSlaveClock.WaitingOnFrames => WaitingOnFrames;
+            IBindable<bool> IMultiplayerSpectatorSlaveClock.WaitingOnFrames => WaitingOnFrames;
 
             public bool IsCatchingUp { get; set; }
 
             public readonly int Id;
 
-            public TestSlaveClock(int id)
+            public TestSpectatorSlaveClock(int id)
             {
                 Id = id;
 

@@ -20,11 +20,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public WorkingBeatmap Beatmap { get; private set; }
 
         public readonly Score Score;
-        public readonly MultiplayerSlaveClock GameplayClock;
+        public readonly MultiplayerSpectatorSlaveClock GameplayClock;
 
         private OsuScreenStack stack;
 
-        public PlayerInstance(Score score, MultiplayerSlaveClock gameplayClock)
+        public PlayerInstance(Score score, MultiplayerSpectatorSlaveClock gameplayClock)
         {
             Score = score;
             GameplayClock = gameplayClock;

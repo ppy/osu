@@ -24,7 +24,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         private readonly PlayerInstance[] instances;
         private MasterGameplayClockContainer masterClockContainer;
-        private IMultiplayerSyncManager syncManager;
+        private IMultiplayerSpectatorSyncManager syncManager;
         private PlayerGrid grid;
         private MultiplayerSpectatorLeaderboard leaderboard;
 
@@ -65,7 +65,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             InternalChildren = new[]
             {
-                (Drawable)(syncManager = new MultiplayerSyncManager(masterClockContainer)),
+                (Drawable)(syncManager = new MultiplayerCatchupSyncManager(masterClockContainer)),
                 masterClockContainer
             };
 
@@ -101,7 +101,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 leaderboard.RemoveClock(existingInstance.User.Id);
             }
 
-            LoadComponentAsync(instances[userIndex] = new PlayerInstance(gameplayState.Score, new MultiplayerSlaveClock(masterClockContainer.GameplayClock)), d =>
+            LoadComponentAsync(instances[userIndex] = new PlayerInstance(gameplayState.Score, new MultiplayerSpectatorSlaveClock(masterClockContainer.GameplayClock)), d =>
             {
                 if (instances[userIndex] == d)
                 {
