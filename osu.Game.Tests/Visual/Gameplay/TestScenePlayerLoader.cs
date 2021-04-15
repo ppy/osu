@@ -25,6 +25,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.PlayerSettings;
+using osu.Game.Utils;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -47,6 +48,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         [Cached]
         private readonly VolumeOverlay volumeOverlay;
+
+        [Cached(typeof(BatteryInfo))]
+        private readonly LocalBatteryInfo batteryInfo = new LocalBatteryInfo();
 
         private readonly ChangelogOverlay changelogOverlay;
 
@@ -288,6 +292,33 @@ namespace osu.Game.Tests.Visual.Gameplay
             }
         }
 
+        [TestCase(false, 1.0, false)] // not charging, above cutoff --> no warning
+        [TestCase(true, 0.1, false)] // charging, below cutoff --> no warning
+        [TestCase(false, 0.25, true)] // not charging, at cutoff --> warning
+        public void TestLowBatteryNotification(bool isCharging, double chargeLevel, bool shouldWarn)
+        {
+            AddStep("reset notification lock", () => sessionStatics.GetBindable<bool>(Static.LowBatteryNotificationShownOnce).Value = false);
+
+            // set charge status and level
+            AddStep("load player", () => resetPlayer(false, () =>
+            {
+                batteryInfo.SetCharging(isCharging);
+                batteryInfo.SetChargeLevel(chargeLevel);
+            }));
+            AddUntilStep("wait for player", () => player?.LoadState == LoadState.Ready);
+            AddAssert($"notification {(shouldWarn ? "triggered" : "not triggered")}", () => notificationOverlay.UnreadCount.Value == (shouldWarn ? 1 : 0));
+            AddStep("click notification", () =>
+            {
+                var scrollContainer = (OsuScrollContainer)notificationOverlay.Children.Last();
+                var flowContainer = scrollContainer.Children.OfType<FillFlowContainer<NotificationSection>>().First();
+                var notification = flowContainer.First();
+
+                InputManager.MoveMouseTo(notification);
+                InputManager.Click(MouseButton.Left);
+            });
+            AddUntilStep("wait for player load", () => player.IsLoaded);
+        }
+
         [Test]
         public void TestEpilepsyWarningEarlyExit()
         {
@@ -347,6 +378,30 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 if (!AllowLoad.Wait(TimeSpan.FromSeconds(10)))
                     throw new TimeoutException();
+            }
+        }
+
+        /// <summary>
+        /// Mutable dummy BatteryInfo class for <see cref="TestScenePlayerLoader.TestLowBatteryNotification"/>
+        /// </summary>
+        /// <inheritdoc/>
+        private class LocalBatteryInfo : BatteryInfo
+        {
+            private bool isCharging = true;
+            private double chargeLevel = 1;
+
+            public override bool IsCharging => isCharging;
+
+            public override double ChargeLevel => chargeLevel;
+
+            public void SetCharging(bool value)
+            {
+                isCharging = value;
+            }
+
+            public void SetChargeLevel(double value)
+            {
+                chargeLevel = value;
             }
         }
     }
