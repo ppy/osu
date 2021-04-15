@@ -65,6 +65,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             this.userContent = userContent;
 
             RelativeSizeAxes = Axes.X;
+            Height = timeline_height;
 
             ZoomDuration = 200;
             ZoomEasing = Easing.OutQuint;
