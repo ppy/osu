@@ -38,6 +38,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
                 },
                 new Container
                 {
+                    Name = "centre line",
                     RelativeSizeAxes = Axes.Both,
                     Colour = colours.Gray5,
                     Children = new Drawable[]
