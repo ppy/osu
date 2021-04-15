@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
@@ -21,6 +22,9 @@ namespace osu.Game.Rulesets.Osu.Mods
             Precision = 0.01,
         };
 
+        [SettingSource("Direction", "The direction of rotation")]
+        public Bindable<RotationDirection> Direction { get; } = new Bindable<RotationDirection>(RotationDirection.Clockwise);
+
         public override string Name => "Barrel Roll";
         public override string Acronym => "BR";
         public override string Description => "The whole playfield is on a wheel!";
@@ -28,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void Update(Playfield playfield)
         {
-            playfield.Rotation = 360 * (float)(playfield.Time.Current / 60000 * SpinSpeed.Value);
+            playfield.Rotation = (Direction.Value == RotationDirection.CounterClockwise ? -1 : 1) * 360 * (float)(playfield.Time.Current / 60000 * SpinSpeed.Value);
         }
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
