@@ -13,12 +13,12 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModBarrelRoll : Mod, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>
     {
-        [SettingSource("Roll speed", "Speed at which things rotate")]
-        public BindableNumber<double> SpinSpeed { get; } = new BindableDouble(1)
+        [SettingSource("Roll speed", "Rotations per minute")]
+        public BindableNumber<double> SpinSpeed { get; } = new BindableDouble(0.5)
         {
-            MinValue = 0.1,
-            MaxValue = 20,
-            Precision = 0.1,
+            MinValue = 0.02,
+            MaxValue = 4,
+            Precision = 0.01,
         };
 
         public override string Name => "Barrel Roll";
@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void Update(Playfield playfield)
         {
-            playfield.Rotation = (float)(playfield.Time.Current / 1000 * SpinSpeed.Value);
+            playfield.Rotation = 360 * (float)(playfield.Time.Current / 60000 * SpinSpeed.Value);
         }
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
