@@ -4,9 +4,7 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Osu;
-using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using osuTK;
