@@ -15,8 +15,6 @@ namespace osu.Game.Storyboards
 
         public double StartTime { get; }
 
-        public double EndTime => StartTime;
-
         public int Volume { get; }
 
         public IEnumerable<string> LookupNames => new[]
