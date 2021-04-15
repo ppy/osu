@@ -321,6 +321,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             public override string Name => string.Empty;
             public override string Acronym => string.Empty;
             public override double ScoreMultiplier => 1;
+            public override string Description => string.Empty;
 
             public bool Applied { get; private set; }
 

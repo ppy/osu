@@ -57,6 +57,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         private abstract class TestMod : Mod, IApplicableMod
         {
             public override double ScoreMultiplier => 1.0;
+
+            public override string Description => "This is a test mod.";
         }
     }
 }
