@@ -49,7 +49,7 @@ namespace Mvis.Plugin.StoryboardSupport
             RelativeSizeAxes = Axes.Both;
 
             Name = "故事版加载器";
-            Description = "用于呈现故事版; Mfosu自带插件";
+            Description = "在播放器的背景显示谱面故事版";
             Author = "mf-osu";
 
             Flags.AddRange(new[]
@@ -102,9 +102,6 @@ namespace Mvis.Plugin.StoryboardSupport
             }
             else
             {
-                if (ContentLoaded)
-                    currentStoryboard?.FadeOut(STORYBOARD_FADEOUT_DURATION, Easing.OutQuint);
-
                 StoryboardReplacesBackground.Value = false;
                 NeedToHideTriangles.Value = false;
             }
@@ -180,7 +177,10 @@ namespace Mvis.Plugin.StoryboardSupport
 
         public override void UnLoad()
         {
-            ClearInternal();
+            if (ContentLoaded)
+                currentStoryboard?.FadeTo(0.01f, 250, Easing.OutQuint).Expire();
+
+            currentStoryboard = null;
 
             if (MvisScreen != null)
             {
@@ -196,6 +196,8 @@ namespace Mvis.Plugin.StoryboardSupport
             NeedToHideTriangles.UnbindAll();
             StoryboardReplacesBackground.UnbindAll();
 
+            this.FadeTo(0.01f, 300, Easing.OutQuint);
+
             base.UnLoad();
         }
 
@@ -206,6 +208,8 @@ namespace Mvis.Plugin.StoryboardSupport
                 MvisScreen.HideTriangles.Value = false;
                 MvisScreen.HideScreenBackground.Value = false;
             }
+
+            hideOrCancelLoadStoryboard(false);
 
             return base.Disable();
         }
@@ -221,17 +225,25 @@ namespace Mvis.Plugin.StoryboardSupport
             return base.Enable();
         }
 
-        private void refresh(WorkingBeatmap newBeatmap)
+        private void hideOrCancelLoadStoryboard(bool expireIfLoaded)
         {
             if (!ContentLoaded)
             {
                 Cancel();
+
                 currentStoryboard?.Expire();
                 currentStoryboard?.Dispose();
+                currentStoryboard = null;
             }
-            else
+            else if (expireIfLoaded)
                 currentStoryboard?.FadeTo(0.01f, 300, Easing.OutQuint).Expire();
+            else
+                currentStoryboard?.FadeTo(0, 300, Easing.OutQuint);
+        }
 
+        private void refresh(WorkingBeatmap newBeatmap)
+        {
+            hideOrCancelLoadStoryboard(true);
             if (Disabled.Value && newBeatmap != targetBeatmap) ContentLoaded = false;
 
             targetBeatmap = newBeatmap;
