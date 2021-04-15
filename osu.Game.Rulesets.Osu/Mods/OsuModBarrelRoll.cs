@@ -23,6 +23,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override string Name => "Barrel Roll";
         public override string Acronym => "BR";
+        public override string Description => "The whole playfield is on a wheel!";
         public override double ScoreMultiplier => 1;
 
         public void Update(Playfield playfield)
