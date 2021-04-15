@@ -21,10 +21,10 @@ namespace osu.Game.Screens.Mvis.Plugins
         [Resolved]
         private Storage storage { get; set; }
 
-        public Action<MvisPlugin> OnPluginAdd;
-        public Action<MvisPlugin> OnPluginUnLoad;
+        internal Action<MvisPlugin> OnPluginAdd;
+        internal Action<MvisPlugin> OnPluginUnLoad;
 
-        public int PLUGIN_VERSION => 1;
+        public int PluginVersion => 1;
 
         [BackgroundDependencyLoader]
         private void load(CustomStore customStore, OsuGameBase gameBase)
@@ -39,13 +39,13 @@ namespace osu.Game.Screens.Mvis.Plugins
         public IPluginConfigManager GetConfigManager(MvisPlugin pl) =>
             configManagers.GetOrAdd(pl.GetType(), _ => pl.CreateConfigManager(storage));
 
-        public bool AddPlugin(MvisPlugin pl)
+        internal bool AddPlugin(MvisPlugin pl)
         {
             if (avaliablePlugins.Contains(pl) || pl == null) return false;
 
-            if (pl.Version < PLUGIN_VERSION)
+            if (pl.Version < PluginVersion)
                 Logger.Log($"插件 \"{pl.Name}\" 的版本已经过时, 继续使用可能会导致意外情况的发生!", LoggingTarget.Runtime, LogLevel.Important);
-            else if (pl.Version > PLUGIN_VERSION)
+            else if (pl.Version > PluginVersion)
                 Logger.Log($"插件 \"{pl.Name}\" 是为更高版本的mf-osu打造的, 继续使用可能会导致意外情况的发生!", LoggingTarget.Runtime, LogLevel.Important);
 
             avaliablePlugins.Add(pl);
@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Mvis.Plugins
             return true;
         }
 
-        public bool UnLoadPlugin(MvisPlugin pl)
+        internal bool UnLoadPlugin(MvisPlugin pl)
         {
             if (!avaliablePlugins.Contains(pl) || pl == null) return false;
 
@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Mvis.Plugins
             return true;
         }
 
-        public bool ActivePlugin(MvisPlugin pl)
+        internal bool ActivePlugin(MvisPlugin pl)
         {
             if (!avaliablePlugins.Contains(pl) || activePlugins.Contains(pl) || pl == null) return false;
 
@@ -94,7 +94,7 @@ namespace osu.Game.Screens.Mvis.Plugins
             return success;
         }
 
-        public bool DisablePlugin(MvisPlugin pl)
+        internal bool DisablePlugin(MvisPlugin pl)
         {
             if (!avaliablePlugins.Contains(pl) || !activePlugins.Contains(pl) || pl == null) return false;
 
@@ -134,7 +134,7 @@ namespace osu.Game.Screens.Mvis.Plugins
             return avaliablePlugins.ToList();
         }
 
-        public void DisposeAllPlugins()
+        internal void DisposeAllPlugins()
         {
             foreach (var pl in avaliablePlugins)
             {

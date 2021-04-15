@@ -13,7 +13,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Mvis.SideBar
 {
-    public class SidebarPluginsPage : CompositeDrawable, ISidebarContent
+    internal class SidebarPluginsPage : CompositeDrawable, ISidebarContent
     {
         public float ResizeWidth => 0.35f;
         public string Title => "插件";

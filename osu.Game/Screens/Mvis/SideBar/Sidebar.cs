@@ -20,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Mvis.SideBar
 {
-    public class Sidebar : VisibilityContainer
+    internal class Sidebar : VisibilityContainer
     {
         [Resolved]
         private CustomColourProvider colourProvider { get; set; }

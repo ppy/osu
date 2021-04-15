@@ -654,7 +654,7 @@ namespace osu.Game.Screens.Mvis
             base.LoadComplete();
         }
 
-        public bool RemovePluginFromLoadList(MvisPlugin pl)
+        internal bool RemovePluginFromLoadList(MvisPlugin pl)
         {
             if (!loadList.Contains(pl)) return false;
 
@@ -662,7 +662,7 @@ namespace osu.Game.Screens.Mvis
             return true;
         }
 
-        public bool AddPluginToLoadList(MvisPlugin pl)
+        internal bool AddPluginToLoadList(MvisPlugin pl)
         {
             if (loadList.Contains(pl)) return false;
 

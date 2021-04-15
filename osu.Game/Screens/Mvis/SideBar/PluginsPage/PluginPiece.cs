@@ -153,7 +153,7 @@ namespace osu.Game.Screens.Mvis.SideBar.PluginsPage
                 }
             };
 
-            if (Plugin.Version != manager.PLUGIN_VERSION)
+            if (Plugin.Version != manager.PluginVersion)
             {
                 fillFlow.Add(new OsuSpriteText
                 {

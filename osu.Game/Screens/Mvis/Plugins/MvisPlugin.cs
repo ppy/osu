@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Mvis.Plugins
     public abstract class MvisPlugin : Container
     {
         /// <summary>
-        /// 加载内容
+        /// 加载插件要提供的内容
         /// </summary>
         /// <returns>要加载的Drawable</returns>
         protected abstract Drawable CreateContent();
@@ -74,7 +74,7 @@ namespace osu.Game.Screens.Mvis.Plugins
         [CanBeNull]
         protected MvisScreen MvisScreen => mvisScreen;
 
-        #region 异步加载任务
+        #region 异步加载任务相关
 
         private CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
@@ -123,6 +123,9 @@ namespace osu.Game.Screens.Mvis.Plugins
             }
         }
 
+        /// <summary>
+        /// 取消加载任务
+        /// </summary>
         public void Cancel()
         {
             cancellationTokenSource.Cancel();
@@ -131,6 +134,9 @@ namespace osu.Game.Screens.Mvis.Plugins
             mvisScreen?.RemovePluginFromLoadList(this);
         }
 
+        /// <summary>
+        /// 加载插件内容
+        /// </summary>
         public virtual void Load()
         {
             try
@@ -153,6 +159,12 @@ namespace osu.Game.Screens.Mvis.Plugins
             }
         }
 
+        /// <summary>
+        /// 启用插件
+        /// </summary>
+        /// <returns>
+        /// true: 启用过程未发生意外<br/>
+        /// false: 启用过程发生意外</returns>
         public virtual bool Enable()
         {
             if (!ContentLoaded)
@@ -163,12 +175,21 @@ namespace osu.Game.Screens.Mvis.Plugins
             return true;
         }
 
+        /// <summary>
+        /// 卸载插件
+        /// </summary>
         public virtual void UnLoad()
         {
             Disable();
             Expire();
         }
 
+        /// <summary>
+        /// 禁用插件
+        /// </summary>
+        /// <returns>
+        /// true: 禁用过程未发生意外<br/>
+        /// false: 禁用过程发生意外</returns>
         public virtual bool Disable()
         {
             if (!ContentLoaded)

@@ -23,15 +23,26 @@ namespace Mvis.Plugin.Example
         private OsuSpriteText text3;
         private OsuSpriteText text4;
 
+        /// <summary>
+        /// 请参阅 <see cref="MvisPlugin.TargetLayer"/>
+        /// </summary>
         public override TargetLayer Target => TargetLayer.Foreground;
+
+        /// <summary>
+        /// 插件兼容性版本，截至2021.04.16，MvisPluginManager的兼容版本为1。<br/>
+        /// 加载任何大于或小于MvisPluginManager兼容版本的插件都会弹出警告。
+        /// </summary>
         public override int Version => 1;
 
+        //指定插件的配置管理器
         public override IPluginConfigManager CreateConfigManager(Storage storage)
             => new ExamplePluginConfigManager(storage);
 
+        //指定插件的设置界面
         public override PluginSettingsSubSection CreateSettingsSubSection()
             => new ExampleSettings(this);
 
+        //指定插件的侧边栏页面
         public override PluginSidebarPage CreateSidebarPage()
             => new ExampleSidebarPage(this);
 
@@ -52,6 +63,9 @@ namespace Mvis.Plugin.Example
             Origin = Anchor.Centre;
         }
 
+        /// <summary>
+        /// 请参阅 <see cref="MvisPlugin.CreateContent()"/>
+        /// </summary>
         protected override Drawable CreateContent() => new FillFlowContainer
         {
             AutoSizeAxes = Axes.Both,
@@ -87,26 +101,40 @@ namespace Mvis.Plugin.Example
         private Bindable<ExampleEnum> bindableEnum;
         public Bindable<string> BindableString;
 
+        /// <summary>
+        /// 请参阅 <see cref="MvisPlugin.PostInit()"/>
+        /// </summary>
         protected override bool PostInit()
         {
             Logger.Log($"插件{Name}开始加载前的准备!");
 
             //从MvisPluginManager获取自己的配置管理器
             var config = (ExamplePluginConfigManager)Dependencies.Get<MvisPluginManager>().GetConfigManager(this);
+
+            //从配置管理器获取bindable，你也可以用config.BindWith()来将某一配置和现有的Bindable绑定。
             BindableString = config.GetBindable<string>(ExamplePluginSettings.KeyString);
             bindableFloat = config.GetBindable<float>(ExamplePluginSettings.KeyFloat);
             bindableEnum = config.GetBindable<ExampleEnum>(ExamplePluginSettings.keyEnum);
             return true;
         }
 
+        /// <summary>
+        /// 请参阅 <see cref="MvisPlugin.OnContentLoaded(Drawable)"/>
+        /// </summary>
         protected override bool OnContentLoaded(Drawable content)
         {
+            //当bindableString的值改变时，调用onBindableStringValueChanged。
             BindableString.BindValueChanged(onBindableStringValueChanged);
+
+            //当bindableEnum的值改变时，调用onBindableEnumValueChanged。
             bindableEnum.BindValueChanged(onBindableEnumValueChanged);
 
             //osu.Framework/Bindables/Bindable.cs#L106:
             //public void BindValueChanged(Action<ValueChangedEvent<T>> onChange, bool runOnceImmediately = false)
+            //当bindableFloat的值改变时，调用onBindableFloatValueChanged。
             bindableFloat.BindValueChanged(onBindableFloatValueChanged, true);
+
+            //在这里设置可以避免bindable值发生改变时因插件内容未被加载导致的NullReferenceException
 
             Logger.Log($"插件{Name}已加载!");
             return true;
@@ -114,6 +142,7 @@ namespace Mvis.Plugin.Example
 
         private void onBindableStringValueChanged(ValueChangedEvent<string> v)
         {
+            //设置text2的文本
             text2.Text = "BindableString: " + v.NewValue;
         }
 
@@ -136,10 +165,25 @@ namespace Mvis.Plugin.Example
                     break;
             }
 
-            //如果新值没有描述，则设置文本为ToString的结果
-            text4.Text = v.NewValue.GetDescription() ?? v.NewValue.ToString();
+            //设置text4的文本
+            text4.Text = v.NewValue.GetDescription();
         }
 
+        /// <summary>
+        /// 设置text1的文本
+        /// </summary>
+        /// <param name="text"></param>
+        private void setText(string text)
+        {
+            //setText被调用时text1可能尚未被加载
+            //故添加null检测
+            if (text1 != null)
+                text1.Text = text;
+        }
+
+        /// <summary>
+        /// 请参阅 <see cref="MvisPlugin.Disable()"/>
+        /// </summary>
         public override bool Disable()
         {
             setText("插件被禁用了oAo!");
@@ -147,17 +191,14 @@ namespace Mvis.Plugin.Example
             return base.Disable();
         }
 
+        /// <summary>
+        /// 请参阅 <see cref="MvisPlugin.Enable()"/>
+        /// </summary>
         public override bool Enable()
         {
             setText("插件被启用了oAo!");
 
             return base.Enable();
-        }
-
-        private void setText(string text)
-        {
-            if (text1 != null)
-                text1.Text = text;
         }
     }
 }
