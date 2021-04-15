@@ -237,6 +237,7 @@ namespace osu.Game.Overlays.Volume
         private double accelerationModifier = 1;
 
         private const double max_acceleration = 5;
+        private const double acceleration_multiplier = 1.8;
 
         private ScheduledDelegate accelerationDebounce;
 
@@ -250,7 +251,7 @@ namespace osu.Game.Overlays.Volume
             accelerationDebounce = Scheduler.AddDelayed(resetAcceleration, 150);
 
             delta *= accelerationModifier;
-            accelerationModifier = Math.Min(max_acceleration, accelerationModifier * 1.2f);
+            accelerationModifier = Math.Min(max_acceleration, accelerationModifier * acceleration_multiplier);
 
             var precision = Bindable.Precision;
 
