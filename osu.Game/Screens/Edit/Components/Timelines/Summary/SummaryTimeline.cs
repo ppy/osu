@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
                         new Circle
                         {
                             Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreRight,
+                            Origin = Anchor.Centre,
                             Size = new Vector2(5)
                         },
                         new Box
@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
                         new Circle
                         {
                             Anchor = Anchor.CentreRight,
-                            Origin = Anchor.CentreLeft,
+                            Origin = Anchor.Centre,
                             Size = new Vector2(5)
                         },
                     }
