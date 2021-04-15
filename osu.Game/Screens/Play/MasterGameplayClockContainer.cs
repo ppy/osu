@@ -128,7 +128,9 @@ namespace osu.Game.Screens.Play
             Seek(skipTarget);
         }
 
-        protected override GameplayClock CreateGameplayClock(IClock source)
+        protected override IFrameBasedClock ClockToProcess => userOffsetClock;
+
+        protected override GameplayClock CreateGameplayClock(IFrameBasedClock source)
         {
             // Lazer's audio timings in general doesn't match stable. This is the result of user testing, albeit limited.
             // This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
@@ -138,14 +140,6 @@ namespace osu.Game.Screens.Play
             userOffsetClock = new HardwareCorrectionOffsetClock(platformOffsetClock);
 
             return localGameplayClock = new LocalGameplayClock(userOffsetClock);
-        }
-
-        protected override void Update()
-        {
-            if (!IsPaused.Value)
-                userOffsetClock.ProcessFrame();
-
-            base.Update();
         }
 
         /// <summary>
