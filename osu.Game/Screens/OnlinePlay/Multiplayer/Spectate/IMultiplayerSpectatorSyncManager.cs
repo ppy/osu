@@ -5,12 +5,12 @@ using osu.Framework.Timing;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
-    public interface IMultiplayerSyncManager
+    public interface IMultiplayerSpectatorSyncManager
     {
         IAdjustableClock Master { get; }
 
-        void AddSlave(IMultiplayerSlaveClock clock);
+        void AddSlave(IMultiplayerSpectatorSlaveClock clock);
 
-        void RemoveSlave(IMultiplayerSlaveClock clock);
+        void RemoveSlave(IMultiplayerSpectatorSlaveClock clock);
     }
 }

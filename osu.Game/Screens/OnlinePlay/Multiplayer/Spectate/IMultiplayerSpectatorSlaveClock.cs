@@ -6,7 +6,7 @@ using osu.Framework.Timing;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
-    public interface IMultiplayerSlaveClock : IAdjustableClock
+    public interface IMultiplayerSpectatorSlaveClock : IAdjustableClock
     {
         IBindable<bool> WaitingOnFrames { get; }
 

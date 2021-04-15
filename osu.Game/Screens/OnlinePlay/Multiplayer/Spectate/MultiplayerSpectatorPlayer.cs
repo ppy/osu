@@ -11,9 +11,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
     public class MultiplayerSpectatorPlayer : SpectatorPlayer
     {
-        private readonly MultiplayerSlaveClock gameplayClock;
+        private readonly MultiplayerSpectatorSlaveClock gameplayClock;
 
-        public MultiplayerSpectatorPlayer(Score score, MultiplayerSlaveClock gameplayClock)
+        public MultiplayerSpectatorPlayer(Score score, MultiplayerSpectatorSlaveClock gameplayClock)
             : base(score)
         {
             this.gameplayClock = gameplayClock;
