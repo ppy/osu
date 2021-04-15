@@ -4,11 +4,14 @@
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModBarrelRoll : Mod, IUpdatableByPlayfield
+    public class OsuModBarrelRoll : Mod, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>
     {
         [SettingSource("Roll speed", "Speed at which things rotate")]
         public BindableNumber<double> SpinSpeed { get; } = new BindableDouble(1)
@@ -25,6 +28,12 @@ namespace osu.Game.Rulesets.Osu.Mods
         public void Update(Playfield playfield)
         {
             playfield.Rotation = (float)(playfield.Time.Current / 1000 * SpinSpeed.Value);
+        }
+
+        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
+        {
+            // scale the playfield to allow all hitobjects to stay within the visible region.
+            drawableRuleset.Playfield.Scale = new Vector2(OsuPlayfield.BASE_SIZE.Y / OsuPlayfield.BASE_SIZE.X);
         }
     }
 }
