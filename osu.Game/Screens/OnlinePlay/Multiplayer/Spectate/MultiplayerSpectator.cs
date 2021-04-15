@@ -2,14 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Logging;
-using osu.Framework.Utils;
 using osu.Game.Online.Spectator;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Spectate;
@@ -18,9 +14,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
     public class MultiplayerSpectator : SpectatorScreen
     {
-        private const double min_duration_to_allow_playback = 50;
-        private const double maximum_start_delay = 15000;
-
         // Isolates beatmap/ruleset to this screen.
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
@@ -30,10 +23,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private SpectatorStreamingClient spectatorClient { get; set; }
 
         private readonly PlayerInstance[] instances;
-        private GameplayClockContainer gameplayClockContainer;
+        private MasterGameplayClockContainer masterClockContainer;
+        private IMultiplayerSyncManager syncManager;
         private PlayerGrid grid;
         private MultiplayerSpectatorLeaderboard leaderboard;
-        private double? loadFinishTime;
 
         public MultiplayerSpectator(int[] userIds)
             : base(userIds.AsSpan().Slice(0, Math.Min(16, userIds.Length)).ToArray())
@@ -46,7 +39,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         {
             Container leaderboardContainer;
 
-            InternalChild = gameplayClockContainer = new MasterGameplayClockContainer(Beatmap.Value, 0)
+            masterClockContainer = new MasterGameplayClockContainer(Beatmap.Value, 0)
             {
                 Child = new GridContainer
                 {
@@ -70,6 +63,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 }
             };
 
+            InternalChildren = new[]
+            {
+                (Drawable)(syncManager = new MultiplayerSyncManager(masterClockContainer)),
+                masterClockContainer
+            };
+
             // Todo: This is not quite correct - it should be per-user to adjust for other mod combinations.
             var playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Ruleset.Value);
             var scoreProcessor = Ruleset.Value.CreateInstance().CreateScoreProcessor();
@@ -78,65 +77,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             LoadComponentAsync(leaderboard = new MultiplayerSpectatorLeaderboard(scoreProcessor, UserIds) { Expanded = { Value = true } }, leaderboardContainer.Add);
         }
 
-        protected override void UpdateAfterChildren()
+        protected override void LoadComplete()
         {
-            base.UpdateAfterChildren();
+            base.LoadComplete();
 
-            if (AllPlayersLoaded)
-                loadFinishTime ??= Time.Current;
-
-            updateGameplayPlayingState();
-        }
-
-        private bool canStartGameplay =>
-            // All players must be loaded, and...
-            AllPlayersLoaded
-            && (
-                // All players have frames...
-                instances.All(i => i.Score.Replay.Frames.Count > 0)
-                // Or any player has frames and the maximum start delay has been exceeded.
-                || (Time.Current - loadFinishTime > maximum_start_delay
-                    && instances.Any(i => i.Score.Replay.Frames.Count > 0))
-            );
-
-        private bool firstStartFrame = true;
-
-        private void updateGameplayPlayingState()
-        {
-            // Make sure all players are loaded and have frames before starting any.
-            if (!canStartGameplay)
-            {
-                foreach (var inst in instances)
-                    inst?.PauseGameplay();
-                return;
-            }
-
-            if (firstStartFrame)
-                gameplayClockContainer.Restart();
-
-            // Not all instances may be in a valid gameplay state (see canStartGameplay). Only control the ones that are.
-            IEnumerable<PlayerInstance> validInstances = instances.Where(i => i.Score.Replay.Frames.Count > 0);
-
-            double targetGameplayTime = gameplayClockContainer.GameplayClock.CurrentTime;
-
-            var instanceTimes = string.Join(',', validInstances.Select(i => $" {i.User.Id}: {(int)i.GetCurrentGameplayTime()}"));
-            Logger.Log($"target: {(int)targetGameplayTime},{instanceTimes}");
-
-            foreach (var inst in validInstances)
-            {
-                Debug.Assert(inst != null);
-
-                double lastFrameTime = inst.Score.Replay.Frames.Select(f => f.Time).Last();
-                double currentTime = inst.GetCurrentGameplayTime();
-
-                bool canContinuePlayback = Precision.DefinitelyBigger(lastFrameTime, currentTime, min_duration_to_allow_playback);
-                if (!canContinuePlayback)
-                    continue;
-
-                inst.ContinueGameplay(targetGameplayTime);
-            }
-
-            firstStartFrame = false;
+            masterClockContainer.Stop();
+            masterClockContainer.Restart();
         }
 
         protected override void OnUserStateChanged(int userId, SpectatorState spectatorState)
@@ -151,15 +97,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             if (existingInstance != null)
             {
                 grid.Remove(existingInstance);
+                syncManager.RemoveSlave(existingInstance.GameplayClock);
                 leaderboard.RemoveClock(existingInstance.User.Id);
             }
 
-            LoadComponentAsync(instances[userIndex] = new PlayerInstance(gameplayState.Score, gameplayClockContainer.GameplayClock), d =>
+            LoadComponentAsync(instances[userIndex] = new PlayerInstance(gameplayState.Score, new MultiplayerSlaveClock(masterClockContainer.GameplayClock)), d =>
             {
                 if (instances[userIndex] == d)
                 {
                     grid.Add(d);
-                    leaderboard.AddClock(d.User.Id, d.Beatmap.Track);
+                    syncManager.AddSlave(d.GameplayClock);
+                    leaderboard.AddClock(d.User.Id, d.GameplayClock);
                 }
             });
         }
