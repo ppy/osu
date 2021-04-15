@@ -226,7 +226,6 @@ namespace osu.Game.Screens.Ranking
         /// <summary>
         /// Enumerates all <see cref="ScorePanel"/>s contained in this <see cref="ScorePanelList"/>.
         /// </summary>
-        /// <returns></returns>
         public IEnumerable<ScorePanel> GetScorePanels() => flow.Select(t => t.Panel);
 
         /// <summary>
