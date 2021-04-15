@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup Label="Project">
     <TargetFramework>netstandard2.1</TargetFramework>
     <OutputType>Library</OutputType>
@@ -29,7 +29,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
     <PackageReference Include="Microsoft.NETCore.Targets" Version="3.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="ppy.osu.Framework" Version="2021.413.0" />
+    <PackageReference Include="ppy.osu.Framework" Version="2021.415.0" />
     <PackageReference Include="ppy.osu.Game.Resources" Version="2021.412.0" />
     <PackageReference Include="Sentry" Version="3.2.0" />
     <PackageReference Include="SharpCompress" Version="0.28.1" />
