@@ -128,13 +128,13 @@ namespace osu.Game.Rulesets.Replays
             double frameStart = getFrameTime(currentFrameIndex);
             double frameEnd = getFrameTime(currentFrameIndex + 1);
 
-            // If the proposed time is after the current frame end time, we progress forwards.
-            // If the proposed time is before the current frame start time, and we are at the frame boundary, we progress backwards.
+            // If the proposed time is after the current frame end time, we progress forwards to precisely the new frame's time (regardless of incoming time).
             if (frameEnd <= time)
             {
                 time = frameEnd;
                 currentFrameIndex++;
             }
+            // If the proposed time is before the current frame start time, and we are at the frame boundary, we progress backwards.
             else if (time < frameStart && CurrentTime == frameStart)
                 currentFrameIndex--;
 
