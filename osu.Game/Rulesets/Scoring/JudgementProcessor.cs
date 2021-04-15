@@ -28,6 +28,8 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public int JudgedHits { get; private set; }
 
+        private JudgementResult lastAppliedResult;
+
         private readonly BindableBool hasCompleted = new BindableBool();
 
         /// <summary>
@@ -53,12 +55,11 @@ namespace osu.Game.Rulesets.Scoring
         public void ApplyResult(JudgementResult result)
         {
             JudgedHits++;
+            lastAppliedResult = result;
 
             ApplyResultInternal(result);
 
             NewJudgement?.Invoke(result);
-
-            updateHasCompleted();
         }
 
         /// <summary>
@@ -68,8 +69,6 @@ namespace osu.Game.Rulesets.Scoring
         public void RevertResult(JudgementResult result)
         {
             JudgedHits--;
-
-            updateHasCompleted();
 
             RevertResultInternal(result);
         }
@@ -134,6 +133,10 @@ namespace osu.Game.Rulesets.Scoring
             }
         }
 
-        private void updateHasCompleted() => hasCompleted.Value = JudgedHits == MaxHits;
+        protected override void Update()
+        {
+            base.Update();
+            hasCompleted.Value = JudgedHits == MaxHits && (JudgedHits == 0 || lastAppliedResult.TimeAbsolute < Clock.CurrentTime);
+        }
     }
 }

@@ -9,6 +9,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Name => "Touch Device";
         public override string Acronym => "TD";
+        public override string Description => "Automatically applied to plays on devices with a touchscreen.";
         public override double ScoreMultiplier => 1;
 
         public override ModType Type => ModType.System;
