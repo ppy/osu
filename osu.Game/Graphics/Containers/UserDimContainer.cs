@@ -24,9 +24,9 @@ namespace osu.Game.Graphics.Containers
         protected const double BACKGROUND_FADE_DURATION = 800;
 
         /// <summary>
-        /// Whether or not user-configured effect settings should be applied to this container.
+        /// Whether or not user-configured settings relating to brightness of elements should be ignored
         /// </summary>
-        public readonly Bindable<bool> ApplyUserSettings = new Bindable<bool>(true);
+        public readonly Bindable<bool> IgnoreUserSettings = new Bindable<bool>();
 
         /// <summary>
         /// Whether or not the storyboard loaded should completely hide the background behind it.
@@ -52,7 +52,7 @@ namespace osu.Game.Graphics.Containers
 
         private float breakLightening => LightenDuringBreaks.Value && IsBreakTime.Value ? BREAK_LIGHTEN_AMOUNT : 0;
 
-        protected float DimLevel => Math.Max(ApplyUserSettings.Value ? (float)UserDimLevel.Value - breakLightening : 0, 0);
+        protected float DimLevel => Math.Max(!IgnoreUserSettings.Value ? (float)UserDimLevel.Value - breakLightening : 0, 0);
 
         protected override Container<Drawable> Content => dimContent;
 
@@ -78,7 +78,7 @@ namespace osu.Game.Graphics.Containers
             IsBreakTime.ValueChanged += _ => UpdateVisuals();
             ShowStoryboard.ValueChanged += _ => UpdateVisuals();
             StoryboardReplacesBackground.ValueChanged += _ => UpdateVisuals();
-            ApplyUserSettings.ValueChanged += _ => UpdateVisuals();
+            IgnoreUserSettings.ValueChanged += _ => UpdateVisuals();
         }
 
         protected override void LoadComplete()
