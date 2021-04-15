@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                     return;
                 }
 
-                Colour = controlPoints.Any(c => c is TimingControlPoint) ? colours.YellowDark : colours.Green;
+                Colour = Group.ControlPoints.First().GetRepresentingColour(colours);
             }, true);
         }
     }
