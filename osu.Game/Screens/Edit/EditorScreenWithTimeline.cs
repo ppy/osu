@@ -19,8 +19,6 @@ namespace osu.Game.Screens.Edit
         private const float vertical_margins = 10;
         private const float horizontal_margins = 20;
 
-        private const float timeline_height = 110;
-
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
 
         private Container timelineContainer;
@@ -40,64 +38,87 @@ namespace osu.Game.Screens.Edit
             if (beatDivisor != null)
                 this.beatDivisor.BindTo(beatDivisor);
 
-            Children = new Drawable[]
+            Child = new GridContainer
             {
-                mainContent = new Container
+                RelativeSizeAxes = Axes.Both,
+                RowDimensions = new[]
                 {
-                    Name = "Main content",
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding
-                    {
-                        Horizontal = horizontal_margins,
-                        Top = vertical_margins + timeline_height,
-                        Bottom = vertical_margins
-                    },
-                    Child = spinner = new LoadingSpinner(true)
-                    {
-                        State = { Value = Visibility.Visible },
-                    },
+                    new Dimension(GridSizeMode.AutoSize),
+                    new Dimension(),
                 },
-                new Container
+                Content = new[]
                 {
-                    Name = "Timeline",
-                    RelativeSizeAxes = Axes.X,
-                    Height = timeline_height,
-                    Children = new Drawable[]
+                    new Drawable[]
                     {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black.Opacity(0.5f)
-                        },
                         new Container
                         {
-                            Name = "Timeline content",
-                            RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Horizontal = horizontal_margins, Vertical = vertical_margins },
-                            Child = new GridContainer
+                            Name = "Timeline",
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Children = new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Content = new[]
+                                new Box
                                 {
-                                    new Drawable[]
-                                    {
-                                        timelineContainer = new Container
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Padding = new MarginPadding { Right = 5 },
-                                        },
-                                        new BeatDivisorControl(beatDivisor) { RelativeSizeAxes = Axes.Both }
-                                    },
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = Color4.Black.Opacity(0.5f)
                                 },
-                                ColumnDimensions = new[]
+                                new Container
                                 {
-                                    new Dimension(),
-                                    new Dimension(GridSizeMode.Absolute, 90),
+                                    Name = "Timeline content",
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Padding = new MarginPadding { Horizontal = horizontal_margins, Vertical = vertical_margins },
+                                    Child = new GridContainer
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Content = new[]
+                                        {
+                                            new Drawable[]
+                                            {
+                                                timelineContainer = new Container
+                                                {
+                                                    RelativeSizeAxes = Axes.X,
+                                                    AutoSizeAxes = Axes.Y,
+                                                    Padding = new MarginPadding { Right = 5 },
+                                                },
+                                                new BeatDivisorControl(beatDivisor) { RelativeSizeAxes = Axes.Both }
+                                            },
+                                        },
+                                        RowDimensions = new[]
+                                        {
+                                            new Dimension(GridSizeMode.AutoSize),
+                                        },
+                                        ColumnDimensions = new[]
+                                        {
+                                            new Dimension(),
+                                            new Dimension(GridSizeMode.Absolute, 90),
+                                        }
+                                    },
                                 }
+                            }
+                        },
+                    },
+                    new Drawable[]
+                    {
+                        mainContent = new Container
+                        {
+                            Name = "Main content",
+                            RelativeSizeAxes = Axes.Both,
+                            Depth = float.MaxValue,
+                            Padding = new MarginPadding
+                            {
+                                Horizontal = horizontal_margins,
+                                Top = vertical_margins,
+                                Bottom = vertical_margins
                             },
-                        }
-                    }
-                },
+                            Child = spinner = new LoadingSpinner(true)
+                            {
+                                State = { Value = Visibility.Visible },
+                            },
+                        },
+                    },
+                }
             };
         }
 
@@ -112,14 +133,7 @@ namespace osu.Game.Screens.Edit
                 mainContent.Add(content);
                 content.FadeInFromZero(300, Easing.OutQuint);
 
-                LoadComponentAsync(new TimelineArea
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new[]
-                    {
-                        CreateTimelineContent(),
-                    }
-                }, t =>
+                LoadComponentAsync(new TimelineArea(CreateTimelineContent()), t =>
                 {
                     timelineContainer.Add(t);
                     OnTimelineLoaded(t);
