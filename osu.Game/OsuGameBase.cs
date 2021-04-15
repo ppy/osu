@@ -40,6 +40,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
+using osu.Game.Utils;
 using osuTK.Input;
 using RuntimeInfo = osu.Framework.RuntimeInfo;
 
@@ -155,6 +156,8 @@ namespace osu.Game
         private DatabaseContextFactory contextFactory;
 
         protected override UserInputManager CreateUserInputManager() => new OsuUserInputManager();
+
+        protected virtual BatteryInfo CreateBatteryInfo() => null;
 
         /// <summary>
         /// The maximum volume at which audio tracks should playback. This can be set lower than 1 to create some head-room for sound effects.
@@ -281,6 +284,11 @@ namespace osu.Game
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
             dependencies.Cache(RulesetConfigCache = new RulesetConfigCache(SettingsStore));
+
+            var powerStatus = CreateBatteryInfo();
+            if (powerStatus != null)
+                dependencies.CacheAs(powerStatus);
+
             dependencies.Cache(new SessionStatics());
             dependencies.Cache(new OsuColour());
 
