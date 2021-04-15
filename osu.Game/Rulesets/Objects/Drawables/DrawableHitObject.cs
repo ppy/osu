@@ -56,8 +56,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         public virtual IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples;
 
-        private readonly Lazy<List<DrawableHitObject>> nestedHitObjects = new Lazy<List<DrawableHitObject>>();
-        public IReadOnlyList<DrawableHitObject> NestedHitObjects => nestedHitObjects.IsValueCreated ? nestedHitObjects.Value : (IReadOnlyList<DrawableHitObject>)Array.Empty<DrawableHitObject>();
+        private readonly List<DrawableHitObject> nestedHitObjects = new List<DrawableHitObject>();
+        public IReadOnlyList<DrawableHitObject> NestedHitObjects => nestedHitObjects;
 
         /// <summary>
         /// Whether this object should handle any user input events.
@@ -249,7 +249,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 // Must be done before the nested DHO is added to occur before the nested Apply()!
                 drawableNested.ParentHitObject = this;
 
-                nestedHitObjects.Value.Add(drawableNested);
+                nestedHitObjects.Add(drawableNested);
                 AddNestedHitObject(drawableNested);
             }
 
@@ -305,18 +305,15 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (Samples != null)
                 Samples.Samples = null;
 
-            if (nestedHitObjects.IsValueCreated)
+            foreach (var obj in nestedHitObjects)
             {
-                foreach (var obj in nestedHitObjects.Value)
-                {
-                    obj.OnNewResult -= onNewResult;
-                    obj.OnRevertResult -= onRevertResult;
-                    obj.ApplyCustomUpdateState -= onApplyCustomUpdateState;
-                }
-
-                nestedHitObjects.Value.Clear();
-                ClearNestedHitObjects();
+                obj.OnNewResult -= onNewResult;
+                obj.OnRevertResult -= onRevertResult;
+                obj.ApplyCustomUpdateState -= onApplyCustomUpdateState;
             }
+
+            nestedHitObjects.Clear();
+            ClearNestedHitObjects();
 
             HitObject.DefaultsApplied -= onDefaultsApplied;
 
@@ -574,7 +571,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Calculate the position to be used for sample playback at a specified X position (0..1).
         /// </summary>
         /// <param name="position">The lookup X position. Generally should be <see cref="SamplePlaybackPosition"/>.</param>
-        /// <returns></returns>
         protected double CalculateSamplePlaybackBalance(double position)
         {
             const float balance_adjust_amount = 0.4f;

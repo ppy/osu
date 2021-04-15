@@ -19,6 +19,8 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 
         protected OnlinePlayComposite Settings { get; set; }
 
+        protected override bool BlockScrollInput => false;
+
         [BackgroundDependencyLoader]
         private void load()
         {
