@@ -27,9 +27,12 @@ namespace osu.Game.Screens.Backgrounds
         private WorkingBeatmap beatmap;
 
         /// <summary>
-        /// Whether or not user-configured settings relating to brightness of elements should be ignored
+        /// Whether or not user-configured settings relating to brightness of elements should be ignored.
         /// </summary>
-        public readonly Bindable<bool> IgnoreUserSettings = new Bindable<bool>();
+        /// <remarks>
+        /// Beatmap background screens should not apply user settings by default.
+        /// </remarks>
+        public readonly Bindable<bool> IgnoreUserSettings = new Bindable<bool>(true);
 
         public readonly Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
 
@@ -49,9 +52,6 @@ namespace osu.Game.Screens.Backgrounds
             Beatmap = beatmap;
 
             InternalChild = dimmable = CreateFadeContainer();
-
-            // Beatmap background screens should not apply user settings by default.
-            IgnoreUserSettings.Value = true;
 
             dimmable.IgnoreUserSettings.BindTo(IgnoreUserSettings);
             dimmable.IsBreakTime.BindTo(IsBreakTime);
