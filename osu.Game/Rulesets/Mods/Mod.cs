@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Mods
         /// The user readable description of this mod.
         /// </summary>
         [JsonIgnore]
-        public virtual string Description => string.Empty;
+        public abstract string Description { get; }
 
         /// <summary>
         /// The tooltip to display for this mod when used in a <see cref="ModIcon"/>.

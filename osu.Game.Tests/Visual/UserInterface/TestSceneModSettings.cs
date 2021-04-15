@@ -226,6 +226,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             public override double ScoreMultiplier => 1.0;
 
+            public override string Description => "This is a customisable test mod.";
+
             public override ModType Type => ModType.Conversion;
 
             [SettingSource("Sample float", "Change something for a mod")]
