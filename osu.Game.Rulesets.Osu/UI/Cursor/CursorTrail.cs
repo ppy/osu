@@ -32,7 +32,17 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         private double timeOffset;
         private float time;
 
-        protected Anchor TrailOrigin = Anchor.Centre;
+        private Anchor trailOrigin = Anchor.Centre;
+
+        protected Anchor TrailOrigin
+        {
+            get => trailOrigin;
+            set
+            {
+                trailOrigin = value;
+                Invalidate(Invalidation.DrawNode);
+            }
+        }
 
         public CursorTrail()
         {
