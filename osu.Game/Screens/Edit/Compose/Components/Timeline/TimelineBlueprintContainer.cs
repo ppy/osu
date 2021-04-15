@@ -63,7 +63,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             AddInternal(backgroundBox = new SelectableAreaBackground
             {
-                Colour = Color4.Black
+                Colour = Color4.Black,
+                Depth = float.MaxValue,
             });
         }
 
