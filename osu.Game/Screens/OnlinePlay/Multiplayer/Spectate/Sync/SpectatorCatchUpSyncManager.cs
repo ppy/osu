@@ -7,9 +7,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Framework.Timing;
 
-namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
+namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync
 {
-    public class MultiplayerCatchupSyncManager : Component, IMultiplayerSpectatorSyncManager
+    /// <summary>
+    /// A <see cref="ISpectatorSyncManager"/> which synchronises de-synced slave clocks through catchup.
+    /// </summary>
+    public class SpectatorCatchUpSyncManager : Component, ISpectatorSyncManager
     {
         /// <summary>
         /// The offset from the master clock to which slaves should be synchronised to.
@@ -34,19 +37,19 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// <summary>
         /// The slave clocks.
         /// </summary>
-        private readonly List<IMultiplayerSpectatorSlaveClock> slaves = new List<IMultiplayerSpectatorSlaveClock>();
+        private readonly List<ISpectatorSlaveClock> slaves = new List<ISpectatorSlaveClock>();
 
         private bool hasStarted;
         private double? firstStartAttemptTime;
 
-        public MultiplayerCatchupSyncManager(IAdjustableClock master)
+        public SpectatorCatchUpSyncManager(IAdjustableClock master)
         {
             Master = master;
         }
 
-        public void AddSlave(IMultiplayerSpectatorSlaveClock clock) => slaves.Add(clock);
+        public void AddSlave(ISpectatorSlaveClock clock) => slaves.Add(clock);
 
-        public void RemoveSlave(IMultiplayerSpectatorSlaveClock clock) => slaves.Remove(clock);
+        public void RemoveSlave(ISpectatorSlaveClock clock) => slaves.Remove(clock);
 
         protected override void Update()
         {

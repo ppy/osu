@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Scoring;
+using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
 
@@ -20,11 +21,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public WorkingBeatmap Beatmap { get; private set; }
 
         public readonly Score Score;
-        public readonly MultiplayerSpectatorSlaveClock GameplayClock;
+        public readonly SpectatorCatchUpSlaveClock GameplayClock;
 
         private OsuScreenStack stack;
 
-        public PlayerInstance(Score score, MultiplayerSpectatorSlaveClock gameplayClock)
+        public PlayerInstance(Score score, SpectatorCatchUpSlaveClock gameplayClock)
         {
             Score = score;
             GameplayClock = gameplayClock;

@@ -6,16 +6,16 @@ using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
-using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
+using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Tests.OnlinePlay
 {
     [HeadlessTest]
-    public class MultiplayerCatchupSyncManagerTest : OsuTestScene
+    public class MultiplayerCatchUpSyncManagerTest : OsuTestScene
     {
         private TestManualClock master;
-        private MultiplayerCatchupSyncManager catchupSyncManager;
+        private SpectatorCatchUpSyncManager syncManager;
 
         private TestSpectatorSlaveClock slave1;
         private TestSpectatorSlaveClock slave2;
@@ -23,11 +23,11 @@ namespace osu.Game.Tests.OnlinePlay
         [SetUp]
         public void Setup()
         {
-            catchupSyncManager = new MultiplayerCatchupSyncManager(master = new TestManualClock());
-            catchupSyncManager.AddSlave(slave1 = new TestSpectatorSlaveClock(1));
-            catchupSyncManager.AddSlave(slave2 = new TestSpectatorSlaveClock(2));
+            syncManager = new SpectatorCatchUpSyncManager(master = new TestManualClock());
+            syncManager.AddSlave(slave1 = new TestSpectatorSlaveClock(1));
+            syncManager.AddSlave(slave2 = new TestSpectatorSlaveClock(2));
 
-            Schedule(() => Child = catchupSyncManager);
+            Schedule(() => Child = syncManager);
         }
 
         [Test]
@@ -47,7 +47,7 @@ namespace osu.Game.Tests.OnlinePlay
         [Test]
         public void TestMasterClockDoesNotStartWhenNoneReadyForMaximumDelayTime()
         {
-            AddWaitStep($"wait {MultiplayerCatchupSyncManager.MAXIMUM_START_DELAY} milliseconds", (int)Math.Ceiling(MultiplayerCatchupSyncManager.MAXIMUM_START_DELAY / TimePerAction));
+            AddWaitStep($"wait {SpectatorCatchUpSyncManager.MAXIMUM_START_DELAY} milliseconds", (int)Math.Ceiling(SpectatorCatchUpSyncManager.MAXIMUM_START_DELAY / TimePerAction));
             assertMasterState(false);
         }
 
@@ -55,7 +55,7 @@ namespace osu.Game.Tests.OnlinePlay
         public void TestMasterClockStartsWhenAnyReadyForMaximumDelayTime()
         {
             setWaiting(() => slave1, false);
-            AddWaitStep($"wait {MultiplayerCatchupSyncManager.MAXIMUM_START_DELAY} milliseconds", (int)Math.Ceiling(MultiplayerCatchupSyncManager.MAXIMUM_START_DELAY / TimePerAction));
+            AddWaitStep($"wait {SpectatorCatchUpSyncManager.MAXIMUM_START_DELAY} milliseconds", (int)Math.Ceiling(SpectatorCatchUpSyncManager.MAXIMUM_START_DELAY / TimePerAction));
             assertMasterState(true);
         }
 
@@ -64,7 +64,7 @@ namespace osu.Game.Tests.OnlinePlay
         {
             setAllWaiting(false);
 
-            setMasterTime(MultiplayerCatchupSyncManager.SYNC_TARGET + 1);
+            setMasterTime(SpectatorCatchUpSyncManager.SYNC_TARGET + 1);
             assertCatchingUp(() => slave1, false);
         }
 
@@ -73,7 +73,7 @@ namespace osu.Game.Tests.OnlinePlay
         {
             setAllWaiting(false);
 
-            setMasterTime(MultiplayerCatchupSyncManager.MAX_SYNC_OFFSET + 1);
+            setMasterTime(SpectatorCatchUpSyncManager.MAX_SYNC_OFFSET + 1);
             assertCatchingUp(() => slave1, true);
             assertCatchingUp(() => slave2, true);
         }
@@ -83,8 +83,8 @@ namespace osu.Game.Tests.OnlinePlay
         {
             setAllWaiting(false);
 
-            setMasterTime(MultiplayerCatchupSyncManager.MAX_SYNC_OFFSET + 1);
-            setSlaveTime(() => slave1, MultiplayerCatchupSyncManager.SYNC_TARGET + 1);
+            setMasterTime(SpectatorCatchUpSyncManager.MAX_SYNC_OFFSET + 1);
+            setSlaveTime(() => slave1, SpectatorCatchUpSyncManager.SYNC_TARGET + 1);
             assertCatchingUp(() => slave1, true);
         }
 
@@ -93,8 +93,8 @@ namespace osu.Game.Tests.OnlinePlay
         {
             setAllWaiting(false);
 
-            setMasterTime(MultiplayerCatchupSyncManager.MAX_SYNC_OFFSET + 2);
-            setSlaveTime(() => slave1, MultiplayerCatchupSyncManager.SYNC_TARGET);
+            setMasterTime(SpectatorCatchUpSyncManager.MAX_SYNC_OFFSET + 2);
+            setSlaveTime(() => slave1, SpectatorCatchUpSyncManager.SYNC_TARGET);
             assertCatchingUp(() => slave1, false);
             assertCatchingUp(() => slave2, true);
         }
@@ -104,7 +104,7 @@ namespace osu.Game.Tests.OnlinePlay
         {
             setAllWaiting(false);
 
-            setSlaveTime(() => slave1, -MultiplayerCatchupSyncManager.SYNC_TARGET);
+            setSlaveTime(() => slave1, -SpectatorCatchUpSyncManager.SYNC_TARGET);
             assertCatchingUp(() => slave1, false);
             assertSlaveState(() => slave1, true);
         }
@@ -114,7 +114,7 @@ namespace osu.Game.Tests.OnlinePlay
         {
             setAllWaiting(false);
 
-            setSlaveTime(() => slave1, -MultiplayerCatchupSyncManager.SYNC_TARGET - 1);
+            setSlaveTime(() => slave1, -SpectatorCatchUpSyncManager.SYNC_TARGET - 1);
 
             // This is a silent catchup, where IsCatchingUp = false but IsRunning = false also.
             assertCatchingUp(() => slave1, false);
@@ -162,10 +162,10 @@ namespace osu.Game.Tests.OnlinePlay
         private void assertSlaveState(Func<TestSpectatorSlaveClock> slave, bool running)
             => AddAssert($"slave {slave().Id} {(running ? "is" : "is not")} running", () => slave().IsRunning == running);
 
-        private class TestSpectatorSlaveClock : TestManualClock, IMultiplayerSpectatorSlaveClock
+        private class TestSpectatorSlaveClock : TestManualClock, ISpectatorSlaveClock
         {
             public readonly Bindable<bool> WaitingOnFrames = new Bindable<bool>(true);
-            IBindable<bool> IMultiplayerSpectatorSlaveClock.WaitingOnFrames => WaitingOnFrames;
+            IBindable<bool> ISpectatorSlaveClock.WaitingOnFrames => WaitingOnFrames;
 
             public bool IsCatchingUp { get; set; }
 
@@ -183,6 +183,16 @@ namespace osu.Game.Tests.OnlinePlay
                         Start();
                 });
             }
+
+            public void ProcessFrame()
+            {
+            }
+
+            public double ElapsedFrameTime => 0;
+
+            public double FramesPerSecond => 0;
+
+            public FrameTimeInfo TimeInfo => default;
         }
 
         private class TestManualClock : ManualClock, IAdjustableClock
