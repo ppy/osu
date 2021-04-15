@@ -21,9 +21,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations
 
         public PointVisualisation()
         {
-            Origin = Anchor.TopCentre;
-
-            RelativePositionAxes = Axes.X;
+            RelativePositionAxes = Axes.Both;
             RelativeSizeAxes = Axes.Y;
 
             Anchor = Anchor.CentreLeft;
