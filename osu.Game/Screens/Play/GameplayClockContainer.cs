@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -9,7 +10,7 @@ using osu.Framework.Timing;
 
 namespace osu.Game.Screens.Play
 {
-    public abstract class GameplayClockContainer : Container
+    public abstract class GameplayClockContainer : Container, IAdjustableClock
     {
         /// <summary>
         /// The final clock which is exposed to underlying components.
@@ -90,5 +91,37 @@ namespace osu.Game.Screens.Play
         protected virtual IFrameBasedClock ClockToProcess => AdjustableClock;
 
         protected abstract GameplayClock CreateGameplayClock(IFrameBasedClock source);
+
+        #region IAdjustableClock
+
+        bool IAdjustableClock.Seek(double position)
+        {
+            Seek(position);
+            return true;
+        }
+
+        void IAdjustableClock.Reset()
+        {
+            Restart();
+            Stop();
+        }
+
+        public void ResetSpeedAdjustments()
+        {
+        }
+
+        double IAdjustableClock.Rate
+        {
+            get => GameplayClock.Rate;
+            set => throw new NotSupportedException();
+        }
+
+        double IClock.Rate => GameplayClock.Rate;
+
+        public double CurrentTime => GameplayClock.CurrentTime;
+
+        public bool IsRunning => GameplayClock.IsRunning;
+
+        #endregion
     }
 }
