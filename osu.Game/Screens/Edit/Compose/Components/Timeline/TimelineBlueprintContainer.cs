@@ -65,6 +65,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 Colour = Color4.Black,
                 Depth = float.MaxValue,
+                Blending = BlendingParameters.Additive,
             });
         }
 
