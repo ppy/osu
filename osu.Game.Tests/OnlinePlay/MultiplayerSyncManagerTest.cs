@@ -167,10 +167,6 @@ namespace osu.Game.Tests.OnlinePlay
             public readonly Bindable<bool> WaitingOnFrames = new Bindable<bool>(true);
             IBindable<bool> IMultiplayerSlaveClock.WaitingOnFrames => WaitingOnFrames;
 
-            public double LastFrameTime => 0;
-
-            double IMultiplayerSlaveClock.LastFrameTime => LastFrameTime;
-
             public bool IsCatchingUp { get; set; }
 
             public readonly int Id;

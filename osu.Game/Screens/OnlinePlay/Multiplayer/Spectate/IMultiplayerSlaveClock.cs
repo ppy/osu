@@ -10,8 +10,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
     {
         IBindable<bool> WaitingOnFrames { get; }
 
-        double LastFrameTime { get; }
-
         bool IsCatchingUp { get; set; }
     }
 }
