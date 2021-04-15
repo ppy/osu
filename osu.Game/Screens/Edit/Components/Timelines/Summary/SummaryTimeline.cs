@@ -27,6 +27,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
                     Anchor = Anchor.Centre,
                     Origin = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.Both,
+                    Y = -10,
                     Height = 0.35f
                 },
                 new BookmarkPart
