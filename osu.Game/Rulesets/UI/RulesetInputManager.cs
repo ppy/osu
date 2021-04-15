@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.UI
 
         protected override List<IInput> GetPendingInputs()
         {
-            if (replayInputHandler != null && !replayInputHandler.IsActive)
+            if (replayInputHandler?.IsActive == false)
                 return emptyInputList;
 
             return base.GetPendingInputs();
