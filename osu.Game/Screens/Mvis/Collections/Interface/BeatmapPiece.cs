@@ -14,7 +14,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Mvis.Collections.Interface
 {
@@ -27,7 +26,7 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
         private Bindable<WorkingBeatmap> b { get; set; }
 
         [Resolved]
-        private MusicController controller { get; set; }
+        private CollectionHelper collectionHelper { get; set; }
 
         public readonly BindableBool Active = new BindableBool();
         public bool IsCurrent;
@@ -236,10 +235,7 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
         protected override bool OnClick(ClickEvent e)
         {
             if (IsCurrent && b.Value != Beatmap)
-            {
-                b.Value = Beatmap;
-                controller.Play();
-            }
+                collectionHelper.Play(Beatmap);
             else
                 content.Shake();
 

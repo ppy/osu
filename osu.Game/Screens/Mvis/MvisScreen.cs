@@ -578,11 +578,11 @@ namespace osu.Game.Screens.Mvis
                 if (v.NewValue)
                 {
                     Beatmap.Value.Track.Completed += collectionHelper.PlayNextBeatmap;
-                    musicController.TrackAdjustTakenOver = true;
+                    Beatmap.Disabled = true;
                 }
                 else
                 {
-                    musicController.TrackAdjustTakenOver = false;
+                    Beatmap.Disabled = false;
                 }
             }, true);
 
@@ -711,7 +711,7 @@ namespace osu.Game.Screens.Mvis
 
         private void seekTo(double position)
         {
-            musicController.SeekTo(position);
+            Beatmap.Value.Track.Seek(position);
             OnSeek?.Invoke(position);
         }
 
@@ -748,7 +748,7 @@ namespace osu.Game.Screens.Mvis
             //重置Track
             track.ResetSpeedAdjustments();
             track.Looping = false;
-            musicController.TrackAdjustTakenOver = false;
+            Beatmap.Disabled = false;
 
             //锁定变更
             lockChanges.Value = true;
@@ -786,7 +786,7 @@ namespace osu.Game.Screens.Mvis
         {
             base.OnResuming(last);
 
-            musicController.TrackAdjustTakenOver = true;
+            Beatmap.Disabled = playFromCollection.Value;
             collectionHelper.UpdateBeatmaps();
             collectionPanel.RefreshCollectionList();
 
@@ -942,11 +942,7 @@ namespace osu.Game.Screens.Mvis
 
         private void togglePause()
         {
-            if (track.IsRunning)
-                musicController.Stop();
-            else
-                musicController.Play();
-
+            musicController.TogglePause();
             OnTrackRunningToggle?.Invoke(track.IsRunning);
         }
 

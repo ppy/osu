@@ -10,7 +10,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Mvis.Collections
 {
-    public class CollectionHelper : Component
+    internal class CollectionHelper : Component
     {
         [Resolved]
         private CollectionManager collectionManager { get; set; }
@@ -39,17 +39,21 @@ namespace osu.Game.Screens.Mvis.Collections
 
         public void PlayNextBeatmap() => Schedule(NextTrack);
 
-        public void NextTrack()
+        public void Play(WorkingBeatmap b) => changeBeatmap(b);
+
+        private void changeBeatmap(WorkingBeatmap working)
         {
-            b.Value = getBeatmap(beatmapList, b.Value, true);
+            b.Disabled = false;
+            b.Value = working;
+            b.Disabled = true;
             controller.Play();
         }
 
-        public void PrevTrack()
-        {
-            b.Value = getBeatmap(beatmapList, b.Value, true, -1);
-            controller.Play();
-        }
+        public void NextTrack() =>
+            changeBeatmap(getBeatmap(beatmapList, b.Value, true));
+
+        public void PrevTrack() =>
+            changeBeatmap(getBeatmap(beatmapList, b.Value, true, -1));
 
         /// <summary>
         /// 用于从列表中获取指定的<see cref="WorkingBeatmap"/>。
