@@ -345,7 +345,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         /// </summary>
         public class ExtendableCircle : CompositeDrawable
         {
-            private readonly CircularContainer content;
+            private readonly Circle content;
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => content.ReceivePositionalInputAt(screenSpacePos);
 
@@ -354,19 +354,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             public ExtendableCircle()
             {
                 Padding = new MarginPadding { Horizontal = -circle_size / 2f };
-                InternalChild = content = new CircularContainer
+                InternalChild = content = new Circle
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Masking = true,
                     EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Shadow,
                         Radius = 5,
                         Colour = Color4.Black.Opacity(0.4f)
-                    },
-                    Child = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both
                     }
                 };
             }
