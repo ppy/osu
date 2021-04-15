@@ -6,7 +6,7 @@ using osu.Framework.Timing;
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync
 {
     /// <summary>
-    /// Manages the synchronisation between one or more slave clocks in relation to a master clock.
+    /// Manages the synchronisation between one or more <see cref="ISpectatorSlaveClock"/>s in relation to a master clock.
     /// </summary>
     public interface ISpectatorSyncManager
     {
@@ -16,15 +16,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync
         IAdjustableClock Master { get; }
 
         /// <summary>
-        /// Adds a slave clock.
+        /// Adds an <see cref="ISpectatorSlaveClock"/> to manage.
         /// </summary>
-        /// <param name="clock">The clock to add.</param>
+        /// <param name="clock">The <see cref="ISpectatorSlaveClock"/> to add.</param>
         void AddSlave(ISpectatorSlaveClock clock);
 
         /// <summary>
-        /// Removes a slave clock.
+        /// Removes an <see cref="ISpectatorSlaveClock"/>, stopping it from being managed by this <see cref="ISpectatorSyncManager"/>.
         /// </summary>
-        /// <param name="clock">The clock to remove.</param>
+        /// <param name="clock">The <see cref="ISpectatorSlaveClock"/> to remove.</param>
         void RemoveSlave(ISpectatorSlaveClock clock);
     }
 }

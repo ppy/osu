@@ -7,10 +7,13 @@ using osu.Framework.Timing;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync
 {
+    /// <summary>
+    /// A <see cref="ISpectatorSlaveClock"/> which catches up using rate adjustment.
+    /// </summary>
     public class SpectatorCatchUpSlaveClock : ISpectatorSlaveClock
     {
         /// <summary>
-        /// The catchup rate.
+        /// The catch up rate.
         /// </summary>
         public const double CATCHUP_RATE = 2;
 
