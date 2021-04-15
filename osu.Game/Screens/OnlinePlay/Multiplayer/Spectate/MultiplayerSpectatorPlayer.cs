@@ -4,7 +4,6 @@
 using osu.Framework.Bindables;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 
@@ -12,13 +11,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
     public class MultiplayerSpectatorPlayer : SpectatorPlayer
     {
-        public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
+        private readonly MultiplayerSlaveClock gameplayClock;
 
-        public new SubGameplayClockContainer GameplayClockContainer => (SubGameplayClockContainer)base.GameplayClockContainer;
-
-        private readonly GameplayClock gameplayClock;
-
-        public MultiplayerSpectatorPlayer(Score score, GameplayClock gameplayClock)
+        public MultiplayerSpectatorPlayer(Score score, MultiplayerSlaveClock gameplayClock)
             : base(score)
         {
             this.gameplayClock = gameplayClock;

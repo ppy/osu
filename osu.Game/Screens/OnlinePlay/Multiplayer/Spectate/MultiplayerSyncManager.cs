@@ -27,11 +27,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public const double MAXIMUM_START_DELAY = 15000;
 
         /// <summary>
-        /// The catchup rate.
-        /// </summary>
-        public const double CATCHUP_RATE = 2;
-
-        /// <summary>
         /// The master clock which is used to control the timing of all slave clocks.
         /// </summary>
         public IAdjustableClock Master { get; }

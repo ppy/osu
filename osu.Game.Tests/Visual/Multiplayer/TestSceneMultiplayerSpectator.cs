@@ -1,15 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
@@ -157,34 +154,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        public void TestPlayerStartsCatchingUpOnlyAfterExceedingMaxOffset()
-        {
-            start(new[] { 55, 56 });
-            loadSpectateScreen();
-
-            sendFrames(55, 1000);
-            sendFrames(56, 1000);
-
-            Bindable<double> slowDownAdjustment;
-
-            AddStep("slow down player 2", () =>
-            {
-                slowDownAdjustment = new Bindable<double>(0.99);
-                getInstance(56).Beatmap.Track.AddAdjustment(AdjustableProperty.Frequency, slowDownAdjustment);
-            });
-
-            AddUntilStep("exceeded min offset but not catching up", () => getGameplayOffset(55, 56) > PlayerInstance.MAX_OFFSET && !getInstance(56).IsCatchingUp);
-            AddUntilStep("catching up or caught up", () => getInstance(56).IsCatchingUp || Math.Abs(getGameplayOffset(55, 56)) < PlayerInstance.SYNC_TARGET * 2);
-        }
-
-        [Test]
         public void TestPlayersCatchUpAfterFallingBehind()
         {
             start(new[] { 55, 56 });
             loadSpectateScreen();
 
             // Send initial frames for both players. A few more for player 1.
-            sendFrames(55, 100);
+            sendFrames(55, 1000);
             sendFrames(56, 10);
             checkPausedInstant(55, false);
             checkPausedInstant(56, false);
@@ -194,11 +170,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddWaitStep("wait a few more frames", 10);
 
             // Send more frames for player 2. It should unpause.
-            sendFrames(56, 100);
+            sendFrames(56, 1000);
             checkPausedInstant(56, false);
 
             // Player 2 should catch up to player 1 after unpausing.
-            AddUntilStep("player 2 not catching up", () => !getInstance(56).IsCatchingUp);
+            AddUntilStep("player 2 not catching up", () => !getInstance(56).GameplayClock.IsCatchingUp);
             AddWaitStep("wait a bit", 10);
         }
 
