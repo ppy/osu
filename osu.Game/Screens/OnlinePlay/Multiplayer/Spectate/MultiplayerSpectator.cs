@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.Spectator;
+using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Spectate;
 
@@ -24,7 +25,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         private readonly PlayerInstance[] instances;
         private MasterGameplayClockContainer masterClockContainer;
-        private IMultiplayerSpectatorSyncManager syncManager;
+        private ISpectatorSyncManager syncManager;
         private PlayerGrid grid;
         private MultiplayerSpectatorLeaderboard leaderboard;
 
@@ -65,7 +66,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             InternalChildren = new[]
             {
-                (Drawable)(syncManager = new MultiplayerCatchupSyncManager(masterClockContainer)),
+                (Drawable)(syncManager = new SpectatorCatchUpSyncManager(masterClockContainer)),
                 masterClockContainer
             };
 
@@ -101,7 +102,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 leaderboard.RemoveClock(existingInstance.User.Id);
             }
 
-            LoadComponentAsync(instances[userIndex] = new PlayerInstance(gameplayState.Score, new MultiplayerSpectatorSlaveClock(masterClockContainer.GameplayClock)), d =>
+            LoadComponentAsync(instances[userIndex] = new PlayerInstance(gameplayState.Score, new SpectatorCatchUpSlaveClock(masterClockContainer.GameplayClock)), d =>
             {
                 if (instances[userIndex] == d)
                 {
