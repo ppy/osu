@@ -69,7 +69,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Height = 0.25f
+                    Height = 0.10f
                 }
             };
         }
