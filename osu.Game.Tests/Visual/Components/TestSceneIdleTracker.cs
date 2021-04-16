@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual.Components
 
         private IdleTrackingBox[] boxes;
 
-        public SessionStatics sessionStatics;
+        private SessionStatics sessionStatics;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -175,6 +175,7 @@ namespace osu.Game.Tests.Visual.Components
 
             public IdleTrackingBox(int timeToIdle, SessionStatics statics)
             {
+
                 Box box;
 
                 Alpha = 0.6f;
@@ -182,7 +183,7 @@ namespace osu.Game.Tests.Visual.Components
 
                 InternalChildren = new Drawable[]
                 {
-                    idleTracker = new GameIdleTracker(timeToIdle, statics),
+                    idleTracker = new GameIdleTracker(timeToIdle),
                     box = new Box
                     {
                         Colour = Color4.White,
@@ -190,7 +191,11 @@ namespace osu.Game.Tests.Visual.Components
                     },
                 };
 
-                idleTracker.IsIdle.BindValueChanged(idle => box.Colour = idle.NewValue ? Color4.White : Color4.Black, true);
+                idleTracker.IsIdle.BindValueChanged(idle =>
+                {
+                    box.Colour = idle.NewValue ? Color4.White : Color4.Black;
+                    if (idle.NewValue) statics.ResetValues();
+                }, true);
             }
         }
     }
