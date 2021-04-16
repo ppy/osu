@@ -27,6 +27,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             RelativeSizeAxes = Axes.Y;
             AutoSizeAxes = Axes.X;
 
+            Origin = Anchor.TopCentre;
+
             X = (float)group.Time;
         }
 

@@ -60,6 +60,7 @@ namespace osu.Game.Online.Spectator
         private IBindable<IReadOnlyList<Mod>> currentMods { get; set; }
 
         private readonly SpectatorState currentState = new SpectatorState();
+        private readonly Dictionary<int, SpectatorState> currentUserStates = new Dictionary<int, SpectatorState>();
 
         private bool isPlaying;
 
@@ -69,7 +70,7 @@ namespace osu.Game.Online.Spectator
         public event Action<int, FrameDataBundle> OnNewFrames;
 
         /// <summary>
-        /// Called whenever a user starts a play session.
+        /// Called whenever a user starts a play session, or immediately if the user is being watched and currently in a play session.
         /// </summary>
         public event Action<int, SpectatorState> OnUserBeganPlaying;
 
@@ -134,6 +135,9 @@ namespace osu.Game.Online.Spectator
             if (!playingUsers.Contains(userId))
                 playingUsers.Add(userId);
 
+            lock (userLock)
+                currentUserStates[userId] = state;
+
             OnUserBeganPlaying?.Invoke(userId, state);
 
             return Task.CompletedTask;
@@ -142,6 +146,9 @@ namespace osu.Game.Online.Spectator
         Task ISpectatorClient.UserFinishedPlaying(int userId, SpectatorState state)
         {
             playingUsers.Remove(userId);
+
+            lock (userLock)
+                currentUserStates.Remove(userId);
 
             OnUserFinishedPlaying?.Invoke(userId, state);
 
@@ -267,6 +274,25 @@ namespace osu.Game.Online.Spectator
             SendFrames(new FrameDataBundle(currentScore.ScoreInfo, frames));
 
             lastSendTime = Time.Current;
+        }
+
+        /// <summary>
+        /// Bind an action to <see cref="OnUserBeganPlaying"/> with the option of running the bound action once immediately.
+        /// </summary>
+        /// <param name="callback">The action to perform when a user begins playing.</param>
+        /// <param name="runOnceImmediately">Whether the action provided in <paramref name="callback"/> should be run once immediately for all users currently playing.</param>
+        public void BindUserBeganPlaying(Action<int, SpectatorState> callback, bool runOnceImmediately = false)
+        {
+            OnUserBeganPlaying += callback;
+
+            if (!runOnceImmediately)
+                return;
+
+            lock (userLock)
+            {
+                foreach (var (userId, state) in currentUserStates)
+                    callback(userId, state);
+            }
         }
     }
 }

@@ -186,6 +186,13 @@ namespace osu.Game.Graphics
         public readonly Color4 GrayE = Color4Extensions.FromHex(@"eee");
         public readonly Color4 GrayF = Color4Extensions.FromHex(@"fff");
 
+        // in latest editor design logic, need to figure out where these sit...
+        public readonly Color4 Lime1 = Color4Extensions.FromHex(@"b2ff66");
+        public readonly Color4 Orange1 = Color4Extensions.FromHex(@"ffd966");
+
+        // Content Background
+        public readonly Color4 B5 = Color4Extensions.FromHex(@"222a28");
+
         public readonly Color4 RedLighter = Color4Extensions.FromHex(@"ffeded");
         public readonly Color4 RedLight = Color4Extensions.FromHex(@"ed7787");
         public readonly Color4 Red = Color4Extensions.FromHex(@"ed1121");
