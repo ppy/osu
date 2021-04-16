@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
@@ -170,7 +171,12 @@ namespace osu.Game.Rulesets.Mods
                 target.UnbindFrom(sourceBindable);
             }
             else
-                target.Parse(source);
+            {
+                if (!(target is IParseable parseable))
+                    throw new InvalidOperationException($"Bindable type {target.GetType().ReadableName()} is not {nameof(IParseable)}.");
+
+                parseable.Parse(source);
+            }
         }
 
         public bool Equals(IMod other) => other is Mod them && Equals(them);
