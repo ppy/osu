@@ -10,7 +10,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Tests.Gameplay
 {
     [HeadlessTest]
-    public class TestSceneGameplayClockContainer : OsuTestScene
+    public class TestSceneMasterGameplayClockContainer : OsuTestScene
     {
         [Test]
         public void TestStartThenElapsedTime()
