@@ -15,9 +15,11 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Mvis;
+using osu.Game.Screens.Mvis.Misc;
 using osuTK;
 
-namespace osu.Game.Screens.Mvis.Collections.Interface
+namespace Mvis.Plugin.CollectionSupport.Sidebar
 {
     public class CollectionPanel : CompositeDrawable
     {
@@ -27,7 +29,7 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
         public readonly BeatmapCollection Collection;
 
         ///<summary>
-        ///用于触发<see cref="CollectionSelectPanel"/>的SelectedCollection变更
+        ///用于触发<see cref="CollectionPluginPage"/>的SelectedCollection变更
         ///</summary>
         public Bindable<BeatmapCollection> SelectedCollection = new Bindable<BeatmapCollection>();
 

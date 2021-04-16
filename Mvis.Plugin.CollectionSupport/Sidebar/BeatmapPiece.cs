@@ -14,8 +14,10 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Mvis;
+using osu.Game.Screens.Mvis.Misc;
 
-namespace osu.Game.Screens.Mvis.Collections.Interface
+namespace Mvis.Plugin.CollectionSupport.Sidebar
 {
     public class BeatmapPiece : CompositeDrawable
     {

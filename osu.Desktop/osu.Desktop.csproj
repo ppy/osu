@@ -25,6 +25,7 @@
     <ProjectReference Include="..\Mvis.Plugin.RulesetPanel\Mvis.Plugin.RulesetPanel.csproj" />
     <ProjectReference Include="..\Mvis.Plugin.StoryboardSupport\Mvis.Plugin.StoryboardSupport.csproj" />
     <ProjectReference Include="..\Mvis.Plugin.FakeEditor\Mvis.Plugin.FakeEditor.csproj" />
+    <ProjectReference Include="..\Mvis.Plugin.CollectionSupport\Mvis.Plugin.CollectionSupport.csproj" />
   </ItemGroup>
   <ItemGroup Label="Package References">
     <PackageReference Include="Microsoft.NETCore.Targets" Version="5.0.0" />

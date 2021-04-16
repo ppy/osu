@@ -12,11 +12,12 @@ using osu.Game.Collections;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Mvis.Skinning;
 using osu.Game.Skinning;
 using osuTK;
 
-namespace osu.Game.Screens.Mvis.Collections.Interface
+namespace Mvis.Plugin.CollectionSupport.Sidebar
 {
     public class CollectionInfo : CompositeDrawable
     {

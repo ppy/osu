@@ -8,9 +8,8 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
-using osu.Game.Screens.Mvis.Misc;
 
-namespace osu.Game.Screens.Mvis.Collections.Interface
+namespace osu.Game.Screens.Mvis.Misc
 {
     public class BeatmapCover : CompositeDrawable
     {

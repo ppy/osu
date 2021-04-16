@@ -1,16 +1,23 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using Mvis.Plugin.CollectionSupport.Config;
+using Mvis.Plugin.CollectionSupport.Sidebar;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Overlays;
+using osu.Game.Screens.Mvis.Plugins;
+using osu.Game.Screens.Mvis.Plugins.Config;
+using osu.Game.Screens.Mvis.Plugins.Types;
+using osu.Game.Screens.Mvis.Skinning;
 
-namespace osu.Game.Screens.Mvis.Collections
+namespace Mvis.Plugin.CollectionSupport
 {
-    internal class CollectionHelper : Component
+    public class CollectionHelper : MvisPlugin, IProvideAudioControlPlugin
     {
         [Resolved]
         private CollectionManager collectionManager { get; set; }
@@ -29,6 +36,27 @@ namespace osu.Game.Screens.Mvis.Collections
         private int maxCount;
         public Bindable<BeatmapCollection> CurrentCollection = new Bindable<BeatmapCollection>();
 
+        protected override Drawable CreateContent() => new PlaceHolder();
+
+        protected override bool OnContentLoaded(Drawable content) => true;
+
+        protected override bool PostInit() => true;
+
+        public override int Version => 1;
+
+        public override PluginSidebarPage CreateSidebarPage()
+            => new CollectionPluginPage(this);
+
+        public override IPluginConfigManager CreateConfigManager(Storage storage)
+            => new CollectionHelperConfigManager(storage);
+
+        public CollectionHelper()
+        {
+            Name = "收藏夹";
+            Description = "将收藏夹作为歌单播放音乐!";
+            Author = "mf-osu";
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -36,8 +64,6 @@ namespace osu.Game.Screens.Mvis.Collections
 
             collectionManager.Collections.CollectionChanged += triggerRefresh;
         }
-
-        public void PlayNextBeatmap() => Schedule(NextTrack);
 
         public void Play(WorkingBeatmap b) => changeBeatmap(b);
 
@@ -54,6 +80,18 @@ namespace osu.Game.Screens.Mvis.Collections
 
         public void PrevTrack() =>
             changeBeatmap(getBeatmap(beatmapList, b.Value, true, -1));
+
+        public void TogglePause()
+        {
+            var track = b.Value.Track;
+
+            if (track.IsRunning)
+                track.Stop();
+            else
+                track.Start();
+        }
+
+        public void Seek(double position) => b.Value.Track.Seek(position);
 
         /// <summary>
         /// 用于从列表中获取指定的<see cref="WorkingBeatmap"/>。
@@ -134,7 +172,9 @@ namespace osu.Game.Screens.Mvis.Collections
 
         protected override void Dispose(bool isDisposing)
         {
-            collectionManager.Collections.CollectionChanged -= triggerRefresh;
+            if (collectionManager != null)
+                collectionManager.Collections.CollectionChanged -= triggerRefresh;
+
             base.Dispose(isDisposing);
         }
     }

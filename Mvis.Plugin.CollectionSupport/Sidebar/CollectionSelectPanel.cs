@@ -6,34 +6,43 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Collections;
 using osu.Game.Graphics.Containers;
-using osu.Game.Screens.Mvis.SideBar;
+using osu.Game.Screens.Mvis.Plugins;
 using osuTK;
 
-namespace osu.Game.Screens.Mvis.Collections.Interface
+namespace Mvis.Plugin.CollectionSupport.Sidebar
 {
-    public class CollectionSelectPanel : CompositeDrawable, ISidebarContent
+    public class CollectionPluginPage : PluginSidebarPage
     {
         [Resolved]
         private CollectionManager collectionManager { get; set; }
 
-        [Resolved]
-        private CollectionHelper collectionHelper { get; set; }
+        private readonly CollectionHelper collectionHelper;
 
         private readonly Bindable<BeatmapCollection> selectedCollection = new Bindable<BeatmapCollection>();
         private readonly Bindable<CollectionPanel> selectedPanel = new Bindable<CollectionPanel>();
 
-        private readonly FillFlowContainer<CollectionPanel> collectionsFillFlow;
+        private FillFlowContainer<CollectionPanel> collectionsFillFlow;
         private CollectionPanel selectedpanel;
         private CollectionPanel prevPanel;
-        private readonly OsuScrollContainer collectionScroll;
-        private readonly CollectionInfo info;
+        private OsuScrollContainer collectionScroll;
+        private CollectionInfo info;
 
-        public float ResizeWidth => 0.8f;
-        public string Title => "收藏夹";
-
-        public CollectionSelectPanel()
+        public CollectionPluginPage(MvisPlugin plugin)
+            : base(plugin, 0.8f)
         {
             RelativeSizeAxes = Axes.Both;
+            collectionHelper = (CollectionHelper)plugin;
+        }
+
+        private DependencyContainer dependencies;
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
+            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            dependencies.Cache(collectionHelper);
 
             InternalChildren = new Drawable[]
             {
@@ -68,11 +77,7 @@ namespace osu.Game.Screens.Mvis.Collections.Interface
                     Origin = Anchor.TopRight,
                 }
             };
-        }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
             collectionManager.Collections.CollectionChanged += triggerRefresh;
         }
 

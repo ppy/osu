@@ -11,11 +11,12 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
+using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Mvis.Skinning;
 using osu.Game.Skinning;
 using osuTK;
 
-namespace osu.Game.Screens.Mvis.Collections.Interface
+namespace Mvis.Plugin.CollectionSupport.Sidebar
 {
     public class BeatmapList : CompositeDrawable
     {

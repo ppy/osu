@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Specialized;
+using System.Linq;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -28,10 +29,9 @@ using osu.Game.Overlays.Settings.Sections.Mf;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Mvis.BottomBar;
 using osu.Game.Screens.Mvis.BottomBar.Buttons;
-using osu.Game.Screens.Mvis.Collections;
-using osu.Game.Screens.Mvis.Collections.Interface;
 using osu.Game.Screens.Mvis.Misc;
 using osu.Game.Screens.Mvis.Plugins;
+using osu.Game.Screens.Mvis.Plugins.Types;
 using osu.Game.Screens.Mvis.SideBar;
 using osu.Game.Screens.Mvis.Skinning;
 using osu.Game.Screens.Play;
@@ -128,7 +128,6 @@ namespace osu.Game.Screens.Mvis
         [Resolved]
         private MvisPluginManager pluginManager { get; set; }
 
-        private CollectionHelper collectionHelper;
         private CustomColourProvider colourProvider;
         private DependencyContainer dependencies;
 
@@ -150,7 +149,6 @@ namespace osu.Game.Screens.Mvis
         private BottomBarSwitchButton loopToggleButton;
         private BottomBarOverlayLockSwitchButton lockButton;
         private BottomBarSwitchButton songProgressButton;
-        private BottomBarButton collectionButton;
 
         #endregion
 
@@ -182,7 +180,6 @@ namespace osu.Game.Screens.Mvis
 
         #region 侧边栏
 
-        private CollectionSelectPanel collectionPanel;
         private SidebarSettingsScrollContainer settingsScroll;
         private SidebarPluginsPage pluginsPage;
 
@@ -196,8 +193,8 @@ namespace osu.Game.Screens.Mvis
         private readonly BindableDouble musicSpeed = new BindableDouble();
         private readonly BindableBool adjustFreq = new BindableBool();
         private readonly BindableBool nightcoreBeat = new BindableBool();
-        private readonly BindableBool playFromCollection = new BindableBool();
         private readonly BindableBool allowProxy = new BindableBool();
+        private Bindable<string> currentAudioControlProviderSetting;
 
         #endregion
 
@@ -232,6 +229,9 @@ namespace osu.Game.Screens.Mvis
         public Bindable<bool> HideTriangles = new Bindable<bool>();
         public Bindable<bool> HideScreenBackground = new Bindable<bool>();
 
+        private IProvideAudioControlPlugin audioControlProvider;
+        private readonly OsuMusicControllerWrapper musicControllerWrapper = new OsuMusicControllerWrapper();
+
         #endregion
 
         public MvisScreen()
@@ -248,7 +248,6 @@ namespace osu.Game.Screens.Mvis
             var iG = config.Get<float>(MSetting.MvisInterfaceGreen);
             var iB = config.Get<float>(MSetting.MvisInterfaceBlue);
             dependencies.Cache(colourProvider = new CustomColourProvider(iR, iG, iB));
-            dependencies.Cache(collectionHelper = new CollectionHelper());
             dependencies.Cache(this);
 
             sidebar.AddRange(new Drawable[]
@@ -283,7 +282,6 @@ namespace osu.Game.Screens.Mvis
                         }
                     },
                 },
-                collectionPanel = new CollectionSelectPanel(),
                 pluginsPage = new SidebarPluginsPage()
             });
 
@@ -295,13 +293,13 @@ namespace osu.Game.Screens.Mvis
             config.BindWith(MSetting.MvisMusicSpeed, musicSpeed);
             config.BindWith(MSetting.MvisAdjustMusicWithFreq, adjustFreq);
             config.BindWith(MSetting.MvisEnableNightcoreBeat, nightcoreBeat);
-            config.BindWith(MSetting.MvisPlayFromCollection, playFromCollection);
             config.BindWith(MSetting.MvisStoryboardProxy, allowProxy);
+            currentAudioControlProviderSetting = config.GetBindable<string>(MSetting.MvisCurrentAudioProvider);
 
             InternalChildren = new Drawable[]
             {
                 colourProvider,
-                collectionHelper,
+                musicControllerWrapper,
                 nightcoreBeatContainer = new NightcoreBeatContainer
                 {
                     Alpha = 0
@@ -477,12 +475,6 @@ namespace osu.Game.Screens.Mvis
                                                                     TooltipText = "查看插件",
                                                                     Action = () => updateSidebarState(pluginsPage)
                                                                 },
-                                                                collectionButton = new BottomBarButton
-                                                                {
-                                                                    ButtonIcon = FontAwesome.Solid.List,
-                                                                    TooltipText = "查看收藏夹",
-                                                                    Action = () => updateSidebarState(collectionPanel)
-                                                                },
                                                                 new BottomBarButton
                                                                 {
                                                                     ButtonIcon = FontAwesome.Solid.Desktop,
@@ -570,21 +562,6 @@ namespace osu.Game.Screens.Mvis
             musicSpeed.BindValueChanged(_ => applyTrackAdjustments());
             adjustFreq.BindValueChanged(_ => applyTrackAdjustments());
             nightcoreBeat.BindValueChanged(_ => applyTrackAdjustments());
-            playFromCollection.BindValueChanged(v =>
-            {
-                //确保Beatmap.Value.Track.Completed中collectionHelper.PlayNextBeatmap只会触发一次
-                Beatmap.Value.Track.Completed -= collectionHelper.PlayNextBeatmap;
-
-                if (v.NewValue)
-                {
-                    Beatmap.Value.Track.Completed += collectionHelper.PlayNextBeatmap;
-                    Beatmap.Disabled = true;
-                }
-                else
-                {
-                    Beatmap.Disabled = false;
-                }
-            }, true);
 
             isIdle.BindValueChanged(v =>
             {
@@ -644,6 +621,13 @@ namespace osu.Game.Screens.Mvis
                 var pluginSidebarPage = pl.CreateSidebarPage();
                 if (pluginSidebarPage != null) sidebar.Add(pluginSidebarPage);
             }
+
+            currentAudioControlProviderSetting.BindValueChanged(v =>
+            {
+                var pl = (IProvideAudioControlPlugin)pluginManager.GetAllPlugins(false).FirstOrDefault(p => $"{p.GetType().Namespace}+{p.GetType().Name}" == v.NewValue);
+                Beatmap.Disabled = pl != null;
+                audioControlProvider = pl ?? musicControllerWrapper;
+            }, true);
 
             pluginManager.OnPluginUnLoad += onPluginUnLoad;
 
@@ -709,12 +693,6 @@ namespace osu.Game.Screens.Mvis
             sidebar.ShowComponent(d);
         }
 
-        private void seekTo(double position)
-        {
-            Beatmap.Value.Track.Seek(position);
-            OnSeek?.Invoke(position);
-        }
-
         #region override事件
 
         protected override void Update()
@@ -737,8 +715,6 @@ namespace osu.Game.Screens.Mvis
             foreground.ScaleTo(0f).Then().ScaleTo(1f, duration, Easing.OutQuint);
             bottomFillFlow.MoveToY(bottomBar.Height + 30).Then().MoveToY(0, duration, Easing.OutQuint);
             skinnableForeground.FadeIn(duration, Easing.OutQuint);
-
-            playFromCollection.TriggerChange();
 
             isPushed = true;
         }
@@ -768,7 +744,7 @@ namespace osu.Game.Screens.Mvis
         public override void OnSuspending(IScreen next)
         {
             track.ResetSpeedAdjustments();
-            playFromCollection.TriggerChange();
+            Beatmap.Disabled = false;
 
             //背景层的动画
             applyBackgroundBrightness(false, 1);
@@ -786,10 +762,7 @@ namespace osu.Game.Screens.Mvis
         {
             base.OnResuming(last);
 
-            Beatmap.Disabled = playFromCollection.Value;
-            collectionHelper.UpdateBeatmaps();
-            collectionPanel.RefreshCollectionList();
-
+            Beatmap.Disabled = audioControlProvider != null && audioControlProvider != musicControllerWrapper;
             this.FadeIn(duration * 0.6f)
                 .ScaleTo(1, duration * 0.6f, Easing.OutQuint);
 
@@ -838,10 +811,6 @@ namespace osu.Game.Screens.Mvis
 
                 case GlobalAction.MvisForceLockOverlayChanges:
                     lockChanges.Toggle();
-                    return true;
-
-                case GlobalAction.MvisSelectCollection:
-                    collectionButton.Click();
                     return true;
 
                 case GlobalAction.MvisTogglePluginPage:
@@ -942,24 +911,20 @@ namespace osu.Game.Screens.Mvis
 
         private void togglePause()
         {
-            musicController.TogglePause();
+            audioControlProvider?.TogglePause();
             OnTrackRunningToggle?.Invoke(track.IsRunning);
         }
 
-        private void prevTrack()
-        {
-            if (playFromCollection.Value)
-                collectionHelper.PrevTrack();
-            else
-                musicController.PreviousTrack();
-        }
+        private void prevTrack() =>
+            audioControlProvider?.PrevTrack();
 
-        private void nextTrack()
+        private void nextTrack() =>
+            audioControlProvider?.NextTrack();
+
+        private void seekTo(double position)
         {
-            if (playFromCollection.Value)
-                collectionHelper.NextTrack();
-            else
-                musicController.NextTrack();
+            audioControlProvider?.Seek(position);
+            OnSeek?.Invoke(position);
         }
 
         private void updateIdleVisuals()
@@ -1021,7 +986,6 @@ namespace osu.Game.Screens.Mvis
         private void onBeatmapChanged(ValueChangedEvent<WorkingBeatmap> v)
         {
             var beatmap = v.NewValue;
-            playFromCollection.TriggerChange();
 
             Schedule(() =>
             {
