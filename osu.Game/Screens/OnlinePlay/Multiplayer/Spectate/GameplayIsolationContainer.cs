@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
@@ -22,13 +23,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         [Cached]
         private readonly Bindable<IReadOnlyList<Mod>> mods = new Bindable<IReadOnlyList<Mod>>();
 
+        private readonly Track track;
+
         public GameplayIsolationContainer(WorkingBeatmap beatmap, RulesetInfo ruleset, IReadOnlyList<Mod> mods)
         {
             this.beatmap.Value = beatmap;
             this.ruleset.Value = ruleset;
             this.mods.Value = mods;
 
-            beatmap.LoadTrack();
+            track = beatmap.LoadTrack();
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -38,6 +41,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             dependencies.CacheAs(beatmap.BeginLease(false));
             dependencies.CacheAs(mods.BeginLease(false));
             return dependencies;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            track?.Dispose();
         }
     }
 }
