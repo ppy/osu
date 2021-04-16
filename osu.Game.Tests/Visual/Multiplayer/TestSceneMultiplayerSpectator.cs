@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     public class TestSceneMultiplayerSpectator : MultiplayerTestScene
     {
         [Cached(typeof(SpectatorStreamingClient))]
-        private TestSpectatorStreamingClient testSpectatorStreamingClient = new TestSpectatorStreamingClient();
+        private TestSpectatorStreamingClient streamingClient = new TestSpectatorStreamingClient();
 
         [Cached(typeof(UserLookupCache))]
         private UserLookupCache lookupCache = new TestUserLookupCache();
@@ -62,16 +62,40 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("add streaming client", () =>
             {
-                Remove(testSpectatorStreamingClient);
-                Add(testSpectatorStreamingClient);
+                Remove(streamingClient);
+                Add(streamingClient);
             });
 
             AddStep("finish previous gameplay", () =>
             {
                 foreach (var id in playingUserIds)
-                    testSpectatorStreamingClient.EndPlay(id, importedBeatmapId);
+                    streamingClient.EndPlay(id, importedBeatmapId);
                 playingUserIds.Clear();
             });
+        }
+
+        [Test]
+        public void TestDelayedStart()
+        {
+            AddStep("start players silently", () =>
+            {
+                Client.CurrentMatchPlayingUserIds.Add(55);
+                Client.CurrentMatchPlayingUserIds.Add(56);
+                playingUserIds.Add(55);
+                playingUserIds.Add(56);
+                nextFrame[55] = 0;
+                nextFrame[56] = 0;
+            });
+
+            loadSpectateScreen(false);
+
+            AddWaitStep("wait a bit", 10);
+            AddStep("load player 55", () => streamingClient.StartPlay(55, importedBeatmapId));
+            AddUntilStep("one player added", () => spectator.ChildrenOfType<Player>().Count() == 1);
+
+            AddWaitStep("wait a bit", 10);
+            AddStep("load player 56", () => streamingClient.StartPlay(56, importedBeatmapId));
+            AddUntilStep("two players added", () => spectator.ChildrenOfType<Player>().Count() == 2);
         }
 
         [Test]
@@ -178,7 +202,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddWaitStep("wait a bit", 10);
         }
 
-        private void loadSpectateScreen()
+        private void loadSpectateScreen(bool waitForPlayerLoad = true)
         {
             AddStep("load screen", () =>
             {
@@ -188,7 +212,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 LoadScreen(spectator = new MultiplayerSpectator(playingUserIds.ToArray()));
             });
 
-            AddUntilStep("wait for screen load", () => spectator.LoadState == LoadState.Loaded && spectator.AllPlayersLoaded);
+            AddUntilStep("wait for screen load", () => spectator.LoadState == LoadState.Loaded && (!waitForPlayerLoad || spectator.AllPlayersLoaded));
         }
 
         private void start(int userId, int? beatmapId = null) => start(new[] { userId }, beatmapId);
@@ -200,7 +224,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 foreach (int id in userIds)
                 {
                     Client.CurrentMatchPlayingUserIds.Add(id);
-                    testSpectatorStreamingClient.StartPlay(id, beatmapId ?? importedBeatmapId);
+                    streamingClient.StartPlay(id, beatmapId ?? importedBeatmapId);
                     playingUserIds.Add(id);
                     nextFrame[id] = 0;
                 }
@@ -211,7 +235,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("end play", () =>
             {
-                testSpectatorStreamingClient.EndPlay(userId, beatmapId ?? importedBeatmapId);
+                streamingClient.EndPlay(userId, beatmapId ?? importedBeatmapId);
                 playingUserIds.Remove(userId);
                 nextFrame.Remove(userId);
             });
@@ -225,7 +249,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 foreach (int id in userIds)
                 {
-                    testSpectatorStreamingClient.SendFrames(id, nextFrame[id], count);
+                    streamingClient.SendFrames(id, nextFrame[id], count);
                     nextFrame[id] += count;
                 }
             });
@@ -246,7 +270,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private Player getPlayer(int userId) => getInstance(userId).ChildrenOfType<Player>().Single();
 
-        private PlayerInstance getInstance(int userId) => spectator.ChildrenOfType<PlayerInstance>().Single(p => p.User.Id == userId);
+        private PlayerInstance getInstance(int userId) => spectator.ChildrenOfType<PlayerInstance>().Single(p => p.UserId == userId);
 
         public class TestSpectatorStreamingClient : SpectatorStreamingClient
         {
@@ -297,7 +321,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             public override void WatchUser(int userId)
             {
-                if (userSentStateDictionary[userId])
+                if (userSentStateDictionary.TryGetValue(userId, out var sent) && sent)
                 {
                     // usually the server would do this.
                     sendState(userId, userBeatmapDictionary[userId]);
