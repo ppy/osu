@@ -41,9 +41,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             addClickStep(MouseButton.Left);
             addClickStep(MouseButton.Right);
 
-            assertPlaced(true);
-            assertLength(0);
-            assertControlPointType(0, PathType.Linear);
+            assertPlaced(false);
         }
 
         [Test]

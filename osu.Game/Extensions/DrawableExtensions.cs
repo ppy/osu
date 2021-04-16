@@ -9,6 +9,9 @@ namespace osu.Game.Extensions
 {
     public static class DrawableExtensions
     {
+        public const double REPEAT_INTERVAL = 70;
+        public const double INITIAL_DELAY = 250;
+
         /// <summary>
         /// Helper method that is used while <see cref="IKeyBindingHandler"/> doesn't support repetitions of <see cref="IKeyBindingHandler{T}.OnPressed"/>.
         /// Simulates repetitions by continually invoking a delegate according to the default key repeat rate.
@@ -19,12 +22,13 @@ namespace osu.Game.Extensions
         /// <param name="handler">The <see cref="IKeyBindingHandler{T}"/> which is handling the repeat.</param>
         /// <param name="scheduler">The <see cref="Scheduler"/> to schedule repetitions on.</param>
         /// <param name="action">The <see cref="Action"/> to be invoked once immediately and with every repetition.</param>
+        /// <param name="initialRepeatDelay">The delay imposed on the first repeat. Defaults to <see cref="INITIAL_DELAY"/>.</param>
         /// <returns>A <see cref="ScheduledDelegate"/> which can be cancelled to stop the repeat events from firing.</returns>
-        public static ScheduledDelegate BeginKeyRepeat(this IKeyBindingHandler handler, Scheduler scheduler, Action action)
+        public static ScheduledDelegate BeginKeyRepeat(this IKeyBindingHandler handler, Scheduler scheduler, Action action, double initialRepeatDelay = INITIAL_DELAY)
         {
             action();
 
-            ScheduledDelegate repeatDelegate = new ScheduledDelegate(action, handler.Time.Current + 250, 70);
+            ScheduledDelegate repeatDelegate = new ScheduledDelegate(action, handler.Time.Current + initialRepeatDelay, REPEAT_INTERVAL);
             scheduler.Add(repeatDelegate);
             return repeatDelegate;
         }

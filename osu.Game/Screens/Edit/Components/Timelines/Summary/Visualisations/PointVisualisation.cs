@@ -9,7 +9,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations
     /// <summary>
     /// Represents a singular point on a timeline part.
     /// </summary>
-    public class PointVisualisation : Box
+    public class PointVisualisation : Circle
     {
         public const float MAX_WIDTH = 4;
 
@@ -21,9 +21,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations
 
         public PointVisualisation()
         {
-            Origin = Anchor.TopCentre;
-
-            RelativePositionAxes = Axes.X;
+            RelativePositionAxes = Axes.Both;
             RelativeSizeAxes = Axes.Y;
 
             Anchor = Anchor.CentreLeft;
