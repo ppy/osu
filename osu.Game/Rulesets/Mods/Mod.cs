@@ -173,7 +173,7 @@ namespace osu.Game.Rulesets.Mods
             else
             {
                 if (!(target is IParseable parseable))
-                    throw new InvalidOperationException($"Bindable type {target.GetType().ReadableName()} is not IParseable.");
+                    throw new InvalidOperationException($"Bindable type {target.GetType().ReadableName()} is not {nameof(IParseable)}.");
 
                 parseable.Parse(source);
             }
