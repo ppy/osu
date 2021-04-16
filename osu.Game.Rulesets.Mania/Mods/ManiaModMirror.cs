@@ -15,7 +15,6 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override string Name => "镜像";
         public override string Acronym => "MR";
         public override ModType Type => ModType.Conversion;
-        public override string Description => "Notes are flipped horizontally.";
         public override double ScoreMultiplier => 1;
         public override bool Ranked => true;
 

@@ -99,7 +99,7 @@ namespace osu.Game.Screens.Edit.Verify
                         {
                             new TriangleButton
                             {
-                                Text = "Refresh",
+                                Text = "刷新",
                                 Action = refresh,
                                 Size = new Vector2(120, 40),
                                 Anchor = Anchor.BottomRight,

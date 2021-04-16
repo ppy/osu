@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Edit
             public HeaderText(string text)
             {
                 Text = text.ToUpper();
-                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold);
+                Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold);
             }
         }
 

@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModBarrelRoll : Mod, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>
     {
-        [SettingSource("Roll speed", "Rotations per minute")]
+        [SettingSource("滚动速度", "每分钟多少转")]
         public BindableNumber<double> SpinSpeed { get; } = new BindableDouble(0.5)
         {
             MinValue = 0.02,
@@ -22,12 +22,12 @@ namespace osu.Game.Rulesets.Osu.Mods
             Precision = 0.01,
         };
 
-        [SettingSource("Direction", "The direction of rotation")]
+        [SettingSource("方向", "旋转方向")]
         public Bindable<RotationDirection> Direction { get; } = new Bindable<RotationDirection>(RotationDirection.Clockwise);
 
-        public override string Name => "Barrel Roll";
+        public override string Name => "滚筒";
         public override string Acronym => "BR";
-        public override string Description => "The whole playfield is on a wheel!";
+        public override string Description => "或许你需要旋转屏幕";
         public override double ScoreMultiplier => 1;
 
         public void Update(Playfield playfield)

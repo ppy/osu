@@ -82,10 +82,10 @@ namespace osu.Game.Screens.Edit.Verify
             var columns = new List<TableColumn>
             {
                 new TableColumn(string.Empty, Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)),
-                new TableColumn("Type", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize, minSize: 60)),
-                new TableColumn("Time", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize, minSize: 60)),
-                new TableColumn("Message", Anchor.CentreLeft),
-                new TableColumn("Category", Anchor.CentreRight, new Dimension(GridSizeMode.AutoSize)),
+                new TableColumn("类型", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize, minSize: 60)),
+                new TableColumn("时间", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize, minSize: 60)),
+                new TableColumn("消息", Anchor.CentreLeft),
+                new TableColumn("分类", Anchor.CentreRight, new Dimension(GridSizeMode.AutoSize)),
             };
 
             return columns.ToArray();
@@ -101,7 +101,7 @@ namespace osu.Game.Screens.Edit.Verify
             },
             new OsuSpriteText
             {
-                Text = issue.Template.Type.ToString(),
+                Text = issue.Template.Type.GetDescription(),
                 Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Bold),
                 Margin = new MarginPadding { Right = 10 },
                 Colour = issue.Template.Colour
