@@ -18,7 +18,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public bool PlayerLoaded => stack?.CurrentScreen is Player;
 
         public readonly int UserId;
-        public readonly SpectatorCatchUpSlaveClock GameplayClock;
+        public readonly CatchUpSlaveClock GameplayClock;
 
         public Score Score { get; private set; }
 
@@ -29,7 +29,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private readonly LoadingLayer loadingLayer;
         private OsuScreenStack stack;
 
-        public PlayerInstance(int userId, SpectatorCatchUpSlaveClock gameplayClock)
+        public PlayerInstance(int userId, CatchUpSlaveClock gameplayClock)
         {
             UserId = userId;
             GameplayClock = gameplayClock;

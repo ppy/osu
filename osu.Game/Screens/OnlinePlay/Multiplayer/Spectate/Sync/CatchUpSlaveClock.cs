@@ -8,9 +8,9 @@ using osu.Framework.Timing;
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync
 {
     /// <summary>
-    /// A <see cref="ISpectatorSlaveClock"/> which catches up using rate adjustment.
+    /// A <see cref="ISlaveClock"/> which catches up using rate adjustment.
     /// </summary>
-    public class SpectatorCatchUpSlaveClock : ISpectatorSlaveClock
+    public class CatchUpSlaveClock : ISlaveClock
     {
         /// <summary>
         /// The catch up rate.
@@ -19,7 +19,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync
 
         private readonly IFrameBasedClock masterClock;
 
-        public SpectatorCatchUpSlaveClock(IFrameBasedClock masterClock)
+        public CatchUpSlaveClock(IFrameBasedClock masterClock)
         {
             this.masterClock = masterClock;
         }
