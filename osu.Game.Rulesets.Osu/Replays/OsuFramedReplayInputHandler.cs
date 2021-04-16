@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Input.StateChanges;
 using osu.Framework.Utils;
@@ -30,9 +29,7 @@ namespace osu.Game.Rulesets.Osu.Replays
                 if (frame == null)
                     return null;
 
-                Debug.Assert(CurrentTime != null);
-
-                return NextFrame != null ? Interpolation.ValueAt(CurrentTime.Value, frame.Position, NextFrame.Position, frame.Time, NextFrame.Time) : frame.Position;
+                return NextFrame != null ? Interpolation.ValueAt(CurrentTime, frame.Position, NextFrame.Position, frame.Time, NextFrame.Time) : frame.Position;
             }
         }
 
