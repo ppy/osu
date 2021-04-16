@@ -7,7 +7,6 @@ using osu.Framework.Input.StateChanges;
 using osu.Framework.Utils;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Replays;
-using osuTK;
 
 namespace osu.Game.Rulesets.EmptyFreeform.Replays
 {
@@ -20,24 +19,13 @@ namespace osu.Game.Rulesets.EmptyFreeform.Replays
 
         protected override bool IsImportant(EmptyFreeformReplayFrame frame) => frame.Actions.Any();
 
-        protected Vector2 Position
-        {
-            get
-            {
-                var frame = CurrentFrame;
-
-                if (frame == null)
-                    return Vector2.Zero;
-
-                return Interpolation.ValueAt(CurrentTime, frame.Position, NextFrame.Position, frame.Time, NextFrame.Time);
-            }
-        }
-
         public override void CollectPendingInputs(List<IInput> inputs)
         {
+            var position = Interpolation.ValueAt(CurrentTime, StartFrame.Position, EndFrame.Position, StartFrame.Time, EndFrame.Time);
+
             inputs.Add(new MousePositionAbsoluteInput
             {
-                Position = GamefieldToScreenSpace(Position),
+                Position = GamefieldToScreenSpace(position),
             });
             inputs.Add(new ReplayState<EmptyFreeformAction>
             {
