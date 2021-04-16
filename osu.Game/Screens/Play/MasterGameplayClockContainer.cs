@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public const double MINIMUM_SKIP_TIME = 1000;
 
-        protected Track Track => (Track)AdjustableClock.Source;
+        protected Track Track => (Track)AdjustableSource.Source;
 
         public readonly BindableNumber<double> UserPlaybackRate = new BindableDouble(1)
         {
@@ -84,17 +84,25 @@ namespace osu.Game.Screens.Play
 
             Seek(startTime);
 
-            AdjustableClock.ProcessFrame();
+            AdjustableSource.ProcessFrame();
         }
 
         protected override void OnIsPausedChanged(ValueChangedEvent<bool> isPaused)
         {
+            // The source is stopped by a frequency fade first.
             if (isPaused.NewValue)
-                this.TransformBindableTo(pauseFreqAdjust, 0, 200, Easing.Out).OnComplete(_ => AdjustableClock.Stop());
+                this.TransformBindableTo(pauseFreqAdjust, 0, 200, Easing.Out).OnComplete(_ => AdjustableSource.Stop());
             else
                 this.TransformBindableTo(pauseFreqAdjust, 1, 200, Easing.In);
         }
 
+        /// <summary>
+        /// Seek to a specific time in gameplay.
+        /// </summary>
+        /// <remarks>
+        /// Adjusts for any offsets which have been applied (so the seek may not be the expected point in time on the underlying audio track).
+        /// </remarks>
+        /// <param name="time">The destination time to seek to.</param>
         public override void Seek(double time)
         {
             // remove the offset component here because most of the time we want the seek to be aligned to gameplay, not the audio track.
@@ -146,7 +154,7 @@ namespace osu.Game.Screens.Play
         public void StopUsingBeatmapClock()
         {
             removeSourceClockAdjustments();
-            AdjustableClock.ChangeSource(new TrackVirtual(beatmap.Track.Length));
+            AdjustableSource.ChangeSource(new TrackVirtual(beatmap.Track.Length));
         }
 
         private bool speedAdjustmentsApplied;
