@@ -135,7 +135,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private void endCurve()
         {
             updateSlider();
-            EndPlacement(HitObject.Path.ExpectedDistance?.Value > 0);
+            EndPlacement(HitObject.Path.HasValidLength);
         }
 
         protected override void Update()
