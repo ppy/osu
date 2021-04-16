@@ -48,8 +48,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 AllowPause = false,
                 AllowRestart = false,
-                AllowSkippingIntro = false,
-                AllowSkippingOutro = false,
+                AllowSkipping = false,
             })
         {
             this.userIds = userIds;

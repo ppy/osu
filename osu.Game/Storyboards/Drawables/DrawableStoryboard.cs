@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using osuTK;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
@@ -81,6 +82,28 @@ namespace osu.Game.Storyboards.Drawables
         {
             foreach (var layer in Children)
                 layer.Enabled = passing ? layer.Layer.VisibleWhenPassing : layer.Layer.VisibleWhenFailing;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            updateHasStoryboardEnded();
+        }
+
+        /// <summary>
+        /// Whether the storyboard has ended after the gameplay portion of the beatmap.
+        /// </summary>
+        public IBindable<bool> HasStoryboardEnded => hasStoryboardEnded;
+
+        private readonly BindableBool hasStoryboardEnded = new BindableBool(true);
+
+        private void updateHasStoryboardEnded()
+        {
+            if (Storyboard.LatestEventTime == null)
+                return;
+
+            var time = Clock.CurrentTime;
+            hasStoryboardEnded.Value = time >= Storyboard.LatestEventTime;
         }
     }
 }

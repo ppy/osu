@@ -74,8 +74,6 @@ namespace osu.Game.Screens.Play
 
         private Bindable<bool> mouseWheelDisabled;
 
-        private Bindable<bool> storyboardEnabled;
-
         private readonly Bindable<bool> storyboardReplacesBackground = new Bindable<bool>();
 
         protected readonly Bindable<bool> LocalUserPlaying = new Bindable<bool>();
@@ -106,7 +104,7 @@ namespace osu.Game.Screens.Play
 
         private BreakTracker breakTracker;
 
-        private SkipOverlay skipOverlay;
+        private SkipOverlay skipIntroOverlay;
 
         private SkipOverlay skipOutroOverlay;
 
@@ -194,8 +192,6 @@ namespace osu.Game.Screens.Play
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
 
-            storyboardEnabled = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
-
             if (game != null)
                 gameActive.BindTo(game.IsActive);
 
@@ -250,7 +246,7 @@ namespace osu.Game.Screens.Play
                 HUDOverlay.ShowHud.Value = false;
                 HUDOverlay.ShowHud.Disabled = true;
                 BreakOverlay.Hide();
-                skipOverlay.Hide();
+                skipIntroOverlay.Hide();
             }
 
             DrawableRuleset.FrameStableClock.WaitingOnFrames.BindValueChanged(waiting =>
@@ -292,7 +288,8 @@ namespace osu.Game.Screens.Play
             HealthProcessor.Failed += onFail;
 
             // Keep track of whether the storyboard ended after the playable portion
-            GameplayClockContainer.HasStoryboardEnded.ValueChanged += updateCompletionState;
+            if (DimmableStoryboard.HasStoryboardEnded != null)
+                DimmableStoryboard.HasStoryboardEnded.ValueChanged += updateCompletionState;
 
             foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
                 mod.ApplyToScoreProcessor(ScoreProcessor);
@@ -365,7 +362,7 @@ namespace osu.Game.Screens.Play
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     },
-                    skipOverlay = new SkipOverlay(DrawableRuleset.GameplayStartTime)
+                    skipIntroOverlay = new SkipOverlay(DrawableRuleset.GameplayStartTime)
                     {
                         RequestSkip = performUserRequestedSkip
                     },
@@ -399,11 +396,8 @@ namespace osu.Game.Screens.Play
                 }
             };
 
-            if (!Configuration.AllowSkippingIntro)
-                skipOverlay.Expire();
-
-            if (!Configuration.AllowSkippingOutro)
-                skipOutroOverlay.Expire();
+            if (!Configuration.AllowSkipping)
+                skipIntroOverlay.Expire();
 
             if (Configuration.AllowRestart)
             {
@@ -637,8 +631,9 @@ namespace osu.Game.Screens.Play
                 return score.ScoreInfo;
             });
 
-            // show skip overlay if storyboard is enabled and has an outro
-            if (storyboardEnabled.Value && GameplayClockContainer.HasTimeLeftInStoryboard)
+            var storyboardHasOutro = DimmableStoryboard.ContentDisplayed && (!DimmableStoryboard.HasStoryboardEnded?.Value ?? false);
+
+            if (storyboardHasOutro)
             {
                 skipOutroOverlay.Show();
                 completionProgressDelegate = null;

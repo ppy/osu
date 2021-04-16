@@ -6,12 +6,14 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Storyboards;
 using osuTK;
@@ -36,6 +38,16 @@ namespace osu.Game.Tests.Visual.Gameplay
             storyboard.GetLayer("Background").Add(sprite);
         }
 
+        [SetUpSteps]
+        public override void SetUpSteps()
+        {
+            base.SetUpSteps();
+            AddStep("ignore user settings", () =>
+            {
+                Player.DimmableStoryboard.IgnoreUserSettings.Value = true;
+            });
+        }
+
         [Test]
         public void TestStoryboardSkipOutro()
         {
@@ -50,8 +62,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddUntilStep("storyboard loaded", () => Player.Beatmap.Value.StoryboardLoaded);
             AddUntilStep("storyboard ends", () => Player.HUDOverlay.Progress.ReferenceClock.CurrentTime >= storyboard_duration);
-            AddWaitStep("wait for score", 10);
-            AddAssert("score shown", () => Player.IsScoreShown);
+            AddUntilStep("wait for score shown", () => Player.IsScoreShown);
         }
 
         [Test]
@@ -84,6 +95,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             public void ExitViaPause() => PerformExit(true);
 
             public bool IsScoreShown => !this.IsCurrentScreen() && this.GetChildScreen() is ResultsScreen;
+
+            public new DimmableStoryboard DimmableStoryboard => base.DimmableStoryboard;
 
             public OutroPlayer()
                 : base(false)
