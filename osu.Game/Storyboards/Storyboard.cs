@@ -40,7 +40,7 @@ namespace osu.Game.Storyboards
         /// Across all layers, find the latest point in time that a storyboard element ends at.
         /// Will return null if there are no elements.
         /// </summary>
-        public double? LatestEventTime => Layers.SelectMany(l => l.Elements.OfType<IHasDuration>()).OrderByDescending(e => e.EndTime).FirstOrDefault()?.EndTime;
+        public double? LatestEventTime => Layers.SelectMany(l => l.Elements.OfType<IStoryboardElementHasDuration>()).OrderByDescending(e => e.EndTime).FirstOrDefault()?.EndTime;
 
         /// <summary>
         /// Depth of the currently front-most storyboard layer, excluding the overlay layer.

@@ -3,7 +3,7 @@
 
 namespace osu.Game.Storyboards
 {
-    public interface IHasDuration
+    public interface IStoryboardElementHasDuration
     {
         double EndTime { get; }
     }
