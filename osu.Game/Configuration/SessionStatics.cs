@@ -20,6 +20,14 @@ namespace osu.Game.Configuration
             SetDefault(Static.LastHoverSoundPlaybackTime, (double?)null);
             SetDefault<APISeasonalBackgrounds>(Static.SeasonalBackgrounds, null);
         }
+
+        public void ResetValues()
+        {
+            SetValue(Static.LoginOverlayDisplayed, false);
+            SetValue(Static.MutedAudioNotificationShownOnce, false);
+            SetValue(Static.LowBatteryNotificationShownOnce, false);
+            SetValue(Static.LastHoverSoundPlaybackTime, (double?)null);
+        }
     }
 
     public enum Static
