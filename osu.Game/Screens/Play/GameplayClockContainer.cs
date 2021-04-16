@@ -10,26 +10,36 @@ using osu.Framework.Timing;
 
 namespace osu.Game.Screens.Play
 {
+    /// <summary>
+    /// Encapsulates gameplay timing logic and provides a <see cref="GameplayClock"/> via DI for gameplay components to use.
+    /// </summary>
     public abstract class GameplayClockContainer : Container, IAdjustableClock
     {
         /// <summary>
-        /// The final clock which is exposed to underlying components.
+        /// The final clock which is exposed to gameplay components.
         /// </summary>
         public GameplayClock GameplayClock { get; private set; }
 
+        /// <summary>
+        /// Whether gameplay is paused.
+        /// </summary>
         public readonly BindableBool IsPaused = new BindableBool();
 
         /// <summary>
-        /// The decoupled clock used for gameplay. Should be used for seeks and clock control.
+        /// The adjustable source clock used for gameplay. Should be used for seeks and clock control.
         /// </summary>
-        protected readonly DecoupleableInterpolatingFramedClock AdjustableClock;
+        protected readonly DecoupleableInterpolatingFramedClock AdjustableSource;
 
+        /// <summary>
+        /// Creates a new <see cref="GameplayClockContainer"/>.
+        /// </summary>
+        /// <param name="sourceClock">The source <see cref="IClock"/> used for timing.</param>
         protected GameplayClockContainer(IClock sourceClock)
         {
             RelativeSizeAxes = Axes.Both;
 
-            AdjustableClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
-            AdjustableClock.ChangeSource(sourceClock);
+            AdjustableSource = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
+            AdjustableSource.ChangeSource(sourceClock);
 
             IsPaused.BindValueChanged(OnIsPausedChanged);
         }
@@ -38,21 +48,24 @@ namespace osu.Game.Screens.Play
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-            dependencies.CacheAs(GameplayClock = CreateGameplayClock(AdjustableClock));
+            dependencies.CacheAs(GameplayClock = CreateGameplayClock(AdjustableSource));
             GameplayClock.IsPaused.BindTo(IsPaused);
 
             return dependencies;
         }
 
+        /// <summary>
+        /// Starts gameplay.
+        /// </summary>
         public virtual void Start()
         {
-            if (!AdjustableClock.IsRunning)
+            if (!AdjustableSource.IsRunning)
             {
                 // Seeking the decoupled clock to its current time ensures that its source clock will be seeked to the same time
                 // This accounts for the clock source potentially taking time to enter a completely stopped state
                 Seek(GameplayClock.CurrentTime);
 
-                AdjustableClock.Start();
+                AdjustableSource.Start();
             }
 
             IsPaused.Value = false;
@@ -60,19 +73,22 @@ namespace osu.Game.Screens.Play
 
         /// <summary>
         /// Seek to a specific time in gameplay.
-        /// <remarks>
-        /// Adjusts for any offsets which have been applied (so the seek may not be the expected point in time on the underlying audio track).
-        /// </remarks>
         /// </summary>
         /// <param name="time">The destination time to seek to.</param>
-        public virtual void Seek(double time) => AdjustableClock.Seek(time);
+        public virtual void Seek(double time) => AdjustableSource.Seek(time);
 
+        /// <summary>
+        /// Stops gameplay.
+        /// </summary>
         public virtual void Stop() => IsPaused.Value = true;
 
+        /// <summary>
+        /// Restarts gameplay.
+        /// </summary>
         public virtual void Restart()
         {
-            AdjustableClock.Seek(0);
-            AdjustableClock.Stop();
+            AdjustableSource.Seek(0);
+            AdjustableSource.Stop();
 
             if (!IsPaused.Value)
                 Start();
@@ -86,8 +102,26 @@ namespace osu.Game.Screens.Play
             base.Update();
         }
 
-        protected abstract void OnIsPausedChanged(ValueChangedEvent<bool> isPaused);
+        /// <summary>
+        /// Invoked when the value of <see cref="IsPaused"/> is changed to start or stop the <see cref="AdjustableSource"/> clock.
+        /// </summary>
+        /// <param name="isPaused">Whether the clock should now be paused.</param>
+        protected virtual void OnIsPausedChanged(ValueChangedEvent<bool> isPaused)
+        {
+            if (isPaused.NewValue)
+                AdjustableSource.Stop();
+            else
+                AdjustableSource.Start();
+        }
 
+        /// <summary>
+        /// Creates the final <see cref="GameplayClock"/> which is exposed via DI to be used by gameplay components.
+        /// </summary>
+        /// <remarks>
+        /// Any intermediate clocks such as platform offsets should be applied here.
+        /// </remarks>
+        /// <param name="source">The <see cref="IFrameBasedClock"/> providing the source time.</param>
+        /// <returns>The final <see cref="GameplayClock"/>.</returns>
         protected abstract GameplayClock CreateGameplayClock(IFrameBasedClock source);
 
         #region IAdjustableClock
