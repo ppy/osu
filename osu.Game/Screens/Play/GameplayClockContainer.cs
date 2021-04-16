@@ -80,14 +80,12 @@ namespace osu.Game.Screens.Play
         protected override void Update()
         {
             if (!IsPaused.Value)
-                ClockToProcess.ProcessFrame();
+                GameplayClock.UnderlyingClock.ProcessFrame();
 
             base.Update();
         }
 
         protected abstract void OnIsPausedChanged(ValueChangedEvent<bool> isPaused);
-
-        protected virtual IFrameBasedClock ClockToProcess => AdjustableClock;
 
         protected abstract GameplayClock CreateGameplayClock(IFrameBasedClock source);
     }
