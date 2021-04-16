@@ -438,8 +438,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void onBlueprintDeselected(SelectionBlueprint blueprint)
         {
-            SelectionHandler.HandleDeselected(blueprint);
             SelectionBlueprints.ChangeChildDepth(blueprint, 0);
+            SelectionHandler.HandleDeselected(blueprint);
 
             Composer.Playfield.SetKeepAlive(blueprint.HitObject, false);
         }
