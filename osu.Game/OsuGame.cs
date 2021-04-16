@@ -575,7 +575,16 @@ namespace osu.Game
             Container logoContainer;
             BackButton.Receptor receptor;
 
-            dependencies.CacheAs(idleTracker = new GameIdleTracker(300_000, Dependencies.Get<SessionStatics>()));
+            dependencies.CacheAs(idleTracker = new GameIdleTracker(6000));
+
+            GameIdleTracker sessionIdleTracker = new GameIdleTracker(300_000);
+            Add(sessionIdleTracker);
+
+            sessionIdleTracker.IsIdle.BindValueChanged((e) =>
+            {
+                if (e.NewValue)
+                    Dependencies.Get<SessionStatics>().ResetValues();
+            });
 
             AddRange(new Drawable[]
             {

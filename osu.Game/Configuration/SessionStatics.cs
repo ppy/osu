@@ -23,10 +23,8 @@ namespace osu.Game.Configuration
 
         public void ResetValues()
         {
-            SetValue(Static.LoginOverlayDisplayed, false);
-            SetValue(Static.MutedAudioNotificationShownOnce, false);
-            SetValue(Static.LowBatteryNotificationShownOnce, false);
-            SetValue(Static.LastHoverSoundPlaybackTime, (double?)null);
+            ConfigStore.Clear();
+            InitialiseDefaults();
         }
     }
 
