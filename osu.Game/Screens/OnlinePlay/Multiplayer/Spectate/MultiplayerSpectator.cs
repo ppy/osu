@@ -32,7 +32,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public MultiplayerSpectator(int[] userIds)
             : base(userIds.AsSpan().Slice(0, Math.Min(16, userIds.Length)).ToArray())
         {
-            instances = new PlayerInstance[userIds.Length];
+            instances = new PlayerInstance[UserIds.Length];
         }
 
         [BackgroundDependencyLoader]
@@ -70,6 +70,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 masterClockContainer
             };
 
+            for (int i = 0; i < UserIds.Length; i++)
+                grid.Add(instances[i] = new PlayerInstance(UserIds[i], new SpectatorCatchUpSlaveClock(masterClockContainer.GameplayClock)));
+
             // Todo: This is not quite correct - it should be per-user to adjust for other mod combinations.
             var playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Ruleset.Value);
             var scoreProcessor = Ruleset.Value.CreateInstance().CreateScoreProcessor();
@@ -93,24 +96,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         protected override void StartGameplay(int userId, GameplayState gameplayState)
         {
             int userIndex = getIndexForUser(userId);
-            var existingInstance = instances[userIndex];
 
-            if (existingInstance != null)
-            {
-                grid.Remove(existingInstance);
-                syncManager.RemoveSlave(existingInstance.GameplayClock);
-                leaderboard.RemoveClock(existingInstance.User.Id);
-            }
+            var instance = instances[userIndex];
+            syncManager.RemoveSlave(instance.GameplayClock);
+            leaderboard.RemoveClock(instance.UserId);
 
-            LoadComponentAsync(instances[userIndex] = new PlayerInstance(gameplayState.Score, new SpectatorCatchUpSlaveClock(masterClockContainer.GameplayClock)), d =>
-            {
-                if (instances[userIndex] == d)
-                {
-                    grid.Add(d);
-                    syncManager.AddSlave(d.GameplayClock);
-                    leaderboard.AddClock(d.User.Id, d.GameplayClock);
-                }
-            });
+            instance.LoadPlayer(gameplayState.Score);
+            syncManager.AddSlave(instance.GameplayClock);
+            leaderboard.AddClock(instance.UserId, instance.GameplayClock);
         }
 
         protected override void EndGameplay(int userId)

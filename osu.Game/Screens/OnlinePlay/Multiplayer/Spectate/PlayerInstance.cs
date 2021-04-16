@@ -8,7 +8,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Scoring;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync;
 using osu.Game.Screens.Play;
-using osu.Game.Users;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
@@ -16,30 +15,30 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
     {
         public bool PlayerLoaded => stack?.CurrentScreen is Player;
 
-        public User User => Score.ScoreInfo.User;
-
-        public WorkingBeatmap Beatmap { get; private set; }
-
-        public readonly Score Score;
+        public readonly int UserId;
         public readonly SpectatorCatchUpSlaveClock GameplayClock;
+
+        public Score Score { get; private set; }
+
+        [Resolved]
+        private BeatmapManager beatmapManager { get; set; }
 
         private OsuScreenStack stack;
 
-        public PlayerInstance(Score score, SpectatorCatchUpSlaveClock gameplayClock)
+        public PlayerInstance(int userId, SpectatorCatchUpSlaveClock gameplayClock)
         {
-            Score = score;
+            UserId = userId;
             GameplayClock = gameplayClock;
 
             RelativeSizeAxes = Axes.Both;
             Masking = true;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(BeatmapManager beatmapManager)
+        public void LoadPlayer(Score score)
         {
-            Beatmap = beatmapManager.GetWorkingBeatmap(Score.ScoreInfo.Beatmap, bypassCache: true);
+            Score = score;
 
-            InternalChild = new GameplayIsolationContainer(Beatmap, Score.ScoreInfo.Ruleset, Score.ScoreInfo.Mods)
+            InternalChild = new GameplayIsolationContainer(beatmapManager.GetWorkingBeatmap(Score.ScoreInfo.Beatmap, bypassCache: true), Score.ScoreInfo.Ruleset, Score.ScoreInfo.Mods)
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = new DrawSizePreservingFillContainer
