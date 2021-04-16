@@ -175,7 +175,6 @@ namespace osu.Game.Tests.Visual.Components
 
             public IdleTrackingBox(int timeToIdle, SessionStatics statics)
             {
-
                 Box box;
 
                 Alpha = 0.6f;
