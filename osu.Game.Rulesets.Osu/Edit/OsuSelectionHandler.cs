@@ -226,7 +226,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             Quad scaledQuad = getSurroundingQuad(new OsuHitObject[] { slider });
             (bool xInBounds, bool yInBounds) = isQuadInBounds(scaledQuad);
 
-            if (xInBounds && yInBounds)
+            if (xInBounds && yInBounds && slider.Path.HasValidLength)
                 return;
 
             foreach (var point in slider.Path.ControlPoints)
