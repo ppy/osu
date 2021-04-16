@@ -16,6 +16,16 @@ using osu.Game.Configuration;
 
 namespace osu.Game.Screens.Play
 {
+    /// <summary>
+    /// A <see cref="GameplayClockContainer"/> which uses a <see cref="WorkingBeatmap"/> as a source.
+    /// <para>
+    /// This is the most complete <see cref="GameplayClockContainer"/> which takes into account all user and platform offsets,
+    /// and provides implementations for user actions such as skipping or adjusting playback rates that may occur during gameplay.
+    /// </para>
+    /// </summary>
+    /// <remarks>
+    /// This is intended to be used as a single controller for gameplay, or as a reference source for other <see cref="GameplayClockContainer"/>s.
+    /// </remarks>
     public class MasterGameplayClockContainer : GameplayClockContainer
     {
         /// <summary>
