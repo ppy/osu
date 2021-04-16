@@ -23,8 +23,11 @@ namespace osu.Game.Configuration
 
         public void ResetValues()
         {
-            ConfigStore.Clear();
-            InitialiseDefaults();
+            SetValue(Static.LoginOverlayDisplayed, false);
+            SetValue(Static.MutedAudioNotificationShownOnce, false);
+            SetValue(Static.LowBatteryNotificationShownOnce, false);
+            SetValue(Static.LastHoverSoundPlaybackTime, (double?)null);
+            SetValue<APISeasonalBackgrounds>(Static.SeasonalBackgrounds, null);
         }
     }
 
