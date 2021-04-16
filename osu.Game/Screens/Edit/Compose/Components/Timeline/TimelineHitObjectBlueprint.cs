@@ -133,7 +133,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             var comboColours = skin.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value ?? Array.Empty<Color4>();
             var comboColour = combo.GetComboColour(comboColours);
 
-            if (HitObject is IHasDuration)
+            if (HitObject is IHasDuration duration && duration.Duration > 0)
                 circle.Colour = ColourInfo.GradientHorizontal(comboColour, comboColour.Lighten(0.4f));
             else
                 circle.Colour = comboColour;
