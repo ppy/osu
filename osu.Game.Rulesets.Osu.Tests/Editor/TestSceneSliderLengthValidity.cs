@@ -159,7 +159,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddStep("Add slider", () =>
             {
-                slider = new Slider { StartTime = EditorClock.CurrentTime, Position = new Vector2(300) };
+                slider = new Slider { StartTime = EditorClock.CurrentTime, Position = new Vector2(300, 200) };
 
                 PathControlPoint[] points =
                 {
@@ -183,9 +183,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             AddStep("move mouse to handle", () => InputManager.MoveMouseTo(Editor.ChildrenOfType<SelectionBoxDragHandle>().Skip(1).First()));
             AddStep("begin drag", () => InputManager.PressButton(MouseButton.Left));
-            moveMouse(new Vector2(350, 400));
-            moveMouse(new Vector2(350, 350));
-            moveMouse(new Vector2(350, 300));
+            moveMouse(new Vector2(300, 300));
+            moveMouse(new Vector2(300, 250));
+            moveMouse(new Vector2(300, 200));
             AddStep("end drag", () => InputManager.ReleaseButton(MouseButton.Left));
 
             AddAssert("slider length shrunk", () => slider.Path.Distance < distanceBefore);
