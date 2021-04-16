@@ -65,7 +65,6 @@ namespace osu.Game.Tests.Visual.Components
                     Origin = Anchor.BottomRight,
                 },
             };
-
         });
 
         [Test]
