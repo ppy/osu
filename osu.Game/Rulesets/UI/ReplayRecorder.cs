@@ -58,6 +58,12 @@ namespace osu.Game.Rulesets.UI
             spectatorStreaming?.EndPlaying();
         }
 
+        protected override void Update()
+        {
+            base.Update();
+            recordFrame(false);
+        }
+
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
             recordFrame(false);
