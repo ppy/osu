@@ -321,7 +321,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             public override void WatchUser(int userId)
             {
-                if (userSentStateDictionary.TryGetValue(userId, out var sent) && sent)
+                if (!PlayingUsers.Contains(userId) && userSentStateDictionary.TryGetValue(userId, out var sent) && sent)
                 {
                     // usually the server would do this.
                     sendState(userId, userBeatmapDictionary[userId]);
