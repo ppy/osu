@@ -397,7 +397,10 @@ namespace osu.Game.Screens.Play
             };
 
             if (!Configuration.AllowSkipping)
+            {
                 skipIntroOverlay.Expire();
+                skipOutroOverlay.Expire();
+            }
 
             if (Configuration.AllowRestart)
             {
