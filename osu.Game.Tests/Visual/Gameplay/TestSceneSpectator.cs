@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -202,6 +203,29 @@ namespace osu.Game.Tests.Visual.Gameplay
             sendFrames();
 
             AddAssert("screen didn't change", () => Stack.CurrentScreen is SoloSpectator);
+        }
+
+        [Test]
+        public void OnUserBeganPlayingCallbackInvokedOnNewAdd()
+        {
+            bool callbackInvoked = false;
+            Action<int, SpectatorState> callbackAction = (_, __) => callbackInvoked = true;
+
+            AddStep("bind first event", () => testSpectatorStreamingClient.OnUserBeganPlaying += callbackAction);
+            start();
+            AddAssert("callback invoked", () => callbackInvoked);
+
+            AddStep("reset", () =>
+            {
+                testSpectatorStreamingClient.OnUserBeganPlaying -= callbackAction;
+                callbackInvoked = false;
+            });
+
+            AddStep("bind event again", () => testSpectatorStreamingClient.OnUserBeganPlaying += callbackAction);
+            AddAssert("callback invoked", () => callbackInvoked);
+
+            // Don't leave the event bound if test run succeeded.
+            AddStep("reset", () => testSpectatorStreamingClient.OnUserBeganPlaying -= callbackAction);
         }
 
         private OsuFramedReplayInputHandler replayHandler =>

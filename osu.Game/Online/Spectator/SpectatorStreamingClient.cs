@@ -60,6 +60,7 @@ namespace osu.Game.Online.Spectator
         private IBindable<IReadOnlyList<Mod>> currentMods { get; set; }
 
         private readonly SpectatorState currentState = new SpectatorState();
+        private readonly Dictionary<int, SpectatorState> currentUserStates = new Dictionary<int, SpectatorState>();
 
         private bool isPlaying;
 
@@ -68,10 +69,25 @@ namespace osu.Game.Online.Spectator
         /// </summary>
         public event Action<int, FrameDataBundle> OnNewFrames;
 
+        private event Action<int, SpectatorState> onUserBeganPlaying;
+
         /// <summary>
-        /// Called whenever a user starts a play session.
+        /// Called whenever a user starts a play session, or immediately if the user is being watched and currently in a play session.
         /// </summary>
-        public event Action<int, SpectatorState> OnUserBeganPlaying;
+        public event Action<int, SpectatorState> OnUserBeganPlaying
+        {
+            add
+            {
+                onUserBeganPlaying += value;
+
+                lock (userLock)
+                {
+                    foreach (var (userId, state) in currentUserStates)
+                        value?.Invoke(userId, state);
+                }
+            }
+            remove => onUserBeganPlaying -= value;
+        }
 
         /// <summary>
         /// Called whenever a user finishes a play session.
@@ -134,7 +150,10 @@ namespace osu.Game.Online.Spectator
             if (!playingUsers.Contains(userId))
                 playingUsers.Add(userId);
 
-            OnUserBeganPlaying?.Invoke(userId, state);
+            lock (userLock)
+                currentUserStates[userId] = state;
+
+            onUserBeganPlaying?.Invoke(userId, state);
 
             return Task.CompletedTask;
         }
@@ -142,6 +161,9 @@ namespace osu.Game.Online.Spectator
         Task ISpectatorClient.UserFinishedPlaying(int userId, SpectatorState state)
         {
             playingUsers.Remove(userId);
+
+            lock (userLock)
+                currentUserStates.Remove(userId);
 
             OnUserFinishedPlaying?.Invoke(userId, state);
 
