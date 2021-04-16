@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework;
@@ -704,9 +705,18 @@ namespace osu.Game.Screens.Mvis
             progressBar.EndTime = track.Length;
         }
 
+        private readonly MvisModRateAdjust modRateAdjust = new MvisModRateAdjust();
+        private IReadOnlyList<Mod> originalMods;
+
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
+
+            originalMods = Mods.Value;
+
+            //override mod列表
+            var list = new List<Mod> { modRateAdjust };
+            Mods.Value = list;
 
             //各种背景层的动画
             background.FadeOut().Then().Delay(250).FadeIn(500);
@@ -725,6 +735,9 @@ namespace osu.Game.Screens.Mvis
             track.ResetSpeedAdjustments();
             track.Looping = false;
             Beatmap.Disabled = false;
+
+            //恢复mods
+            Mods.Value = originalMods;
 
             //锁定变更
             lockChanges.Value = true;
@@ -941,6 +954,8 @@ namespace osu.Game.Screens.Mvis
             track.Looping = loopToggleButton.ToggleableValue.Value;
             track.RestartPoint = 0;
             track.AddAdjustment(adjustFreq.Value ? AdjustableProperty.Frequency : AdjustableProperty.Tempo, musicSpeed);
+
+            modRateAdjust.SpeedChange.Value = musicSpeed.Value;
 
             if (nightcoreBeat.Value)
                 nightcoreBeatContainer.Show();
