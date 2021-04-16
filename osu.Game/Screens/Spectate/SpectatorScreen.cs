@@ -62,26 +62,42 @@ namespace osu.Game.Screens.Spectate
         {
             base.LoadComplete();
 
-            spectatorClient.OnUserBeganPlaying += userBeganPlaying;
-            spectatorClient.OnUserFinishedPlaying += userFinishedPlaying;
-            spectatorClient.OnNewFrames += userSentFrames;
-
-            foreach (var id in UserIds)
+            populateAllUsers().ContinueWith(_ => Schedule(() =>
             {
-                userLookupCache.GetUserAsync(id).ContinueWith(u => Schedule(() =>
+                spectatorClient.BindUserBeganPlaying(userBeganPlaying, true);
+                spectatorClient.OnUserFinishedPlaying += userFinishedPlaying;
+                spectatorClient.OnNewFrames += userSentFrames;
+
+                managerUpdated = beatmaps.ItemUpdated.GetBoundCopy();
+                managerUpdated.BindValueChanged(beatmapUpdated);
+
+                lock (stateLock)
                 {
-                    if (u.Result == null)
+                    foreach (var (id, _) in userMap)
+                        spectatorClient.WatchUser(id);
+                }
+            }));
+        }
+
+        private Task populateAllUsers()
+        {
+            var userLookupTasks = new Task[UserIds.Length];
+
+            for (int i = 0; i < UserIds.Length; i++)
+            {
+                var userId = UserIds[i];
+
+                userLookupTasks[i] = userLookupCache.GetUserAsync(userId).ContinueWith(task =>
+                {
+                    if (!task.IsCompletedSuccessfully)
                         return;
 
                     lock (stateLock)
-                        userMap[id] = u.Result;
-
-                    spectatorClient.WatchUser(id);
-                }), TaskContinuationOptions.OnlyOnRanToCompletion);
+                        userMap[userId] = task.Result;
+                });
             }
 
-            managerUpdated = beatmaps.ItemUpdated.GetBoundCopy();
-            managerUpdated.BindValueChanged(beatmapUpdated);
+            return Task.WhenAll(userLookupTasks);
         }
 
         private void beatmapUpdated(ValueChangedEvent<WeakReference<BeatmapSetInfo>> e)

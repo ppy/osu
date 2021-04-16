@@ -23,6 +23,8 @@ namespace osu.Game.Graphics.Containers
         protected virtual string PopInSampleName => "UI/overlay-pop-in";
         protected virtual string PopOutSampleName => "UI/overlay-pop-out";
 
+        protected override bool BlockScrollInput => false;
+
         protected override bool BlockNonPositionalInput => true;
 
         /// <summary>

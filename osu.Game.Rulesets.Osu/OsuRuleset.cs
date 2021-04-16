@@ -185,6 +185,7 @@ namespace osu.Game.Rulesets.Osu
                         new MultiMod(new OsuModGrow(), new OsuModDeflate()),
                         new MultiMod(new ModWindUp(), new ModWindDown()),
                         new OsuModTraceable(),
+                        new OsuModBarrelRoll(),
                     };
 
                 case ModType.System:
@@ -205,6 +206,8 @@ namespace osu.Game.Rulesets.Osu
         public override PerformanceCalculator CreatePerformanceCalculator(DifficultyAttributes attributes, ScoreInfo score) => new OsuPerformanceCalculator(this, attributes, score);
 
         public override HitObjectComposer CreateHitObjectComposer() => new OsuHitObjectComposer(this);
+
+        public override IBeatmapVerifier CreateBeatmapVerifier() => new OsuBeatmapVerifier();
 
         public override string Description => "osu!";
 

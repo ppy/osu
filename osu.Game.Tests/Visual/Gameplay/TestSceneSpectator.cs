@@ -83,7 +83,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             waitForPlayer();
             AddAssert("ensure frames arrived", () => replayHandler.HasFrames);
 
-            AddUntilStep("wait for frame starvation", () => replayHandler.NextFrame == null);
+            AddUntilStep("wait for frame starvation", () => replayHandler.WaitingForFrame);
             checkPaused(true);
 
             double? pausedTime = null;
@@ -92,7 +92,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             sendFrames();
 
-            AddUntilStep("wait for frame starvation", () => replayHandler.NextFrame == null);
+            AddUntilStep("wait for frame starvation", () => replayHandler.WaitingForFrame);
             checkPaused(true);
 
             AddAssert("time advanced", () => currentFrameStableTime > pausedTime);
@@ -288,7 +288,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public override void WatchUser(int userId)
             {
-                if (sentState)
+                if (!PlayingUsers.Contains(userId) && sentState)
                 {
                     // usually the server would do this.
                     sendState(beatmapId);
