@@ -46,13 +46,6 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 },
                 new SettingsSlider<float>
                 {
-                    LabelText = "空闲时Mvis面板的不透明度",
-                    Current = config.GetBindable<float>(MSetting.MvisContentAlpha),
-                    DisplayAsPercentage = true,
-                    KeyboardStep = 0.01f,
-                },
-                new SettingsSlider<float>
-                {
                     LabelText = "界面主题色(红)",
                     Current = iR,
                     KeyboardStep = 1,
@@ -72,7 +65,19 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                     KeyboardStep = 1,
                     TransferValueOnCommit = false
                 },
-                preview = new ColourPreviewer()
+                preview = new ColourPreviewer(),
+                new SettingsCheckbox
+                {
+                    LabelText = "置顶Proxy",
+                    Current = config.GetBindable<bool>(MSetting.MvisStoryboardProxy),
+                    TooltipText = "让所有Proxy显示在前景上方"
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "启用背景动画",
+                    Current = config.GetBindable<bool>(MSetting.MvisEnableBgTriangles),
+                    TooltipText = "如果条件允许,播放器将会在背景显示动画"
+                }
             };
         }
 

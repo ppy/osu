@@ -17,6 +17,7 @@ namespace osu.Game.Overlays
         {
             AddSection(new MfMainSection());
             AddSection(new MfMvisSection());
+            AddSection(new MfMvisPluginSection());
             AddSection(new DangerousZone());
         }
     }

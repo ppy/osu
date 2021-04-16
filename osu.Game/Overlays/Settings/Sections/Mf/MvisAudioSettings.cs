@@ -1,9 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Mvis.Plugins;
+using osu.Game.Screens.Mvis.Plugins.Types;
 
 namespace osu.Game.Overlays.Settings.Sections.Mf
 {
@@ -12,8 +18,9 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
         protected override string Header => "音频";
 
         [BackgroundDependencyLoader]
-        private void load(MConfigManager config)
+        private void load(MConfigManager config, MvisPluginManager pluginManager)
         {
+            AudioControlPluginDropDown dropdown;
             Children = new Drawable[]
             {
                 new SettingsSlider<double>
@@ -36,17 +43,61 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                     Current = config.GetBindable<bool>(MSetting.MvisEnableNightcoreBeat),
                     TooltipText = "动次打次动次打次"
                 },
-                new SettingsCheckbox
+                dropdown = new AudioControlPluginDropDown
                 {
-                    LabelText = "从收藏夹播放歌曲",
-                    Current = config.GetBindable<bool>(MSetting.MvisPlayFromCollection)
-                },
-                new SettingsCheckbox
-                {
-                    LabelText = "启用Note打击音效",
-                    Current = config.GetBindable<bool>(MSetting.MvisEnableFakeEditor)
+                    LabelText = "音乐控制插件"
                 }
             };
+
+            var plugins = new List<IProvideAudioControlPlugin>();
+            var currentAudioControlPlugin = config.Get<string>(MSetting.MvisCurrentAudioProvider);
+
+            plugins.Add(new OsuMusicControllerWrapper());
+
+            foreach (var pl in pluginManager.GetAllPlugins(false))
+            {
+                if (pl is IProvideAudioControlPlugin pacp)
+                {
+                    plugins.Add(pacp);
+
+                    var type = pl.GetType();
+
+                    if ($"{type.Namespace}+{type.Name}" == currentAudioControlPlugin)
+                    {
+                        Logger.Log("Get!");
+                        dropdown.Current.Value = pacp;
+                    }
+                }
+            }
+
+            dropdown.Items = plugins;
+            dropdown.Current.BindValueChanged(v =>
+            {
+                if (v.NewValue == null)
+                {
+                    config.SetValue(MSetting.MvisCurrentAudioProvider, string.Empty);
+                    return;
+                }
+
+                var pl = (MvisPlugin)v.NewValue;
+                var type = pl.GetType();
+
+                config.SetValue(MSetting.MvisCurrentAudioProvider, $"{type.Namespace}+{type.Name}");
+            });
+        }
+
+        private class AudioControlPluginDropDown : SettingsDropdown<IProvideAudioControlPlugin>
+        {
+            protected override OsuDropdown<IProvideAudioControlPlugin> CreateDropdown()
+                => new PluginDropDownControl();
+
+            private class PluginDropDownControl : DropdownControl
+            {
+                protected override LocalisableString GenerateItemText(IProvideAudioControlPlugin item)
+                {
+                    return ((MvisPlugin)item).Name;
+                }
+            }
         }
     }
 }

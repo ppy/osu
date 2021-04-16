@@ -12,6 +12,12 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModMirror : ModMirror, IApplicableToBeatmap
     {
+        public override string Name => "镜像";
+        public override string Acronym => "MR";
+        public override ModType Type => ModType.Conversion;
+        public override double ScoreMultiplier => 1;
+        public override bool Ranked => true;
+
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
             var availableColumns = ((ManiaBeatmap)beatmap).TotalColumns;

@@ -1,13 +1,17 @@
 using System;
+using Mvis.Plugin.StoryboardSupport.Config;
 using Mvis.Plugin.StoryboardSupport.Storyboard;
+using Mvis.Plugin.StoryboardSupport.UI;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Platform;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Overlays;
+using osu.Game.Screens.Mvis.Plugins;
+using osu.Game.Screens.Mvis.Plugins.Config;
 using osu.Game.Screens.Mvis.Plugins.Types;
 
 namespace Mvis.Plugin.StoryboardSupport
@@ -44,8 +48,8 @@ namespace Mvis.Plugin.StoryboardSupport
         {
             RelativeSizeAxes = Axes.Both;
 
-            Name = "故事版加载器(内置)";
-            Description = "用于呈现故事版; Mfosu自带插件";
+            Name = "故事版加载器";
+            Description = "在播放器的背景显示谱面故事版";
             Author = "mf-osu";
 
             Flags.AddRange(new[]
@@ -56,9 +60,10 @@ namespace Mvis.Plugin.StoryboardSupport
         }
 
         [BackgroundDependencyLoader]
-        private void load(MConfigManager config)
+        private void load()
         {
-            config.BindWith(MSetting.MvisEnableStoryboard, Value);
+            var config = (SbLoaderConfigManager)DependenciesContainer.Get<MvisPluginManager>().GetConfigManager(this);
+            config.BindWith(SbLoaderSettings.EnableStoryboard, Value);
 
             currentBeatmap.BindValueChanged(v =>
             {
@@ -73,7 +78,13 @@ namespace Mvis.Plugin.StoryboardSupport
             {
                 MvisScreen.OnScreenExiting += UnLoad;
                 MvisScreen.OnBeatmapChanged += refresh;
+                MvisScreen.OnScreenSuspending += onScreenSuspending;
             }
+        }
+
+        private void onScreenSuspending()
+        {
+            MvisScreen.HideScreenBackground.Value = false;
         }
 
         protected override void OnValueChanged(ValueChangedEvent<bool> v)
@@ -91,9 +102,6 @@ namespace Mvis.Plugin.StoryboardSupport
             }
             else
             {
-                if (ContentLoaded)
-                    currentStoryboard?.FadeOut(STORYBOARD_FADEOUT_DURATION, Easing.OutQuint);
-
                 StoryboardReplacesBackground.Value = false;
                 NeedToHideTriangles.Value = false;
             }
@@ -105,11 +113,12 @@ namespace Mvis.Plugin.StoryboardSupport
             Alpha = 0.1f
         };
 
+        public override IPluginConfigManager CreateConfigManager(Storage storage) => new SbLoaderConfigManager(storage);
+
+        public override PluginSettingsSubSection CreateSettingsSubSection() => new StoryboardSettings(this);
+
         protected override bool PostInit()
         {
-            if (Disabled.Value)
-                return false;
-
             if (targetBeatmap == null)
                 throw new InvalidOperationException("currentBeatmap 不能为 null");
 
@@ -125,6 +134,8 @@ namespace Mvis.Plugin.StoryboardSupport
 
             return true;
         }
+
+        public override int Version => 1;
 
         private Drawable prevProxy;
 
@@ -146,13 +157,13 @@ namespace Mvis.Plugin.StoryboardSupport
 
             if (prevProxy != null)
             {
-                MvisScreen?.ProxyLayer.Remove(prevProxy);
+                MvisScreen?.RemoveDrawableFromProxy(prevProxy);
                 prevProxy.Expire();
             }
 
             prevProxy = getProxy(newStoryboard);
 
-            if (prevProxy != null) MvisScreen?.ProxyLayer.Add(prevProxy);
+            if (prevProxy != null) MvisScreen?.AddDrawableToProxy(prevProxy);
             prevProxy?.Show();
 
             if (MvisScreen != null)
@@ -166,10 +177,14 @@ namespace Mvis.Plugin.StoryboardSupport
 
         public override void UnLoad()
         {
-            ClearInternal();
+            if (ContentLoaded)
+                currentStoryboard?.FadeTo(0.01f, 250, Easing.OutQuint).Expire();
+
+            currentStoryboard = null;
 
             if (MvisScreen != null)
             {
+                MvisScreen.OnScreenSuspending -= onScreenSuspending;
                 MvisScreen.OnBeatmapChanged -= refresh;
                 MvisScreen.OnScreenExiting -= UnLoad;
                 MvisScreen.OnSeek -= Seek;
@@ -181,21 +196,60 @@ namespace Mvis.Plugin.StoryboardSupport
             NeedToHideTriangles.UnbindAll();
             StoryboardReplacesBackground.UnbindAll();
 
+            this.FadeTo(0.01f, 300, Easing.OutQuint);
+
             base.UnLoad();
         }
 
-        private void refresh(WorkingBeatmap newBeatmap)
+        public override bool Disable()
+        {
+            if (MvisScreen != null)
+            {
+                MvisScreen.HideTriangles.Value = false;
+                MvisScreen.HideScreenBackground.Value = false;
+            }
+
+            hideOrCancelLoadStoryboard(false);
+
+            return base.Disable();
+        }
+
+        public override bool Enable()
+        {
+            if (MvisScreen != null && ContentLoaded)
+            {
+                MvisScreen.HideTriangles.Value = NeedToHideTriangles.Value;
+                MvisScreen.HideScreenBackground.Value = targetBeatmap.Storyboard.ReplacesBackground;
+            }
+
+            return base.Enable();
+        }
+
+        private void hideOrCancelLoadStoryboard(bool expireIfLoaded)
         {
             if (!ContentLoaded)
             {
                 Cancel();
+
                 currentStoryboard?.Expire();
                 currentStoryboard?.Dispose();
+                currentStoryboard = null;
             }
+            else if (expireIfLoaded)
+                currentStoryboard?.FadeTo(0.01f, 300, Easing.OutQuint).Expire();
+            else
+                currentStoryboard?.FadeTo(0, 300, Easing.OutQuint);
+        }
 
-            currentStoryboard?.FadeTo(0.01f, 300, Easing.OutQuint).Expire();
+        private void refresh(WorkingBeatmap newBeatmap)
+        {
+            hideOrCancelLoadStoryboard(true);
+            if (Disabled.Value && newBeatmap != targetBeatmap) ContentLoaded = false;
+
             targetBeatmap = newBeatmap;
-            Load();
+
+            if (!Disabled.Value)
+                Load();
         }
 
         private Drawable getProxy(BackgroundStoryboard storyboard)

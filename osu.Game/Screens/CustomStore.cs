@@ -28,10 +28,13 @@ namespace osu.Game.Screens
         public List<MvisPluginProvider> LoadedPluginProviders = new List<MvisPluginProvider>();
         public static bool CustomFontLoaded;
 
+        private Storage storage;
+
         public CustomStore(Storage storage, OsuGameBase gameBase)
             : base(new StorageBackedResourceStore(storage), "custom")
         {
             this.gameBase = gameBase;
+            this.storage = storage;
 
             customStorage = storage.GetStorageForDirectory("custom");
 
@@ -76,8 +79,11 @@ namespace osu.Game.Screens
             }
 
             //从程序根目录加载
-            foreach (var file in Directory.GetFiles(RuntimeInfo.StartupDirectory, "Mvis.Plugin.*.dll"))
-                loadAssembly(Assembly.LoadFrom(file));
+            if (RuntimeInfo.IsDesktop)
+            {
+                foreach (var file in Directory.GetFiles(RuntimeInfo.StartupDirectory, "Mvis.Plugin.*.dll"))
+                    loadAssembly(Assembly.LoadFrom(file));
+            }
 
             foreach (var assembly in assemblies)
             {
@@ -102,31 +108,39 @@ namespace osu.Game.Screens
             if (loadedAssemblies.Values.Any(t => Path.GetFileNameWithoutExtension(t.Assembly.Location) == name))
                 return;
 
-            foreach (var type in assembly.GetTypes())
+            try
             {
-                //Logger.Log($"case: 尝试加载 {type}");
-
-                if (type.IsSubclassOf(typeof(Font)))
+                foreach (var type in assembly.GetTypes())
                 {
-                    loadedFontAssemblies[assembly] = type;
-                    loadedAssemblies[assembly] = type;
-                    addFont(type, assembly.FullName);
-                    continue;
+                    //Logger.Log($"case: 尝试加载 {type}");
+
+                    if (type.IsSubclassOf(typeof(Font)))
+                    {
+                        loadedFontAssemblies[assembly] = type;
+                        loadedAssemblies[assembly] = type;
+                        addFont(type, assembly.FullName);
+                        continue;
+                    }
+
+                    if (type.IsSubclassOf(typeof(MvisPluginProvider)))
+                    {
+                        loadedMvisPluginAssemblies[assembly] = type;
+                        loadedAssemblies[assembly] = type;
+                        //Logger.Log($"{type}是插件Provider");
+                        addMvisPlugin(type, assembly.FullName);
+                    }
+
+                    //Logger.Log($"{type}不是任何一个SubClass");
                 }
 
-                if (type.IsSubclassOf(typeof(MvisPluginProvider)))
-                {
-                    loadedMvisPluginAssemblies[assembly] = type;
-                    loadedAssemblies[assembly] = type;
-                    Logger.Log($"{type}是插件Provider");
-                    addMvisPlugin(type, assembly.FullName);
-                }
-
-                //Logger.Log($"{type}不是任何一个SubClass");
+                //添加store
+                gameBase.Resources.AddStore(new DllResourceStore(assembly));
             }
-
-            //添加store
-            gameBase.Resources.AddStore(new DllResourceStore(assembly));
+            catch (Exception e)
+            {
+                Logger.Error(e, $"载入插件{assembly.FullName}时出现了问题, 请联系你的插件提供方。");
+                return;
+            }
         }
 
         /// <summary>
@@ -188,7 +202,7 @@ namespace osu.Game.Screens
             {
                 var providerInstance = (MvisPluginProvider)Activator.CreateInstance(pluginType);
                 LoadedPluginProviders.Add(providerInstance);
-                Logger.Log($"[OK] 载入 {fullName}");
+                //Logger.Log($"[OK] 载入 {fullName}");
             }
             catch (Exception e)
             {

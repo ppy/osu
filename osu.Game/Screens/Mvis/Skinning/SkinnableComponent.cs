@@ -10,6 +10,12 @@ namespace osu.Game.Screens.Mvis.Skinning
 {
     public class SkinnableComponent : SkinnableDrawable
     {
+        public new MarginPadding Padding
+        {
+            get => base.Padding;
+            set => base.Padding = value;
+        }
+
         public SkinnableComponent(string textureName,
                                   Func<ISkinComponent, Drawable> defaultImplementation,
                                   Func<ISkinSource, bool> allowFallback = null,

@@ -59,11 +59,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             this.slider = slider;
             ControlPoint = controlPoint;
 
+            // we don't want to run the path type update on construction as it may inadvertently change the slider.
+            cachePoints(slider);
+
             slider.Path.Version.BindValueChanged(_ =>
             {
-                PointsInSegment = slider.Path.PointsInSegment(ControlPoint);
+                cachePoints(slider);
                 updatePathType();
-            }, runOnceImmediately: true);
+            });
 
             controlPoint.Type.BindValueChanged(_ => updateMarkerDisplay());
 
@@ -182,6 +185,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         protected override void OnDrag(DragEvent e)
         {
+            Vector2[] oldControlPoints = slider.Path.ControlPoints.Select(cp => cp.Position.Value).ToArray();
+            var oldPosition = slider.Position;
+            var oldStartTime = slider.StartTime;
+
             if (ControlPoint == slider.Path.ControlPoints[0])
             {
                 // Special handling for the head control point - the position of the slider changes which means the snapped position and time have to be taken into account
@@ -199,11 +206,23 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             else
                 ControlPoint.Position.Value = dragStartPosition + (e.MousePosition - e.MouseDownPosition);
 
+            if (!slider.Path.HasValidLength)
+            {
+                for (var i = 0; i < slider.Path.ControlPoints.Count; i++)
+                    slider.Path.ControlPoints[i].Position.Value = oldControlPoints[i];
+
+                slider.Position = oldPosition;
+                slider.StartTime = oldStartTime;
+                return;
+            }
+
             // Maintain the path type in case it got defaulted to bezier at some point during the drag.
             PointsInSegment[0].Type.Value = dragPathType;
         }
 
         protected override void OnDragEnd(DragEndEvent e) => changeHandler?.EndChange();
+
+        private void cachePoints(Slider slider) => PointsInSegment = slider.Path.PointsInSegment(ControlPoint);
 
         /// <summary>
         /// Handles correction of invalid path types.

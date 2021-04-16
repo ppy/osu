@@ -2,6 +2,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics.Containers;
 using osuTK;
 
 namespace osu.Game.Screens.Mvis.SideBar.Header
@@ -29,15 +30,25 @@ namespace osu.Game.Screens.Mvis.SideBar.Header
                     RelativeSizeAxes = Axes.Both,
                     Depth = float.MaxValue
                 },
-                Tabs = new FillFlowContainer<HeaderTabItem>
+                new OsuScrollContainer(Direction.Horizontal)
                 {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    AutoSizeAxes = Axes.X,
-                    RelativeSizeAxes = Axes.Y,
-                    Direction = FillDirection.Horizontal,
-                    Spacing = new Vector2(10, 0),
-                    Margin = new MarginPadding { Right = 25 }
+                    RelativeSizeAxes = Axes.Both,
+                    ScrollContent =
+                    {
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight
+                    },
+                    Child = Tabs = new FillFlowContainer<HeaderTabItem>
+                    {
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                        AutoSizeAxes = Axes.X,
+                        RelativeSizeAxes = Axes.Y,
+                        Direction = FillDirection.Horizontal,
+                        Spacing = new Vector2(10, 0),
+                        Margin = new MarginPadding { Horizontal = 25 }
+                    },
+                    ScrollbarVisible = false
                 },
                 highLightBox = new Box
                 {

@@ -10,7 +10,7 @@ using osu.Framework.Bindables;
 
 namespace osu.Game.Screens.Menu
 {
-    internal class MenuLogoVisualisation : LogoVisualisation
+    public class MenuLogoVisualisation : LogoVisualisation
     {
         private IBindable<User> user;
         private Bindable<Skin> skin;

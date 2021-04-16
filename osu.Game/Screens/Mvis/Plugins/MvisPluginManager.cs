@@ -1,29 +1,33 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
+using osu.Game.Screens.Mvis.Plugins.Config;
 
 namespace osu.Game.Screens.Mvis.Plugins
 {
-    public class MvisPluginManager : Component
+    public class MvisPluginManager : CompositeDrawable
     {
         private readonly BindableList<MvisPlugin> avaliablePlugins = new BindableList<MvisPlugin>();
         private readonly BindableList<MvisPlugin> activePlugins = new BindableList<MvisPlugin>();
         private readonly List<MvisPluginProvider> providers = new List<MvisPluginProvider>();
+        private readonly ConcurrentDictionary<Type, IPluginConfigManager> configManagers = new ConcurrentDictionary<Type, IPluginConfigManager>();
 
-        [CanBeNull]
-        [Resolved(CanBeNull = true)]
-        private SideBar.Sidebar sideBar { get; set; }
+        [Resolved]
+        private Storage storage { get; set; }
 
-        public Action<MvisPlugin> OnPluginAdd;
-        public Action<MvisPlugin> OnPluginUnLoad;
+        internal Action<MvisPlugin> OnPluginAdd;
+        internal Action<MvisPlugin> OnPluginUnLoad;
+
+        public int PluginVersion => 1;
 
         [BackgroundDependencyLoader]
-        private void load(CustomStore customStore)
+        private void load(CustomStore customStore, OsuGameBase gameBase)
         {
             foreach (var provider in customStore.LoadedPluginProviders)
             {
@@ -32,21 +36,26 @@ namespace osu.Game.Screens.Mvis.Plugins
             }
         }
 
-        public bool AddPlugin(MvisPlugin pl)
+        public IPluginConfigManager GetConfigManager(MvisPlugin pl) =>
+            configManagers.GetOrAdd(pl.GetType(), _ => pl.CreateConfigManager(storage));
+
+        internal bool AddPlugin(MvisPlugin pl)
         {
             if (avaliablePlugins.Contains(pl) || pl == null) return false;
 
+            if (pl.Version < PluginVersion)
+                Logger.Log($"插件 \"{pl.Name}\" 的版本已经过时, 继续使用可能会导致意外情况的发生!", LoggingTarget.Runtime, LogLevel.Important);
+            else if (pl.Version > PluginVersion)
+                Logger.Log($"插件 \"{pl.Name}\" 是为更高版本的mf-osu打造的, 继续使用可能会导致意外情况的发生!", LoggingTarget.Runtime, LogLevel.Important);
+
             avaliablePlugins.Add(pl);
-            sideBar?.Add(pl.SidebarPage);
             OnPluginAdd?.Invoke(pl);
             return true;
         }
 
-        public bool UnLoadPlugin(MvisPlugin pl)
+        internal bool UnLoadPlugin(MvisPlugin pl)
         {
             if (!avaliablePlugins.Contains(pl) || pl == null) return false;
-
-            sideBar?.Remove(pl.SidebarPage);
 
             var provider = providers.Find(p => p.CreatePlugin.GetType() == pl.GetType());
 
@@ -70,7 +79,7 @@ namespace osu.Game.Screens.Mvis.Plugins
             return true;
         }
 
-        public bool ActivePlugin(MvisPlugin pl)
+        internal bool ActivePlugin(MvisPlugin pl)
         {
             if (!avaliablePlugins.Contains(pl) || activePlugins.Contains(pl) || pl == null) return false;
 
@@ -85,7 +94,7 @@ namespace osu.Game.Screens.Mvis.Plugins
             return success;
         }
 
-        public bool DisablePlugin(MvisPlugin pl)
+        internal bool DisablePlugin(MvisPlugin pl)
         {
             if (!avaliablePlugins.Contains(pl) || !activePlugins.Contains(pl) || pl == null) return false;
 
@@ -106,7 +115,9 @@ namespace osu.Game.Screens.Mvis.Plugins
         /// <summary>
         /// 获取所有插件
         /// </summary>
-        /// <param name="newInstance">是否创建新插件本体，该选项应当只用于MvisScreen启动！</param>
+        /// <param name="newInstance">
+        /// 是否处理当前所有插件并创建新插件本体<br/>
+        /// </param>
         /// <returns>所有已加载且可用的插件</returns>
         public List<MvisPlugin> GetAllPlugins(bool newInstance)
         {
@@ -123,7 +134,7 @@ namespace osu.Game.Screens.Mvis.Plugins
             return avaliablePlugins.ToList();
         }
 
-        public void DisposeAllPlugins()
+        internal void DisposeAllPlugins()
         {
             foreach (var pl in avaliablePlugins)
             {

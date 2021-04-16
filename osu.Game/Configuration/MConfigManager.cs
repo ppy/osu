@@ -36,25 +36,35 @@ namespace osu.Game.Configuration
             SetDefault(MSetting.SamplePlaybackGain, 1f, 0f, 20f);
 
             //MvisSettings
-            SetDefault(MSetting.MvisParticleAmount, 350, 0, 350);
             SetDefault(MSetting.MvisContentAlpha, 1f, 0f, 1f);
             SetDefault(MSetting.MvisBgBlur, 0.2f, 0f, 1f);
-            SetDefault(MSetting.MvisEnableStoryboard, true);
             SetDefault(MSetting.MvisStoryboardProxy, false);
-            SetDefault(MSetting.MvisUseOsuLogoVisualisation, false);
             SetDefault(MSetting.MvisIdleBgDim, 0.8f, 0f, 1f);
             SetDefault(MSetting.MvisEnableBgTriangles, true);
             SetDefault(MSetting.MvisAdjustMusicWithFreq, true);
             SetDefault(MSetting.MvisMusicSpeed, 1.0, 0.1, 2.0);
             SetDefault(MSetting.MvisEnableNightcoreBeat, false);
             SetDefault(MSetting.MvisPlayFromCollection, false);
-            SetDefault(MSetting.MvisEnableFakeEditor, false);
-            SetDefault(MSetting.MvisEnableRulesetPanel, true);
             SetDefault(MSetting.MvisInterfaceRed, value: 0, 0, 255f);
             SetDefault(MSetting.MvisInterfaceGreen, value: 119f, 0, 255f);
             SetDefault(MSetting.MvisInterfaceBlue, value: 255f, 0, 255f);
+            SetDefault(MSetting.MvisCurrentAudioProvider, "osu.Game.Screens.Mvis.Plugins+OsuMusicControllerWrapper");
 
-            //Mvis Settings(Upstream)
+            //实验性功能
+            SetDefault(MSetting.CustomWindowIconPath, "");
+            SetDefault(MSetting.UseCustomGreetingPicture, false);
+            SetDefault(MSetting.FadeOutWindowWhenExiting, false);
+            SetDefault(MSetting.FadeInWindowWhenEntering, false);
+            SetDefault(MSetting.UseSystemCursor, false);
+            SetDefault(MSetting.PreferredFont, "Torus");
+
+            //已分离
+            SetDefault(MSetting.MvisEnableStoryboard, true);
+            SetDefault(MSetting.MvisEnableFakeEditor, false);
+
+            //Mvis Settings(Upstream; 已分离)
+            SetDefault(MSetting.MvisEnableRulesetPanel, true);
+            SetDefault(MSetting.MvisParticleAmount, 350, 0, 350);
             SetDefault(MSetting.MvisShowParticles, true);
             SetDefault(MSetting.MvisBarType, MvisBarType.Rounded);
             SetDefault(MSetting.MvisVisualizerAmount, 3, 1, 5);
@@ -65,14 +75,7 @@ namespace osu.Game.Configuration
             SetDefault(MSetting.MvisRed, 0, 0, 255);
             SetDefault(MSetting.MvisGreen, 0, 0, 255);
             SetDefault(MSetting.MvisBlue, 0, 0, 255);
-
-            //实验性功能
-            SetDefault(MSetting.CustomWindowIconPath, "");
-            SetDefault(MSetting.UseCustomGreetingPicture, false);
-            SetDefault(MSetting.FadeOutWindowWhenExiting, false);
-            SetDefault(MSetting.FadeInWindowWhenEntering, false);
-            SetDefault(MSetting.UseSystemCursor, false);
-            SetDefault(MSetting.PreferredFont, "Torus");
+            SetDefault(MSetting.MvisUseOsuLogoVisualisation, false);
         }
     }
 
@@ -81,14 +84,35 @@ namespace osu.Game.Configuration
         OptUI,
         TrianglesEnabled,
         UseSayobot,
-        MvisParticleAmount,
         MvisBgBlur,
-        MvisUseOsuLogoVisualisation,
         MvisEnableStoryboard,
         MvisStoryboardProxy,
         MvisIdleBgDim,
         MvisContentAlpha,
         MvisEnableBgTriangles,
+        MvisMusicSpeed,
+        MvisAdjustMusicWithFreq,
+        MvisEnableNightcoreBeat,
+        MvisPlayFromCollection,
+        MvisInterfaceRed,
+        MvisInterfaceGreen,
+        MvisInterfaceBlue,
+        MvisEnableFakeEditor,
+        SamplePlaybackGain,
+        SongSelectBgBlur,
+        IntroLoadDirectToSongSelect,
+        CustomWindowIconPath,
+        UseCustomGreetingPicture,
+        FadeOutWindowWhenExiting,
+        FadeInWindowWhenEntering,
+        UseSystemCursor,
+        PreferredFont,
+        AlwaysHideTextIndicator,
+        MvisCurrentAudioProvider,
+
+        //已分离(MvisPanel)
+        MvisEnableRulesetPanel,
+        MvisParticleAmount,
         MvisShowParticles,
         MvisVisualizerAmount,
         MvisBarWidth,
@@ -99,27 +123,10 @@ namespace osu.Game.Configuration
         MvisRed,
         MvisGreen,
         MvisBlue,
-        MvisMusicSpeed,
-        MvisAdjustMusicWithFreq,
-        MvisEnableNightcoreBeat,
-        MvisPlayFromCollection,
-        MvisInterfaceRed,
-        MvisInterfaceGreen,
-        MvisInterfaceBlue,
-        MvisEnableFakeEditor,
-        MvisEnableRulesetPanel,
-        SamplePlaybackGain,
-        SongSelectBgBlur,
-        IntroLoadDirectToSongSelect,
-        CustomWindowIconPath,
-        UseCustomGreetingPicture,
-        FadeOutWindowWhenExiting,
-        FadeInWindowWhenEntering,
-        UseSystemCursor,
-        PreferredFont,
-        AlwaysHideTextIndicator
+        MvisUseOsuLogoVisualisation,
     }
 
+    //已分离(MvisPanel)
     public enum MvisBarType
     {
         [Description("基本")]

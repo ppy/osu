@@ -20,12 +20,12 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Mvis.SideBar
 {
-    public class Sidebar : VisibilityContainer
+    internal class Sidebar : VisibilityContainer
     {
         [Resolved]
         private CustomColourProvider colourProvider { get; set; }
 
-        private readonly List<ISidebarContent> components = new List<ISidebarContent>();
+        public readonly List<ISidebarContent> Components = new List<ISidebarContent>();
         private readonly TabHeader header;
         private const float duration = 400;
         private HeaderTabItem prevTab;
@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Mvis.SideBar
                 new ClickToCloseBox
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black.Opacity(0.6f),
+                    Colour = Color4.Black.Opacity(0.7f),
                     Action = () =>
                     {
                         if (!content.IsHovered)
@@ -106,7 +106,6 @@ namespace osu.Game.Screens.Mvis.SideBar
             content.Add(new SkinnableComponent(
                 "MSidebar-background",
                 confineMode: ConfineMode.ScaleToFill,
-                masking: true,
                 defaultImplementation: _ => sidebarBg = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -168,11 +167,11 @@ namespace osu.Game.Screens.Mvis.SideBar
             if (!(d is ISidebarContent c))
                 throw new InvalidOperationException($"{d}不是{typeof(ISidebarContent)}");
 
-            if (!components.Contains(c))
+            if (!Components.Contains(c))
                 throw new InvalidOperationException($"组成部分中不包含{c}");
 
             if (c.ResizeWidth < 0.3f || c.ResizeHeight < 0.3f)
-                throw new InvalidOperationException("组件过小");
+                throw new InvalidOperationException("组件过小, 缩放大小不能小于30%(0.3)");
 
             startFromHiddenState = State.Value == Visibility.Hidden;
 
@@ -207,7 +206,7 @@ namespace osu.Game.Screens.Mvis.SideBar
             if (d is ISidebarContent s)
             {
                 d.Alpha = 0;
-                components.Add(s);
+                Components.Add(s);
                 header.Tabs.Add(new HeaderTabItem(s)
                 {
                     Action = () => ShowComponent(d)

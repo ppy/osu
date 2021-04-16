@@ -1,10 +1,14 @@
+using Mvis.Plugin.RulesetPanel.Config;
+using Mvis.Plugin.RulesetPanel.Objects;
+using Mvis.Plugin.RulesetPanel.UI;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Configuration;
+using osu.Framework.Platform;
 using osu.Game.Graphics.Containers;
-using osu.Game.Screens.Mvis.Objects;
+using osu.Game.Screens.Mvis.Plugins;
+using osu.Game.Screens.Mvis.Plugins.Config;
 using osu.Game.Screens.Mvis.Plugins.Types;
 using osuTK;
 
@@ -13,10 +17,11 @@ namespace Mvis.Plugin.RulesetPanel
     public class RulesetPanel : BindableControlledPlugin
     {
         public override TargetLayer Target => TargetLayer.Foreground;
+        public override int Version => 1;
 
         public RulesetPanel()
         {
-            Name = "Mvis面板(内置)";
+            Name = "Mvis面板";
             Description = "用于提供Mvis面板功能(中心的谱面图及周围的粒子效果)";
             Author = "mf-osu; EVAST9919";
 
@@ -32,9 +37,6 @@ namespace Mvis.Plugin.RulesetPanel
             Scale = new Vector2(0.8f);
         }
 
-        [Resolved]
-        private MConfigManager config { get; set; }
-
         private readonly Bindable<bool> showParticles = new BindableBool();
         private readonly BindableFloat idleAlpha = new BindableFloat();
 
@@ -43,11 +45,14 @@ namespace Mvis.Plugin.RulesetPanel
         private BeatmapLogo beatmapLogo;
 
         [BackgroundDependencyLoader]
-        private void load(MConfigManager config)
+        private void load()
         {
-            config.BindWith(MSetting.MvisShowParticles, showParticles);
-            config.BindWith(MSetting.MvisEnableRulesetPanel, Value);
-            config.BindWith(MSetting.MvisContentAlpha, idleAlpha);
+            var config = (RulesetPanelConfigManager)Dependencies.Get<MvisPluginManager>().GetConfigManager(this);
+            DependenciesContainer.Cache(config);
+
+            config.BindWith(RulesetPanelSetting.ShowParticles, showParticles);
+            config.BindWith(RulesetPanelSetting.EnableRulesetPanel, Value);
+            config.BindWith(RulesetPanelSetting.IdleAlpha, idleAlpha);
             idleAlpha.BindValueChanged(onIdleAlphaChanged);
 
             if (MvisScreen != null)
@@ -66,6 +71,12 @@ namespace Mvis.Plugin.RulesetPanel
             if ((MvisScreen?.OverlaysHidden ?? true) && Value.Value)
                 this.FadeTo(v.NewValue, 750, Easing.OutQuint);
         }
+
+        public override IPluginConfigManager CreateConfigManager(Storage storage)
+            => new RulesetPanelConfigManager(storage);
+
+        public override PluginSettingsSubSection CreateSettingsSubSection()
+            => new RulesetPanelSettings(this);
 
         protected override Drawable CreateContent() => new Container
         {

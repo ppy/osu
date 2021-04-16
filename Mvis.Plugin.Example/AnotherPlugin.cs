@@ -72,6 +72,7 @@ namespace Mvis.Plugin.Example
         }
 
         public override TargetLayer Target => TargetLayer.Background;
+        public override int Version => 1;
 
         public AnotherPlugin()
         {

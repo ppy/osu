@@ -18,5 +18,8 @@ namespace osu.Game.Screens.Edit
 
         [Description("timing设计")]
         Timing,
+
+        [Description("检查谱面")]
+        Verify,
     }
 }

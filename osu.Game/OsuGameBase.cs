@@ -40,11 +40,11 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
+using osu.Game.Utils;
 using osuTK.Input;
 using RuntimeInfo = osu.Framework.RuntimeInfo;
 using M.Resources;
 using osu.Game.Screens;
-using osu.Game.Utils;
 
 namespace osu.Game
 {
@@ -159,6 +159,8 @@ namespace osu.Game
         private DatabaseContextFactory contextFactory;
 
         protected override UserInputManager CreateUserInputManager() => new OsuUserInputManager();
+
+        protected virtual BatteryInfo CreateBatteryInfo() => null;
 
         /// <summary>
         /// The maximum volume at which audio tracks should playback. This can be set lower than 1 to create some head-room for sound effects.
@@ -294,6 +296,11 @@ namespace osu.Game
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
             dependencies.Cache(RulesetConfigCache = new RulesetConfigCache(SettingsStore));
+
+            var powerStatus = CreateBatteryInfo();
+            if (powerStatus != null)
+                dependencies.CacheAs(powerStatus);
+
             dependencies.Cache(new SessionStatics());
             dependencies.Cache(new OsuColour());
 
@@ -448,12 +455,15 @@ namespace osu.Game
             if (paths.Length == 0)
                 return;
 
-            var extension = Path.GetExtension(paths.First())?.ToLowerInvariant();
+            var filesPerExtension = paths.GroupBy(p => Path.GetExtension(p).ToLowerInvariant());
 
-            foreach (var importer in fileImporters)
+            foreach (var groups in filesPerExtension)
             {
-                if (importer.HandledExtensions.Contains(extension))
-                    await importer.Import(paths).ConfigureAwait(false);
+                foreach (var importer in fileImporters)
+                {
+                    if (importer.HandledExtensions.Contains(groups.Key))
+                        await importer.Import(groups.ToArray()).ConfigureAwait(false);
+                }
             }
         }
 

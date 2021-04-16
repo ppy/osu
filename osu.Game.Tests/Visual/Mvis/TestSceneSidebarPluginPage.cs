@@ -6,7 +6,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
+using osu.Game.Screens;
 using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Mvis.Plugins;
 using osu.Game.Screens.Mvis.SideBar;
@@ -25,11 +28,16 @@ namespace osu.Game.Tests.Visual.Mvis
         private BasicMvisPlugin plugin = new BasicMvisPlugin();
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(Storage storage, OsuGameBase gameBase)
         {
             var manager = new MvisPluginManager();
+            var dialog = new DialogOverlay();
+            var customStore = dependencies.Get<CustomStore>() ?? new CustomStore(storage, gameBase);
+
             dependencies.Cache(new CustomColourProvider(0, 0, 1));
             dependencies.Cache(manager);
+            dependencies.Cache(dialog);
+            dependencies.Cache(customStore);
 
             dependencies.Cache(sidebar = new Sidebar
             {
@@ -41,7 +49,8 @@ namespace osu.Game.Tests.Visual.Mvis
             Children = new Drawable[]
             {
                 sidebar,
-                manager
+                manager,
+                dialog
             };
 
             AddStep("Toggle Sidebar ", sidebar.ToggleVisibility);
@@ -50,15 +59,17 @@ namespace osu.Game.Tests.Visual.Mvis
                 if (manager.AddPlugin(plugin))
                     Add(plugin);
 
-                var undisablePlugin = new BasicMvisPlugin(true, true);
+                var undisablePlugin = new BasicMvisPlugin();
                 manager.AddPlugin(undisablePlugin);
                 Add(undisablePlugin);
             });
             AddStep("Enable Plugin", () => manager.ActivePlugin(plugin));
             AddStep("Disable Plugin", () => manager.DisablePlugin(plugin));
+            AddStep("Enable Plugin(UnSafe)", () => plugin.Disabled.Value = false);
+            AddStep("Disable Plugin(UnSafe)", () => plugin.Disabled.Value = true);
             AddStep("Remove All Plugin From Manager", () =>
             {
-                foreach (var mvisPlugin in manager.GetAllPlugins())
+                foreach (var mvisPlugin in manager.GetAllPlugins(false))
                 {
                     if (manager.UnLoadPlugin(mvisPlugin))
                         Remove(mvisPlugin);
@@ -72,16 +83,14 @@ namespace osu.Game.Tests.Visual.Mvis
 
         private class BasicMvisPlugin : MvisPlugin
         {
-            public BasicMvisPlugin(bool enableDisable = false, bool enableUnload = false)
+            public BasicMvisPlugin()
             {
-                page.Plugin = this;
                 Size = new Vector2(200, 100);
-
-                if (enableDisable)
-                    Flags.Add(PluginFlags.CanDisable);
-
-                if (enableUnload)
-                    Flags.Add(PluginFlags.CanUnload);
+                Flags.AddRange(new[]
+                {
+                    PluginFlags.CanDisable,
+                    PluginFlags.CanUnload
+                });
             }
 
             private readonly OsuSpriteText text = new OsuSpriteText
@@ -95,8 +104,8 @@ namespace osu.Game.Tests.Visual.Mvis
 
             protected override bool PostInit() => true;
 
-            private readonly PluginSidebarPage page = new VoidSidebarContent(0.5f, "插件");
-            public override PluginSidebarPage SidebarPage => page;
+            public override PluginSidebarPage CreateSidebarPage() => new VoidSidebarContent(this, 0.5f);
+            public override int Version => 1;
 
             public override bool Enable()
             {
@@ -129,8 +138,8 @@ namespace osu.Game.Tests.Visual.Mvis
         {
             private readonly OsuSpriteText t;
 
-            public VoidSidebarContent(float reWidth, string tabTitle)
-                : base(reWidth, tabTitle)
+            public VoidSidebarContent(MvisPlugin plugin, float reWidth)
+                : base(plugin, reWidth)
             {
                 RelativeSizeAxes = Axes.Both;
                 Child = new FillFlowContainer
@@ -143,7 +152,7 @@ namespace osu.Game.Tests.Visual.Mvis
                     {
                         new OsuSpriteText
                         {
-                            Text = "num: " + tabTitle,
+                            Text = "num: " + plugin.Name,
                         },
                         new OsuSpriteText
                         {

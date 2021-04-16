@@ -1,14 +1,17 @@
+using Mvis.Plugin.FakeEditor.Config;
 using Mvis.Plugin.FakeEditor.Editor;
+using Mvis.Plugin.FakeEditor.UI;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Events;
+using osu.Framework.Platform;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Mvis.Misc;
+using osu.Game.Screens.Mvis.Plugins;
+using osu.Game.Screens.Mvis.Plugins.Config;
 using osu.Game.Screens.Mvis.Plugins.Types;
 using osu.Game.Screens.Play;
 
@@ -35,7 +38,7 @@ namespace Mvis.Plugin.FakeEditor
 
         public FakeEditor()
         {
-            Name = "谱面编辑器(内置)";
+            Name = "谱面编辑器";
             Description = "用于提供Note音效; 高内存占用, 不要用来尝试那些会崩掉你游戏/电脑的图";
             Author = "mf-osu";
 
@@ -52,9 +55,10 @@ namespace Mvis.Plugin.FakeEditor
         private MusicController musicController { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(MConfigManager config)
+        private void load()
         {
-            config.BindWith(MSetting.MvisEnableFakeEditor, Value);
+            var config = (FakeEditorConfigManager)dependencies.Get<MvisPluginManager>().GetConfigManager(this);
+            config.BindWith(FakeEditorSetting.EnableFakeEditor, Value);
 
             dependencies.CacheAs(beatDivisor);
 
@@ -71,6 +75,12 @@ namespace Mvis.Plugin.FakeEditor
                 MvisScreen.OnBeatmapChanged += initDependencies;
             }
         }
+
+        public override IPluginConfigManager CreateConfigManager(Storage storage)
+            => new FakeEditorConfigManager(storage);
+
+        public override PluginSettingsSubSection CreateSettingsSubSection()
+            => new FakeEditorSettings(this);
 
         public override void UnLoad()
         {
@@ -111,7 +121,9 @@ namespace Mvis.Plugin.FakeEditor
         private void reload()
         {
             Clear();
-            Load();
+
+            if (!Disabled.Value)
+                Load();
         }
 
         protected override void OnValueChanged(ValueChangedEvent<bool> v)
@@ -148,6 +160,7 @@ namespace Mvis.Plugin.FakeEditor
             => new EditorContainer(beatmap);
 
         protected override bool PostInit() => true;
+        public override int Version => 1;
 
         private void updateSamplePlaybackDisabled() =>
             samplePlaybackDisabled.Value = !Value.Value || !musicController.CurrentTrack.IsRunning;
@@ -176,12 +189,5 @@ namespace Mvis.Plugin.FakeEditor
         public double GetBeatLengthAtTime(double referenceTime) => 0;
 
         public int BeatDivisor => beatDivisor.Value;
-
-        public class BlockMouseBox : Box
-        {
-            protected override bool OnClick(ClickEvent e) => true;
-            protected override bool OnMouseMove(MouseMoveEvent e) => true;
-            protected override bool OnMouseDown(MouseDownEvent e) => true;
-        }
     }
 }

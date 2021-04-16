@@ -8,64 +8,58 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    public class ControlPointTable : TableContainer
+    public class ControlPointTable : EditorTable
     {
-        private const float horizontal_inset = 20;
-        private const float row_height = 25;
-        private const int text_size = 14;
-
-        private readonly FillFlowContainer backgroundFlow;
-
         [Resolved]
         private Bindable<ControlPointGroup> selectedGroup { get; set; }
 
-        public ControlPointTable()
-        {
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
-
-            Padding = new MarginPadding { Horizontal = horizontal_inset };
-            RowSize = new Dimension(GridSizeMode.Absolute, row_height);
-
-            AddInternal(backgroundFlow = new FillFlowContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-                Depth = 1f,
-                Padding = new MarginPadding { Horizontal = -horizontal_inset },
-                Margin = new MarginPadding { Top = row_height }
-            });
-        }
+        [Resolved]
+        private EditorClock clock { get; set; }
 
         public IEnumerable<ControlPointGroup> ControlGroups
         {
             set
             {
                 Content = null;
-                backgroundFlow.Clear();
+                BackgroundFlow.Clear();
 
                 if (value?.Any() != true)
                     return;
 
                 foreach (var group in value)
                 {
-                    backgroundFlow.Add(new RowBackground(group));
+                    BackgroundFlow.Add(new RowBackground(group)
+                    {
+                        Action = () =>
+                        {
+                            selectedGroup.Value = group;
+                            clock.SeekSmoothlyTo(group.Time);
+                        }
+                    });
                 }
 
                 Columns = createHeaders();
                 Content = value.Select((g, i) => createContent(i, g)).ToArray().ToRectangular();
             }
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            selectedGroup.BindValueChanged(group =>
+            {
+                foreach (var b in BackgroundFlow) b.Selected = b.Item == group.NewValue;
+            }, true);
         }
 
         private TableColumn[] createHeaders()
@@ -86,13 +80,13 @@ namespace osu.Game.Screens.Edit.Timing
             new OsuSpriteText
             {
                 Text = $"#{index + 1}",
-                Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold),
+                Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Bold),
                 Margin = new MarginPadding(10)
             },
             new OsuSpriteText
             {
                 Text = group.Time.ToEditorFormattedString(),
-                Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
+                Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Bold)
             },
             null,
             new ControlGroupAttributes(group),
@@ -161,112 +155,6 @@ namespace osu.Game.Screens.Edit.Timing
                 }
 
                 return null;
-            }
-        }
-
-        protected override Drawable CreateHeader(int index, TableColumn column) => new HeaderText(column?.Header ?? string.Empty);
-
-        private class HeaderText : OsuSpriteText
-        {
-            public HeaderText(string text)
-            {
-                Text = text.ToUpper();
-                Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold);
-            }
-        }
-
-        public class RowBackground : OsuClickableContainer
-        {
-            private readonly ControlPointGroup controlGroup;
-            private const int fade_duration = 100;
-
-            private readonly Box hoveredBackground;
-
-            [Resolved]
-            private EditorClock clock { get; set; }
-
-            [Resolved]
-            private Bindable<ControlPointGroup> selectedGroup { get; set; }
-
-            public RowBackground(ControlPointGroup controlGroup)
-            {
-                this.controlGroup = controlGroup;
-                RelativeSizeAxes = Axes.X;
-                Height = 25;
-
-                AlwaysPresent = true;
-
-                CornerRadius = 3;
-                Masking = true;
-
-                Children = new Drawable[]
-                {
-                    hoveredBackground = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Alpha = 0,
-                    },
-                };
-
-                Action = () =>
-                {
-                    selectedGroup.Value = controlGroup;
-                    clock.SeekSmoothlyTo(controlGroup.Time);
-                };
-            }
-
-            private Color4 colourHover;
-            private Color4 colourSelected;
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                hoveredBackground.Colour = colourHover = colours.BlueDarker;
-                colourSelected = colours.YellowDarker;
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                selectedGroup.BindValueChanged(group => { Selected = controlGroup == group.NewValue; }, true);
-            }
-
-            private bool selected;
-
-            protected bool Selected
-            {
-                get => selected;
-                set
-                {
-                    if (value == selected)
-                        return;
-
-                    selected = value;
-                    updateState();
-                }
-            }
-
-            protected override bool OnHover(HoverEvent e)
-            {
-                updateState();
-                return base.OnHover(e);
-            }
-
-            protected override void OnHoverLost(HoverLostEvent e)
-            {
-                updateState();
-                base.OnHoverLost(e);
-            }
-
-            private void updateState()
-            {
-                hoveredBackground.FadeColour(selected ? colourSelected : colourHover, 450, Easing.OutQuint);
-
-                if (selected || IsHovered)
-                    hoveredBackground.FadeIn(fade_duration, Easing.OutQuint);
-                else
-                    hoveredBackground.FadeOut(fade_duration, Easing.OutQuint);
             }
         }
     }
