@@ -221,7 +221,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 callbackInvoked = false;
             });
 
-            AddStep("bind event again", () => testSpectatorStreamingClient.OnUserBeganPlaying += callbackAction);
+            AddStep("bind event with run once immediately", () => testSpectatorStreamingClient.BindUserBeganPlaying(callbackAction, true));
             AddAssert("callback invoked", () => callbackInvoked);
 
             // Don't leave the event bound if test run succeeded.
