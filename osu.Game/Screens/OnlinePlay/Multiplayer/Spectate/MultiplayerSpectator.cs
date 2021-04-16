@@ -25,7 +25,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         private readonly PlayerInstance[] instances;
         private MasterGameplayClockContainer masterClockContainer;
-        private ISpectatorSyncManager syncManager;
+        private ISyncManager syncManager;
         private PlayerGrid grid;
         private MultiplayerSpectatorLeaderboard leaderboard;
 
@@ -66,12 +66,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             InternalChildren = new[]
             {
-                (Drawable)(syncManager = new SpectatorCatchUpSyncManager(masterClockContainer)),
+                (Drawable)(syncManager = new CatchUpSyncManager(masterClockContainer)),
                 masterClockContainer
             };
 
             for (int i = 0; i < UserIds.Length; i++)
-                grid.Add(instances[i] = new PlayerInstance(UserIds[i], new SpectatorCatchUpSlaveClock(masterClockContainer.GameplayClock)));
+                grid.Add(instances[i] = new PlayerInstance(UserIds[i], new CatchUpSlaveClock(masterClockContainer.GameplayClock)));
 
             // Todo: This is not quite correct - it should be per-user to adjust for other mod combinations.
             var playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Ruleset.Value);
