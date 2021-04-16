@@ -33,7 +33,6 @@ namespace osu.Game.Screens.Mvis.SideBar.Footer
                 new SkinnableComponent(
                     "MSidebar-BottomBox",
                     confineMode: ConfineMode.ScaleToFill,
-                    masking: true,
                     defaultImplementation: _ => createDefaultFooter())
                 {
                     Name = "侧边栏底部横条",

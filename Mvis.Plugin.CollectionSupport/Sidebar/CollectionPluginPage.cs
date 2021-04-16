@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Collections;
 using osu.Game.Graphics.Containers;
+using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Mvis.Plugins;
 using osuTK;
 
@@ -15,6 +16,9 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
     {
         [Resolved]
         private CollectionManager collectionManager { get; set; }
+
+        [Resolved]
+        private MvisScreen mvisScreen { get; set; }
 
         private readonly CollectionHelper collectionHelper;
 
@@ -90,6 +94,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
             selectedPanel.BindValueChanged(updateSelectedPanel);
 
             RefreshCollectionList();
+            mvisScreen.OnScreenResuming += RefreshCollectionList;
         }
 
         private void OnCurrentCollectionChanged(ValueChangedEvent<BeatmapCollection> v)

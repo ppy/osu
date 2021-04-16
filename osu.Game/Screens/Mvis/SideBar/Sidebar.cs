@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Mvis.SideBar
                 new ClickToCloseBox
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black.Opacity(0.6f),
+                    Colour = Color4.Black.Opacity(0.7f),
                     Action = () =>
                     {
                         if (!content.IsHovered)
@@ -106,7 +106,6 @@ namespace osu.Game.Screens.Mvis.SideBar
             content.Add(new SkinnableComponent(
                 "MSidebar-background",
                 confineMode: ConfineMode.ScaleToFill,
-                masking: true,
                 defaultImplementation: _ => sidebarBg = new Box
                 {
                     RelativeSizeAxes = Axes.Both,

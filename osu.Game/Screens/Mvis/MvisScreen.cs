@@ -24,7 +24,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
-using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections.Mf;
 using osu.Game.Rulesets.Mods;
@@ -124,9 +123,6 @@ namespace osu.Game.Screens.Mvis
         private OsuGame game { get; set; }
 
         [Resolved]
-        private MusicController musicController { get; set; }
-
-        [Resolved]
         private MvisPluginManager pluginManager { get; set; }
 
         private CustomColourProvider colourProvider;
@@ -179,13 +175,6 @@ namespace osu.Game.Screens.Mvis
 
         #endregion
 
-        #region 侧边栏
-
-        private SidebarSettingsScrollContainer settingsScroll;
-        private SidebarPluginsPage pluginsPage;
-
-        #endregion
-
         #region 设置
 
         private readonly BindableBool trackRunning = new BindableBool();
@@ -204,12 +193,28 @@ namespace osu.Game.Screens.Mvis
         /// <summary>
         /// 请将各种Drawable Proxy放置在此处
         /// </summary>
-        public readonly Container ProxyLayer = new Container
+        private readonly Container proxyLayer = new Container
         {
             RelativeSizeAxes = Axes.Both,
             Name = "Proxy Layer",
             Depth = -1
         };
+
+        public void AddDrawableToProxy(Drawable d) => proxyLayer.Add(d);
+
+        public bool RemoveDrawableFromProxy(Drawable d)
+        {
+            try
+            {
+                proxyLayer.Remove(d);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+            return true;
+        }
 
         #endregion
 
@@ -223,7 +228,7 @@ namespace osu.Game.Screens.Mvis
 
         private readonly Bindable<UserActivity> activity = new Bindable<UserActivity>();
 
-        private DrawableTrack track => musicController.CurrentTrack;
+        private DrawableTrack track => audioControlProvider.GetCurrentTrack();
 
         private readonly BindableList<MvisPlugin> loadList = new BindableList<MvisPlugin>();
 
@@ -251,6 +256,8 @@ namespace osu.Game.Screens.Mvis
             dependencies.Cache(colourProvider = new CustomColourProvider(iR, iG, iB));
             dependencies.Cache(this);
 
+            SidebarSettingsScrollContainer settingsScroll;
+            SidebarPluginsPage pluginsPage;
             sidebar.AddRange(new Drawable[]
             {
                 settingsScroll = new SidebarSettingsScrollContainer
@@ -344,13 +351,6 @@ namespace osu.Game.Screens.Mvis
                     Depth = float.MinValue,
                     Children = new Drawable[]
                     {
-                        sidebar,
-                        loadingSpinner = new LoadingSpinner(true, true)
-                        {
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.BottomCentre,
-                            Margin = new MarginPadding(115)
-                        },
                         skinnableBbBackground = new FullScreenSkinnableComponent("MBottomBar-background",
                             confineMode: ConfineMode.ScaleToFill,
                             masking: true,
@@ -366,6 +366,13 @@ namespace osu.Game.Screens.Mvis
                             Alpha = 0,
                             CentreComponent = false,
                             OverrideChildAnchor = true
+                        },
+                        sidebar,
+                        loadingSpinner = new LoadingSpinner(true, true)
+                        {
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+                            Margin = new MarginPadding(115)
                         },
                         bottomFillFlow = new FillFlowContainer
                         {
@@ -580,13 +587,13 @@ namespace osu.Game.Screens.Mvis
                 //如果允许proxy显示
                 if (v.NewValue)
                 {
-                    background.Remove(ProxyLayer);
-                    AddInternal(ProxyLayer);
+                    background.Remove(proxyLayer);
+                    AddInternal(proxyLayer);
                 }
                 else
                 {
-                    RemoveInternal(ProxyLayer);
-                    background.Add(ProxyLayer);
+                    RemoveInternal(proxyLayer);
+                    background.Add(proxyLayer);
                 }
             }, true);
 
@@ -627,6 +634,10 @@ namespace osu.Game.Screens.Mvis
             {
                 var pl = (IProvideAudioControlPlugin)pluginManager.GetAllPlugins(false).FirstOrDefault(p => $"{p.GetType().Namespace}+{p.GetType().Name}" == v.NewValue);
                 Beatmap.Disabled = pl != null;
+
+                if (audioControlProvider != null) audioControlProvider.IsCurrent = false;
+                if (pl != null) pl.IsCurrent = true;
+
                 audioControlProvider = pl ?? musicControllerWrapper;
             }, true);
 
@@ -707,6 +718,7 @@ namespace osu.Game.Screens.Mvis
 
         private readonly MvisModRateAdjust modRateAdjust = new MvisModRateAdjust();
         private IReadOnlyList<Mod> originalMods;
+        private List<Mod> timeRateMod;
 
         public override void OnEntering(IScreen last)
         {
@@ -715,8 +727,8 @@ namespace osu.Game.Screens.Mvis
             originalMods = Mods.Value;
 
             //override mod列表
-            var list = new List<Mod> { modRateAdjust };
-            Mods.Value = list;
+            timeRateMod = new List<Mod> { modRateAdjust };
+            Mods.Value = timeRateMod;
 
             //各种背景层的动画
             background.FadeOut().Then().Delay(250).FadeIn(500);
@@ -759,6 +771,9 @@ namespace osu.Game.Screens.Mvis
             track.ResetSpeedAdjustments();
             Beatmap.Disabled = false;
 
+            //恢复mods
+            Mods.Value = originalMods;
+
             //背景层的动画
             applyBackgroundBrightness(false, 1);
 
@@ -774,6 +789,8 @@ namespace osu.Game.Screens.Mvis
         public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
+
+            Mods.Value = timeRateMod;
 
             Beatmap.Disabled = audioControlProvider != null && audioControlProvider != musicControllerWrapper;
             this.FadeIn(duration * 0.6f)

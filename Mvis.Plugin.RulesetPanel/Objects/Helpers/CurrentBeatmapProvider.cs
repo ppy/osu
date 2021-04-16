@@ -26,6 +26,7 @@ namespace Mvis.Plugin.RulesetPanel.Objects.Helpers
         public virtual void StopResponseOnBeatmapChanges()
         {
             Beatmap.UnbindFrom(working);
+            Beatmap.Disabled = false;
         }
 
         public virtual void ResponseOnBeatmapChanges()

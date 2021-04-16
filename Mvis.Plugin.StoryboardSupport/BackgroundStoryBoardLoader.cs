@@ -157,13 +157,13 @@ namespace Mvis.Plugin.StoryboardSupport
 
             if (prevProxy != null)
             {
-                MvisScreen?.ProxyLayer.Remove(prevProxy);
+                MvisScreen?.RemoveDrawableFromProxy(prevProxy);
                 prevProxy.Expire();
             }
 
             prevProxy = getProxy(newStoryboard);
 
-            if (prevProxy != null) MvisScreen?.ProxyLayer.Add(prevProxy);
+            if (prevProxy != null) MvisScreen?.AddDrawableToProxy(prevProxy);
             prevProxy?.Show();
 
             if (MvisScreen != null)

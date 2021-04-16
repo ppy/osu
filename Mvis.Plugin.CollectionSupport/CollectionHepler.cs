@@ -6,6 +6,7 @@ using Mvis.Plugin.CollectionSupport.Sidebar;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Audio;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
@@ -17,7 +18,7 @@ using osu.Game.Screens.Mvis.Skinning;
 
 namespace Mvis.Plugin.CollectionSupport
 {
-    public class CollectionHelper : MvisPlugin, IProvideAudioControlPlugin
+    public class CollectionHelper : BindableControlledPlugin, IProvideAudioControlPlugin
     {
         [Resolved]
         private CollectionManager collectionManager { get; set; }
@@ -55,6 +56,15 @@ namespace Mvis.Plugin.CollectionSupport
             Name = "收藏夹";
             Description = "将收藏夹作为歌单播放音乐!";
             Author = "mf-osu";
+
+            Flags.Add(PluginFlags.CanDisable);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            var config = (CollectionHelperConfigManager)DependenciesContainer.Get<MvisPluginManager>().GetConfigManager(this);
+            config.BindWith(CollectionSettings.EnablePlugin, Value);
         }
 
         protected override void LoadComplete()
@@ -63,15 +73,20 @@ namespace Mvis.Plugin.CollectionSupport
             CurrentCollection.BindValueChanged(OnCollectionChanged);
 
             collectionManager.Collections.CollectionChanged += triggerRefresh;
+
+            if (MvisScreen != null) MvisScreen.OnScreenResuming += UpdateBeatmaps;
         }
 
         public void Play(WorkingBeatmap b) => changeBeatmap(b);
 
         private void changeBeatmap(WorkingBeatmap working)
         {
+            if (Disabled.Value) return;
+
             b.Disabled = false;
             b.Value = working;
-            b.Disabled = true;
+            b.Disabled = IsCurrent;
+            drawableTrack = new DrawableTrack(b.Value.Track);
             controller.Play();
         }
 
@@ -83,15 +98,19 @@ namespace Mvis.Plugin.CollectionSupport
 
         public void TogglePause()
         {
-            var track = b.Value.Track;
-
-            if (track.IsRunning)
-                track.Stop();
+            if (drawableTrack.IsRunning)
+                drawableTrack.Stop();
             else
-                track.Start();
+                drawableTrack.Start();
         }
 
         public void Seek(double position) => b.Value.Track.Seek(position);
+
+        private DrawableTrack drawableTrack;
+
+        public DrawableTrack GetCurrentTrack() => drawableTrack ??= new DrawableTrack(b.Value.Track);
+
+        public bool IsCurrent { get; set; }
 
         /// <summary>
         /// 用于从列表中获取指定的<see cref="WorkingBeatmap"/>。
@@ -174,6 +193,8 @@ namespace Mvis.Plugin.CollectionSupport
         {
             if (collectionManager != null)
                 collectionManager.Collections.CollectionChanged -= triggerRefresh;
+
+            if (MvisScreen != null) MvisScreen.OnScreenResuming -= UpdateBeatmaps;
 
             base.Dispose(isDisposing);
         }
