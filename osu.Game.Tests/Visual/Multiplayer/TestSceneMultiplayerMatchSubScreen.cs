@@ -13,6 +13,7 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Tests.Beatmaps;
@@ -127,6 +128,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerSpectateButton>().Single());
                 InputManager.Click(MouseButton.Left);
             });
+
+            AddUntilStep("wait for ready button to be enabled", () => this.ChildrenOfType<MultiplayerReadyButton>().Single().ChildrenOfType<ReadyButton>().Single().Enabled.Value);
 
             AddStep("click ready button", () =>
             {

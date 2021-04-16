@@ -205,10 +205,12 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             Quad sliderQuad = getSurroundingQuad(slider.Path.ControlPoints.Select(p => p.Position.Value));
 
-            // Limit minimum distance between control points  after scaling to almost 0. Less than 0 causes the slider to flip, exactly 0 causes a crash through division by 0.
+            // Limit minimum distance between control points after scaling to almost 0. Less than 0 causes the slider to flip, exactly 0 causes a crash through division by 0.
             scale = Vector2.ComponentMax(new Vector2(Precision.FLOAT_EPSILON), sliderQuad.Size + scale) - sliderQuad.Size;
 
-            Vector2 pathRelativeDeltaScale = new Vector2(1 + scale.X / sliderQuad.Width, 1 + scale.Y / sliderQuad.Height);
+            Vector2 pathRelativeDeltaScale = new Vector2(
+                sliderQuad.Width == 0 ? 0 : 1 + scale.X / sliderQuad.Width,
+                sliderQuad.Height == 0 ? 0 : 1 + scale.Y / sliderQuad.Height);
 
             Queue<Vector2> oldControlPoints = new Queue<Vector2>();
 
@@ -226,7 +228,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             Quad scaledQuad = getSurroundingQuad(new OsuHitObject[] { slider });
             (bool xInBounds, bool yInBounds) = isQuadInBounds(scaledQuad);
 
-            if (xInBounds && yInBounds)
+            if (xInBounds && yInBounds && slider.Path.HasValidLength)
                 return;
 
             foreach (var point in slider.Path.ControlPoints)
