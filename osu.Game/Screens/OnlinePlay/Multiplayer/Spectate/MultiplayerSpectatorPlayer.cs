@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Scoring;
@@ -33,19 +32,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
     public class SubGameplayClockContainer : GameplayClockContainer
     {
-        public new DecoupleableInterpolatingFramedClock AdjustableClock => base.AdjustableClock;
-
         public SubGameplayClockContainer(IClock sourceClock)
             : base(sourceClock)
         {
-        }
-
-        protected override void OnIsPausedChanged(ValueChangedEvent<bool> isPaused)
-        {
-            if (isPaused.NewValue)
-                AdjustableClock.Stop();
-            else
-                AdjustableClock.Start();
         }
 
         protected override GameplayClock CreateGameplayClock(IFrameBasedClock source) => new GameplayClock(source);
