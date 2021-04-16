@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         {
             base.UpdateTimeAndPosition(result);
 
-            if (PlacementActive)
+            if (PlacementActive == PlacementState.Active)
             {
                 if (result.Time is double endTime)
                 {
