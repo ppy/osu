@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
@@ -31,32 +33,42 @@ namespace osu.Game.Rulesets.Replays
         /// The current time is always between the start and the end time of the current frame.
         /// </summary>
         /// <remarks>Returns null if the current time is strictly before the first frame.</remarks>
+        public TFrame? CurrentFrame => currentFrameIndex == -1 ? null : (TFrame)Frames[currentFrameIndex];
+
+        /// <summary>
+        /// The next frame of the replay.
+        /// The start time of <see cref="NextFrame"/> is always greater or equal to the start time of <see cref="CurrentFrame"/> regardless of the seeking direction.
+        /// </summary>
+        /// <remarks>Returns null if the current frame is the last frame.</remarks>
+        public TFrame? NextFrame => currentFrameIndex == Frames.Count - 1 ? null : (TFrame)Frames[currentFrameIndex + 1];
+
+        /// <summary>
+        /// The frame for the start value of the interpolation of the replay movement.
+        /// </summary>
         /// <exception cref="InvalidOperationException">The replay is empty.</exception>
-        public TFrame CurrentFrame
+        public TFrame StartFrame
         {
             get
             {
                 if (!HasFrames)
-                    throw new InvalidOperationException($"Attempted to get {nameof(CurrentFrame)} of an empty replay");
+                    throw new InvalidOperationException($"Attempted to get {nameof(StartFrame)} of an empty replay");
 
-                return currentFrameIndex == -1 ? null : (TFrame)Frames[currentFrameIndex];
+                return (TFrame)Frames[Math.Max(0, currentFrameIndex)];
             }
         }
 
         /// <summary>
-        /// The next frame of the replay.
-        /// The start time is always greater or equal to the start time of <see cref="CurrentFrame"/> regardless of the seeking direction.
+        /// The frame for the end value of the interpolation of the replay movement.
         /// </summary>
-        /// <remarks>Returns null if the current frame is the last frame.</remarks>
         /// <exception cref="InvalidOperationException">The replay is empty.</exception>
-        public TFrame NextFrame
+        public TFrame EndFrame
         {
             get
             {
                 if (!HasFrames)
-                    throw new InvalidOperationException($"Attempted to get {nameof(NextFrame)} of an empty replay");
+                    throw new InvalidOperationException($"Attempted to get {nameof(EndFrame)} of an empty replay");
 
-                return currentFrameIndex == Frames.Count - 1 ? null : (TFrame)Frames[currentFrameIndex + 1];
+                return (TFrame)Frames[Math.Min(currentFrameIndex + 1, Frames.Count - 1)];
             }
         }
 
@@ -69,8 +81,7 @@ namespace osu.Game.Rulesets.Replays
         // This input handler should be enabled only if there is at least one replay frame.
         public override bool IsActive => HasFrames;
 
-        // Can make it non-null but that is a breaking change.
-        protected double? CurrentTime { get; private set; }
+        protected double CurrentTime { get; private set; }
 
         protected virtual double AllowedImportantTimeSpan => sixty_frame_time * 1.2;
 
@@ -97,11 +108,11 @@ namespace osu.Game.Rulesets.Replays
         {
             get
             {
-                if (!HasFrames || !FrameAccuratePlayback || CurrentFrame == null)
+                if (!HasFrames || !FrameAccuratePlayback || currentFrameIndex == -1)
                     return false;
 
-                return IsImportant(CurrentFrame) && // a button is in a pressed state
-                       Math.Abs(CurrentTime - NextFrame.Time ?? 0) <= AllowedImportantTimeSpan; // the next frame is within an allowable time span
+                return IsImportant(StartFrame) && // a button is in a pressed state
+                       Math.Abs(CurrentTime - EndFrame.Time) <= AllowedImportantTimeSpan; // the next frame is within an allowable time span
             }
         }
 
@@ -151,7 +162,7 @@ namespace osu.Game.Rulesets.Replays
             CurrentTime = Math.Clamp(time, frameStart, frameEnd);
 
             // In an important section, a mid-frame time cannot be used and a null is returned instead.
-            return inImportantSection && frameStart < time && time < frameEnd ? null : CurrentTime;
+            return inImportantSection && frameStart < time && time < frameEnd ? null : (double?)CurrentTime;
         }
 
         private double getFrameTime(int index)

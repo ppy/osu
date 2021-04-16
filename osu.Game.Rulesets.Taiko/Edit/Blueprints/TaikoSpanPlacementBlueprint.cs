@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
         {
             base.UpdateTimeAndPosition(result);
 
-            if (PlacementActive)
+            if (PlacementActive == PlacementState.Active)
             {
                 if (result.Time is double dragTime)
                 {
