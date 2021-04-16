@@ -2,12 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Diagnostics;
 using osu.Framework.Input.StateChanges;
 using osu.Framework.Utils;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Replays;
-using osuTK;
 
 namespace osu.Game.Rulesets.Pippidon.Replays
 {
@@ -20,26 +18,13 @@ namespace osu.Game.Rulesets.Pippidon.Replays
 
         protected override bool IsImportant(PippidonReplayFrame frame) => true;
 
-        protected Vector2 Position
-        {
-            get
-            {
-                var frame = CurrentFrame;
-
-                if (frame == null)
-                    return Vector2.Zero;
-
-                Debug.Assert(CurrentTime != null);
-
-                return NextFrame != null ? Interpolation.ValueAt(CurrentTime.Value, frame.Position, NextFrame.Position, frame.Time, NextFrame.Time) : frame.Position;
-            }
-        }
-
         public override void CollectPendingInputs(List<IInput> inputs)
         {
+            var position = Interpolation.ValueAt(CurrentTime, StartFrame.Position, EndFrame.Position, StartFrame.Time, EndFrame.Time);
+
             inputs.Add(new MousePositionAbsoluteInput
             {
-                Position = GamefieldToScreenSpace(Position)
+                Position = GamefieldToScreenSpace(position)
             });
         }
     }
