@@ -95,13 +95,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         protected override void StartGameplay(int userId, GameplayState gameplayState)
         {
-            int userIndex = getIndexForUser(userId);
+            var instance = instances[getIndexForUser(userId)];
+            instance.LoadScore(gameplayState.Score);
 
-            var instance = instances[userIndex];
-            syncManager.RemoveSlave(instance.GameplayClock);
-            leaderboard.RemoveClock(instance.UserId);
-
-            instance.LoadPlayer(gameplayState.Score);
             syncManager.AddSlave(instance.GameplayClock);
             leaderboard.AddClock(instance.UserId, instance.GameplayClock);
         }
