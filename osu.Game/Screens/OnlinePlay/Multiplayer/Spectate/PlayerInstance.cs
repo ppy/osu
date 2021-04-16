@@ -1,10 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Scoring;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync;
 using osu.Game.Screens.Play;
@@ -23,6 +25,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
 
+        private readonly Container content;
+        private readonly LoadingLayer loadingLayer;
         private OsuScreenStack stack;
 
         public PlayerInstance(int userId, SpectatorCatchUpSlaveClock gameplayClock)
@@ -32,23 +36,29 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             RelativeSizeAxes = Axes.Both;
             Masking = true;
+
+            InternalChildren = new Drawable[]
+            {
+                content = new DrawSizePreservingFillContainer { RelativeSizeAxes = Axes.Both },
+                loadingLayer = new LoadingLayer(true) { State = { Value = Visibility.Visible } }
+            };
         }
 
-        public void LoadPlayer(Score score)
+        public void LoadScore(Score score)
         {
+            if (Score != null)
+                throw new InvalidOperationException($"Cannot load a new score on a {nameof(PlayerInstance)} with an existing score.");
+
             Score = score;
 
-            InternalChild = new GameplayIsolationContainer(beatmapManager.GetWorkingBeatmap(Score.ScoreInfo.Beatmap, bypassCache: true), Score.ScoreInfo.Ruleset, Score.ScoreInfo.Mods)
+            content.Child = new GameplayIsolationContainer(beatmapManager.GetWorkingBeatmap(Score.ScoreInfo.Beatmap, bypassCache: true), Score.ScoreInfo.Ruleset, Score.ScoreInfo.Mods)
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = new DrawSizePreservingFillContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Child = stack = new OsuScreenStack()
-                }
+                Child = stack = new OsuScreenStack()
             };
 
             stack.Push(new MultiplayerSpectatorPlayerLoader(Score, () => new MultiplayerSpectatorPlayer(Score, GameplayClock)));
+            loadingLayer.Hide();
         }
 
         // Player interferes with global input, so disable input for now.
