@@ -7,6 +7,7 @@ namespace osu.Game.Screens.Mvis.Misc
     {
         public override string Name => ToString();
         public override string Acronym => "RA";
+        public override string Description => "missingno";
         public override double ScoreMultiplier => 0;
 
         public override BindableNumber<double> SpeedChange { get; } = new BindableDouble

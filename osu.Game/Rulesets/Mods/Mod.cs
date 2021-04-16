@@ -7,11 +7,13 @@ using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets.UI;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -19,7 +21,7 @@ namespace osu.Game.Rulesets.Mods
     /// The base class for gameplay modifiers.
     /// </summary>
     [ExcludeFromDynamicCompile]
-    public abstract class Mod : IMod, IJsonSerializable
+    public abstract class Mod : IMod, IEquatable<Mod>, IJsonSerializable
     {
         /// <summary>
         /// The name of this mod.
@@ -48,7 +50,7 @@ namespace osu.Game.Rulesets.Mods
         /// The user readable description of this mod.
         /// </summary>
         [JsonIgnore]
-        public virtual string Description => string.Empty;
+        public abstract string Description { get; }
 
         /// <summary>
         /// The tooltip to display for this mod when used in a <see cref="ModIcon"/>.
@@ -169,10 +171,27 @@ namespace osu.Game.Rulesets.Mods
                 target.UnbindFrom(sourceBindable);
             }
             else
-                target.Parse(source);
+            {
+                if (!(target is IParseable parseable))
+                    throw new InvalidOperationException($"Bindable type {target.GetType().ReadableName()} is not {nameof(IParseable)}.");
+
+                parseable.Parse(source);
+            }
         }
 
-        public bool Equals(IMod other) => GetType() == other?.GetType();
+        public bool Equals(IMod other) => other is Mod them && Equals(them);
+
+        public bool Equals(Mod other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+
+            return GetType() == other.GetType() &&
+                   this.GetSettingsSourceProperties().All(pair =>
+                       EqualityComparer<object>.Default.Equals(
+                           ModUtils.GetSettingUnderlyingValue(pair.Item2.GetValue(this)),
+                           ModUtils.GetSettingUnderlyingValue(pair.Item2.GetValue(other))));
+        }
 
         /// <summary>
         /// Reset all custom settings for this mod back to their defaults.

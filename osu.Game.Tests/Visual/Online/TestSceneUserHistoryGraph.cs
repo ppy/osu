@@ -19,13 +19,12 @@ namespace osu.Game.Tests.Visual.Online
         {
             UserHistoryGraph graph;
 
-            Add(graph = new UserHistoryGraph
+            Add(graph = new UserHistoryGraph("Test")
             {
                 RelativeSizeAxes = Axes.X,
                 Height = 200,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                TooltipCounterName = "Test"
             });
 
             var values = new[]
