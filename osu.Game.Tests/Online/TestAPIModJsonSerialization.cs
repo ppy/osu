@@ -140,6 +140,7 @@ namespace osu.Game.Tests.Online
         {
             public override string Name => "Test Mod";
             public override string Acronym => "TM";
+            public override string Description => "This is a test mod.";
             public override double ScoreMultiplier => 1;
 
             [SettingSource("Test")]
@@ -156,6 +157,7 @@ namespace osu.Game.Tests.Online
         {
             public override string Name => "Test Mod";
             public override string Acronym => "TMTR";
+            public override string Description => "This is a test mod.";
             public override double ScoreMultiplier => 1;
 
             [SettingSource("Initial rate", "The starting speed of the track")]

@@ -30,6 +30,8 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         public readonly Bindable<double?> ExpectedDistance = new Bindable<double?>();
 
+        public bool HasValidLength => Distance > 0;
+
         /// <summary>
         /// The control points of the path.
         /// </summary>
