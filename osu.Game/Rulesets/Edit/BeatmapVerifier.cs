@@ -17,6 +17,7 @@ namespace osu.Game.Rulesets.Edit
         private readonly List<ICheck> checks = new List<ICheck>
         {
             new CheckBackground(),
+            new CheckBackgroundQuality()
         };
 
         public IEnumerable<Issue> Run(WorkingBeatmap workingBeatmap) => checks.SelectMany(check => check.Run(workingBeatmap));
