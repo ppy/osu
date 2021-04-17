@@ -13,11 +13,13 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.Chat;
@@ -105,10 +107,18 @@ namespace osu.Game.Screens.OnlinePlay
 
         private void refresh()
         {
+            var beatmapMetadata = Item.Beatmap.Value.Metadata ?? Item.Beatmap.Value.BeatmapSet?.Metadata;
             difficultyIconContainer.Child = new DifficultyIcon(beatmap.Value, ruleset.Value, requiredMods) { Size = new Vector2(32) };
 
             beatmapText.Clear();
-            beatmapText.AddLink(Item.Beatmap.ToString(), LinkAction.OpenBeatmap, Item.Beatmap.Value.OnlineBeatmapID.ToString());
+            var text = new List<SpriteText>
+            {
+                new OsuSpriteText { Text = new RomanisableString(beatmapMetadata.ArtistUnicode, beatmapMetadata.Artist) },
+                new OsuSpriteText { Text = " - " },
+                new OsuSpriteText { Text = new RomanisableString(beatmapMetadata.TitleUnicode, beatmapMetadata.Title) },
+                new OsuSpriteText { Text = $" ({beatmapMetadata.Author}) [{Item.Beatmap.Value.Version}]" }
+            };
+            beatmapText.AddLink(text, LinkAction.OpenBeatmap, Item.Beatmap.Value.OnlineBeatmapID.ToString());
 
             authorText.Clear();
 
