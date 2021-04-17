@@ -44,7 +44,7 @@ namespace osu.Game.Storyboards
         /// This iterates all elements and as such should be used sparingly or stored locally.
         /// Videos and samples return StartTime as their EndTIme.
         /// </remarks>
-        public double? LatestEventTime => Layers.SelectMany(l => l.Elements.OfType<IStoryboardElementHasDuration>()).OrderByDescending(e => e.EndTime).FirstOrDefault()?.EndTime;
+        public double? LatestEventTime => Layers.SelectMany(l => l.Elements).OrderBy(e => e.GetEndTime()).LastOrDefault()?.GetEndTime();
 
         /// <summary>
         /// Depth of the currently front-most storyboard layer, excluding the overlay layer.

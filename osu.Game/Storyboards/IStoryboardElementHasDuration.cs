@@ -3,6 +3,9 @@
 
 namespace osu.Game.Storyboards
 {
+    /// <summary>
+    /// A StoryboardElement that ends at a different time than its start time.
+    /// </summary>
     public interface IStoryboardElementHasDuration
     {
         double EndTime { get; }

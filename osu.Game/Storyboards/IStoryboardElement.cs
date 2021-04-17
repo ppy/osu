@@ -14,4 +14,17 @@ namespace osu.Game.Storyboards
 
         Drawable CreateDrawable();
     }
+
+    public static class StoryboardElementExtensions
+    {
+        /// <summary>
+        /// Returns the end time of this object.
+        /// </summary>
+        /// <remarks>
+        /// This returns the <see cref="IStoryboardElementHasDuration.EndTime"/> where available, falling back to <see cref="IStoryboardElement.StartTime"/> otherwise.
+        /// </remarks>
+        /// <param name="storyboardElement">The object.</param>
+        /// <returns>The end time of this object.</returns>
+        public static double GetEndTime(this IStoryboardElement storyboardElement) => (storyboardElement as IStoryboardElementHasDuration)?.EndTime ?? storyboardElement.StartTime;
+    }
 }
