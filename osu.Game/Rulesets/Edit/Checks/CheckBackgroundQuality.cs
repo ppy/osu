@@ -32,7 +32,8 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(WorkingBeatmap workingBeatmap)
         {
-            if (workingBeatmap.Metadata?.BackgroundFile == null)
+            var backgroundFile = workingBeatmap.Beatmap.Metadata?.BackgroundFile;
+            if (backgroundFile == null)
                 yield break;
 
             var texture = workingBeatmap.Background;
@@ -47,7 +48,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             else if (texture.Width < low_width || texture.Height < low_height)
                 yield return new IssueTemplateLowResolution(this).Create(texture.Width, texture.Height);
 
-            string storagePath = workingBeatmap.BeatmapInfo.BeatmapSet.GetPathForFile(workingBeatmap.Metadata.BackgroundFile);
+            string storagePath = workingBeatmap.Beatmap.BeatmapInfo.BeatmapSet.GetPathForFile(backgroundFile);
             double filesizeMb = workingBeatmap.GetStream(storagePath).Length / (1024d * 1024d);
 
             if (filesizeMb > max_filesize_mb)
