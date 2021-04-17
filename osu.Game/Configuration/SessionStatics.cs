@@ -23,11 +23,11 @@ namespace osu.Game.Configuration
 
         public void ResetValues()
         {
-            SetValue(Static.LoginOverlayDisplayed, false);
-            SetValue(Static.MutedAudioNotificationShownOnce, false);
-            SetValue(Static.LowBatteryNotificationShownOnce, false);
-            SetValue(Static.LastHoverSoundPlaybackTime, (double?)null);
-            SetValue<APISeasonalBackgrounds>(Static.SeasonalBackgrounds, null);
+            GetOriginalBindable<bool>(Static.LoginOverlayDisplayed).SetDefault();
+            GetOriginalBindable<bool>(Static.MutedAudioNotificationShownOnce).SetDefault();
+            GetOriginalBindable<bool>(Static.LowBatteryNotificationShownOnce).SetDefault();
+            GetOriginalBindable<double?>(Static.LastHoverSoundPlaybackTime).SetDefault();
+            GetOriginalBindable<APISeasonalBackgrounds>(Static.SeasonalBackgrounds).SetDefault();
         }
     }
 
