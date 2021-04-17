@@ -1,7 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
@@ -29,6 +31,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Acronym => "BR";
         public override string Description => "The whole playfield is on a wheel!";
         public override double ScoreMultiplier => 1;
+
+        public override string SettingDescription => $"{SpinSpeed.Value}rpm, {Direction.Value.GetDescription().ToLowerInvariant()}";
 
         public void Update(Playfield playfield)
         {
