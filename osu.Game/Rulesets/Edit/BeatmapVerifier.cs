@@ -19,6 +19,6 @@ namespace osu.Game.Rulesets.Edit
             new CheckBackground(),
         };
 
-        public IEnumerable<Issue> Run(IBeatmap beatmap) => checks.SelectMany(check => check.Run(beatmap));
+        public IEnumerable<Issue> Run(WorkingBeatmap workingBeatmap) => checks.SelectMany(check => check.Run(workingBeatmap));
     }
 }

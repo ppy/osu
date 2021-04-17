@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit.Checks;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Editing.Checks
 {
@@ -14,13 +15,13 @@ namespace osu.Game.Tests.Editing.Checks
     public class CheckBackgroundTest
     {
         private CheckBackground check;
-        private IBeatmap beatmap;
+        private WorkingBeatmap beatmap;
 
         [SetUp]
         public void Setup()
         {
             check = new CheckBackground();
-            beatmap = new Beatmap<HitObject>
+            beatmap = new TestWorkingBeatmap(new Beatmap<HitObject>
             {
                 BeatmapInfo = new BeatmapInfo
                 {
@@ -33,7 +34,7 @@ namespace osu.Game.Tests.Editing.Checks
                         })
                     }
                 }
-            };
+            });
         }
 
         [Test]
