@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit.Checks.Components;
 
@@ -20,7 +19,9 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(WorkingBeatmap workingBeatmap)
         {
-            if (workingBeatmap.Metadata?.BackgroundFile == null)
+            string backgroundFile = workingBeatmap.Beatmap.Metadata?.BackgroundFile;
+
+            if (backgroundFile == null)
             {
                 yield return new IssueTemplateNoneSet(this).Create();
 
@@ -28,14 +29,11 @@ namespace osu.Game.Rulesets.Edit.Checks
             }
 
             // If the background is set, also make sure it still exists.
-
-            var set = workingBeatmap.BeatmapInfo.BeatmapSet;
-            var file = set.Files.FirstOrDefault(f => f.Filename == workingBeatmap.Metadata.BackgroundFile);
-
-            if (file != null)
+            var storagePath = workingBeatmap.Beatmap.BeatmapInfo.BeatmapSet.GetPathForFile(backgroundFile);
+            if (storagePath != null)
                 yield break;
 
-            yield return new IssueTemplateDoesNotExist(this).Create(workingBeatmap.Metadata.BackgroundFile);
+            yield return new IssueTemplateDoesNotExist(this).Create(backgroundFile);
         }
 
         public class IssueTemplateNoneSet : IssueTemplate
