@@ -59,6 +59,8 @@ namespace osu.Game.Beatmaps
 
         public string StoryboardFile => Files?.Find(f => f.Filename.EndsWith(".osb", StringComparison.OrdinalIgnoreCase))?.Filename;
 
+        public string GetPathForFile(string filename) => Files?.SingleOrDefault(f => string.Equals(f.Filename, filename, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
+
         public List<BeatmapSetFileInfo> Files { get; set; }
 
         public override string ToString() => Metadata?.ToString() ?? base.ToString();
