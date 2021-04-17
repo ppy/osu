@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.IO;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
@@ -142,6 +143,8 @@ namespace osu.Game.Beatmaps
                     return null;
                 }
             }
+
+            public override Stream GetStream(string storagePath) => resources.Files.GetStream(storagePath);
         }
     }
 }
