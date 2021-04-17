@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Rulesets;
@@ -67,5 +68,7 @@ namespace osu.Game.Beatmaps
         /// </remarks>
         /// <returns>A fresh track instance, which will also be available via <see cref="Track"/>.</returns>
         Track LoadTrack();
+
+        Stream GetStream(string storagePath);
     }
 }
