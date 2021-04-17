@@ -1,11 +1,13 @@
 ﻿using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Catch.Mods
 {
-    public class CatchModFloatingFruits : Mod, IApplicableToPlayer
+    public class CatchModFloatingFruits : Mod, IApplicableToDrawableRuleset<CatchHitObject>
     {
         public override string Name => "Floating Fruits";
         public override string Acronym => "FF";
@@ -13,11 +15,12 @@ namespace osu.Game.Rulesets.Catch.Mods
         public override double ScoreMultiplier => 1;
         public override IconUsage? Icon => FontAwesome.Brands.Fly;
 
-        public void ApplyToPlayer(Player player)
+        public void ApplyToDrawableRuleset(DrawableRuleset<CatchHitObject> drawableRuleset)
         {
-            player.DrawableRuleset.Anchor = Anchor.Centre;
-            player.DrawableRuleset.Origin = Anchor.Centre;
-            player.DrawableRuleset.Scale = new osuTK.Vector2(1, -1);
+            drawableRuleset.Anchor = Anchor.Centre;
+            drawableRuleset.Origin = Anchor.Centre;
+            drawableRuleset.Scale = new osuTK.Vector2(1, -1);
         }
+
     }
 }
