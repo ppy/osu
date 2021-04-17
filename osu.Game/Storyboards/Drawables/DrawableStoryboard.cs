@@ -95,15 +95,13 @@ namespace osu.Game.Storyboards.Drawables
         /// </summary>
         public IBindable<bool> HasStoryboardEnded => hasStoryboardEnded;
 
-        private readonly BindableBool hasStoryboardEnded = new BindableBool(true);
+        private readonly BindableBool hasStoryboardEnded = new BindableBool();
 
         private void updateHasStoryboardEnded()
         {
-            if (Storyboard.LatestEventTime == null)
-                return;
-
-            var time = Clock.CurrentTime;
-            hasStoryboardEnded.Value = time >= Storyboard.LatestEventTime;
+            hasStoryboardEnded.Value =
+                Storyboard.LatestEventTime == null ||
+                Time.Current >= Storyboard.LatestEventTime;
         }
     }
 }
