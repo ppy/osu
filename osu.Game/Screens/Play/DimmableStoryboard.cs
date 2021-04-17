@@ -50,6 +50,7 @@ namespace osu.Game.Screens.Play
                 return;
 
             drawableStoryboard = storyboard.CreateDrawable();
+            HasStoryboardEnded.BindTo(drawableStoryboard.HasStoryboardEnded);
 
             if (async)
                 LoadComponentAsync(drawableStoryboard, onStoryboardCreated);
@@ -63,6 +64,6 @@ namespace osu.Game.Screens.Play
             OverlayLayerContainer.Add(storyboard.OverlayLayer.CreateProxy());
         }
 
-        public IBindable<bool> HasStoryboardEnded => drawableStoryboard?.HasStoryboardEnded;
+        public IBindable<bool> HasStoryboardEnded = new BindableBool(true);
     }
 }
