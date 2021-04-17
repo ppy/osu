@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -61,7 +62,7 @@ namespace osu.Game.Screens.Edit.Verify
             private EditorClock clock { get; set; }
 
             [Resolved]
-            protected EditorBeatmap Beatmap { get; private set; }
+            protected WorkingBeatmap Beatmap { get; private set; }
 
             [Resolved]
             private Bindable<Issue> selectedIssue { get; set; }
