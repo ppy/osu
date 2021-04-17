@@ -228,11 +228,6 @@ namespace osu.Game.Screens.Play
             adjustableClock.ChangeSource(track);
         }
 
-        /// <summary>
-        /// Gets the endtime of the last element in the storyboard in ms, or start time of the last hitobject if there's no storyboard.
-        /// </summary>
-        public double StoryboardEndTime => beatmap.Storyboard.LatestEventTime ?? 0;
-
         protected override void Update()
         {
             if (!IsPaused.Value)
