@@ -247,6 +247,7 @@ namespace osu.Game.Screens.Play
                 HUDOverlay.ShowHud.Disabled = true;
                 BreakOverlay.Hide();
                 skipIntroOverlay.Hide();
+                skipOutroOverlay.Hide();
             }
 
             DrawableRuleset.FrameStableClock.WaitingOnFrames.BindValueChanged(waiting =>
@@ -368,7 +369,8 @@ namespace osu.Game.Screens.Play
                     },
                     skipOutroOverlay = new SkipOverlay(Beatmap.Value.Storyboard.LatestEventTime ?? 0)
                     {
-                        RequestSkip = scheduleCompletion
+                        RequestSkip = scheduleCompletion,
+                        Alpha = 0
                     },
                     FailOverlay = new FailOverlay
                     {
@@ -415,8 +417,6 @@ namespace osu.Game.Screens.Play
                     },
                 });
             }
-
-            skipOutroOverlay.Hide();
 
             return container;
         }
@@ -539,13 +539,9 @@ namespace osu.Game.Screens.Play
                     return;
                 }
 
-                // show the score if in storyboard outro (score has been set)
-                bool scoreReady = prepareScoreForDisplayTask != null && prepareScoreForDisplayTask.IsCompleted;
-
-                if (scoreReady)
-                {
+                // if the score is ready for display but results screen has not been pushed yet (e.g. storyboard is still playing beyond gameplay), then transition to results screen instead of exiting.
+                if (prepareScoreForDisplayTask != null)
                     scheduleCompletion();
-                }
             }
 
             this.Exit();
@@ -639,7 +635,6 @@ namespace osu.Game.Screens.Play
             if (storyboardHasOutro)
             {
                 skipOutroOverlay.Show();
-                completionProgressDelegate = null;
                 return;
             }
 
