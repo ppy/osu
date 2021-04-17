@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Catch.Mods
         public override string Acronym => "FF";
         public override string Description => "The fruits are... floating?";
         public override double ScoreMultiplier => 1;
-        public override IconUsage? Icon => FontAwesome.Brands.Fly;
+        public override IconUsage? Icon => FontAwesome.Solid.Cloud;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<CatchHitObject> drawableRuleset)
         {
