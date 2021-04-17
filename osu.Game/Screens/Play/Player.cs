@@ -110,7 +110,7 @@ namespace osu.Game.Screens.Play
 
         protected HealthProcessor HealthProcessor { get; private set; }
 
-        protected DrawableRuleset DrawableRuleset { get; private set; }
+        public DrawableRuleset DrawableRuleset { get; set; }
 
         protected HUDOverlay HUDOverlay { get; private set; }
 
