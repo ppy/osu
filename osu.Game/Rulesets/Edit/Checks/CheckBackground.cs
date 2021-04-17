@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             new IssueTemplateDoesNotExist(this)
         };
 
-        public IEnumerable<Issue> Run(WorkingBeatmap workingBeatmap)
+        public IEnumerable<Issue> Run(IWorkingBeatmap workingBeatmap)
         {
             string backgroundFile = workingBeatmap.Beatmap.Metadata?.BackgroundFile;
 
