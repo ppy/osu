@@ -85,6 +85,13 @@ namespace osu.Game.Tests.Visual.Components
         [Test]
         public void TestMovement()
         {
+            checkIdleStatus(1, false);
+            checkIdleStatus(2, false);
+            checkIdleStatus(3, false);
+            checkIdleStatus(4, false);
+
+            waitForAllIdle();
+
             AddStep("move to top right", () => InputManager.MoveMouseTo(box2));
 
             checkIdleStatus(1, true);
@@ -106,6 +113,8 @@ namespace osu.Game.Tests.Visual.Components
         [Test]
         public void TestTimings()
         {
+            waitForAllIdle();
+
             AddStep("move to centre", () => InputManager.MoveMouseTo(Content));
 
             checkIdleStatus(1, false);
