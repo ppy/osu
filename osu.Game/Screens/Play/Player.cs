@@ -366,7 +366,7 @@ namespace osu.Game.Screens.Play
                     {
                         RequestSkip = performUserRequestedSkip
                     },
-                    skipOutroOverlay = new SkipOverlay(GameplayClockContainer.StoryboardEndTime)
+                    skipOutroOverlay = new SkipOverlay(Beatmap.Value.Storyboard.LatestEventTime ?? 0)
                     {
                         RequestSkip = scheduleCompletion
                     },
