@@ -62,7 +62,10 @@ namespace osu.Game.Screens.Edit.Verify
             private EditorClock clock { get; set; }
 
             [Resolved]
-            protected WorkingBeatmap Beatmap { get; private set; }
+            private BeatmapManager beatmapManager { get; set; }
+
+            [Resolved]
+            private EditorBeatmap beatmap { get; set; }
 
             [Resolved]
             private Bindable<Issue> selectedIssue { get; set; }
@@ -74,7 +77,7 @@ namespace osu.Game.Screens.Edit.Verify
             private void load(OsuColour colours)
             {
                 generalVerifier = new BeatmapVerifier();
-                rulesetVerifier = Beatmap.BeatmapInfo.Ruleset?.CreateInstance()?.CreateBeatmapVerifier();
+                rulesetVerifier = beatmap.BeatmapInfo.Ruleset?.CreateInstance()?.CreateBeatmapVerifier();
 
                 RelativeSizeAxes = Axes.Both;
 
@@ -120,10 +123,11 @@ namespace osu.Game.Screens.Edit.Verify
 
             private void refresh()
             {
-                var issues = generalVerifier.Run(Beatmap);
+                var workingBeatmap = beatmapManager.GetWorkingBeatmap(beatmap.BeatmapInfo);
+                var issues = generalVerifier.Run(workingBeatmap);
 
                 if (rulesetVerifier != null)
-                    issues = issues.Concat(rulesetVerifier.Run(Beatmap));
+                    issues = issues.Concat(rulesetVerifier.Run(workingBeatmap));
 
                 table.Issues = issues
                                .OrderBy(issue => issue.Template.Type)
