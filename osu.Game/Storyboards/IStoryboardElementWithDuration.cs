@@ -6,11 +6,16 @@ namespace osu.Game.Storyboards
     /// <summary>
     /// A <see cref="IStoryboardElement"/> that ends at a different time than its start time.
     /// </summary>
-    public interface IStoryboardElementHasDuration
+    public interface IStoryboardElementWithDuration : IStoryboardElement
     {
         /// <summary>
         /// The time at which the <see cref="IStoryboardElement"/> ends.
         /// </summary>
         double EndTime { get; }
+
+        /// <summary>
+        /// The duration of the StoryboardElement.
+        /// </summary>
+        double Duration { get; }
     }
 }
