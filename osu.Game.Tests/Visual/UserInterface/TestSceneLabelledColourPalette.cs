@@ -25,6 +25,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                 if (component.Colours.Count > 0)
                     component.Colours.RemoveAt(RNG.Next(component.Colours.Count));
             }, 5);
+
+            AddStep("set custom prefix", () => component.ColourNamePrefix = "Combo");
         }
 
         private void createColourPalette(bool hasDescription = false)
@@ -41,6 +43,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
+                        ColourNamePrefix = "My colour #"
                     }
                 };
 
