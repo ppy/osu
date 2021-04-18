@@ -12,15 +12,15 @@ using osu.Game.Tests.Beatmaps;
 namespace osu.Game.Tests.Editing.Checks
 {
     [TestFixture]
-    public class CheckBackgroundTest
+    public class CheckFilePresenceTest
     {
-        private CheckBackground check;
+        private CheckBackgroundPresence check;
         private WorkingBeatmap beatmap;
 
         [SetUp]
         public void Setup()
         {
-            check = new CheckBackground();
+            check = new CheckBackgroundPresence();
             beatmap = new TestWorkingBeatmap(new Beatmap<HitObject>
             {
                 BeatmapInfo = new BeatmapInfo
@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Editing.Checks
             var issues = check.Run(beatmap).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
-            Assert.That(issues.Single().Template is CheckBackground.IssueTemplateDoesNotExist);
+            Assert.That(issues.Single().Template is CheckFilePresence.IssueTemplateDoesNotExist);
         }
 
         [Test]
@@ -62,7 +62,7 @@ namespace osu.Game.Tests.Editing.Checks
             var issues = check.Run(beatmap).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
-            Assert.That(issues.Single().Template is CheckBackground.IssueTemplateNoneSet);
+            Assert.That(issues.Single().Template is CheckFilePresence.IssueTemplateNoneSet);
         }
     }
 }
