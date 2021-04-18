@@ -105,7 +105,6 @@ namespace osu.Game.Screens.Play
         private BreakTracker breakTracker;
 
         private SkipOverlay skipIntroOverlay;
-
         private SkipOverlay skipOutroOverlay;
 
         protected ScoreProcessor ScoreProcessor { get; private set; }
