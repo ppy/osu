@@ -67,12 +67,35 @@ namespace osu.Game.Graphics.Containers
             createLink(text, new LinkDetails(action, linkArgument), tooltipText);
         }
 
+        public void AddLink(SpriteText text, LinkAction action = LinkAction.External, string linkArgument = null, string tooltipText = null)
+        {
+            AddArbitraryDrawable(text);
+
+            createLink(text, new LinkDetails(action, linkArgument), tooltipText);
+        }
+
         public void AddUserLink(User user, Action<SpriteText> creationParameters = null)
             => createLink(AddText(user.Username, creationParameters), new LinkDetails(LinkAction.OpenUserProfile, user.Id.ToString()), "view profile");
 
         private void createLink(IEnumerable<Drawable> drawables, LinkDetails link, string tooltipText, Action action = null)
         {
             AddInternal(new DrawableLinkCompiler(drawables.OfType<SpriteText>().ToList())
+            {
+                RelativeSizeAxes = Axes.Both,
+                TooltipText = tooltipText,
+                Action = () =>
+                {
+                    if (action != null)
+                        action();
+                    else
+                        game?.HandleLink(link);
+                },
+            });
+        }
+
+        private void createLink(Drawable drawable, LinkDetails link, string tooltipText, Action action = null)
+        {
+            AddInternal(new DrawableLinkCompiler(drawable)
             {
                 RelativeSizeAxes = Axes.Both,
                 TooltipText = tooltipText,
