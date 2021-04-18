@@ -15,6 +15,12 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         public BindableList<Color4> Colours => Component.Colours;
 
+        public string ColourNamePrefix
+        {
+            get => Component.ColourNamePrefix;
+            set => Component.ColourNamePrefix = value;
+        }
+
         protected override ColourPalette CreateComponent() => new ColourPalette();
     }
 }
