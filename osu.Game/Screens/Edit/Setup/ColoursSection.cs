@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Edit.Setup
                 }
             };
 
-            var colours = Beatmap.BeatmapSkin.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value;
+            var colours = Beatmap.BeatmapSkin?.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value;
             if (colours != null)
                 comboColours.Colours.AddRange(colours);
         }
