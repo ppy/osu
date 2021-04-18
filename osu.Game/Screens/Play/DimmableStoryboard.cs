@@ -20,6 +20,14 @@ namespace osu.Game.Screens.Play
         private readonly Storyboard storyboard;
         private DrawableStoryboard drawableStoryboard;
 
+        /// <summary>
+        /// Whether the storyboard is considered finished.
+        /// </summary>
+        /// <remarks>
+        /// This is true by default in here, until an actual drawable storyboard is loaded, in which case it'll bind to it.
+        /// </remarks>
+        public IBindable<bool> HasStoryboardEnded = new BindableBool(true);
+
         public DimmableStoryboard(Storyboard storyboard)
         {
             this.storyboard = storyboard;
@@ -63,7 +71,5 @@ namespace osu.Game.Screens.Play
             Add(storyboard);
             OverlayLayerContainer.Add(storyboard.OverlayLayer.CreateProxy());
         }
-
-        public IBindable<bool> HasStoryboardEnded = new BindableBool(true);
     }
 }

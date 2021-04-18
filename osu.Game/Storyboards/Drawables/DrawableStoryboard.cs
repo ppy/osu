@@ -91,7 +91,7 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         /// <summary>
-        /// Whether the storyboard has ended after the gameplay portion of the beatmap.
+        /// Whether the storyboard is considered finished.
         /// </summary>
         public IBindable<bool> HasStoryboardEnded => hasStoryboardEnded;
 

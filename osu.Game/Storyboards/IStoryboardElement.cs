@@ -18,13 +18,13 @@ namespace osu.Game.Storyboards
     public static class StoryboardElementExtensions
     {
         /// <summary>
-        /// Returns the end time of this object.
+        /// Returns the end time of this storyboard element.
         /// </summary>
         /// <remarks>
         /// This returns the <see cref="IStoryboardElementHasDuration.EndTime"/> where available, falling back to <see cref="IStoryboardElement.StartTime"/> otherwise.
         /// </remarks>
-        /// <param name="storyboardElement">The object.</param>
-        /// <returns>The end time of this object.</returns>
-        public static double GetEndTime(this IStoryboardElement storyboardElement) => (storyboardElement as IStoryboardElementHasDuration)?.EndTime ?? storyboardElement.StartTime;
+        /// <param name="element">The storyboard element.</param>
+        /// <returns>The end time of this element.</returns>
+        public static double GetEndTime(this IStoryboardElement element) => (element as IStoryboardElementHasDuration)?.EndTime ?? element.StartTime;
     }
 }
