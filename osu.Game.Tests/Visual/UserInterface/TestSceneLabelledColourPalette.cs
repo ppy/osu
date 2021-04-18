@@ -4,6 +4,7 @@
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Utils;
 using osu.Game.Graphics.UserInterfaceV2;
 using osuTK.Graphics;
 
@@ -14,7 +15,17 @@ namespace osu.Game.Tests.Visual.UserInterface
         private LabelledColourPalette component;
 
         [Test]
-        public void TestPalette([Values] bool hasDescription) => createColourPalette(hasDescription);
+        public void TestPalette([Values] bool hasDescription)
+        {
+            createColourPalette(hasDescription);
+
+            AddRepeatStep("add random colour", () => component.Colours.Add(randomColour()), 4);
+            AddRepeatStep("remove random colour", () =>
+            {
+                if (component.Colours.Count > 0)
+                    component.Colours.RemoveAt(RNG.Next(component.Colours.Count));
+            }, 5);
+        }
 
         private void createColourPalette(bool hasDescription = false)
         {
@@ -45,5 +56,11 @@ namespace osu.Game.Tests.Visual.UserInterface
                 });
             });
         }
+
+        private Color4 randomColour() => new Color4(
+            RNG.NextSingle(),
+            RNG.NextSingle(),
+            RNG.NextSingle(),
+            1);
     }
 }
