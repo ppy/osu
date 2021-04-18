@@ -20,13 +20,14 @@ namespace osu.Game.Tests.Visual.UserInterface
             createColourPalette(hasDescription);
 
             AddRepeatStep("add random colour", () => component.Colours.Add(randomColour()), 4);
+
+            AddStep("set custom prefix", () => component.ColourNamePrefix = "Combo");
+
             AddRepeatStep("remove random colour", () =>
             {
                 if (component.Colours.Count > 0)
                     component.Colours.RemoveAt(RNG.Next(component.Colours.Count));
-            }, 5);
-
-            AddStep("set custom prefix", () => component.ColourNamePrefix = "Combo");
+            }, 8);
         }
 
         private void createColourPalette(bool hasDescription = false)
