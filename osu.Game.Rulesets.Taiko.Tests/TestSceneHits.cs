@@ -129,8 +129,12 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
             DrawableRuleset.Playfield.Add(h);
 
-            ((TaikoPlayfield)DrawableRuleset.Playfield).OnNewResult(h, new JudgementResult(hit, new TaikoJudgement()) { Type = hitResult });
-            ((TaikoPlayfield)DrawableRuleset.Playfield).OnNewResult(h.NestedHitObjects.Single(), new JudgementResult(hit.NestedHitObjects.Single(), new TaikoStrongJudgement()) { Type = HitResult.Great });
+            h.OnLoadComplete += _ =>
+            {
+                ((TaikoPlayfield)DrawableRuleset.Playfield).OnNewResult(h, new JudgementResult(hit, new TaikoJudgement()) { Type = hitResult });
+                ((TaikoPlayfield)DrawableRuleset.Playfield).OnNewResult(h.NestedHitObjects.Single(),
+                    new JudgementResult(hit.NestedHitObjects.Single(), new TaikoStrongJudgement()) { Type = HitResult.Great });
+            };
         }
 
         private void addMissJudgement()
