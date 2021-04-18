@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// The currently selected blueprints.
         /// Should be used when operations are dealing directly with the visible blueprints.
-        /// For more general selection operations, use EditorBeatmap.SelectedHitObjects instead.
+        /// For more general selection operations, use <see cref="osu.Game.Screens.Edit.EditorBeatmap.SelectedHitObjects"/> instead.
         /// </summary>
         public IEnumerable<SelectionBlueprint> SelectedBlueprints => selectedBlueprints;
 
