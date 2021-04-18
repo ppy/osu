@@ -48,7 +48,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
         {
             dependencies.Cache(collectionHelper);
 
-            InternalChildren = new Drawable[]
+            Children = new Drawable[]
             {
                 new Container
                 {

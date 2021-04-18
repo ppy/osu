@@ -60,11 +60,17 @@ namespace Mvis.Plugin.CollectionSupport
             Flags.Add(PluginFlags.CanDisable);
         }
 
+        private bool trackChangedAfterDisable;
+
         [BackgroundDependencyLoader]
         private void load()
         {
             var config = (CollectionHelperConfigManager)DependenciesContainer.Get<MvisPluginManager>().GetConfigManager(this);
             config.BindWith(CollectionSettings.EnablePlugin, Value);
+            b.BindValueChanged(v =>
+            {
+                if (!IsCurrent) trackChangedAfterDisable = true;
+            });
         }
 
         protected override void LoadComplete()
@@ -78,17 +84,6 @@ namespace Mvis.Plugin.CollectionSupport
         }
 
         public void Play(WorkingBeatmap b) => changeBeatmap(b);
-
-        private void changeBeatmap(WorkingBeatmap working)
-        {
-            if (Disabled.Value) return;
-
-            b.Disabled = false;
-            b.Value = working;
-            b.Disabled = IsCurrent;
-            drawableTrack = new DrawableTrack(b.Value.Track);
-            controller.Play();
-        }
 
         public void NextTrack() =>
             changeBeatmap(getBeatmap(beatmapList, b.Value, true));
@@ -110,7 +105,37 @@ namespace Mvis.Plugin.CollectionSupport
 
         public DrawableTrack GetCurrentTrack() => drawableTrack ??= new DrawableTrack(b.Value.Track);
 
-        public bool IsCurrent { get; set; }
+        private bool isCurrent;
+
+        public bool IsCurrent
+        {
+            get => isCurrent;
+            set
+            {
+                if (trackChangedAfterDisable && value)
+                {
+                    drawableTrack = new DrawableTrack(b.Value.Track);
+                    trackChangedAfterDisable = false;
+                }
+
+                isCurrent = value;
+            }
+        }
+
+        private void changeBeatmap(WorkingBeatmap working)
+        {
+            if (Disabled.Value) return;
+
+            b.Disabled = false;
+            b.Value = working;
+            b.Disabled = IsCurrent;
+            drawableTrack = new DrawableTrack(b.Value.Track);
+            drawableTrack.Completed += () =>
+            {
+                if (IsCurrent) Schedule(NextTrack);
+            };
+            controller.Play();
+        }
 
         /// <summary>
         /// 用于从列表中获取指定的<see cref="WorkingBeatmap"/>。
@@ -146,16 +171,6 @@ namespace Mvis.Plugin.CollectionSupport
                 ? beatmaps.GetWorkingBeatmap(list.ElementAt(currentPosition).Beatmaps.First())
                 : b.Value;
             return newBeatmap;
-        }
-
-        private void playFirstBeatmap(List<BeatmapSetInfo> list)
-        {
-            if (list.Count == 0) return;
-
-            var newBeatmap = beatmaps.GetWorkingBeatmap(list.FirstOrDefault()?.Beatmaps.First());
-
-            b.Value = newBeatmap;
-            controller.Play();
         }
 
         ///<summary>
