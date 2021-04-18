@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
+using osu.Framework.Localisation;
 using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.IO.Serialization;
@@ -127,6 +128,8 @@ namespace osu.Game.Beatmaps
         // Metadata
         public string Version { get; set; }
 
+        public string VersionString => string.IsNullOrEmpty(Version) ? string.Empty : $"[{Version}]";
+
         [JsonProperty("difficulty_rating")]
         public double StarDifficulty { get; set; }
 
@@ -143,11 +146,12 @@ namespace osu.Game.Beatmaps
             Version
         }.Concat(Metadata?.SearchableTerms ?? Enumerable.Empty<string>()).Where(s => !string.IsNullOrEmpty(s)).ToArray();
 
-        public override string ToString()
-        {
-            string version = string.IsNullOrEmpty(Version) ? string.Empty : $"[{Version}]";
+        public override string ToString() => $"{Metadata ?? BeatmapSet?.Metadata} {VersionString}".Trim();
 
-            return $"{Metadata ?? BeatmapSet?.Metadata} {version}".Trim();
+        public RomanisableString ToRomanisableString()
+        {
+            var metadata = (Metadata ?? BeatmapSet?.Metadata).ToRomanisableString() ?? new RomanisableString(null, null);
+            return new RomanisableString($"{metadata.GetPreferred(true)} {VersionString}".Trim(), $"{metadata.GetPreferred(false)} {VersionString}".Trim());
         }
 
         public bool Equals(BeatmapInfo other)
