@@ -284,13 +284,15 @@ namespace osu.Game.Screens.Play
                 ScoreProcessor.RevertResult(r);
             };
 
+            DimmableStoryboard.HasStoryboardEnded.ValueChanged += _ =>
+            {
+                if (ScoreProcessor.HasCompleted.Value)
+                    scheduleCompletion();
+            };
+
             // Bind the judgement processors to ourselves
             ScoreProcessor.HasCompleted.ValueChanged += updateCompletionState;
             HealthProcessor.Failed += onFail;
-
-            // Keep track of whether the storyboard ended after the playable portion
-            if (DimmableStoryboard.HasStoryboardEnded != null)
-                DimmableStoryboard.HasStoryboardEnded.ValueChanged += updateCompletionState;
 
             foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
                 mod.ApplyToScoreProcessor(ScoreProcessor);
@@ -630,7 +632,7 @@ namespace osu.Game.Screens.Play
                 return score.ScoreInfo;
             });
 
-            var storyboardHasOutro = DimmableStoryboard.ContentDisplayed && (!DimmableStoryboard.HasStoryboardEnded?.Value ?? false);
+            var storyboardHasOutro = DimmableStoryboard.ContentDisplayed && !DimmableStoryboard.HasStoryboardEnded.Value;
 
             if (storyboardHasOutro)
             {
