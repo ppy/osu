@@ -107,18 +107,11 @@ namespace osu.Game.Screens.OnlinePlay
 
         private void refresh()
         {
-            var beatmapMetadata = Item.Beatmap.Value.Metadata ?? Item.Beatmap.Value.BeatmapSet?.Metadata;
             difficultyIconContainer.Child = new DifficultyIcon(beatmap.Value, ruleset.Value, requiredMods) { Size = new Vector2(32) };
 
             beatmapText.Clear();
-            var text = new List<SpriteText>
-            {
-                new OsuSpriteText { Text = new RomanisableString(beatmapMetadata.ArtistUnicode, beatmapMetadata.Artist) },
-                new OsuSpriteText { Text = " - " },
-                new OsuSpriteText { Text = new RomanisableString(beatmapMetadata.TitleUnicode, beatmapMetadata.Title) },
-                new OsuSpriteText { Text = $" ({beatmapMetadata.Author}) [{Item.Beatmap.Value.Version}]" }
-            };
-            beatmapText.AddLink(text, LinkAction.OpenBeatmap, Item.Beatmap.Value.OnlineBeatmapID.ToString());
+            beatmapText.AddLink(new List<SpriteText>{ new OsuSpriteText { Text = Item.Beatmap.Value.ToRomanisableString() } }
+            , LinkAction.OpenBeatmap, Item.Beatmap.Value.OnlineBeatmapID.ToString());
 
             authorText.Clear();
 
