@@ -284,9 +284,9 @@ namespace osu.Game.Screens.Play
                 ScoreProcessor.RevertResult(r);
             };
 
-            DimmableStoryboard.HasStoryboardEnded.ValueChanged += _ =>
+            DimmableStoryboard.HasStoryboardEnded.ValueChanged += storyboardEnded =>
             {
-                if (ScoreProcessor.HasCompleted.Value)
+                if (storyboardEnded.NewValue && ScoreProcessor.HasCompleted.Value)
                     scheduleCompletion();
             };
 
