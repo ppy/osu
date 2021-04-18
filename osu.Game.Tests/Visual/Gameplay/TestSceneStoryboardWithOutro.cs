@@ -58,6 +58,16 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("score shown", () => Player.IsScoreShown);
         }
 
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestStoryboardToggle(bool enabledAtBeginning)
+        {
+            AddStep($"{(enabledAtBeginning ? "enable" : "disable")} storyboard", () => LocalConfig.SetValue(OsuSetting.ShowStoryboard, enabledAtBeginning));
+            AddUntilStep("storyboard loaded", () => Player.Beatmap.Value.StoryboardLoaded);
+            AddStep($"toggle storyboard", () => LocalConfig.SetValue(OsuSetting.ShowStoryboard, !enabledAtBeginning));
+            AddUntilStep("wait for score shown", () => Player.IsScoreShown);
+        }
+
         protected override bool AllowFail => false;
 
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
