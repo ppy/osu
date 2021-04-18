@@ -40,7 +40,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private Bindable<int> indexInCurrentComboBindable;
         private Bindable<int> comboIndexBindable;
 
-        private readonly Drawable circle;
+        private readonly ExtendableCircle circle;
+        private readonly Border border;
 
         private readonly Container colouredComponents;
         private readonly OsuSpriteText comboIndexText;
@@ -62,9 +63,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             RelativeSizeAxes = Axes.X;
             Height = circle_size;
 
-            AddRangeInternal(new[]
+            AddRangeInternal(new Drawable[]
             {
                 circle = new ExtendableCircle
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                },
+                border = new Border
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.CentreLeft,
@@ -116,11 +123,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         protected override void OnSelected()
         {
             // base logic hides selected blueprints when not selected, but timeline doesn't do that.
+            updateComboColour();
         }
 
         protected override void OnDeselected()
         {
             // base logic hides selected blueprints when not selected, but timeline doesn't do that.
+            updateComboColour();
         }
 
         private void updateComboIndex() => comboIndexText.Text = (indexInCurrentComboBindable.Value + 1).ToString();
@@ -133,7 +142,17 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             var comboColours = skin.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value ?? Array.Empty<Color4>();
             var comboColour = combo.GetComboColour(comboColours);
 
-            if (HitObject is IHasDuration)
+            if (IsSelected)
+            {
+                border.Show();
+                comboColour = comboColour.Lighten(0.3f);
+            }
+            else
+            {
+                border.Hide();
+            }
+
+            if (HitObject is IHasDuration duration && duration.Duration > 0)
                 circle.Colour = ColourInfo.GradientHorizontal(comboColour, comboColour.Lighten(0.4f));
             else
                 circle.Colour = comboColour;
@@ -340,22 +359,38 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
         }
 
+        public class Border : ExtendableCircle
+        {
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                Content.Child.Alpha = 0;
+                Content.Child.AlwaysPresent = true;
+
+                Content.BorderColour = colours.Yellow;
+                Content.EdgeEffect = new EdgeEffectParameters();
+            }
+        }
+
         /// <summary>
         /// A circle with externalised end caps so it can take up the full width of a relative width area.
         /// </summary>
         public class ExtendableCircle : CompositeDrawable
         {
-            private readonly Circle content;
+            protected readonly Circle Content;
 
-            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => content.ReceivePositionalInputAt(screenSpacePos);
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Content.ReceivePositionalInputAt(screenSpacePos);
 
-            public override Quad ScreenSpaceDrawQuad => content.ScreenSpaceDrawQuad;
+            public override Quad ScreenSpaceDrawQuad => Content.ScreenSpaceDrawQuad;
 
             public ExtendableCircle()
             {
                 Padding = new MarginPadding { Horizontal = -circle_size / 2f };
-                InternalChild = content = new Circle
+                InternalChild = Content = new Circle
                 {
+                    BorderColour = OsuColour.Gray(0.75f),
+                    BorderThickness = 4,
+                    Masking = true,
                     RelativeSizeAxes = Axes.Both,
                     EdgeEffect = new EdgeEffectParameters
                     {

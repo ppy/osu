@@ -71,8 +71,6 @@ namespace osu.Game.Rulesets.Osu.Replays
 
             buttonIndex = 0;
 
-            AddFrameToReplay(new OsuReplayFrame(-100000, new Vector2(256, 500)));
-            AddFrameToReplay(new OsuReplayFrame(Beatmap.HitObjects[0].StartTime - 1500, new Vector2(256, 500)));
             AddFrameToReplay(new OsuReplayFrame(Beatmap.HitObjects[0].StartTime - 1500, new Vector2(256, 500)));
 
             for (int i = 0; i < Beatmap.HitObjects.Count; i++)
