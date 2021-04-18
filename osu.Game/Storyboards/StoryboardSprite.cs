@@ -11,7 +11,7 @@ using JetBrains.Annotations;
 
 namespace osu.Game.Storyboards
 {
-    public class StoryboardSprite : IStoryboardElement, IStoryboardElementHasDuration
+    public class StoryboardSprite : IStoryboardElementWithDuration
     {
         private readonly List<CommandLoop> loops = new List<CommandLoop>();
         private readonly List<CommandTrigger> triggers = new List<CommandTrigger>();
@@ -64,6 +64,8 @@ namespace osu.Game.Storyboards
                 return latestEndTime;
             }
         }
+
+        public double Duration => EndTime - StartTime;
 
         public bool HasCommands => TimelineGroup.HasCommands || loops.Any(l => l.HasCommands);
 

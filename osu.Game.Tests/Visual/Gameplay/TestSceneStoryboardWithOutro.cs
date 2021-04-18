@@ -35,7 +35,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestStoryboardSkipOutro()
         {
-            AddUntilStep("storyboard loaded", () => Player.Beatmap.Value.StoryboardLoaded);
             AddUntilStep("completion set by processor", () => Player.ScoreProcessor.HasCompleted.Value);
             AddStep("skip outro", () => InputManager.Key(osuTK.Input.Key.Space));
             AddAssert("score shown", () => Player.IsScoreShown);
@@ -44,7 +43,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestStoryboardNoSkipOutro()
         {
-            AddUntilStep("storyboard loaded", () => Player.Beatmap.Value.StoryboardLoaded);
             AddUntilStep("storyboard ends", () => Player.GameplayClockContainer.GameplayClock.CurrentTime >= storyboard_duration);
             AddUntilStep("wait for score shown", () => Player.IsScoreShown);
         }
@@ -52,7 +50,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestStoryboardExitToSkipOutro()
         {
-            AddUntilStep("storyboard loaded", () => Player.Beatmap.Value.StoryboardLoaded);
             AddUntilStep("completion set by processor", () => Player.ScoreProcessor.HasCompleted.Value);
             AddStep("exit via pause", () => Player.ExitViaPause());
             AddAssert("score shown", () => Player.IsScoreShown);
@@ -63,7 +60,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestStoryboardToggle(bool enabledAtBeginning)
         {
             AddStep($"{(enabledAtBeginning ? "enable" : "disable")} storyboard", () => LocalConfig.SetValue(OsuSetting.ShowStoryboard, enabledAtBeginning));
-            AddUntilStep("storyboard loaded", () => Player.Beatmap.Value.StoryboardLoaded);
             AddStep("toggle storyboard", () => LocalConfig.SetValue(OsuSetting.ShowStoryboard, !enabledAtBeginning));
             AddUntilStep("wait for score shown", () => Player.IsScoreShown);
         }
