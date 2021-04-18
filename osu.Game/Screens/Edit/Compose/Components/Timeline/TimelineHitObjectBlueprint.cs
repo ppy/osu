@@ -21,6 +21,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 
@@ -158,10 +159,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 circle.Colour = comboColour;
 
             var col = circle.Colour.TopLeft.Linear;
-            float brightness = col.R + col.G + col.B;
-
-            // decide the combo index colour based on brightness?
-            colouredComponents.Colour = OsuColour.Gray(brightness > 0.5f ? 0.2f : 0.9f);
+            colouredComponents.Colour = ColourUtils.ForegroundTextColourFor(col);
         }
 
         protected override void Update()

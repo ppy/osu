@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 
@@ -98,6 +99,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             fill.Colour = current.Value;
             colourHexCode.Text = current.Value.ToHex();
+            colourHexCode.Colour = ColourUtils.ForegroundTextColourFor(current.Value);
         }
     }
 }
