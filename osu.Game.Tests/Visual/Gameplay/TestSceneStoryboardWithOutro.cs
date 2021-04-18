@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep($"{(enabledAtBeginning ? "enable" : "disable")} storyboard", () => LocalConfig.SetValue(OsuSetting.ShowStoryboard, enabledAtBeginning));
             AddUntilStep("storyboard loaded", () => Player.Beatmap.Value.StoryboardLoaded);
-            AddStep($"toggle storyboard", () => LocalConfig.SetValue(OsuSetting.ShowStoryboard, !enabledAtBeginning));
+            AddStep("toggle storyboard", () => LocalConfig.SetValue(OsuSetting.ShowStoryboard, !enabledAtBeginning));
             AddUntilStep("wait for score shown", () => Player.IsScoreShown);
         }
 
