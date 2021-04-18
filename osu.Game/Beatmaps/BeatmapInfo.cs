@@ -150,7 +150,7 @@ namespace osu.Game.Beatmaps
 
         public RomanisableString ToRomanisableString()
         {
-            var metadata = (Metadata ?? BeatmapSet?.Metadata).ToRomanisableString() ?? new RomanisableString(null, null);
+            var metadata = (Metadata ?? BeatmapSet?.Metadata)?.ToRomanisableString() ?? new RomanisableString(null, null);
             return new RomanisableString($"{metadata.GetPreferred(true)} {VersionString}".Trim(), $"{metadata.GetPreferred(false)} {VersionString}".Trim());
         }
 
