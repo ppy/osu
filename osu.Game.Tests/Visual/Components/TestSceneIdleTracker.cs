@@ -173,6 +173,8 @@ namespace osu.Game.Tests.Visual.Components
                         RelativeSizeAxes = Axes.Both,
                     },
                 };
+
+                idleTracker.IsIdle.BindValueChanged(idle => box.Colour = idle.NewValue ? Color4.White : Color4.Black, true);
             }
         }
     }
