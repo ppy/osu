@@ -8,15 +8,14 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Edit.Compose.Components.Timeline;
+using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    public class TimingScreen : EditorScreenWithTimeline
+    public class TimingScreen : RoundedContentEditorScreen
     {
         [Cached]
         private Bindable<ControlPointGroup> selectedGroup = new Bindable<ControlPointGroup>();
@@ -26,28 +25,26 @@ namespace osu.Game.Screens.Edit.Timing
         {
         }
 
-        protected override Drawable CreateMainContent() => new GridContainer
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            RelativeSizeAxes = Axes.Both,
-            ColumnDimensions = new[]
+            Add(new GridContainer
             {
-                new Dimension(),
-                new Dimension(GridSizeMode.Absolute, 350),
-            },
-            Content = new[]
-            {
-                new Drawable[]
+                RelativeSizeAxes = Axes.Both,
+                ColumnDimensions = new[]
                 {
-                    new ControlPointList(),
-                    new ControlPointSettings(),
+                    new Dimension(),
+                    new Dimension(GridSizeMode.Absolute, 350),
                 },
-            }
-        };
-
-        protected override void OnTimelineLoaded(TimelineArea timelineArea)
-        {
-            base.OnTimelineLoaded(timelineArea);
-            timelineArea.Timeline.Zoom = timelineArea.Timeline.MinZoom;
+                Content = new[]
+                {
+                    new Drawable[]
+                    {
+                        new ControlPointList(),
+                        new ControlPointSettings(),
+                    },
+                }
+            });
         }
 
         public class ControlPointList : CompositeDrawable
@@ -70,7 +67,7 @@ namespace osu.Game.Screens.Edit.Timing
             private IEditorChangeHandler changeHandler { get; set; }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OverlayColourProvider colours)
             {
                 RelativeSizeAxes = Axes.Both;
 
@@ -78,7 +75,7 @@ namespace osu.Game.Screens.Edit.Timing
                 {
                     new Box
                     {
-                        Colour = colours.Gray0,
+                        Colour = colours.Background2,
                         RelativeSizeAxes = Axes.Both,
                     },
                     new OsuScrollContainer

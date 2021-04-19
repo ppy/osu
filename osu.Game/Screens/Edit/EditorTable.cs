@@ -9,6 +9,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit
@@ -93,10 +94,10 @@ namespace osu.Game.Screens.Edit
             private Color4 colourSelected;
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OverlayColourProvider colours)
             {
-                hoveredBackground.Colour = colourHover = colours.BlueDarker;
-                colourSelected = colours.YellowDarker;
+                hoveredBackground.Colour = colourHover = colours.Background3;
+                colourSelected = colours.Background1;
             }
 
             private bool selected;
