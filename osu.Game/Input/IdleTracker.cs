@@ -42,6 +42,12 @@ namespace osu.Game.Input
             RelativeSizeAxes = Axes.Both;
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            updateLastInteractionTime();
+        }
+
         protected override void Update()
         {
             base.Update();
