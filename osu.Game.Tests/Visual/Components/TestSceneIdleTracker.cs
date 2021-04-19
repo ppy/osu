@@ -5,7 +5,6 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Configuration;
 using osu.Game.Input;
 using osuTK;
 using osuTK.Graphics;
@@ -22,17 +21,14 @@ namespace osu.Game.Tests.Visual.Components
 
         private IdleTrackingBox[] boxes;
 
-        private SessionStatics sessionStatics;
-
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            sessionStatics = new SessionStatics();
             InputManager.MoveMouseTo(Vector2.Zero);
 
             Children = boxes = new[]
             {
-                box1 = new IdleTrackingBox(2000, sessionStatics)
+                box1 = new IdleTrackingBox(2000)
                 {
                     Name = "TopLeft",
                     RelativeSizeAxes = Axes.Both,
@@ -40,7 +36,7 @@ namespace osu.Game.Tests.Visual.Components
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft,
                 },
-                box2 = new IdleTrackingBox(4000, sessionStatics)
+                box2 = new IdleTrackingBox(4000)
                 {
                     Name = "TopRight",
                     RelativeSizeAxes = Axes.Both,
@@ -48,7 +44,7 @@ namespace osu.Game.Tests.Visual.Components
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                 },
-                box3 = new IdleTrackingBox(6000, sessionStatics)
+                box3 = new IdleTrackingBox(6000)
                 {
                     Name = "BottomLeft",
                     RelativeSizeAxes = Axes.Both,
@@ -56,7 +52,7 @@ namespace osu.Game.Tests.Visual.Components
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                 },
-                box4 = new IdleTrackingBox(8000, sessionStatics)
+                box4 = new IdleTrackingBox(8000)
                 {
                     Name = "BottomRight",
                     RelativeSizeAxes = Axes.Both,
@@ -145,27 +141,6 @@ namespace osu.Game.Tests.Visual.Components
 
             waitForAllIdle();
         }
-
-        [Test]
-        public void TestSessionStaticsReset()
-        {
-            AddStep("move to top left", () => InputManager.MoveMouseTo(box1));
-            AddStep("set session statics", () =>
-            {
-                sessionStatics.SetValue(Static.LoginOverlayDisplayed, true);
-                sessionStatics.SetValue(Static.MutedAudioNotificationShownOnce, true);
-                sessionStatics.SetValue(Static.LowBatteryNotificationShownOnce, true);
-                sessionStatics.SetValue(Static.LastHoverSoundPlaybackTime, (double?)1d);
-            });
-
-            AddStep("move away from box1", () => InputManager.MoveMouseTo(box4));
-            AddUntilStep("Wait for idle", () => box1.IsIdle);
-            AddAssert("LoginOverlayDisplayed is default", () => sessionStatics.Get<bool>(Static.LoginOverlayDisplayed) == false);
-            AddAssert("MutedAudioNotificationShownOnce is default", () => sessionStatics.Get<bool>(Static.MutedAudioNotificationShownOnce) == false);
-            AddAssert("LowBatteryNotificationShownOnce is default", () => sessionStatics.Get<bool>(Static.LowBatteryNotificationShownOnce) == false);
-            AddAssert("LastHoverSoundPlaybackTime is default", () => sessionStatics.Get<double?>(Static.LastHoverSoundPlaybackTime) == null);
-        }
-
         private void checkIdleStatus(int box, bool expectedIdle)
         {
             AddAssert($"box {box} is {(expectedIdle ? "idle" : "active")}", () => boxes[box - 1].IsIdle == expectedIdle);
@@ -182,7 +157,7 @@ namespace osu.Game.Tests.Visual.Components
 
             public bool IsIdle => idleTracker.IsIdle.Value;
 
-            public IdleTrackingBox(int timeToIdle, SessionStatics statics)
+            public IdleTrackingBox(int timeToIdle)
             {
                 Box box;
 
@@ -198,12 +173,6 @@ namespace osu.Game.Tests.Visual.Components
                         RelativeSizeAxes = Axes.Both,
                     },
                 };
-
-                idleTracker.IsIdle.BindValueChanged(idle =>
-                {
-                    box.Colour = idle.NewValue ? Color4.White : Color4.Black;
-                    if (idle.NewValue) statics.ResetValues();
-                }, true);
             }
         }
     }
