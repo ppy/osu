@@ -147,7 +147,7 @@ namespace osu.Game.Screens.Edit.Timing
                         ).Trim(), colour);
 
                     case SampleControlPoint sample:
-                        return new EmptyRowAttribute("sample", () => $"{sample.SampleBank} {sample.SampleVolume}%", colour);
+                        return new SampleRowAttribute(sample);
                 }
 
                 return null;
