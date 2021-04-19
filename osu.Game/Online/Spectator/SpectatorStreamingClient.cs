@@ -47,6 +47,8 @@ namespace osu.Game.Online.Spectator
 
         private readonly BindableList<int> playingUsers = new BindableList<int>();
 
+        private readonly Dictionary<int, SpectatorState> currentUserStates = new Dictionary<int, SpectatorState>();
+
         [CanBeNull]
         private IBeatmap currentBeatmap;
 
@@ -60,7 +62,6 @@ namespace osu.Game.Online.Spectator
         private IBindable<IReadOnlyList<Mod>> currentMods { get; set; }
 
         private readonly SpectatorState currentState = new SpectatorState();
-        private readonly Dictionary<int, SpectatorState> currentUserStates = new Dictionary<int, SpectatorState>();
 
         private bool isPlaying;
 
@@ -124,8 +125,11 @@ namespace osu.Game.Online.Spectator
                     }
                     else
                     {
-                        playingUsers.Clear();
-                        currentUserStates.Clear();
+                        lock (userLock)
+                        {
+                            playingUsers.Clear();
+                            currentUserStates.Clear();
+                        }
                     }
                 }, true);
             }
@@ -133,11 +137,13 @@ namespace osu.Game.Online.Spectator
 
         Task ISpectatorClient.UserBeganPlaying(int userId, SpectatorState state)
         {
-            if (!playingUsers.Contains(userId))
-                playingUsers.Add(userId);
-
             lock (userLock)
+            {
+                if (!playingUsers.Contains(userId))
+                    playingUsers.Add(userId);
+
                 currentUserStates[userId] = state;
+            }
 
             OnUserBeganPlaying?.Invoke(userId, state);
 
@@ -146,10 +152,11 @@ namespace osu.Game.Online.Spectator
 
         Task ISpectatorClient.UserFinishedPlaying(int userId, SpectatorState state)
         {
-            playingUsers.Remove(userId);
-
             lock (userLock)
+            {
+                playingUsers.Remove(userId);
                 currentUserStates.Remove(userId);
+            }
 
             OnUserFinishedPlaying?.Invoke(userId, state);
 
