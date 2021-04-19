@@ -21,7 +21,6 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
-using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 
@@ -159,7 +158,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 circle.Colour = comboColour;
 
             var col = circle.Colour.TopLeft.Linear;
-            colouredComponents.Colour = ColourUtils.ForegroundTextColourFor(col);
+            colouredComponents.Colour = OsuColour.ForegroundTextColourFor(col);
         }
 
         protected override void Update()
