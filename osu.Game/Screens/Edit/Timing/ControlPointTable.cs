@@ -66,9 +66,7 @@ namespace osu.Game.Screens.Edit.Timing
         {
             var columns = new List<TableColumn>
             {
-                new TableColumn(string.Empty, Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-                new TableColumn("Time", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-                new TableColumn(),
+                new TableColumn("Time", Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, 120)),
                 new TableColumn("Attributes", Anchor.CentreLeft),
             };
 
@@ -79,16 +77,9 @@ namespace osu.Game.Screens.Edit.Timing
         {
             new OsuSpriteText
             {
-                Text = $"#{index + 1}",
-                Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Bold),
-                Margin = new MarginPadding(10)
-            },
-            new OsuSpriteText
-            {
                 Text = group.Time.ToEditorFormattedString(),
                 Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Bold)
             },
-            null,
             new ControlGroupAttributes(group),
         };
 
