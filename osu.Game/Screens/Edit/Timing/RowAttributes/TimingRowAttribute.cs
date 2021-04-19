@@ -12,14 +12,14 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Edit.Timing.RowAttributes
 {
-    internal class TimingRowAttribute : RowAttribute
+    public class TimingRowAttribute : RowAttribute
     {
         private readonly BindableNumber<double> beatLength;
         private readonly Bindable<TimeSignatures> timeSignature;
         private OsuSpriteText text;
 
         public TimingRowAttribute(TimingControlPoint timing)
-            : base(timing)
+            : base(timing, "timing")
         {
             timeSignature = timing.TimeSignatureBindable.GetBoundCopy();
             beatLength = timing.BeatLengthBindable.GetBoundCopy();
