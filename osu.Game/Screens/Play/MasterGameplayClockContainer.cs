@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public const double MINIMUM_SKIP_TIME = 1000;
 
-        protected Track Track => (Track)AdjustableSource.Source;
+        protected Track Track => (Track)SourceClock;
 
         public readonly BindableNumber<double> UserPlaybackRate = new BindableDouble(1)
         {
@@ -164,7 +164,7 @@ namespace osu.Game.Screens.Play
         public void StopUsingBeatmapClock()
         {
             removeSourceClockAdjustments();
-            AdjustableSource.ChangeSource(new TrackVirtual(beatmap.Track.Length));
+            ChangeSource(new TrackVirtual(beatmap.Track.Length));
         }
 
         private bool speedAdjustmentsApplied;
