@@ -285,8 +285,8 @@ namespace osu.Game.Screens.Play
 
             DimmableStoryboard.HasStoryboardEnded.ValueChanged += storyboardEnded =>
             {
-                if (storyboardEnded.NewValue && ScoreProcessor.HasCompleted.Value)
-                    scheduleCompletion();
+                if (storyboardEnded.NewValue && completionProgressDelegate == null)
+                    updateCompletionState(new ValueChangedEvent<bool>(true, ScoreProcessor.HasCompleted.Value));
             };
 
             // Bind the judgement processors to ourselves
