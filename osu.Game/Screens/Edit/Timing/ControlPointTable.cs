@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -24,6 +25,8 @@ namespace osu.Game.Screens.Edit.Timing
 
         [Resolved]
         private EditorClock clock { get; set; }
+
+        public const float TIMING_COLUMN_WIDTH = 210;
 
         public IEnumerable<ControlPointGroup> ControlGroups
         {
@@ -66,35 +69,62 @@ namespace osu.Game.Screens.Edit.Timing
         {
             var columns = new List<TableColumn>
             {
-                new TableColumn("Time", Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, 120)),
+                new TableColumn("Time", Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, TIMING_COLUMN_WIDTH)),
                 new TableColumn("Attributes", Anchor.CentreLeft),
             };
 
             return columns.ToArray();
         }
 
-        private Drawable[] createContent(int index, ControlPointGroup group) => new Drawable[]
+        private Drawable[] createContent(int index, ControlPointGroup group)
         {
-            new OsuSpriteText
+            return new Drawable[]
             {
-                Text = group.Time.ToEditorFormattedString(),
-                Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Bold)
-            },
-            new ControlGroupAttributes(group),
-        };
+                new FillFlowContainer
+                {
+                    RelativeSizeAxes = Axes.Y,
+                    Width = TIMING_COLUMN_WIDTH,
+                    Spacing = new Vector2(5),
+                    Children = new Drawable[]
+                    {
+                        new OsuSpriteText
+                        {
+                            Text = group.Time.ToEditorFormattedString(),
+                            Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Bold),
+                            Width = 60,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                        },
+                        new ControlGroupAttributes(group, c => c is TimingControlPoint)
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                        }
+                    }
+                },
+                new ControlGroupAttributes(group, c => !(c is TimingControlPoint))
+            };
+        }
 
         private class ControlGroupAttributes : CompositeDrawable
         {
+            private readonly Func<ControlPoint, bool> matchFunction;
+
             private readonly IBindableList<ControlPoint> controlPoints = new BindableList<ControlPoint>();
 
             private readonly FillFlowContainer fill;
 
-            public ControlGroupAttributes(ControlPointGroup group)
+            public ControlGroupAttributes(ControlPointGroup group, Func<ControlPoint, bool> matchFunction)
             {
-                RelativeSizeAxes = Axes.Both;
+                this.matchFunction = matchFunction;
+
+                AutoSizeAxes = Axes.X;
+                RelativeSizeAxes = Axes.Y;
+
                 InternalChild = fill = new FillFlowContainer
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    AutoSizeAxes = Axes.X,
+                    RelativeSizeAxes = Axes.Y,
                     Direction = FillDirection.Horizontal,
                     Spacing = new Vector2(2)
                 };
@@ -120,6 +150,7 @@ namespace osu.Game.Screens.Edit.Timing
             private void createChildren()
             {
                 fill.ChildrenEnumerable = controlPoints
+                                          .Where(matchFunction)
                                           .Select(createAttribute)
                                           .Where(c => c != null)
                                           // arbitrary ordering to make timing points first.
