@@ -5,6 +5,10 @@ using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Objects
 {
+    /// <summary>
+    /// Created for a <see cref="DrawableHitObject"/> when only <see cref="HitObject"/> is given
+    /// to make sure a <see cref="DrawableHitObject"/> is always associated with a <see cref="HitObjectLifetimeEntry"/>.
+    /// </summary>
     internal class UnmanagedHitObjectEntry : HitObjectLifetimeEntry
     {
         public readonly DrawableHitObject DrawableHitObject;
