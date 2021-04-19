@@ -23,6 +23,8 @@ namespace osu.Game.Screens.Mvis.Plugins
         {
         }
 
+        public virtual PluginBottomBarButton CreateBottomBarButton() => null;
+
         private bool contentInit;
 
         public MvisPlugin Plugin { get; }

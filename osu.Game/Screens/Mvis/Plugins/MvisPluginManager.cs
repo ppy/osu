@@ -123,7 +123,8 @@ namespace osu.Game.Screens.Mvis.Plugins
         {
             if (newInstance)
             {
-                DisposeAllPlugins();
+                //bug: 直接调用Dispose会导致快速进出时抛出Disposed drawabled may never in the scene graph
+                ExpireOldPlugins();
 
                 foreach (var p in providers)
                 {
@@ -134,12 +135,12 @@ namespace osu.Game.Screens.Mvis.Plugins
             return avaliablePlugins.ToList();
         }
 
-        internal void DisposeAllPlugins()
+        internal void ExpireOldPlugins()
         {
             foreach (var pl in avaliablePlugins)
             {
                 activePlugins.Remove(pl);
-                pl.Dispose();
+                pl.Expire();
             }
 
             avaliablePlugins.Clear();

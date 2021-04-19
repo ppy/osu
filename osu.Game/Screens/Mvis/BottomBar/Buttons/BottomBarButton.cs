@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
-            Font = OsuFont.GetFont(typeface: Typeface.Custom)
+            Font = OsuFont.GetFont(Typeface.Custom)
         };
 
         protected SpriteIcon SpriteIcon = new SpriteIcon

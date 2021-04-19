@@ -57,7 +57,11 @@ namespace Mvis.Plugin.CollectionSupport
             Description = "将收藏夹作为歌单播放音乐!";
             Author = "mf-osu";
 
-            Flags.Add(PluginFlags.CanDisable);
+            Flags.AddRange(new[]
+            {
+                PluginFlags.CanDisable,
+                PluginFlags.CanUnload
+            });
         }
 
         private bool trackChangedAfterDisable;

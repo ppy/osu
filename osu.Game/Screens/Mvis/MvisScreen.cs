@@ -9,7 +9,6 @@ using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
@@ -45,9 +44,7 @@ using SongProgressBar = osu.Game.Screens.Mvis.BottomBar.SongProgressBar;
 
 namespace osu.Game.Screens.Mvis
 {
-    ///<summary>
-    /// 音乐播放器
-    ///</summary>
+    //todo: 重写界面?
     public class MvisScreen : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>
     {
         public override bool HideOverlaysOnEnter => true;
@@ -136,8 +133,6 @@ namespace osu.Game.Screens.Mvis
         #region 底栏
 
         private BottomBarContainer bottomBar;
-        private FillFlowContainer bottomFillFlow;
-        private Container buttonsContainer;
         private SongProgressBar progressBar;
         private BottomBarButton soloButton;
         private BottomBarButton prevButton;
@@ -169,8 +164,7 @@ namespace osu.Game.Screens.Mvis
 
         private readonly Sidebar sidebar = new Sidebar
         {
-            Name = "Sidebar Container",
-            Padding = new MarginPadding { Right = HORIZONTAL_OVERFLOW_PADDING }
+            Name = "Sidebar Container"
         };
 
         #endregion
@@ -188,11 +182,8 @@ namespace osu.Game.Screens.Mvis
 
         #endregion
 
-        #region 故事版proxy
+        #region proxy
 
-        /// <summary>
-        /// 请将各种Drawable Proxy放置在此处
-        /// </summary>
         private readonly Container proxyLayer = new Container
         {
             RelativeSizeAxes = Axes.Both,
@@ -200,8 +191,19 @@ namespace osu.Game.Screens.Mvis
             Depth = -1
         };
 
+        /// <summary>
+        /// 添加一个Drawable到Proxy层
+        /// </summary>
+        /// <param name="d">要添加的Drawable</param>
         public void AddDrawableToProxy(Drawable d) => proxyLayer.Add(d);
 
+        /// <summary>
+        /// 从Proxy层移除一个Drawablw
+        /// </summary>
+        /// <param name="d">要移除的Drawable</param>
+        /// <returns>
+        /// true: 移除成功<br/>
+        /// false: 移除出现异常</returns>
         public bool RemoveDrawableFromProxy(Drawable d)
         {
             try
@@ -220,7 +222,7 @@ namespace osu.Game.Screens.Mvis
 
         #region 杂项
 
-        private const float duration = 750;
+        private const float duration = 500;
 
         public bool OverlaysHidden { get; private set; }
         private readonly BindableBool lockChanges = new BindableBool();
@@ -237,6 +239,8 @@ namespace osu.Game.Screens.Mvis
 
         private IProvideAudioControlPlugin audioControlProvider;
         private readonly OsuMusicControllerWrapper musicControllerWrapper = new OsuMusicControllerWrapper();
+
+        public float BottombarHeight => (bottomBar?.Height - bottomBar?.Y ?? 0) + 10 + 5;
 
         #endregion
 
@@ -316,7 +320,7 @@ namespace osu.Game.Screens.Mvis
                 {
                     Name = "Content Container",
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Horizontal = 50 },
+                    Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING },
                     Masking = true,
                     Children = new Drawable[]
                     {
@@ -349,6 +353,7 @@ namespace osu.Game.Screens.Mvis
                     Name = "Overlay Layer",
                     RelativeSizeAxes = Axes.Both,
                     Depth = float.MinValue,
+                    Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING },
                     Children = new Drawable[]
                     {
                         skinnableBbBackground = new FullScreenSkinnableComponent("MBottomBar-background",
@@ -374,181 +379,107 @@ namespace osu.Game.Screens.Mvis
                             Origin = Anchor.BottomCentre,
                             Margin = new MarginPadding(115)
                         },
-                        bottomFillFlow = new FillFlowContainer
+                        progressBar = new SongProgressBar(),
+                        bottomBar = new BottomBarContainer
                         {
-                            Name = "Bottom FillFlow",
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.BottomCentre,
-                            Direction = FillDirection.Vertical,
-                            LayoutDuration = duration,
-                            LayoutEasing = Easing.OutQuint,
-                            Children = new Drawable[]
+                            LeftContent = new Drawable[]
                             {
-                                bottomBar = new BottomBarContainer
+                                new BottomBarButton
                                 {
-                                    Children = new Drawable[]
-                                    {
-                                        new Container
-                                        {
-                                            Name = "Base Container",
-                                            Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING },
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            RelativeSizeAxes = Axes.Both,
-                                            Children = new Drawable[]
-                                            {
-                                                buttonsContainer = new Container
-                                                {
-                                                    Name = "Buttons Container",
-                                                    Anchor = Anchor.Centre,
-                                                    Origin = Anchor.Centre,
-                                                    RelativeSizeAxes = Axes.Both,
-                                                    Children = new Drawable[]
-                                                    {
-                                                        new FillFlowContainer
-                                                        {
-                                                            Name = "Left Buttons FillFlow",
-                                                            Anchor = Anchor.CentreLeft,
-                                                            Origin = Anchor.CentreLeft,
-                                                            AutoSizeAxes = Axes.Both,
-                                                            Spacing = new Vector2(5),
-                                                            Margin = new MarginPadding { Left = 5 },
-                                                            Children = new Drawable[]
-                                                            {
-                                                                new BottomBarButton
-                                                                {
-                                                                    ButtonIcon = FontAwesome.Solid.ArrowLeft,
-                                                                    Action = this.Exit,
-                                                                    TooltipText = "退出",
-                                                                },
-                                                                new BottomBarButton
-                                                                {
-                                                                    ButtonIcon = FontAwesome.Regular.QuestionCircle,
-                                                                    Action = () => game?.OpenUrlExternally("https://matrix-feather.github.io/mfosu/mfosu_mp_manual/"),
-                                                                    TooltipText = "食用手册"
-                                                                },
-                                                            }
-                                                        },
-                                                        new FillFlowContainer
-                                                        {
-                                                            Name = "Centre Button FillFlow",
-                                                            Anchor = Anchor.Centre,
-                                                            Origin = Anchor.Centre,
-                                                            AutoSizeAxes = Axes.Both,
-                                                            Spacing = new Vector2(5),
-                                                            Children = new Drawable[]
-                                                            {
-                                                                prevButton = new NextPrevButton
-                                                                {
-                                                                    Size = new Vector2(50, 30),
-                                                                    Anchor = Anchor.Centre,
-                                                                    Origin = Anchor.Centre,
-                                                                    ButtonIcon = FontAwesome.Solid.StepBackward,
-                                                                    Action = prevTrack,
-                                                                    TooltipText = "上一首 / 重新开始",
-                                                                },
-                                                                songProgressButton = new SongProgressButton
-                                                                {
-                                                                    TooltipText = "暂停 / 播放",
-                                                                    Action = togglePause,
-                                                                    Anchor = Anchor.Centre,
-                                                                    Origin = Anchor.Centre
-                                                                },
-                                                                nextButton = new NextPrevButton
-                                                                {
-                                                                    Size = new Vector2(50, 30),
-                                                                    Anchor = Anchor.Centre,
-                                                                    Origin = Anchor.Centre,
-                                                                    ButtonIcon = FontAwesome.Solid.StepForward,
-                                                                    Action = nextTrack,
-                                                                    TooltipText = "下一首",
-                                                                },
-                                                            }
-                                                        },
-                                                        new FillFlowContainer
-                                                        {
-                                                            Name = "Right Buttons FillFlow",
-                                                            Anchor = Anchor.CentreRight,
-                                                            Origin = Anchor.CentreRight,
-                                                            AutoSizeAxes = Axes.Both,
-                                                            Spacing = new Vector2(5),
-                                                            Margin = new MarginPadding { Right = 5 },
-                                                            Children = new Drawable[]
-                                                            {
-                                                                pluginButton = new BottomBarButton
-                                                                {
-                                                                    ButtonIcon = FontAwesome.Solid.Plug,
-                                                                    TooltipText = "查看插件",
-                                                                    Action = () => updateSidebarState(pluginsPage)
-                                                                },
-                                                                new BottomBarButton
-                                                                {
-                                                                    ButtonIcon = FontAwesome.Solid.Desktop,
-                                                                    Action = () =>
-                                                                    {
-                                                                        //隐藏界面，锁定更改并隐藏锁定按钮
-                                                                        lockChanges.Value = false;
-                                                                        hideOverlays(true);
-
-                                                                        updateSidebarState(null);
-
-                                                                        //防止手机端无法恢复界面
-                                                                        lockChanges.Value = RuntimeInfo.IsDesktop;
-                                                                        lockButton.ToggleableValue.Value = !RuntimeInfo.IsDesktop;
-                                                                    },
-                                                                    TooltipText = "锁定变更并隐藏界面"
-                                                                },
-                                                                loopToggleButton = new ToggleLoopButton
-                                                                {
-                                                                    ButtonIcon = FontAwesome.Solid.Undo,
-                                                                    Action = () => track.Looping = loopToggleButton.ToggleableValue.Value,
-                                                                    TooltipText = "单曲循环",
-                                                                },
-                                                                soloButton = new BottomBarButton
-                                                                {
-                                                                    ButtonIcon = FontAwesome.Solid.User,
-                                                                    Action = presentBeatmap,
-                                                                    TooltipText = "在单人游戏选歌界面中查看",
-                                                                },
-                                                                sidebarToggleButton = new BottomBarButton
-                                                                {
-                                                                    ButtonIcon = FontAwesome.Solid.Cog,
-                                                                    Action = () => updateSidebarState(settingsScroll),
-                                                                    TooltipText = "播放器设置",
-                                                                }
-                                                            }
-                                                        },
-                                                    }
-                                                },
-                                                progressBar = new SongProgressBar
-                                                {
-                                                    RelativeSizeAxes = Axes.Both,
-                                                },
-                                            }
-                                        },
-                                    }
+                                    ButtonIcon = FontAwesome.Solid.ArrowLeft,
+                                    Action = this.Exit,
+                                    TooltipText = "退出",
                                 },
-                                new Container
+                                new BottomBarButton
                                 {
-                                    Name = "Lock Button Container",
-                                    AutoSizeAxes = Axes.Both,
-                                    Anchor = Anchor.BottomCentre,
-                                    Origin = Anchor.BottomCentre,
-                                    Margin = new MarginPadding { Bottom = 5 },
-                                    Child = lockButton = new BottomBarOverlayLockSwitchButton
+                                    ButtonIcon = FontAwesome.Regular.QuestionCircle,
+                                    Action = () => game?.OpenUrlExternally("https://matrix-feather.github.io/mfosu/mfosu_mp_manual/"),
+                                    TooltipText = "食用手册"
+                                }
+                            },
+                            CentreContent = new Drawable[]
+                            {
+                                prevButton = new NextPrevButton
+                                {
+                                    Size = new Vector2(50, 30),
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    ButtonIcon = FontAwesome.Solid.StepBackward,
+                                    Action = prevTrack,
+                                    TooltipText = "上一首 / 重新开始",
+                                },
+                                songProgressButton = new SongProgressButton
+                                {
+                                    TooltipText = "暂停 / 播放",
+                                    Action = togglePause,
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre
+                                },
+                                nextButton = new NextPrevButton
+                                {
+                                    Size = new Vector2(50, 30),
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    ButtonIcon = FontAwesome.Solid.StepForward,
+                                    Action = nextTrack,
+                                    TooltipText = "下一首",
+                                },
+                            },
+                            RightContent = new Drawable[]
+                            {
+                                pluginButton = new BottomBarButton
+                                {
+                                    ButtonIcon = FontAwesome.Solid.Plug,
+                                    TooltipText = "查看插件",
+                                    Action = () => updateSidebarState(pluginsPage)
+                                },
+                                new BottomBarButton
+                                {
+                                    ButtonIcon = FontAwesome.Solid.Desktop,
+                                    Action = () =>
                                     {
-                                        TooltipText = "锁定变更",
-                                        Action = updateLockButtonVisuals,
-                                        Anchor = Anchor.BottomCentre,
-                                        Origin = Anchor.BottomCentre,
-                                    }
+                                        //隐藏界面，锁定更改并隐藏锁定按钮
+                                        lockChanges.Value = false;
+                                        hideOverlays(true);
+
+                                        updateSidebarState(null);
+
+                                        //防止手机端无法恢复界面
+                                        lockChanges.Value = RuntimeInfo.IsDesktop;
+                                        lockButton.ToggleableValue.Value = !RuntimeInfo.IsDesktop;
+                                    },
+                                    TooltipText = "锁定变更并隐藏界面"
+                                },
+                                loopToggleButton = new ToggleLoopButton
+                                {
+                                    ButtonIcon = FontAwesome.Solid.Undo,
+                                    Action = () => track.Looping = loopToggleButton.ToggleableValue.Value,
+                                    TooltipText = "单曲循环",
+                                },
+                                soloButton = new BottomBarButton
+                                {
+                                    ButtonIcon = FontAwesome.Solid.User,
+                                    Action = presentBeatmap,
+                                    TooltipText = "在单人游戏选歌界面中查看",
+                                },
+                                sidebarToggleButton = new BottomBarButton
+                                {
+                                    ButtonIcon = FontAwesome.Solid.Cog,
+                                    Action = () => updateSidebarState(settingsScroll),
+                                    TooltipText = "播放器设置",
                                 }
                             }
+                        },
+                        lockButton = new BottomBarOverlayLockSwitchButton
+                        {
+                            TooltipText = "锁定变更",
+                            Action = updateLockButtonVisuals,
+                            Anchor = Anchor.BottomRight,
+                            Origin = Anchor.BottomRight,
+                            Margin = new MarginPadding { Bottom = 5 }
                         }
                     }
-                },
+                }
             };
         }
 
@@ -560,9 +491,7 @@ namespace osu.Game.Screens.Mvis
             idleBgDim.BindValueChanged(_ => updateIdleVisuals());
             lockChanges.BindValueChanged(v =>
             {
-                lockButton.FadeColour(v.NewValue
-                    ? Color4.Gray.Opacity(0.6f)
-                    : Color4.White, 300);
+                lockButton.Disabled = v.NewValue;
             });
 
             Beatmap.BindValueChanged(onBeatmapChanged, true);
@@ -627,7 +556,19 @@ namespace osu.Game.Screens.Mvis
                 }
 
                 var pluginSidebarPage = pl.CreateSidebarPage();
-                if (pluginSidebarPage != null) sidebar.Add(pluginSidebarPage);
+
+                if (pluginSidebarPage != null)
+                {
+                    sidebar.Add(pluginSidebarPage);
+                    var btn = pluginSidebarPage.CreateBottomBarButton();
+
+                    if (btn != null)
+                    {
+                        btn.Action = () => updateSidebarState(pluginSidebarPage);
+
+                        bottomBar.PluginEntriesFillFlow.Add(btn);
+                    }
+                }
             }
 
             currentAudioControlProviderSetting.BindValueChanged(v =>
@@ -645,6 +586,9 @@ namespace osu.Game.Screens.Mvis
 
             Beatmap.TriggerChange();
 
+            bottomBar.MoveToY(bottomBar.Height + 10).FadeOut();
+            progressBar.MoveToY(5);
+
             showOverlays(true);
 
             OnTrackRunningToggle?.Invoke(track.IsRunning);
@@ -657,7 +601,18 @@ namespace osu.Game.Screens.Mvis
             foreach (var sc in sidebar.Components)
             {
                 if (sc is PluginSidebarPage plsp && plsp.Plugin == pl)
+                {
                     sidebar.Remove(plsp);
+
+                    foreach (var d in bottomBar.PluginEntriesFillFlow)
+                    {
+                        if (d is PluginBottomBarButton btn && btn.Page == plsp)
+                        {
+                            btn.FadeOut(300, Easing.OutQuint).Then().Expire();
+                            //bottomBar.PluginEntriesFillFlow.Remove(btn);
+                        }
+                    }
+                }
             }
         }
 
@@ -735,7 +690,6 @@ namespace osu.Game.Screens.Mvis
 
             //非背景层的动画
             foreground.ScaleTo(0f).Then().ScaleTo(1f, duration, Easing.OutQuint);
-            bottomFillFlow.MoveToY(bottomBar.Height + 30).Then().MoveToY(0, duration, Easing.OutQuint);
             skinnableForeground.FadeIn(duration, Easing.OutQuint);
 
             isPushed = true;
@@ -756,7 +710,8 @@ namespace osu.Game.Screens.Mvis
 
             //非背景层的动画
             foreground.ScaleTo(0, duration, Easing.OutQuint);
-            bottomFillFlow.MoveToY(bottomBar.Height + 30, duration, Easing.OutQuint);
+            bottomBar.MoveToY(bottomBar.Height + 10, duration, Easing.OutQuint).FadeOut(duration, Easing.OutExpo);
+            progressBar.MoveToY(3.5f, duration, Easing.OutQuint).FadeTo(0.1f, duration, Easing.OutExpo);
 
             this.FadeOut(500, Easing.OutQuint);
 
@@ -901,15 +856,14 @@ namespace osu.Game.Screens.Mvis
         private void hideOverlays(bool force)
         {
             if (!force && (!canReallyHide || !isIdle.Value || !IsHovered
-                           || bottomBar.Hovered.Value || lockButton.ToggleableValue.Value
+                           || bottomBar.IsHovered || lockButton.ToggleableValue.Value
                            || lockChanges.Value))
                 return;
 
             skinnableBbBackground.MoveToY(bottomBar.Height, duration, Easing.OutQuint)
                                  .FadeOut(duration, Easing.OutQuint);
-            buttonsContainer.MoveToY(bottomBar.Height, duration, Easing.OutQuint);
-            progressBar.MoveToY(5, duration, Easing.OutQuint);
-            bottomBar.FadeOut(duration, Easing.OutQuint);
+            bottomBar.MoveToY(bottomBar.Height + 10, duration, Easing.OutQuint).FadeOut(duration, Easing.OutQuint);
+            progressBar.MoveToY(4f, duration, Easing.OutQuint);
 
             OverlaysHidden = true;
             updateIdleVisuals();
@@ -929,9 +883,8 @@ namespace osu.Game.Screens.Mvis
 
             skinnableBbBackground.MoveToY(0, duration, Easing.OutQuint)
                                  .FadeIn(duration, Easing.OutQuint);
-            buttonsContainer.MoveToY(0, duration, Easing.OutQuint);
+            bottomBar.MoveToY(0, duration, Easing.OutQuint).FadeIn(duration, Easing.OutQuint);
             progressBar.MoveToY(0, duration, Easing.OutQuint);
-            bottomBar.FadeIn(duration, Easing.OutQuint);
 
             OverlaysHidden = false;
 

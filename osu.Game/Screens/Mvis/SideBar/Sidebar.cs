@@ -25,6 +25,9 @@ namespace osu.Game.Screens.Mvis.SideBar
         [Resolved]
         private CustomColourProvider colourProvider { get; set; }
 
+        [Resolved]
+        private MvisScreen mvisScreen { get; set; }
+
         public readonly List<ISidebarContent> Components = new List<ISidebarContent>();
         private readonly TabHeader header;
         private const float duration = 400;
@@ -158,7 +161,12 @@ namespace osu.Game.Screens.Mvis.SideBar
 
         protected override void UpdateAfterChildren()
         {
-            contentContainer.Padding = new MarginPadding { Top = header.Height + header.DrawPosition.Y, Bottom = 50 };
+            contentContainer.Padding = new MarginPadding
+            {
+                Top = header.Height + header.DrawPosition.Y,
+                Bottom = mvisScreen.BottombarHeight
+            };
+
             base.UpdateAfterChildren();
         }
 

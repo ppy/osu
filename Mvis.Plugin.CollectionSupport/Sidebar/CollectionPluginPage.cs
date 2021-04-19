@@ -43,6 +43,8 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
+        public override PluginBottomBarButton CreateBottomBarButton() => new CollectionSupportEntryButton(this);
+
         [BackgroundDependencyLoader]
         private void load()
         {

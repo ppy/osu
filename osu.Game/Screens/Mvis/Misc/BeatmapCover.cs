@@ -26,14 +26,14 @@ namespace osu.Game.Screens.Mvis.Misc
 
         public BeatmapCover(WorkingBeatmap beatmap)
         {
+            RelativeSizeAxes = Axes.Both;
+
             b = beatmap;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            RelativeSizeAxes = Axes.Both;
-
             if (BackgroundBox)
             {
                 AddInternal(new Box
