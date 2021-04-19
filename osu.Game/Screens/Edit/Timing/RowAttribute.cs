@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Edit.Timing
                                     Padding = new MarginPadding(3),
                                     Font = OsuFont.Default.With(weight: FontWeight.SemiBold, size: 12),
                                     Text = label,
-                                    Colour = colours.Gray0
+                                    Colour = overlayColours.Background5,
                                 },
                             },
                         },

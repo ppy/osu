@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Edit.Timing.RowAttributes
             CornerRadius = Height / 2;
 
             BackgroundColour = overlayColours.Background6;
-            Colour = controlPoint.GetRepresentingColour(colours);
+            FillColour = controlPoint.GetRepresentingColour(colours);
         }
     }
 }
