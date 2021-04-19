@@ -44,7 +44,6 @@ namespace osu.Game.Screens.Spectate
         private readonly object stateLock = new object();
 
         private readonly Dictionary<int, User> userMap = new Dictionary<int, User>();
-        private readonly Dictionary<int, SpectatorState> spectatorStates = new Dictionary<int, SpectatorState>();
         private readonly Dictionary<int, GameplayState> gameplayStates = new Dictionary<int, GameplayState>();
 
         private IBindable<WeakReference<BeatmapSetInfo>> managerUpdated;
@@ -107,9 +106,12 @@ namespace osu.Game.Screens.Spectate
 
             lock (stateLock)
             {
-                foreach (var (userId, state) in spectatorStates)
+                foreach (var (userId, _) in userMap)
                 {
-                    if (beatmapSet.Beatmaps.Any(b => b.OnlineBeatmapID == state.BeatmapID))
+                    if (!spectatorClient.TryGetPlayingUserState(userId, out var userState))
+                        continue;
+
+                    if (beatmapSet.Beatmaps.Any(b => b.OnlineBeatmapID == userState.BeatmapID))
                         updateGameplayState(userId);
                 }
             }
@@ -125,7 +127,6 @@ namespace osu.Game.Screens.Spectate
                 if (!userMap.ContainsKey(userId))
                     return;
 
-                spectatorStates[userId] = state;
                 Schedule(() => OnUserStateChanged(userId, state));
 
                 updateGameplayState(userId);
@@ -138,7 +139,10 @@ namespace osu.Game.Screens.Spectate
             {
                 Debug.Assert(userMap.ContainsKey(userId));
 
-                var spectatorState = spectatorStates[userId];
+                // The user may have stopped playing.
+                if (!spectatorClient.TryGetPlayingUserState(userId, out var spectatorState))
+                    return;
+
                 var user = userMap[userId];
 
                 var resolvedRuleset = rulesets.AvailableRulesets.FirstOrDefault(r => r.ID == spectatorState.RulesetID)?.CreateInstance();
