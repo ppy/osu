@@ -31,11 +31,6 @@ namespace osu.Game.Online.Chat
             Parts = parts.ToList();
         }
 
-        public DrawableLinkCompiler(Drawable part)
-        {
-            Parts = new List<Drawable> { part };
-        }
-
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
