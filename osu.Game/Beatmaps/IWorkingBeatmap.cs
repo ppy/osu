@@ -43,6 +43,11 @@ namespace osu.Game.Beatmaps
         ISkin Skin { get; }
 
         /// <summary>
+        /// Get the loaded audio track instance.
+        /// </summary>
+        Track Track { get; }
+
+        /// <summary>
         /// Constructs a playable <see cref="IBeatmap"/> from <see cref="Beatmap"/> using the applicable converters for a specific <see cref="RulesetInfo"/>.
         /// <para>
         /// The returned <see cref="IBeatmap"/> is in a playable state - all <see cref="HitObject"/> and <see cref="BeatmapDifficulty"/> <see cref="Mod"/>s
