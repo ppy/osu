@@ -584,7 +584,7 @@ namespace osu.Game
                     SessionStatics.ResetValues();
             });
 
-            Add(new GameIdleTracker(300000));
+            Add(sessionIdleTracker);
 
             AddRange(new Drawable[]
             {
