@@ -149,7 +149,7 @@ namespace osu.Game.Tests.Visual.Components
 
         private void waitForAllIdle()
         {
-            AddUntilStep("Wait for all idle", () => box1.IsIdle && box2.IsIdle && box3.IsIdle && box4.IsIdle);
+            AddUntilStep("wait for all idle", () => box1.IsIdle && box2.IsIdle && box3.IsIdle && box4.IsIdle);
         }
 
         private class IdleTrackingBox : CompositeDrawable
@@ -158,7 +158,7 @@ namespace osu.Game.Tests.Visual.Components
 
             public bool IsIdle => idleTracker.IsIdle.Value;
 
-            public IdleTrackingBox(double timeToIdle)
+            public IdleTrackingBox(int timeToIdle)
             {
                 Box box;
 
@@ -167,7 +167,7 @@ namespace osu.Game.Tests.Visual.Components
 
                 InternalChildren = new Drawable[]
                 {
-                    idleTracker = new IdleTracker(timeToIdle),
+                    idleTracker = new GameIdleTracker(timeToIdle),
                     box = new Box
                     {
                         Colour = Color4.White,
