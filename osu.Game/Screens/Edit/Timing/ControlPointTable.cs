@@ -12,8 +12,8 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Screens.Edit.Timing.RowAttributes;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Timing
 {
@@ -66,9 +66,7 @@ namespace osu.Game.Screens.Edit.Timing
         {
             var columns = new List<TableColumn>
             {
-                new TableColumn(string.Empty, Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-                new TableColumn("Time", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-                new TableColumn(),
+                new TableColumn("Time", Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, 120)),
                 new TableColumn("Attributes", Anchor.CentreLeft),
             };
 
@@ -79,16 +77,9 @@ namespace osu.Game.Screens.Edit.Timing
         {
             new OsuSpriteText
             {
-                Text = $"#{index + 1}",
-                Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Bold),
-                Margin = new MarginPadding(10)
-            },
-            new OsuSpriteText
-            {
                 Text = group.Time.ToEditorFormattedString(),
                 Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Bold)
             },
-            null,
             new ControlGroupAttributes(group),
         };
 
@@ -128,30 +119,29 @@ namespace osu.Game.Screens.Edit.Timing
 
             private void createChildren()
             {
-                fill.ChildrenEnumerable = controlPoints.Select(createAttribute).Where(c => c != null);
+                fill.ChildrenEnumerable = controlPoints
+                                          .Select(createAttribute)
+                                          .Where(c => c != null)
+                                          // arbitrary ordering to make timing points first.
+                                          // probably want to explicitly define order in the future.
+                                          .OrderByDescending(c => c.GetType().Name);
             }
 
             private Drawable createAttribute(ControlPoint controlPoint)
             {
-                Color4 colour = controlPoint.GetRepresentingColour(colours);
-
                 switch (controlPoint)
                 {
                     case TimingControlPoint timing:
-                        return new RowAttribute("timing", () => $"{60000 / timing.BeatLength:n1}bpm {timing.TimeSignature}", colour);
+                        return new TimingRowAttribute(timing);
 
                     case DifficultyControlPoint difficulty:
-
-                        return new RowAttribute("difficulty", () => $"{difficulty.SpeedMultiplier:n2}x", colour);
+                        return new DifficultyRowAttribute(difficulty);
 
                     case EffectControlPoint effect:
-                        return new RowAttribute("effect", () => string.Join(" ",
-                            effect.KiaiMode ? "Kiai" : string.Empty,
-                            effect.OmitFirstBarLine ? "NoBarLine" : string.Empty
-                        ).Trim(), colour);
+                        return new EffectRowAttribute(effect);
 
                     case SampleControlPoint sample:
-                        return new RowAttribute("sample", () => $"{sample.SampleBank} {sample.SampleVolume}%", colour);
+                        return new SampleRowAttribute(sample);
                 }
 
                 return null;
