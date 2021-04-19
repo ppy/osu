@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Mvis.Plugins
         internal Action<MvisPlugin> OnPluginAdd;
         internal Action<MvisPlugin> OnPluginUnLoad;
 
-        public int PluginVersion => 1;
+        public int PluginVersion => 2;
 
         [BackgroundDependencyLoader]
         private void load(CustomStore customStore, OsuGameBase gameBase)
