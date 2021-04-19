@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Edit
 
         protected const float ROW_HEIGHT = 25;
 
-        protected const int TEXT_SIZE = 14;
+        public const int TEXT_SIZE = 14;
 
         protected readonly FillFlowContainer<RowBackground> BackgroundFlow;
 
