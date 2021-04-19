@@ -60,10 +60,10 @@ namespace osu.Game.Screens.Edit.Timing.RowAttributes
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    Padding = new MarginPadding(3),
+                    Padding = new MarginPadding(6),
                     Font = OsuFont.Default.With(weight: FontWeight.SemiBold, size: 12),
                     Text = text,
-                    Colour = colours.Gray0
+                    Colour = overlayColours.Background5,
                 },
             };
         }
