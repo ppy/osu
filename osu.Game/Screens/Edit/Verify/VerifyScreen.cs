@@ -124,10 +124,10 @@ namespace osu.Game.Screens.Edit.Verify
             private void refresh()
             {
                 var workingBeatmap = beatmapManager.GetWorkingBeatmap(beatmap.BeatmapInfo);
-                var issues = generalVerifier.Run(workingBeatmap);
+                var issues = generalVerifier.Run(beatmap.PlayableBeatmap, workingBeatmap);
 
                 if (rulesetVerifier != null)
-                    issues = issues.Concat(rulesetVerifier.Run(workingBeatmap));
+                    issues = issues.Concat(rulesetVerifier.Run(beatmap.PlayableBeatmap, workingBeatmap));
 
                 table.Issues = issues
                                .OrderBy(issue => issue.Template.Type)
