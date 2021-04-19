@@ -204,23 +204,27 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <param name="lifetimeEntry">The <see cref="HitObjectLifetimeEntry"/> controlling the lifetime of <paramref name="hitObject"/>.</param>
         public void Apply([NotNull] HitObject hitObject, [CanBeNull] HitObjectLifetimeEntry lifetimeEntry)
         {
-            free();
-
-            HitObject = hitObject ?? throw new InvalidOperationException($"Cannot apply a null {nameof(HitObject)}.");
-
-            this.lifetimeEntry = lifetimeEntry;
+            if (hitObject == null)
+                throw new ArgumentNullException($"Cannot apply a null {nameof(HitObject)}.");
 
             if (lifetimeEntry != null)
             {
-                // Transfer lifetime from the entry.
-                LifetimeStart = lifetimeEntry.LifetimeStart;
-                LifetimeEnd = lifetimeEntry.LifetimeEnd;
-
-                // Copy any existing result from the entry (required for rewind / judgement revert).
-                Result = lifetimeEntry.Result;
+                applyEntry(lifetimeEntry);
             }
             else
-                LifetimeStart = HitObject.StartTime - InitialLifetimeOffset;
+            {
+                applyHitObject(hitObject);
+
+                // Set default lifetime for a non-pooled DHO
+                LifetimeStart = hitObject.StartTime - InitialLifetimeOffset;
+            }
+        }
+
+        private void applyHitObject([NotNull] HitObject hitObject)
+        {
+            freeHitObject();
+
+            HitObject = hitObject;
 
             // Ensure this DHO has a result.
             Result ??= CreateResult(HitObject.CreateJudgement())
@@ -281,10 +285,23 @@ namespace osu.Game.Rulesets.Objects.Drawables
             hasHitObjectApplied = true;
         }
 
+        private void applyEntry([NotNull] HitObjectLifetimeEntry entry)
+        {
+            freeEntry();
+
+            setLifetime(entry.LifetimeStart, entry.LifetimeEnd);
+            lifetimeEntry = entry;
+
+            // Copy any existing result from the entry (required for rewind / judgement revert).
+            Result = entry.Result;
+
+            applyHitObject(entry.HitObject);
+        }
+
         /// <summary>
         /// Removes the currently applied <see cref="HitObject"/>
         /// </summary>
-        private void free()
+        private void freeHitObject()
         {
             if (!hasHitObjectApplied)
                 return;
@@ -322,11 +339,21 @@ namespace osu.Game.Rulesets.Objects.Drawables
             HitObject = null;
             ParentHitObject = null;
             Result = null;
-            lifetimeEntry = null;
 
             clearExistingStateTransforms();
 
             hasHitObjectApplied = false;
+        }
+
+        private void freeEntry()
+        {
+            freeHitObject();
+
+            if (lifetimeEntry == null) return;
+
+            lifetimeEntry = null;
+
+            setLifetime(double.MaxValue, double.MaxValue);
         }
 
         protected sealed override void FreeAfterUse()
@@ -337,7 +364,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (!IsInPool)
                 return;
 
-            free();
+            freeEntry();
         }
 
         /// <summary>
