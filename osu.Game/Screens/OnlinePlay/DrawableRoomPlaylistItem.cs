@@ -18,7 +18,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.Chat;
@@ -109,8 +108,7 @@ namespace osu.Game.Screens.OnlinePlay
             difficultyIconContainer.Child = new DifficultyIcon(beatmap.Value, ruleset.Value, requiredMods) { Size = new Vector2(32) };
 
             beatmapText.Clear();
-            beatmapText.AddLink(new OsuSpriteText { Text = Item.Beatmap.Value.ToRomanisableString() },
-                LinkAction.OpenBeatmap, Item.Beatmap.Value.OnlineBeatmapID.ToString());
+            beatmapText.AddLink(Item.Beatmap.Value.ToRomanisableString(), LinkAction.OpenBeatmap, Item.Beatmap.Value.OnlineBeatmapID.ToString());
 
             authorText.Clear();
 

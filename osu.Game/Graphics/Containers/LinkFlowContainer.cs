@@ -7,7 +7,10 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using System.Collections.Generic;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 
 namespace osu.Game.Graphics.Containers
@@ -59,17 +62,18 @@ namespace osu.Game.Graphics.Containers
         public void AddLink(string text, LinkAction action, string argument, string tooltipText = null, Action<SpriteText> creationParameters = null)
             => createLink(AddText(text, creationParameters), new LinkDetails(action, argument), tooltipText);
 
+        public void AddLink(RomanisableString text, LinkAction action, string argument, string tooltipText = null, Action<SpriteText> creationParameters = null)
+        {
+            var spriteText = new OsuSpriteText { Text = text };
+
+            AddText(spriteText, creationParameters);
+            createLink(spriteText.Yield(), new LinkDetails(action, argument), tooltipText);
+        }
+
         public void AddLink(IEnumerable<SpriteText> text, LinkAction action = LinkAction.External, string linkArgument = null, string tooltipText = null)
         {
             foreach (var t in text)
                 AddArbitraryDrawable(t);
-
-            createLink(text, new LinkDetails(action, linkArgument), tooltipText);
-        }
-
-        public void AddLink(SpriteText text, LinkAction action = LinkAction.External, string linkArgument = null, string tooltipText = null)
-        {
-            AddArbitraryDrawable(text);
 
             createLink(text, new LinkDetails(action, linkArgument), tooltipText);
         }
@@ -80,22 +84,6 @@ namespace osu.Game.Graphics.Containers
         private void createLink(IEnumerable<Drawable> drawables, LinkDetails link, string tooltipText, Action action = null)
         {
             AddInternal(new DrawableLinkCompiler(drawables.OfType<SpriteText>().ToList())
-            {
-                RelativeSizeAxes = Axes.Both,
-                TooltipText = tooltipText,
-                Action = () =>
-                {
-                    if (action != null)
-                        action();
-                    else
-                        game?.HandleLink(link);
-                },
-            });
-        }
-
-        private void createLink(Drawable drawable, LinkDetails link, string tooltipText, Action action = null)
-        {
-            AddInternal(new DrawableLinkCompiler(drawable)
             {
                 RelativeSizeAxes = Axes.Both,
                 TooltipText = tooltipText,
