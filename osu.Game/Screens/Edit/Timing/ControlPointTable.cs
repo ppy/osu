@@ -138,7 +138,7 @@ namespace osu.Game.Screens.Edit.Timing
                         return new TimingRowAttribute(timing);
 
                     case DifficultyControlPoint difficulty:
-                        return new EmptyRowAttribute("difficulty", () => $"{difficulty.SpeedMultiplier:n2}x", colour);
+                        return new DifficultyRowAttribute(difficulty);
 
                     case EffectControlPoint effect:
                         return new EmptyRowAttribute("effect", () => string.Join(" ",
