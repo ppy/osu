@@ -308,7 +308,7 @@ namespace osu.Game.Screens.Select
                                 Margin = new MarginPadding { Top = 10 },
                                 Direction = FillDirection.Horizontal,
                                 AutoSizeAxes = Axes.Both,
-                                Children = new[] { getMapper(metadata) },
+                                Child = getMapper(metadata),
                             },
                             infoLabelContainer = new FillFlowContainer
                             {
@@ -431,10 +431,10 @@ namespace osu.Game.Screens.Select
                 ForceRedraw();
             }
 
-            private LinkFlowContainer getMapper(BeatmapMetadata metadata)
+            private Drawable getMapper(BeatmapMetadata metadata)
             {
                 if (metadata.Author == null)
-                    return new LinkFlowContainer();
+                    return Empty();
 
                 return new LinkFlowContainer(s =>
                 {
