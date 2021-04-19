@@ -12,6 +12,9 @@ using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
+    /// <summary>
+    /// A component which displays a collection of colours in individual <see cref="ColourDisplay"/>s.
+    /// </summary>
     public class ColourPalette : CompositeDrawable
     {
         public BindableList<Color4> Colours { get; } = new BindableList<Color4>();
