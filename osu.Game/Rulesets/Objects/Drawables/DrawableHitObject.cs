@@ -39,7 +39,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// The <see cref="HitObject"/> currently represented by this <see cref="DrawableHitObject"/>.
         /// </summary>
-        public HitObject HitObject { get; private set; }
+        public HitObject HitObject => lifetimeEntry?.HitObject ?? initialHitObject;
+
+        /// <summary>
+        /// The <see cref="HitObject"/> given in the constructor that will be applied when loaded.
+        /// </summary>
+        private HitObject initialHitObject;
 
         /// <summary>
         /// The parenting <see cref="DrawableHitObject"/>, if any.
@@ -108,7 +113,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// The scoring result of this <see cref="DrawableHitObject"/>.
         /// </summary>
-        public JudgementResult Result { get; private set; }
+        public JudgementResult Result => lifetimeEntry?.Result;
 
         /// <summary>
         /// The relative X position of this hit object for sample playback balance adjustment.
@@ -141,11 +146,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public IBindable<ArmedState> State => state;
 
         /// <summary>
-        /// Whether <see cref="HitObject"/> is currently applied.
-        /// </summary>
-        private bool hasHitObjectApplied;
-
-        /// <summary>
         /// The <see cref="HitObjectLifetimeEntry"/> controlling the lifetime of the currently-attached <see cref="HitObject"/>.
         /// </summary>
         [CanBeNull]
@@ -168,7 +168,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </param>
         protected DrawableHitObject([CanBeNull] HitObject initialHitObject = null)
         {
-            HitObject = initialHitObject;
+            this.initialHitObject = initialHitObject;
         }
 
         [BackgroundDependencyLoader]
@@ -184,8 +184,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             base.LoadAsyncComplete();
 
-            if (HitObject != null)
-                Apply(HitObject, lifetimeEntry);
+            if (initialHitObject != null)
+            {
+                Apply(initialHitObject, null);
+                initialHitObject = null;
+            }
         }
 
         protected override void LoadComplete()
@@ -209,26 +212,36 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             if (lifetimeEntry != null)
             {
-                applyEntry(lifetimeEntry);
+                if (lifetimeEntry.HitObject != hitObject)
+                    throw new InvalidOperationException($"{nameof(HitObjectLifetimeEntry)} has different {nameof(HitObject)} from the specified one.");
+
+                apply(lifetimeEntry);
             }
             else
             {
-                applyHitObject(hitObject);
+                var unmanagedEntry = new UnmanagedHitObjectEntry(hitObject, this);
+                apply(unmanagedEntry);
 
                 // Set default lifetime for a non-pooled DHO
                 LifetimeStart = hitObject.StartTime - InitialLifetimeOffset;
             }
         }
 
-        private void applyHitObject([NotNull] HitObject hitObject)
+        /// <summary>
+        /// Applies a new <see cref="HitObjectLifetimeEntry"/> to be represented by this <see cref="DrawableHitObject"/>.
+        /// </summary>
+        private void apply([NotNull] HitObjectLifetimeEntry entry)
         {
-            freeHitObject();
+            free();
 
-            HitObject = hitObject;
+            lifetimeEntry = entry;
+
+            LifetimeStart = entry.LifetimeStart;
+            LifetimeEnd = entry.LifetimeEnd;
 
             // Ensure this DHO has a result.
-            Result ??= CreateResult(HitObject.CreateJudgement())
-                       ?? throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
+            entry.Result ??= CreateResult(HitObject.CreateJudgement())
+                             ?? throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
 
             // Copy back the result to the entry for potential future retrieval.
             if (lifetimeEntry != null)
@@ -281,30 +294,14 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 else
                     updateState(ArmedState.Idle, true);
             }
-
-            hasHitObjectApplied = true;
-        }
-
-        private void applyEntry([NotNull] HitObjectLifetimeEntry entry)
-        {
-            freeEntry();
-
-            setLifetime(entry.LifetimeStart, entry.LifetimeEnd);
-            lifetimeEntry = entry;
-
-            // Copy any existing result from the entry (required for rewind / judgement revert).
-            Result = entry.Result;
-
-            applyHitObject(entry.HitObject);
         }
 
         /// <summary>
-        /// Removes the currently applied <see cref="HitObject"/>
+        /// Removes the currently applied <see cref="lifetimeEntry"/>
         /// </summary>
-        private void freeHitObject()
+        private void free()
         {
-            if (!hasHitObjectApplied)
-                return;
+            if (lifetimeEntry == null) return;
 
             StartTimeBindable.UnbindFrom(HitObject.StartTimeBindable);
             if (HitObject is IHasComboInformation combo)
@@ -336,24 +333,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             OnFree();
 
-            HitObject = null;
             ParentHitObject = null;
-            Result = null;
-
-            clearExistingStateTransforms();
-
-            hasHitObjectApplied = false;
-        }
-
-        private void freeEntry()
-        {
-            freeHitObject();
-
-            if (lifetimeEntry == null) return;
-
             lifetimeEntry = null;
 
-            setLifetime(double.MaxValue, double.MaxValue);
+            clearExistingStateTransforms();
         }
 
         protected sealed override void FreeAfterUse()
@@ -364,7 +347,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (!IsInPool)
                 return;
 
-            freeEntry();
+            free();
         }
 
         /// <summary>
