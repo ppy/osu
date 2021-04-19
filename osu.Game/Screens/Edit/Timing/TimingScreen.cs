@@ -106,9 +106,9 @@ namespace osu.Game.Screens.Edit.Timing
                             },
                             new OsuButton
                             {
-                                Text = "+",
+                                Text = "+ Add at current time",
                                 Action = addNew,
-                                Size = new Vector2(30, 30),
+                                Size = new Vector2(160, 30),
                                 Anchor = Anchor.BottomRight,
                                 Origin = Anchor.BottomRight,
                             },
