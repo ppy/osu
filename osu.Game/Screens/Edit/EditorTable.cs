@@ -96,8 +96,8 @@ namespace osu.Game.Screens.Edit
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colours)
             {
-                hoveredBackground.Colour = colourHover = colours.Background3;
-                colourSelected = colours.Background1;
+                hoveredBackground.Colour = colourHover = colours.Background1;
+                colourSelected = colours.Colour3;
             }
 
             private bool selected;

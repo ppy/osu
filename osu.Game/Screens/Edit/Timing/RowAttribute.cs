@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Edit.Timing
             Origin = Anchor.CentreLeft;
 
             Masking = true;
-            CornerRadius = 5;
+            CornerRadius = 3;
 
             InternalChildren = new Drawable[]
             {
@@ -53,33 +53,25 @@ namespace osu.Game.Screens.Edit.Timing
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
                     Direction = FillDirection.Horizontal,
-                    Margin = new MarginPadding { Right = 5 },
+                    Margin = new MarginPadding { Horizontal = 5 },
                     Spacing = new Vector2(5),
                     Children = new Drawable[]
                     {
-                        new Container
+                        new Circle
                         {
-                            RelativeSizeAxes = Axes.Y,
-                            AutoSizeAxes = Axes.X,
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    Colour = Point.GetRepresentingColour(colours),
-                                    RelativeSizeAxes = Axes.Both,
-                                },
-                                new OsuSpriteText
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Padding = new MarginPadding(3),
-                                    Font = OsuFont.Default.With(weight: FontWeight.SemiBold, size: 12),
-                                    Text = label,
-                                    Colour = overlayColours.Background5,
-                                },
-                            },
+                            Colour = Point.GetRepresentingColour(colours),
+                            RelativeSizeAxes = Axes.Y,
+                            Size = new Vector2(4, 0.6f),
+                        },
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Padding = new MarginPadding(3),
+                            Font = OsuFont.Default.With(weight: FontWeight.Bold, size: 12),
+                            Text = label,
                         },
                     },
                 }
