@@ -286,11 +286,11 @@ namespace osu.Game.Screens.Play
             DimmableStoryboard.HasStoryboardEnded.ValueChanged += storyboardEnded =>
             {
                 if (storyboardEnded.NewValue && completionProgressDelegate == null)
-                    updateCompletionState(new ValueChangedEvent<bool>(true, ScoreProcessor.HasCompleted.Value));
+                    updateCompletionState();
             };
 
             // Bind the judgement processors to ourselves
-            ScoreProcessor.HasCompleted.BindValueChanged(e => updateCompletionState(e));
+            ScoreProcessor.HasCompleted.BindValueChanged(_ => updateCompletionState());
             HealthProcessor.Failed += onFail;
 
             foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
@@ -370,7 +370,7 @@ namespace osu.Game.Screens.Play
                     },
                     skipOutroOverlay = new SkipOverlay(Beatmap.Value.Storyboard.LatestEventTime ?? 0)
                     {
-                        RequestSkip = () => updateCompletionState(new ValueChangedEvent<bool>(true, true), true),
+                        RequestSkip = () => updateCompletionState(true),
                         Alpha = 0
                     },
                     FailOverlay = new FailOverlay
@@ -542,7 +542,7 @@ namespace osu.Game.Screens.Play
 
                 // if the score is ready for display but results screen has not been pushed yet (e.g. storyboard is still playing beyond gameplay), then transition to results screen instead of exiting.
                 if (prepareScoreForDisplayTask != null)
-                    updateCompletionState(new ValueChangedEvent<bool>(true, true), true);
+                    updateCompletionState(true);
             }
 
             this.Exit();
@@ -581,13 +581,13 @@ namespace osu.Game.Screens.Play
         private ScheduledDelegate completionProgressDelegate;
         private Task<ScoreInfo> prepareScoreForDisplayTask;
 
-        private void updateCompletionState(ValueChangedEvent<bool> completionState, bool skipStoryboardOutro = false)
+        private void updateCompletionState(bool skipStoryboardOutro = false)
         {
             // screen may be in the exiting transition phase.
             if (!this.IsCurrentScreen())
                 return;
 
-            if (!completionState.NewValue)
+            if (!ScoreProcessor.HasCompleted.Value)
             {
                 completionProgressDelegate?.Cancel();
                 completionProgressDelegate = null;
