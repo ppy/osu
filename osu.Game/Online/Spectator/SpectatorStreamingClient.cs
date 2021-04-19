@@ -47,7 +47,7 @@ namespace osu.Game.Online.Spectator
 
         private readonly BindableList<int> playingUsers = new BindableList<int>();
 
-        private readonly Dictionary<int, SpectatorState> currentUserStates = new Dictionary<int, SpectatorState>();
+        private readonly Dictionary<int, SpectatorState> playingUserStates = new Dictionary<int, SpectatorState>();
 
         [CanBeNull]
         private IBeatmap currentBeatmap;
@@ -128,7 +128,7 @@ namespace osu.Game.Online.Spectator
                         lock (userLock)
                         {
                             playingUsers.Clear();
-                            currentUserStates.Clear();
+                            playingUserStates.Clear();
                         }
                     }
                 }, true);
@@ -142,7 +142,7 @@ namespace osu.Game.Online.Spectator
                 if (!playingUsers.Contains(userId))
                     playingUsers.Add(userId);
 
-                currentUserStates[userId] = state;
+                playingUserStates[userId] = state;
             }
 
             OnUserBeganPlaying?.Invoke(userId, state);
@@ -155,7 +155,7 @@ namespace osu.Game.Online.Spectator
             lock (userLock)
             {
                 playingUsers.Remove(userId);
-                currentUserStates.Remove(userId);
+                playingUserStates.Remove(userId);
             }
 
             OnUserFinishedPlaying?.Invoke(userId, state);
@@ -298,7 +298,7 @@ namespace osu.Game.Online.Spectator
 
             lock (userLock)
             {
-                foreach (var (userId, state) in currentUserStates)
+                foreach (var (userId, state) in playingUserStates)
                     callback(userId, state);
             }
         }
