@@ -15,14 +15,16 @@ namespace osu.Game.Screens.Edit.Timing
 {
     public class RowAttribute : CompositeDrawable
     {
-        private readonly ControlPoint point;
+        protected readonly ControlPoint Point;
+
         private readonly string label;
 
         protected FillFlowContainer Content { get; private set; }
 
         public RowAttribute(ControlPoint point, string label)
         {
-            this.point = point;
+            Point = point;
+
             this.label = label;
         }
 
@@ -65,7 +67,7 @@ namespace osu.Game.Screens.Edit.Timing
                             {
                                 new Box
                                 {
-                                    Colour = point.GetRepresentingColour(colours),
+                                    Colour = Point.GetRepresentingColour(colours),
                                     RelativeSizeAxes = Axes.Both,
                                 },
                                 new OsuSpriteText
