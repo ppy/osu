@@ -290,7 +290,7 @@ namespace osu.Game.Screens.Play
             };
 
             // Bind the judgement processors to ourselves
-            ScoreProcessor.HasCompleted.ValueChanged += updateCompletionState;
+            ScoreProcessor.HasCompleted.BindValueChanged(e => updateCompletionState(e));
             HealthProcessor.Failed += onFail;
 
             foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
@@ -370,7 +370,7 @@ namespace osu.Game.Screens.Play
                     },
                     skipOutroOverlay = new SkipOverlay(Beatmap.Value.Storyboard.LatestEventTime ?? 0)
                     {
-                        RequestSkip = scheduleCompletion,
+                        RequestSkip = () => updateCompletionState(new ValueChangedEvent<bool>(true, true), true),
                         Alpha = 0
                     },
                     FailOverlay = new FailOverlay
@@ -542,7 +542,7 @@ namespace osu.Game.Screens.Play
 
                 // if the score is ready for display but results screen has not been pushed yet (e.g. storyboard is still playing beyond gameplay), then transition to results screen instead of exiting.
                 if (prepareScoreForDisplayTask != null)
-                    scheduleCompletion();
+                    updateCompletionState(new ValueChangedEvent<bool>(true, true), true);
             }
 
             this.Exit();
@@ -581,7 +581,7 @@ namespace osu.Game.Screens.Play
         private ScheduledDelegate completionProgressDelegate;
         private Task<ScoreInfo> prepareScoreForDisplayTask;
 
-        private void updateCompletionState(ValueChangedEvent<bool> completionState)
+        private void updateCompletionState(ValueChangedEvent<bool> completionState, bool skipStoryboardOutro = false)
         {
             // screen may be in the exiting transition phase.
             if (!this.IsCurrentScreen())
@@ -630,6 +630,12 @@ namespace osu.Game.Screens.Play
 
                 return score.ScoreInfo;
             });
+
+            if (skipStoryboardOutro)
+            {
+                scheduleCompletion();
+                return;
+            }
 
             var storyboardHasOutro = DimmableStoryboard.ContentDisplayed && !DimmableStoryboard.HasStoryboardEnded.Value;
 
