@@ -19,8 +19,10 @@ namespace osu.Game.Rulesets.Edit
             // Resources
             new CheckBackgroundPresence(),
             new CheckBackgroundQuality(),
+
             // Audio
             new CheckAudioPresence(),
+            new CheckAudioQuality()
         };
 
         public IEnumerable<Issue> Run(IBeatmap playableBeatmap, WorkingBeatmap workingBeatmap)
