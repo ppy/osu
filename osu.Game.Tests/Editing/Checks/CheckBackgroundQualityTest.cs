@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Editing.Checks
         }
 
         [Test]
-        public void TestBackgroundMissing()
+        public void TestMissing()
         {
             // While this is a problem, it is out of scope for this check and is caught by a different one.
             beatmap.Metadata.BackgroundFile = null;
@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Editing.Checks
         }
 
         [Test]
-        public void TestBackgroundAcceptable()
+        public void TestAcceptable()
         {
             var mock = getMockWorkingBeatmap(new Texture(1920, 1080));
 
@@ -67,7 +67,7 @@ namespace osu.Game.Tests.Editing.Checks
         }
 
         [Test]
-        public void TestBackgroundTooHighResolution()
+        public void TestTooHighResolution()
         {
             var mock = getMockWorkingBeatmap(new Texture(3840, 2160));
 
@@ -78,7 +78,7 @@ namespace osu.Game.Tests.Editing.Checks
         }
 
         [Test]
-        public void TestBackgroundLowResolution()
+        public void TestLowResolution()
         {
             var mock = getMockWorkingBeatmap(new Texture(640, 480));
 
@@ -89,7 +89,7 @@ namespace osu.Game.Tests.Editing.Checks
         }
 
         [Test]
-        public void TestBackgroundTooLowResolution()
+        public void TestTooLowResolution()
         {
             var mock = getMockWorkingBeatmap(new Texture(100, 100));
 
@@ -100,7 +100,7 @@ namespace osu.Game.Tests.Editing.Checks
         }
 
         [Test]
-        public void TestBackgroundTooUncompressed()
+        public void TestTooUncompressed()
         {
             var mock = getMockWorkingBeatmap(new Texture(1920, 1080), new byte[1024 * 1024 * 3]);
 
