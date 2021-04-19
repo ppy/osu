@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Edit.Timing
         [Resolved]
         private EditorClock clock { get; set; }
 
-        public const float TIMING_COLUMN_WIDTH = 210;
+        public const float TIMING_COLUMN_WIDTH = 220;
 
         public IEnumerable<ControlPointGroup> ControlGroups
         {
