@@ -16,12 +16,14 @@ namespace osu.Game.Screens.Edit.Timing
     public class RowAttribute : CompositeDrawable
     {
         private readonly ControlPoint point;
+        private readonly string label;
 
         protected FillFlowContainer Content { get; private set; }
 
-        public RowAttribute(ControlPoint point)
+        public RowAttribute(ControlPoint point, string label)
         {
             this.point = point;
+            this.label = label;
         }
 
         [BackgroundDependencyLoader]
@@ -72,7 +74,7 @@ namespace osu.Game.Screens.Edit.Timing
                                     Origin = Anchor.CentreLeft,
                                     Padding = new MarginPadding(3),
                                     Font = OsuFont.Default.With(weight: FontWeight.SemiBold, size: 12),
-                                    Text = point.GetType().Name.Replace("ControlPoint", string.Empty).ToLowerInvariant(),
+                                    Text = label,
                                     Colour = colours.Gray0
                                 },
                             },
