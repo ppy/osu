@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         public class IssueTemplateTooUncompressed : IssueTemplate
         {
             public IssueTemplateTooUncompressed(ICheck check)
-                : base(check, IssueType.Problem, "The background filesize ({0:0.#} MB) exceeds {1} MB.")
+                : base(check, IssueType.Problem, "The background filesize ({0:0.##} MB) exceeds {1} MB.")
             {
             }
 
