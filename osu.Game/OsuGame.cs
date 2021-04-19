@@ -577,14 +577,14 @@ namespace osu.Game
 
             dependencies.CacheAs(idleTracker = new GameIdleTracker(6000));
 
-            GameIdleTracker sessionIdleTracker = new GameIdleTracker(300_000);
-            Add(sessionIdleTracker);
-
-            sessionIdleTracker.IsIdle.BindValueChanged(e =>
+            var sessionIdleTracker = new GameIdleTracker(300000);
+            sessionIdleTracker.IsIdle.BindValueChanged(idle =>
             {
-                if (e.NewValue)
-                    Dependencies.Get<SessionStatics>().ResetValues();
+                if (idle.NewValue)
+                    SessionStatics.ResetValues();
             });
+
+            Add(new GameIdleTracker(300000));
 
             AddRange(new Drawable[]
             {
