@@ -23,6 +23,9 @@ namespace osu.Game.Rulesets.Edit
             new CheckAudioPresence(),
         };
 
-        public IEnumerable<Issue> Run(WorkingBeatmap workingBeatmap) => checks.SelectMany(check => check.Run(workingBeatmap));
+        public IEnumerable<Issue> Run(IBeatmap playableBeatmap, WorkingBeatmap workingBeatmap)
+        {
+            return checks.SelectMany(check => check.Run(playableBeatmap, workingBeatmap));
+        }
     }
 }

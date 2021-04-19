@@ -24,7 +24,8 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         /// <summary>
         /// Runs this check and returns any issues detected for the provided beatmap.
         /// </summary>
-        /// <param name="workingBeatmap">The beatmap to run the check on.</param>
-        public IEnumerable<Issue> Run(IWorkingBeatmap workingBeatmap);
+        /// <param name="playableBeatmap">The playable beatmap of the beatmap to run the check on.</param>
+        /// <param name="workingBeatmap">The working beatmap of the beatmap to run the check on.</param>
+        public IEnumerable<Issue> Run(IBeatmap playableBeatmap, IWorkingBeatmap workingBeatmap);
     }
 }

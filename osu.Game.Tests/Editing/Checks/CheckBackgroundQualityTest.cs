@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Editing.Checks
             beatmap.Metadata.BackgroundFile = null;
             var mock = getMockWorkingBeatmap(null, System.Array.Empty<byte>());
 
-            Assert.That(check.Run(mock.Object), Is.Empty);
+            Assert.That(check.Run(beatmap, mock.Object), Is.Empty);
         }
 
         [Test]
@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             var mock = getMockWorkingBeatmap(new Texture(1920, 1080));
 
-            Assert.That(check.Run(mock.Object), Is.Empty);
+            Assert.That(check.Run(beatmap, mock.Object), Is.Empty);
         }
 
         [Test]
@@ -71,7 +71,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             var mock = getMockWorkingBeatmap(new Texture(3840, 2160));
 
-            var issues = check.Run(mock.Object).ToList();
+            var issues = check.Run(beatmap, mock.Object).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues.Single().Template is CheckBackgroundQuality.IssueTemplateTooHighResolution);
@@ -82,7 +82,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             var mock = getMockWorkingBeatmap(new Texture(640, 480));
 
-            var issues = check.Run(mock.Object).ToList();
+            var issues = check.Run(beatmap, mock.Object).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues.Single().Template is CheckBackgroundQuality.IssueTemplateLowResolution);
@@ -93,7 +93,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             var mock = getMockWorkingBeatmap(new Texture(100, 100));
 
-            var issues = check.Run(mock.Object).ToList();
+            var issues = check.Run(beatmap, mock.Object).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues.Single().Template is CheckBackgroundQuality.IssueTemplateTooLowResolution);
@@ -104,7 +104,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             var mock = getMockWorkingBeatmap(new Texture(1920, 1080), new byte[1024 * 1024 * 3]);
 
-            var issues = check.Run(mock.Object).ToList();
+            var issues = check.Run(beatmap, mock.Object).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues.Single().Template is CheckBackgroundQuality.IssueTemplateTooUncompressed);

@@ -15,13 +15,13 @@ namespace osu.Game.Tests.Editing.Checks
     public class CheckFilePresenceTest
     {
         private CheckBackgroundPresence check;
-        private WorkingBeatmap beatmap;
+        private IBeatmap beatmap;
 
         [SetUp]
         public void Setup()
         {
             check = new CheckBackgroundPresence();
-            beatmap = new TestWorkingBeatmap(new Beatmap<HitObject>
+            beatmap = new Beatmap<HitObject>
             {
                 BeatmapInfo = new BeatmapInfo
                 {
@@ -34,13 +34,13 @@ namespace osu.Game.Tests.Editing.Checks
                         })
                     }
                 }
-            });
+            };
         }
 
         [Test]
         public void TestBackgroundSetAndInFiles()
         {
-            Assert.That(check.Run(beatmap), Is.Empty);
+            Assert.That(check.Run(beatmap, new TestWorkingBeatmap(beatmap)), Is.Empty);
         }
 
         [Test]
@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             beatmap.BeatmapInfo.BeatmapSet.Files.Clear();
 
-            var issues = check.Run(beatmap).ToList();
+            var issues = check.Run(beatmap, new TestWorkingBeatmap(beatmap)).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues.Single().Template is CheckFilePresence.IssueTemplateDoesNotExist);
@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             beatmap.Metadata.BackgroundFile = null;
 
-            var issues = check.Run(beatmap).ToList();
+            var issues = check.Run(beatmap, new TestWorkingBeatmap(beatmap)).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues.Single().Template is CheckFilePresence.IssueTemplateNoneSet);

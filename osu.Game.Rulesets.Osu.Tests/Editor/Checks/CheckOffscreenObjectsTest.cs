@@ -224,12 +224,12 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
 
         private void assertOk(IBeatmap beatmap)
         {
-            Assert.That(check.Run(new TestWorkingBeatmap(beatmap)), Is.Empty);
+            Assert.That(check.Run(beatmap, new TestWorkingBeatmap(beatmap)), Is.Empty);
         }
 
         private void assertOffscreenCircle(IBeatmap beatmap)
         {
-            var issues = check.Run(new TestWorkingBeatmap(beatmap)).ToList();
+            var issues = check.Run(beatmap, new TestWorkingBeatmap(beatmap)).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues.Single().Template is CheckOffscreenObjects.IssueTemplateOffscreenCircle);
@@ -237,7 +237,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
 
         private void assertOffscreenSlider(IBeatmap beatmap)
         {
-            var issues = check.Run(new TestWorkingBeatmap(beatmap)).ToList();
+            var issues = check.Run(beatmap, new TestWorkingBeatmap(beatmap)).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues.Single().Template is CheckOffscreenObjects.IssueTemplateOffscreenSlider);
