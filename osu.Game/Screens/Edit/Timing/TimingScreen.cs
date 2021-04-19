@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Edit.Timing
             ColumnDimensions = new[]
             {
                 new Dimension(),
-                new Dimension(GridSizeMode.Absolute, 200),
+                new Dimension(GridSizeMode.Absolute, 350),
             },
             Content = new[]
             {
