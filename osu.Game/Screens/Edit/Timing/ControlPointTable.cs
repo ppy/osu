@@ -12,6 +12,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Screens.Edit.Timing.RowAttributes;
 using osuTK;
 using osuTK.Graphics;
 
@@ -119,7 +120,12 @@ namespace osu.Game.Screens.Edit.Timing
 
             private void createChildren()
             {
-                fill.ChildrenEnumerable = controlPoints.Select(createAttribute).Where(c => c != null);
+                fill.ChildrenEnumerable = controlPoints
+                                          .Select(createAttribute)
+                                          .Where(c => c != null)
+                                          // arbitrary ordering to make timing points first.
+                                          // probably want to explicitly define order in the future.
+                                          .OrderByDescending(c => c.GetType().Name);
             }
 
             private Drawable createAttribute(ControlPoint controlPoint)
@@ -129,20 +135,19 @@ namespace osu.Game.Screens.Edit.Timing
                 switch (controlPoint)
                 {
                     case TimingControlPoint timing:
-                        return new RowAttribute("timing", () => $"{60000 / timing.BeatLength:n1}bpm {timing.TimeSignature}", colour);
+                        return new TimingRowAttribute(timing);
 
                     case DifficultyControlPoint difficulty:
-
-                        return new RowAttribute("difficulty", () => $"{difficulty.SpeedMultiplier:n2}x", colour);
+                        return new EmptyRowAttribute("difficulty", () => $"{difficulty.SpeedMultiplier:n2}x", colour);
 
                     case EffectControlPoint effect:
-                        return new RowAttribute("effect", () => string.Join(" ",
+                        return new EmptyRowAttribute("effect", () => string.Join(" ",
                             effect.KiaiMode ? "Kiai" : string.Empty,
                             effect.OmitFirstBarLine ? "NoBarLine" : string.Empty
                         ).Trim(), colour);
 
                     case SampleControlPoint sample:
-                        return new RowAttribute("sample", () => $"{sample.SampleBank} {sample.SampleVolume}%", colour);
+                        return new EmptyRowAttribute("sample", () => $"{sample.SampleBank} {sample.SampleVolume}%", colour);
                 }
 
                 return null;

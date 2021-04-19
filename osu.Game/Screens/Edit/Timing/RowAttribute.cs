@@ -1,33 +1,31 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osuTK.Graphics;
+using osu.Game.Overlays;
+using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    public class RowAttribute : CompositeDrawable, IHasTooltip
+    public class RowAttribute : CompositeDrawable
     {
-        private readonly string header;
-        private readonly Func<string> content;
-        private readonly Color4 colour;
+        private readonly ControlPoint point;
 
-        public RowAttribute(string header, Func<string> content, Color4 colour)
+        protected FillFlowContainer Content { get; private set; }
+
+        public RowAttribute(ControlPoint point)
         {
-            this.header = header;
-            this.content = content;
-            this.colour = colour;
+            this.point = point;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, OverlayColourProvider overlayColours)
         {
             AutoSizeAxes = Axes.X;
 
@@ -43,21 +41,45 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 new Box
                 {
-                    Colour = colour,
+                    Colour = overlayColours.Background4,
                     RelativeSizeAxes = Axes.Both,
                 },
-                new OsuSpriteText
+                Content = new FillFlowContainer
                 {
-                    Padding = new MarginPadding(2),
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Font = OsuFont.Default.With(weight: FontWeight.SemiBold, size: 12),
-                    Text = header,
-                    Colour = colours.Gray0
-                },
+                    RelativeSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.X,
+                    Direction = FillDirection.Horizontal,
+                    Margin = new MarginPadding { Right = 5 },
+                    Spacing = new Vector2(5),
+                    Children = new Drawable[]
+                    {
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.Y,
+                            AutoSizeAxes = Axes.X,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    Colour = point.GetRepresentingColour(colours),
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                                new OsuSpriteText
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Padding = new MarginPadding(3),
+                                    Font = OsuFont.Default.With(weight: FontWeight.SemiBold, size: 12),
+                                    Text = point.GetType().Name.Replace("ControlPoint", string.Empty).ToLowerInvariant(),
+                                    Colour = colours.Gray0
+                                },
+                            },
+                        },
+                    },
+                }
             };
         }
-
-        public string TooltipText => content();
     }
 }
