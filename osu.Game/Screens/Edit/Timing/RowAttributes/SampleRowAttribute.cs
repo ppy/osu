@@ -5,14 +5,13 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Edit.Timing.RowAttributes
 {
     public class SampleRowAttribute : RowAttribute
     {
-        private AttributeBubbledWord sampleText;
+        private AttributeText sampleText;
         private OsuSpriteText volumeText;
 
         private readonly Bindable<string> sampleBank;
@@ -32,15 +31,12 @@ namespace osu.Game.Screens.Edit.Timing.RowAttributes
 
             Content.AddRange(new Drawable[]
             {
-                volumeText = new OsuSpriteText
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    Width = 30,
-                    Font = OsuFont.GetFont(size: EditorTable.TEXT_SIZE, weight: FontWeight.Regular),
-                },
+                sampleText = new AttributeText(Point),
                 progress = new AttributeProgressBar(Point),
-                sampleText = new AttributeBubbledWord(Point),
+                volumeText = new AttributeText(Point)
+                {
+                    Width = 40,
+                },
             });
 
             volume.BindValueChanged(vol =>

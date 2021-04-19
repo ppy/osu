@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Edit.Timing.RowAttributes
@@ -27,17 +26,14 @@ namespace osu.Game.Screens.Edit.Timing.RowAttributes
         {
             Content.AddRange(new Drawable[]
             {
-                text = new OsuSpriteText
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    Width = 40,
-                    Font = OsuFont.GetFont(size: EditorTable.TEXT_SIZE, weight: FontWeight.Regular),
-                },
                 new AttributeProgressBar(Point)
                 {
                     Current = speedMultiplier,
-                }
+                },
+                text = new AttributeText(Point)
+                {
+                    Width = 40,
+                },
             });
 
             speedMultiplier.BindValueChanged(_ => updateText(), true);

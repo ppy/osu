@@ -4,10 +4,8 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
-using osu.Framework.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Edit.Timing.RowAttributes
@@ -28,12 +26,7 @@ namespace osu.Game.Screens.Edit.Timing.RowAttributes
         [BackgroundDependencyLoader]
         private void load()
         {
-            Content.Add(text = new OsuSpriteText
-            {
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
-                Font = OsuFont.GetFont(size: EditorTable.TEXT_SIZE, weight: FontWeight.Regular),
-            });
+            Content.Add(text = new AttributeText(Point));
 
             timeSignature.BindValueChanged(_ => updateText());
             beatLength.BindValueChanged(_ => updateText(), true);

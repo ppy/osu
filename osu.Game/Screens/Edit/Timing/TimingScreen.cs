@@ -71,12 +71,19 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 RelativeSizeAxes = Axes.Both;
 
+                const float margins = 10;
                 InternalChildren = new Drawable[]
                 {
                     new Box
                     {
-                        Colour = colours.Background2,
+                        Colour = colours.Background3,
                         RelativeSizeAxes = Axes.Both,
+                    },
+                    new Box
+                    {
+                        Colour = colours.Background2,
+                        RelativeSizeAxes = Axes.Y,
+                        Width = ControlPointTable.TIMING_COLUMN_WIDTH + margins,
                     },
                     new OsuScrollContainer
                     {
@@ -89,7 +96,7 @@ namespace osu.Game.Screens.Edit.Timing
                         Anchor = Anchor.BottomRight,
                         Origin = Anchor.BottomRight,
                         Direction = FillDirection.Horizontal,
-                        Margin = new MarginPadding(10),
+                        Margin = new MarginPadding(margins),
                         Spacing = new Vector2(5),
                         Children = new Drawable[]
                         {

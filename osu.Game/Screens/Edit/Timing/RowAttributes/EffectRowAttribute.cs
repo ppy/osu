@@ -12,8 +12,8 @@ namespace osu.Game.Screens.Edit.Timing.RowAttributes
     {
         private readonly Bindable<bool> kiaiMode;
         private readonly Bindable<bool> omitBarLine;
-        private AttributeBubbledWord kiaiModeBubble;
-        private AttributeBubbledWord omitBarLineBubble;
+        private AttributeText kiaiModeBubble;
+        private AttributeText omitBarLineBubble;
 
         public EffectRowAttribute(EffectControlPoint effect)
             : base(effect, "effect")
@@ -27,8 +27,8 @@ namespace osu.Game.Screens.Edit.Timing.RowAttributes
         {
             Content.AddRange(new Drawable[]
             {
-                kiaiModeBubble = new AttributeBubbledWord(Point) { Text = "kiai" },
-                omitBarLineBubble = new AttributeBubbledWord(Point) { Text = "no barline" },
+                kiaiModeBubble = new AttributeText(Point) { Text = "kiai" },
+                omitBarLineBubble = new AttributeText(Point) { Text = "no barline" },
             });
 
             kiaiMode.BindValueChanged(enabled => kiaiModeBubble.FadeTo(enabled.NewValue ? 1 : 0), true);
