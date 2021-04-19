@@ -96,11 +96,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
-                approachRateFactor += 0.4 * (Attributes.ApproachRate - 10.33);
+                approachRateFactor += 0.25 * (Attributes.ApproachRate - 10.33);
             else if (Attributes.ApproachRate < 8.0)
                 approachRateFactor += 0.01 * (8.0 - Attributes.ApproachRate);
 
-            aimValue *= 1.0 + Math.Min(approachRateFactor, approachRateFactor * (totalHits / 1000.0));
+            aimValue *= 1.0 + approachRateFactor; //Math.Min(approachRateFactor, approachRateFactor * (totalHits / 1000.0));
 
             // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
             if (mods.Any(h => h is OsuModHidden))
@@ -131,6 +131,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (countMiss > 0)
                 speedValue *= 0.97 * Math.Pow(1 - Math.Pow((double)countMiss / totalHits, 0.775), Math.Pow(countMiss, .875));
+
+            double approachRateFactor = 0.0;
+            if (Attributes.ApproachRate > 10.33)
+                approachRateFactor += 0.25 * (Attributes.ApproachRate - 10.33);
+            else if (Attributes.ApproachRate < 8.0)
+                approachRateFactor += 0.01 * (8.0 - Attributes.ApproachRate);
+
+            speedValue *= 1.0 + approachRateFactor;
 
             // Combo scaling
             if (Attributes.MaxCombo > 0)
