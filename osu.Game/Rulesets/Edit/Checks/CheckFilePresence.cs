@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Edit.Checks
     {
         protected abstract CheckCategory Category { get; }
         protected abstract string TypeOfFile { get; }
-        protected abstract string GetFilename(IWorkingBeatmap workingBeatmap);
+        protected abstract string GetFilename(IBeatmap playableBeatmap);
 
         public CheckMetadata Metadata => new CheckMetadata(Category, $"Missing {TypeOfFile}");
 
@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(IBeatmap playableBeatmap, IWorkingBeatmap workingBeatmap)
         {
-            var filename = GetFilename(workingBeatmap);
+            var filename = GetFilename(playableBeatmap);
 
             if (filename == null)
             {
