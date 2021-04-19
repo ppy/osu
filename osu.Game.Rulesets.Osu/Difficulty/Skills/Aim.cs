@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double strain = 2 * currVector.Length + prevDiffStrain + Math.Abs(prevDiffStrain - nextDiffStrain) * Math.Min(osuNextObj.FlowProbability, osuPrevObj.FlowProbability);
 
-            strain = Math.Pow(strain, 1.1);
+            // strain = Math.Pow(strain, 1.1);
 
             return strain;
         }
