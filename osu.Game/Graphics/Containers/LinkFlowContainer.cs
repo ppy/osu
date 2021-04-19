@@ -62,7 +62,7 @@ namespace osu.Game.Graphics.Containers
         public void AddLink(string text, LinkAction action, string argument, string tooltipText = null, Action<SpriteText> creationParameters = null)
             => createLink(AddText(text, creationParameters), new LinkDetails(action, argument), tooltipText);
 
-        public void AddLink(RomanisableString text, LinkAction action, string argument, string tooltipText = null, Action<SpriteText> creationParameters = null)
+        public void AddLink(LocalisableString text, LinkAction action, string argument, string tooltipText = null, Action<SpriteText> creationParameters = null)
         {
             var spriteText = new OsuSpriteText { Text = text };
 
