@@ -35,7 +35,6 @@ namespace osu.Game.Rulesets.Taiko.Replays
 
             bool hitButton = true;
 
-            Frames.Add(new TaikoReplayFrame(-100000));
             Frames.Add(new TaikoReplayFrame(Beatmap.HitObjects[0].StartTime - 1000));
 
             for (int i = 0; i < Beatmap.HitObjects.Count; i++)

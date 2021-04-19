@@ -44,6 +44,9 @@ namespace osu.Game.Overlays.Volume
 
         protected override bool OnScroll(ScrollEvent e)
         {
+            if (e.ScrollDelta.Y == 0)
+                return false;
+
             // forward any unhandled mouse scroll events to the volume control.
             ScrollActionRequested?.Invoke(GlobalAction.IncreaseVolume, e.ScrollDelta.Y, e.IsPrecise);
             return true;
