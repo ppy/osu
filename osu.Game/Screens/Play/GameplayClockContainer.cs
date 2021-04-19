@@ -30,16 +30,21 @@ namespace osu.Game.Screens.Play
         protected readonly DecoupleableInterpolatingFramedClock AdjustableSource;
 
         /// <summary>
+        /// The source clock.
+        /// </summary>
+        protected IClock SourceClock { get; private set; }
+
+        /// <summary>
         /// Creates a new <see cref="GameplayClockContainer"/>.
         /// </summary>
         /// <param name="sourceClock">The source <see cref="IClock"/> used for timing.</param>
         protected GameplayClockContainer(IClock sourceClock)
         {
+            SourceClock = sourceClock;
+
             RelativeSizeAxes = Axes.Both;
 
             AdjustableSource = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
-            AdjustableSource.ChangeSource(sourceClock);
-
             IsPaused.BindValueChanged(OnIsPausedChanged);
         }
 
@@ -86,12 +91,20 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public virtual void Reset()
         {
+            ChangeSource(SourceClock);
+
             AdjustableSource.Seek(0);
             AdjustableSource.Stop();
 
             if (!IsPaused.Value)
                 Start();
         }
+
+        /// <summary>
+        /// Changes the source clock.
+        /// </summary>
+        /// <param name="sourceClock">The new source.</param>
+        protected void ChangeSource(IClock sourceClock) => AdjustableSource.ChangeSource(SourceClock = sourceClock);
 
         protected override void Update()
         {
