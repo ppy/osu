@@ -14,7 +14,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Edit.Timing.RowAttributes;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Timing
 {
@@ -130,8 +129,6 @@ namespace osu.Game.Screens.Edit.Timing
 
             private Drawable createAttribute(ControlPoint controlPoint)
             {
-                Color4 colour = controlPoint.GetRepresentingColour(colours);
-
                 switch (controlPoint)
                 {
                     case TimingControlPoint timing:
@@ -141,10 +138,7 @@ namespace osu.Game.Screens.Edit.Timing
                         return new DifficultyRowAttribute(difficulty);
 
                     case EffectControlPoint effect:
-                        return new EmptyRowAttribute("effect", () => string.Join(" ",
-                            effect.KiaiMode ? "Kiai" : string.Empty,
-                            effect.OmitFirstBarLine ? "NoBarLine" : string.Empty
-                        ).Trim(), colour);
+                        return new EffectRowAttribute(effect);
 
                     case SampleControlPoint sample:
                         return new SampleRowAttribute(sample);
