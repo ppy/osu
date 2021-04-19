@@ -29,6 +29,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Ranking.Expanded;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Select
 {
@@ -307,7 +308,7 @@ namespace osu.Game.Screens.Select
                                 Margin = new MarginPadding { Top = 10 },
                                 Direction = FillDirection.Horizontal,
                                 AutoSizeAxes = Axes.Both,
-                                Children = getMapper(metadata)
+                                Children = new[] { getMapper(metadata) },
                             },
                             infoLabelContainer = new FillFlowContainer
                             {
@@ -430,24 +431,20 @@ namespace osu.Game.Screens.Select
                 ForceRedraw();
             }
 
-            private OsuSpriteText[] getMapper(BeatmapMetadata metadata)
+            private LinkFlowContainer getMapper(BeatmapMetadata metadata)
             {
-                if (string.IsNullOrEmpty(metadata.Author?.Username))
-                    return Array.Empty<OsuSpriteText>();
+                if (metadata.Author == null)
+                    return new LinkFlowContainer();
 
-                return new[]
+                return new LinkFlowContainer(s =>
                 {
-                    new OsuSpriteText
-                    {
-                        Text = "mapped by ",
-                        Font = OsuFont.GetFont(size: 15),
-                    },
-                    new OsuSpriteText
-                    {
-                        Text = metadata.Author.Username,
-                        Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 15),
-                    }
-                };
+                    s.Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 15);
+                }).With(d =>
+                {
+                    d.AutoSizeAxes = Axes.Both;
+                    d.AddText("mapped by ");
+                    d.AddUserLink(metadata.Author);
+                });
             }
 
             protected override void Dispose(bool isDisposing)
