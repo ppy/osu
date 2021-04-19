@@ -16,6 +16,9 @@ using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
+    /// <summary>
+    /// A component which displays a colour along with related description text.
+    /// </summary>
     public class ColourDisplay : CompositeDrawable, IHasCurrentValue<Color4>
     {
         private readonly BindableWithCurrent<Color4> current = new BindableWithCurrent<Color4>();
