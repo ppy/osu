@@ -125,6 +125,7 @@ namespace osu.Game.Online.Spectator
                     else
                     {
                         playingUsers.Clear();
+                        currentUserStates.Clear();
                     }
                 }, true);
             }
