@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void Update(Playfield playfield)
         {
-            playfield.Rotation = (Direction.Value == RotationDirection.CounterClockwise ? -1 : 1) * 360 * (float)(playfield.Time.Current / 60000 * SpinSpeed.Value);
+            playfield.Rotation = (Direction.Value == RotationDirection.Counterclockwise ? -1 : 1) * 360 * (float)(playfield.Time.Current / 60000 * SpinSpeed.Value);
         }
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
