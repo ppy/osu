@@ -82,9 +82,9 @@ namespace osu.Game.Screens.Play
         public virtual void Stop() => IsPaused.Value = true;
 
         /// <summary>
-        /// Restarts gameplay.
+        /// Resets this <see cref="GameplayClockContainer"/> and the source to an initial state ready for gameplay.
         /// </summary>
-        public virtual void Restart()
+        public virtual void Reset()
         {
             AdjustableSource.Seek(0);
             AdjustableSource.Stop();

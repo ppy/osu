@@ -123,10 +123,10 @@ namespace osu.Game.Screens.Play
             userOffsetClock.ProcessFrame();
         }
 
-        public override void Restart()
+        public override void Reset()
         {
             updateRate();
-            base.Restart();
+            base.Reset();
         }
 
         /// <summary>
