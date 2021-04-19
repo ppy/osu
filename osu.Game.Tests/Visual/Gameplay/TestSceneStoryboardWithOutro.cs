@@ -1,17 +1,22 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Storyboards;
 using osuTK;
@@ -20,9 +25,15 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestSceneStoryboardWithOutro : PlayerTestScene
     {
+        protected override bool HasCustomSteps => true;
+
         protected new OutroPlayer Player => (OutroPlayer)base.Player;
 
-        private const double storyboard_duration = 2000;
+        private double currentStoryboardDuration;
+
+        private bool showResults = true;
+
+        private event Func<HealthProcessor, JudgementResult, bool> currentFailConditions;
 
         [SetUpSteps]
         public override void SetUpSteps()
@@ -30,11 +41,15 @@ namespace osu.Game.Tests.Visual.Gameplay
             base.SetUpSteps();
             AddStep("enable storyboard", () => LocalConfig.SetValue(OsuSetting.ShowStoryboard, true));
             AddStep("set dim level to 0", () => LocalConfig.SetValue<double>(OsuSetting.DimLevel, 0));
+            AddStep("reset fail conditions", () => currentFailConditions = (_, __) => false);
+            AddStep("set storyboard duration to 2s", () => currentStoryboardDuration = 2000);
+            AddStep("set ShowResults = true", () => showResults = true);
         }
 
         [Test]
         public void TestStoryboardSkipOutro()
         {
+            CreateTest(null);
             AddUntilStep("completion set by processor", () => Player.ScoreProcessor.HasCompleted.Value);
             AddStep("skip outro", () => InputManager.Key(osuTK.Input.Key.Space));
             AddAssert("score shown", () => Player.IsScoreShown);
@@ -43,13 +58,15 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestStoryboardNoSkipOutro()
         {
-            AddUntilStep("storyboard ends", () => Player.GameplayClockContainer.GameplayClock.CurrentTime >= storyboard_duration);
+            CreateTest(null);
+            AddUntilStep("storyboard ends", () => Player.GameplayClockContainer.GameplayClock.CurrentTime >= currentStoryboardDuration);
             AddUntilStep("wait for score shown", () => Player.IsScoreShown);
         }
 
         [Test]
         public void TestStoryboardExitToSkipOutro()
         {
+            CreateTest(null);
             AddUntilStep("completion set by processor", () => Player.ScoreProcessor.HasCompleted.Value);
             AddStep("exit via pause", () => Player.ExitViaPause());
             AddAssert("score shown", () => Player.IsScoreShown);
@@ -59,16 +76,51 @@ namespace osu.Game.Tests.Visual.Gameplay
         [TestCase(true)]
         public void TestStoryboardToggle(bool enabledAtBeginning)
         {
+            CreateTest(null);
             AddStep($"{(enabledAtBeginning ? "enable" : "disable")} storyboard", () => LocalConfig.SetValue(OsuSetting.ShowStoryboard, enabledAtBeginning));
             AddStep("toggle storyboard", () => LocalConfig.SetValue(OsuSetting.ShowStoryboard, !enabledAtBeginning));
             AddUntilStep("wait for score shown", () => Player.IsScoreShown);
         }
 
-        protected override bool AllowFail => false;
+        [Test]
+        public void TestOutroEndsDuringFailAnimation()
+        {
+            CreateTest(() =>
+            {
+                AddStep("fail on first judgement", () => currentFailConditions = (_, __) => true);
+                AddStep("set storyboard duration to 1.3s", () => currentStoryboardDuration = 1300);
+            });
+            AddUntilStep("wait for fail", () => Player.HasFailed);
+            AddUntilStep("storyboard ends", () => Player.GameplayClockContainer.GameplayClock.CurrentTime >= currentStoryboardDuration);
+            AddUntilStep("wait for fail overlay", () => Player.FailOverlay.State.Value == Visibility.Visible);
+        }
+
+        [Test]
+        public void TestShowResultsFalse()
+        {
+            CreateTest(() =>
+            {
+                AddStep("set ShowResults = false", () => showResults = false);
+            });
+            AddUntilStep("storyboard ends", () => Player.GameplayClockContainer.GameplayClock.CurrentTime >= currentStoryboardDuration);
+            AddWaitStep("wait", 10);
+            AddAssert("no score shown", () => !Player.IsScoreShown);
+        }
+
+        [Test]
+        public void TestStoryboardEndsBeforeCompletion()
+        {
+            CreateTest(() => AddStep("set storyboard duration to .1s", () => currentStoryboardDuration = 100));
+            AddUntilStep("storyboard ends", () => Player.GameplayClockContainer.GameplayClock.CurrentTime >= currentStoryboardDuration);
+            AddUntilStep("completion set by processor", () => Player.ScoreProcessor.HasCompleted.Value);
+            AddUntilStep("wait for score shown", () => Player.IsScoreShown);
+        }
+
+        protected override bool AllowFail => true;
 
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
 
-        protected override TestPlayer CreatePlayer(Ruleset ruleset) => new OutroPlayer();
+        protected override TestPlayer CreatePlayer(Ruleset ruleset) => new OutroPlayer(currentFailConditions, showResults);
 
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
         {
@@ -79,26 +131,38 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
         {
-            if (storyboard == null)
-            {
-                storyboard = new Storyboard();
-                var sprite = new StoryboardSprite("unknown", Anchor.TopLeft, Vector2.Zero);
-                sprite.TimelineGroup.Alpha.Add(Easing.None, 0, storyboard_duration, 1, 0);
-                storyboard.GetLayer("Background").Add(sprite);
-            }
+            return base.CreateWorkingBeatmap(beatmap, createStoryboard(currentStoryboardDuration));
+        }
 
-            return base.CreateWorkingBeatmap(beatmap, storyboard);
+        private Storyboard createStoryboard(double duration)
+        {
+            var storyboard = new Storyboard();
+            var sprite = new StoryboardSprite("unknown", Anchor.TopLeft, Vector2.Zero);
+            sprite.TimelineGroup.Alpha.Add(Easing.None, 0, duration, 1, 0);
+            storyboard.GetLayer("Background").Add(sprite);
+            return storyboard;
         }
 
         protected class OutroPlayer : TestPlayer
         {
             public void ExitViaPause() => PerformExit(true);
 
+            public new FailOverlay FailOverlay => base.FailOverlay;
+
             public bool IsScoreShown => !this.IsCurrentScreen() && this.GetChildScreen() is ResultsScreen;
 
-            public OutroPlayer()
-                : base(false)
+            private event Func<HealthProcessor, JudgementResult, bool> failConditions;
+
+            public OutroPlayer(Func<HealthProcessor, JudgementResult, bool> failConditions, bool showResults = true)
+                : base(false, showResults)
             {
+                this.failConditions = failConditions;
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                HealthProcessor.FailConditions += failConditions;
             }
 
             protected override Task ImportScore(Score score)
