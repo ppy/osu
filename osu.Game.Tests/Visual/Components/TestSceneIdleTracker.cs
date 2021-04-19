@@ -141,6 +141,7 @@ namespace osu.Game.Tests.Visual.Components
 
             waitForAllIdle();
         }
+
         private void checkIdleStatus(int box, bool expectedIdle)
         {
             AddAssert($"box {box} is {(expectedIdle ? "idle" : "active")}", () => boxes[box - 1].IsIdle == expectedIdle);
