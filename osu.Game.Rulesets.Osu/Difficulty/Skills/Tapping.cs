@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
     public class Tapping : OsuSkill
     {
-        private const double skill_multiplier = 1.35;
+        private const double skill_multiplier = 1.3;
         protected override double StarsPerDouble => 1.075;
 
         private Speed speedSkill;
