@@ -11,14 +11,9 @@ namespace osu.Game.Rulesets.Objects
     /// </summary>
     internal class UnmanagedHitObjectEntry : HitObjectLifetimeEntry
     {
-        public readonly DrawableHitObject DrawableHitObject;
-
-        public UnmanagedHitObjectEntry(HitObject hitObject, DrawableHitObject drawableHitObject)
+        public UnmanagedHitObjectEntry(HitObject hitObject)
             : base(hitObject)
         {
-            DrawableHitObject = drawableHitObject;
-            LifetimeStart = DrawableHitObject.LifetimeStart;
-            LifetimeEnd = DrawableHitObject.LifetimeEnd;
         }
     }
 }
