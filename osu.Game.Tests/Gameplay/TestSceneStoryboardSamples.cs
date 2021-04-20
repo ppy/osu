@@ -92,7 +92,7 @@ namespace osu.Game.Tests.Gameplay
                 var working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
                 working.LoadTrack();
 
-                Add(gameplayContainer = new GameplayClockContainer(working, 1000, true));
+                Add(gameplayContainer = new MasterGameplayClockContainer(working, 1000, true));
 
                 gameplayContainer.Add(sample = new DrawableStoryboardSample(new StoryboardSampleInfo(string.Empty, 0, 1))
                 {
