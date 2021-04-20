@@ -43,7 +43,7 @@ namespace osu.Game.Beatmaps
         ISkin Skin { get; }
 
         /// <summary>
-        /// Get the loaded audio track instance.
+        /// Retrieves the <see cref="Track"/> which this <see cref="WorkingBeatmap"/> has loaded.
         /// </summary>
         Track Track { get; }
 
