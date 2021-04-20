@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -165,7 +166,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         /// <param name="initialHitObject">
         /// The <see cref="HitObject"/> to be initially applied to this <see cref="DrawableHitObject"/>.
-        /// If <c>null</c>, a hitobject is expected to be later applied via <see cref="Apply"/> (or automatically via pooling).
+        /// If <c>null</c>, a hitobject is expected to be later applied via <see cref="Apply(osu.Game.Rulesets.Objects.HitObjectLifetimeEntry)"/> (or automatically via pooling).
         /// </param>
         protected DrawableHitObject([CanBeNull] HitObject initialHitObject = null)
         {
@@ -187,7 +188,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             base.LoadAsyncComplete();
 
             if (lifetimeEntry != null && !hasEntryApplied)
-                apply(lifetimeEntry);
+                Apply(lifetimeEntry);
         }
 
         protected override void LoadComplete()
@@ -200,36 +201,47 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         /// <summary>
-        /// Applies a new <see cref="HitObject"/> to be represented by this <see cref="DrawableHitObject"/>.
+        /// Applies a hit object to be represented by this <see cref="DrawableHitObject"/>.
         /// </summary>
-        /// <param name="hitObject">The <see cref="HitObject"/> to apply.</param>
-        /// <param name="lifetimeEntry">The <see cref="HitObjectLifetimeEntry"/> controlling the lifetime of <paramref name="hitObject"/>.</param>
+        /// <remarks>This overload is semi-deprecated. Use either <see cref="Apply(osu.Game.Rulesets.Objects.HitObject)"/> or <see cref="Apply(osu.Game.Rulesets.Objects.HitObjectLifetimeEntry)"/>.</remarks>
         public void Apply([NotNull] HitObject hitObject, [CanBeNull] HitObjectLifetimeEntry lifetimeEntry)
+        {
+            if (lifetimeEntry != null && lifetimeEntry.HitObject != hitObject)
+                throw new InvalidOperationException($"{nameof(HitObjectLifetimeEntry)} has different {nameof(HitObject)} from the specified one.");
+
+            if (lifetimeEntry != null)
+                Apply(lifetimeEntry);
+            else
+                Apply(hitObject);
+        }
+
+        /// <summary>
+        /// Applies a new <see cref="HitObject"/> to be represented by this <see cref="DrawableHitObject"/>.
+        /// A new <see cref="HitObjectLifetimeEntry"/> is automatically created and applied to this <see cref="DrawableHitObject"/>.
+        /// </summary>
+        public void Apply([NotNull] HitObject hitObject)
         {
             if (hitObject == null)
                 throw new ArgumentNullException($"Cannot apply a null {nameof(HitObject)}.");
 
-            if (lifetimeEntry != null && lifetimeEntry.HitObject != hitObject)
-                throw new InvalidOperationException($"{nameof(HitObjectLifetimeEntry)} has different {nameof(HitObject)} from the specified one.");
-
-            apply(lifetimeEntry ?? new UnmanagedHitObjectEntry(hitObject));
+            Apply(new UnmanagedHitObjectEntry(hitObject));
         }
 
         /// <summary>
         /// Applies a new <see cref="HitObjectLifetimeEntry"/> to be represented by this <see cref="DrawableHitObject"/>.
         /// </summary>
-        private void apply([NotNull] HitObjectLifetimeEntry entry)
+        public void Apply([NotNull] HitObjectLifetimeEntry newEntry)
         {
             free();
 
-            lifetimeEntry = entry;
+            lifetimeEntry = newEntry;
 
-            LifetimeStart = entry.LifetimeStart;
-            LifetimeEnd = entry.LifetimeEnd;
+            LifetimeStart = lifetimeEntry.LifetimeStart;
+            LifetimeEnd = lifetimeEntry.LifetimeEnd;
 
             // Ensure this DHO has a result.
-            entry.Result ??= CreateResult(HitObject.CreateJudgement())
-                             ?? throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
+            lifetimeEntry.Result ??= CreateResult(HitObject.CreateJudgement())
+                                     ?? throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
 
             // Copy back the result to the entry for potential future retrieval.
             if (lifetimeEntry != null)
@@ -387,7 +399,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         private void onDefaultsApplied(HitObject hitObject)
         {
-            Apply(hitObject, lifetimeEntry);
+            Debug.Assert(lifetimeEntry != null);
+            Apply(lifetimeEntry);
+
             DefaultsApplied?.Invoke(this);
         }
 
