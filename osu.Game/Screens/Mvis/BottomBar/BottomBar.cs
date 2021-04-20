@@ -1,6 +1,8 @@
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Screens.Mvis.BottomBar.Buttons;
 using osuTK;
 
 namespace osu.Game.Screens.Mvis.BottomBar
@@ -24,7 +26,7 @@ namespace osu.Game.Screens.Mvis.BottomBar
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(MvisScreen mvisScreen)
         {
             InternalChildren = new Drawable[]
             {
@@ -59,14 +61,28 @@ namespace osu.Game.Screens.Mvis.BottomBar
                 },
                 PluginEntriesFillFlow = new FillFlowContainer
                 {
-                    Name = "Right Container",
-                    Anchor = Anchor.BottomRight,
-                    Origin = Anchor.BottomRight,
+                    Name = "Plugin Entries Container",
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
                     AutoSizeAxes = Axes.Both,
+                    AutoSizeDuration = 300,
+                    AutoSizeEasing = Easing.OutQuint,
                     Spacing = new Vector2(5),
-                    Margin = new MarginPadding { Right = 5, Bottom = 35 }
+                    Margin = new MarginPadding { Bottom = 35 }
                 }
             };
+
+            mvisScreen.OnIdle += Hide;
+            mvisScreen.OnResumeFromIdle += Show;
         }
+
+        public override void Show() =>
+            this.MoveToY(0, 300, Easing.OutQuint).FadeIn(300, Easing.OutQuint);
+
+        public override void Hide() =>
+            this.MoveToY(40, 300, Easing.OutQuint);
+
+        public void CentreBotton(BottomBarButton btn) =>
+            PluginEntriesFillFlow.SetLayoutPosition(btn, (float)Math.Floor(PluginEntriesFillFlow.Count / 2f));
     }
 }

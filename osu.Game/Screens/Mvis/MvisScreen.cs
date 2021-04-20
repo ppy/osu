@@ -1,6 +1,3 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
-// See the LICENCE file in the repository root for full licence text.
-
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -50,17 +47,19 @@ namespace osu.Game.Screens.Mvis
         public override bool HideOverlaysOnEnter => true;
         public override bool AllowBackButton => false;
 
-        public override bool CursorVisible => !OverlaysHidden || sidebar.State.Value == Visibility.Visible; //隐藏界面或侧边栏可见，显示光标
+        public override bool CursorVisible => !OverlaysHidden
+                                              || sidebar.State.Value == Visibility.Visible
+                                              || IsHovered == false; //隐藏界面或侧边栏可见，显示光标
 
         public override bool AllowRateAdjustments => true;
 
-        private bool canReallyHide =>
-            // don't hide if the user is hovering one of the panes, unless they are idle.
-            (IsHovered || isIdle.Value)
-            // don't hide if the user is dragging a slider or otherwise.
-            && inputManager?.DraggedDrawable == null
-            // don't hide if a focused overlay is visible, like settings.
-            && inputManager?.FocusedDrawable == null;
+        private bool okForHide => IsHovered
+                                  && isIdle.Value
+                                  && !(bottomBar?.IsHovered ?? false)
+                                  && !(lockButton?.ToggleableValue.Value ?? false)
+                                  && !lockChanges.Value
+                                  && inputManager?.DraggedDrawable == null
+                                  && inputManager?.FocusedDrawable == null;
 
         private bool isPushed;
 
@@ -134,10 +133,13 @@ namespace osu.Game.Screens.Mvis
 
         private BottomBarContainer bottomBar;
         private SongProgressBar progressBar;
+
         private BottomBarButton soloButton;
         private BottomBarButton prevButton;
         private BottomBarButton nextButton;
         private BottomBarButton sidebarToggleButton;
+        private BottomBarButton pluginButton;
+
         private BottomBarSwitchButton loopToggleButton;
         private BottomBarOverlayLockSwitchButton lockButton;
         private BottomBarSwitchButton songProgressButton;
@@ -162,10 +164,7 @@ namespace osu.Game.Screens.Mvis
 
         private LoadingSpinner loadingSpinner;
 
-        private readonly Sidebar sidebar = new Sidebar
-        {
-            Name = "Sidebar Container"
-        };
+        private readonly Sidebar sidebar = new Sidebar();
 
         #endregion
 
@@ -318,7 +317,7 @@ namespace osu.Game.Screens.Mvis
                 },
                 new Container
                 {
-                    Name = "Content Container",
+                    Name = "Contents",
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING },
                     Masking = true,
@@ -469,18 +468,16 @@ namespace osu.Game.Screens.Mvis
                                     TooltipText = "播放器设置",
                                 }
                             }
-                        },
-                        lockButton = new BottomBarOverlayLockSwitchButton
-                        {
-                            TooltipText = "锁定变更",
-                            Action = updateLockButtonVisuals,
-                            Anchor = Anchor.BottomRight,
-                            Origin = Anchor.BottomRight,
-                            Margin = new MarginPadding { Bottom = 5 }
                         }
                     }
                 }
             };
+
+            bottomBar.PluginEntriesFillFlow.Add(lockButton = new BottomBarOverlayLockSwitchButton
+            {
+                TooltipText = "锁定变更",
+                Action = showPluginEntriesTemporary
+            });
         }
 
         protected override void LoadComplete()
@@ -571,6 +568,8 @@ namespace osu.Game.Screens.Mvis
                 }
             }
 
+            bottomBar.CentreBotton(lockButton);
+
             currentAudioControlProviderSetting.BindValueChanged(v =>
             {
                 var pl = (IProvideAudioControlPlugin)pluginManager.GetAllPlugins(false).FirstOrDefault(p => $"{p.GetType().Namespace}+{p.GetType().Name}" == v.NewValue);
@@ -608,8 +607,11 @@ namespace osu.Game.Screens.Mvis
                     {
                         if (d is PluginBottomBarButton btn && btn.Page == plsp)
                         {
-                            btn.FadeOut(300, Easing.OutQuint).Then().Expire();
-                            //bottomBar.PluginEntriesFillFlow.Remove(btn);
+                            btn.FadeTo(0.01f, 300, Easing.OutQuint).Then().Schedule(() =>
+                            {
+                                btn.Expire();
+                                bottomBar.CentreBotton(lockButton);
+                            });
                         }
                     }
                 }
@@ -850,19 +852,17 @@ namespace osu.Game.Screens.Mvis
         private void presentBeatmap() =>
             game?.PresentBeatmap(Beatmap.Value.BeatmapSetInfo);
 
-        private void updateLockButtonVisuals() =>
-            lockButton.FadeIn(500, Easing.OutQuint).Then().Delay(2000).FadeOut(500, Easing.OutQuint);
+        private void showPluginEntriesTemporary() =>
+            bottomBar.PluginEntriesFillFlow.FadeIn(500, Easing.OutQuint).Then().Delay(2000).FadeOut(500, Easing.OutQuint);
 
         private void hideOverlays(bool force)
         {
-            if (!force && (!canReallyHide || !isIdle.Value || !IsHovered
-                           || bottomBar.IsHovered || lockButton.ToggleableValue.Value
-                           || lockChanges.Value))
+            if (!force && !okForHide)
                 return;
 
             skinnableBbBackground.MoveToY(bottomBar.Height, duration, Easing.OutQuint)
                                  .FadeOut(duration, Easing.OutQuint);
-            bottomBar.MoveToY(bottomBar.Height + 10, duration, Easing.OutQuint).FadeOut(duration, Easing.OutQuint);
+
             progressBar.MoveToY(4f, duration, Easing.OutQuint);
 
             OverlaysHidden = true;
@@ -875,7 +875,7 @@ namespace osu.Game.Screens.Mvis
             //在有锁并且悬浮界面已隐藏或悬浮界面可见的情况下显示悬浮锁
             if (!force && (lockButton.ToggleableValue.Value && OverlaysHidden || !OverlaysHidden || lockChanges.Value))
             {
-                lockButton.FadeIn(500, Easing.OutQuint).Then().Delay(2500).FadeOut(500, Easing.OutQuint);
+                showPluginEntriesTemporary();
                 return;
             }
 
@@ -883,7 +883,7 @@ namespace osu.Game.Screens.Mvis
 
             skinnableBbBackground.MoveToY(0, duration, Easing.OutQuint)
                                  .FadeIn(duration, Easing.OutQuint);
-            bottomBar.MoveToY(0, duration, Easing.OutQuint).FadeIn(duration, Easing.OutQuint);
+
             progressBar.MoveToY(0, duration, Easing.OutQuint);
 
             OverlaysHidden = false;
@@ -965,8 +965,6 @@ namespace osu.Game.Screens.Mvis
                 background.FadeColour(targetColor, duration, Easing.OutQuint);
             });
         }
-
-        private BottomBarButton pluginButton;
 
         private void onBeatmapChanged(ValueChangedEvent<WorkingBeatmap> v)
         {

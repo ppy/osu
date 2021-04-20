@@ -29,18 +29,6 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
         [Resolved]
         private MvisScreen mvisScreen { get; set; }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            this.Delay(1000).FadeOut(500, Easing.OutQuint);
-        }
-
-        protected override void Update()
-        {
-            Margin = new MarginPadding { Bottom = mvisScreen.BottombarHeight, Right = 5 };
-            base.Update();
-        }
-
         protected override void OnToggledOnAnimation()
         {
             base.OnToggledOnAnimation();

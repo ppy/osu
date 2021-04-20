@@ -1,3 +1,4 @@
+using System;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -91,7 +92,7 @@ namespace osu.Game.Screens.Mvis.SideBar.Footer
 
         protected override void Update()
         {
-            Height = mvisScreen.BottombarHeight;
+            Height = Math.Max(mvisScreen.BottombarHeight, 10);
             base.Update();
         }
     }
