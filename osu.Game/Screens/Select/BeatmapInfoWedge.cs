@@ -42,9 +42,6 @@ namespace osu.Game.Screens.Select
         private IBindable<RulesetInfo> ruleset { get; set; }
 
         [Resolved]
-        private IBindable<IReadOnlyList<Mod>> mods { get; set; }
-
-        [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; }
 
         private IBindable<StarDifficulty?> beatmapDifficulty;
@@ -150,7 +147,7 @@ namespace osu.Game.Screens.Select
 
                     removeOldInfo();
                     Add(Background = loaded);
-                    Add(Info = new WedgeInfoText(beatmap, ruleset.Value, mods, beatmapDifficulty)
+                    Add(Info = new WedgeInfoText(beatmap, ruleset.Value, beatmapDifficulty)
                     {
                         Shear = -Shear
                     });
@@ -172,6 +169,9 @@ namespace osu.Game.Screens.Select
             public OsuSpriteText VersionLabel { get; private set; }
             public BeatmapSetOnlineStatusPill StatusPill { get; private set; }
 
+            [Resolved]
+            private IBindable<IReadOnlyList<Mod>> mods { get; set; }
+
             private ILocalisedBindableString titleBinding;
             private ILocalisedBindableString artistBinding;
             private FillFlowContainer infoLabelContainer;
@@ -181,14 +181,12 @@ namespace osu.Game.Screens.Select
 
             private readonly WorkingBeatmap beatmap;
             private readonly RulesetInfo ruleset;
-            private readonly IBindable<IReadOnlyList<Mod>> mods;
             private readonly IBindable<StarDifficulty?> starDifficulty;
 
-            public WedgeInfoText(WorkingBeatmap beatmap, RulesetInfo userRuleset, IBindable<IReadOnlyList<Mod>> mods, IBindable<StarDifficulty?> difficulty)
+            public WedgeInfoText(WorkingBeatmap beatmap, RulesetInfo userRuleset, IBindable<StarDifficulty?> difficulty)
             {
                 this.beatmap = beatmap;
                 ruleset = userRuleset ?? beatmap.BeatmapInfo.Ruleset;
-                this.mods = mods;
                 starDifficulty = difficulty;
             }
 
@@ -409,7 +407,6 @@ namespace osu.Game.Screens.Select
                     }
                 };
 
-                // this is currently not triggering when a mod gets (de)selected
                 mods.BindValueChanged(mods => refreshModInformation(mods), true);
             }
 
@@ -418,7 +415,7 @@ namespace osu.Game.Screens.Select
                 settingChangeTracker?.Dispose();
                 settingChangeTracker = new ModSettingChangeTracker(modsChangedEvent.NewValue);
                 settingChangeTracker.SettingChanged += _ => refreshBPMLabel(modsChangedEvent.NewValue);
-                refreshBPMLabel(mods.Value);
+                refreshBPMLabel(modsChangedEvent.NewValue);
             }
 
             private OsuSpriteText[] getMapper(BeatmapMetadata metadata)
