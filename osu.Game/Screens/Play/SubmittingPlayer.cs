@@ -71,6 +71,8 @@ namespace osu.Game.Screens.Play
 
             void handleTokenFailure(Exception exception)
             {
+                tcs.SetResult(false);
+
                 if (HandleTokenRetrievalFailure(exception))
                 {
                     if (string.IsNullOrEmpty(exception.Message))
@@ -84,8 +86,6 @@ namespace osu.Game.Screens.Play
                         this.Exit();
                     });
                 }
-
-                tcs.SetResult(false);
             }
         }
 
