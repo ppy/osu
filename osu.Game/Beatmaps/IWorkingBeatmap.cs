@@ -74,6 +74,10 @@ namespace osu.Game.Beatmaps
         /// <returns>A fresh track instance, which will also be available via <see cref="Track"/>.</returns>
         Track LoadTrack();
 
+        /// <summary>
+        /// Returns the stream of the file from the given storage path.
+        /// </summary>
+        /// <param name="storagePath">The storage path to the file.</param>
         Stream GetStream(string storagePath);
     }
 }
