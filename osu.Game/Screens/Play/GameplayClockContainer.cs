@@ -105,9 +105,10 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public virtual void Reset()
         {
-            AdjustableSource.Seek(StartOffset);
-            AdjustableSource.Stop();
+            Seek(StartOffset);
 
+            // Manually stop the source in order to not affect the IsPaused state.
+            AdjustableSource.Stop();
 
             if (!IsPaused.Value)
                 Start();
