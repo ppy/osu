@@ -299,7 +299,6 @@ namespace osu.Game.Screens.Select
                 // no difficulty means it can't have a status to show
                 if (beatmapInfo.Version == null)
                     StatusPill.Hide();
-
             }
 
             private void setStarRatingDisplayVisibility()
