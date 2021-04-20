@@ -171,7 +171,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected DrawableHitObject([CanBeNull] HitObject initialHitObject = null)
         {
             if (initialHitObject != null)
+            {
                 lifetimeEntry = new UnmanagedHitObjectEntry(initialHitObject);
+                ensureEntryHasResult();
+            }
         }
 
         [BackgroundDependencyLoader]
@@ -239,13 +242,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             LifetimeStart = lifetimeEntry.LifetimeStart;
             LifetimeEnd = lifetimeEntry.LifetimeEnd;
 
-            // Ensure this DHO has a result.
-            lifetimeEntry.Result ??= CreateResult(HitObject.CreateJudgement())
-                                     ?? throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
-
-            // Copy back the result to the entry for potential future retrieval.
-            if (lifetimeEntry != null)
-                lifetimeEntry.Result = Result;
+            ensureEntryHasResult();
 
             foreach (var h in HitObject.NestedHitObjects)
             {
@@ -798,6 +795,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         /// <param name="judgement">The <see cref="Judgement"/> that provides the scoring information.</param>
         protected virtual JudgementResult CreateResult(Judgement judgement) => new JudgementResult(HitObject, judgement);
+
+        private void ensureEntryHasResult()
+        {
+            Debug.Assert(lifetimeEntry != null);
+            lifetimeEntry.Result ??= CreateResult(HitObject.CreateJudgement())
+                                     ?? throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
+        }
 
         protected override void Dispose(bool isDisposing)
         {
