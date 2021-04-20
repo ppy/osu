@@ -142,11 +142,6 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-        }
-
         public class WedgeInfoText : Container
         {
             public FillFlowContainer MapperContainer { get; private set; }
@@ -394,7 +389,7 @@ namespace osu.Game.Screens.Select
                     }
                 };
 
-                mods.BindValueChanged(mods => refreshModInformation(mods), true);
+                mods.BindValueChanged(refreshModInformation, true);
             }
 
             private void refreshModInformation(ValueChangedEvent<IReadOnlyList<Mod>> modsChangedEvent)
@@ -470,7 +465,7 @@ namespace osu.Game.Screens.Select
                         }
                     };
 
-                    starDifficulty.BindValueChanged(valueChangedEvent => setColour(valueChangedEvent), true);
+                    starDifficulty.BindValueChanged(setColour, true);
                 }
 
                 private void setColour(ValueChangedEvent<StarDifficulty?> valueChanged)
