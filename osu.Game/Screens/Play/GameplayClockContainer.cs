@@ -87,7 +87,13 @@ namespace osu.Game.Screens.Play
         /// Seek to a specific time in gameplay.
         /// </summary>
         /// <param name="time">The destination time to seek to.</param>
-        public virtual void Seek(double time) => AdjustableSource.Seek(time);
+        public virtual void Seek(double time)
+        {
+            AdjustableSource.Seek(time);
+
+            // Manually process to make sure the gameplay clock is correctly updated after a seek.
+            GameplayClock.UnderlyingClock.ProcessFrame();
+        }
 
         /// <summary>
         /// Stops gameplay.
@@ -102,8 +108,6 @@ namespace osu.Game.Screens.Play
             AdjustableSource.Seek(StartOffset);
             AdjustableSource.Stop();
 
-            // Make sure the gameplay clock takes on the new time, otherwise the adjustable source will be seeked to the gameplay clock time in Start().
-            GameplayClock.UnderlyingClock.ProcessFrame();
 
             if (!IsPaused.Value)
                 Start();
