@@ -39,12 +39,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// The <see cref="HitObject"/> currently represented by this <see cref="DrawableHitObject"/>.
         /// </summary>
-        public HitObject HitObject => lifetimeEntry?.HitObject ?? initialHitObject;
-
-        /// <summary>
-        /// The <see cref="HitObject"/> given in the constructor that will be applied when loaded.
-        /// </summary>
-        private HitObject initialHitObject;
+        public HitObject HitObject => lifetimeEntry?.HitObject;
 
         /// <summary>
         /// The parenting <see cref="DrawableHitObject"/>, if any.
@@ -146,8 +141,14 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public IBindable<ArmedState> State => state;
 
         /// <summary>
+        /// Whether a <see cref="HitObjectLifetimeEntry"/> is currently applied.
+        /// </summary>
+        private bool hasEntryApplied;
+
+        /// <summary>
         /// The <see cref="HitObjectLifetimeEntry"/> controlling the lifetime of the currently-attached <see cref="HitObject"/>.
         /// </summary>
+        /// <remarks>Even if it is not null, it may not be fully applied until loaded (<see cref="hasEntryApplied"/> is false).</remarks>
         [CanBeNull]
         private HitObjectLifetimeEntry lifetimeEntry;
 
@@ -168,7 +169,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </param>
         protected DrawableHitObject([CanBeNull] HitObject initialHitObject = null)
         {
-            this.initialHitObject = initialHitObject;
+            if (initialHitObject != null)
+                lifetimeEntry = new UnmanagedHitObjectEntry(initialHitObject);
         }
 
         [BackgroundDependencyLoader]
@@ -184,11 +186,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             base.LoadAsyncComplete();
 
-            if (initialHitObject != null)
-            {
-                Apply(initialHitObject, null);
-                initialHitObject = null;
-            }
+            if (lifetimeEntry != null && !hasEntryApplied)
+                apply(lifetimeEntry);
         }
 
         protected override void LoadComplete()
@@ -210,21 +209,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (hitObject == null)
                 throw new ArgumentNullException($"Cannot apply a null {nameof(HitObject)}.");
 
-            if (lifetimeEntry != null)
-            {
-                if (lifetimeEntry.HitObject != hitObject)
-                    throw new InvalidOperationException($"{nameof(HitObjectLifetimeEntry)} has different {nameof(HitObject)} from the specified one.");
+            if (lifetimeEntry != null && lifetimeEntry.HitObject != hitObject)
+                throw new InvalidOperationException($"{nameof(HitObjectLifetimeEntry)} has different {nameof(HitObject)} from the specified one.");
 
-                apply(lifetimeEntry);
-            }
-            else
-            {
-                var unmanagedEntry = new UnmanagedHitObjectEntry(hitObject, this);
-                apply(unmanagedEntry);
-
-                // Set default lifetime for a non-pooled DHO
-                LifetimeStart = hitObject.StartTime - InitialLifetimeOffset;
-            }
+            apply(lifetimeEntry ?? new UnmanagedHitObjectEntry(hitObject));
         }
 
         /// <summary>
@@ -294,6 +282,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 else
                     updateState(ArmedState.Idle, true);
             }
+
+            hasEntryApplied = true;
         }
 
         /// <summary>
@@ -301,7 +291,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         private void free()
         {
-            if (lifetimeEntry == null) return;
+            if (!hasEntryApplied) return;
 
             StartTimeBindable.UnbindFrom(HitObject.StartTimeBindable);
             if (HitObject is IHasComboInformation combo)
@@ -337,6 +327,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             lifetimeEntry = null;
 
             clearExistingStateTransforms();
+
+            hasEntryApplied = false;
         }
 
         protected sealed override void FreeAfterUse()
