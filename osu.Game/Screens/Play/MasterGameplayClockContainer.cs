@@ -47,6 +47,9 @@ namespace osu.Game.Screens.Play
 
         private readonly BindableDouble pauseFreqAdjust = new BindableDouble(1);
 
+        protected override double StartOffset => startOffset;
+        private double startOffset;
+
         private readonly WorkingBeatmap beatmap;
         private readonly double gameplayStartTime;
         private readonly bool startAtGameplayStart;
@@ -74,27 +77,23 @@ namespace osu.Game.Screens.Play
             userAudioOffset.BindValueChanged(offset => userOffsetClock.Offset = offset.NewValue, true);
 
             // sane default provided by ruleset.
-            double startTime = gameplayStartTime;
+            startOffset = gameplayStartTime;
 
             if (!startAtGameplayStart)
             {
-                startTime = Math.Min(0, startTime);
+                startOffset = Math.Min(0, startOffset);
 
                 // if a storyboard is present, it may dictate the appropriate start time by having events in negative time space.
                 // this is commonly used to display an intro before the audio track start.
                 double? firstStoryboardEvent = beatmap.Storyboard.EarliestEventTime;
                 if (firstStoryboardEvent != null)
-                    startTime = Math.Min(startTime, firstStoryboardEvent.Value);
+                    startOffset = Math.Min(startOffset, firstStoryboardEvent.Value);
 
                 // some beatmaps specify a current lead-in time which should be used instead of the ruleset-provided value when available.
                 // this is not available as an option in the live editor but can still be applied via .osu editing.
                 if (beatmap.BeatmapInfo.AudioLeadIn > 0)
-                    startTime = Math.Min(startTime, firstHitObjectTime - beatmap.BeatmapInfo.AudioLeadIn);
+                    startOffset = Math.Min(startOffset, firstHitObjectTime - beatmap.BeatmapInfo.AudioLeadIn);
             }
-
-            Seek(startTime);
-
-            AdjustableSource.ProcessFrame();
         }
 
         protected override void OnIsPausedChanged(ValueChangedEvent<bool> isPaused)
