@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Globalization;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -46,7 +45,7 @@ namespace osu.Game.Screens.Ranking.Expanded
         }
 
         /// <summary>
-        /// Creates a new <see cref="StarRatingDisplay"/> using a <see cref="BeatmapInfo"/> to use a bindable for the difficulty. 
+        /// Creates a new <see cref="StarRatingDisplay"/> using a <see cref="BeatmapInfo"/> to use a bindable for the difficulty.
         /// </summary>
         /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to use to create a bindable for <see cref="StarDifficulty"/></param>
         public StarRatingDisplay(BeatmapInfo beatmapInfo)
