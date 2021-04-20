@@ -1,10 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Globalization;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Framework.Timing;
 
 namespace osu.Game.Screens.Play
@@ -68,6 +70,9 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public virtual void Start()
         {
+            // Ensure that the source clock is set.
+            ChangeSource(SourceClock);
+
             if (!AdjustableSource.IsRunning)
             {
                 // Seeking the decoupled clock to its current time ensures that its source clock will be seeked to the same time
@@ -96,8 +101,6 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public virtual void Reset()
         {
-            ChangeSource(SourceClock);
-
             AdjustableSource.Seek(StartOffset);
             AdjustableSource.Stop();
 
