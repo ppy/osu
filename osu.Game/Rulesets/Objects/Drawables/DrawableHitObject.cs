@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Threading;
 using osu.Game.Audio;
@@ -25,7 +26,7 @@ using osuTK.Graphics;
 namespace osu.Game.Rulesets.Objects.Drawables
 {
     [Cached(typeof(DrawableHitObject))]
-    public abstract class DrawableHitObject : SkinReloadableDrawable
+    public abstract class DrawableHitObject : PoolableDrawable
     {
         /// <summary>
         /// Invoked after this <see cref="DrawableHitObject"/>'s applied <see cref="HitObject"/> has had its defaults applied.
@@ -178,12 +179,15 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, ISkinSource skinSource)
         {
             config.BindWith(OsuSetting.PositionalHitSounds, userPositionalHitSounds);
 
             // Explicit non-virtual function call.
             base.AddInternal(Samples = new PausableSkinnableSound());
+
+            CurrentSkin = skinSource;
+            CurrentSkin.SourceChanged += onSkinSourceChanged;
         }
 
         protected override void LoadAsyncComplete()
@@ -536,17 +540,19 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         #endregion
 
-        protected sealed override void SkinChanged(ISkinSource skin, bool allowFallback)
-        {
-            base.SkinChanged(skin, allowFallback);
+        #region Skinning
 
+        protected ISkinSource CurrentSkin { get; private set; }
+
+        private void onSkinSourceChanged() => Scheduler.AddOnce(() =>
+        {
             UpdateComboColour();
 
-            ApplySkin(skin, allowFallback);
+            ApplySkin(CurrentSkin, true);
 
             if (IsLoaded)
                 updateState(State.Value, true);
-        }
+        });
 
         protected void UpdateComboColour()
         {
@@ -615,6 +621,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (Samples?.Looping == true)
                 Samples.Stop();
         }
+
+        #endregion
 
         protected override void Update()
         {
@@ -811,6 +819,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             if (HitObject != null)
                 HitObject.DefaultsApplied -= onDefaultsApplied;
+
+            CurrentSkin.SourceChanged -= onSkinSourceChanged;
         }
     }
 
