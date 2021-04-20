@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public BindableNumber<double> SpinSpeed { get; } = new BindableDouble(0.5)
         {
             MinValue = 0.02,
-            MaxValue = 4,
+            MaxValue = 12,
             Precision = 0.01,
         };
 
