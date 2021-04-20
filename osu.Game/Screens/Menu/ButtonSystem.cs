@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
@@ -22,6 +23,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
+using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
@@ -121,10 +123,10 @@ namespace osu.Game.Screens.Menu
         private LoginOverlay loginOverlay { get; set; }
 
         [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio, IdleTracker idleTracker, GameHost host)
+        private void load(AudioManager audio, IdleTracker idleTracker, GameHost host, LocalisationManager strings)
         {
-            buttonsPlay.Add(new Button(@"solo", @"button-solo-select", FontAwesome.Solid.User, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
-            buttonsPlay.Add(new Button(@"multi", @"button-generic-select", FontAwesome.Solid.Users, new Color4(94, 63, 186, 255), onMultiplayer, 0, Key.M));
+            buttonsPlay.Add(new Button(MainMenuStrings.Solo, @"button-solo-select", FontAwesome.Solid.User, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
+            buttonsPlay.Add(new Button(MainMenuStrings.Multi, @"button-generic-select", FontAwesome.Solid.Users, new Color4(94, 63, 186, 255), onMultiplayer, 0, Key.M));
             buttonsPlay.Add(new Button(@"playlists", @"button-generic-select", OsuIcon.Charts, new Color4(94, 63, 186, 255), onPlaylists, 0, Key.L));
             buttonsPlay.ForEach(b => b.VisibleState = ButtonSystemState.Play);
 

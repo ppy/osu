@@ -19,6 +19,7 @@ using osu.Game.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Screens.Menu
@@ -50,7 +51,7 @@ namespace osu.Game.Screens.Menu
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => box.ReceivePositionalInputAt(screenSpacePos);
 
-        public Button(string text, string sampleName, IconUsage symbol, Color4 colour, Action clickAction = null, float extraWidth = 0, Key triggerKey = Key.Unknown)
+        public Button(LocalisableString text, string sampleName, IconUsage symbol, Color4 colour, Action clickAction = null, float extraWidth = 0, Key triggerKey = Key.Unknown)
         {
             this.sampleName = sampleName;
             this.clickAction = clickAction;
