@@ -105,6 +105,12 @@ namespace osu.Game.Screens.Play
                 this.TransformBindableTo(pauseFreqAdjust, 1, 200, Easing.In);
         }
 
+        public override void Start()
+        {
+            addSourceClockAdjustments();
+            base.Start();
+        }
+
         /// <summary>
         /// Seek to a specific time in gameplay.
         /// </summary>
@@ -120,12 +126,6 @@ namespace osu.Game.Screens.Play
 
             // manually process frame to ensure GameplayClock is correctly updated after a seek.
             userOffsetClock.ProcessFrame();
-        }
-
-        public override void Reset()
-        {
-            updateRate();
-            base.Reset();
         }
 
         /// <summary>
@@ -164,11 +164,12 @@ namespace osu.Game.Screens.Play
         {
             removeSourceClockAdjustments();
             ChangeSource(new TrackVirtual(beatmap.Track.Length));
+            addSourceClockAdjustments();
         }
 
         private bool speedAdjustmentsApplied;
 
-        private void updateRate()
+        private void addSourceClockAdjustments()
         {
             if (speedAdjustmentsApplied)
                 return;
