@@ -303,13 +303,14 @@ namespace osu.Game.Online.Spectator
         /// <param name="runOnceImmediately">Whether the action provided in <paramref name="callback"/> should be run once immediately for all users currently playing.</param>
         public void BindUserBeganPlaying(Action<int, SpectatorState> callback, bool runOnceImmediately = false)
         {
-            OnUserBeganPlaying += callback;
-
-            if (!runOnceImmediately)
-                return;
-
+            // The lock is taken before the event is subscribed to to prevent doubling of events.
             lock (userLock)
             {
+                OnUserBeganPlaying += callback;
+
+                if (!runOnceImmediately)
+                    return;
+
                 foreach (var (userId, state) in playingUserStates)
                     callback(userId, state);
             }
