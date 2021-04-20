@@ -37,8 +37,8 @@ namespace osu.Game.Tests.Editing.Checks
             beatmap.Metadata.AudioFile = null;
 
             var mock = new Mock<IWorkingBeatmap>();
-            mock.SetupGet(_ => _.Beatmap).Returns(beatmap);
-            mock.SetupGet(_ => _.Track).Returns((Track)null);
+            mock.SetupGet(w => w.Beatmap).Returns(beatmap);
+            mock.SetupGet(w => w.Track).Returns((Track)null);
 
             Assert.That(check.Run(beatmap, mock.Object), Is.Empty);
         }
@@ -102,11 +102,11 @@ namespace osu.Game.Tests.Editing.Checks
         private Mock<IWorkingBeatmap> getMockWorkingBeatmap(int? audioBitrate)
         {
             var mockTrack = new Mock<Track>();
-            mockTrack.SetupGet(_ => _.Bitrate).Returns(audioBitrate);
+            mockTrack.SetupGet(t => t.Bitrate).Returns(audioBitrate);
 
             var mockWorkingBeatmap = new Mock<IWorkingBeatmap>();
-            mockWorkingBeatmap.SetupGet(_ => _.Beatmap).Returns(beatmap);
-            mockWorkingBeatmap.SetupGet(_ => _.Track).Returns(mockTrack.Object);
+            mockWorkingBeatmap.SetupGet(w => w.Beatmap).Returns(beatmap);
+            mockWorkingBeatmap.SetupGet(w => w.Track).Returns(mockTrack.Object);
 
             return mockWorkingBeatmap;
         }

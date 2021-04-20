@@ -120,9 +120,9 @@ namespace osu.Game.Tests.Editing.Checks
             var stream = new MemoryStream(fileBytes ?? new byte[1024 * 1024]);
 
             var mock = new Mock<IWorkingBeatmap>();
-            mock.SetupGet(_ => _.Beatmap).Returns(beatmap);
-            mock.SetupGet(_ => _.Background).Returns(background);
-            mock.Setup(_ => _.GetStream(It.IsAny<string>())).Returns(stream);
+            mock.SetupGet(w => w.Beatmap).Returns(beatmap);
+            mock.SetupGet(w => w.Background).Returns(background);
+            mock.Setup(w => w.GetStream(It.IsAny<string>())).Returns(stream);
 
             return mock;
         }
