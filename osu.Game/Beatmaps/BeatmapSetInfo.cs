@@ -59,6 +59,10 @@ namespace osu.Game.Beatmaps
 
         public string StoryboardFile => Files?.Find(f => f.Filename.EndsWith(".osb", StringComparison.OrdinalIgnoreCase))?.Filename;
 
+        /// <summary>
+        /// Returns the storage path for the file in this beatmapset with the given filename, if any exists, otherwise null.
+        /// </summary>
+        /// <param name="filename">The name of the file to get the storage path of.</param>
         public string GetPathForFile(string filename) => Files?.SingleOrDefault(f => string.Equals(f.Filename, filename, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
 
         public List<BeatmapSetFileInfo> Files { get; set; }
