@@ -1,8 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Globalization;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -22,7 +24,11 @@ namespace osu.Game.Screens.Ranking.Expanded
     /// </summary>
     public class StarRatingDisplay : CompositeDrawable
     {
-        private readonly StarDifficulty difficulty;
+        private CircularContainer colorContainer;
+        private OsuTextFlowContainer textContainer;
+
+        private readonly StarDifficulty starDifficulty;
+        private readonly IBindable<StarDifficulty?> bindableStarDifficulty;
 
         /// <summary>
         /// Creates a new <see cref="StarRatingDisplay"/> using an already computed <see cref="StarDifficulty"/>.
@@ -30,14 +36,21 @@ namespace osu.Game.Screens.Ranking.Expanded
         /// <param name="starDifficulty">The already computed <see cref="StarDifficulty"/> to display the star difficulty of.</param>
         public StarRatingDisplay(StarDifficulty starDifficulty)
         {
-            difficulty = starDifficulty;
+            this.starDifficulty = starDifficulty;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours, BeatmapDifficultyCache difficultyCache)
+        /// <summary>
+        /// Creates a new <see cref="StarRatingDisplay"/> using a binded nullable <see cref="StarDifficulty"/>.
+        /// </summary>
+        /// <param name="starDifficulty">The binded nullable <see cref="StarDifficulty"/> to display the star difficulty of. If <c>null</c>, a new instance of <see cref="StarDifficulty"/> will be created </param>
+        public StarRatingDisplay(IBindable<StarDifficulty?> starDifficulty)
         {
-            AutoSizeAxes = Axes.Both;
+            bindableStarDifficulty = starDifficulty;
+        }
 
+        private void setDifficulty(OsuColour colours)
+        {
+            var difficulty = bindableStarDifficulty == null ? starDifficulty : bindableStarDifficulty.Value ?? new StarDifficulty();
             var starRatingParts = difficulty.Stars.ToString("0.00", CultureInfo.InvariantCulture).Split('.');
             string wholePart = starRatingParts[0];
             string fractionPart = starRatingParts[1];
@@ -47,9 +60,36 @@ namespace osu.Game.Screens.Ranking.Expanded
                 ? ColourInfo.GradientVertical(Color4Extensions.FromHex("#C1C1C1"), Color4Extensions.FromHex("#595959"))
                 : (ColourInfo)colours.ForDifficultyRating(difficulty.DifficultyRating);
 
+            colorContainer.Colour = backgroundColour;
+
+            textContainer.Text = string.Empty;
+
+            textContainer.With(t =>
+            {
+                t.AddText($"{wholePart}", s =>
+                {
+                    s.Colour = Color4.Black;
+                    s.Font = s.Font.With(size: 14);
+                    s.UseFullGlyphHeight = false;
+                });
+
+                t.AddText($"{separator}{fractionPart}", s =>
+                {
+                    s.Colour = Color4.Black;
+                    s.Font = s.Font.With(size: 7);
+                    s.UseFullGlyphHeight = false;
+                });
+            });
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours, BeatmapDifficultyCache difficultyCache)
+        {
+            AutoSizeAxes = Axes.Both;
+
             InternalChildren = new Drawable[]
             {
-                new CircularContainer
+                colorContainer = new CircularContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
@@ -58,7 +98,6 @@ namespace osu.Game.Screens.Ranking.Expanded
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = backgroundColour
                         },
                     }
                 },
@@ -78,32 +117,24 @@ namespace osu.Game.Screens.Ranking.Expanded
                             Icon = FontAwesome.Solid.Star,
                             Colour = Color4.Black
                         },
-                        new OsuTextFlowContainer(s => s.Font = OsuFont.Numeric.With(weight: FontWeight.Black))
+                        textContainer = new OsuTextFlowContainer(s => s.Font = OsuFont.Numeric.With(weight: FontWeight.Black))
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             AutoSizeAxes = Axes.Both,
                             Direction = FillDirection.Horizontal,
                             TextAnchor = Anchor.BottomLeft,
-                        }.With(t =>
-                        {
-                            t.AddText($"{wholePart}", s =>
-                            {
-                                s.Colour = Color4.Black;
-                                s.Font = s.Font.With(size: 14);
-                                s.UseFullGlyphHeight = false;
-                            });
-
-                            t.AddText($"{separator}{fractionPart}", s =>
-                            {
-                                s.Colour = Color4.Black;
-                                s.Font = s.Font.With(size: 7);
-                                s.UseFullGlyphHeight = false;
-                            });
-                        })
+                        },
                     }
                 }
             };
+
+            if (bindableStarDifficulty != null)
+            {
+                bindableStarDifficulty.BindValueChanged(_ => setDifficulty(colours));
+            }
+
+            setDifficulty(colours);
         }
     }
 }
