@@ -105,7 +105,6 @@ namespace osu.Game.Screens.Select
 
                 beatmapDifficulty?.UnbindAll();
                 beatmapDifficulty = difficultyCache.GetBindableDifficulty(beatmap.BeatmapInfo, cancellationSource.Token);
-                beatmapDifficulty.BindValueChanged(_ => updateDisplay());
 
                 updateDisplay();
             }
@@ -151,7 +150,7 @@ namespace osu.Game.Screens.Select
 
                     removeOldInfo();
                     Add(Background = loaded);
-                    Add(Info = new WedgeInfoText(beatmap, ruleset.Value, mods.Value, beatmapDifficulty.Value ?? new StarDifficulty())
+                    Add(Info = new WedgeInfoText(beatmap, ruleset.Value, mods.Value, beatmapDifficulty)
                     {
                         Shear = -Shear
                     });
@@ -176,15 +175,16 @@ namespace osu.Game.Screens.Select
             private ILocalisedBindableString titleBinding;
             private ILocalisedBindableString artistBinding;
             private FillFlowContainer infoLabelContainer;
+            private Drawable starRatingDisplay;
             private Container bpmLabelContainer;
             private ModSettingChangeTracker settingChangeTracker;
 
             private readonly WorkingBeatmap beatmap;
             private readonly RulesetInfo ruleset;
             private readonly IReadOnlyList<Mod> mods;
-            private readonly StarDifficulty starDifficulty;
+            private readonly IBindable<StarDifficulty?> starDifficulty;
 
-            public WedgeInfoText(WorkingBeatmap beatmap, RulesetInfo userRuleset, IReadOnlyList<Mod> mods, StarDifficulty difficulty)
+            public WedgeInfoText(WorkingBeatmap beatmap, RulesetInfo userRuleset, IReadOnlyList<Mod> mods, IBindable<StarDifficulty?> difficulty)
             {
                 this.beatmap = beatmap;
                 ruleset = userRuleset ?? beatmap.BeatmapInfo.Ruleset;
@@ -241,12 +241,13 @@ namespace osu.Game.Screens.Select
                         Shear = wedged_container_shear,
                         Children = new[]
                         {
-                            createStarRatingDisplay(starDifficulty).With(display =>
+                            starRatingDisplay = new StarRatingDisplay(starDifficulty)
                             {
-                                display.Anchor = Anchor.TopRight;
-                                display.Origin = Anchor.TopRight;
-                                display.Shear = -wedged_container_shear;
-                            }),
+                                Anchor = Anchor.TopRight,
+                                Origin = Anchor.TopRight,
+                                Shear = -wedged_container_shear,
+                                Margin = new MarginPadding { Bottom = 5 }
+                            },
                             StatusPill = new BeatmapSetOnlineStatusPill
                             {
                                 Anchor = Anchor.TopRight,
@@ -307,6 +308,18 @@ namespace osu.Game.Screens.Select
                     StatusPill.Hide();
 
                 addInfoLabels();
+            }
+
+            private void setStarRatingDisplayVisibility()
+            {
+                if (starDifficulty.Value.HasValue && starDifficulty.Value.Value.Stars > 0)
+                {
+                    starRatingDisplay.Show();
+                }
+                else
+                {
+                    starRatingDisplay.Hide();
+                }
             }
 
             private InfoLabel[] getRulesetInfoLabels()
@@ -420,18 +433,14 @@ namespace osu.Game.Screens.Select
                 };
             }
 
-            private static Drawable createStarRatingDisplay(StarDifficulty difficulty) => difficulty.Stars > 0
-                ? new StarRatingDisplay(difficulty)
-                {
-                    Margin = new MarginPadding { Bottom = 5 }
-                }
-                : Empty();
-
             private class DifficultyColourBar : Container
             {
-                private readonly StarDifficulty difficulty;
+                private Box solidDifficultyBox;
+                private Box transparentDifficultyBox;
 
-                public DifficultyColourBar(StarDifficulty difficulty)
+                private readonly IBindable<StarDifficulty?> difficulty;
+
+                public DifficultyColourBar(IBindable<StarDifficulty?> difficulty)
                 {
                     this.difficulty = difficulty;
                 }
@@ -441,26 +450,33 @@ namespace osu.Game.Screens.Select
                 {
                     const float full_opacity_ratio = 0.7f;
 
-                    var difficultyColour = colours.ForDifficultyRating(difficulty.DifficultyRating);
-
                     Children = new Drawable[]
                     {
-                        new Box
+                        solidDifficultyBox = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = difficultyColour,
                             Width = full_opacity_ratio,
                         },
-                        new Box
+                        transparentDifficultyBox = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
                             RelativePositionAxes = Axes.Both,
-                            Colour = difficultyColour,
                             Alpha = 0.5f,
                             X = full_opacity_ratio,
                             Width = 1 - full_opacity_ratio,
                         }
                     };
+
+                    difficulty.BindValueChanged(_ => setColour(colours));
+                    setColour(colours);
+                }
+
+                private void setColour(OsuColour colours)
+                {
+                    var difficultyColour = colours.ForDifficultyRating(difficulty.Value?.DifficultyRating ?? (new StarDifficulty()).DifficultyRating);
+
+                    solidDifficultyBox.Colour = difficultyColour;
+                    transparentDifficultyBox.Colour = difficultyColour;
                 }
             }
 
