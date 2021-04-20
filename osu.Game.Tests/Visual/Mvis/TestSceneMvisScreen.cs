@@ -3,11 +3,18 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
+using osu.Framework.Platform;
 using osu.Game.Collections;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Input;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Screens;
 using osu.Game.Screens.Mvis;
+using osu.Game.Screens.Mvis.Plugins;
 
 namespace osu.Game.Tests.Visual.Mvis
 {
@@ -25,6 +32,8 @@ namespace osu.Game.Tests.Visual.Mvis
 
         private DependencyContainer dependencies;
 
+        private MvisScreen mvis;
+
         [Test]
         public void CreateMvisScreen()
         {
@@ -33,7 +42,7 @@ namespace osu.Game.Tests.Visual.Mvis
                 if (Stack.CurrentScreen != null)
                     Stack?.Exit();
 
-                LoadScreen(new MvisScreen());
+                LoadScreen(mvis = new MvisScreen());
             });
         }
 
@@ -41,14 +50,23 @@ namespace osu.Game.Tests.Visual.Mvis
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(Storage storage, OsuGameBase gameBase)
         {
+            CollectionManager collectionManager;
+            MvisPluginManager mvisPluginManager;
+            CustomStore customStore = dependencies.Get<CustomStore>() ?? new CustomStore(storage, gameBase);
+            dependencies.Cache(customStore);
+
+            dependencies.Cache(collectionManager = new CollectionManager(LocalStorage));
+            dependencies.Cache(mvisPluginManager = new MvisPluginManager());
+            dependencies.Cache(GetContainingInputManager() ?? new LocalInputManager());
+            mvisPluginManager.AddPlugin(new MvisTestsPlugin());
+
+            Add(mvisPluginManager);
             Add(idle);
             Add(musicController);
             Add(dialog);
 
-            CollectionManager collectionManager;
-            dependencies.Cache(collectionManager = new CollectionManager(LocalStorage));
             Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
 
             AddStep("Add Collection", () =>
@@ -58,6 +76,43 @@ namespace osu.Game.Tests.Visual.Mvis
                     Name = { Value = "Collection" },
                 });
             });
+        }
+
+        private class MvisTestsPlugin : MvisPlugin
+        {
+            private OsuSpriteText songTitle;
+            private OsuSpriteText songArtist;
+
+            protected override Drawable CreateContent() => new FillFlowContainer
+            {
+                AutoSizeAxes = Axes.Both,
+                Children = new Drawable[]
+                {
+                    songTitle = new OsuSpriteText(),
+                    songArtist = new OsuSpriteText()
+                }
+            };
+
+            protected override bool OnContentLoaded(Drawable content) => true;
+
+            protected override bool PostInit() => true;
+
+            public override int Version => 0;
+
+            protected override void LoadComplete()
+            {
+                MvisScreen.OnBeatmapChanged += b =>
+                {
+                    songTitle.Text = b.Metadata.TitleUnicode ?? b.Metadata.Title;
+                    songArtist.Text = b.Metadata.ArtistUnicode ?? b.Metadata.Artist;
+                };
+
+                base.LoadComplete();
+            }
+        }
+
+        private class LocalInputManager : UserInputManager
+        {
         }
     }
 }

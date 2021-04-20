@@ -378,7 +378,6 @@ namespace osu.Game.Screens.Mvis
                             Origin = Anchor.BottomCentre,
                             Margin = new MarginPadding(115)
                         },
-                        progressBar = new SongProgressBar(),
                         bottomBar = new BottomBarContainer
                         {
                             LeftContent = new Drawable[]
@@ -468,7 +467,8 @@ namespace osu.Game.Screens.Mvis
                                     TooltipText = "播放器设置",
                                 }
                             }
-                        }
+                        },
+                        progressBar = new SongProgressBar(),
                     }
                 }
             };

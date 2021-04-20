@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Mvis.SideBar.Footer
         [Resolved]
         private CustomColourProvider colourProvider { get; set; }
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private MvisScreen mvisScreen { get; set; }
 
         [BackgroundDependencyLoader]
@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Mvis.SideBar.Footer
 
         protected override void Update()
         {
-            Height = Math.Max(mvisScreen.BottombarHeight, 10);
+            Height = Math.Max(mvisScreen?.BottombarHeight ?? 0, 10);
             base.Update();
         }
     }
