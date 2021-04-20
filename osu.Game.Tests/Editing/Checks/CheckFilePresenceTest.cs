@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
+using osu.Game.IO;
 using osu.Game.Rulesets.Edit.Checks;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Tests.Beatmaps;
@@ -30,7 +31,11 @@ namespace osu.Game.Tests.Editing.Checks
                     {
                         Files = new List<BeatmapSetFileInfo>(new[]
                         {
-                            new BeatmapSetFileInfo { Filename = "abc123.jpg" }
+                            new BeatmapSetFileInfo
+                            {
+                                Filename = "abc123.jpg",
+                                FileInfo = new FileInfo { Hash = "abcdef" }
+                            }
                         })
                     }
                 }
