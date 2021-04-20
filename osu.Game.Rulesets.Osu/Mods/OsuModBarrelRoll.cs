@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
@@ -30,9 +31,11 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => "The whole playfield is on a wheel!";
         public override double ScoreMultiplier => 1;
 
+        public override string SettingDescription => $"{SpinSpeed.Value} rpm {Direction.Value.GetDescription().ToLowerInvariant()}";
+
         public void Update(Playfield playfield)
         {
-            playfield.Rotation = (Direction.Value == RotationDirection.CounterClockwise ? -1 : 1) * 360 * (float)(playfield.Time.Current / 60000 * SpinSpeed.Value);
+            playfield.Rotation = (Direction.Value == RotationDirection.Counterclockwise ? -1 : 1) * 360 * (float)(playfield.Time.Current / 60000 * SpinSpeed.Value);
         }
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
