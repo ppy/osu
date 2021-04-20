@@ -77,7 +77,33 @@ namespace osu.Game.Tests.Gameplay
 
             AddStep("start time", () => gameplayContainer.Start());
 
-            AddUntilStep("sample playback succeeded", () => sample.LifetimeEnd < double.MaxValue);
+            AddUntilStep("sample played", () => sample.RequestedPlaying);
+            AddUntilStep("sample has lifetime end", () => sample.LifetimeEnd < double.MaxValue);
+        }
+
+        [Test]
+        public void TestSampleHasLifetimeEndWithInitialClockTime()
+        {
+            GameplayClockContainer gameplayContainer = null;
+            DrawableStoryboardSample sample = null;
+
+            AddStep("create container", () =>
+            {
+                var working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+                working.LoadTrack();
+
+                Add(gameplayContainer = new GameplayClockContainer(working, 1000, true));
+
+                gameplayContainer.Add(sample = new DrawableStoryboardSample(new StoryboardSampleInfo(string.Empty, 0, 1))
+                {
+                    Clock = gameplayContainer.GameplayClock
+                });
+            });
+
+            AddStep("start time", () => gameplayContainer.Start());
+
+            AddUntilStep("sample not played", () => !sample.RequestedPlaying);
+            AddUntilStep("sample has lifetime end", () => sample.LifetimeEnd < double.MaxValue);
         }
 
         [TestCase(typeof(OsuModDoubleTime), 1.5)]

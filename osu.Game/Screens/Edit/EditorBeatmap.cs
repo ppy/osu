@@ -46,6 +46,7 @@ namespace osu.Game.Screens.Edit
 
         public readonly IBeatmap PlayableBeatmap;
 
+        [CanBeNull]
         public readonly ISkin BeatmapSkin;
 
         [Resolved]

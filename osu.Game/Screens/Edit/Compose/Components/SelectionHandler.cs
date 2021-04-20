@@ -33,10 +33,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// </summary>
     public class SelectionHandler : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IHasContextMenu
     {
+        /// <summary>
+        /// The currently selected blueprints.
+        /// Should be used when operations are dealing directly with the visible blueprints.
+        /// For more general selection operations, use <see cref="osu.Game.Screens.Edit.EditorBeatmap.SelectedHitObjects"/> instead.
+        /// </summary>
         public IEnumerable<SelectionBlueprint> SelectedBlueprints => selectedBlueprints;
-        private readonly List<SelectionBlueprint> selectedBlueprints;
 
-        public int SelectedCount => selectedBlueprints.Count;
+        private readonly List<SelectionBlueprint> selectedBlueprints;
 
         private Drawable content;
 
@@ -295,7 +299,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         private void updateVisibility()
         {
-            int count = selectedBlueprints.Count;
+            int count = EditorBeatmap.SelectedHitObjects.Count;
 
             selectionDetailsText.Text = count > 0 ? count.ToString() : string.Empty;
 
