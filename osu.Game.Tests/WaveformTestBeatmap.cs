@@ -52,6 +52,8 @@ namespace osu.Game.Tests
 
         protected override Waveform GetWaveform() => new Waveform(trackStore.GetStream(firstAudioFile));
 
+        public override Stream GetStream(string storagePath) => null;
+
         protected override Track GetBeatmapTrack() => trackStore.Get(firstAudioFile);
 
         private string firstAudioFile
