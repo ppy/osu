@@ -127,6 +127,10 @@ namespace osu.Game.Screens.Spectate
                 if (!userMap.ContainsKey(userId))
                     return;
 
+                // The user may have stopped playing.
+                if (!spectatorClient.TryGetPlayingUserState(userId, out _))
+                    return;
+
                 Schedule(() => OnUserStateChanged(userId, state));
 
                 updateGameplayState(userId);
