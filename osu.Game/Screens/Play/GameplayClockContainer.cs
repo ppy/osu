@@ -30,11 +30,6 @@ namespace osu.Game.Screens.Play
         protected readonly DecoupleableInterpolatingFramedClock AdjustableSource;
 
         /// <summary>
-        /// The offset at which to start playing. Affects the time which the clock is reset to via <see cref="Reset"/>.
-        /// </summary>
-        protected virtual double StartOffset => 0;
-
-        /// <summary>
         /// The source clock.
         /// </summary>
         protected IClock SourceClock { get; private set; }
@@ -105,7 +100,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public virtual void Reset()
         {
-            Seek(StartOffset);
+            Seek(0);
 
             // Manually stop the source in order to not affect the IsPaused state.
             AdjustableSource.Stop();

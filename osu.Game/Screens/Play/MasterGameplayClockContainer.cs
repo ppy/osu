@@ -47,9 +47,6 @@ namespace osu.Game.Screens.Play
 
         private readonly BindableDouble pauseFreqAdjust = new BindableDouble(1);
 
-        protected override double StartOffset => startOffset;
-        private double startOffset;
-
         private readonly WorkingBeatmap beatmap;
         private readonly double gameplayStartTime;
         private readonly bool startAtGameplayStart;
@@ -59,6 +56,7 @@ namespace osu.Game.Screens.Play
         private FramedOffsetClock platformOffsetClock;
         private LocalGameplayClock localGameplayClock;
         private Bindable<double> userAudioOffset;
+        private double startOffset;
 
         public MasterGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStartTime, bool startAtGameplayStart = false)
             : base(beatmap.Track)
@@ -94,6 +92,8 @@ namespace osu.Game.Screens.Play
                 if (beatmap.BeatmapInfo.AudioLeadIn > 0)
                     startOffset = Math.Min(startOffset, firstHitObjectTime - beatmap.BeatmapInfo.AudioLeadIn);
             }
+
+            Seek(startOffset);
         }
 
         protected override void OnIsPausedChanged(ValueChangedEvent<bool> isPaused)
@@ -140,6 +140,12 @@ namespace osu.Game.Screens.Play
                 skipTarget = 0;
 
             Seek(skipTarget);
+        }
+
+        public override void Reset()
+        {
+            base.Reset();
+            Seek(startOffset);
         }
 
         protected override GameplayClock CreateGameplayClock(IFrameBasedClock source)
