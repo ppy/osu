@@ -138,7 +138,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
         [Test]
         public void TestSliderNearEdgeStackedOffscreen()
         {
-            assertOk(new Beatmap<HitObject>
+            assertOffscreenSlider(new Beatmap<HitObject>
             {
                 HitObjects = new List<HitObject>
                 {
