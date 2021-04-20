@@ -41,11 +41,6 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
 
-        [Resolved]
-        private BeatmapDifficultyCache difficultyCache { get; set; }
-
-        private IBindable<StarDifficulty?> beatmapDifficulty;
-
         protected BufferedWedgeBackground Background;
         protected WedgeInfoText Info;
 
@@ -87,8 +82,6 @@ namespace osu.Game.Screens.Select
 
         private WorkingBeatmap beatmap;
 
-        private CancellationTokenSource cancellationSource;
-
         public WorkingBeatmap Beatmap
         {
             get => beatmap;
@@ -97,12 +90,6 @@ namespace osu.Game.Screens.Select
                 if (beatmap == value) return;
 
                 beatmap = value;
-                cancellationSource?.Cancel();
-                cancellationSource = new CancellationTokenSource();
-
-                beatmapDifficulty?.UnbindAll();
-                beatmapDifficulty = difficultyCache.GetBindableDifficulty(beatmap.BeatmapInfo, cancellationSource.Token);
-
                 updateDisplay();
             }
         }
@@ -147,7 +134,7 @@ namespace osu.Game.Screens.Select
 
                     removeOldInfo();
                     Add(Background = loaded);
-                    Add(Info = new WedgeInfoText(beatmap, ruleset.Value, beatmapDifficulty)
+                    Add(Info = new WedgeInfoText(beatmap, ruleset.Value)
                     {
                         Shear = -Shear
                     });
@@ -158,7 +145,6 @@ namespace osu.Game.Screens.Select
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            cancellationSource?.Cancel();
         }
 
         public class WedgeInfoText : Container
@@ -178,23 +164,29 @@ namespace osu.Game.Screens.Select
             private Drawable starRatingDisplay;
             private Container bpmLabelContainer;
             private ModSettingChangeTracker settingChangeTracker;
+            private CancellationTokenSource cancellationTokenSource;
+            private IBindable<StarDifficulty?> starDifficulty;
 
             private readonly WorkingBeatmap beatmap;
             private readonly RulesetInfo ruleset;
-            private readonly IBindable<StarDifficulty?> starDifficulty;
 
-            public WedgeInfoText(WorkingBeatmap beatmap, RulesetInfo userRuleset, IBindable<StarDifficulty?> difficulty)
+            public WedgeInfoText(WorkingBeatmap beatmap, RulesetInfo userRuleset)
             {
                 this.beatmap = beatmap;
                 ruleset = userRuleset ?? beatmap.BeatmapInfo.Ruleset;
-                starDifficulty = difficulty;
             }
 
             [BackgroundDependencyLoader]
-            private void load(LocalisationManager localisation)
+            private void load(LocalisationManager localisation, BeatmapDifficultyCache difficultyCache)
             {
                 var beatmapInfo = beatmap.BeatmapInfo;
                 var metadata = beatmapInfo.Metadata ?? beatmap.BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
+
+                cancellationTokenSource?.Cancel();
+                cancellationTokenSource = new CancellationTokenSource();
+
+                starDifficulty?.UnbindAll();
+                starDifficulty = difficultyCache.GetBindableDifficulty(beatmapInfo, cancellationTokenSource.Token);
 
                 RelativeSizeAxes = Axes.Both;
 
@@ -203,7 +195,7 @@ namespace osu.Game.Screens.Select
 
                 Children = new Drawable[]
                 {
-                    new DifficultyColourBar(starDifficulty)
+                    new DifficultyColourBar(beatmapInfo)
                     {
                         RelativeSizeAxes = Axes.Y,
                         Width = 20,
@@ -239,7 +231,7 @@ namespace osu.Game.Screens.Select
                         Shear = wedged_container_shear,
                         Children = new[]
                         {
-                            starRatingDisplay = new StarRatingDisplay(starDifficulty)
+                            starRatingDisplay = new StarRatingDisplay(beatmapInfo)
                             {
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
@@ -313,13 +305,9 @@ namespace osu.Game.Screens.Select
             private void setStarRatingDisplayVisibility()
             {
                 if (starDifficulty.Value.HasValue && starDifficulty.Value.Value.Stars > 0)
-                {
                     starRatingDisplay.Show();
-                }
                 else
-                {
                     starRatingDisplay.Hide();
-                }
             }
 
             private InfoLabel[] getRulesetInfoLabels()
@@ -440,20 +428,31 @@ namespace osu.Game.Screens.Select
 
             private class DifficultyColourBar : Container
             {
+                [Resolved]
+                private OsuColour colours { get; set; }
+
                 private Box solidDifficultyBox;
                 private Box transparentDifficultyBox;
+                private CancellationTokenSource cancellationTokenSource;
+                private IBindable<StarDifficulty?> starDifficulty;
 
-                private readonly IBindable<StarDifficulty?> difficulty;
+                private readonly BeatmapInfo beatmapInfo;
 
-                public DifficultyColourBar(IBindable<StarDifficulty?> difficulty)
+                public DifficultyColourBar(BeatmapInfo beatmapInfo)
                 {
-                    this.difficulty = difficulty;
+                    this.beatmapInfo = beatmapInfo;
                 }
 
                 [BackgroundDependencyLoader]
-                private void load(OsuColour colours)
+                private void load(BeatmapDifficultyCache difficultyCache)
                 {
                     const float full_opacity_ratio = 0.7f;
+
+                    cancellationTokenSource?.Cancel();
+                    cancellationTokenSource = new CancellationTokenSource();
+
+                    starDifficulty?.UnbindAll();
+                    starDifficulty = difficultyCache.GetBindableDifficulty(beatmapInfo, cancellationTokenSource.Token);
 
                     Children = new Drawable[]
                     {
@@ -472,15 +471,21 @@ namespace osu.Game.Screens.Select
                         }
                     };
 
-                    difficulty.BindValueChanged(_ => setColour(colours), true);
+                    starDifficulty.BindValueChanged(valueChangedEvent => setColour(valueChangedEvent), true);
                 }
 
-                private void setColour(OsuColour colours)
+                private void setColour(ValueChangedEvent<StarDifficulty?> valueChanged)
                 {
-                    var difficultyColour = colours.ForDifficultyRating(difficulty.Value?.DifficultyRating ?? (new StarDifficulty()).DifficultyRating);
+                    var difficultyColour = colours.ForDifficultyRating(valueChanged.NewValue?.DifficultyRating ?? (new StarDifficulty()).DifficultyRating);
 
                     solidDifficultyBox.Colour = difficultyColour;
                     transparentDifficultyBox.Colour = difficultyColour;
+                }
+
+                protected override void Dispose(bool isDisposing)
+                {
+                    base.Dispose(isDisposing);
+                    cancellationTokenSource?.Cancel();
                 }
             }
 

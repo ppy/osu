@@ -3,6 +3,7 @@
 
 using System;
 using System.Globalization;
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -24,11 +25,16 @@ namespace osu.Game.Screens.Ranking.Expanded
     /// </summary>
     public class StarRatingDisplay : CompositeDrawable
     {
+        [Resolved]
+        private OsuColour colours { get; set; }
+
         private CircularContainer colorContainer;
         private OsuTextFlowContainer textContainer;
+        private CancellationTokenSource cancellationTokenSource;
+        private IBindable<StarDifficulty?> bindableStarDifficulty;
 
         private readonly StarDifficulty starDifficulty;
-        private readonly IBindable<StarDifficulty?> bindableStarDifficulty;
+        private readonly BeatmapInfo beatmapInfo;
 
         /// <summary>
         /// Creates a new <see cref="StarRatingDisplay"/> using an already computed <see cref="StarDifficulty"/>.
@@ -40,17 +46,16 @@ namespace osu.Game.Screens.Ranking.Expanded
         }
 
         /// <summary>
-        /// Creates a new <see cref="StarRatingDisplay"/> using a binded nullable <see cref="StarDifficulty"/>.
+        /// Creates a new <see cref="StarRatingDisplay"/> using a <see cref="BeatmapInfo"/> to use a bindable for the difficulty. 
         /// </summary>
-        /// <param name="starDifficulty">The binded nullable <see cref="StarDifficulty"/> to display the star difficulty of. If <c>null</c>, a new instance of <see cref="StarDifficulty"/> will be created </param>
-        public StarRatingDisplay(IBindable<StarDifficulty?> starDifficulty)
+        /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to use to create a bindable for <see cref="StarDifficulty"/></param>
+        public StarRatingDisplay(BeatmapInfo beatmapInfo)
         {
-            bindableStarDifficulty = starDifficulty;
+            this.beatmapInfo = beatmapInfo;
         }
 
-        private void setDifficulty(OsuColour colours)
+        private void setDifficulty(StarDifficulty difficulty)
         {
-            var difficulty = bindableStarDifficulty == null ? starDifficulty : bindableStarDifficulty.Value ?? new StarDifficulty();
             var starRatingParts = difficulty.Stars.ToString("0.00", CultureInfo.InvariantCulture).Split('.');
             string wholePart = starRatingParts[0];
             string fractionPart = starRatingParts[1];
@@ -83,8 +88,17 @@ namespace osu.Game.Screens.Ranking.Expanded
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, BeatmapDifficultyCache difficultyCache)
+        private void load(BeatmapDifficultyCache difficultyCache)
         {
+            if (beatmapInfo != null)
+            {
+                cancellationTokenSource?.Cancel();
+                cancellationTokenSource = new CancellationTokenSource();
+
+                bindableStarDifficulty?.UnbindAll();
+                bindableStarDifficulty = difficultyCache.GetBindableDifficulty(beatmapInfo, cancellationTokenSource.Token);
+            }
+
             AutoSizeAxes = Axes.Both;
 
             InternalChildren = new Drawable[]
@@ -130,11 +144,15 @@ namespace osu.Game.Screens.Ranking.Expanded
             };
 
             if (bindableStarDifficulty != null)
-            {
-                bindableStarDifficulty.BindValueChanged(_ => setDifficulty(colours));
-            }
+                bindableStarDifficulty.BindValueChanged(valueChanged => setDifficulty(valueChanged.NewValue ?? new StarDifficulty()), true);
+            else
+                setDifficulty(starDifficulty);
+        }
 
-            setDifficulty(colours);
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            cancellationTokenSource?.Cancel();
         }
     }
 }
