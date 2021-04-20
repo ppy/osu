@@ -6,15 +6,15 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Edit.Timing
 {
     public class ControlPointSettings : CompositeDrawable
     {
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colours)
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 new Box
                 {
-                    Colour = colours.Gray3,
+                    Colour = colours.Background4,
                     RelativeSizeAxes = Axes.Both,
                 },
                 new OsuScrollContainer
