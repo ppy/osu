@@ -41,8 +41,9 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
 
-        protected BufferedWedgeBackground Background;
-        protected WedgeInfoText Info;
+        protected BeatmapInfoWedgeContainer Container;
+        protected WedgeInfoText Info => Container.Info;
+        protected BufferedWedgeBackground Background => Container.Background;
 
         public BeatmapInfoWedge()
         {
@@ -94,9 +95,9 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        public override bool IsPresent => base.IsPresent || Background == null; // Visibility is updated in the LoadComponentAsync callback
+        public override bool IsPresent => base.IsPresent || Container == null; // Visibility is updated in the LoadComponentAsync callback
 
-        private BufferedWedgeBackground loadingInfo;
+        private BeatmapInfoWedgeContainer loadingInfo;
 
         private void updateDisplay()
         {
@@ -108,13 +109,9 @@ namespace osu.Game.Screens.Select
                 {
                     State.Value = beatmap == null ? Visibility.Hidden : Visibility.Visible;
 
-                    Info?.FadeOut(250);
-                    Info?.Expire();
-                    Info = null;
-
-                    Background?.FadeOut(250);
-                    Background?.Expire();
-                    Background = null;
+                    Container?.FadeOut(250);
+                    Container?.Expire();
+                    Container = null;
                 }
 
                 if (beatmap == null)
@@ -123,22 +120,47 @@ namespace osu.Game.Screens.Select
                     return;
                 }
 
-                LoadComponentAsync(loadingInfo = new BufferedWedgeBackground(beatmap)
+                LoadComponentAsync(loadingInfo = new BeatmapInfoWedgeContainer(beatmap, ruleset.Value)
                 {
                     Shear = -Shear,
-                    Depth = Background?.Depth + 1 ?? 0
                 }, loaded =>
                 {
                     // ensure we are the most recent loaded wedge.
                     if (loaded != loadingInfo) return;
 
                     removeOldInfo();
-                    Add(Background = loaded);
-                    Add(Info = new WedgeInfoText(beatmap, ruleset.Value)
-                    {
-                        Shear = -Shear
-                    });
+                    Add(Container = loaded);
                 });
+            }
+        }
+
+        public class BeatmapInfoWedgeContainer : Container
+        {
+            private readonly WorkingBeatmap beatmap;
+            private readonly RulesetInfo ruleset;
+
+            internal BufferedWedgeBackground Background;
+            internal WedgeInfoText Info;
+
+            public BeatmapInfoWedgeContainer(WorkingBeatmap beatmap, RulesetInfo ruleset)
+            {
+                this.beatmap = beatmap;
+                this.ruleset = ruleset;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                RelativeSizeAxes = Axes.Both;
+
+                Children = new Drawable[]
+                {
+                    Background = new BufferedWedgeBackground(beatmap)
+                    {
+                        Depth = Background?.Depth + 1 ?? 0,
+                    },
+                    Info = new WedgeInfoText(beatmap, ruleset),
+                };
             }
         }
 
