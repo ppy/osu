@@ -86,7 +86,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             base.LoadComplete();
 
             masterClockContainer.Stop();
-            masterClockContainer.Restart();
+            masterClockContainer.Reset();
         }
 
         protected override void OnUserStateChanged(int userId, SpectatorState spectatorState)
