@@ -3,8 +3,11 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -27,7 +30,15 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private class OsuEditPlayfield : OsuPlayfield
         {
+            private Bindable<bool> hitAnimations;
+
             protected override GameplayCursorContainer CreateCursor() => null;
+
+            [BackgroundDependencyLoader]
+            private void load(OsuConfigManager config)
+            {
+                hitAnimations = config.GetBindable<bool>(OsuSetting.EditorHitAnimations);
+            }
 
             protected override void OnNewDrawableHitObject(DrawableHitObject d)
             {
@@ -42,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             private void updateState(DrawableHitObject hitObject, ArmedState state)
             {
-                if (state == ArmedState.Idle)
+                if (state == ArmedState.Idle || hitAnimations.Value)
                     return;
 
                 // adjust the visuals of certain object types to make them stay on screen for longer than usual.
@@ -60,6 +71,15 @@ namespace osu.Game.Rulesets.Osu.Edit
                         circle.ApproachCircle
                               .FadeOutFromOne(editor_hit_object_fade_out_extension * 4)
                               .Expire();
+
+                        circle.ApproachCircle.ScaleTo(1.1f, 300, Easing.OutQuint);
+
+                        var circlePieceDrawable = circle.CirclePiece.Drawable;
+
+                        // clear any explode animation logic.
+                        circlePieceDrawable.ApplyTransformsAt(circle.HitStateUpdateTime, true);
+                        circlePieceDrawable.ClearTransformsAfter(circle.HitStateUpdateTime, true);
+
                         break;
                 }
 
