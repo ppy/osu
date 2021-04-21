@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Objects
@@ -13,8 +11,8 @@ namespace osu.Game.Rulesets.Objects
     /// </summary>
     internal class SyntheticHitObjectEntry : HitObjectLifetimeEntry
     {
-        public SyntheticHitObjectEntry(HitObject hitObject, double initialLifetimeStart)
-            : base(hitObject, initialLifetimeStart)
+        public SyntheticHitObjectEntry(HitObject hitObject)
+            : base(hitObject)
         {
         }
     }
