@@ -206,12 +206,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Applies a hit object to be represented by this <see cref="DrawableHitObject"/>.
         /// </summary>
-        /// <remarks>This overload is semi-deprecated. Use either <see cref="Apply(osu.Game.Rulesets.Objects.HitObject)"/> or <see cref="Apply(osu.Game.Rulesets.Objects.HitObjectLifetimeEntry)"/>.</remarks>
+        [Obsolete("Use either overload of Apply that takes a single argument of type HitObject or HitObjectLifetimeEntry")]
         public void Apply([NotNull] HitObject hitObject, [CanBeNull] HitObjectLifetimeEntry lifetimeEntry)
         {
-            if (lifetimeEntry != null && lifetimeEntry.HitObject != hitObject)
-                throw new InvalidOperationException($"{nameof(HitObjectLifetimeEntry)} has different {nameof(HitObject)} from the specified one.");
-
             if (lifetimeEntry != null)
                 Apply(lifetimeEntry);
             else

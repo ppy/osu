@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 Type = HitType.Rim,
                 IsStrong = false,
                 StartTime = 300
-            }), null));
+            })));
 
             AddHitObject(hit);
             RemoveHitObject(hit);
@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 Type = HitType.Centre,
                 IsStrong = true,
                 StartTime = 500
-            }), null));
+            })));
 
             AddHitObject(hit);
         }
