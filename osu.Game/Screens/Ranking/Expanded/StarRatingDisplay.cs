@@ -29,13 +29,19 @@ namespace osu.Game.Screens.Ranking.Expanded
         private OsuColour colours { get; set; }
 
         private CircularContainer colorContainer;
-        private CancellationTokenSource cancellationTokenSource;
-        private IBindable<StarDifficulty?> bindableStarDifficulty;
         private OsuSpriteText wholePartText;
         private OsuSpriteText fractionPartText;
+        private StarDifficulty starDifficulty;
 
-        private readonly StarDifficulty starDifficulty;
-        private readonly BeatmapInfo beatmapInfo;
+        public StarDifficulty StarDifficulty
+        {
+            get => starDifficulty;
+            set
+            {
+                starDifficulty = value;
+                setDifficulty(starDifficulty);
+            }
+        }
 
         /// <summary>
         /// Creates a new <see cref="StarRatingDisplay"/> using an already computed <see cref="StarDifficulty"/>.
@@ -44,15 +50,6 @@ namespace osu.Game.Screens.Ranking.Expanded
         public StarRatingDisplay(StarDifficulty starDifficulty)
         {
             this.starDifficulty = starDifficulty;
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="StarRatingDisplay"/> using a <see cref="BeatmapInfo"/> to use a bindable for the difficulty.
-        /// </summary>
-        /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to use to create a bindable for <see cref="StarDifficulty"/></param>
-        public StarRatingDisplay(BeatmapInfo beatmapInfo)
-        {
-            this.beatmapInfo = beatmapInfo;
         }
 
         private void setDifficulty(StarDifficulty difficulty)
@@ -71,21 +68,12 @@ namespace osu.Game.Screens.Ranking.Expanded
             wholePartText.Text = $"{wholePart}";
             fractionPartText.Text = $"{separator}{fractionPart}";
 
-            
+
         }
 
         [BackgroundDependencyLoader]
         private void load(BeatmapDifficultyCache difficultyCache)
         {
-            if (beatmapInfo != null)
-            {
-                cancellationTokenSource?.Cancel();
-                cancellationTokenSource = new CancellationTokenSource();
-
-                bindableStarDifficulty?.UnbindAll();
-                bindableStarDifficulty = difficultyCache.GetBindableDifficulty(beatmapInfo, cancellationTokenSource.Token);
-            }
-
             AutoSizeAxes = Axes.Both;
 
             InternalChildren = new Drawable[]
@@ -144,16 +132,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                 }
             };
 
-            if (bindableStarDifficulty != null)
-                bindableStarDifficulty.BindValueChanged(valueChanged => setDifficulty(valueChanged.NewValue ?? new StarDifficulty()), true);
-            else
-                setDifficulty(starDifficulty);
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            cancellationTokenSource?.Cancel();
+            setDifficulty(starDifficulty);
         }
     }
 }
