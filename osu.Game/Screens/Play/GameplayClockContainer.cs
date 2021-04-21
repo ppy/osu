@@ -31,16 +31,21 @@ namespace osu.Game.Screens.Play
         protected readonly DecoupleableInterpolatingFramedClock AdjustableSource;
 
         /// <summary>
+        /// The source clock.
+        /// </summary>
+        protected IClock SourceClock { get; private set; }
+
+        /// <summary>
         /// Creates a new <see cref="GameplayClockContainer"/>.
         /// </summary>
         /// <param name="sourceClock">The source <see cref="IClock"/> used for timing.</param>
         protected GameplayClockContainer(IClock sourceClock)
         {
+            SourceClock = sourceClock;
+
             RelativeSizeAxes = Axes.Both;
 
             AdjustableSource = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
-            AdjustableSource.ChangeSource(sourceClock);
-
             IsPaused.BindValueChanged(OnIsPausedChanged);
         }
 
@@ -59,6 +64,9 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public virtual void Start()
         {
+            // Ensure that the source clock is set.
+            ChangeSource(SourceClock);
+
             if (!AdjustableSource.IsRunning)
             {
                 // Seeking the decoupled clock to its current time ensures that its source clock will be seeked to the same time
@@ -75,7 +83,13 @@ namespace osu.Game.Screens.Play
         /// Seek to a specific time in gameplay.
         /// </summary>
         /// <param name="time">The destination time to seek to.</param>
-        public virtual void Seek(double time) => AdjustableSource.Seek(time);
+        public virtual void Seek(double time)
+        {
+            AdjustableSource.Seek(time);
+
+            // Manually process to make sure the gameplay clock is correctly updated after a seek.
+            GameplayClock.UnderlyingClock.ProcessFrame();
+        }
 
         /// <summary>
         /// Stops gameplay.
@@ -83,16 +97,24 @@ namespace osu.Game.Screens.Play
         public virtual void Stop() => IsPaused.Value = true;
 
         /// <summary>
-        /// Restarts gameplay.
+        /// Resets this <see cref="GameplayClockContainer"/> and the source to an initial state ready for gameplay.
         /// </summary>
-        public virtual void Restart()
+        public virtual void Reset()
         {
-            AdjustableSource.Seek(0);
+            Seek(0);
+
+            // Manually stop the source in order to not affect the IsPaused state.
             AdjustableSource.Stop();
 
             if (!IsPaused.Value)
                 Start();
         }
+
+        /// <summary>
+        /// Changes the source clock.
+        /// </summary>
+        /// <param name="sourceClock">The new source.</param>
+        protected void ChangeSource(IClock sourceClock) => AdjustableSource.ChangeSource(SourceClock = sourceClock);
 
         protected override void Update()
         {
