@@ -135,15 +135,15 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private void selectBeatmap([CanBeNull] IBeatmap b)
         {
-            BeatmapInfoWedge.BufferedWedgeBackground backgroundBefore = null;
+            BeatmapInfoWedge.BeatmapInfoWedgeContainer containerBefore = null;
 
             AddStep($"select {b?.Metadata.Title ?? "null"} beatmap", () =>
             {
-                backgroundBefore = infoWedge.Background;
+                containerBefore = infoWedge.Container;
                 infoWedge.Beatmap = Beatmap.Value = b == null ? Beatmap.Default : CreateWorkingBeatmap(b);
             });
 
-            AddUntilStep("wait for async load", () => infoWedge.Background != backgroundBefore);
+            AddUntilStep("wait for async load", () => infoWedge.Container != containerBefore);
         }
 
         private IBeatmap createTestBeatmap(RulesetInfo ruleset)
@@ -196,6 +196,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             public new BufferedWedgeBackground Background => base.Background;
 
             public new WedgeInfoText Info => base.Info;
+
+            public new BeatmapInfoWedgeContainer Container => base.Container;
         }
 
         private class TestHitObject : ConvertHitObject, IHasPosition
