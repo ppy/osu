@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Play
 
         private FramedOffsetClock userOffsetClock;
         private FramedOffsetClock platformOffsetClock;
-        private LocalGameplayClock localGameplayClock;
+        private MasterGameplayClock masterGameplayClock;
         private Bindable<double> userAudioOffset;
         private double startOffset;
 
@@ -157,7 +157,7 @@ namespace osu.Game.Screens.Play
             // the final usable gameplay clock with user-set offsets applied.
             userOffsetClock = new HardwareCorrectionOffsetClock(platformOffsetClock);
 
-            return localGameplayClock = new LocalGameplayClock(userOffsetClock);
+            return masterGameplayClock = new MasterGameplayClock(userOffsetClock);
         }
 
         /// <summary>
@@ -180,8 +180,8 @@ namespace osu.Game.Screens.Play
             Track.AddAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
             Track.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
 
-            localGameplayClock.MutableNonGameplayAdjustments.Add(pauseFreqAdjust);
-            localGameplayClock.MutableNonGameplayAdjustments.Add(UserPlaybackRate);
+            masterGameplayClock.MutableNonGameplayAdjustments.Add(pauseFreqAdjust);
+            masterGameplayClock.MutableNonGameplayAdjustments.Add(UserPlaybackRate);
 
             speedAdjustmentsApplied = true;
         }
@@ -194,8 +194,8 @@ namespace osu.Game.Screens.Play
             Track.RemoveAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
             Track.RemoveAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
 
-            localGameplayClock.MutableNonGameplayAdjustments.Remove(pauseFreqAdjust);
-            localGameplayClock.MutableNonGameplayAdjustments.Remove(UserPlaybackRate);
+            masterGameplayClock.MutableNonGameplayAdjustments.Remove(pauseFreqAdjust);
+            masterGameplayClock.MutableNonGameplayAdjustments.Remove(UserPlaybackRate);
 
             speedAdjustmentsApplied = false;
         }
@@ -218,13 +218,13 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private class LocalGameplayClock : GameplayClock
+        private class MasterGameplayClock : GameplayClock
         {
             public readonly List<Bindable<double>> MutableNonGameplayAdjustments = new List<Bindable<double>>();
 
             public override IEnumerable<Bindable<double>> NonGameplayAdjustments => MutableNonGameplayAdjustments;
 
-            public LocalGameplayClock(FramedOffsetClock underlyingClock)
+            public MasterGameplayClock(FramedOffsetClock underlyingClock)
                 : base(underlyingClock)
             {
             }
