@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
 
@@ -28,9 +29,10 @@ namespace osu.Game.Screens.Ranking.Expanded
         private OsuColour colours { get; set; }
 
         private CircularContainer colorContainer;
-        private OsuTextFlowContainer textContainer;
         private CancellationTokenSource cancellationTokenSource;
         private IBindable<StarDifficulty?> bindableStarDifficulty;
+        private OsuSpriteText wholePartText;
+        private OsuSpriteText fractionPartText;
 
         private readonly StarDifficulty starDifficulty;
         private readonly BeatmapInfo beatmapInfo;
@@ -66,24 +68,10 @@ namespace osu.Game.Screens.Ranking.Expanded
 
             colorContainer.Colour = backgroundColour;
 
-            textContainer.Text = string.Empty;
+            wholePartText.Text = $"{wholePart}";
+            fractionPartText.Text = $"{separator}{fractionPart}";
 
-            textContainer.With(t =>
-            {
-                t.AddText($"{wholePart}", s =>
-                {
-                    s.Colour = Color4.Black;
-                    s.Font = s.Font.With(size: 14);
-                    s.UseFullGlyphHeight = false;
-                });
-
-                t.AddText($"{separator}{fractionPart}", s =>
-                {
-                    s.Colour = Color4.Black;
-                    s.Font = s.Font.With(size: 7);
-                    s.UseFullGlyphHeight = false;
-                });
-            });
+            
         }
 
         [BackgroundDependencyLoader]
@@ -130,14 +118,28 @@ namespace osu.Game.Screens.Ranking.Expanded
                             Icon = FontAwesome.Solid.Star,
                             Colour = Color4.Black
                         },
-                        textContainer = new OsuTextFlowContainer(s => s.Font = OsuFont.Numeric.With(weight: FontWeight.Black))
+                        new OsuTextFlowContainer(s => s.Font = OsuFont.Numeric.With(weight: FontWeight.Black))
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             AutoSizeAxes = Axes.Both,
                             Direction = FillDirection.Horizontal,
                             TextAnchor = Anchor.BottomLeft,
-                        },
+                        }.With(t =>
+                        {
+                            t.AddText(wholePartText = new OsuSpriteText(), s =>
+                            {
+                                s.Colour = Color4.Black;
+                                s.Font = s.Font.With(size:14);
+                                s.UseFullGlyphHeight = false;
+                            });
+                            t.AddText(fractionPartText = new OsuSpriteText(), s =>
+                            {
+                                s.Colour = Color4.Black;
+                                s.Font = s.Font.With(size: 7);
+                                s.UseFullGlyphHeight = false;
+                            });
+                        }),
                     }
                 }
             };
