@@ -74,7 +74,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync
 
         public FrameTimeInfo TimeInfo => new FrameTimeInfo { Elapsed = ElapsedFrameTime, Current = CurrentTime };
 
-        public IBindable<bool> WaitingOnFrames { get; } = new Bindable<bool>();
+        public IBindable<bool> WaitingOnFrames { get; } = new Bindable<bool>(true);
 
         public bool IsCatchingUp { get; set; }
     }
