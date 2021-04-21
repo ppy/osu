@@ -11,7 +11,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -43,7 +42,6 @@ namespace osu.Game.Screens.Select
 
         protected BeatmapInfoWedgeContainer Container;
         protected WedgeInfoText Info => Container.Info;
-        protected BufferedWedgeBackground Background => Container.Background;
 
         public BeatmapInfoWedge()
         {
@@ -123,6 +121,7 @@ namespace osu.Game.Screens.Select
                 LoadComponentAsync(loadingInfo = new BeatmapInfoWedgeContainer(beatmap, ruleset.Value)
                 {
                     Shear = -Shear,
+                    Depth = Container?.Depth + 1 ?? 0,
                 }, loaded =>
                 {
                     // ensure we are the most recent loaded wedge.
@@ -139,7 +138,6 @@ namespace osu.Game.Screens.Select
             private readonly WorkingBeatmap beatmap;
             private readonly RulesetInfo ruleset;
 
-            internal BufferedWedgeBackground Background;
             internal WedgeInfoText Info;
 
             public BeatmapInfoWedgeContainer(WorkingBeatmap beatmap, RulesetInfo ruleset)
@@ -155,10 +153,7 @@ namespace osu.Game.Screens.Select
 
                 Children = new Drawable[]
                 {
-                    Background = new BufferedWedgeBackground(beatmap)
-                    {
-                        Depth = Background?.Depth + 1 ?? 0,
-                    },
+                    new BeatmapInfoWedgeBackground(beatmap),
                     Info = new WedgeInfoText(beatmap, ruleset),
                 };
             }
@@ -570,54 +565,6 @@ namespace osu.Game.Screens.Select
             {
                 base.Dispose(isDisposing);
                 settingChangeTracker?.Dispose();
-            }
-        }
-
-        public class BufferedWedgeBackground : BufferedContainer
-        {
-            private readonly WorkingBeatmap beatmap;
-
-            public BufferedWedgeBackground(WorkingBeatmap beatmap)
-                : base(pixelSnapping: true)
-            {
-                this.beatmap = beatmap;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(LocalisationManager localisation)
-            {
-                CacheDrawnFrameBuffer = true;
-                RelativeSizeAxes = Axes.Both;
-
-                Children = new Drawable[]
-                {
-                    // We will create the white-to-black gradient by modulating transparency and having
-                    // a black backdrop. This results in an sRGB-space gradient and not linear space,
-                    // transitioning from white to black more perceptually uniformly.
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black,
-                    },
-                    // We use a container, such that we can set the colour gradient to go across the
-                    // vertices of the masked container instead of the vertices of the (larger) sprite.
-                    new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = ColourInfo.GradientVertical(Color4.White, Color4.White.Opacity(0.3f)),
-                        Children = new[]
-                        {
-                            // Zoomed-in and cropped beatmap background
-                            new BeatmapBackgroundSprite(beatmap)
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                FillMode = FillMode.Fill,
-                            },
-                        },
-                    },
-                };
             }
         }
     }

@@ -193,8 +193,6 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private class TestBeatmapInfoWedge : BeatmapInfoWedge
         {
-            public new BufferedWedgeBackground Background => base.Background;
-
             public new WedgeInfoText Info => base.Info;
 
             public new BeatmapInfoWedgeContainer Container => base.Container;
