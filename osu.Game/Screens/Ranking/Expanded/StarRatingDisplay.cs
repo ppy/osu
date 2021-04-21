@@ -2,9 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Globalization;
-using System.Threading;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -67,8 +65,6 @@ namespace osu.Game.Screens.Ranking.Expanded
 
             wholePartText.Text = $"{wholePart}";
             fractionPartText.Text = $"{separator}{fractionPart}";
-
-
         }
 
         [BackgroundDependencyLoader]
@@ -118,7 +114,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                             t.AddText(wholePartText = new OsuSpriteText(), s =>
                             {
                                 s.Colour = Color4.Black;
-                                s.Font = s.Font.With(size:14);
+                                s.Font = s.Font.With(size: 14);
                                 s.UseFullGlyphHeight = false;
                             });
                             t.AddText(fractionPartText = new OsuSpriteText(), s =>
