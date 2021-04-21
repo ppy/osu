@@ -172,7 +172,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             if (initialHitObject != null)
             {
-                lifetimeEntry = new UnmanagedHitObjectEntry(initialHitObject);
+                lifetimeEntry = new SyntheticHitObjectEntry(initialHitObject);
                 ensureEntryHasResult();
             }
         }
@@ -227,7 +227,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (hitObject == null)
                 throw new ArgumentNullException($"Cannot apply a null {nameof(HitObject)}.");
 
-            Apply(new UnmanagedHitObjectEntry(hitObject));
+            Apply(new SyntheticHitObjectEntry(hitObject));
         }
 
         /// <summary>

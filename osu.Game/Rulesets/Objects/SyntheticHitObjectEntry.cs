@@ -9,9 +9,9 @@ namespace osu.Game.Rulesets.Objects
     /// Created for a <see cref="DrawableHitObject"/> when only <see cref="HitObject"/> is given
     /// to make sure a <see cref="DrawableHitObject"/> is always associated with a <see cref="HitObjectLifetimeEntry"/>.
     /// </summary>
-    internal class UnmanagedHitObjectEntry : HitObjectLifetimeEntry
+    internal class SyntheticHitObjectEntry : HitObjectLifetimeEntry
     {
-        public UnmanagedHitObjectEntry(HitObject hitObject)
+        public SyntheticHitObjectEntry(HitObject hitObject)
             : base(hitObject)
         {
         }
