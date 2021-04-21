@@ -226,7 +226,7 @@ namespace osu.Game.Screens.Edit
                                 {
                                     Items = new[]
                                     {
-                                        new WaveformOpacityMenu(config)
+                                        new WaveformOpacityMenuItem(config.GetBindable<float>(OsuSetting.EditorWaveformOpacity)),
                                     }
                                 }
                             }
