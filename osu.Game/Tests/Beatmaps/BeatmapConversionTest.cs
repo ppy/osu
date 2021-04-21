@@ -215,6 +215,8 @@ namespace osu.Game.Tests.Beatmaps
 
             protected override Track GetBeatmapTrack() => throw new NotImplementedException();
 
+            public override Stream GetStream(string storagePath) => throw new NotImplementedException();
+
             protected override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap, Ruleset ruleset)
             {
                 var converter = base.CreateBeatmapConverter(beatmap, ruleset);

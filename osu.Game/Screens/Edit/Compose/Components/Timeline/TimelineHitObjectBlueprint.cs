@@ -158,10 +158,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 circle.Colour = comboColour;
 
             var col = circle.Colour.TopLeft.Linear;
-            float brightness = col.R + col.G + col.B;
-
-            // decide the combo index colour based on brightness?
-            colouredComponents.Colour = OsuColour.Gray(brightness > 0.5f ? 0.2f : 0.9f);
+            colouredComponents.Colour = OsuColour.ForegroundTextColourFor(col);
         }
 
         protected override void Update()
