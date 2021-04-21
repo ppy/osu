@@ -30,17 +30,12 @@ namespace osu.Game.Rulesets.Objects
         /// Creates a new <see cref="HitObjectLifetimeEntry"/>.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> to store the lifetime of.</param>
-        /// <param name="lifetimeStart">The <see cref="LifetimeStart"/>.</param>
-        /// <param name="lifetimeEnd">The <see cref="LifetimeEnd"/>.</param>
-        public HitObjectLifetimeEntry(HitObject hitObject, double lifetimeStart = double.MinValue, double lifetimeEnd = double.MaxValue)
+        public HitObjectLifetimeEntry(HitObject hitObject)
         {
             HitObject = hitObject;
 
             startTimeBindable.BindTo(HitObject.StartTimeBindable);
-            // Only set initial lifetime if it is not provided
-            startTimeBindable.BindValueChanged(onStartTimeChanged, lifetimeStart == double.MinValue);
-
-            setLifetime(lifetimeStart, lifetimeEnd);
+            startTimeBindable.BindValueChanged(onStartTimeChanged, true);
         }
 
         // The lifetime start, as set by the hitobject.
