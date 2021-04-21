@@ -198,12 +198,12 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
                 switch (timingPoint.TimeSignature)
                 {
                     case TimeSignatures.SimpleQuadruple:
-                        if (beatIndex % 4 == 0 && beatIndex / 4 > 0 || effectPoint.KiaiMode)
+                        if ((beatIndex % 4 == 0 && beatIndex / 4 > 0) || effectPoint.KiaiMode)
                             flashBox.FadeOutFromOne(1000);
                         break;
 
                     case TimeSignatures.SimpleTriple:
-                        if (beatIndex % 3 == 0 && beatIndex / 3 > 0 || effectPoint.KiaiMode)
+                        if ((beatIndex % 3 == 0 && beatIndex / 3 > 0) || effectPoint.KiaiMode)
                             flashBox.FadeOutFromOne(1000);
                         break;
                 }

@@ -572,7 +572,7 @@ namespace osu.Game.Screens.Mvis
 
             currentAudioControlProviderSetting.BindValueChanged(v =>
             {
-                var pl = (IProvideAudioControlPlugin)pluginManager.GetAllPlugins(false).FirstOrDefault(p => $"{p.GetType().Namespace}+{p.GetType().Name}" == v.NewValue);
+                var pl = (IProvideAudioControlPlugin)pluginManager.GetAllPlugins(false).FirstOrDefault(p => v.NewValue == $"{p.GetType().Namespace}+{p.GetType().Name}");
                 Beatmap.Disabled = pl != null;
 
                 if (audioControlProvider != null) audioControlProvider.IsCurrent = false;

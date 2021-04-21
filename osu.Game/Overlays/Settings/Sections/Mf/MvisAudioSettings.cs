@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
 
                     var type = pl.GetType();
 
-                    if ($"{type.Namespace}+{type.Name}" == currentAudioControlPlugin)
+                    if (currentAudioControlPlugin == $"{type.Namespace}+{type.Name}")
                     {
                         dropdown.Current.Value = pacp;
                     }

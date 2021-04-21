@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Mvis.BottomBar
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
             indicator.MoveToX(
-                getFinalPosX(indicator, ToLocalSpace(e.ScreenSpaceMousePosition).X - indicator.Width / 2),
+                getFinalPosX(indicator, ToLocalSpace(e.ScreenSpaceMousePosition).X - (indicator.Width / 2)),
                 300, Easing.OutQuint);
 
             return base.OnMouseMove(e);
@@ -89,7 +89,9 @@ namespace osu.Game.Screens.Mvis.BottomBar
             fill.Width = value;
 
             if (mvisScreen.OverlaysHidden)
-                songProgressIndicator.MoveToX(getFinalPosX(songProgressIndicator, value * UsableWidth - songProgressIndicator.Width / 2), 300, Easing.OutQuint);
+                songProgressIndicator.MoveToX(
+                    getFinalPosX(songProgressIndicator, (value * UsableWidth) - (songProgressIndicator.Width / 2)),
+                    300, Easing.OutQuint);
         }
 
         private bool indicatorsOverlaps;
@@ -118,8 +120,8 @@ namespace osu.Game.Screens.Mvis.BottomBar
                 var songX = songProgressIndicator.X - 5;
                 var songEnd = songX + songProgressIndicator.Width + 5;
 
-                overlap = indicatorX >= songX && indicatorX <= songEnd
-                          || indicatorEnd >= songX && indicatorEnd <= songEnd;
+                overlap = (indicatorX >= songX && indicatorX <= songEnd)
+                          || (indicatorEnd >= songX && indicatorEnd <= songEnd);
             }
 
             base.Update();

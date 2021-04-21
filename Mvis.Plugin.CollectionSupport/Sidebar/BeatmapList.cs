@@ -192,7 +192,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
                 //列表顶部多出的30像素(?)会导致原有的滚动距离比实际需要的短从而造成没有滚动到正确位置的问题
                 //因此在后面加30确保列表能正确滚动，将(index-1)处的beatmapPiece显示在顶部
                 //滚动到(index-1)能让用户知道当前播放的不是列表中的第一首歌曲
-                float distance = (index - 1) * 85 + 30;
+                float distance = ((index - 1) * 85) + 30;
 
                 //如果滚动范围超出了beatmapFillFlow的高度，那么滚动到尾
                 //n个piece, n-1个间隔
