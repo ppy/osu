@@ -31,18 +31,21 @@ namespace osu.Game.Localisation
             string ns = split[0];
             string key = split[1];
 
-            if (!resourceManagers.TryGetValue(ns, out var manager))
-                resourceManagers[ns] = manager = new ResourceManager(ns, GetType().Assembly);
+            lock (resourceManagers)
+            {
+                if (!resourceManagers.TryGetValue(ns, out var manager))
+                    resourceManagers[ns] = manager = new ResourceManager(ns, GetType().Assembly);
 
-            try
-            {
-                return manager.GetString(key, EffectiveCulture);
-            }
-            catch (MissingManifestResourceException)
-            {
-                // in the case the manifest is missing, it is likely that the user is adding code-first implementations of new localisation namespaces.
-                // it's fine to ignore this as localisation will fallback to default values.
-                return null;
+                try
+                {
+                    return manager.GetString(key, EffectiveCulture);
+                }
+                catch (MissingManifestResourceException)
+                {
+                    // in the case the manifest is missing, it is likely that the user is adding code-first implementations of new localisation namespaces.
+                    // it's fine to ignore this as localisation will fallback to default values.
+                    return null;
+                }
             }
         }
 
