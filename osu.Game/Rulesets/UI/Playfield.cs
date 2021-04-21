@@ -362,7 +362,7 @@ namespace osu.Game.Rulesets.UI
                     lifetimeEntryMap[hitObject] = entry = CreateLifetimeEntry(hitObject);
 
                 dho.ParentHitObject = parent;
-                dho.Apply(hitObject, entry);
+                dho.Apply(entry);
             });
         }
 
