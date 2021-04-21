@@ -873,7 +873,7 @@ namespace osu.Game.Screens.Mvis
         private void showOverlays(bool force)
         {
             //在有锁并且悬浮界面已隐藏或悬浮界面可见的情况下显示悬浮锁
-            if (!force && (lockButton.ToggleableValue.Value && OverlaysHidden || !OverlaysHidden || lockChanges.Value))
+            if (!force && ((lockButton.ToggleableValue.Value && OverlaysHidden) || !OverlaysHidden || lockChanges.Value))
             {
                 showPluginEntriesTemporary();
                 return;

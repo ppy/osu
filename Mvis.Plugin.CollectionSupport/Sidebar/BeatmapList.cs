@@ -196,7 +196,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
 
                 //如果滚动范围超出了beatmapFillFlow的高度，那么滚动到尾
                 //n个piece, n-1个间隔
-                if (distance + beatmapScroll.DrawHeight > (fillFlow?.Count * 85 - 5))
+                if (distance + beatmapScroll.DrawHeight > ((fillFlow?.Count * 85) - 5))
                     beatmapScroll.ScrollToEnd(!firstScroll);
                 else
                     beatmapScroll.ScrollTo(distance, !firstScroll);
