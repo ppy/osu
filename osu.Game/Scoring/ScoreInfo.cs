@@ -65,14 +65,19 @@ namespace osu.Game.Scoring
         {
             get
             {
-                if (mods != null)
-                    return mods;
-
-                if (localAPIMods == null)
-                    return Array.Empty<Mod>();
+                Mod[] scoreMods = Array.Empty<Mod>();
 
                 var rulesetInstance = Ruleset.CreateInstance();
-                return apiMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
+
+                if (mods != null)
+                    scoreMods = mods;
+                else if (localAPIMods != null)
+                    scoreMods = apiMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
+
+                if (IsLegacyScore)
+                    scoreMods = scoreMods.Append(rulesetInstance.GetAllMods().OfType<ModClassic>().Single()).ToArray();
+
+                return scoreMods;
             }
             set
             {
