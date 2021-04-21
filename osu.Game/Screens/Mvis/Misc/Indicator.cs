@@ -20,6 +20,8 @@ namespace osu.Game.Screens.Mvis.Misc
         };
 
         private Box fgBox;
+        private InputManager inputManager;
+        private Container content;
 
         public LocalisableString Text
         {
@@ -36,47 +38,45 @@ namespace osu.Game.Screens.Mvis.Misc
             Margin = new MarginPadding { Bottom = 10 };
             Anchor = Anchor.BottomLeft;
             Origin = Anchor.BottomLeft;
-            Y = -10;
             Alpha = 0;
 
-            InternalChildren = new[]
+            InternalChild = content = new Container
             {
-                new Container
+                AutoSizeAxes = Axes.Both,
+                Anchor = Anchor.BottomCentre,
+                Origin = Anchor.BottomCentre,
+                CornerRadius = 5,
+                Masking = true,
+                Y = -10,
+                EdgeEffect = new EdgeEffectParameters
                 {
-                    AutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    CornerRadius = 5,
-                    Masking = true,
-                    EdgeEffect = new EdgeEffectParameters
+                    Type = EdgeEffectType.Shadow,
+                    Radius = 1.5f,
+                    Colour = Color4.Black.Opacity(0.6f),
+                    Offset = new Vector2(0, 1.5f)
+                },
+                Children = new Drawable[]
+                {
+                    fgBox = new Box
                     {
-                        Type = EdgeEffectType.Shadow,
-                        Radius = 1.5f,
-                        Colour = Color4.Black.Opacity(0.6f),
-                        Offset = new Vector2(0, 1.5f)
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = colourProvider.Background4
                     },
-                    Children = new Drawable[]
+                    text,
+                    new Container
                     {
-                        fgBox = new Box
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        RelativeSizeAxes = Axes.Y,
+                        Child = box = new Box
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = colourProvider.Background4
-                        },
-                        text,
-                        new Container
-                        {
+                            RelativeSizeAxes = Axes.Y,
+                            Width = 2,
+                            Height = 0.15f,
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                            RelativeSizeAxes = Axes.Y,
-                            Child = box = new Box
-                            {
-                                RelativeSizeAxes = Axes.Y,
-                                Width = 2,
-                                Height = 0.15f,
-                                Anchor = Anchor.BottomLeft,
-                                Origin = Anchor.BottomLeft,
-                                Alpha = IsMouseIndicator ? 1 : 0
-                            }
+                            Colour = Color4.Black,
+                            Alpha = IsMouseIndicator ? 1 : 0
                         }
                     }
                 }
@@ -89,13 +89,17 @@ namespace osu.Game.Screens.Mvis.Misc
             }, true);
         }
 
-        public override void Show() =>
-            this.FadeIn(300, Easing.OutQuint).MoveToY(0, 300, Easing.OutQuint);
+        public override void Show()
+        {
+            this.FadeIn(300, Easing.OutQuint);
+            content.MoveToY(0, 300, Easing.OutQuint);
+        }
 
-        public override void Hide() =>
-            this.FadeOut(300, Easing.OutQuint).MoveToY(-10, 300, Easing.OutQuint);
-
-        private InputManager inputManager;
+        public override void Hide()
+        {
+            this.FadeOut(300, Easing.OutQuint);
+            content.MoveToY(-10, 300, Easing.OutQuint);
+        }
 
         protected override void LoadComplete()
         {
@@ -112,10 +116,12 @@ namespace osu.Game.Screens.Mvis.Misc
 
         protected override void Update()
         {
-            if (inputManager != null)
-                box?.MoveToX(ToLocalSpace(inputManager.CurrentState.Mouse.Position).X);
+            if (IsMouseIndicator && inputManager != null)
+                UpdateBox(inputManager.CurrentState.Mouse.Position);
 
             base.Update();
         }
+
+        public void UpdateBox(Vector2 position) => box?.MoveToX(ToLocalSpace(position).X);
     }
 }
