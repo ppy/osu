@@ -19,9 +19,27 @@ namespace osu.Game.Screens.Mvis.Misc
             Margin = new MarginPadding { Horizontal = 10, Vertical = 7 }
         };
 
+        public override float Height => content.Height;
+
         private Box fgBox;
         private InputManager inputManager;
-        private Container content;
+
+        private Container content = new Container
+        {
+            AutoSizeAxes = Axes.Both,
+            Anchor = Anchor.BottomCentre,
+            Origin = Anchor.BottomCentre,
+            CornerRadius = 5,
+            Masking = true,
+            Y = -10,
+            EdgeEffect = new EdgeEffectParameters
+            {
+                Type = EdgeEffectType.Shadow,
+                Radius = 1.5f,
+                Colour = Color4.Black.Opacity(0.6f),
+                Offset = new Vector2(0, 1.5f)
+            }
+        };
 
         public LocalisableString Text
         {
@@ -40,47 +58,33 @@ namespace osu.Game.Screens.Mvis.Misc
             Origin = Anchor.BottomLeft;
             Alpha = 0;
 
-            InternalChild = content = new Container
+            content.AddRange(new Drawable[]
             {
-                AutoSizeAxes = Axes.Both,
-                Anchor = Anchor.BottomCentre,
-                Origin = Anchor.BottomCentre,
-                CornerRadius = 5,
-                Masking = true,
-                Y = -10,
-                EdgeEffect = new EdgeEffectParameters
+                fgBox = new Box
                 {
-                    Type = EdgeEffectType.Shadow,
-                    Radius = 1.5f,
-                    Colour = Color4.Black.Opacity(0.6f),
-                    Offset = new Vector2(0, 1.5f)
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = colourProvider.Background4
                 },
-                Children = new Drawable[]
+                text,
+                new Container
                 {
-                    fgBox = new Box
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    RelativeSizeAxes = Axes.Y,
+                    Child = box = new Box
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider.Background4
-                    },
-                    text,
-                    new Container
-                    {
+                        RelativeSizeAxes = Axes.Y,
+                        Width = 2,
+                        Height = 0.15f,
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
-                        RelativeSizeAxes = Axes.Y,
-                        Child = box = new Box
-                        {
-                            RelativeSizeAxes = Axes.Y,
-                            Width = 2,
-                            Height = 0.15f,
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            Colour = Color4.Black,
-                            Alpha = IsMouseIndicator ? 1 : 0
-                        }
+                        Colour = Color4.Black,
+                        Alpha = IsMouseIndicator ? 1 : 0
                     }
                 }
-            };
+            });
+
+            InternalChild = content;
 
             colourProvider.HueColour.BindValueChanged(_ =>
             {
