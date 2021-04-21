@@ -154,11 +154,7 @@ namespace osu.Game.Screens.Play
             return true;
         }
 
-        void IAdjustableClock.Reset()
-        {
-            Restart();
-            Stop();
-        }
+        void IAdjustableClock.Reset() => Reset();
 
         public void ResetSpeedAdjustments()
         {
