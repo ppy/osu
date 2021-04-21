@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                     case DrawableHitCircle circle: // also handles slider heads
                         circle.ApproachCircle
-                              .FadeOutFromOne(editor_hit_object_fade_out_extension)
+                              .FadeOutFromOne(editor_hit_object_fade_out_extension * 4)
                               .Expire();
                         break;
                 }
@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                 hitObject.RemoveTransform(existing);
 
-                using (hitObject.BeginAbsoluteSequence(existing.StartTime))
+                using (hitObject.BeginAbsoluteSequence(hitObject.HitStateUpdateTime))
                     hitObject.FadeOut(editor_hit_object_fade_out_extension).Expire();
             }
         }
