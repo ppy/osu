@@ -178,7 +178,7 @@ namespace osu.Game.Screens.Select
             private ILocalisedBindableString titleBinding;
             private ILocalisedBindableString artistBinding;
             private FillFlowContainer infoLabelContainer;
-            private Drawable starRatingDisplay;
+            private StarRatingDisplay starRatingDisplay;
             private Container bpmLabelContainer;
             private ModSettingChangeTracker settingChangeTracker;
             private CancellationTokenSource cancellationTokenSource;
@@ -246,9 +246,9 @@ namespace osu.Game.Screens.Select
                         Padding = new MarginPadding { Top = 14, Right = shear_width / 2 },
                         AutoSizeAxes = Axes.Both,
                         Shear = wedged_container_shear,
-                        Children = new[]
+                        Children = new Drawable[]
                         {
-                            starRatingDisplay = new StarRatingDisplay(beatmapInfo)
+                            starRatingDisplay = new StarRatingDisplay(starDifficulty.Value ?? new StarDifficulty())
                             {
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
@@ -311,19 +311,21 @@ namespace osu.Game.Screens.Select
 
                 titleBinding.BindValueChanged(_ => setMetadata(metadata.Source));
                 artistBinding.BindValueChanged(_ => setMetadata(metadata.Source), true);
-                starDifficulty.BindValueChanged(_ => setStarRatingDisplayVisibility(), true);
+                starDifficulty.BindValueChanged(updateStarRatingDisplay, true);
 
                 // no difficulty means it can't have a status to show
                 if (beatmapInfo.Version == null)
                     StatusPill.Hide();
             }
 
-            private void setStarRatingDisplayVisibility()
+            private void updateStarRatingDisplay(ValueChangedEvent<StarDifficulty?> valueChanged)
             {
-                if (starDifficulty.Value.HasValue && starDifficulty.Value.Value.Stars > 0)
+                if (valueChanged.NewValue.HasValue && valueChanged.NewValue.Value.Stars > 0)
                     starRatingDisplay.Show();
                 else
                     starRatingDisplay.Hide();
+
+                starRatingDisplay.StarDifficulty = valueChanged.NewValue ?? new StarDifficulty();
             }
 
             private InfoLabel[] getRulesetInfoLabels()
