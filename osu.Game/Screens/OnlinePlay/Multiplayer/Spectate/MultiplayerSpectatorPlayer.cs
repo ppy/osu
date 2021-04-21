@@ -37,27 +37,27 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         }
 
         protected override GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart)
-            => new SubGameplayClockContainer(slaveClock);
-    }
+            => new SlaveGameplayClockContainer(slaveClock);
 
-    public class SubGameplayClockContainer : GameplayClockContainer
-    {
-        public SubGameplayClockContainer(IClock sourceClock)
-            : base(sourceClock)
+        private class SlaveGameplayClockContainer : GameplayClockContainer
         {
+            public SlaveGameplayClockContainer(IClock sourceClock)
+                : base(sourceClock)
+            {
+            }
+
+            protected override void Update()
+            {
+                // The slave clock's running state is controlled by the sync manager, but the local pausing state needs to be updated to stop gameplay.
+                if (SourceClock.IsRunning)
+                    Start();
+                else
+                    Stop();
+
+                base.Update();
+            }
+
+            protected override GameplayClock CreateGameplayClock(IFrameBasedClock source) => new GameplayClock(source);
         }
-
-        protected override void Update()
-        {
-            // The slave clock's running state is controlled by the sync manager, but the local pausing state needs to be updated to stop gameplay.
-            if (SourceClock.IsRunning)
-                Start();
-            else
-                Stop();
-
-            base.Update();
-        }
-
-        protected override GameplayClock CreateGameplayClock(IFrameBasedClock source) => new GameplayClock(source);
     }
 }
