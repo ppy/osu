@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Scoring;
@@ -12,22 +13,31 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
     public class MultiplayerSpectatorPlayer : SpectatorPlayer
     {
-        private readonly ISlaveClock gameplayClock;
+        private readonly Bindable<bool> waitingOnFrames = new Bindable<bool>(true);
+        private readonly Score score;
+        private readonly ISlaveClock slaveClock;
 
-        public MultiplayerSpectatorPlayer(Score score, ISlaveClock gameplayClock)
+        public MultiplayerSpectatorPlayer(Score score, ISlaveClock slaveClock)
             : base(score)
         {
-            this.gameplayClock = gameplayClock;
+            this.score = score;
+            this.slaveClock = slaveClock;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            gameplayClock.WaitingOnFrames.BindTo(DrawableRuleset.FrameStableClock.WaitingOnFrames);
+            slaveClock.WaitingOnFrames.BindTo(waitingOnFrames);
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+            waitingOnFrames.Value = DrawableRuleset.FrameStableClock.WaitingOnFrames.Value || score.Replay.Frames.Count == 0;
         }
 
         protected override GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart)
-            => new SubGameplayClockContainer(gameplayClock);
+            => new SubGameplayClockContainer(slaveClock);
     }
 
     public class SubGameplayClockContainer : GameplayClockContainer
@@ -35,6 +45,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public SubGameplayClockContainer(IClock sourceClock)
             : base(sourceClock)
         {
+        }
+
+        protected override void Update()
+        {
+            // The slave clock's running state is controlled by the sync manager, but the local pausing state needs to be updated to stop gameplay.
+            if (SourceClock.IsRunning)
+                Start();
+            else
+                Stop();
+
+            base.Update();
         }
 
         protected override GameplayClock CreateGameplayClock(IFrameBasedClock source) => new GameplayClock(source);

@@ -256,17 +256,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         private void checkPaused(int userId, bool state) =>
-            AddUntilStep($"{userId} is {(state ? "paused" : "playing")}", () => getPlayer(userId).ChildrenOfType<GameplayClockContainer>().First().IsPaused.Value == state);
+            AddUntilStep($"{userId} is {(state ? "paused" : "playing")}", () => getPlayer(userId).ChildrenOfType<GameplayClockContainer>().First().GameplayClock.IsRunning != state);
 
         private void checkPausedInstant(int userId, bool state) =>
-            AddAssert($"{userId} is {(state ? "paused" : "playing")}", () => getPlayer(userId).ChildrenOfType<GameplayClockContainer>().First().IsPaused.Value == state);
-
-        /// <summary>
-        /// Returns time(user1) - time(user2).
-        /// </summary>
-        private double getGameplayOffset(int user1, int user2) => getGameplayTime(user1) - getGameplayTime(user2);
-
-        private double getGameplayTime(int userId) => getPlayer(userId).ChildrenOfType<GameplayClockContainer>().Single().GameplayClock.CurrentTime;
+            AddAssert($"{userId} is {(state ? "paused" : "playing")}", () => getPlayer(userId).ChildrenOfType<GameplayClockContainer>().First().GameplayClock.IsRunning != state);
 
         private Player getPlayer(int userId) => getInstance(userId).ChildrenOfType<Player>().Single();
 

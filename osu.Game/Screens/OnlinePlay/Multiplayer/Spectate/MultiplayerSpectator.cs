@@ -39,10 +39,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private void load()
         {
             Container leaderboardContainer;
+            masterClockContainer = new MasterGameplayClockContainer(Beatmap.Value, 0);
 
-            masterClockContainer = new MasterGameplayClockContainer(Beatmap.Value, 0)
+            InternalChildren = new[]
             {
-                Child = new GridContainer
+                (Drawable)(syncManager = new CatchUpSyncManager(masterClockContainer)),
+                masterClockContainer.WithChild(new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     ColumnDimensions = new[]
@@ -61,13 +63,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                             grid = new PlayerGrid { RelativeSizeAxes = Axes.Both }
                         }
                     }
-                }
-            };
-
-            InternalChildren = new[]
-            {
-                (Drawable)(syncManager = new CatchUpSyncManager(masterClockContainer)),
-                masterClockContainer
+                })
             };
 
             for (int i = 0; i < UserIds.Length; i++)
