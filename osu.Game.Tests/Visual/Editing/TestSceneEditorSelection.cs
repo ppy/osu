@@ -42,6 +42,28 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
+        public void TestNudgeSelection()
+        {
+            HitCircle[] addedObjects = null;
+
+            AddStep("add hitobjects", () => EditorBeatmap.AddRange(addedObjects = new[]
+            {
+                new HitCircle { StartTime = 100 },
+                new HitCircle { StartTime = 200, Position = new Vector2(50) },
+                new HitCircle { StartTime = 300, Position = new Vector2(100) },
+                new HitCircle { StartTime = 400, Position = new Vector2(150) },
+            }));
+
+            AddStep("select objects", () => EditorBeatmap.SelectedHitObjects.AddRange(addedObjects));
+
+            AddStep("nudge forwards", () => InputManager.Key(Key.K));
+            AddAssert("objects moved forwards in time", () => addedObjects[0].StartTime > 100);
+
+            AddStep("nudge backwards", () => InputManager.Key(Key.J));
+            AddAssert("objects reverted to original position", () => addedObjects[0].StartTime == 100);
+        }
+
+        [Test]
         public void TestBasicSelect()
         {
             var addedObject = new HitCircle { StartTime = 100 };
