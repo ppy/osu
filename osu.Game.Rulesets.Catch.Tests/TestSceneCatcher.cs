@@ -21,6 +21,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using osu.Game.Tests.Visual;
+using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
@@ -175,7 +176,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             AddStep("catch more fruits", () => attemptCatch(() => new Fruit
             {
-                X = (RNG.NextSingle() - 0.5f) * CatcherArea.CATCHER_SIZE
+                X = (RNG.NextSingle() - 0.5f) * Catcher.CalculateCatchWidth(Vector2.One)
             }, 50));
         }
 
