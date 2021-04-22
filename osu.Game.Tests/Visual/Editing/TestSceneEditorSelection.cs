@@ -12,6 +12,7 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
@@ -156,9 +157,35 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
-        public void TestQuickDeleteRemovesObject()
+        public void TestQuickDeleteRemovesObjectInPlacement()
         {
-            var addedObject = new HitCircle { StartTime = 1000 };
+            var addedObject = new HitCircle
+            {
+                StartTime = 0,
+                Position = OsuPlayfield.BASE_SIZE * 0.5f
+            };
+
+            AddStep("add hitobject", () => EditorBeatmap.Add(addedObject));
+
+            AddStep("enter placement mode", () => InputManager.PressKey(Key.Number2));
+
+            moveMouseToObject(() => addedObject);
+
+            AddStep("hold shift", () => InputManager.PressKey(Key.ShiftLeft));
+            AddStep("right click", () => InputManager.Click(MouseButton.Right));
+            AddStep("release shift", () => InputManager.ReleaseKey(Key.ShiftLeft));
+
+            AddAssert("no hitobjects in beatmap", () => EditorBeatmap.HitObjects.Count == 0);
+        }
+
+        [Test]
+        public void TestQuickDeleteRemovesObjectInSelection()
+        {
+            var addedObject = new HitCircle
+            {
+                StartTime = 0,
+                Position = OsuPlayfield.BASE_SIZE * 0.5f
+            };
 
             AddStep("add hitobject", () => EditorBeatmap.Add(addedObject));
 
