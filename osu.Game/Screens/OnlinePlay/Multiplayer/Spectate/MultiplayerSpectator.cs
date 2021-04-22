@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -28,6 +29,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private ISyncManager syncManager;
         private PlayerGrid grid;
         private MultiplayerSpectatorLeaderboard leaderboard;
+        private PlayerInstance currentAudioSource;
 
         public MultiplayerSpectator(int[] userIds)
             : base(userIds.AsSpan().Slice(0, Math.Min(16, userIds.Length)).ToArray())
@@ -84,6 +86,24 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             masterClockContainer.Stop();
             masterClockContainer.Reset();
         }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (!isCandidateAudioSource(currentAudioSource?.GameplayClock))
+            {
+                currentAudioSource = instances.Where(i => isCandidateAudioSource(i.GameplayClock))
+                                              .OrderBy(i => Math.Abs(i.GameplayClock.CurrentTime - syncManager.Master.CurrentTime))
+                                              .FirstOrDefault();
+
+                foreach (var instance in instances)
+                    instance.Volume.Value = instance == currentAudioSource ? 1 : 0;
+            }
+        }
+
+        private bool isCandidateAudioSource([CanBeNull] ISlaveClock clock)
+            => clock?.IsRunning == true && !clock.IsCatchingUp && !clock.WaitingOnFrames.Value;
 
         protected override void OnUserStateChanged(int userId, SpectatorState spectatorState)
         {

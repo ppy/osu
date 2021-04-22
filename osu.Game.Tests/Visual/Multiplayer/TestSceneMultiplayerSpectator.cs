@@ -198,8 +198,38 @@ namespace osu.Game.Tests.Visual.Multiplayer
             checkPausedInstant(56, false);
 
             // Player 2 should catch up to player 1 after unpausing.
-            AddUntilStep("player 2 not catching up", () => !getInstance(56).GameplayClock.IsCatchingUp);
+            waitForCatchup(56);
             AddWaitStep("wait a bit", 10);
+        }
+
+        [Test]
+        public void TestMostInSyncUserIsAudioSource()
+        {
+            start(new[] { 55, 56 });
+            loadSpectateScreen();
+
+            assertVolume(55, 0);
+            assertVolume(56, 0);
+
+            sendFrames(55, 10);
+            sendFrames(56, 20);
+            assertVolume(55, 1);
+            assertVolume(56, 0);
+
+            checkPaused(55, true);
+            assertVolume(55, 0);
+            assertVolume(56, 1);
+
+            sendFrames(55, 100);
+            waitForCatchup(55);
+            checkPaused(56, true);
+            assertVolume(55, 1);
+            assertVolume(56, 0);
+
+            sendFrames(56, 100);
+            waitForCatchup(56);
+            assertVolume(55, 1);
+            assertVolume(56, 0);
         }
 
         private void loadSpectateScreen(bool waitForPlayerLoad = true)
@@ -255,11 +285,17 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
         }
 
-        private void checkPaused(int userId, bool state) =>
-            AddUntilStep($"{userId} is {(state ? "paused" : "playing")}", () => getPlayer(userId).ChildrenOfType<GameplayClockContainer>().First().GameplayClock.IsRunning != state);
+        private void checkPaused(int userId, bool state)
+            => AddUntilStep($"{userId} is {(state ? "paused" : "playing")}", () => getPlayer(userId).ChildrenOfType<GameplayClockContainer>().First().GameplayClock.IsRunning != state);
 
-        private void checkPausedInstant(int userId, bool state) =>
-            AddAssert($"{userId} is {(state ? "paused" : "playing")}", () => getPlayer(userId).ChildrenOfType<GameplayClockContainer>().First().GameplayClock.IsRunning != state);
+        private void checkPausedInstant(int userId, bool state)
+            => AddAssert($"{userId} is {(state ? "paused" : "playing")}", () => getPlayer(userId).ChildrenOfType<GameplayClockContainer>().First().GameplayClock.IsRunning != state);
+
+        private void assertVolume(int userId, double volume)
+            => AddAssert($"{userId} volume is {volume}", () => getInstance(userId).Volume.Value == volume);
+
+        private void waitForCatchup(int userId)
+            => AddUntilStep($"{userId} not catching up", () => !getInstance(userId).GameplayClock.IsCatchingUp);
 
         private Player getPlayer(int userId) => getInstance(userId).ChildrenOfType<Player>().Single();
 
