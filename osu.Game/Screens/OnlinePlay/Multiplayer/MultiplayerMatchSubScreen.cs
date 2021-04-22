@@ -416,10 +416,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             UpdateMods();
 
             if (client.LocalUser.State == MultiplayerUserState.Spectating
-                && (client.Room.State == MultiplayerRoomState.Playing || client.Room.State == MultiplayerRoomState.WaitingForLoad)
-                && ParentScreen.IsCurrentScreen())
+                && (client.Room.State == MultiplayerRoomState.Playing || client.Room.State == MultiplayerRoomState.WaitingForLoad))
             {
-                PushTopLevelScreen(() => new MultiplayerSpectator(client.CurrentMatchPlayingUserIds.ToArray()));
+                StartPlay();
 
                 // If the current user was host, they started the match and the in-progres operation needs to be stopped now.
                 readyClickOperation?.Dispose();
@@ -429,14 +428,20 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private void onLoadRequested()
         {
-            Debug.Assert(client.Room != null);
-
-            int[] userIds = client.CurrentMatchPlayingUserIds.ToArray();
-
-            StartPlay(() => new MultiplayerPlayer(SelectedItem.Value, userIds));
+            StartPlay();
 
             readyClickOperation?.Dispose();
             readyClickOperation = null;
+        }
+
+        protected override Screen CreateGameplayScreen()
+        {
+            Debug.Assert(client.LocalUser != null);
+
+            if (client.LocalUser.State == MultiplayerUserState.Spectating)
+                return new MultiSpectatorScreen(client.CurrentMatchPlayingUserIds.ToArray());
+
+            return new MultiplayerPlayer(SelectedItem.Value, client.CurrentMatchPlayingUserIds.ToArray());
         }
 
         protected override void Dispose(bool isDisposing)
