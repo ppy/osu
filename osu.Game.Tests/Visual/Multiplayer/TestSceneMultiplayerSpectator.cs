@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
 
-        private MultiplayerSpectator spectator;
+        private MultiSpectatorScreen spectatorScreen;
 
         private readonly List<int> playingUserIds = new List<int>();
         private readonly Dictionary<int, int> nextFrame = new Dictionary<int, int>();
@@ -91,11 +91,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddWaitStep("wait a bit", 10);
             AddStep("load player 55", () => streamingClient.StartPlay(55, importedBeatmapId));
-            AddUntilStep("one player added", () => spectator.ChildrenOfType<Player>().Count() == 1);
+            AddUntilStep("one player added", () => spectatorScreen.ChildrenOfType<Player>().Count() == 1);
 
             AddWaitStep("wait a bit", 10);
             AddStep("load player 56", () => streamingClient.StartPlay(56, importedBeatmapId));
-            AddUntilStep("two players added", () => spectator.ChildrenOfType<Player>().Count() == 2);
+            AddUntilStep("two players added", () => spectatorScreen.ChildrenOfType<Player>().Count() == 2);
         }
 
         [Test]
@@ -239,10 +239,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Beatmap.Value = beatmapManager.GetWorkingBeatmap(importedBeatmap);
                 Ruleset.Value = importedBeatmap.Ruleset;
 
-                LoadScreen(spectator = new MultiplayerSpectator(playingUserIds.ToArray()));
+                LoadScreen(spectatorScreen = new MultiSpectatorScreen(playingUserIds.ToArray()));
             });
 
-            AddUntilStep("wait for screen load", () => spectator.LoadState == LoadState.Loaded && (!waitForPlayerLoad || spectator.AllPlayersLoaded));
+            AddUntilStep("wait for screen load", () => spectatorScreen.LoadState == LoadState.Loaded && (!waitForPlayerLoad || spectatorScreen.AllPlayersLoaded));
         }
 
         private void start(int userId, int? beatmapId = null) => start(new[] { userId }, beatmapId);
@@ -299,7 +299,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private Player getPlayer(int userId) => getInstance(userId).ChildrenOfType<Player>().Single();
 
-        private PlayerInstance getInstance(int userId) => spectator.ChildrenOfType<PlayerInstance>().Single(p => p.UserId == userId);
+        private PlayerInstance getInstance(int userId) => spectatorScreen.ChildrenOfType<PlayerInstance>().Single(p => p.UserId == userId);
 
         public class TestSpectatorStreamingClient : SpectatorStreamingClient
         {

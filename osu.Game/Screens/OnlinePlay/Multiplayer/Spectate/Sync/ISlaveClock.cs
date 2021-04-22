@@ -7,7 +7,7 @@ using osu.Framework.Timing;
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync
 {
     /// <summary>
-    /// A clock which is used by <see cref="MultiplayerSpectatorPlayer"/>s and managed by an <see cref="ISyncManager"/>.
+    /// A clock which is used by <see cref="MultiSpectatorPlayer"/>s and managed by an <see cref="ISyncManager"/>.
     /// </summary>
     public interface ISlaveClock : IFrameBasedClock, IAdjustableClock
     {
