@@ -144,7 +144,6 @@ namespace osu.Game.Online.Multiplayer
                     Room = joinedRoom;
                     apiRoom = room;
                     defaultPlaylistItemId = apiRoom.Playlist.FirstOrDefault()?.ID ?? 0;
-
                     foreach (var user in joinedRoom.Users)
                         updateUserPlayingState(user.UserID, user.State);
                 }, cancellationSource.Token).ConfigureAwait(false);
