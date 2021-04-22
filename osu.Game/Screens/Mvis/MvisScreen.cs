@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -468,7 +469,7 @@ namespace osu.Game.Screens.Mvis
                                 }
                             }
                         },
-                        progressBar = new SongProgressBar(),
+                        progressBar = new SongProgressBar()
                     }
                 }
             };
@@ -478,6 +479,9 @@ namespace osu.Game.Screens.Mvis
                 TooltipText = "锁定变更",
                 Action = showPluginEntriesTemporary
             });
+
+            //todo: 找出为啥audioControlProvider会在被赋值前访问
+            audioControlProvider = musicControllerWrapper;
         }
 
         protected override void LoadComplete()
@@ -490,8 +494,6 @@ namespace osu.Game.Screens.Mvis
             {
                 lockButton.Disabled = v.NewValue;
             });
-
-            Beatmap.BindValueChanged(onBeatmapChanged, true);
 
             musicSpeed.BindValueChanged(_ => applyTrackAdjustments());
             adjustFreq.BindValueChanged(_ => applyTrackAdjustments());
@@ -541,30 +543,37 @@ namespace osu.Game.Screens.Mvis
 
             foreach (var pl in pluginManager.GetAllPlugins(true))
             {
-                switch (pl.Target)
+                try
                 {
-                    case MvisPlugin.TargetLayer.Background:
-                        background.Add(pl);
-                        break;
-
-                    case MvisPlugin.TargetLayer.Foreground:
-                        foreground.Add(pl);
-                        break;
-                }
-
-                var pluginSidebarPage = pl.CreateSidebarPage();
-
-                if (pluginSidebarPage != null)
-                {
-                    sidebar.Add(pluginSidebarPage);
-                    var btn = pluginSidebarPage.CreateBottomBarButton();
-
-                    if (btn != null)
+                    switch (pl.Target)
                     {
-                        btn.Action = () => updateSidebarState(pluginSidebarPage);
+                        case MvisPlugin.TargetLayer.Background:
+                            background.Add(pl);
+                            break;
 
-                        bottomBar.PluginEntriesFillFlow.Add(btn);
+                        case MvisPlugin.TargetLayer.Foreground:
+                            foreground.Add(pl);
+                            break;
                     }
+
+                    var pluginSidebarPage = pl.CreateSidebarPage();
+
+                    if (pluginSidebarPage != null)
+                    {
+                        sidebar.Add(pluginSidebarPage);
+                        var btn = pluginSidebarPage.CreateBottomBarButton();
+
+                        if (btn != null)
+                        {
+                            btn.Action = () => updateSidebarState(pluginSidebarPage);
+
+                            bottomBar.PluginEntriesFillFlow.Add(btn);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, $"在添加 {pl.Name} 时出现问题, 请联系你的插件提供方");
                 }
             }
 
@@ -583,7 +592,7 @@ namespace osu.Game.Screens.Mvis
 
             pluginManager.OnPluginUnLoad += onPluginUnLoad;
 
-            Beatmap.TriggerChange();
+            Beatmap.BindValueChanged(onBeatmapChanged, true);
 
             bottomBar.MoveToY(bottomBar.Height + 10).FadeOut();
             progressBar.MoveToY(5);
