@@ -7,8 +7,8 @@ namespace osu.Game.Rulesets.Mania.Scoring
 {
     internal class ManiaScoreProcessor : ScoreProcessor
     {
-        protected override double DefaultAccuracyPortion => 0.95;
+        protected override double DefaultAccuracyPortion => 0.99;
 
-        protected override double DefaultComboPortion => 0.05;
+        protected override double DefaultComboPortion => 0.01;
     }
 }

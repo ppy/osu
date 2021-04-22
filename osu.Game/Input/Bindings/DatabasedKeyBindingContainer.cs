@@ -74,19 +74,29 @@ namespace osu.Game.Input.Bindings
             base.LoadComplete();
         }
 
-        protected override void ReloadMappings()
-        {
-            if (realmKeyBindings != null)
-                KeyBindings = realmKeyBindings.Detach();
-            else
-                base.ReloadMappings();
-        }
-
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
 
             realmSubscription?.Dispose();
+        }
+
+        protected override void ReloadMappings()
+        {
+            var defaults = DefaultKeyBindings.ToList();
+
+            if (ruleset != null && !ruleset.ID.HasValue)
+                // if the provided ruleset is not stored to the database, we have no way to retrieve custom bindings.
+                // fallback to defaults instead.
+                KeyBindings = defaults;
+            else
+            {
+                KeyBindings = realmKeyBindings.Detach()
+                                              // this ordering is important to ensure that we read entries from the database in the order
+                                              // enforced by DefaultKeyBindings. allow for song select to handle actions that may otherwise
+                                              // have been eaten by the music controller due to query order.
+                                              .OrderBy(b => defaults.FindIndex(d => (int)d.Action == b.ActionInt)).ToList();
+            }
         }
     }
 }

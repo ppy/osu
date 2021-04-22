@@ -32,8 +32,6 @@ namespace osu.Game.Input.Handlers
 
         public override bool Initialize(GameHost host) => true;
 
-        public override bool IsActive => true;
-
         public class ReplayState<T> : IInput
             where T : struct
         {

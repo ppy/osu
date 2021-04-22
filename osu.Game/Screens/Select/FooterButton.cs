@@ -4,7 +4,6 @@
 using System;
 using osuTK;
 using osuTK.Graphics;
-using osuTK.Input;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -13,10 +12,13 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
+using osu.Game.Input.Bindings;
+using osu.Framework.Input.Bindings;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Select
 {
-    public class FooterButton : OsuClickableContainer
+    public class FooterButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
     {
         public const float SHEAR_WIDTH = 7.5f;
 
@@ -64,6 +66,7 @@ namespace osu.Game.Screens.Select
         private readonly Box light;
 
         public FooterButton()
+            : base(HoverSampleSet.SongSelect)
         {
             AutoSizeAxes = Axes.Both;
             Shear = SHEAR;
@@ -105,6 +108,7 @@ namespace osu.Game.Screens.Select
                                     AutoSizeAxes = Axes.Both,
                                     Child = SpriteText = new OsuSpriteText
                                     {
+                                        AlwaysPresent = true,
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
                                     }
@@ -118,7 +122,7 @@ namespace osu.Game.Screens.Select
 
         public Action Hovered;
         public Action HoverLost;
-        public Key? Hotkey;
+        public GlobalAction? Hotkey;
 
         protected override void UpdateAfterChildren()
         {
@@ -168,15 +172,17 @@ namespace osu.Game.Screens.Select
             return base.OnClick(e);
         }
 
-        protected override bool OnKeyDown(KeyDownEvent e)
+        public virtual bool OnPressed(GlobalAction action)
         {
-            if (!e.Repeat && e.Key == Hotkey)
+            if (action == Hotkey)
             {
                 Click();
                 return true;
             }
 
-            return base.OnKeyDown(e);
+            return false;
         }
+
+        public virtual void OnReleased(GlobalAction action) { }
     }
 }

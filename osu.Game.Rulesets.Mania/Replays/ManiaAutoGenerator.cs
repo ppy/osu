@@ -70,10 +70,6 @@ namespace osu.Game.Rulesets.Mania.Replays
                     }
                 }
 
-                // todo: can be removed once FramedReplayInputHandler correctly handles rewinding before first frame.
-                if (Replay.Frames.Count == 0)
-                    Replay.Frames.Add(new ManiaReplayFrame(group.First().Time - 1));
-
                 Replay.Frames.Add(new ManiaReplayFrame(group.First().Time, actions.ToArray()));
             }
 

@@ -109,7 +109,12 @@ namespace osu.Game.Screens.Play
 
             request.Success += s =>
             {
-                score.ScoreInfo.OnlineScoreID = s.ID;
+                // For the time being, online ID responses are not really useful for anything.
+                // In addition, the IDs provided via new (lazer) endpoints are based on a different autoincrement from legacy (stable) scores.
+                //
+                // Until we better define the server-side logic behind this, let's not store the online ID to avoid potential unique constraint
+                // conflicts across various systems (ie. solo and multiplayer).
+                // score.ScoreInfo.OnlineScoreID = s.ID;
                 tcs.SetResult(true);
             };
 

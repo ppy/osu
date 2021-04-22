@@ -196,7 +196,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private void refreshTool()
         {
             removePlacement();
-            createPlacement();
+            ensurePlacementCreated();
         }
 
         private void updatePlacementPosition()
@@ -215,15 +215,26 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             base.Update();
 
-            if (Composer.CursorInPlacementArea)
-                createPlacement();
-            else if (currentPlacement?.PlacementActive == false)
-                removePlacement();
-
             if (currentPlacement != null)
             {
-                updatePlacementPosition();
+                switch (currentPlacement.PlacementActive)
+                {
+                    case PlacementBlueprint.PlacementState.Waiting:
+                        if (!Composer.CursorInPlacementArea)
+                            removePlacement();
+                        break;
+
+                    case PlacementBlueprint.PlacementState.Finished:
+                        removePlacement();
+                        break;
+                }
             }
+
+            if (Composer.CursorInPlacementArea)
+                ensurePlacementCreated();
+
+            if (currentPlacement != null)
+                updatePlacementPosition();
         }
 
         protected sealed override SelectionBlueprint CreateBlueprintFor(HitObject hitObject)
@@ -249,7 +260,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 NewCombo.Value = TernaryState.False;
         }
 
-        private void createPlacement()
+        private void ensurePlacementCreated()
         {
             if (currentPlacement != null) return;
 

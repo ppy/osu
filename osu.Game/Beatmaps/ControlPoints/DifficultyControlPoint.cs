@@ -25,7 +25,7 @@ namespace osu.Game.Beatmaps.ControlPoints
             MaxValue = 10
         };
 
-        public override Color4 GetRepresentingColour(OsuColour colours) => colours.GreenDark;
+        public override Color4 GetRepresentingColour(OsuColour colours) => colours.Lime1;
 
         /// <summary>
         /// The speed multiplier at this control point.

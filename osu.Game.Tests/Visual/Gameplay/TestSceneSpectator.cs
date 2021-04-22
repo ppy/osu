@@ -3,6 +3,8 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -11,6 +13,7 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Online;
 using osu.Game.Online.Spectator;
 using osu.Game.Replays.Legacy;
@@ -29,10 +32,13 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached(typeof(SpectatorStreamingClient))]
         private TestSpectatorStreamingClient testSpectatorStreamingClient = new TestSpectatorStreamingClient();
 
+        [Cached(typeof(UserLookupCache))]
+        private UserLookupCache lookupCache = new TestUserLookupCache();
+
         // used just to show beatmap card for the time being.
         protected override bool UseOnlineAPI => true;
 
-        private Spectator spectatorScreen;
+        private SoloSpectator spectatorScreen;
 
         [Resolved]
         private OsuGameBase game { get; set; }
@@ -69,7 +75,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             loadSpectatingScreen();
 
-            AddAssert("screen hasn't changed", () => Stack.CurrentScreen is Spectator);
+            AddAssert("screen hasn't changed", () => Stack.CurrentScreen is SoloSpectator);
 
             start();
             sendFrames();
@@ -77,7 +83,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             waitForPlayer();
             AddAssert("ensure frames arrived", () => replayHandler.HasFrames);
 
-            AddUntilStep("wait for frame starvation", () => replayHandler.NextFrame == null);
+            AddUntilStep("wait for frame starvation", () => replayHandler.WaitingForFrame);
             checkPaused(true);
 
             double? pausedTime = null;
@@ -86,7 +92,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             sendFrames();
 
-            AddUntilStep("wait for frame starvation", () => replayHandler.NextFrame == null);
+            AddUntilStep("wait for frame starvation", () => replayHandler.WaitingForFrame);
             checkPaused(true);
 
             AddAssert("time advanced", () => currentFrameStableTime > pausedTime);
@@ -195,7 +201,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             start(-1234);
             sendFrames();
 
-            AddAssert("screen didn't change", () => Stack.CurrentScreen is Spectator);
+            AddAssert("screen didn't change", () => Stack.CurrentScreen is SoloSpectator);
         }
 
         private OsuFramedReplayInputHandler replayHandler =>
@@ -226,7 +232,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void loadSpectatingScreen()
         {
-            AddStep("load screen", () => LoadScreen(spectatorScreen = new Spectator(testSpectatorStreamingClient.StreamingUser)));
+            AddStep("load screen", () => LoadScreen(spectatorScreen = new SoloSpectator(testSpectatorStreamingClient.StreamingUser)));
             AddUntilStep("wait for screen load", () => spectatorScreen.LoadState == LoadState.Loaded);
         }
 
@@ -300,6 +306,15 @@ namespace osu.Game.Tests.Visual.Gameplay
                     RulesetID = 0,
                 });
             }
+        }
+
+        internal class TestUserLookupCache : UserLookupCache
+        {
+            protected override Task<User> ComputeValueAsync(int lookup, CancellationToken token = default) => Task.FromResult(new User
+            {
+                Id = lookup,
+                Username = $"User {lookup}"
+            });
         }
     }
 }
