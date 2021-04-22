@@ -288,7 +288,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public override void WatchUser(int userId)
             {
-                if (sentState)
+                if (!PlayingUsers.Contains(userId) && sentState)
                 {
                     // usually the server would do this.
                     sendState(beatmapId);
