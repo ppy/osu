@@ -384,16 +384,7 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             updateTrailVisibility();
 
-            if (hyperDashing)
-            {
-                this.FadeColour(hyperDashColour, HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
-                this.FadeTo(0.2f, HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
-            }
-            else
-            {
-                this.FadeColour(Color4.White, HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
-                this.FadeTo(1f, HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
-            }
+            this.FadeColour(hyperDashing ? hyperDashColour : Color4.White, HYPER_DASH_TRANSITION_DURATION, Easing.OutQuint);
         }
 
         private void updateTrailVisibility() => trails.DisplayTrail = Dashing || HyperDashing;
