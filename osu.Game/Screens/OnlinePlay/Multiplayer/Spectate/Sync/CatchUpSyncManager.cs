@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
-using osu.Framework.Logging;
 using osu.Framework.Timing;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync
@@ -84,16 +83,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync
             int readyCount = slaves.Count(s => !s.WaitingOnFrames.Value);
 
             if (readyCount == slaves.Count)
-            {
-                Logger.Log("Gameplay started (all ready).");
                 return hasStarted = true;
-            }
 
             if (readyCount > 0 && (Time.Current - firstStartAttemptTime) > MAXIMUM_START_DELAY)
-            {
-                Logger.Log($"Gameplay started (maximum delay exceeded, {readyCount}/{slaves.Count} ready).");
                 return hasStarted = true;
-            }
 
             return false;
         }
@@ -124,19 +117,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync
                 {
                     // Stop the slave from catching up if it's within the sync target.
                     if (timeDelta <= SYNC_TARGET)
-                    {
                         slave.IsCatchingUp = false;
-                        Logger.Log($"Slave {i} catchup finished (delta = {timeDelta})");
-                    }
                 }
                 else
                 {
                     // Make the slave start catching up if it's exceeded the maximum allowable sync offset.
                     if (timeDelta > MAX_SYNC_OFFSET)
-                    {
                         slave.IsCatchingUp = true;
-                        Logger.Log($"Slave {i} catchup started (too far behind, delta = {timeDelta})");
-                    }
                 }
             }
         }
