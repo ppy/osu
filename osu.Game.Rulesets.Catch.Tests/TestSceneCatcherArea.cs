@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 {
                     attemptCatch(new Fruit
                     {
-                        X = (RNG.NextSingle() - 0.5f) * Catcher.CalculateCatchWidth(beatmapDifficulty),
+                        X = (RNG.NextSingle() - 0.5f) * Catcher.CalculateCatchWidth(beatmapDifficulty) * 0.6f,
                     });
 
                     if (count-- == 0)
