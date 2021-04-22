@@ -299,7 +299,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private Player getPlayer(int userId) => getInstance(userId).ChildrenOfType<Player>().Single();
 
-        private PlayerInstance getInstance(int userId) => spectatorScreen.ChildrenOfType<PlayerInstance>().Single(p => p.UserId == userId);
+        private PlayerArea getInstance(int userId) => spectatorScreen.ChildrenOfType<PlayerArea>().Single(p => p.UserId == userId);
 
         public class TestSpectatorStreamingClient : SpectatorStreamingClient
         {

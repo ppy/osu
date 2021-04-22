@@ -14,27 +14,37 @@ using osu.Game.Screens.Spectate;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
+    /// <summary>
+    /// A <see cref="SpectatorScreen"/> that spectates multiple users in a match.
+    /// </summary>
     public class MultiSpectatorScreen : SpectatorScreen
     {
         // Isolates beatmap/ruleset to this screen.
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
+        /// <summary>
+        /// Whether all spectating players have finished loading.
+        /// </summary>
         public bool AllPlayersLoaded => instances.All(p => p?.PlayerLoaded == true);
 
         [Resolved]
         private SpectatorStreamingClient spectatorClient { get; set; }
 
-        private readonly PlayerInstance[] instances;
+        private readonly PlayerArea[] instances;
         private MasterGameplayClockContainer masterClockContainer;
         private ISyncManager syncManager;
         private PlayerGrid grid;
         private MultiSpectatorLeaderboard leaderboard;
-        private PlayerInstance currentAudioSource;
+        private PlayerArea currentAudioSource;
 
+        /// <summary>
+        /// Creates a new <see cref="MultiSpectatorScreen"/>.
+        /// </summary>
+        /// <param name="userIds">The players to spectate.</param>
         public MultiSpectatorScreen(int[] userIds)
             : base(userIds.AsSpan().Slice(0, Math.Min(16, userIds.Length)).ToArray())
         {
-            instances = new PlayerInstance[UserIds.Length];
+            instances = new PlayerArea[UserIds.Length];
         }
 
         [BackgroundDependencyLoader]
@@ -69,7 +79,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             };
 
             for (int i = 0; i < UserIds.Length; i++)
-                grid.Add(instances[i] = new PlayerInstance(UserIds[i], new CatchUpSlaveClock(masterClockContainer.GameplayClock)));
+                grid.Add(instances[i] = new PlayerArea(UserIds[i], new CatchUpSlaveClock(masterClockContainer.GameplayClock)));
 
             // Todo: This is not quite correct - it should be per-user to adjust for other mod combinations.
             var playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Ruleset.Value);

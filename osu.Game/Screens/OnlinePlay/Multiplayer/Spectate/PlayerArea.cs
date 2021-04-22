@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
@@ -18,13 +19,31 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
-    public class PlayerInstance : CompositeDrawable, IAdjustableAudioComponent
+    /// <summary>
+    /// Provides an area for and manages the hierarchy of a spectated player within a <see cref="MultiSpectatorScreen"/>.
+    /// </summary>
+    public class PlayerArea : CompositeDrawable, IAdjustableAudioComponent
     {
+        /// <summary>
+        /// Whether a <see cref="Player"/> is loaded in the area.
+        /// </summary>
         public bool PlayerLoaded => stack?.CurrentScreen is Player;
 
+        /// <summary>
+        /// The user id this <see cref="PlayerArea"/> corresponds to.
+        /// </summary>
         public readonly int UserId;
-        public readonly CatchUpSlaveClock GameplayClock;
 
+        /// <summary>
+        /// The <see cref="ISlaveClock"/> used to control the gameplay running state of a loaded <see cref="Player"/>.
+        /// </summary>
+        [NotNull]
+        public readonly ISlaveClock GameplayClock;
+
+        /// <summary>
+        /// The currently-loaded score.
+        /// </summary>
+        [CanBeNull]
         public Score Score { get; private set; }
 
         [Resolved]
@@ -35,7 +54,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private readonly AudioContainer audioContainer;
         private OsuScreenStack stack;
 
-        public PlayerInstance(int userId, CatchUpSlaveClock gameplayClock)
+        public PlayerArea(int userId, [NotNull] ISlaveClock gameplayClock)
         {
             UserId = userId;
             GameplayClock = gameplayClock;
@@ -54,10 +73,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             };
         }
 
-        public void LoadScore(Score score)
+        public void LoadScore([NotNull] Score score)
         {
             if (Score != null)
-                throw new InvalidOperationException($"Cannot load a new score on a {nameof(PlayerInstance)} with an existing score.");
+                throw new InvalidOperationException($"Cannot load a new score on a {nameof(PlayerArea)} that has an existing score.");
 
             Score = score;
 

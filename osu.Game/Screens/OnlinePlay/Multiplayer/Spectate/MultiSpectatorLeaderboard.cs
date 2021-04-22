@@ -11,7 +11,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
     public class MultiSpectatorLeaderboard : MultiplayerGameplayLeaderboard
     {
-        public MultiSpectatorLeaderboard(ScoreProcessor scoreProcessor, int[] userIds)
+        public MultiSpectatorLeaderboard([NotNull] ScoreProcessor scoreProcessor, int[] userIds)
             : base(scoreProcessor, userIds)
         {
         }
