@@ -4,14 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Screens.Mvis.Plugins.Config;
 
 namespace osu.Game.Screens.Mvis.Plugins
 {
-    public class MvisPluginManager : CompositeDrawable
+    public class MvisPluginManager : Drawable
     {
         private readonly BindableList<MvisPlugin> avaliablePlugins = new BindableList<MvisPlugin>();
         private readonly BindableList<MvisPlugin> activePlugins = new BindableList<MvisPlugin>();
@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Mvis.Plugins
             if (avaliablePlugins.Contains(pl) || pl == null) return false;
 
             if (pl.Version < PluginVersion)
-                Logger.Log($"插件 \"{pl.Name}\" 的版本已经过时, 继续使用可能会导致意外情况的发生!", LoggingTarget.Runtime, LogLevel.Important);
+                Logger.Log($"插件 \"{pl.Name}\" 是为旧版本的mf-osu打造的, 继续使用可能会导致意外情况的发生!", LoggingTarget.Runtime, LogLevel.Important);
             else if (pl.Version > PluginVersion)
                 Logger.Log($"插件 \"{pl.Name}\" 是为更高版本的mf-osu打造的, 继续使用可能会导致意外情况的发生!", LoggingTarget.Runtime, LogLevel.Important);
 

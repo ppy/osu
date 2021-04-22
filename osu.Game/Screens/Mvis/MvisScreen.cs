@@ -37,6 +37,7 @@ using osu.Game.Skinning;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 using Sidebar = osu.Game.Screens.Mvis.SideBar.Sidebar;
 using SongProgressBar = osu.Game.Screens.Mvis.BottomBar.SongProgressBar;
 
@@ -135,6 +136,7 @@ namespace osu.Game.Screens.Mvis
         private BottomBarContainer bottomBar;
         private SongProgressBar progressBar;
 
+        //留着这些能让播放器在触发GlobalAction时会有更好的界面体验
         private BottomBarButton soloButton;
         private BottomBarButton prevButton;
         private BottomBarButton nextButton;
@@ -224,6 +226,13 @@ namespace osu.Game.Screens.Mvis
 
         private const float duration = 500;
 
+        private readonly MvisModRateAdjust modRateAdjust = new MvisModRateAdjust();
+        private IReadOnlyList<Mod> originalMods;
+        private List<Mod> timeRateMod;
+
+        private readonly Dictionary<GlobalAction, Action> keyBindings = new Dictionary<GlobalAction, Action>();
+        private readonly Dictionary<Key, Action> pluginKeyBindings = new Dictionary<Key, Action>();
+
         public bool OverlaysHidden { get; private set; }
         private readonly BindableBool lockChanges = new BindableBool();
         private readonly IBindable<bool> isIdle = new BindableBool();
@@ -254,12 +263,14 @@ namespace osu.Game.Screens.Mvis
         [BackgroundDependencyLoader]
         private void load(MConfigManager config, IdleTracker idleTracker)
         {
+            //早期设置
             var iR = config.Get<float>(MSetting.MvisInterfaceRed);
             var iG = config.Get<float>(MSetting.MvisInterfaceGreen);
             var iB = config.Get<float>(MSetting.MvisInterfaceBlue);
             dependencies.Cache(colourProvider = new CustomColourProvider(iR, iG, iB));
             dependencies.Cache(this);
 
+            //处理侧边栏
             SidebarSettingsScrollContainer settingsScroll;
             SidebarPluginsPage pluginsPage;
             sidebar.AddRange(new Drawable[]
@@ -297,8 +308,7 @@ namespace osu.Game.Screens.Mvis
                 pluginsPage = new SidebarPluginsPage()
             });
 
-            dependencies.Cache(sidebar);
-
+            //配置绑定/设置
             isIdle.BindTo(idleTracker.IsIdle);
             config.BindWith(MSetting.MvisBgBlur, bgBlur);
             config.BindWith(MSetting.MvisIdleBgDim, idleBgDim);
@@ -321,7 +331,6 @@ namespace osu.Game.Screens.Mvis
                     Name = "Contents",
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING },
-                    Masking = true,
                     Children = new Drawable[]
                     {
                         bgTriangles = new BgTrianglesContainer(),
@@ -469,11 +478,15 @@ namespace osu.Game.Screens.Mvis
                                 }
                             }
                         },
-                        progressBar = new SongProgressBar()
+                        progressBar = new SongProgressBar
+                        {
+                            OnSeek = seekTo
+                        }
                     }
                 }
             };
 
+            //后期设置
             bottomBar.PluginEntriesFillFlow.Add(lockButton = new BottomBarOverlayLockSwitchButton
             {
                 TooltipText = "锁定变更",
@@ -486,6 +499,8 @@ namespace osu.Game.Screens.Mvis
 
         protected override void LoadComplete()
         {
+            //各种BindValueChanged
+            //这部分放load会导致当前屏幕为主界面时，播放器会在后台相应设置变动
             loadList.BindCollectionChanged(onLoadListChanged);
 
             bgBlur.BindValueChanged(v => updateBackground(Beatmap.Value));
@@ -505,8 +520,6 @@ namespace osu.Game.Screens.Mvis
             });
 
             inputManager = GetContainingInputManager();
-
-            progressBar.OnSeek = seekTo;
 
             songProgressButton.ToggleableValue.BindTo(trackRunning);
 
@@ -541,10 +554,15 @@ namespace osu.Game.Screens.Mvis
 
             HideScreenBackground.BindValueChanged(_ => applyBackgroundBrightness());
 
+            //设置键位
+            setupKeyBindings();
+
+            //添加插件
             foreach (var pl in pluginManager.GetAllPlugins(true))
             {
                 try
                 {
+                    //决定要把插件放在何处
                     switch (pl.Target)
                     {
                         case MvisPlugin.TargetLayer.Background:
@@ -558,16 +576,28 @@ namespace osu.Game.Screens.Mvis
 
                     var pluginSidebarPage = pl.CreateSidebarPage();
 
+                    //如果插件有侧边栏页面
                     if (pluginSidebarPage != null)
                     {
                         sidebar.Add(pluginSidebarPage);
                         var btn = pluginSidebarPage.CreateBottomBarButton();
 
+                        //如果插件的侧边栏页面有入口按钮
                         if (btn != null)
                         {
                             btn.Action = () => updateSidebarState(pluginSidebarPage);
+                            btn.TooltipText += $" ({pluginSidebarPage.ShortcutKey})";
 
                             bottomBar.PluginEntriesFillFlow.Add(btn);
+                        }
+
+                        //如果插件的侧边栏页面有调用快捷键
+                        if (pluginSidebarPage.ShortcutKey != Key.Unknown)
+                        {
+                            pluginKeyBindings[pluginSidebarPage.ShortcutKey] = () =>
+                            {
+                                if (!pl.Disabled.Value) btn?.Click();
+                            };
                         }
                     }
                 }
@@ -577,43 +607,85 @@ namespace osu.Game.Screens.Mvis
                 }
             }
 
-            bottomBar.CentreBotton(lockButton);
-
-            currentAudioControlProviderSetting.BindValueChanged(v =>
-            {
-                var pl = (IProvideAudioControlPlugin)pluginManager.GetAllPlugins(false).FirstOrDefault(p => v.NewValue == $"{p.GetType().Namespace}+{p.GetType().Name}");
-                Beatmap.Disabled = pl != null;
-
-                if (audioControlProvider != null) audioControlProvider.IsCurrent = false;
-                if (pl != null) pl.IsCurrent = true;
-
-                audioControlProvider = pl ?? musicControllerWrapper;
-            }, true);
-
+            //当插件卸载时调用onPluginUnload
             pluginManager.OnPluginUnLoad += onPluginUnLoad;
 
-            Beatmap.BindValueChanged(onBeatmapChanged, true);
+            //把lockButton放在中间
+            bottomBar.CentreBotton(lockButton);
 
+            //更新当前音乐控制插件
+            currentAudioControlProviderSetting.BindValueChanged(v =>
+            {
+                //获取与新值匹配的控制插件
+                var pl = (IProvideAudioControlPlugin)pluginManager.GetAllPlugins(false).FirstOrDefault(p => v.NewValue == $"{p.GetType().Namespace}+{p.GetType().Name}");
+
+                //如果没找到(为null)，则解锁Beatmap.Disabled
+                Beatmap.Disabled = pl != null;
+
+                //设置当前控制插件IsCurrent为false
+                audioControlProvider.IsCurrent = false;
+
+                //切换并设置当前控制插件IsCurrent为true
+                audioControlProvider = pl ?? musicControllerWrapper;
+                audioControlProvider.IsCurrent = true;
+            }, true);
+
+            //触发一次onBeatmapChanged和onTrackRunningToggle
+            Beatmap.BindValueChanged(onBeatmapChanged, true);
+            OnTrackRunningToggle?.Invoke(track.IsRunning);
+
+            //界面动画
             bottomBar.MoveToY(bottomBar.Height + 10).FadeOut();
             progressBar.MoveToY(5);
-
             showOverlays(true);
-
-            OnTrackRunningToggle?.Invoke(track.IsRunning);
 
             base.LoadComplete();
         }
 
+        private void setupKeyBindings()
+        {
+            keyBindings[GlobalAction.MvisMusicPrev] = () => prevButton.Click();
+            keyBindings[GlobalAction.MvisMusicNext] = () => nextButton.Click();
+            keyBindings[GlobalAction.MvisOpenInSongSelect] = () => soloButton.Click();
+            keyBindings[GlobalAction.MvisToggleOverlayLock] = () => lockButton.Click();
+            keyBindings[GlobalAction.MvisTogglePluginPage] = () => pluginButton.Click();
+            keyBindings[GlobalAction.MvisTogglePause] = () => songProgressButton.Click();
+            keyBindings[GlobalAction.MvisToggleTrackLoop] = () => loopToggleButton.Click();
+            keyBindings[GlobalAction.MvisTogglePlayList] = () => sidebarToggleButton.Click();
+            keyBindings[GlobalAction.MvisForceLockOverlayChanges] = () => lockChanges.Toggle();
+            keyBindings[GlobalAction.Back] = () =>
+            {
+                if (sidebar.IsPresent && !sidebar.Hiding)
+                {
+                    sidebar.Hide();
+                    return;
+                }
+
+                if (OverlaysHidden)
+                {
+                    lockChanges.Value = false;
+                    lockButton.ToggleableValue.Value = false;
+                    showOverlays(true);
+                }
+                else
+                    this.Exit();
+            };
+        }
+
         private void onPluginUnLoad(MvisPlugin pl)
         {
+            //查找与pl对应的侧边栏页面
             foreach (var sc in sidebar.Components)
             {
+                //如果找到的侧边栏的Plugin与pl匹配
                 if (sc is PluginSidebarPage plsp && plsp.Plugin == pl)
                 {
-                    sidebar.Remove(plsp);
+                    sidebar.Remove(plsp); //移除这个页面
 
+                    //查找与plsp对应的底栏入口
                     foreach (var d in bottomBar.PluginEntriesFillFlow)
                     {
+                        //同上
                         if (d is PluginBottomBarButton btn && btn.Page == plsp)
                         {
                             btn.FadeTo(0.01f, 300, Easing.OutQuint).Then().Schedule(() =>
@@ -656,8 +728,8 @@ namespace osu.Game.Screens.Mvis
 
         private void updateSidebarState(Drawable d)
         {
-            if (d == null) sidebar.Hide();
-            if (!(d is ISidebarContent)) return;
+            if (d == null) sidebar.Hide(); //如果d是null, 则隐藏侧边栏
+            if (!(d is ISidebarContent)) return; //如果d不是ISidebarContent, 则忽略这次调用
 
             var sc = (ISidebarContent)d;
 
@@ -681,10 +753,6 @@ namespace osu.Game.Screens.Mvis
             progressBar.CurrentTime = track.CurrentTime;
             progressBar.EndTime = track.Length;
         }
-
-        private readonly MvisModRateAdjust modRateAdjust = new MvisModRateAdjust();
-        private IReadOnlyList<Mod> originalMods;
-        private List<Mod> timeRateMod;
 
         public override void OnEntering(IScreen last)
         {
@@ -775,75 +843,28 @@ namespace osu.Game.Screens.Mvis
 
         public bool OnPressed(GlobalAction action)
         {
-            switch (action)
-            {
-                case GlobalAction.MvisMusicPrev:
-                    prevButton.Click();
-                    return true;
-
-                case GlobalAction.MvisMusicNext:
-                    nextButton.Click();
-                    return true;
-
-                case GlobalAction.MvisTogglePause:
-                    songProgressButton.Click();
-                    return true;
-
-                case GlobalAction.MvisTogglePlayList:
-                    sidebarToggleButton.Click();
-                    return true;
-
-                case GlobalAction.MvisOpenInSongSelect:
-                    soloButton.Click();
-                    return true;
-
-                case GlobalAction.MvisToggleOverlayLock:
-                    lockButton.Click();
-                    return true;
-
-                case GlobalAction.MvisToggleTrackLoop:
-                    loopToggleButton.Click();
-                    return true;
-
-                case GlobalAction.MvisForceLockOverlayChanges:
-                    lockChanges.Toggle();
-                    return true;
-
-                case GlobalAction.MvisTogglePluginPage:
-                    pluginButton.Click();
-                    return true;
-
-                case GlobalAction.Back:
-                    if (sidebar.IsPresent && !sidebar.Hiding)
-                    {
-                        sidebar.Hide();
-                        return true;
-                    }
-
-                    if (!OverlaysHidden)
-                        this.Exit();
-
-                    return true;
-            }
+            //查找本体按键绑定
+            keyBindings.FirstOrDefault(b => b.Key == action).Value?.Invoke();
 
             return false;
         }
 
-        public void OnReleased(GlobalAction action)
-        {
-        }
+        public void OnReleased(GlobalAction action) { }
 
         protected override bool Handle(UIEvent e)
         {
-            switch (e)
-            {
-                case MouseMoveEvent _:
-                    showOverlays(false);
-                    return base.Handle(e);
+            if (e is MouseMoveEvent)
+                showOverlays(false);
 
-                default:
-                    return base.Handle(e);
-            }
+            return base.Handle(e);
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            //查找插件按键绑定
+            pluginKeyBindings.FirstOrDefault(b => b.Key == e.Key).Value?.Invoke();
+
+            return base.OnKeyDown(e);
         }
 
         //当有弹窗或游戏失去焦点时要进行的动作
