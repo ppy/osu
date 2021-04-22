@@ -416,7 +416,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             UpdateMods();
 
             if (client.LocalUser.State == MultiplayerUserState.Spectating
-                && (client.Room.State == MultiplayerRoomState.Playing || client.Room.State == MultiplayerRoomState.WaitingForLoad))
+                && (client.Room.State == MultiplayerRoomState.Playing || client.Room.State == MultiplayerRoomState.WaitingForLoad)
+                && ParentScreen.IsCurrentScreen())
             {
                 StartPlay();
 
