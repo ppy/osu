@@ -65,9 +65,11 @@ namespace osu.Game.Scoring
         {
             get
             {
-                Mod[] scoreMods = Array.Empty<Mod>();
+                var rulesetInstance = Ruleset?.CreateInstance();
+                if (rulesetInstance == null)
+                    return mods ?? Array.Empty<Mod>();
 
-                var rulesetInstance = Ruleset.CreateInstance();
+                Mod[] scoreMods = Array.Empty<Mod>();
 
                 if (mods != null)
                     scoreMods = mods;
