@@ -54,7 +54,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [SetUpSteps]
         public new void SetUpSteps()
         {
-            MultiplayerSpectatorLeaderboard leaderboard = null;
+            MultiSpectatorLeaderboard leaderboard = null;
 
             AddStep("reset", () =>
             {
@@ -78,7 +78,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 var scoreProcessor = new OsuScoreProcessor();
                 scoreProcessor.ApplyBeatmap(playable);
 
-                LoadComponentAsync(leaderboard = new MultiplayerSpectatorLeaderboard(scoreProcessor, clocks.Keys.ToArray()) { Expanded = { Value = true } }, Add);
+                LoadComponentAsync(leaderboard = new MultiSpectatorLeaderboard(scoreProcessor, clocks.Keys.ToArray()) { Expanded = { Value = true } }, Add);
             });
 
             AddUntilStep("wait for load", () => leaderboard.IsLoaded);

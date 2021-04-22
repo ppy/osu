@@ -14,7 +14,7 @@ using osu.Game.Screens.Spectate;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
-    public class MultiplayerSpectator : SpectatorScreen
+    public class MultiSpectatorScreen : SpectatorScreen
     {
         // Isolates beatmap/ruleset to this screen.
         public override bool DisallowExternalBeatmapRulesetChanges => true;
@@ -28,10 +28,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private MasterGameplayClockContainer masterClockContainer;
         private ISyncManager syncManager;
         private PlayerGrid grid;
-        private MultiplayerSpectatorLeaderboard leaderboard;
+        private MultiSpectatorLeaderboard leaderboard;
         private PlayerInstance currentAudioSource;
 
-        public MultiplayerSpectator(int[] userIds)
+        public MultiSpectatorScreen(int[] userIds)
             : base(userIds.AsSpan().Slice(0, Math.Min(16, userIds.Length)).ToArray())
         {
             instances = new PlayerInstance[UserIds.Length];
@@ -76,7 +76,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             var scoreProcessor = Ruleset.Value.CreateInstance().CreateScoreProcessor();
             scoreProcessor.ApplyBeatmap(playableBeatmap);
 
-            LoadComponentAsync(leaderboard = new MultiplayerSpectatorLeaderboard(scoreProcessor, UserIds) { Expanded = { Value = true } }, leaderboardContainer.Add);
+            LoadComponentAsync(leaderboard = new MultiSpectatorLeaderboard(scoreProcessor, UserIds) { Expanded = { Value = true } }, leaderboardContainer.Add);
         }
 
         protected override void LoadComplete()

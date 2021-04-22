@@ -8,9 +8,9 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
-    public class MultiplayerSpectatorPlayerLoader : SpectatorPlayerLoader
+    public class MultiSpectatorPlayerLoader : SpectatorPlayerLoader
     {
-        public MultiplayerSpectatorPlayerLoader(Score score, Func<MultiplayerSpectatorPlayer> createPlayer)
+        public MultiSpectatorPlayerLoader(Score score, Func<MultiSpectatorPlayer> createPlayer)
             : base(score, createPlayer)
         {
         }

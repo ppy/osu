@@ -11,13 +11,13 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
-    public class MultiplayerSpectatorPlayer : SpectatorPlayer
+    public class MultiSpectatorPlayer : SpectatorPlayer
     {
         private readonly Bindable<bool> waitingOnFrames = new Bindable<bool>(true);
         private readonly Score score;
         private readonly ISlaveClock slaveClock;
 
-        public MultiplayerSpectatorPlayer(Score score, ISlaveClock slaveClock)
+        public MultiSpectatorPlayer(Score score, ISlaveClock slaveClock)
             : base(score)
         {
             this.score = score;
