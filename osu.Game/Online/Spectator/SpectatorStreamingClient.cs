@@ -47,6 +47,8 @@ namespace osu.Game.Online.Spectator
 
         private readonly BindableList<int> playingUsers = new BindableList<int>();
 
+        private readonly Dictionary<int, SpectatorState> playingUserStates = new Dictionary<int, SpectatorState>();
+
         [CanBeNull]
         private IBeatmap currentBeatmap;
 
@@ -60,7 +62,6 @@ namespace osu.Game.Online.Spectator
         private IBindable<IReadOnlyList<Mod>> currentMods { get; set; }
 
         private readonly SpectatorState currentState = new SpectatorState();
-        private readonly Dictionary<int, SpectatorState> currentUserStates = new Dictionary<int, SpectatorState>();
 
         private bool isPlaying;
 
@@ -124,7 +125,11 @@ namespace osu.Game.Online.Spectator
                     }
                     else
                     {
-                        playingUsers.Clear();
+                        lock (userLock)
+                        {
+                            playingUsers.Clear();
+                            playingUserStates.Clear();
+                        }
                     }
                 }, true);
             }
@@ -132,11 +137,13 @@ namespace osu.Game.Online.Spectator
 
         Task ISpectatorClient.UserBeganPlaying(int userId, SpectatorState state)
         {
-            if (!playingUsers.Contains(userId))
-                playingUsers.Add(userId);
-
             lock (userLock)
-                currentUserStates[userId] = state;
+            {
+                if (!playingUsers.Contains(userId))
+                    playingUsers.Add(userId);
+
+                playingUserStates[userId] = state;
+            }
 
             OnUserBeganPlaying?.Invoke(userId, state);
 
@@ -145,10 +152,11 @@ namespace osu.Game.Online.Spectator
 
         Task ISpectatorClient.UserFinishedPlaying(int userId, SpectatorState state)
         {
-            playingUsers.Remove(userId);
-
             lock (userLock)
-                currentUserStates.Remove(userId);
+            {
+                playingUsers.Remove(userId);
+                playingUserStates.Remove(userId);
+            }
 
             OnUserFinishedPlaying?.Invoke(userId, state);
 
@@ -277,20 +285,33 @@ namespace osu.Game.Online.Spectator
         }
 
         /// <summary>
+        /// Attempts to retrieve the <see cref="SpectatorState"/> for a currently-playing user.
+        /// </summary>
+        /// <param name="userId">The user.</param>
+        /// <param name="state">The current <see cref="SpectatorState"/> for the user, if they're playing. <c>null</c> if the user is not playing.</param>
+        /// <returns><c>true</c> if successful (the user is playing), <c>false</c> otherwise.</returns>
+        public bool TryGetPlayingUserState(int userId, out SpectatorState state)
+        {
+            lock (userLock)
+                return playingUserStates.TryGetValue(userId, out state);
+        }
+
+        /// <summary>
         /// Bind an action to <see cref="OnUserBeganPlaying"/> with the option of running the bound action once immediately.
         /// </summary>
         /// <param name="callback">The action to perform when a user begins playing.</param>
         /// <param name="runOnceImmediately">Whether the action provided in <paramref name="callback"/> should be run once immediately for all users currently playing.</param>
         public void BindUserBeganPlaying(Action<int, SpectatorState> callback, bool runOnceImmediately = false)
         {
-            OnUserBeganPlaying += callback;
-
-            if (!runOnceImmediately)
-                return;
-
+            // The lock is taken before the event is subscribed to to prevent doubling of events.
             lock (userLock)
             {
-                foreach (var (userId, state) in currentUserStates)
+                OnUserBeganPlaying += callback;
+
+                if (!runOnceImmediately)
+                    return;
+
+                foreach (var (userId, state) in playingUserStates)
                     callback(userId, state);
             }
         }
