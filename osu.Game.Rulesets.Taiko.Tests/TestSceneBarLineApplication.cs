@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             {
                 StartTime = 400,
                 Major = true
-            }), null));
+            })));
             AddHitObject(barLine);
             RemoveHitObject(barLine);
 
@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             {
                 StartTime = 200,
                 Major = false
-            }), null));
+            })));
             AddHitObject(barLine);
         }
     }

@@ -167,7 +167,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 GetModButton(mod).SelectNext(1);
 
             public void SetModSettingsWidth(float newWidth) =>
-                ModSettingsContainer.Width = newWidth;
+                ModSettingsContainer.Parent.Width = newWidth;
         }
 
         public class TestRulesetInfo : RulesetInfo
@@ -225,6 +225,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         private abstract class TestModCustomisable : Mod, IApplicableMod
         {
             public override double ScoreMultiplier => 1.0;
+
+            public override string Description => "This is a customisable test mod.";
 
             public override ModType Type => ModType.Conversion;
 
