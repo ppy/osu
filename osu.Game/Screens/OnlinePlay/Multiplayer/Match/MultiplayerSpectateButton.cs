@@ -81,7 +81,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     break;
             }
 
-            button.Enabled.Value = !operationInProgress.Value;
+            button.Enabled.Value = Client.Room?.State != MultiplayerRoomState.Closed && !operationInProgress.Value;
         }
 
         private class ButtonWithTrianglesExposed : TriangleButton
