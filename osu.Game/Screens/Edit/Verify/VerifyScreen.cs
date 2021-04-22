@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
@@ -60,7 +61,10 @@ namespace osu.Game.Screens.Edit.Verify
             private EditorClock clock { get; set; }
 
             [Resolved]
-            protected EditorBeatmap Beatmap { get; private set; }
+            private IBindable<WorkingBeatmap> workingBeatmap { get; set; }
+
+            [Resolved]
+            private EditorBeatmap beatmap { get; set; }
 
             [Resolved]
             private Bindable<Issue> selectedIssue { get; set; }
@@ -72,7 +76,7 @@ namespace osu.Game.Screens.Edit.Verify
             private void load(OverlayColourProvider colours)
             {
                 generalVerifier = new BeatmapVerifier();
-                rulesetVerifier = Beatmap.BeatmapInfo.Ruleset?.CreateInstance()?.CreateBeatmapVerifier();
+                rulesetVerifier = beatmap.BeatmapInfo.Ruleset?.CreateInstance()?.CreateBeatmapVerifier();
 
                 RelativeSizeAxes = Axes.Both;
 
@@ -118,10 +122,10 @@ namespace osu.Game.Screens.Edit.Verify
 
             private void refresh()
             {
-                var issues = generalVerifier.Run(Beatmap);
+                var issues = generalVerifier.Run(beatmap, workingBeatmap.Value);
 
                 if (rulesetVerifier != null)
-                    issues = issues.Concat(rulesetVerifier.Run(Beatmap));
+                    issues = issues.Concat(rulesetVerifier.Run(beatmap, workingBeatmap.Value));
 
                 table.Issues = issues
                                .OrderBy(issue => issue.Template.Type)
