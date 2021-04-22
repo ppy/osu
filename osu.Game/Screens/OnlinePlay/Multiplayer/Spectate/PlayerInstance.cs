@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
@@ -9,6 +10,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync;
 using osu.Game.Screens.Play;
@@ -58,13 +61,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             Score = score;
 
-            gameplayContent.Child = new GameplayIsolationContainer(beatmapManager.GetWorkingBeatmap(Score.ScoreInfo.Beatmap), Score.ScoreInfo.Ruleset, Score.ScoreInfo.Mods)
+            gameplayContent.Child = new PlayerIsolationContainer(beatmapManager.GetWorkingBeatmap(Score.ScoreInfo.Beatmap), Score.ScoreInfo.Ruleset, Score.ScoreInfo.Mods)
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = stack = new OsuScreenStack()
             };
 
-            stack.Push(new MultiplayerSpectatorPlayerLoader(Score, () => new MultiplayerSpectatorPlayer(Score, GameplayClock)));
+            stack.Push(new MultiSpectatorPlayerLoader(Score, () => new MultiSpectatorPlayer(Score, GameplayClock)));
             loadingLayer.Hide();
         }
 
@@ -116,5 +119,33 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public BindableNumber<double> Tempo => audioContainer.Tempo;
 
         #endregion
+
+        private class PlayerIsolationContainer : Container
+        {
+            [Cached]
+            private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
+
+            [Cached]
+            private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+
+            [Cached]
+            private readonly Bindable<IReadOnlyList<Mod>> mods = new Bindable<IReadOnlyList<Mod>>();
+
+            public PlayerIsolationContainer(WorkingBeatmap beatmap, RulesetInfo ruleset, IReadOnlyList<Mod> mods)
+            {
+                this.beatmap.Value = beatmap;
+                this.ruleset.Value = ruleset;
+                this.mods.Value = mods;
+            }
+
+            protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+            {
+                var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+                dependencies.CacheAs(ruleset.BeginLease(false));
+                dependencies.CacheAs(beatmap.BeginLease(false));
+                dependencies.CacheAs(mods.BeginLease(false));
+                return dependencies;
+            }
+        }
     }
 }
