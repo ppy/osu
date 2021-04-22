@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 Position = new Vector2(128, 128),
                 ComboIndex = 1,
-            }), null));
+            })));
         }
 
         private HitCircle prepareObject(HitCircle circle)
