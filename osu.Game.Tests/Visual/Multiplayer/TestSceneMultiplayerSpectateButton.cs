@@ -120,9 +120,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
             };
         });
 
-        [Test]
-        public void TestEnabledWhenRoomOpen()
+        [TestCase(MultiplayerRoomState.Open)]
+        [TestCase(MultiplayerRoomState.WaitingForLoad)]
+        [TestCase(MultiplayerRoomState.Playing)]
+        public void TestEnabledWhenRoomOpenOrInGameplay(MultiplayerRoomState roomState)
         {
+            AddStep($"change room to {roomState}", () => Client.ChangeRoomState(roomState));
             assertSpectateButtonEnablement(true);
         }
 
@@ -137,12 +140,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("user is idle", () => Client.Room?.Users[0].State == MultiplayerUserState.Idle);
         }
 
-        [TestCase(MultiplayerRoomState.WaitingForLoad)]
-        [TestCase(MultiplayerRoomState.Playing)]
         [TestCase(MultiplayerRoomState.Closed)]
-        public void TestDisabledDuringGameplayOrClosed(MultiplayerRoomState roomState)
+        public void TestDisabledWhenClosed(MultiplayerRoomState roomState)
         {
-            AddStep($"change user to {roomState}", () => Client.ChangeRoomState(roomState));
+            AddStep($"change room to {roomState}", () => Client.ChangeRoomState(roomState));
             assertSpectateButtonEnablement(false);
         }
 
