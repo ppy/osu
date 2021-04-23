@@ -21,6 +21,5 @@ namespace osu.Game.Rulesets.Catch.Mods
             drawableRuleset.Origin = Anchor.Centre;
             drawableRuleset.Scale = new osuTK.Vector2(1, -1);
         }
-
     }
 }
