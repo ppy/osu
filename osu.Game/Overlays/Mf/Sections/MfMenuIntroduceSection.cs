@@ -161,7 +161,7 @@ namespace osu.Game.Overlays.Mf.Sections
         {
             var t = new MfText();
 
-            t.AddText("“osu!”是ppy的商标，本软件与ppy无关。");
+            t.AddText("“osu!”是ppy的商标，本软件的任何额外功能与ppy无关。");
             t.NewParagraph();
 
             t.AddParagraph("您可以在");
