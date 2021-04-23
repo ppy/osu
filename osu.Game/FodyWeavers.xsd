@@ -5,7 +5,13 @@
     <xs:complexType>
       <xs:all>
         <xs:element name="Realm" minOccurs="0" maxOccurs="1">
-          <xs:complexType></xs:complexType>
+          <xs:complexType>
+            <xs:attribute name="DisableAnalytics" type="xs:boolean">
+              <xs:annotation>
+                <xs:documentation>Disables anonymized usage information from being sent on build. Read more about what data is being collected and why here: https://github.com/realm/realm-dotnet/blob/master/Realm/Realm.Fody/Common/Analytics.cs</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+          </xs:complexType>
         </xs:element>
       </xs:all>
       <xs:attribute name="VerifyAssembly" type="xs:boolean">
