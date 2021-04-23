@@ -11,6 +11,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Mf.Sections
 {
+    //todo: 优化这里的实现方式...
     public class MfMenuFaqSection : MfMenuSection
     {
         public override string Title => "常见问题";
@@ -60,7 +61,7 @@ namespace osu.Game.Overlays.Mf.Sections
                                 new MfMenuDropDownTextBoxContainer
                                 {
                                     Title = "为什么加载谱面封面/音频预览的时间会那么长?",
-                                    D = new OsuSpriteText
+                                    Child = new OsuSpriteText
                                     {
                                         Text = "这与你的系统和当前的网络环境等一系列因素有关，"
                                                + "也可能是你一次性发送了过多的资源请求。请多等待一会，你也可以尝试重新进入谱面列表/信息界面。",
@@ -70,7 +71,16 @@ namespace osu.Game.Overlays.Mf.Sections
                                 new MfMenuDropDownTextBoxContainer
                                 {
                                     Title = "为什么我没法查看谱面/在线列表/排名/聊天/看板?",
-                                    D = faqCannotUseOnlineFunctionText
+                                    Child = faqCannotUseOnlineFunctionText
+                                },
+                                new MfMenuDropDownTextBoxContainer
+                                {
+                                    Title = "我要如何导入谱面/皮肤?",
+                                    Child = new OsuSpriteText
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Text = "主界面 > 游玩 > 最 高 机 密 > 文件导入 (请确保设置中'启用Mf自定义UI'选项开启)"
+                                    }
                                 }
                             }
                         },
@@ -91,7 +101,7 @@ namespace osu.Game.Overlays.Mf.Sections
                                 new MfMenuDropDownTextBoxContainer
                                 {
                                     Title = "为什么我突然没法从Sayobot下图了?",
-                                    D = new FillFlowContainer
+                                    Child = new FillFlowContainer
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
@@ -129,7 +139,7 @@ namespace osu.Game.Overlays.Mf.Sections
                                 new MfMenuDropDownTextBoxContainer
                                 {
                                     Title = "为什么我没法在Mf-osu上多人游戏?",
-                                    D = new FillFlowContainer
+                                    Child = new FillFlowContainer
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
@@ -166,6 +176,39 @@ namespace osu.Game.Overlays.Mf.Sections
                                         }
                                     }
                                 },
+                                new MfMenuDropDownTextBoxContainer
+                                {
+                                    Title = "为什么我找不到歌曲目录?/Songs、Skins在哪里?",
+                                    Child = new FillFlowContainer
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Spacing = new Vector2(0, 5),
+                                        Children = new Drawable[]
+                                        {
+                                            new OsuSpriteText
+                                            {
+                                                Text = "目前osu!lazer与osu!stable存储文件的方式并不一样，因此在lazer下不存在'Songs'、'Skins'，lazer将几乎所有文件以sha256编码存在'files'中。",
+                                                RelativeSizeAxes = Axes.X
+                                            },
+                                            new OsuSpriteText
+                                            {
+                                                Text = "不过根据wiki，ppy或许会在本年上线一个游戏内管理功能，所以一起期待吧*摊手*",
+                                                RelativeSizeAxes = Axes.X
+                                            },
+                                            new Box
+                                            {
+                                                Height = 19,
+                                                Colour = Colour4.Black.Opacity(0)
+                                            },
+                                            new OsuSpriteText
+                                            {
+                                                Text = "详情请见: https://github.com/ppy/osu/wiki/User-file-storage",
+                                                RelativeSizeAxes = Axes.X
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         },
                     },

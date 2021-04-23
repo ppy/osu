@@ -46,17 +46,17 @@ namespace osu.Game.Overlays.Mf.Sections
                                 new MfMenuTextBoxContainer
                                 {
                                     Title = "关于Mf-osu",
-                                    d = CreateIntroduceText()
+                                    Child = CreateIntroduceText()
                                 },
                                 new MfMenuTextBoxContainer
                                 {
                                     Title = "Bug反馈/提出建议",
-                                    d = CreateReportIssuesText()
+                                    Child = CreateReportIssuesText()
                                 },
                                 new MfMenuTextBoxContainer
                                 {
                                     Title = "项目引用",
-                                    d = CreateProjectRefsText(),
+                                    Child = CreateProjectRefsText(),
                                 }
                             }
                         },
@@ -77,17 +77,17 @@ namespace osu.Game.Overlays.Mf.Sections
                                 new MfMenuTextBoxContainer
                                 {
                                     Title = "参与过完善该分支的人(按首字母排序)",
-                                    d = CreateStaffText()
+                                    Child = CreateStaffText()
                                 },
                                 new MfMenuTextBoxContainer
                                 {
                                     Title = "注意事项",
-                                    d = CreateAttentionsText()
+                                    Child = CreateAttentionsText()
                                 },
                                 new MfMenuTextBoxContainer
                                 {
                                     Title = "Special Thanks",
-                                    d = CreateSpecialThanksText()
+                                    Child = CreateSpecialThanksText()
                                 }
                             }
                         },
