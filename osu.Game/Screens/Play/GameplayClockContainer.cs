@@ -63,8 +63,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public virtual void Start()
         {
-            // Ensure that the source clock is set.
-            ChangeSource(SourceClock);
+            ensureSourceClockSet();
 
             if (!AdjustableSource.IsRunning)
             {
@@ -100,7 +99,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public virtual void Reset()
         {
-            ChangeSource(SourceClock);
+            ensureSourceClockSet();
             Seek(0);
 
             // Manually stop the source in order to not affect the IsPaused state.
@@ -115,6 +114,15 @@ namespace osu.Game.Screens.Play
         /// </summary>
         /// <param name="sourceClock">The new source.</param>
         protected void ChangeSource(IClock sourceClock) => AdjustableSource.ChangeSource(SourceClock = sourceClock);
+
+        /// <summary>
+        /// Ensures that the <see cref="AdjustableSource"/> is set to <see cref="SourceClock"/>.
+        /// This is usually done before a seek to avoid accidentally seeking only the adjustable source in decoupled mode,
+        /// but not the actual source clock.
+        /// That will pretty much only happen on the very first call of this method, as the source clock is passed in the constructor,
+        /// but it is not yet set on the adjustable source there.
+        /// </summary>
+        private void ensureSourceClockSet() => ChangeSource(SourceClock);
 
         protected override void Update()
         {
