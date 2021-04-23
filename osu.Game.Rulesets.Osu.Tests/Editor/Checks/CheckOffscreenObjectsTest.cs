@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Edit.Checks;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Tests.Beatmaps;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
@@ -30,25 +31,23 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
         [Test]
         public void TestCircleInCenter()
         {
-            var beatmap = new Beatmap<HitObject>
+            assertOk(new Beatmap<HitObject>
             {
                 HitObjects = new List<HitObject>
                 {
                     new HitCircle
                     {
                         StartTime = 3000,
-                        Position = playfield_centre // Playfield is 640 x 480.
+                        Position = playfield_centre
                     }
                 }
-            };
-
-            Assert.That(check.Run(beatmap), Is.Empty);
+            });
         }
 
         [Test]
         public void TestCircleNearEdge()
         {
-            var beatmap = new Beatmap<HitObject>
+            assertOk(new Beatmap<HitObject>
             {
                 HitObjects = new List<HitObject>
                 {
@@ -58,15 +57,13 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                         Position = new Vector2(5, 5)
                     }
                 }
-            };
-
-            Assert.That(check.Run(beatmap), Is.Empty);
+            });
         }
 
         [Test]
         public void TestCircleNearEdgeStackedOffscreen()
         {
-            var beatmap = new Beatmap<HitObject>
+            assertOffscreenCircle(new Beatmap<HitObject>
             {
                 HitObjects = new List<HitObject>
                 {
@@ -77,15 +74,13 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                         StackHeight = 5
                     }
                 }
-            };
-
-            assertOffscreenCircle(beatmap);
+            });
         }
 
         [Test]
         public void TestCircleOffscreen()
         {
-            var beatmap = new Beatmap<HitObject>
+            assertOffscreenCircle(new Beatmap<HitObject>
             {
                 HitObjects = new List<HitObject>
                 {
@@ -95,15 +90,13 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                         Position = new Vector2(0, 0)
                     }
                 }
-            };
-
-            assertOffscreenCircle(beatmap);
+            });
         }
 
         [Test]
         public void TestSliderInCenter()
         {
-            var beatmap = new Beatmap<HitObject>
+            assertOk(new Beatmap<HitObject>
             {
                 HitObjects = new List<HitObject>
                 {
@@ -118,15 +111,13 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                         }),
                     }
                 }
-            };
-
-            Assert.That(check.Run(beatmap), Is.Empty);
+            });
         }
 
         [Test]
         public void TestSliderNearEdge()
         {
-            var beatmap = new Beatmap<HitObject>
+            assertOk(new Beatmap<HitObject>
             {
                 HitObjects = new List<HitObject>
                 {
@@ -141,15 +132,13 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                         }),
                     }
                 }
-            };
-
-            Assert.That(check.Run(beatmap), Is.Empty);
+            });
         }
 
         [Test]
         public void TestSliderNearEdgeStackedOffscreen()
         {
-            var beatmap = new Beatmap<HitObject>
+            assertOffscreenSlider(new Beatmap<HitObject>
             {
                 HitObjects = new List<HitObject>
                 {
@@ -165,15 +154,13 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                         StackHeight = 5
                     }
                 }
-            };
-
-            assertOffscreenSlider(beatmap);
+            });
         }
 
         [Test]
         public void TestSliderOffscreenStart()
         {
-            var beatmap = new Beatmap<HitObject>
+            assertOffscreenSlider(new Beatmap<HitObject>
             {
                 HitObjects = new List<HitObject>
                 {
@@ -188,15 +175,13 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                         }),
                     }
                 }
-            };
-
-            assertOffscreenSlider(beatmap);
+            });
         }
 
         [Test]
         public void TestSliderOffscreenEnd()
         {
-            var beatmap = new Beatmap<HitObject>
+            assertOffscreenSlider(new Beatmap<HitObject>
             {
                 HitObjects = new List<HitObject>
                 {
@@ -211,15 +196,13 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                         }),
                     }
                 }
-            };
-
-            assertOffscreenSlider(beatmap);
+            });
         }
 
         [Test]
         public void TestSliderOffscreenPath()
         {
-            var beatmap = new Beatmap<HitObject>
+            assertOffscreenSlider(new Beatmap<HitObject>
             {
                 HitObjects = new List<HitObject>
                 {
@@ -236,14 +219,17 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                         }),
                     }
                 }
-            };
+            });
+        }
 
-            assertOffscreenSlider(beatmap);
+        private void assertOk(IBeatmap beatmap)
+        {
+            Assert.That(check.Run(beatmap, new TestWorkingBeatmap(beatmap)), Is.Empty);
         }
 
         private void assertOffscreenCircle(IBeatmap beatmap)
         {
-            var issues = check.Run(beatmap).ToList();
+            var issues = check.Run(beatmap, new TestWorkingBeatmap(beatmap)).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues.Single().Template is CheckOffscreenObjects.IssueTemplateOffscreenCircle);
@@ -251,7 +237,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
 
         private void assertOffscreenSlider(IBeatmap beatmap)
         {
-            var issues = check.Run(beatmap).ToList();
+            var issues = check.Run(beatmap, new TestWorkingBeatmap(beatmap)).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues.Single().Template is CheckOffscreenObjects.IssueTemplateOffscreenSlider);

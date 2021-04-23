@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Edit
 {
@@ -128,8 +129,11 @@ namespace osu.Game.Rulesets.Edit
                 case DoubleClickEvent _:
                     return false;
 
-                case MouseButtonEvent _:
-                    return true;
+                case MouseButtonEvent mouse:
+                    // placement blueprints should generally block mouse from reaching underlying components (ie. performing clicks on interface buttons).
+                    // for now, the one exception we want to allow is when using a non-main mouse button when shift is pressed, which is used to trigger object deletion
+                    // while in placement mode.
+                    return mouse.Button == MouseButton.Left || !mouse.ShiftPressed;
 
                 default:
                     return false;

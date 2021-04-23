@@ -31,9 +31,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
             new IssueTemplateOffscreenSlider(this)
         };
 
-        public IEnumerable<Issue> Run(IBeatmap beatmap)
+        public IEnumerable<Issue> Run(IBeatmap playableBeatmap, IWorkingBeatmap workingBeatmap)
         {
-            foreach (var hitobject in beatmap.HitObjects)
+            foreach (var hitobject in playableBeatmap.HitObjects)
             {
                 switch (hitobject)
                 {

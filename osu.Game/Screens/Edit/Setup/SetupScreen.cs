@@ -3,24 +3,12 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    public class SetupScreen : EditorScreen
+    public class SetupScreen : RoundedContentEditorScreen
     {
-        public const int HORIZONTAL_PADDING = 100;
-
-        [Resolved]
-        private OsuColour colours { get; set; }
-
-        [Cached]
-        protected readonly OverlayColourProvider ColourProvider;
-
         [Cached]
         private SectionsContainer<SetupSection> sections = new SectionsContainer<SetupSection>();
 
@@ -30,42 +18,26 @@ namespace osu.Game.Screens.Edit.Setup
         public SetupScreen()
             : base(EditorScreenMode.SongSetup)
         {
-            ColourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            Child = new Container
+            AddRange(new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Padding = new MarginPadding(50),
-                Child = new Container
+                sections = new SectionsContainer<SetupSection>
                 {
+                    FixedHeader = header,
                     RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    CornerRadius = 10,
-                    Children = new Drawable[]
+                    Children = new SetupSection[]
                     {
-                        new Box
-                        {
-                            Colour = ColourProvider.Dark4,
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                        sections = new SectionsContainer<SetupSection>
-                        {
-                            FixedHeader = header,
-                            RelativeSizeAxes = Axes.Both,
-                            Children = new SetupSection[]
-                            {
-                                new ResourcesSection(),
-                                new MetadataSection(),
-                                new DifficultySection(),
-                            }
-                        },
+                        new ResourcesSection(),
+                        new MetadataSection(),
+                        new DifficultySection(),
+                        new ColoursSection()
                     }
-                }
-            };
+                },
+            });
         }
     }
 }
