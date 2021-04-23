@@ -15,10 +15,8 @@ namespace osu.Game.Overlays.Mf.Sections
         [BackgroundDependencyLoader]
         private void load()
         {
-            ChildDrawable = new GridContainer
+            Child = new GridContainer
             {
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre,
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 RowDimensions = new[]
@@ -100,7 +98,7 @@ namespace osu.Game.Overlays.Mf.Sections
 
         protected Drawable CreateIntroduceText()
         {
-            var t = new MfText();
+            var t = new MfLinkFlowContainer();
 
             t.AddLink("Mf-osu", "https://github.com/MATRIX-feather/osu");
             t.AddText("是一个基于osu!lazer(ppy/osu)的分支版本");
@@ -110,7 +108,7 @@ namespace osu.Game.Overlays.Mf.Sections
 
         protected Drawable CreateStaffText()
         {
-            var t = new MfText();
+            var t = new MfLinkFlowContainer();
 
             t.AddUserLink(new User
             {
@@ -141,7 +139,7 @@ namespace osu.Game.Overlays.Mf.Sections
 
         protected Drawable CreateReportIssuesText()
         {
-            var t = new MfText();
+            var t = new MfLinkFlowContainer();
 
             t.AddText("任何与翻译文本、字体大小等有关的问题, 请前往");
             t.AddLink("Mf-osu的issue页面", "https://github.com/MATRIX-feather/osu/issues");
@@ -159,19 +157,15 @@ namespace osu.Game.Overlays.Mf.Sections
 
         protected Drawable CreateAttentionsText()
         {
-            var t = new MfText();
+            var t = new MfLinkFlowContainer();
 
-            t.AddText("“osu!”是ppy的商标，本软件的任何额外功能与ppy无关。");
+            t.AddText("“osu!”是ppy的商标，本软件属于ppy/osu的一个派生分支。");
             t.NewParagraph();
 
             t.AddParagraph("您可以在");
             t.AddLink("这里", "https://github.com/ppy/osu");
             t.AddText("找到原版osu!lazer的源码");
             t.NewParagraph();
-
-            t.AddParagraph("与本项目有关的问题, 请发送邮件至");
-            t.AddLink("midnightcarnival@outlook.com", "mailto:midnightcarnival@outlook.com");
-            t.AddText(", 一般情况下, 本人将会在一周内给予回应");
 
             t.AddParagraph("与本项目二进制发行版有关的问题, 请联系您的二进制发行方。");
 
@@ -180,7 +174,7 @@ namespace osu.Game.Overlays.Mf.Sections
 
         protected Drawable CreateProjectRefsText()
         {
-            var t = new MfText();
+            var t = new MfLinkFlowContainer();
 
             t.AddText("Mf-osu项目在跟进和维护的同时也会尝试");
             t.AddText("添加一些新奇的功能。");
@@ -207,7 +201,7 @@ namespace osu.Game.Overlays.Mf.Sections
 
         protected Drawable CreateSpecialThanksText()
         {
-            var t = new MfText();
+            var t = new MfLinkFlowContainer();
 
             t.AddUserLink(new User
             {

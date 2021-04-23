@@ -1,4 +1,3 @@
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -10,7 +9,6 @@ namespace osu.Game.Overlays.Mf.Header
 {
     public class MfMenuHeaderTabControl : OverlayTabControl<MfMenuSection>
     {
-        public Func<float> GetHeaderDrawHeight;
         public const float HEIGHT = 47;
         private const float bar_height = 2;
 

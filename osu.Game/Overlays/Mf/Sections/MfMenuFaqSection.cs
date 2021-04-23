@@ -8,6 +8,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Mf.TextBox;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Mf.Sections
 {
@@ -30,10 +31,8 @@ namespace osu.Game.Overlays.Mf.Sections
         [BackgroundDependencyLoader]
         private void load()
         {
-            ChildDrawable = new GridContainer
+            Child = new GridContainer
             {
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre,
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 RowDimensions = new[]
@@ -80,6 +79,17 @@ namespace osu.Game.Overlays.Mf.Sections
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         Text = "主界面 > 游玩 > 最 高 机 密 > 文件导入 (请确保设置中'启用Mf自定义UI'选项开启)"
+                                    }
+                                },
+                                new MfMenuDropDownTextBoxContainer
+                                {
+                                    Title = "我想要xxx功能，给你钱你做不?",
+                                    Child = new OsuSpriteText
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Text = "我不做，同时也不接受任何定制客户端的请求，请不要再问我了。",
+                                        Colour = Color4.Gold,
+                                        Font = OsuFont.GetFont(weight: FontWeight.Black)
                                     }
                                 }
                             }
