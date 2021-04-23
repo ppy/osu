@@ -42,7 +42,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// </summary>
         /// <param name="userIds">The players to spectate.</param>
         public MultiSpectatorScreen(int[] userIds)
-            : base(userIds.AsSpan().Slice(0, Math.Min(16, userIds.Length)).ToArray())
+            : base(userIds.Take(PlayerGrid.MAX_PLAYERS).ToArray())
         {
             instances = new PlayerArea[UserIds.Length];
         }
