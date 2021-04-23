@@ -14,7 +14,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync
         /// <summary>
         /// Whether this clock is waiting on frames to continue playback.
         /// </summary>
-        IBindable<bool> WaitingOnFrames { get; }
+        Bindable<bool> WaitingOnFrames { get; }
 
         /// <summary>
         /// Whether this clock is resynchronising to the master clock.

@@ -164,8 +164,7 @@ namespace osu.Game.Tests.OnlinePlay
 
         private class TestSlaveClock : TestManualClock, ISlaveClock
         {
-            public readonly Bindable<bool> WaitingOnFrames = new Bindable<bool>(true);
-            IBindable<bool> ISlaveClock.WaitingOnFrames => WaitingOnFrames;
+            public Bindable<bool> WaitingOnFrames { get; } = new Bindable<bool>(true);
 
             public bool IsCatchingUp { get; set; }
 
