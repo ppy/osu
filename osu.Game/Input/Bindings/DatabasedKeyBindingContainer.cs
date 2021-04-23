@@ -27,9 +27,6 @@ namespace osu.Game.Input.Bindings
         private IQueryable<RealmKeyBinding> realmKeyBindings;
 
         [Resolved]
-        private RealmKeyBindingStore store { get; set; }
-
-        [Resolved]
         private RealmContextFactory realmFactory { get; set; }
 
         public override IEnumerable<IKeyBinding> DefaultKeyBindings => ruleset.CreateInstance().GetDefaultKeyBindings(variant ?? 0);
