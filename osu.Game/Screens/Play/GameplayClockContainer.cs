@@ -100,6 +100,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public virtual void Reset()
         {
+            ChangeSource(SourceClock);
             Seek(0);
 
             // Manually stop the source in order to not affect the IsPaused state.
