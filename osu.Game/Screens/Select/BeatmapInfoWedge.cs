@@ -323,6 +323,48 @@ namespace osu.Game.Screens.Select
                 starRatingDisplay.StarDifficulty = valueChanged.NewValue ?? new StarDifficulty();
             }
 
+            private void refreshModInformation(ValueChangedEvent<IReadOnlyList<Mod>> modsChangedEvent)
+            {
+                settingChangeTracker?.Dispose();
+                settingChangeTracker = new ModSettingChangeTracker(modsChangedEvent.NewValue);
+                settingChangeTracker.SettingChanged += _ => refreshBPMLabel(modsChangedEvent.NewValue);
+                refreshBPMLabel(modsChangedEvent.NewValue);
+            }
+
+            private void setMetadata(string source)
+            {
+                ArtistLabel.Text = artistBinding.Value;
+                TitleLabel.Text = string.IsNullOrEmpty(source) ? titleBinding.Value : source + " — " + titleBinding.Value;
+            }
+
+            private void addInfoLabels()
+            {
+                if (beatmap.Beatmap?.HitObjects?.Any() != true)
+                    return;
+
+                infoLabelContainer.Children = new Drawable[]
+                {
+                    new InfoLabel(new BeatmapStatistic
+                    {
+                        Name = "Length",
+                        CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Length),
+                        Content = TimeSpan.FromMilliseconds(beatmap.BeatmapInfo.Length).ToString(@"m\:ss"),
+                    }),
+                    bpmLabelContainer = new Container
+                    {
+                        AutoSizeAxes = Axes.Both,
+                    },
+                    new FillFlowContainer
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Spacing = new Vector2(20, 0),
+                        Children = getRulesetInfoLabels()
+                    }
+                };
+
+                mods.BindValueChanged(refreshModInformation, true);
+            }
+
             private InfoLabel[] getRulesetInfoLabels()
             {
                 try
@@ -377,48 +419,6 @@ namespace osu.Game.Screens.Select
                 });
             }
 
-            private void setMetadata(string source)
-            {
-                ArtistLabel.Text = artistBinding.Value;
-                TitleLabel.Text = string.IsNullOrEmpty(source) ? titleBinding.Value : source + " — " + titleBinding.Value;
-            }
-
-            private void addInfoLabels()
-            {
-                if (beatmap.Beatmap?.HitObjects?.Any() != true)
-                    return;
-
-                infoLabelContainer.Children = new Drawable[]
-                {
-                    new InfoLabel(new BeatmapStatistic
-                    {
-                        Name = "Length",
-                        CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Length),
-                        Content = TimeSpan.FromMilliseconds(beatmap.BeatmapInfo.Length).ToString(@"m\:ss"),
-                    }),
-                    bpmLabelContainer = new Container
-                    {
-                        AutoSizeAxes = Axes.Both,
-                    },
-                    new FillFlowContainer
-                    {
-                        AutoSizeAxes = Axes.Both,
-                        Spacing = new Vector2(20, 0),
-                        Children = getRulesetInfoLabels()
-                    }
-                };
-
-                mods.BindValueChanged(refreshModInformation, true);
-            }
-
-            private void refreshModInformation(ValueChangedEvent<IReadOnlyList<Mod>> modsChangedEvent)
-            {
-                settingChangeTracker?.Dispose();
-                settingChangeTracker = new ModSettingChangeTracker(modsChangedEvent.NewValue);
-                settingChangeTracker.SettingChanged += _ => refreshBPMLabel(modsChangedEvent.NewValue);
-                refreshBPMLabel(modsChangedEvent.NewValue);
-            }
-
             private OsuSpriteText[] getMapper(BeatmapMetadata metadata)
             {
                 if (string.IsNullOrEmpty(metadata.Author?.Username))
@@ -437,6 +437,71 @@ namespace osu.Game.Screens.Select
                         Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 15),
                     }
                 };
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+                settingChangeTracker?.Dispose();
+            }
+
+            public class InfoLabel : Container, IHasTooltip
+            {
+                public string TooltipText { get; }
+
+                public InfoLabel(BeatmapStatistic statistic)
+                {
+                    TooltipText = statistic.Name;
+                    AutoSizeAxes = Axes.Both;
+
+                    Children = new Drawable[]
+                    {
+                        new Container
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Size = new Vector2(20),
+                            Children = new[]
+                            {
+                                new SpriteIcon
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = Color4Extensions.FromHex(@"441288"),
+                                    Icon = FontAwesome.Solid.Square,
+                                    Rotation = 45,
+                                },
+                                new SpriteIcon
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = Color4Extensions.FromHex(@"f7dd55"),
+                                    Icon = FontAwesome.Regular.Circle,
+                                    Size = new Vector2(0.8f)
+                                },
+                                statistic.CreateIcon().With(i =>
+                                {
+                                    i.Anchor = Anchor.Centre;
+                                    i.Origin = Anchor.Centre;
+                                    i.RelativeSizeAxes = Axes.Both;
+                                    i.Colour = Color4Extensions.FromHex(@"f7dd55");
+                                    i.Size = new Vector2(0.64f);
+                                }),
+                            }
+                        },
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Colour = new Color4(255, 221, 85, 255),
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17),
+                            Margin = new MarginPadding { Left = 30 },
+                            Text = statistic.Content,
+                        }
+                    };
+                }
             }
 
             private class DifficultyColourBar : Container
@@ -500,71 +565,6 @@ namespace osu.Game.Screens.Select
                     base.Dispose(isDisposing);
                     cancellationTokenSource?.Cancel();
                 }
-            }
-
-            public class InfoLabel : Container, IHasTooltip
-            {
-                public string TooltipText { get; }
-
-                public InfoLabel(BeatmapStatistic statistic)
-                {
-                    TooltipText = statistic.Name;
-                    AutoSizeAxes = Axes.Both;
-
-                    Children = new Drawable[]
-                    {
-                        new Container
-                        {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Size = new Vector2(20),
-                            Children = new[]
-                            {
-                                new SpriteIcon
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4Extensions.FromHex(@"441288"),
-                                    Icon = FontAwesome.Solid.Square,
-                                    Rotation = 45,
-                                },
-                                new SpriteIcon
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4Extensions.FromHex(@"f7dd55"),
-                                    Icon = FontAwesome.Regular.Circle,
-                                    Size = new Vector2(0.8f)
-                                },
-                                statistic.CreateIcon().With(i =>
-                                {
-                                    i.Anchor = Anchor.Centre;
-                                    i.Origin = Anchor.Centre;
-                                    i.RelativeSizeAxes = Axes.Both;
-                                    i.Colour = Color4Extensions.FromHex(@"f7dd55");
-                                    i.Size = new Vector2(0.64f);
-                                }),
-                            }
-                        },
-                        new OsuSpriteText
-                        {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Colour = new Color4(255, 221, 85, 255),
-                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17),
-                            Margin = new MarginPadding { Left = 30 },
-                            Text = statistic.Content,
-                        }
-                    };
-                }
-            }
-
-            protected override void Dispose(bool isDisposing)
-            {
-                base.Dispose(isDisposing);
-                settingChangeTracker?.Dispose();
             }
         }
     }
