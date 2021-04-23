@@ -23,7 +23,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiplayerSpectator : MultiplayerTestScene
+    public class TestSceneMultiSpectatorScreen : MultiplayerTestScene
     {
         [Cached(typeof(SpectatorStreamingClient))]
         private TestSpectatorStreamingClient streamingClient = new TestSpectatorStreamingClient();
