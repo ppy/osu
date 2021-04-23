@@ -13,7 +13,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Default
 {
-    public class MainCirclePiece : CompositeDrawable
+    public class MainCirclePiece : CompositeDrawable, IMainCirclePiece
     {
         private readonly CirclePiece circle;
         private readonly RingPiece ring;
@@ -67,12 +67,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             }, true);
 
             indexInCurrentCombo.BindValueChanged(index => number.Text = (index.NewValue + 1).ToString(), true);
-
-            drawableObject.ApplyCustomUpdateState += updateState;
-            updateState(drawableObject, drawableObject.State.Value);
         }
 
-        private void updateState(DrawableHitObject drawableObject, ArmedState state)
+        public void Animate(ArmedState state)
         {
             using (BeginAbsoluteSequence(drawableObject.StateUpdateTime))
                 glow.FadeOut(400);
