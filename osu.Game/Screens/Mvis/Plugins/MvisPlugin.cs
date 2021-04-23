@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -67,11 +66,9 @@ namespace osu.Game.Screens.Mvis.Plugins
 
         public abstract int Version { get; }
 
-        [CanBeNull]
         [Resolved(CanBeNull = true)]
         private MvisScreen mvisScreen { get; set; }
 
-        [CanBeNull]
         protected MvisScreen MvisScreen => mvisScreen;
 
         #region 异步加载任务相关

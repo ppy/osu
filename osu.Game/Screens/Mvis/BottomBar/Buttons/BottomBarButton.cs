@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
         protected FillFlowContainer ContentFillFlow;
         protected virtual string BackgroundTextureName => "MButtonSquare-background";
 
-        protected virtual Drawable CreateBackgroundTexture => new SkinnableSprite(BackgroundTextureName, confineMode: ConfineMode.ScaleToFit)
+        protected virtual Drawable CreateBackgroundDrawable => new SkinnableSprite(BackgroundTextureName, confineMode: ConfineMode.ScaleToFit)
         {
             RelativeSizeAxes = Axes.Both,
             CentreComponent = false
@@ -102,7 +102,7 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
                             RelativeSizeAxes = Axes.Both,
                             Colour = ColourProvider.Background3
                         },
-                        CreateBackgroundTexture,
+                        CreateBackgroundDrawable,
                         ContentFillFlow = new FillFlowContainer
                         {
                             Margin = new MarginPadding { Left = 15, Right = 15 },

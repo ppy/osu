@@ -8,16 +8,18 @@ namespace Mvis.Plugin.RulesetPanel.Objects.Helpers
     public class CurrentBeatmapProvider : Container
     {
         [Resolved]
-        private Bindable<WorkingBeatmap> working { get; set; }
+        private RulesetPanel panel { get; set; }
 
         protected Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
-        protected override void LoadComplete()
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            base.LoadComplete();
-            Beatmap.BindTo(working);
-            Beatmap.BindValueChanged(OnBeatmapChanged, true);
+            panel.OnMvisBeatmapChanged += onMvisBeatmapChanged;
+            Beatmap.BindValueChanged(OnBeatmapChanged);
         }
+
+        private void onMvisBeatmapChanged(WorkingBeatmap b) => Beatmap.Value = b;
 
         protected virtual void OnBeatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)
         {
@@ -25,14 +27,14 @@ namespace Mvis.Plugin.RulesetPanel.Objects.Helpers
 
         public virtual void StopResponseOnBeatmapChanges()
         {
-            Beatmap.UnbindFrom(working);
+            panel.OnMvisBeatmapChanged -= onMvisBeatmapChanged;
             Beatmap.Disabled = false;
         }
 
         public virtual void ResponseOnBeatmapChanges()
         {
             StopResponseOnBeatmapChanges();
-            Beatmap.BindTo(working);
+            panel.OnMvisBeatmapChanged += onMvisBeatmapChanged;
         }
     }
 }

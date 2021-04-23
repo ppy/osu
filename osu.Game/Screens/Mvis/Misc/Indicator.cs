@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Mvis.Misc
         private Box fgBox;
         private InputManager inputManager;
 
-        private Container content = new Container
+        private readonly Container content = new Container
         {
             AutoSizeAxes = Axes.Both,
             Anchor = Anchor.BottomCentre,

@@ -8,17 +8,10 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
     public class BottomBarOverlayLockSwitchButton : BottomBarSwitchButton
     {
         private const float animate_duration = 100;
-        private bool disabled;
 
         public bool Disabled
         {
-            get => disabled;
-            set
-            {
-                this.FadeColour(value ? Color4.Gray : Color4.White, 300, Easing.OutQuint);
-
-                disabled = value;
-            }
+            set => this.FadeColour(value ? Color4.Gray : Color4.White, 300, Easing.OutQuint);
         }
 
         public BottomBarOverlayLockSwitchButton()

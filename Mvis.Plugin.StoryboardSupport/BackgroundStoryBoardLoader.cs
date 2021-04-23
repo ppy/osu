@@ -218,7 +218,7 @@ namespace Mvis.Plugin.StoryboardSupport
         {
             if (MvisScreen != null && ContentLoaded)
             {
-                MvisScreen.HideTriangles.Value = targetBeatmap.Storyboard.HasDrawable;
+                MvisScreen.HideTriangles.Value = NeedToHideTriangles.Value;
                 MvisScreen.HideScreenBackground.Value = targetBeatmap.Storyboard.ReplacesBackground;
             }
 

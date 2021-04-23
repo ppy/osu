@@ -103,7 +103,6 @@ namespace osu.Game.Screens.Mvis
         /// <summary>
         /// 谱面变更时调用<br/><br/>
         /// 传递: 当前谱面(WorkingBeatmap)<br/>
-        /// 插件开发建议使用此Action节省一系列的时间
         /// </summary>
         public Action<WorkingBeatmap> OnBeatmapChanged;
 
@@ -239,7 +238,7 @@ namespace osu.Game.Screens.Mvis
 
         private readonly Bindable<UserActivity> activity = new Bindable<UserActivity>();
 
-        private DrawableTrack track => audioControlProvider.GetCurrentTrack();
+        public DrawableTrack CurrentTrack => audioControlProvider.GetCurrentTrack();
 
         private readonly BindableList<MvisPlugin> loadList = new BindableList<MvisPlugin>();
 
@@ -461,7 +460,7 @@ namespace osu.Game.Screens.Mvis
                                 loopToggleButton = new ToggleLoopButton
                                 {
                                     ButtonIcon = FontAwesome.Solid.Undo,
-                                    Action = () => track.Looping = loopToggleButton.ToggleableValue.Value,
+                                    Action = () => CurrentTrack.Looping = loopToggleButton.ToggleableValue.Value,
                                     TooltipText = "单曲循环",
                                 },
                                 soloButton = new BottomBarButton
@@ -492,6 +491,62 @@ namespace osu.Game.Screens.Mvis
                 TooltipText = "锁定变更",
                 Action = showPluginEntriesTemporary
             });
+
+            //设置键位
+            setupKeyBindings();
+
+            //当插件卸载时调用onPluginUnload
+            pluginManager.OnPluginUnLoad += onPluginUnLoad;
+
+            //添加插件
+            foreach (var pl in pluginManager.GetAllPlugins(true))
+            {
+                try
+                {
+                    //决定要把插件放在何处
+                    switch (pl.Target)
+                    {
+                        case MvisPlugin.TargetLayer.Background:
+                            background.Add(pl);
+                            break;
+
+                        case MvisPlugin.TargetLayer.Foreground:
+                            foreground.Add(pl);
+                            break;
+                    }
+
+                    var pluginSidebarPage = pl.CreateSidebarPage();
+
+                    //如果插件有侧边栏页面
+                    if (pluginSidebarPage != null)
+                    {
+                        sidebar.Add(pluginSidebarPage);
+                        var btn = pluginSidebarPage.CreateBottomBarButton();
+
+                        //如果插件的侧边栏页面有入口按钮
+                        if (btn != null)
+                        {
+                            btn.Action = () => updateSidebarState(pluginSidebarPage);
+                            btn.TooltipText += $" ({pluginSidebarPage.ShortcutKey})";
+
+                            bottomBar.PluginEntriesFillFlow.Add(btn);
+                        }
+
+                        //如果插件的侧边栏页面有调用快捷键
+                        if (pluginSidebarPage.ShortcutKey != Key.Unknown)
+                        {
+                            pluginKeyBindings[pluginSidebarPage.ShortcutKey] = () =>
+                            {
+                                if (!pl.Disabled.Value) btn?.Click();
+                            };
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, $"在添加 {pl.Name} 时出现问题, 请联系你的插件提供方");
+                }
+            }
 
             //todo: 找出为啥audioControlProvider会在被赋值前访问
             audioControlProvider = musicControllerWrapper;
@@ -554,62 +609,6 @@ namespace osu.Game.Screens.Mvis
 
             HideScreenBackground.BindValueChanged(_ => applyBackgroundBrightness());
 
-            //设置键位
-            setupKeyBindings();
-
-            //添加插件
-            foreach (var pl in pluginManager.GetAllPlugins(true))
-            {
-                try
-                {
-                    //决定要把插件放在何处
-                    switch (pl.Target)
-                    {
-                        case MvisPlugin.TargetLayer.Background:
-                            background.Add(pl);
-                            break;
-
-                        case MvisPlugin.TargetLayer.Foreground:
-                            foreground.Add(pl);
-                            break;
-                    }
-
-                    var pluginSidebarPage = pl.CreateSidebarPage();
-
-                    //如果插件有侧边栏页面
-                    if (pluginSidebarPage != null)
-                    {
-                        sidebar.Add(pluginSidebarPage);
-                        var btn = pluginSidebarPage.CreateBottomBarButton();
-
-                        //如果插件的侧边栏页面有入口按钮
-                        if (btn != null)
-                        {
-                            btn.Action = () => updateSidebarState(pluginSidebarPage);
-                            btn.TooltipText += $" ({pluginSidebarPage.ShortcutKey})";
-
-                            bottomBar.PluginEntriesFillFlow.Add(btn);
-                        }
-
-                        //如果插件的侧边栏页面有调用快捷键
-                        if (pluginSidebarPage.ShortcutKey != Key.Unknown)
-                        {
-                            pluginKeyBindings[pluginSidebarPage.ShortcutKey] = () =>
-                            {
-                                if (!pl.Disabled.Value) btn?.Click();
-                            };
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    Logger.Error(e, $"在添加 {pl.Name} 时出现问题, 请联系你的插件提供方");
-                }
-            }
-
-            //当插件卸载时调用onPluginUnload
-            pluginManager.OnPluginUnLoad += onPluginUnLoad;
-
             //把lockButton放在中间
             bottomBar.CentreBotton(lockButton);
 
@@ -632,7 +631,7 @@ namespace osu.Game.Screens.Mvis
 
             //触发一次onBeatmapChanged和onTrackRunningToggle
             Beatmap.BindValueChanged(onBeatmapChanged, true);
-            OnTrackRunningToggle?.Invoke(track.IsRunning);
+            OnTrackRunningToggle?.Invoke(CurrentTrack.IsRunning);
 
             //界面动画
             bottomBar.MoveToY(bottomBar.Height + 10).FadeOut();
@@ -681,6 +680,7 @@ namespace osu.Game.Screens.Mvis
                 if (sc is PluginSidebarPage plsp && plsp.Plugin == pl)
                 {
                     sidebar.Remove(plsp); //移除这个页面
+                    pluginKeyBindings.Remove(plsp.ShortcutKey); //移除快捷键
 
                     //查找与plsp对应的底栏入口
                     foreach (var d in bottomBar.PluginEntriesFillFlow)
@@ -749,9 +749,9 @@ namespace osu.Game.Screens.Mvis
         {
             base.Update();
 
-            trackRunning.Value = track.IsRunning;
-            progressBar.CurrentTime = track.CurrentTime;
-            progressBar.EndTime = track.Length;
+            trackRunning.Value = CurrentTrack.IsRunning;
+            progressBar.CurrentTime = CurrentTrack.CurrentTime;
+            progressBar.EndTime = CurrentTrack.Length;
         }
 
         public override void OnEntering(IScreen last)
@@ -777,8 +777,8 @@ namespace osu.Game.Screens.Mvis
         public override bool OnExiting(IScreen next)
         {
             //重置Track
-            track.ResetSpeedAdjustments();
-            track.Looping = false;
+            CurrentTrack.ResetSpeedAdjustments();
+            CurrentTrack.Looping = false;
             Beatmap.Disabled = false;
 
             //恢复mods
@@ -802,7 +802,7 @@ namespace osu.Game.Screens.Mvis
 
         public override void OnSuspending(IScreen next)
         {
-            track.ResetSpeedAdjustments();
+            CurrentTrack.ResetSpeedAdjustments();
             Beatmap.Disabled = false;
 
             //恢复mods
@@ -830,7 +830,7 @@ namespace osu.Game.Screens.Mvis
             this.FadeIn(duration * 0.6f)
                 .ScaleTo(1, duration * 0.6f, Easing.OutQuint);
 
-            track.ResetSpeedAdjustments();
+            CurrentTrack.ResetSpeedAdjustments();
             applyTrackAdjustments();
             updateBackground(Beatmap.Value);
 
@@ -925,7 +925,7 @@ namespace osu.Game.Screens.Mvis
         private void togglePause()
         {
             audioControlProvider?.TogglePause();
-            OnTrackRunningToggle?.Invoke(track.IsRunning);
+            OnTrackRunningToggle?.Invoke(CurrentTrack.IsRunning);
         }
 
         private void prevTrack() =>
@@ -950,10 +950,10 @@ namespace osu.Game.Screens.Mvis
 
         private void applyTrackAdjustments()
         {
-            track.ResetSpeedAdjustments();
-            track.Looping = loopToggleButton.ToggleableValue.Value;
-            track.RestartPoint = 0;
-            track.AddAdjustment(adjustFreq.Value ? AdjustableProperty.Frequency : AdjustableProperty.Tempo, musicSpeed);
+            CurrentTrack.ResetSpeedAdjustments();
+            CurrentTrack.Looping = loopToggleButton.ToggleableValue.Value;
+            CurrentTrack.RestartPoint = 0;
+            CurrentTrack.AddAdjustment(adjustFreq.Value ? AdjustableProperty.Frequency : AdjustableProperty.Tempo, musicSpeed);
 
             modRateAdjust.SpeedChange.Value = musicSpeed.Value;
 

@@ -20,10 +20,10 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
         protected virtual string SwitchOnBgTextureName => "MButtonSwitchOn-background";
         protected virtual ConfineMode TextureConfineMode => ConfineMode.ScaleToFit;
 
-        protected virtual Color4 ActivateColor => ColourProvider.Highlight1;
-        protected virtual Color4 InActivateColor => ColourProvider.Background3;
+        protected Color4 ActivateColor => ColourProvider.Highlight1;
+        protected Color4 InActivateColor => ColourProvider.Background3;
 
-        protected override Drawable CreateBackgroundTexture => new Container
+        protected override Drawable CreateBackgroundDrawable => new Container
         {
             RelativeSizeAxes = Axes.Both,
             Children = new Drawable[]
