@@ -11,6 +11,6 @@ namespace osu.Game.Database
     {
         [JsonIgnore]
         [PrimaryKey]
-        public Guid ID { get; set; }
+        Guid ID { get; set; }
     }
 }

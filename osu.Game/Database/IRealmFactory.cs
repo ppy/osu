@@ -10,7 +10,7 @@ namespace osu.Game.Database
         /// <summary>
         /// The main realm context, bound to the update thread.
         /// </summary>
-        public Realm Context { get; }
+        Realm Context { get; }
 
         /// <summary>
         /// Get a fresh context for read usage.
