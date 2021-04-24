@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         protected override Container<Drawable> Content => content ?? base.Content;
 
         [Cached]
-        protected readonly Bindable<bool> configColourCodedNotes = new Bindable<bool>();
+        protected readonly Bindable<bool> ConfigColourCodedNotes = new Bindable<bool>();
 
         protected ManiaInputTestScene(int keys)
         {
@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         private void load(RulesetConfigCache configCache)
         {
             var config = (ManiaRulesetConfigManager)configCache.GetConfigFor(Ruleset.Value.CreateInstance());
-            config.BindWith(ManiaRulesetSetting.ColourCodedNotes, configColourCodedNotes);
+            config.BindWith(ManiaRulesetSetting.ColourCodedNotes, ConfigColourCodedNotes);
         }
 
         private class LocalInputManager : ManiaInputManager
