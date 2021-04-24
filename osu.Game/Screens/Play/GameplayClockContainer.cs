@@ -116,13 +116,17 @@ namespace osu.Game.Screens.Play
         protected void ChangeSource(IClock sourceClock) => AdjustableSource.ChangeSource(SourceClock = sourceClock);
 
         /// <summary>
-        /// Ensures that the <see cref="AdjustableSource"/> is set to <see cref="SourceClock"/>.
+        /// Ensures that the <see cref="AdjustableSource"/> is set to <see cref="SourceClock"/>, if it hasn't been given a source yet.
         /// This is usually done before a seek to avoid accidentally seeking only the adjustable source in decoupled mode,
         /// but not the actual source clock.
         /// That will pretty much only happen on the very first call of this method, as the source clock is passed in the constructor,
         /// but it is not yet set on the adjustable source there.
         /// </summary>
-        private void ensureSourceClockSet() => ChangeSource(SourceClock);
+        private void ensureSourceClockSet()
+        {
+            if (AdjustableSource.Source == null)
+                ChangeSource(SourceClock);
+        }
 
         protected override void Update()
         {
