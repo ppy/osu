@@ -146,7 +146,7 @@ namespace osu.Game.Screens.Menu
             buttonsPlay.Add(new Button(@"游玩列表", @"button-generic-select", OsuIcon.Charts, new Color4(94, 63, 186, 255), onPlaylists, 0, Key.L));
             buttonsPlay.ForEach(b => b.VisibleState = ButtonSystemState.Play);
 
-            buttonsP2C.Add(new Button(@"最 高 机 密", @"osu-logo-select", FontAwesome.Solid.QuestionCircle, new Color4(0, 86, 73, 255), () => State = ButtonSystemState.Custom));
+            buttonsP2C.Add(new Button(@"最 高 机 密", @"button-play-select", FontAwesome.Solid.QuestionCircle, new Color4(0, 86, 73, 255), () => State = ButtonSystemState.Custom));
             buttonsP2C.ForEach(b => b.VisibleState = ButtonSystemState.Play);
 
             buttonsTopLevel.Add(new Button(@"游玩", @"button-play-select", OsuIcon.Logo, new Color4(102, 68, 204, 255), () => State = ButtonSystemState.Play, WEDGE_WIDTH, Key.P));

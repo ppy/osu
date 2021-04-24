@@ -158,7 +158,7 @@ namespace osu.Game.Screens.Mvis.SideBar.PluginsPage
                 fillFlow.Add(new OsuSpriteText
                 {
                     Colour = Color4.Gold,
-                    Text = "插件版本不匹配",
+                    Text = Plugin.Version < manager.PluginVersion ? "为历史版本打造" : "为未来版本打造",
                     Font = OsuFont.GetFont(weight: FontWeight.Bold)
                 });
             }

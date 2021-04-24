@@ -41,6 +41,32 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
             checkPlayingUserCount(0);
         }
 
+        [Test]
+        public void TestPlayingUsersUpdatedOnJoin()
+        {
+            AddStep("leave room", () => Client.LeaveRoom());
+            AddUntilStep("wait for room part", () => Client.Room == null);
+
+            AddStep("create room initially in gameplay", () =>
+            {
+                Room.RoomID.Value = null;
+                Client.RoomSetupAction = room =>
+                {
+                    room.State = MultiplayerRoomState.Playing;
+                    room.Users.Add(new MultiplayerRoomUser(55)
+                    {
+                        User = new User { Id = 55 },
+                        State = MultiplayerUserState.Playing
+                    });
+                };
+
+                RoomManager.CreateRoom(Room);
+            });
+
+            AddUntilStep("wait for room join", () => Client.Room != null);
+            checkPlayingUserCount(1);
+        }
+
         private void checkPlayingUserCount(int expectedCount)
             => AddAssert($"{"user".ToQuantity(expectedCount)} playing", () => Client.CurrentMatchPlayingUserIds.Count == expectedCount);
 

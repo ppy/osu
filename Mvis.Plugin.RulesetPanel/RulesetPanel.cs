@@ -1,3 +1,4 @@
+using System;
 using Mvis.Plugin.RulesetPanel.Config;
 using Mvis.Plugin.RulesetPanel.Objects;
 using Mvis.Plugin.RulesetPanel.UI;
@@ -6,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Mvis.Plugins;
 using osu.Game.Screens.Mvis.Plugins.Config;
@@ -17,7 +19,7 @@ namespace Mvis.Plugin.RulesetPanel
     public class RulesetPanel : BindableControlledPlugin
     {
         public override TargetLayer Target => TargetLayer.Foreground;
-        public override int Version => 1;
+        public override int Version => 2;
 
         public RulesetPanel()
         {
@@ -49,6 +51,7 @@ namespace Mvis.Plugin.RulesetPanel
         {
             var config = (RulesetPanelConfigManager)Dependencies.Get<MvisPluginManager>().GetConfigManager(this);
             DependenciesContainer.Cache(config);
+            DependenciesContainer.Cache(this);
 
             config.BindWith(RulesetPanelSetting.ShowParticles, showParticles);
             config.BindWith(RulesetPanelSetting.EnableRulesetPanel, Value);
@@ -63,8 +66,12 @@ namespace Mvis.Plugin.RulesetPanel
                     if (Value.Value)
                         this.FadeTo(1, 750, Easing.OutQuint);
                 };
+                MvisScreen.OnBeatmapChanged += onMvisBeatmapChanged;
             }
         }
+
+        public Action<WorkingBeatmap> OnMvisBeatmapChanged;
+        private void onMvisBeatmapChanged(WorkingBeatmap b) => OnMvisBeatmapChanged?.Invoke(b);
 
         private void onIdleAlphaChanged(ValueChangedEvent<float> v)
         {
@@ -114,15 +121,13 @@ namespace Mvis.Plugin.RulesetPanel
                 }
             }, true);
 
-            if (MvisScreen != null)
+            MvisScreen.OnScreenExiting += beatmapLogo.StopResponseOnBeatmapChanges;
+            MvisScreen.OnScreenSuspending += beatmapLogo.StopResponseOnBeatmapChanges;
+            MvisScreen.OnScreenResuming += () =>
             {
-                MvisScreen.OnScreenExiting += beatmapLogo.StopResponseOnBeatmapChanges;
-                MvisScreen.OnScreenSuspending += beatmapLogo.StopResponseOnBeatmapChanges;
-                MvisScreen.OnScreenResuming += () =>
-                {
-                    if (!Disabled.Value) beatmapLogo.ResponseOnBeatmapChanges();
-                };
-            }
+                if (!Disabled.Value) beatmapLogo.ResponseOnBeatmapChanges();
+            };
+            onMvisBeatmapChanged(MvisScreen.Beatmap.Value);
 
             return true;
         }
@@ -148,6 +153,9 @@ namespace Mvis.Plugin.RulesetPanel
 
         public override void UnLoad()
         {
+            MvisScreen.OnBeatmapChanged -= onMvisBeatmapChanged;
+            MvisScreen.OnScreenExiting -= beatmapLogo.StopResponseOnBeatmapChanges;
+            MvisScreen.OnScreenSuspending -= beatmapLogo.StopResponseOnBeatmapChanges;
             Value.UnbindAll();
             Disable();
 

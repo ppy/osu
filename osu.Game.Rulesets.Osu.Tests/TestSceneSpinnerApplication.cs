@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Position = new Vector2(256, 192),
                 ComboIndex = 1,
                 Duration = 1000,
-            }), null));
+            })));
 
             AddAssert("rotation is reset", () => dho.Result.RateAdjustedRotation == 0);
         }

@@ -13,6 +13,9 @@ namespace Mvis.Plugin.Example.Sidebar
         {
         }
 
+        public override PluginBottomBarButton CreateBottomBarButton()
+            => new ExampleBottomBarButton(this);
+
         protected override void InitContent(MvisPlugin plugin)
         {
             var pl = (ExamplePlugin)plugin;

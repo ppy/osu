@@ -324,6 +324,33 @@ namespace osu.Game.Rulesets.Mania.Tests
             assertTailJudgement(HitResult.Ok);
         }
 
+        [Test]
+        public void TestZeroLength()
+        {
+            var beatmap = new Beatmap<ManiaHitObject>
+            {
+                HitObjects =
+                {
+                    new HoldNote
+                    {
+                        StartTime = 1000,
+                        Duration = 0,
+                        Column = 0,
+                    },
+                },
+                BeatmapInfo = { Ruleset = new ManiaRuleset().RulesetInfo },
+            };
+
+            performTest(new List<ReplayFrame>
+            {
+                new ManiaReplayFrame(beatmap.HitObjects[0].StartTime, ManiaAction.Key1),
+                new ManiaReplayFrame(beatmap.HitObjects[0].GetEndTime() + 1),
+            }, beatmap);
+
+            AddAssert("hold note hit", () => judgementResults.Where(j => beatmap.HitObjects[0].NestedHitObjects.Contains(j.HitObject))
+                                                             .All(j => j.Type.IsHit()));
+        }
+
         private void assertHeadJudgement(HitResult result)
             => AddAssert($"head judged as {result}", () => judgementResults.First(j => j.HitObject is Note).Type == result);
 

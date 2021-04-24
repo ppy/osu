@@ -9,6 +9,7 @@ using osu.Game.Screens.Mvis.Misc;
 using osu.Game.Screens.Mvis.SideBar;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Mvis.Plugins
 {
@@ -22,6 +23,9 @@ namespace osu.Game.Screens.Mvis.Plugins
         protected virtual void InitContent(MvisPlugin plugin)
         {
         }
+
+        public virtual PluginBottomBarButton CreateBottomBarButton() => null;
+        public virtual Key ShortcutKey => Key.Unknown;
 
         private bool contentInit;
 

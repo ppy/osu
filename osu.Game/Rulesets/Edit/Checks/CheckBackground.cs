@@ -18,9 +18,9 @@ namespace osu.Game.Rulesets.Edit.Checks
             new IssueTemplateDoesNotExist(this)
         };
 
-        public IEnumerable<Issue> Run(IBeatmap beatmap)
+        public IEnumerable<Issue> Run(IBeatmap playableBeatmap, IWorkingBeatmap workingBeatmap)
         {
-            if (beatmap.Metadata.BackgroundFile == null)
+            if (playableBeatmap.Metadata.BackgroundFile == null)
             {
                 yield return new IssueTemplateNoneSet(this).Create();
 
@@ -29,13 +29,13 @@ namespace osu.Game.Rulesets.Edit.Checks
 
             // If the background is set, also make sure it still exists.
 
-            var set = beatmap.BeatmapInfo.BeatmapSet;
-            var file = set.Files.FirstOrDefault(f => f.Filename == beatmap.Metadata.BackgroundFile);
+            var set = playableBeatmap.BeatmapInfo.BeatmapSet;
+            var file = set.Files.FirstOrDefault(f => f.Filename == playableBeatmap.Metadata.BackgroundFile);
 
             if (file != null)
                 yield break;
 
-            yield return new IssueTemplateDoesNotExist(this).Create(beatmap.Metadata.BackgroundFile);
+            yield return new IssueTemplateDoesNotExist(this).Create(playableBeatmap.Metadata.BackgroundFile);
         }
 
         public class IssueTemplateNoneSet : IssueTemplate

@@ -279,8 +279,8 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
         /// </summary>
         public void Reset(bool force = false)
         {
-            if (State.Value != ActiveState.Disabled && State.Value != ActiveState.Active
-                || State.Value != ActiveState.Disabled && force)
+            if ((State.Value != ActiveState.Disabled && State.Value != ActiveState.Active)
+                || (State.Value != ActiveState.Disabled && force))
             {
                 State.Value = ActiveState.Idle;
             }

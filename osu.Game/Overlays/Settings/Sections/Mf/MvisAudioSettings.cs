@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
-using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Mvis.Plugins;
@@ -62,9 +61,8 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
 
                     var type = pl.GetType();
 
-                    if ($"{type.Namespace}+{type.Name}" == currentAudioControlPlugin)
+                    if (currentAudioControlPlugin == $"{type.Namespace}+{type.Name}")
                     {
-                        Logger.Log("Get!");
                         dropdown.Current.Value = pacp;
                     }
                 }

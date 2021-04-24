@@ -160,7 +160,7 @@ namespace Mvis.Plugin.FakeEditor
             => new EditorContainer(beatmap);
 
         protected override bool PostInit() => true;
-        public override int Version => 1;
+        public override int Version => 2;
 
         private void updateSamplePlaybackDisabled() =>
             samplePlaybackDisabled.Value = !Value.Value || !musicController.CurrentTrack.IsRunning;

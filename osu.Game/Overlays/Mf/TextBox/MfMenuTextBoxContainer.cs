@@ -16,18 +16,13 @@ namespace osu.Game.Overlays.Mf.TextBox
 {
     public class MfMenuTextBoxContainer : Container
     {
-        public Drawable d;
-        public float HoverScale = 1.025f;
         public string Title;
-
-        private FillFlowContainer contentFillFlow;
 
         protected virtual bool Clickable => false;
         protected BindableBool AllowTransformBasicEffects = new BindableBool();
-        protected BindableFloat borderThickness = new BindableFloat();
-        protected float cornerRadius = 12.5f;
-        protected float Duration = 500;
-        protected Easing Easing = Easing.OutQuint;
+        protected BindableFloat ContentBorderThickness = new BindableFloat();
+        protected const float ANIMATION_DURATION = 500;
+        protected const Easing ANIMATION_EASING = Easing.OutQuint;
 
         protected EdgeEffectParameters EdgeEffectNormal = new EdgeEffectParameters
         {
@@ -44,17 +39,29 @@ namespace osu.Game.Overlays.Mf.TextBox
             Colour = Color4.Black.Opacity(0.35f),
         };
 
-        [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        protected override Container<Drawable> Content { get; } = new Container
+        {
+            AutoSizeAxes = Axes.Y,
+            RelativeSizeAxes = Axes.X
+        };
+
+        public MfMenuTextBoxContainer()
         {
             Masking = true;
             EdgeEffect = EdgeEffectNormal;
-            BorderColour = colourProvider.Light1;
-            CornerRadius = cornerRadius;
+            CornerRadius = 12.5f;
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
+        {
+            BorderColour = colourProvider.Light1;
+            AllowTransformBasicEffects.Value = true;
+
             InternalChildren = new[]
             {
                 new Box
@@ -68,17 +75,18 @@ namespace osu.Game.Overlays.Mf.TextBox
                     Alpha = 0.3f,
                     Colour = Colour4.Black,
                 },
-                contentFillFlow = new FillFlowContainer
+                new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Padding = new MarginPadding(25),
                     Spacing = new Vector2(15),
                     Masking = true,
-                    LayoutEasing = Easing,
-                    LayoutDuration = Duration + 250,
+                    LayoutEasing = ANIMATION_EASING,
+                    LayoutDuration = ANIMATION_DURATION + 250,
                     Children = new Drawable[]
                     {
+                        //bug: 不套Container会导致部分文本抽搐，加了会导致容器高度异常
                         new Container
                         {
                             RelativeSizeAxes = Axes.X,
@@ -89,33 +97,24 @@ namespace osu.Game.Overlays.Mf.TextBox
                                 Text = Title,
                                 Font = OsuFont.GetFont(size: 30, weight: FontWeight.SemiBold)
                             }
-                        }
+                        },
+                        Content
                     }
                 },
                 selectSounds()
             };
-
-            AllowTransformBasicEffects.Value = true;
         }
+
+        public override void Clear(bool disposeChildren) => Content.Clear(disposeChildren);
 
         protected override void LoadComplete()
         {
-            borderThickness.BindValueChanged(OnborderThicknessChanged);
-
-            if (d != null)
-                contentFillFlow.Add(d);
-
-            contentFillFlow.UpdateSubTree();
+            ContentBorderThickness.BindValueChanged(OnborderThicknessChanged);
 
             base.LoadComplete();
         }
 
-        private Drawable selectSounds()
-        {
-            Drawable s = Clickable ? new HoverClickSounds() : new HoverSounds();
-
-            return s;
-        }
+        private Drawable selectSounds() => Clickable ? new HoverClickSounds() : new HoverSounds();
 
         private void OnborderThicknessChanged(ValueChangedEvent<float> v)
         {
@@ -127,8 +126,8 @@ namespace osu.Game.Overlays.Mf.TextBox
         {
             if (AllowTransformBasicEffects.Value)
             {
-                this.TransformBindableTo(borderThickness, 2);
-                TweenEdgeEffectTo(EdgeEffectHover, Duration, Easing);
+                this.TransformBindableTo(ContentBorderThickness, 2);
+                TweenEdgeEffectTo(EdgeEffectHover, ANIMATION_DURATION, ANIMATION_EASING);
             }
 
             return base.OnHover(e);
@@ -138,8 +137,8 @@ namespace osu.Game.Overlays.Mf.TextBox
         {
             if (AllowTransformBasicEffects.Value)
             {
-                this.TransformBindableTo(borderThickness, 0);
-                TweenEdgeEffectTo(EdgeEffectNormal, Duration, Easing);
+                this.TransformBindableTo(ContentBorderThickness, 0);
+                TweenEdgeEffectTo(EdgeEffectNormal, ANIMATION_DURATION, ANIMATION_EASING);
             }
 
             base.OnHoverLost(e);

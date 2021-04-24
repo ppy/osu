@@ -13,10 +13,14 @@ namespace osu.Game.Overlays.Mf.Sections
     {
         public abstract string Title { get; }
         public abstract string SectionId { get; }
-        public Drawable ChildDrawable { get; set; }
 
-        private FillFlowContainer contentFillFlow;
-        private SectionTriangles bgTriangle;
+        protected override Container<Drawable> Content { get; } = new Container
+        {
+            RelativeSizeAxes = Axes.X,
+            AutoSizeAxes = Axes.Y,
+            Anchor = Anchor.TopCentre,
+            Origin = Anchor.TopCentre,
+        };
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -33,12 +37,14 @@ namespace osu.Game.Overlays.Mf.Sections
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background5,
                 },
-                bgTriangle = new SectionTriangles
+                new SectionTriangles
                 {
                     Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre
+                    Origin = Anchor.BottomCentre,
+                    Height = 0.3f,
+                    RelativeSizeAxes = Axes.Both
                 },
-                contentFillFlow = new FillFlowContainer
+                new FillFlowContainer
                 {
                     Padding = new MarginPadding { Top = 20, Bottom = 20, Left = 50, Right = 50 },
                     Anchor = Anchor.TopCentre,
@@ -56,28 +62,11 @@ namespace osu.Game.Overlays.Mf.Sections
                             Origin = Anchor.TopCentre,
                             Text = Title,
                             Font = OsuFont.GetFont(size: 30, weight: FontWeight.SemiBold),
-                        }
+                        },
+                        Content
                     }
                 }
             };
         }
-
-        protected override void UpdateAfterChildren()
-        {
-            bgTriangle.Height = DrawHeight * 0.3f;
-            base.UpdateAfterChildren();
-        }
-
-        protected override void LoadComplete()
-        {
-            if (ChildDrawable != null)
-                contentFillFlow.Add(ChildDrawable);
-        }
-
-        public override void Show() =>
-            this.FadeIn(300, Easing.OutQuint);
-
-        public override void Hide() =>
-            this.FadeOut(300, Easing.OutQuint);
     }
 }

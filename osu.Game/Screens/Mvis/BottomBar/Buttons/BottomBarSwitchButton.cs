@@ -5,6 +5,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Skinning;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Mvis.BottomBar.Buttons
 {
@@ -19,7 +20,10 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
         protected virtual string SwitchOnBgTextureName => "MButtonSwitchOn-background";
         protected virtual ConfineMode TextureConfineMode => ConfineMode.ScaleToFit;
 
-        protected override Drawable CreateBackgroundTexture => new Container
+        protected Color4 ActivateColor => ColourProvider.Highlight1;
+        protected Color4 InActivateColor => ColourProvider.Background3;
+
+        protected override Drawable CreateBackgroundDrawable => new Container
         {
             RelativeSizeAxes = Axes.Both,
             Children = new Drawable[]
@@ -67,7 +71,7 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
             switch (ToggleableValue.Value)
             {
                 case true:
-                    BgBox.FadeColour(ColourProvider.Highlight1, duration, Easing.OutQuint);
+                    BgBox.FadeColour(ActivateColor, duration, Easing.OutQuint);
                     ContentFillFlow.FadeColour(Colour4.Black, duration, Easing.OutQuint);
                     off?.FadeOut(duration, Easing.OutQuint);
                     on?.FadeIn(duration, Easing.OutQuint);
@@ -78,7 +82,7 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
                 case false:
                     off?.FadeIn(duration, Easing.OutQuint);
                     on?.FadeOut(duration, Easing.OutQuint);
-                    BgBox.FadeColour(ColourProvider.Background3, duration, Easing.OutQuint);
+                    BgBox.FadeColour(InActivateColor, duration, Easing.OutQuint);
                     ContentFillFlow.FadeColour(Colour4.White, duration, Easing.OutQuint);
                     break;
             }

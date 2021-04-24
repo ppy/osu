@@ -2,17 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5991b8eb-7f34-4d3b-a7ca-53141b00c12f" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.Mvis.Plugin.Example.dir/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.Mvis.Plugin.Example.dir/.idea/indexLayout.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.Mvis.Plugin.Example.dir/.idea/projectSettingsUpdater.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.Mvis.Plugin.Example.dir/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.Mvis.Plugin.Example.dir/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AnotherPlugin.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AnotherPluginProvider.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ExamplePlugin.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ExamplePluginProvider.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Mvis.Plugin.Example.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../osu.Game/Screens/Mvis/Plugins/MvisPluginManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../osu.Game/Screens/Mvis/Plugins/MvisPluginManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sidebar/ExampleSidebarPage.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sidebar/ExampleSidebarPage.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../osu.Game/Screens/Mvis/BottomBar/BottomBar.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../osu.Game/Screens/Mvis/BottomBar/BottomBar.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../osu.Game/Screens/Mvis/BottomBar/Buttons/BottomBarOverlayLockSwitchButton.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../osu.Game/Screens/Mvis/BottomBar/Buttons/BottomBarOverlayLockSwitchButton.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../osu.Game/Screens/Mvis/MvisScreen.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../osu.Game/Screens/Mvis/MvisScreen.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../osu.Game/Screens/Mvis/SideBar/Footer/Footer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/../osu.Game/Screens/Mvis/SideBar/Footer/Footer.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,6 +22,8 @@
       <option value="$PROJECT_DIR$/ExamplePluginProvider.cs" />
       <option value="$PROJECT_DIR$/ExamplePlugin.cs" />
       <option value="$PROJECT_DIR$/AnotherPlugin.cs" />
+      <option value="$PROJECT_DIR$/Sidebar/ExampleBottomBarButton.cs" />
+      <option value="$PROJECT_DIR$/Sidebar/ExampleSidebarPage.cs" />
     </changedPaths>
   </component>
   <component name="ProjectId" id="1qylv5mmmHKQSBOKlhLr3NMehse" />
@@ -39,6 +35,7 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../osu.Desktop.slnf" />
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -49,6 +46,7 @@
       <option name="presentableId" value="Default" />
       <updated>1618059937502</updated>
       <workItem from="1618059946332" duration="1575000" />
+      <workItem from="1618918982298" duration="267000" />
     </task>
     <servers />
   </component>

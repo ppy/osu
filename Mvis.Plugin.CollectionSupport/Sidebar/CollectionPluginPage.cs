@@ -9,6 +9,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Mvis.Plugins;
 using osuTK;
+using osuTK.Input;
 
 namespace Mvis.Plugin.CollectionSupport.Sidebar
 {
@@ -43,12 +44,15 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
+        public override PluginBottomBarButton CreateBottomBarButton() => new CollectionSupportEntryButton(this);
+        public override Key ShortcutKey => Key.Period;
+
         [BackgroundDependencyLoader]
         private void load()
         {
             dependencies.Cache(collectionHelper);
 
-            InternalChildren = new Drawable[]
+            Children = new Drawable[]
             {
                 new Container
                 {

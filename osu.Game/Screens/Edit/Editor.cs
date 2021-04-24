@@ -224,9 +224,10 @@ namespace osu.Game.Screens.Edit
                                 },
                                 new MenuItem("视图")
                                 {
-                                    Items = new[]
+                                    Items = new MenuItem[]
                                     {
-                                        new WaveformOpacityMenu(config)
+                                        new WaveformOpacityMenuItem(config.GetBindable<float>(OsuSetting.EditorWaveformOpacity)),
+                                        new HitAnimationsMenuItem(config.GetBindable<bool>(OsuSetting.EditorHitAnimations))
                                     }
                                 }
                             }

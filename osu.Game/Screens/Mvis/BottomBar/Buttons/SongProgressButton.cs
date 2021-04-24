@@ -1,7 +1,7 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Game.Overlays;
+using osu.Framework.Graphics.Audio;
 using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Mvis.BottomBar.Buttons
@@ -16,7 +16,9 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
         private string timeTotal;
 
         [Resolved]
-        private MusicController musicController { get; set; }
+        private MvisScreen mvisScreen { get; set; }
+
+        private DrawableTrack track => mvisScreen.CurrentTrack;
 
         private string formatTime(TimeSpan timeSpan) => $"{(timeSpan < TimeSpan.Zero ? "-" : "")}{Math.Floor(timeSpan.Duration().TotalMinutes)}:{timeSpan.Duration().Seconds:D2}";
 
@@ -30,7 +32,6 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
         {
             base.Update();
 
-            var track = musicController.CurrentTrack;
             int currentSecond = (int)Math.Floor(track.CurrentTime / 1000.0);
             timeCurrent = formatTime(TimeSpan.FromSeconds(currentSecond));
             timeTotal = formatTime(TimeSpan.FromMilliseconds(track.Length));

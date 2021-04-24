@@ -42,7 +42,6 @@ namespace osu.Game.Screens.Menu
         public override bool AllowRateAdjustments => false;
 
         private Screen songSelect;
-        private Screen mvisPlayer;
 
         private MenuSideFlashes sideFlashes;
 
@@ -166,14 +165,11 @@ namespace osu.Game.Screens.Menu
         {
             if (songSelect == null)
                 LoadComponentAsync(songSelect = new PlaySongSelect());
-
-            if (mvisPlayer == null)
-                LoadComponentAsync(mvisPlayer = new MvisScreen());
         }
 
         private void loadSoloSongSelect() => this.Push(consumeSongSelect());
 
-        private void onMvis() => this.Push(consumeMvis());
+        private void onMvis() => this.Push(new MvisScreen());
 
         private void onImport() => this.Push(new FileImportScreen());
 
@@ -181,13 +177,6 @@ namespace osu.Game.Screens.Menu
         {
             var s = songSelect;
             songSelect = null;
-            return s;
-        }
-
-        private Screen consumeMvis()
-        {
-            var s = mvisPlayer;
-            mvisPlayer = null;
             return s;
         }
 

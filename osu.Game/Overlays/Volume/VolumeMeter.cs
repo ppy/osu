@@ -245,6 +245,9 @@ namespace osu.Game.Overlays.Volume
 
         private void adjust(double delta, bool isPrecise)
         {
+            if (delta == 0)
+                return;
+
             // every adjust increment increases the rate at which adjustments happen up to a cutoff.
             // this debounce will reset on inactivity.
             accelerationDebounce?.Cancel();

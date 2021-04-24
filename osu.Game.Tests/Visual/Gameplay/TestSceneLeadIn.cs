@@ -130,9 +130,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public double GameplayClockTime => GameplayClockContainer.GameplayClock.CurrentTime;
 
-            protected override void UpdateAfterChildren()
+            protected override void Update()
             {
-                base.UpdateAfterChildren();
+                base.Update();
 
                 if (!FirstFrameClockTime.HasValue)
                 {
