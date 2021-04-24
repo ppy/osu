@@ -1,9 +1,12 @@
-﻿using osu.Framework.Graphics;
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Play;
+using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Mods
 {
@@ -19,7 +22,8 @@ namespace osu.Game.Rulesets.Catch.Mods
         {
             drawableRuleset.Anchor = Anchor.Centre;
             drawableRuleset.Origin = Anchor.Centre;
-            drawableRuleset.Scale = new osuTK.Vector2(1, -1);
+
+            drawableRuleset.Scale = new Vector2(1, -1);
         }
     }
 }
