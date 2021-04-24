@@ -512,7 +512,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             if (startTime == endTime)
             {
-                newObject = new Note(Beatmap)
+                newObject = new Note
                 {
                     StartTime = startTime,
                     Samples = sampleInfoListAt(startTime),
@@ -521,7 +521,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             }
             else
             {
-                newObject = new HoldNote(Beatmap)
+                newObject = new HoldNote
                 {
                     StartTime = startTime,
                     Duration = endTime - startTime,

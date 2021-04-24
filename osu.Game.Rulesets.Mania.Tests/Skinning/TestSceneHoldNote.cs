@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
 
         protected override DrawableManiaHitObject CreateHitObject()
         {
-            var note = new HoldNote(Beatmap.Value.Beatmap) { Duration = 1000 };
+            var note = new HoldNote { Duration = 1000 };
             note.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
             return new DrawableHoldNote(note);

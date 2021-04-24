@@ -19,10 +19,10 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
 
         [TestCase(false)]
         [TestCase(true)]
-        public void TestNote(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestData(new Note(Beatmap.Value.Beatmap) { StartTime = 1000 }), shouldMiss);
+        public void TestNote(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestData(new Note { StartTime = 1000 }), shouldMiss);
 
         [TestCase(false)]
         [TestCase(true)]
-        public void TestHoldNote(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestData(new HoldNote(Beatmap.Value.Beatmap) { StartTime = 1000, EndTime = 3000 }), shouldMiss);
+        public void TestHoldNote(bool shouldMiss) => CreateHitObjectTest(new HitObjectTestData(new HoldNote { StartTime = 1000, EndTime = 3000 }), shouldMiss);
     }
 }

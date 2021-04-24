@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             if (holdNote)
             {
-                newObject = new HoldNote(Beatmap)
+                newObject = new HoldNote
                 {
                     StartTime = HitObject.StartTime,
                     Duration = endTime - HitObject.StartTime,
@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             }
             else
             {
-                newObject = new Note(Beatmap)
+                newObject = new Note
                 {
                     StartTime = HitObject.StartTime,
                     Samples = HitObject.Samples,
