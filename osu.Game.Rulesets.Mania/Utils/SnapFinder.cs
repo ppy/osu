@@ -18,51 +18,20 @@ namespace osu.Game.Rulesets.Mania.Utils
             this.beatmap = beatmap;
         }
 
+        private readonly static int[] snaps = { 1, 2, 3, 4, 6, 8, 12, 16 };
+
         public int FindSnap(HitObject hitObject)
         {
             TimingControlPoint currentTimingPoint = beatmap.ControlPointInfo.TimingPointAt(hitObject.StartTime);
-            double startTime = currentTimingPoint.Time;
-            double secondsPerFourCounts = currentTimingPoint.BeatLength * 4;
+            double snapResult = (hitObject.StartTime - currentTimingPoint.Time) % (currentTimingPoint.BeatLength * 4);
 
-            double offset = startTime % secondsPerFourCounts;
-            double snapResult = hitObject.StartTime % secondsPerFourCounts - offset;
+            foreach (var snap in snaps)
+            {
+                if (almostDivisibleBy(snapResult, currentTimingPoint.BeatLength / (double)snap))
+                    return snap;
+            }
 
-            if (almostDivisibleBy(snapResult, secondsPerFourCounts / 4.0))
-            {
-                return 1;
-            }
-            else if (almostDivisibleBy(snapResult, secondsPerFourCounts / 8.0))
-            {
-                return 2;
-            }
-            else if (almostDivisibleBy(snapResult, secondsPerFourCounts / 12.0))
-            {
-                return 3;
-            }
-            else if (almostDivisibleBy(snapResult, secondsPerFourCounts / 16.0))
-            {
-                return 4;
-            }
-            else if (almostDivisibleBy(snapResult, secondsPerFourCounts / 24.0))
-            {
-                return 6;
-            }
-            else if (almostDivisibleBy(snapResult, secondsPerFourCounts / 32.0))
-            {
-                return 8;
-            }
-            else if (almostDivisibleBy(snapResult, secondsPerFourCounts / 48.0))
-            {
-                return 12;
-            }
-            else if (almostDivisibleBy(snapResult, secondsPerFourCounts / 64.0))
-            {
-                return 16;
-            }
-            else
-            {
-                return 0;
-            }
+            return 0;
         }
 
         private const double leniency_ms = 1.0;
