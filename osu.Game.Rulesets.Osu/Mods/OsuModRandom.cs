@@ -3,17 +3,47 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModRandom : ModRandomOsu
+    /// <summary>
+    /// Mod that randomises the positions of the <see cref="HitObject"/>s
+    /// </summary>
+    public class OsuModRandom : ModRandom, IApplicableToBeatmap
     {
-        protected override void RandomiseHitObjectPositions(IBeatmap beatmap)
+        public override string Description => "Practice your reaction time!";
+        public override bool Ranked => false;
+
+        [SettingSource("Circles", "Hit circles appear at random positions")]
+        public Bindable<bool> RandomiseCirclePositions { get; } = new BindableBool
+        {
+            Default = true,
+            Value = true,
+        };
+
+        [SettingSource("Sliders", "Sliders appear at random positions")]
+        public Bindable<bool> RandomiseSliderPositions { get; } = new BindableBool
+        {
+            Default = true,
+            Value = true,
+        };
+
+        [SettingSource("Spinners", "Spinners appear at random positions")]
+        public Bindable<bool> RandomiseSpinnerPositions { get; } = new BindableBool
+        {
+            Default = true,
+            Value = true,
+        };
+
+        public void ApplyToBeatmap(IBeatmap beatmap)
         {
             var rng = new Random();
 
