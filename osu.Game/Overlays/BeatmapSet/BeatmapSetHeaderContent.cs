@@ -268,9 +268,11 @@ namespace osu.Game.Overlays.BeatmapSet
                     break;
 
                 case DownloadState.Downloading:
-                case DownloadState.Importing:
                     // temporary to avoid showing two buttons for maps with novideo. will be fixed in new beatmap overlay design.
                     downloadButtonsContainer.Child = new HeaderDownloadButton(BeatmapSet.Value);
+                    break;
+
+                case DownloadState.Importing:
                     break;
 
                 default:
