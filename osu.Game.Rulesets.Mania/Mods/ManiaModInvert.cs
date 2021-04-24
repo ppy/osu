@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                     // Decrease the duration by at most a 1/4 beat to ensure there's no instantaneous notes.
                     duration = Math.Max(duration / 2, duration - beatLength / 4);
 
-                    newColumnObjects.Add(new HoldNote(maniaBeatmap)
+                    newColumnObjects.Add(new HoldNote
                     {
                         Column = column.Key,
                         StartTime = locations[i].startTime,

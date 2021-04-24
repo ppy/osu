@@ -28,9 +28,8 @@ namespace osu.Game.Rulesets.Mania.Objects
             set => SnapBindable.Value = value;
         }
 
-        public Note(IBeatmap beatmap) : base()
+        public Note()
         {
-            Beatmap = beatmap;
             this.StartTimeBindable.BindValueChanged(_ => SnapToBeatmap(), true);
         }
 

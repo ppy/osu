@@ -441,7 +441,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// <param name="column">The column to add the note to.</param>
         private void addToPattern(Pattern pattern, int column)
         {
-            pattern.Add(new Note(Beatmap)
+            pattern.Add(new Note
             {
                 StartTime = HitObject.StartTime,
                 Samples = HitObject.Samples,

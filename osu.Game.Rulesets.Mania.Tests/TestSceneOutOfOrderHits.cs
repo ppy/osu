@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             {
                 double time = 1000 + i * 100;
 
-                objects.Add(new Note(Beatmap.Value.Beatmap) { StartTime = time });
+                objects.Add(new Note { StartTime = time });
 
                 // don't hit the first note
                 if (i > 0)
@@ -60,12 +60,12 @@ namespace osu.Game.Rulesets.Mania.Tests
         {
             var objects = new List<ManiaHitObject>
             {
-                new HoldNote(Beatmap.Value.Beatmap)
+                new HoldNote
                 {
                     StartTime = 1000,
                     EndTime = 1010,
                 },
-                new HoldNote(Beatmap.Value.Beatmap)
+                new HoldNote
                 {
                     StartTime = 1020,
                     EndTime = 1030
@@ -83,12 +83,12 @@ namespace osu.Game.Rulesets.Mania.Tests
         {
             var objects = new List<ManiaHitObject>
             {
-                new HoldNote(Beatmap.Value.Beatmap)
+                new HoldNote
                 {
                     StartTime = 1000,
                     EndTime = 1010,
                 },
-                new HoldNote(Beatmap.Value.Beatmap)
+                new HoldNote
                 {
                     StartTime = 1020,
                     EndTime = 1030
