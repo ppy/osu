@@ -8,7 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Skinning.Default;
-using osu.Game.Rulesets.Mania.Utils;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit;

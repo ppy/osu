@@ -3,17 +3,16 @@
 
 using System;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Mania.Beatmaps;
-using osu.Game.Rulesets.Objects;
 
-namespace osu.Game.Rulesets.Mania.Utils
+namespace osu.Game.Rulesets.Objects
 {
     public class SnapFinder
     {
-        private readonly ManiaBeatmap beatmap;
+        private readonly IBeatmap beatmap;
 
-        public SnapFinder(ManiaBeatmap beatmap)
+        public SnapFinder(IBeatmap beatmap)
         {
             this.beatmap = beatmap;
         }
