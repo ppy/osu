@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Mania.UI
         protected new ManiaRulesetConfigManager Config => (ManiaRulesetConfigManager)base.Config;
 
         [Cached]
-        protected readonly Bindable<ManiaColourCode> configColourCode = new Bindable<ManiaColourCode>();
+        protected readonly Bindable<bool> configColourCode = new Bindable<bool>();
 
         public ScrollVisualisationMethod ScrollMethod
         {

@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         private OsuColour colours { get; set; }
 
         [Resolved]
-        private Bindable<ManiaColourCode> configColourCode { get; set; }
+        private Bindable<bool> configColourCode { get; set; }
 
         [Resolved(canBeNull: true)]
         private ManiaBeatmap beatmap { get; set; }
@@ -166,9 +166,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             return Precision.AlmostEquals(remainder, 0, LENIENCY_MS) || Precision.AlmostEquals(remainder - divisor, 0, LENIENCY_MS);
         }
 
-        private void UpdateSnapColour(ManiaColourCode colourCode, int snap)
+        private void UpdateSnapColour(bool colourCode, int snap)
         {
-            if (colourCode == ManiaColourCode.On)
+            if (colourCode)
             {
                 Colour = BindableBeatDivisor.GetColourFor(Snap, colours);
             }
