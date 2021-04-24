@@ -37,10 +37,10 @@ namespace osu.Game.Rulesets.Mania
                     Current = config.GetBindable<double>(ManiaRulesetSetting.ScrollTime),
                     KeyboardStep = 5
                 },
-                new SettingsEnumDropdown<ManiaColourCode>
+                new SettingsCheckbox
                 {
                     LabelText = "Colour-coded notes",
-                    Current = config.GetBindable<ManiaColourCode>(ManiaRulesetSetting.ColourCode),
+                    Current = config.GetBindable<bool>(ManiaRulesetSetting.ColourCode),
                 }
             };
         }
