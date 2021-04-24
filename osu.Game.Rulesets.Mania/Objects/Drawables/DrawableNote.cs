@@ -26,9 +26,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         private OsuColour colours { get; set; }
 
         [Resolved]
-        private Bindable<bool> configColourCode { get; set; }
+        private Bindable<bool> configColourCodedNotes { get; set; }
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private SnapFinder snapFinder { get; set; }
 
         protected virtual ManiaSkinComponents Component => ManiaSkinComponents.Note;
@@ -60,10 +60,13 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             base.LoadComplete();
 
-            HitObject.StartTimeBindable.BindValueChanged(_ => Snap = snapFinder.FindSnap(HitObject), true);
+            if (snapFinder != null)
+            {
+                HitObject.StartTimeBindable.BindValueChanged(_ => Snap = snapFinder.FindSnap(HitObject), true);
 
-            SnapBindable.BindValueChanged(snap => UpdateSnapColour(configColourCode.Value, snap.NewValue), true);
-            configColourCode.BindValueChanged(colourCode => UpdateSnapColour(colourCode.NewValue, Snap));
+                SnapBindable.BindValueChanged(snap => UpdateSnapColour(configColourCodedNotes.Value, snap.NewValue), true);
+                configColourCodedNotes.BindValueChanged(colourCode => UpdateSnapColour(colourCode.NewValue, Snap));
+            }
         }
 
         protected override void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)

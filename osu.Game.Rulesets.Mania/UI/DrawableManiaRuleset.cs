@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Mania.UI
         protected new ManiaRulesetConfigManager Config => (ManiaRulesetConfigManager)base.Config;
 
         [Cached]
-        protected readonly Bindable<bool> configColourCode = new Bindable<bool>();
+        protected readonly Bindable<bool> configColourCodedNotes = new Bindable<bool>();
 
         public ScrollVisualisationMethod ScrollMethod
         {
@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             Config.BindWith(ManiaRulesetSetting.ScrollTime, configTimeRange);
 
-            Config.BindWith(ManiaRulesetSetting.ColourCodedNotes, configColourCode);
+            Config.BindWith(ManiaRulesetSetting.ColourCodedNotes, configColourCodedNotes);
         }
 
         protected override void AdjustScrollSpeed(int amount)
