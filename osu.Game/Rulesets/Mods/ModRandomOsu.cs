@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => "Random";
         public override string Acronym => "RD";
         public override IconUsage? Icon => OsuIcon.Dice;
-        public override ModType Type => ModType.Fun;
+        public override ModType Type => ModType.Conversion;
         public override string Description => "Practice your reaction time!";
         public override double ScoreMultiplier => 1;
         public override bool Ranked => false;
