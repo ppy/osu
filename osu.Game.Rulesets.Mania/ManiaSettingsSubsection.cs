@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Mania
                 new SettingsCheckbox
                 {
                     LabelText = "Colour-coded notes",
-                    Current = config.GetBindable<bool>(ManiaRulesetSetting.ColourCode),
+                    Current = config.GetBindable<bool>(ManiaRulesetSetting.ColourCodedNotes),
                 }
             };
         }
