@@ -64,6 +64,8 @@ namespace osu.Game
         protected OsuConfigManager LocalConfig;
         protected MConfigManager MfConfig;
 
+        protected SessionStatics SessionStatics { get; private set; }
+
         protected BeatmapManager BeatmapManager;
 
         protected ScoreManager ScoreManager;
@@ -301,7 +303,7 @@ namespace osu.Game
             if (powerStatus != null)
                 dependencies.CacheAs(powerStatus);
 
-            dependencies.Cache(new SessionStatics());
+            dependencies.Cache(SessionStatics = new SessionStatics());
             dependencies.Cache(new OsuColour());
 
             RegisterImportHandler(BeatmapManager);

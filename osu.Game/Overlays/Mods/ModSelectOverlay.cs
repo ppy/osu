@@ -245,15 +245,21 @@ namespace osu.Game.Overlays.Mods
                                             },
                                         }
                                     },
-                                    ModSettingsContainer = new ModSettingsContainer
+                                    new Container
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         Anchor = Anchor.BottomRight,
                                         Origin = Anchor.BottomRight,
-                                        Width = 0.3f,
-                                        Alpha = 0,
                                         Padding = new MarginPadding(30),
-                                        SelectedMods = { BindTarget = SelectedMods },
+                                        Width = 0.3f,
+                                        Children = new Drawable[]
+                                        {
+                                            ModSettingsContainer = new ModSettingsContainer
+                                            {
+                                                Alpha = 0,
+                                                SelectedMods = { BindTarget = SelectedMods },
+                                            },
+                                        }
                                     },
                                 }
                             },

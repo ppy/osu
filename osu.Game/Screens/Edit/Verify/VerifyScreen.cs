@@ -7,16 +7,17 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks.Components;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Verify
 {
-    public class VerifyScreen : EditorScreen
+    public class VerifyScreen : RoundedContentEditorScreen
     {
         [Cached]
         private Bindable<Issue> selectedIssue = new Bindable<Issue>();
@@ -32,7 +33,6 @@ namespace osu.Game.Screens.Edit.Verify
             Child = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Padding = new MarginPadding(20),
                 Child = new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -61,7 +61,10 @@ namespace osu.Game.Screens.Edit.Verify
             private EditorClock clock { get; set; }
 
             [Resolved]
-            protected EditorBeatmap Beatmap { get; private set; }
+            private IBindable<WorkingBeatmap> workingBeatmap { get; set; }
+
+            [Resolved]
+            private EditorBeatmap beatmap { get; set; }
 
             [Resolved]
             private Bindable<Issue> selectedIssue { get; set; }
@@ -70,10 +73,10 @@ namespace osu.Game.Screens.Edit.Verify
             private BeatmapVerifier generalVerifier;
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OverlayColourProvider colours)
             {
                 generalVerifier = new BeatmapVerifier();
-                rulesetVerifier = Beatmap.BeatmapInfo.Ruleset?.CreateInstance()?.CreateBeatmapVerifier();
+                rulesetVerifier = beatmap.BeatmapInfo.Ruleset?.CreateInstance()?.CreateBeatmapVerifier();
 
                 RelativeSizeAxes = Axes.Both;
 
@@ -81,7 +84,7 @@ namespace osu.Game.Screens.Edit.Verify
                 {
                     new Box
                     {
-                        Colour = colours.Gray0,
+                        Colour = colours.Background2,
                         RelativeSizeAxes = Axes.Both,
                     },
                     new OsuScrollContainer
@@ -119,10 +122,10 @@ namespace osu.Game.Screens.Edit.Verify
 
             private void refresh()
             {
-                var issues = generalVerifier.Run(Beatmap);
+                var issues = generalVerifier.Run(beatmap, workingBeatmap.Value);
 
                 if (rulesetVerifier != null)
-                    issues = issues.Concat(rulesetVerifier.Run(Beatmap));
+                    issues = issues.Concat(rulesetVerifier.Run(beatmap, workingBeatmap.Value));
 
                 table.Issues = issues
                                .OrderBy(issue => issue.Template.Type)

@@ -295,7 +295,7 @@ namespace osu.Game.Screens.Play
             IsBreakTime.BindValueChanged(onBreakTimeChanged, true);
         }
 
-        protected virtual GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart) => new GameplayClockContainer(beatmap, gameplayStart);
+        protected virtual GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart) => new MasterGameplayClockContainer(beatmap, gameplayStart);
 
         private Drawable createUnderlayComponents() =>
             DimmableStoryboard = new DimmableStoryboard(Beatmap.Value.Storyboard) { RelativeSizeAxes = Axes.Both };
@@ -343,7 +343,6 @@ namespace osu.Game.Screens.Play
                             Action = () => PerformExit(true),
                             IsPaused = { BindTarget = GameplayClockContainer.IsPaused }
                         },
-                        PlayerSettingsOverlay = { PlaybackSettings = { UserPlaybackRate = { BindTarget = GameplayClockContainer.UserPlaybackRate } } },
                         KeyCounter =
                         {
                             AlwaysVisible = { BindTarget = DrawableRuleset.HasReplayLoaded },
@@ -386,6 +385,9 @@ namespace osu.Game.Screens.Play
                     failAnimation = new FailAnimation(DrawableRuleset) { OnComplete = onFailComplete, },
                 }
             };
+
+            if (GameplayClockContainer is MasterGameplayClockContainer master)
+                HUDOverlay.PlayerSettingsOverlay.PlaybackSettings.UserPlaybackRate.BindTarget = master.UserPlaybackRate;
 
             if (!Configuration.AllowSkippingIntro)
                 skipOverlay.Expire();
@@ -534,7 +536,8 @@ namespace osu.Game.Screens.Play
             // user requested skip
             // disable sample playback to stop currently playing samples and perform skip
             samplePlaybackDisabled.Value = true;
-            GameplayClockContainer.Skip();
+
+            (GameplayClockContainer as MasterGameplayClockContainer)?.Skip();
 
             // return samplePlaybackDisabled.Value to what is defined by the beatmap's current state
             updateSampleDisabledState();
@@ -809,7 +812,7 @@ namespace osu.Game.Screens.Play
             if (GameplayClockContainer.GameplayClock.IsRunning)
                 throw new InvalidOperationException($"{nameof(StartGameplay)} should not be called when the gameplay clock is already running");
 
-            GameplayClockContainer.Restart();
+            GameplayClockContainer.Reset();
         }
 
         public override void OnSuspending(IScreen next)
@@ -833,7 +836,7 @@ namespace osu.Game.Screens.Play
 
             // GameplayClockContainer performs seeks / start / stop operations on the beatmap's track.
             // as we are no longer the current screen, we cannot guarantee the track is still usable.
-            GameplayClockContainer?.StopUsingBeatmapClock();
+            (GameplayClockContainer as MasterGameplayClockContainer)?.StopUsingBeatmapClock();
 
             musicController.ResetTrackAdjustments();
 

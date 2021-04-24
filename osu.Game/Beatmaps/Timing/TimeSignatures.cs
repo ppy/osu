@@ -7,9 +7,10 @@ namespace osu.Game.Beatmaps.Timing
 {
     public enum TimeSignatures
     {
-        [Description("四分之一拍")]
+        [Description("四分之一拍(4/4)")]
         SimpleQuadruple = 4,
-        [Description("三分之一拍")]
+
+        [Description("三分之一拍(3/4)")]
         SimpleTriple = 3
     }
 }

@@ -519,7 +519,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 // Apply the start time at the newly snapped-to position
                 double offset = result.Time.Value - movementBlueprints.First().HitObject.StartTime;
 
-                Beatmap.PerformOnSelection(obj => obj.StartTime += offset);
+                if (offset != 0)
+                    Beatmap.PerformOnSelection(obj => obj.StartTime += offset);
             }
 
             return true;

@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -16,22 +15,8 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModClassic : Mod, IApplicableToHitObject, IApplicableToDrawableHitObjects, IApplicableToDrawableRuleset<OsuHitObject>
+    public class OsuModClassic : ModClassic, IApplicableToHitObject, IApplicableToDrawableHitObjects, IApplicableToDrawableRuleset<OsuHitObject>
     {
-        public override string Name => "怀旧";
-
-        public override string Acronym => "CL";
-
-        public override double ScoreMultiplier => 1;
-
-        public override IconUsage? Icon => FontAwesome.Solid.History;
-
-        public override string Description => "梦 回 V 1";
-
-        public override bool Ranked => false;
-
-        public override ModType Type => ModType.Conversion;
-
         [SettingSource("去除滑条头的准确率要求", "滑条分数与其命中的滑条刻成比例。")]
         public Bindable<bool> NoSliderHeadAccuracy { get; } = new BindableBool(true);
 
@@ -44,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         [SettingSource("固定滑条球打击区域", "使滑条球始终跟踪其最终大小。")]
         public Bindable<bool> FixedFollowCircleHitArea { get; } = new BindableBool(true);
 
-        [SettingSource("Always play a slider's tail sample", "Always plays a slider's tail sample regardless of whether it was hit or not.")]
+        [SettingSource("永远播放滑条尾音效", "总是播放滑条尾音效，无论该滑条是否已经画完")]
         public Bindable<bool> AlwaysPlayTailSample { get; } = new BindableBool(true);
 
         public void ApplyToHitObject(HitObject hitObject)

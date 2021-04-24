@@ -641,6 +641,15 @@ namespace osu.Game
 
             dependencies.CacheAs(idleTracker = new GameIdleTracker(6000));
 
+            var sessionIdleTracker = new GameIdleTracker(300000);
+            sessionIdleTracker.IsIdle.BindValueChanged(idle =>
+            {
+                if (idle.NewValue)
+                    SessionStatics.ResetValues();
+            });
+
+            Add(sessionIdleTracker);
+
             AddRange(new Drawable[]
             {
                 new VolumeControlReceptor

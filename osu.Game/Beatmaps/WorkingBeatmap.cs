@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -325,6 +326,8 @@ namespace osu.Game.Beatmaps
 
         protected virtual ISkin GetSkin() => new DefaultSkin();
         private readonly RecyclableLazy<ISkin> skin;
+
+        public abstract Stream GetStream(string storagePath);
 
         public class RecyclableLazy<T>
         {

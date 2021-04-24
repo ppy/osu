@@ -20,6 +20,7 @@ using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Visual;
 using osuTK;
@@ -184,7 +185,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             addSeekStep(0);
 
-            AddStep("adjust track rate", () => Player.GameplayClockContainer.UserPlaybackRate.Value = rate);
+            AddStep("adjust track rate", () => ((MasterGameplayClockContainer)Player.GameplayClockContainer).UserPlaybackRate.Value = rate);
 
             addSeekStep(1000);
             AddAssert("progress almost same", () => Precision.AlmostEquals(expectedProgress, drawableSpinner.Progress, 0.05));
