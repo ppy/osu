@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        private Container dragHandles;
+        private SelectionBoxDragHandleDisplay dragHandles;
         private FillFlowContainer buttons;
 
         public const float BORDER_RADIUS = 3;
@@ -161,7 +161,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         },
                     }
                 },
-                dragHandles = new Container
+                dragHandles = new SelectionBoxDragHandleDisplay
                 {
                     RelativeSizeAxes = Axes.Both,
                     // ensures that the centres of all drag handles line up with the middle of the selection box border.
@@ -186,75 +186,76 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void addRotationComponents()
         {
-            const float separation = 40;
-
             addButton(FontAwesome.Solid.Undo, "Rotate 90 degrees counter-clockwise", () => OnRotation?.Invoke(-90));
             addButton(FontAwesome.Solid.Redo, "Rotate 90 degrees clockwise", () => OnRotation?.Invoke(90));
 
-            AddRangeInternal(new Drawable[]
-            {
-                new Box
-                {
-                    Depth = float.MaxValue,
-                    Colour = colours.YellowLight,
-                    Blending = BlendingParameters.Additive,
-                    Alpha = 0.3f,
-                    Size = new Vector2(BORDER_RADIUS, separation),
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.BottomCentre,
-                },
-                new SelectionBoxDragHandleButton(FontAwesome.Solid.Redo, "Free rotate")
-                {
-                    Anchor = Anchor.TopCentre,
-                    Y = -separation,
-                    HandleDrag = e => OnRotation?.Invoke(convertDragEventToAngleOfRotation(e)),
-                    OperationStarted = operationStarted,
-                    OperationEnded = operationEnded
-                }
-            });
+            addRotateHandle(Anchor.TopLeft);
+            addRotateHandle(Anchor.TopRight);
+            addRotateHandle(Anchor.BottomLeft);
+            addRotateHandle(Anchor.BottomRight);
         }
 
         private void addYScaleComponents()
         {
             addButton(FontAwesome.Solid.ArrowsAltV, "Flip vertically (Ctrl-J)", () => OnFlip?.Invoke(Direction.Vertical));
 
-            addDragHandle(Anchor.TopCentre);
-            addDragHandle(Anchor.BottomCentre);
+            addScaleHandle(Anchor.TopCentre);
+            addScaleHandle(Anchor.BottomCentre);
         }
 
         private void addFullScaleComponents()
         {
-            addDragHandle(Anchor.TopLeft);
-            addDragHandle(Anchor.TopRight);
-            addDragHandle(Anchor.BottomLeft);
-            addDragHandle(Anchor.BottomRight);
+            addScaleHandle(Anchor.TopLeft);
+            addScaleHandle(Anchor.TopRight);
+            addScaleHandle(Anchor.BottomLeft);
+            addScaleHandle(Anchor.BottomRight);
         }
 
         private void addXScaleComponents()
         {
             addButton(FontAwesome.Solid.ArrowsAltH, "Flip horizontally (Ctrl-H)", () => OnFlip?.Invoke(Direction.Horizontal));
 
-            addDragHandle(Anchor.CentreLeft);
-            addDragHandle(Anchor.CentreRight);
+            addScaleHandle(Anchor.CentreLeft);
+            addScaleHandle(Anchor.CentreRight);
         }
 
         private void addButton(IconUsage icon, string tooltip, Action action)
         {
-            buttons.Add(new SelectionBoxDragHandleButton(icon, tooltip)
+            var button = new SelectionBoxButton(icon, tooltip)
             {
-                OperationStarted = operationStarted,
-                OperationEnded = operationEnded,
                 Action = action
-            });
+            };
+
+            button.OperationStarted += operationStarted;
+            button.OperationEnded += operationEnded;
+            buttons.Add(button);
         }
 
-        private void addDragHandle(Anchor anchor) => dragHandles.Add(new SelectionBoxDragHandle
+        private void addScaleHandle(Anchor anchor)
         {
-            Anchor = anchor,
-            HandleDrag = e => OnScale?.Invoke(e.Delta, anchor),
-            OperationStarted = operationStarted,
-            OperationEnded = operationEnded
-        });
+            var handle = new SelectionBoxScaleHandle
+            {
+                Anchor = anchor,
+                HandleDrag = e => OnScale?.Invoke(e.Delta, anchor)
+            };
+
+            handle.OperationStarted += operationStarted;
+            handle.OperationEnded += operationEnded;
+            dragHandles.AddScaleHandle(handle);
+        }
+
+        private void addRotateHandle(Anchor anchor)
+        {
+            var handle = new SelectionBoxRotationHandle
+            {
+                Anchor = anchor,
+                HandleDrag = e => OnRotation?.Invoke(convertDragEventToAngleOfRotation(e))
+            };
+
+            handle.OperationStarted += operationStarted;
+            handle.OperationEnded += operationEnded;
+            dragHandles.AddRotationHandle(handle);
+        }
 
         private int activeOperations;
 
