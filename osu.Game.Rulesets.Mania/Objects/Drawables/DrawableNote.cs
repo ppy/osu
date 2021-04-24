@@ -5,6 +5,7 @@ using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Input.Bindings;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Skinning.Default;
@@ -34,13 +35,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         private readonly Drawable headPiece;
 
-        public readonly Bindable<int> SnapBindable = new Bindable<int>();
-
-        public int Snap
-        {
-            get => SnapBindable.Value;
-            set => SnapBindable.Value = value;
-        }
+        private readonly Bindable<int> Snap = new Bindable<int>();
 
         public DrawableNote(Note hitObject)
             : base(hitObject)
@@ -61,10 +56,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             if (snapFinder != null)
             {
-                HitObject.StartTimeBindable.BindValueChanged(_ => Snap = snapFinder.FindSnap(HitObject), true);
+                HitObject.StartTimeBindable.BindValueChanged(_ => Snap.Value = snapFinder.FindSnap(HitObject), true);
 
-                SnapBindable.BindValueChanged(snap => updateSnapColour(configColourCodedNotes.Value, snap.NewValue), true);
-                configColourCodedNotes.BindValueChanged(colourCode => updateSnapColour(colourCode.NewValue, Snap));
+                Snap.BindValueChanged(_ => updateSnapColour(), true);
+                configColourCodedNotes.BindValueChanged(_ => updateSnapColour());
             }
         }
 
@@ -106,18 +101,13 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         public virtual void OnReleased(ManiaAction action)
         {
-        }
+        } 
 
-        private void updateSnapColour(bool colourCode, int snap)
+        private void updateSnapColour()
         {
-            if (colourCode)
-            {
-                Colour = BindableBeatDivisor.GetColourFor(Snap, colours);
-            }
-            else
-            {
-                Colour = Colour4.White;
-            }
+            Colour = configColourCodedNotes.Value
+                ? (ColourInfo)BindableBeatDivisor.GetColourFor(Snap.Value, colours)
+                : (ColourInfo)Colour4.White;
         }
     }
 }
