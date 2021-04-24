@@ -492,62 +492,6 @@ namespace osu.Game.Screens.Mvis
                 Action = showPluginEntriesTemporary
             });
 
-            //设置键位
-            setupKeyBindings();
-
-            //当插件卸载时调用onPluginUnload
-            pluginManager.OnPluginUnLoad += onPluginUnLoad;
-
-            //添加插件
-            foreach (var pl in pluginManager.GetAllPlugins(true))
-            {
-                try
-                {
-                    //决定要把插件放在何处
-                    switch (pl.Target)
-                    {
-                        case MvisPlugin.TargetLayer.Background:
-                            background.Add(pl);
-                            break;
-
-                        case MvisPlugin.TargetLayer.Foreground:
-                            foreground.Add(pl);
-                            break;
-                    }
-
-                    var pluginSidebarPage = pl.CreateSidebarPage();
-
-                    //如果插件有侧边栏页面
-                    if (pluginSidebarPage != null)
-                    {
-                        sidebar.Add(pluginSidebarPage);
-                        var btn = pluginSidebarPage.CreateBottomBarButton();
-
-                        //如果插件的侧边栏页面有入口按钮
-                        if (btn != null)
-                        {
-                            btn.Action = () => updateSidebarState(pluginSidebarPage);
-                            btn.TooltipText += $" ({pluginSidebarPage.ShortcutKey})";
-
-                            bottomBar.PluginEntriesFillFlow.Add(btn);
-                        }
-
-                        //如果插件的侧边栏页面有调用快捷键
-                        if (pluginSidebarPage.ShortcutKey != Key.Unknown)
-                        {
-                            pluginKeyBindings[pluginSidebarPage.ShortcutKey] = () =>
-                            {
-                                if (!pl.Disabled.Value) btn?.Click();
-                            };
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    Logger.Error(e, $"在添加 {pl.Name} 时出现问题, 请联系你的插件提供方");
-                }
-            }
-
             //todo: 找出为啥audioControlProvider会在被赋值前访问
             audioControlProvider = musicControllerWrapper;
         }
@@ -608,6 +552,62 @@ namespace osu.Game.Screens.Mvis
             }, true);
 
             HideScreenBackground.BindValueChanged(_ => applyBackgroundBrightness());
+
+            //设置键位
+            setupKeyBindings();
+
+            //当插件卸载时调用onPluginUnload
+            pluginManager.OnPluginUnLoad += onPluginUnLoad;
+
+            //添加插件
+            foreach (var pl in pluginManager.GetAllPlugins(true))
+            {
+                try
+                {
+                    //决定要把插件放在何处
+                    switch (pl.Target)
+                    {
+                        case MvisPlugin.TargetLayer.Background:
+                            background.Add(pl);
+                            break;
+
+                        case MvisPlugin.TargetLayer.Foreground:
+                            foreground.Add(pl);
+                            break;
+                    }
+
+                    var pluginSidebarPage = pl.CreateSidebarPage();
+
+                    //如果插件有侧边栏页面
+                    if (pluginSidebarPage != null)
+                    {
+                        sidebar.Add(pluginSidebarPage);
+                        var btn = pluginSidebarPage.CreateBottomBarButton();
+
+                        //如果插件的侧边栏页面有入口按钮
+                        if (btn != null)
+                        {
+                            btn.Action = () => updateSidebarState(pluginSidebarPage);
+                            btn.TooltipText += $" ({pluginSidebarPage.ShortcutKey})";
+
+                            bottomBar.PluginEntriesFillFlow.Add(btn);
+                        }
+
+                        //如果插件的侧边栏页面有调用快捷键
+                        if (pluginSidebarPage.ShortcutKey != Key.Unknown)
+                        {
+                            pluginKeyBindings[pluginSidebarPage.ShortcutKey] = () =>
+                            {
+                                if (!pl.Disabled.Value) btn?.Click();
+                            };
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, $"在添加 {pl.Name} 时出现问题, 请联系你的插件提供方");
+                }
+            }
 
             //把lockButton放在中间
             bottomBar.CentreBotton(lockButton);
