@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             Config.BindWith(ManiaRulesetSetting.ScrollTime, configTimeRange);
 
-            Config.BindWith(ManiaRulesetSetting.ColourCode, configColourCode);
+            Config.BindWith(ManiaRulesetSetting.ColourCodedNotes, configColourCode);
         }
 
         protected override void AdjustScrollSpeed(int amount)
