@@ -20,6 +20,7 @@ using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Replays;
+using osu.Game.Rulesets.Mania.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -45,8 +46,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public new ManiaBeatmap Beatmap => (ManiaBeatmap)base.Beatmap;
 
-        [Cached(typeof(ManiaBeatmap))]
-        private ManiaBeatmap CachedBeatmap { get; }
+        [Cached]
+        private SnapFinder snapFinder { get; set; }
 
         public IEnumerable<BarLine> BarLines;
 
@@ -84,7 +85,7 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             BarLines = new BarLineGenerator<BarLine>(Beatmap).BarLines;
 
-            CachedBeatmap = Beatmap;
+            snapFinder = new SnapFinder(Beatmap);
         }
 
         [BackgroundDependencyLoader]

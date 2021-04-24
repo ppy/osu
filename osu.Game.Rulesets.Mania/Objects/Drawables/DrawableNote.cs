@@ -7,12 +7,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
-using osu.Framework.Utils;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Skinning.Default;
-using osu.Game.Rulesets.Mania.UI;
+using osu.Game.Rulesets.Mania.Utils;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit;
@@ -31,8 +28,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         [Resolved]
         private Bindable<bool> configColourCode { get; set; }
 
-        [Resolved(canBeNull: true)]
-        private ManiaBeatmap beatmap { get; set; }
+        [Resolved]
+        private SnapFinder snapFinder { get; set; }
 
         protected virtual ManiaSkinComponents Component => ManiaSkinComponents.Note;
 
@@ -63,7 +60,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             base.LoadComplete();
 
-            HitObject.StartTimeBindable.BindValueChanged(_ => SnapToBeatmap(), true);
+            HitObject.StartTimeBindable.BindValueChanged(_ => Snap = snapFinder.FindSnap(HitObject), true);
 
             SnapBindable.BindValueChanged(snap => UpdateSnapColour(configColourCode.Value, snap.NewValue), true);
             configColourCode.BindValueChanged(colourCode => UpdateSnapColour(colourCode.NewValue, Snap));
@@ -107,63 +104,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         public virtual void OnReleased(ManiaAction action)
         {
-        }
-        private void SnapToBeatmap()
-        {
-            if (beatmap != null)
-            {
-                TimingControlPoint currentTimingPoint = beatmap.ControlPointInfo.TimingPointAt(HitObject.StartTime);
-                int timeSignature = (int)currentTimingPoint.TimeSignature;
-                double startTime = currentTimingPoint.Time;
-                double secondsPerFourCounts = currentTimingPoint.BeatLength * 4;
-
-                double offset = startTime % secondsPerFourCounts;
-                double snapResult = HitObject.StartTime % secondsPerFourCounts - offset;
-
-                if (AlmostDivisibleBy(snapResult, secondsPerFourCounts / 4.0))
-                {
-                    Snap = 1;
-                }
-                else if (AlmostDivisibleBy(snapResult, secondsPerFourCounts / 8.0))
-                {
-                    Snap = 2;
-                }
-                else if (AlmostDivisibleBy(snapResult, secondsPerFourCounts / 12.0))
-                {
-                    Snap = 3;
-                }
-                else if (AlmostDivisibleBy(snapResult, secondsPerFourCounts / 16.0))
-                {
-                    Snap = 4;
-                }
-                else if (AlmostDivisibleBy(snapResult, secondsPerFourCounts / 24.0))
-                {
-                    Snap = 6;
-                }
-                else if (AlmostDivisibleBy(snapResult, secondsPerFourCounts / 32.0))
-                {
-                    Snap = 8;
-                }
-                else if (AlmostDivisibleBy(snapResult, secondsPerFourCounts / 48.0))
-                {
-                    Snap = 12;
-                }
-                else if (AlmostDivisibleBy(snapResult, secondsPerFourCounts / 64.0))
-                {
-                    Snap = 16;
-                }
-                else
-                {
-                    Snap = 0;
-                }
-            }
-        }
-
-        private const double LENIENCY_MS = 1.0;
-        private static bool AlmostDivisibleBy(double dividend, double divisor)
-        {
-            double remainder = Math.Abs(dividend) % divisor;
-            return Precision.AlmostEquals(remainder, 0, LENIENCY_MS) || Precision.AlmostEquals(remainder - divisor, 0, LENIENCY_MS);
         }
 
         private void UpdateSnapColour(bool colourCode, int snap)
