@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         private readonly IAdjustableClock clock = new StopwatchClock();
 
         [Cached]
-        protected readonly Bindable<bool> configColourCodedNotes = new Bindable<bool>();
+        protected readonly Bindable<bool> ConfigColourCodedNotes = new Bindable<bool>();
 
         protected ManiaSelectionBlueprintTestScene()
         {
@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         private void load(RulesetConfigCache configCache)
         {
             var config = (ManiaRulesetConfigManager)configCache.GetConfigFor(Ruleset.Value.CreateInstance());
-            config.BindWith(ManiaRulesetSetting.ColourCodedNotes, configColourCodedNotes);
+            config.BindWith(ManiaRulesetSetting.ColourCodedNotes, ConfigColourCodedNotes);
         }
 
         public ManiaPlayfield Playfield => null;

@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         private IScrollingInfo scrollingInfo;
 
         [Cached]
-        protected readonly Bindable<bool> configColourCodedNotes = new Bindable<bool>();
+        protected readonly Bindable<bool> ConfigColourCodedNotes = new Bindable<bool>();
 
         protected ManiaPlacementBlueprintTestScene()
         {
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         private void load(RulesetConfigCache configCache)
         {
             var config = (ManiaRulesetConfigManager)configCache.GetConfigFor(Ruleset.Value.CreateInstance());
-            config.BindWith(ManiaRulesetSetting.ColourCodedNotes, configColourCodedNotes);
+            config.BindWith(ManiaRulesetSetting.ColourCodedNotes, ConfigColourCodedNotes);
         }
 
         protected override SnapResult SnapForBlueprint(PlacementBlueprint blueprint)

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -64,8 +63,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             {
                 HitObject.StartTimeBindable.BindValueChanged(_ => Snap = snapFinder.FindSnap(HitObject), true);
 
-                SnapBindable.BindValueChanged(snap => UpdateSnapColour(configColourCodedNotes.Value, snap.NewValue), true);
-                configColourCodedNotes.BindValueChanged(colourCode => UpdateSnapColour(colourCode.NewValue, Snap));
+                SnapBindable.BindValueChanged(snap => updateSnapColour(configColourCodedNotes.Value, snap.NewValue), true);
+                configColourCodedNotes.BindValueChanged(colourCode => updateSnapColour(colourCode.NewValue, Snap));
             }
         }
 
@@ -109,7 +108,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
         }
 
-        private void UpdateSnapColour(bool colourCode, int snap)
+        private void updateSnapColour(bool colourCode, int snap)
         {
             if (colourCode)
             {

@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
         private readonly TestScrollingInfo scrollingInfo = new TestScrollingInfo();
 
         [Cached]
-        protected readonly Bindable<bool> configColourCodedNotes = new Bindable<bool>();
+        protected readonly Bindable<bool> ConfigColourCodedNotes = new Bindable<bool>();
 
         protected override Ruleset CreateRulesetForSkinProvider() => new ManiaRuleset();
 
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
         private void load(RulesetConfigCache configCache)
         {
             var config = (ManiaRulesetConfigManager)configCache.GetConfigFor(Ruleset.Value.CreateInstance());
-            config.BindWith(ManiaRulesetSetting.ColourCodedNotes, configColourCodedNotes);
+            config.BindWith(ManiaRulesetSetting.ColourCodedNotes, ConfigColourCodedNotes);
         }
 
         [Test]
