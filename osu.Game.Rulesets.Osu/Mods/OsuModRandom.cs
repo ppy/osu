@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     /// </summary>
     public class OsuModRandom : ModRandom, IApplicableToBeatmap
     {
-        public override string Description => "Practice your reaction time!";
+        public override string Description => "It never gets boring!";
         public override bool Ranked => false;
 
         [SettingSource("Circles", "Hit circles appear at random positions")]
