@@ -39,6 +39,9 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 case ScoreType.Firsts:
                     return user.ScoresFirstCount;
 
+                case ScoreType.Recent:
+                    return user.ScoresRecentCount;
+
                 default:
                     return 0;
             }
@@ -50,9 +53,6 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 drawableItemIndex = 0;
 
             base.OnItemsReceived(items);
-
-            if (type == ScoreType.Recent)
-                SetCount(items.Count);
         }
 
         protected override APIRequest<List<APILegacyScoreInfo>> CreateRequest() =>
