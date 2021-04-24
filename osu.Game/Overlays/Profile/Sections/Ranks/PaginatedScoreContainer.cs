@@ -36,6 +36,9 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         {
             switch (type)
             {
+                case ScoreType.Best:
+                    return user.ScoresBestCount;
+
                 case ScoreType.Firsts:
                     return user.ScoresFirstCount;
 
