@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
 
@@ -27,9 +26,8 @@ namespace osu.Game.Screens.Ranking.Expanded
         private OsuColour colours { get; set; }
 
         private CircularContainer colorContainer;
-        private OsuSpriteText wholePartText;
-        private OsuSpriteText fractionPartText;
         private StarDifficulty starDifficulty;
+        private FillFlowContainer foregroundContainer;
 
         public StarDifficulty StarDifficulty
         {
@@ -52,23 +50,15 @@ namespace osu.Game.Screens.Ranking.Expanded
 
         private void setDifficulty(StarDifficulty difficulty)
         {
-            var starRatingParts = difficulty.Stars.ToString("0.00", CultureInfo.InvariantCulture).Split('.');
-            string wholePart = starRatingParts[0];
-            string fractionPart = starRatingParts[1];
-            string separator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
+            colorContainer.FadeColour(getDifficultyColour(difficulty), 250);
 
-            ColourInfo backgroundColour = difficulty.DifficultyRating == DifficultyRating.ExpertPlus
-                ? ColourInfo.GradientVertical(Color4Extensions.FromHex("#C1C1C1"), Color4Extensions.FromHex("#595959"))
-                : (ColourInfo)colours.ForDifficultyRating(difficulty.DifficultyRating);
-
-            colorContainer.Colour = backgroundColour;
-
-            wholePartText.Text = $"{wholePart}";
-            fractionPartText.Text = $"{separator}{fractionPart}";
+            foregroundContainer.Expire();
+            foregroundContainer = null;
+            AddInternal(foregroundContainer = createForegroundContainer(difficulty));
         }
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapDifficultyCache difficultyCache)
+        private void load()
         {
             AutoSizeAxes = Axes.Both;
 
@@ -78,6 +68,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                 {
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
+                    Colour = getDifficultyColour(starDifficulty),
                     Children = new Drawable[]
                     {
                         new Box
@@ -86,49 +77,64 @@ namespace osu.Game.Screens.Ranking.Expanded
                         },
                     }
                 },
-                new FillFlowContainer
+                foregroundContainer = createForegroundContainer(starDifficulty),
+            };
+        }
+
+        private ColourInfo getDifficultyColour(StarDifficulty difficulty)
+        {
+            return difficulty.DifficultyRating == DifficultyRating.ExpertPlus
+                ? ColourInfo.GradientVertical(Color4Extensions.FromHex("#C1C1C1"), Color4Extensions.FromHex("#595959"))
+                : (ColourInfo)colours.ForDifficultyRating(difficulty.DifficultyRating);
+        }
+
+        private FillFlowContainer createForegroundContainer(StarDifficulty difficulty)
+        {
+            var starRatingParts = difficulty.Stars.ToString("0.00", CultureInfo.InvariantCulture).Split('.');
+            string wholePart = starRatingParts[0];
+            string fractionPart = starRatingParts[1];
+            string separator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
+
+            return new FillFlowContainer
+            {
+                AutoSizeAxes = Axes.Both,
+                Padding = new MarginPadding { Horizontal = 8, Vertical = 4 },
+                Direction = FillDirection.Horizontal,
+                Spacing = new Vector2(2, 0),
+                Children = new Drawable[]
                 {
-                    AutoSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Horizontal = 8, Vertical = 4 },
-                    Direction = FillDirection.Horizontal,
-                    Spacing = new Vector2(2, 0),
-                    Children = new Drawable[]
+                    new SpriteIcon
                     {
-                        new SpriteIcon
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Size = new Vector2(7),
+                        Icon = FontAwesome.Solid.Star,
+                        Colour = Color4.Black
+                    },
+                    new OsuTextFlowContainer(s => s.Font = OsuFont.Numeric.With(weight: FontWeight.Black))
+                    {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Horizontal,
+                        TextAnchor = Anchor.BottomLeft,
+                    }.With(t =>
+                    {
+                        t.AddText($"{wholePart}", s =>
                         {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Size = new Vector2(7),
-                            Icon = FontAwesome.Solid.Star,
-                            Colour = Color4.Black
-                        },
-                        new OsuTextFlowContainer(s => s.Font = OsuFont.Numeric.With(weight: FontWeight.Black))
+                            s.Colour = Color4.Black;
+                            s.Font = s.Font.With(size: 14);
+                            s.UseFullGlyphHeight = false;
+                        });
+                        t.AddText($"{separator}{fractionPart}", s =>
                         {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Horizontal,
-                            TextAnchor = Anchor.BottomLeft,
-                        }.With(t =>
-                        {
-                            t.AddText(wholePartText = new OsuSpriteText(), s =>
-                            {
-                                s.Colour = Color4.Black;
-                                s.Font = s.Font.With(size: 14);
-                                s.UseFullGlyphHeight = false;
-                            });
-                            t.AddText(fractionPartText = new OsuSpriteText(), s =>
-                            {
-                                s.Colour = Color4.Black;
-                                s.Font = s.Font.With(size: 7);
-                                s.UseFullGlyphHeight = false;
-                            });
-                        }),
-                    }
+                            s.Colour = Color4.Black;
+                            s.Font = s.Font.With(size: 7);
+                            s.UseFullGlyphHeight = false;
+                        });
+                    }),
                 }
             };
-
-            setDifficulty(starDifficulty);
         }
     }
 }
