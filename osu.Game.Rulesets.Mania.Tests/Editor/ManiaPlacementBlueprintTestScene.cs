@@ -4,10 +4,12 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
@@ -28,6 +30,9 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         [Cached(typeof(IScrollingInfo))]
         private IScrollingInfo scrollingInfo;
 
+        [Cached]
+        protected readonly Bindable<ManiaColourCode> configColourCode = new Bindable<ManiaColourCode>();
+
         protected ManiaPlacementBlueprintTestScene()
         {
             scrollingInfo = ((ScrollingTestContainer)HitObjectContainer).ScrollingInfo;
@@ -39,6 +44,13 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
                 AccentColour = Color4.OrangeRed,
                 Clock = new FramedClock(new StopwatchClock()), // No scroll
             });
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(RulesetConfigCache configCache)
+        {
+            var config = (ManiaRulesetConfigManager)configCache.GetConfigFor(Ruleset.Value.CreateInstance());
+            config.BindWith(ManiaRulesetSetting.ColourCode, configColourCode);
         }
 
         protected override SnapResult SnapForBlueprint(PlacementBlueprint blueprint)

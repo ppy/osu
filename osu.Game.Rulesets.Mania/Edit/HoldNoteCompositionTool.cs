@@ -5,19 +5,22 @@ using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
+using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Edit.Blueprints;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
     public class HoldNoteCompositionTool : HitObjectCompositionTool
     {
-        public HoldNoteCompositionTool()
+        private ManiaBeatmap Beatmap;
+        public HoldNoteCompositionTool(ManiaBeatmap beatmap)
             : base("Hold")
         {
+            Beatmap = beatmap;
         }
 
         public override Drawable CreateIcon() => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Sliders);
 
-        public override PlacementBlueprint CreatePlacementBlueprint() => new HoldNotePlacementBlueprint();
+        public override PlacementBlueprint CreatePlacementBlueprint() => new HoldNotePlacementBlueprint(Beatmap);
     }
 }

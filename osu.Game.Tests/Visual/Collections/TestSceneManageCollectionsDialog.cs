@@ -140,12 +140,12 @@ namespace osu.Game.Tests.Visual.Collections
             AddStep("add dropdown", () =>
             {
                 Add(new CollectionFilterDropdown
-                    {
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
-                        RelativeSizeAxes = Axes.X,
-                        Width = 0.4f,
-                    }
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    RelativeSizeAxes = Axes.X,
+                    Width = 0.4f,
+                }
                 );
             });
             AddStep("add two collections with same name", () => manager.Collections.AddRange(new[]

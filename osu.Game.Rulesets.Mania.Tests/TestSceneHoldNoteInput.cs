@@ -249,21 +249,6 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             var beatmap = new Beatmap<ManiaHitObject>
             {
-                HitObjects =
-                {
-                    new HoldNote
-                    {
-                        StartTime = 1000,
-                        Duration = 500,
-                        Column = 0,
-                    },
-                    new HoldNote
-                    {
-                        StartTime = 1000 + 500 + windows.WindowFor(HitResult.Miss) + 10,
-                        Duration = 500,
-                        Column = 0,
-                    },
-                },
                 BeatmapInfo =
                 {
                     BaseDifficulty = new BeatmapDifficulty
@@ -273,6 +258,20 @@ namespace osu.Game.Rulesets.Mania.Tests
                     },
                     Ruleset = new ManiaRuleset().RulesetInfo
                 },
+            };
+            beatmap.HitObjects = new List<ManiaHitObject> {
+                    new HoldNote(beatmap)
+                    {
+                        StartTime = 1000,
+                        Duration = 500,
+                        Column = 0,
+                    },
+                    new HoldNote(beatmap)
+                    {
+                        StartTime = 1000 + 500 + windows.WindowFor(HitResult.Miss) + 10,
+                        Duration = 500,
+                        Column = 0,
+                    },
             };
 
             performTest(new List<ReplayFrame>
@@ -297,21 +296,21 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             var beatmap = new Beatmap<ManiaHitObject>
             {
-                HitObjects =
-                {
-                    new HoldNote
-                    {
-                        StartTime = time_head,
-                        Duration = time_tail - time_head,
-                        Column = 0,
-                    }
-                },
                 BeatmapInfo =
                 {
                     BaseDifficulty = new BeatmapDifficulty { SliderTickRate = tick_rate },
                     Ruleset = new ManiaRuleset().RulesetInfo
                 },
             };
+            beatmap.HitObjects = new List<ManiaHitObject>
+                {
+                    new HoldNote(beatmap)
+                    {
+                        StartTime = time_head,
+                        Duration = time_tail - time_head,
+                        Column = 0,
+                    }
+                };
 
             performTest(new List<ReplayFrame>
             {
@@ -329,17 +328,17 @@ namespace osu.Game.Rulesets.Mania.Tests
         {
             var beatmap = new Beatmap<ManiaHitObject>
             {
-                HitObjects =
+                BeatmapInfo = { Ruleset = new ManiaRuleset().RulesetInfo },
+            };
+            beatmap.HitObjects = new List<ManiaHitObject>
                 {
-                    new HoldNote
+                    new HoldNote(beatmap)
                     {
                         StartTime = 1000,
                         Duration = 0,
                         Column = 0,
                     },
-                },
-                BeatmapInfo = { Ruleset = new ManiaRuleset().RulesetInfo },
-            };
+                };
 
             performTest(new List<ReplayFrame>
             {
@@ -374,21 +373,21 @@ namespace osu.Game.Rulesets.Mania.Tests
             {
                 beatmap = new Beatmap<ManiaHitObject>
                 {
-                    HitObjects =
-                    {
-                        new HoldNote
-                        {
-                            StartTime = time_head,
-                            Duration = time_tail - time_head,
-                            Column = 0,
-                        }
-                    },
                     BeatmapInfo =
                     {
                         BaseDifficulty = new BeatmapDifficulty { SliderTickRate = 4 },
                         Ruleset = new ManiaRuleset().RulesetInfo
                     },
                 };
+                beatmap.HitObjects = new List<ManiaHitObject>
+                    {
+                        new HoldNote(beatmap)
+                        {
+                            StartTime = time_head,
+                            Duration = time_tail - time_head,
+                            Column = 0,
+                        }
+                    };
 
                 beatmap.ControlPointInfo.Add(0, new DifficultyControlPoint { SpeedMultiplier = 0.1f });
             }

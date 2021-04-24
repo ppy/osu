@@ -55,6 +55,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         private Note getNote() => this.ChildrenOfType<DrawableNote>().FirstOrDefault()?.HitObject;
 
         protected override DrawableHitObject CreateHitObject(HitObject hitObject) => new DrawableNote((Note)hitObject);
-        protected override PlacementBlueprint CreateBlueprint() => new NotePlacementBlueprint();
+        protected override PlacementBlueprint CreateBlueprint() => new NotePlacementBlueprint(null);
     }
 }

@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
 
         public TestSceneHoldNoteSelectionBlueprint()
         {
-            var holdNote = new HoldNote { Column = 0, Duration = 1000 };
+            var holdNote = new HoldNote(null) { Column = 0, Duration = 1000 };
             holdNote.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
             base.Content.Child = content = new ScrollingTestContainer(ScrollingDirection.Down)

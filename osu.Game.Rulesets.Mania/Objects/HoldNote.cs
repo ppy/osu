@@ -17,6 +17,8 @@ namespace osu.Game.Rulesets.Mania.Objects
     /// </summary>
     public class HoldNote : ManiaHitObject, IHasDuration
     {
+        public IBeatmap Beatmap;
+
         public double EndTime
         {
             get => StartTime + Duration;
@@ -84,6 +86,11 @@ namespace osu.Game.Rulesets.Mania.Objects
         /// </summary>
         private double tickSpacing = 50;
 
+        public HoldNote(IBeatmap beatmap) : base()
+        {
+            Beatmap = beatmap;
+        }
+
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
@@ -98,14 +105,14 @@ namespace osu.Game.Rulesets.Mania.Objects
 
             createTicks(cancellationToken);
 
-            AddNested(Head = new Note
+            AddNested(Head = new Note(Beatmap)
             {
                 StartTime = StartTime,
                 Column = Column,
                 Samples = GetNodeSamples(0),
             });
 
-            AddNested(Tail = new TailNote
+            AddNested(Tail = new TailNote(Beatmap)
             {
                 StartTime = EndTime,
                 Column = Column,
