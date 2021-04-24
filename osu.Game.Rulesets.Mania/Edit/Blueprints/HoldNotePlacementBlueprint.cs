@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Mania.Objects;
@@ -23,8 +24,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         [Resolved]
         private IScrollingInfo scrollingInfo { get; set; }
 
-        public HoldNotePlacementBlueprint()
-            : base(new HoldNote())
+        public HoldNotePlacementBlueprint(IBeatmap beatmap)
+            : base(new HoldNote(beatmap))
         {
             RelativeSizeAxes = Axes.Both;
 

@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
     {
         protected override DrawableManiaHitObject CreateHitObject()
         {
-            var note = new Note();
+            var note = new Note(Beatmap.Value.Beatmap);
             note.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
             return new DrawableNote(note);

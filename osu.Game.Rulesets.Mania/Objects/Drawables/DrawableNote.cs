@@ -2,12 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Diagnostics;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Skinning.Default;
+using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Screens.Edit;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
@@ -17,6 +21,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// </summary>
     public class DrawableNote : DrawableManiaHitObject<Note>, IKeyBindingHandler<ManiaAction>
     {
+        [Resolved]
+        private OsuColour colours { get; set; }
+
+        [Resolved]
+        private Bindable<ManiaColourCode> configColourCode { get; set; }
+
         protected virtual ManiaSkinComponents Component => ManiaSkinComponents.Note;
 
         private readonly Drawable headPiece;
@@ -32,6 +42,26 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y
             });
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            HitObject.SnapBindable.BindValueChanged(snap => UpdateSnapColour(configColourCode.Value, snap.NewValue), true);
+            configColourCode.BindValueChanged(colourCode => UpdateSnapColour(colourCode.NewValue, HitObject.Snap));
+        }
+
+        private void UpdateSnapColour(ManiaColourCode colourCode, int snap)
+        {
+            if (colourCode == ManiaColourCode.On)
+            {
+                Colour = BindableBeatDivisor.GetColourFor(HitObject.Snap, colours);
+            }
+            else
+            {
+                Colour = Colour4.White;
+            }
         }
 
         protected override void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)

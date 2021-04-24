@@ -247,7 +247,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
                 if (HitObject is IHasDuration endTimeData)
                 {
-                    pattern.Add(new HoldNote
+                    pattern.Add(new HoldNote(Beatmap)
                     {
                         StartTime = HitObject.StartTime,
                         Duration = endTimeData.Duration,
@@ -258,7 +258,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 }
                 else if (HitObject is IHasXPosition)
                 {
-                    pattern.Add(new Note
+                    pattern.Add(new Note(Beatmap)
                     {
                         StartTime = HitObject.StartTime,
                         Samples = HitObject.Samples,

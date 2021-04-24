@@ -15,8 +15,10 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -29,6 +31,10 @@ namespace osu.Game.Rulesets.Mania.Tests
     [TestFixture]
     public class TestSceneNotes : OsuTestScene
     {
+
+        [Cached]
+        protected readonly Bindable<ManiaColourCode> configColourCode = new Bindable<ManiaColourCode>();
+
         [Test]
         public void TestVariousNotes()
         {
@@ -63,9 +69,16 @@ namespace osu.Game.Rulesets.Mania.Tests
             AddAssert("hold note 2 facing upwards", () => verifyAnchors(holdNote2, Anchor.y0));
         }
 
+        [BackgroundDependencyLoader]
+        private void load(RulesetConfigCache configCache)
+        {
+            var config = (ManiaRulesetConfigManager)configCache.GetConfigFor(Ruleset.Value.CreateInstance());
+            config.BindWith(ManiaRulesetSetting.ColourCode, configColourCode);
+        }
+
         private Drawable createNoteDisplay(ScrollingDirection direction, int identifier, out DrawableNote hitObject)
         {
-            var note = new Note { StartTime = 0 };
+            var note = new Note(null) { StartTime = 0 };
             note.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
             return new ScrollingTestContainer(direction)
@@ -80,7 +93,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         private Drawable createHoldNoteDisplay(ScrollingDirection direction, int identifier, out DrawableHoldNote hitObject)
         {
-            var note = new HoldNote { StartTime = 0, Duration = 5000 };
+            var note = new HoldNote(null) { StartTime = 0, Duration = 5000 };
             note.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
             return new ScrollingTestContainer(direction)

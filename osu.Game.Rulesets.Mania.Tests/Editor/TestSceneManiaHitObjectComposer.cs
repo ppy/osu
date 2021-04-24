@@ -159,7 +159,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             AddStep("setup beatmap", () =>
             {
                 composer.EditorBeatmap.Clear();
-                composer.EditorBeatmap.Add(new HoldNote
+                composer.EditorBeatmap.Add(new HoldNote(Beatmap.Value.Beatmap)
                 {
                     Column = 1,
                     EndTime = 200
@@ -201,9 +201,10 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
 
             public TestComposer()
             {
+                var beatmap = new ManiaBeatmap(new StageDefinition { Columns = 4 });
                 InternalChildren = new Drawable[]
                 {
-                    EditorBeatmap = new EditorBeatmap(new ManiaBeatmap(new StageDefinition { Columns = 4 }))
+                    EditorBeatmap = new EditorBeatmap(beatmap)
                     {
                         BeatmapInfo = { Ruleset = new ManiaRuleset().RulesetInfo }
                     },
@@ -211,7 +212,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
                 };
 
                 for (int i = 0; i < 10; i++)
-                    EditorBeatmap.Add(new Note { StartTime = 125 * i });
+                    EditorBeatmap.Add(new Note(beatmap) { StartTime = 125 * i });
             }
         }
     }

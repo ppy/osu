@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
+using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Edit.Blueprints;
 using osu.Game.Rulesets.Mania.Objects;
 
@@ -12,13 +13,16 @@ namespace osu.Game.Rulesets.Mania.Edit
 {
     public class NoteCompositionTool : HitObjectCompositionTool
     {
-        public NoteCompositionTool()
+        private ManiaBeatmap Beatmap;
+
+        public NoteCompositionTool(ManiaBeatmap beatmap)
             : base(nameof(Note))
         {
+            Beatmap = beatmap;
         }
 
         public override Drawable CreateIcon() => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles);
 
-        public override PlacementBlueprint CreatePlacementBlueprint() => new NotePlacementBlueprint();
+        public override PlacementBlueprint CreatePlacementBlueprint() => new NotePlacementBlueprint(Beatmap);
     }
 }

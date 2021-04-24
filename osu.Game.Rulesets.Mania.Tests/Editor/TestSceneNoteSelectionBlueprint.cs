@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
 
         public TestSceneNoteSelectionBlueprint()
         {
-            var note = new Note { Column = 0 };
+            var note = new Note(null) { Column = 0 };
             note.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
             DrawableNote drawableObject;
