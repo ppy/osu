@@ -12,10 +12,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
-    /// <summary>
-    /// A drag "handle" which shares the visual appearance but behaves more like a clickable button.
-    /// </summary>
-    public sealed class SelectionBoxDragHandleButton : SelectionBoxDragHandle, IHasTooltip
+    public sealed class SelectionBoxButton : SelectionBoxControl, IHasTooltip
     {
         private SpriteIcon icon;
 
@@ -23,7 +20,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public Action Action;
 
-        public SelectionBoxDragHandleButton(IconUsage iconUsage, string tooltip)
+        public SelectionBoxButton(IconUsage iconUsage, string tooltip)
         {
             this.iconUsage = iconUsage;
 
@@ -36,7 +33,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            Size *= 2;
+            Size = new Vector2(20);
             AddInternal(icon = new SpriteIcon
             {
                 RelativeSizeAxes = Axes.Both,
@@ -49,9 +46,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override bool OnClick(ClickEvent e)
         {
-            OperationStarted?.Invoke();
+            OnOperationStarted();
             Action?.Invoke();
-            OperationEnded?.Invoke();
+            OnOperationEnded();
             return true;
         }
 
