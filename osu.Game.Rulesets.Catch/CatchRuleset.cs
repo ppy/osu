@@ -127,7 +127,8 @@ namespace osu.Game.Rulesets.Catch
                 case ModType.Fun:
                     return new Mod[]
                     {
-                        new MultiMod(new ModWindUp(), new ModWindDown())
+                        new MultiMod(new ModWindUp(), new ModWindDown()),
+                        new CatchModFloatingFruits()
                     };
 
                 default:
