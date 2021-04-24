@@ -212,7 +212,7 @@ namespace osu.Game.Graphics
 
         public override void Show()
         {
-            if (!optUI.Value || alwaysHide.Value) return;
+            if ((!optUI?.Value ?? false) || (alwaysHide?.Value ?? false)) return;
 
             base.Show();
         }
