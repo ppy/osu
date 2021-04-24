@@ -1,21 +1,24 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
+using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
-    public class TestSceneComposeSelectBox : OsuTestScene
+    public class TestSceneComposeSelectBox : OsuManualInputManagerTestScene
     {
         private Container selectionArea;
+        private SelectionBox selectionBox;
 
         public TestSceneComposeSelectBox()
         {
-            SelectionBox selectionBox = null;
-
             AddStep("create box", () =>
                 Child = selectionArea = new Container
                 {
@@ -67,6 +70,95 @@ namespace osu.Game.Tests.Visual.Editing
             // kinda silly and wrong, but just showing that the drag handles work.
             selectionArea.Rotation += angle;
             return true;
+        }
+
+        [SetUp]
+        public void SetUp() => Schedule(() =>
+        {
+            InputManager.MoveMouseTo(selectionBox);
+            selectionBox.CanRotate = true;
+            selectionBox.CanScaleX = true;
+            selectionBox.CanScaleY = true;
+        });
+
+        [Test]
+        public void TestRotationHandleShownOnHover()
+        {
+            SelectionBoxRotationHandle rotationHandle = null;
+
+            AddStep("enable rotation", () => selectionBox.CanRotate = true);
+            AddStep("retrieve rotation handle", () => rotationHandle = this.ChildrenOfType<SelectionBoxRotationHandle>().First());
+
+            AddAssert("handle hidden", () => rotationHandle.Alpha == 0);
+            AddStep("hover over handle", () => InputManager.MoveMouseTo(rotationHandle));
+            AddUntilStep("rotation handle shown", () => rotationHandle.Alpha == 1);
+
+            AddStep("move mouse away", () => InputManager.MoveMouseTo(selectionBox));
+            AddUntilStep("handle hidden", () => rotationHandle.Alpha == 0);
+        }
+
+        [Test]
+        public void TestRotationHandleShownOnHoveringClosestScaleHandler()
+        {
+            SelectionBoxRotationHandle rotationHandle = null;
+
+            AddStep("retrieve rotation handle", () => rotationHandle = this.ChildrenOfType<SelectionBoxRotationHandle>().First());
+
+            AddAssert("rotation handle hidden", () => rotationHandle.Alpha == 0);
+            AddStep("hover over closest scale handle", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<SelectionBoxScaleHandle>().Single(s => s.Anchor == rotationHandle.Anchor));
+            });
+            AddUntilStep("rotation handle shown", () => rotationHandle.Alpha == 1);
+
+            AddStep("move mouse away", () => InputManager.MoveMouseTo(selectionBox));
+            AddUntilStep("handle hidden", () => rotationHandle.Alpha == 0);
+        }
+
+        [Test]
+        public void TestHoverRotationHandleFromScaleHandle()
+        {
+            SelectionBoxRotationHandle rotationHandle = null;
+
+            AddStep("retrieve rotation handle", () => rotationHandle = this.ChildrenOfType<SelectionBoxRotationHandle>().First());
+
+            AddAssert("rotation handle hidden", () => rotationHandle.Alpha == 0);
+            AddStep("hover over closest scale handle", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<SelectionBoxScaleHandle>().Single(s => s.Anchor == rotationHandle.Anchor));
+            });
+            AddUntilStep("rotation handle shown", () => rotationHandle.Alpha == 1);
+            AddAssert("rotation handle not hovered", () => !rotationHandle.IsHovered);
+
+            AddStep("hover over rotation handle", () => InputManager.MoveMouseTo(rotationHandle));
+            AddAssert("rotation handle still shown", () => rotationHandle.Alpha == 1);
+            AddAssert("rotation handle hovered", () => rotationHandle.IsHovered);
+
+            AddStep("move mouse away", () => InputManager.MoveMouseTo(selectionBox));
+            AddUntilStep("handle hidden", () => rotationHandle.Alpha == 0);
+        }
+
+        [Test]
+        public void TestDraggingScaleHandleKeepsCorrespondingRotationHandleShown()
+        {
+            SelectionBoxRotationHandle rotationHandle = null;
+
+            AddStep("retrieve rotation handle", () => rotationHandle = this.ChildrenOfType<SelectionBoxRotationHandle>().First());
+
+            AddAssert("rotation handle hidden", () => rotationHandle.Alpha == 0);
+            AddStep("hover over and hold closest scale handle", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<SelectionBoxScaleHandle>().Single(s => s.Anchor == rotationHandle.Anchor));
+                InputManager.PressButton(MouseButton.Left);
+            });
+            AddUntilStep("rotation handle shown", () => rotationHandle.Alpha == 1);
+
+            AddStep("drag to centre", () => InputManager.MoveMouseTo(selectionBox));
+            AddAssert("rotation handle still shown", () => rotationHandle.Alpha > 0);
+
+            AddStep("unhold left", () => InputManager.ReleaseButton(MouseButton.Left));
+            AddStep("move mouse away", () => InputManager.MoveMouseTo(selectionBox, new Vector2(20)));
+            AddUntilStep("handle hidden", () => rotationHandle.Alpha == 0);
         }
     }
 }
