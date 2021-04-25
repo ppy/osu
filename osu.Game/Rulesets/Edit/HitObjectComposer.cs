@@ -88,6 +88,7 @@ namespace osu.Game.Rulesets.Edit
                 return;
             }
 
+            const float content_padding = 32;
             const float toolbar_width = 200;
 
             InternalChildren = new Drawable[]
@@ -95,7 +96,7 @@ namespace osu.Game.Rulesets.Edit
                 new Container
                 {
                     Name = "Content",
-                    Padding = new MarginPadding { Left = toolbar_width },
+                    Padding = new MarginPadding(content_padding) { Left = toolbar_width + content_padding },
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
