@@ -5,7 +5,6 @@ using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Input.Bindings;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Configuration;
@@ -15,6 +14,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit;
 using osu.Game.Skinning;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -104,8 +104,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         private void updateSnapColour()
         {
             Colour = configColourCodedNotes.Value
-                ? (ColourInfo)BindableBeatDivisor.GetColourFor(snap.Value, colours)
-                : (ColourInfo)Colour4.White;
+                ? BindableBeatDivisor.GetColourFor(snap.Value, colours)
+                : Color4.White;
         }
     }
 }
