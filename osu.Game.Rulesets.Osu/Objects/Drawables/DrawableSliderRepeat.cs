@@ -26,7 +26,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private double animDuration;
 
-        public Drawable CirclePiece { get; private set; }
+        public SkinnableDrawable CirclePiece { get; private set; }
+
         private Drawable scaleContainer;
         private ReverseArrowPiece arrow;
 
@@ -53,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Children = new[]
+                Children = new Drawable[]
                 {
                     // no default for this; only visible in legacy skins.
                     CirclePiece = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderTailHitCircle), _ => Empty()),
@@ -90,6 +91,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override void UpdateHitStateTransforms(ArmedState state)
         {
             base.UpdateHitStateTransforms(state);
+
+            (CirclePiece.Drawable as IMainCirclePiece)?.Animate(state);
 
             switch (state)
             {
