@@ -15,9 +15,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// Represents the base appearance for UI controls of the <see cref="SelectionBox"/>,
     /// such as scale handles, rotation handles, buttons, etc...
     /// </summary>
-    public abstract class SelectionBoxControl : VisibilityContainer
+    public abstract class SelectionBoxControl : CompositeDrawable
     {
-        protected const double TRANSFORM_DURATION = 100;
+        public const double TRANSFORM_DURATION = 100;
 
         public event Action OperationStarted;
         public event Action OperationEnded;
@@ -89,10 +89,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             UpdateHoverState();
             base.OnMouseUp(e);
         }
-
-        protected override void PopIn() => this.FadeIn(TRANSFORM_DURATION, Easing.OutQuint);
-
-        protected override void PopOut() => this.FadeOut(TRANSFORM_DURATION, Easing.OutQuint);
 
         protected virtual void UpdateHoverState()
         {
