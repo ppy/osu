@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Objects
             this.beatmap = beatmap;
         }
 
-        private readonly static int[] snaps = { 1, 2, 3, 4, 6, 8, 12, 16 };
+        private static readonly int[] snaps = { 1, 2, 3, 4, 6, 8, 12, 16 };
 
         /// <summary>
         /// Finds the lowest beat divisor that the given HitObject aligns to.
@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Objects
 
             foreach (var snap in snaps)
             {
-                if (almostDivisibleBy(snapResult, currentTimingPoint.BeatLength / (double)snap))
+                if (almostDivisibleBy(snapResult, currentTimingPoint.BeatLength / snap))
                     return snap;
             }
 
