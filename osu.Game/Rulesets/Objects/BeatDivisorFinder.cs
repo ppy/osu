@@ -27,12 +27,13 @@ namespace osu.Game.Rulesets.Objects
 
         /// <summary>
         /// Finds the lowest beat divisor that the given <see cref="HitObject"/> aligns to.
+        /// Returns 0 if it does not align to any divisor.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> to evaluate.</param>
         public int FindDivisor(HitObject hitObject)
         {
             TimingControlPoint currentTimingPoint = beatmap.ControlPointInfo.TimingPointAt(hitObject.StartTime);
-            double snapResult = (hitObject.StartTime - currentTimingPoint.Time) % (currentTimingPoint.BeatLength * 4);
+            double snapResult = hitObject.StartTime - currentTimingPoint.Time;
 
             foreach (var divisor in BindableBeatDivisor.VALID_DIVISORS)
             {
