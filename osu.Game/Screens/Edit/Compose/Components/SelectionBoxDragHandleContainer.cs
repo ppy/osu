@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// <summary>
     /// Represents a display composite containing and managing the visibility state of the selection box's drag handles.
     /// </summary>
-    public class SelectionBoxDragHandleDisplay : CompositeDrawable
+    public class SelectionBoxDragHandleContainer : CompositeDrawable
     {
         private Container<SelectionBoxScaleHandle> scaleHandles;
         private Container<SelectionBoxRotationHandle> rotationHandles;
@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (activeHandle?.InOperation == true || activeHandle?.IsHovered == true)
                 return;
 
-            displayedRotationHandle?.FadeOut(SelectionBoxControl.TRANSFORM_DURATION, Easing.OutQuint);
+            displayedRotationHandle?.Hide();
             displayedRotationHandle = null;
 
             activeHandle = allDragHandles.SingleOrDefault(h => h.InOperation);
@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (activeHandle != null)
             {
                 displayedRotationHandle = getCorrespondingRotationHandle(activeHandle, rotationHandles);
-                displayedRotationHandle?.FadeIn(SelectionBoxControl.TRANSFORM_DURATION, Easing.OutQuint);
+                displayedRotationHandle?.Show();
             }
         }
 
