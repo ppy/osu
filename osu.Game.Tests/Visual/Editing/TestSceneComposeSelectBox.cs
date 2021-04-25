@@ -75,7 +75,6 @@ namespace osu.Game.Tests.Visual.Editing
         {
             SelectionBoxRotationHandle rotationHandle = null;
 
-            AddStep("enable rotation", () => selectionBox.CanRotate = true);
             AddStep("retrieve rotation handle", () => rotationHandle = this.ChildrenOfType<SelectionBoxRotationHandle>().First());
 
             AddAssert("handle hidden", () => rotationHandle.Alpha == 0);
