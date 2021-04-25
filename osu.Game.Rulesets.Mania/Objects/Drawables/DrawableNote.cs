@@ -26,13 +26,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         [Resolved]
         private OsuColour colours { get; set; }
 
-        [Resolved(canBeNull: true)]
-        private ManiaRulesetConfigManager config { get; set; }
-
         private readonly Bindable<bool> configColourCodedNotes = new Bindable<bool>();
-
-        [Resolved(canBeNull: true)]
-        private SnapFinder snapFinder { get; set; }
 
         protected virtual ManiaSkinComponents Component => ManiaSkinComponents.Note;
 
@@ -53,13 +47,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             });
         }
 
-        protected override void LoadComplete()
+        [BackgroundDependencyLoader(true)]
+        private void load(ManiaRulesetConfigManager rulesetConfig, SnapFinder snapFinder)
         {
-            base.LoadComplete();
-
             if (snapFinder != null)
             {
-                config?.BindWith(ManiaRulesetSetting.ColourCodedNotes, configColourCodedNotes);
+                rulesetConfig?.BindWith(ManiaRulesetSetting.ColourCodedNotes, configColourCodedNotes);
 
                 HitObject.StartTimeBindable.BindValueChanged(_ => snap.Value = snapFinder.FindSnap(HitObject), true);
 
