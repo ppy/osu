@@ -24,7 +24,8 @@ namespace osu.Game.Screens.Mvis.Plugins
         internal Action<MvisPlugin> OnPluginAdd;
         internal Action<MvisPlugin> OnPluginUnLoad;
 
-        public int PluginVersion => 2;
+        public int PluginVersion => 3;
+        public int MinimumPluginVersion => 2;
 
         [BackgroundDependencyLoader]
         private void load(CustomStore customStore, OsuGameBase gameBase)
@@ -43,7 +44,7 @@ namespace osu.Game.Screens.Mvis.Plugins
         {
             if (avaliablePlugins.Contains(pl) || pl == null) return false;
 
-            if (pl.Version < PluginVersion)
+            if (pl.Version < MinimumPluginVersion)
                 Logger.Log($"插件 \"{pl.Name}\" 是为旧版本的mf-osu打造的, 继续使用可能会导致意外情况的发生!", LoggingTarget.Runtime, LogLevel.Important);
             else if (pl.Version > PluginVersion)
                 Logger.Log($"插件 \"{pl.Name}\" 是为更高版本的mf-osu打造的, 继续使用可能会导致意外情况的发生!", LoggingTarget.Runtime, LogLevel.Important);

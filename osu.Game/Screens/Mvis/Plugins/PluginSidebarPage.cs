@@ -86,9 +86,18 @@ namespace osu.Game.Screens.Mvis.Plugins
             };
         }
 
+        private DependencyContainer dependencies;
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
+            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
         [BackgroundDependencyLoader]
         private void load()
         {
+            dependencies.Cache(this);
+            dependencies.Cache(Plugin);
+            dependencies.Cache(Dependencies.Get<MvisPluginManager>().GetConfigManager(Plugin));
+
             Plugin.Disabled.BindValueChanged(v =>
             {
                 content.FadeTo(v.NewValue ? 0 : 1);

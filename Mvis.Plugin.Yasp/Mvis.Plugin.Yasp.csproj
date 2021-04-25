@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup Label="Project">
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <OutputType>Library</OutputType>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Description>ExamplePlugin</Description>
+  </PropertyGroup>
+
+  <ItemGroup Label="Project References">
+    <ProjectReference Include="..\..\mfosu\osu.Game\osu.Game.csproj" />
+    <ProjectReference Include="..\..\osu-framework\osu.Framework\osu.Framework.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Textures\**\*" />
+  </ItemGroup>
+</Project>
