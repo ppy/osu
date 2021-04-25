@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private Circle circle;
 
         /// <summary>
-        /// Whether an operation has began from this control.
+        /// Whether this control is currently being operated on by the user.
         /// </summary>
         public bool InOperation { get; private set; }
 
