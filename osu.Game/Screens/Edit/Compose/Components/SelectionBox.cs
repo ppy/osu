@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        private SelectionBoxDragHandleDisplay dragHandles;
+        private SelectionBoxDragHandleContainer dragHandles;
         private FillFlowContainer buttons;
 
         public const float BORDER_RADIUS = 3;
@@ -161,7 +161,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         },
                     }
                 },
-                dragHandles = new SelectionBoxDragHandleDisplay
+                dragHandles = new SelectionBoxDragHandleContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     // ensures that the centres of all drag handles line up with the middle of the selection box border.
