@@ -17,6 +17,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// </summary>
     public abstract class SelectionBoxControl : CompositeDrawable
     {
+        public const double TRANSFORM_DURATION = 100;
+
         public event Action OperationStarted;
         public event Action OperationEnded;
 
@@ -90,8 +92,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected virtual void UpdateHoverState()
         {
-            circle.Colour = HandlingMouse ? Colours.GrayF : (IsHovered ? Colours.Red : Colours.YellowDark);
-            this.ScaleTo(HandlingMouse || IsHovered ? 1.5f : 1, 100, Easing.OutQuint);
+            if (HandlingMouse)
+                circle.FadeColour(Colours.GrayF, TRANSFORM_DURATION, Easing.OutQuint);
+            else
+                circle.FadeColour(IsHovered ? Colours.Red : Colours.YellowDark, TRANSFORM_DURATION, Easing.OutQuint);
+
+            this.ScaleTo(HandlingMouse || IsHovered ? 1.5f : 1, TRANSFORM_DURATION, Easing.OutQuint);
         }
 
         protected void OnOperationStarted()
