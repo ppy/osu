@@ -35,8 +35,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override void UpdateHoverState()
         {
-            icon.Colour = !HandlingMouse && IsHovered ? Color4.White : Color4.Black;
             base.UpdateHoverState();
+            icon.FadeColour(!HandlingMouse && IsHovered ? Color4.White : Color4.Black, TRANSFORM_DURATION, Easing.OutQuint);
         }
     }
 }
