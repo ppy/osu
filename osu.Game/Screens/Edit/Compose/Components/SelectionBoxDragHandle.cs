@@ -24,7 +24,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override void OnDragEnd(DragEndEvent e)
         {
-            HandlingMouse = false;
             OnOperationEnded();
 
             UpdateHoverState();

@@ -74,7 +74,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Whether this control is currently handling mouse down input.
         /// </summary>
-        protected bool HandlingMouse { get; set; }
+        protected bool HandlingMouse { get; private set; }
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
