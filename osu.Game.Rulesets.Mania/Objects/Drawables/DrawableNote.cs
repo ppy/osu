@@ -48,13 +48,13 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(ManiaRulesetConfigManager rulesetConfig, SnapFinder snapFinder)
+        private void load(ManiaRulesetConfigManager rulesetConfig, BeatDivisorFinder beatDivisorFinder)
         {
-            if (snapFinder != null)
+            if (beatDivisorFinder != null)
             {
                 rulesetConfig?.BindWith(ManiaRulesetSetting.ColourCodedNotes, configColourCodedNotes);
 
-                HitObject.StartTimeBindable.BindValueChanged(_ => snap.Value = snapFinder.FindSnap(HitObject), true);
+                HitObject.StartTimeBindable.BindValueChanged(_ => snap.Value = beatDivisorFinder.FindDivisor(HitObject), true);
 
                 snap.BindValueChanged(_ => updateSnapColour(), true);
                 configColourCodedNotes.BindValueChanged(_ => updateSnapColour());

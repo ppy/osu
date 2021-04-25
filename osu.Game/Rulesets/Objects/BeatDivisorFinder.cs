@@ -9,17 +9,17 @@ using osu.Game.Beatmaps.ControlPoints;
 namespace osu.Game.Rulesets.Objects
 {
     /// <summary>
-    /// Used to find the lowest beat divisor that a <see cref="HitObject"/> aligns to in an <see cref="IBeatmap"/>
+    /// Used to find the lowest beat divisor that a <see cref="HitObject"/> aligns to in an <see cref="IBeatmap"/>.
     /// </summary>
-    public class SnapFinder
+    public class BeatDivisorFinder
     {
         private readonly IBeatmap beatmap;
 
         /// <summary>
-        /// Creates a new SnapFinder instance.
+        /// Creates a new <see cref="BeatDivisorFinder"/> instance.
         /// </summary>
-        /// <param name="beatmap">The beatmap to align to when evaulating.</param>
-        public SnapFinder(IBeatmap beatmap)
+        /// <param name="beatmap">The beatmap to use when calculating beat divisor alignment.</param>
+        public BeatDivisorFinder(IBeatmap beatmap)
         {
             this.beatmap = beatmap;
         }
@@ -27,10 +27,10 @@ namespace osu.Game.Rulesets.Objects
         private static readonly int[] snaps = { 1, 2, 3, 4, 6, 8, 12, 16 };
 
         /// <summary>
-        /// Finds the lowest beat divisor that the given HitObject aligns to.
+        /// Finds the lowest beat divisor that the given <see cref="HitObject"/> aligns to.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> to evaluate.</param>
-        public int FindSnap(HitObject hitObject)
+        public int FindDivisor(HitObject hitObject)
         {
             TimingControlPoint currentTimingPoint = beatmap.ControlPointInfo.TimingPointAt(hitObject.StartTime);
             double snapResult = (hitObject.StartTime - currentTimingPoint.Time) % (currentTimingPoint.BeatLength * 4);
