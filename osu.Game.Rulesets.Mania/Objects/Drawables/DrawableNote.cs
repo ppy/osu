@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         private readonly Drawable headPiece;
 
-        private readonly Bindable<int> Snap = new Bindable<int>();
+        private readonly Bindable<int> snap = new Bindable<int>();
 
         public DrawableNote(Note hitObject)
             : base(hitObject)
@@ -61,9 +61,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             {
                 config?.BindWith(ManiaRulesetSetting.ColourCodedNotes, configColourCodedNotes);
 
-                HitObject.StartTimeBindable.BindValueChanged(_ => Snap.Value = snapFinder.FindSnap(HitObject), true);
+                HitObject.StartTimeBindable.BindValueChanged(_ => snap.Value = snapFinder.FindSnap(HitObject), true);
 
-                Snap.BindValueChanged(_ => updateSnapColour(), true);
+                snap.BindValueChanged(_ => updateSnapColour(), true);
                 configColourCodedNotes.BindValueChanged(_ => updateSnapColour());
             }
         }
@@ -106,12 +106,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         public virtual void OnReleased(ManiaAction action)
         {
-        } 
+        }
 
         private void updateSnapColour()
         {
             Colour = configColourCodedNotes.Value
-                ? (ColourInfo)BindableBeatDivisor.GetColourFor(Snap.Value, colours)
+                ? (ColourInfo)BindableBeatDivisor.GetColourFor(snap.Value, colours)
                 : (ColourInfo)Colour4.White;
         }
     }
