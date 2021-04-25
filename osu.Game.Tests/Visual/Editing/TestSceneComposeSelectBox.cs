@@ -17,32 +17,30 @@ namespace osu.Game.Tests.Visual.Editing
         private Container selectionArea;
         private SelectionBox selectionBox;
 
-        public TestSceneComposeSelectBox()
+        [SetUp]
+        public void SetUp() => Schedule(() =>
         {
-            AddStep("create box", () =>
-                Child = selectionArea = new Container
+            Child = selectionArea = new Container
+            {
+                Size = new Vector2(400),
+                Position = -new Vector2(150),
+                Anchor = Anchor.Centre,
+                Children = new Drawable[]
                 {
-                    Size = new Vector2(400),
-                    Position = -new Vector2(150),
-                    Anchor = Anchor.Centre,
-                    Children = new Drawable[]
+                    selectionBox = new SelectionBox
                     {
-                        selectionBox = new SelectionBox
-                        {
-                            CanRotate = true,
-                            CanScaleX = true,
-                            CanScaleY = true,
+                        CanRotate = true,
+                        CanScaleX = true,
+                        CanScaleY = true,
 
-                            OnRotation = handleRotation,
-                            OnScale = handleScale
-                        }
+                        OnRotation = handleRotation,
+                        OnScale = handleScale
                     }
-                });
+                }
+            };
 
-            AddToggleStep("toggle rotation", state => selectionBox.CanRotate = state);
-            AddToggleStep("toggle x", state => selectionBox.CanScaleX = state);
-            AddToggleStep("toggle y", state => selectionBox.CanScaleY = state);
-        }
+            InputManager.MoveMouseTo(selectionBox);
+        });
 
         private bool handleScale(Vector2 amount, Anchor reference)
         {
@@ -71,15 +69,6 @@ namespace osu.Game.Tests.Visual.Editing
             selectionArea.Rotation += angle;
             return true;
         }
-
-        [SetUp]
-        public void SetUp() => Schedule(() =>
-        {
-            InputManager.MoveMouseTo(selectionBox);
-            selectionBox.CanRotate = true;
-            selectionBox.CanScaleX = true;
-            selectionBox.CanScaleY = true;
-        });
 
         [Test]
         public void TestRotationHandleShownOnHover()
