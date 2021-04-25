@@ -15,7 +15,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -30,16 +29,6 @@ namespace osu.Game.Rulesets.Mania.Tests
     [TestFixture]
     public class TestSceneNotes : OsuTestScene
     {
-        [Cached]
-        protected readonly Bindable<bool> ConfigColourCodedNotes = new Bindable<bool>();
-
-        [BackgroundDependencyLoader]
-        private void load(RulesetConfigCache configCache)
-        {
-            var config = (ManiaRulesetConfigManager)configCache.GetConfigFor(Ruleset.Value.CreateInstance());
-            config.BindWith(ManiaRulesetSetting.ColourCodedNotes, ConfigColourCodedNotes);
-        }
-
         [Test]
         public void TestVariousNotes()
         {
