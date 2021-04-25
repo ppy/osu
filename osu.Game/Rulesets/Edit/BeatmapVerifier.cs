@@ -22,7 +22,10 @@ namespace osu.Game.Rulesets.Edit
 
             // Audio
             new CheckAudioPresence(),
-            new CheckAudioQuality()
+            new CheckAudioQuality(),
+
+            // Compose
+            new CheckUnsnaps()
         };
 
         public IEnumerable<Issue> Run(IBeatmap playableBeatmap, WorkingBeatmap workingBeatmap)
