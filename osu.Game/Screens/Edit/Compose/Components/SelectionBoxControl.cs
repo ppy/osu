@@ -25,6 +25,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private Circle circle;
 
+        /// <summary>
+        /// Whether an operation has began from this control.
+        /// </summary>
+        public bool InOperation { get; private set; }
+
         [Resolved]
         protected OsuColour Colours { get; private set; }
 
@@ -89,8 +94,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
             this.ScaleTo(HandlingMouse || IsHovered ? 1.5f : 1, 100, Easing.OutQuint);
         }
 
-        protected void OnOperationStarted() => OperationStarted?.Invoke();
+        protected void OnOperationStarted()
+        {
+            InOperation = true;
+            OperationStarted?.Invoke();
+        }
 
-        protected void OnOperationEnded() => OperationEnded?.Invoke();
+        protected void OnOperationEnded()
+        {
+            InOperation = false;
+            OperationEnded?.Invoke();
+        }
     }
 }
