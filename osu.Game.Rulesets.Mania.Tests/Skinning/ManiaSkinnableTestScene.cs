@@ -7,7 +7,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Rulesets.UI.Scrolling.Algorithms;
 using osu.Game.Tests.Visual;
@@ -25,9 +24,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
         [Cached(Type = typeof(IScrollingInfo))]
         private readonly TestScrollingInfo scrollingInfo = new TestScrollingInfo();
 
-        [Cached]
-        protected readonly Bindable<bool> ConfigColourCodedNotes = new Bindable<bool>();
-
         protected override Ruleset CreateRulesetForSkinProvider() => new ManiaRuleset();
 
         protected ManiaSkinnableTestScene()
@@ -40,13 +36,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                 Colour = Color4.SlateGray.Opacity(0.2f),
                 Depth = 1
             });
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(RulesetConfigCache configCache)
-        {
-            var config = (ManiaRulesetConfigManager)configCache.GetConfigFor(Ruleset.Value.CreateInstance());
-            config.BindWith(ManiaRulesetSetting.ColourCodedNotes, ConfigColourCodedNotes);
         }
 
         [Test]

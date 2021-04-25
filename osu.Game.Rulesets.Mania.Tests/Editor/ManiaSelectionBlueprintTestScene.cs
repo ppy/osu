@@ -2,10 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
-using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Tests.Visual;
 using osuTK.Graphics;
@@ -17,9 +15,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         [Cached(Type = typeof(IAdjustableClock))]
         private readonly IAdjustableClock clock = new StopwatchClock();
 
-        [Cached]
-        protected readonly Bindable<bool> ConfigColourCodedNotes = new Bindable<bool>();
-
         protected ManiaSelectionBlueprintTestScene()
         {
             Add(new Column(0)
@@ -29,13 +24,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
                 AccentColour = Color4.OrangeRed,
                 Clock = new FramedClock(new StopwatchClock()), // No scroll
             });
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(RulesetConfigCache configCache)
-        {
-            var config = (ManiaRulesetConfigManager)configCache.GetConfigFor(Ruleset.Value.CreateInstance());
-            config.BindWith(ManiaRulesetSetting.ColourCodedNotes, ConfigColourCodedNotes);
         }
 
         public ManiaPlayfield Playfield => null;

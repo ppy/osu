@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Input.Bindings;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Skinning.Default;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
@@ -25,8 +26,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         [Resolved]
         private OsuColour colours { get; set; }
 
-        [Resolved]
-        private Bindable<bool> configColourCodedNotes { get; set; }
+        [Resolved(canBeNull: true)]
+        private ManiaRulesetConfigManager config { get; set; }
+
+        private readonly Bindable<bool> configColourCodedNotes = new Bindable<bool>();
 
         [Resolved(canBeNull: true)]
         private SnapFinder snapFinder { get; set; }
@@ -56,6 +59,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             if (snapFinder != null)
             {
+                config?.BindWith(ManiaRulesetSetting.ColourCodedNotes, configColourCodedNotes);
+
                 HitObject.StartTimeBindable.BindValueChanged(_ => Snap.Value = snapFinder.FindSnap(HitObject), true);
 
                 Snap.BindValueChanged(_ => updateSnapColour(), true);
