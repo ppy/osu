@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Screens.Edit;
 
 namespace osu.Game.Rulesets.Objects
 {
@@ -24,8 +25,6 @@ namespace osu.Game.Rulesets.Objects
             this.beatmap = beatmap;
         }
 
-        private static readonly int[] snaps = { 1, 2, 3, 4, 6, 8, 12, 16 };
-
         /// <summary>
         /// Finds the lowest beat divisor that the given <see cref="HitObject"/> aligns to.
         /// </summary>
@@ -35,10 +34,10 @@ namespace osu.Game.Rulesets.Objects
             TimingControlPoint currentTimingPoint = beatmap.ControlPointInfo.TimingPointAt(hitObject.StartTime);
             double snapResult = (hitObject.StartTime - currentTimingPoint.Time) % (currentTimingPoint.BeatLength * 4);
 
-            foreach (var snap in snaps)
+            foreach (var divisor in BindableBeatDivisor.VALID_DIVISORS)
             {
-                if (almostDivisibleBy(snapResult, currentTimingPoint.BeatLength / snap))
-                    return snap;
+                if (almostDivisibleBy(snapResult, currentTimingPoint.BeatLength / divisor))
+                    return divisor;
             }
 
             return 0;
