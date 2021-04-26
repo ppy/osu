@@ -24,7 +24,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiplayerSpectatorLeaderboard : MultiplayerTestScene
+    public class TestSceneMultiSpectatorLeaderboard : MultiplayerTestScene
     {
         [Cached(typeof(SpectatorStreamingClient))]
         private TestSpectatorStreamingClient streamingClient = new TestSpectatorStreamingClient();
@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             { 56, new ManualClock() }
         };
 
-        public TestSceneMultiplayerSpectatorLeaderboard()
+        public TestSceneMultiSpectatorLeaderboard()
         {
             base.Content.AddRange(new Drawable[]
             {
