@@ -37,6 +37,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         /// </summary>
         public bool InputTracksVisualSize = true;
 
+        /// <summary>
+        /// Whether to track this <see cref="SliderBall"/> using only the action that hit the slider head, until no other actions are held.
+        /// If <c>false</c>, the ball will be tracked with any action regardless.
+        /// </summary>
+        public bool TrackHeadActionInitially = true;
+
         private readonly Drawable followCircle;
         private readonly DrawableSlider drawableSlider;
         private readonly Drawable ball;
@@ -138,23 +144,26 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         {
             base.Update();
 
-            // from the point at which the head circle is hit, this will be non-null.
-            // it may be null if the head circle was missed.
-            var headCircleHitAction = GetInitialHitAction();
-
-            if (headCircleHitAction == null)
-                timeToAcceptAnyKeyAfter = null;
-
             var actions = drawableSlider.OsuActionInputManager?.PressedActions;
 
-            // if the head circle was hit with a specific key, tracking should only occur while that key is pressed.
-            if (headCircleHitAction != null && timeToAcceptAnyKeyAfter == null)
+            if (TrackHeadActionInitially)
             {
-                var otherKey = headCircleHitAction == OsuAction.RightButton ? OsuAction.LeftButton : OsuAction.RightButton;
+                // from the point at which the head circle is hit, this will be non-null.
+                // it may be null if the head circle was missed.
+                var headCircleHitAction = GetInitialHitAction();
 
-                // we can return to accepting all keys if the initial head circle key is the *only* key pressed, or all keys have been released.
-                if (actions?.Contains(otherKey) != true)
-                    timeToAcceptAnyKeyAfter = Time.Current;
+                if (headCircleHitAction == null)
+                    timeToAcceptAnyKeyAfter = null;
+
+                // if the head circle was hit with a specific key, tracking should only occur while that key is pressed.
+                if (headCircleHitAction != null && timeToAcceptAnyKeyAfter == null)
+                {
+                    var otherKey = headCircleHitAction == OsuAction.RightButton ? OsuAction.LeftButton : OsuAction.RightButton;
+
+                    // we can return to accepting all keys if the initial head circle key is the *only* key pressed, or all keys have been released.
+                    if (actions?.Contains(otherKey) != true)
+                        timeToAcceptAnyKeyAfter = Time.Current;
+                }
             }
 
             Tracking =
@@ -171,11 +180,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
         /// </summary>
         private bool isValidTrackingAction(OsuAction action)
         {
-            bool headCircleHit = GetInitialHitAction().HasValue;
+            if (TrackHeadActionInitially)
+            {
+                bool headCircleHit = GetInitialHitAction().HasValue;
 
-            // if the head circle was hit, we may not yet be allowed to accept any key, so we must use the initial hit action.
-            if (headCircleHit && (!timeToAcceptAnyKeyAfter.HasValue || Time.Current <= timeToAcceptAnyKeyAfter.Value))
-                return action == GetInitialHitAction();
+                // if the head circle was hit, we may not yet be allowed to accept any key, so we must use the initial hit action.
+                if (headCircleHit && (!timeToAcceptAnyKeyAfter.HasValue || Time.Current <= timeToAcceptAnyKeyAfter.Value))
+                    return action == GetInitialHitAction();
+            }
 
             return action == OsuAction.LeftButton || action == OsuAction.RightButton;
         }
