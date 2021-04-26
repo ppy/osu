@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         public abstract class IssueTemplateUnsnap : IssueTemplate
         {
             protected IssueTemplateUnsnap(ICheck check, IssueType type)
-                : base(check, type, "{0:0.##} is unsnapped by {1:0.##} ms.")
+                : base(check, type, "{0} is unsnapped by {1:0.##} ms.")
             {
             }
 
