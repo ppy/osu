@@ -32,6 +32,11 @@ namespace osu.Game.Beatmaps
 
         public readonly BeatmapMetadata Metadata;
 
+        /// <summary>
+        /// Only if this is set to true, changes made by mods that implement <see cref="IApplicableToBeatmapKeepStarRating"/> will be applied.
+        /// </summary>
+        public bool ApplyChangesToBeatmap;
+
         protected AudioManager AudioManager { get; }
 
         protected WorkingBeatmap(BeatmapInfo beatmapInfo, AudioManager audioManager)
@@ -166,9 +171,14 @@ namespace osu.Game.Beatmaps
 
                 foreach (var mod in mods.OfType<IApplicableToBeatmap>())
                 {
+                    if (mod is IApplicableToBeatmapKeepStarRating && !ApplyChangesToBeatmap)
+                        continue;
+
                     cancellationSource.Token.ThrowIfCancellationRequested();
                     mod.ApplyToBeatmap(converted);
                 }
+
+                ApplyChangesToBeatmap = false;
 
                 return converted;
             }
