@@ -37,8 +37,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private readonly Dictionary<int, ManualClock> clocks = new Dictionary<int, ManualClock>
         {
-            { 55, new ManualClock() },
-            { 56, new ManualClock() }
+            { PLAYER_1_ID, new ManualClock() },
+            { PLAYER_2_ID, new ManualClock() }
         };
 
         public TestSceneMultiSpectatorLeaderboard()
@@ -95,46 +95,46 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("send frames", () =>
             {
-                // For user 55, send frames in sets of 1.
-                // For user 56, send frames in sets of 10.
+                // For player 1, send frames in sets of 1.
+                // For player 2, send frames in sets of 10.
                 for (int i = 0; i < 100; i++)
                 {
-                    streamingClient.SendFrames(55, i, 1);
+                    streamingClient.SendFrames(PLAYER_1_ID, i, 1);
 
                     if (i % 10 == 0)
-                        streamingClient.SendFrames(56, i, 10);
+                        streamingClient.SendFrames(PLAYER_2_ID, i, 10);
                 }
             });
 
-            assertCombo(55, 1);
-            assertCombo(56, 10);
+            assertCombo(PLAYER_1_ID, 1);
+            assertCombo(PLAYER_2_ID, 10);
 
-            // Advance to a point where only user 55's frame changes.
+            // Advance to a point where only user player 1's frame changes.
             setTime(500);
-            assertCombo(55, 5);
-            assertCombo(56, 10);
+            assertCombo(PLAYER_1_ID, 5);
+            assertCombo(PLAYER_2_ID, 10);
 
             // Advance to a point where both user's frame changes.
             setTime(1100);
-            assertCombo(55, 11);
-            assertCombo(56, 20);
+            assertCombo(PLAYER_1_ID, 11);
+            assertCombo(PLAYER_2_ID, 20);
 
-            // Advance user 56 only to a point where its frame changes.
-            setTime(56, 2100);
-            assertCombo(55, 11);
-            assertCombo(56, 30);
+            // Advance user player 2 only to a point where its frame changes.
+            setTime(PLAYER_2_ID, 2100);
+            assertCombo(PLAYER_1_ID, 11);
+            assertCombo(PLAYER_2_ID, 30);
 
             // Advance both users beyond their last frame
             setTime(101 * 100);
-            assertCombo(55, 100);
-            assertCombo(56, 100);
+            assertCombo(PLAYER_1_ID, 100);
+            assertCombo(PLAYER_2_ID, 100);
         }
 
         [Test]
         public void TestNoFrames()
         {
-            assertCombo(55, 0);
-            assertCombo(56, 0);
+            assertCombo(PLAYER_1_ID, 0);
+            assertCombo(PLAYER_2_ID, 0);
         }
 
         private void setTime(double time) => AddStep($"set time {time}", () =>
