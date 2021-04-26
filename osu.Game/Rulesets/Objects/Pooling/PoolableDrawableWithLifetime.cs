@@ -13,15 +13,15 @@ namespace osu.Game.Rulesets.Objects.Pooling
     /// A <see cref="PoolableDrawable"/> that is controlled by <see cref="Entry"/> to implement drawable pooling and replay rewinding.
     /// </summary>
     /// <typeparam name="TEntry">The <see cref="LifetimeEntry"/> type storing state and controlling this drawable.</typeparam>
-    public abstract class DrawableObject<TEntry> : PoolableDrawable where TEntry : LifetimeEntry
+    public abstract class PoolableDrawableWithLifetime<TEntry> : PoolableDrawable where TEntry : LifetimeEntry
     {
         /// <summary>
-        /// The entry holding essential state of this <see cref="DrawableObject{TEntry}"/>.
+        /// The entry holding essential state of this <see cref="PoolableDrawableWithLifetime{TEntry}"/>.
         /// </summary>
         protected TEntry? Entry { get; private set; }
 
         /// <summary>
-        /// Whether <see cref="Entry"/> is applied to this <see cref="DrawableObject{TEntry}"/>.
+        /// Whether <see cref="Entry"/> is applied to this <see cref="PoolableDrawableWithLifetime{TEntry}"/>.
         /// When an initial entry is specified in the constructor, <see cref="Entry"/> is set but not applied until loading is completed.
         /// </summary>
         protected bool HasEntryApplied { get; private set; }
@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Objects.Pooling
         public override bool RemoveWhenNotAlive => false;
         public override bool RemoveCompletedTransforms => false;
 
-        protected DrawableObject(TEntry? initialEntry = null)
+        protected PoolableDrawableWithLifetime(TEntry? initialEntry = null)
         {
             Entry = initialEntry;
         }

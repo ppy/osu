@@ -26,7 +26,7 @@ using osuTK.Graphics;
 namespace osu.Game.Rulesets.Objects.Drawables
 {
     [Cached(typeof(DrawableHitObject))]
-    public abstract class DrawableHitObject : DrawableObject<HitObjectLifetimeEntry>
+    public abstract class DrawableHitObject : PoolableDrawableWithLifetime<HitObjectLifetimeEntry>
     {
         /// <summary>
         /// Invoked after this <see cref="DrawableHitObject"/>'s applied <see cref="HitObject"/> has had its defaults applied.
@@ -153,7 +153,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         /// <param name="initialHitObject">
         /// The <see cref="HitObject"/> to be initially applied to this <see cref="DrawableHitObject"/>.
-        /// If <c>null</c>, a hitobject is expected to be later applied via <see cref="DrawableObject{TEntry}.Apply"/> (or automatically via pooling).
+        /// If <c>null</c>, a hitobject is expected to be later applied via <see cref="PoolableDrawableWithLifetime{TEntry}.Apply"/> (or automatically via pooling).
         /// </param>
         protected DrawableHitObject([CanBeNull] HitObject initialHitObject = null)
             : base(initialHitObject != null ? new SyntheticHitObjectEntry(initialHitObject) : null)
