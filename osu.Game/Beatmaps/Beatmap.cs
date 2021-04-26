@@ -81,6 +81,7 @@ namespace osu.Game.Beatmaps
             var beatLength = timingPoint.BeatLength / beatDivisor;
             var beatLengths = (int)Math.Round((time - timingPoint.Time) / beatLength, MidpointRounding.AwayFromZero);
 
+            // Casting to int matches stable.
             return (int)(timingPoint.Time + beatLengths * beatLength);
         }
 
