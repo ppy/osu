@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Edit
 
         protected ComposeBlueprintContainer BlueprintContainer { get; private set; }
 
-        private DrawableEditRulesetWrapper<TObject> drawableRulesetWrapper;
+        private DrawableEditorRulesetWrapper<TObject> drawableRulesetWrapper;
 
         protected readonly Container LayerBelowRuleset = new Container { RelativeSizeAxes = Axes.Both };
 
@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Edit
 
             try
             {
-                drawableRulesetWrapper = new DrawableEditRulesetWrapper<TObject>(CreateDrawableRuleset(Ruleset, EditorBeatmap.PlayableBeatmap, new[] { Ruleset.GetAutoplayMod() }))
+                drawableRulesetWrapper = new DrawableEditorRulesetWrapper<TObject>(CreateDrawableRuleset(Ruleset, EditorBeatmap.PlayableBeatmap, new[] { Ruleset.GetAutoplayMod() }))
                 {
                     Clock = EditorClock,
                     ProcessCustomClock = false
