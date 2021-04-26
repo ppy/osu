@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 {
     public class CheckUnsnaps : ICheck
     {
-        private const double unsnap_ms_threshold = 2;
+        public const double UNSNAP_MS_THRESHOLD = 2;
 
         public CheckMetadata Metadata { get; } = new CheckMetadata(CheckCategory.Compose, "Unsnapped hitobjects");
 
@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         private IEnumerable<Issue> getUnsnapIssues(HitObject hitobject, double unsnap, double time, string postfix = "")
         {
-            if (Math.Abs(unsnap) >= unsnap_ms_threshold)
+            if (Math.Abs(unsnap) >= UNSNAP_MS_THRESHOLD)
                 yield return new IssueTemplate2MsOrMore(this).Create(hitobject, unsnap, time, postfix);
             else if (Math.Abs(unsnap) >= 1)
                 yield return new IssueTemplate1MsOrMore(this).Create(hitobject, unsnap, time, postfix);
