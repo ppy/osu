@@ -19,24 +19,24 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
     {
         private readonly Bindable<bool> waitingOnFrames = new Bindable<bool>(true);
         private readonly Score score;
-        private readonly ISlaveClock slaveClock;
+        private readonly ISpectatorPlayerClock spectatorPlayerClock;
 
         /// <summary>
         /// Creates a new <see cref="MultiSpectatorPlayer"/>.
         /// </summary>
         /// <param name="score">The score containing the player's replay.</param>
-        /// <param name="slaveClock">The clock controlling the gameplay running state.</param>
-        public MultiSpectatorPlayer([NotNull] Score score, [NotNull] ISlaveClock slaveClock)
+        /// <param name="spectatorPlayerClock">The clock controlling the gameplay running state.</param>
+        public MultiSpectatorPlayer([NotNull] Score score, [NotNull] ISpectatorPlayerClock spectatorPlayerClock)
             : base(score)
         {
             this.score = score;
-            this.slaveClock = slaveClock;
+            this.spectatorPlayerClock = spectatorPlayerClock;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            slaveClock.WaitingOnFrames.BindTo(waitingOnFrames);
+            spectatorPlayerClock.WaitingOnFrames.BindTo(waitingOnFrames);
         }
 
         protected override void UpdateAfterChildren()
@@ -48,18 +48,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         }
 
         protected override GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart)
-            => new SlaveGameplayClockContainer(slaveClock);
+            => new SpectatorGameplayClockContainer(spectatorPlayerClock);
 
-        private class SlaveGameplayClockContainer : GameplayClockContainer
+        private class SpectatorGameplayClockContainer : GameplayClockContainer
         {
-            public SlaveGameplayClockContainer([NotNull] IClock sourceClock)
+            public SpectatorGameplayClockContainer([NotNull] IClock sourceClock)
                 : base(sourceClock)
             {
             }
 
             protected override void Update()
             {
-                // The slave clock's running state is controlled externally, but the local pausing state needs to be updated to stop gameplay.
+                // The player clock's running state is controlled externally, but the local pausing state needs to be updated to stop gameplay.
                 if (SourceClock.IsRunning)
                     Start();
                 else

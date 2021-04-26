@@ -9,46 +9,46 @@ using osu.Framework.Timing;
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync
 {
     /// <summary>
-    /// A <see cref="ISyncManager"/> which synchronises de-synced slave clocks through catchup.
+    /// A <see cref="ISyncManager"/> which synchronises de-synced player clocks through catchup.
     /// </summary>
     public class CatchUpSyncManager : Component, ISyncManager
     {
         /// <summary>
-        /// The offset from the master clock to which slaves should be synchronised to.
+        /// The offset from the master clock to which player clocks should be synchronised to.
         /// </summary>
         public const double SYNC_TARGET = 16;
 
         /// <summary>
-        /// The offset from the master clock at which slaves begin resynchronising.
+        /// The offset from the master clock at which player clocks begin resynchronising.
         /// </summary>
         public const double MAX_SYNC_OFFSET = 50;
 
         /// <summary>
-        /// The maximum delay to start gameplay, if any (but not all) slaves are ready.
+        /// The maximum delay to start gameplay, if any (but not all) player clocks are ready.
         /// </summary>
         public const double MAXIMUM_START_DELAY = 15000;
 
         /// <summary>
-        /// The master clock which is used to control the timing of all slave clocks.
+        /// The master clock which is used to control the timing of all player clocks clocks.
         /// </summary>
-        public IAdjustableClock Master { get; }
+        public IAdjustableClock MasterClock { get; }
 
         /// <summary>
-        /// The slave clocks.
+        /// The player clocks.
         /// </summary>
-        private readonly List<ISlaveClock> slaves = new List<ISlaveClock>();
+        private readonly List<ISpectatorPlayerClock> playerClocks = new List<ISpectatorPlayerClock>();
 
         private bool hasStarted;
         private double? firstStartAttemptTime;
 
         public CatchUpSyncManager(IAdjustableClock master)
         {
-            Master = master;
+            MasterClock = master;
         }
 
-        public void AddSlave(ISlaveClock clock) => slaves.Add(clock);
+        public void AddPlayerClock(ISpectatorPlayerClock clock) => playerClocks.Add(clock);
 
-        public void RemoveSlave(ISlaveClock clock) => slaves.Remove(clock);
+        public void RemovePlayerClock(ISpectatorPlayerClock clock) => playerClocks.Remove(clock);
 
         protected override void Update()
         {
@@ -56,9 +56,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync
 
             if (!attemptStart())
             {
-                // Ensure all slaves are stopped until the start succeeds.
-                foreach (var slave in slaves)
-                    slave.Stop();
+                // Ensure all player clocks are stopped until the start succeeds.
+                foreach (var clock in playerClocks)
+                    clock.Stop();
                 return;
             }
 
@@ -67,7 +67,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync
         }
 
         /// <summary>
-        /// Attempts to start playback. Awaits for all slaves to have available frames for up to <see cref="MAXIMUM_START_DELAY"/> milliseconds.
+        /// Attempts to start playback. Waits for all player clocks to have available frames for up to <see cref="MAXIMUM_START_DELAY"/> milliseconds.
         /// </summary>
         /// <returns>Whether playback was started and syncing should occur.</returns>
         private bool attemptStart()
@@ -75,14 +75,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync
             if (hasStarted)
                 return true;
 
-            if (slaves.Count == 0)
+            if (playerClocks.Count == 0)
                 return false;
 
             firstStartAttemptTime ??= Time.Current;
 
-            int readyCount = slaves.Count(s => !s.WaitingOnFrames.Value);
+            int readyCount = playerClocks.Count(s => !s.WaitingOnFrames.Value);
 
-            if (readyCount == slaves.Count)
+            if (readyCount == playerClocks.Count)
                 return hasStarted = true;
 
             if (readyCount > 0 && (Time.Current - firstStartAttemptTime) > MAXIMUM_START_DELAY)
@@ -92,38 +92,38 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync
         }
 
         /// <summary>
-        /// Updates the catchup states of all slave clocks.
+        /// Updates the catchup states of all player clocks clocks.
         /// </summary>
         private void updateCatchup()
         {
-            for (int i = 0; i < slaves.Count; i++)
+            for (int i = 0; i < playerClocks.Count; i++)
             {
-                var slave = slaves[i];
-                double timeDelta = Master.CurrentTime - slave.CurrentTime;
+                var clock = playerClocks[i];
+                double timeDelta = MasterClock.CurrentTime - clock.CurrentTime;
 
-                // Check that the slave isn't too far ahead.
-                // This is a quiet case in which the catchup is done by the master clock, so IsCatchingUp is not set on the slave.
+                // Check that the player clock isn't too far ahead.
+                // This is a quiet case in which the catchup is done by the master clock, so IsCatchingUp is not set on the player clock.
                 if (timeDelta < -SYNC_TARGET)
                 {
-                    slave.Stop();
+                    clock.Stop();
                     continue;
                 }
 
-                // Make sure the slave is running if it can.
-                if (!slave.WaitingOnFrames.Value)
-                    slave.Start();
+                // Make sure the player clock is running if it can.
+                if (!clock.WaitingOnFrames.Value)
+                    clock.Start();
 
-                if (slave.IsCatchingUp)
+                if (clock.IsCatchingUp)
                 {
-                    // Stop the slave from catching up if it's within the sync target.
+                    // Stop the player clock from catching up if it's within the sync target.
                     if (timeDelta <= SYNC_TARGET)
-                        slave.IsCatchingUp = false;
+                        clock.IsCatchingUp = false;
                 }
                 else
                 {
-                    // Make the slave start catching up if it's exceeded the maximum allowable sync offset.
+                    // Make the player clock start catching up if it's exceeded the maximum allowable sync offset.
                     if (timeDelta > MAX_SYNC_OFFSET)
-                        slave.IsCatchingUp = true;
+                        clock.IsCatchingUp = true;
                 }
             }
         }
@@ -133,14 +133,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync
         /// </summary>
         private void updateMasterClock()
         {
-            bool anyInSync = slaves.Any(s => !s.IsCatchingUp);
+            bool anyInSync = playerClocks.Any(s => !s.IsCatchingUp);
 
-            if (Master.IsRunning != anyInSync)
+            if (MasterClock.IsRunning != anyInSync)
             {
                 if (anyInSync)
-                    Master.Start();
+                    MasterClock.Start();
                 else
-                    Master.Stop();
+                    MasterClock.Stop();
             }
         }
     }

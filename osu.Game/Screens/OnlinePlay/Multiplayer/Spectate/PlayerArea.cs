@@ -35,10 +35,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public readonly int UserId;
 
         /// <summary>
-        /// The <see cref="ISlaveClock"/> used to control the gameplay running state of a loaded <see cref="Player"/>.
+        /// The <see cref="ISpectatorPlayerClock"/> used to control the gameplay running state of a loaded <see cref="Player"/>.
         /// </summary>
         [NotNull]
-        public readonly ISlaveClock GameplayClock;
+        public readonly ISpectatorPlayerClock GameplayClock;
 
         /// <summary>
         /// The currently-loaded score.
@@ -54,7 +54,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private readonly AudioContainer audioContainer;
         private OsuScreenStack stack;
 
-        public PlayerArea(int userId, [NotNull] ISlaveClock gameplayClock)
+        public PlayerArea(int userId, [NotNull] ISpectatorPlayerClock gameplayClock)
         {
             UserId = userId;
             GameplayClock = gameplayClock;
