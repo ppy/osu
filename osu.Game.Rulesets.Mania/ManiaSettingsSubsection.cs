@@ -39,8 +39,8 @@ namespace osu.Game.Rulesets.Mania
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Colour-coded notes",
-                    Current = config.GetBindable<bool>(ManiaRulesetSetting.ColourCodedNotes),
+                    LabelText = "Timing-based note colouring",
+                    Current = config.GetBindable<bool>(ManiaRulesetSetting.TimingBasedNoteColouring),
                 }
             };
         }
