@@ -101,8 +101,8 @@ namespace osu.Game.Tests.Editing.Checks
             var hitobjects = new List<HitObject>
             {
                 getSliderMock(startTime: 100, endTime: 400.75d).Object,
-                new HitCircle { StartTime = 300 },
-                getSliderMock(startTime: 200, endTime: 500.75d).Object
+                getSliderMock(startTime: 200, endTime: 500.75d).Object,
+                new HitCircle { StartTime = 300 }
             };
 
             var issues = check.Run(getPlayableBeatmap(hitobjects), null).ToList();
