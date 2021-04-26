@@ -17,6 +17,7 @@ using osu.Game.Online.Spectator;
 using osu.Game.Replays.Legacy;
 using osu.Game.Scoring;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
+using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Beatmaps.IO;
 using osu.Game.Users;
@@ -128,7 +129,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        public void TestPlayersDoNotStartSimultaneouslyIfBufferingFor15Seconds()
+        public void TestPlayersDoNotStartSimultaneouslyIfBufferingForMaximumStartDelay()
         {
             start(new[] { 55, 56 });
             loadSpectateScreen();
@@ -138,8 +139,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
             checkPausedInstant(55, true);
             checkPausedInstant(56, true);
 
-            // Wait 15 seconds...
-            AddWaitStep("wait 15 seconds", (int)(15000 / TimePerAction));
+            // Wait for the start delay seconds...
+            AddWaitStep("wait maximum start delay seconds", (int)(CatchUpSyncManager.MAXIMUM_START_DELAY / TimePerAction));
 
             // Player 1 should start playing by itself, player 2 should remain paused.
             checkPausedInstant(55, false);
