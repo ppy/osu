@@ -52,6 +52,28 @@ namespace osu.Game.Beatmaps
         double GetMostCommonBeatLength();
 
         /// <summary>
+        /// Returns the time on the given beat divisor closest to the given time.
+        /// </summary>
+        /// <param name="time">The time to find the closest snapped time to.</param>
+        /// <param name="beatDivisor">The beat divisor to snap to.</param>
+        /// <param name="referenceTime">The time at which the timing point is retrieved, by default same as time.</param>
+        int SnapTimeForDivisor(double time, int beatDivisor, double? referenceTime = null);
+
+        /// <summary>
+        /// Returns the time on any valid beat divisor closest to the given time.
+        /// </summary>
+        /// <param name="time">The time to find the closest snapped time to.</param>
+        /// <param name="referenceTime">The time at which the timing point is retrieved, by default same as time.</param>
+        int SnapTimeAnyDivisor(double time, double? referenceTime = null);
+
+        /// <summary>
+        /// Returns the beat snap divisor closest to the given time. If two are equally close, the smallest is returned.
+        /// </summary>
+        /// <param name="time">The time to find the closest beat snap divisor to.</param>
+        /// <param name="referenceTime">The time at which the timing point is retrieved, by default same as time.</param>
+        int ClosestBeatSnapDivisor(double time, double? referenceTime = null);
+
+        /// <summary>
         /// Creates a shallow-clone of this beatmap and returns it.
         /// </summary>
         /// <returns>The shallow-cloned beatmap.</returns>

@@ -3,9 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit.Checks.Components;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -15,8 +13,6 @@ namespace osu.Game.Rulesets.Edit.Checks
     public class CheckUnsnaps : ICheck
     {
         private const double unsnap_ms_threshold = 2;
-
-        private static readonly int[] greatest_common_divisors = { 16, 12, 9, 7, 5 };
 
         public CheckMetadata Metadata { get; } = new CheckMetadata(CheckCategory.Compose, "Unsnapped hitobjects");
 
@@ -30,7 +26,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         {
             foreach (var hitobject in playableBeatmap.HitObjects)
             {
-                double startUnsnap = hitobject.StartTime - closestSnapTime(playableBeatmap, hitobject.StartTime);
+                double startUnsnap = hitobject.StartTime - playableBeatmap.SnapTimeAnyDivisor(hitobject.StartTime);
                 string startPostfix = hitobject is IHasDuration ? "start" : "";
                 foreach (var issue in getUnsnapIssues(hitobject, startUnsnap, hitobject.StartTime, startPostfix))
                     yield return issue;
@@ -41,7 +37,7 @@ namespace osu.Game.Rulesets.Edit.Checks
                     {
                         double spanDuration = hasRepeats.Duration / (hasRepeats.RepeatCount + 1);
                         double repeatTime = hitobject.StartTime + spanDuration * (repeatIndex + 1);
-                        double repeatUnsnap = repeatTime - closestSnapTime(playableBeatmap, repeatTime);
+                        double repeatUnsnap = repeatTime - playableBeatmap.SnapTimeAnyDivisor(repeatTime);
                         foreach (var issue in getUnsnapIssues(hitobject, repeatUnsnap, repeatTime, "repeat"))
                             yield return issue;
                     }
@@ -49,7 +45,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 
                 if (hitobject is IHasDuration hasDuration)
                 {
-                    double endUnsnap = hasDuration.EndTime - closestSnapTime(playableBeatmap, hasDuration.EndTime);
+                    double endUnsnap = hasDuration.EndTime - playableBeatmap.SnapTimeAnyDivisor(hasDuration.EndTime);
                     foreach (var issue in getUnsnapIssues(hitobject, endUnsnap, hasDuration.EndTime, "end"))
                         yield return issue;
                 }
@@ -64,23 +60,6 @@ namespace osu.Game.Rulesets.Edit.Checks
                 yield return new IssueTemplate1MsOrMore(this).Create(hitobject, unsnap, time, postfix);
 
             // We don't care about unsnaps < 1 ms, as all object ends have these due to the way SV works.
-        }
-
-        private int closestSnapTime(IBeatmap playableBeatmap, double time)
-        {
-            var timingPoint = playableBeatmap.ControlPointInfo.TimingPointAt(time);
-            double smallestUnsnap = greatest_common_divisors.Select(divisor => Math.Abs(time - snapTime(timingPoint, time, divisor))).Min();
-
-            return (int)Math.Round(time + smallestUnsnap);
-        }
-
-        private int snapTime(TimingControlPoint timingPoint, double time, int beatDivisor)
-        {
-            double beatLength = timingPoint.BeatLength / beatDivisor;
-            int beatLengths = (int)Math.Round((time - timingPoint.Time) / beatLength, MidpointRounding.AwayFromZero);
-
-            // Casting to int matches the editor in both stable and lazer.
-            return (int)(timingPoint.Time + beatLengths * beatLength);
         }
 
         public abstract class IssueTemplateUnsnap : IssueTemplate
