@@ -7,6 +7,7 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Spectator;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync;
 using osu.Game.Screens.Play;
@@ -31,6 +32,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         [Resolved]
         private SpectatorStreamingClient spectatorClient { get; set; }
+
+        [Resolved]
+        private StatefulMultiplayerClient multiplayerClient { get; set; }
 
         private readonly PlayerArea[] instances;
         private MasterGameplayClockContainer masterClockContainer;
