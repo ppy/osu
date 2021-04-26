@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Security.Principal;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
@@ -9,7 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 
-namespace osu.Game.Admin
+namespace osu.Desktop.Admin
 {
     /// <summary>
     /// Checks if the game is running with elevated privileges (as admin in Windows, root in Unix) and displays a warning notification if so.
@@ -22,11 +24,11 @@ namespace osu.Game.Admin
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            if (IsAdmin())
+            if (isAdmin())
                 Notifications.Post(new AdminNotification());
         }
 
-        protected virtual bool IsAdmin() => false;
+        private bool isAdmin() => OperatingSystem.IsWindows() ? new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator) : Mono.Unix.Native.Syscall.geteuid() == 0;
 
         private class AdminNotification : SimpleNotification
         {
@@ -34,8 +36,7 @@ namespace osu.Game.Admin
 
             public AdminNotification()
             {
-                bool isUnix = RuntimeInfo.IsUnix;
-                Text = $"Running osu! as {(isUnix ? "root" : "administrator")} does not improve performance and poses a security risk. Please run the game normally.";
+                Text = $"Running osu! as {(RuntimeInfo.IsUnix ? "root" : "administrator")} does not improve performance and poses a security risk. Please run the game normally.";
             }
 
             [BackgroundDependencyLoader]
@@ -52,6 +53,4 @@ namespace osu.Game.Admin
             }
         }
     }
-
-
 }
