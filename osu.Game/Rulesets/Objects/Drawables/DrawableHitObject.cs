@@ -212,10 +212,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             // LifetimeStart is already computed using HitObjectLifetimeEntry's InitialLifetimeOffset.
             // We override this with DHO's InitialLifetimeOffset for a non-pooled DHO.
             if (entry is SyntheticHitObjectEntry)
-                entry.LifetimeStart = HitObject.StartTime - InitialLifetimeOffset;
-
-            LifetimeStart = entry.LifetimeStart;
-            LifetimeEnd = entry.LifetimeEnd;
+                LifetimeStart = HitObject.StartTime - InitialLifetimeOffset;
 
             ensureEntryHasResult();
 
