@@ -78,15 +78,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync
             if (playerClocks.Count == 0)
                 return false;
 
-            firstStartAttemptTime ??= Time.Current;
-
             int readyCount = playerClocks.Count(s => !s.WaitingOnFrames.Value);
 
             if (readyCount == playerClocks.Count)
                 return hasStarted = true;
 
-            if (readyCount > 0 && (Time.Current - firstStartAttemptTime) > MAXIMUM_START_DELAY)
-                return hasStarted = true;
+            if (readyCount > 0)
+            {
+                firstStartAttemptTime ??= Time.Current;
+
+                if (Time.Current - firstStartAttemptTime > MAXIMUM_START_DELAY)
+                    return hasStarted = true;
+            }
 
             return false;
         }
