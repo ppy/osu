@@ -421,7 +421,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 StartPlay();
 
-                // If the current user was host, they started the match and the in-progres operation needs to be stopped now.
+                // If the current user was host, they started the match and the in-progress operation needs to be stopped now.
                 readyClickOperation?.Dispose();
                 readyClickOperation = null;
             }
