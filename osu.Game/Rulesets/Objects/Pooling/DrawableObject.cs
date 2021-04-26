@@ -50,6 +50,7 @@ namespace osu.Game.Rulesets.Objects.Pooling
         {
             base.LoadAsyncComplete();
 
+            // Apply the initial entry given in the constructor.
             if (Entry != null && !HasEntryApplied)
                 Apply(Entry);
         }
@@ -60,7 +61,8 @@ namespace osu.Game.Rulesets.Objects.Pooling
         /// </summary>
         public void Apply(TEntry entry)
         {
-            freeIfInUse();
+            if (HasEntryApplied)
+                free();
 
             setLifetime(entry.LifetimeStart, entry.LifetimeEnd);
             Entry = entry;
@@ -74,8 +76,9 @@ namespace osu.Game.Rulesets.Objects.Pooling
         {
             base.FreeAfterUse();
 
-            if (IsInPool)
-                freeIfInUse();
+            // We preserve the existing entry in case we want to move a non-pooled drawable between different parent drawables.
+            if (HasEntryApplied && IsInPool)
+                free();
         }
 
         /// <summary>
@@ -104,11 +107,9 @@ namespace osu.Game.Rulesets.Objects.Pooling
             }
         }
 
-        private void freeIfInUse()
+        private void free()
         {
-            if (!HasEntryApplied) return;
-
-            Debug.Assert(Entry != null);
+            Debug.Assert(Entry != null && HasEntryApplied);
 
             OnFree(Entry);
 
