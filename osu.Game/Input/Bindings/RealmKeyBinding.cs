@@ -12,7 +12,7 @@ namespace osu.Game.Input.Bindings
     public class RealmKeyBinding : RealmObject, IHasGuidPrimaryKey, IKeyBinding
     {
         [PrimaryKey]
-        public Guid ID { get; set; }
+        public Guid ID { get; set; } = Guid.NewGuid();
 
         public int? RulesetID { get; set; }
 
