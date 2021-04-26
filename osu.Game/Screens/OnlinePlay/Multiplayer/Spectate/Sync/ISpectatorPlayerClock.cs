@@ -20,5 +20,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync
         /// Whether this clock is resynchronising to the master clock.
         /// </summary>
         bool IsCatchingUp { get; set; }
+
+        /// <summary>
+        /// The source clock
+        /// </summary>
+        IFrameBasedClock Source { set; }
     }
 }

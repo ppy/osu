@@ -168,6 +168,11 @@ namespace osu.Game.Tests.OnlinePlay
 
             public bool IsCatchingUp { get; set; }
 
+            public IFrameBasedClock Source
+            {
+                set => throw new NotImplementedException();
+            }
+
             public readonly int Id;
 
             public TestSpectatorPlayerClock(int id)

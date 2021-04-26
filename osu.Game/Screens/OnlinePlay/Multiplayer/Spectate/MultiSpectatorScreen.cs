@@ -79,7 +79,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             };
 
             for (int i = 0; i < UserIds.Length; i++)
-                grid.Add(instances[i] = new PlayerArea(UserIds[i], new CatchUpSpectatorPlayerClock(masterClockContainer.GameplayClock)));
+            {
+                grid.Add(instances[i] = new PlayerArea(UserIds[i], masterClockContainer.GameplayClock));
+                syncManager.AddPlayerClock(instances[i].GameplayClock);
+            }
 
             // Todo: This is not quite correct - it should be per-user to adjust for other mod combinations.
             var playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Ruleset.Value);
