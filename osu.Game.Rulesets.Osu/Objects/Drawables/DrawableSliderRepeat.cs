@@ -112,8 +112,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 case ArmedState.Hit:
                     this.FadeOut(animDuration, Easing.Out);
 
-                    Arrow.ScaleTo(Scale * 1.5f, animDuration, Easing.Out);
-                    CirclePiece.ScaleTo(Scale * 1.5f, animDuration, Easing.Out);
+                    const float final_scale = 1.5f;
+
+                    Arrow.ScaleTo(Scale * final_scale, animDuration, Easing.Out);
+                    CirclePiece.ScaleTo(Scale * final_scale, animDuration, Easing.Out);
                     break;
             }
         }
