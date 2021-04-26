@@ -74,7 +74,6 @@ namespace osu.Game.Tests.Visual
             typeof(FileStore),
             typeof(ScoreManager),
             typeof(BeatmapManager),
-            typeof(RealmKeyBindingStore),
             typeof(SettingsStore),
             typeof(RulesetConfigCache),
             typeof(OsuColour),
