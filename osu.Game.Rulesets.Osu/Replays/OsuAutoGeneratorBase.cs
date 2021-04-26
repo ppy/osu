@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Rulesets.Osu.Replays
@@ -19,6 +20,8 @@ namespace osu.Game.Rulesets.Osu.Replays
         /// <summary>
         /// Constants (for spinners).
         /// </summary>
+        protected static readonly Vector2 SPINNER_CENTRE = OsuPlayfield.BASE_SIZE / 2;
+
         public const float SPIN_RADIUS = 50;
 
         #endregion
