@@ -32,6 +32,12 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
                     Current = config.GetBindable<bool>(LyricSettings.SaveLrcWhenFetchFinish),
                     TooltipText = "保存后歌词在离线时也能用，但如果保存的歌词有问题，您需要手动删除对应文件并重新获取"
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "禁用背景暗化",
+                    Current = config.GetBindable<bool>(LyricSettings.DisableBackgroundDim),
+                    TooltipText = "不要暗化歌词下方的物件"
+                },
                 new SettingsSlider<double>
                 {
                     LabelText = "全局歌词偏移(毫秒)",

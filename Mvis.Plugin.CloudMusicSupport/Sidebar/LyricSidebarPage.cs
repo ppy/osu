@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Mvis.Plugin.CloudMusicSupport.Misc;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -24,7 +25,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
     public class LyricSidebarPage : PluginSidebarPage
     {
         private BeatmapCover cover;
-        private FillFlowContainer<LyricInfoContainer> lyricFlow;
+        private FillFlowContainer<LyricInfoPiece> lyricFlow;
         private LoadingSpinner loading;
         private IconButton saveButton;
         private OsuSpriteText idText;
@@ -47,6 +48,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
 
         //旧版(2021.424.0 -> 版本2)兼容
         private DependencyContainer dependencies;
+        private OsuScrollContainer scroll;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
@@ -103,6 +105,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
                                             }
                                         }
                                     },
+                                    new TrackTimeIndicator(),
                                     new FillFlowContainer
                                     {
                                         Margin = new MarginPadding(5),
@@ -124,10 +127,24 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
                                             },
                                             new IconButton
                                             {
-                                                Icon = FontAwesome.Solid.Circle,
+                                                Icon = FontAwesome.Solid.Undo,
+                                                Size = new Vector2(45),
+                                                TooltipText = "刷新",
+                                                Action = () => plugin.RefreshLyric()
+                                            },
+                                            new IconButton
+                                            {
+                                                Icon = FontAwesome.Solid.CloudDownloadAlt,
                                                 Size = new Vector2(45),
                                                 TooltipText = "重新获取歌词",
-                                                Action = plugin.RefreshLyric
+                                                Action = () => plugin.RefreshLyric(true)
+                                            },
+                                            new IconButton
+                                            {
+                                                Icon = FontAwesome.Solid.AngleDown,
+                                                Size = new Vector2(45),
+                                                TooltipText = "滚动到当前歌词",
+                                                Action = scrollToCurrent
                                             }
                                         }
                                     },
@@ -141,10 +158,10 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
                         },
                         new Drawable[]
                         {
-                            new OsuScrollContainer
+                            scroll = new OsuScrollContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Child = lyricFlow = new FillFlowContainer<LyricInfoContainer>
+                                Child = lyricFlow = new FillFlowContainer<LyricInfoPiece>
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
@@ -155,7 +172,6 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
                         }
                     }
                 },
-                new TrackTimeIndicator(),
                 loading = new LoadingLayer(true)
                 {
                     Anchor = Anchor.Centre,
@@ -186,6 +202,17 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
             }, true);
         }
 
+        private void scrollToCurrent()
+        {
+            var pos = lyricFlow.Children.FirstOrDefault(p =>
+                p.Value == plugin.Lyrics.FindLast(l => mvisScreen.CurrentTrack.CurrentTime >= l.Time))?.Y ?? 0;
+
+            if (pos + scroll.DrawHeight > lyricFlow.Height)
+                scroll.ScrollToEnd();
+            else
+                scroll.ScrollTo(pos);
+        }
+
         protected override void LoadComplete()
         {
             mvisScreen.OnBeatmapChanged += refreshBeatmap;
@@ -200,7 +227,10 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
 
             foreach (var t in lyrics)
             {
-                lyricFlow.Add(new LyricInfoContainer(t));
+                lyricFlow.Add(new LyricInfoPiece(t)
+                {
+                    Action = l => mvisScreen.SeekTo(l.Time + 1)
+                });
             }
         }
 

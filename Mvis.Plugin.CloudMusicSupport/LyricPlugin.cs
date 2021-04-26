@@ -33,7 +33,7 @@ namespace Mvis.Plugin.CloudMusicSupport
         public override PluginSidebarPage CreateSidebarPage()
             => new LyricSidebarPage(this, 0.4f);
 
-        public override int Version => 2;
+        public override int Version => 3;
 
         private WorkingBeatmap currentWorkingBeatmap;
         private LyricLine lrcLine;
@@ -53,6 +53,7 @@ namespace Mvis.Plugin.CloudMusicSupport
         private Bindable<float> lyricFadeInDuration;
         private Bindable<float> lyricFadeOutDuration;
         private Bindable<bool> autoSave;
+        private Bindable<bool> alwaysHideBox;
 
         public readonly Bindable<Status> CurrentStatus = new Bindable<Status>();
 
@@ -88,6 +89,11 @@ namespace Mvis.Plugin.CloudMusicSupport
                 lrcLine.FadeOutDuration = v.NewValue;
             }, true);
 
+            alwaysHideBox.BindValueChanged(v =>
+            {
+                lrcLine.AlwaysHideBox = v.NewValue;
+            }, true);
+
             return true;
         }
 
@@ -101,6 +107,7 @@ namespace Mvis.Plugin.CloudMusicSupport
             lyricFadeInDuration = config.GetBindable<float>(LyricSettings.LyricFadeInDuration);
             lyricFadeOutDuration = config.GetBindable<float>(LyricSettings.LyricFadeOutDuration);
             autoSave = config.GetBindable<bool>(LyricSettings.SaveLrcWhenFetchFinish);
+            alwaysHideBox = config.GetBindable<bool>(LyricSettings.DisableBackgroundDim);
 
             AddInternal(processor);
         }
@@ -110,7 +117,7 @@ namespace Mvis.Plugin.CloudMusicSupport
             processor.WriteLrcToFile(Lyrics, currentWorkingBeatmap);
         }
 
-        public void RefreshLyric()
+        public void RefreshLyric(bool noLocalFile = false)
         {
             CurrentStatus.Value = Status.Working;
 
@@ -122,7 +129,7 @@ namespace Mvis.Plugin.CloudMusicSupport
 
             Lyrics.Clear();
 
-            processor.StartFetchLrcFor(currentWorkingBeatmap, onLyricRequestFinished, onLyricRequestFail);
+            processor.StartFetchLrcFor(currentWorkingBeatmap, noLocalFile, onLyricRequestFinished, onLyricRequestFail);
         }
 
         private double targetTime => track.CurrentTime + offset.Value;

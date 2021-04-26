@@ -62,8 +62,8 @@ namespace osu.Game.Overlays.Mf.Sections
                                     Title = "为什么加载谱面封面/音频预览的时间会那么长?",
                                     Child = new OsuSpriteText
                                     {
-                                        Text = "这与你的系统和当前的网络环境等一系列因素有关，"
-                                               + "也可能是你一次性发送了过多的资源请求。请多等待一会，你也可以尝试重新进入谱面列表/信息界面。",
+                                        Text = "这与您的系统和当前的网络环境等一系列因素有关，"
+                                               + "也可能是您一次性发送了过多的资源请求。请多等待一会，您也可以尝试重新进入谱面列表/信息界面。",
                                         RelativeSizeAxes = Axes.X,
                                     }
                                 },
@@ -141,7 +141,7 @@ namespace osu.Game.Overlays.Mf.Sections
                                             new OsuSpriteText
                                             {
                                                 RelativeSizeAxes = Axes.X,
-                                                Text = "如果官网正常，但是游戏内无法下图，你可以前往项目地址开个新的issue"
+                                                Text = "如果官网正常，但是游戏内无法下图，您可以前往项目地址开个新的issue"
                                             }
                                         }
                                     }
@@ -244,7 +244,7 @@ namespace osu.Game.Overlays.Mf.Sections
                     break;
 
                 case APIState.Failing:
-                    faqCannotUseOnlineFunctionText.Text = "请检查你的网络环境。";
+                    faqCannotUseOnlineFunctionText.Text = "请检查您的网络环境。";
                     break;
 
                 case APIState.Connecting:
@@ -252,7 +252,7 @@ namespace osu.Game.Overlays.Mf.Sections
                     break;
 
                 case APIState.Online:
-                    faqCannotUseOnlineFunctionText.Text = "请检查你的网络环境，也可能是ppy那边出了点状况。";
+                    faqCannotUseOnlineFunctionText.Text = "请检查您的网络环境，也可能是ppy那边出了点状况。";
                     break;
             }
         }

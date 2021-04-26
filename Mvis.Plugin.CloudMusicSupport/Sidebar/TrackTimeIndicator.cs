@@ -35,6 +35,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
             Anchor = Anchor.TopRight;
             Origin = Anchor.TopRight;
             Margin = new MarginPadding(10);
+            BorderThickness = 3;
         }
 
         [BackgroundDependencyLoader]
@@ -42,6 +43,8 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
         {
             var config = (LyricConfigManager)Dependencies.Get<MvisPluginManager>()
                                                          .GetConfigManager(sidebarPage.Plugin);
+
+            BorderColour = provider.Content2;
 
             InternalChildren = new Drawable[]
             {

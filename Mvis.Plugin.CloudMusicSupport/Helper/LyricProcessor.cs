@@ -138,19 +138,26 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
 
         private UrlEncoder encoder;
 
-        public void StartFetchLrcFor(WorkingBeatmap beatmap, Action<List<Lyric>> onFinish, Action<string> onFail)
+        public void StartFetchLrcFor(
+            WorkingBeatmap beatmap,
+            bool noLocalFile,
+            Action<List<Lyric>> onFinish,
+            Action<string> onFail)
         {
-            try
+            if (!noLocalFile)
             {
-                if (storage.Exists($"custom/lyrics/beatmap-{beatmap.BeatmapSetInfo.ID}.json"))
+                try
                 {
-                    onFinish?.Invoke(GetLyricFrom(beatmap));
-                    return;
+                    if (storage.Exists($"custom/lyrics/beatmap-{beatmap.BeatmapSetInfo.ID}.json"))
+                    {
+                        onFinish?.Invoke(GetLyricFrom(beatmap));
+                        return;
+                    }
                 }
-            }
-            catch
-            {
-                //忽略异常
+                catch
+                {
+                    //忽略异常
+                }
             }
 
             encoder ??= UrlEncoder.Default;

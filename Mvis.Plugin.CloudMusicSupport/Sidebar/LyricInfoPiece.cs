@@ -1,34 +1,43 @@
 using System;
 using Mvis.Plugin.CloudMusicSupport.Misc;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Mvis;
 using osuTK.Graphics;
 
 namespace Mvis.Plugin.CloudMusicSupport.Sidebar
 {
-    public class LyricInfoContainer : CompositeDrawable
+    public class LyricInfoPiece : CompositeDrawable, IHasTooltip
     {
-        private readonly Lyric lyric;
+        public readonly Lyric Value;
 
-        public LyricInfoContainer(Lyric lrc)
+        public Action<Lyric> Action;
+        public string TooltipText { get; private set; }
+
+        private Box hoverBox;
+
+        public LyricInfoPiece(Lyric lrc)
         {
             CornerRadius = 5f;
             Masking = true;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            lyric = lrc;
+            Value = lrc;
         }
 
         [BackgroundDependencyLoader]
         private void load(CustomColourProvider colourProvider)
         {
-            var timeSpan = TimeSpan.FromMilliseconds(lyric.Time);
+            var timeSpan = TimeSpan.FromMilliseconds(Value.Time);
 
             InternalChildren = new Drawable[]
             {
@@ -69,7 +78,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
                         },
                         new OsuSpriteText
                         {
-                            Text = lyric.Content,
+                            Text = Value.Content,
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             RelativeSizeAxes = Axes.X,
@@ -77,15 +86,42 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
                         },
                         new OsuSpriteText
                         {
-                            Text = lyric.TranslatedString,
+                            Text = Value.TranslatedString,
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             RelativeSizeAxes = Axes.X,
                             Margin = new MarginPadding { Left = 5, Bottom = 5 }
                         },
                     }
-                }
+                },
+                hoverBox = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.White.Opacity(0.2f),
+                    Alpha = 0
+                },
+                new HoverClickSounds()
             };
+
+            TooltipText = $"调整到 {timeSpan:mm\\:ss\\.fff}";
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            Action?.Invoke(Value);
+            return base.OnClick(e);
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            hoverBox.FadeIn(300);
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            hoverBox.FadeOut(300);
+            base.OnHoverLost(e);
         }
     }
 }

@@ -479,7 +479,7 @@ namespace osu.Game.Screens.Mvis
                         },
                         progressBar = new SongProgressBar
                         {
-                            OnSeek = seekTo
+                            OnSeek = SeekTo
                         }
                     }
                 }
@@ -934,8 +934,11 @@ namespace osu.Game.Screens.Mvis
         private void nextTrack() =>
             audioControlProvider?.NextTrack();
 
-        private void seekTo(double position)
+        public void SeekTo(double position)
         {
+            if (position > CurrentTrack.Length)
+                position = CurrentTrack.Length - 10000;
+
             audioControlProvider?.Seek(position);
             OnSeek?.Invoke(position);
         }

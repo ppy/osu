@@ -21,6 +21,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Config
             SetDefault(LyricSettings.LyricFadeInDuration, 200f, 0, 1000);
             SetDefault(LyricSettings.LyricFadeOutDuration, 200f, 0, 1000);
             SetDefault(LyricSettings.SaveLrcWhenFetchFinish, false);
+            SetDefault(LyricSettings.DisableBackgroundDim, false);
             base.InitialiseDefaults();
         }
 
@@ -34,6 +35,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Config
         LyricOffset,
         LyricFadeInDuration,
         LyricFadeOutDuration,
-        SaveLrcWhenFetchFinish
+        SaveLrcWhenFetchFinish,
+        DisableBackgroundDim
     }
 }
