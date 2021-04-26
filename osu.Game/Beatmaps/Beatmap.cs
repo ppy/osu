@@ -95,9 +95,8 @@ namespace osu.Game.Beatmaps
 
             int[] divisors = BindableBeatDivisor.VALID_DIVISORS;
             double smallestUnsnap = divisors.Min(getUnsnap);
-            int closestDivisor = divisors.FirstOrDefault(divisor => getUnsnap(divisor) == smallestUnsnap);
 
-            return closestDivisor;
+            return divisors.FirstOrDefault(divisor => getUnsnap(divisor) == smallestUnsnap);
         }
 
         IBeatmap IBeatmap.Clone() => Clone();
