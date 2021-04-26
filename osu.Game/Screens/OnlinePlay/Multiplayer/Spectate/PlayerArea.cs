@@ -9,6 +9,7 @@ using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
@@ -38,7 +39,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// The <see cref="ISpectatorPlayerClock"/> used to control the gameplay running state of a loaded <see cref="Player"/>.
         /// </summary>
         [NotNull]
-        public readonly ISpectatorPlayerClock GameplayClock;
+        public readonly ISpectatorPlayerClock GameplayClock = new CatchUpSpectatorPlayerClock();
 
         /// <summary>
         /// The currently-loaded score.
@@ -54,10 +55,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private readonly AudioContainer audioContainer;
         private OsuScreenStack stack;
 
-        public PlayerArea(int userId, [NotNull] ISpectatorPlayerClock gameplayClock)
+        public PlayerArea(int userId, IFrameBasedClock masterClock)
         {
             UserId = userId;
-            GameplayClock = gameplayClock;
 
             RelativeSizeAxes = Axes.Both;
             Masking = true;
@@ -71,6 +71,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 },
                 loadingLayer = new LoadingLayer(true) { State = { Value = Visibility.Visible } }
             };
+
+            GameplayClock.Source = masterClock;
         }
 
         public void LoadScore([NotNull] Score score)

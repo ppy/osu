@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Timing;
@@ -17,12 +19,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync
         /// </summary>
         public const double CATCHUP_RATE = 2;
 
-        private readonly IFrameBasedClock masterClock;
-
-        public CatchUpSpectatorPlayerClock(IFrameBasedClock masterClock)
-        {
-            this.masterClock = masterClock;
-        }
+        /// <summary>
+        /// The source clock.
+        /// </summary>
+        public IFrameBasedClock? Source { get; set; }
 
         public double CurrentTime { get; private set; }
 
@@ -52,19 +52,22 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync
 
         public void ProcessFrame()
         {
-            masterClock.ProcessFrame();
-
             ElapsedFrameTime = 0;
             FramesPerSecond = 0;
 
+            if (Source == null)
+                return;
+
+            Source.ProcessFrame();
+
             if (IsRunning)
             {
-                double elapsedSource = masterClock.ElapsedFrameTime;
+                double elapsedSource = Source.ElapsedFrameTime;
                 double elapsed = elapsedSource * Rate;
 
                 CurrentTime += elapsed;
                 ElapsedFrameTime = elapsed;
-                FramesPerSecond = masterClock.FramesPerSecond;
+                FramesPerSecond = Source.FramesPerSecond;
             }
         }
 
