@@ -12,16 +12,16 @@ using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
-    public class DrawableManiaEditRuleset : DrawableManiaRuleset
+    public class DrawableManiaEditorRuleset : DrawableManiaRuleset
     {
         public new IScrollingInfo ScrollingInfo => base.ScrollingInfo;
 
-        public DrawableManiaEditRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods)
+        public DrawableManiaEditorRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods)
             : base(ruleset, beatmap, mods)
         {
         }
 
-        protected override Playfield CreatePlayfield() => new ManiaEditPlayfield(Beatmap.Stages)
+        protected override Playfield CreatePlayfield() => new ManiaEditorPlayfield(Beatmap.Stages)
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
