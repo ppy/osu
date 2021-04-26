@@ -135,7 +135,7 @@ namespace Mvis.Plugin.StoryboardSupport
             return true;
         }
 
-        public override int Version => 2;
+        public override int Version => 3;
 
         private Drawable prevProxy;
 

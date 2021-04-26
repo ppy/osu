@@ -43,7 +43,7 @@ namespace Mvis.Plugin.CollectionSupport
 
         protected override bool PostInit() => true;
 
-        public override int Version => 2;
+        public override int Version => 3;
 
         public override PluginSidebarPage CreateSidebarPage()
             => new CollectionPluginPage(this);
