@@ -14,6 +14,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Mvis.Misc;
 using osu.Game.Screens.Mvis.Plugins;
@@ -43,6 +45,9 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
 
         [Resolved]
         private Storage storage { get; set; }
+
+        [Resolved]
+        private DialogOverlay dialog { get; set; }
 
         private LyricPlugin plugin => (LyricPlugin)Plugin;
 
@@ -137,7 +142,11 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
                                                 Icon = FontAwesome.Solid.CloudDownloadAlt,
                                                 Size = new Vector2(45),
                                                 TooltipText = "重新获取歌词",
-                                                Action = () => plugin.RefreshLyric(true)
+                                                Action = () => dialog.Push
+                                                (
+                                                    new ConfirmDialog("重新获取歌词",
+                                                        () => plugin.RefreshLyric(true))
+                                                )
                                             },
                                             new IconButton
                                             {

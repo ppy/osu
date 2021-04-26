@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Dialog
         public ConfirmDialog(string message, Action onConfirm, Action onCancel = null)
         {
             HeaderText = message;
-            BodyText = "Last chance to turn back";
+            BodyText = "要继续吗?";
 
             Icon = FontAwesome.Solid.ExclamationTriangle;
 
