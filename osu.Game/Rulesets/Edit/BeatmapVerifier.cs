@@ -25,7 +25,8 @@ namespace osu.Game.Rulesets.Edit
             new CheckAudioQuality(),
 
             // Compose
-            new CheckUnsnaps()
+            new CheckUnsnaps(),
+            new CheckConcurrentObjects()
         };
 
         public IEnumerable<Issue> Run(IBeatmap playableBeatmap, WorkingBeatmap workingBeatmap)
