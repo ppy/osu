@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Edit.Checks
 {
-    public class CheckUnsnaps : ICheck
+    public class CheckUnsnappedObjects : ICheck
     {
         public const double UNSNAP_MS_THRESHOLD = 2;
 

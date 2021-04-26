@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Edit.Checks
     public class CheckConcurrentObjects : ICheck
     {
         // We guarantee that the objects are either treated as concurrent or unsnapped when near the same beat divisor.
-        private const double ms_leniency = CheckUnsnaps.UNSNAP_MS_THRESHOLD;
+        private const double ms_leniency = CheckUnsnappedObjects.UNSNAP_MS_THRESHOLD;
 
         public CheckMetadata Metadata { get; } = new CheckMetadata(CheckCategory.Compose, "Concurrent hitobjects");
 
