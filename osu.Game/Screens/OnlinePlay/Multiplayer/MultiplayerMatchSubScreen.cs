@@ -406,29 +406,22 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }
         }
 
-        private void onRoomUpdated() => Scheduler.Add(() =>
+        private void onRoomUpdated()
         {
-            if (client.Room == null)
-                return;
-
-            Debug.Assert(client.LocalUser != null);
-
-            UpdateMods();
-
-            if (client.LocalUser.State == MultiplayerUserState.Spectating
-                && (client.Room.State == MultiplayerRoomState.Playing || client.Room.State == MultiplayerRoomState.WaitingForLoad)
-                && ParentScreen.IsCurrentScreen())
-            {
-                StartPlay();
-
-                // If the current user was host, they started the match and the in-progress operation needs to be stopped now.
-                readyClickOperation?.Dispose();
-                readyClickOperation = null;
-            }
-        });
+            Scheduler.AddOnce(UpdateMods);
+        }
 
         private void onLoadRequested()
         {
+            // If the user is spectating, the multi-spectator screen may still be the current screen.
+            if (!ParentScreen.IsCurrentScreen())
+            {
+                ParentScreen.MakeCurrent();
+
+                Schedule(onLoadRequested);
+                return;
+            }
+
             StartPlay();
 
             readyClickOperation?.Dispose();
