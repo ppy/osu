@@ -17,18 +17,18 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public class DrawableOsuEditRuleset : DrawableOsuRuleset
+    public class DrawableOsuEditorRuleset : DrawableOsuRuleset
     {
-        public DrawableOsuEditRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods)
+        public DrawableOsuEditorRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods)
             : base(ruleset, beatmap, mods)
         {
         }
 
-        protected override Playfield CreatePlayfield() => new OsuEditPlayfield();
+        protected override Playfield CreatePlayfield() => new OsuEditorPlayfield();
 
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new OsuPlayfieldAdjustmentContainer { Size = Vector2.One };
 
-        private class OsuEditPlayfield : OsuPlayfield
+        private class OsuEditorPlayfield : OsuPlayfield
         {
             private Bindable<bool> hitAnimations;
 
