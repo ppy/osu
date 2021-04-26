@@ -72,6 +72,16 @@ namespace osu.Game.Scoring
             }
         }
 
+        protected override void ExportModelTo(ScoreInfo model, Stream outputStream)
+        {
+            var file = model.Files.SingleOrDefault();
+            if (file == null)
+                return;
+
+            using (var inputStream = Files.Storage.GetStream(file.FileInfo.StoragePath))
+                inputStream.CopyTo(outputStream);
+        }
+
         protected override IEnumerable<string> GetStableImportPaths(Storage storage)
             => storage.GetFiles(ImportFromStablePath).Where(p => HandledExtensions.Any(ext => Path.GetExtension(p)?.Equals(ext, StringComparison.OrdinalIgnoreCase) ?? false))
                       .Select(path => storage.GetFullPath(path));

@@ -422,15 +422,25 @@ namespace osu.Game.Database
             if (retrievedItem == null)
                 throw new ArgumentException("Specified model could not be found", nameof(item));
 
+            using (var outputStream = exportStorage.GetStream($"{getValidFilename(item.ToString())}{HandledExtensions.First()}", FileAccess.Write, FileMode.Create))
+                ExportModelTo(retrievedItem, outputStream);
+
+            exportStorage.OpenInNativeExplorer();
+        }
+
+        /// <summary>
+        /// Exports an item to the given output stream.
+        /// </summary>
+        /// <param name="model">The item to export.</param>
+        /// <param name="outputStream">The output stream to export to.</param>
+        protected virtual void ExportModelTo(TModel model, Stream outputStream)
+        {
             using (var archive = ZipArchive.Create())
             {
-                foreach (var file in retrievedItem.Files)
+                foreach (var file in model.Files)
                     archive.AddEntry(file.Filename, Files.Storage.GetStream(file.FileInfo.StoragePath));
 
-                using (var outputStream = exportStorage.GetStream($"{getValidFilename(item.ToString())}{HandledExtensions.First()}", FileAccess.Write, FileMode.Create))
-                    archive.SaveTo(outputStream);
-
-                exportStorage.OpenInNativeExplorer();
+                archive.SaveTo(outputStream);
             }
         }
 
