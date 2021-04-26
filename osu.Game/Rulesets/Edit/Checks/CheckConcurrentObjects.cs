@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             }
         }
 
-        protected bool areConcurrent(HitObject hitobject, HitObject nextHitobject) => nextHitobject.StartTime <= hitobject.GetEndTime() + ms_leniency;
+        private bool areConcurrent(HitObject hitobject, HitObject nextHitobject) => nextHitobject.StartTime <= hitobject.GetEndTime() + ms_leniency;
 
         public abstract class IssueTemplateConcurrent : IssueTemplate
         {
