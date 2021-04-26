@@ -47,6 +47,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private BeatmapInfo importedBeatmap;
         private int importedBeatmapId;
 
+        private const int player_1_id = 55;
+        private const int player_2_id = 56;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -80,29 +83,29 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("start players silently", () =>
             {
-                Client.CurrentMatchPlayingUserIds.Add(55);
-                Client.CurrentMatchPlayingUserIds.Add(56);
-                playingUserIds.Add(55);
-                playingUserIds.Add(56);
-                nextFrame[55] = 0;
-                nextFrame[56] = 0;
+                Client.CurrentMatchPlayingUserIds.Add(player_1_id);
+                Client.CurrentMatchPlayingUserIds.Add(player_2_id);
+                playingUserIds.Add(player_1_id);
+                playingUserIds.Add(player_2_id);
+                nextFrame[player_1_id] = 0;
+                nextFrame[player_2_id] = 0;
             });
 
             loadSpectateScreen(false);
 
             AddWaitStep("wait a bit", 10);
-            AddStep("load player 55", () => streamingClient.StartPlay(55, importedBeatmapId));
+            AddStep("load player first_player_id", () => streamingClient.StartPlay(player_1_id, importedBeatmapId));
             AddUntilStep("one player added", () => spectatorScreen.ChildrenOfType<Player>().Count() == 1);
 
             AddWaitStep("wait a bit", 10);
-            AddStep("load player 56", () => streamingClient.StartPlay(56, importedBeatmapId));
+            AddStep("load player second_player_id", () => streamingClient.StartPlay(player_2_id, importedBeatmapId));
             AddUntilStep("two players added", () => spectatorScreen.ChildrenOfType<Player>().Count() == 2);
         }
 
         [Test]
         public void TestGeneral()
         {
-            int[] userIds = Enumerable.Range(0, 4).Select(i => 55 + i).ToArray();
+            int[] userIds = Enumerable.Range(0, 4).Select(i => player_1_id + i).ToArray();
 
             start(userIds);
             loadSpectateScreen();
@@ -114,123 +117,123 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestPlayersMustStartSimultaneously()
         {
-            start(new[] { 55, 56 });
+            start(new[] { player_1_id, player_2_id });
             loadSpectateScreen();
 
             // Send frames for one player only, both should remain paused.
-            sendFrames(55, 20);
-            checkPausedInstant(55, true);
-            checkPausedInstant(56, true);
+            sendFrames(player_1_id, 20);
+            checkPausedInstant(player_1_id, true);
+            checkPausedInstant(player_2_id, true);
 
             // Send frames for the other player, both should now start playing.
-            sendFrames(56, 20);
-            checkPausedInstant(55, false);
-            checkPausedInstant(56, false);
+            sendFrames(player_2_id, 20);
+            checkPausedInstant(player_1_id, false);
+            checkPausedInstant(player_2_id, false);
         }
 
         [Test]
         public void TestPlayersDoNotStartSimultaneouslyIfBufferingForMaximumStartDelay()
         {
-            start(new[] { 55, 56 });
+            start(new[] { player_1_id, player_2_id });
             loadSpectateScreen();
 
             // Send frames for one player only, both should remain paused.
-            sendFrames(55, 1000);
-            checkPausedInstant(55, true);
-            checkPausedInstant(56, true);
+            sendFrames(player_1_id, 1000);
+            checkPausedInstant(player_1_id, true);
+            checkPausedInstant(player_2_id, true);
 
             // Wait for the start delay seconds...
             AddWaitStep("wait maximum start delay seconds", (int)(CatchUpSyncManager.MAXIMUM_START_DELAY / TimePerAction));
 
             // Player 1 should start playing by itself, player 2 should remain paused.
-            checkPausedInstant(55, false);
-            checkPausedInstant(56, true);
+            checkPausedInstant(player_1_id, false);
+            checkPausedInstant(player_2_id, true);
         }
 
         [Test]
         public void TestPlayersContinueWhileOthersBuffer()
         {
-            start(new[] { 55, 56 });
+            start(new[] { player_1_id, player_2_id });
             loadSpectateScreen();
 
             // Send initial frames for both players. A few more for player 1.
-            sendFrames(55, 20);
-            sendFrames(56, 10);
-            checkPausedInstant(55, false);
-            checkPausedInstant(56, false);
+            sendFrames(player_1_id, 20);
+            sendFrames(player_2_id, 10);
+            checkPausedInstant(player_1_id, false);
+            checkPausedInstant(player_2_id, false);
 
             // Eventually player 2 will pause, player 1 must remain running.
-            checkPaused(56, true);
-            checkPausedInstant(55, false);
+            checkPaused(player_2_id, true);
+            checkPausedInstant(player_1_id, false);
 
             // Eventually both players will run out of frames and should pause.
-            checkPaused(55, true);
-            checkPausedInstant(56, true);
+            checkPaused(player_1_id, true);
+            checkPausedInstant(player_2_id, true);
 
             // Send more frames for the first player only. Player 1 should start playing with player 2 remaining paused.
-            sendFrames(55, 20);
-            checkPausedInstant(56, true);
-            checkPausedInstant(55, false);
+            sendFrames(player_1_id, 20);
+            checkPausedInstant(player_2_id, true);
+            checkPausedInstant(player_1_id, false);
 
             // Send more frames for the second player. Both should be playing
-            sendFrames(56, 20);
-            checkPausedInstant(56, false);
-            checkPausedInstant(55, false);
+            sendFrames(player_2_id, 20);
+            checkPausedInstant(player_2_id, false);
+            checkPausedInstant(player_1_id, false);
         }
 
         [Test]
         public void TestPlayersCatchUpAfterFallingBehind()
         {
-            start(new[] { 55, 56 });
+            start(new[] { player_1_id, player_2_id });
             loadSpectateScreen();
 
             // Send initial frames for both players. A few more for player 1.
-            sendFrames(55, 1000);
-            sendFrames(56, 10);
-            checkPausedInstant(55, false);
-            checkPausedInstant(56, false);
+            sendFrames(player_1_id, 1000);
+            sendFrames(player_2_id, 10);
+            checkPausedInstant(player_1_id, false);
+            checkPausedInstant(player_2_id, false);
 
             // Eventually player 2 will run out of frames and should pause.
-            checkPaused(56, true);
+            checkPaused(player_2_id, true);
             AddWaitStep("wait a few more frames", 10);
 
             // Send more frames for player 2. It should unpause.
-            sendFrames(56, 1000);
-            checkPausedInstant(56, false);
+            sendFrames(player_2_id, 1000);
+            checkPausedInstant(player_2_id, false);
 
             // Player 2 should catch up to player 1 after unpausing.
-            waitForCatchup(56);
+            waitForCatchup(player_2_id);
             AddWaitStep("wait a bit", 10);
         }
 
         [Test]
         public void TestMostInSyncUserIsAudioSource()
         {
-            start(new[] { 55, 56 });
+            start(new[] { player_1_id, player_2_id });
             loadSpectateScreen();
 
-            assertVolume(55, 0);
-            assertVolume(56, 0);
+            assertVolume(player_1_id, 0);
+            assertVolume(player_2_id, 0);
 
-            sendFrames(55, 10);
-            sendFrames(56, 20);
-            assertVolume(55, 1);
-            assertVolume(56, 0);
+            sendFrames(player_1_id, 10);
+            sendFrames(player_2_id, 20);
+            assertVolume(player_1_id, 1);
+            assertVolume(player_2_id, 0);
 
-            checkPaused(55, true);
-            assertVolume(55, 0);
-            assertVolume(56, 1);
+            checkPaused(player_1_id, true);
+            assertVolume(player_1_id, 0);
+            assertVolume(player_2_id, 1);
 
-            sendFrames(55, 100);
-            waitForCatchup(55);
-            checkPaused(56, true);
-            assertVolume(55, 1);
-            assertVolume(56, 0);
+            sendFrames(player_1_id, 100);
+            waitForCatchup(player_1_id);
+            checkPaused(player_2_id, true);
+            assertVolume(player_1_id, 1);
+            assertVolume(player_2_id, 0);
 
-            sendFrames(56, 100);
-            waitForCatchup(56);
-            assertVolume(55, 1);
-            assertVolume(56, 0);
+            sendFrames(player_2_id, 100);
+            waitForCatchup(player_2_id);
+            assertVolume(player_1_id, 1);
+            assertVolume(player_2_id, 0);
         }
 
         private void loadSpectateScreen(bool waitForPlayerLoad = true)
