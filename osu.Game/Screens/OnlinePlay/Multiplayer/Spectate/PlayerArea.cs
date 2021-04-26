@@ -23,7 +23,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
     /// <summary>
     /// Provides an area for and manages the hierarchy of a spectated player within a <see cref="MultiSpectatorScreen"/>.
     /// </summary>
-    public class PlayerArea : CompositeDrawable, IAdjustableAudioComponent
+    public class PlayerArea : CompositeDrawable
     {
         /// <summary>
         /// Whether a <see cref="Player"/> is loaded in the area.
@@ -50,9 +50,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
 
+        private readonly BindableDouble volumeAdjustment = new BindableDouble();
         private readonly Container gameplayContent;
         private readonly LoadingLayer loadingLayer;
-        private readonly AudioContainer audioContainer;
         private OsuScreenStack stack;
 
         public PlayerArea(int userId, IFrameBasedClock masterClock)
@@ -62,6 +62,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             RelativeSizeAxes = Axes.Both;
             Masking = true;
 
+            AudioContainer audioContainer;
             InternalChildren = new Drawable[]
             {
                 audioContainer = new AudioContainer
@@ -71,6 +72,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 },
                 loadingLayer = new LoadingLayer(true) { State = { Value = Visibility.Visible } }
             };
+
+            audioContainer.AddAdjustment(AdjustableProperty.Volume, volumeAdjustment);
 
             GameplayClock.Source = masterClock;
         }
@@ -92,54 +95,21 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             loadingLayer.Hide();
         }
 
+        private bool mute = true;
+
+        public bool Mute
+        {
+            get => mute;
+            set
+            {
+                mute = value;
+                volumeAdjustment.Value = value ? 0 : 1;
+            }
+        }
+
         // Player interferes with global input, so disable input for now.
         public override bool PropagatePositionalInputSubTree => false;
         public override bool PropagateNonPositionalInputSubTree => false;
-
-        #region IAdjustableAudioComponent
-
-        public IBindable<double> AggregateVolume => audioContainer.AggregateVolume;
-
-        public IBindable<double> AggregateBalance => audioContainer.AggregateBalance;
-
-        public IBindable<double> AggregateFrequency => audioContainer.AggregateFrequency;
-
-        public IBindable<double> AggregateTempo => audioContainer.AggregateTempo;
-
-        public void BindAdjustments(IAggregateAudioAdjustment component)
-        {
-            audioContainer.BindAdjustments(component);
-        }
-
-        public void UnbindAdjustments(IAggregateAudioAdjustment component)
-        {
-            audioContainer.UnbindAdjustments(component);
-        }
-
-        public void AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable)
-        {
-            audioContainer.AddAdjustment(type, adjustBindable);
-        }
-
-        public void RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable)
-        {
-            audioContainer.RemoveAdjustment(type, adjustBindable);
-        }
-
-        public void RemoveAllAdjustments(AdjustableProperty type)
-        {
-            audioContainer.RemoveAllAdjustments(type);
-        }
-
-        public BindableNumber<double> Volume => audioContainer.Volume;
-
-        public BindableNumber<double> Balance => audioContainer.Balance;
-
-        public BindableNumber<double> Frequency => audioContainer.Frequency;
-
-        public BindableNumber<double> Tempo => audioContainer.Tempo;
-
-        #endregion
 
         private class PlayerIsolationContainer : Container
         {

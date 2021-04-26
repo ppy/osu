@@ -209,28 +209,28 @@ namespace osu.Game.Tests.Visual.Multiplayer
             start(new[] { PLAYER_1_ID, PLAYER_2_ID });
             loadSpectateScreen();
 
-            assertVolume(PLAYER_1_ID, 0);
-            assertVolume(PLAYER_2_ID, 0);
+            assertMuted(PLAYER_1_ID, true);
+            assertMuted(PLAYER_2_ID, true);
 
             sendFrames(PLAYER_1_ID, 10);
             sendFrames(PLAYER_2_ID, 20);
-            assertVolume(PLAYER_1_ID, 1);
-            assertVolume(PLAYER_2_ID, 0);
+            assertMuted(PLAYER_1_ID, false);
+            assertMuted(PLAYER_2_ID, true);
 
             checkPaused(PLAYER_1_ID, true);
-            assertVolume(PLAYER_1_ID, 0);
-            assertVolume(PLAYER_2_ID, 1);
+            assertMuted(PLAYER_1_ID, true);
+            assertMuted(PLAYER_2_ID, false);
 
             sendFrames(PLAYER_1_ID, 100);
             waitForCatchup(PLAYER_1_ID);
             checkPaused(PLAYER_2_ID, true);
-            assertVolume(PLAYER_1_ID, 1);
-            assertVolume(PLAYER_2_ID, 0);
+            assertMuted(PLAYER_1_ID, false);
+            assertMuted(PLAYER_2_ID, true);
 
             sendFrames(PLAYER_2_ID, 100);
             waitForCatchup(PLAYER_2_ID);
-            assertVolume(PLAYER_1_ID, 1);
-            assertVolume(PLAYER_2_ID, 0);
+            assertMuted(PLAYER_1_ID, false);
+            assertMuted(PLAYER_2_ID, true);
         }
 
         private void loadSpectateScreen(bool waitForPlayerLoad = true)
@@ -292,8 +292,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private void checkPausedInstant(int userId, bool state)
             => AddAssert($"{userId} is {(state ? "paused" : "playing")}", () => getPlayer(userId).ChildrenOfType<GameplayClockContainer>().First().GameplayClock.IsRunning != state);
 
-        private void assertVolume(int userId, double volume)
-            => AddAssert($"{userId} volume is {volume}", () => getInstance(userId).Volume.Value == volume);
+        private void assertMuted(int userId, bool muted)
+            => AddAssert($"{userId} {(muted ? "is" : "is not")} muted", () => getInstance(userId).Mute == muted);
 
         private void waitForCatchup(int userId)
             => AddUntilStep($"{userId} not catching up", () => !getInstance(userId).GameplayClock.IsCatchingUp);

@@ -111,7 +111,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                                               .FirstOrDefault();
 
                 foreach (var instance in instances)
-                    instance.Volume.Value = instance == currentAudioSource ? 1 : 0;
+                    instance.Mute = instance != currentAudioSource;
             }
         }
 
