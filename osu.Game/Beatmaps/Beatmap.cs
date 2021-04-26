@@ -75,7 +75,7 @@ namespace osu.Game.Beatmaps
             return mostCommon.beatLength;
         }
 
-        public int SnapTimeForDivisor(double time, int beatDivisor, double? referenceTime = null)
+        public int ClosestSnapTime(double time, int beatDivisor, double? referenceTime = null)
         {
             var timingPoint = ControlPointInfo.TimingPointAt(referenceTime ?? time);
             var beatLength = timingPoint.BeatLength / beatDivisor;
@@ -84,14 +84,14 @@ namespace osu.Game.Beatmaps
             return (int)(timingPoint.Time + beatLengths * beatLength);
         }
 
-        public int SnapTimeAnyDivisor(double time, double? referenceTime = null)
+        public int ClosestSnapTime(double time, double? referenceTime = null)
         {
-            return SnapTimeForDivisor(time, ClosestBeatSnapDivisor(time, referenceTime), referenceTime);
+            return ClosestSnapTime(time, ClosestBeatDivisor(time, referenceTime), referenceTime);
         }
 
-        public int ClosestBeatSnapDivisor(double time, double? referenceTime = null)
+        public int ClosestBeatDivisor(double time, double? referenceTime = null)
         {
-            double getUnsnap(int divisor) => Math.Abs(time - SnapTimeForDivisor(time, divisor, referenceTime));
+            double getUnsnap(int divisor) => Math.Abs(time - ClosestSnapTime(time, divisor, referenceTime));
 
             int[] divisors = BindableBeatDivisor.VALID_DIVISORS;
             double smallestUnsnap = divisors.Min(getUnsnap);

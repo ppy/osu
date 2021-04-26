@@ -301,16 +301,16 @@ namespace osu.Game.Screens.Edit
             return list.Count - 1;
         }
 
-        public int SnapTimeForDivisor(double time, int beatDivisor, double? referenceTime = null)
+        public int ClosestSnapTime(double time, int beatDivisor, double? referenceTime = null)
         {
-            return PlayableBeatmap.SnapTimeForDivisor(time, beatDivisor, referenceTime);
+            return PlayableBeatmap.ClosestSnapTime(time, beatDivisor, referenceTime);
         }
 
-        public int SnapTimeAnyDivisor(double time, double? referenceTime = null) => PlayableBeatmap.SnapTimeAnyDivisor(time, referenceTime);
+        public int ClosestSnapTime(double time, double? referenceTime = null) => PlayableBeatmap.ClosestSnapTime(time, referenceTime);
 
-        public int ClosestBeatSnapDivisor(double time, double? referenceTime = null) => PlayableBeatmap.ClosestBeatSnapDivisor(time, referenceTime);
+        public int ClosestBeatDivisor(double time, double? referenceTime = null) => PlayableBeatmap.ClosestBeatDivisor(time, referenceTime);
 
-        public double SnapTime(double time, double? referenceTime) => SnapTimeForDivisor(time, BeatDivisor, referenceTime);
+        public double SnapTime(double time, double? referenceTime) => ClosestSnapTime(time, BeatDivisor, referenceTime);
 
         public double GetBeatLengthAtTime(double referenceTime) => ControlPointInfo.TimingPointAt(referenceTime).BeatLength / BeatDivisor;
 
