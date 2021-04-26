@@ -142,6 +142,8 @@ namespace osu.Game.Tests.NonVisual
 
                     foreach (var file in osuStorage.IgnoreFiles)
                     {
+                        // avoid touching realm files which may be a pipe and break everything.
+                        // this is also done locally inside OsuStorage via the IgnoreFiles list.
                         if (file.EndsWith(".ini", StringComparison.Ordinal))
                             Assert.That(File.Exists(Path.Combine(originalDirectory, file)));
                         Assert.That(storage.Exists(file), Is.False);
