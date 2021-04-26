@@ -70,14 +70,9 @@ namespace osu.Game.Tests.Editing.Checks
         public void TestSliderSnapped()
         {
             // Slider ends are naturally < 1 ms unsnapped because of how SV works.
-            var mockSlider = new Mock<Slider>();
-            mockSlider.SetupGet(s => s.StartTime).Returns(100);
-            mockSlider.As<IHasRepeats>().Setup(r => r.RepeatCount).Returns(0);
-            mockSlider.As<IHasDuration>().Setup(d => d.Duration).Returns(400.75d);
-
             assertOk(new List<HitObject>
             {
-                mockSlider.Object
+                getSliderMock(startTime: 100, endTime: 400.75d).Object
             });
         }
 
