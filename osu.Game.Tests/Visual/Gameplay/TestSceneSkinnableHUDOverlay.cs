@@ -4,17 +4,21 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
+using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -31,6 +35,32 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         [Resolved]
         private OsuConfigManager config { get; set; }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Add(new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Width = 0.3f,
+                Children = new Drawable[]
+                {
+                    new Box
+                    {
+                        Colour = Color4.Black,
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0.7f,
+                    },
+                    new FillFlowContainer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Direction = FillDirection.Vertical,
+                        Children = createSkinSourceComponents(),
+                    },
+                }
+            });
+        }
 
         [Test]
         public void TestComboCounterIncrementing()
@@ -72,6 +102,18 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             // Key counter flow container should not be affected by this, only the key counter display will be hidden as checked above.
             AddAssert("key counter flow not affected", () => keyCounterFlow.IsPresent);
+        }
+
+        private IReadOnlyList<Drawable> createSkinSourceComponents()
+        {
+            var hudComponents = typeof(SkinnableHUDComponent).Assembly.GetTypes().Where(t => typeof(SkinnableHUDComponent).IsAssignableFrom(t)).ToArray();
+
+            List<Drawable> drawables = new List<Drawable>();
+
+            foreach (var component in hudComponents)
+                drawables.AddRange(component.CreateSettingsControls());
+
+            return drawables;
         }
 
         private void createNew(Action<HUDOverlay> action = null)

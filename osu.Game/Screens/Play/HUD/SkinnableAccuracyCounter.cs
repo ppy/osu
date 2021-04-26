@@ -6,7 +6,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class SkinnableAccuracyCounter : SkinnableDrawable, IAccuracyCounter
+    public class SkinnableAccuracyCounter : SkinnableHUDComponent, IAccuracyCounter
     {
         public Bindable<double> Current { get; } = new Bindable<double>();
 
