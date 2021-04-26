@@ -18,6 +18,9 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         [Resolved]
         private IScrollingInfo scrollingInfo { get; set; }
 
+        // Overriding the base because this method is called right after `Column` is changed and `DrawableObject` is not yet loaded and Parent is not set.
+        public override Vector2 GetInstantDelta(Vector2 screenSpacePosition) => Parent.ToLocalSpace(screenSpacePosition) - Position;
+
         protected ManiaSelectionBlueprint(DrawableHitObject drawableObject)
             : base(drawableObject)
         {
