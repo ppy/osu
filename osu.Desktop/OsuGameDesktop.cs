@@ -7,9 +7,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Versioning;
-using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.Win32;
+using osu.Desktop.Admin;
 using osu.Desktop.Overlays;
 using osu.Framework.Platform;
 using osu.Game;
@@ -21,7 +21,6 @@ using osu.Game.Screens.Menu;
 using osu.Game.Updater;
 using osu.Desktop.Windows;
 using osu.Framework.Threading;
-using osu.Game.Admin;
 using osu.Game.IO;
 
 namespace osu.Desktop
@@ -104,8 +103,6 @@ namespace osu.Desktop
             }
         }
 
-        protected override AdminChecker CreateAdminChecker() => new DesktopAdminChecker();
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -117,6 +114,8 @@ namespace osu.Desktop
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
                 LoadComponentAsync(new GameplayWinKeyBlocker(), Add);
+
+            LoadComponentAsync(new AdminChecker(), Add);
         }
 
         protected override void ScreenChanged(IScreen lastScreen, IScreen newScreen)
@@ -183,11 +182,6 @@ namespace osu.Desktop
 
                 Task.Factory.StartNew(() => Import(paths), TaskCreationOptions.LongRunning);
             }
-        }
-
-        private class DesktopAdminChecker : AdminChecker
-        {
-            protected override bool IsAdmin() => OperatingSystem.IsWindows() ? new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator) : Mono.Unix.Native.Syscall.geteuid() == 0;
         }
     }
 }
