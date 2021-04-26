@@ -10,7 +10,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class SkinnableScoreCounter : SkinnableDrawable, IScoreCounter
+    public class SkinnableScoreCounter : SkinnableHUDComponent, IScoreCounter
     {
         public Bindable<double> Current { get; } = new Bindable<double>();
 
