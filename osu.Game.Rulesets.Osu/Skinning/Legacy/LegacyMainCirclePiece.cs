@@ -12,6 +12,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -19,7 +20,7 @@ using static osu.Game.Skinning.LegacySkinConfiguration;
 
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
-    public class LegacyMainCirclePiece : CompositeDrawable
+    public class LegacyMainCirclePiece : CompositeDrawable, IMainCirclePiece
     {
         private readonly string priorityLookup;
         private readonly bool hasNumber;
@@ -138,12 +139,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             accentColour.BindValueChanged(colour => hitCircleSprite.Colour = LegacyColourCompatibility.DisallowZeroAlpha(colour.NewValue), true);
             if (hasNumber)
                 indexInCurrentCombo.BindValueChanged(index => hitCircleText.Text = (index.NewValue + 1).ToString(), true);
-
-            drawableObject.ApplyCustomUpdateState += updateState;
-            updateState(drawableObject, drawableObject.State.Value);
         }
 
-        private void updateState(DrawableHitObject drawableObject, ArmedState state)
+        public void Animate(ArmedState state)
         {
             const double legacy_fade_duration = 240;
 

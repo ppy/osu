@@ -8,6 +8,8 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Framework.Threading;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
@@ -31,12 +33,32 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private float circleSize;
 
+        private ScheduledDelegate addManyFruit;
+
+        private BeatmapDifficulty beatmapDifficulty;
+
         public TestSceneCatcherArea()
         {
             AddSliderStep<float>("circle size", 0, 8, 5, createCatcher);
             AddToggleStep("hyper dash", t => this.ChildrenOfType<TestCatcherArea>().ForEach(area => area.ToggleHyperDash(t)));
 
-            AddStep("catch fruit", () => attemptCatch(new Fruit()));
+            AddStep("catch centered fruit", () => attemptCatch(new Fruit()));
+            AddStep("catch many random fruit", () =>
+            {
+                int count = 50;
+
+                addManyFruit?.Cancel();
+                addManyFruit = Scheduler.AddDelayed(() =>
+                {
+                    attemptCatch(new Fruit
+                    {
+                        X = (RNG.NextSingle() - 0.5f) * Catcher.CalculateCatchWidth(beatmapDifficulty) * 0.6f,
+                    });
+
+                    if (count-- == 0)
+                        addManyFruit?.Cancel();
+                }, 50, true);
+            });
             AddStep("catch fruit last in combo", () => attemptCatch(new Fruit { LastInCombo = true }));
             AddStep("catch kiai fruit", () => attemptCatch(new TestSceneCatcher.TestKiaiFruit()));
             AddStep("miss last in combo", () => attemptCatch(new Fruit { X = 100, LastInCombo = true }));
@@ -45,10 +67,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         private void attemptCatch(Fruit fruit)
         {
             fruit.X = fruit.OriginalX + catcher.X;
-            fruit.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty
-            {
-                CircleSize = circleSize
-            });
+            fruit.ApplyDefaults(new ControlPointInfo(), beatmapDifficulty);
 
             foreach (var area in this.ChildrenOfType<CatcherArea>())
             {
@@ -71,6 +90,11 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             circleSize = size;
 
+            beatmapDifficulty = new BeatmapDifficulty
+            {
+                CircleSize = circleSize
+            };
+
             SetContents(() =>
             {
                 var droppedObjectContainer = new Container<CaughtObject>
@@ -84,7 +108,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                     Children = new Drawable[]
                     {
                         droppedObjectContainer,
-                        new TestCatcherArea(droppedObjectContainer, new BeatmapDifficulty { CircleSize = size })
+                        new TestCatcherArea(droppedObjectContainer, beatmapDifficulty)
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.TopCentre,
