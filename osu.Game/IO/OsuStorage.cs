@@ -43,7 +43,8 @@ namespace osu.Game.IO
         {
             "framework.ini",
             "storage.ini",
-            "client.realm.note"
+            "client.realm.note",
+            "client.realm.lock",
         };
 
         public OsuStorage(GameHost host, Storage defaultStorage)
