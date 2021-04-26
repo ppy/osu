@@ -79,7 +79,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             };
 
             for (int i = 0; i < UserIds.Length; i++)
-                grid.Add(instances[i] = new PlayerArea(UserIds[i], new CatchUpSlaveClock(masterClockContainer.GameplayClock)));
+                grid.Add(instances[i] = new PlayerArea(UserIds[i], new CatchUpSpectatorPlayerClock(masterClockContainer.GameplayClock)));
 
             // Todo: This is not quite correct - it should be per-user to adjust for other mod combinations.
             var playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Ruleset.Value);
@@ -104,7 +104,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             if (!isCandidateAudioSource(currentAudioSource?.GameplayClock))
             {
                 currentAudioSource = instances.Where(i => isCandidateAudioSource(i.GameplayClock))
-                                              .OrderBy(i => Math.Abs(i.GameplayClock.CurrentTime - syncManager.Master.CurrentTime))
+                                              .OrderBy(i => Math.Abs(i.GameplayClock.CurrentTime - syncManager.MasterClock.CurrentTime))
                                               .FirstOrDefault();
 
                 foreach (var instance in instances)
@@ -112,7 +112,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             }
         }
 
-        private bool isCandidateAudioSource([CanBeNull] ISlaveClock clock)
+        private bool isCandidateAudioSource([CanBeNull] ISpectatorPlayerClock clock)
             => clock?.IsRunning == true && !clock.IsCatchingUp && !clock.WaitingOnFrames.Value;
 
         protected override void OnUserStateChanged(int userId, SpectatorState spectatorState)
@@ -124,7 +124,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             var instance = instances[getIndexForUser(userId)];
             instance.LoadScore(gameplayState.Score);
 
-            syncManager.AddSlave(instance.GameplayClock);
+            syncManager.AddPlayerClock(instance.GameplayClock);
             leaderboard.AddClock(instance.UserId, instance.GameplayClock);
         }
 

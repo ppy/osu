@@ -9,7 +9,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync
     /// <summary>
     /// A clock which is used by <see cref="MultiSpectatorPlayer"/>s and managed by an <see cref="ISyncManager"/>.
     /// </summary>
-    public interface ISlaveClock : IFrameBasedClock, IAdjustableClock
+    public interface ISpectatorPlayerClock : IFrameBasedClock, IAdjustableClock
     {
         /// <summary>
         /// Whether this clock is waiting on frames to continue playback.
