@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Edit
             new CheckAudioQuality(),
 
             // Compose
-            new CheckUnsnaps(),
+            new CheckUnsnappedObjects(),
             new CheckConcurrentObjects()
         };
 

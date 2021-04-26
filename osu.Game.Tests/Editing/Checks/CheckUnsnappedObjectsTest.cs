@@ -15,15 +15,15 @@ using osu.Game.Rulesets.Osu.Objects;
 namespace osu.Game.Tests.Editing.Checks
 {
     [TestFixture]
-    public class CheckUnsnapsTest
+    public class CheckUnsnappedObjectsTest
     {
-        private CheckUnsnaps check;
+        private CheckUnsnappedObjects check;
         private ControlPointInfo cpi;
 
         [SetUp]
         public void Setup()
         {
-            check = new CheckUnsnaps();
+            check = new CheckUnsnappedObjects();
 
             cpi = new ControlPointInfo();
             cpi.Add(100, new TimingControlPoint { BeatLength = 100 });
@@ -108,8 +108,8 @@ namespace osu.Game.Tests.Editing.Checks
             var issues = check.Run(getPlayableBeatmap(hitobjects), null).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(2));
-            Assert.That(issues.Any(issue => issue.Template is CheckUnsnaps.IssueTemplate1MsOrMore));
-            Assert.That(issues.Any(issue => issue.Template is CheckUnsnaps.IssueTemplate2MsOrMore));
+            Assert.That(issues.Any(issue => issue.Template is CheckUnsnappedObjects.IssueTemplate1MsOrMore));
+            Assert.That(issues.Any(issue => issue.Template is CheckUnsnappedObjects.IssueTemplate2MsOrMore));
         }
 
         private Mock<Slider> getSliderMock(double startTime, double endTime, int repeats = 0)
@@ -132,7 +132,7 @@ namespace osu.Game.Tests.Editing.Checks
             var issues = check.Run(getPlayableBeatmap(hitobjects), null).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(count));
-            Assert.That(issues.All(issue => issue.Template is CheckUnsnaps.IssueTemplate1MsOrMore));
+            Assert.That(issues.All(issue => issue.Template is CheckUnsnappedObjects.IssueTemplate1MsOrMore));
         }
 
         private void assert2Ms(List<HitObject> hitobjects, int count = 1)
@@ -140,7 +140,7 @@ namespace osu.Game.Tests.Editing.Checks
             var issues = check.Run(getPlayableBeatmap(hitobjects), null).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(count));
-            Assert.That(issues.All(issue => issue.Template is CheckUnsnaps.IssueTemplate2MsOrMore));
+            Assert.That(issues.All(issue => issue.Template is CheckUnsnappedObjects.IssueTemplate2MsOrMore));
         }
 
         private IBeatmap getPlayableBeatmap(List<HitObject> hitobjects)
