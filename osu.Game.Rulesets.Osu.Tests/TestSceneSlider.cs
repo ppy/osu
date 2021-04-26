@@ -27,9 +27,15 @@ namespace osu.Game.Rulesets.Osu.Tests
     {
         private int depthIndex;
 
+        private bool trackHeadActionInitially = true;
+        private bool inputTracksVisualSize = true;
+
         [Test]
         public void TestVariousSliders()
         {
+            AddToggleStep("Ball.TrackHeadActionInitially", v => trackHeadActionInitially = v);
+            AddToggleStep("Ball.InputTracksVisualSize", v => inputTracksVisualSize = v);
+
             AddStep("Big Single", () => SetContents(() => testSimpleBig()));
             AddStep("Medium Single", () => SetContents(() => testSimpleMedium()));
             AddStep("Small Single", () => SetContents(() => testSimpleSmall()));
@@ -334,6 +340,12 @@ namespace osu.Game.Rulesets.Osu.Tests
             slider.ApplyDefaults(cpi, new BeatmapDifficulty { CircleSize = circleSize, SliderTickRate = 3 });
 
             var drawable = CreateDrawableSlider(slider);
+
+            drawable.OnLoadComplete += _ =>
+            {
+                drawable.Ball.TrackHeadActionInitially = trackHeadActionInitially;
+                drawable.Ball.InputTracksVisualSize = inputTracksVisualSize;
+            };
 
             foreach (var mod in SelectedMods.Value.OfType<IApplicableToDrawableHitObjects>())
                 mod.ApplyToDrawableHitObjects(new[] { drawable });
