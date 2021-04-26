@@ -28,6 +28,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Threading;
+using osu.Game.Admin;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Graphics;
@@ -450,6 +451,8 @@ namespace osu.Game
 
         protected virtual UpdateManager CreateUpdateManager() => new UpdateManager();
 
+        protected virtual AdminChecker CreateAdminChecker() => new AdminChecker();
+
         protected override Container CreateScalingContainer() => new ScalingContainer(ScalingMode.Everything);
 
         #region Beatmap progression
@@ -672,6 +675,8 @@ namespace osu.Game
 
             // dependency on notification overlay, dependent by settings overlay
             loadComponentSingleFile(CreateUpdateManager(), Add, true);
+
+            loadComponentSingleFile(CreateAdminChecker(), Add, false);
 
             // overlay elements
             loadComponentSingleFile(new ManageCollectionsDialog(), overlayContent.Add, true);
