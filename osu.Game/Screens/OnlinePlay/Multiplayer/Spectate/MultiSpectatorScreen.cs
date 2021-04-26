@@ -140,6 +140,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             leaderboard.RemoveClock(userId);
         }
 
+        public override bool OnBackButton()
+        {
+            // On a manual exit, set the player state back to idle.
+            multiplayerClient.ChangeState(MultiplayerUserState.Idle);
+            return base.OnBackButton();
+        }
+
         private int getIndexForUser(int userId) => Array.IndexOf(userIds, userId);
     }
 }
