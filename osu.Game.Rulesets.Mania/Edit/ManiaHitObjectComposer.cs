@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 {
     public class ManiaHitObjectComposer : HitObjectComposer<ManiaHitObject>
     {
-        private DrawableManiaEditRuleset drawableRuleset;
+        private DrawableManiaEditorRuleset drawableRuleset;
         private ManiaBeatSnapGrid beatSnapGrid;
         private InputManager inputManager;
 
@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         protected override DrawableRuleset<ManiaHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
         {
-            drawableRuleset = new DrawableManiaEditRuleset(ruleset, beatmap, mods);
+            drawableRuleset = new DrawableManiaEditorRuleset(ruleset, beatmap, mods);
 
             // This is the earliest we can cache the scrolling info to ourselves, before masks are added to the hierarchy and inject it
             dependencies.CacheAs(drawableRuleset.ScrollingInfo);

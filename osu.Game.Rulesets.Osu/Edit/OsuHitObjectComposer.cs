@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         }
 
         protected override DrawableRuleset<OsuHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
-            => new DrawableOsuEditRuleset(ruleset, beatmap, mods);
+            => new DrawableOsuEditorRuleset(ruleset, beatmap, mods);
 
         protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
         {
