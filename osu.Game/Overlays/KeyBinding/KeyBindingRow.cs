@@ -337,7 +337,7 @@ namespace osu.Game.Overlays.KeyBinding
         {
             using (var usage = realmFactory.GetForWrite())
             {
-                var binding = usage.Realm.Find<RealmKeyBinding>(((IHasGuidPrimaryKey)button.KeyBinding).ID.ToString());
+                var binding = usage.Realm.Find<RealmKeyBinding>(((IHasGuidPrimaryKey)button.KeyBinding).ID);
                 binding.KeyCombinationString = button.KeyBinding.KeyCombinationString;
 
                 usage.Commit();
