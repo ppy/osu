@@ -158,7 +158,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             {
                 var otherKey = headCircleHitAction == OsuAction.RightButton ? OsuAction.LeftButton : OsuAction.RightButton;
 
-                // we can return to accepting all other keys if they were released in the previous frame.
+                // we can start accepting any key once all other keys have been released in the previous frame.
                 if (!lastPressedActions.Contains(otherKey))
                     timeToAcceptAnyKeyAfter = Time.Current;
             }
