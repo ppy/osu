@@ -11,6 +11,7 @@ using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Skinning.Default;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
 using osuTK;
@@ -56,43 +57,45 @@ namespace osu.Game.Rulesets.Osu.Edit
                 if (state == ArmedState.Idle || hitAnimations.Value)
                     return;
 
-                // adjust the visuals of certain object types to make them stay on screen for longer than usual.
-                switch (hitObject)
+                if (hitObject is DrawableHitCircle circle)
                 {
-                    default:
-                        // there are quite a few drawable hit types we don't want to extend (spinners, ticks etc.)
-                        return;
+                    circle.ApproachCircle
+                          .FadeOutFromOne(editor_hit_object_fade_out_extension * 4)
+                          .Expire();
 
-                    case DrawableSlider _:
-                        // no specifics to sliders but let them fade slower below.
-                        break;
-
-                    case DrawableHitCircle circle: // also handles slider heads
-                        circle.ApproachCircle
-                              .FadeOutFromOne(editor_hit_object_fade_out_extension * 4)
-                              .Expire();
-
-                        circle.ApproachCircle.ScaleTo(1.1f, 300, Easing.OutQuint);
-
-                        var circlePieceDrawable = circle.CirclePiece.Drawable;
-
-                        // clear any explode animation logic.
-                        circlePieceDrawable.ApplyTransformsAt(circle.HitStateUpdateTime, true);
-                        circlePieceDrawable.ClearTransformsAfter(circle.HitStateUpdateTime, true);
-
-                        break;
+                    circle.ApproachCircle.ScaleTo(1.1f, 300, Easing.OutQuint);
                 }
 
-                // Get the existing fade out transform
-                var existing = hitObject.Transforms.LastOrDefault(t => t.TargetMember == nameof(Alpha));
+                if (hitObject is IHasMainCirclePiece mainPieceContainer)
+                {
+                    // clear any explode animation logic.
+                    mainPieceContainer.CirclePiece.ApplyTransformsAt(hitObject.HitStateUpdateTime, true);
+                    mainPieceContainer.CirclePiece.ClearTransformsAfter(hitObject.HitStateUpdateTime, true);
+                }
 
-                if (existing == null)
-                    return;
+                if (hitObject is DrawableSliderRepeat repeat)
+                {
+                    repeat.Arrow.ApplyTransformsAt(hitObject.HitStateUpdateTime, true);
+                    repeat.Arrow.ClearTransformsAfter(hitObject.HitStateUpdateTime, true);
+                }
 
-                hitObject.RemoveTransform(existing);
+                // adjust the visuals of top-level object types to make them stay on screen for longer than usual.
+                switch (hitObject)
+                {
+                    case DrawableSlider _:
+                    case DrawableHitCircle _:
+                        // Get the existing fade out transform
+                        var existing = hitObject.Transforms.LastOrDefault(t => t.TargetMember == nameof(Alpha));
 
-                using (hitObject.BeginAbsoluteSequence(hitObject.HitStateUpdateTime))
-                    hitObject.FadeOut(editor_hit_object_fade_out_extension).Expire();
+                        if (existing == null)
+                            return;
+
+                        hitObject.RemoveTransform(existing);
+
+                        using (hitObject.BeginAbsoluteSequence(hitObject.HitStateUpdateTime))
+                            hitObject.FadeOut(editor_hit_object_fade_out_extension).Expire();
+                        break;
+                }
             }
         }
     }
