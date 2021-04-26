@@ -27,6 +27,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// </summary>
         public bool AllPlayersLoaded => instances.All(p => p?.PlayerLoaded == true);
 
+        private readonly int[] userIds;
+
         [Resolved]
         private SpectatorStreamingClient spectatorClient { get; set; }
 
@@ -44,7 +46,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public MultiSpectatorScreen(int[] userIds)
             : base(userIds.Take(PlayerGrid.MAX_PLAYERS).ToArray())
         {
-            instances = new PlayerArea[UserIds.Length];
+            this.userIds = GetUserIds().ToArray();
+            instances = new PlayerArea[this.userIds.Length];
         }
 
         [BackgroundDependencyLoader]
@@ -78,9 +81,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 })
             };
 
-            for (int i = 0; i < UserIds.Length; i++)
+            for (int i = 0; i < userIds.Length; i++)
             {
-                grid.Add(instances[i] = new PlayerArea(UserIds[i], masterClockContainer.GameplayClock));
+                grid.Add(instances[i] = new PlayerArea(userIds[i], masterClockContainer.GameplayClock));
                 syncManager.AddPlayerClock(instances[i].GameplayClock);
             }
 
@@ -89,7 +92,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             var scoreProcessor = Ruleset.Value.CreateInstance().CreateScoreProcessor();
             scoreProcessor.ApplyBeatmap(playableBeatmap);
 
-            LoadComponentAsync(leaderboard = new MultiSpectatorLeaderboard(scoreProcessor, UserIds) { Expanded = { Value = true } }, leaderboardContainer.Add);
+            LoadComponentAsync(leaderboard = new MultiSpectatorLeaderboard(scoreProcessor, userIds) { Expanded = { Value = true } }, leaderboardContainer.Add);
         }
 
         protected override void LoadComplete()
@@ -133,10 +136,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         protected override void EndGameplay(int userId)
         {
-            spectatorClient.StopWatchingUser(userId);
+            RemoveUser(userId);
             leaderboard.RemoveClock(userId);
         }
 
-        private int getIndexForUser(int userId) => Array.IndexOf(UserIds, userId);
+        private int getIndexForUser(int userId) => Array.IndexOf(userIds, userId);
     }
 }
