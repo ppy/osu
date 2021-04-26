@@ -157,8 +157,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestReadyButtonEnabledWhenHostAndUsersReady()
         {
-            AddStep("add user", () => Client.AddUser(new User { Id = 55 }));
-            AddStep("set user ready", () => Client.ChangeUserState(55, MultiplayerUserState.Ready));
+            AddStep("add user", () => Client.AddUser(new User { Id = PLAYER_1_ID }));
+            AddStep("set user ready", () => Client.ChangeUserState(PLAYER_1_ID, MultiplayerUserState.Ready));
 
             addClickSpectateButtonStep();
             assertReadyButtonEnablement(true);
@@ -169,11 +169,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("add user and transfer host", () =>
             {
-                Client.AddUser(new User { Id = 55 });
-                Client.TransferHost(55);
+                Client.AddUser(new User { Id = PLAYER_1_ID });
+                Client.TransferHost(PLAYER_1_ID);
             });
 
-            AddStep("set user ready", () => Client.ChangeUserState(55, MultiplayerUserState.Ready));
+            AddStep("set user ready", () => Client.ChangeUserState(PLAYER_1_ID, MultiplayerUserState.Ready));
 
             addClickSpectateButtonStep();
             assertReadyButtonEnablement(false);

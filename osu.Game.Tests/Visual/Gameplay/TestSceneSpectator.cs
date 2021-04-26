@@ -23,6 +23,7 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Beatmaps.IO;
+using osu.Game.Tests.Visual.Multiplayer;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -238,7 +239,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         public class TestSpectatorStreamingClient : SpectatorStreamingClient
         {
-            public readonly User StreamingUser = new User { Id = 55, Username = "Test user" };
+            public readonly User StreamingUser = new User { Id = MultiplayerTestScene.PLAYER_1_ID, Username = "Test user" };
 
             public new BindableList<int> PlayingUsers => (BindableList<int>)base.PlayingUsers;
 
