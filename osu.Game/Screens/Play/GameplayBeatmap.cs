@@ -45,6 +45,15 @@ namespace osu.Game.Screens.Play
 
         public double GetMostCommonBeatLength() => PlayableBeatmap.GetMostCommonBeatLength();
 
+        public int SnapTimeForDivisor(double time, int beatDivisor, double? referenceTime = null)
+        {
+            return PlayableBeatmap.SnapTimeForDivisor(time, beatDivisor, referenceTime);
+        }
+
+        public int SnapTimeAnyDivisor(double time, double? referenceTime = null) => PlayableBeatmap.SnapTimeAnyDivisor(time, referenceTime);
+
+        public int ClosestBeatSnapDivisor(double time, double? referenceTime = null) => PlayableBeatmap.ClosestBeatSnapDivisor(time, referenceTime);
+
         public IBeatmap Clone() => PlayableBeatmap.Clone();
 
         private readonly Bindable<JudgementResult> lastJudgementResult = new Bindable<JudgementResult>();
