@@ -290,8 +290,6 @@ namespace osu.Game
 
             migrateDataToRealm();
 
-            dependencies.CacheAs(KeyBindingStore = new RealmKeyBindingStore(realmFactory));
-
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
             dependencies.Cache(RulesetConfigCache = new RulesetConfigCache(SettingsStore));
 
