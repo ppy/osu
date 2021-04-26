@@ -26,6 +26,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         [Resolved]
         private OsuColour colours { get; set; }
 
+        [Resolved]
+        private BeatDivisorFinder beatDivisorFinder { get; set; }
+
         private readonly Bindable<bool> configColourCodedNotes = new Bindable<bool>();
 
         protected virtual ManiaSkinComponents Component => ManiaSkinComponents.Note;
@@ -48,17 +51,20 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(ManiaRulesetConfigManager rulesetConfig, BeatDivisorFinder beatDivisorFinder)
+        private void load(ManiaRulesetConfigManager rulesetConfig)
+        {
+            rulesetConfig?.BindWith(ManiaRulesetSetting.ColourCodedNotes, configColourCodedNotes);
+        }
+
+        protected override void LoadComplete()
         {
             if (beatDivisorFinder != null)
             {
-                rulesetConfig?.BindWith(ManiaRulesetSetting.ColourCodedNotes, configColourCodedNotes);
-
                 HitObject.StartTimeBindable.BindValueChanged(_ => snap.Value = beatDivisorFinder.FindDivisor(HitObject), true);
-
-                snap.BindValueChanged(_ => updateSnapColour(), true);
-                configColourCodedNotes.BindValueChanged(_ => updateSnapColour());
             }
+
+            snap.BindValueChanged(_ => updateSnapColour());
+            configColourCodedNotes.BindValueChanged(_ => updateSnapColour(), true);
         }
 
         protected override void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)
