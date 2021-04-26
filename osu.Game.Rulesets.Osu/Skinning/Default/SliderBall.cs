@@ -172,7 +172,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 (actions?.Any(isValidTrackingAction) ?? false);
 
             lastPressedActions.Clear();
-            lastPressedActions.AddRange(actions);
+            if (actions != null)
+                lastPressedActions.AddRange(actions);
         }
 
         /// <summary>
