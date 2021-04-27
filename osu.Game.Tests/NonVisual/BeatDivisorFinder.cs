@@ -14,32 +14,32 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestFindDivisor()
         {
-            const int beatLength = 1000;
+            const double beat_length = 1000;
 
             var beatmap = new Beatmap
             {
                 HitObjects = new List<HitObject>
                 {
-                    new HitObject { StartTime = -beatLength / 3 },
+                    new HitObject { StartTime = -beat_length / 3 },
                     new HitObject { StartTime = 0 },
-                    new HitObject { StartTime = beatLength / 16 },
-                    new HitObject { StartTime = beatLength / 12 },
-                    new HitObject { StartTime = beatLength / 8 },
-                    new HitObject { StartTime = beatLength / 6 },
-                    new HitObject { StartTime = beatLength / 4 },
-                    new HitObject { StartTime = beatLength / 3 },
-                    new HitObject { StartTime = beatLength / 2 },
-                    new HitObject { StartTime = beatLength },
-                    new HitObject { StartTime = beatLength + beatLength / 7 }
+                    new HitObject { StartTime = beat_length / 16 },
+                    new HitObject { StartTime = beat_length / 12 },
+                    new HitObject { StartTime = beat_length / 8 },
+                    new HitObject { StartTime = beat_length / 6 },
+                    new HitObject { StartTime = beat_length / 4 },
+                    new HitObject { StartTime = beat_length / 3 },
+                    new HitObject { StartTime = beat_length / 2 },
+                    new HitObject { StartTime = beat_length },
+                    new HitObject { StartTime = beat_length + beat_length / 7 }
                 },
                 ControlPointInfo = new ControlPointInfo()
             };
 
-            beatmap.ControlPointInfo.Add(0, new TimingControlPoint()
-                {
-                    TimeSignature = Game.Beatmaps.Timing.TimeSignatures.SimpleQuadruple,
-                    BeatLength = beatLength
-                });
+            beatmap.ControlPointInfo.Add(0, new TimingControlPoint
+            {
+                TimeSignature = Game.Beatmaps.Timing.TimeSignatures.SimpleQuadruple,
+                BeatLength = beat_length
+            });
 
             var beatDivisorFinder = new BeatDivisorFinder(beatmap);
 
@@ -59,49 +59,49 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestFindDivisorWithTempoChanges()
         {
-            const int firstBeatLength = 1000;
-            const int secondBeatLength = 700;
-            const int thirdBeatLength = 200;
+            const double first_beat_length = 1000;
+            const double second_beat_length = 700;
+            const double third_beat_length = 200;
 
-            const int firstBeatLengthStart = 0;
-            const int secondBeatLengthStart = 1000;
-            const int thirdBeatLengthStart = 2000;
+            const double first_beat_length_start = 0;
+            const double second_beat_length_start = 1000;
+            const double third_beat_length_start = 2000;
 
             var beatmap = new Beatmap
             {
                 HitObjects = new List<HitObject>
                 {
-                    new HitObject { StartTime = firstBeatLengthStart },
-                    new HitObject { StartTime = firstBeatLengthStart + firstBeatLength / 2 },
-                    new HitObject { StartTime = secondBeatLengthStart },
-                    new HitObject { StartTime = secondBeatLengthStart + secondBeatLength / 2 },
-                    new HitObject { StartTime = thirdBeatLengthStart },
-                    new HitObject { StartTime = thirdBeatLengthStart + thirdBeatLength / 2 },
+                    new HitObject { StartTime = first_beat_length_start },
+                    new HitObject { StartTime = first_beat_length_start + first_beat_length / 2 },
+                    new HitObject { StartTime = second_beat_length_start },
+                    new HitObject { StartTime = second_beat_length_start + second_beat_length / 2 },
+                    new HitObject { StartTime = third_beat_length_start },
+                    new HitObject { StartTime = third_beat_length_start + third_beat_length / 2 },
                 },
                 ControlPointInfo = new ControlPointInfo()
             };
 
-            var firstTimingControlPoint = new TimingControlPoint()
+            var firstTimingControlPoint = new TimingControlPoint
             {
                 TimeSignature = Game.Beatmaps.Timing.TimeSignatures.SimpleQuadruple,
-                BeatLength = firstBeatLength
-            };
-            
-            var secondTimingControlPoint = new TimingControlPoint()
-            {
-                TimeSignature = Game.Beatmaps.Timing.TimeSignatures.SimpleQuadruple,
-                BeatLength = secondBeatLength
-            };
-            
-            var thirdTimingControlPoint = new TimingControlPoint()
-            {
-                TimeSignature = Game.Beatmaps.Timing.TimeSignatures.SimpleQuadruple,
-                BeatLength = thirdBeatLength
+                BeatLength = first_beat_length
             };
 
-            beatmap.ControlPointInfo.Add(firstBeatLengthStart, firstTimingControlPoint);
-            beatmap.ControlPointInfo.Add(secondBeatLengthStart, secondTimingControlPoint);
-            beatmap.ControlPointInfo.Add(thirdBeatLengthStart, thirdTimingControlPoint);
+            var secondTimingControlPoint = new TimingControlPoint
+            {
+                TimeSignature = Game.Beatmaps.Timing.TimeSignatures.SimpleQuadruple,
+                BeatLength = second_beat_length
+            };
+
+            var thirdTimingControlPoint = new TimingControlPoint
+            {
+                TimeSignature = Game.Beatmaps.Timing.TimeSignatures.SimpleQuadruple,
+                BeatLength = third_beat_length
+            };
+
+            beatmap.ControlPointInfo.Add(first_beat_length_start, firstTimingControlPoint);
+            beatmap.ControlPointInfo.Add(second_beat_length_start, secondTimingControlPoint);
+            beatmap.ControlPointInfo.Add(third_beat_length_start, thirdTimingControlPoint);
 
             var beatDivisorFinder = new BeatDivisorFinder(beatmap);
 

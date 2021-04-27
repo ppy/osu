@@ -21,26 +21,28 @@ namespace osu.Game.Rulesets.Mania.Tests
     {
         [Resolved]
         private RulesetConfigCache configCache { get; set; }
+
         private readonly Bindable<bool> configTimingBasedNoteColouring = new Bindable<bool>();
 
         protected override void LoadComplete()
         {
-            const int beatLength = 500;
+            const double beat_length = 500;
 
             var ruleset = new ManiaRuleset();
 
             var beatmap = new ManiaBeatmap(new StageDefinition { Columns = 1 })
             {
-                HitObjects = {
+                HitObjects =
+                {
                     new Note { StartTime = 0 },
-                    new Note { StartTime = beatLength / 16 },
-                    new Note { StartTime = beatLength / 12 },
-                    new Note { StartTime = beatLength / 8 },
-                    new Note { StartTime = beatLength / 6 },
-                    new Note { StartTime = beatLength / 4 },
-                    new Note { StartTime = beatLength / 3 },
-                    new Note { StartTime = beatLength / 2 },
-                    new Note { StartTime = beatLength }
+                    new Note { StartTime = beat_length / 16 },
+                    new Note { StartTime = beat_length / 12 },
+                    new Note { StartTime = beat_length / 8 },
+                    new Note { StartTime = beat_length / 6 },
+                    new Note { StartTime = beat_length / 4 },
+                    new Note { StartTime = beat_length / 3 },
+                    new Note { StartTime = beat_length / 2 },
+                    new Note { StartTime = beat_length }
                 },
                 ControlPointInfo = new ControlPointInfo(),
                 BeatmapInfo =
@@ -59,10 +61,10 @@ namespace osu.Game.Rulesets.Mania.Tests
                 note.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
             }
 
-            beatmap.ControlPointInfo.Add(0, new TimingControlPoint()
+            beatmap.ControlPointInfo.Add(0, new TimingControlPoint
                 {
                     TimeSignature = Game.Beatmaps.Timing.TimeSignatures.SimpleQuadruple,
-                    BeatLength = beatLength
+                    BeatLength = beat_length
                 }
             );
 
