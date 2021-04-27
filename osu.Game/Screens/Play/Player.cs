@@ -455,8 +455,6 @@ namespace osu.Game.Screens.Play
                 rulesetInfo = Ruleset.Value ?? Beatmap.Value.BeatmapInfo.Ruleset;
                 ruleset = rulesetInfo.CreateInstance();
 
-                Beatmap.Value.ApplyChangesToBeatmap = true;
-
                 try
                 {
                     playable = Beatmap.Value.GetPlayableBeatmap(ruleset.RulesetInfo, Mods.Value);
