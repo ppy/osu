@@ -25,20 +25,17 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    internal class TimelineBlueprintContainer : BlueprintContainer
+    internal class TimelineBlueprintContainer : EditorBlueprintContainer
     {
         [Resolved(CanBeNull = true)]
         private Timeline timeline { get; set; }
-
-        [Resolved]
-        private EditorBeatmap beatmap { get; set; }
 
         [Resolved]
         private OsuColour colours { get; set; }
 
         private DragEvent lastDragEvent;
         private Bindable<HitObject> placement;
-        private SelectionBlueprint placementBlueprint;
+        private SelectionBlueprint<HitObject> placementBlueprint;
 
         private SelectableAreaBackground backgroundBox;
 
@@ -76,7 +73,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             base.LoadComplete();
             DragBox.Alpha = 0;
 
-            placement = beatmap.PlacementObject.GetBoundCopy();
+            placement = Beatmap.PlacementObject.GetBoundCopy();
             placement.ValueChanged += placementChanged;
         }
 
@@ -100,7 +97,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
         }
 
-        protected override Container<SelectionBlueprint> CreateSelectionBlueprintContainer() => new TimelineSelectionBlueprintContainer { RelativeSizeAxes = Axes.Both };
+        protected override Container<SelectionBlueprint<HitObject>> CreateSelectionBlueprintContainer() => new TimelineSelectionBlueprintContainer { RelativeSizeAxes = Axes.Both };
 
         protected override bool OnHover(HoverEvent e)
         {
@@ -160,7 +157,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 // remove objects from the stack as long as their end time is in the past.
                 while (currentConcurrentObjects.TryPeek(out HitObject hitObject))
                 {
-                    if (Precision.AlmostBigger(hitObject.GetEndTime(), b.HitObject.StartTime, 1))
+                    if (Precision.AlmostBigger(hitObject.GetEndTime(), b.Item.StartTime, 1))
                         break;
 
                     currentConcurrentObjects.Pop();
@@ -168,7 +165,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 // if the stack gets too high, we should have space below it to display the next batch of objects.
                 // importantly, we only do this if time has incremented, else a stack of hitobjects all at the same time value would start to overlap themselves.
-                if (currentConcurrentObjects.TryPeek(out HitObject h) && !Precision.AlmostEquals(h.StartTime, b.HitObject.StartTime, 1))
+                if (currentConcurrentObjects.TryPeek(out HitObject h) && !Precision.AlmostEquals(h.StartTime, b.Item.StartTime, 1))
                 {
                     if (currentConcurrentObjects.Count >= stack_reset_count)
                         currentConcurrentObjects.Clear();
@@ -176,13 +173,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 b.Y = -(stack_offset * currentConcurrentObjects.Count);
 
-                currentConcurrentObjects.Push(b.HitObject);
+                currentConcurrentObjects.Push(b.Item);
             }
         }
 
-        protected override SelectionHandler CreateSelectionHandler() => new TimelineSelectionHandler();
+        protected override SelectionHandler<HitObject> CreateSelectionHandler() => new TimelineSelectionHandler();
 
-        protected override SelectionBlueprint CreateBlueprintFor(HitObject hitObject)
+        protected override SelectionBlueprint<HitObject> CreateBlueprintFor(HitObject hitObject)
         {
             return new TimelineHitObjectBlueprint(hitObject)
             {
@@ -239,10 +236,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
         }
 
-        internal class TimelineSelectionHandler : SelectionHandler, IKeyBindingHandler<GlobalAction>
+        internal class TimelineSelectionHandler : EditorSelectionHandler, IKeyBindingHandler<GlobalAction>
         {
             // for now we always allow movement. snapping is provided by the Timeline's "distance" snap implementation
-            public override bool HandleMovement(MoveSelectionEvent moveEvent) => true;
+            public override bool HandleMovement(MoveSelectionEvent<HitObject> moveEvent) => true;
 
             public bool OnPressed(GlobalAction action)
             {
@@ -344,13 +341,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
         }
 
-        protected class TimelineSelectionBlueprintContainer : Container<SelectionBlueprint>
+        protected class TimelineSelectionBlueprintContainer : Container<SelectionBlueprint<HitObject>>
         {
-            protected override Container<SelectionBlueprint> Content { get; }
+            protected override Container<SelectionBlueprint<HitObject>> Content { get; }
 
             public TimelineSelectionBlueprintContainer()
             {
-                AddInternal(new TimelinePart<SelectionBlueprint>(Content = new HitObjectOrderedSelectionContainer { RelativeSizeAxes = Axes.Both }) { RelativeSizeAxes = Axes.Both });
+                AddInternal(new TimelinePart<SelectionBlueprint<HitObject>>(Content = new HitObjectOrderedSelectionContainer { RelativeSizeAxes = Axes.Both }) { RelativeSizeAxes = Axes.Both });
             }
         }
     }
