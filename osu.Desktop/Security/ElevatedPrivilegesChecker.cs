@@ -26,7 +26,7 @@ namespace osu.Desktop.Security
         [BackgroundDependencyLoader]
         private void load()
         {
-            elevated = isElevated();
+            elevated = checkElevated();
         }
 
         protected override void LoadComplete()
@@ -37,7 +37,7 @@ namespace osu.Desktop.Security
                 notifications.Post(new ElevatedPrivilegesNotification());
         }
 
-        private bool isElevated()
+        private bool checkElevated()
         {
             try
             {
