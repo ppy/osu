@@ -374,8 +374,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// <summary>
         /// All osu! hitobjects which can be moved/rotated/scaled.
         /// </summary>
-        private OsuHitObject[] selectedMovableObjects => EditorBeatmap.SelectedHitObjects
-                                                                      .OfType<OsuHitObject>()
+        private OsuHitObject[] selectedMovableObjects => SelectedItems.OfType<OsuHitObject>()
                                                                       .Where(h => !(h is Spinner))
                                                                       .ToArray();
 
