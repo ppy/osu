@@ -9,7 +9,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class SkinnableHealthDisplay : SkinnableDrawable, IHealthDisplay
+    public class SkinnableHealthDisplay : SkinnableHUDComponent, IHealthDisplay
     {
         public Bindable<double> Current { get; } = new BindableDouble(1)
         {

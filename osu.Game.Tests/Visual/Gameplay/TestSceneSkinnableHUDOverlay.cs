@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -13,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     {
                         Colour = Color4.Black,
                         RelativeSizeAxes = Axes.Both,
-                        Alpha = 0.7f,
+                        Alpha = 0.9f,
                     },
                     new FillFlowContainer
                     {
@@ -106,12 +106,23 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private IReadOnlyList<Drawable> createSkinSourceComponents()
         {
-            var hudComponents = typeof(SkinnableHUDComponent).Assembly.GetTypes().Where(t => typeof(SkinnableHUDComponent).IsAssignableFrom(t)).ToArray();
+            Drawable[] hudComponents = typeof(SkinnableHUDComponent).Assembly
+                                                                    .GetTypes()
+                                                                    .Where(t => typeof(SkinnableHUDComponent).IsAssignableFrom(t))
+                                                                    .Where(t => !t.IsAbstract)
+                                                                    .Select(t => Activator.CreateInstance(t) as Drawable)
+                                                                    .ToArray();
 
             List<Drawable> drawables = new List<Drawable>();
 
             foreach (var component in hudComponents)
+            {
+                drawables.Add(new OsuSpriteText
+                {
+                    Text = component.GetType().Name
+                });
                 drawables.AddRange(component.CreateSettingsControls());
+            }
 
             return drawables;
         }
