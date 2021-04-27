@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         public IReadOnlyList<SelectionBlueprint<T>> SelectedBlueprints => selectedBlueprints;
 
-        protected BindableList<T> SelectedItems = new BindableList<T>();
+        public BindableList<T> SelectedItems = new BindableList<T>();
 
         private readonly List<SelectionBlueprint<T>> selectedBlueprints;
 
