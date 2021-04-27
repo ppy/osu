@@ -38,7 +38,7 @@ namespace osu.Game.Configuration
         /// The type of the settings control which handles this setting source.
         /// </summary>
         /// <remarks>
-        /// Must be a type deriving <see cref="SettingsItem{T}"/>.
+        /// Must be a type deriving <see cref="SettingsItem{T}"/> with a public parameterless constructor.
         /// </remarks>
         public Type? SettingControlType { get; set; }
 
