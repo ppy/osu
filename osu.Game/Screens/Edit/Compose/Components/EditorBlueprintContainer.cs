@@ -108,9 +108,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             base.AddBlueprintFor(item);
         }
 
-        protected override void UpdateSelection()
+        protected override void DragOperationCompleted()
         {
-            base.UpdateSelection();
+            base.DragOperationCompleted();
 
             // handle positional change etc.
             foreach (var blueprint in SelectionBlueprints)

@@ -173,7 +173,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             if (isDraggingBlueprint)
             {
-                UpdateSelection();
+                DragOperationCompleted();
 
                 changeHandler?.EndChange();
             }
@@ -182,7 +182,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 DragBox.Hide();
         }
 
-        protected virtual void UpdateSelection()
+        /// <summary>
+        /// Called whenever a drag operation completes, before any change transaction is committed.
+        /// </summary>
+        protected virtual void DragOperationCompleted()
         {
         }
 
