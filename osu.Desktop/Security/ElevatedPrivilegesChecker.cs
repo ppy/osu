@@ -19,7 +19,7 @@ namespace osu.Desktop.Security
     public class ElevatedPrivilegesChecker : Component
     {
         [Resolved]
-        protected NotificationOverlay Notifications { get; private set; }
+        private NotificationOverlay notifications { get; set; }
 
         private bool elevated;
 
@@ -33,32 +33,35 @@ namespace osu.Desktop.Security
         {
             base.LoadComplete();
 
-            if (!elevated)
-                return;
-
-            Notifications.Post(new ElevatedPrivilegesNotification());
+            if (elevated)
+                notifications.Post(new ElevatedPrivilegesNotification());
         }
 
         private bool isElevated()
         {
-            switch (RuntimeInfo.OS)
+            try
             {
-                case RuntimeInfo.Platform.Windows:
+                switch (RuntimeInfo.OS)
                 {
-                    if (!OperatingSystem.IsWindows()) return false;
+                    case RuntimeInfo.Platform.Windows:
+                        if (!OperatingSystem.IsWindows()) return false;
 
-                    var windowsIdentity = WindowsIdentity.GetCurrent();
-                    var windowsPrincipal = new WindowsPrincipal(windowsIdentity);
+                        var windowsIdentity = WindowsIdentity.GetCurrent();
+                        var windowsPrincipal = new WindowsPrincipal(windowsIdentity);
 
-                    return windowsPrincipal.IsInRole(WindowsBuiltInRole.Administrator);
+                        return windowsPrincipal.IsInRole(WindowsBuiltInRole.Administrator);
+
+                    case RuntimeInfo.Platform.macOS:
+                    case RuntimeInfo.Platform.Linux:
+                        return Mono.Unix.Native.Syscall.geteuid() == 0;
+
+                    default:
+                        return false;
                 }
-
-                case RuntimeInfo.Platform.macOS:
-                case RuntimeInfo.Platform.Linux:
-                    return Mono.Unix.Native.Syscall.geteuid() == 0;
-
-                default:
-                    return false;
+            }
+            catch
+            {
+                return false;
             }
         }
 
@@ -77,11 +80,7 @@ namespace osu.Desktop.Security
                 Icon = FontAwesome.Solid.ShieldAlt;
                 IconBackgound.Colour = colours.YellowDark;
 
-                Activated = delegate
-                {
-                    notificationOverlay.Hide();
-                    return true;
-                };
+                Activated = () => true;
             }
         }
     }
