@@ -77,8 +77,6 @@ namespace osu.Desktop.Security
             {
                 Icon = FontAwesome.Solid.ShieldAlt;
                 IconBackgound.Colour = colours.YellowDark;
-
-                Activated = () => true;
             }
         }
     }
