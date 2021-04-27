@@ -53,7 +53,7 @@ namespace Mvis.Plugin.CloudMusicSupport
         private Bindable<float> lyricFadeInDuration;
         private Bindable<float> lyricFadeOutDuration;
         private Bindable<bool> autoSave;
-        private Bindable<bool> alwaysHideBox;
+        private Bindable<bool> disableBufferOutline;
 
         public readonly Bindable<Status> CurrentStatus = new Bindable<Status>();
 
@@ -89,9 +89,9 @@ namespace Mvis.Plugin.CloudMusicSupport
                 lrcLine.FadeOutDuration = v.NewValue;
             }, true);
 
-            alwaysHideBox.BindValueChanged(v =>
+            disableBufferOutline.BindValueChanged(v =>
             {
-                lrcLine.AlwaysHideBox = v.NewValue;
+                lrcLine.DisableOutline = v.NewValue;
             }, true);
 
             return true;
@@ -107,7 +107,7 @@ namespace Mvis.Plugin.CloudMusicSupport
             lyricFadeInDuration = config.GetBindable<float>(LyricSettings.LyricFadeInDuration);
             lyricFadeOutDuration = config.GetBindable<float>(LyricSettings.LyricFadeOutDuration);
             autoSave = config.GetBindable<bool>(LyricSettings.SaveLrcWhenFetchFinish);
-            alwaysHideBox = config.GetBindable<bool>(LyricSettings.DisableBackgroundDim);
+            disableBufferOutline = config.GetBindable<bool>(LyricSettings.NoExtraShadow);
 
             AddInternal(processor);
         }

@@ -156,16 +156,19 @@ namespace osu.Desktop
                         Schedule(() => textEditIndicator.Show());
                 }
             };
+
             desktopWindow.OnTextInput += () =>
             {
                 if (textEditIndicator != null)
                 {
                     if (textEditIndicator.State.Value != Visibility.Hidden)
+                    {
                         Schedule(() =>
                         {
                             textEditIndicator.Flash();
                             textEditIndicator.Hide();
                         });
+                    }
                 }
             };
         }

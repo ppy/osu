@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Mvis.Plugin.CloudMusicSupport.Config;
 using Mvis.Plugin.CloudMusicSupport.Misc;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -16,6 +17,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
+using osu.Game.Overlays.Settings;
 using osu.Game.Screens.Mvis;
 using osu.Game.Screens.Mvis.Misc;
 using osu.Game.Screens.Mvis.Plugins;
@@ -61,12 +63,16 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
         [BackgroundDependencyLoader]
         private void load(CustomColourProvider provider)
         {
+            LyricConfigManager config;
+
             if (dependencies.Get<MvisPluginManager>().PluginVersion < 3)
             {
                 dependencies.Cache(this);
                 dependencies.Cache(Plugin);
-                dependencies.Cache(Dependencies.Get<MvisPluginManager>().GetConfigManager(Plugin));
+                dependencies.Cache(config = (LyricConfigManager)Dependencies.Get<MvisPluginManager>().GetConfigManager(Plugin));
             }
+            else
+                config = (LyricConfigManager)Config;
 
             Children = new Drawable[]
             {
@@ -84,7 +90,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
                             new Container
                             {
                                 RelativeSizeAxes = Axes.X,
-                                Height = 100,
+                                Height = 125,
                                 Masking = true,
                                 Children = new Drawable[]
                                 {
@@ -161,6 +167,16 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
                                     {
                                         Margin = new MarginPadding(15),
                                         Font = OsuFont.GetFont(size: 20)
+                                    },
+                                    new SettingsSlider<double>
+                                    {
+                                        Anchor = Anchor.BottomRight,
+                                        Origin = Anchor.BottomRight,
+                                        Current = config.GetBindable<double>(LyricSettings.LyricOffset),
+                                        LabelText = "全局歌词偏移",
+                                        RelativeSizeAxes = Axes.None,
+                                        Width = 200 + 25,
+                                        Padding = new MarginPadding { Right = 10 }
                                     }
                                 }
                             }
@@ -245,7 +261,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
 
         private void refreshBeatmap(WorkingBeatmap working)
         {
-            idText.Text = working.BeatmapSetInfo.ID.ToString();
+            idText.Text = $"ID: {working.BeatmapSetInfo.ID}";
             cover.UpdateBackground(working);
         }
     }

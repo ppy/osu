@@ -1,10 +1,11 @@
+using System.Linq;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Effects;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osuTK;
 using osuTK.Graphics;
 
 namespace Mvis.Plugin.CloudMusicSupport.UI
@@ -15,8 +16,15 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
         private OsuSpriteText currentLineTranslated;
         private string currentRawText;
         private string currentRawTranslateText;
-        private bool alwaysHideBox;
-        private Container boxContainer;
+        private bool disableOutline;
+        private readonly BufferedContainer outlineEffectContainer;
+
+        private readonly Container lyricContainer = new Container
+        {
+            AutoSizeAxes = Axes.Both,
+            Anchor = Anchor.BottomCentre,
+            Origin = Anchor.BottomCentre,
+        };
 
         public float FadeOutDuration = 200;
         private Easing fadeOutEasing => Easing.OutQuint;
@@ -24,17 +32,29 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
 
         public float FadeInDuration = 200;
 
-        public bool AlwaysHideBox
+        public bool DisableOutline
         {
-            get => alwaysHideBox;
+            get => disableOutline;
             set
             {
-                alwaysHideBox = value;
+                disableOutline = value;
 
                 if (value)
-                    boxContainer.FadeOut(300, Easing.OutQuint);
+                {
+                    if (outlineEffectContainer.Contains(lyricContainer))
+                        outlineEffectContainer.Remove(lyricContainer);
+
+                    AddInternal(lyricContainer);
+                    outlineEffectContainer.Hide();
+                }
                 else
-                    boxContainer.FadeIn(300, Easing.OutQuint);
+                {
+                    if (InternalChildren.Contains(lyricContainer))
+                        RemoveInternal(lyricContainer);
+
+                    outlineEffectContainer.Add(lyricContainer);
+                    outlineEffectContainer.Show();
+                }
             }
         }
 
@@ -51,7 +71,7 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
                                .FadeOut(FadeOutDuration, fadeOutEasing).Then().Expire();
                 }
 
-                AddInternal(currentLine = new OsuSpriteText
+                lyricContainer.Add(currentLine = new OsuSpriteText
                 {
                     Text = value,
                     Alpha = 0,
@@ -81,7 +101,7 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
                                          .FadeOut(FadeOutDuration, fadeOutEasing).Then().Expire();
                 }
 
-                AddInternal(currentLineTranslated = new OsuSpriteText
+                lyricContainer.Add(currentLineTranslated = new OsuSpriteText
                 {
                     Text = value,
                     Alpha = 0,
@@ -115,43 +135,18 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
             AutoSizeAxes = Axes.Y;
             Alpha = 0;
 
-            InternalChildren = new Drawable[]
+            InternalChild = outlineEffectContainer = new Container
             {
-                boxContainer = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black.Opacity(0.4f)
-                        },
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 50,
-                            Colour = ColourInfo.GradientVertical(
-                                Color4.Black.Opacity(0.4f),
-                                Color4.Black.Opacity(0)),
-                            Rotation = 180,
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre
-                        },
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 50,
-                            Colour = ColourInfo.GradientVertical(
-                                Color4.Black.Opacity(0),
-                                Color4.Black.Opacity(0.4f)),
-                            Rotation = 180,
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.BottomCentre
-                        }
-                    }
-                }
-            };
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+            }.WithEffect(new OutlineEffect
+            {
+                Colour = Color4.Black.Opacity(0.3f),
+                BlurSigma = new Vector2(3f),
+                Strength = 3f
+            });
+
+            outlineEffectContainer.FrameBufferScale = new Vector2(1.1f);
         }
     }
 }

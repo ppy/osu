@@ -30,13 +30,13 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
                 {
                     LabelText = "自动保存歌词到本地",
                     Current = config.GetBindable<bool>(LyricSettings.SaveLrcWhenFetchFinish),
-                    TooltipText = "保存后歌词在离线时也能用，但如果保存的歌词有问题，您需要手动删除对应文件并重新获取"
+                    TooltipText = "歌词将保存在\"custom/lyrics/beatmap-{ID}.json\"中"
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "禁用背景暗化",
-                    Current = config.GetBindable<bool>(LyricSettings.DisableBackgroundDim),
-                    TooltipText = "不要暗化歌词下方的物件"
+                    LabelText = "禁用额外阴影",
+                    Current = config.GetBindable<bool>(LyricSettings.NoExtraShadow),
+                    TooltipText = "不要给歌词文本添加额外的阴影效果"
                 },
                 new SettingsSlider<double>
                 {

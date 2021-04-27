@@ -6,6 +6,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Mvis.Misc;
+using osu.Game.Screens.Mvis.Plugins.Config;
 using osu.Game.Screens.Mvis.SideBar;
 using osuTK;
 using osuTK.Graphics;
@@ -30,6 +31,7 @@ namespace osu.Game.Screens.Mvis.Plugins
         private bool contentInit;
 
         public MvisPlugin Plugin { get; }
+        protected IPluginConfigManager Config => Dependencies.Get<MvisPluginManager>().GetConfigManager(Plugin);
 
         protected PluginSidebarPage(MvisPlugin plugin, float resizeWidth)
         {

@@ -41,7 +41,7 @@ namespace osu.Game.Graphics
 
                 text = value;
 
-                //bug: 不使用Schedule()会导致osu.Framework.Graphics.Drawable+InvalidThreadForMutationException
+                //猜测: 因为文本输入在input上，因此不使用Schedule()会导致osu.Framework.Graphics.Drawable+InvalidThreadForMutationException
 
                 if (string.IsNullOrEmpty(value))
                 {
@@ -212,7 +212,7 @@ namespace osu.Game.Graphics
 
         public override void Show()
         {
-            if ((!optUI?.Value ?? false) || (alwaysHide?.Value ?? false)) return;
+            if (!optUI.Value || alwaysHide.Value) return;
 
             base.Show();
         }
@@ -222,9 +222,8 @@ namespace osu.Game.Graphics
             var emptyText = string.IsNullOrEmpty(Text);
             abortTimeoutHide(!emptyText);
 
-            //在某些系统下窗口会莫名进入编辑状态，此时因为没有文本，所以执行隐藏计时
-            if (emptyText)
-                executeTimeoutHide();
+            //在某些系统下窗口会莫名进入编辑状态，此时因为没有文本，所以不要显示
+            if (emptyText) return;
 
             this.FadeIn(300, Easing.OutSine)
                 .MoveToY(0, 300, Easing.OutQuint);
@@ -232,9 +231,6 @@ namespace osu.Game.Graphics
 
         protected override void PopOut()
         {
-            //中断bar其他正在执行的ResizeWidthTo变换
-            bar.ResizeWidthTo(bar.Width);
-
             this.FadeOut(300, Easing.OutQuint)
                 .MoveToY(-23, 300, Easing.OutQuint);
         }
