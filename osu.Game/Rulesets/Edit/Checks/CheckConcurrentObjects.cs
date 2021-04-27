@@ -16,13 +16,13 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public CheckMetadata Metadata { get; } = new CheckMetadata(CheckCategory.Compose, "Concurrent hitobjects");
 
-        public virtual IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
+        public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
             new IssueTemplateConcurrentSame(this),
             new IssueTemplateConcurrentDifferent(this)
         };
 
-        public virtual IEnumerable<Issue> Run(IBeatmap playableBeatmap, IWorkingBeatmap workingBeatmap)
+        public IEnumerable<Issue> Run(IBeatmap playableBeatmap, IWorkingBeatmap workingBeatmap)
         {
             for (int i = 0; i < playableBeatmap.HitObjects.Count - 1; ++i)
             {
