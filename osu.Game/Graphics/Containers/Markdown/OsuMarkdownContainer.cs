@@ -12,8 +12,6 @@ namespace osu.Game.Graphics.Containers.Markdown
 {
     public class OsuMarkdownContainer : MarkdownContainer
     {
-        public override MarkdownTextFlowContainer CreateTextFlow() => new OsuMarkdownTextFlowContainer();
-
         protected override void AddMarkdownComponent(IMarkdownObject markdownObject, FillFlowContainer container, int level)
         {
             switch (markdownObject)
@@ -27,6 +25,10 @@ namespace osu.Game.Graphics.Containers.Markdown
                     break;
             }
         }
+
+        public override MarkdownTextFlowContainer CreateTextFlow() => new OsuMarkdownTextFlowContainer();
+
+        protected override MarkdownFencedCodeBlock CreateFencedCodeBlock(FencedCodeBlock fencedCodeBlock) => new OsuMarkdownFencedCodeBlock(fencedCodeBlock);
 
         protected override MarkdownPipeline CreateBuilder()
             => new MarkdownPipelineBuilder().UseAutoIdentifiers(AutoIdentifierOptions.GitHub)

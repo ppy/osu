@@ -49,5 +49,18 @@ namespace osu.Game.Tests.Visual.UserInterface
                 markdownContainer.Text = "[Welcome to osu!](https://osu.ppy.sh)";
             });
         }
+
+        [Test]
+        public void TestFencedCodeBlock()
+        {
+            AddStep("Add Code Block", () =>
+            {
+                markdownContainer.Text = @"```markdown
+# Markdown code block
+
+This is markdown code block.
+```";
+            });
+        }
     }
 }
