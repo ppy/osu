@@ -430,9 +430,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         /// <summary>
-        /// Removes all previously applied transforms, then reapplies a new set of transforms with potentially different parameters.
-        /// The transforms will use the current <see cref="ArmedState"/>, and they will use the appropriate start times.
-        /// This also takes in account potential overrides defined in <see cref="ApplyCustomUpdateState"/>.
+        /// Reapplies the current <see cref="ArmedState"/>.
         /// </summary>
         protected void RefreshStateTransforms() => updateState(State.Value, true);
 
