@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Edit.Checks
     {
         public const double UNSNAP_MS_THRESHOLD = 2;
 
-        public CheckMetadata Metadata { get; } = new CheckMetadata(CheckCategory.Compose, "Unsnapped hitobjects");
+        public CheckMetadata Metadata { get; } = new CheckMetadata(CheckCategory.Timing, "Unsnapped hitobjects");
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
