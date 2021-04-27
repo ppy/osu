@@ -239,9 +239,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 updatePlacementPosition();
         }
 
-        protected sealed override SelectionBlueprint<HitObject> CreateBlueprintFor(HitObject hitObject)
+        protected sealed override SelectionBlueprint<HitObject> CreateBlueprintFor(HitObject item)
         {
-            var drawable = Composer.HitObjects.FirstOrDefault(d => d.HitObject == hitObject);
+            var drawable = Composer.HitObjects.FirstOrDefault(d => d.HitObject == item);
 
             if (drawable == null)
                 return null;

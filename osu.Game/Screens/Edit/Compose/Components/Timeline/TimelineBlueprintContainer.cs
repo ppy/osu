@@ -179,9 +179,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         protected override SelectionHandler<HitObject> CreateSelectionHandler() => new TimelineSelectionHandler();
 
-        protected override SelectionBlueprint<HitObject> CreateBlueprintFor(HitObject hitObject)
+        protected override SelectionBlueprint<HitObject> CreateBlueprintFor(HitObject item)
         {
-            return new TimelineHitObjectBlueprint(hitObject)
+            return new TimelineHitObjectBlueprint(item)
             {
                 OnDragHandled = handleScrollViaDrag
             };

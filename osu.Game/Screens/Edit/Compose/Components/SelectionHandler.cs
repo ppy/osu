@@ -15,26 +15,27 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
     /// <summary>
-    /// A component which outlines <see cref="DrawableHitObject"/>s and handles movement of selections.
+    /// A component which outlines items and handles movement of selections.
     /// </summary>
     public abstract class SelectionHandler<T> : CompositeDrawable, IKeyBindingHandler<PlatformAction>
     {
         /// <summary>
         /// The currently selected blueprints.
         /// Should be used when operations are dealing directly with the visible blueprints.
-        /// For more general selection operations, use <see cref="osu.Game.Screens.Edit.EditorBeatmap.SelectedHitObjects"/> instead.
+        /// For more general selection operations, use <see cref="SelectedItems"/> instead.
         /// </summary>
         public IReadOnlyList<SelectionBlueprint<T>> SelectedBlueprints => selectedBlueprints;
 
-        public BindableList<T> SelectedItems = new BindableList<T>();
+        /// <summary>
+        /// The currently selected items.
+        /// </summary>
+        public readonly BindableList<T> SelectedItems = new BindableList<T>();
 
         private readonly List<SelectionBlueprint<T>> selectedBlueprints;
 
@@ -124,45 +125,45 @@ namespace osu.Game.Screens.Edit.Compose.Components
         #region User Input Handling
 
         /// <summary>
-        /// Handles the selected <see cref="DrawableHitObject"/>s being moved.
+        /// Handles the selected items being moved.
         /// </summary>
         /// <remarks>
-        /// Just returning true is enough to allow <see cref="HitObject.StartTime"/> updates to take place.
+        /// Just returning true is enough to allow default movement to take place.
         /// Custom implementation is only required if other attributes are to be considered, like changing columns.
         /// </remarks>
         /// <param name="moveEvent">The move event.</param>
         /// <returns>
-        /// Whether any <see cref="DrawableHitObject"/>s could be moved.
+        /// Whether any items could be moved.
         /// Returning true will also propagate StartTime changes provided by the closest <see cref="IPositionSnapProvider.SnapScreenSpacePositionToValidTime"/>.
         /// </returns>
         public virtual bool HandleMovement(MoveSelectionEvent<T> moveEvent) => false;
 
         /// <summary>
-        /// Handles the selected <see cref="DrawableHitObject"/>s being rotated.
+        /// Handles the selected items being rotated.
         /// </summary>
         /// <param name="angle">The delta angle to apply to the selection.</param>
-        /// <returns>Whether any <see cref="DrawableHitObject"/>s could be rotated.</returns>
+        /// <returns>Whether any items could be rotated.</returns>
         public virtual bool HandleRotation(float angle) => false;
 
         /// <summary>
-        /// Handles the selected <see cref="DrawableHitObject"/>s being scaled.
+        /// Handles the selected items being scaled.
         /// </summary>
         /// <param name="scale">The delta scale to apply, in playfield local coordinates.</param>
         /// <param name="anchor">The point of reference where the scale is originating from.</param>
-        /// <returns>Whether any <see cref="DrawableHitObject"/>s could be scaled.</returns>
+        /// <returns>Whether any items could be scaled.</returns>
         public virtual bool HandleScale(Vector2 scale, Anchor anchor) => false;
 
         /// <summary>
-        /// Handles the selected <see cref="DrawableHitObject"/>s being flipped.
+        /// Handles the selected items being flipped.
         /// </summary>
         /// <param name="direction">The direction to flip</param>
-        /// <returns>Whether any <see cref="DrawableHitObject"/>s could be flipped.</returns>
+        /// <returns>Whether any items could be flipped.</returns>
         public virtual bool HandleFlip(Direction direction) => false;
 
         /// <summary>
-        /// Handles the selected <see cref="DrawableHitObject"/>s being reversed pattern-wise.
+        /// Handles the selected items being reversed pattern-wise.
         /// </summary>
-        /// <returns>Whether any <see cref="DrawableHitObject"/>s could be reversed.</returns>
+        /// <returns>Whether any items could be reversed.</returns>
         public virtual bool HandleReverse() => false;
 
         public bool OnPressed(PlatformAction action)
@@ -196,7 +197,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="blueprint">The blueprint.</param>
         internal virtual void HandleSelected(SelectionBlueprint<T> blueprint)
         {
-            // there are potentially multiple SelectionHandlers active, but we only want to add hitobjects to the selected list once.
+            // there are potentially multiple SelectionHandlers active, but we only want to add items to the selected list once.
             if (!SelectedItems.Contains(blueprint.Item))
                 SelectedItems.Add(blueprint.Item);
 
@@ -323,7 +324,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (selectedBlueprints.Count == 0)
                 return;
 
-            // Move the rectangle to cover the hitobjects
+            // Move the rectangle to cover the items
             var topLeft = new Vector2(float.MaxValue, float.MaxValue);
             var bottomRight = new Vector2(float.MinValue, float.MinValue);
 
