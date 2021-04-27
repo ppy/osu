@@ -9,7 +9,7 @@ using System.Reflection;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using Microsoft.Win32;
-using osu.Desktop.Admin;
+using osu.Desktop.Security;
 using osu.Desktop.Overlays;
 using osu.Framework.Platform;
 using osu.Game;

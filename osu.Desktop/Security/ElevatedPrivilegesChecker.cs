@@ -11,7 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 
-namespace osu.Desktop.Admin
+namespace osu.Desktop.Security
 {
     /// <summary>
     /// Checks if the game is running with elevated privileges (as admin in Windows, root in Unix) and displays a warning notification if so.
@@ -21,27 +21,45 @@ namespace osu.Desktop.Admin
         [Resolved]
         protected NotificationOverlay Notifications { get; private set; }
 
+        private bool elevated;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            bool elevated = false;
-
-            if (OperatingSystem.IsWindows())
-            {
-                var windowsIdentity = WindowsIdentity.GetCurrent();
-                var windowsPrincipal = new WindowsPrincipal(windowsIdentity);
-                elevated = windowsPrincipal.IsInRole(WindowsBuiltInRole.Administrator);
-            }
-            else if (RuntimeInfo.IsUnix)
-            {
-                elevated = Mono.Unix.Native.Syscall.geteuid() == 0;
-            }
 
             if (!elevated)
                 return;
 
             Notifications.Post(new ElevatedPrivilegesNotification());
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            elevated = isElevated();
+        }
+
+        private bool isElevated()
+        {
+            switch (RuntimeInfo.OS)
+            {
+                case RuntimeInfo.Platform.Windows:
+                {
+                    if (!OperatingSystem.IsWindows()) return false;
+
+                    var windowsIdentity = WindowsIdentity.GetCurrent();
+                    var windowsPrincipal = new WindowsPrincipal(windowsIdentity);
+
+                    return windowsPrincipal.IsInRole(WindowsBuiltInRole.Administrator);
+                }
+
+                case RuntimeInfo.Platform.macOS:
+                case RuntimeInfo.Platform.Linux:
+                    return Mono.Unix.Native.Syscall.geteuid() == 0;
+
+                default:
+                    return false;
+            }
         }
 
         private class ElevatedPrivilegesNotification : SimpleNotification
@@ -50,7 +68,7 @@ namespace osu.Desktop.Admin
 
             public ElevatedPrivilegesNotification()
             {
-                Text = $"Running osu! as {(RuntimeInfo.IsUnix ? "root" : "administrator")} does not improve performance and poses a security risk. Please run the game normally.";
+                Text = $"Running osu! as {(RuntimeInfo.IsUnix ? "root" : "administrator")} does not improve performance and poses a security risk. Please run the game as a normal user.";
             }
 
             [BackgroundDependencyLoader]
