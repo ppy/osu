@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
@@ -30,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         [SettingSource("Seed", "Seed for the random number generator")]
         public Bindable<string> Seed { get; } = new Bindable<string>
         {
-            Value = "0"
+            Value = RNG.Next().ToString()
         };
 
         public void ApplyToBeatmap(IBeatmap beatmap)
