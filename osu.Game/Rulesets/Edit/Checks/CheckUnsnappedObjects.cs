@@ -18,8 +18,8 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
-            new IssueTemplate2MsOrMore(this),
-            new IssueTemplate1MsOrMore(this)
+            new IssueTemplateLargeUnsnap(this),
+            new IssueTemplateSmallUnsnap(this)
         };
 
         public IEnumerable<Issue> Run(IBeatmap playableBeatmap, IWorkingBeatmap workingBeatmap)
@@ -55,9 +55,9 @@ namespace osu.Game.Rulesets.Edit.Checks
         private IEnumerable<Issue> getUnsnapIssues(HitObject hitobject, double unsnap, double time, string postfix = "")
         {
             if (Math.Abs(unsnap) >= UNSNAP_MS_THRESHOLD)
-                yield return new IssueTemplate2MsOrMore(this).Create(hitobject, unsnap, time, postfix);
+                yield return new IssueTemplateLargeUnsnap(this).Create(hitobject, unsnap, time, postfix);
             else if (Math.Abs(unsnap) >= 1)
-                yield return new IssueTemplate1MsOrMore(this).Create(hitobject, unsnap, time, postfix);
+                yield return new IssueTemplateSmallUnsnap(this).Create(hitobject, unsnap, time, postfix);
 
             // We don't care about unsnaps < 1 ms, as all object ends have these due to the way SV works.
         }
@@ -79,17 +79,17 @@ namespace osu.Game.Rulesets.Edit.Checks
             }
         }
 
-        public class IssueTemplate2MsOrMore : IssueTemplateUnsnap
+        public class IssueTemplateLargeUnsnap : IssueTemplateUnsnap
         {
-            public IssueTemplate2MsOrMore(ICheck check)
+            public IssueTemplateLargeUnsnap(ICheck check)
                 : base(check, IssueType.Problem)
             {
             }
         }
 
-        public class IssueTemplate1MsOrMore : IssueTemplateUnsnap
+        public class IssueTemplateSmallUnsnap : IssueTemplateUnsnap
         {
-            public IssueTemplate1MsOrMore(ICheck check)
+            public IssueTemplateSmallUnsnap(ICheck check)
                 : base(check, IssueType.Negligible)
             {
             }

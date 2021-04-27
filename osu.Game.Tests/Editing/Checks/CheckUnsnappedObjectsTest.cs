@@ -108,8 +108,8 @@ namespace osu.Game.Tests.Editing.Checks
             var issues = check.Run(getPlayableBeatmap(hitobjects), null).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(2));
-            Assert.That(issues.Any(issue => issue.Template is CheckUnsnappedObjects.IssueTemplate1MsOrMore));
-            Assert.That(issues.Any(issue => issue.Template is CheckUnsnappedObjects.IssueTemplate2MsOrMore));
+            Assert.That(issues.Any(issue => issue.Template is CheckUnsnappedObjects.IssueTemplateSmallUnsnap));
+            Assert.That(issues.Any(issue => issue.Template is CheckUnsnappedObjects.IssueTemplateLargeUnsnap));
         }
 
         private Mock<Slider> getSliderMock(double startTime, double endTime, int repeats = 0)
@@ -132,7 +132,7 @@ namespace osu.Game.Tests.Editing.Checks
             var issues = check.Run(getPlayableBeatmap(hitobjects), null).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(count));
-            Assert.That(issues.All(issue => issue.Template is CheckUnsnappedObjects.IssueTemplate1MsOrMore));
+            Assert.That(issues.All(issue => issue.Template is CheckUnsnappedObjects.IssueTemplateSmallUnsnap));
         }
 
         private void assert2Ms(List<HitObject> hitobjects, int count = 1)
@@ -140,7 +140,7 @@ namespace osu.Game.Tests.Editing.Checks
             var issues = check.Run(getPlayableBeatmap(hitobjects), null).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(count));
-            Assert.That(issues.All(issue => issue.Template is CheckUnsnappedObjects.IssueTemplate2MsOrMore));
+            Assert.That(issues.All(issue => issue.Template is CheckUnsnappedObjects.IssueTemplateLargeUnsnap));
         }
 
         private IBeatmap getPlayableBeatmap(List<HitObject> hitobjects)
