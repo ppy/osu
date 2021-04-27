@@ -115,7 +115,7 @@ namespace osu.Desktop
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
                 LoadComponentAsync(new GameplayWinKeyBlocker(), Add);
 
-            LoadComponentAsync(new AdminChecker(), Add);
+            LoadComponentAsync(new ElevatedPrivilegesChecker(), Add);
         }
 
         protected override void ScreenChanged(IScreen lastScreen, IScreen newScreen)

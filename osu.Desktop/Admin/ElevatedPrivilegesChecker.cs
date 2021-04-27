@@ -5,7 +5,7 @@ using System;
 using System.Security.Principal;
 using osu.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Overlays;
@@ -16,7 +16,7 @@ namespace osu.Desktop.Admin
     /// <summary>
     /// Checks if the game is running with elevated privileges (as admin in Windows, root in Unix) and displays a warning notification if so.
     /// </summary>
-    public class AdminChecker : CompositeDrawable
+    public class ElevatedPrivilegesChecker : Component
     {
         [Resolved]
         protected NotificationOverlay Notifications { get; private set; }
@@ -24,17 +24,31 @@ namespace osu.Desktop.Admin
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            if (isAdmin())
-                Notifications.Post(new AdminNotification());
+
+            bool elevated = false;
+
+            if (OperatingSystem.IsWindows())
+            {
+                var windowsIdentity = WindowsIdentity.GetCurrent();
+                var windowsPrincipal = new WindowsPrincipal(windowsIdentity);
+                elevated = windowsPrincipal.IsInRole(WindowsBuiltInRole.Administrator);
+            }
+            else if (RuntimeInfo.IsUnix)
+            {
+                elevated = Mono.Unix.Native.Syscall.geteuid() == 0;
+            }
+
+            if (!elevated)
+                return;
+
+            Notifications.Post(new ElevatedPrivilegesNotification());
         }
 
-        private bool isAdmin() => OperatingSystem.IsWindows() ? new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator) : Mono.Unix.Native.Syscall.geteuid() == 0;
-
-        private class AdminNotification : SimpleNotification
+        private class ElevatedPrivilegesNotification : SimpleNotification
         {
             public override bool IsImportant => true;
 
-            public AdminNotification()
+            public ElevatedPrivilegesNotification()
             {
                 Text = $"Running osu! as {(RuntimeInfo.IsUnix ? "root" : "administrator")} does not improve performance and poses a security risk. Please run the game normally.";
             }
