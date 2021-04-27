@@ -69,7 +69,7 @@ namespace osu.Desktop.Security
 
             public ElevatedPrivilegesNotification()
             {
-                Text = $"Running osu! as {(RuntimeInfo.IsUnix ? "root" : "administrator")} does not improve performance and poses a security risk. Please run the game as a normal user.";
+                Text = $"Running osu! as {(RuntimeInfo.IsUnix ? "root" : "administrator")} does not improve performance, may break integrations and poses a security risk. Please run the game as a normal user.";
             }
 
             [BackgroundDependencyLoader]
