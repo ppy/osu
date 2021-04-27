@@ -6,7 +6,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class SkinnableComboCounter : SkinnableDrawable, IComboCounter
+    public class SkinnableComboCounter : SkinnableHUDComponent, IComboCounter
     {
         public Bindable<int> Current { get; } = new Bindable<int>();
 
