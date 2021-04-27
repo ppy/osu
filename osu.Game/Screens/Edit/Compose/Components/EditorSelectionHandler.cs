@@ -101,11 +101,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         protected virtual void UpdateTernaryStates()
         {
-            SelectionNewComboState.Value = GetStateFromSelection(EditorBeatmap.SelectedHitObjects.OfType<IHasComboInformation>(), h => h.NewCombo);
+            SelectionNewComboState.Value = GetStateFromSelection(SelectedItems.OfType<IHasComboInformation>(), h => h.NewCombo);
 
             foreach (var (sampleName, bindable) in SelectionSampleStates)
             {
-                bindable.Value = GetStateFromSelection(EditorBeatmap.SelectedHitObjects, h => h.Samples.Any(s => s.Name == sampleName));
+                bindable.Value = GetStateFromSelection(SelectedItems, h => h.Samples.Any(s => s.Name == sampleName));
             }
         }
 

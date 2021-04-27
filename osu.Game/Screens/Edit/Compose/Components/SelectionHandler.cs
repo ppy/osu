@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// <summary>
     /// A component which outlines <see cref="DrawableHitObject"/>s and handles movement of selections.
     /// </summary>
-    public class SelectionHandler<T> : CompositeDrawable, IKeyBindingHandler<PlatformAction>
+    public abstract class SelectionHandler<T> : CompositeDrawable, IKeyBindingHandler<PlatformAction>
     {
         /// <summary>
         /// The currently selected blueprints.
@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [Resolved(CanBeNull = true)]
         protected IEditorChangeHandler ChangeHandler { get; private set; }
 
-        public SelectionHandler()
+        protected SelectionHandler()
         {
             selectedBlueprints = new List<SelectionBlueprint<T>>();
 
@@ -265,9 +265,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 DeleteSelected();
         }
 
-        protected virtual void DeleteItems(IEnumerable<T> items)
-        {
-        }
+        /// <summary>
+        /// Called whenever the deletion of items has been requested.
+        /// </summary>
+        /// <param name="items">The items to be deleted.</param>
+        protected abstract void DeleteItems(IEnumerable<T> items);
 
         /// <summary>
         /// Ensure the blueprint is in a selected state.

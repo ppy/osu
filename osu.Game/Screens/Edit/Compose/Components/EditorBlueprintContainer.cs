@@ -135,6 +135,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override Container<SelectionBlueprint<HitObject>> CreateSelectionBlueprintContainer() => new HitObjectOrderedSelectionContainer { RelativeSizeAxes = Axes.Both };
 
+        protected override SelectionHandler<HitObject> CreateSelectionHandler() => new EditorSelectionHandler();
+
         protected override void SelectAll()
         {
             Composer.Playfield.KeepAllAlive();

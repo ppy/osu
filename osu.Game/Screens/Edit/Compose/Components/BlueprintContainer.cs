@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Creates a <see cref="Components.SelectionHandler{T}"/> which outlines <see cref="DrawableHitObject"/>s and handles movement of selections.
         /// </summary>
-        protected virtual SelectionHandler<T> CreateSelectionHandler() => new SelectionHandler<T>();
+        protected abstract SelectionHandler<T> CreateSelectionHandler();
 
         /// <summary>
         /// Creates a <see cref="SelectionBlueprint{T}"/> for a specific <see cref="DrawableHitObject"/>.
