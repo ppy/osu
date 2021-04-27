@@ -12,6 +12,8 @@ namespace osu.Game.Graphics.Containers.Markdown
 {
     public class OsuMarkdownContainer : MarkdownContainer
     {
+        public override MarkdownTextFlowContainer CreateTextFlow() => new OsuMarkdownTextFlowContainer();
+
         protected override void AddMarkdownComponent(IMarkdownObject markdownObject, FillFlowContainer container, int level)
         {
             switch (markdownObject)
