@@ -54,15 +54,13 @@ namespace osu.Desktop.Security
                     case RuntimeInfo.Platform.macOS:
                     case RuntimeInfo.Platform.Linux:
                         return Mono.Unix.Native.Syscall.geteuid() == 0;
-
-                    default:
-                        return false;
                 }
             }
             catch
             {
-                return false;
             }
+
+            return false;
         }
 
         private class ElevatedPrivilegesNotification : SimpleNotification
