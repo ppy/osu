@@ -14,13 +14,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Threading;
 using osu.Game.Audio;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects.Pooling;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Skinning;
-using osu.Game.Configuration;
-using osu.Game.Rulesets.Objects.Pooling;
 using osu.Game.Rulesets.UI;
+using osu.Game.Skinning;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Objects.Drawables
@@ -428,6 +428,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
             // has to call this method directly (not ClearTransforms) to bypass the local ClearTransformsAfter override.
             base.ClearTransformsAfter(double.MinValue, true);
         }
+
+        /// <summary>
+        /// Reapplies the current <see cref="ArmedState"/>.
+        /// </summary>
+        protected void RefreshStateTransforms() => updateState(State.Value, true);
 
         /// <summary>
         /// Apply (generally fade-in) transforms leading into the <see cref="HitObject"/> start time.
