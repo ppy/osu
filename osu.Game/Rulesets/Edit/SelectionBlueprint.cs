@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
 
@@ -17,26 +16,26 @@ namespace osu.Game.Rulesets.Edit
     /// <summary>
     /// A blueprint placed above a <see cref="DrawableHitObject"/> adding editing functionality.
     /// </summary>
-    public abstract class SelectionBlueprint : CompositeDrawable, IStateful<SelectionState>
+    public abstract class SelectionBlueprint<T> : CompositeDrawable, IStateful<SelectionState>
     {
-        public readonly HitObject HitObject;
+        public readonly T Item;
 
         /// <summary>
-        /// Invoked when this <see cref="SelectionBlueprint"/> has been selected.
+        /// Invoked when this <see cref="SelectionBlueprint{T}"/> has been selected.
         /// </summary>
-        public event Action<SelectionBlueprint> Selected;
+        public event Action<SelectionBlueprint<T>> Selected;
 
         /// <summary>
-        /// Invoked when this <see cref="SelectionBlueprint"/> has been deselected.
+        /// Invoked when this <see cref="SelectionBlueprint{T}"/> has been deselected.
         /// </summary>
-        public event Action<SelectionBlueprint> Deselected;
+        public event Action<SelectionBlueprint<T>> Deselected;
 
         public override bool HandlePositionalInput => ShouldBeAlive;
         public override bool RemoveWhenNotAlive => false;
 
-        protected SelectionBlueprint(HitObject hitObject)
+        protected SelectionBlueprint(T item)
         {
-            HitObject = hitObject;
+            Item = item;
 
             RelativeSizeAxes = Axes.Both;
             AlwaysPresent = true;

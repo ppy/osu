@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public class OsuSelectionHandler : SelectionHandler
+    public class OsuSelectionHandler : EditorSelectionHandler
     {
         protected override void OnSelectionChanged()
         {
@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             referencePathTypes = null;
         }
 
-        public override bool HandleMovement(MoveSelectionEvent moveEvent)
+        public override bool HandleMovement(MoveSelectionEvent<HitObject> moveEvent)
         {
             var hitObjects = selectedMovableObjects;
 
