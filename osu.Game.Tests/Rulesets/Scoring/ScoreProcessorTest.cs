@@ -287,6 +287,23 @@ namespace osu.Game.Tests.Rulesets.Scoring
             Assert.AreEqual(expectedReturnValue, hitResult.IsScorable());
         }
 
+        [TestCase(HitResult.Perfect, 1_000_000)]
+        [TestCase(HitResult.SmallTickHit, 1_000_000)]
+        [TestCase(HitResult.LargeTickHit, 1_000_000)]
+        [TestCase(HitResult.SmallBonus, 700_000 + Judgement.SMALL_BONUS_SCORE)]
+        [TestCase(HitResult.LargeBonus, 700_000 + Judgement.LARGE_BONUS_SCORE)]
+        public void TestGetScoreWithExternalStatistics(HitResult result, int expectedScore)
+        {
+            var statistic = new Dictionary<HitResult, int> { { result, 1 } };
+
+            scoreProcessor.ApplyBeatmap(new Beatmap
+            {
+                HitObjects = { new TestHitObject(result) }
+            });
+
+            Assert.That(scoreProcessor.GetImmediateScore(ScoringMode.Standardised, result.AffectsCombo() ? 1 : 0, statistic), Is.EqualTo(expectedScore).Within(0.5d));
+        }
+
         private class TestJudgement : Judgement
         {
             public override HitResult MaxResult { get; }
