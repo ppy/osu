@@ -29,8 +29,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             // bring in updates from selection changes
             EditorBeatmap.HitObjectUpdated += _ => Scheduler.AddOnce(UpdateTernaryStates);
-            EditorBeatmap.SelectedHitObjects.BindTo(SelectedItems);
 
+            SelectedItems.BindTo(EditorBeatmap.SelectedHitObjects);
             SelectedItems.CollectionChanged += (sender, args) =>
             {
                 Scheduler.AddOnce(UpdateTernaryStates);
