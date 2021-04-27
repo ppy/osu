@@ -2,7 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Bindables;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
@@ -24,9 +27,23 @@ namespace osu.Game.Rulesets.Osu.Mods
         private const byte border_distance_x = 128;
         private const byte border_distance_y = 96;
 
+        [SettingSource("Seed", "Seed for the random number generator")]
+        public Bindable<string> Seed { get; } = new Bindable<string>
+        {
+            Value = "0"
+        };
+
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
-            var rng = new Random();
+            if (!int.TryParse(Seed.Value, out var seed))
+            {
+                var e = new FormatException("Seed must be an integer");
+                Logger.Error(e, "Could not load beatmap: RNG seed must be an integer.");
+
+                return;
+            }
+
+            var rng = new Random(seed);
 
             // Absolute angle
             float prevAngleRad = 0;
