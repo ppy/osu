@@ -108,13 +108,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             base.AddBlueprintFor(item);
         }
 
-        protected override void OnBlueprintAdded(SelectionBlueprint<HitObject> blueprint)
-        {
-            base.OnBlueprintAdded(blueprint);
-            if (Beatmap.SelectedHitObjects.Contains(blueprint.Item))
-                blueprint.Select();
-        }
-
         protected override void UpdateSelection()
         {
             base.UpdateSelection();

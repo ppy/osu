@@ -251,7 +251,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public virtual OverlaySelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject) => null;
 
-        protected override void OnBlueprintAdded(SelectionBlueprint<HitObject> item)
+        protected override void OnBlueprintAdded(HitObject item)
         {
             base.OnBlueprintAdded(item);
 
