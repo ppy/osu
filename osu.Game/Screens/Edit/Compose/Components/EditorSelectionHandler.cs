@@ -37,22 +37,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             };
         }
 
-        internal override void HandleSelected(SelectionBlueprint<HitObject> blueprint)
-        {
-            base.HandleSelected(blueprint);
-
-            // there are potentially multiple SelectionHandlers active, but we only want to add hitobjects to the selected list once.
-            if (!EditorBeatmap.SelectedHitObjects.Contains(blueprint.Item))
-                EditorBeatmap.SelectedHitObjects.Add(blueprint.Item);
-        }
-
-        internal override void HandleDeselected(SelectionBlueprint<HitObject> blueprint)
-        {
-            base.HandleDeselected(blueprint);
-
-            EditorBeatmap.SelectedHitObjects.Remove(blueprint.Item);
-        }
-
         protected override void DeleteItems(IEnumerable<HitObject> items) => EditorBeatmap.RemoveRange(items);
 
         #region Selection State

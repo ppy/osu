@@ -196,6 +196,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="blueprint">The blueprint.</param>
         internal virtual void HandleSelected(SelectionBlueprint<T> blueprint)
         {
+            // there are potentially multiple SelectionHandlers active, but we only want to add hitobjects to the selected list once.
+            if (!SelectedItems.Contains(blueprint.Item))
+                SelectedItems.Add(blueprint.Item);
+
             selectedBlueprints.Add(blueprint);
         }
 
@@ -205,6 +209,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="blueprint">The blueprint.</param>
         internal virtual void HandleDeselected(SelectionBlueprint<T> blueprint)
         {
+            SelectedItems.Remove(blueprint.Item);
             selectedBlueprints.Remove(blueprint);
         }
 
