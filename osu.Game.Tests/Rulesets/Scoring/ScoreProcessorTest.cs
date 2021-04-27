@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Judgements;
@@ -51,7 +50,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
             };
             scoreProcessor.ApplyResult(judgementResult);
 
-            Assert.IsTrue(Precision.AlmostEquals(expectedScore, scoreProcessor.TotalScore.Value));
+            Assert.That(scoreProcessor.TotalScore.Value, Is.EqualTo(expectedScore).Within(0.5d));
         }
 
         /// <summary>
@@ -118,7 +117,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
                 scoreProcessor.ApplyResult(judgementResult);
             }
 
-            Assert.IsTrue(Precision.AlmostEquals(expectedScore, scoreProcessor.TotalScore.Value, 0.5));
+            Assert.That(scoreProcessor.TotalScore.Value, Is.EqualTo(expectedScore).Within(0.5d));
         }
 
         /// <remarks>
@@ -158,7 +157,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
             };
             scoreProcessor.ApplyResult(lastJudgementResult);
 
-            Assert.IsTrue(Precision.AlmostEquals(expectedScore, scoreProcessor.TotalScore.Value, 0.5));
+            Assert.That(scoreProcessor.TotalScore.Value, Is.EqualTo(expectedScore).Within(0.5d));
         }
 
         [Test]
@@ -169,7 +168,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
             scoreProcessor.Mode.Value = scoringMode;
             scoreProcessor.ApplyBeatmap(new TestBeatmap(new RulesetInfo()));
 
-            Assert.IsTrue(Precision.AlmostEquals(0, scoreProcessor.TotalScore.Value));
+            Assert.That(scoreProcessor.TotalScore.Value, Is.Zero);
         }
 
         [TestCase(HitResult.IgnoreHit, HitResult.IgnoreMiss)]
