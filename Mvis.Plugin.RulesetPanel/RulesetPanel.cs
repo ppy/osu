@@ -50,8 +50,6 @@ namespace Mvis.Plugin.RulesetPanel
         private void load()
         {
             var config = (RulesetPanelConfigManager)Dependencies.Get<MvisPluginManager>().GetConfigManager(this);
-            DependenciesContainer.Cache(config);
-            DependenciesContainer.Cache(this);
 
             config.BindWith(RulesetPanelSetting.ShowParticles, showParticles);
             config.BindWith(RulesetPanelSetting.EnableRulesetPanel, Value);

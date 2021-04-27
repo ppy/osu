@@ -190,13 +190,13 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
 
         private void onRequestFinish(ResponseRoot responseRoot, Action<List<Lyric>> onFinish, Action<string> onFail)
         {
-            if (responseRoot.Result.songCount <= 0)
+            if (responseRoot.Result.SongCount <= 0)
             {
                 onFail?.Invoke("未搜索到对应歌曲!");
                 return;
             }
 
-            var id = responseRoot.Result.songs.First().id;
+            var id = responseRoot.Result.Songs.First().ID;
             var target = $"https://music.163.com/api/song/lyric?os=pc&id={id}&lv=-1&kv=-1&tv=-1";
             var req = new OsuJsonWebRequest<LyricResponseRoot>(target);
             req.Finished += () => onFinish?.Invoke(parse(req.ResponseObject));

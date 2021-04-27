@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Mvis.Plugin.CloudMusicSupport.Config;
 using Mvis.Plugin.CloudMusicSupport.Misc;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -51,11 +52,15 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
         [Resolved]
         private DialogOverlay dialog { get; set; }
 
+        [Resolved(canBeNull: true)]
+        private GameHost host { get; set; }
+
         private LyricPlugin plugin => (LyricPlugin)Plugin;
 
         //旧版(2021.424.0 -> 版本2)兼容
         private DependencyContainer dependencies;
         private OsuScrollContainer scroll;
+        private int beatmapSetId;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
@@ -74,6 +79,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
             else
                 config = (LyricConfigManager)Config;
 
+            FillFlowContainer buttonsFillFlow;
             Children = new Drawable[]
             {
                 new GridContainer
@@ -117,12 +123,13 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
                                         }
                                     },
                                     new TrackTimeIndicator(),
-                                    new FillFlowContainer
+                                    buttonsFillFlow = new FillFlowContainer
                                     {
                                         Margin = new MarginPadding(5),
-                                        AutoSizeAxes = Axes.Both,
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Width = 0.5f,
                                         Spacing = new Vector2(5),
-                                        Direction = FillDirection.Horizontal,
                                         Anchor = Anchor.BottomLeft,
                                         Origin = Anchor.BottomLeft,
                                         AutoSizeDuration = 200,
@@ -204,6 +211,17 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
                 }
             };
 
+            if (RuntimeInfo.IsDesktop)
+            {
+                buttonsFillFlow.Add(new IconButton
+                {
+                    Icon = FontAwesome.Solid.Code,
+                    Size = new Vector2(45),
+                    TooltipText = "编辑原始json",
+                    Action = () => host?.OpenFileExternally(storage.GetFullPath($"custom/lyrics/beatmap-{beatmapSetId}.json"))
+                });
+            }
+
             plugin.CurrentStatus.BindValueChanged(v =>
             {
                 switch (v.NewValue)
@@ -261,7 +279,8 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
 
         private void refreshBeatmap(WorkingBeatmap working)
         {
-            idText.Text = $"ID: {working.BeatmapSetInfo.ID}";
+            beatmapSetId = working.BeatmapSetInfo.ID;
+            idText.Text = $"ID: {beatmapSetId}";
             cover.UpdateBackground(working);
         }
     }

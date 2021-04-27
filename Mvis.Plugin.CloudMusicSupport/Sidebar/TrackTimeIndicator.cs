@@ -95,6 +95,8 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
             offsetText.Text = $"{toTimeSpanText(mvisScreen.CurrentTrack.CurrentTime)}"
                               + $"{(globalOffset.Value >= 0 ? "+" : "-")}"
                               + $"{toTimeSpanText(globalOffset.Value)}";
+
+            Width = Math.Min(Parent.DrawWidth * 0.45f, 200);
         }
 
         private string toTimeSpanText(double ms) => $"{TimeSpan.FromMilliseconds(ms):mm\\:ss\\.fff}";

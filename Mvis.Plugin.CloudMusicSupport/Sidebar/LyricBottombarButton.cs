@@ -9,7 +9,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
             : base(page)
         {
             ButtonIcon = FontAwesome.Solid.ListAlt;
-            Text = "打开歌词面板";
+            TooltipText = "打开歌词面板";
         }
     }
 }

@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Screens.Mvis.Plugins.Config;
 using osuTK;
 using osuTK.Graphics;
 
@@ -128,9 +127,9 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
         private readonly Bindable<bool> disableOutline = new Bindable<bool>();
 
         [BackgroundDependencyLoader]
-        private void load(IPluginConfigManager ipcm)
+        private void load(LyricConfigManager config)
         {
-            var config = (LyricConfigManager)ipcm;
+            //var config = Dependencies.Get<LyricConfigManager>();
 
             config.BindWith(LyricSettings.LyricFadeInDuration, fadeInDuration);
             config.BindWith(LyricSettings.LyricFadeOutDuration, fadeOutDuration);
