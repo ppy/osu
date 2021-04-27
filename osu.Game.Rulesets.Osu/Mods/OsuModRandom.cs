@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     /// <summary>
     /// Mod that randomises the positions of the <see cref="HitObject"/>s
     /// </summary>
-    public class OsuModRandom : ModRandom, IApplicableToBeatmapKeepStarRating
+    public class OsuModRandom : ModRandom, IApplicableToBeatmap
     {
         public override string Description => "It never gets boring!";
         public override bool Ranked => false;
