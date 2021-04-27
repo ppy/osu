@@ -14,15 +14,13 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
     /// <summary>
-    /// A container which provides a "blueprint" display of hitobjects.
+    /// A container which provides a "blueprint" display of items.
     /// Includes selection and manipulation support via a <see cref="Components.SelectionHandler{T}"/>.
     /// </summary>
     public abstract class BlueprintContainer<T> : CompositeDrawable, IKeyBindingHandler<PlatformAction>
@@ -65,15 +63,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected virtual Container<SelectionBlueprint<T>> CreateSelectionBlueprintContainer() => new Container<SelectionBlueprint<T>> { RelativeSizeAxes = Axes.Both };
 
         /// <summary>
-        /// Creates a <see cref="Components.SelectionHandler{T}"/> which outlines <see cref="DrawableHitObject"/>s and handles movement of selections.
+        /// Creates a <see cref="Components.SelectionHandler{T}"/> which outlines items and handles movement of selections.
         /// </summary>
         protected abstract SelectionHandler<T> CreateSelectionHandler();
 
         /// <summary>
-        /// Creates a <see cref="SelectionBlueprint{T}"/> for a specific <see cref="DrawableHitObject"/>.
+        /// Creates a <see cref="SelectionBlueprint{T}"/> for a specific item.
         /// </summary>
-        /// <param name="hitObject">The <see cref="DrawableHitObject"/> to create the overlay for.</param>
-        protected virtual SelectionBlueprint<T> CreateBlueprintFor(T hitObject) => null;
+        /// <param name="item">The item to create the overlay for.</param>
+        protected virtual SelectionBlueprint<T> CreateBlueprintFor(T item) => null;
 
         protected virtual DragBox CreateDragBox(Action<RectangleF> performSelect) => new DragBox(performSelect);
 
@@ -103,7 +101,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             ClickedBlueprint = SelectionHandler.SelectedBlueprints.FirstOrDefault(b => b.IsHovered);
 
             // Deselection should only occur if no selected blueprints are hovered
-            // A special case for when a blueprint was selected via this click is added since OnClick() may occur outside the hitobject and should not trigger deselection
+            // A special case for when a blueprint was selected via this click is added since OnClick() may occur outside the item and should not trigger deselection
             if (endClickSelection(e) || ClickedBlueprint != null)
                 return true;
 
@@ -237,7 +235,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             SelectionBlueprints.Add(blueprint);
 
-            OnBlueprintAdded(blueprint);
+            if (SelectionHandler.SelectedItems.Contains(item))
+                blueprint.Select();
+
+            OnBlueprintAdded(blueprint.Item);
         }
 
         protected void RemoveBlueprintFor(T item)
@@ -254,22 +255,24 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (movementBlueprints?.Contains(blueprint) == true)
                 finishSelectionMovement();
 
-            OnBlueprintRemoved(blueprint);
+            OnBlueprintRemoved(blueprint.Item);
         }
 
         /// <summary>
-        /// Called after a <see cref="HitObject"/> blueprint has been added.
+        /// Called after an item's blueprint has been added.
         /// </summary>
-        /// <param name="blueprint">The <see cref="HitObject"/> for which the blueprint has been added.</param>
-        protected virtual void OnBlueprintAdded(SelectionBlueprint<T> blueprint)
+        /// <param name="item">The item for which the blueprint has been added.</param>
+        protected virtual void OnBlueprintAdded(T item)
         {
+            if (SelectionHandler.SelectedItems.Contains(item))
+                blueprintMap[item].Select();
         }
 
         /// <summary>
-        /// Called after a <see cref="HitObject"/> blueprint has been removed.
+        /// Called after an item's blueprint has been removed.
         /// </summary>
-        /// <param name="item">The <see cref="HitObject"/> for which the blueprint has been removed.</param>
-        protected virtual void OnBlueprintRemoved(SelectionBlueprint<T> item)
+        /// <param name="item">The item for which the blueprint has been removed.</param>
+        protected virtual void OnBlueprintRemoved(T item)
         {
         }
 
@@ -398,16 +401,21 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (!SelectionHandler.SelectedBlueprints.Any())
                 return;
 
-            // Any selected blueprint that is hovered can begin the movement of the group, however only the earliest hitobject is used for movement
+            // Any selected blueprint that is hovered can begin the movement of the group, however only the first item (according to SortForMovement) is used for movement.
             // A special case is added for when a click selection occurred before the drag
             if (!clickSelectionBegan && !SelectionHandler.SelectedBlueprints.Any(b => b.IsHovered))
                 return;
 
-            // Movement is tracked from the blueprint of the earliest hitobject, since it only makes sense to distance snap from that hitobject
+            // Movement is tracked from the blueprint of the earliest item, since it only makes sense to distance snap from that item
             movementBlueprints = SortForMovement(SelectionHandler.SelectedBlueprints).ToArray();
             movementBlueprintOriginalPositions = movementBlueprints.Select(m => m.ScreenSpaceSelectionPoint).ToArray();
         }
 
+        /// <summary>
+        /// Apply sorting of selected blueprints before performing movement. Generally used to surface the "main" item to the beginning of the collection.
+        /// </summary>
+        /// <param name="blueprints">The blueprints to be moved.</param>
+        /// <returns>Sorted blueprints.</returns>
         protected virtual IEnumerable<SelectionBlueprint<T>> SortForMovement(IReadOnlyList<SelectionBlueprint<T>> blueprints) => blueprints;
 
         /// <summary>
@@ -442,7 +450,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
 
             // if no positional snapping could be performed, try unrestricted snapping from the earliest
-            // hitobject in the selection.
+            // item in the selection.
 
             // The final movement position, relative to movementBlueprintOriginalPosition.
             Vector2 movePosition = movementBlueprintOriginalPositions.First() + distanceTravelled;

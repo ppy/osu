@@ -8,13 +8,12 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
 
 namespace osu.Game.Rulesets.Edit
 {
     /// <summary>
-    /// A blueprint placed above a <see cref="DrawableHitObject"/> adding editing functionality.
+    /// A blueprint placed above a displaying item adding editing functionality.
     /// </summary>
     public abstract class SelectionBlueprint<T> : CompositeDrawable, IStateful<SelectionState>
     {
@@ -86,7 +85,7 @@ namespace osu.Game.Rulesets.Edit
 
         protected virtual void OnDeselected()
         {
-            // selection blueprints are AlwaysPresent while the related DrawableHitObject is visible
+            // selection blueprints are AlwaysPresent while the related item is visible
             // set the body piece's alpha directly to avoid arbitrarily rendering frame buffers etc. of children.
             foreach (var d in InternalChildren)
                 d.Hide();
