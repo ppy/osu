@@ -50,10 +50,7 @@ namespace Mvis.Plugin.CloudMusicSupport
 
         private Track track;
         private readonly BindableDouble offset = new BindableDouble();
-        private Bindable<float> lyricFadeInDuration;
-        private Bindable<float> lyricFadeOutDuration;
         private Bindable<bool> autoSave;
-        private Bindable<bool> disableBufferOutline;
 
         public readonly Bindable<Status> CurrentStatus = new Bindable<Status>();
 
@@ -77,25 +74,7 @@ namespace Mvis.Plugin.CloudMusicSupport
         /// <summary>
         /// 请参阅 <see cref="MvisPlugin.OnContentLoaded(Drawable)"/>
         /// </summary>
-        protected override bool OnContentLoaded(Drawable content)
-        {
-            lyricFadeInDuration.BindValueChanged(v =>
-            {
-                lrcLine.FadeInDuration = v.NewValue;
-            }, true);
-
-            lyricFadeOutDuration.BindValueChanged(v =>
-            {
-                lrcLine.FadeOutDuration = v.NewValue;
-            }, true);
-
-            disableBufferOutline.BindValueChanged(v =>
-            {
-                lrcLine.DisableOutline = v.NewValue;
-            }, true);
-
-            return true;
-        }
+        protected override bool OnContentLoaded(Drawable content) => true;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -104,10 +83,7 @@ namespace Mvis.Plugin.CloudMusicSupport
 
             config.BindWith(LyricSettings.EnablePlugin, Value);
             config.BindWith(LyricSettings.LyricOffset, offset);
-            lyricFadeInDuration = config.GetBindable<float>(LyricSettings.LyricFadeInDuration);
-            lyricFadeOutDuration = config.GetBindable<float>(LyricSettings.LyricFadeOutDuration);
             autoSave = config.GetBindable<bool>(LyricSettings.SaveLrcWhenFetchFinish);
-            disableBufferOutline = config.GetBindable<bool>(LyricSettings.NoExtraShadow);
 
             AddInternal(processor);
         }

@@ -1,10 +1,14 @@
 using System.Linq;
+using Mvis.Plugin.CloudMusicSupport.Config;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Screens.Mvis.Plugins.Config;
 using osuTK;
 using osuTK.Graphics;
 
@@ -16,7 +20,6 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
         private OsuSpriteText currentLineTranslated;
         private string currentRawText;
         private string currentRawTranslateText;
-        private bool disableOutline;
         private readonly BufferedContainer outlineEffectContainer;
 
         private readonly Container lyricContainer = new Container
@@ -26,37 +29,8 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
             Origin = Anchor.BottomCentre,
         };
 
-        public float FadeOutDuration = 200;
         private Easing fadeOutEasing => Easing.OutQuint;
         private Easing fadeInEasing => Easing.OutQuint;
-
-        public float FadeInDuration = 200;
-
-        public bool DisableOutline
-        {
-            get => disableOutline;
-            set
-            {
-                disableOutline = value;
-
-                if (value)
-                {
-                    if (outlineEffectContainer.Contains(lyricContainer))
-                        outlineEffectContainer.Remove(lyricContainer);
-
-                    AddInternal(lyricContainer);
-                    outlineEffectContainer.Hide();
-                }
-                else
-                {
-                    if (InternalChildren.Contains(lyricContainer))
-                        RemoveInternal(lyricContainer);
-
-                    outlineEffectContainer.Add(lyricContainer);
-                    outlineEffectContainer.Show();
-                }
-            }
-        }
 
         public string Text
         {
@@ -67,8 +41,8 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
                 {
                     if (value == currentLine.Text) return;
 
-                    currentLine?.MoveToY(5, FadeOutDuration, fadeOutEasing)
-                               .FadeOut(FadeOutDuration, fadeOutEasing).Then().Expire();
+                    currentLine?.MoveToY(5, fadeOutDuration.Value, fadeOutEasing)
+                               .FadeOut(fadeOutDuration.Value, fadeOutEasing).Then().Expire();
                 }
 
                 lyricContainer.Add(currentLine = new OsuSpriteText
@@ -80,8 +54,8 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                 });
-                currentLine.MoveToY(0, FadeInDuration, fadeInEasing)
-                           .FadeIn(FadeInDuration, fadeInEasing);
+                currentLine.MoveToY(0, fadeInDuration.Value, fadeInEasing)
+                           .FadeIn(fadeInDuration.Value, fadeInEasing);
 
                 currentRawText = value;
                 checkIfEmpty();
@@ -97,8 +71,8 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
                 {
                     if (value == currentLineTranslated.Text) return;
 
-                    currentLineTranslated?.MoveToY(5, FadeOutDuration, fadeOutEasing)
-                                         .FadeOut(FadeOutDuration, fadeOutEasing).Then().Expire();
+                    currentLineTranslated?.MoveToY(5, fadeOutDuration.Value, fadeOutEasing)
+                                         .FadeOut(fadeOutDuration.Value, fadeOutEasing).Then().Expire();
                 }
 
                 lyricContainer.Add(currentLineTranslated = new OsuSpriteText
@@ -111,8 +85,8 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
                     Origin = Anchor.BottomCentre,
                     Margin = new MarginPadding { Bottom = 40 }
                 });
-                currentLineTranslated.MoveToY(0, FadeInDuration, fadeInEasing)
-                                     .FadeIn(FadeInDuration, fadeInEasing);
+                currentLineTranslated.MoveToY(0, fadeInDuration.Value, fadeInEasing)
+                                     .FadeIn(fadeInDuration.Value, fadeInEasing);
 
                 currentRawTranslateText = value;
                 checkIfEmpty();
@@ -147,6 +121,45 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
             });
 
             outlineEffectContainer.FrameBufferScale = new Vector2(1.1f);
+        }
+
+        private readonly Bindable<float> fadeInDuration = new Bindable<float>();
+        private readonly Bindable<float> fadeOutDuration = new Bindable<float>();
+        private readonly Bindable<bool> disableOutline = new Bindable<bool>();
+
+        [BackgroundDependencyLoader]
+        private void load(IPluginConfigManager ipcm)
+        {
+            var config = (LyricConfigManager)ipcm;
+
+            config.BindWith(LyricSettings.LyricFadeInDuration, fadeInDuration);
+            config.BindWith(LyricSettings.LyricFadeOutDuration, fadeOutDuration);
+            config.BindWith(LyricSettings.NoExtraShadow, disableOutline);
+        }
+
+        protected override void LoadComplete()
+        {
+            disableOutline.BindValueChanged(v =>
+            {
+                if (v.NewValue)
+                {
+                    if (outlineEffectContainer.Contains(lyricContainer))
+                        outlineEffectContainer.Remove(lyricContainer);
+
+                    AddInternal(lyricContainer);
+                    outlineEffectContainer.Hide();
+                }
+                else
+                {
+                    if (InternalChildren.Contains(lyricContainer))
+                        RemoveInternal(lyricContainer);
+
+                    outlineEffectContainer.Add(lyricContainer);
+                    outlineEffectContainer.Show();
+                }
+            }, true);
+
+            base.LoadComplete();
         }
     }
 }
