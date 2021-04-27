@@ -38,40 +38,23 @@ namespace osu.Game.Rulesets.Objects
             startTimeBindable.BindValueChanged(onStartTimeChanged, true);
         }
 
-        // The lifetime start, as set by the hitobject.
+        // The lifetime, as set by the hitobject.
         private double realLifetimeStart = double.MinValue;
-
-        /// <summary>
-        /// The time at which the <see cref="HitObject"/> should become alive.
-        /// </summary>
-        public new double LifetimeStart
-        {
-            get => realLifetimeStart;
-            set => setLifetime(realLifetimeStart = value, LifetimeEnd);
-        }
-
-        // The lifetime end, as set by the hitobject.
         private double realLifetimeEnd = double.MaxValue;
 
-        /// <summary>
-        /// The time at which the <see cref="HitObject"/> should become dead.
-        /// </summary>
-        public new double LifetimeEnd
+        // This method is called even if `start == LifetimeStart` when `KeepAlive` is true (necessary to update `realLifetimeStart`).
+        protected override void SetLifetimeStart(double start)
         {
-            get => realLifetimeEnd;
-            set => setLifetime(LifetimeStart, realLifetimeEnd = value);
+            realLifetimeStart = start;
+            if (!keepAlive)
+                base.SetLifetimeStart(start);
         }
 
-        private void setLifetime(double start, double end)
+        protected override void SetLifetimeEnd(double end)
         {
-            if (keepAlive)
-            {
-                start = double.MinValue;
-                end = double.MaxValue;
-            }
-
-            base.LifetimeStart = start;
-            base.LifetimeEnd = end;
+            realLifetimeEnd = end;
+            if (!keepAlive)
+                base.SetLifetimeEnd(end);
         }
 
         private bool keepAlive;
@@ -87,7 +70,10 @@ namespace osu.Game.Rulesets.Objects
                     return;
 
                 keepAlive = value;
-                setLifetime(realLifetimeStart, realLifetimeEnd);
+                if (keepAlive)
+                    SetLifetime(double.MinValue, double.MaxValue);
+                else
+                    SetLifetime(realLifetimeStart, realLifetimeEnd);
             }
         }
 
@@ -98,12 +84,12 @@ namespace osu.Game.Rulesets.Objects
         /// <remarks>
         /// This is only used as an optimisation to delay the initial update of the <see cref="HitObject"/> and may be tuned more aggressively if required.
         /// It is indirectly used to decide the automatic transform offset provided to <see cref="DrawableHitObject.UpdateInitialTransforms"/>.
-        /// A more accurate <see cref="LifetimeStart"/> should be set for further optimisation (in <see cref="DrawableHitObject.LoadComplete"/>, for example).
+        /// A more accurate <see cref="LifetimeEntry.LifetimeStart"/> should be set for further optimisation (in <see cref="DrawableHitObject.LoadComplete"/>, for example).
         /// </remarks>
         protected virtual double InitialLifetimeOffset => 10000;
 
         /// <summary>
-        /// Resets <see cref="LifetimeStart"/> according to the change in start time of the <see cref="HitObject"/>.
+        /// Resets <see cref="LifetimeEntry.LifetimeStart"/> according to the change in start time of the <see cref="HitObject"/>.
         /// </summary>
         private void onStartTimeChanged(ValueChangedEvent<double> startTime) => LifetimeStart = HitObject.StartTime - InitialLifetimeOffset;
     }
