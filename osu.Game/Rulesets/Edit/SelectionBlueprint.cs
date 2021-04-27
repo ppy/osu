@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -34,9 +33,6 @@ namespace osu.Game.Rulesets.Edit
 
         public override bool HandlePositionalInput => ShouldBeAlive;
         public override bool RemoveWhenNotAlive => false;
-
-        [Resolved(CanBeNull = true)]
-        private HitObjectComposer composer { get; set; }
 
         protected SelectionBlueprint(HitObject hitObject)
         {
