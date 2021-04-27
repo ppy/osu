@@ -37,6 +37,38 @@ namespace osu.Game.Tests.Gameplay
             AddAssert("Entry lifetime is updated", () => entry.LifetimeEnd == 3000);
         }
 
+        [Test]
+        public void TestKeepAlive()
+        {
+            TestDrawableHitObject dho = null;
+            TestLifetimeEntry entry = null;
+            AddStep("Create DHO", () =>
+            {
+                dho = new TestDrawableHitObject(null);
+                dho.Apply(entry = new TestLifetimeEntry(new HitObject())
+                {
+                    LifetimeStart = 0,
+                    LifetimeEnd = 1000,
+                });
+                Child = dho;
+            });
+
+            AddStep("KeepAlive = true", () => entry.KeepAlive = true);
+            AddAssert("Lifetime is overriden", () => entry.LifetimeStart == double.MinValue && entry.LifetimeEnd == double.MaxValue);
+
+            AddStep("Set LifetimeStart", () => dho.LifetimeStart = 500);
+            AddStep("KeepAlive = false", () => entry.KeepAlive = false);
+            AddAssert("Lifetime is correct", () => entry.LifetimeStart == 500 && entry.LifetimeEnd == 1000);
+
+            AddStep("Set LifetimeStart while KeepAlive", () =>
+            {
+                entry.KeepAlive = true;
+                dho.LifetimeStart = double.MinValue;
+                entry.KeepAlive = false;
+            });
+            AddAssert("Lifetime is changed", () => entry.LifetimeStart == double.MinValue && entry.LifetimeEnd == 1000);
+        }
+
         private class TestDrawableHitObject : DrawableHitObject
         {
             public const double INITIAL_LIFETIME_OFFSET = 100;
