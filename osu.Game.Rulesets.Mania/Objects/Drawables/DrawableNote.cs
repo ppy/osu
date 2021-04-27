@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         [Resolved]
         private OsuColour colours { get; set; }
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private BeatDivisorFinder beatDivisorFinder { get; set; }
 
         private readonly Bindable<bool> configTimingBasedNoteColouring = new Bindable<bool>();
