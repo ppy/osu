@@ -42,11 +42,22 @@ namespace osu.Game.Rulesets.Objects
         private double realLifetimeStart = double.MinValue;
         private double realLifetimeEnd = double.MaxValue;
 
-        public override void SetLifetime(double start, double end)
+        // This method is called even if `start == LifetimeStart` when `KeepAlive` is true (necessary to update `realLifetimeStart`).
+        protected override void SetLifetimeStart(double start)
         {
+            // This assignment cannot be done in `SetLifetime` because otherwise setting only `LifetimeStart` will make `realLifetimeEnd` to be lost.
             realLifetimeStart = start;
-            realLifetimeEnd = end;
+            base.SetLifetimeStart(start);
+        }
 
+        protected override void SetLifetimeEnd(double end)
+        {
+            realLifetimeEnd = end;
+            base.SetLifetimeEnd(end);
+        }
+
+        protected override void SetLifetime(double start, double end)
+        {
             if (keepAlive)
                 base.SetLifetime(double.MinValue, double.MaxValue);
             else

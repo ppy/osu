@@ -100,7 +100,11 @@ namespace osu.Game.Rulesets.Objects.Pooling
             base.LifetimeStart = start;
             base.LifetimeEnd = end;
 
-            Entry?.SetLifetime(start, end);
+            if (Entry != null)
+            {
+                Entry.LifetimeStart = start;
+                Entry.LifetimeEnd = end;
+            }
         }
 
         private void free()
