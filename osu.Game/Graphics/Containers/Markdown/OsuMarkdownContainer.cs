@@ -30,6 +30,8 @@ namespace osu.Game.Graphics.Containers.Markdown
 
         protected override MarkdownFencedCodeBlock CreateFencedCodeBlock(FencedCodeBlock fencedCodeBlock) => new OsuMarkdownFencedCodeBlock(fencedCodeBlock);
 
+        protected override MarkdownSeparator CreateSeparator(ThematicBreakBlock thematicBlock) => new OsuMarkdownSeparator();
+
         protected override MarkdownPipeline CreateBuilder()
             => new MarkdownPipelineBuilder().UseAutoIdentifiers(AutoIdentifierOptions.GitHub)
                                             .UseEmojiAndSmiley()
