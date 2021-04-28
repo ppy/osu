@@ -7,6 +7,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Framework.Lists;
+using osu.Game.Screens.Edit;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
@@ -158,6 +159,47 @@ namespace osu.Game.Beatmaps.ControlPoints
             group.ItemRemoved -= groupItemRemoved;
 
             groups.Remove(group);
+        }
+
+        /// <summary>
+        /// Returns the time on the given beat divisor closest to the given time.
+        /// </summary>
+        /// <param name="time">The time to find the closest snapped time to.</param>
+        /// <param name="beatDivisor">The beat divisor to snap to.</param>
+        /// <param name="referenceTime">An optional reference point to use for timing point lookup.</param>
+        public int ClosestSnapTime(double time, int beatDivisor, double? referenceTime = null)
+        {
+            var timingPoint = TimingPointAt(referenceTime ?? time);
+            var beatLength = timingPoint.BeatLength / beatDivisor;
+            var beatLengths = (int)Math.Round((time - timingPoint.Time) / beatLength, MidpointRounding.AwayFromZero);
+
+            // Casting to int matches stable.
+            return (int)(timingPoint.Time + beatLengths * beatLength);
+        }
+
+        /// <summary>
+        /// Returns the time on any valid beat divisor closest to the given time.
+        /// </summary>
+        /// <param name="time">The time to find the closest snapped time to.</param>
+        /// <param name="referenceTime">An optional reference point to use for timing point lookup.</param>
+        public int ClosestSnapTime(double time, double? referenceTime = null)
+        {
+            return ClosestSnapTime(time, ClosestBeatDivisor(time, referenceTime), referenceTime);
+        }
+
+        /// <summary>
+        /// Returns the beat snap divisor closest to the given time. If two are equally close, the smallest is returned.
+        /// </summary>
+        /// <param name="time">The time to find the closest beat snap divisor to.</param>
+        /// <param name="referenceTime">An optional reference point to use for timing point lookup.</param>
+        public int ClosestBeatDivisor(double time, double? referenceTime = null)
+        {
+            double getUnsnap(int divisor) => Math.Abs(time - ClosestSnapTime(time, divisor, referenceTime));
+
+            int[] divisors = BindableBeatDivisor.VALID_DIVISORS;
+            double smallestUnsnap = divisors.Min(getUnsnap);
+
+            return divisors.FirstOrDefault(divisor => getUnsnap(divisor) == smallestUnsnap);
         }
 
         /// <summary>

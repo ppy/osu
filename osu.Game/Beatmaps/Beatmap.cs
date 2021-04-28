@@ -9,7 +9,6 @@ using System.Linq;
 using osu.Game.Beatmaps.ControlPoints;
 using Newtonsoft.Json;
 using osu.Game.IO.Serialization.Converters;
-using osu.Game.Screens.Edit;
 
 namespace osu.Game.Beatmaps
 {
@@ -73,31 +72,6 @@ namespace osu.Game.Beatmaps
                                 .OrderByDescending(i => i.duration).FirstOrDefault();
 
             return mostCommon.beatLength;
-        }
-
-        public int ClosestSnapTime(double time, int beatDivisor, double? referenceTime = null)
-        {
-            var timingPoint = ControlPointInfo.TimingPointAt(referenceTime ?? time);
-            var beatLength = timingPoint.BeatLength / beatDivisor;
-            var beatLengths = (int)Math.Round((time - timingPoint.Time) / beatLength, MidpointRounding.AwayFromZero);
-
-            // Casting to int matches stable.
-            return (int)(timingPoint.Time + beatLengths * beatLength);
-        }
-
-        public int ClosestSnapTime(double time, double? referenceTime = null)
-        {
-            return ClosestSnapTime(time, ClosestBeatDivisor(time, referenceTime), referenceTime);
-        }
-
-        public int ClosestBeatDivisor(double time, double? referenceTime = null)
-        {
-            double getUnsnap(int divisor) => Math.Abs(time - ClosestSnapTime(time, divisor, referenceTime));
-
-            int[] divisors = BindableBeatDivisor.VALID_DIVISORS;
-            double smallestUnsnap = divisors.Min(getUnsnap);
-
-            return divisors.FirstOrDefault(divisor => getUnsnap(divisor) == smallestUnsnap);
         }
 
         IBeatmap IBeatmap.Clone() => Clone();
