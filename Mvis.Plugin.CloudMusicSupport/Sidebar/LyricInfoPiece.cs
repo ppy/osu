@@ -32,6 +32,10 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Value = lrc;
+
+            Colour = string.IsNullOrEmpty(lrc.Content)
+                ? Color4Extensions.FromHex(@"555")
+                : Color4.White;
         }
 
         [BackgroundDependencyLoader]

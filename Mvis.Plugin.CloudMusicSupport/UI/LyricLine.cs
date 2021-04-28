@@ -36,13 +36,8 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
             get => currentRawText;
             set
             {
-                if (currentLine != null)
-                {
-                    if (value == currentLine.Text) return;
-
-                    currentLine?.MoveToY(5, fadeOutDuration.Value, fadeOutEasing)
-                               .FadeOut(fadeOutDuration.Value, fadeOutEasing).Then().Expire();
-                }
+                currentLine?.MoveToY(5, fadeOutDuration.Value, fadeOutEasing)
+                           .FadeOut(fadeOutDuration.Value, fadeOutEasing).Then().Expire();
 
                 lyricContainer.Add(currentLine = new OsuSpriteText
                 {
@@ -66,13 +61,8 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
             get => currentRawTranslateText;
             set
             {
-                if (currentLineTranslated != null)
-                {
-                    if (value == currentLineTranslated.Text) return;
-
-                    currentLineTranslated?.MoveToY(5, fadeOutDuration.Value, fadeOutEasing)
-                                         .FadeOut(fadeOutDuration.Value, fadeOutEasing).Then().Expire();
-                }
+                currentLineTranslated?.MoveToY(5, fadeOutDuration.Value, fadeOutEasing)
+                                     .FadeOut(fadeOutDuration.Value, fadeOutEasing).Then().Expire();
 
                 lyricContainer.Add(currentLineTranslated = new OsuSpriteText
                 {

@@ -82,125 +82,113 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
             FillFlowContainer buttonsFillFlow;
             Children = new Drawable[]
             {
-                new GridContainer
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    RowDimensions = new[]
+                    Padding = new MarginPadding { Top = 125 },
+                    Child = scroll = new OsuScrollContainer
                     {
-                        new Dimension(GridSizeMode.AutoSize)
-                    },
-                    Content = new[]
-                    {
-                        new Drawable[]
+                        RelativeSizeAxes = Axes.Both,
+                        Child = lyricFlow = new FillFlowContainer<LyricInfoPiece>
                         {
-                            new Container
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Spacing = new Vector2(5),
+                            Padding = new MarginPadding(5)
+                        }
+                    }
+                },
+                new Container
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = 125,
+                    Masking = true,
+                    Children = new Drawable[]
+                    {
+                        cover = new BeatmapCover(mvisScreen.Beatmap.Value),
+                        new FillFlowContainer
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Children = new[]
                             {
-                                RelativeSizeAxes = Axes.X,
-                                Height = 125,
-                                Masking = true,
-                                Children = new Drawable[]
+                                new Box
                                 {
-                                    cover = new BeatmapCover(mvisScreen.Beatmap.Value),
-                                    new FillFlowContainer
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Children = new[]
-                                        {
-                                            new Box
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Width = 0.7f,
-                                                Colour = Color4.Black.Opacity(0.6f)
-                                            },
-                                            new Box
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Width = 0.3f,
-                                                Colour = ColourInfo.GradientHorizontal(
-                                                    Color4.Black.Opacity(0.6f),
-                                                    Color4.Black.Opacity(0))
-                                            }
-                                        }
-                                    },
-                                    new TrackTimeIndicator(),
-                                    buttonsFillFlow = new FillFlowContainer
-                                    {
-                                        Margin = new MarginPadding(5),
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
-                                        Width = 0.5f,
-                                        Spacing = new Vector2(5),
-                                        Anchor = Anchor.BottomLeft,
-                                        Origin = Anchor.BottomLeft,
-                                        AutoSizeDuration = 200,
-                                        AutoSizeEasing = Easing.OutQuint,
-                                        Children = new Drawable[]
-                                        {
-                                            saveButton = new IconButton
-                                            {
-                                                Icon = FontAwesome.Solid.Save,
-                                                Size = new Vector2(45),
-                                                TooltipText = "保存为lrc",
-                                                Action = plugin.WriteLyricToDisk
-                                            },
-                                            new IconButton
-                                            {
-                                                Icon = FontAwesome.Solid.Undo,
-                                                Size = new Vector2(45),
-                                                TooltipText = "刷新",
-                                                Action = () => plugin.RefreshLyric()
-                                            },
-                                            new IconButton
-                                            {
-                                                Icon = FontAwesome.Solid.CloudDownloadAlt,
-                                                Size = new Vector2(45),
-                                                TooltipText = "重新获取歌词",
-                                                Action = () => dialog.Push
-                                                (
-                                                    new ConfirmDialog("重新获取歌词",
-                                                        () => plugin.RefreshLyric(true))
-                                                )
-                                            },
-                                            new IconButton
-                                            {
-                                                Icon = FontAwesome.Solid.AngleDown,
-                                                Size = new Vector2(45),
-                                                TooltipText = "滚动到当前歌词",
-                                                Action = scrollToCurrent
-                                            }
-                                        }
-                                    },
-                                    idText = new OsuSpriteText
-                                    {
-                                        Margin = new MarginPadding(15),
-                                        Font = OsuFont.GetFont(size: 20)
-                                    },
-                                    new SettingsSlider<double>
-                                    {
-                                        Anchor = Anchor.BottomRight,
-                                        Origin = Anchor.BottomRight,
-                                        Current = config.GetBindable<double>(LyricSettings.LyricOffset),
-                                        LabelText = "全局歌词偏移",
-                                        RelativeSizeAxes = Axes.None,
-                                        Width = 200 + 25,
-                                        Padding = new MarginPadding { Right = 10 }
-                                    }
+                                    RelativeSizeAxes = Axes.Both,
+                                    Width = 0.7f,
+                                    Colour = Color4.Black.Opacity(0.6f)
+                                },
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Width = 0.3f,
+                                    Colour = ColourInfo.GradientHorizontal(
+                                        Color4.Black.Opacity(0.6f),
+                                        Color4.Black.Opacity(0))
                                 }
                             }
                         },
-                        new Drawable[]
+                        new TrackTimeIndicator(),
+                        buttonsFillFlow = new FillFlowContainer
                         {
-                            scroll = new OsuScrollContainer
+                            Margin = new MarginPadding(5),
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Width = 0.5f,
+                            Spacing = new Vector2(5),
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            AutoSizeDuration = 200,
+                            AutoSizeEasing = Easing.OutQuint,
+                            Children = new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Child = lyricFlow = new FillFlowContainer<LyricInfoPiece>
+                                saveButton = new IconButton
                                 {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Spacing = new Vector2(5),
-                                    Padding = new MarginPadding(5)
+                                    Icon = FontAwesome.Solid.Save,
+                                    Size = new Vector2(45),
+                                    TooltipText = "保存为lrc",
+                                    Action = plugin.WriteLyricToDisk
+                                },
+                                new IconButton
+                                {
+                                    Icon = FontAwesome.Solid.Undo,
+                                    Size = new Vector2(45),
+                                    TooltipText = "刷新",
+                                    Action = () => plugin.RefreshLyric()
+                                },
+                                new IconButton
+                                {
+                                    Icon = FontAwesome.Solid.CloudDownloadAlt,
+                                    Size = new Vector2(45),
+                                    TooltipText = "重新获取歌词",
+                                    Action = () => dialog.Push
+                                    (
+                                        new ConfirmDialog("重新获取歌词",
+                                            () => plugin.RefreshLyric(true))
+                                    )
+                                },
+                                new IconButton
+                                {
+                                    Icon = FontAwesome.Solid.AngleDown,
+                                    Size = new Vector2(45),
+                                    TooltipText = "滚动到当前歌词",
+                                    Action = scrollToCurrent
                                 }
                             }
+                        },
+                        idText = new OsuSpriteText
+                        {
+                            Margin = new MarginPadding(15),
+                            Font = OsuFont.GetFont(size: 20)
+                        },
+                        new SettingsSlider<double>
+                        {
+                            Anchor = Anchor.BottomRight,
+                            Origin = Anchor.BottomRight,
+                            Current = config.GetBindable<double>(LyricSettings.LyricOffset),
+                            LabelText = "全局歌词偏移",
+                            RelativeSizeAxes = Axes.None,
+                            Width = 200 + 25,
+                            Padding = new MarginPadding { Right = 10 }
                         }
                     }
                 },

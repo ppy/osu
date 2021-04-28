@@ -164,6 +164,9 @@ namespace Mvis.Plugin.CloudMusicSupport
             return true;
         }
 
+        private Lyric currentLine;
+        private readonly Lyric defaultLrc = new Lyric();
+
         protected override void Update()
         {
             base.Update();
@@ -172,13 +175,15 @@ namespace Mvis.Plugin.CloudMusicSupport
 
             if (ContentLoaded)
             {
-                var lrc = Lyrics.FindLast(l => targetTime >= l.Time);
+                var lrc = Lyrics.FindLast(l => targetTime >= l.Time) ?? defaultLrc;
 
-                if (lrc != null)
+                if (lrc != currentLine)
                 {
                     lrcLine.Text = lrc.Content;
                     lrcLine.TranslatedText = lrc.TranslatedString;
                 }
+
+                currentLine = lrc;
             }
         }
 
