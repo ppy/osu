@@ -267,8 +267,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="item">The item for which the blueprint has been added.</param>
         protected virtual void OnBlueprintAdded(T item)
         {
-            if (SelectionHandler.SelectedItems.Contains(item))
-                blueprintMap[item].Select();
         }
 
         /// <summary>
