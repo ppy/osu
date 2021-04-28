@@ -36,32 +36,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Resolved]
         private OsuConfigManager config { get; set; }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            Add(new Container
-            {
-                RelativeSizeAxes = Axes.Both,
-                Width = 0.3f,
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        Colour = Color4.Black,
-                        RelativeSizeAxes = Axes.Both,
-                        Alpha = 0.9f,
-                    },
-                    new FillFlowContainer
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Direction = FillDirection.Vertical,
-                        Children = createSkinSourceComponents(),
-                    },
-                }
-            });
-        }
-
         [Test]
         public void TestComboCounterIncrementing()
         {
