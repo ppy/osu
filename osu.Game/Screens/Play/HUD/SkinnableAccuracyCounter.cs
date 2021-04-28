@@ -2,12 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class SkinnableAccuracyCounter : SkinnableHUDComponent, IAccuracyCounter
+    public class SkinnableAccuracyCounter : SkinnableDrawable, IAccuracyCounter
     {
         public Bindable<double> Current { get; } = new Bindable<double>();
 
@@ -15,7 +14,6 @@ namespace osu.Game.Screens.Play.HUD
             : base(new HUDSkinComponent(HUDSkinComponents.AccuracyCounter), _ => new DefaultAccuracyCounter())
         {
             CentreComponent = false;
-            AutoSizeAxes = Axes.Both;
         }
 
         private IAccuracyCounter skinnedCounter;

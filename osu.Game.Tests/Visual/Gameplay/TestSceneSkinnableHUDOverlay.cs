@@ -9,16 +9,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.Play.HUD;
-using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -76,29 +72,6 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             // Key counter flow container should not be affected by this, only the key counter display will be hidden as checked above.
             AddAssert("key counter flow not affected", () => keyCounterFlow.IsPresent);
-        }
-
-        private IReadOnlyList<Drawable> createSkinSourceComponents()
-        {
-            Drawable[] hudComponents = typeof(SkinnableHUDComponent).Assembly
-                                                                    .GetTypes()
-                                                                    .Where(t => typeof(SkinnableHUDComponent).IsAssignableFrom(t))
-                                                                    .Where(t => !t.IsAbstract)
-                                                                    .Select(t => Activator.CreateInstance(t) as Drawable)
-                                                                    .ToArray();
-
-            List<Drawable> drawables = new List<Drawable>();
-
-            foreach (var component in hudComponents)
-            {
-                drawables.Add(new OsuSpriteText
-                {
-                    Text = component.GetType().Name
-                });
-                drawables.AddRange(component.CreateSettingsControls());
-            }
-
-            return drawables;
         }
 
         private void createNew(Action<HUDOverlay> action = null)

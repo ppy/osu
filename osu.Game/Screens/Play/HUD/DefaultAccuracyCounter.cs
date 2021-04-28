@@ -9,7 +9,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class DefaultAccuracyCounter : PercentageCounter, IAccuracyCounter
+    public class DefaultAccuracyCounter : PercentageCounter, IAccuracyCounter, ISkinnableComponent
     {
         private readonly Vector2 offset = new Vector2(-20, 5);
 
