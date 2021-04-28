@@ -134,7 +134,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="moveEvent">The move event.</param>
         /// <returns>
         /// Whether any items could be moved.
-        /// Returning true will also propagate StartTime changes provided by the closest <see cref="IPositionSnapProvider.SnapScreenSpacePositionToValidTime"/>.
         /// </returns>
         public virtual bool HandleMovement(MoveSelectionEvent<T> moveEvent) => false;
 
