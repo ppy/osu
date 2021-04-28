@@ -17,12 +17,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public readonly SelectionBlueprint<T> Blueprint;
 
         /// <summary>
-        /// The expected screen-space position of the hitobject at the current cursor position.
+        /// The expected screen-space position of the blueprint's item at the current cursor position.
         /// </summary>
         public readonly Vector2 ScreenSpacePosition;
 
         /// <summary>
-        /// The distance between <see cref="ScreenSpacePosition"/> and the hitobject's current position, in the coordinate-space of the hitobject's parent.
+        /// The distance between <see cref="ScreenSpacePosition"/> and the blueprint's current position, in the coordinate-space of the blueprint item's parent.
         /// </summary>
         public readonly Vector2 InstantDelta;
 
