@@ -170,35 +170,47 @@ namespace osu.Game.Beatmaps.ControlPoints
         public double GetClosestSnappedTime(double time, int beatDivisor, double? referenceTime = null)
         {
             var timingPoint = TimingPointAt(referenceTime ?? time);
-            var beatLength = timingPoint.BeatLength / beatDivisor;
-            var beatLengths = (int)Math.Round((time - timingPoint.Time) / beatLength, MidpointRounding.AwayFromZero);
-
-            return timingPoint.Time + beatLengths * beatLength;
+            return getClosestSnappedTime(timingPoint, time, beatDivisor);
         }
 
         /// <summary>
-        /// Returns the time on any valid beat divisor closest to the given time.
+        /// Returns the time on *ANY* valid beat divisor, favouring the divisor closest to the given time.
         /// </summary>
         /// <param name="time">The time to find the closest snapped time to.</param>
-        /// <param name="referenceTime">An optional reference point to use for timing point lookup.</param>
-        public double GetClosestSnappedTime(double time, double? referenceTime = null)
-        {
-            return GetClosestSnappedTime(time, GetClosestBeatDivisor(time, referenceTime), referenceTime);
-        }
+        public double GetClosestSnappedTime(double time) => GetClosestSnappedTime(time, GetClosestBeatDivisor(time));
 
         /// <summary>
-        /// Returns the beat snap divisor closest to the given time. If two are equally close, the smallest is returned.
+        /// Returns the beat snap divisor closest to the given time. If two are equally close, the smallest divisor is returned.
         /// </summary>
         /// <param name="time">The time to find the closest beat snap divisor to.</param>
         /// <param name="referenceTime">An optional reference point to use for timing point lookup.</param>
         public int GetClosestBeatDivisor(double time, double? referenceTime = null)
         {
-            double getUnsnap(int divisor) => Math.Abs(time - GetClosestSnappedTime(time, divisor, referenceTime));
+            TimingControlPoint timingPoint = TimingPointAt(referenceTime ?? time);
 
-            int[] divisors = BindableBeatDivisor.VALID_DIVISORS;
-            double smallestUnsnap = divisors.Min(getUnsnap);
+            int closestDivisor = 0;
+            double closestTime = double.MaxValue;
 
-            return divisors.FirstOrDefault(divisor => getUnsnap(divisor) == smallestUnsnap);
+            foreach (int divisor in BindableBeatDivisor.VALID_DIVISORS)
+            {
+                double distanceFromSnap = Math.Abs(time - getClosestSnappedTime(timingPoint, time, divisor));
+
+                if (distanceFromSnap < closestTime)
+                {
+                    closestDivisor = divisor;
+                    closestTime = distanceFromSnap;
+                }
+            }
+
+            return closestDivisor;
+        }
+
+        private static double getClosestSnappedTime(TimingControlPoint timingPoint, double time, int beatDivisor)
+        {
+            var beatLength = timingPoint.BeatLength / beatDivisor;
+            var beatLengths = (int)Math.Round((time - timingPoint.Time) / beatLength, MidpointRounding.AwayFromZero);
+
+            return timingPoint.Time + beatLengths * beatLength;
         }
 
         /// <summary>
