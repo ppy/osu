@@ -111,7 +111,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     public override bool HandleRotation(float angle)
                     {
                         foreach (var c in SelectedBlueprints)
-                            c.Item.Rotation += angle;
+                            c.Item.SkinRotation.Value += angle;
 
                         return base.HandleRotation(angle);
                     }
@@ -121,8 +121,15 @@ namespace osu.Game.Tests.Visual.Gameplay
                         adjustScaleFromAnchor(ref scale, anchor);
 
                         foreach (var c in SelectedBlueprints)
-                            c.Item.Scale += scale * 0.01f;
+                            c.Item.SkinScale.Value += scale.X * 0.01f;
 
+                        return true;
+                    }
+
+                    public override bool HandleMovement(MoveSelectionEvent<SkinnableHUDComponent> moveEvent)
+                    {
+                        foreach (var c in SelectedBlueprints)
+                            c.Item.SkinPosition.Value += moveEvent.InstantDelta.X;
                         return true;
                     }
 
@@ -135,13 +142,6 @@ namespace osu.Game.Tests.Visual.Gameplay
                         // reverse the scale direction if dragging from top or left.
                         if ((reference & Anchor.x0) > 0) scale.X = -scale.X;
                         if ((reference & Anchor.y0) > 0) scale.Y = -scale.Y;
-                    }
-
-                    public override bool HandleMovement(MoveSelectionEvent<SkinnableHUDComponent> moveEvent)
-                    {
-                        foreach (var c in SelectedBlueprints)
-                            c.Item.Position += moveEvent.InstantDelta;
-                        return true;
                     }
                 }
 
