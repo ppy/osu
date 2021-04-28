@@ -85,7 +85,7 @@ namespace osu.Game.Tests.NonVisual
             };
 
             for (int i = 0; i < divisors.Count; ++i)
-                Assert.AreEqual(closestDivisors[i], beatmap.ControlPointInfo.ClosestBeatDivisor(beatmap.HitObjects[i].StartTime), $"at index {i}");
+                Assert.AreEqual(closestDivisors[i], beatmap.ControlPointInfo.GetClosestBeatDivisor(beatmap.HitObjects[i].StartTime), $"at index {i}");
         }
     }
 }

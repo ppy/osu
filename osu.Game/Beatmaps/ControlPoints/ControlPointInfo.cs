@@ -167,7 +167,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <param name="time">The time to find the closest snapped time to.</param>
         /// <param name="beatDivisor">The beat divisor to snap to.</param>
         /// <param name="referenceTime">An optional reference point to use for timing point lookup.</param>
-        public int ClosestSnapTime(double time, int beatDivisor, double? referenceTime = null)
+        public int GetClosestSnappedTime(double time, int beatDivisor, double? referenceTime = null)
         {
             var timingPoint = TimingPointAt(referenceTime ?? time);
             var beatLength = timingPoint.BeatLength / beatDivisor;
@@ -182,9 +182,9 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         /// <param name="time">The time to find the closest snapped time to.</param>
         /// <param name="referenceTime">An optional reference point to use for timing point lookup.</param>
-        public int ClosestSnapTime(double time, double? referenceTime = null)
+        public int GetClosestSnappedTime(double time, double? referenceTime = null)
         {
-            return ClosestSnapTime(time, ClosestBeatDivisor(time, referenceTime), referenceTime);
+            return GetClosestSnappedTime(time, GetClosestBeatDivisor(time, referenceTime), referenceTime);
         }
 
         /// <summary>
@@ -192,9 +192,9 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         /// <param name="time">The time to find the closest beat snap divisor to.</param>
         /// <param name="referenceTime">An optional reference point to use for timing point lookup.</param>
-        public int ClosestBeatDivisor(double time, double? referenceTime = null)
+        public int GetClosestBeatDivisor(double time, double? referenceTime = null)
         {
-            double getUnsnap(int divisor) => Math.Abs(time - ClosestSnapTime(time, divisor, referenceTime));
+            double getUnsnap(int divisor) => Math.Abs(time - GetClosestSnappedTime(time, divisor, referenceTime));
 
             int[] divisors = BindableBeatDivisor.VALID_DIVISORS;
             double smallestUnsnap = divisors.Min(getUnsnap);
