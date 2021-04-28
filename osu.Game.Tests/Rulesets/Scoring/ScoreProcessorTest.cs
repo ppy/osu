@@ -83,8 +83,8 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(ScoringMode.Standardised, HitResult.SmallTickHit, HitResult.SmallTickHit, 925_000)] // (3 * 10) / (4 * 10) * 300_000 + 700_000 (max combo 0)
         [TestCase(ScoringMode.Standardised, HitResult.LargeTickMiss, HitResult.LargeTickHit, 0)] // (3 * 0) / (4 * 30) * 300_000 + (0 / 4) * 700_000
         [TestCase(ScoringMode.Standardised, HitResult.LargeTickHit, HitResult.LargeTickHit, 575_000)] // (3 * 30) / (4 * 30) * 300_000 + (0 / 4) * 700_000
-        [TestCase(ScoringMode.Standardised, HitResult.SmallBonus, HitResult.SmallBonus, 1_000_030)] // 0 * 300_000 + 700_000 (max combo 0) + 3 * 10 (bonus points)
-        [TestCase(ScoringMode.Standardised, HitResult.LargeBonus, HitResult.LargeBonus, 1_000_150)] // 0 * 300_000 + 700_000 (max combo 0) + 3 * 50 (bonus points)
+        [TestCase(ScoringMode.Standardised, HitResult.SmallBonus, HitResult.SmallBonus, 1_000_030)] // 1 * 300_000 + 700_000 (max combo 0) + 3 * 10 (bonus points)
+        [TestCase(ScoringMode.Standardised, HitResult.LargeBonus, HitResult.LargeBonus, 1_000_150)] // 1 * 300_000 + 700_000 (max combo 0) + 3 * 50 (bonus points)
         [TestCase(ScoringMode.Classic, HitResult.Miss, HitResult.Great, 0)] // (0 * 4 * 300) * (1 + 0 / 25)
         [TestCase(ScoringMode.Classic, HitResult.Meh, HitResult.Great, 156)] // (((3 * 50) / (4 * 300)) * 4 * 300) * (1 + 1 / 25)
         [TestCase(ScoringMode.Classic, HitResult.Ok, HitResult.Great, 312)] // (((3 * 100) / (4 * 300)) * 4 * 300) * (1 + 1 / 25)
@@ -95,8 +95,8 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(ScoringMode.Classic, HitResult.SmallTickHit, HitResult.SmallTickHit, 225)] // (((3 * 10) / (4 * 10)) * 1 * 300) * (1 + 0 / 25)
         [TestCase(ScoringMode.Classic, HitResult.LargeTickMiss, HitResult.LargeTickHit, 0)] // (0 * 4 * 300) * (1 + 0 / 25)
         [TestCase(ScoringMode.Classic, HitResult.LargeTickHit, HitResult.LargeTickHit, 936)] // (((3 * 50) / (4 * 50)) * 4 * 300) * (1 + 1 / 25)
-        [TestCase(ScoringMode.Classic, HitResult.SmallBonus, HitResult.SmallBonus, 330)] // (0 * 1 * 300) * (1 + 0 / 25) + 3 * 10 (bonus points)
-        [TestCase(ScoringMode.Classic, HitResult.LargeBonus, HitResult.LargeBonus, 450)] // (1 * 1 * 300) * (1 + 0 / 25) * 3 * 50 (bonus points)
+        [TestCase(ScoringMode.Classic, HitResult.SmallBonus, HitResult.SmallBonus, 330)] // (1 * 1 * 300) * (1 + 0 / 25) + 3 * 10 (bonus points)
+        [TestCase(ScoringMode.Classic, HitResult.LargeBonus, HitResult.LargeBonus, 450)] // (1 * 1 * 300) * (1 + 0 / 25) + 3 * 50 (bonus points)
         public void TestFourVariousResultsOneMiss(ScoringMode scoringMode, HitResult hitResult, HitResult maxResult, int expectedScore)
         {
             var minResult = new TestJudgement(hitResult).MinResult;
