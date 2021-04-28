@@ -62,5 +62,18 @@ This is markdown code block.
 ```";
             });
         }
+
+        [Test]
+        public void TestSeparator()
+        {
+            AddStep("Add Seperator", () =>
+            {
+                markdownContainer.Text = @"Line above
+
+---
+
+Line below";
+            });
+        }
     }
 }
