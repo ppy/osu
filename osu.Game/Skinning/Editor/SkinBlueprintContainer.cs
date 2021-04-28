@@ -23,9 +23,14 @@ namespace osu.Game.Skinning.Editor
         {
             base.LoadComplete();
 
-            ISkinnableComponent[] components = target.ChildrenOfType<ISkinnableComponent>().ToArray();
+            checkForComponents();
+        }
 
-            foreach (var c in components) AddBlueprintFor(c);
+        private void checkForComponents()
+        {
+            foreach (var c in target.ChildrenOfType<ISkinnableComponent>().ToArray()) AddBlueprintFor(c);
+
+            Scheduler.AddDelayed(checkForComponents, 1000);
         }
 
         protected override SelectionHandler<ISkinnableComponent> CreateSelectionHandler() => new SkinSelectionHandler();
