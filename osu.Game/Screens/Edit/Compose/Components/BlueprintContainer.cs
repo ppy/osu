@@ -174,7 +174,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (isDraggingBlueprint)
             {
                 DragOperationCompleted();
-
                 changeHandler?.EndChange();
             }
 
