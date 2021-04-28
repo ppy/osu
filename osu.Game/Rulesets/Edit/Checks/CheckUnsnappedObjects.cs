@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 
             foreach (var hitobject in playableBeatmap.HitObjects)
             {
-                double startUnsnap = hitobject.StartTime - controlPointInfo.ClosestSnapTime(hitobject.StartTime);
+                double startUnsnap = hitobject.StartTime - controlPointInfo.GetClosestSnappedTime(hitobject.StartTime);
                 string startPostfix = hitobject is IHasDuration ? "start" : "";
                 foreach (var issue in getUnsnapIssues(hitobject, startUnsnap, hitobject.StartTime, startPostfix))
                     yield return issue;
@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Edit.Checks
                     {
                         double spanDuration = hasRepeats.Duration / (hasRepeats.RepeatCount + 1);
                         double repeatTime = hitobject.StartTime + spanDuration * (repeatIndex + 1);
-                        double repeatUnsnap = repeatTime - controlPointInfo.ClosestSnapTime(repeatTime);
+                        double repeatUnsnap = repeatTime - controlPointInfo.GetClosestSnappedTime(repeatTime);
                         foreach (var issue in getUnsnapIssues(hitobject, repeatUnsnap, repeatTime, "repeat"))
                             yield return issue;
                     }
@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 
                 if (hitobject is IHasDuration hasDuration)
                 {
-                    double endUnsnap = hasDuration.EndTime - controlPointInfo.ClosestSnapTime(hasDuration.EndTime);
+                    double endUnsnap = hasDuration.EndTime - controlPointInfo.GetClosestSnappedTime(hasDuration.EndTime);
                     foreach (var issue in getUnsnapIssues(hitobject, endUnsnap, hasDuration.EndTime, "end"))
                         yield return issue;
                 }
