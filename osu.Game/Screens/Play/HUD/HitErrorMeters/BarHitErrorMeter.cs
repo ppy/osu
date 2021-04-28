@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 {
-    public class BarHitErrorMeter : HitErrorMeter
+    public class BarHitErrorMeter : HitErrorMeter, ISkinnableComponent
     {
         private readonly Anchor alignment;
 

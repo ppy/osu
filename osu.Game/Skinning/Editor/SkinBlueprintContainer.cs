@@ -10,7 +10,7 @@ using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Skinning.Editor
 {
-    public class SkinBlueprintContainer : BlueprintContainer<SkinnableHUDComponent>
+    public class SkinBlueprintContainer : BlueprintContainer<ISkinnableComponent>
     {
         private readonly Drawable target;
 
@@ -23,14 +23,14 @@ namespace osu.Game.Skinning.Editor
         {
             base.LoadComplete();
 
-            SkinnableHUDComponent[] components = target.ChildrenOfType<SkinnableHUDComponent>().ToArray();
+            ISkinnableComponent[] components = target.ChildrenOfType<ISkinnableComponent>().ToArray();
 
             foreach (var c in components) AddBlueprintFor(c);
         }
 
-        protected override SelectionHandler<SkinnableHUDComponent> CreateSelectionHandler() => new SkinSelectionHandler();
+        protected override SelectionHandler<ISkinnableComponent> CreateSelectionHandler() => new SkinSelectionHandler();
 
-        protected override SelectionBlueprint<SkinnableHUDComponent> CreateBlueprintFor(SkinnableHUDComponent component)
+        protected override SelectionBlueprint<ISkinnableComponent> CreateBlueprintFor(ISkinnableComponent component)
             => new SkinBlueprint(component);
     }
 }

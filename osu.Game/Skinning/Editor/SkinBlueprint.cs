@@ -15,24 +15,25 @@ using osuTK;
 
 namespace osu.Game.Skinning.Editor
 {
-    public class SkinBlueprint : SelectionBlueprint<SkinnableHUDComponent>
+    public class SkinBlueprint : SelectionBlueprint<ISkinnableComponent>
     {
         /// <summary>
         /// The <see cref="DrawableHitObject"/> which this <see cref="OverlaySelectionBlueprint"/> applies to.
         /// </summary>
-        public readonly SkinnableHUDComponent Component;
+        public readonly ISkinnableComponent Component;
 
         private Container box;
-        private Drawable drawable => Component.Drawable;
+
+        private Drawable drawable => (Drawable)Component;
 
         /// <summary>
         /// Whether the blueprint should be shown even when the <see cref="Component"/> is not alive.
         /// </summary>
         protected virtual bool AlwaysShowWhenSelected => false;
 
-        protected override bool ShouldBeAlive => (Component.IsAlive && Component.IsPresent) || (AlwaysShowWhenSelected && State == SelectionState.Selected);
+        protected override bool ShouldBeAlive => (drawable.IsAlive && Component.IsPresent) || (AlwaysShowWhenSelected && State == SelectionState.Selected);
 
-        public SkinBlueprint(SkinnableHUDComponent component)
+        public SkinBlueprint(ISkinnableComponent component)
             : base(component)
         {
             Component = component;
@@ -72,15 +73,15 @@ namespace osu.Game.Skinning.Editor
 
             box.Position = quad.TopLeft;
             box.Size = quad.Size;
-            box.Rotation = Component.Rotation;
+            box.Rotation = drawable.Rotation;
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => drawable.ReceivePositionalInputAt(screenSpacePos);
 
-        public override Vector2 ScreenSpaceSelectionPoint => Component.ToScreenSpace(Vector2.Zero);
+        public override Vector2 ScreenSpaceSelectionPoint => drawable.ToScreenSpace(Vector2.Zero);
 
         public override Quad SelectionQuad => drawable.ScreenSpaceDrawQuad;
 
-        public override Vector2 GetInstantDelta(Vector2 screenSpacePosition) => Component.Parent.ToLocalSpace(screenSpacePosition) - Component.Position;
+        public override Vector2 GetInstantDelta(Vector2 screenSpacePosition) => Component.Parent.ToLocalSpace(screenSpacePosition) - drawable.Position;
     }
 }

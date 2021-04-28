@@ -14,15 +14,15 @@ using osuTK;
 
 namespace osu.Game.Skinning.Editor
 {
-    public class SkinSelectionHandler : SelectionHandler<SkinnableHUDComponent>
+    public class SkinSelectionHandler : SelectionHandler<ISkinnableComponent>
     {
-        protected override void DeleteItems(IEnumerable<SkinnableHUDComponent> items)
+        protected override void DeleteItems(IEnumerable<ISkinnableComponent> items)
         {
             foreach (var i in items)
-                i.Drawable.Expire();
+                i.Hide();
         }
 
-        protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<SkinnableHUDComponent>> selection)
+        protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<ISkinnableComponent>> selection)
         {
             yield return new OsuMenuItem("Anchor")
             {
@@ -49,7 +49,7 @@ namespace osu.Game.Skinning.Editor
 
                 return displayableAnchors.Select(a =>
                 {
-                    var countExisting = selection.Count(b => b.Item.SkinAnchor.Value == a);
+                    var countExisting = selection.Count(b => ((Drawable)b.Item).Anchor == a);
                     var countTotal = selection.Count();
 
                     TernaryState state;
@@ -72,7 +72,7 @@ namespace osu.Game.Skinning.Editor
         private void applyAnchor(Anchor anchor)
         {
             foreach (var item in SelectedItems)
-                item.SkinAnchor.Value = anchor;
+                ((Drawable)item).Anchor = anchor;
         }
 
         protected override void OnSelectionChanged()
@@ -88,7 +88,7 @@ namespace osu.Game.Skinning.Editor
         public override bool HandleRotation(float angle)
         {
             foreach (var c in SelectedBlueprints)
-                c.Item.SkinRotation.Value += angle;
+                ((Drawable)c.Item).Rotation += angle;
 
             return base.HandleRotation(angle);
         }
@@ -98,20 +98,16 @@ namespace osu.Game.Skinning.Editor
             adjustScaleFromAnchor(ref scale, anchor);
 
             foreach (var c in SelectedBlueprints)
-            {
-                c.Item.SkinScaleX.Value += scale.X * 0.01f;
-                c.Item.SkinScaleY.Value += scale.Y * 0.01f;
-            }
+                ((Drawable)c.Item).Scale += scale * 0.01f;
 
             return true;
         }
 
-        public override bool HandleMovement(MoveSelectionEvent<SkinnableHUDComponent> moveEvent)
+        public override bool HandleMovement(MoveSelectionEvent<ISkinnableComponent> moveEvent)
         {
             foreach (var c in SelectedBlueprints)
             {
-                c.Item.SkinPositionX.Value += moveEvent.InstantDelta.X;
-                c.Item.SkinPositionY.Value += moveEvent.InstantDelta.Y;
+                ((Drawable)c.Item).Position += moveEvent.InstantDelta;
             }
 
             return true;
@@ -130,7 +126,7 @@ namespace osu.Game.Skinning.Editor
 
         public class AnchorMenuItem : TernaryStateMenuItem
         {
-            public AnchorMenuItem(Anchor anchor, IEnumerable<SelectionBlueprint<SkinnableHUDComponent>> selection, Action<TernaryState> action)
+            public AnchorMenuItem(Anchor anchor, IEnumerable<SelectionBlueprint<ISkinnableComponent>> selection, Action<TernaryState> action)
                 : base(anchor.ToString(), getNextState, MenuItemType.Standard, action)
             {
             }

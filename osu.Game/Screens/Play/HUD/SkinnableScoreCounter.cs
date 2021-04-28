@@ -4,14 +4,13 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class SkinnableScoreCounter : SkinnableHUDComponent, IScoreCounter
+    public class SkinnableScoreCounter : SkinnableDrawable, IScoreCounter
     {
         public Bindable<double> Current { get; } = new Bindable<double>();
 
@@ -23,7 +22,6 @@ namespace osu.Game.Screens.Play.HUD
             : base(new HUDSkinComponent(HUDSkinComponents.ScoreCounter), _ => new DefaultScoreCounter())
         {
             CentreComponent = false;
-            AutoSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
