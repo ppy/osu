@@ -91,13 +91,13 @@ namespace osu.Game.Scoring.Legacy
 
                 if (score.Replay != null)
                 {
-                    LegacyReplayFrame lastF = new LegacyReplayFrame(0, 0, 0, ReplayButtonState.None);
-
+                    int lastTimeRounded = 0;
                     foreach (var f in score.Replay.Frames.OfType<IConvertibleReplayFrame>().Select(f => f.ToLegacy(beatmap)))
                     {
-                        replayData.Append(FormattableString.Invariant($"{Math.Round(f.Time - lastF.Time)}|{f.MouseX ?? 0}|{f.MouseY ?? 0}|{(int)f.ButtonState},"));
-                        lastF = f;
-                        lastF.Time = Math.Round(f.Time);
+                        // Rounding because stable could only parse integral values
+                        int timeRounded = (int)Math.Round(f.Time);
+                        replayData.Append(FormattableString.Invariant($"{timeRounded - lastTimeRounded}|{f.MouseX ?? 0}|{f.MouseY ?? 0}|{(int)f.ButtonState},"));
+                        lastTimeRounded = timeRounded;
                     }
                 }
 
