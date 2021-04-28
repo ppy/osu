@@ -147,7 +147,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Handles the selected items being scaled.
         /// </summary>
-        /// <param name="scale">The delta scale to apply, in playfield local coordinates.</param>
+        /// <param name="scale">The delta scale to apply, in local coordinates.</param>
         /// <param name="anchor">The point of reference where the scale is originating from.</param>
         /// <returns>Whether any items could be scaled.</returns>
         public virtual bool HandleScale(Vector2 scale, Anchor anchor) => false;
