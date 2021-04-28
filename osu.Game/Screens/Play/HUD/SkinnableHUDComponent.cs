@@ -16,11 +16,17 @@ namespace osu.Game.Screens.Play.HUD
     /// </summary>
     public abstract class SkinnableHUDComponent : SkinnableDrawable
     {
-        [SettingSource("Scale", "The scale at which this component should be displayed.")]
-        public BindableNumber<float> SkinScale { get; } = new BindableFloat(1);
+        [SettingSource("ScaleX", "The horizontal scale at which this component should be displayed.")]
+        public BindableNumber<float> SkinScaleX { get; } = new BindableFloat(1);
 
-        [SettingSource("Position", "The position at which this component should be displayed.")]
-        public BindableNumber<float> SkinPosition { get; } = new BindableFloat();
+        [SettingSource("ScaleY", "The vertical scale at which this component should be displayed.")]
+        public BindableNumber<float> SkinScaleY { get; } = new BindableFloat(1);
+
+        [SettingSource("PositionX", "The horizontal position at which this component should be displayed.")]
+        public BindableNumber<float> SkinPositionX { get; } = new BindableFloat();
+
+        [SettingSource("PositionY", "The vertical position at which this component should be displayed.")]
+        public BindableNumber<float> SkinPositionY { get; } = new BindableFloat();
 
         [SettingSource("Rotation", "The rotation at which this component should be displayed.")]
         public BindableNumber<float> SkinRotation { get; } = new BindableFloat();
@@ -31,8 +37,12 @@ namespace osu.Game.Screens.Play.HUD
         protected SkinnableHUDComponent(ISkinComponent component, Func<ISkinComponent, Drawable> defaultImplementation, Func<ISkinSource, bool> allowFallback = null, ConfineMode confineMode = ConfineMode.NoScaling)
             : base(component, defaultImplementation, allowFallback, confineMode)
         {
-            SkinScale.BindValueChanged(scale => Drawable.Scale = new Vector2(scale.NewValue));
-            SkinPosition.BindValueChanged(position => Position = new Vector2(position.NewValue));
+            SkinScaleX.BindValueChanged(x => Drawable.Scale = new Vector2(x.NewValue, Drawable.Scale.Y));
+            SkinScaleY.BindValueChanged(y => Drawable.Scale = new Vector2(Drawable.Scale.X, y.NewValue));
+
+            SkinPositionX.BindValueChanged(x => Position = new Vector2(x.NewValue, Position.Y));
+            SkinPositionY.BindValueChanged(y => Position = new Vector2(Position.X, y.NewValue));
+
             SkinRotation.BindValueChanged(rotation => Drawable.Rotation = rotation.NewValue);
             SkinAnchor.BindValueChanged(anchor =>
             {
@@ -42,8 +52,10 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
         {
-            SkinScale.Value = Drawable.Scale.X;
-            SkinPosition.Value = Position.X;
+            SkinScaleX.Value = Drawable.Scale.X;
+            SkinScaleY.Value = Drawable.Scale.Y;
+            SkinPositionX.Value = Position.X;
+            SkinPositionY.Value = Position.Y;
             SkinRotation.Value = Drawable.Rotation;
             SkinAnchor.Value = Anchor;
             return base.OnInvalidate(invalidation, source);
