@@ -3,6 +3,7 @@
 
 using Markdig;
 using Markdig.Extensions.AutoIdentifiers;
+using Markdig.Extensions.Tables;
 using Markdig.Extensions.Yaml;
 using Markdig.Syntax;
 using osu.Framework.Graphics.Containers;
@@ -33,6 +34,8 @@ namespace osu.Game.Graphics.Containers.Markdown
         protected override MarkdownSeparator CreateSeparator(ThematicBreakBlock thematicBlock) => new OsuMarkdownSeparator();
 
         protected override MarkdownQuoteBlock CreateQuoteBlock(QuoteBlock quoteBlock) => new OsuMarkdownQuoteBlock(quoteBlock);
+
+        protected override MarkdownTable CreateTable(Table table) => new OsuMarkdownTable(table);
 
         protected override MarkdownPipeline CreateBuilder()
             => new MarkdownPipelineBuilder().UseAutoIdentifiers(AutoIdentifierOptions.GitHub)
