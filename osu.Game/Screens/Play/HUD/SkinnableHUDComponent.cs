@@ -37,26 +37,26 @@ namespace osu.Game.Screens.Play.HUD
         protected SkinnableHUDComponent(ISkinComponent component, Func<ISkinComponent, Drawable> defaultImplementation, Func<ISkinSource, bool> allowFallback = null, ConfineMode confineMode = ConfineMode.NoScaling)
             : base(component, defaultImplementation, allowFallback, confineMode)
         {
-            SkinScaleX.BindValueChanged(x => Drawable.Scale = new Vector2(x.NewValue, Drawable.Scale.Y));
-            SkinScaleY.BindValueChanged(y => Drawable.Scale = new Vector2(Drawable.Scale.X, y.NewValue));
+            SkinScaleX.BindValueChanged(x => Scale = new Vector2(x.NewValue, Scale.Y));
+            SkinScaleY.BindValueChanged(y => Scale = new Vector2(Scale.X, y.NewValue));
 
             SkinPositionX.BindValueChanged(x => Position = new Vector2(x.NewValue, Position.Y));
             SkinPositionY.BindValueChanged(y => Position = new Vector2(Position.X, y.NewValue));
 
-            SkinRotation.BindValueChanged(rotation => Drawable.Rotation = rotation.NewValue);
-            SkinAnchor.BindValueChanged(anchor =>
-            {
-                Drawable.Anchor = anchor.NewValue;
-            });
+            SkinRotation.BindValueChanged(rotation => Rotation = rotation.NewValue);
+            SkinAnchor.BindValueChanged(anchor => { Anchor = anchor.NewValue; });
+
+            RelativeSizeAxes = Axes.None;
+            AutoSizeAxes = Axes.Both;
         }
 
         protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
         {
-            SkinScaleX.Value = Drawable.Scale.X;
-            SkinScaleY.Value = Drawable.Scale.Y;
+            SkinScaleX.Value = Scale.X;
+            SkinScaleY.Value = Scale.Y;
             SkinPositionX.Value = Position.X;
             SkinPositionY.Value = Position.Y;
-            SkinRotation.Value = Drawable.Rotation;
+            SkinRotation.Value = Rotation;
             SkinAnchor.Value = Anchor;
             return base.OnInvalidate(invalidation, source);
         }
