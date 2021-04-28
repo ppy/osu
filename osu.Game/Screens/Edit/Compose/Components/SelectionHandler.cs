@@ -312,7 +312,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         }
 
         /// <summary>
-        /// Triggered whenever the set of selected objects changes.
+        /// Triggered whenever the set of selected items changes.
         /// Should update the selection box's state to match supported operations.
         /// </summary>
         protected virtual void OnSelectionChanged()
