@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawables
         }
 
         /// <summary>
-        /// Get a random number in range [0,1) based on seed <see cref="RandomSeed"/>.
+        /// Get a random number in range [0,1] based on seed <see cref="RandomSeed"/>.
         /// </summary>
         public float RandomSingle(int series) => StatelessRNG.NextSingle(RandomSeed, series);
 
