@@ -95,8 +95,9 @@ namespace osu.Game.Scoring.Legacy
 
                     foreach (var f in score.Replay.Frames.OfType<IConvertibleReplayFrame>().Select(f => f.ToLegacy(beatmap)))
                     {
-                        replayData.Append(FormattableString.Invariant($"{(int)Math.Round(f.Time - lastF.Time)}|{f.MouseX ?? 0}|{f.MouseY ?? 0}|{(int)f.ButtonState},"));
+                        replayData.Append(FormattableString.Invariant($"{Math.Round(f.Time - lastF.Time)}|{f.MouseX ?? 0}|{f.MouseY ?? 0}|{(int)f.ButtonState},"));
                         lastF = f;
+                        lastF.Time = Math.Round(f.Time);
                     }
                 }
 
