@@ -76,9 +76,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected virtual DragBox CreateDragBox(Action<RectangleF> performSelect) => new DragBox(performSelect);
 
         /// <summary>
-        /// Whether this component is in a state where deselection should be allowed. If false, selection will only be added to.
+        /// Whether this component is in a state where items outside a drag selection should be deselected. If false, selection will only be added to.
         /// </summary>
-        protected virtual bool AllowDeselection => true;
+        protected virtual bool AllowDeselectionDuringDrag => true;
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
@@ -354,7 +354,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         break;
 
                     case SelectionState.Selected:
-                        if (AllowDeselection && !isValidForSelection())
+                        if (AllowDeselectionDuringDrag && !isValidForSelection())
                             blueprint.Deselect();
                         break;
                 }
