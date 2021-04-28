@@ -51,6 +51,15 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestLinkWithInlineText()
+        {
+            AddStep("Add Link with inline text", () =>
+            {
+                markdownContainer.Text = "Hey, [welcome to osu!](https://osu.ppy.sh) Please enjoy the game.";
+            });
+        }
+
+        [Test]
         public void TestFencedCodeBlock()
         {
             AddStep("Add Code Block", () =>
