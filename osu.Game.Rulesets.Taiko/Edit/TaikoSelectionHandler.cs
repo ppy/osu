@@ -80,6 +80,9 @@ namespace osu.Game.Rulesets.Taiko.Edit
 
             if (selection.All(s => s.Item is TaikoHitObject))
                 yield return new TernaryStateMenuItem("Strong") { State = { BindTarget = selectionStrongState } };
+
+            foreach (var item in base.GetContextMenuItemsForSelection(selection))
+                yield return item;
         }
 
         public override bool HandleMovement(MoveSelectionEvent<HitObject> moveEvent) => true;

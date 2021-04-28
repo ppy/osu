@@ -7,7 +7,6 @@ using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Audio;
 using osu.Game.Graphics.UserInterface;
@@ -17,7 +16,7 @@ using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
-    public class EditorSelectionHandler : SelectionHandler<HitObject>, IHasContextMenu
+    public class EditorSelectionHandler : SelectionHandler<HitObject>
     {
         [Resolved]
         protected EditorBeatmap EditorBeatmap { get; private set; }
@@ -171,46 +170,24 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         #region Context Menu
 
-        public MenuItem[] ContextMenuItems
-        {
-            get
-            {
-                if (!SelectedBlueprints.Any(b => b.IsHovered))
-                    return Array.Empty<MenuItem>();
-
-                var items = new List<MenuItem>();
-
-                items.AddRange(GetContextMenuItemsForSelection(SelectedBlueprints));
-
-                if (SelectedBlueprints.All(b => b.Item is IHasComboInformation))
-                {
-                    items.Add(new TernaryStateMenuItem("New combo") { State = { BindTarget = SelectionNewComboState } });
-                }
-
-                if (SelectedBlueprints.Count == 1)
-                    items.AddRange(SelectedBlueprints[0].ContextMenuItems);
-
-                items.AddRange(new[]
-                {
-                    new OsuMenuItem("Sound")
-                    {
-                        Items = SelectionSampleStates.Select(kvp =>
-                            new TernaryStateMenuItem(kvp.Value.Description) { State = { BindTarget = kvp.Value } }).ToArray()
-                    },
-                    new OsuMenuItem("Delete", MenuItemType.Destructive, DeleteSelected),
-                });
-
-                return items.ToArray();
-            }
-        }
-
         /// <summary>
         /// Provide context menu items relevant to current selection. Calling base is not required.
         /// </summary>
         /// <param name="selection">The current selection.</param>
         /// <returns>The relevant menu items.</returns>
-        protected virtual IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<HitObject>> selection)
-            => Enumerable.Empty<MenuItem>();
+        protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<HitObject>> selection)
+        {
+            if (SelectedBlueprints.All(b => b.Item is IHasComboInformation))
+            {
+                yield return new TernaryStateMenuItem("New combo") { State = { BindTarget = SelectionNewComboState } };
+            }
+
+            yield return new OsuMenuItem("Sound")
+            {
+                Items = SelectionSampleStates.Select(kvp =>
+                    new TernaryStateMenuItem(kvp.Value.Description) { State = { BindTarget = kvp.Value } }).ToArray()
+            };
+        }
 
         #endregion
     }

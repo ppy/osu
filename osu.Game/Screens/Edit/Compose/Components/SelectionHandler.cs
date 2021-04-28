@@ -8,12 +8,15 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osuTK;
 using osuTK.Input;
@@ -23,7 +26,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// <summary>
     /// A component which outlines items and handles movement of selections.
     /// </summary>
-    public abstract class SelectionHandler<T> : CompositeDrawable, IKeyBindingHandler<PlatformAction>
+    public abstract class SelectionHandler<T> : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IHasContextMenu
     {
         /// <summary>
         /// The currently selected blueprints.
@@ -339,6 +342,38 @@ namespace osu.Game.Screens.Edit.Compose.Components
             content.Size = bottomRight - topLeft;
             content.Position = topLeft;
         }
+
+        #endregion
+
+        #region Context Menu
+
+        public MenuItem[] ContextMenuItems
+        {
+            get
+            {
+                if (!SelectedBlueprints.Any(b => b.IsHovered))
+                    return Array.Empty<MenuItem>();
+
+                var items = new List<MenuItem>();
+
+                items.AddRange(GetContextMenuItemsForSelection(SelectedBlueprints));
+
+                if (SelectedBlueprints.Count == 1)
+                    items.AddRange(SelectedBlueprints[0].ContextMenuItems);
+
+                items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, DeleteSelected));
+
+                return items.ToArray();
+            }
+        }
+
+        /// <summary>
+        /// Provide context menu items relevant to current selection. Calling base is not required.
+        /// </summary>
+        /// <param name="selection">The current selection.</param>
+        /// <returns>The relevant menu items.</returns>
+        protected virtual IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<T>> selection)
+            => Enumerable.Empty<MenuItem>();
 
         #endregion
     }
