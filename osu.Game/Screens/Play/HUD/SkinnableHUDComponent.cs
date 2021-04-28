@@ -34,7 +34,10 @@ namespace osu.Game.Screens.Play.HUD
             SkinScale.BindValueChanged(scale => Drawable.Scale = new Vector2(scale.NewValue));
             SkinPosition.BindValueChanged(position => Position = new Vector2(position.NewValue));
             SkinRotation.BindValueChanged(rotation => Drawable.Rotation = rotation.NewValue);
-            SkinAnchor.BindValueChanged(anchor => Anchor = anchor.NewValue);
+            SkinAnchor.BindValueChanged(anchor =>
+            {
+                Drawable.Anchor = anchor.NewValue;
+            });
         }
 
         protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
