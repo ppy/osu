@@ -167,14 +167,13 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <param name="time">The time to find the closest snapped time to.</param>
         /// <param name="beatDivisor">The beat divisor to snap to.</param>
         /// <param name="referenceTime">An optional reference point to use for timing point lookup.</param>
-        public int GetClosestSnappedTime(double time, int beatDivisor, double? referenceTime = null)
+        public double GetClosestSnappedTime(double time, int beatDivisor, double? referenceTime = null)
         {
             var timingPoint = TimingPointAt(referenceTime ?? time);
             var beatLength = timingPoint.BeatLength / beatDivisor;
             var beatLengths = (int)Math.Round((time - timingPoint.Time) / beatLength, MidpointRounding.AwayFromZero);
 
-            // Casting to int matches stable.
-            return (int)(timingPoint.Time + beatLengths * beatLength);
+            return timingPoint.Time + beatLengths * beatLength;
         }
 
         /// <summary>
@@ -182,7 +181,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         /// <param name="time">The time to find the closest snapped time to.</param>
         /// <param name="referenceTime">An optional reference point to use for timing point lookup.</param>
-        public int GetClosestSnappedTime(double time, double? referenceTime = null)
+        public double GetClosestSnappedTime(double time, double? referenceTime = null)
         {
             return GetClosestSnappedTime(time, GetClosestBeatDivisor(time, referenceTime), referenceTime);
         }
