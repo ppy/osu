@@ -98,7 +98,10 @@ namespace osu.Game.Skinning.Editor
             adjustScaleFromAnchor(ref scale, anchor);
 
             foreach (var c in SelectedBlueprints)
-                c.Item.SkinScale.Value += scale.X * 0.01f;
+            {
+                c.Item.SkinScaleX.Value += scale.X * 0.01f;
+                c.Item.SkinScaleY.Value += scale.Y * 0.01f;
+            }
 
             return true;
         }
@@ -106,7 +109,11 @@ namespace osu.Game.Skinning.Editor
         public override bool HandleMovement(MoveSelectionEvent<SkinnableHUDComponent> moveEvent)
         {
             foreach (var c in SelectedBlueprints)
-                c.Item.SkinPosition.Value += moveEvent.InstantDelta.X;
+            {
+                c.Item.SkinPositionX.Value += moveEvent.InstantDelta.X;
+                c.Item.SkinPositionY.Value += moveEvent.InstantDelta.Y;
+            }
+
             return true;
         }
 
