@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
@@ -35,6 +36,8 @@ namespace osu.Game.Screens.Play.HUD
             : base(new HUDSkinComponent(HUDSkinComponents.HealthDisplay), _ => new DefaultHealthDisplay())
         {
             CentreComponent = false;
+            AutoSizeAxes = Axes.Y;
+            RelativeSizeAxes = Axes.X;
         }
 
         private IHealthDisplay skinnedCounter;

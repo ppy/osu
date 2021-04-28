@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play.HUD
@@ -14,6 +15,7 @@ namespace osu.Game.Screens.Play.HUD
             : base(new HUDSkinComponent(HUDSkinComponents.AccuracyCounter), _ => new DefaultAccuracyCounter())
         {
             CentreComponent = false;
+            AutoSizeAxes = Axes.Both;
         }
 
         private IAccuracyCounter skinnedCounter;
