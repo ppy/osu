@@ -32,6 +32,8 @@ namespace osu.Game.Graphics.Containers.Markdown
 
         protected override MarkdownSeparator CreateSeparator(ThematicBreakBlock thematicBlock) => new OsuMarkdownSeparator();
 
+        protected override MarkdownQuoteBlock CreateQuoteBlock(QuoteBlock quoteBlock) => new OsuMarkdownQuoteBlock(quoteBlock);
+
         protected override MarkdownPipeline CreateBuilder()
             => new MarkdownPipelineBuilder().UseAutoIdentifiers(AutoIdentifierOptions.GitHub)
                                             .UseEmojiAndSmiley()
