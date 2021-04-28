@@ -354,7 +354,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         break;
 
                     case SelectionState.Selected:
-                        // if the editor is playing, we generally don't want to deselect objects even if outside the selection area.
                         if (AllowDeselection && !isValidForSelection())
                             blueprint.Deselect();
                         break;
