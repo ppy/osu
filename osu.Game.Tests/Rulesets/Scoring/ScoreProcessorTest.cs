@@ -95,6 +95,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(ScoringMode.Classic, HitResult.SmallTickHit, HitResult.SmallTickHit, 225)] // (((3 * 10) / (4 * 10)) * 1 * 300) * (1 + 0 / 25)
         [TestCase(ScoringMode.Classic, HitResult.LargeTickMiss, HitResult.LargeTickHit, 0)] // (0 * 4 * 300) * (1 + 0 / 25)
         [TestCase(ScoringMode.Classic, HitResult.LargeTickHit, HitResult.LargeTickHit, 936)] // (((3 * 50) / (4 * 50)) * 4 * 300) * (1 + 1 / 25)
+        // TODO: The following two cases don't match expectations currently (a single hit is registered in acc portion when it shouldn't be). See https://github.com/ppy/osu/issues/12604.
         [TestCase(ScoringMode.Classic, HitResult.SmallBonus, HitResult.SmallBonus, 330)] // (1 * 1 * 300) * (1 + 0 / 25) + 3 * 10 (bonus points)
         [TestCase(ScoringMode.Classic, HitResult.LargeBonus, HitResult.LargeBonus, 450)] // (1 * 1 * 300) * (1 + 0 / 25) + 3 * 50 (bonus points)
         public void TestFourVariousResultsOneMiss(ScoringMode scoringMode, HitResult hitResult, HitResult maxResult, int expectedScore)
