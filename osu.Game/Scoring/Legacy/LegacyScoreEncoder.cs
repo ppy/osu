@@ -8,7 +8,6 @@ using System.Text;
 using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.IO.Legacy;
-using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Replays.Types;
 using SharpCompress.Compressors.LZMA;
 
@@ -91,13 +90,14 @@ namespace osu.Game.Scoring.Legacy
 
                 if (score.Replay != null)
                 {
-                    int lastTimeRounded = 0;
+                    int lastTime = 0;
+
                     foreach (var f in score.Replay.Frames.OfType<IConvertibleReplayFrame>().Select(f => f.ToLegacy(beatmap)))
                     {
                         // Rounding because stable could only parse integral values
-                        int timeRounded = (int)Math.Round(f.Time);
-                        replayData.Append(FormattableString.Invariant($"{timeRounded - lastTimeRounded}|{f.MouseX ?? 0}|{f.MouseY ?? 0}|{(int)f.ButtonState},"));
-                        lastTimeRounded = timeRounded;
+                        int time = (int)Math.Round(f.Time);
+                        replayData.Append(FormattableString.Invariant($"{time - lastTime}|{f.MouseX ?? 0}|{f.MouseY ?? 0}|{(int)f.ButtonState},"));
+                        lastTime = time;
                     }
                 }
 
