@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Objects.Pooling
         /// <summary>
         /// The entry holding essential state of this <see cref="PoolableDrawableWithLifetime{TEntry}"/>.
         /// </summary>
-        protected TEntry? Entry { get; private set; }
+        public TEntry? Entry { get; private set; }
 
         /// <summary>
         /// Whether <see cref="Entry"/> is applied to this <see cref="PoolableDrawableWithLifetime{TEntry}"/>.
