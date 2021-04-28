@@ -122,7 +122,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         #endregion
 
-        #region Sample Changes
+        #region Ternary state changes
 
         /// <summary>
         /// Adds a hit sample to all selected <see cref="HitObject"/>s.
@@ -141,6 +141,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
         }
 
         /// <summary>
+        /// Removes a hit sample from all selected <see cref="HitObject"/>s.
+        /// </summary>
+        /// <param name="sampleName">The name of the hit sample.</param>
+        public void RemoveHitSample(string sampleName)
+        {
+            EditorBeatmap.PerformOnSelection(h => h.SamplesBindable.RemoveAll(s => s.Name == sampleName));
+        }
+
+        /// <summary>
         /// Set the new combo state of all selected <see cref="HitObject"/>s.
         /// </summary>
         /// <param name="state">Whether to set or unset.</param>
@@ -156,15 +165,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 comboInfo.NewCombo = state;
                 EditorBeatmap.Update(h);
             });
-        }
-
-        /// <summary>
-        /// Removes a hit sample from all selected <see cref="HitObject"/>s.
-        /// </summary>
-        /// <param name="sampleName">The name of the hit sample.</param>
-        public void RemoveHitSample(string sampleName)
-        {
-            EditorBeatmap.PerformOnSelection(h => h.SamplesBindable.RemoveAll(s => s.Name == sampleName));
         }
 
         #endregion
