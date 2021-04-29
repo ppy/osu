@@ -125,7 +125,8 @@ namespace Mvis.Plugin.RulesetPanel
             {
                 if (!Disabled.Value) beatmapLogo.ResponseOnBeatmapChanges();
             };
-            onMvisBeatmapChanged(MvisScreen.Beatmap.Value);
+
+            beatmapLogo.ResponseOnBeatmapChanges();
 
             return true;
         }
@@ -152,8 +153,12 @@ namespace Mvis.Plugin.RulesetPanel
         public override void UnLoad()
         {
             MvisScreen.OnBeatmapChanged -= onMvisBeatmapChanged;
-            MvisScreen.OnScreenExiting -= beatmapLogo.StopResponseOnBeatmapChanges;
-            MvisScreen.OnScreenSuspending -= beatmapLogo.StopResponseOnBeatmapChanges;
+
+            if (ContentLoaded)
+            {
+                MvisScreen.OnScreenExiting -= beatmapLogo.StopResponseOnBeatmapChanges;
+                MvisScreen.OnScreenSuspending -= beatmapLogo.StopResponseOnBeatmapChanges;
+            }
             Value.UnbindAll();
             Disable();
 
