@@ -51,6 +51,7 @@ using osu.Game.Utils;
 using LogLevel = osu.Framework.Logging.LogLevel;
 using osu.Game.Database;
 using osu.Game.IO;
+using osu.Game.Skinning.Editor;
 
 namespace osu.Game
 {
@@ -597,6 +598,8 @@ namespace osu.Game
                 screenContainer = new ScalingContainer(ScalingMode.ExcludeOverlays)
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     Children = new Drawable[]
                     {
                         receptor = new BackButton.Receptor(),
@@ -616,6 +619,7 @@ namespace osu.Game
                         logoContainer = new Container { RelativeSizeAxes = Axes.Both },
                     }
                 },
+                skinEditor = new SkinEditorContainer(screenContainer),
                 overlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 rightFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 leftFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
@@ -942,6 +946,8 @@ namespace osu.Game
 
         private ScalingContainer screenContainer;
 
+        private SkinEditorContainer skinEditor;
+
         protected override bool OnExiting()
         {
             if (ScreenStack.CurrentScreen is Loader)
@@ -968,6 +974,8 @@ namespace osu.Game
 
         protected virtual void ScreenChanged(IScreen current, IScreen newScreen)
         {
+            skinEditor.Reset();
+
             switch (newScreen)
             {
                 case IntroScreen intro:
