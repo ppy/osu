@@ -10,6 +10,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -42,15 +43,13 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             public Action EditPlaylist;
 
-            public OsuTextBox NameField, MaxParticipantsField;
+            public OsuTextBox NameField, MaxParticipantsField, MaxAttemptsField;
             public OsuDropdown<TimeSpan> DurationField;
             public RoomAvailabilityPicker AvailabilityPicker;
-            public GameTypePicker TypePicker;
             public TriangleButton ApplyButton;
 
             public OsuSpriteText ErrorText;
 
-            private OsuSpriteText typeLabel;
             private LoadingLayer loadingLayer;
             private DrawableRoomPlaylist playlist;
             private OsuSpriteText playlistLength;
@@ -134,36 +133,21 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                 }
                                                             }
                                                         },
+                                                        new Section("Allowed attempts (across all playlist items)")
+                                                        {
+                                                            Child = MaxAttemptsField = new SettingsNumberTextBox
+                                                            {
+                                                                RelativeSizeAxes = Axes.X,
+                                                                TabbableContentContainer = this,
+                                                                PlaceholderText = "Unlimited",
+                                                            },
+                                                        },
                                                         new Section("Room visibility")
                                                         {
                                                             Alpha = disabled_alpha,
                                                             Child = AvailabilityPicker = new RoomAvailabilityPicker
                                                             {
                                                                 Enabled = { Value = false }
-                                                            },
-                                                        },
-                                                        new Section("Game type")
-                                                        {
-                                                            Alpha = disabled_alpha,
-                                                            Child = new FillFlowContainer
-                                                            {
-                                                                AutoSizeAxes = Axes.Y,
-                                                                RelativeSizeAxes = Axes.X,
-                                                                Direction = FillDirection.Vertical,
-                                                                Spacing = new Vector2(7),
-                                                                Children = new Drawable[]
-                                                                {
-                                                                    TypePicker = new GameTypePicker
-                                                                    {
-                                                                        RelativeSizeAxes = Axes.X,
-                                                                        Enabled = { Value = false }
-                                                                    },
-                                                                    typeLabel = new OsuSpriteText
-                                                                    {
-                                                                        Font = OsuFont.GetFont(size: 14),
-                                                                        Colour = colours.Yellow
-                                                                    },
-                                                                },
                                                             },
                                                         },
                                                         new Section("Max participants")
@@ -200,7 +184,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                             Child = new GridContainer
                                                             {
                                                                 RelativeSizeAxes = Axes.X,
-                                                                Height = 300,
+                                                                Height = 500,
                                                                 Content = new[]
                                                                 {
                                                                     new Drawable[]
@@ -294,11 +278,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     loadingLayer = new LoadingLayer(true)
                 };
 
-                TypePicker.Current.BindValueChanged(type => typeLabel.Text = type.NewValue?.Name ?? string.Empty, true);
                 RoomName.BindValueChanged(name => NameField.Text = name.NewValue, true);
                 Availability.BindValueChanged(availability => AvailabilityPicker.Current.Value = availability.NewValue, true);
-                Type.BindValueChanged(type => TypePicker.Current.Value = type.NewValue, true);
                 MaxParticipants.BindValueChanged(count => MaxParticipantsField.Text = count.NewValue?.ToString(), true);
+                MaxAttempts.BindValueChanged(count => MaxAttemptsField.Text = count.NewValue?.ToString(), true);
                 Duration.BindValueChanged(duration => DurationField.Current.Value = duration.NewValue ?? TimeSpan.FromMinutes(30), true);
 
                 playlist.Items.BindTo(Playlist);
@@ -326,12 +309,16 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
                 RoomName.Value = NameField.Text;
                 Availability.Value = AvailabilityPicker.Current.Value;
-                Type.Value = TypePicker.Current.Value;
 
                 if (int.TryParse(MaxParticipantsField.Text, out int max))
                     MaxParticipants.Value = max;
                 else
                     MaxParticipants.Value = null;
+
+                if (int.TryParse(MaxAttemptsField.Text, out max))
+                    MaxAttempts.Value = max;
+                else
+                    MaxAttempts.Value = null;
 
                 Duration.Value = DurationField.Current.Value;
 
@@ -376,7 +363,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 Menu.MaxHeight = 100;
             }
 
-            protected override string GenerateItemText(TimeSpan item) => item.Humanize();
+            protected override LocalisableString GenerateItemText(TimeSpan item) => item.Humanize();
         }
     }
 }

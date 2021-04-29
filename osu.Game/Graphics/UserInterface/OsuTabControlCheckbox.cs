@@ -11,6 +11,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -35,7 +36,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        public string Text
+        public LocalisableString Text
         {
             get => text.Text;
             set => text.Text = value;

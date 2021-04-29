@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Edit
 
         protected ComposeBlueprintContainer BlueprintContainer { get; private set; }
 
-        private DrawableEditRulesetWrapper<TObject> drawableRulesetWrapper;
+        private DrawableEditorRulesetWrapper<TObject> drawableRulesetWrapper;
 
         protected readonly Container LayerBelowRuleset = new Container { RelativeSizeAxes = Axes.Both };
 
@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Edit
 
             try
             {
-                drawableRulesetWrapper = new DrawableEditRulesetWrapper<TObject>(CreateDrawableRuleset(Ruleset, EditorBeatmap.PlayableBeatmap, new[] { Ruleset.GetAutoplayMod() }))
+                drawableRulesetWrapper = new DrawableEditorRulesetWrapper<TObject>(CreateDrawableRuleset(Ruleset, EditorBeatmap.PlayableBeatmap, new[] { Ruleset.GetAutoplayMod() }))
                 {
                     Clock = EditorClock,
                     ProcessCustomClock = false
@@ -437,6 +437,8 @@ namespace osu.Game.Rulesets.Edit
         /// Whether the user's cursor is currently in an area of the <see cref="HitObjectComposer"/> that is valid for placement.
         /// </summary>
         public abstract bool CursorInPlacementArea { get; }
+
+        public virtual string ConvertSelectionToString() => string.Empty;
 
         #region IPositionSnapProvider
 

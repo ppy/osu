@@ -3,7 +3,6 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -12,16 +11,6 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// </summary>
     public class DrawableTaikoJudgement : DrawableJudgement
     {
-        /// <summary>
-        /// Creates a new judgement text.
-        /// </summary>
-        /// <param name="judgedObject">The object which is being judged.</param>
-        /// <param name="result">The judgement to visualise.</param>
-        public DrawableTaikoJudgement(JudgementResult result, DrawableHitObject judgedObject)
-            : base(result, judgedObject)
-        {
-        }
-
         protected override void ApplyHitAnimations()
         {
             this.MoveToY(-100, 500);

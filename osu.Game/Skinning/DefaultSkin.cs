@@ -24,7 +24,7 @@ namespace osu.Game.Skinning
 
         public override Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => null;
 
-        public override SampleChannel GetSample(ISampleInfo sampleInfo) => null;
+        public override ISample GetSample(ISampleInfo sampleInfo) => null;
 
         public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
         {

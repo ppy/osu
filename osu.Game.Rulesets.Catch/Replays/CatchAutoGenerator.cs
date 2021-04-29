@@ -45,6 +45,11 @@ namespace osu.Game.Rulesets.Catch.Replays
                 float positionChange = Math.Abs(lastPosition - h.EffectiveX);
                 double timeAvailable = h.StartTime - lastTime;
 
+                if (timeAvailable < 0)
+                {
+                    return;
+                }
+
                 // So we can either make it there without a dash or not.
                 // If positionChange is 0, we don't need to move, so speedRequired should also be 0 (could be NaN if timeAvailable is 0 too)
                 // The case where positionChange > 0 and timeAvailable == 0 results in PositiveInfinity which provides expected beheaviour.
@@ -120,10 +125,6 @@ namespace osu.Game.Rulesets.Catch.Replays
 
         private void addFrame(double time, float? position = null, bool dashing = false)
         {
-            // todo: can be removed once FramedReplayInputHandler correctly handles rewinding before first frame.
-            if (Replay.Frames.Count == 0)
-                Replay.Frames.Add(new CatchReplayFrame(time - 1, position, false, null));
-
             var last = currentFrame;
             currentFrame = new CatchReplayFrame(time, position, dashing, last);
             Replay.Frames.Add(currentFrame);

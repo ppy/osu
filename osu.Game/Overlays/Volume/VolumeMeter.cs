@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -176,6 +177,7 @@ namespace osu.Game.Overlays.Volume
                     }
                 }
             };
+
             Bindable.ValueChanged += volume =>
             {
                 this.TransformTo("DisplayVolume",
@@ -183,6 +185,7 @@ namespace osu.Game.Overlays.Volume
                     400,
                     Easing.OutQuint);
             };
+
             bgProgress.Current.Value = 0.75f;
         }
 
@@ -223,7 +226,7 @@ namespace osu.Game.Overlays.Volume
             private set => Bindable.Value = value;
         }
 
-        private const double adjust_step = 0.05;
+        private const double adjust_step = 0.01;
 
         public void Increase(double amount = 1, bool isPrecise = false) => adjust(amount, isPrecise);
         public void Decrease(double amount = 1, bool isPrecise = false) => adjust(-amount, isPrecise);
@@ -231,16 +234,43 @@ namespace osu.Game.Overlays.Volume
         // because volume precision is set to 0.01, this local is required to keep track of more precise adjustments and only apply when possible.
         private double scrollAccumulation;
 
+        private double accelerationModifier = 1;
+
+        private const double max_acceleration = 5;
+        private const double acceleration_multiplier = 1.8;
+
+        private ScheduledDelegate accelerationDebounce;
+
+        private void resetAcceleration() => accelerationModifier = 1;
+
         private void adjust(double delta, bool isPrecise)
         {
-            scrollAccumulation += delta * adjust_step * (isPrecise ? 0.1 : 1);
+            if (delta == 0)
+                return;
+
+            // every adjust increment increases the rate at which adjustments happen up to a cutoff.
+            // this debounce will reset on inactivity.
+            accelerationDebounce?.Cancel();
+            accelerationDebounce = Scheduler.AddDelayed(resetAcceleration, 150);
+
+            delta *= accelerationModifier;
+            accelerationModifier = Math.Min(max_acceleration, accelerationModifier * acceleration_multiplier);
 
             var precision = Bindable.Precision;
 
-            while (Precision.AlmostBigger(Math.Abs(scrollAccumulation), precision))
+            if (isPrecise)
             {
-                Volume += Math.Sign(scrollAccumulation) * precision;
-                scrollAccumulation = scrollAccumulation < 0 ? Math.Min(0, scrollAccumulation + precision) : Math.Max(0, scrollAccumulation - precision);
+                scrollAccumulation += delta * adjust_step * 0.1;
+
+                while (Precision.AlmostBigger(Math.Abs(scrollAccumulation), precision))
+                {
+                    Volume += Math.Sign(scrollAccumulation) * precision;
+                    scrollAccumulation = scrollAccumulation < 0 ? Math.Min(0, scrollAccumulation + precision) : Math.Max(0, scrollAccumulation - precision);
+                }
+            }
+            else
+            {
+                Volume += Math.Sign(delta) * Math.Max(precision, Math.Abs(delta * adjust_step));
             }
         }
 

@@ -6,7 +6,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -84,15 +83,16 @@ namespace osu.Game.Screens.Play.HUD
         {
             InternalChildren = new[]
             {
-                displayedCountSpriteText = createSpriteText().With(s =>
+                popOutCount = new LegacySpriteText(skin, LegacyFont.Combo)
                 {
-                    s.Alpha = 0;
-                }),
-                popOutCount = createSpriteText().With(s =>
+                    Alpha = 0,
+                    Margin = new MarginPadding(0.05f),
+                    Blending = BlendingParameters.Additive,
+                },
+                displayedCountSpriteText = new LegacySpriteText(skin, LegacyFont.Combo)
                 {
-                    s.Alpha = 0;
-                    s.Margin = new MarginPadding(0.05f);
-                })
+                    Alpha = 0,
+                },
             };
 
             Current.ValueChanged += combo => updateCount(combo.NewValue == 0);
@@ -246,7 +246,5 @@ namespace osu.Game.Screens.Play.HUD
             double difference = currentValue > newValue ? currentValue - newValue : newValue - currentValue;
             return difference * rolling_duration;
         }
-
-        private OsuSpriteText createSpriteText() => (OsuSpriteText)skin.GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ComboText));
     }
 }

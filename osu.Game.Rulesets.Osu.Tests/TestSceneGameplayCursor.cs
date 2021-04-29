@@ -4,13 +4,22 @@
 using System;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Textures;
+using osu.Framework.Input;
 using osu.Framework.Testing.Input;
 using osu.Framework.Utils;
+using osu.Game.Audio;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Screens.Play;
+using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
@@ -21,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Cached]
         private GameplayBeatmap gameplayBeatmap;
 
-        private ClickingCursorContainer lastContainer;
+        private OsuCursorContainer lastContainer;
 
         [Resolved]
         private OsuConfigManager config { get; set; }
@@ -46,14 +55,12 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddSliderStep("circle size", 0f, 10f, 0f, val =>
             {
-                config.Set(OsuSetting.AutoCursorSize, true);
+                config.SetValue(OsuSetting.AutoCursorSize, true);
                 gameplayBeatmap.BeatmapInfo.BaseDifficulty.CircleSize = val;
-                Scheduler.AddOnce(recreate);
+                Scheduler.AddOnce(() => loadContent(false));
             });
 
-            AddStep("test cursor container", recreate);
-
-            void recreate() => SetContents(() => new OsuInputManager(new OsuRuleset().RulesetInfo) { Child = new OsuCursorContainer() });
+            AddStep("test cursor container", () => loadContent(false));
         }
 
         [TestCase(1, 1)]
@@ -64,34 +71,62 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(10, 1.5f)]
         public void TestSizing(int circleSize, float userScale)
         {
-            AddStep($"set user scale to {userScale}", () => config.Set(OsuSetting.GameplayCursorSize, userScale));
+            AddStep($"set user scale to {userScale}", () => config.SetValue(OsuSetting.GameplayCursorSize, userScale));
             AddStep($"adjust cs to {circleSize}", () => gameplayBeatmap.BeatmapInfo.BaseDifficulty.CircleSize = circleSize);
-            AddStep("turn on autosizing", () => config.Set(OsuSetting.AutoCursorSize, true));
+            AddStep("turn on autosizing", () => config.SetValue(OsuSetting.AutoCursorSize, true));
 
-            AddStep("load content", loadContent);
+            AddStep("load content", () => loadContent());
 
             AddUntilStep("cursor size correct", () => lastContainer.ActiveCursor.Scale.X == OsuCursorContainer.GetScaleForCircleSize(circleSize) * userScale);
 
-            AddStep("set user scale to 1", () => config.Set(OsuSetting.GameplayCursorSize, 1f));
+            AddStep("set user scale to 1", () => config.SetValue(OsuSetting.GameplayCursorSize, 1f));
             AddUntilStep("cursor size correct", () => lastContainer.ActiveCursor.Scale.X == OsuCursorContainer.GetScaleForCircleSize(circleSize));
 
-            AddStep("turn off autosizing", () => config.Set(OsuSetting.AutoCursorSize, false));
+            AddStep("turn off autosizing", () => config.SetValue(OsuSetting.AutoCursorSize, false));
             AddUntilStep("cursor size correct", () => lastContainer.ActiveCursor.Scale.X == 1);
 
-            AddStep($"set user scale to {userScale}", () => config.Set(OsuSetting.GameplayCursorSize, userScale));
+            AddStep($"set user scale to {userScale}", () => config.SetValue(OsuSetting.GameplayCursorSize, userScale));
             AddUntilStep("cursor size correct", () => lastContainer.ActiveCursor.Scale.X == userScale);
         }
 
-        private void loadContent()
+        [Test]
+        public void TestTopLeftOrigin()
         {
-            SetContents(() => new MovingCursorInputManager
+            AddStep("load content", () => loadContent(false, () => new SkinProvidingContainer(new TopLeftCursorSkin())));
+        }
+
+        private void loadContent(bool automated = true, Func<SkinProvidingContainer> skinProvider = null)
+        {
+            SetContents(() =>
             {
-                Child = lastContainer = new ClickingCursorContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                }
+                var inputManager = automated ? (InputManager)new MovingCursorInputManager() : new OsuInputManager(new OsuRuleset().RulesetInfo);
+                var skinContainer = skinProvider?.Invoke() ?? new SkinProvidingContainer(null);
+
+                lastContainer = automated ? new ClickingCursorContainer() : new OsuCursorContainer();
+
+                return inputManager.WithChild(skinContainer.WithChild(lastContainer));
             });
+        }
+
+        private class TopLeftCursorSkin : ISkin
+        {
+            public Drawable GetDrawableComponent(ISkinComponent component) => null;
+            public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => null;
+            public ISample GetSample(ISampleInfo sampleInfo) => null;
+
+            public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
+            {
+                switch (lookup)
+                {
+                    case OsuSkinConfiguration osuLookup:
+                        if (osuLookup == OsuSkinConfiguration.CursorCentre)
+                            return SkinUtils.As<TValue>(new BindableBool(false));
+
+                        break;
+                }
+
+                return null;
+            }
         }
 
         private class ClickingCursorContainer : OsuCursorContainer

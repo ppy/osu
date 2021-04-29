@@ -110,8 +110,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             double startTime = start.GetEndTime();
             double duration = end.StartTime - startTime;
 
+            // Preempt time can go below 800ms. Normally, this is achieved via the DT mod which uniformly speeds up all animations game wide regardless of AR.
+            // This uniform speedup is hard to match 1:1, however we can at least make AR>10 (via mods) feel good by extending the upper linear preempt function (see: OsuHitObject).
+            // Note that this doesn't exactly match the AR>10 visuals as they're classically known, but it feels good.
+            double preempt = PREEMPT * Math.Min(1, start.TimePreempt / OsuHitObject.PREEMPT_MIN);
+
             fadeOutTime = startTime + fraction * duration;
-            fadeInTime = fadeOutTime - PREEMPT;
+            fadeInTime = fadeOutTime - preempt;
         }
     }
 }

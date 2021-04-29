@@ -25,6 +25,8 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         public bool UserScrolling { get; private set; }
 
+        public void CancelUserScroll() => UserScrolling = false;
+
         public UserTrackingScrollContainer()
         {
         }
@@ -44,6 +46,12 @@ namespace osu.Game.Graphics.Containers
         {
             UserScrolling = false;
             base.ScrollTo(value, animated, distanceDecay);
+        }
+
+        public new void ScrollToEnd(bool animated = true, bool allowDuringDrag = false)
+        {
+            UserScrolling = false;
+            base.ScrollToEnd(animated, allowDuringDrag);
         }
     }
 }

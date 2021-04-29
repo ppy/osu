@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
+using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
@@ -19,6 +20,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
@@ -68,6 +70,50 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 kvp.Value.BindValueChanged(_ => updatePlacementSamples());
             }
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.ControlPressed)
+            {
+                switch (e.Key)
+                {
+                    case Key.Left:
+                        moveSelection(new Vector2(-1, 0));
+                        return true;
+
+                    case Key.Right:
+                        moveSelection(new Vector2(1, 0));
+                        return true;
+
+                    case Key.Up:
+                        moveSelection(new Vector2(0, -1));
+                        return true;
+
+                    case Key.Down:
+                        moveSelection(new Vector2(0, 1));
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Move the current selection spatially by the specified delta, in gamefield coordinates (ie. the same coordinates as the blueprints).
+        /// </summary>
+        /// <param name="delta"></param>
+        private void moveSelection(Vector2 delta)
+        {
+            var firstBlueprint = SelectionHandler.SelectedBlueprints.FirstOrDefault();
+
+            if (firstBlueprint == null)
+                return;
+
+            // convert to game space coordinates
+            delta = firstBlueprint.ToScreenSpace(delta) - firstBlueprint.ToScreenSpace(Vector2.Zero);
+
+            SelectionHandler.HandleMovement(new MoveSelectionEvent(firstBlueprint, firstBlueprint.ScreenSpaceSelectionPoint + delta));
         }
 
         private void updatePlacementNewCombo()
@@ -150,7 +196,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private void refreshTool()
         {
             removePlacement();
-            createPlacement();
+            ensurePlacementCreated();
         }
 
         private void updatePlacementPosition()
@@ -169,15 +215,26 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             base.Update();
 
-            if (Composer.CursorInPlacementArea)
-                createPlacement();
-            else if (currentPlacement?.PlacementActive == false)
-                removePlacement();
-
             if (currentPlacement != null)
             {
-                updatePlacementPosition();
+                switch (currentPlacement.PlacementActive)
+                {
+                    case PlacementBlueprint.PlacementState.Waiting:
+                        if (!Composer.CursorInPlacementArea)
+                            removePlacement();
+                        break;
+
+                    case PlacementBlueprint.PlacementState.Finished:
+                        removePlacement();
+                        break;
+                }
             }
+
+            if (Composer.CursorInPlacementArea)
+                ensurePlacementCreated();
+
+            if (currentPlacement != null)
+                updatePlacementPosition();
         }
 
         protected sealed override SelectionBlueprint CreateBlueprintFor(HitObject hitObject)
@@ -203,7 +260,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 NewCombo.Value = TernaryState.False;
         }
 
-        private void createPlacement()
+        private void ensurePlacementCreated()
         {
             if (currentPlacement != null) return;
 
@@ -211,9 +268,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             if (blueprint != null)
             {
-                // doing this post-creations as adding the default hit sample should be the case regardless of the ruleset.
-                blueprint.HitObject.Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_NORMAL));
-
                 placementBlueprintContainer.Child = currentPlacement = blueprint;
 
                 // Fixes a 1-frame position discrepancy due to the first mouse move event happening in the next frame

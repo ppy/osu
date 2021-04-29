@@ -92,6 +92,15 @@ namespace osu.Game.Tests.Skins
         }
 
         [Test]
+        public void TestStripWhitespace()
+        {
+            var decoder = new LegacySkinDecoder();
+            using (var resStream = TestResources.OpenResource("skin-with-space.ini"))
+            using (var stream = new LineBufferedReader(resStream))
+                Assert.AreEqual(2.0m, decoder.Decode(stream).LegacyVersion);
+        }
+
+        [Test]
         public void TestDecodeLatestVersion()
         {
             var decoder = new LegacySkinDecoder();

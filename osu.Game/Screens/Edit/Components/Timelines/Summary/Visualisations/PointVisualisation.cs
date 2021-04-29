@@ -3,16 +3,15 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osuTK;
 
 namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations
 {
     /// <summary>
     /// Represents a singular point on a timeline part.
     /// </summary>
-    public class PointVisualisation : Box
+    public class PointVisualisation : Circle
     {
-        public const float WIDTH = 1;
+        public const float MAX_WIDTH = 4;
 
         public PointVisualisation(double startTime)
             : this()
@@ -22,13 +21,14 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations
 
         public PointVisualisation()
         {
-            Origin = Anchor.TopCentre;
-
-            RelativePositionAxes = Axes.X;
+            RelativePositionAxes = Axes.Both;
             RelativeSizeAxes = Axes.Y;
 
-            Width = WIDTH;
-            EdgeSmoothness = new Vector2(WIDTH, 0);
+            Anchor = Anchor.CentreLeft;
+            Origin = Anchor.Centre;
+
+            Width = MAX_WIDTH;
+            Height = 0.75f;
         }
     }
 }

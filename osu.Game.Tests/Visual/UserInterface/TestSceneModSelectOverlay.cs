@@ -8,6 +8,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -41,30 +42,57 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void SetUp() => Schedule(() =>
         {
             SelectedMods.Value = Array.Empty<Mod>();
-            Children = new Drawable[]
-            {
-                modSelect = new TestModSelectOverlay
-                {
-                    Origin = Anchor.BottomCentre,
-                    Anchor = Anchor.BottomCentre,
-                    SelectedMods = { BindTarget = SelectedMods }
-                },
-
-                modDisplay = new ModDisplay
-                {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    AutoSizeAxes = Axes.Both,
-                    Position = new Vector2(-5, 25),
-                    Current = { BindTarget = modSelect.SelectedMods }
-                }
-            };
+            createDisplay(() => new TestModSelectOverlay());
         });
 
         [SetUpSteps]
         public void SetUpSteps()
         {
             AddStep("show", () => modSelect.Show());
+        }
+
+        [Test]
+        public void TestSettingsResetOnDeselection()
+        {
+            var osuModDoubleTime = new OsuModDoubleTime { SpeedChange = { Value = 1.2 } };
+
+            changeRuleset(0);
+
+            AddStep("set dt mod with custom rate", () => { SelectedMods.Value = new[] { osuModDoubleTime }; });
+
+            AddAssert("selected mod matches", () => (SelectedMods.Value.Single() as OsuModDoubleTime)?.SpeedChange.Value == 1.2);
+
+            AddStep("deselect", () => modSelect.DeselectAllButton.Click());
+            AddAssert("selected mods empty", () => SelectedMods.Value.Count == 0);
+
+            AddStep("reselect", () => modSelect.GetModButton(osuModDoubleTime).Click());
+            AddAssert("selected mod has default value", () => (SelectedMods.Value.Single() as OsuModDoubleTime)?.SpeedChange.IsDefault == true);
+        }
+
+        [Test]
+        public void TestAnimationFlushOnClose()
+        {
+            changeRuleset(0);
+
+            AddStep("Select all fun mods", () =>
+            {
+                modSelect.ModSectionsContainer
+                         .Single(c => c.ModType == ModType.DifficultyIncrease)
+                         .SelectAll();
+            });
+
+            AddUntilStep("many mods selected", () => modDisplay.Current.Value.Count >= 5);
+
+            AddStep("trigger deselect and close overlay", () =>
+            {
+                modSelect.ModSectionsContainer
+                         .Single(c => c.ModType == ModType.DifficultyIncrease)
+                         .DeselectAll();
+
+                modSelect.Hide();
+            });
+
+            AddAssert("all mods deselected", () => modDisplay.Current.Value.Count == 0);
         }
 
         [Test]
@@ -144,6 +172,85 @@ namespace osu.Game.Tests.Visual.UserInterface
                 var button = modSelect.GetModButton(SelectedMods.Value.Single());
                 return ((OsuModDoubleTime)button.SelectedMod).SpeedChange.Value == 1.01;
             });
+        }
+
+        [Test]
+        public void TestSettingsAreRetainedOnReload()
+        {
+            changeRuleset(0);
+
+            AddStep("set customized mod externally", () => SelectedMods.Value = new[] { new OsuModDoubleTime { SpeedChange = { Value = 1.01 } } });
+
+            AddAssert("setting remains", () => (SelectedMods.Value.SingleOrDefault() as OsuModDoubleTime)?.SpeedChange.Value == 1.01);
+
+            AddStep("create overlay", () => createDisplay(() => new TestNonStackedModSelectOverlay()));
+
+            AddAssert("setting remains", () => (SelectedMods.Value.SingleOrDefault() as OsuModDoubleTime)?.SpeedChange.Value == 1.01);
+        }
+
+        [Test]
+        public void TestExternallySetModIsReplacedByOverlayInstance()
+        {
+            Mod external = new OsuModDoubleTime();
+            Mod overlayButtonMod = null;
+
+            changeRuleset(0);
+
+            AddStep("set mod externally", () => { SelectedMods.Value = new[] { external }; });
+
+            AddAssert("ensure button is selected", () =>
+            {
+                var button = modSelect.GetModButton(SelectedMods.Value.Single());
+                overlayButtonMod = button.SelectedMod;
+                return overlayButtonMod.GetType() == external.GetType();
+            });
+
+            // Right now, when an external change occurs, the ModSelectOverlay will replace the global instance with its own
+            AddAssert("mod instance doesn't match", () => external != overlayButtonMod);
+
+            AddAssert("one mod present in global selected", () => SelectedMods.Value.Count == 1);
+            AddAssert("globally selected matches button's mod instance", () => SelectedMods.Value.Contains(overlayButtonMod));
+            AddAssert("globally selected doesn't contain original external change", () => !SelectedMods.Value.Contains(external));
+        }
+
+        [Test]
+        public void TestNonStacked()
+        {
+            changeRuleset(0);
+
+            AddStep("create overlay", () => createDisplay(() => new TestNonStackedModSelectOverlay()));
+
+            AddStep("show", () => modSelect.Show());
+
+            AddAssert("ensure all buttons are spread out", () => modSelect.ChildrenOfType<ModButton>().All(m => m.Mods.Length <= 1));
+        }
+
+        [Test]
+        public void TestChangeIsValidChangesButtonVisibility()
+        {
+            changeRuleset(0);
+
+            AddAssert("double time visible", () => modSelect.ChildrenOfType<ModButton>().Any(b => b.Mods.Any(m => m is OsuModDoubleTime)));
+
+            AddStep("make double time invalid", () => modSelect.IsValidMod = m => !(m is OsuModDoubleTime));
+            AddUntilStep("double time not visible", () => modSelect.ChildrenOfType<ModButton>().All(b => !b.Mods.Any(m => m is OsuModDoubleTime)));
+            AddAssert("nightcore still visible", () => modSelect.ChildrenOfType<ModButton>().Any(b => b.Mods.Any(m => m is OsuModNightcore)));
+
+            AddStep("make double time valid again", () => modSelect.IsValidMod = m => true);
+            AddUntilStep("double time visible", () => modSelect.ChildrenOfType<ModButton>().Any(b => b.Mods.Any(m => m is OsuModDoubleTime)));
+            AddAssert("nightcore still visible", () => modSelect.ChildrenOfType<ModButton>().Any(b => b.Mods.Any(m => m is OsuModNightcore)));
+        }
+
+        [Test]
+        public void TestChangeIsValidPreservesSelection()
+        {
+            changeRuleset(0);
+
+            AddStep("select DT + HD", () => SelectedMods.Value = new Mod[] { new OsuModDoubleTime(), new OsuModHidden() });
+            AddAssert("DT + HD selected", () => modSelect.ChildrenOfType<ModButton>().Count(b => b.Selected) == 2);
+
+            AddStep("make NF invalid", () => modSelect.IsValidMod = m => !(m is ModNoFail));
+            AddAssert("DT + HD still selected", () => modSelect.ChildrenOfType<ModButton>().Count(b => b.Selected) == 2);
         }
 
         private void testSingleMod(Mod mod)
@@ -265,11 +372,35 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private void checkLabelColor(Func<Color4> getColour) => AddAssert("check label has expected colour", () => modSelect.MultiplierLabel.Colour.AverageColour == getColour());
 
-        private class TestModSelectOverlay : ModSelectOverlay
+        private void createDisplay(Func<TestModSelectOverlay> createOverlayFunc)
+        {
+            Children = new Drawable[]
+            {
+                modSelect = createOverlayFunc().With(d =>
+                {
+                    d.Origin = Anchor.BottomCentre;
+                    d.Anchor = Anchor.BottomCentre;
+                    d.SelectedMods.BindTarget = SelectedMods;
+                }),
+                modDisplay = new ModDisplay
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    AutoSizeAxes = Axes.Both,
+                    Position = new Vector2(-5, 25),
+                    Current = { BindTarget = modSelect.SelectedMods }
+                }
+            };
+        }
+
+        private class TestModSelectOverlay : LocalPlayerModSelectOverlay
         {
             public new Bindable<IReadOnlyList<Mod>> SelectedMods => base.SelectedMods;
 
             public bool AllLoaded => ModSectionsContainer.Children.All(c => c.ModIconsLoaded);
+
+            public new FillFlowContainer<ModSection> ModSectionsContainer =>
+                base.ModSectionsContainer;
 
             public ModButton GetModButton(Mod mod)
             {
@@ -282,6 +413,11 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             public new Color4 LowMultiplierColour => base.LowMultiplierColour;
             public new Color4 HighMultiplierColour => base.HighMultiplierColour;
+        }
+
+        private class TestNonStackedModSelectOverlay : TestModSelectOverlay
+        {
+            protected override bool Stacked => false;
         }
     }
 }

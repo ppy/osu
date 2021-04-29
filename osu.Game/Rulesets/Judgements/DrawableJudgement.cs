@@ -150,17 +150,13 @@ namespace osu.Game.Rulesets.Judgements
                 }
 
                 if (JudgementBody.Drawable is IAnimatableJudgement animatable)
-                {
-                    var drawableAnimation = (Drawable)animatable;
-
                     animatable.PlayAnimation();
 
-                    // a derived version of DrawableJudgement may be proposing a lifetime.
-                    // if not adjusted (or the skinned portion requires greater bounds than calculated) use the skinned source's lifetime.
-                    double lastTransformTime = drawableAnimation.LatestTransformEndTime;
-                    if (LifetimeEnd == double.MaxValue || lastTransformTime > LifetimeEnd)
-                        LifetimeEnd = lastTransformTime;
-                }
+                // a derived version of DrawableJudgement may be proposing a lifetime.
+                // if not adjusted (or the skinned portion requires greater bounds than calculated) use the skinned source's lifetime.
+                double lastTransformTime = JudgementBody.Drawable.LatestTransformEndTime;
+                if (LifetimeEnd == double.MaxValue || lastTransformTime > LifetimeEnd)
+                    LifetimeEnd = lastTransformTime;
             }
         }
 

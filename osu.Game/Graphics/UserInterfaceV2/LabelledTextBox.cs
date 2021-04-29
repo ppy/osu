@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.UserInterfaceV2
@@ -52,6 +53,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
             RelativeSizeAxes = Axes.X,
             CornerRadius = CORNER_RADIUS,
         };
+
+        public override bool AcceptsFocus => true;
+
+        protected override void OnFocus(FocusEvent e)
+        {
+            base.OnFocus(e);
+            GetContainingInputManager().ChangeFocus(Component);
+        }
 
         protected override OsuTextBox CreateComponent() => CreateTextBox().With(t =>
         {

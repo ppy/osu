@@ -16,6 +16,6 @@ namespace osu.Game.Rulesets.Mods
         public override string Description => "You can't fail, no matter what.";
         public override double ScoreMultiplier => 0.5;
         public override bool Ranked => true;
-        public override Type[] IncompatibleMods => new[] { typeof(ModRelax), typeof(ModSuddenDeath), typeof(ModAutoplay) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModRelax), typeof(ModFailCondition), typeof(ModAutoplay) };
     }
 }

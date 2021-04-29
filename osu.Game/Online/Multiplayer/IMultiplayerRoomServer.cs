@@ -1,7 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 
 namespace osu.Game.Online.Multiplayer
@@ -46,6 +48,12 @@ namespace osu.Game.Online.Multiplayer
         /// </summary>
         /// <param name="newBeatmapAvailability">The proposed new beatmap availability state.</param>
         Task ChangeBeatmapAvailability(BeatmapAvailability newBeatmapAvailability);
+
+        /// <summary>
+        /// Change the local user's mods in the currently joined room.
+        /// </summary>
+        /// <param name="newMods">The proposed new mods, excluding any required by the room itself.</param>
+        Task ChangeUserMods(IEnumerable<APIMod> newMods);
 
         /// <summary>
         /// As the host of a room, start the match.

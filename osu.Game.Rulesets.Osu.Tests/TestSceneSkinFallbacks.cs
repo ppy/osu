@@ -42,10 +42,10 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep("enable user provider", () => testUserSkin.Enabled = true);
 
-            AddStep("enable beatmap skin", () => LocalConfig.Set<bool>(OsuSetting.BeatmapSkins, true));
+            AddStep("enable beatmap skin", () => LocalConfig.SetValue(OsuSetting.BeatmapSkins, true));
             checkNextHitObject("beatmap");
 
-            AddStep("disable beatmap skin", () => LocalConfig.Set<bool>(OsuSetting.BeatmapSkins, false));
+            AddStep("disable beatmap skin", () => LocalConfig.SetValue(OsuSetting.BeatmapSkins, false));
             checkNextHitObject("user");
 
             AddStep("disable user provider", () => testUserSkin.Enabled = false);
@@ -57,20 +57,20 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep("enable user provider", () => testUserSkin.Enabled = true);
 
-            AddStep("enable beatmap skin", () => LocalConfig.Set<bool>(OsuSetting.BeatmapSkins, true));
-            AddStep("enable beatmap colours", () => LocalConfig.Set<bool>(OsuSetting.BeatmapColours, true));
+            AddStep("enable beatmap skin", () => LocalConfig.SetValue(OsuSetting.BeatmapSkins, true));
+            AddStep("enable beatmap colours", () => LocalConfig.SetValue(OsuSetting.BeatmapColours, true));
             checkNextHitObject("beatmap");
 
-            AddStep("enable beatmap skin", () => LocalConfig.Set<bool>(OsuSetting.BeatmapSkins, true));
-            AddStep("disable beatmap colours", () => LocalConfig.Set<bool>(OsuSetting.BeatmapColours, false));
+            AddStep("enable beatmap skin", () => LocalConfig.SetValue(OsuSetting.BeatmapSkins, true));
+            AddStep("disable beatmap colours", () => LocalConfig.SetValue(OsuSetting.BeatmapColours, false));
             checkNextHitObject("beatmap");
 
-            AddStep("disable beatmap skin", () => LocalConfig.Set<bool>(OsuSetting.BeatmapSkins, false));
-            AddStep("enable beatmap colours", () => LocalConfig.Set<bool>(OsuSetting.BeatmapColours, true));
+            AddStep("disable beatmap skin", () => LocalConfig.SetValue(OsuSetting.BeatmapSkins, false));
+            AddStep("enable beatmap colours", () => LocalConfig.SetValue(OsuSetting.BeatmapColours, true));
             checkNextHitObject("user");
 
-            AddStep("disable beatmap skin", () => LocalConfig.Set<bool>(OsuSetting.BeatmapSkins, false));
-            AddStep("disable beatmap colours", () => LocalConfig.Set<bool>(OsuSetting.BeatmapColours, false));
+            AddStep("disable beatmap skin", () => LocalConfig.SetValue(OsuSetting.BeatmapSkins, false));
+            AddStep("disable beatmap colours", () => LocalConfig.SetValue(OsuSetting.BeatmapColours, false));
             checkNextHitObject("user");
 
             AddStep("disable user provider", () => testUserSkin.Enabled = false);
@@ -162,7 +162,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => null;
 
-            public SampleChannel GetSample(ISampleInfo sampleInfo) => null;
+            public ISample GetSample(ISampleInfo sampleInfo) => null;
 
             public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration => default;
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => null;

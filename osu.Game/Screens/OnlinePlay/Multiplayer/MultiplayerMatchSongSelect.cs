@@ -1,70 +1,51 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
-using System.Linq;
-using Humanizer;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
-using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
-    public class MultiplayerMatchSongSelect : SongSelect, IOnlinePlaySubScreen
+    public class MultiplayerMatchSongSelect : OnlinePlaySongSelect
     {
-        public string ShortTitle => "song selection";
-
-        public override string Title => ShortTitle.Humanize();
-
-        [Resolved(typeof(Room), nameof(Room.Playlist))]
-        private BindableList<PlaylistItem> playlist { get; set; }
-
         [Resolved]
         private StatefulMultiplayerClient client { get; set; }
 
         private LoadingLayer loadingLayer;
 
-        private WorkingBeatmap initialBeatmap;
-        private RulesetInfo initialRuleset;
-        private IReadOnlyList<Mod> initialMods;
-
-        private bool itemSelected;
-
-        public MultiplayerMatchSongSelect()
+        /// <summary>
+        /// Construct a new instance of multiplayer song select.
+        /// </summary>
+        /// <param name="beatmap">An optional initial beatmap selection to perform.</param>
+        /// <param name="ruleset">An optional initial ruleset selection to perform.</param>
+        public MultiplayerMatchSongSelect(WorkingBeatmap beatmap = null, RulesetInfo ruleset = null)
         {
-            Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING };
+            if (beatmap != null || ruleset != null)
+            {
+                Schedule(() =>
+                {
+                    if (beatmap != null) Beatmap.Value = beatmap;
+                    if (ruleset != null) Ruleset.Value = ruleset;
+                });
+            }
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
             AddInternal(loadingLayer = new LoadingLayer(true));
-            initialBeatmap = Beatmap.Value;
-            initialRuleset = Ruleset.Value;
-            initialMods = Mods.Value.ToList();
         }
 
-        protected override bool OnStart()
+        protected override void SelectItem(PlaylistItem item)
         {
-            itemSelected = true;
-            var item = new PlaylistItem();
-
-            item.Beatmap.Value = Beatmap.Value.BeatmapInfo;
-            item.Ruleset.Value = Ruleset.Value;
-
-            item.RequiredMods.Clear();
-            item.RequiredMods.AddRange(Mods.Value.Select(m => m.CreateCopy()));
-
             // If the client is already in a room, update via the client.
             // Otherwise, update the playlist directly in preparation for it to be submitted to the API on match creation.
             if (client.Room != null)
@@ -89,30 +70,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }
             else
             {
-                playlist.Clear();
-                playlist.Add(item);
+                Playlist.Clear();
+                Playlist.Add(item);
                 this.Exit();
             }
-
-            return true;
-        }
-
-        public override bool OnExiting(IScreen next)
-        {
-            if (!itemSelected)
-            {
-                Beatmap.Value = initialBeatmap;
-                Ruleset.Value = initialRuleset;
-                Mods.Value = initialMods;
-            }
-
-            return base.OnExiting(next);
         }
 
         protected override BeatmapDetailArea CreateBeatmapDetailArea() => new PlayBeatmapDetailArea();
 
-        protected override ModSelectOverlay CreateModSelectOverlay() => new ModSelectOverlay(isValidMod);
-
-        private bool isValidMod(Mod mod) => !(mod is ModAutoplay) && (mod as MultiMod)?.Mods.Any(mm => mm is ModAutoplay) != true;
+        protected override bool IsValidFreeMod(Mod mod) => base.IsValidFreeMod(mod) && !(mod is ModTimeRamp) && !(mod is ModRateAdjust);
     }
 }

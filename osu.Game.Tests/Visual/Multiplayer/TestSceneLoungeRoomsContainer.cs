@@ -69,6 +69,20 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("last room joined", () => RoomManager.Rooms.Last().Status.Value is JoinedRoomStatus);
         }
 
+        [Test]
+        public void TestClickDeselection()
+        {
+            AddRooms(1);
+
+            AddAssert("no selection", () => checkRoomSelected(null));
+
+            press(Key.Down);
+            AddAssert("first room selected", () => checkRoomSelected(RoomManager.Rooms.First()));
+
+            AddStep("click away", () => InputManager.Click(MouseButton.Left));
+            AddAssert("no selection", () => checkRoomSelected(null));
+        }
+
         private void press(Key down)
         {
             AddStep($"press {down}", () => InputManager.Key(down));

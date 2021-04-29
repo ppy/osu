@@ -3,11 +3,11 @@
 
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Graphics.Audio;
 using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Visual.Editing
 {
@@ -19,14 +19,14 @@ namespace osu.Game.Tests.Visual.Editing
         public void TestSlidingSampleStopsOnSeek()
         {
             DrawableSlider slider = null;
-            DrawableSample[] loopingSamples = null;
-            DrawableSample[] onceOffSamples = null;
+            PoolableSkinnableSample[] loopingSamples = null;
+            PoolableSkinnableSample[] onceOffSamples = null;
 
             AddStep("get first slider", () =>
             {
                 slider = Editor.ChildrenOfType<DrawableSlider>().OrderBy(s => s.HitObject.StartTime).First();
-                onceOffSamples = slider.ChildrenOfType<DrawableSample>().Where(s => !s.Looping).ToArray();
-                loopingSamples = slider.ChildrenOfType<DrawableSample>().Where(s => s.Looping).ToArray();
+                onceOffSamples = slider.ChildrenOfType<PoolableSkinnableSample>().Where(s => !s.Looping).ToArray();
+                loopingSamples = slider.ChildrenOfType<PoolableSkinnableSample>().Where(s => s.Looping).ToArray();
             });
 
             AddStep("start playback", () => EditorClock.Start());

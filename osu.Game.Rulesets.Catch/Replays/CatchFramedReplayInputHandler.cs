@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Input.StateChanges;
 using osu.Framework.Utils;
@@ -20,29 +19,14 @@ namespace osu.Game.Rulesets.Catch.Replays
 
         protected override bool IsImportant(CatchReplayFrame frame) => frame.Actions.Any();
 
-        protected float? Position
-        {
-            get
-            {
-                var frame = CurrentFrame;
-
-                if (frame == null)
-                    return null;
-
-                Debug.Assert(CurrentTime != null);
-
-                return NextFrame != null ? Interpolation.ValueAt(CurrentTime.Value, frame.Position, NextFrame.Position, frame.Time, NextFrame.Time) : frame.Position;
-            }
-        }
-
         public override void CollectPendingInputs(List<IInput> inputs)
         {
-            if (!Position.HasValue) return;
+            var position = Interpolation.ValueAt(CurrentTime, StartFrame.Position, EndFrame.Position, StartFrame.Time, EndFrame.Time);
 
             inputs.Add(new CatchReplayState
             {
                 PressedActions = CurrentFrame?.Actions ?? new List<CatchAction>(),
-                CatcherX = Position.Value
+                CatcherX = position
             });
         }
 

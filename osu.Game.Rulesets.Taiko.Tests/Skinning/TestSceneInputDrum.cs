@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         [BackgroundDependencyLoader]
         private void load()
         {
-            SetContents(() => new TaikoInputManager(new RulesetInfo { ID = 1 })
+            SetContents(() => new TaikoInputManager(new TaikoRuleset().RulesetInfo)
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = new Container

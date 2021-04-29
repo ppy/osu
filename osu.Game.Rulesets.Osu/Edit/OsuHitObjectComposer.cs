@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         }
 
         protected override DrawableRuleset<OsuHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
-            => new DrawableOsuEditRuleset(ruleset, beatmap, mods);
+            => new DrawableOsuEditorRuleset(ruleset, beatmap, mods);
 
         protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
         {
@@ -81,6 +81,9 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         protected override ComposeBlueprintContainer CreateBlueprintContainer()
             => new OsuBlueprintContainer(this);
+
+        public override string ConvertSelectionToString()
+            => string.Join(',', selectedHitObjects.Cast<OsuHitObject>().OrderBy(h => h.StartTime).Select(h => (h.IndexInCurrentCombo + 1).ToString()));
 
         private DistanceSnapGrid distanceSnapGrid;
         private Container distanceSnapGridContainer;

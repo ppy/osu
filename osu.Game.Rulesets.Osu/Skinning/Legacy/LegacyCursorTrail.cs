@@ -26,7 +26,17 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             Texture = skin.GetTexture("cursortrail");
             disjointTrail = skin.GetTexture("cursormiddle") == null;
 
-            Blending = !disjointTrail ? BlendingParameters.Additive : BlendingParameters.Inherit;
+            if (disjointTrail)
+            {
+                bool centre = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.CursorCentre)?.Value ?? true;
+
+                TrailOrigin = centre ? Anchor.Centre : Anchor.TopLeft;
+                Blending = BlendingParameters.Inherit;
+            }
+            else
+            {
+                Blending = BlendingParameters.Additive;
+            }
 
             if (Texture != null)
             {

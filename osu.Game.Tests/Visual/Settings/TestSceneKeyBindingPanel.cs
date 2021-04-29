@@ -78,7 +78,7 @@ namespace osu.Game.Tests.Visual.Settings
 
             clickClearButton();
 
-            AddAssert("first binding cleared", () => string.IsNullOrEmpty(multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().First().Text.Text));
+            AddAssert("first binding cleared", () => string.IsNullOrEmpty(multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().First().Text.Text.ToString()));
 
             AddStep("click second binding", () =>
             {
@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Visual.Settings
 
             clickClearButton();
 
-            AddAssert("second binding cleared", () => string.IsNullOrEmpty(multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(1).Text.Text));
+            AddAssert("second binding cleared", () => string.IsNullOrEmpty(multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(1).Text.Text.ToString()));
 
             void clickClearButton()
             {

@@ -12,7 +12,6 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
         /// <summary>
         /// Whether this <see cref="RadioButton"/> is selected.
         /// </summary>
-        /// <returns></returns>
         public readonly BindableBool Selected;
 
         /// <summary>

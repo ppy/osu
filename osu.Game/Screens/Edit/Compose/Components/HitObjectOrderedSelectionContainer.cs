@@ -71,7 +71,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             // Put earlier blueprints towards the end of the list, so they handle input first
             int i = yObj.HitObject.StartTime.CompareTo(xObj.HitObject.StartTime);
-            return i == 0 ? CompareReverseChildID(x, y) : i;
+
+            if (i != 0) return i;
+
+            // Fall back to end time if the start time is equal.
+            i = yObj.HitObject.GetEndTime().CompareTo(xObj.HitObject.GetEndTime());
+
+            return i == 0 ? CompareReverseChildID(y, x) : i;
         }
     }
 }

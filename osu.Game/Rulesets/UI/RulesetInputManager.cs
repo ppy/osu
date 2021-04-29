@@ -16,7 +16,6 @@ using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Input.Handlers;
 using osu.Game.Screens.Play;
-using osuTK.Input;
 using static osu.Game.Input.Handlers.ReplayInputHandler;
 
 namespace osu.Game.Rulesets.UI
@@ -109,9 +108,9 @@ namespace osu.Game.Rulesets.UI
         {
             switch (e)
             {
-                case MouseDownEvent mouseDown when mouseDown.Button == MouseButton.Left || mouseDown.Button == MouseButton.Right:
+                case MouseDownEvent _:
                     if (mouseDisabled.Value)
-                        return false;
+                        return true; // importantly, block upwards propagation so global bindings also don't fire.
 
                     break;
 

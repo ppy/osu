@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Catch.Mods
     public class CatchModDifficultyAdjust : ModDifficultyAdjust
     {
         [SettingSource("Circle Size", "Override a beatmap's set CS.", FIRST_SETTING_ORDER - 1)]
-        public BindableNumber<float> CircleSize { get; } = new BindableFloat
+        public BindableNumber<float> CircleSize { get; } = new BindableFloatWithLimitExtension
         {
             Precision = 0.1f,
             MinValue = 1,
@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Catch.Mods
         };
 
         [SettingSource("Approach Rate", "Override a beatmap's set AR.", LAST_SETTING_ORDER + 1)]
-        public BindableNumber<float> ApproachRate { get; } = new BindableFloat
+        public BindableNumber<float> ApproachRate { get; } = new BindableFloatWithLimitExtension
         {
             Precision = 0.1f,
             MinValue = 1,
@@ -30,6 +30,14 @@ namespace osu.Game.Rulesets.Catch.Mods
             Default = 5,
             Value = 5,
         };
+
+        protected override void ApplyLimits(bool extended)
+        {
+            base.ApplyLimits(extended);
+
+            CircleSize.MaxValue = extended ? 11 : 10;
+            ApproachRate.MaxValue = extended ? 11 : 10;
+        }
 
         public override string SettingDescription
         {

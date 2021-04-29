@@ -90,7 +90,7 @@ namespace osu.Game.Screens.Play
 
         private const double fade_time = 300;
 
-        private double fadeOutBeginTime => startTime - GameplayClockContainer.MINIMUM_SKIP_TIME;
+        private double fadeOutBeginTime => startTime - MasterGameplayClockContainer.MINIMUM_SKIP_TIME;
 
         protected override void LoadComplete()
         {
@@ -230,7 +230,7 @@ namespace osu.Game.Screens.Play
             private Box background;
             private AspectContainer aspect;
 
-            private SampleChannel sampleConfirm;
+            private Sample sampleConfirm;
 
             public Button()
             {

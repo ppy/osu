@@ -3,34 +3,28 @@
 
 #nullable enable
 
-using System;
-using System.Diagnostics;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Logging;
+using osu.Game.Beatmaps;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.Rooms;
 
 namespace osu.Game.Online.Multiplayer
 {
     public class MultiplayerClient : StatefulMultiplayerClient
     {
-        public override IBindable<bool> IsConnected => isConnected;
-
-        private readonly Bindable<bool> isConnected = new Bindable<bool>();
-        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
-
-        [Resolved]
-        private IAPIProvider api { get; set; } = null!;
-
-        private HubConnection? connection;
-
         private readonly string endpoint;
+
+        private IHubClientConnector? connector;
+
+        public override IBindable<bool> IsConnected { get; } = new BindableBool();
+
+        private HubConnection? connection => connector?.CurrentConnection;
 
         public MultiplayerClient(EndpointConfiguration endpoints)
         {
@@ -38,121 +32,52 @@ namespace osu.Game.Online.Multiplayer
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(IAPIProvider api)
         {
-            apiState.BindTo(api.State);
-            apiState.BindValueChanged(apiStateChanged, true);
-        }
+            connector = api.GetHubConnector(nameof(MultiplayerClient), endpoint);
 
-        private void apiStateChanged(ValueChangedEvent<APIState> state)
-        {
-            switch (state.NewValue)
+            if (connector != null)
             {
-                case APIState.Failing:
-                case APIState.Offline:
-                    connection?.StopAsync();
-                    connection = null;
-                    break;
-
-                case APIState.Online:
-                    Task.Run(Connect);
-                    break;
-            }
-        }
-
-        protected virtual async Task Connect()
-        {
-            if (connection != null)
-                return;
-
-            connection = new HubConnectionBuilder()
-                         .WithUrl(endpoint, options =>
-                         {
-                             options.Headers.Add("Authorization", $"Bearer {api.AccessToken}");
-                         })
-                         .AddNewtonsoftJsonProtocol(options => { options.PayloadSerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore; })
-                         .Build();
-
-            // this is kind of SILLY
-            // https://github.com/dotnet/aspnetcore/issues/15198
-            connection.On<MultiplayerRoomState>(nameof(IMultiplayerClient.RoomStateChanged), ((IMultiplayerClient)this).RoomStateChanged);
-            connection.On<MultiplayerRoomUser>(nameof(IMultiplayerClient.UserJoined), ((IMultiplayerClient)this).UserJoined);
-            connection.On<MultiplayerRoomUser>(nameof(IMultiplayerClient.UserLeft), ((IMultiplayerClient)this).UserLeft);
-            connection.On<int>(nameof(IMultiplayerClient.HostChanged), ((IMultiplayerClient)this).HostChanged);
-            connection.On<MultiplayerRoomSettings>(nameof(IMultiplayerClient.SettingsChanged), ((IMultiplayerClient)this).SettingsChanged);
-            connection.On<int, MultiplayerUserState>(nameof(IMultiplayerClient.UserStateChanged), ((IMultiplayerClient)this).UserStateChanged);
-            connection.On(nameof(IMultiplayerClient.LoadRequested), ((IMultiplayerClient)this).LoadRequested);
-            connection.On(nameof(IMultiplayerClient.MatchStarted), ((IMultiplayerClient)this).MatchStarted);
-            connection.On(nameof(IMultiplayerClient.ResultsReady), ((IMultiplayerClient)this).ResultsReady);
-
-            connection.Closed += async ex =>
-            {
-                isConnected.Value = false;
-
-                Logger.Log(ex != null
-                    ? $"Multiplayer client lost connection: {ex}"
-                    : "Multiplayer client disconnected", LoggingTarget.Network);
-
-                if (connection != null)
-                    await tryUntilConnected();
-            };
-
-            await tryUntilConnected();
-
-            async Task tryUntilConnected()
-            {
-                Logger.Log("Multiplayer client connecting...", LoggingTarget.Network);
-
-                while (api.State.Value == APIState.Online)
+                connector.ConfigureConnection = connection =>
                 {
-                    try
-                    {
-                        Debug.Assert(connection != null);
+                    // this is kind of SILLY
+                    // https://github.com/dotnet/aspnetcore/issues/15198
+                    connection.On<MultiplayerRoomState>(nameof(IMultiplayerClient.RoomStateChanged), ((IMultiplayerClient)this).RoomStateChanged);
+                    connection.On<MultiplayerRoomUser>(nameof(IMultiplayerClient.UserJoined), ((IMultiplayerClient)this).UserJoined);
+                    connection.On<MultiplayerRoomUser>(nameof(IMultiplayerClient.UserLeft), ((IMultiplayerClient)this).UserLeft);
+                    connection.On<int>(nameof(IMultiplayerClient.HostChanged), ((IMultiplayerClient)this).HostChanged);
+                    connection.On<MultiplayerRoomSettings>(nameof(IMultiplayerClient.SettingsChanged), ((IMultiplayerClient)this).SettingsChanged);
+                    connection.On<int, MultiplayerUserState>(nameof(IMultiplayerClient.UserStateChanged), ((IMultiplayerClient)this).UserStateChanged);
+                    connection.On(nameof(IMultiplayerClient.LoadRequested), ((IMultiplayerClient)this).LoadRequested);
+                    connection.On(nameof(IMultiplayerClient.MatchStarted), ((IMultiplayerClient)this).MatchStarted);
+                    connection.On(nameof(IMultiplayerClient.ResultsReady), ((IMultiplayerClient)this).ResultsReady);
+                    connection.On<int, IEnumerable<APIMod>>(nameof(IMultiplayerClient.UserModsChanged), ((IMultiplayerClient)this).UserModsChanged);
+                    connection.On<int, BeatmapAvailability>(nameof(IMultiplayerClient.UserBeatmapAvailabilityChanged), ((IMultiplayerClient)this).UserBeatmapAvailabilityChanged);
+                };
 
-                        // reconnect on any failure
-                        await connection.StartAsync();
-                        Logger.Log("Multiplayer client connected!", LoggingTarget.Network);
-
-                        // Success.
-                        isConnected.Value = true;
-                        break;
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Log($"Multiplayer client connection error: {e}", LoggingTarget.Network);
-                        await Task.Delay(5000);
-                    }
-                }
+                IsConnected.BindTo(connector.IsConnected);
             }
         }
 
         protected override Task<MultiplayerRoom> JoinRoom(long roomId)
         {
-            if (!isConnected.Value)
+            if (!IsConnected.Value)
                 return Task.FromCanceled<MultiplayerRoom>(new CancellationToken(true));
 
             return connection.InvokeAsync<MultiplayerRoom>(nameof(IMultiplayerServer.JoinRoom), roomId);
         }
 
-        public override async Task LeaveRoom()
+        protected override Task LeaveRoomInternal()
         {
-            if (!isConnected.Value)
-            {
-                // even if not connected, make sure the local room state can be cleaned up.
-                await base.LeaveRoom();
-                return;
-            }
+            if (!IsConnected.Value)
+                return Task.FromCanceled(new CancellationToken(true));
 
-            if (Room == null)
-                return;
-
-            await base.LeaveRoom();
-            await connection.InvokeAsync(nameof(IMultiplayerServer.LeaveRoom));
+            return connection.InvokeAsync(nameof(IMultiplayerServer.LeaveRoom));
         }
 
         public override Task TransferHost(int userId)
         {
-            if (!isConnected.Value)
+            if (!IsConnected.Value)
                 return Task.CompletedTask;
 
             return connection.InvokeAsync(nameof(IMultiplayerServer.TransferHost), userId);
@@ -160,7 +85,7 @@ namespace osu.Game.Online.Multiplayer
 
         public override Task ChangeSettings(MultiplayerRoomSettings settings)
         {
-            if (!isConnected.Value)
+            if (!IsConnected.Value)
                 return Task.CompletedTask;
 
             return connection.InvokeAsync(nameof(IMultiplayerServer.ChangeSettings), settings);
@@ -168,26 +93,66 @@ namespace osu.Game.Online.Multiplayer
 
         public override Task ChangeState(MultiplayerUserState newState)
         {
-            if (!isConnected.Value)
+            if (!IsConnected.Value)
                 return Task.CompletedTask;
+
+            if (newState == MultiplayerUserState.Spectating)
+                return Task.CompletedTask; // Not supported yet.
 
             return connection.InvokeAsync(nameof(IMultiplayerServer.ChangeState), newState);
         }
 
         public override Task ChangeBeatmapAvailability(BeatmapAvailability newBeatmapAvailability)
         {
-            if (!isConnected.Value)
+            if (!IsConnected.Value)
                 return Task.CompletedTask;
 
             return connection.InvokeAsync(nameof(IMultiplayerServer.ChangeBeatmapAvailability), newBeatmapAvailability);
         }
 
+        public override Task ChangeUserMods(IEnumerable<APIMod> newMods)
+        {
+            if (!IsConnected.Value)
+                return Task.CompletedTask;
+
+            return connection.InvokeAsync(nameof(IMultiplayerServer.ChangeUserMods), newMods);
+        }
+
         public override Task StartMatch()
         {
-            if (!isConnected.Value)
+            if (!IsConnected.Value)
                 return Task.CompletedTask;
 
             return connection.InvokeAsync(nameof(IMultiplayerServer.StartMatch));
+        }
+
+        protected override Task<BeatmapSetInfo> GetOnlineBeatmapSet(int beatmapId, CancellationToken cancellationToken = default)
+        {
+            var tcs = new TaskCompletionSource<BeatmapSetInfo>();
+            var req = new GetBeatmapSetRequest(beatmapId, BeatmapSetLookupType.BeatmapId);
+
+            req.Success += res =>
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    tcs.SetCanceled();
+                    return;
+                }
+
+                tcs.SetResult(res.ToBeatmapSet(Rulesets));
+            };
+
+            req.Failure += e => tcs.SetException(e);
+
+            API.Queue(req);
+
+            return tcs.Task;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            connector?.Dispose();
         }
     }
 }
