@@ -36,7 +36,7 @@ namespace osu.Game.Skinning.Editor
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    headerText = new OsuTextFlowContainer()
+                    headerText = new OsuTextFlowContainer
                     {
                         TextAnchor = Anchor.TopCentre,
                         Padding = new MarginPadding(20),
