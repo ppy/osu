@@ -6,15 +6,11 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Rulesets.Osu.UI;
-using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModBarrelRoll : ModBarrelRoll<OsuHitObject>, IApplicableToDrawableHitObjects
     {
-        protected override Vector2 PlayfieldScale => new Vector2(OsuPlayfield.BASE_SIZE.Y / OsuPlayfield.BASE_SIZE.X);
-
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
             foreach (var d in drawables)
