@@ -19,6 +19,16 @@ namespace osu.Game.Rulesets.UI
 {
     public class HitObjectContainer : CompositeDrawable, IHitObjectContainer
     {
+        /// <summary>
+        /// All entries in this <see cref="HitObjectContainer"/> including dead entries.
+        /// </summary>
+        public IEnumerable<HitObjectLifetimeEntry> Entries => allEntries;
+
+        /// <summary>
+        /// All alive entries and <see cref="DrawableHitObject"/>s used by the entries.
+        /// </summary>
+        public IEnumerable<(HitObjectLifetimeEntry Entry, DrawableHitObject Drawable)> AliveEntries => drawableMap.Select(x => (x.Key, x.Value));
+
         public IEnumerable<DrawableHitObject> Objects => InternalChildren.Cast<DrawableHitObject>().OrderBy(h => h.HitObject.StartTime);
 
         public IEnumerable<DrawableHitObject> AliveObjects => AliveInternalChildren.Cast<DrawableHitObject>().OrderBy(h => h.HitObject.StartTime);
@@ -60,9 +70,12 @@ namespace osu.Game.Rulesets.UI
         internal double FutureLifetimeExtension { get; set; }
 
         private readonly Dictionary<DrawableHitObject, IBindable> startTimeMap = new Dictionary<DrawableHitObject, IBindable>();
+
         private readonly Dictionary<HitObjectLifetimeEntry, DrawableHitObject> drawableMap = new Dictionary<HitObjectLifetimeEntry, DrawableHitObject>();
-        private readonly LifetimeEntryManager lifetimeManager = new LifetimeEntryManager();
         private readonly Dictionary<HitObjectLifetimeEntry, DrawableHitObject> nonPooledDrawableMap = new Dictionary<HitObjectLifetimeEntry, DrawableHitObject>();
+
+        private readonly LifetimeEntryManager lifetimeManager = new LifetimeEntryManager();
+        private readonly HashSet<HitObjectLifetimeEntry> allEntries = new HashSet<HitObjectLifetimeEntry>();
 
         [Resolved(CanBeNull = true)]
         private IPooledHitObjectProvider pooledObjectProvider { get; set; }
@@ -86,13 +99,18 @@ namespace osu.Game.Rulesets.UI
 
         #region Pooling support
 
-        public void Add(HitObjectLifetimeEntry entry) => lifetimeManager.AddEntry(entry);
+        public void Add(HitObjectLifetimeEntry entry)
+        {
+            allEntries.Add(entry);
+            lifetimeManager.AddEntry(entry);
+        }
 
         public bool Remove(HitObjectLifetimeEntry entry)
         {
             if (!lifetimeManager.RemoveEntry(entry)) return false;
-            // It has to be done here because non-pooled entry may be removed by specifying its entry.
+            // The entry has to be removed from the non-pooled map here because non-pooled entry may be removed by specifying its entry.
             nonPooledDrawableMap.Remove(entry);
+            allEntries.Remove(entry);
             return true;
         }
 
