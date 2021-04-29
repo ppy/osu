@@ -43,9 +43,11 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
         {
             var timeSpan = TimeSpan.FromMilliseconds(Value.Time);
 
+            Box bgBox;
+            Box fgBox;
             InternalChildren = new Drawable[]
             {
-                new Box
+                bgBox = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background4
@@ -66,7 +68,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
                             Margin = new MarginPadding(5),
                             Children = new Drawable[]
                             {
-                                new Box
+                                fgBox = new Box
                                 {
                                     Colour = colourProvider.Highlight1,
                                     RelativeSizeAxes = Axes.Both,
@@ -108,6 +110,12 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
             };
 
             TooltipText = $"调整到 {timeSpan:mm\\:ss\\.fff}";
+
+            colourProvider.HueColour.BindValueChanged(_ =>
+            {
+                bgBox.Colour = colourProvider.Background4;
+                fgBox.Colour = colourProvider.Highlight1;
+            }, true);
         }
 
         protected override bool OnClick(ClickEvent e)

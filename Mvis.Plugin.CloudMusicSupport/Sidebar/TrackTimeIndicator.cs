@@ -46,9 +46,10 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
 
             BorderColour = provider.Content2;
 
+            Box bgBox;
             InternalChildren = new Drawable[]
             {
-                new Box
+                bgBox = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = provider.Highlight1
@@ -83,6 +84,12 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
             };
 
             config.BindWith(LyricSettings.LyricOffset, globalOffset);
+
+            provider.HueColour.BindValueChanged(_ =>
+            {
+                BorderColour = provider.Content2;
+                bgBox.Colour = provider.Highlight1;
+            }, true);
         }
 
         private double totalOffset => globalOffset.Value + mvisScreen?.CurrentTrack.CurrentTime ?? 0;
