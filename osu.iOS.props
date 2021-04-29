@@ -95,7 +95,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="ppy.osu.Framework" Version="2021.427.0" />
     <PackageReference Include="SharpCompress" Version="0.28.1" />
-    <PackageReference Include="NUnit" Version="3.12.0" />
+    <PackageReference Include="NUnit" Version="3.13.2" />
     <PackageReference Include="SharpRaven" Version="2.4.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="ppy.osu.Framework.NativeLibs" Version="2021.115.0" ExcludeAssets="all" />
