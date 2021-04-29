@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Extensions;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Compose.Components;
@@ -107,7 +108,8 @@ namespace osu.Game.Skinning.Editor
         {
             foreach (var c in SelectedBlueprints)
             {
-                ((Drawable)c.Item).Position += moveEvent.InstantDelta;
+                Drawable drawable = (Drawable)c.Item;
+                drawable.Position += drawable.ScreenSpaceDeltaToParentSpace(moveEvent.ScreenSpaceDelta);
             }
 
             return true;
