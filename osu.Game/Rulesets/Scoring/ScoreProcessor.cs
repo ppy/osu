@@ -252,7 +252,7 @@ namespace osu.Game.Rulesets.Scoring
                 computedBaseScore += Judgement.ToNumericResult(pair.Key) * pair.Value;
             }
 
-            return GetScore(mode, maxAchievableCombo, calculateAccuracyRatio(computedBaseScore), calculateComboRatio(maxCombo), scoreResultCounts);
+            return GetScore(mode, maxAchievableCombo, calculateAccuracyRatio(computedBaseScore), calculateComboRatio(maxCombo), statistics);
         }
 
         /// <summary>
@@ -266,7 +266,7 @@ namespace osu.Game.Rulesets.Scoring
             if (preferRolling && rollingMaxBaseScore != 0)
                 return baseScore / rollingMaxBaseScore;
 
-            return maxBaseScore > 0 ? baseScore / maxBaseScore : 0;
+            return maxBaseScore > 0 ? baseScore / maxBaseScore : 1;
         }
 
         private double calculateComboRatio(int maxCombo) => maxAchievableCombo > 0 ? (double)maxCombo / maxAchievableCombo : 1;
@@ -337,7 +337,7 @@ namespace osu.Game.Rulesets.Scoring
             score.TotalScore = (long)Math.Round(GetStandardisedScore());
             score.Combo = Combo.Value;
             score.MaxCombo = HighestCombo.Value;
-            score.Accuracy = Math.Round(Accuracy.Value, 4);
+            score.Accuracy = Accuracy.Value;
             score.Rank = Rank.Value;
             score.Date = DateTimeOffset.Now;
 
@@ -346,12 +346,6 @@ namespace osu.Game.Rulesets.Scoring
 
             score.HitEvents = hitEvents;
         }
-
-        /// <summary>
-        /// Create a <see cref="HitWindows"/> for this processor.
-        /// </summary>
-        [Obsolete("Method is now unused.")] // Can be removed 20210328
-        public virtual HitWindows CreateHitWindows() => new HitWindows();
     }
 
     public enum ScoringMode

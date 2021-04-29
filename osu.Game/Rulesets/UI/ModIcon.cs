@@ -16,6 +16,9 @@ using osu.Framework.Bindables;
 
 namespace osu.Game.Rulesets.UI
 {
+    /// <summary>
+    /// Display the specified mod at a fixed size.
+    /// </summary>
     public class ModIcon : Container, IHasTooltip
     {
         public readonly BindableBool Selected = new BindableBool();
@@ -26,11 +29,10 @@ namespace osu.Game.Rulesets.UI
 
         private const float size = 80;
 
-        private readonly ModType type;
-
-        public virtual string TooltipText => mod.IconTooltip;
+        public virtual string TooltipText => showTooltip ? mod.IconTooltip : null;
 
         private Mod mod;
+        private readonly bool showTooltip;
 
         public Mod Mod
         {
@@ -38,15 +40,27 @@ namespace osu.Game.Rulesets.UI
             set
             {
                 mod = value;
-                updateMod(value);
+
+                if (IsLoaded)
+                    updateMod(value);
             }
         }
 
-        public ModIcon(Mod mod)
+        [Resolved]
+        private OsuColour colours { get; set; }
+
+        private Color4 backgroundColour;
+        private Color4 highlightedColour;
+
+        /// <summary>
+        /// Construct a new instance.
+        /// </summary>
+        /// <param name="mod">The mod to be displayed</param>
+        /// <param name="showTooltip">Whether a tooltip describing the mod should display on hover.</param>
+        public ModIcon(Mod mod, bool showTooltip = true)
         {
             this.mod = mod ?? throw new ArgumentNullException(nameof(mod));
-
-            type = mod.Type;
+            this.showTooltip = showTooltip;
 
             Size = new Vector2(size);
 
@@ -79,6 +93,13 @@ namespace osu.Game.Rulesets.UI
                     Icon = FontAwesome.Solid.Question
                 },
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Selected.BindValueChanged(_ => updateColour());
 
             updateMod(mod);
         }
@@ -92,20 +113,14 @@ namespace osu.Game.Rulesets.UI
             {
                 modIcon.FadeOut();
                 modAcronym.FadeIn();
-                return;
+            }
+            else
+            {
+                modIcon.FadeIn();
+                modAcronym.FadeOut();
             }
 
-            modIcon.FadeIn();
-            modAcronym.FadeOut();
-        }
-
-        private Color4 backgroundColour;
-        private Color4 highlightedColour;
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            switch (type)
+            switch (value.Type)
             {
                 default:
                 case ModType.DifficultyIncrease:
@@ -139,12 +154,13 @@ namespace osu.Game.Rulesets.UI
                     modIcon.Colour = colours.Yellow;
                     break;
             }
+
+            updateColour();
         }
 
-        protected override void LoadComplete()
+        private void updateColour()
         {
-            base.LoadComplete();
-            Selected.BindValueChanged(selected => background.Colour = selected.NewValue ? highlightedColour : backgroundColour, true);
+            background.Colour = Selected.Value ? highlightedColour : backgroundColour;
         }
     }
 }

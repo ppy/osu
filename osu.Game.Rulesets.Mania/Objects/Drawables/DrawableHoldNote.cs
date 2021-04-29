@@ -221,7 +221,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             // As the note is being held, adjust the size of the sizing container. This has two effects:
             // 1. The contained masking container will mask the body and ticks.
             // 2. The head note will move along with the new "head position" in the container.
-            if (Head.IsHit && releaseTime == null)
+            if (Head.IsHit && releaseTime == null && DrawHeight > 0)
             {
                 // How far past the hit target this hold note is. Always a positive value.
                 float yOffset = Math.Max(0, Direction.Value == ScrollingDirection.Up ? -Y : Y);
@@ -233,6 +233,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             if (Tail.AllJudged)
             {
+                foreach (var tick in tickContainer)
+                {
+                    if (!tick.Judged)
+                        tick.MissForcefully();
+                }
+
                 ApplyResult(r => r.Type = r.Judgement.MaxResult);
                 endHold();
             }

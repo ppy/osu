@@ -20,27 +20,14 @@ namespace osu.Game.Tests.NonVisual
         {
             handler = new TestInputHandler(replay = new Replay
             {
-                Frames = new List<ReplayFrame>
-                {
-                    new TestReplayFrame(0),
-                    new TestReplayFrame(1000),
-                    new TestReplayFrame(2000),
-                    new TestReplayFrame(3000, true),
-                    new TestReplayFrame(4000, true),
-                    new TestReplayFrame(5000, true),
-                    new TestReplayFrame(7000, true),
-                    new TestReplayFrame(8000),
-                }
+                HasReceivedAllFrames = false
             });
         }
 
         [Test]
         public void TestNormalPlayback()
         {
-            Assert.IsNull(handler.CurrentFrame);
-
-            confirmCurrentFrame(null);
-            confirmNextFrame(0);
+            setReplayFrames();
 
             setTime(0, 0);
             confirmCurrentFrame(0);
@@ -107,6 +94,8 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestIntroTime()
         {
+            setReplayFrames();
+
             setTime(-1000, -1000);
             confirmCurrentFrame(null);
             confirmNextFrame(0);
@@ -123,6 +112,8 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestBasicRewind()
         {
+            setReplayFrames();
+
             setTime(2800, 0);
             setTime(2800, 1000);
             setTime(2800, 2000);
@@ -133,34 +124,35 @@ namespace osu.Game.Tests.NonVisual
             // pivot without crossing a frame boundary
             setTime(2700, 2700);
             confirmCurrentFrame(2);
-            confirmNextFrame(1);
+            confirmNextFrame(3);
 
-            // cross current frame boundary; should not yet update frame
-            setTime(1980, 1980);
+            // cross current frame boundary
+            setTime(1980, 2000);
             confirmCurrentFrame(2);
-            confirmNextFrame(1);
+            confirmNextFrame(3);
 
             setTime(1200, 1200);
-            confirmCurrentFrame(2);
-            confirmNextFrame(1);
+            confirmCurrentFrame(1);
+            confirmNextFrame(2);
 
             // ensure each frame plays out until start
             setTime(-500, 1000);
             confirmCurrentFrame(1);
-            confirmNextFrame(0);
+            confirmNextFrame(2);
 
             setTime(-500, 0);
             confirmCurrentFrame(0);
-            confirmNextFrame(null);
+            confirmNextFrame(1);
 
             setTime(-500, -500);
-            confirmCurrentFrame(0);
-            confirmNextFrame(null);
+            confirmCurrentFrame(null);
+            confirmNextFrame(0);
         }
 
         [Test]
         public void TestRewindInsideImportantSection()
         {
+            setReplayFrames();
             fastForwardToPoint(3000);
 
             setTime(4000, 4000);
@@ -168,12 +160,12 @@ namespace osu.Game.Tests.NonVisual
             confirmNextFrame(5);
 
             setTime(3500, null);
-            confirmCurrentFrame(4);
-            confirmNextFrame(3);
+            confirmCurrentFrame(3);
+            confirmNextFrame(4);
 
             setTime(3000, 3000);
             confirmCurrentFrame(3);
-            confirmNextFrame(2);
+            confirmNextFrame(4);
 
             setTime(3500, null);
             confirmCurrentFrame(3);
@@ -187,46 +179,127 @@ namespace osu.Game.Tests.NonVisual
             confirmCurrentFrame(4);
             confirmNextFrame(5);
 
-            setTime(4000, null);
+            setTime(4000, 4000);
             confirmCurrentFrame(4);
             confirmNextFrame(5);
 
             setTime(3500, null);
-            confirmCurrentFrame(4);
-            confirmNextFrame(3);
+            confirmCurrentFrame(3);
+            confirmNextFrame(4);
 
             setTime(3000, 3000);
             confirmCurrentFrame(3);
-            confirmNextFrame(2);
+            confirmNextFrame(4);
         }
 
         [Test]
         public void TestRewindOutOfImportantSection()
         {
+            setReplayFrames();
             fastForwardToPoint(3500);
 
             confirmCurrentFrame(3);
             confirmNextFrame(4);
 
             setTime(3200, null);
-            // next frame doesn't change even though direction reversed, because of important section.
             confirmCurrentFrame(3);
             confirmNextFrame(4);
 
-            setTime(3000, null);
+            setTime(3000, 3000);
             confirmCurrentFrame(3);
             confirmNextFrame(4);
 
             setTime(2800, 2800);
-            confirmCurrentFrame(3);
-            confirmNextFrame(2);
+            confirmCurrentFrame(2);
+            confirmNextFrame(3);
+        }
+
+        [Test]
+        public void TestReplayStreaming()
+        {
+            // no frames are arrived yet
+            setTime(0, null);
+            setTime(1000, null);
+            Assert.IsTrue(handler.WaitingForFrame, "Should be waiting for the first frame");
+
+            replay.Frames.Add(new TestReplayFrame(0));
+            replay.Frames.Add(new TestReplayFrame(1000));
+
+            // should always play from beginning
+            setTime(1000, 0);
+            confirmCurrentFrame(0);
+            Assert.IsFalse(handler.WaitingForFrame, "Should not be waiting yet");
+            setTime(1000, 1000);
+            confirmCurrentFrame(1);
+            confirmNextFrame(null);
+            Assert.IsTrue(handler.WaitingForFrame, "Should be waiting");
+
+            // cannot seek beyond the last frame
+            setTime(1500, null);
+            confirmCurrentFrame(1);
+
+            setTime(-100, 0);
+            confirmCurrentFrame(0);
+
+            // can seek to the point before the first frame, however
+            setTime(-100, -100);
+            confirmCurrentFrame(null);
+            confirmNextFrame(0);
+
+            fastForwardToPoint(1000);
+            setTime(3000, null);
+            replay.Frames.Add(new TestReplayFrame(2000));
+            confirmCurrentFrame(1);
+            setTime(1000, 1000);
+            setTime(3000, 2000);
+        }
+
+        [Test]
+        public void TestMultipleFramesSameTime()
+        {
+            replay.Frames.Add(new TestReplayFrame(0));
+            replay.Frames.Add(new TestReplayFrame(0));
+            replay.Frames.Add(new TestReplayFrame(1000));
+            replay.Frames.Add(new TestReplayFrame(1000));
+            replay.Frames.Add(new TestReplayFrame(2000));
+
+            // forward direction is prioritized when multiple frames have the same time.
+            setTime(0, 0);
+            setTime(0, 0);
+
+            setTime(2000, 1000);
+            setTime(2000, 1000);
+
+            setTime(1000, 1000);
+            setTime(1000, 1000);
+            setTime(-100, 1000);
+            setTime(-100, 0);
+            setTime(-100, 0);
+            setTime(-100, -100);
+        }
+
+        private void setReplayFrames()
+        {
+            replay.Frames = new List<ReplayFrame>
+            {
+                new TestReplayFrame(0),
+                new TestReplayFrame(1000),
+                new TestReplayFrame(2000),
+                new TestReplayFrame(3000, true),
+                new TestReplayFrame(4000, true),
+                new TestReplayFrame(5000, true),
+                new TestReplayFrame(7000, true),
+                new TestReplayFrame(8000),
+            };
+            replay.HasReceivedAllFrames = true;
         }
 
         private void fastForwardToPoint(double destination)
         {
             for (int i = 0; i < 1000; i++)
             {
-                if (handler.SetFrameFromTime(destination) == null)
+                var time = handler.SetFrameFromTime(destination);
+                if (time == null || time == destination)
                     return;
             }
 
@@ -235,33 +308,17 @@ namespace osu.Game.Tests.NonVisual
 
         private void setTime(double set, double? expect)
         {
-            Assert.AreEqual(expect, handler.SetFrameFromTime(set));
+            Assert.AreEqual(expect, handler.SetFrameFromTime(set), "Unexpected return value");
         }
 
         private void confirmCurrentFrame(int? frame)
         {
-            if (frame.HasValue)
-            {
-                Assert.IsNotNull(handler.CurrentFrame);
-                Assert.AreEqual(replay.Frames[frame.Value].Time, handler.CurrentFrame.Time);
-            }
-            else
-            {
-                Assert.IsNull(handler.CurrentFrame);
-            }
+            Assert.AreEqual(frame is int x ? replay.Frames[x].Time : (double?)null, handler.CurrentFrame?.Time, "Unexpected current frame");
         }
 
         private void confirmNextFrame(int? frame)
         {
-            if (frame.HasValue)
-            {
-                Assert.IsNotNull(handler.NextFrame);
-                Assert.AreEqual(replay.Frames[frame.Value].Time, handler.NextFrame.Time);
-            }
-            else
-            {
-                Assert.IsNull(handler.NextFrame);
-            }
+            Assert.AreEqual(frame is int x ? replay.Frames[x].Time : (double?)null, handler.NextFrame?.Time, "Unexpected next frame");
         }
 
         private class TestReplayFrame : ReplayFrame

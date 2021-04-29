@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using MessagePack;
 using Newtonsoft.Json;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -12,31 +13,37 @@ using osu.Game.Scoring;
 namespace osu.Game.Online.Spectator
 {
     [Serializable]
+    [MessagePackObject]
     public class FrameHeader
     {
         /// <summary>
         /// The current accuracy of the score.
         /// </summary>
+        [Key(0)]
         public double Accuracy { get; set; }
 
         /// <summary>
         /// The current combo of the score.
         /// </summary>
+        [Key(1)]
         public int Combo { get; set; }
 
         /// <summary>
         /// The maximum combo achieved up to the current point in time.
         /// </summary>
+        [Key(2)]
         public int MaxCombo { get; set; }
 
         /// <summary>
         /// Cumulative hit statistics.
         /// </summary>
+        [Key(3)]
         public Dictionary<HitResult, int> Statistics { get; set; }
 
         /// <summary>
         /// The time at which this frame was received by the server.
         /// </summary>
+        [Key(4)]
         public DateTimeOffset ReceivedTime { get; set; }
 
         /// <summary>
@@ -54,7 +61,8 @@ namespace osu.Game.Online.Spectator
         }
 
         [JsonConstructor]
-        public FrameHeader(int combo, int maxCombo, double accuracy, Dictionary<HitResult, int> statistics, DateTimeOffset receivedTime)
+        [SerializationConstructor]
+        public FrameHeader(double accuracy, int combo, int maxCombo, Dictionary<HitResult, int> statistics, DateTimeOffset receivedTime)
         {
             Combo = combo;
             MaxCombo = maxCombo;

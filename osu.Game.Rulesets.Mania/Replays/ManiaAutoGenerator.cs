@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Mania.Beatmaps;
+using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Replays;
 
@@ -69,10 +70,6 @@ namespace osu.Game.Rulesets.Mania.Replays
                     }
                 }
 
-                // todo: can be removed once FramedReplayInputHandler correctly handles rewinding before first frame.
-                if (Replay.Frames.Count == 0)
-                    Replay.Frames.Add(new ManiaReplayFrame(group.First().Time - 1));
-
                 Replay.Frames.Add(new ManiaReplayFrame(group.First().Time, actions.ToArray()));
             }
 
@@ -85,18 +82,26 @@ namespace osu.Game.Rulesets.Mania.Replays
             {
                 var currentObject = Beatmap.HitObjects[i];
                 var nextObjectInColumn = GetNextObject(i); // Get the next object that requires pressing the same button
-
-                double endTime = currentObject.GetEndTime();
-
-                bool canDelayKeyUp = nextObjectInColumn == null ||
-                                     nextObjectInColumn.StartTime > endTime + RELEASE_DELAY;
-
-                double calculatedDelay = canDelayKeyUp ? RELEASE_DELAY : (nextObjectInColumn.StartTime - endTime) * 0.9;
+                var releaseTime = calculateReleaseTime(currentObject, nextObjectInColumn);
 
                 yield return new HitPoint { Time = currentObject.StartTime, Column = currentObject.Column };
 
-                yield return new ReleasePoint { Time = endTime + calculatedDelay, Column = currentObject.Column };
+                yield return new ReleasePoint { Time = releaseTime, Column = currentObject.Column };
             }
+        }
+
+        private double calculateReleaseTime(HitObject currentObject, HitObject nextObject)
+        {
+            double endTime = currentObject.GetEndTime();
+
+            if (currentObject is HoldNote)
+                // hold note releases must be timed exactly.
+                return endTime;
+
+            bool canDelayKeyUpFully = nextObject == null ||
+                                      nextObject.StartTime > endTime + RELEASE_DELAY;
+
+            return endTime + (canDelayKeyUpFully ? RELEASE_DELAY : (nextObject.StartTime - endTime) * 0.9);
         }
 
         protected override HitObject GetNextObject(int currentIndex)

@@ -7,12 +7,14 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Edit
 {
@@ -24,7 +26,7 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// Whether the <see cref="HitObject"/> is currently mid-placement, but has not necessarily finished being placed.
         /// </summary>
-        public bool PlacementActive { get; private set; }
+        public PlacementState PlacementActive { get; private set; }
 
         /// <summary>
         /// The <see cref="HitObject"/> that is being placed.
@@ -44,6 +46,9 @@ namespace osu.Game.Rulesets.Edit
         protected PlacementBlueprint(HitObject hitObject)
         {
             HitObject = hitObject;
+
+            // adding the default hit sample should be the case regardless of the ruleset.
+            HitObject.Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_NORMAL));
 
             RelativeSizeAxes = Axes.Both;
 
@@ -68,7 +73,8 @@ namespace osu.Game.Rulesets.Edit
         protected void BeginPlacement(bool commitStart = false)
         {
             placementHandler.BeginPlacement(HitObject);
-            PlacementActive |= commitStart;
+            if (commitStart)
+                PlacementActive = PlacementState.Active;
         }
 
         /// <summary>
@@ -78,10 +84,19 @@ namespace osu.Game.Rulesets.Edit
         /// <param name="commit">Whether the object should be committed.</param>
         public void EndPlacement(bool commit)
         {
-            if (!PlacementActive)
-                BeginPlacement();
+            switch (PlacementActive)
+            {
+                case PlacementState.Finished:
+                    return;
+
+                case PlacementState.Waiting:
+                    // ensure placement was started before ending to make state handling simpler.
+                    BeginPlacement();
+                    break;
+            }
+
             placementHandler.EndPlacement(HitObject, commit);
-            PlacementActive = false;
+            PlacementActive = PlacementState.Finished;
         }
 
         /// <summary>
@@ -90,7 +105,7 @@ namespace osu.Game.Rulesets.Edit
         /// <param name="result">The snap result information.</param>
         public virtual void UpdateTimeAndPosition(SnapResult result)
         {
-            if (!PlacementActive)
+            if (PlacementActive == PlacementState.Waiting)
                 HitObject.StartTime = result.Time ?? EditorClock?.CurrentTime ?? Time.Current;
         }
 
@@ -114,12 +129,22 @@ namespace osu.Game.Rulesets.Edit
                 case DoubleClickEvent _:
                     return false;
 
-                case MouseButtonEvent _:
-                    return true;
+                case MouseButtonEvent mouse:
+                    // placement blueprints should generally block mouse from reaching underlying components (ie. performing clicks on interface buttons).
+                    // for now, the one exception we want to allow is when using a non-main mouse button when shift is pressed, which is used to trigger object deletion
+                    // while in placement mode.
+                    return mouse.Button == MouseButton.Left || !mouse.ShiftPressed;
 
                 default:
                     return false;
             }
+        }
+
+        public enum PlacementState
+        {
+            Waiting,
+            Active,
+            Finished
         }
     }
 }

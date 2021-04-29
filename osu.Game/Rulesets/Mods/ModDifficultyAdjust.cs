@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Mods
         protected const int LAST_SETTING_ORDER = 2;
 
         [SettingSource("HP Drain", "Override a beatmap's set HP.", FIRST_SETTING_ORDER)]
-        public BindableNumber<float> DrainRate { get; } = new BindableFloat
+        public BindableNumber<float> DrainRate { get; } = new BindableFloatWithLimitExtension
         {
             Precision = 0.1f,
             MinValue = 0,
@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Mods
         };
 
         [SettingSource("Accuracy", "Override a beatmap's set OD.", LAST_SETTING_ORDER)]
-        public BindableNumber<float> OverallDifficulty { get; } = new BindableFloat
+        public BindableNumber<float> OverallDifficulty { get; } = new BindableFloatWithLimitExtension
         {
             Precision = 0.1f,
             MinValue = 0,
@@ -52,6 +52,24 @@ namespace osu.Game.Rulesets.Mods
             Default = 5,
             Value = 5,
         };
+
+        [SettingSource("Extended Limits", "Adjust difficulty beyond sane limits.")]
+        public BindableBool ExtendedLimits { get; } = new BindableBool();
+
+        protected ModDifficultyAdjust()
+        {
+            ExtendedLimits.BindValueChanged(extend => ApplyLimits(extend.NewValue));
+        }
+
+        /// <summary>
+        /// Changes the difficulty adjustment limits. Occurs when the value of <see cref="ExtendedLimits"/> is changed.
+        /// </summary>
+        /// <param name="extended">Whether limits should extend beyond sane ranges.</param>
+        protected virtual void ApplyLimits(bool extended)
+        {
+            DrainRate.MaxValue = extended ? 11 : 10;
+            OverallDifficulty.MaxValue = extended ? 11 : 10;
+        }
 
         public override string SettingDescription
         {
@@ -140,6 +158,74 @@ namespace osu.Game.Rulesets.Mods
         {
             ApplySetting(DrainRate, dr => difficulty.DrainRate = dr);
             ApplySetting(OverallDifficulty, od => difficulty.OverallDifficulty = od);
+        }
+
+        public override void ResetSettingsToDefaults()
+        {
+            base.ResetSettingsToDefaults();
+
+            if (difficulty != null)
+            {
+                // base implementation potentially overwrite modified defaults that came from a beatmap selection.
+                TransferSettings(difficulty);
+            }
+        }
+
+        /// <summary>
+        /// A <see cref="BindableDouble"/> that extends its min/max values to support any assigned value.
+        /// </summary>
+        protected class BindableDoubleWithLimitExtension : BindableDouble
+        {
+            public override double Value
+            {
+                get => base.Value;
+                set
+                {
+                    if (value < MinValue)
+                        MinValue = value;
+                    if (value > MaxValue)
+                        MaxValue = value;
+                    base.Value = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// A <see cref="BindableFloat"/> that extends its min/max values to support any assigned value.
+        /// </summary>
+        protected class BindableFloatWithLimitExtension : BindableFloat
+        {
+            public override float Value
+            {
+                get => base.Value;
+                set
+                {
+                    if (value < MinValue)
+                        MinValue = value;
+                    if (value > MaxValue)
+                        MaxValue = value;
+                    base.Value = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// A <see cref="BindableInt"/> that extends its min/max values to support any assigned value.
+        /// </summary>
+        protected class BindableIntWithLimitExtension : BindableInt
+        {
+            public override int Value
+            {
+                get => base.Value;
+                set
+                {
+                    if (value < MinValue)
+                        MinValue = value;
+                    if (value > MaxValue)
+                        MaxValue = value;
+                    base.Value = value;
+                }
+            }
         }
     }
 }

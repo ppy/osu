@@ -30,6 +30,8 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         public readonly Bindable<double?> ExpectedDistance = new Bindable<double?>();
 
+        public bool HasValidLength => Distance > 0;
+
         /// <summary>
         /// The control points of the path.
         /// </summary>
@@ -147,13 +149,44 @@ namespace osu.Game.Rulesets.Objects
         /// to 1 (end of the path).
         /// </summary>
         /// <param name="progress">Ranges from 0 (beginning of the path) to 1 (end of the path).</param>
-        /// <returns></returns>
         public Vector2 PositionAt(double progress)
         {
             ensureValid();
 
             double d = progressToDistance(progress);
             return interpolateVertices(indexOfDistance(d), d);
+        }
+
+        /// <summary>
+        /// Returns the control points belonging to the same segment as the one given.
+        /// The first point has a PathType which all other points inherit.
+        /// </summary>
+        /// <param name="controlPoint">One of the control points in the segment.</param>
+        public List<PathControlPoint> PointsInSegment(PathControlPoint controlPoint)
+        {
+            bool found = false;
+            List<PathControlPoint> pointsInCurrentSegment = new List<PathControlPoint>();
+
+            foreach (PathControlPoint point in ControlPoints)
+            {
+                if (point.Type.Value != null)
+                {
+                    if (!found)
+                        pointsInCurrentSegment.Clear();
+                    else
+                    {
+                        pointsInCurrentSegment.Add(point);
+                        break;
+                    }
+                }
+
+                pointsInCurrentSegment.Add(point);
+
+                if (point == controlPoint)
+                    found = true;
+            }
+
+            return pointsInCurrentSegment;
         }
 
         private void invalidate()

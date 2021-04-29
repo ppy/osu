@@ -31,6 +31,8 @@ namespace osu.Game.Screens.Play
 
         protected override bool BlockNonPositionalInput => true;
 
+        protected override bool BlockScrollInput => false;
+
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         public Action OnRetry;
