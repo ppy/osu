@@ -158,11 +158,7 @@ namespace Mvis.Plugin.CloudMusicSupport
             return base.Enable();
         }
 
-        protected override bool PostInit()
-        {
-            currentWorkingBeatmap ??= MvisScreen.Beatmap.Value;
-            return true;
-        }
+        protected override bool PostInit() => true;
 
         private Lyric currentLine;
         private readonly Lyric defaultLrc = new Lyric();

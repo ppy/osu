@@ -159,6 +159,7 @@ namespace Mvis.Plugin.RulesetPanel
                 MvisScreen.OnScreenExiting -= beatmapLogo.StopResponseOnBeatmapChanges;
                 MvisScreen.OnScreenSuspending -= beatmapLogo.StopResponseOnBeatmapChanges;
             }
+
             Value.UnbindAll();
             Disable();
 

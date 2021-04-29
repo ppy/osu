@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Screens.Mvis.Plugins.Config;
@@ -81,10 +82,14 @@ namespace osu.Game.Screens.Mvis.Plugins
             }
             catch (Exception e)
             {
-                Logger.Error(e, "卸载插件时出现了问题");
-                avaliablePlugins.Add(pl);
-                providers.Add(provider);
-                throw;
+                Logger.Error(e, $"卸载插件时出现了问题: {e.Message}");
+
+                //直接dispose掉插件
+                if (pl.Parent is Container container)
+                {
+                    container.Remove(pl);
+                    pl.Dispose();
+                }
             }
 
             return true;
