@@ -88,6 +88,7 @@ namespace osu.Game.Skinning.Editor
 
         public override bool HandleRotation(float angle)
         {
+            // TODO: this doesn't correctly account for origin/anchor specs being different in a multi-selection.
             foreach (var c in SelectedBlueprints)
                 ((Drawable)c.Item).Rotation += angle;
 
