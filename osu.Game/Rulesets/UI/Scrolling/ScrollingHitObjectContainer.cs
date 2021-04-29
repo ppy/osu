@@ -185,8 +185,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
             layoutComputed.Remove(hitObject);
         }
 
-        private float scrollLength;
-
         protected override void Update()
         {
             base.Update();
@@ -199,29 +197,16 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 layoutComputed.Clear();
 
                 scrollingInfo.Algorithm.Reset();
-
-                switch (direction.Value)
-                {
-                    case ScrollingDirection.Up:
-                    case ScrollingDirection.Down:
-                        scrollLength = DrawSize.Y;
-                        break;
-
-                    default:
-                        scrollLength = DrawSize.X;
-                        break;
-                }
-
                 layoutCache.Validate();
             }
         }
 
+        // We need to calculate hit object positions (including nested hit objects) as soon as possible after lifetimes
+        // to prevent hit objects displayed in a wrong position for one frame.
         protected override void UpdateAfterChildrenLife()
         {
             base.UpdateAfterChildrenLife();
 
-            // We need to calculate hit object positions (including nested hit objects) as soon as possible after lifetimes
-            // to prevent hit objects displayed in a wrong position for one frame.
             // Only AliveObjects need to be considered for layout (reduces overhead in the case of scroll speed changes).
             foreach (var obj in AliveObjects)
             {
@@ -260,7 +245,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
                     break;
             }
 
-            entry.LifetimeStart = scrollingInfo.Algorithm.GetDisplayStartTime(entry.HitObject.StartTime, startOffset, timeRange.Value, scrollLength);
+            entry.LifetimeStart = scrollingInfo.Algorithm.GetDisplayStartTime(entry.HitObject.StartTime, startOffset, timeRange.Value, getLength());
         }
 
         private void updateLayoutRecursive(DrawableHitObject hitObject)
@@ -271,12 +256,12 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 {
                     case ScrollingDirection.Up:
                     case ScrollingDirection.Down:
-                        hitObject.Height = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, e.EndTime, timeRange.Value, scrollLength);
+                        hitObject.Height = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, e.EndTime, timeRange.Value, getLength());
                         break;
 
                     case ScrollingDirection.Left:
                     case ScrollingDirection.Right:
-                        hitObject.Width = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, e.EndTime, timeRange.Value, scrollLength);
+                        hitObject.Width = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, e.EndTime, timeRange.Value, getLength());
                         break;
                 }
             }
@@ -295,19 +280,19 @@ namespace osu.Game.Rulesets.UI.Scrolling
             switch (direction.Value)
             {
                 case ScrollingDirection.Up:
-                    hitObject.Y = scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
+                    hitObject.Y = scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, getLength());
                     break;
 
                 case ScrollingDirection.Down:
-                    hitObject.Y = -scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
+                    hitObject.Y = -scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, getLength());
                     break;
 
                 case ScrollingDirection.Left:
-                    hitObject.X = scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
+                    hitObject.X = scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, getLength());
                     break;
 
                 case ScrollingDirection.Right:
-                    hitObject.X = -scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
+                    hitObject.X = -scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, getLength());
                     break;
             }
         }
