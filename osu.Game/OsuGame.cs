@@ -619,7 +619,6 @@ namespace osu.Game
                         logoContainer = new Container { RelativeSizeAxes = Axes.Both },
                     }
                 },
-                skinEditor = new SkinEditorContainer(screenContainer),
                 overlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 rightFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 leftFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
@@ -689,6 +688,7 @@ namespace osu.Game
             var changelogOverlay = loadComponentSingleFile(new ChangelogOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add, true);
+            loadComponentSingleFile(skinEditor = new SkinEditorContainer(screenContainer), overlayContent.Add);
 
             loadComponentSingleFile(new LoginOverlay
             {
