@@ -31,7 +31,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="ppy.osu.Framework" Version="2021.427.0" />
     <PackageReference Include="ppy.osu.Game.Resources" Version="2021.422.0" />
-    <PackageReference Include="Sentry" Version="3.2.0" />
+    <PackageReference Include="Sentry" Version="3.3.4" />
     <PackageReference Include="SharpCompress" Version="0.28.2" />
     <PackageReference Include="NUnit" Version="3.13.1" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
