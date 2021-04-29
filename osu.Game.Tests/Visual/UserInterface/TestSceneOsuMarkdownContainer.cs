@@ -108,5 +108,25 @@ Line below";
 | Left                 |         Center         |                 Right |";
             });
         }
+
+        [Test]
+        public void TestUnorderedList()
+        {
+            AddStep("Add Unordered List", () =>
+            {
+                markdownContainer.Text = @"- First item level 1
+- Second item level 1
+    - First item level 2
+        - First item level 3
+        - Second item level 3
+        - Third item level 3
+            - First item level 4
+            - Second item level 4
+            - Third item level 4
+    - Second item level 2
+    - Third item level 2
+- Third item level 1";
+            });
+        }
     }
 }
