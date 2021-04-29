@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Utils;
+using osu.Game.Extensions;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
@@ -42,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             // this will potentially move the selection out of bounds...
             foreach (var h in hitObjects)
-                h.Position += moveEvent.InstantDelta;
+                h.Position += this.ScreenSpaceDeltaToParentSpace(moveEvent.ScreenSpaceDelta);
 
             // but this will be corrected.
             moveSelectionInBounds();

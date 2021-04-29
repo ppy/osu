@@ -127,7 +127,7 @@ namespace osu.Game.Rulesets.Edit
         public virtual MenuItem[] ContextMenuItems => Array.Empty<MenuItem>();
 
         /// <summary>
-        /// The screen-space point that causes this <see cref="OverlaySelectionBlueprint"/> to be selected.
+        /// The screen-space point that causes this <see cref="OverlaySelectionBlueprint"/> to be selected via a drag.
         /// </summary>
         public virtual Vector2 ScreenSpaceSelectionPoint => ScreenSpaceDrawQuad.Centre;
 
@@ -135,8 +135,6 @@ namespace osu.Game.Rulesets.Edit
         /// The screen-space quad that outlines this <see cref="OverlaySelectionBlueprint"/> for selections.
         /// </summary>
         public virtual Quad SelectionQuad => ScreenSpaceDrawQuad;
-
-        public virtual Vector2 GetInstantDelta(Vector2 screenSpacePosition) => Parent.ToLocalSpace(screenSpacePosition) - Position;
 
         /// <summary>
         /// Handle to perform a partial deletion when the user requests a quick delete (Shift+Right Click).
