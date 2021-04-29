@@ -35,6 +35,15 @@ namespace osu.Game.Skinning.Editor
         {
             switch (action)
             {
+                case GlobalAction.Back:
+                    if (skinEditor?.State.Value == Visibility.Visible)
+                    {
+                        skinEditor.ToggleVisibility();
+                        return true;
+                    }
+
+                    break;
+
                 case GlobalAction.ToggleSkinEditor:
                     if (skinEditor == null)
                     {
