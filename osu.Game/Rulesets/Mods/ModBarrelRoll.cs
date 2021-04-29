@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
@@ -34,11 +35,6 @@ namespace osu.Game.Rulesets.Mods
 
         public override string SettingDescription => $"{SpinSpeed.Value} rpm {Direction.Value.GetDescription().ToLowerInvariant()}";
 
-        /// <summary>
-        /// Used to allow all hitobjects to stay within the visible region.
-        /// </summary>
-        protected abstract Vector2 PlayfieldScale { get; }
-
         public void Update(Playfield playfield)
         {
             playfield.Rotation = CurrentRotation = (Direction.Value == RotationDirection.Counterclockwise ? -1 : 1) * 360 * (float)(playfield.Time.Current / 60000 * SpinSpeed.Value);
@@ -46,7 +42,12 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToDrawableRuleset(DrawableRuleset<TObject> drawableRuleset)
         {
-            drawableRuleset.Playfield.Scale = PlayfieldScale;
+            // scale the playfield to allow all hitobjects to stay within the visible region.
+
+            var playfieldSize = drawableRuleset.Playfield.DrawSize;
+            var minSide = MathF.Min(playfieldSize.X, playfieldSize.Y);
+            var maxSide = MathF.Max(playfieldSize.X, playfieldSize.Y);
+            drawableRuleset.Playfield.Scale = new Vector2(minSide / maxSide);
         }
     }
 }
