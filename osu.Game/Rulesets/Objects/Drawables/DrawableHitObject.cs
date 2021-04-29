@@ -11,16 +11,17 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Performance;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Threading;
 using osu.Game.Audio;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects.Pooling;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Skinning;
-using osu.Game.Configuration;
-using osu.Game.Rulesets.Objects.Pooling;
 using osu.Game.Rulesets.UI;
+using osu.Game.Skinning;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Objects.Drawables
@@ -430,8 +431,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         /// <summary>
+        /// Reapplies the current <see cref="ArmedState"/>.
+        /// </summary>
+        protected void RefreshStateTransforms() => updateState(State.Value, true);
+
+        /// <summary>
         /// Apply (generally fade-in) transforms leading into the <see cref="HitObject"/> start time.
-        /// The local drawable hierarchy is recursively delayed to <see cref="HitObjectLifetimeEntry.LifetimeStart"/> for convenience.
+        /// The local drawable hierarchy is recursively delayed to <see cref="LifetimeEntry.LifetimeStart"/> for convenience.
         ///
         /// By default this will fade in the object from zero with no duration.
         /// </summary>
@@ -613,7 +619,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <remarks>
         /// This is only used as an optimisation to delay the initial update of this <see cref="DrawableHitObject"/> and may be tuned more aggressively if required.
         /// It is indirectly used to decide the automatic transform offset provided to <see cref="UpdateInitialTransforms"/>.
-        /// A more accurate <see cref="HitObjectLifetimeEntry.LifetimeStart"/> should be set for further optimisation (in <see cref="LoadComplete"/>, for example).
+        /// A more accurate <see cref="LifetimeEntry.LifetimeStart"/> should be set for further optimisation (in <see cref="LoadComplete"/>, for example).
         /// <para>
         /// Only has an effect if this <see cref="DrawableHitObject"/> is not being pooled.
         /// For pooled <see cref="DrawableHitObject"/>s, use <see cref="HitObjectLifetimeEntry.InitialLifetimeOffset"/> instead.
