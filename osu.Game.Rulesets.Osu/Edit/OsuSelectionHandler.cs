@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public class OsuSelectionHandler : SelectionHandler
+    public class OsuSelectionHandler : EditorSelectionHandler
     {
         protected override void OnSelectionChanged()
         {
@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             referencePathTypes = null;
         }
 
-        public override bool HandleMovement(MoveSelectionEvent moveEvent)
+        public override bool HandleMovement(MoveSelectionEvent<HitObject> moveEvent)
         {
             var hitObjects = selectedMovableObjects;
 
@@ -374,8 +374,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// <summary>
         /// All osu! hitobjects which can be moved/rotated/scaled.
         /// </summary>
-        private OsuHitObject[] selectedMovableObjects => EditorBeatmap.SelectedHitObjects
-                                                                      .OfType<OsuHitObject>()
+        private OsuHitObject[] selectedMovableObjects => SelectedItems.OfType<OsuHitObject>()
                                                                       .Where(h => !(h is Spinner))
                                                                       .ToArray();
 

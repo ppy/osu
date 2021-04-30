@@ -23,8 +23,8 @@ namespace osu.Game.Tests.Visual.Editing
 
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset, false);
 
-        private BlueprintContainer blueprintContainer
-            => Editor.ChildrenOfType<BlueprintContainer>().First();
+        private EditorBlueprintContainer blueprintContainer
+            => Editor.ChildrenOfType<EditorBlueprintContainer>().First();
 
         [Test]
         public void TestSelectedObjectHasPriorityWhenOverlapping()

@@ -3,12 +3,13 @@
 
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
 
 namespace osu.Game.Rulesets.Edit
 {
-    public abstract class OverlaySelectionBlueprint : SelectionBlueprint
+    public abstract class OverlaySelectionBlueprint : SelectionBlueprint<HitObject>
     {
         /// <summary>
         /// The <see cref="DrawableHitObject"/> which this <see cref="OverlaySelectionBlueprint"/> applies to.
