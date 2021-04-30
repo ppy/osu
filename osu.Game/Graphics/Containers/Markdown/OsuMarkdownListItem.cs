@@ -9,6 +9,8 @@ namespace osu.Game.Graphics.Containers.Markdown
 {
     public class OsuMarkdownListItem : FillFlowContainer
     {
+        private const float default_left_padding = 20;
+
         public OsuMarkdownListItem()
         {
             AutoSizeAxes = Axes.Y;
@@ -16,6 +18,7 @@ namespace osu.Game.Graphics.Containers.Markdown
 
             Direction = FillDirection.Vertical;
             Spacing = new Vector2(10, 10);
+            Padding = new MarginPadding { Left = default_left_padding };
         }
     }
 }
