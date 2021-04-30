@@ -11,21 +11,23 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Performance;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Threading;
 using osu.Game.Audio;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects.Pooling;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Skinning;
-using osu.Game.Configuration;
 using osu.Game.Rulesets.UI;
+using osu.Game.Skinning;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {
     [Cached(typeof(DrawableHitObject))]
-    public abstract class DrawableHitObject : SkinReloadableDrawable
+    public abstract class DrawableHitObject : PoolableDrawableWithLifetime<HitObjectLifetimeEntry>
     {
         /// <summary>
         /// Invoked after this <see cref="DrawableHitObject"/>'s applied <see cref="HitObject"/> has had its defaults applied.
@@ -40,7 +42,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// The <see cref="HitObject"/> currently represented by this <see cref="DrawableHitObject"/>.
         /// </summary>
-        public HitObject HitObject => lifetimeEntry?.HitObject;
+        public HitObject HitObject => Entry?.HitObject;
 
         /// <summary>
         /// The parenting <see cref="DrawableHitObject"/>, if any.
@@ -109,7 +111,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// The scoring result of this <see cref="DrawableHitObject"/>.
         /// </summary>
-        public JudgementResult Result => lifetimeEntry?.Result;
+        public JudgementResult Result => Entry?.Result;
 
         /// <summary>
         /// The relative X position of this hit object for sample playback balance adjustment.
@@ -125,8 +127,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private readonly Bindable<bool> userPositionalHitSounds = new Bindable<bool>();
         private readonly Bindable<int> comboIndexBindable = new Bindable<int>();
 
-        public override bool RemoveWhenNotAlive => false;
-        public override bool RemoveCompletedTransforms => false;
         protected override bool RequiresChildrenUpdate => true;
 
         public override bool IsPresent => base.IsPresent || (State.Value == ArmedState.Idle && Clock?.CurrentTime >= LifetimeStart);
@@ -141,18 +141,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </remarks>
         public IBindable<ArmedState> State => state;
 
-        /// <summary>
-        /// Whether a <see cref="HitObjectLifetimeEntry"/> is currently applied.
-        /// </summary>
-        private bool hasEntryApplied;
-
-        /// <summary>
-        /// The <see cref="HitObjectLifetimeEntry"/> controlling the lifetime of the currently-attached <see cref="HitObject"/>.
-        /// </summary>
-        /// <remarks>Even if it is not null, it may not be fully applied until loaded (<see cref="hasEntryApplied"/> is false).</remarks>
-        [CanBeNull]
-        private HitObjectLifetimeEntry lifetimeEntry;
-
         [Resolved(CanBeNull = true)]
         private IPooledHitObjectProvider pooledObjectProvider { get; set; }
 
@@ -166,32 +154,25 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         /// <param name="initialHitObject">
         /// The <see cref="HitObject"/> to be initially applied to this <see cref="DrawableHitObject"/>.
-        /// If <c>null</c>, a hitobject is expected to be later applied via <see cref="Apply(osu.Game.Rulesets.Objects.HitObjectLifetimeEntry)"/> (or automatically via pooling).
+        /// If <c>null</c>, a hitobject is expected to be later applied via <see cref="PoolableDrawableWithLifetime{TEntry}.Apply"/> (or automatically via pooling).
         /// </param>
         protected DrawableHitObject([CanBeNull] HitObject initialHitObject = null)
+            : base(initialHitObject != null ? new SyntheticHitObjectEntry(initialHitObject) : null)
         {
-            if (initialHitObject != null)
-            {
-                lifetimeEntry = new SyntheticHitObjectEntry(initialHitObject);
+            if (Entry != null)
                 ensureEntryHasResult();
-            }
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, ISkinSource skinSource)
         {
             config.BindWith(OsuSetting.PositionalHitSounds, userPositionalHitSounds);
 
             // Explicit non-virtual function call.
             base.AddInternal(Samples = new PausableSkinnableSound());
-        }
 
-        protected override void LoadAsyncComplete()
-        {
-            base.LoadAsyncComplete();
-
-            if (lifetimeEntry != null && !hasEntryApplied)
-                Apply(lifetimeEntry);
+            CurrentSkin = skinSource;
+            CurrentSkin.SourceChanged += onSkinSourceChanged;
         }
 
         protected override void LoadComplete()
@@ -227,22 +208,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
             Apply(new SyntheticHitObjectEntry(hitObject));
         }
 
-        /// <summary>
-        /// Applies a new <see cref="HitObjectLifetimeEntry"/> to be represented by this <see cref="DrawableHitObject"/>.
-        /// </summary>
-        public void Apply([NotNull] HitObjectLifetimeEntry newEntry)
+        protected sealed override void OnApply(HitObjectLifetimeEntry entry)
         {
-            free();
-
-            lifetimeEntry = newEntry;
-
             // LifetimeStart is already computed using HitObjectLifetimeEntry's InitialLifetimeOffset.
             // We override this with DHO's InitialLifetimeOffset for a non-pooled DHO.
-            if (newEntry is SyntheticHitObjectEntry)
-                lifetimeEntry.LifetimeStart = HitObject.StartTime - InitialLifetimeOffset;
-
-            LifetimeStart = lifetimeEntry.LifetimeStart;
-            LifetimeEnd = lifetimeEntry.LifetimeEnd;
+            if (entry is SyntheticHitObjectEntry)
+                LifetimeStart = HitObject.StartTime - InitialLifetimeOffset;
 
             ensureEntryHasResult();
 
@@ -293,17 +264,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 else
                     updateState(ArmedState.Idle, true);
             }
-
-            hasEntryApplied = true;
         }
 
-        /// <summary>
-        /// Removes the currently applied <see cref="lifetimeEntry"/>
-        /// </summary>
-        private void free()
+        protected sealed override void OnFree(HitObjectLifetimeEntry entry)
         {
-            if (!hasEntryApplied) return;
-
             StartTimeBindable.UnbindFrom(HitObject.StartTimeBindable);
             if (HitObject is IHasComboInformation combo)
                 comboIndexBindable.UnbindFrom(combo.ComboIndexBindable);
@@ -335,22 +299,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             OnFree();
 
             ParentHitObject = null;
-            lifetimeEntry = null;
 
             clearExistingStateTransforms();
-
-            hasEntryApplied = false;
-        }
-
-        protected sealed override void FreeAfterUse()
-        {
-            base.FreeAfterUse();
-
-            // Freeing while not in a pool would cause the DHO to not be usable elsewhere in the hierarchy without being re-applied.
-            if (!IsInPool)
-                return;
-
-            free();
         }
 
         /// <summary>
@@ -398,8 +348,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         private void onDefaultsApplied(HitObject hitObject)
         {
-            Debug.Assert(lifetimeEntry != null);
-            Apply(lifetimeEntry);
+            Debug.Assert(Entry != null);
+            Apply(Entry);
 
             DefaultsApplied?.Invoke(this);
         }
@@ -481,8 +431,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         /// <summary>
+        /// Reapplies the current <see cref="ArmedState"/>.
+        /// </summary>
+        protected void RefreshStateTransforms() => updateState(State.Value, true);
+
+        /// <summary>
         /// Apply (generally fade-in) transforms leading into the <see cref="HitObject"/> start time.
-        /// The local drawable hierarchy is recursively delayed to <see cref="LifetimeStart"/> for convenience.
+        /// The local drawable hierarchy is recursively delayed to <see cref="LifetimeEntry.LifetimeStart"/> for convenience.
         ///
         /// By default this will fade in the object from zero with no duration.
         /// </summary>
@@ -536,17 +491,19 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         #endregion
 
-        protected sealed override void SkinChanged(ISkinSource skin, bool allowFallback)
-        {
-            base.SkinChanged(skin, allowFallback);
+        #region Skinning
 
+        protected ISkinSource CurrentSkin { get; private set; }
+
+        private void onSkinSourceChanged() => Scheduler.AddOnce(() =>
+        {
             UpdateComboColour();
 
-            ApplySkin(skin, allowFallback);
+            ApplySkin(CurrentSkin, true);
 
             if (IsLoaded)
                 updateState(State.Value, true);
-        }
+        });
 
         protected void UpdateComboColour()
         {
@@ -616,6 +573,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 Samples.Stop();
         }
 
+        #endregion
+
         protected override void Update()
         {
             base.Update();
@@ -653,30 +612,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </remarks>
         protected internal new ScheduledDelegate Schedule(Action action) => base.Schedule(action);
 
-        public override double LifetimeStart
-        {
-            get => base.LifetimeStart;
-            set => setLifetime(value, LifetimeEnd);
-        }
-
-        public override double LifetimeEnd
-        {
-            get => base.LifetimeEnd;
-            set => setLifetime(LifetimeStart, value);
-        }
-
-        private void setLifetime(double lifetimeStart, double lifetimeEnd)
-        {
-            base.LifetimeStart = lifetimeStart;
-            base.LifetimeEnd = lifetimeEnd;
-
-            if (lifetimeEntry != null)
-            {
-                lifetimeEntry.LifetimeStart = lifetimeStart;
-                lifetimeEntry.LifetimeEnd = lifetimeEnd;
-            }
-        }
-
         /// <summary>
         /// A safe offset prior to the start time of <see cref="HitObject"/> at which this <see cref="DrawableHitObject"/> may begin displaying contents.
         /// By default, <see cref="DrawableHitObject"/>s are assumed to display their contents within 10 seconds prior to the start time of <see cref="HitObject"/>.
@@ -684,7 +619,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <remarks>
         /// This is only used as an optimisation to delay the initial update of this <see cref="DrawableHitObject"/> and may be tuned more aggressively if required.
         /// It is indirectly used to decide the automatic transform offset provided to <see cref="UpdateInitialTransforms"/>.
-        /// A more accurate <see cref="LifetimeStart"/> should be set for further optimisation (in <see cref="LoadComplete"/>, for example).
+        /// A more accurate <see cref="LifetimeEntry.LifetimeStart"/> should be set for further optimisation (in <see cref="LoadComplete"/>, for example).
         /// <para>
         /// Only has an effect if this <see cref="DrawableHitObject"/> is not being pooled.
         /// For pooled <see cref="DrawableHitObject"/>s, use <see cref="HitObjectLifetimeEntry.InitialLifetimeOffset"/> instead.
@@ -800,9 +735,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         private void ensureEntryHasResult()
         {
-            Debug.Assert(lifetimeEntry != null);
-            lifetimeEntry.Result ??= CreateResult(HitObject.CreateJudgement())
-                                     ?? throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
+            Debug.Assert(Entry != null);
+            Entry.Result ??= CreateResult(HitObject.CreateJudgement())
+                             ?? throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
         }
 
         protected override void Dispose(bool isDisposing)
@@ -811,6 +746,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             if (HitObject != null)
                 HitObject.DefaultsApplied -= onDefaultsApplied;
+
+            CurrentSkin.SourceChanged -= onSkinSourceChanged;
         }
     }
 
