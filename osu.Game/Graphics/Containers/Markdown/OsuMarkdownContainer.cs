@@ -21,6 +21,13 @@ namespace osu.Game.Graphics.Containers.Markdown
                     // Don't parse YAML Frontmatter
                     break;
 
+                case ListItemBlock listItemBlock:
+                    var childContainer = CreateListItem(listItemBlock);
+                    container.Add(childContainer);
+                    foreach (var single in listItemBlock)
+                        base.AddMarkdownComponent(single, childContainer, level);
+                    break;
+
                 default:
                     base.AddMarkdownComponent(markdownObject, container, level);
                     break;
@@ -36,6 +43,8 @@ namespace osu.Game.Graphics.Containers.Markdown
         protected override MarkdownQuoteBlock CreateQuoteBlock(QuoteBlock quoteBlock) => new OsuMarkdownQuoteBlock(quoteBlock);
 
         protected override MarkdownTable CreateTable(Table table) => new OsuMarkdownTable(table);
+
+        protected virtual OsuMarkdownListItem CreateListItem(ListItemBlock listItemBlock) => new OsuMarkdownListItem();
 
         protected override MarkdownPipeline CreateBuilder()
             => new MarkdownPipelineBuilder().UseAutoIdentifiers(AutoIdentifierOptions.GitHub)
