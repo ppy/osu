@@ -6,6 +6,7 @@ using Markdig.Extensions.AutoIdentifiers;
 using Markdig.Extensions.Tables;
 using Markdig.Extensions.Yaml;
 using Markdig.Syntax;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Containers.Markdown;
 
@@ -43,6 +44,11 @@ namespace osu.Game.Graphics.Containers.Markdown
         protected override MarkdownQuoteBlock CreateQuoteBlock(QuoteBlock quoteBlock) => new OsuMarkdownQuoteBlock(quoteBlock);
 
         protected override MarkdownTable CreateTable(Table table) => new OsuMarkdownTable(table);
+
+        protected override MarkdownList CreateList(ListBlock listBlock) => new MarkdownList
+        {
+            Padding = new MarginPadding(0)
+        };
 
         protected virtual OsuMarkdownListItem CreateListItem(ListItemBlock listItemBlock) => new OsuMarkdownListItem();
 
