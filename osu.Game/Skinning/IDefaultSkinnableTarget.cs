@@ -1,7 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-namespace osu.Game.Screens.Play.HUD
+namespace osu.Game.Skinning
 {
     /// <summary>
     /// The default placement location for new <see cref="ISkinnableComponent"/>s.

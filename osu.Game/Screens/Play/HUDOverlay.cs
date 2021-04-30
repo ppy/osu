@@ -17,6 +17,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Screens.Play

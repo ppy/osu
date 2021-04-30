@@ -11,7 +11,6 @@ using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
-using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Skinning.Editor
 {
