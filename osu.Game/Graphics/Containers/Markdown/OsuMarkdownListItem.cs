@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using Markdig.Syntax;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -23,11 +24,11 @@ namespace osu.Game.Graphics.Containers.Markdown
 
         public FillFlowContainer Content { get; }
 
-        public OsuMarkdownListItem(int level, int order)
+        public OsuMarkdownListItem(ListItemBlock listItemBlock, int level)
         {
             this.level = level;
-            this.order = order;
-            isOrdered = order != 0;
+            this.order = listItemBlock.Order;
+            isOrdered = ((ListBlock)listItemBlock.Parent).IsOrdered;
 
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
