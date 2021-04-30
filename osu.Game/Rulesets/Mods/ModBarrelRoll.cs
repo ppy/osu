@@ -15,6 +15,10 @@ namespace osu.Game.Rulesets.Mods
     public abstract class ModBarrelRoll<TObject> : Mod, IUpdatableByPlayfield, IApplicableToDrawableRuleset<TObject>
         where TObject : HitObject
     {
+        /// <summary>
+        /// The current angle of rotation being applied by this mod.
+        /// Generally should be used to apply inverse rotation to elements which should not be rotated.
+        /// </summary>
         protected float CurrentRotation { get; private set; }
 
         [SettingSource("Roll speed", "Rotations per minute")]
