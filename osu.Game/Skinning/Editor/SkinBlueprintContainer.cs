@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Compose.Components;
-using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Skinning.Editor
 {
