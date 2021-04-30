@@ -50,10 +50,18 @@ namespace osu.Game.Graphics.Containers.Markdown
         {
             var marker = parentTextComponent.CreateSpriteText();
             marker.Text = createTextMarker();
-            marker.Font = OsuFont.GetFont(size: marker.Font.Size / 2);
-            marker.Origin = Anchor.Centre;
-            marker.X = -default_left_padding / 2;
-            marker.Y = marker.Font.Size;
+
+            if (isOrdered)
+            {
+                marker.X = -ordered_left_padding;
+            }
+            else
+            {
+                marker.Font = OsuFont.GetFont(size: marker.Font.Size / 2);
+                marker.Origin = Anchor.Centre;
+                marker.X = -unordered_left_padding / 2;
+                marker.Y = marker.Font.Size;
+            }
 
             AddInternal(marker);
         }
