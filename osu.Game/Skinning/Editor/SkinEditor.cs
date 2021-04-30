@@ -11,7 +11,7 @@ using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
-using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Skinning.Editor
 {
@@ -70,7 +70,7 @@ namespace osu.Game.Skinning.Editor
         {
             var instance = (Drawable)Activator.CreateInstance(type);
 
-            var targetContainer = target.ChildrenOfType<HUDOverlay>().FirstOrDefault();
+            var targetContainer = target.ChildrenOfType<IDefaultSkinnableTarget>().FirstOrDefault();
 
             targetContainer?.Add(instance);
         }
