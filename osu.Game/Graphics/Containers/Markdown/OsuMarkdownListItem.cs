@@ -43,13 +43,28 @@ namespace osu.Game.Graphics.Containers.Markdown
         private void load()
         {
             var marker = parentTextComponent.CreateSpriteText();
-            marker.Text = "●";
+            marker.Text = createTextMarker();
             marker.Font = OsuFont.GetFont(size: marker.Font.Size / 2);
             marker.Origin = Anchor.Centre;
             marker.X = -default_left_padding / 2;
             marker.Y = marker.Font.Size;
 
             AddInternal(marker);
+        }
+
+        private string createTextMarker()
+        {
+            switch (level)
+            {
+                case 1:
+                    return "●";
+
+                case 2:
+                    return "○";
+
+                default:
+                    return "■";
+            }
         }
     }
 }
