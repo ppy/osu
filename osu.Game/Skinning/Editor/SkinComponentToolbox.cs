@@ -10,21 +10,22 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Skinning.Editor
 {
-    public class SkinComponentToolbox : CompositeDrawable
+    public class SkinComponentToolbox : ScrollingToolboxGroup
     {
         public Action<Type> RequestPlacement;
 
-        public SkinComponentToolbox()
+        public SkinComponentToolbox(float height)
+            : base("Components", height)
         {
-            RelativeSizeAxes = Axes.Y;
+            RelativeSizeAxes = Axes.None;
             Width = 200;
         }
 
@@ -33,16 +34,12 @@ namespace osu.Game.Skinning.Editor
         {
             FillFlowContainer fill;
 
-            InternalChild = new OsuScrollContainer
+            Child = fill = new FillFlowContainer
             {
-                RelativeSizeAxes = Axes.Both,
-                Child = fill = new FillFlowContainer
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(20)
-                }
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(20)
             };
 
             var skinnableTypes = typeof(OsuGame).Assembly.GetTypes().Where(t => typeof(ISkinnableComponent).IsAssignableFrom(t)).ToArray();
