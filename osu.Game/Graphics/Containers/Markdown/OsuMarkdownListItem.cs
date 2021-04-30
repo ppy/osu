@@ -14,7 +14,9 @@ namespace osu.Game.Graphics.Containers.Markdown
         private readonly int level;
         private readonly int order;
         private readonly bool isOrdered;
-        private const float default_left_padding = 20;
+
+        private const float ordered_left_padding = 30;
+        private const float unordered_left_padding = 20;
 
         [Resolved]
         private IMarkdownTextComponent parentTextComponent { get; set; }
@@ -29,7 +31,7 @@ namespace osu.Game.Graphics.Containers.Markdown
 
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
-            Padding = new MarginPadding { Left = default_left_padding };
+            Padding = new MarginPadding { Left = isOrdered ? ordered_left_padding : unordered_left_padding };
 
             InternalChildren = new Drawable[]
             {
