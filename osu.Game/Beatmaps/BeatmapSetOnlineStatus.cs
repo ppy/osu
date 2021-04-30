@@ -3,12 +3,6 @@
 
 namespace osu.Game.Beatmaps
 {
-    public static class BeatmapSetOnlineStatusExtensions
-    {
-        public static bool HasPerformancePoints(this BeatmapSetOnlineStatus status)
-            => status == BeatmapSetOnlineStatus.Ranked || status == BeatmapSetOnlineStatus.Approved;
-    }
-
     public enum BeatmapSetOnlineStatus
     {
         None = -3,
@@ -19,5 +13,11 @@ namespace osu.Game.Beatmaps
         Approved = 2,
         Qualified = 3,
         Loved = 4,
+    }
+
+    public static class BeatmapSetOnlineStatusExtensions
+    {
+        public static bool GrantsPerformancePoints(this BeatmapSetOnlineStatus status)
+            => status == BeatmapSetOnlineStatus.Ranked || status == BeatmapSetOnlineStatus.Approved;
     }
 }
