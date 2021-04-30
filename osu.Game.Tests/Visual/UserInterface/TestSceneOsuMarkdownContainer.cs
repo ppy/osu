@@ -128,5 +128,25 @@ Line below";
 - Third item level 1";
             });
         }
+
+        [Test]
+        public void TestOrderedList()
+        {
+            AddStep("Add Ordered List", () =>
+            {
+                markdownContainer.Text = @"1. First item level 1
+2. Second item level 1
+    1. First item level 2
+        1. First item level 3
+        2. Second item level 3
+        3. Third item level 3
+            1. First item level 4
+            2. Second item level 4
+            3. Third item level 4
+    2. Second item level 2
+    3. Third item level 2
+3. Third item level 1";
+            });
+        }
     }
 }
