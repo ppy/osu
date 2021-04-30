@@ -26,7 +26,7 @@ namespace osu.Game.Graphics.Containers.Markdown
                     var childContainer = CreateListItem(listItemBlock);
                     container.Add(childContainer);
                     foreach (var single in listItemBlock)
-                        base.AddMarkdownComponent(single, childContainer, level);
+                        base.AddMarkdownComponent(single, childContainer.Content, level);
                     break;
 
                 default:

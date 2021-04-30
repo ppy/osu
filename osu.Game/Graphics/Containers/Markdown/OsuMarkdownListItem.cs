@@ -7,18 +7,28 @@ using osuTK;
 
 namespace osu.Game.Graphics.Containers.Markdown
 {
-    public class OsuMarkdownListItem : FillFlowContainer
+    public class OsuMarkdownListItem : CompositeDrawable
     {
         private const float default_left_padding = 20;
+
+        public FillFlowContainer Content { get; }
 
         public OsuMarkdownListItem()
         {
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
-
-            Direction = FillDirection.Vertical;
-            Spacing = new Vector2(10, 10);
             Padding = new MarginPadding { Left = default_left_padding };
+
+            InternalChildren = new Drawable[]
+            {
+                Content = new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.X,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(10, 10),
+                }
+            };
         }
     }
 }
