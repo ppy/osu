@@ -76,10 +76,6 @@ namespace osu.Game.Screens.Play
             {
                 new SongProgressDisplay
                 {
-                    Masking = true,
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
                     Children = new Drawable[]
                     {
                         info = new SongProgressInfo
@@ -187,8 +183,16 @@ namespace osu.Game.Screens.Play
 
         public class SongProgressDisplay : Container, ISkinnableComponent
         {
-            // TODO: move actual implementation into this.
-            // exists for skin customisation purposes.
+            public SongProgressDisplay()
+            {
+                // TODO: move actual implementation into this.
+                // exists for skin customisation purposes.
+
+                Masking = true;
+                RelativeSizeAxes = Axes.Both;
+                Anchor = Anchor.BottomCentre;
+                Origin = Anchor.BottomCentre;
+            }
         }
     }
 }
