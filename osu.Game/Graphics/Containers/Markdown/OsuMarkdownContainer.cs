@@ -50,7 +50,7 @@ namespace osu.Game.Graphics.Containers.Markdown
             Padding = new MarginPadding(0)
         };
 
-        protected virtual OsuMarkdownListItem CreateListItem(ListItemBlock listItemBlock, int level) => new OsuMarkdownListItem(level);
+        protected virtual OsuMarkdownListItem CreateListItem(ListItemBlock listItemBlock, int level) => new OsuMarkdownListItem(level, listItemBlock.Order);
 
         protected override MarkdownPipeline CreateBuilder()
             => new MarkdownPipelineBuilder().UseAutoIdentifiers(AutoIdentifierOptions.GitHub)
