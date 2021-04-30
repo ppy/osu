@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             // convert to game space coordinates
             delta = firstBlueprint.ToScreenSpace(delta) - firstBlueprint.ToScreenSpace(Vector2.Zero);
 
-            SelectionHandler.HandleMovement(new MoveSelectionEvent<HitObject>(firstBlueprint, firstBlueprint.ScreenSpaceSelectionPoint + delta));
+            SelectionHandler.HandleMovement(new MoveSelectionEvent<HitObject>(firstBlueprint, delta));
         }
 
         private void updatePlacementNewCombo()
