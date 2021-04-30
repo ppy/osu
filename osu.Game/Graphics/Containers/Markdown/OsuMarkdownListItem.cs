@@ -11,6 +11,7 @@ namespace osu.Game.Graphics.Containers.Markdown
 {
     public class OsuMarkdownListItem : CompositeDrawable
     {
+        private readonly int level;
         private const float default_left_padding = 20;
 
         [Resolved]
@@ -18,8 +19,10 @@ namespace osu.Game.Graphics.Containers.Markdown
 
         public FillFlowContainer Content { get; }
 
-        public OsuMarkdownListItem()
+        public OsuMarkdownListItem(int level)
         {
+            this.level = level;
+
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
             Padding = new MarginPadding { Left = default_left_padding };

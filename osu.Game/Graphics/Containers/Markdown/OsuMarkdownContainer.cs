@@ -23,7 +23,7 @@ namespace osu.Game.Graphics.Containers.Markdown
                     break;
 
                 case ListItemBlock listItemBlock:
-                    var childContainer = CreateListItem(listItemBlock);
+                    var childContainer = CreateListItem(listItemBlock, level);
                     container.Add(childContainer);
                     foreach (var single in listItemBlock)
                         base.AddMarkdownComponent(single, childContainer.Content, level);
@@ -50,7 +50,7 @@ namespace osu.Game.Graphics.Containers.Markdown
             Padding = new MarginPadding(0)
         };
 
-        protected virtual OsuMarkdownListItem CreateListItem(ListItemBlock listItemBlock) => new OsuMarkdownListItem();
+        protected virtual OsuMarkdownListItem CreateListItem(ListItemBlock listItemBlock, int level) => new OsuMarkdownListItem(level);
 
         protected override MarkdownPipeline CreateBuilder()
             => new MarkdownPipelineBuilder().UseAutoIdentifiers(AutoIdentifierOptions.GitHub)
