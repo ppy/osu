@@ -48,11 +48,10 @@ namespace osu.Game.Skinning.Editor
                         RelativeSizeAxes = Axes.X
                     },
                     new SkinBlueprintContainer(target),
-                    new SkinComponentToolbox
+                    new SkinComponentToolbox(600)
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Height = SkinEditorContainer.VISIBLE_TARGET_SCALE,
                         RequestPlacement = placeComponent
                     }
                 }

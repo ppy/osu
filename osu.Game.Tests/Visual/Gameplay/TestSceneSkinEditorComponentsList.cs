@@ -14,7 +14,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestToggleEditor()
         {
-            AddStep("show available components", () => SetContents(() => new SkinComponentToolbox
+            AddStep("show available components", () => SetContents(() => new SkinComponentToolbox(300)
             {
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
