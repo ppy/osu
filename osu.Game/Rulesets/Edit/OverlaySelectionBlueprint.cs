@@ -3,12 +3,13 @@
 
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
 
 namespace osu.Game.Rulesets.Edit
 {
-    public abstract class OverlaySelectionBlueprint : SelectionBlueprint
+    public abstract class OverlaySelectionBlueprint : SelectionBlueprint<HitObject>
     {
         /// <summary>
         /// The <see cref="DrawableHitObject"/> which this <see cref="OverlaySelectionBlueprint"/> applies to.
@@ -33,7 +34,5 @@ namespace osu.Game.Rulesets.Edit
         public override Vector2 ScreenSpaceSelectionPoint => DrawableObject.ScreenSpaceDrawQuad.Centre;
 
         public override Quad SelectionQuad => DrawableObject.ScreenSpaceDrawQuad;
-
-        public override Vector2 GetInstantDelta(Vector2 screenSpacePosition) => DrawableObject.Parent.ToLocalSpace(screenSpacePosition) - DrawableObject.Position;
     }
 }
