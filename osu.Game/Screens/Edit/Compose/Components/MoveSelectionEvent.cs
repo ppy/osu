@@ -17,21 +17,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public readonly SelectionBlueprint<T> Blueprint;
 
         /// <summary>
-        /// The expected screen-space position of the blueprint's item at the current cursor position.
+        /// The screen-space delta of this move event.
         /// </summary>
-        public readonly Vector2 ScreenSpacePosition;
+        public readonly Vector2 ScreenSpaceDelta;
 
-        /// <summary>
-        /// The distance between <see cref="ScreenSpacePosition"/> and the blueprint's current position, in the coordinate-space of the blueprint item's parent.
-        /// </summary>
-        public readonly Vector2 InstantDelta;
-
-        public MoveSelectionEvent(SelectionBlueprint<T> blueprint, Vector2 screenSpacePosition)
+        public MoveSelectionEvent(SelectionBlueprint<T> blueprint, Vector2 screenSpaceDelta)
         {
             Blueprint = blueprint;
-            ScreenSpacePosition = screenSpacePosition;
-
-            InstantDelta = Blueprint.GetInstantDelta(ScreenSpacePosition);
+            ScreenSpaceDelta = screenSpaceDelta;
         }
     }
 }

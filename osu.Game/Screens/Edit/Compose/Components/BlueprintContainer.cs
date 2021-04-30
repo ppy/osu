@@ -436,14 +436,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 // check for positional snap for every object in selection (for things like object-object snapping)
                 for (var i = 0; i < movementBlueprintOriginalPositions.Length; i++)
                 {
-                    var testPosition = movementBlueprintOriginalPositions[i] + distanceTravelled;
+                    Vector2 originalPosition = movementBlueprintOriginalPositions[i];
+                    var testPosition = originalPosition + distanceTravelled;
 
                     var positionalResult = snapProvider.SnapScreenSpacePositionToValidPosition(testPosition);
 
                     if (positionalResult.ScreenSpacePosition == testPosition) continue;
 
+                    var delta = positionalResult.ScreenSpacePosition - movementBlueprints[i].ScreenSpaceSelectionPoint;
+
                     // attempt to move the objects, and abort any time based snapping if we can.
-                    if (SelectionHandler.HandleMovement(new MoveSelectionEvent<T>(movementBlueprints[i], positionalResult.ScreenSpacePosition)))
+                    if (SelectionHandler.HandleMovement(new MoveSelectionEvent<T>(movementBlueprints[i], delta)))
                         return true;
                 }
             }
@@ -459,14 +462,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             if (result == null)
             {
-                return SelectionHandler.HandleMovement(new MoveSelectionEvent<T>(movementBlueprints.First(), movePosition));
+                return SelectionHandler.HandleMovement(new MoveSelectionEvent<T>(movementBlueprints.First(), movePosition - movementBlueprints.First().ScreenSpaceSelectionPoint));
             }
 
             return ApplySnapResult(movementBlueprints, result);
         }
 
         protected virtual bool ApplySnapResult(SelectionBlueprint<T>[] blueprints, SnapResult result) =>
-            SelectionHandler.HandleMovement(new MoveSelectionEvent<T>(blueprints.First(), result.ScreenSpacePosition));
+            SelectionHandler.HandleMovement(new MoveSelectionEvent<T>(blueprints.First(), result.ScreenSpacePosition - blueprints.First().ScreenSpaceSelectionPoint));
 
         /// <summary>
         /// Finishes the current movement of selected blueprints.
