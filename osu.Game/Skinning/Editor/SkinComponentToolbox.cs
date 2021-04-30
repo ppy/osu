@@ -5,12 +5,14 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
@@ -21,6 +23,8 @@ namespace osu.Game.Skinning.Editor
     public class SkinComponentToolbox : ScrollingToolboxGroup
     {
         public Action<Type> RequestPlacement;
+
+        private const float component_display_scale = 0.8f;
 
         public SkinComponentToolbox(float height)
             : base("Components", height)
@@ -56,7 +60,7 @@ namespace osu.Game.Skinning.Editor
             }
         }
 
-        private static ToolboxComponent attemptAddComponent(Type type)
+        private static ToolboxComponentButton attemptAddComponent(Type type)
         {
             try
             {
@@ -64,7 +68,7 @@ namespace osu.Game.Skinning.Editor
 
                 Debug.Assert(instance != null);
 
-                return new ToolboxComponent(instance);
+                return new ToolboxComponentButton(instance);
             }
             catch
             {
@@ -72,58 +76,59 @@ namespace osu.Game.Skinning.Editor
             }
         }
 
-        private class ToolboxComponent : CompositeDrawable
+        private class ToolboxComponentButton : OsuButton
         {
             private readonly Drawable component;
-            private readonly Box box;
 
             public Action<Type> RequestPlacement;
 
-            public ToolboxComponent(Drawable component)
+            private Container innerContainer;
+
+            public ToolboxComponentButton(Drawable component)
             {
                 this.component = component;
-                Container innerContainer;
+
+                Enabled.Value = true;
 
                 RelativeSizeAxes = Axes.X;
-                AutoSizeAxes = Axes.Y;
+                Height = 70;
+            }
 
-                InternalChild = new FillFlowContainer
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                BackgroundColour = colours.Gray3;
+                Content.EdgeEffect = new EdgeEffectParameters
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Children = new Drawable[]
-                    {
-                        new OsuSpriteText { Text = component.GetType().Name },
-                        innerContainer = new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Masking = true,
-                            CornerRadius = 10,
-                            Children = new[]
-                            {
-                                box = new Box
-                                {
-                                    Colour = Color4.Black,
-                                    Alpha = 0.5f,
-                                    RelativeSizeAxes = Axes.Both,
-                                },
-                                component
-                            }
-                        },
-                    }
+                    Type = EdgeEffectType.Shadow,
+                    Radius = 2,
+                    Offset = new Vector2(0, 1),
+                    Colour = Color4.Black.Opacity(0.5f)
                 };
 
-                // adjust provided component to fit / display in a known state.
+                AddRange(new Drawable[]
+                {
+                    new OsuSpriteText
+                    {
+                        Text = component.GetType().Name,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                    },
+                    innerContainer = new Container
+                    {
+                        Y = 10,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.Both,
+                        Scale = new Vector2(component_display_scale),
+                        Masking = true,
+                        Child = component
+                    }
+                });
 
+                // adjust provided component to fit / display in a known state.
                 component.Anchor = Anchor.Centre;
                 component.Origin = Anchor.Centre;
-
-                if (component.RelativeSizeAxes != Axes.None)
-                {
-                    innerContainer.AutoSizeAxes = Axes.None;
-                    innerContainer.Height = 100;
-                }
 
                 switch (component)
                 {
@@ -137,25 +142,21 @@ namespace osu.Game.Skinning.Editor
                 }
             }
 
-            [Resolved]
-            private OsuColour colours { get; set; }
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                if (component.RelativeSizeAxes != Axes.None)
+                {
+                    innerContainer.AutoSizeAxes = Axes.None;
+                    innerContainer.Height = 100;
+                }
+            }
 
             protected override bool OnClick(ClickEvent e)
             {
                 RequestPlacement?.Invoke(component.GetType());
                 return true;
-            }
-
-            protected override bool OnHover(HoverEvent e)
-            {
-                box.FadeColour(colours.Yellow, 100);
-                return base.OnHover(e);
-            }
-
-            protected override void OnHoverLost(HoverLostEvent e)
-            {
-                box.FadeColour(Color4.Black, 100);
-                base.OnHoverLost(e);
             }
         }
     }
