@@ -8,6 +8,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Play.HUD;
@@ -18,10 +20,12 @@ namespace osu.Game.Skinning.Editor
 {
     public class SkinComponentToolbox : CompositeDrawable
     {
+        public Action<Type> RequestPlacement;
+
         public SkinComponentToolbox()
         {
             RelativeSizeAxes = Axes.Y;
-            Width = 500;
+            Width = 200;
         }
 
         [BackgroundDependencyLoader]
@@ -36,9 +40,6 @@ namespace osu.Game.Skinning.Editor
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Width = 0.5f,
                     Direction = FillDirection.Vertical,
                     Spacing = new Vector2(20)
                 }
@@ -48,13 +49,17 @@ namespace osu.Game.Skinning.Editor
 
             foreach (var type in skinnableTypes)
             {
-                var container = attemptAddComponent(type);
-                if (container != null)
-                    fill.Add(container);
+                var component = attemptAddComponent(type);
+
+                if (component != null)
+                {
+                    component.RequestPlacement = t => RequestPlacement?.Invoke(t);
+                    fill.Add(component);
+                }
             }
         }
 
-        private static Drawable attemptAddComponent(Type type)
+        private static ToolboxComponent attemptAddComponent(Type type)
         {
             try
             {
@@ -66,15 +71,20 @@ namespace osu.Game.Skinning.Editor
             }
             catch
             {
+                return null;
             }
-
-            return null;
         }
 
         private class ToolboxComponent : CompositeDrawable
         {
-            public ToolboxComponent(Drawable instance)
+            private readonly Drawable component;
+            private readonly Box box;
+
+            public Action<Type> RequestPlacement;
+
+            public ToolboxComponent(Drawable component)
             {
+                this.component = component;
                 Container innerContainer;
 
                 RelativeSizeAxes = Axes.X;
@@ -86,7 +96,7 @@ namespace osu.Game.Skinning.Editor
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        new OsuSpriteText { Text = instance.GetType().Name },
+                        new OsuSpriteText { Text = component.GetType().Name },
                         innerContainer = new Container
                         {
                             RelativeSizeAxes = Axes.X,
@@ -95,13 +105,13 @@ namespace osu.Game.Skinning.Editor
                             CornerRadius = 10,
                             Children = new[]
                             {
-                                new Box
+                                box = new Box
                                 {
                                     Colour = Color4.Black,
                                     Alpha = 0.5f,
                                     RelativeSizeAxes = Axes.Both,
                                 },
-                                instance
+                                component
                             }
                         },
                     }
@@ -109,16 +119,16 @@ namespace osu.Game.Skinning.Editor
 
                 // adjust provided component to fit / display in a known state.
 
-                instance.Anchor = Anchor.Centre;
-                instance.Origin = Anchor.Centre;
+                component.Anchor = Anchor.Centre;
+                component.Origin = Anchor.Centre;
 
-                if (instance.RelativeSizeAxes != Axes.None)
+                if (component.RelativeSizeAxes != Axes.None)
                 {
                     innerContainer.AutoSizeAxes = Axes.None;
                     innerContainer.Height = 100;
                 }
 
-                switch (instance)
+                switch (component)
                 {
                     case IScoreCounter score:
                         score.Current.Value = 133773;
@@ -128,6 +138,27 @@ namespace osu.Game.Skinning.Editor
                         combo.Current.Value = 727;
                         break;
                 }
+            }
+
+            [Resolved]
+            private OsuColour colours { get; set; }
+
+            protected override bool OnClick(ClickEvent e)
+            {
+                RequestPlacement?.Invoke(component.GetType());
+                return true;
+            }
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                box.FadeColour(colours.Yellow, 100);
+                return base.OnHover(e);
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                box.FadeColour(Color4.Black, 100);
+                base.OnHoverLost(e);
             }
         }
     }

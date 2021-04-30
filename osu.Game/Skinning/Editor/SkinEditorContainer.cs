@@ -20,7 +20,7 @@ namespace osu.Game.Skinning.Editor
         private readonly ScalingContainer target;
         private SkinEditor skinEditor;
 
-        private const float visible_target_scale = 0.8f;
+        public const float VISIBLE_TARGET_SCALE = 0.8f;
 
         [Resolved]
         private OsuColour colours { get; set; }
@@ -63,12 +63,14 @@ namespace osu.Game.Skinning.Editor
         {
             if (visibility.NewValue == Visibility.Visible)
             {
-                target.ScaleTo(visible_target_scale, SkinEditor.TRANSITION_DURATION, Easing.OutQuint);
-
                 target.Masking = true;
                 target.BorderThickness = 5;
                 target.BorderColour = colours.Yellow;
                 target.AllowScaling = false;
+                target.RelativePositionAxes = Axes.Both;
+
+                target.ScaleTo(VISIBLE_TARGET_SCALE, SkinEditor.TRANSITION_DURATION, Easing.OutQuint);
+                target.MoveToX(0.1f, SkinEditor.TRANSITION_DURATION, Easing.OutQuint);
             }
             else
             {
@@ -76,6 +78,7 @@ namespace osu.Game.Skinning.Editor
                 target.AllowScaling = true;
 
                 target.ScaleTo(1, SkinEditor.TRANSITION_DURATION, Easing.OutQuint).OnComplete(_ => target.Masking = false);
+                target.MoveToX(0f, SkinEditor.TRANSITION_DURATION, Easing.OutQuint);
             }
         }
 
