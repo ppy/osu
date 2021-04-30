@@ -148,5 +148,44 @@ Line below";
 3. Third item level 1";
             });
         }
+
+        [Test]
+        public void TestLongMixedList()
+        {
+            AddStep("Add long mixed list", () =>
+            {
+                markdownContainer.Text = @"1. The osu! World Cup is a country-based team tournament played on the osu! game mode.
+   - While this competition is planned as a 4 versus 4 setup, this may change depending on the number of incoming registrations.
+2. Beatmap scoring is based on Score V2.
+3. The beatmaps for each round will be announced by the map selectors in advance on the Sunday before the actual matches take place. Only these beatmaps will be used during the respective matches.
+   - One beatmap will be a tiebreaker beatmap. This beatmap will only be played in case of a tie. **The only exception to this is the Qualifiers pool.**
+4. The match schedule will be settled by the Tournament Management (see the [scheduling instructions](#scheduling-instructions)).
+5. If no staff or referee is available, the match will be postponed.
+6. Use of the Visual Settings to alter background dim or disable beatmap elements like storyboards and skins are allowed.
+7. If the beatmap ends in a draw, the map will be nullified and replayed.
+8. If a player disconnects, their scores will not be counted towards their team's total.
+   - Disconnects within 30 seconds or 25% of the beatmap length (whichever happens first) after beatmap begin can be aborted and/or rematched. This is up to the referee's discretion.
+9. Beatmaps cannot be reused in the same match unless the map was nullified.
+10. If less than the minimum required players attend, the maximum time the match can be postponed is 10 minutes.
+11. Exchanging players during a match is allowed without limitations.
+    - **If a map rematch is required, exchanging players is not allowed. With the referee's discretion, an exception can be made if the previous roster is unavailable to play.**
+12. Lag is not a valid reason to nullify a beatmap.
+13. All players are supposed to keep the match running fluently and without delays. Penalties can be issued to the players if they cause excessive match delays.
+14. If a player disconnects between maps and the team cannot provide a replacement, the match can be delayed 10 minutes at maximum.
+15. All players and referees must be treated with respect. Instructions of the referees and tournament Management are to be followed. Decisions labeled as final are not to be objected.
+16. Disrupting the match by foul play, insulting and provoking other players or referees, delaying the match or other deliberate inappropriate misbehavior is strictly prohibited.
+17. The multiplayer chatrooms are subject to the [osu! community rules](/wiki/Rules).
+    - Breaking the chat rules will result in a silence. Silenced players can not participate in multiplayer matches and must be exchanged for the time being.
+18. **The seeding method will be revealed after all the teams have played their Qualifier rounds.**
+19. Unexpected incidents are handled by the tournament management. Referees may allow higher tolerance depending on the circumstances. This is up to their discretion.
+20. Penalties for violating the tournament rules may include:
+    - Exclusion of specific players for one beatmap
+    - Exclusion of specific players for an entire match
+    - Declaring the match as Lost by Default
+    - Disqualification from the entire tournament
+    - Disqualification from the current and future official tournaments until appealed
+    - Any modification of these rules will be announced.";
+            });
+        }
     }
 }
