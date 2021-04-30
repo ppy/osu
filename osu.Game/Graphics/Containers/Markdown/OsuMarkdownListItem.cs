@@ -58,6 +58,11 @@ namespace osu.Game.Graphics.Containers.Markdown
 
         private string createTextMarker()
         {
+            if (isOrdered)
+            {
+                return $"{order}.";
+            }
+
             switch (level)
             {
                 case 1:
