@@ -20,7 +20,10 @@ namespace osu.Game.Skinning.Editor
         protected override void DeleteItems(IEnumerable<ISkinnableComponent> items)
         {
             foreach (var i in items)
-                i.Hide();
+            {
+                ((Drawable)i).Expire();
+                SelectedItems.Remove(i);
+            }
         }
 
         protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<ISkinnableComponent>> selection)
