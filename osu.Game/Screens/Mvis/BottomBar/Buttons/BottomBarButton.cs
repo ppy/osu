@@ -71,6 +71,12 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
             Size = new Vector2(13),
         };
 
+        public new Axes AutoSizeAxes
+        {
+            get => base.AutoSizeAxes;
+            set => base.AutoSizeAxes = value;
+        }
+
         public BottomBarButton()
         {
             Size = new Vector2(30);

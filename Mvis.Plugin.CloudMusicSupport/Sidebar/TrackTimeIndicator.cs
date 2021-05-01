@@ -19,7 +19,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
         private MvisScreen mvisScreen { get; set; }
 
         [Resolved]
-        private LyricSidebarPage sidebarPage { get; set; }
+        private LyricSidebarSectionContainer sidebarPage { get; set; }
 
         private readonly Bindable<double> globalOffset = new Bindable<double>();
 

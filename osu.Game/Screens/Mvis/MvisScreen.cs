@@ -21,6 +21,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections.Mf;
 using osu.Game.Rulesets.Mods;
@@ -621,22 +623,26 @@ namespace osu.Game.Screens.Mvis
             {
                 //获取与新值匹配的控制插件
                 var pl = (IProvideAudioControlPlugin)pluginManager.GetAllPlugins(false).FirstOrDefault(p => v.NewValue == $"{p.GetType().Namespace}+{p.GetType().Name}");
-
-                //如果没找到(为null)，则解锁Beatmap.Disabled
-                Beatmap.Disabled = pl != null;
-
-                //设置当前控制插件IsCurrent为false
-                audioControlProvider.IsCurrent = false;
-
-                //切换并设置当前控制插件IsCurrent为true
-                audioControlProvider = pl ?? musicControllerWrapper;
-                audioControlProvider.IsCurrent = true;
+                changeAudioControlProvider(pl);
             }, true);
 
             bottomBar.MoveToY(bottomBar.Height + 10).FadeOut();
             progressBar.MoveToY(5);
 
             base.LoadComplete();
+        }
+
+        private void changeAudioControlProvider(IProvideAudioControlPlugin pacp)
+        {
+            //如果没找到(为null)，则解锁Beatmap.Disabled
+            Beatmap.Disabled = pacp != null;
+
+            //设置当前控制插件IsCurrent为false
+            audioControlProvider.IsCurrent = false;
+
+            //切换并设置当前控制插件IsCurrent为true
+            audioControlProvider = pacp ?? musicControllerWrapper;
+            audioControlProvider.IsCurrent = true;
         }
 
         private void setupKeyBindings()
@@ -711,6 +717,22 @@ namespace osu.Game.Screens.Mvis
 
             loadList.Add(pl);
             return true;
+        }
+
+        [Resolved]
+        private DialogOverlay dialog { get; set; }
+
+        public void RequestAudioControl(IProvideAudioControlPlugin pacp, string message, Action onDeny, Action onAllow)
+        {
+            if (!(pacp is MvisPlugin mpl)) return;
+
+            dialog.Push(new ConfirmDialog($"{mpl} 请求接手音频控制。\n原因是: {message}",
+                () =>
+                {
+                    changeAudioControlProvider(pacp);
+                    onAllow.Invoke();
+                },
+                onDeny));
         }
 
         private void onLoadListChanged(object sender, NotifyCollectionChangedEventArgs e)

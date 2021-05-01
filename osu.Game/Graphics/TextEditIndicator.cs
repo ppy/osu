@@ -21,8 +21,8 @@ namespace osu.Game.Graphics
         private readonly OsuSpriteText spriteText;
         private readonly ProgressBar bg;
         private readonly Box flashBox;
-        private IBindable<bool> optUI;
-        private IBindable<bool> alwaysHide;
+        private Bindable<bool> optUI = new Bindable<bool>();
+        private Bindable<bool> alwaysHide = new Bindable<bool>();
         private readonly FillFlowContainer placeHolderContainer;
         private readonly Circle bar;
 
@@ -189,8 +189,8 @@ namespace osu.Game.Graphics
         [BackgroundDependencyLoader]
         private void load(MConfigManager config)
         {
-            optUI = config.GetBindable<bool>(MSetting.OptUI);
-            alwaysHide = config.GetBindable<bool>(MSetting.AlwaysHideTextIndicator);
+            config.BindWith(MSetting.OptUI, optUI);
+            config.BindWith(MSetting.AlwaysHideTextIndicator, alwaysHide);
 
             optUI.BindValueChanged(v =>
             {
