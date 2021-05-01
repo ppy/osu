@@ -105,7 +105,10 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
                     Masking = true,
                     Children = new Drawable[]
                     {
-                        cover = new BeatmapCover(mvisScreen.Beatmap.Value),
+                        cover = new BeatmapCover(mvisScreen.Beatmap.Value)
+                        {
+                            TimeBeforeWrapperLoad = 0
+                        },
                         new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -255,6 +258,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
         private void refreshLrcInfo(List<Lyric> lyrics)
         {
             lyricFlow.Clear();
+            scroll.ScrollToStart();
 
             foreach (var t in lyrics)
             {
