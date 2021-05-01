@@ -45,8 +45,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public new ManiaBeatmap Beatmap => (ManiaBeatmap)base.Beatmap;
 
-        [Cached]
-        private BeatDivisorFinder beatDivisorFinder { get; set; }
+        [Cached(typeof(IBeatmap))]
+        private ManiaBeatmap cachedBeatmap { get; set; }
 
         public IEnumerable<BarLine> BarLines;
 
@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Mania.UI
             : base(ruleset, beatmap, mods)
         {
             BarLines = new BarLineGenerator<BarLine>(Beatmap).BarLines;
-            beatDivisorFinder = new BeatDivisorFinder(Beatmap);
+            cachedBeatmap = Beatmap;
         }
 
         [BackgroundDependencyLoader]
