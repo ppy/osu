@@ -328,21 +328,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 return;
 
             // Move the rectangle to cover the items
-            var topLeft = new Vector2(float.MaxValue, float.MaxValue);
-            var bottomRight = new Vector2(float.MinValue, float.MinValue);
+            RectangleF selectionRect = ToLocalSpace(selectedBlueprints.First().SelectionQuad).AABBFloat;
 
-            foreach (var blueprint in selectedBlueprints)
-            {
-                var blueprintRect = blueprint.SelectionQuad.AABBFloat;
-                topLeft = Vector2.ComponentMin(topLeft, ToLocalSpace(blueprintRect.TopLeft));
-                bottomRight = Vector2.ComponentMax(bottomRight, ToLocalSpace(blueprintRect.BottomRight));
-            }
+            foreach (var blueprint in selectedBlueprints.Skip(1))
+                selectionRect = RectangleF.Union(selectionRect, ToLocalSpace(blueprint.SelectionQuad).AABBFloat);
 
-            topLeft -= new Vector2(5);
-            bottomRight += new Vector2(5);
+            selectionRect = selectionRect.Inflate(5f);
 
-            content.Size = bottomRight - topLeft;
-            content.Position = topLeft;
+            content.Position = selectionRect.Location;
+            content.Size = selectionRect.Size;
         }
 
         #endregion
