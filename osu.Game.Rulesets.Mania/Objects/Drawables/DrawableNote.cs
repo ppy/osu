@@ -35,8 +35,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         private readonly Drawable headPiece;
 
-        private readonly Bindable<int> snap = new Bindable<int>();
-
         public DrawableNote(Note hitObject)
             : base(hitObject)
         {
@@ -58,17 +56,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected override void LoadComplete()
         {
-            if (beatmap != null)
-            {
-                HitObject.StartTimeBindable.BindValueChanged(startTime =>
-                    {
-                        snap.Value = beatmap.ControlPointInfo.GetClosestBeatDivisor(startTime.NewValue);
-                    },
-                    true
-                );
-            }
-
-            snap.BindValueChanged(_ => updateSnapColour());
+            HitObject.StartTimeBindable.BindValueChanged(_ => updateSnapColour());
             configTimingBasedNoteColouring.BindValueChanged(_ => updateSnapColour(), true);
         }
 
@@ -114,9 +102,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         private void updateSnapColour()
         {
-            Colour = configTimingBasedNoteColouring.Value
-                ? BindableBeatDivisor.GetColourFor(snap.Value, colours)
-                : Color4.White;
+            if (beatmap == null) return;
+
+            int snapDivisor = beatmap.ControlPointInfo.GetClosestBeatDivisor(HitObject.StartTime);
+
+            Colour = configTimingBasedNoteColouring.Value ? BindableBeatDivisor.GetColourFor(snapDivisor, colours) : Color4.White;
         }
     }
 }
