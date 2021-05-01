@@ -2,13 +2,20 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Logging;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Platform;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using osuTK;
@@ -25,36 +32,58 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         // The distances from the hit objects to the borders of the playfield they start to "turn around" and curve towards the middle.
         // The closer the hit objects draw to the border, the sharper the turn
-        private const byte border_distance_x = 128;
-        private const byte border_distance_y = 96;
+        private const byte border_distance_x = 192;
+        private const byte border_distance_y = 144;
 
-        [SettingSource("Seed", "Seed for the random number generator")]
-        public Bindable<string> Seed { get; } = new Bindable<string>
+        private static readonly Bindable<int> seed = new Bindable<int>
         {
-            Value = RNG.Next().ToString()
+            Default = -1
         };
 
-        public void ApplyToBeatmap(IBeatmap beatmap)
+        private static readonly BindableBool random_seed = new BindableBool
         {
-            if (!int.TryParse(Seed.Value, out var seed))
-            {
-                var e = new FormatException("Seed must be an integer");
-                Logger.Error(e, "Could not load beatmap: RNG seed must be an integer.");
+            Value = true,
+            Default = true
+        };
 
+        [SettingSource("Random seed", "Generate a random seed for the beatmap generation")]
+        public BindableBool RandomSeed => random_seed;
+
+        [SettingSource("Seed", "Seed for the random beatmap generation", SettingControlType = typeof(OsuModRandomSettingsControl))]
+        public Bindable<int> Seed => seed;
+
+        internal static bool CustomSeedDisabled => random_seed.Value;
+
+        public OsuModRandom()
+        {
+            if (seed.Default != -1)
                 return;
-            }
 
-            var rng = new Random(seed);
+            var random = RNG.Next();
+            seed.Value = random;
+            seed.Default = random;
+            seed.BindValueChanged(e => seed.Default = e.NewValue);
+        }
+
+        public void ApplyToBeatmap(IBeatmap iBeatmap)
+        {
+            if (!(iBeatmap is OsuBeatmap beatmap))
+                return;
+
+            if (RandomSeed.Value)
+                seed.Value = RNG.Next();
+
+            var rng = new Random(seed.Value);
 
             // Absolute angle
             float prevAngleRad = 0;
 
             // Absolute positions
-            Vector2 prevPosUnchanged = ((OsuHitObject)beatmap.HitObjects[0]).Position;
-            Vector2 prevPosChanged = ((OsuHitObject)beatmap.HitObjects[0]).Position;
+            Vector2 prevPosUnchanged = beatmap.HitObjects[0].Position;
+            Vector2 prevPosChanged = beatmap.HitObjects[0].Position;
 
             // rateOfChangeMultiplier changes every i iterations to prevent shaky-line-shaped streams
-            byte i = 5;
+            byte i = 3;
             float rateOfChangeMultiplier = 0;
 
             foreach (var beatmapHitObject in beatmap.HitObjects)
@@ -69,7 +98,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 // Angle of the vector pointing from the last to the current hit object
                 float angleRad = 0;
 
-                if (i >= 5)
+                if (i >= 3)
                 {
                     i = 0;
                     rateOfChangeMultiplier = (float)rng.NextDouble() * 2 - 1;
@@ -232,6 +261,104 @@ namespace osu.Game.Rulesets.Osu.Mods
                 initial.Length * (float)Math.Cos(finalAngle),
                 initial.Length * (float)Math.Sin(finalAngle)
             );
+        }
+    }
+
+    public class OsuModRandomSettingsControl : SettingsItem<int>
+    {
+        [Resolved]
+        private static GameHost host { get; set; }
+
+        [BackgroundDependencyLoader]
+        private void load(GameHost gameHost) => host = gameHost;
+
+        protected override Drawable CreateControl() => new SeedControl
+        {
+            RelativeSizeAxes = Axes.X,
+            Margin = new MarginPadding { Top = 5 }
+        };
+
+        private sealed class SeedControl : CompositeDrawable, IHasCurrentValue<int>
+        {
+            private readonly BindableWithCurrent<int> current = new BindableWithCurrent<int>();
+
+            public Bindable<int> Current
+            {
+                get => current;
+                set => Scheduler.Add(() => current.Current = value);
+            }
+
+            private readonly OsuNumberBox seedNumberBox;
+
+            public SeedControl()
+            {
+                AutoSizeAxes = Axes.Y;
+
+                InternalChildren = new[]
+                {
+                    new GridContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        ColumnDimensions = new[]
+                        {
+                            new Dimension(),
+                            new Dimension(GridSizeMode.Absolute, 2),
+                            new Dimension(GridSizeMode.Relative, 0.25f)
+                        },
+                        RowDimensions = new[]
+                        {
+                            new Dimension(GridSizeMode.AutoSize)
+                        },
+                        Content = new[]
+                        {
+                            new Drawable[]
+                            {
+                                seedNumberBox = new OsuNumberBox
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    CommitOnFocusLost = true
+                                },
+                                null,
+                                new TriangleButton
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Height = 1,
+                                    Text = "Copy",
+                                    Action = copySeedToClipboard
+                                }
+                            }
+                        }
+                    }
+                };
+
+                seedNumberBox.Current.BindValueChanged(onTextBoxValueChanged);
+            }
+
+            private void onTextBoxValueChanged(ValueChangedEvent<string> e)
+            {
+                string seed = e.NewValue;
+
+                while (!string.IsNullOrEmpty(seed) && !int.TryParse(seed, out _))
+                    seed = seed[..^1];
+
+                if (!int.TryParse(seed, out var intVal))
+                    intVal = 0;
+
+                current.Value = intVal;
+            }
+
+            private void copySeedToClipboard() => host.GetClipboard().SetText(seedNumberBox.Text);
+
+            protected override void Update()
+            {
+                seedNumberBox.ReadOnly = OsuModRandom.CustomSeedDisabled;
+
+                if (seedNumberBox.HasFocus)
+                    return;
+
+                seedNumberBox.Text = current.Current.Value.ToString();
+            }
         }
     }
 }
