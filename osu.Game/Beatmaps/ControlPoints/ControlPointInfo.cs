@@ -7,6 +7,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Framework.Lists;
+using osu.Framework.Utils;
 using osu.Game.Screens.Edit;
 
 namespace osu.Game.Beatmaps.ControlPoints
@@ -195,7 +196,7 @@ namespace osu.Game.Beatmaps.ControlPoints
             {
                 double distanceFromSnap = Math.Abs(time - getClosestSnappedTime(timingPoint, time, divisor));
 
-                if (distanceFromSnap < closestTime)
+                if (Precision.DefinitelyBigger(closestTime, distanceFromSnap))
                 {
                     closestDivisor = divisor;
                     closestTime = distanceFromSnap;
