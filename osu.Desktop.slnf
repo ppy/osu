@@ -19,6 +19,8 @@
       "M.Resources\\M.Resources.csproj",
       "Mvis.Plugin.StoryboardSupport\\Mvis.Plugin.StoryboardSupport.csproj",
       "Mvis.Plugin.CollectionSupport\\Mvis.Plugin.CollectionSupport.csproj",
+      "Mvis.Plugin.Yasp\\Mvis.Plugin.Yasp.csproj",
+      "Mvis.Plugin.CloudMusicSupport\\Mvis.Plugin.CloudMusicSupport.csproj",
       "Mvis.Plugin.RulesetPanel\\Mvis.Plugin.RulesetPanel.csproj",
       "Mvis.Plugin.FakeEditor\\Mvis.Plugin.FakeEditor.csproj",
       "..\\osu-framework\\osu.Framework\\osu.Framework.csproj",
