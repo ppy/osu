@@ -7,9 +7,9 @@ using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
-    public class ManiaEditPlayfield : ManiaPlayfield
+    public class ManiaEditorPlayfield : ManiaPlayfield
     {
-        public ManiaEditPlayfield(List<StageDefinition> stages)
+        public ManiaEditorPlayfield(List<StageDefinition> stages)
             : base(stages)
         {
         }
