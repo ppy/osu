@@ -45,15 +45,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                     new Note { StartTime = beat_length }
                 },
                 ControlPointInfo = new ControlPointInfo(),
-                BeatmapInfo =
-                {
-                    BaseDifficulty = new BeatmapDifficulty
-                    {
-                        SliderTickRate = 4,
-                        OverallDifficulty = 10,
-                    },
-                    Ruleset = ruleset.RulesetInfo
-                },
+                BeatmapInfo = { Ruleset = ruleset.RulesetInfo },
             };
 
             foreach (var note in beatmap.HitObjects)
@@ -62,11 +54,9 @@ namespace osu.Game.Rulesets.Mania.Tests
             }
 
             beatmap.ControlPointInfo.Add(0, new TimingControlPoint
-                {
-                    TimeSignature = Game.Beatmaps.Timing.TimeSignatures.SimpleQuadruple,
-                    BeatLength = beat_length
-                }
-            );
+            {
+                BeatLength = beat_length
+            });
 
             Child = new Container
             {
