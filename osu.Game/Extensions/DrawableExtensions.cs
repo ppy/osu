@@ -2,8 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Threading;
+using osuTK;
 
 namespace osu.Game.Extensions
 {
@@ -32,5 +34,14 @@ namespace osu.Game.Extensions
             scheduler.Add(repeatDelegate);
             return repeatDelegate;
         }
+
+        /// <summary>
+        /// Accepts a delta vector in screen-space coordinates and converts it to one which can be applied to this drawable's position.
+        /// </summary>
+        /// <param name="drawable">The drawable.</param>
+        /// <param name="delta">A delta in screen-space coordinates.</param>
+        /// <returns>The delta vector in Parent's coordinates.</returns>
+        public static Vector2 ScreenSpaceDeltaToParentSpace(this Drawable drawable, Vector2 delta) =>
+            drawable.Parent.ToLocalSpace(drawable.Parent.ToScreenSpace(Vector2.Zero) + delta);
     }
 }

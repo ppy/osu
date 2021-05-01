@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         }
 
         protected override DrawableRuleset<OsuHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
-            => new DrawableOsuEditRuleset(ruleset, beatmap, mods);
+            => new DrawableOsuEditorRuleset(ruleset, beatmap, mods);
 
         protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
         {
@@ -147,7 +147,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 if (b.IsSelected)
                     continue;
 
-                var hitObject = (OsuHitObject)b.HitObject;
+                var hitObject = (OsuHitObject)b.Item;
 
                 Vector2? snap = checkSnap(hitObject.Position);
                 if (snap == null && hitObject.Position != hitObject.EndPosition)

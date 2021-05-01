@@ -156,33 +156,44 @@ namespace osu.Game.Database
 
             bool isLowPriorityImport = tasks.Length > low_priority_import_batch_size;
 
-            await Task.WhenAll(tasks.Select(async task =>
+            try
             {
-                notification.CancellationToken.ThrowIfCancellationRequested();
-
-                try
+                await Task.WhenAll(tasks.Select(async task =>
                 {
-                    var model = await Import(task, isLowPriorityImport, notification.CancellationToken).ConfigureAwait(false);
+                    notification.CancellationToken.ThrowIfCancellationRequested();
 
-                    lock (imported)
+                    try
                     {
-                        if (model != null)
-                            imported.Add(model);
-                        current++;
+                        var model = await Import(task, isLowPriorityImport, notification.CancellationToken).ConfigureAwait(false);
 
-                        notification.Text = $"Imported {current} of {tasks.Length} {HumanisedModelName}s";
-                        notification.Progress = (float)current / tasks.Length;
+                        lock (imported)
+                        {
+                            if (model != null)
+                                imported.Add(model);
+                            current++;
+
+                            notification.Text = $"Imported {current} of {tasks.Length} {HumanisedModelName}s";
+                            notification.Progress = (float)current / tasks.Length;
+                        }
                     }
-                }
-                catch (TaskCanceledException)
+                    catch (TaskCanceledException)
+                    {
+                        throw;
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e, $@"Could not import ({task})", LoggingTarget.Database);
+                    }
+                })).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                if (imported.Count == 0)
                 {
-                    throw;
+                    notification.State = ProgressNotificationState.Cancelled;
+                    return imported;
                 }
-                catch (Exception e)
-                {
-                    Logger.Error(e, $@"Could not import ({task})", LoggingTarget.Database);
-                }
-            })).ConfigureAwait(false);
+            }
 
             if (imported.Count == 0)
             {
@@ -422,15 +433,25 @@ namespace osu.Game.Database
             if (retrievedItem == null)
                 throw new ArgumentException("Specified model could not be found", nameof(item));
 
+            using (var outputStream = exportStorage.GetStream($"{getValidFilename(item.ToString())}{HandledExtensions.First()}", FileAccess.Write, FileMode.Create))
+                ExportModelTo(retrievedItem, outputStream);
+
+            exportStorage.OpenInNativeExplorer();
+        }
+
+        /// <summary>
+        /// Exports an item to the given output stream.
+        /// </summary>
+        /// <param name="model">The item to export.</param>
+        /// <param name="outputStream">The output stream to export to.</param>
+        protected virtual void ExportModelTo(TModel model, Stream outputStream)
+        {
             using (var archive = ZipArchive.Create())
             {
-                foreach (var file in retrievedItem.Files)
+                foreach (var file in model.Files)
                     archive.AddEntry(file.Filename, Files.Storage.GetStream(file.FileInfo.StoragePath));
 
-                using (var outputStream = exportStorage.GetStream($"{getValidFilename(item.ToString())}{HandledExtensions.First()}", FileAccess.Write, FileMode.Create))
-                    archive.SaveTo(outputStream);
-
-                exportStorage.OpenInNativeExplorer();
+                archive.SaveTo(outputStream);
             }
         }
 
