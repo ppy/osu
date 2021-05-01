@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders;
@@ -18,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
         }
 
-        protected override SelectionHandler CreateSelectionHandler() => new OsuSelectionHandler();
+        protected override SelectionHandler<HitObject> CreateSelectionHandler() => new OsuSelectionHandler();
 
         public override OverlaySelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject)
         {
