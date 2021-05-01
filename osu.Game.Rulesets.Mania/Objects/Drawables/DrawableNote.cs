@@ -6,10 +6,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Skinning.Default;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit;
@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         private OsuColour colours { get; set; }
 
         [Resolved(canBeNull: true)]
-        private BeatDivisorFinder beatDivisorFinder { get; set; }
+        private IBeatmap beatmap { get; set; }
 
         private readonly Bindable<bool> configTimingBasedNoteColouring = new Bindable<bool>();
 
@@ -58,9 +58,14 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected override void LoadComplete()
         {
-            if (beatDivisorFinder != null)
+            if (beatmap != null)
             {
-                HitObject.StartTimeBindable.BindValueChanged(_ => snap.Value = beatDivisorFinder.FindDivisor(HitObject), true);
+                HitObject.StartTimeBindable.BindValueChanged(startTime =>
+                    {
+                        snap.Value = beatmap.ControlPointInfo.GetClosestBeatDivisor(startTime.NewValue);
+                    },
+                    true
+                );
             }
 
             snap.BindValueChanged(_ => updateSnapColour());
