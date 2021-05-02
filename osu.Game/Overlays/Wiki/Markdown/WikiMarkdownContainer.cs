@@ -32,6 +32,8 @@ namespace osu.Game.Overlays.Wiki.Markdown
 
         public override MarkdownTextFlowContainer CreateTextFlow() => new WikiMarkdownTextFlowContainer();
 
+        protected override MarkdownParagraph CreateParagraph(ParagraphBlock paragraphBlock, int level) => new WikiMarkdownParagraph(paragraphBlock);
+
         protected virtual FillFlowContainer CreateNotice(YamlFrontMatterBlock yamlFrontMatterBlock) => new WikiNoticeContainer(yamlFrontMatterBlock);
     }
 }
