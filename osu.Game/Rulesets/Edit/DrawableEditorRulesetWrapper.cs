@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Edit
     /// <summary>
     /// A wrapper for a <see cref="DrawableRuleset{TObject}"/>. Handles adding visual representations of <see cref="HitObject"/>s to the underlying <see cref="DrawableRuleset{TObject}"/>.
     /// </summary>
-    internal class DrawableEditRulesetWrapper<TObject> : CompositeDrawable
+    internal class DrawableEditorRulesetWrapper<TObject> : CompositeDrawable
         where TObject : HitObject
     {
         public Playfield Playfield => drawableRuleset.Playfield;
@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Edit
         [Resolved]
         private EditorBeatmap beatmap { get; set; }
 
-        public DrawableEditRulesetWrapper(DrawableRuleset<TObject> drawableRuleset)
+        public DrawableEditorRulesetWrapper(DrawableRuleset<TObject> drawableRuleset)
         {
             this.drawableRuleset = drawableRuleset;
 

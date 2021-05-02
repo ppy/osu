@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Components.RadioButtons
 {
-    public class DrawableRadioButton : TriangleButton
+    public class DrawableRadioButton : OsuButton
     {
         /// <summary>
         /// Invoked when this <see cref="DrawableRadioButton"/> has been selected.

@@ -15,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Components.TernaryButtons
 {
-    internal class DrawableTernaryButton : TriangleButton
+    internal class DrawableTernaryButton : OsuButton
     {
         private Color4 defaultBackgroundColour;
         private Color4 defaultBubbleColour;
