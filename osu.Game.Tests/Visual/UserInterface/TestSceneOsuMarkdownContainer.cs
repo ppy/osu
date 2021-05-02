@@ -60,6 +60,15 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestInlineCode()
+        {
+            AddStep("Add inline code", () =>
+            {
+                markdownContainer.Text = "This is `inline code` text";
+            });
+        }
+
+        [Test]
         public void TestFencedCodeBlock()
         {
             AddStep("Add Code Block", () =>
