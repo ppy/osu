@@ -4,6 +4,7 @@
 using Markdig.Extensions.Yaml;
 using Markdig.Syntax;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Containers.Markdown;
 using osu.Game.Graphics.Containers.Markdown;
 
 namespace osu.Game.Overlays.Wiki.Markdown
@@ -28,6 +29,8 @@ namespace osu.Game.Overlays.Wiki.Markdown
                     break;
             }
         }
+
+        public override MarkdownTextFlowContainer CreateTextFlow() => new WikiMarkdownTextFlowContainer();
 
         protected virtual FillFlowContainer CreateNotice(YamlFrontMatterBlock yamlFrontMatterBlock) => new WikiNoticeContainer(yamlFrontMatterBlock);
     }
