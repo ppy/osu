@@ -43,9 +43,6 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
             selectedBackgroundColour = colours.BlueDark;
             selectedBubbleColour = selectedBackgroundColour.Lighten(0.5f);
 
-            Triangles.Alpha = 0;
-            Triangles.IgnoreSettings = true;
-
             Content.EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
