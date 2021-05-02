@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Components.RadioButtons
 {
-    public class DrawableRadioButton : TriangleButton
+    public class DrawableRadioButton : OsuButton
     {
         /// <summary>
         /// Invoked when this <see cref="DrawableRadioButton"/> has been selected.
@@ -48,9 +48,6 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
             defaultBubbleColour = defaultBackgroundColour.Darken(0.5f);
             selectedBackgroundColour = colours.BlueDark;
             selectedBubbleColour = selectedBackgroundColour.Lighten(0.5f);
-
-            Triangles.Alpha = 0;
-            Triangles.IgnoreSettings = true;
 
             Content.EdgeEffect = new EdgeEffectParameters
             {

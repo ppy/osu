@@ -37,6 +37,11 @@ namespace osu.Game.Rulesets.Mania
                     Current = config.GetBindable<double>(ManiaRulesetSetting.ScrollTime),
                     KeyboardStep = 5
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "Timing-based note colouring",
+                    Current = config.GetBindable<bool>(ManiaRulesetSetting.TimingBasedNoteColouring),
+                }
             };
         }
 

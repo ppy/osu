@@ -19,7 +19,7 @@ namespace Mvis.Plugin.RulesetPanel
     public class RulesetPanel : BindableControlledPlugin
     {
         public override TargetLayer Target => TargetLayer.Foreground;
-        public override int Version => 2;
+        public override int Version => 3;
 
         public RulesetPanel()
         {
@@ -50,8 +50,6 @@ namespace Mvis.Plugin.RulesetPanel
         private void load()
         {
             var config = (RulesetPanelConfigManager)Dependencies.Get<MvisPluginManager>().GetConfigManager(this);
-            DependenciesContainer.Cache(config);
-            DependenciesContainer.Cache(this);
 
             config.BindWith(RulesetPanelSetting.ShowParticles, showParticles);
             config.BindWith(RulesetPanelSetting.EnableRulesetPanel, Value);
@@ -127,7 +125,8 @@ namespace Mvis.Plugin.RulesetPanel
             {
                 if (!Disabled.Value) beatmapLogo.ResponseOnBeatmapChanges();
             };
-            onMvisBeatmapChanged(MvisScreen.Beatmap.Value);
+
+            beatmapLogo.ResponseOnBeatmapChanges();
 
             return true;
         }
@@ -154,8 +153,13 @@ namespace Mvis.Plugin.RulesetPanel
         public override void UnLoad()
         {
             MvisScreen.OnBeatmapChanged -= onMvisBeatmapChanged;
-            MvisScreen.OnScreenExiting -= beatmapLogo.StopResponseOnBeatmapChanges;
-            MvisScreen.OnScreenSuspending -= beatmapLogo.StopResponseOnBeatmapChanges;
+
+            if (ContentLoaded)
+            {
+                MvisScreen.OnScreenExiting -= beatmapLogo.StopResponseOnBeatmapChanges;
+                MvisScreen.OnScreenSuspending -= beatmapLogo.StopResponseOnBeatmapChanges;
+            }
+
             Value.UnbindAll();
             Disable();
 

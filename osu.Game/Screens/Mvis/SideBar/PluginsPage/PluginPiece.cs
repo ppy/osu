@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Mvis.SideBar.PluginsPage
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Masking = true,
-                CornerRadius = 10,
+                CornerRadius = 7,
                 BorderThickness = 3f,
                 Children = new Drawable[]
                 {
@@ -178,9 +178,10 @@ namespace osu.Game.Screens.Mvis.SideBar.PluginsPage
                                 ? "启用该插件"
                                 : "该插件报告它已被禁用, 但我们在已启用的插件中找到了它。";
 
-                            indicator.FadeColour(!activeListContainsPlugin
+                            changeColor(!activeListContainsPlugin
                                 ? indicatorInActiveColor
-                                : Color4.Gold, 300, Easing.OutQuint);
+                                : Color4.Gold);
+
                             break;
 
                         case false:
@@ -189,9 +190,10 @@ namespace osu.Game.Screens.Mvis.SideBar.PluginsPage
                                 ? "禁用该插件"
                                 : "该插件报告它已被启用, 但我们没有在已启用的插件中找到它。";
 
-                            indicator.FadeColour(activeListContainsPlugin
+                            changeColor(activeListContainsPlugin
                                 ? indicatorActiveColor
-                                : Color4.Gold, 300, Easing.OutQuint);
+                                : Color4.Gold);
+
                             break;
                     }
                 }, true);
@@ -207,6 +209,7 @@ namespace osu.Game.Screens.Mvis.SideBar.PluginsPage
             else
             {
                 indicator.TooltipText = "目前不能通过此面板禁用该插件";
+                changeColor(Color4.Gold);
             }
 
             if (Plugin.Flags.Contains(MvisPlugin.PluginFlags.CanUnload))
@@ -232,9 +235,14 @@ namespace osu.Game.Screens.Mvis.SideBar.PluginsPage
                 disabled.TriggerChange();
                 maskBox.FadeColour(colourProvider.Background3.Opacity(0.65f));
                 bgBox.FadeColour(colourProvider.Background4);
-                content.BorderColour = colourProvider.Light3;
                 unloadButton.Colour = defaultIconColor;
             }, true);
+        }
+
+        private void changeColor(Color4 target)
+        {
+            indicator.FadeColour(target, 300, Easing.OutQuint);
+            content.BorderColour = target;
         }
 
         public override void Hide()

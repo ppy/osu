@@ -135,7 +135,7 @@ namespace Mvis.Plugin.StoryboardSupport
             return true;
         }
 
-        public override int Version => 2;
+        public override int Version => 3;
 
         private Drawable prevProxy;
 
@@ -218,7 +218,7 @@ namespace Mvis.Plugin.StoryboardSupport
         {
             if (MvisScreen != null && ContentLoaded)
             {
-                MvisScreen.HideTriangles.Value = NeedToHideTriangles.Value;
+                MvisScreen.HideTriangles.Value = targetBeatmap.Storyboard.HasDrawable;
                 MvisScreen.HideScreenBackground.Value = targetBeatmap.Storyboard.ReplacesBackground;
             }
 

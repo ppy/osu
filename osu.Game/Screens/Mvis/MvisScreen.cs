@@ -63,8 +63,6 @@ namespace osu.Game.Screens.Mvis
                                   && inputManager?.DraggedDrawable == null
                                   && inputManager?.FocusedDrawable == null;
 
-        private bool isPushed;
-
         #region 外部事件
 
         /// <summary>
@@ -269,7 +267,7 @@ namespace osu.Game.Screens.Mvis
             dependencies.Cache(colourProvider = new CustomColourProvider(iR, iG, iB));
             dependencies.Cache(this);
 
-            //处理侧边栏
+            //向侧边栏添加内容
             SidebarSettingsScrollContainer settingsScroll;
             SidebarPluginsPage pluginsPage;
             sidebar.AddRange(new Drawable[]
@@ -479,7 +477,7 @@ namespace osu.Game.Screens.Mvis
                         },
                         progressBar = new SongProgressBar
                         {
-                            OnSeek = seekTo
+                            OnSeek = SeekTo
                         }
                     }
                 }
@@ -511,7 +509,13 @@ namespace osu.Game.Screens.Mvis
 
             musicSpeed.BindValueChanged(_ => applyTrackAdjustments());
             adjustFreq.BindValueChanged(_ => applyTrackAdjustments());
-            nightcoreBeat.BindValueChanged(_ => applyTrackAdjustments());
+            nightcoreBeat.BindValueChanged(v =>
+            {
+                if (v.NewValue)
+                    nightcoreBeatContainer.Show();
+                else
+                    nightcoreBeatContainer.Hide();
+            });
 
             isIdle.BindValueChanged(v =>
             {
@@ -629,14 +633,8 @@ namespace osu.Game.Screens.Mvis
                 audioControlProvider.IsCurrent = true;
             }, true);
 
-            //触发一次onBeatmapChanged和onTrackRunningToggle
-            Beatmap.BindValueChanged(onBeatmapChanged, true);
-            OnTrackRunningToggle?.Invoke(CurrentTrack.IsRunning);
-
-            //界面动画
             bottomBar.MoveToY(bottomBar.Height + 10).FadeOut();
             progressBar.MoveToY(5);
-            showOverlays(true);
 
             base.LoadComplete();
         }
@@ -771,7 +769,10 @@ namespace osu.Game.Screens.Mvis
             foreground.ScaleTo(0f).Then().ScaleTo(1f, duration, Easing.OutQuint);
             skinnableForeground.FadeIn(duration, Easing.OutQuint);
 
-            isPushed = true;
+            //触发一次onBeatmapChanged和onTrackRunningToggle
+            Beatmap.BindValueChanged(onBeatmapChanged, true);
+            OnTrackRunningToggle?.Invoke(CurrentTrack.IsRunning);
+            showOverlays(true);
         }
 
         public override bool OnExiting(IScreen next)
@@ -934,8 +935,11 @@ namespace osu.Game.Screens.Mvis
         private void nextTrack() =>
             audioControlProvider?.NextTrack();
 
-        private void seekTo(double position)
+        public void SeekTo(double position)
         {
+            if (position > CurrentTrack.Length)
+                position = CurrentTrack.Length - 10000;
+
             audioControlProvider?.Seek(position);
             OnSeek?.Invoke(position);
         }
@@ -956,24 +960,18 @@ namespace osu.Game.Screens.Mvis
             CurrentTrack.AddAdjustment(adjustFreq.Value ? AdjustableProperty.Frequency : AdjustableProperty.Tempo, musicSpeed);
 
             modRateAdjust.SpeedChange.Value = musicSpeed.Value;
-
-            if (nightcoreBeat.Value)
-                nightcoreBeatContainer.Show();
-            else
-                nightcoreBeatContainer.Hide();
         }
 
-        private void updateBackground(WorkingBeatmap beatmap)
+        private void updateBackground(WorkingBeatmap beatmap, bool applyBgBrightness = true)
         {
-            if (!isPushed) return;
-
             ApplyToBackground(bsb =>
             {
                 bsb.BlurAmount.Value = bgBlur.Value * 100;
                 bsb.Beatmap = beatmap;
             });
 
-            applyBackgroundBrightness();
+            if (applyBgBrightness)
+                applyBackgroundBrightness();
         }
 
         /// <summary>
@@ -983,7 +981,7 @@ namespace osu.Game.Screens.Mvis
         /// <param name="brightness">要调整的亮度.</param>
         private void applyBackgroundBrightness(bool auto = true, float brightness = 0)
         {
-            if (!this.IsCurrentScreen() || !isPushed) return;
+            if (!this.IsCurrentScreen()) return;
 
             ApplyToBackground(b =>
             {
@@ -1000,11 +998,8 @@ namespace osu.Game.Screens.Mvis
         {
             var beatmap = v.NewValue;
 
-            Schedule(() =>
-            {
-                applyTrackAdjustments();
-                updateBackground(beatmap);
-            });
+            applyTrackAdjustments();
+            updateBackground(beatmap);
 
             activity.Value = new UserActivity.InMvis(beatmap.BeatmapInfo);
             OnBeatmapChanged?.Invoke(beatmap);

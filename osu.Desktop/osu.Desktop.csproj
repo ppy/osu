@@ -9,7 +9,7 @@
     <Product>osu!lazer</Product>
     <ApplicationIcon>lazer.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Version>2021.424.0</Version>
+    <Version>2021.502.0</Version>
     <FileVersion>0.0.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup>
@@ -26,9 +26,12 @@
     <ProjectReference Include="..\Mvis.Plugin.StoryboardSupport\Mvis.Plugin.StoryboardSupport.csproj" />
     <ProjectReference Include="..\Mvis.Plugin.FakeEditor\Mvis.Plugin.FakeEditor.csproj" />
     <ProjectReference Include="..\Mvis.Plugin.CollectionSupport\Mvis.Plugin.CollectionSupport.csproj" />
+    <ProjectReference Include="..\Mvis.Plugin.Yasp\Mvis.Plugin.Yasp.csproj" />
+    <ProjectReference Include="..\Mvis.Plugin.CloudMusicSupport\Mvis.Plugin.CloudMusicSupport.csproj" />
   </ItemGroup>
   <ItemGroup Label="Package References">
     <PackageReference Include="Microsoft.NETCore.Targets" Version="5.0.0" />
+    <PackageReference Include="Mono.Posix.NETStandard" Version="1.0.0" />
     <PackageReference Include="System.IO.Packaging" Version="5.0.0" />
     <PackageReference Include="ppy.squirrel.windows" Version="1.9.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.6" />
