@@ -9,6 +9,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
@@ -327,20 +328,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 return;
 
             // Move the rectangle to cover the items
-            var topLeft = new Vector2(float.MaxValue, float.MaxValue);
-            var bottomRight = new Vector2(float.MinValue, float.MinValue);
+            RectangleF selectionRect = ToLocalSpace(selectedBlueprints[0].SelectionQuad).AABBFloat;
 
-            foreach (var blueprint in selectedBlueprints)
-            {
-                topLeft = Vector2.ComponentMin(topLeft, ToLocalSpace(blueprint.SelectionQuad.TopLeft));
-                bottomRight = Vector2.ComponentMax(bottomRight, ToLocalSpace(blueprint.SelectionQuad.BottomRight));
-            }
+            for (int i = 1; i < selectedBlueprints.Count; i++)
+                selectionRect = RectangleF.Union(selectionRect, ToLocalSpace(selectedBlueprints[i].SelectionQuad).AABBFloat);
 
-            topLeft -= new Vector2(5);
-            bottomRight += new Vector2(5);
+            selectionRect = selectionRect.Inflate(5f);
 
-            content.Size = bottomRight - topLeft;
-            content.Position = topLeft;
+            content.Position = selectionRect.Location;
+            content.Size = selectionRect.Size;
         }
 
         #endregion
