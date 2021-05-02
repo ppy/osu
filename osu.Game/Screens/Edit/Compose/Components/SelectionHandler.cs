@@ -328,10 +328,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 return;
 
             // Move the rectangle to cover the items
-            RectangleF selectionRect = ToLocalSpace(selectedBlueprints.First().SelectionQuad).AABBFloat;
+            RectangleF selectionRect = ToLocalSpace(selectedBlueprints[0].SelectionQuad).AABBFloat;
 
-            foreach (var blueprint in selectedBlueprints.Skip(1))
-                selectionRect = RectangleF.Union(selectionRect, ToLocalSpace(blueprint.SelectionQuad).AABBFloat);
+            for (int i = 1; i < selectedBlueprints.Count; i++)
+                selectionRect = RectangleF.Union(selectionRect, ToLocalSpace(selectedBlueprints[i].SelectionQuad).AABBFloat);
 
             selectionRect = selectionRect.Inflate(5f);
 
