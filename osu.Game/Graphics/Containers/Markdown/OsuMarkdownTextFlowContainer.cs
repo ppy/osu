@@ -2,13 +2,22 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using Markdig.Syntax.Inlines;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers.Markdown;
+using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.Containers.Markdown
 {
     public class OsuMarkdownTextFlowContainer : MarkdownTextFlowContainer
     {
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; }
+
         protected override void AddLinkText(string text, LinkInline linkInline)
             => AddDrawable(new OsuMarkdownLinkText(text, linkInline));
+
+        // TODO : Add background (colour B6) and change font to monospace
+        protected override void AddCodeInLine(CodeInline codeInline)
+            => AddText(codeInline.Content, t => { t.Colour = colourProvider.Light1; });
     }
 }
