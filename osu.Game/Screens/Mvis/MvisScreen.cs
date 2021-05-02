@@ -726,13 +726,19 @@ namespace osu.Game.Screens.Mvis
         {
             if (!(pacp is MvisPlugin mpl)) return;
 
-            dialog.Push(new ConfirmDialog($"{mpl} 请求接手音频控制。\n原因是: {message}",
+            dialog.Push(new ConfirmDialog($"插件\"{mpl}\"\n请求接手音频控制。\n原因是: {message}",
                 () =>
                 {
                     changeAudioControlProvider(pacp);
                     onAllow.Invoke();
                 },
                 onDeny));
+        }
+
+        public void ReleaseAudioControlFrom(IProvideAudioControlPlugin pacp)
+        {
+            if (audioControlProvider == pacp)
+                changeAudioControlProvider(null);
         }
 
         private void onLoadListChanged(object sender, NotifyCollectionChangedEventArgs e)

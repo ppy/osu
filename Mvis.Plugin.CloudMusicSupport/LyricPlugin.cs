@@ -56,8 +56,7 @@ namespace Mvis.Plugin.CloudMusicSupport
         {
             CurrentStatus.Value = Status.Working;
 
-            processor.WriteLrcToFile(newList, currentWorkingBeatmap);
-            Lyrics = processor.GetLyricFrom(currentWorkingBeatmap);
+            Lyrics = newList;
 
             CurrentStatus.Value = Status.Finish;
         }
@@ -72,15 +71,18 @@ namespace Mvis.Plugin.CloudMusicSupport
         {
             MvisScreen.RequestAudioControl(this,
                 "编辑歌词需要禁用切歌功能",
-                () => isEditing = false,
-                () =>
-                {
-                    isEditing = true;
-                    onAllow.Invoke();
-                });
+                () => IsEditing = false,
+                onAllow);
         }
 
-        private bool isEditing;
+        public bool IsEditing
+        {
+            set
+            {
+                if (!value)
+                    MvisScreen.ReleaseAudioControlFrom(this);
+            }
+        }
 
         private Track track;
         private readonly BindableDouble offset = new BindableDouble();
@@ -226,14 +228,10 @@ namespace Mvis.Plugin.CloudMusicSupport
 
         public void NextTrack()
         {
-            if (!isEditing)
-                controller.NextTrack();
         }
 
         public void PrevTrack()
         {
-            if (!isEditing)
-                controller.PreviousTrack();
         }
 
         public void TogglePause() => controller.TogglePause();

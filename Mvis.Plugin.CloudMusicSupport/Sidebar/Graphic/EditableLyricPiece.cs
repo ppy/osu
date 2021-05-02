@@ -1,3 +1,4 @@
+using System;
 using Mvis.Plugin.CloudMusicSupport.Misc;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -6,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Mvis;
 using osuTK;
@@ -19,6 +21,11 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
 
         private Box hoverBox;
 
+        public Action OnSeekTriggered;
+        public Action OnAdjustTriggered;
+        public Action OnDeleted;
+        public Action OnSave;
+
         public EditableLyricPiece(Lyric lrc)
         {
             CornerRadius = 5f;
@@ -30,7 +37,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
         }
 
         [BackgroundDependencyLoader]
-        private void load(CustomColourProvider colourProvider)
+        private void load(CustomColourProvider colourProvider, OsuColour osuColour)
         {
             Box bgBox;
             OsuTextBox timeTextBox;
@@ -77,11 +84,42 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                             PlaceholderText = "歌词翻译",
                             CommitOnFocusLost = true,
                         },
-                        new OsuButton
+                        new FillFlowContainer
                         {
-                            Text = "删除这条歌词",
-                            Size = new Vector2(90, 40),
-                            Action = () => Expire()
+                            AutoSizeAxes = Axes.Y,
+                            RelativeSizeAxes = Axes.X,
+                            Spacing = new Vector2(5),
+                            Children = new Drawable[]
+                            {
+                                new OsuButton
+                                {
+                                    Text = "删除这条歌词",
+                                    Size = new Vector2(90, 40),
+                                    Action = () =>
+                                    {
+                                        OnDeleted?.Invoke();
+                                        Expire();
+                                    },
+                                    BackgroundColour = osuColour.PinkDark
+                                },
+                                new OsuButton
+                                {
+                                    Text = "调整歌词到歌曲时间",
+                                    Size = new Vector2(120, 40),
+                                    Action = () =>
+                                    {
+                                        OnAdjustTriggered?.Invoke();
+                                        timeTextBox.Text = Value.Time.ToString();
+                                    },
+                                    BackgroundColour = osuColour.GreySeafoamDarker
+                                },
+                                new OsuButton
+                                {
+                                    Text = "调整歌曲到歌词时间",
+                                    Size = new Vector2(120, 40),
+                                    Action = () => OnSeekTriggered?.Invoke()
+                                }
+                            }
                         }
                     }
                 },

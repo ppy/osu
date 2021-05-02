@@ -21,7 +21,23 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
     public class LyricEditScreen : LyricScreen
     {
         protected override DrawableLyric CreateDrawableLyric(Lyric lyric)
-            => new EditableLyricPiece(lyric);
+        {
+            var piece = new EditableLyricPiece(lyric)
+            {
+                OnSeekTriggered = () => plugin.GetCurrentTrack().Seek(lyric.Time),
+                OnDeleted = () => this.Delay(1).Schedule(applyChanges)
+            };
+
+            piece.OnAdjustTriggered = () => adjustPieceTime(piece);
+
+            return piece;
+        }
+
+        private void adjustPieceTime(DrawableLyric drawableLyric)
+        {
+            drawableLyric.Value.Time = (int)plugin.GetCurrentTrack().CurrentTime;
+            applyChanges();
+        }
 
         public override Drawable[] Entries => new Drawable[]
         {
@@ -48,23 +64,30 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
             },
             new IconButton
             {
+                Icon = FontAwesome.Solid.AngleDown,
+                Size = new Vector2(45),
+                TooltipText = "滚动到当前歌词",
+                Action = ScrollToCurrent
+            },
+            new IconButton
+            {
                 Icon = FontAwesome.Solid.Save,
                 TooltipText = "保存",
-                Action = saveChanges,
+                Action = applyChanges,
                 Size = new Vector2(45)
             }
         };
 
-        private void saveChanges()
+        private void applyChanges()
         {
             var list = new List<Lyric>();
 
-            foreach (var drawableLyric in LyricFlow)
+            foreach (var drawableLyric in LyricFlow.Children)
             {
                 list.Add(drawableLyric.Value);
             }
 
-            plugin.ReplaceLyricWith(list);
+            syncLyric(list);
         }
 
         [Resolved]
@@ -72,6 +95,12 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
 
         [Resolved]
         private LyricPlugin plugin { get; set; }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            RefreshLrcInfo(plugin.Lyrics);
+        }
 
         //From EditorClock.cs
         private void seek(int direction)
@@ -128,14 +157,35 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
             plugin.Seek(seekTime);
         }
 
+        private void syncLyric(List<Lyric> list) =>
+            plugin.ReplaceLyricWith(list);
+
         private void addNewLyricAt(double time)
         {
-            plugin.Lyrics.Add(new Lyric
+            var lrc = new Lyric
             {
                 Time = (int)time
-            });
+            };
 
-            RefreshLrcInfo(plugin.Lyrics.OrderBy(l => l.Time).ToList());
+            plugin.Lyrics.Add(lrc);
+            var list = plugin.Lyrics.OrderBy(l => l.Time).ToList();
+
+            syncLyric(list);
+
+            //获取index
+            var targetIndex = list.IndexOf(lrc);
+
+            foreach (var d in LyricFlow)
+            {
+                var drawableIndex = LyricFlow.IndexOf(d);
+
+                if (drawableIndex >= targetIndex)
+                    LyricFlow.SetLayoutPosition(d, drawableIndex + 1);
+            }
+
+            var piece = CreateDrawableLyric(lrc);
+
+            LyricFlow.Insert(targetIndex, piece);
         }
 
         protected override void UpdateStatus(LyricPlugin.Status status)
@@ -146,21 +196,24 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         {
             LyricFlow.Clear();
 
+            int index = 0;
+
             foreach (var t in lyrics)
             {
-                LyricFlow.Add(CreateDrawableLyric(t));
+                LyricFlow.Insert(index, CreateDrawableLyric(t));
+                index++;
             }
         }
 
         public override void OnEntering(IScreen last)
         {
-            RefreshLrcInfo(plugin.Lyrics);
             this.MoveToX(0, 200, Easing.OutQuint).FadeInFromZero(200, Easing.OutQuint);
             base.OnEntering(last);
         }
 
         public override bool OnExiting(IScreen next)
         {
+            plugin.IsEditing = false;
             this.MoveToX(10, 200, Easing.OutQuint).FadeOut(200, Easing.OutQuint);
             return base.OnExiting(next);
         }
