@@ -12,9 +12,9 @@ namespace osu.Game.Rulesets.Catch.Mods
 {
     public class CatchModFloatingFruits : Mod, IApplicableToDrawableRuleset<CatchHitObject>
     {
-        public override string Name => "Floating Fruits";
+        public override string Name => "悬浮";
         public override string Acronym => "FF";
-        public override string Description => "The fruits are... floating?";
+        public override string Description => "上落式音游(";
         public override double ScoreMultiplier => 1;
         public override IconUsage? Icon => FontAwesome.Solid.Cloud;
 
