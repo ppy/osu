@@ -13,9 +13,10 @@ using osu.Game.Input.Bindings;
 namespace osu.Game.Skinning.Editor
 {
     /// <summary>
-    /// A container which handles loading a skin editor on user request.
+    /// A container which handles loading a skin editor on user request for a specified target.
+    /// This also handles the scaling / positioning adjustment of the target.
     /// </summary>
-    public class SkinEditorContainer : CompositeDrawable, IKeyBindingHandler<GlobalAction>
+    public class SkinEditorOverlay : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
         private readonly ScalingContainer target;
         private SkinEditor skinEditor;
@@ -25,7 +26,7 @@ namespace osu.Game.Skinning.Editor
         [Resolved]
         private OsuColour colours { get; set; }
 
-        public SkinEditorContainer(ScalingContainer target)
+        public SkinEditorOverlay(ScalingContainer target)
         {
             this.target = target;
             RelativeSizeAxes = Axes.Both;

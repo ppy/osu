@@ -688,7 +688,7 @@ namespace osu.Game
             var changelogOverlay = loadComponentSingleFile(new ChangelogOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(skinEditor = new SkinEditorContainer(screenContainer), overlayContent.Add);
+            loadComponentSingleFile(skinEditor = new SkinEditorOverlay(screenContainer), overlayContent.Add);
 
             loadComponentSingleFile(new LoginOverlay
             {
@@ -946,7 +946,7 @@ namespace osu.Game
 
         private ScalingContainer screenContainer;
 
-        private SkinEditorContainer skinEditor;
+        private SkinEditorOverlay skinEditor;
 
         protected override bool OnExiting()
         {
