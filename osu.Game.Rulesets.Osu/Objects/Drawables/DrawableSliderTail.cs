@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableSliderTail : DrawableOsuHitObject, IRequireTracking, ITrackSnaking
+    public class DrawableSliderTail : DrawableOsuHitObject, IRequireTracking, ITrackSnaking, IHasMainCirclePiece
     {
         public new SliderTailCircle HitObject => (SliderTailCircle)base.HitObject;
 
@@ -35,7 +35,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public bool Tracking { get; set; }
 
-        private SkinnableDrawable circlePiece;
+        public SkinnableDrawable CirclePiece { get; private set; }
+
         private Container scaleContainer;
 
         public DrawableSliderTail()
@@ -64,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Children = new Drawable[]
                     {
                         // no default for this; only visible in legacy skins.
-                        circlePiece = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderTailHitCircle), _ => Empty())
+                        CirclePiece = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderTailHitCircle), _ => Empty())
                     }
                 },
             };
@@ -76,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdateInitialTransforms();
 
-            circlePiece.FadeInFromZero(HitObject.TimeFadeIn);
+            CirclePiece.FadeInFromZero(HitObject.TimeFadeIn);
         }
 
         protected override void UpdateHitStateTransforms(ArmedState state)
@@ -85,7 +86,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Debug.Assert(HitObject.HitWindows != null);
 
-            (circlePiece.Drawable as IMainCirclePiece)?.Animate(state);
+            (CirclePiece.Drawable as IMainCirclePiece)?.Animate(state);
 
             switch (state)
             {
