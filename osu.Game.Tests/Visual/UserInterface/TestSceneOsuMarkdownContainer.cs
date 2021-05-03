@@ -42,6 +42,20 @@ namespace osu.Game.Tests.Visual.UserInterface
         });
 
         [Test]
+        public void TestEmphases()
+        {
+            AddStep("Emphases", () =>
+            {
+                markdownContainer.Text = @"_italic with underscore_
+*italic with asterisk*
+__bold with underscore__
+**bold with asterisk**
+*__italic with asterisk, bold with underscore__*
+_**italic with underscore, bold with asterisk**_";
+            });
+        }
+
+        [Test]
         public void TestHeading()
         {
             AddStep("Add Heading", () =>
