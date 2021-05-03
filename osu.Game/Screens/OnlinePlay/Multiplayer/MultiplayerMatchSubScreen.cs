@@ -413,7 +413,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private void onLoadRequested()
         {
-            // If the user is spectating, the multi-spectator screen may still be the current screen.
+            // In the case of spectating, IMultiplayerClient.LoadRequested can be fired while the game is still spectating a previous session.
+            // For now, we want to game to switch to the new game so need to request exiting from the play screen.
             if (!ParentScreen.IsCurrentScreen())
             {
                 ParentScreen.MakeCurrent();
