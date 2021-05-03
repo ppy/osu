@@ -12,5 +12,31 @@ namespace osu.Game.Graphics.Containers.Markdown
             : base(headingBlock)
         {
         }
+
+        protected override float GetFontSizeByLevel(int level)
+        {
+            const float base_font_size = 14;
+
+            switch (level)
+            {
+                case 1:
+                    return 30 / base_font_size;
+
+                case 2:
+                    return 26 / base_font_size;
+
+                case 3:
+                    return 20 / base_font_size;
+
+                case 4:
+                    return 18 / base_font_size;
+
+                case 5:
+                    return 16 / base_font_size;
+
+                default:
+                    return 1;
+            }
+        }
     }
 }
