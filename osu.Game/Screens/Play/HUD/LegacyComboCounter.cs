@@ -97,7 +97,6 @@ namespace osu.Game.Screens.Play.HUD
             };
 
             Current.BindTo(scoreProcessor.Combo);
-            Current.BindValueChanged(combo => updateCount(combo.NewValue == 0), true);
         }
 
         protected override void LoadComplete()
@@ -111,7 +110,7 @@ namespace osu.Game.Screens.Play.HUD
             popOutCount.Origin = Origin;
             popOutCount.Anchor = Anchor;
 
-            updateCount(false);
+            Current.BindValueChanged(combo => updateCount(combo.NewValue == 0), true);
         }
 
         private void updateCount(bool rolling)
