@@ -42,6 +42,19 @@ namespace osu.Game.Tests.Visual.UserInterface
         });
 
         [Test]
+        public void TestHeading()
+        {
+            AddStep("Add Heading", () =>
+            {
+                markdownContainer.Text = @"# Header 1
+## Header 2
+### Header 3
+#### Header 4
+##### Header 5";
+            });
+        }
+
+        [Test]
         public void TestLink()
         {
             AddStep("Add Link", () =>
