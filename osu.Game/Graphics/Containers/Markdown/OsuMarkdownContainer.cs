@@ -44,6 +44,8 @@ namespace osu.Game.Graphics.Containers.Markdown
 
         public override MarkdownTextFlowContainer CreateTextFlow() => new OsuMarkdownTextFlowContainer();
 
+        protected override MarkdownHeading CreateHeading(HeadingBlock headingBlock) => new OsuMarkdownHeading(headingBlock);
+
         protected override MarkdownFencedCodeBlock CreateFencedCodeBlock(FencedCodeBlock fencedCodeBlock) => new OsuMarkdownFencedCodeBlock(fencedCodeBlock);
 
         protected override MarkdownSeparator CreateSeparator(ThematicBreakBlock thematicBlock) => new OsuMarkdownSeparator();
