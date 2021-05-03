@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (activeHandle?.InOperation == true || activeHandle?.IsHovered == true)
                 return;
 
-            displayedRotationHandle?.Hide();
+            displayedRotationHandle?.FadeOut(SelectionBoxControl.TRANSFORM_DURATION, Easing.OutQuint);
             displayedRotationHandle = null;
 
             activeHandle = allDragHandles.SingleOrDefault(h => h.InOperation);
@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (activeHandle != null)
             {
                 displayedRotationHandle = getCorrespondingRotationHandle(activeHandle, rotationHandles);
-                displayedRotationHandle?.Show();
+                displayedRotationHandle?.FadeIn(SelectionBoxControl.TRANSFORM_DURATION, Easing.OutQuint);
             }
         }
 
