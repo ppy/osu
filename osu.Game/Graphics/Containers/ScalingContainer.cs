@@ -50,7 +50,7 @@ namespace osu.Game.Graphics.Containers
                     return;
 
                 allowScaling = value;
-                updateSize();
+                if (IsLoaded) updateSize();
             }
         }
 
