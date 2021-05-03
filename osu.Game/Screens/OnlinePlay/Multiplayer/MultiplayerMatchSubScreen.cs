@@ -433,10 +433,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             Debug.Assert(client.LocalUser != null);
 
-            if (client.LocalUser.State == MultiplayerUserState.Spectating)
-                return new MultiSpectatorScreen(client.CurrentMatchPlayingUserIds.ToArray());
+            int[] userIds = client.CurrentMatchPlayingUserIds.ToArray();
 
-            return new MultiplayerPlayer(SelectedItem.Value, client.CurrentMatchPlayingUserIds.ToArray());
+            switch (client.LocalUser.State)
+            {
+                case MultiplayerUserState.Spectating:
+                    return new MultiSpectatorScreen(userIds);
+
+                default:
+                    return new MultiplayerPlayer(SelectedItem.Value, userIds);
+            }
         }
 
         protected override void Dispose(bool isDisposing)
