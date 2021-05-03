@@ -34,7 +34,6 @@ namespace osu.Game.Screens.Play
         public float TopScoringElementsHeight { get; private set; }
 
         public readonly KeyCounterDisplay KeyCounter;
-        public readonly SkinnableComboCounter ComboCounter;
         public readonly SkinnableScoreCounter ScoreCounter;
         public readonly SkinnableAccuracyCounter AccuracyCounter;
         public readonly SkinnableHealthDisplay HealthDisplay;
@@ -106,7 +105,7 @@ namespace osu.Game.Screens.Play
                                         HealthDisplay = CreateHealthDisplay(),
                                         AccuracyCounter = CreateAccuracyCounter(),
                                         ScoreCounter = CreateScoreCounter(),
-                                        ComboCounter = CreateComboCounter(),
+                                        CreateComboCounter(),
                                         HitErrorDisplay = CreateHitErrorDisplayOverlay(),
                                     }
                                 },
@@ -276,13 +275,13 @@ namespace osu.Game.Screens.Play
             Progress.BindDrawableRuleset(drawableRuleset);
         }
 
-        protected virtual SkinnableAccuracyCounter CreateAccuracyCounter() => new SkinnableAccuracyCounter();
+        protected SkinnableAccuracyCounter CreateAccuracyCounter() => new SkinnableAccuracyCounter();
 
-        protected virtual SkinnableScoreCounter CreateScoreCounter() => new SkinnableScoreCounter();
+        protected SkinnableScoreCounter CreateScoreCounter() => new SkinnableScoreCounter();
 
-        protected virtual SkinnableComboCounter CreateComboCounter() => new SkinnableComboCounter();
+        protected SkinnableComboCounter CreateComboCounter() => new SkinnableComboCounter();
 
-        protected virtual SkinnableHealthDisplay CreateHealthDisplay() => new SkinnableHealthDisplay();
+        protected SkinnableHealthDisplay CreateHealthDisplay() => new SkinnableHealthDisplay();
 
         protected virtual FailingLayer CreateFailingLayer() => new FailingLayer
         {
@@ -323,7 +322,6 @@ namespace osu.Game.Screens.Play
         {
             ScoreCounter?.Current.BindTo(processor.TotalScore);
             AccuracyCounter?.Current.BindTo(processor.Accuracy);
-            ComboCounter?.Current.BindTo(processor.Combo);
 
             if (HealthDisplay is IHealthDisplay shd)
             {
