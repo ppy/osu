@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Input;
 
@@ -16,6 +17,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 {
     public class SelectionBox : CompositeDrawable
     {
+        public const float BORDER_RADIUS = 3;
+
         public Func<float, bool> OnRotation;
         public Func<Vector2, Anchor, bool> OnScale;
         public Func<Direction, bool> OnFlip;
@@ -92,21 +95,32 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
+        private string text;
+
+        public string Text
+        {
+            get => text;
+            set
+            {
+                if (value == text)
+                    return;
+
+                text = value;
+                if (selectionDetailsText != null)
+                    selectionDetailsText.Text = value;
+            }
+        }
+
         private Container dragHandles;
         private FillFlowContainer buttons;
 
-        public const float BORDER_RADIUS = 3;
+        private OsuSpriteText selectionDetailsText;
 
         [Resolved]
         private OsuColour colours { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load()
-        {
-            RelativeSizeAxes = Axes.Both;
-
-            recreate();
-        }
+        private void load() => recreate();
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
@@ -144,6 +158,26 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             InternalChildren = new Drawable[]
             {
+                new Container
+                {
+                    Name = "info text",
+                    AutoSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            Colour = colours.YellowDark,
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        selectionDetailsText = new OsuSpriteText
+                        {
+                            Padding = new MarginPadding(2),
+                            Colour = colours.Gray0,
+                            Font = OsuFont.Default.With(size: 11),
+                            Text = text,
+                        }
+                    }
+                },
                 new Container
                 {
                     Masking = true,
