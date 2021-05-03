@@ -110,6 +110,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public override bool PropagatePositionalInputSubTree => false;
         public override bool PropagateNonPositionalInputSubTree => false;
 
+        /// <summary>
+        /// Isolates each player instance from the game-wide ruleset/beatmap/mods (to allow for different players having different settings).
+        /// </summary>
         private class PlayerIsolationContainer : Container
         {
             [Cached]
