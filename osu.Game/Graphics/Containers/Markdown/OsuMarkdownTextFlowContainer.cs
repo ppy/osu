@@ -4,6 +4,8 @@
 using Markdig.Syntax.Inlines;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers.Markdown;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.Containers.Markdown
@@ -12,6 +14,11 @@ namespace osu.Game.Graphics.Containers.Markdown
     {
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
+
+        protected override SpriteText CreateSpriteText() => new OsuSpriteText
+        {
+            Font = OsuFont.GetFont(size: 14),
+        };
 
         protected override void AddLinkText(string text, LinkInline linkInline)
             => AddDrawable(new OsuMarkdownLinkText(text, linkInline));

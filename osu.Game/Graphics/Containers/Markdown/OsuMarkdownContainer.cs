@@ -9,6 +9,8 @@ using Markdig.Syntax;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Containers.Markdown;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.Containers.Markdown
 {
@@ -34,6 +36,11 @@ namespace osu.Game.Graphics.Containers.Markdown
                     break;
             }
         }
+
+        public override SpriteText CreateSpriteText() => new OsuSpriteText
+        {
+            Font = OsuFont.GetFont(size: 14),
+        };
 
         public override MarkdownTextFlowContainer CreateTextFlow() => new OsuMarkdownTextFlowContainer();
 
