@@ -125,11 +125,6 @@ namespace osu.Game.Skinning.Editor
             {
             }
 
-            private void updateState(TernaryState obj)
-            {
-                throw new NotImplementedException();
-            }
-
             private static TernaryState getNextState(TernaryState state) => TernaryState.True;
         }
     }
