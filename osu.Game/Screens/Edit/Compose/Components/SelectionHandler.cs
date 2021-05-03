@@ -57,7 +57,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             RelativeSizeAxes = Axes.Both;
             AlwaysPresent = true;
-            Alpha = 0;
         }
 
         [BackgroundDependencyLoader]
@@ -318,7 +317,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             selectionDetailsText.Text = count > 0 ? count.ToString() : string.Empty;
 
-            this.FadeTo(count > 0 ? 1 : 0);
+            content.FadeTo(count > 0 ? 1 : 0);
             OnSelectionChanged();
         }
 
