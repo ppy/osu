@@ -8,35 +8,33 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
 
 namespace osu.Game.Rulesets.Edit
 {
     /// <summary>
-    /// A blueprint placed above a <see cref="DrawableHitObject"/> adding editing functionality.
+    /// A blueprint placed above a displaying item adding editing functionality.
     /// </summary>
-    public abstract class SelectionBlueprint : CompositeDrawable, IStateful<SelectionState>
+    public abstract class SelectionBlueprint<T> : CompositeDrawable, IStateful<SelectionState>
     {
-        public readonly HitObject HitObject;
+        public readonly T Item;
 
         /// <summary>
-        /// Invoked when this <see cref="SelectionBlueprint"/> has been selected.
+        /// Invoked when this <see cref="SelectionBlueprint{T}"/> has been selected.
         /// </summary>
-        public event Action<SelectionBlueprint> Selected;
+        public event Action<SelectionBlueprint<T>> Selected;
 
         /// <summary>
-        /// Invoked when this <see cref="SelectionBlueprint"/> has been deselected.
+        /// Invoked when this <see cref="SelectionBlueprint{T}"/> has been deselected.
         /// </summary>
-        public event Action<SelectionBlueprint> Deselected;
+        public event Action<SelectionBlueprint<T>> Deselected;
 
         public override bool HandlePositionalInput => ShouldBeAlive;
         public override bool RemoveWhenNotAlive => false;
 
-        protected SelectionBlueprint(HitObject hitObject)
+        protected SelectionBlueprint(T item)
         {
-            HitObject = hitObject;
+            Item = item;
 
             RelativeSizeAxes = Axes.Both;
             AlwaysPresent = true;
@@ -87,7 +85,7 @@ namespace osu.Game.Rulesets.Edit
 
         protected virtual void OnDeselected()
         {
-            // selection blueprints are AlwaysPresent while the related DrawableHitObject is visible
+            // selection blueprints are AlwaysPresent while the related item is visible
             // set the body piece's alpha directly to avoid arbitrarily rendering frame buffers etc. of children.
             foreach (var d in InternalChildren)
                 d.Hide();
@@ -129,7 +127,7 @@ namespace osu.Game.Rulesets.Edit
         public virtual MenuItem[] ContextMenuItems => Array.Empty<MenuItem>();
 
         /// <summary>
-        /// The screen-space point that causes this <see cref="OverlaySelectionBlueprint"/> to be selected.
+        /// The screen-space point that causes this <see cref="OverlaySelectionBlueprint"/> to be selected via a drag.
         /// </summary>
         public virtual Vector2 ScreenSpaceSelectionPoint => ScreenSpaceDrawQuad.Centre;
 
@@ -137,8 +135,6 @@ namespace osu.Game.Rulesets.Edit
         /// The screen-space quad that outlines this <see cref="OverlaySelectionBlueprint"/> for selections.
         /// </summary>
         public virtual Quad SelectionQuad => ScreenSpaceDrawQuad;
-
-        public virtual Vector2 GetInstantDelta(Vector2 screenSpacePosition) => Parent.ToLocalSpace(screenSpacePosition) - Position;
 
         /// <summary>
         /// Handle to perform a partial deletion when the user requests a quick delete (Shift+Right Click).
