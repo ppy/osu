@@ -53,21 +53,9 @@ namespace osu.Game.Skinning.Editor
 
                 return displayableAnchors.Select(a =>
                 {
-                    var countExisting = selection.Count(b => ((Drawable)b.Item).Anchor == a);
-                    var countTotal = selection.Count();
-
-                    TernaryState state;
-
-                    if (countExisting == countTotal)
-                        state = TernaryState.True;
-                    else if (countExisting > 0)
-                        state = TernaryState.Indeterminate;
-                    else
-                        state = TernaryState.False;
-
                     return new AnchorMenuItem(a, selection, _ => applyAnchor(a))
                     {
-                        State = { Value = state }
+                        State = { Value = GetStateFromSelection(selection, c => ((Drawable)c.Item).Anchor == a) }
                     };
                 });
             }
