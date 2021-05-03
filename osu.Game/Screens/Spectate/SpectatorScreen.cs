@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
-using NuGet.Packaging;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
@@ -27,8 +26,9 @@ namespace osu.Game.Screens.Spectate
     /// </summary>
     public abstract class SpectatorScreen : OsuScreen
     {
-        protected IEnumerable<int> GetUserIds() => userIds;
-        private readonly HashSet<int> userIds = new HashSet<int>();
+        protected IReadOnlyList<int> UserIds => userIds;
+
+        private readonly List<int> userIds = new List<int>();
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }

@@ -27,8 +27,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// </summary>
         public bool AllPlayersLoaded => instances.All(p => p?.PlayerLoaded == true);
 
-        private readonly int[] userIds;
-
         [Resolved]
         private SpectatorStreamingClient spectatorClient { get; set; }
 
@@ -49,8 +47,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public MultiSpectatorScreen(int[] userIds)
             : base(userIds.Take(PlayerGrid.MAX_PLAYERS).ToArray())
         {
-            this.userIds = GetUserIds().ToArray();
-            instances = new PlayerArea[this.userIds.Length];
+            instances = new PlayerArea[UserIds.Count];
         }
 
         [BackgroundDependencyLoader]
@@ -84,9 +81,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 })
             };
 
-            for (int i = 0; i < userIds.Length; i++)
+            for (int i = 0; i < UserIds.Count; i++)
             {
-                grid.Add(instances[i] = new PlayerArea(userIds[i], masterClockContainer.GameplayClock));
+                grid.Add(instances[i] = new PlayerArea(UserIds[i], masterClockContainer.GameplayClock));
                 syncManager.AddPlayerClock(instances[i].GameplayClock);
             }
 
@@ -95,7 +92,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             var scoreProcessor = Ruleset.Value.CreateInstance().CreateScoreProcessor();
             scoreProcessor.ApplyBeatmap(playableBeatmap);
 
-            LoadComponentAsync(leaderboard = new MultiSpectatorLeaderboard(scoreProcessor, userIds) { Expanded = { Value = true } }, leaderboardContainer.Add);
+            LoadComponentAsync(leaderboard = new MultiSpectatorLeaderboard(scoreProcessor, UserIds.ToArray()) { Expanded = { Value = true } }, leaderboardContainer.Add);
         }
 
         protected override void LoadComplete()
@@ -130,7 +127,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         protected override void StartGameplay(int userId, GameplayState gameplayState)
         {
-            var instance = instances[getIndexForUser(userId)];
+            var instance = instances.Single(i => i.UserId == userId);
+
             instance.LoadScore(gameplayState.Score);
 
             syncManager.AddPlayerClock(instance.GameplayClock);
@@ -149,7 +147,5 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             multiplayerClient.ChangeState(MultiplayerUserState.Idle);
             return base.OnBackButton();
         }
-
-        private int getIndexForUser(int userId) => Array.IndexOf(userIds, userId);
     }
 }
