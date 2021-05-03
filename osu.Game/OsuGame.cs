@@ -80,6 +80,8 @@ namespace osu.Game
 
         private BeatmapSetOverlay beatmapSetOverlay;
 
+        private SkinEditorOverlay skinEditor;
+
         [Cached]
         private readonly DifficultyRecommender difficultyRecommender = new DifficultyRecommender();
 
@@ -945,8 +947,6 @@ namespace osu.Game
         private FrameworkConfigManager frameworkConfig { get; set; }
 
         private ScalingContainer screenContainer;
-
-        private SkinEditorOverlay skinEditor;
 
         protected override bool OnExiting()
         {
