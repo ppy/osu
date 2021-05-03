@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets.Scoring;
 using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
@@ -24,7 +25,11 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours) => Colour = colours.BlueLighter;
+        private void load(OsuColour colours, ScoreProcessor scoreProcessor)
+        {
+            Colour = colours.BlueLighter;
+            Current.BindTo(scoreProcessor.Combo);
+        }
 
         protected override void Update()
         {

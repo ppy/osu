@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -79,7 +80,7 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(ScoreProcessor scoreProcessor)
         {
             InternalChildren = new[]
             {
@@ -95,7 +96,8 @@ namespace osu.Game.Screens.Play.HUD
                 },
             };
 
-            Current.ValueChanged += combo => updateCount(combo.NewValue == 0);
+            Current.BindTo(scoreProcessor.Combo);
+            Current.BindValueChanged(combo => updateCount(combo.NewValue == 0), true);
         }
 
         protected override void LoadComplete()
