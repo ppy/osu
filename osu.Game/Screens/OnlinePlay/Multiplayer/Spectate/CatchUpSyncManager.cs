@@ -14,7 +14,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
     public class CatchUpSyncManager : Component, ISyncManager
     {
         /// <summary>
-        /// The offset from the master clock to which player clocks should be synchronised to.
+        /// The offset from the master clock to which player clocks should remain within to be considered in-sync.
         /// </summary>
         public const double SYNC_TARGET = 16;
 
@@ -102,6 +102,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             for (int i = 0; i < playerClocks.Count; i++)
             {
                 var clock = playerClocks[i];
+
+                // How far this player's clock is out of sync, compared to the master clock.
+                // A negative value means the player is running fast (ahead); a positive value means the player is running behind (catching up).
                 double timeDelta = MasterClock.CurrentTime - clock.CurrentTime;
 
                 // Check that the player clock isn't too far ahead.
