@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void Update(Playfield playfield)
         {
-            if (replayInputHandler!=null && replayInputHandler.Value.HandleActionInput) return;
+            if (replayInputHandler.Value?.HandleActionInput ?? true) return;
 
             bool requiresHold = false;
             bool requiresHit = false;
