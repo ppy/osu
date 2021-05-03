@@ -3,7 +3,6 @@
 
 using System;
 using System.Diagnostics;
-using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
 using osu.Framework.Extensions;
@@ -143,7 +142,8 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.DiscordRichPresence, DiscordRichPresenceMode.Full);
 
-            SetDefault(OsuSetting.EditorWaveformOpacity, 1f);
+            SetDefault(OsuSetting.EditorWaveformOpacity, 0.25f);
+            SetDefault(OsuSetting.EditorHitAnimations, false);
         }
 
         public OsuConfigManager(Storage storage)
@@ -169,14 +169,9 @@ namespace osu.Game.Configuration
 
             int combined = (year * 10000) + monthDay;
 
-            if (combined < 20200305)
+            if (combined < 20210413)
             {
-                // the maximum value of this setting was changed.
-                // if we don't manually increase this, it causes song select to filter out beatmaps the user expects to see.
-                var maxStars = (BindableDouble)GetOriginalBindable<double>(OsuSetting.DisplayStarsMaximum);
-
-                if (maxStars.Value == 10)
-                    maxStars.Value = maxStars.MaxValue;
+                SetValue(OsuSetting.EditorWaveformOpacity, 0.25f);
             }
         }
 
@@ -272,6 +267,7 @@ namespace osu.Game.Configuration
         GameplayDisableWinKey,
         SeasonalBackgroundMode,
         EditorWaveformOpacity,
+        EditorHitAnimations,
         DiscordRichPresence,
         AutomaticallyDownloadWhenSpectating,
         ShowOnlineExplicitContent,

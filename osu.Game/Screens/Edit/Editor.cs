@@ -35,6 +35,7 @@ using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Design;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Edit.Timing;
+using osu.Game.Screens.Edit.Verify;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
 using osuTK.Graphics;
@@ -223,9 +224,10 @@ namespace osu.Game.Screens.Edit
                                 },
                                 new MenuItem("View")
                                 {
-                                    Items = new[]
+                                    Items = new MenuItem[]
                                     {
-                                        new WaveformOpacityMenu(config)
+                                        new WaveformOpacityMenuItem(config.GetBindable<float>(OsuSetting.EditorWaveformOpacity)),
+                                        new HitAnimationsMenuItem(config.GetBindable<bool>(OsuSetting.EditorHitAnimations))
                                     }
                                 }
                             }
@@ -444,6 +446,10 @@ namespace osu.Game.Screens.Edit
                     menuBar.Mode.Value = EditorScreenMode.SongSetup;
                     return true;
 
+                case GlobalAction.EditorVerifyMode:
+                    menuBar.Mode.Value = EditorScreenMode.Verify;
+                    return true;
+
                 default:
                     return false;
             }
@@ -462,7 +468,7 @@ namespace osu.Game.Screens.Edit
                 // todo: temporary. we want to be applying dim using the UserDimContainer eventually.
                 b.FadeColour(Color4.DarkGray, 500);
 
-                b.EnableUserDim.Value = false;
+                b.IgnoreUserSettings.Value = true;
                 b.BlurAmount.Value = 0;
             });
 
@@ -630,6 +636,10 @@ namespace osu.Game.Screens.Edit
 
                     case EditorScreenMode.Timing:
                         currentScreen = new TimingScreen();
+                        break;
+
+                    case EditorScreenMode.Verify:
+                        currentScreen = new VerifyScreen();
                         break;
                 }
 

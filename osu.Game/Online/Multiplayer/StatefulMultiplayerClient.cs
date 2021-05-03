@@ -144,6 +144,8 @@ namespace osu.Game.Online.Multiplayer
                     Room = joinedRoom;
                     apiRoom = room;
                     defaultPlaylistItemId = apiRoom.Playlist.FirstOrDefault()?.ID ?? 0;
+                    foreach (var user in joinedRoom.Users)
+                        updateUserPlayingState(user.UserID, user.State);
                 }, cancellationSource.Token).ConfigureAwait(false);
 
                 // Update room settings.
@@ -246,6 +248,33 @@ namespace osu.Game.Online.Multiplayer
 
                 default:
                     throw new InvalidOperationException($"Cannot toggle ready when in {localUser.State}");
+            }
+        }
+
+        /// <summary>
+        /// Toggles the <see cref="LocalUser"/>'s spectating state.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">If a toggle of the spectating state is not valid at this time.</exception>
+        public async Task ToggleSpectate()
+        {
+            var localUser = LocalUser;
+
+            if (localUser == null)
+                return;
+
+            switch (localUser.State)
+            {
+                case MultiplayerUserState.Idle:
+                case MultiplayerUserState.Ready:
+                    await ChangeState(MultiplayerUserState.Spectating).ConfigureAwait(false);
+                    return;
+
+                case MultiplayerUserState.Spectating:
+                    await ChangeState(MultiplayerUserState.Idle).ConfigureAwait(false);
+                    return;
+
+                default:
+                    throw new InvalidOperationException($"Cannot toggle spectate when in {localUser.State}");
             }
         }
 

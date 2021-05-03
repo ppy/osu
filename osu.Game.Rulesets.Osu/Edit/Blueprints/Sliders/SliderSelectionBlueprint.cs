@@ -215,7 +215,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             }
 
             // If there are 0 or 1 remaining control points, the slider is in a degenerate (single point) form and should be deleted
-            if (controlPoints.Count <= 1)
+            if (controlPoints.Count <= 1 || !slider.HitObject.Path.HasValidLength)
             {
                 placementHandler?.Delete(HitObject);
                 return;

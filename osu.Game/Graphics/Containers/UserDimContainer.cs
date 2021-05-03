@@ -24,11 +24,6 @@ namespace osu.Game.Graphics.Containers
         protected const double BACKGROUND_FADE_DURATION = 800;
 
         /// <summary>
-        /// Whether or not user-configured dim levels should be applied to the container.
-        /// </summary>
-        public readonly Bindable<bool> EnableUserDim = new Bindable<bool>(true);
-
-        /// <summary>
         /// Whether or not user-configured settings relating to brightness of elements should be ignored
         /// </summary>
         public readonly Bindable<bool> IgnoreUserSettings = new Bindable<bool>();
@@ -57,7 +52,7 @@ namespace osu.Game.Graphics.Containers
 
         private float breakLightening => LightenDuringBreaks.Value && IsBreakTime.Value ? BREAK_LIGHTEN_AMOUNT : 0;
 
-        protected float DimLevel => Math.Max(EnableUserDim.Value && !IgnoreUserSettings.Value ? (float)UserDimLevel.Value - breakLightening : 0, 0);
+        protected float DimLevel => Math.Max(!IgnoreUserSettings.Value ? (float)UserDimLevel.Value - breakLightening : 0, 0);
 
         protected override Container<Drawable> Content => dimContent;
 
@@ -78,7 +73,6 @@ namespace osu.Game.Graphics.Containers
             LightenDuringBreaks = config.GetBindable<bool>(OsuSetting.LightenDuringBreaks);
             ShowStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
 
-            EnableUserDim.ValueChanged += _ => UpdateVisuals();
             UserDimLevel.ValueChanged += _ => UpdateVisuals();
             LightenDuringBreaks.ValueChanged += _ => UpdateVisuals();
             IsBreakTime.ValueChanged += _ => UpdateVisuals();

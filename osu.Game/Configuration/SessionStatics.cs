@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
@@ -12,19 +13,25 @@ namespace osu.Game.Configuration
     /// </summary>
     public class SessionStatics : InMemoryConfigManager<Static>
     {
-        protected override void InitialiseDefaults()
+        protected override void InitialiseDefaults() => ResetValues();
+
+        public void ResetValues()
         {
-            SetDefault(Static.LoginOverlayDisplayed, false);
-            SetDefault(Static.MutedAudioNotificationShownOnce, false);
-            SetDefault(Static.LastHoverSoundPlaybackTime, (double?)null);
-            SetDefault<APISeasonalBackgrounds>(Static.SeasonalBackgrounds, null);
+            ensureDefault(SetDefault(Static.LoginOverlayDisplayed, false));
+            ensureDefault(SetDefault(Static.MutedAudioNotificationShownOnce, false));
+            ensureDefault(SetDefault(Static.LowBatteryNotificationShownOnce, false));
+            ensureDefault(SetDefault(Static.LastHoverSoundPlaybackTime, (double?)null));
+            ensureDefault(SetDefault<APISeasonalBackgrounds>(Static.SeasonalBackgrounds, null));
         }
+
+        private void ensureDefault<T>(Bindable<T> bindable) => bindable.SetDefault();
     }
 
     public enum Static
     {
         LoginOverlayDisplayed,
         MutedAudioNotificationShownOnce,
+        LowBatteryNotificationShownOnce,
 
         /// <summary>
         /// Info about seasonal backgrounds available fetched from API - see <see cref="APISeasonalBackgrounds"/>.
