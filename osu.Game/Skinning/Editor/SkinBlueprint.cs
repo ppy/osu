@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
 
@@ -17,26 +16,20 @@ namespace osu.Game.Skinning.Editor
 {
     public class SkinBlueprint : SelectionBlueprint<ISkinnableComponent>
     {
-        /// <summary>
-        /// The <see cref="DrawableHitObject"/> which this <see cref="OverlaySelectionBlueprint"/> applies to.
-        /// </summary>
-        public readonly ISkinnableComponent Component;
-
         private Container box;
 
-        private Drawable drawable => (Drawable)Component;
+        private Drawable drawable => (Drawable)Item;
 
         /// <summary>
-        /// Whether the blueprint should be shown even when the <see cref="Component"/> is not alive.
+        /// Whether the blueprint should be shown even when the <see cref="SelectionBlueprint{T}.Item"/> is not alive.
         /// </summary>
         protected virtual bool AlwaysShowWhenSelected => false;
 
-        protected override bool ShouldBeAlive => (drawable.IsAlive && Component.IsPresent) || (AlwaysShowWhenSelected && State == SelectionState.Selected);
+        protected override bool ShouldBeAlive => (drawable.IsAlive && Item.IsPresent) || (AlwaysShowWhenSelected && State == SelectionState.Selected);
 
         public SkinBlueprint(ISkinnableComponent component)
             : base(component)
         {
-            Component = component;
         }
 
         [BackgroundDependencyLoader]
