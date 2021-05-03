@@ -7,7 +7,7 @@ using System;
 using osu.Framework.Bindables;
 using osu.Framework.Timing;
 
-namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync
+namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
     /// <summary>
     /// A <see cref="ISpectatorPlayerClock"/> which catches up using rate adjustment.
