@@ -54,7 +54,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
             UpdateHoverState();
+            FinishTransforms(true);
         }
 
         protected override bool OnHover(HoverEvent e)
