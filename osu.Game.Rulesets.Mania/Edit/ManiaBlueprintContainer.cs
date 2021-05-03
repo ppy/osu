@@ -4,6 +4,7 @@
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit.Blueprints;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Screens.Edit.Compose.Components;
 
@@ -30,6 +31,6 @@ namespace osu.Game.Rulesets.Mania.Edit
             return base.CreateBlueprintFor(hitObject);
         }
 
-        protected override SelectionHandler CreateSelectionHandler() => new ManiaSelectionHandler();
+        protected override SelectionHandler<HitObject> CreateSelectionHandler() => new ManiaSelectionHandler();
     }
 }

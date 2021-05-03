@@ -1,12 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Overlays.Settings;
@@ -31,7 +34,15 @@ namespace osu.Game.Configuration
 
         public int? OrderPosition { get; }
 
-        public SettingSourceAttribute(string label, string description = null)
+        /// <summary>
+        /// The type of the settings control which handles this setting source.
+        /// </summary>
+        /// <remarks>
+        /// Must be a type deriving <see cref="SettingsItem{T}"/> with a public parameterless constructor.
+        /// </remarks>
+        public Type? SettingControlType { get; set; }
+
+        public SettingSourceAttribute(string? label, string? description = null)
         {
             Label = label ?? string.Empty;
             Description = description ?? string.Empty;
@@ -66,6 +77,22 @@ namespace osu.Game.Configuration
             foreach (var (attr, property) in obj.GetOrderedSettingsSourceProperties())
             {
                 object value = property.GetValue(obj);
+
+                if (attr.SettingControlType != null)
+                {
+                    var controlType = attr.SettingControlType;
+                    if (controlType.EnumerateBaseTypes().All(t => !t.IsGenericType || t.GetGenericTypeDefinition() != typeof(SettingsItem<>)))
+                        throw new InvalidOperationException($"{nameof(SettingSourceAttribute)} had an unsupported custom control type ({controlType.ReadableName()})");
+
+                    var control = (Drawable)Activator.CreateInstance(controlType);
+                    controlType.GetProperty(nameof(SettingsItem<object>.LabelText))?.SetValue(control, attr.Label);
+                    controlType.GetProperty(nameof(SettingsItem<object>.TooltipText))?.SetValue(control, attr.Description);
+                    controlType.GetProperty(nameof(SettingsItem<object>.Current))?.SetValue(control, value);
+
+                    yield return control;
+
+                    continue;
+                }
 
                 switch (value)
                 {
