@@ -33,18 +33,18 @@ namespace osu.Game.Rulesets.Osu.Mods
         private bool wasLeft;
 
         private OsuInputManager osuInputManager;
-        private Bindable<OsuFramedReplayInputHandler> replayInputHandler = new Bindable<OsuFramedReplayInputHandler>();
+
         private Score score;
-        private readonly BindableBool replayLoaded = new BindableBool();
         private DrawableRuleset<OsuHitObject> drawableRuleset;
         private ReplayState<OsuAction> state;
         private double lastStateChangeTime;
+        private OsuFramedReplayInputHandler replayInputHandler;
+        private readonly BindableBool replayLoaded = new BindableBool();
 
         public void ApplyToPlayer(Player player)
         {
-            replayInputHandler.Value = (OsuFramedReplayInputHandler)osuInputManager.ReplayInputHandler;
-            replayInputHandler.BindValueChanged(_ => updateState(), true);
-
+            replayInputHandler = (OsuFramedReplayInputHandler)osuInputManager.ReplayInputHandler;
+            updateState();
             osuInputManager.AllowUserPresses = false;
         }
 
@@ -59,16 +59,16 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void updateState()
         {
-            if (replayInputHandler.Value != null)
+            if (replayInputHandler != null)
             {
                 score = drawableRuleset.ReplayScore;
-                replayInputHandler.Value.HandleActionInput = !(replayLoaded.Value && score.ScoreInfo.IsLegacyScore);
+                replayInputHandler.HandleActionInput = !(replayLoaded.Value && score.ScoreInfo.IsLegacyScore);
             }
         }
 
         public void Update(Playfield playfield)
         {
-            if (replayInputHandler.Value?.HandleActionInput ?? true) return;
+            if (replayInputHandler?.HandleActionInput ?? false) return;
 
             bool requiresHold = false;
             bool requiresHit = false;
