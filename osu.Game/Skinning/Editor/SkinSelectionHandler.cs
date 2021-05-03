@@ -31,7 +31,8 @@ namespace osu.Game.Skinning.Editor
             adjustScaleFromAnchor(ref scale, anchor);
 
             foreach (var c in SelectedBlueprints)
-                ((Drawable)c.Item).Scale += scale * 0.01f;
+                // TODO: this is temporary and will be fixed with a separate refactor of selection transform logic.
+                ((Drawable)c.Item).Scale += scale * 0.02f;
 
             return true;
         }
