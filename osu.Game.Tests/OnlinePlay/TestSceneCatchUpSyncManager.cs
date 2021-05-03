@@ -6,7 +6,7 @@ using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
-using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync;
+using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Tests.OnlinePlay

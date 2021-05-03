@@ -6,7 +6,7 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
 
-namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync
+namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
     /// <summary>
     /// A <see cref="ISyncManager"/> which synchronises de-synced player clocks through catchup.

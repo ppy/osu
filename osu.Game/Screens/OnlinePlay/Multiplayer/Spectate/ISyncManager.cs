@@ -3,7 +3,7 @@
 
 using osu.Framework.Timing;
 
-namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync
+namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
     /// <summary>
     /// Manages the synchronisation between one or more <see cref="ISpectatorPlayerClock"/>s in relation to a master clock.

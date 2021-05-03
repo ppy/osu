@@ -7,7 +7,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Scoring;
-using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate

@@ -4,7 +4,7 @@
 using osu.Framework.Bindables;
 using osu.Framework.Timing;
 
-namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate.Sync
+namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
     /// <summary>
     /// A clock which is used by <see cref="MultiSpectatorPlayer"/>s and managed by an <see cref="ISyncManager"/>.
