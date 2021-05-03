@@ -62,7 +62,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             if (Composer != null)
             {
-                // For pooled rulesets, blueprints must be added for hitobjects already "current" as they would've not been "current" during the async load addition process above.
                 foreach (var obj in Composer.HitObjects)
                     AddBlueprintFor(obj.HitObject);
 
