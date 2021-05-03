@@ -17,6 +17,46 @@ namespace osu.Game.Skinning.Editor
 {
     public class SkinSelectionHandler : SelectionHandler<ISkinnableComponent>
     {
+        public override bool HandleRotation(float angle)
+        {
+            // TODO: this doesn't correctly account for origin/anchor specs being different in a multi-selection.
+            foreach (var c in SelectedBlueprints)
+                ((Drawable)c.Item).Rotation += angle;
+
+            return base.HandleRotation(angle);
+        }
+
+        public override bool HandleScale(Vector2 scale, Anchor anchor)
+        {
+            adjustScaleFromAnchor(ref scale, anchor);
+
+            foreach (var c in SelectedBlueprints)
+                ((Drawable)c.Item).Scale += scale * 0.01f;
+
+            return true;
+        }
+
+        public override bool HandleMovement(MoveSelectionEvent<ISkinnableComponent> moveEvent)
+        {
+            foreach (var c in SelectedBlueprints)
+            {
+                Drawable drawable = (Drawable)c.Item;
+                drawable.Position += drawable.ScreenSpaceDeltaToParentSpace(moveEvent.ScreenSpaceDelta);
+            }
+
+            return true;
+        }
+
+        protected override void OnSelectionChanged()
+        {
+            base.OnSelectionChanged();
+
+            SelectionBox.CanRotate = true;
+            SelectionBox.CanScaleX = true;
+            SelectionBox.CanScaleY = true;
+            SelectionBox.CanReverse = false;
+        }
+
         protected override void DeleteItems(IEnumerable<ISkinnableComponent> items)
         {
             foreach (var i in items)
@@ -65,46 +105,6 @@ namespace osu.Game.Skinning.Editor
         {
             foreach (var item in SelectedItems)
                 ((Drawable)item).Anchor = anchor;
-        }
-
-        protected override void OnSelectionChanged()
-        {
-            base.OnSelectionChanged();
-
-            SelectionBox.CanRotate = true;
-            SelectionBox.CanScaleX = true;
-            SelectionBox.CanScaleY = true;
-            SelectionBox.CanReverse = false;
-        }
-
-        public override bool HandleRotation(float angle)
-        {
-            // TODO: this doesn't correctly account for origin/anchor specs being different in a multi-selection.
-            foreach (var c in SelectedBlueprints)
-                ((Drawable)c.Item).Rotation += angle;
-
-            return base.HandleRotation(angle);
-        }
-
-        public override bool HandleScale(Vector2 scale, Anchor anchor)
-        {
-            adjustScaleFromAnchor(ref scale, anchor);
-
-            foreach (var c in SelectedBlueprints)
-                ((Drawable)c.Item).Scale += scale * 0.01f;
-
-            return true;
-        }
-
-        public override bool HandleMovement(MoveSelectionEvent<ISkinnableComponent> moveEvent)
-        {
-            foreach (var c in SelectedBlueprints)
-            {
-                Drawable drawable = (Drawable)c.Item;
-                drawable.Position += drawable.ScreenSpaceDeltaToParentSpace(moveEvent.ScreenSpaceDelta);
-            }
-
-            return true;
         }
 
         private static void adjustScaleFromAnchor(ref Vector2 scale, Anchor reference)
