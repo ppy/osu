@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
@@ -12,6 +13,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using static osu.Game.Input.Handlers.ReplayInputHandler;
 
@@ -31,32 +33,43 @@ namespace osu.Game.Rulesets.Osu.Mods
         private bool wasLeft;
 
         private OsuInputManager osuInputManager;
-        private OsuFramedReplayInputHandler replayInputHandler;
-
+        private Bindable<OsuFramedReplayInputHandler> replayInputHandler = new Bindable<OsuFramedReplayInputHandler>();
+        private Score score;
+        private readonly BindableBool replayLoaded = new BindableBool();
+        private DrawableRuleset<OsuHitObject> drawableRuleset;
         private ReplayState<OsuAction> state;
         private double lastStateChangeTime;
+
+        public void ApplyToPlayer(Player player)
+        {
+            replayInputHandler.Value = (OsuFramedReplayInputHandler)osuInputManager.ReplayInputHandler;
+            replayInputHandler.BindValueChanged(_ => updateState(), true);
+
+            osuInputManager.AllowUserPresses = false;
+        }
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
             // grab the input manager for future use.
             osuInputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
+            replayLoaded.BindTo(drawableRuleset.HasReplayLoaded);
+            replayLoaded.BindValueChanged(_ => updateState());
+            this.drawableRuleset = drawableRuleset;
         }
 
-        public void ApplyToPlayer(Player player)
+        private void updateState()
         {
-            replayInputHandler = (OsuFramedReplayInputHandler)osuInputManager.ReplayInputHandler;
-
-            if (replayInputHandler != null)
+            if (replayInputHandler.Value != null)
             {
-                replayInputHandler.HandleActionInput = false;
-                return;
+                score = drawableRuleset.ReplayScore;
+                replayInputHandler.Value.HandleActionInput = !(replayLoaded.Value && score.ScoreInfo.IsLegacyScore);
             }
-
-            osuInputManager.AllowUserPresses = false;
         }
 
         public void Update(Playfield playfield)
         {
+            if (replayInputHandler!=null && replayInputHandler.Value.HandleActionInput) return;
+
             bool requiresHold = false;
             bool requiresHit = false;
 
