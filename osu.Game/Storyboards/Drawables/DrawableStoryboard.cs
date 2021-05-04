@@ -20,6 +20,13 @@ namespace osu.Game.Storyboards.Drawables
         [Cached]
         public Storyboard Storyboard { get; }
 
+        /// <summary>
+        /// Whether the storyboard is considered finished.
+        /// </summary>
+        public IBindable<bool> HasStoryboardEnded => hasStoryboardEnded;
+
+        private readonly BindableBool hasStoryboardEnded = new BindableBool();
+
         protected override Container<DrawableStoryboardLayer> Content { get; }
 
         protected override Vector2 DrawScale => new Vector2(Parent.DrawHeight / 480);
@@ -39,6 +46,8 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         public override bool RemoveCompletedTransforms => false;
+
+        private double? lastEventEndTime;
 
         private DependencyContainer dependencies;
 
@@ -74,6 +83,14 @@ namespace osu.Game.Storyboards.Drawables
 
                 Add(layer.CreateDrawable());
             }
+
+            lastEventEndTime = Storyboard.LatestEventTime;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            hasStoryboardEnded.Value = lastEventEndTime == null || Time.Current >= lastEventEndTime;
         }
 
         public DrawableStoryboardLayer OverlayLayer => Children.Single(layer => layer.Name == "Overlay");
@@ -82,26 +99,6 @@ namespace osu.Game.Storyboards.Drawables
         {
             foreach (var layer in Children)
                 layer.Enabled = passing ? layer.Layer.VisibleWhenPassing : layer.Layer.VisibleWhenFailing;
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-            updateHasStoryboardEnded();
-        }
-
-        /// <summary>
-        /// Whether the storyboard is considered finished.
-        /// </summary>
-        public IBindable<bool> HasStoryboardEnded => hasStoryboardEnded;
-
-        private readonly BindableBool hasStoryboardEnded = new BindableBool();
-
-        private void updateHasStoryboardEnded()
-        {
-            hasStoryboardEnded.Value =
-                Storyboard.LatestEventTime == null ||
-                Time.Current >= Storyboard.LatestEventTime;
         }
     }
 }
