@@ -22,9 +22,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public event Action OperationStarted;
         public event Action OperationEnded;
 
-        internal event Action HoverGained;
-        internal event Action HoverLost;
-
         private Circle circle;
 
         /// <summary>
@@ -62,14 +59,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected override bool OnHover(HoverEvent e)
         {
             UpdateHoverState();
-            HoverGained?.Invoke();
             return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            base.OnHoverLost(e);
-            HoverLost?.Invoke();
             UpdateHoverState();
         }
 
@@ -89,7 +83,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             HandlingMouse = false;
             UpdateHoverState();
-            base.OnMouseUp(e);
         }
 
         protected virtual void UpdateHoverState()
