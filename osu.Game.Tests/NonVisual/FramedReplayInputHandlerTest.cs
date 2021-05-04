@@ -284,31 +284,33 @@ namespace osu.Game.Tests.NonVisual
         {
             const double repeating_time = 5000;
 
+            int incrementingData = 0;
+
             // add a range of frames randomized in time but have a "data" assigned to them in ascending order.
             replay.Frames.AddRange(new[]
             {
-                new TestReplayFrame(repeating_time, true, 0),
-                new TestReplayFrame(0, true, 1),
-                new TestReplayFrame(3000, true, 2),
-                new TestReplayFrame(repeating_time, true, 3),
-                new TestReplayFrame(repeating_time, true, 4),
-                new TestReplayFrame(6000, true, 5),
-                new TestReplayFrame(9000, true, 6),
-                new TestReplayFrame(repeating_time, true, 7),
-                new TestReplayFrame(repeating_time, true, 8),
-                new TestReplayFrame(1000, true, 9),
-                new TestReplayFrame(11000, true, 10),
-                new TestReplayFrame(21000, true, 11),
-                new TestReplayFrame(4000, true, 12),
-                new TestReplayFrame(repeating_time, true, 13),
-                new TestReplayFrame(repeating_time, true, 14),
-                new TestReplayFrame(8000, true, 15),
-                new TestReplayFrame(2000, true, 16),
-                new TestReplayFrame(7000, true, 17),
-                new TestReplayFrame(repeating_time, true, 18),
-                new TestReplayFrame(repeating_time, true, 19),
-                new TestReplayFrame(10000, true, 20),
-            });
+                new TestReplayFrame(repeating_time, true),
+                new TestReplayFrame(0, true),
+                new TestReplayFrame(3000, true),
+                new TestReplayFrame(repeating_time, true),
+                new TestReplayFrame(repeating_time, true),
+                new TestReplayFrame(6000, true),
+                new TestReplayFrame(9000, true),
+                new TestReplayFrame(repeating_time, true),
+                new TestReplayFrame(repeating_time, true),
+                new TestReplayFrame(1000, true),
+                new TestReplayFrame(11000, true),
+                new TestReplayFrame(21000, true),
+                new TestReplayFrame(4000, true),
+                new TestReplayFrame(repeating_time, true),
+                new TestReplayFrame(repeating_time, true),
+                new TestReplayFrame(8000, true),
+                new TestReplayFrame(2000, true),
+                new TestReplayFrame(7000, true),
+                new TestReplayFrame(repeating_time, true),
+                new TestReplayFrame(repeating_time, true),
+                new TestReplayFrame(10000, true),
+            }.Select(f => new TestReplayFrame(f.Time, true, incrementingData++)));
 
             replay.HasReceivedAllFrames = true;
 
