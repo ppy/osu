@@ -108,14 +108,52 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("no cover added", () => !updateableCover.ChildrenOfType<DelayedLoadUnloadWrapper>().Any());
         }
 
+        [Test]
+        public void TestCoverChangeOnNewBeatmap()
+        {
+            TestUpdateableBeatmapSetCover updateableCover = null;
+            BeatmapSetCover initialCover = null;
+
+            AddStep("setup cover", () => Child = updateableCover = new TestUpdateableBeatmapSetCover(0)
+            {
+                BeatmapSet = createBeatmapWithCover("https://assets.ppy.sh/beatmaps/1189904/covers/cover.jpg"),
+                RelativeSizeAxes = Axes.Both,
+                Masking = true,
+                Alpha = 0.4f
+            });
+
+            AddUntilStep("cover loaded", () => updateableCover.ChildrenOfType<BeatmapSetCover>().Any());
+            AddStep("store initial cover", () => initialCover = updateableCover.ChildrenOfType<BeatmapSetCover>().Single());
+            AddUntilStep("wait for fade complete", () => initialCover.Alpha == 1);
+
+            AddStep("switch beatmap",
+                () => updateableCover.BeatmapSet = createBeatmapWithCover("https://assets.ppy.sh/beatmaps/1079428/covers/cover.jpg"));
+            AddUntilStep("new cover loaded", () => updateableCover.ChildrenOfType<BeatmapSetCover>().Except(new[] { initialCover }).Any());
+        }
+
+        private static BeatmapSetInfo createBeatmapWithCover(string coverUrl) => new BeatmapSetInfo
+        {
+            OnlineInfo = new BeatmapSetOnlineInfo
+            {
+                Covers = new BeatmapSetOnlineCovers { Cover = coverUrl }
+            }
+        };
+
         private class TestUpdateableBeatmapSetCover : UpdateableBeatmapSetCover
         {
+            private readonly int loadDelay;
+
+            public TestUpdateableBeatmapSetCover(int loadDelay = 10000)
+            {
+                this.loadDelay = loadDelay;
+            }
+
             protected override Drawable CreateDrawable(BeatmapSetInfo model)
             {
                 if (model == null)
                     return null;
 
-                return new TestBeatmapSetCover(model)
+                return new TestBeatmapSetCover(model, loadDelay)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -127,15 +165,18 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private class TestBeatmapSetCover : BeatmapSetCover
         {
-            public TestBeatmapSetCover(BeatmapSetInfo set)
+            private readonly int loadDelay;
+
+            public TestBeatmapSetCover(BeatmapSetInfo set, int loadDelay)
                 : base(set)
             {
+                this.loadDelay = loadDelay;
             }
 
             [BackgroundDependencyLoader]
             private void load()
             {
-                Thread.Sleep(10000);
+                Thread.Sleep(loadDelay);
             }
         }
     }
