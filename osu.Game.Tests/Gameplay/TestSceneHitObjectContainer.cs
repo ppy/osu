@@ -4,7 +4,6 @@
 using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Testing;
-using osu.Framework.Timing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
@@ -20,14 +19,7 @@ namespace osu.Game.Tests.Gameplay
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            Child = container = new HitObjectContainer
-            {
-                Clock = new FramedClock(new ManualClock
-                {
-                    // Make sure hit objects with `StartTime == 0` are alive
-                    CurrentTime = -1
-                })
-            };
+            Child = container = new HitObjectContainer();
         });
 
         [Test]
