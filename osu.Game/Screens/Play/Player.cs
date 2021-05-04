@@ -245,8 +245,6 @@ namespace osu.Game.Screens.Play
                 HUDOverlay.ShowHud.Value = false;
                 HUDOverlay.ShowHud.Disabled = true;
                 BreakOverlay.Hide();
-                skipIntroOverlay.Hide();
-                skipOutroOverlay.Hide();
             }
 
             DrawableRuleset.FrameStableClock.WaitingOnFrames.BindValueChanged(waiting =>
@@ -398,7 +396,7 @@ namespace osu.Game.Screens.Play
                 }
             };
 
-            if (!Configuration.AllowSkipping)
+            if (!Configuration.AllowSkipping || !DrawableRuleset.AllowGameplayOverlays)
             {
                 skipIntroOverlay.Expire();
                 skipOutroOverlay.Expire();
