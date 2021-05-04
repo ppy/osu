@@ -16,6 +16,6 @@ namespace osu.Game.Storyboards
         /// <summary>
         /// The duration of the StoryboardElement.
         /// </summary>
-        double Duration { get; }
+        double Duration => EndTime - StartTime;
     }
 }
