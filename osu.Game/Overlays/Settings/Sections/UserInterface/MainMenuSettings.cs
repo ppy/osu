@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
             {
                 const string not_supporter_note = "Changes to this setting will only apply with an active osu!supporter tag.";
 
-                backgroundSourceDropdown.NoteText = user.Value?.IsSupporter == false ? not_supporter_note : string.Empty;
+                backgroundSourceDropdown.NoteText = user.Value?.IsSupporter != true ? not_supporter_note : string.Empty;
             }, true);
         }
     }
