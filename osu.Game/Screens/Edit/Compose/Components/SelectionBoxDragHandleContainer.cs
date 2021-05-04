@@ -62,8 +62,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             handle.HoverGained += updateRotationHandlesVisibility;
             handle.HoverLost += updateRotationHandlesVisibility;
-            handle.OperationStarted += updateRotationHandlesVisibility;
-            handle.OperationEnded += updateRotationHandlesVisibility;
+            handle.MouseDown += updateRotationHandlesVisibility;
+            handle.MouseUp += updateRotationHandlesVisibility;
             allDragHandles.Add(handle);
         }
 
@@ -72,13 +72,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updateRotationHandlesVisibility()
         {
-            if (activeHandle?.InOperation == true || activeHandle?.IsHovered == true)
+            if (activeHandle?.IsHeld == true || activeHandle?.IsHovered == true)
                 return;
 
             displayedRotationHandle?.FadeOut(SelectionBoxControl.TRANSFORM_DURATION, Easing.OutQuint);
             displayedRotationHandle = null;
 
-            activeHandle = allDragHandles.SingleOrDefault(h => h.InOperation);
+            activeHandle = allDragHandles.SingleOrDefault(h => h.IsHeld);
             activeHandle ??= allDragHandles.SingleOrDefault(h => h.IsHovered);
 
             if (activeHandle != null)
