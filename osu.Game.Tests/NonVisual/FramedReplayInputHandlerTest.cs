@@ -3,7 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Utils;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Replays;
 
@@ -278,6 +280,38 @@ namespace osu.Game.Tests.NonVisual
             setTime(-100, -100);
         }
 
+        [Test]
+        public void TestReplayFrameSortStability()
+        {
+            const double repeating_time = 5000;
+
+            int data = 0;
+
+            // 1. add a range of frames in which some of them have the constant time 5000, all without any "data".
+            // 2. randomize the frames.
+            // 3. assign "data" to each frame in ascending order.
+            replay.Frames.AddRange(Enumerable.Range(1, 250).Select(i =>
+            {
+                if (RNG.NextBool())
+                    return new TestReplayFrame(repeating_time, true);
+                else
+                    return new TestReplayFrame(i * 1000, true);
+            }).OrderBy(_ => RNG.Next()).Select(f => new TestReplayFrame(f.Time, true, ++data)));
+
+            replay.HasReceivedAllFrames = true;
+
+            // create a new handler with the replay for the frames to be sorted.
+            handler = new TestInputHandler(replay);
+
+            // ensure sort stability by checking whether the "data" assigned to each time-repeated frame is in ascending order, as it was before sort.
+            var repeatingTimeFramesData = replay.Frames
+                                                .Cast<TestReplayFrame>()
+                                                .Where(f => f.Time == repeating_time)
+                                                .Select(f => f.Data);
+
+            Assert.That(repeatingTimeFramesData, Is.Ordered.Ascending);
+        }
+
         private void setReplayFrames()
         {
             replay.Frames = new List<ReplayFrame>
@@ -324,11 +358,13 @@ namespace osu.Game.Tests.NonVisual
         private class TestReplayFrame : ReplayFrame
         {
             public readonly bool IsImportant;
+            public readonly int Data;
 
-            public TestReplayFrame(double time, bool isImportant = false)
+            public TestReplayFrame(double time, bool isImportant = false, int data = 0)
                 : base(time)
             {
                 IsImportant = isImportant;
+                Data = data;
             }
         }
 
