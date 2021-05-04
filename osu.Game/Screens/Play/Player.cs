@@ -640,7 +640,7 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            var storyboardHasOutro = DimmableStoryboard.ContentDisplayed && !DimmableStoryboard.HasStoryboardEnded.Value;
+            bool storyboardHasOutro = DimmableStoryboard.ContentDisplayed && !DimmableStoryboard.HasStoryboardEnded.Value;
 
             if (storyboardHasOutro)
             {
