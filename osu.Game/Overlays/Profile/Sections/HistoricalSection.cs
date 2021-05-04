@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Profile.Sections
             {
                 new PlayHistorySubsection(User),
                 new PaginatedMostPlayedBeatmapContainer(User),
-                new PaginatedScoreContainer(ScoreType.Recent, User, "Recent Plays (24h)", CounterVisibilityState.VisibleWhenZero),
+                new PaginatedScoreContainer(ScoreType.Recent, User, "Recent Plays (24h)"),
                 new ReplaysSubsection(User)
             };
         }
