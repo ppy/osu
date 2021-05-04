@@ -3,15 +3,24 @@
 
 using Markdig.Syntax;
 using osu.Framework.Graphics.Containers.Markdown;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Graphics.Containers.Markdown
 {
     public class OsuMarkdownHeading : MarkdownHeading
     {
+        private readonly int level;
+
         public OsuMarkdownHeading(HeadingBlock headingBlock)
             : base(headingBlock)
         {
+            level = headingBlock.Level;
         }
+
+        public override MarkdownTextFlowContainer CreateTextFlow() => new HeadingTextFlowContainer
+        {
+            Weight = GetFontWeightByLevel(level),
+        };
 
         protected override float GetFontSizeByLevel(int level)
         {
@@ -36,6 +45,31 @@ namespace osu.Game.Graphics.Containers.Markdown
 
                 default:
                     return 1;
+            }
+        }
+
+        protected virtual FontWeight GetFontWeightByLevel(int level)
+        {
+            switch (level)
+            {
+                case 1:
+                case 2:
+                    return FontWeight.SemiBold;
+
+                default:
+                    return FontWeight.Bold;
+            }
+        }
+
+        private class HeadingTextFlowContainer : OsuMarkdownTextFlowContainer
+        {
+            public FontWeight Weight { get; set; }
+
+            protected override SpriteText CreateSpriteText()
+            {
+                var spriteText = base.CreateSpriteText();
+                spriteText.Font = spriteText.Font.With(weight: Weight);
+                return spriteText;
             }
         }
     }
