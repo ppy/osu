@@ -65,8 +65,6 @@ namespace osu.Game.Storyboards
             }
         }
 
-        public double Duration => EndTime - StartTime;
-
         public bool HasCommands => TimelineGroup.HasCommands || loops.Any(l => l.HasCommands);
 
         private delegate void DrawablePropertyInitializer<in T>(Drawable drawable, T value);
