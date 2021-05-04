@@ -582,6 +582,11 @@ namespace osu.Game.Screens.Play
         private ScheduledDelegate completionProgressDelegate;
         private Task<ScoreInfo> prepareScoreForDisplayTask;
 
+        /// <summary>
+        /// Handles changes in player state which may progress the completion of gameplay / this screen's lifetime.
+        /// </summary>
+        /// <param name="skipStoryboardOutro">If in a state where a storyboard outro is to be played, offers the choice of skipping beyond it.</param>
+        /// <exception cref="InvalidOperationException">Thrown if this method is called more than once without changing state.</exception>
         private void updateCompletionState(bool skipStoryboardOutro = false)
         {
             // screen may be in the exiting transition phase.
