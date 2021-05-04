@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.Settings
         {
             set
             {
-                noteText.Alpha = 1;
+                noteText.Alpha = string.IsNullOrWhiteSpace(value) ? 0 : 1;
                 noteText.Text = value;
             }
         }
