@@ -19,7 +19,7 @@
   </ItemGroup>
   <ItemGroup Label="Package References">
     <PackageReference Include="DiffPlex" Version="1.7.0" />
-    <PackageReference Include="Humanizer" Version="2.8.26" />
+    <PackageReference Include="Humanizer" Version="2.9.9" />
     <PackageReference Include="MessagePack" Version="2.2.85" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="5.0.5" />
