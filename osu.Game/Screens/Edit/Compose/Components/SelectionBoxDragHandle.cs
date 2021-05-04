@@ -34,6 +34,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         internal event Action HoverGained;
         internal event Action HoverLost;
+        internal event Action MouseDown;
+        internal event Action MouseUp;
 
         protected override bool OnHover(HoverEvent e)
         {
@@ -46,6 +48,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             base.OnHoverLost(e);
             HoverLost?.Invoke();
+        }
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            bool result = base.OnMouseDown(e);
+            MouseDown?.Invoke();
+            return result;
+        }
+
+        protected override void OnMouseUp(MouseUpEvent e)
+        {
+            base.OnMouseUp(e);
+            MouseUp?.Invoke();
         }
 
         #endregion

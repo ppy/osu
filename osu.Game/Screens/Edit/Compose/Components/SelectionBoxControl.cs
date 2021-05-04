@@ -25,9 +25,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private Circle circle;
 
         /// <summary>
-        /// Whether this control is currently being operated on by the user.
+        /// Whether the user is currently holding the control with mouse.
         /// </summary>
-        public bool InOperation { get; private set; }
+        public bool IsHeld { get; private set; }
 
         [Resolved]
         protected OsuColour Colours { get; private set; }
@@ -67,44 +67,31 @@ namespace osu.Game.Screens.Edit.Compose.Components
             UpdateHoverState();
         }
 
-        /// <summary>
-        /// Whether this control is currently handling mouse down input.
-        /// </summary>
-        protected bool HandlingMouse { get; private set; }
-
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            HandlingMouse = true;
+            IsHeld = true;
             UpdateHoverState();
             return true;
         }
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            HandlingMouse = false;
+            IsHeld = false;
             UpdateHoverState();
         }
 
         protected virtual void UpdateHoverState()
         {
-            if (HandlingMouse)
+            if (IsHeld)
                 circle.FadeColour(Colours.GrayF, TRANSFORM_DURATION, Easing.OutQuint);
             else
                 circle.FadeColour(IsHovered ? Colours.Red : Colours.YellowDark, TRANSFORM_DURATION, Easing.OutQuint);
 
-            this.ScaleTo(HandlingMouse || IsHovered ? 1.5f : 1, TRANSFORM_DURATION, Easing.OutQuint);
+            this.ScaleTo(IsHeld || IsHovered ? 1.5f : 1, TRANSFORM_DURATION, Easing.OutQuint);
         }
 
-        protected void OnOperationStarted()
-        {
-            InOperation = true;
-            OperationStarted?.Invoke();
-        }
+        protected void OnOperationStarted() => OperationStarted?.Invoke();
 
-        protected void OnOperationEnded()
-        {
-            InOperation = false;
-            OperationEnded?.Invoke();
-        }
+        protected void OnOperationEnded() => OperationEnded?.Invoke();
     }
 }
