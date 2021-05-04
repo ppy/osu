@@ -16,9 +16,22 @@ namespace osu.Game.Rulesets.Edit
     {
         private readonly List<ICheck> checks = new List<ICheck>
         {
-            new CheckBackground(),
+            // Resources
+            new CheckBackgroundPresence(),
+            new CheckBackgroundQuality(),
+
+            // Audio
+            new CheckAudioPresence(),
+            new CheckAudioQuality(),
+
+            // Compose
+            new CheckUnsnappedObjects(),
+            new CheckConcurrentObjects()
         };
 
-        public IEnumerable<Issue> Run(IBeatmap beatmap) => checks.SelectMany(check => check.Run(beatmap));
+        public IEnumerable<Issue> Run(IBeatmap playableBeatmap, WorkingBeatmap workingBeatmap)
+        {
+            return checks.SelectMany(check => check.Run(playableBeatmap, workingBeatmap));
+        }
     }
 }

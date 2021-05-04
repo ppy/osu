@@ -4,18 +4,17 @@
 using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Edit
 {
-    internal class WaveformOpacityMenu : MenuItem
+    internal class WaveformOpacityMenuItem : MenuItem
     {
         private readonly Bindable<float> waveformOpacity;
 
         private readonly Dictionary<float, ToggleMenuItem> menuItemLookup = new Dictionary<float, ToggleMenuItem>();
 
-        public WaveformOpacityMenu(OsuConfigManager config)
+        public WaveformOpacityMenuItem(Bindable<float> waveformOpacity)
             : base("Waveform opacity")
         {
             Items = new[]
@@ -26,7 +25,7 @@ namespace osu.Game.Screens.Edit
                 createMenuItem(1f),
             };
 
-            waveformOpacity = config.GetBindable<float>(OsuSetting.EditorWaveformOpacity);
+            this.waveformOpacity = waveformOpacity;
             waveformOpacity.BindValueChanged(opacity =>
             {
                 foreach (var kvp in menuItemLookup)

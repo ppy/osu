@@ -17,6 +17,9 @@ namespace osu.Game.Rulesets.Osu.Edit
             new CheckOffscreenObjects()
         };
 
-        public IEnumerable<Issue> Run(IBeatmap beatmap) => checks.SelectMany(check => check.Run(beatmap));
+        public IEnumerable<Issue> Run(IBeatmap playableBeatmap, WorkingBeatmap workingBeatmap)
+        {
+            return checks.SelectMany(check => check.Run(playableBeatmap, workingBeatmap));
+        }
     }
 }

@@ -252,7 +252,7 @@ namespace osu.Game.Rulesets.Scoring
                 computedBaseScore += Judgement.ToNumericResult(pair.Key) * pair.Value;
             }
 
-            return GetScore(mode, maxAchievableCombo, calculateAccuracyRatio(computedBaseScore), calculateComboRatio(maxCombo), scoreResultCounts);
+            return GetScore(mode, maxAchievableCombo, calculateAccuracyRatio(computedBaseScore), calculateComboRatio(maxCombo), statistics);
         }
 
         /// <summary>
@@ -266,7 +266,7 @@ namespace osu.Game.Rulesets.Scoring
             if (preferRolling && rollingMaxBaseScore != 0)
                 return baseScore / rollingMaxBaseScore;
 
-            return maxBaseScore > 0 ? baseScore / maxBaseScore : 0;
+            return maxBaseScore > 0 ? baseScore / maxBaseScore : 1;
         }
 
         private double calculateComboRatio(int maxCombo) => maxAchievableCombo > 0 ? (double)maxCombo / maxAchievableCombo : 1;

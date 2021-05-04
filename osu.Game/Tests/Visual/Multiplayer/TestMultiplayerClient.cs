@@ -25,6 +25,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public override IBindable<bool> IsConnected => isConnected;
         private readonly Bindable<bool> isConnected = new Bindable<bool>(true);
 
+        public Action<MultiplayerRoom>? RoomSetupAction;
+
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
@@ -112,7 +114,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             var apiRoom = roomManager.Rooms.Single(r => r.RoomID.Value == roomId);
 
-            var user = new MultiplayerRoomUser(api.LocalUser.Value.Id)
+            var localUser = new MultiplayerRoomUser(api.LocalUser.Value.Id)
             {
                 User = api.LocalUser.Value
             };
@@ -129,9 +131,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     AllowedMods = apiRoom.Playlist.Last().AllowedMods.Select(m => new APIMod(m)).ToArray(),
                     PlaylistItemId = apiRoom.Playlist.Last().ID
                 },
-                Users = { user },
-                Host = user
+                Users = { localUser },
+                Host = localUser
             };
+
+            RoomSetupAction?.Invoke(room);
+            RoomSetupAction = null;
 
             return Task.FromResult(room);
         }
