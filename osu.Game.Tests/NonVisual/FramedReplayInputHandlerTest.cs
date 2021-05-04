@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Utils;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Replays;
 
@@ -281,26 +280,39 @@ namespace osu.Game.Tests.NonVisual
         }
 
         [Test]
-        public void TestReplayFrameSortStability()
+        public void TestReplayFramesSortStability()
         {
             const double repeating_time = 5000;
 
-            int data = 0;
-
-            // 1. add a range of frames in which some of them have the constant time 5000, all without any "data".
-            // 2. randomize the frames.
-            // 3. assign "data" to each frame in ascending order.
-            replay.Frames.AddRange(Enumerable.Range(1, 250).Select(i =>
+            // add a range of frames randomized in time but have a "data" assigned to them in ascending order.
+            replay.Frames.AddRange(new[]
             {
-                if (RNG.NextBool())
-                    return new TestReplayFrame(repeating_time, true);
-                else
-                    return new TestReplayFrame(i * 1000, true);
-            }).OrderBy(_ => RNG.Next()).Select(f => new TestReplayFrame(f.Time, true, ++data)));
+                new TestReplayFrame(repeating_time, true, 0),
+                new TestReplayFrame(0, true, 1),
+                new TestReplayFrame(3000, true, 2),
+                new TestReplayFrame(repeating_time, true, 3),
+                new TestReplayFrame(repeating_time, true, 4),
+                new TestReplayFrame(6000, true, 5),
+                new TestReplayFrame(9000, true, 6),
+                new TestReplayFrame(repeating_time, true, 7),
+                new TestReplayFrame(repeating_time, true, 8),
+                new TestReplayFrame(1000, true, 9),
+                new TestReplayFrame(11000, true, 10),
+                new TestReplayFrame(21000, true, 11),
+                new TestReplayFrame(4000, true, 12),
+                new TestReplayFrame(repeating_time, true, 13),
+                new TestReplayFrame(repeating_time, true, 14),
+                new TestReplayFrame(8000, true, 15),
+                new TestReplayFrame(2000, true, 16),
+                new TestReplayFrame(7000, true, 17),
+                new TestReplayFrame(repeating_time, true, 18),
+                new TestReplayFrame(repeating_time, true, 19),
+                new TestReplayFrame(10000, true, 20),
+            });
 
             replay.HasReceivedAllFrames = true;
 
-            // create a new handler with the replay for the frames to be sorted.
+            // create a new handler with the replay for the sort to be performed.
             handler = new TestInputHandler(replay);
 
             // ensure sort stability by checking whether the "data" assigned to each time-repeated frame is in ascending order, as it was before sort.
