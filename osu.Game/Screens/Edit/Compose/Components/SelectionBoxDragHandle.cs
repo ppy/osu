@@ -29,5 +29,25 @@ namespace osu.Game.Screens.Edit.Compose.Components
             UpdateHoverState();
             base.OnDragEnd(e);
         }
+
+        #region Internal events for SelectionBoxDragHandleContainer
+
+        internal event Action HoverGained;
+        internal event Action HoverLost;
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            bool result = base.OnHover(e);
+            HoverGained?.Invoke();
+            return result;
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            base.OnHoverLost(e);
+            HoverLost?.Invoke();
+        }
+
+        #endregion
     }
 }
