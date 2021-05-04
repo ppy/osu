@@ -3,6 +3,7 @@
 
 #nullable enable
 
+using System;
 using System.Diagnostics;
 using osu.Framework.Graphics.Performance;
 using osu.Framework.Graphics.Pooling;
@@ -31,7 +32,12 @@ namespace osu.Game.Rulesets.Objects.Pooling
             get => Entry?.LifetimeStart ?? double.MinValue;
             set
             {
-                if (Entry != null) Entry.LifetimeStart = value;
+                if (LifetimeStart == value) return;
+
+                if (Entry == null)
+                    throw new InvalidOperationException($"Cannot modify lifetime of {nameof(PoolableDrawableWithLifetime<TEntry>)} when entry is not set");
+
+                Entry.LifetimeStart = value;
             }
         }
 
@@ -40,7 +46,12 @@ namespace osu.Game.Rulesets.Objects.Pooling
             get => Entry?.LifetimeEnd ?? double.MaxValue;
             set
             {
-                if (Entry != null) Entry.LifetimeEnd = value;
+                if (LifetimeEnd == value) return;
+
+                if (Entry == null)
+                    throw new InvalidOperationException($"Cannot modify lifetime of {nameof(PoolableDrawableWithLifetime<TEntry>)} when entry is not set");
+
+                Entry.LifetimeEnd = value;
             }
         }
 
