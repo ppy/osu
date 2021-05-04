@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 var scoreInfos = value.Scores.Select(s => s.CreateScoreInfo(rulesets)).ToList();
                 var topScore = scoreInfos.First();
 
-                scoreTable.DisplayScores(scoreInfos, topScore.Beatmap?.Status == BeatmapSetOnlineStatus.Ranked);
+                scoreTable.DisplayScores(scoreInfos, topScore.Beatmap?.Status.GrantsPerformancePoints() == true);
                 scoreTable.Show();
 
                 var userScore = value.UserScore;

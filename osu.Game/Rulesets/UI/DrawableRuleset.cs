@@ -85,6 +85,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The beatmap.
         /// </summary>
+        [Cached(typeof(IBeatmap))]
         public readonly Beatmap<TObject> Beatmap;
 
         public override IEnumerable<HitObject> Objects => Beatmap.HitObjects;

@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Play
     /// </summary>
     public class GameplayClock : IFrameBasedClock
     {
-        private readonly IFrameBasedClock underlyingClock;
+        internal readonly IFrameBasedClock UnderlyingClock;
 
         public readonly BindableBool IsPaused = new BindableBool();
 
@@ -30,12 +30,12 @@ namespace osu.Game.Screens.Play
 
         public GameplayClock(IFrameBasedClock underlyingClock)
         {
-            this.underlyingClock = underlyingClock;
+            UnderlyingClock = underlyingClock;
         }
 
-        public double CurrentTime => underlyingClock.CurrentTime;
+        public double CurrentTime => UnderlyingClock.CurrentTime;
 
-        public double Rate => underlyingClock.Rate;
+        public double Rate => UnderlyingClock.Rate;
 
         /// <summary>
         /// The rate of gameplay when playback is at 100%.
@@ -59,19 +59,19 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        public bool IsRunning => underlyingClock.IsRunning;
+        public bool IsRunning => UnderlyingClock.IsRunning;
 
         public void ProcessFrame()
         {
             // intentionally not updating the underlying clock (handled externally).
         }
 
-        public double ElapsedFrameTime => underlyingClock.ElapsedFrameTime;
+        public double ElapsedFrameTime => UnderlyingClock.ElapsedFrameTime;
 
-        public double FramesPerSecond => underlyingClock.FramesPerSecond;
+        public double FramesPerSecond => UnderlyingClock.FramesPerSecond;
 
-        public FrameTimeInfo TimeInfo => underlyingClock.TimeInfo;
+        public FrameTimeInfo TimeInfo => UnderlyingClock.TimeInfo;
 
-        public IClock Source => underlyingClock;
+        public IClock Source => UnderlyingClock;
     }
 }

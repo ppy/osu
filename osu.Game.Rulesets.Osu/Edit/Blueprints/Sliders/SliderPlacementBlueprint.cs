@@ -207,7 +207,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             var lastPiece = controlPointVisualiser.Pieces.Single(p => p.ControlPoint == last);
 
             lastPoint = last;
-            return lastPiece?.IsHovered != true;
+            return lastPiece.IsHovered != true;
         }
 
         private void updateSlider()
