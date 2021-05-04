@@ -19,6 +19,7 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Settings
 {
@@ -35,6 +36,8 @@ namespace osu.Game.Overlays.Settings
         protected readonly FillFlowContainer FlowContent;
 
         private SpriteText labelText;
+
+        private readonly OsuTextFlowContainer noteText;
 
         public bool ShowsDefaultIndicator = true;
 
@@ -54,6 +57,19 @@ namespace osu.Game.Overlays.Settings
                 }
 
                 labelText.Text = value;
+            }
+        }
+
+        /// <summary>
+        /// Text to be displayed at the bottom of this <see cref="SettingsItem{T}"/>.
+        /// Used for further explanation or indicating drawbacks of the current setting.
+        /// </summary>
+        public string NoteText
+        {
+            set
+            {
+                noteText.Alpha = 1;
+                noteText.Text = value;
             }
         }
 
@@ -92,7 +108,16 @@ namespace osu.Game.Overlays.Settings
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Padding = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS },
-                    Child = Control = CreateControl()
+                    Children = new[]
+                    {
+                        Control = CreateControl(),
+                        noteText = new OsuTextFlowContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Alpha = 0,
+                        },
+                    },
                 },
             };
 
@@ -106,6 +131,12 @@ namespace osu.Game.Overlays.Settings
                 if (ShowsDefaultIndicator)
                     restoreDefaultButton.Bindable = controlWithCurrent.Current;
             }
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            noteText.Colour = colours.Yellow;
         }
 
         private void updateDisabled()
