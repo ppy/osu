@@ -284,33 +284,31 @@ namespace osu.Game.Tests.NonVisual
         {
             const double repeating_time = 5000;
 
-            int incrementingData = 0;
-
             // add a range of frames randomized in time but have a "data" assigned to them in ascending order.
             replay.Frames.AddRange(new[]
             {
-                new TestReplayFrame(repeating_time, true),
-                new TestReplayFrame(0, true),
-                new TestReplayFrame(3000, true),
-                new TestReplayFrame(repeating_time, true),
-                new TestReplayFrame(repeating_time, true),
-                new TestReplayFrame(6000, true),
-                new TestReplayFrame(9000, true),
-                new TestReplayFrame(repeating_time, true),
-                new TestReplayFrame(repeating_time, true),
-                new TestReplayFrame(1000, true),
-                new TestReplayFrame(11000, true),
-                new TestReplayFrame(21000, true),
-                new TestReplayFrame(4000, true),
-                new TestReplayFrame(repeating_time, true),
-                new TestReplayFrame(repeating_time, true),
-                new TestReplayFrame(8000, true),
-                new TestReplayFrame(2000, true),
-                new TestReplayFrame(7000, true),
-                new TestReplayFrame(repeating_time, true),
-                new TestReplayFrame(repeating_time, true),
-                new TestReplayFrame(10000, true),
-            }.Select(f => new TestReplayFrame(f.Time, true, incrementingData++)));
+                repeating_time,
+                0,
+                3000,
+                repeating_time,
+                repeating_time,
+                6000,
+                9000,
+                repeating_time,
+                repeating_time,
+                1000,
+                11000,
+                21000,
+                4000,
+                repeating_time,
+                repeating_time,
+                8000,
+                2000,
+                7000,
+                repeating_time,
+                repeating_time,
+                10000
+            }.Select((time, index) => new TestReplayFrame(time, true, index)));
 
             replay.HasReceivedAllFrames = true;
 
@@ -321,7 +319,7 @@ namespace osu.Game.Tests.NonVisual
             var repeatingTimeFramesData = replay.Frames
                                                 .Cast<TestReplayFrame>()
                                                 .Where(f => f.Time == repeating_time)
-                                                .Select(f => f.Data);
+                                                .Select(f => f.FrameIndex);
 
             Assert.That(repeatingTimeFramesData, Is.Ordered.Ascending);
         }
@@ -372,13 +370,13 @@ namespace osu.Game.Tests.NonVisual
         private class TestReplayFrame : ReplayFrame
         {
             public readonly bool IsImportant;
-            public readonly int Data;
+            public readonly int FrameIndex;
 
-            public TestReplayFrame(double time, bool isImportant = false, int data = 0)
+            public TestReplayFrame(double time, bool isImportant = false, int frameIndex = 0)
                 : base(time)
             {
                 IsImportant = isImportant;
-                Data = data;
+                FrameIndex = frameIndex;
             }
         }
 
