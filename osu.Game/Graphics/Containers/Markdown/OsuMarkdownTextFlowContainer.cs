@@ -26,5 +26,12 @@ namespace osu.Game.Graphics.Containers.Markdown
         // TODO : Add background (colour B6) and change font to monospace
         protected override void AddCodeInLine(CodeInline codeInline)
             => AddText(codeInline.Content, t => { t.Colour = colourProvider.Light1; });
+
+        protected override SpriteText CreateEmphasisedSpriteText(bool bold, bool italic)
+        {
+            var spriteText = CreateSpriteText();
+            spriteText.Font = spriteText.Font.With(weight: bold ? FontWeight.Bold : FontWeight.Regular, italics: italic);
+            return spriteText;
+        }
     }
 }
