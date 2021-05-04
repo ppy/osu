@@ -18,7 +18,6 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osuTK;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Settings
@@ -172,6 +171,7 @@ namespace osu.Game.Overlays.Settings
             {
                 RelativeSizeAxes = Axes.Y;
                 Width = SettingsPanel.CONTENT_MARGINS;
+                Padding = new MarginPadding { Vertical = 1.5f };
                 Alpha = 0f;
             }
 
@@ -194,7 +194,7 @@ namespace osu.Game.Overlays.Settings
                         Type = EdgeEffectType.Glow,
                         Radius = 2,
                     },
-                    Size = new Vector2(0.33f, 0.8f),
+                    Width = 0.33f,
                     Child = new Box { RelativeSizeAxes = Axes.Both },
                 };
             }
