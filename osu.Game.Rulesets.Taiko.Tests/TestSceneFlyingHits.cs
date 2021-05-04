@@ -20,19 +20,20 @@ namespace osu.Game.Rulesets.Taiko.Tests
         [TestCase(HitType.Rim)]
         public void TestFlyingHits(HitType hitType)
         {
+            DrawableFlyingHit flyingHit = null;
+
             AddStep("add flying hit", () =>
             {
                 addFlyingHit(hitType);
-            });
 
-            AddAssert("hit type is correct", () =>
-            {
                 // flying hits all land in one common scrolling container (and stay there for rewind purposes),
                 // so we need to manually get the latest one.
-                return this.ChildrenOfType<DrawableFlyingHit>()
-                           .OrderByDescending(h => h.HitObject.StartTime)
-                           .FirstOrDefault()?.HitObject.Type == hitType;
+                flyingHit = this.ChildrenOfType<DrawableFlyingHit>()
+                                .OrderByDescending(h => h.HitObject.StartTime)
+                                .FirstOrDefault();
             });
+
+            AddAssert("hit type is correct", () => flyingHit.HitObject.Type == hitType);
         }
 
         private void addFlyingHit(HitType hitType)
@@ -41,8 +42,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
             DrawableDrumRollTick h;
             DrawableRuleset.Playfield.Add(h = new DrawableDrumRollTick(tick) { JudgementType = hitType });
-            h.OnLoadComplete += _ =>
-                ((TaikoPlayfield)DrawableRuleset.Playfield).OnNewResult(h, new JudgementResult(tick, new TaikoDrumRollTickJudgement()) { Type = HitResult.Great });
+            ((TaikoPlayfield)DrawableRuleset.Playfield).OnNewResult(h, new JudgementResult(tick, new TaikoDrumRollTickJudgement()) { Type = HitResult.Great });
         }
     }
 }
