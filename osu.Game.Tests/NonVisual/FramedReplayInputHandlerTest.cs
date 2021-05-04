@@ -284,7 +284,10 @@ namespace osu.Game.Tests.NonVisual
         {
             const double repeating_time = 5000;
 
-            // add a range of frames randomized in time but have a "data" assigned to them in ascending order.
+            // add a collection of frames in shuffled order time-wise; each frame also stores its original index to check stability later.
+            // data is hand-picked and breaks if the unstable List<T>.Sort() is used.
+            // in theory this can still return a false-positive with another unstable algorithm if extremely unlucky,
+            // but there is no conceivable fool-proof way to prevent that anyways.
             replay.Frames.AddRange(new[]
             {
                 repeating_time,
@@ -315,7 +318,7 @@ namespace osu.Game.Tests.NonVisual
             // create a new handler with the replay for the sort to be performed.
             handler = new TestInputHandler(replay);
 
-            // ensure sort stability by checking whether the "data" assigned to each time-repeated frame is in ascending order, as it was before sort.
+            // ensure sort stability by checking that the frames with time == repeating_time are sorted in ascending frame index order themselves.
             var repeatingTimeFramesData = replay.Frames
                                                 .Cast<TestReplayFrame>()
                                                 .Where(f => f.Time == repeating_time)
