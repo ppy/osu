@@ -6,6 +6,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Framework.Threading;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 using osuTK.Input;
@@ -40,6 +41,7 @@ namespace osu.Game.Tests.Visual.Editing
             };
 
             InputManager.MoveMouseTo(selectionBox);
+            InputManager.ReleaseButton(MouseButton.Left);
         });
 
         private bool handleScale(Vector2 amount, Anchor reference)
@@ -127,26 +129,41 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
-        public void TestDraggingScaleHandleKeepsCorrespondingRotationHandleShown()
+        public void TestHoldingScaleHandleHidesCorrespondingRotationHandle()
         {
             SelectionBoxRotationHandle rotationHandle = null;
 
             AddStep("retrieve rotation handle", () => rotationHandle = this.ChildrenOfType<SelectionBoxRotationHandle>().First());
 
             AddAssert("rotation handle hidden", () => rotationHandle.Alpha == 0);
-            AddStep("hover over and hold closest scale handle", () =>
+            AddStep("hover over closest scale handle", () =>
             {
                 InputManager.MoveMouseTo(this.ChildrenOfType<SelectionBoxScaleHandle>().Single(s => s.Anchor == rotationHandle.Anchor));
-                InputManager.PressButton(MouseButton.Left);
             });
             AddUntilStep("rotation handle shown", () => rotationHandle.Alpha == 1);
+            AddStep("hold scale handle", () => InputManager.PressButton(MouseButton.Left));
+            AddUntilStep("rotation handle hidden", () => rotationHandle.Alpha == 0);
 
-            AddStep("drag to centre", () => InputManager.MoveMouseTo(selectionBox));
-            AddAssert("rotation handle still shown", () => rotationHandle.Alpha > 0);
+            int i;
+            ScheduledDelegate mouseMove = null;
 
+            AddStep("start dragging", () =>
+            {
+                i = 0;
+
+                mouseMove = Scheduler.AddDelayed(() =>
+                {
+                    InputManager.MoveMouseTo(selectionBox.ScreenSpaceDrawQuad.TopLeft + Vector2.One * (5 * ++i));
+                }, 100, true);
+            });
+            AddAssert("rotation handle still hidden", () => rotationHandle.Alpha == 0);
+
+            AddStep("end dragging", () => mouseMove.Cancel());
+            AddAssert("rotation handle still hidden", () => rotationHandle.Alpha == 0);
             AddStep("unhold left", () => InputManager.ReleaseButton(MouseButton.Left));
+            AddUntilStep("rotation handle shown", () => rotationHandle.Alpha == 1);
             AddStep("move mouse away", () => InputManager.MoveMouseTo(selectionBox, new Vector2(20)));
-            AddUntilStep("handle hidden", () => rotationHandle.Alpha == 0);
+            AddUntilStep("rotation handle hidden", () => rotationHandle.Alpha == 0);
         }
     }
 }

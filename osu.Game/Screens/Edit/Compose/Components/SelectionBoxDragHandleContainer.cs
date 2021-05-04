@@ -72,13 +72,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updateRotationHandlesVisibility()
         {
-            if (activeHandle?.IsHeld == true || activeHandle?.IsHovered == true)
+            // if the active handle is a rotation handle and is held or hovered,
+            // then no need to perform any updates to the rotation handles visibility.
+            if (activeHandle is SelectionBoxRotationHandle && (activeHandle?.IsHeld == true || activeHandle?.IsHovered == true))
                 return;
 
             displayedRotationHandle?.FadeOut(SelectionBoxControl.TRANSFORM_DURATION, Easing.OutQuint);
             displayedRotationHandle = null;
 
-            activeHandle = allDragHandles.SingleOrDefault(h => h.IsHeld);
+            // if the active handle is not a rotation handle but is held, then keep the rotation handle hidden.
+            if (activeHandle?.IsHeld == true)
+                return;
+
+            activeHandle = rotationHandles.SingleOrDefault(h => h.IsHeld || h.IsHovered);
             activeHandle ??= allDragHandles.SingleOrDefault(h => h.IsHovered);
 
             if (activeHandle != null)
