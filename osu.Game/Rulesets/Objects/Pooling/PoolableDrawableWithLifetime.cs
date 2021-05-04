@@ -32,12 +32,11 @@ namespace osu.Game.Rulesets.Objects.Pooling
             get => Entry?.LifetimeStart ?? double.MinValue;
             set
             {
-                if (LifetimeStart == value) return;
-
-                if (Entry == null)
+                if (Entry == null && LifetimeStart != value)
                     throw new InvalidOperationException($"Cannot modify lifetime of {nameof(PoolableDrawableWithLifetime<TEntry>)} when entry is not set");
 
-                Entry.LifetimeStart = value;
+                if (Entry != null)
+                    Entry.LifetimeStart = value;
             }
         }
 
@@ -46,12 +45,11 @@ namespace osu.Game.Rulesets.Objects.Pooling
             get => Entry?.LifetimeEnd ?? double.MaxValue;
             set
             {
-                if (LifetimeEnd == value) return;
-
-                if (Entry == null)
+                if (Entry == null && LifetimeEnd != value)
                     throw new InvalidOperationException($"Cannot modify lifetime of {nameof(PoolableDrawableWithLifetime<TEntry>)} when entry is not set");
 
-                Entry.LifetimeEnd = value;
+                if (Entry != null)
+                    Entry.LifetimeEnd = value;
             }
         }
 
