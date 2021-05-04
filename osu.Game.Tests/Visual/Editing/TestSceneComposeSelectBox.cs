@@ -30,6 +30,8 @@ namespace osu.Game.Tests.Visual.Editing
                 {
                     selectionBox = new SelectionBox
                     {
+                        RelativeSizeAxes = Axes.Both,
+
                         CanRotate = true,
                         CanScaleX = true,
                         CanScaleY = true,
