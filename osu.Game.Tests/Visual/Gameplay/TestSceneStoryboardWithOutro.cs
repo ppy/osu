@@ -116,6 +116,15 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for score shown", () => Player.IsScoreShown);
         }
 
+        [Test]
+        public void TestStoryboardRewind()
+        {
+            CreateTest(null);
+            AddUntilStep("completion set by processor", () => Player.ScoreProcessor.HasCompleted.Value);
+            AddStep("rewind", () => Player.GameplayClockContainer.Seek(-1000));
+            AddUntilStep("storyboard ends", () => Player.GameplayClockContainer.GameplayClock.CurrentTime >= currentStoryboardDuration);
+        }
+
         protected override bool AllowFail => true;
 
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
