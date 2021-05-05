@@ -69,9 +69,9 @@ namespace osu.Desktop.Security
 
             public ElevatedPrivilegesNotification()
             {
-                Text = $"使用{(RuntimeInfo.IsUnix ? "root" : "administrator")}用户运行osu!并不会改进性能,"
-                       + "并且可能会破坏集成或导致安全问题."
-                       + "请使用普通用户运行游戏.";
+                Text = $"使用{(RuntimeInfo.IsUnix ? "root" : "administrator")}用户运行osu!并不会改进性能， "
+                       + "并且可能会破坏集成或导致安全问题。 "
+                       + "请使用普通用户运行游戏。";
             }
 
             [BackgroundDependencyLoader]
