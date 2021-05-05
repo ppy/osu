@@ -27,7 +27,7 @@ namespace osu.Game.Graphics.Containers.Markdown
         public OsuMarkdownListItem(ListItemBlock listItemBlock, int level)
         {
             this.level = level;
-            this.order = listItemBlock.Order;
+            order = listItemBlock.Order;
             isOrdered = ((ListBlock)listItemBlock.Parent).IsOrdered;
 
             AutoSizeAxes = Axes.Y;
