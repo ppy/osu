@@ -22,22 +22,7 @@ namespace osu.Game.Screens.Ranking.Expanded
     /// </summary>
     public class StarRatingDisplay : CompositeDrawable
     {
-        [Resolved]
-        private OsuColour colours { get; set; }
-
-        private CircularContainer colorContainer;
-        private StarDifficulty starDifficulty;
-        private FillFlowContainer foregroundContainer;
-
-        public StarDifficulty StarDifficulty
-        {
-            get => starDifficulty;
-            set
-            {
-                starDifficulty = value;
-                setDifficulty(starDifficulty);
-            }
-        }
+        private readonly StarDifficulty difficulty;
 
         /// <summary>
         /// Creates a new <see cref="StarRatingDisplay"/> using an already computed <see cref="StarDifficulty"/>.
@@ -45,94 +30,78 @@ namespace osu.Game.Screens.Ranking.Expanded
         /// <param name="starDifficulty">The already computed <see cref="StarDifficulty"/> to display the star difficulty of.</param>
         public StarRatingDisplay(StarDifficulty starDifficulty)
         {
-            this.starDifficulty = starDifficulty;
-        }
-
-        private void setDifficulty(StarDifficulty difficulty)
-        {
-            colorContainer.FadeColour(getDifficultyColour(difficulty), 250);
-
-            foregroundContainer.Expire();
-            foregroundContainer = null;
-            AddInternal(foregroundContainer = createForegroundContainer(difficulty));
+            difficulty = starDifficulty;
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours, BeatmapDifficultyCache difficultyCache)
         {
             AutoSizeAxes = Axes.Both;
 
-            InternalChildren = new Drawable[]
-            {
-                colorContainer = new CircularContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    Colour = getDifficultyColour(starDifficulty),
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                    }
-                },
-                foregroundContainer = createForegroundContainer(starDifficulty),
-            };
-        }
-
-        private ColourInfo getDifficultyColour(StarDifficulty difficulty)
-        {
-            return difficulty.DifficultyRating == DifficultyRating.ExpertPlus
-                ? ColourInfo.GradientVertical(Color4Extensions.FromHex("#C1C1C1"), Color4Extensions.FromHex("#595959"))
-                : (ColourInfo)colours.ForDifficultyRating(difficulty.DifficultyRating);
-        }
-
-        private FillFlowContainer createForegroundContainer(StarDifficulty difficulty)
-        {
             var starRatingParts = difficulty.Stars.ToString("0.00", CultureInfo.InvariantCulture).Split('.');
             string wholePart = starRatingParts[0];
             string fractionPart = starRatingParts[1];
             string separator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
 
-            return new FillFlowContainer
+            ColourInfo backgroundColour = difficulty.DifficultyRating == DifficultyRating.ExpertPlus
+                ? ColourInfo.GradientVertical(Color4Extensions.FromHex("#C1C1C1"), Color4Extensions.FromHex("#595959"))
+                : (ColourInfo)colours.ForDifficultyRating(difficulty.DifficultyRating);
+
+            InternalChildren = new Drawable[]
             {
-                AutoSizeAxes = Axes.Both,
-                Padding = new MarginPadding { Horizontal = 8, Vertical = 4 },
-                Direction = FillDirection.Horizontal,
-                Spacing = new Vector2(2, 0),
-                Children = new Drawable[]
+                new CircularContainer
                 {
-                    new SpriteIcon
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Size = new Vector2(7),
-                        Icon = FontAwesome.Solid.Star,
-                        Colour = Color4.Black
-                    },
-                    new OsuTextFlowContainer(s => s.Font = OsuFont.Numeric.With(weight: FontWeight.Black))
-                    {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Horizontal,
-                        TextAnchor = Anchor.BottomLeft,
-                    }.With(t =>
-                    {
-                        t.AddText($"{wholePart}", s =>
+                        new Box
                         {
-                            s.Colour = Color4.Black;
-                            s.Font = s.Font.With(size: 14);
-                            s.UseFullGlyphHeight = false;
-                        });
-                        t.AddText($"{separator}{fractionPart}", s =>
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = backgroundColour
+                        },
+                    }
+                },
+                new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Horizontal = 8, Vertical = 4 },
+                    Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(2, 0),
+                    Children = new Drawable[]
+                    {
+                        new SpriteIcon
                         {
-                            s.Colour = Color4.Black;
-                            s.Font = s.Font.With(size: 7);
-                            s.UseFullGlyphHeight = false;
-                        });
-                    }),
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Size = new Vector2(7),
+                            Icon = FontAwesome.Solid.Star,
+                            Colour = Color4.Black
+                        },
+                        new OsuTextFlowContainer(s => s.Font = OsuFont.Numeric.With(weight: FontWeight.Black))
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            AutoSizeAxes = Axes.Both,
+                            Direction = FillDirection.Horizontal,
+                            TextAnchor = Anchor.BottomLeft,
+                        }.With(t =>
+                        {
+                            t.AddText($"{wholePart}", s =>
+                            {
+                                s.Colour = Color4.Black;
+                                s.Font = s.Font.With(size: 14);
+                                s.UseFullGlyphHeight = false;
+                            });
+
+                            t.AddText($"{separator}{fractionPart}", s =>
+                            {
+                                s.Colour = Color4.Black;
+                                s.Font = s.Font.With(size: 7);
+                                s.UseFullGlyphHeight = false;
+                            });
+                        })
+                    }
                 }
             };
         }
