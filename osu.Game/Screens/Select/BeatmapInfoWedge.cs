@@ -132,39 +132,13 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        public class BeatmapInfoWedgeContainer : Container
-        {
-            private readonly WorkingBeatmap beatmap;
-            private readonly RulesetInfo ruleset;
-
-            internal WedgeInfoText Info;
-
-            public BeatmapInfoWedgeContainer(WorkingBeatmap beatmap, RulesetInfo ruleset)
-            {
-                this.beatmap = beatmap;
-                this.ruleset = ruleset;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                RelativeSizeAxes = Axes.Both;
-
-                Children = new Drawable[]
-                {
-                    new BeatmapInfoWedgeBackground(beatmap),
-                    Info = new WedgeInfoText(beatmap, ruleset),
-                };
-            }
-        }
-
         public class WedgeInfoText : Container
         {
-            public FillFlowContainer MapperContainer { get; private set; }
+            public OsuSpriteText VersionLabel { get; private set; }
             public OsuSpriteText TitleLabel { get; private set; }
             public OsuSpriteText ArtistLabel { get; private set; }
-            public OsuSpriteText VersionLabel { get; private set; }
             public BeatmapSetOnlineStatusPill StatusPill { get; private set; }
+            public FillFlowContainer MapperContainer { get; private set; }
 
             [Resolved]
             private IBindable<IReadOnlyList<Mod>> mods { get; set; }
@@ -172,15 +146,16 @@ namespace osu.Game.Screens.Select
             private ILocalisedBindableString titleBinding;
             private ILocalisedBindableString artistBinding;
             private FillFlowContainer infoLabelContainer;
-            private Container topRightMetadataContainer;
+            private Container starRatingContainer;
             private Container bpmLabelContainer;
             private Container difficultyColourBarContainer;
-            private ModSettingChangeTracker settingChangeTracker;
             private CancellationTokenSource cancellationTokenSource;
             private IBindable<StarDifficulty?> starDifficulty;
 
             private readonly WorkingBeatmap beatmap;
             private readonly RulesetInfo ruleset;
+
+            private ModSettingChangeTracker settingChangeTracker;
 
             public WedgeInfoText(WorkingBeatmap beatmap, RulesetInfo userRuleset)
             {
@@ -211,7 +186,6 @@ namespace osu.Game.Screens.Select
                     {
                         RelativeSizeAxes = Axes.Y,
                         Width = 20,
-                        Child = createDifficultyColourBar(starDifficulty.Value ?? new StarDifficulty()),
                     },
                     new FillFlowContainer
                     {
@@ -304,8 +278,6 @@ namespace osu.Game.Screens.Select
                     }
                 };
 
-                addInfoLabels();
-
                 titleBinding.BindValueChanged(_ => setMetadata(metadata.Source));
                 artistBinding.BindValueChanged(_ => setMetadata(metadata.Source), true);
                 starDifficulty.BindValueChanged(updateDifficulty, true);
@@ -313,38 +285,8 @@ namespace osu.Game.Screens.Select
                 // no difficulty means it can't have a status to show
                 if (beatmapInfo.Version == null)
                     StatusPill.Hide();
-            }
 
-            private void updateDifficulty(ValueChangedEvent<StarDifficulty?> valueChanged)
-            {
-                var difficulty = valueChanged.NewValue ?? new StarDifficulty();
-
-                if (starRatingContainer.Children.Count > 0)
-                {
-                    starRatingContainer.Child.FadeOut(250);
-                    starRatingContainer.Child.Expire();
-                }
-
-                starRatingContainer.Child = difficulty.Stars > 0 ? new StarRatingDisplay(difficulty) : Empty();
-
-                if (difficultyColourBarContainer.Children.Count > 0)
-                {
-                    difficultyColourBarContainer.Child.Expire();
-                }
-
-                difficultyColourBarContainer.Child = new DifficultyColourBar(difficulty)
-                {
-                    RelativeSizeAxes = Axes.Y,
-                    Width = 20,
-                };
-            }
-
-            private void refreshModInformation(ValueChangedEvent<IReadOnlyList<Mod>> modsChangedEvent)
-            {
-                settingChangeTracker?.Dispose();
-                settingChangeTracker = new ModSettingChangeTracker(modsChangedEvent.NewValue);
-                settingChangeTracker.SettingChanged += _ => refreshBPMLabel(modsChangedEvent.NewValue);
-                refreshBPMLabel(modsChangedEvent.NewValue);
+                addInfoLabels();
             }
 
             private void setMetadata(string source)
@@ -455,6 +397,38 @@ namespace osu.Game.Screens.Select
                 };
             }
 
+            private void updateDifficulty(ValueChangedEvent<StarDifficulty?> valueChanged)
+            {
+                var difficulty = valueChanged.NewValue ?? new StarDifficulty();
+
+                if (starRatingContainer.Children.Count > 0)
+                {
+                    starRatingContainer.Child.FadeOut(250);
+                    starRatingContainer.Child.Expire();
+                }
+
+                starRatingContainer.Child = difficulty.Stars > 0 ? new StarRatingDisplay(difficulty) : Empty();
+
+                if (difficultyColourBarContainer.Children.Count > 0)
+                {
+                    difficultyColourBarContainer.Child.Expire();
+                }
+
+                difficultyColourBarContainer.Child = new DifficultyColourBar(difficulty)
+                {
+                    RelativeSizeAxes = Axes.Y,
+                    Width = 20,
+                };
+            }
+
+            private void refreshModInformation(ValueChangedEvent<IReadOnlyList<Mod>> modsChangedEvent)
+            {
+                settingChangeTracker?.Dispose();
+                settingChangeTracker = new ModSettingChangeTracker(modsChangedEvent.NewValue);
+                settingChangeTracker.SettingChanged += _ => refreshBPMLabel(modsChangedEvent.NewValue);
+                refreshBPMLabel(modsChangedEvent.NewValue);
+            }
+
             protected override void Dispose(bool isDisposing)
             {
                 base.Dispose(isDisposing);
@@ -555,6 +529,32 @@ namespace osu.Game.Screens.Select
                         }
                     };
                 }
+            }
+        }
+
+        public class BeatmapInfoWedgeContainer : Container
+        {
+            private readonly WorkingBeatmap beatmap;
+            private readonly RulesetInfo ruleset;
+
+            internal WedgeInfoText Info;
+
+            public BeatmapInfoWedgeContainer(WorkingBeatmap beatmap, RulesetInfo ruleset)
+            {
+                this.beatmap = beatmap;
+                this.ruleset = ruleset;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                RelativeSizeAxes = Axes.Both;
+
+                Children = new Drawable[]
+                {
+                    new BeatmapInfoWedgeBackground(beatmap),
+                    Info = new WedgeInfoText(beatmap, ruleset),
+                };
             }
         }
     }
