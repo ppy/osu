@@ -361,7 +361,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Selects all <see cref="SelectionBlueprint{T}"/>s.
         /// </summary>
-        protected virtual void SelectAll()
+        public virtual void SelectAll()
         {
             // Scheduled to allow the change in lifetime to take place.
             Schedule(() => SelectionBlueprints.ToList().ForEach(m => m.Select()));

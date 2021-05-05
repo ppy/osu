@@ -122,7 +122,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override SelectionHandler<HitObject> CreateSelectionHandler() => new EditorSelectionHandler();
 
-        protected override void SelectAll()
+        public override void SelectAll()
         {
             Composer.Playfield.KeepAllAlive();
 
