@@ -48,6 +48,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.O }, GlobalAction.ToggleSettings),
             new KeyBinding(new[] { InputKey.Control, InputKey.D }, GlobalAction.ToggleBeatmapListing),
             new KeyBinding(new[] { InputKey.Control, InputKey.N }, GlobalAction.ToggleNotifications),
+            new KeyBinding(new[] { InputKey.Shift, InputKey.F2 }, GlobalAction.ToggleSkinEditor),
 
             new KeyBinding(InputKey.Escape, GlobalAction.Back),
             new KeyBinding(InputKey.ExtraMouseButton1, GlobalAction.Back),
@@ -258,6 +259,9 @@ namespace osu.Game.Input.Bindings
         EditorNudgeLeft,
 
         [Description("Nudge selection right")]
-        EditorNudgeRight
+        EditorNudgeRight,
+
+        [Description("Toggle skin editor")]
+        ToggleSkinEditor,
     }
 }
