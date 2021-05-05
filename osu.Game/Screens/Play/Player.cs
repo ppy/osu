@@ -598,6 +598,7 @@ namespace osu.Game.Screens.Play
                 completionProgressDelegate?.Cancel();
                 completionProgressDelegate = null;
                 ValidForResume = true;
+                skipOutroOverlay.Hide();
                 return;
             }
 
