@@ -50,7 +50,7 @@ namespace osu.Game.Graphics.Containers.Markdown
         private void load()
         {
             var marker = parentTextComponent.CreateSpriteText();
-            marker.Text = GetTextMarker();
+            marker.Text = GetTextMarker(level, isOrdered);
 
             if (isOrdered)
             {
@@ -67,7 +67,7 @@ namespace osu.Game.Graphics.Containers.Markdown
             AddInternal(marker);
         }
 
-        protected virtual string GetTextMarker()
+        protected virtual string GetTextMarker(int level, bool isOrdered)
         {
             if (isOrdered)
             {
