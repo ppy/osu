@@ -36,11 +36,14 @@ namespace osu.Game.Overlays.Settings
 
         private SpriteText labelText;
 
-        private readonly OsuTextFlowContainer warningText;
+        private OsuTextFlowContainer warningText;
 
         public bool ShowsDefaultIndicator = true;
 
         public string TooltipText { get; set; }
+
+        [Resolved]
+        private OsuColour colours { get; set; }
 
         public virtual LocalisableString LabelText
         {
@@ -67,6 +70,18 @@ namespace osu.Game.Overlays.Settings
         {
             set
             {
+                if (warningText == null)
+                {
+                    // construct lazily for cases where the label is not needed (may be provided by the Control).
+                    FlowContent.Add(warningText = new OsuTextFlowContainer
+                    {
+                        Colour = colours.Yellow,
+                        Margin = new MarginPadding { Bottom = 5 },
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                    });
+                }
+
                 warningText.Alpha = string.IsNullOrWhiteSpace(value) ? 0 : 1;
                 warningText.Text = value;
             }
@@ -110,12 +125,6 @@ namespace osu.Game.Overlays.Settings
                     Children = new[]
                     {
                         Control = CreateControl(),
-                        warningText = new OsuTextFlowContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Alpha = 0,
-                        },
                     },
                 },
             };
@@ -130,12 +139,6 @@ namespace osu.Game.Overlays.Settings
                 if (ShowsDefaultIndicator)
                     restoreDefaultButton.Bindable = controlWithCurrent.Current;
             }
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            warningText.Colour = colours.Yellow;
         }
 
         private void updateDisabled()
