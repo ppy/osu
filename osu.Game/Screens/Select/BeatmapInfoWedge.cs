@@ -41,7 +41,6 @@ namespace osu.Game.Screens.Select
         private IBindable<RulesetInfo> ruleset { get; set; }
 
         protected BeatmapInfoWedgeContainer Container;
-        protected WedgeInfoText Info => Container.Info;
 
         public BeatmapInfoWedge()
         {
