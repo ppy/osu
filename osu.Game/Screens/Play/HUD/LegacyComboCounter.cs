@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Play.HUD
     /// <summary>
     /// Uses the 'x' symbol and has a pop-out effect while rolling over.
     /// </summary>
-    public class LegacyComboCounter : CompositeDrawable, IComboCounter
+    public class LegacyComboCounter : CompositeDrawable, IComboCounter, ISkinnableComponent
     {
         public Bindable<int> Current { get; } = new BindableInt { MinValue = 0, };
 
