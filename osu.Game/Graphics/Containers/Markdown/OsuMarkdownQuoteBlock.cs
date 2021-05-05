@@ -36,10 +36,8 @@ namespace osu.Game.Graphics.Containers.Markdown
             var textFlow = base.CreateTextFlow();
             textFlow.Margin = new MarginPadding
             {
-                Top = 10,
-                Bottom = 10,
-                Left = 20,
-                Right = 20,
+                Vertical = 10,
+                Horizontal = 20,
             };
             return textFlow;
         }
