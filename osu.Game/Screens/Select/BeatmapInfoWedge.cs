@@ -48,7 +48,8 @@ namespace osu.Game.Screens.Select
 
         private IBindable<StarDifficulty?> beatmapDifficulty;
 
-        protected Container Container;
+        protected Container DisplayedContent;
+
         protected WedgeInfoText Info;
 
         public BeatmapInfoWedge()
@@ -110,7 +111,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        public override bool IsPresent => base.IsPresent || Container == null; // Visibility is updated in the LoadComponentAsync callback
+        public override bool IsPresent => base.IsPresent || DisplayedContent == null; // Visibility is updated in the LoadComponentAsync callback
 
         private Container loadingInfo;
 
@@ -124,9 +125,9 @@ namespace osu.Game.Screens.Select
                 {
                     State.Value = beatmap == null ? Visibility.Hidden : Visibility.Visible;
 
-                    Container?.FadeOut(250);
-                    Container?.Expire();
-                    Container = null;
+                    DisplayedContent?.FadeOut(250);
+                    DisplayedContent?.Expire();
+                    DisplayedContent = null;
                 }
 
                 if (beatmap == null)
@@ -139,7 +140,7 @@ namespace osu.Game.Screens.Select
                 {
                     RelativeSizeAxes = Axes.Both,
                     Shear = -Shear,
-                    Depth = Container?.Depth + 1 ?? 0,
+                    Depth = DisplayedContent?.Depth + 1 ?? 0,
                     Children = new Drawable[]
                     {
                         new BeatmapInfoWedgeBackground(beatmap),
@@ -151,7 +152,7 @@ namespace osu.Game.Screens.Select
                     if (loaded != loadingInfo) return;
 
                     removeOldInfo();
-                    Add(Container = loaded);
+                    Add(DisplayedContent = loaded);
                 });
             }
         }
