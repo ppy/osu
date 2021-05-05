@@ -48,16 +48,6 @@ namespace osu.Game.Beatmaps
                     obj.ComboIndex = lastObj.ComboIndex;
                 }
 
-                if (obj is IHasLegacyBeatmapComboOffset legacyObj)
-                {
-                    var lastLegacyObj = (IHasLegacyBeatmapComboOffset)lastObj;
-
-                    if (obj.NewCombo)
-                        legacyObj.LegacyBeatmapComboIndex = (lastLegacyObj?.LegacyBeatmapComboIndex ?? 0) + legacyObj.LegacyBeatmapComboOffset + 1;
-                    else if (lastLegacyObj != null)
-                        legacyObj.LegacyBeatmapComboIndex = lastLegacyObj.LegacyBeatmapComboIndex;
-                }
-
                 lastObj = obj;
             }
         }
