@@ -174,6 +174,7 @@ namespace osu.Game.Screens.Select
             private FillFlowContainer infoLabelContainer;
             private Container topRightMetadataContainer;
             private Container bpmLabelContainer;
+            private Container difficultyColourBarContainer;
             private ModSettingChangeTracker settingChangeTracker;
             private CancellationTokenSource cancellationTokenSource;
             private IBindable<StarDifficulty?> starDifficulty;
@@ -206,10 +207,11 @@ namespace osu.Game.Screens.Select
 
                 Children = new Drawable[]
                 {
-                    new DifficultyColourBar(beatmapInfo)
+                    difficultyColourBarContainer = new Container
                     {
                         RelativeSizeAxes = Axes.Y,
                         Width = 20,
+                        Child = createDifficultyColourBar(starDifficulty.Value ?? new StarDifficulty()),
                     },
                     new FillFlowContainer
                     {
@@ -286,19 +288,31 @@ namespace osu.Game.Screens.Select
 
                 titleBinding.BindValueChanged(_ => setMetadata(metadata.Source));
                 artistBinding.BindValueChanged(_ => setMetadata(metadata.Source), true);
-                starDifficulty.BindValueChanged(updateTopRightMetadata, true);
+                starDifficulty.BindValueChanged(updateDifficulty, true);
 
                 // no difficulty means it can't have a status to show
                 if (beatmapInfo.Version == null)
                     StatusPill.Hide();
             }
 
-            private void updateTopRightMetadata(ValueChangedEvent<StarDifficulty?> valueChanged)
+            private void updateDifficulty(ValueChangedEvent<StarDifficulty?> valueChanged)
             {
+                var difficulty = valueChanged.NewValue ?? new StarDifficulty();
+
                 topRightMetadataContainer.Child.FadeOut(250);
                 topRightMetadataContainer.Child.Expire();
-                topRightMetadataContainer.Child = createTopRightMetadataContainer(beatmap.BeatmapInfo, valueChanged.NewValue ?? new StarDifficulty());
+                topRightMetadataContainer.Child = createTopRightMetadataContainer(beatmap.BeatmapInfo, difficulty);
+
+                difficultyColourBarContainer.Child.Expire();
+                difficultyColourBarContainer.Child = createDifficultyColourBar(difficulty);
             }
+
+            private DifficultyColourBar createDifficultyColourBar(StarDifficulty difficulty)
+                => new DifficultyColourBar(difficulty)
+                {
+                    RelativeSizeAxes = Axes.Y,
+                    Width = 20,
+                };
 
             private FillFlowContainer createTopRightMetadataContainer(BeatmapInfo beatmapInfo, StarDifficulty difficulty)
             {
@@ -515,64 +529,38 @@ namespace osu.Game.Screens.Select
 
             private class DifficultyColourBar : Container
             {
-                [Resolved]
-                private OsuColour colours { get; set; }
+                private readonly StarDifficulty difficulty;
 
-                private Box solidDifficultyBox;
-                private Box transparentDifficultyBox;
-                private CancellationTokenSource cancellationTokenSource;
-                private IBindable<StarDifficulty?> starDifficulty;
-
-                private readonly BeatmapInfo beatmapInfo;
-
-                public DifficultyColourBar(BeatmapInfo beatmapInfo)
+                public DifficultyColourBar(StarDifficulty difficulty)
                 {
-                    this.beatmapInfo = beatmapInfo;
+                    this.difficulty = difficulty;
                 }
 
                 [BackgroundDependencyLoader]
-                private void load(BeatmapDifficultyCache difficultyCache)
+                private void load(OsuColour colours)
                 {
                     const float full_opacity_ratio = 0.7f;
 
-                    cancellationTokenSource?.Cancel();
-                    cancellationTokenSource = new CancellationTokenSource();
-
-                    starDifficulty?.UnbindAll();
-                    starDifficulty = difficultyCache.GetBindableDifficulty(beatmapInfo, cancellationTokenSource.Token);
+                    var difficultyColour = colours.ForDifficultyRating(difficulty.DifficultyRating);
 
                     Children = new Drawable[]
                     {
-                        solidDifficultyBox = new Box
+                        new Box
                         {
                             RelativeSizeAxes = Axes.Both,
+                            Colour = difficultyColour,
                             Width = full_opacity_ratio,
                         },
-                        transparentDifficultyBox = new Box
+                        new Box
                         {
                             RelativeSizeAxes = Axes.Both,
                             RelativePositionAxes = Axes.Both,
+                            Colour = difficultyColour,
                             Alpha = 0.5f,
                             X = full_opacity_ratio,
                             Width = 1 - full_opacity_ratio,
                         }
                     };
-
-                    starDifficulty.BindValueChanged(setColour, true);
-                }
-
-                private void setColour(ValueChangedEvent<StarDifficulty?> valueChanged)
-                {
-                    var difficultyColour = colours.ForDifficultyRating(valueChanged.NewValue?.DifficultyRating ?? (new StarDifficulty()).DifficultyRating);
-
-                    solidDifficultyBox.Colour = difficultyColour;
-                    transparentDifficultyBox.Colour = difficultyColour;
-                }
-
-                protected override void Dispose(bool isDisposing)
-                {
-                    base.Dispose(isDisposing);
-                    cancellationTokenSource?.Cancel();
                 }
             }
         }
