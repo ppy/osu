@@ -193,9 +193,9 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private class TestBeatmapInfoWedge : BeatmapInfoWedge
         {
-            public new WedgeInfoText Info => base.Info;
-
             public new BeatmapInfoWedgeContainer Container => base.Container;
+
+            public WedgeInfoText Info => base.Container.Info;
         }
 
         private class TestHitObject : ConvertHitObject, IHasPosition
