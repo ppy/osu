@@ -67,6 +67,12 @@ namespace osu.Game.Graphics.Containers.Markdown
             AddInternal(marker);
         }
 
+        /// <summary>
+        /// Get text marker based on <paramref name="level"/> and <paramref name="isOrdered"/>.
+        /// </summary>
+        /// <param name="level">The markdown level of current list item.</param>
+        /// <param name="isOrdered">Is true if the list item is an ordered list.</param>
+        /// <returns></returns>
         protected virtual string GetTextMarker(int level, bool isOrdered)
         {
             if (isOrdered)
