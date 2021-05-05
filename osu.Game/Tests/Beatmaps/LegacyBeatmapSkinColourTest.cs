@@ -107,6 +107,8 @@ namespace osu.Game.Tests.Beatmaps
             {
                 new Color4(50, 100, 150, 255),
                 new Color4(40, 80, 120, 255),
+                new Color4(25, 50, 75, 255),
+                new Color4(10, 20, 30, 255),
             };
 
             public static readonly Color4 HYPER_DASH_COLOUR = Color4.DarkBlue;
@@ -134,6 +136,8 @@ namespace osu.Game.Tests.Beatmaps
             {
                 new Color4(150, 100, 50, 255),
                 new Color4(20, 20, 20, 255),
+                new Color4(75, 50, 25, 255),
+                new Color4(80, 80, 80, 255),
             };
 
             public static readonly Color4 HYPER_DASH_COLOUR = Color4.LightBlue;
