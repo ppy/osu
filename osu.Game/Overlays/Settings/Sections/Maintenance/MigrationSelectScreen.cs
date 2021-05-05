@@ -17,6 +17,8 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         [Resolved]
         private Storage storage { get; set; }
 
+        protected override DirectoryInfo InitialPath => new DirectoryInfo(storage.GetFullPath(string.Empty)).Parent;
+
         protected override OsuSpriteText CreateHeader() => new OsuSpriteText
         {
             Text = "Please select a new location",
@@ -40,12 +42,6 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
             ValidForResume = false;
             BeginMigration(target);
-        }
-
-        protected override void LoadComplete()
-        {
-            DirectorySelector.CurrentPath.Value = new DirectoryInfo(storage.GetFullPath(string.Empty)).Parent;
-            base.LoadComplete();
         }
 
         protected virtual void BeginMigration(DirectoryInfo target) => this.Push(new MigrationRunScreen(target));

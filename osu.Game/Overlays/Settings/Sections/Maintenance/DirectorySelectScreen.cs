@@ -34,6 +34,8 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
         protected virtual bool IsValidDirectory(DirectoryInfo info) => info != null;
 
+        protected virtual DirectoryInfo InitialPath => null;
+
         public override bool AllowExternalScreenChange => false;
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
@@ -101,6 +103,9 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
         protected override void LoadComplete()
         {
+            if (InitialPath != null)
+                DirectorySelector.CurrentPath.Value = InitialPath;
+
             DirectorySelector.CurrentPath.BindValueChanged(e => selectionButton.Enabled.Value = IsValidDirectory(e.NewValue), true);
             base.LoadComplete();
         }
