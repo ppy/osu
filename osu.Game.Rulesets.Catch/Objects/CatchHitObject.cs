@@ -67,8 +67,6 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public virtual bool NewCombo { get; set; }
 
-        public int ComboOffset { get; set; }
-
         public Bindable<int> IndexInCurrentComboBindable { get; } = new Bindable<int>();
 
         public int IndexInCurrentCombo

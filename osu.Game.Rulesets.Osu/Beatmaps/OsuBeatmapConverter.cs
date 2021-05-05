@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                         RepeatCount = curveData.RepeatCount,
                         Position = positionData?.Position ?? Vector2.Zero,
                         NewCombo = comboData?.NewCombo ?? false,
-                        ComboOffset = comboData?.ComboOffset ?? 0,
+                        LegacyBeatmapComboOffset = (original as IHasLegacyBeatmapComboOffset)?.LegacyBeatmapComboOffset ?? 0,
                         LegacyLastTickOffset = (original as IHasLegacyLastTickOffset)?.LegacyLastTickOffset,
                         // prior to v8, speed multipliers don't adjust for how many ticks are generated over the same distance.
                         // this results in more (or less) ticks being generated in <v8 maps for the same time duration.
@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                         EndTime = endTimeData.EndTime,
                         Position = positionData?.Position ?? OsuPlayfield.BASE_SIZE / 2,
                         NewCombo = comboData?.NewCombo ?? false,
-                        ComboOffset = comboData?.ComboOffset ?? 0,
+                        LegacyBeatmapComboOffset = (original as IHasLegacyBeatmapComboOffset)?.LegacyBeatmapComboOffset ?? 0,
                     }.Yield();
 
                 default:
@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                         Samples = original.Samples,
                         Position = positionData?.Position ?? Vector2.Zero,
                         NewCombo = comboData?.NewCombo ?? false,
-                        ComboOffset = comboData?.ComboOffset ?? 0,
+                        LegacyBeatmapComboOffset = (original as IHasLegacyBeatmapComboOffset)?.LegacyBeatmapComboOffset ?? 0,
                     }.Yield();
             }
         }
