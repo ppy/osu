@@ -48,7 +48,8 @@ namespace osu.Game.Screens.Select
 
         private IBindable<StarDifficulty?> beatmapDifficulty;
 
-        protected BeatmapInfoWedgeContainer Container;
+        protected Container Container;
+        protected WedgeInfoText Info;
 
         public BeatmapInfoWedge()
         {
@@ -111,7 +112,7 @@ namespace osu.Game.Screens.Select
 
         public override bool IsPresent => base.IsPresent || Container == null; // Visibility is updated in the LoadComponentAsync callback
 
-        private BeatmapInfoWedgeContainer loadingInfo;
+        private Container loadingInfo;
 
         private void updateDisplay()
         {
@@ -134,10 +135,16 @@ namespace osu.Game.Screens.Select
                     return;
                 }
 
-                LoadComponentAsync(loadingInfo = new BeatmapInfoWedgeContainer(beatmap, ruleset.Value, mods.Value, beatmapDifficulty.Value ?? new StarDifficulty())
+                LoadComponentAsync(loadingInfo = new Container
                 {
+                    RelativeSizeAxes = Axes.Both,
                     Shear = -Shear,
                     Depth = Container?.Depth + 1 ?? 0,
+                    Children = new Drawable[]
+                    {
+                        new BeatmapInfoWedgeBackground(beatmap),
+                        Info = new WedgeInfoText(beatmap, ruleset.Value, mods.Value, beatmapDifficulty.Value ?? new StarDifficulty()),
+                    }
                 }, loaded =>
                 {
                     // ensure we are the most recent loaded wedge.
@@ -518,36 +525,6 @@ namespace osu.Game.Screens.Select
                         }
                     };
                 }
-            }
-        }
-
-        public class BeatmapInfoWedgeContainer : Container
-        {
-            private readonly WorkingBeatmap beatmap;
-            private readonly RulesetInfo ruleset;
-            private readonly StarDifficulty starDifficulty;
-            private readonly IReadOnlyList<Mod> mods;
-
-            internal WedgeInfoText Info;
-
-            public BeatmapInfoWedgeContainer(WorkingBeatmap beatmap, RulesetInfo ruleset, IReadOnlyList<Mod> mods, StarDifficulty difficulty)
-            {
-                this.beatmap = beatmap;
-                this.ruleset = ruleset;
-                this.mods = mods;
-                starDifficulty = difficulty;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                RelativeSizeAxes = Axes.Both;
-
-                Children = new Drawable[]
-                {
-                    new BeatmapInfoWedgeBackground(beatmap),
-                    Info = new WedgeInfoText(beatmap, ruleset, mods, starDifficulty),
-                };
             }
         }
     }
