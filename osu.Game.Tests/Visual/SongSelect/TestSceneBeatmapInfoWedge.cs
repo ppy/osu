@@ -7,6 +7,7 @@ using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
@@ -135,7 +136,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private void selectBeatmap([CanBeNull] IBeatmap b)
         {
-            BeatmapInfoWedge.BeatmapInfoWedgeContainer containerBefore = null;
+            Container containerBefore = null;
 
             AddStep($"select {b?.Metadata.Title ?? "null"} beatmap", () =>
             {
@@ -193,9 +194,9 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private class TestBeatmapInfoWedge : BeatmapInfoWedge
         {
-            public new BeatmapInfoWedgeContainer Container => base.Container;
+            public new Container Container => base.Container;
 
-            public WedgeInfoText Info => base.Container.Info;
+            public new WedgeInfoText Info => base.Info;
         }
 
         private class TestHitObject : ConvertHitObject, IHasPosition
