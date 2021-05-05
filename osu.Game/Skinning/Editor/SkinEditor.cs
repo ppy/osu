@@ -69,11 +69,14 @@ namespace osu.Game.Skinning.Editor
 
         protected override void PopIn()
         {
+            skinBlueprintContainer.Show();
             this.FadeIn(TRANSITION_DURATION, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
+            // hide blueprint container instantly to prevent further selections from taking place.
+            skinBlueprintContainer.Hide();
             skinBlueprintContainer.DeselectAll();
             this.FadeOut(TRANSITION_DURATION, Easing.OutQuint);
         }
