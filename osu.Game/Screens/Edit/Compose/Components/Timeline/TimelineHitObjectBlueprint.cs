@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -139,8 +138,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             if (!(Item is IHasComboInformation combo))
                 return;
 
-            var comboColours = skin.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value ?? Array.Empty<Color4>();
-            var comboColour = combo.GetComboColour(comboColours);
+            var comboColour = combo.GetComboColour(skin);
 
             if (IsSelected)
             {

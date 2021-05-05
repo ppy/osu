@@ -509,8 +509,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             if (!(HitObject is IHasComboInformation combo)) return;
 
-            var comboColours = CurrentSkin.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value ?? Array.Empty<Color4>();
-            AccentColour.Value = combo.GetComboColour(comboColours);
+            AccentColour.Value = combo.GetComboColour(CurrentSkin);
         }
 
         /// <summary>
