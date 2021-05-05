@@ -173,7 +173,7 @@ namespace osu.Game.Screens.Select
             private ILocalisedBindableString titleBinding;
             private ILocalisedBindableString artistBinding;
             private FillFlowContainer infoLabelContainer;
-            private StarRatingDisplay starRatingDisplay;
+            private Container topRightMetadataContainer;
             private Container bpmLabelContainer;
             private ModSettingChangeTracker settingChangeTracker;
             private CancellationTokenSource cancellationTokenSource;
@@ -232,34 +232,15 @@ namespace osu.Game.Screens.Select
                             },
                         }
                     },
-                    new FillFlowContainer
+                    topRightMetadataContainer = new Container
                     {
                         Name = "Topright-aligned metadata",
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
-                        Direction = FillDirection.Vertical,
                         Padding = new MarginPadding { Top = 14, Right = shear_width / 2 },
                         AutoSizeAxes = Axes.Both,
                         Shear = wedged_container_shear,
-                        Children = new Drawable[]
-                        {
-                            starRatingDisplay = new StarRatingDisplay(starDifficulty.Value ?? new StarDifficulty())
-                            {
-                                Anchor = Anchor.TopRight,
-                                Origin = Anchor.TopRight,
-                                Shear = -wedged_container_shear,
-                                Margin = new MarginPadding { Bottom = 5 }
-                            },
-                            StatusPill = new BeatmapSetOnlineStatusPill
-                            {
-                                Anchor = Anchor.TopRight,
-                                Origin = Anchor.TopRight,
-                                Shear = -wedged_container_shear,
-                                TextSize = 11,
-                                TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
-                                Status = beatmapInfo.Status,
-                            }
-                        }
+                        Child = createTopRightMetadataContainer(beatmapInfo, starDifficulty.Value ?? new StarDifficulty())
                     },
                     new FillFlowContainer
                     {
@@ -306,21 +287,50 @@ namespace osu.Game.Screens.Select
 
                 titleBinding.BindValueChanged(_ => setMetadata(metadata.Source));
                 artistBinding.BindValueChanged(_ => setMetadata(metadata.Source), true);
-                starDifficulty.BindValueChanged(updateStarRatingDisplay, true);
+                starDifficulty.BindValueChanged(updateTopRightMetadata, true);
 
                 // no difficulty means it can't have a status to show
                 if (beatmapInfo.Version == null)
                     StatusPill.Hide();
             }
 
-            private void updateStarRatingDisplay(ValueChangedEvent<StarDifficulty?> valueChanged)
+            private void updateTopRightMetadata(ValueChangedEvent<StarDifficulty?> valueChanged)
             {
-                if (valueChanged.NewValue.HasValue && valueChanged.NewValue.Value.Stars > 0)
-                    starRatingDisplay.Show();
-                else
-                    starRatingDisplay.Hide();
+                topRightMetadataContainer.Child.FadeOut(250);
+                topRightMetadataContainer.Child.Expire();
+                topRightMetadataContainer.Child = createTopRightMetadataContainer(beatmap.BeatmapInfo, valueChanged.NewValue ?? new StarDifficulty());
+            }
 
-                starRatingDisplay.StarDifficulty = valueChanged.NewValue ?? new StarDifficulty();
+            private FillFlowContainer createTopRightMetadataContainer(BeatmapInfo beatmapInfo, StarDifficulty difficulty)
+            {
+                var container = new FillFlowContainer
+                {
+                    Direction = FillDirection.Vertical,
+                    AutoSizeAxes = Axes.Both,
+                };
+
+                if (difficulty.Stars > 0)
+                {
+                    container.Add(new StarRatingDisplay(difficulty)
+                    {
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                        Shear = -wedged_container_shear,
+                        Margin = new MarginPadding { Bottom = 5 }
+                    });
+                }
+
+                container.Add(StatusPill = new BeatmapSetOnlineStatusPill
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    Shear = -wedged_container_shear,
+                    TextSize = 11,
+                    TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
+                    Status = beatmapInfo.Status,
+                });
+
+                return container;
             }
 
             private void refreshModInformation(ValueChangedEvent<IReadOnlyList<Mod>> modsChangedEvent)
