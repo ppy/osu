@@ -233,15 +233,35 @@ namespace osu.Game.Screens.Select
                             },
                         }
                     },
-                    topRightMetadataContainer = new Container
+                    new FillFlowContainer
                     {
                         Name = "Topright-aligned metadata",
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
+                        Direction = FillDirection.Vertical,
                         Padding = new MarginPadding { Top = 14, Right = shear_width / 2 },
                         AutoSizeAxes = Axes.Both,
                         Shear = wedged_container_shear,
-                        Child = createTopRightMetadataContainer(beatmapInfo, starDifficulty.Value ?? new StarDifficulty())
+                        Children = new Drawable[]
+                        {
+                            starRatingContainer = new Container
+                            {
+                                AutoSizeAxes = Axes.Both,
+                                Anchor = Anchor.TopRight,
+                                Origin = Anchor.TopRight,
+                                Shear = -wedged_container_shear,
+                                Margin = new MarginPadding { Bottom = 5 }
+                            },
+                            StatusPill = new BeatmapSetOnlineStatusPill
+                            {
+                                Anchor = Anchor.TopRight,
+                                Origin = Anchor.TopRight,
+                                Shear = -wedged_container_shear,
+                                TextSize = 11,
+                                TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
+                                Status = beatmapInfo.Status,
+                            }
+                        }
                     },
                     new FillFlowContainer
                     {
@@ -299,51 +319,24 @@ namespace osu.Game.Screens.Select
             {
                 var difficulty = valueChanged.NewValue ?? new StarDifficulty();
 
-                topRightMetadataContainer.Child.FadeOut(250);
-                topRightMetadataContainer.Child.Expire();
-                topRightMetadataContainer.Child = createTopRightMetadataContainer(beatmap.BeatmapInfo, difficulty);
+                if (starRatingContainer.Children.Count > 0)
+                {
+                    starRatingContainer.Child.FadeOut(250);
+                    starRatingContainer.Child.Expire();
+                }
 
-                difficultyColourBarContainer.Child.Expire();
-                difficultyColourBarContainer.Child = createDifficultyColourBar(difficulty);
-            }
+                starRatingContainer.Child = difficulty.Stars > 0 ? new StarRatingDisplay(difficulty) : Empty();
 
-            private DifficultyColourBar createDifficultyColourBar(StarDifficulty difficulty)
-                => new DifficultyColourBar(difficulty)
+                if (difficultyColourBarContainer.Children.Count > 0)
+                {
+                    difficultyColourBarContainer.Child.Expire();
+                }
+
+                difficultyColourBarContainer.Child = new DifficultyColourBar(difficulty)
                 {
                     RelativeSizeAxes = Axes.Y,
                     Width = 20,
                 };
-
-            private FillFlowContainer createTopRightMetadataContainer(BeatmapInfo beatmapInfo, StarDifficulty difficulty)
-            {
-                var container = new FillFlowContainer
-                {
-                    Direction = FillDirection.Vertical,
-                    AutoSizeAxes = Axes.Both,
-                };
-
-                if (difficulty.Stars > 0)
-                {
-                    container.Add(new StarRatingDisplay(difficulty)
-                    {
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
-                        Shear = -wedged_container_shear,
-                        Margin = new MarginPadding { Bottom = 5 }
-                    });
-                }
-
-                container.Add(StatusPill = new BeatmapSetOnlineStatusPill
-                {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    Shear = -wedged_container_shear,
-                    TextSize = 11,
-                    TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
-                    Status = beatmapInfo.Status,
-                });
-
-                return container;
             }
 
             private void refreshModInformation(ValueChangedEvent<IReadOnlyList<Mod>> modsChangedEvent)
