@@ -34,13 +34,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            // For non-pooled rulesets, hitobjects are already present in the playfield which allows the blueprints to be loaded in the async context.
-            if (Composer != null)
-            {
-                foreach (var obj in Composer.HitObjects)
-                    AddBlueprintFor(obj.HitObject);
-            }
-
             selectedHitObjects.BindTo(Beatmap.SelectedHitObjects);
             selectedHitObjects.CollectionChanged += (selectedObjects, args) =>
             {
@@ -69,7 +62,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             if (Composer != null)
             {
-                // For pooled rulesets, blueprints must be added for hitobjects already "current" as they would've not been "current" during the async load addition process above.
                 foreach (var obj in Composer.HitObjects)
                     AddBlueprintFor(obj.HitObject);
 
