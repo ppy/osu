@@ -90,8 +90,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             this.ScaleTo(IsHeld || IsHovered ? 1.5f : 1, TRANSFORM_DURATION, Easing.OutQuint);
         }
 
-        protected void OnOperationStarted() => OperationStarted?.Invoke();
+        protected void TriggerOperationStarted() => OperationStarted?.Invoke();
 
-        protected void OnOperationEnded() => OperationEnded?.Invoke();
+        protected void TriggerOperatoinEnded() => OperationEnded?.Invoke();
     }
 }

@@ -46,9 +46,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override bool OnClick(ClickEvent e)
         {
-            OnOperationStarted();
+            TriggerOperationStarted();
             Action?.Invoke();
-            OnOperationEnded();
+            TriggerOperatoinEnded();
             return true;
         }
 
