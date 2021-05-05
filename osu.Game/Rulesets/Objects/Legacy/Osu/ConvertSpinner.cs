@@ -22,7 +22,5 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
         public float Y => Position.Y;
 
         public bool NewCombo { get; set; }
-
-        public int ComboOffset { get; set; }
     }
 }

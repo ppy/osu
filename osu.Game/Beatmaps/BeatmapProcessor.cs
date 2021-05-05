@@ -37,7 +37,7 @@ namespace osu.Game.Beatmaps
                 if (obj.NewCombo)
                 {
                     obj.IndexInCurrentCombo = 0;
-                    obj.ComboIndex = (lastObj?.ComboIndex ?? 0) + obj.ComboOffset + 1;
+                    obj.ComboIndex = (lastObj?.ComboIndex ?? 0) + 1;
 
                     if (lastObj != null)
                         lastObj.LastInCombo = true;
@@ -46,6 +46,16 @@ namespace osu.Game.Beatmaps
                 {
                     obj.IndexInCurrentCombo = lastObj.IndexInCurrentCombo + 1;
                     obj.ComboIndex = lastObj.ComboIndex;
+                }
+
+                if (obj is IHasLegacyBeatmapComboOffset legacyObj)
+                {
+                    var lastLegacyObj = (IHasLegacyBeatmapComboOffset)lastObj;
+
+                    if (obj.NewCombo)
+                        legacyObj.LegacyBeatmapComboIndex = (lastLegacyObj?.LegacyBeatmapComboIndex ?? 0) + legacyObj.LegacyBeatmapComboOffset + 1;
+                    else if (lastLegacyObj != null)
+                        legacyObj.LegacyBeatmapComboIndex = lastLegacyObj.LegacyBeatmapComboIndex;
                 }
 
                 lastObj = obj;
