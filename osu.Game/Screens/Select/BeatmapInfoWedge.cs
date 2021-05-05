@@ -48,9 +48,9 @@ namespace osu.Game.Screens.Select
 
         private IBindable<StarDifficulty?> beatmapDifficulty;
 
-        protected Container DisplayedContent;
+        protected Container DisplayedContent { get; private set; }
 
-        protected WedgeInfoText Info;
+        protected WedgeInfoText Info { get; private set; }
 
         public BeatmapInfoWedge()
         {
