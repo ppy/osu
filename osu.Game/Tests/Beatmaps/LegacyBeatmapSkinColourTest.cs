@@ -10,7 +10,6 @@ using osu.Framework.Bindables;
 using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osu.Game.Tests.Visual;
 using osuTK.Graphics;
@@ -66,16 +65,12 @@ namespace osu.Game.Tests.Beatmaps
 
         protected virtual ExposedPlayer CreateTestPlayer(bool userHasCustomColours) => new ExposedPlayer(userHasCustomColours);
 
-        protected class ExposedPlayer : Player
+        protected class ExposedPlayer : TestPlayer
         {
             protected readonly bool UserHasCustomColours;
 
             public ExposedPlayer(bool userHasCustomColours)
-                : base(new PlayerConfiguration
-                {
-                    AllowPause = false,
-                    ShowResults = false,
-                })
+                : base(false, false)
             {
                 UserHasCustomColours = userHasCustomColours;
             }
