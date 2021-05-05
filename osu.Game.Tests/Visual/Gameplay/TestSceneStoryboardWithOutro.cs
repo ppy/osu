@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -119,9 +120,16 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestStoryboardRewind()
         {
+            SkipOverlay.FadeContainer fadeContainer() => Player.ChildrenOfType<SkipOverlay.FadeContainer>().First();
+
             CreateTest(null);
             AddUntilStep("completion set by processor", () => Player.ScoreProcessor.HasCompleted.Value);
+            AddUntilStep("skip overlay content becomes visible", () => fadeContainer().State == Visibility.Visible);
+
             AddStep("rewind", () => Player.GameplayClockContainer.Seek(-1000));
+            AddUntilStep("skip overlay content not visible", () => fadeContainer().State == Visibility.Hidden);
+
+            AddUntilStep("skip overlay content becomes visible", () => fadeContainer().State == Visibility.Visible);
             AddUntilStep("storyboard ends", () => Player.GameplayClockContainer.GameplayClock.CurrentTime >= currentStoryboardDuration);
         }
 
