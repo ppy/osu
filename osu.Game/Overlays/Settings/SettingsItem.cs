@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.Settings
 
         private SpriteText labelText;
 
-        private readonly OsuTextFlowContainer noteText;
+        private readonly OsuTextFlowContainer warningText;
 
         public bool ShowsDefaultIndicator = true;
 
@@ -61,14 +61,14 @@ namespace osu.Game.Overlays.Settings
 
         /// <summary>
         /// Text to be displayed at the bottom of this <see cref="SettingsItem{T}"/>.
-        /// Used for further explanation or indicating drawbacks of the current setting.
+        /// Generally used to recommend the user change their setting as the current one is considered sub-optimal.
         /// </summary>
-        public string NoteText
+        public string WarningText
         {
             set
             {
-                noteText.Alpha = string.IsNullOrWhiteSpace(value) ? 0 : 1;
-                noteText.Text = value;
+                warningText.Alpha = string.IsNullOrWhiteSpace(value) ? 0 : 1;
+                warningText.Text = value;
             }
         }
 
@@ -110,7 +110,7 @@ namespace osu.Game.Overlays.Settings
                     Children = new[]
                     {
                         Control = CreateControl(),
-                        noteText = new OsuTextFlowContainer
+                        warningText = new OsuTextFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
@@ -135,7 +135,7 @@ namespace osu.Game.Overlays.Settings
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            noteText.Colour = colours.Yellow;
+            warningText.Colour = colours.Yellow;
         }
 
         private void updateDisabled()

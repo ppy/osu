@@ -147,7 +147,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
                 const string not_fullscreen_note = "Running without fullscreen mode will increase your input latency!";
 
-                windowModeDropdown.NoteText = mode.NewValue != WindowMode.Fullscreen ? not_fullscreen_note : string.Empty;
+                windowModeDropdown.WarningText = mode.NewValue != WindowMode.Fullscreen ? not_fullscreen_note : string.Empty;
             }, true);
 
             windowModes.BindCollectionChanged((sender, args) =>
