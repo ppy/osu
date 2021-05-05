@@ -12,12 +12,12 @@ namespace osu.Game.Graphics.Containers.Markdown
 {
     public class OsuMarkdownListItem : CompositeDrawable
     {
+        private const float ordered_left_padding = 30;
+        private const float unordered_left_padding = 20;
+
         private readonly int level;
         private readonly int order;
         private readonly bool isOrdered;
-
-        private const float ordered_left_padding = 30;
-        private const float unordered_left_padding = 20;
 
         [Resolved]
         private IMarkdownTextComponent parentTextComponent { get; set; }
