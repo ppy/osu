@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private void load()
         {
             SelectionHandler = CreateSelectionHandler();
-            SelectionHandler.DeselectAll = deselectAll;
+            SelectionHandler.DeselectAll = DeselectAll;
 
             AddRangeInternal(new[]
             {
@@ -105,7 +105,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (endClickSelection(e) || ClickedBlueprint != null)
                 return true;
 
-            deselectAll();
+            DeselectAll();
             return true;
         }
 
@@ -196,7 +196,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     if (!SelectionHandler.SelectedBlueprints.Any())
                         return false;
 
-                    deselectAll();
+                    DeselectAll();
                     return true;
             }
 
@@ -370,7 +370,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Deselects all selected <see cref="SelectionBlueprint{T}"/>s.
         /// </summary>
-        private void deselectAll() => SelectionHandler.SelectedBlueprints.ToList().ForEach(m => m.Deselect());
+        public void DeselectAll() => SelectionHandler.SelectedBlueprints.ToList().ForEach(m => m.Deselect());
 
         protected virtual void OnBlueprintSelected(SelectionBlueprint<T> blueprint)
         {

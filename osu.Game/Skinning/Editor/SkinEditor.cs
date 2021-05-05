@@ -18,6 +18,7 @@ namespace osu.Game.Skinning.Editor
         private readonly Drawable target;
 
         private OsuTextFlowContainer headerText;
+        private SkinBlueprintContainer skinBlueprintContainer;
 
         protected override bool StartHidden => true;
 
@@ -44,7 +45,7 @@ namespace osu.Game.Skinning.Editor
                         Origin = Anchor.TopCentre,
                         RelativeSizeAxes = Axes.X
                     },
-                    new SkinBlueprintContainer(target),
+                    skinBlueprintContainer = new SkinBlueprintContainer(target),
                 }
             };
 
@@ -73,6 +74,7 @@ namespace osu.Game.Skinning.Editor
 
         protected override void PopOut()
         {
+            skinBlueprintContainer.DeselectAll();
             this.FadeOut(TRANSITION_DURATION, Easing.OutQuint);
         }
     }
