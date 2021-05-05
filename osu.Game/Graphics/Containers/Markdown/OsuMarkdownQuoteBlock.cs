@@ -26,7 +26,9 @@ namespace osu.Game.Graphics.Containers.Markdown
 
         protected override Drawable CreateBackground()
         {
-            return background = base.CreateBackground();
+            background = base.CreateBackground();
+            background.Width = 2;
+            return background;
         }
 
         public override MarkdownTextFlowContainer CreateTextFlow()
