@@ -9,7 +9,9 @@ IMPORTANT: Your issue may already be reported.
 Please check:
 - Pinned issues, at the top of https://github.com/ppy/osu/issues
 - Current priority 0 issues at https://github.com/ppy/osu/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3Apriority%3A0
-- Search for your issue. If you find that it already exists, please respond with a reaction or add any further information that may be helpful.
+- Search for your issue. You can use the built-in "AND", "NOT" and "OR" operators together with keywords to help you narrow down your search. If you find that the issue already exists, please respond with a reaction or add any further information that may be helpful. Although please refrain from reiterating issues that have already been pointed out by the author or posting comments such as "+1".
+
+Please also note that if you choose to ignore this template when reporting an issue and have not given enough details, the team may not be able to act on your issue at all.
 -->
 
 
