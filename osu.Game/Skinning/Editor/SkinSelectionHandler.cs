@@ -16,6 +16,47 @@ namespace osu.Game.Skinning.Editor
 {
     public class SkinSelectionHandler : SelectionHandler<ISkinnableComponent>
     {
+        public override bool HandleRotation(float angle)
+        {
+            // TODO: this doesn't correctly account for origin/anchor specs being different in a multi-selection.
+            foreach (var c in SelectedBlueprints)
+                ((Drawable)c.Item).Rotation += angle;
+
+            return base.HandleRotation(angle);
+        }
+
+        public override bool HandleScale(Vector2 scale, Anchor anchor)
+        {
+            adjustScaleFromAnchor(ref scale, anchor);
+
+            foreach (var c in SelectedBlueprints)
+                // TODO: this is temporary and will be fixed with a separate refactor of selection transform logic.
+                ((Drawable)c.Item).Scale += scale * 0.02f;
+
+            return true;
+        }
+
+        public override bool HandleMovement(MoveSelectionEvent<ISkinnableComponent> moveEvent)
+        {
+            foreach (var c in SelectedBlueprints)
+            {
+                Drawable drawable = (Drawable)c.Item;
+                drawable.Position += drawable.ScreenSpaceDeltaToParentSpace(moveEvent.ScreenSpaceDelta);
+            }
+
+            return true;
+        }
+
+        protected override void OnSelectionChanged()
+        {
+            base.OnSelectionChanged();
+
+            SelectionBox.CanRotate = true;
+            SelectionBox.CanScaleX = true;
+            SelectionBox.CanScaleY = true;
+            SelectionBox.CanReverse = false;
+        }
+
         protected override void DeleteItems(IEnumerable<ISkinnableComponent> items)
         {
             foreach (var i in items)
@@ -52,21 +93,9 @@ namespace osu.Game.Skinning.Editor
 
                 return displayableAnchors.Select(a =>
                 {
-                    var countExisting = selection.Count(b => ((Drawable)b.Item).Anchor == a);
-                    var countTotal = selection.Count();
-
-                    TernaryState state;
-
-                    if (countExisting == countTotal)
-                        state = TernaryState.True;
-                    else if (countExisting > 0)
-                        state = TernaryState.Indeterminate;
-                    else
-                        state = TernaryState.False;
-
                     return new AnchorMenuItem(a, selection, _ => applyAnchor(a))
                     {
-                        State = { Value = state }
+                        State = { Value = GetStateFromSelection(selection, c => ((Drawable)c.Item).Anchor == a) }
                     };
                 });
             }
@@ -76,46 +105,6 @@ namespace osu.Game.Skinning.Editor
         {
             foreach (var item in SelectedItems)
                 ((Drawable)item).Anchor = anchor;
-        }
-
-        protected override void OnSelectionChanged()
-        {
-            base.OnSelectionChanged();
-
-            SelectionBox.CanRotate = true;
-            SelectionBox.CanScaleX = true;
-            SelectionBox.CanScaleY = true;
-            SelectionBox.CanReverse = false;
-        }
-
-        public override bool HandleRotation(float angle)
-        {
-            // TODO: this doesn't correctly account for origin/anchor specs being different in a multi-selection.
-            foreach (var c in SelectedBlueprints)
-                ((Drawable)c.Item).Rotation += angle;
-
-            return base.HandleRotation(angle);
-        }
-
-        public override bool HandleScale(Vector2 scale, Anchor anchor)
-        {
-            adjustScaleFromAnchor(ref scale, anchor);
-
-            foreach (var c in SelectedBlueprints)
-                ((Drawable)c.Item).Scale += scale * 0.01f;
-
-            return true;
-        }
-
-        public override bool HandleMovement(MoveSelectionEvent<ISkinnableComponent> moveEvent)
-        {
-            foreach (var c in SelectedBlueprints)
-            {
-                Drawable drawable = (Drawable)c.Item;
-                drawable.Position += drawable.ScreenSpaceDeltaToParentSpace(moveEvent.ScreenSpaceDelta);
-            }
-
-            return true;
         }
 
         private static void adjustScaleFromAnchor(ref Vector2 scale, Anchor reference)
@@ -134,11 +123,6 @@ namespace osu.Game.Skinning.Editor
             public AnchorMenuItem(Anchor anchor, IEnumerable<SelectionBlueprint<ISkinnableComponent>> selection, Action<TernaryState> action)
                 : base(anchor.ToString(), getNextState, MenuItemType.Standard, action)
             {
-            }
-
-            private void updateState(TernaryState obj)
-            {
-                throw new NotImplementedException();
             }
 
             private static TernaryState getNextState(TernaryState state) => TernaryState.True;

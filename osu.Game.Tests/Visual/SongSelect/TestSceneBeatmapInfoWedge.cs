@@ -7,6 +7,7 @@ using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
@@ -112,8 +113,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private void testInfoLabels(int expectedCount)
         {
-            AddAssert("check info labels exists", () => infoWedge.Info.ChildrenOfType<BeatmapInfoWedge.BufferedWedgeInfo.InfoLabel>().Any());
-            AddAssert("check info labels count", () => infoWedge.Info.ChildrenOfType<BeatmapInfoWedge.BufferedWedgeInfo.InfoLabel>().Count() == expectedCount);
+            AddAssert("check info labels exists", () => infoWedge.Info.ChildrenOfType<BeatmapInfoWedge.WedgeInfoText.InfoLabel>().Any());
+            AddAssert("check info labels count", () => infoWedge.Info.ChildrenOfType<BeatmapInfoWedge.WedgeInfoText.InfoLabel>().Count() == expectedCount);
         }
 
         [Test]
@@ -124,7 +125,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("check default title", () => infoWedge.Info.TitleLabel.Current.Value == Beatmap.Default.BeatmapInfo.Metadata.Title);
             AddAssert("check default artist", () => infoWedge.Info.ArtistLabel.Current.Value == Beatmap.Default.BeatmapInfo.Metadata.Artist);
             AddAssert("check empty author", () => !infoWedge.Info.MapperContainer.Children.Any());
-            AddAssert("check no info labels", () => !infoWedge.Info.ChildrenOfType<BeatmapInfoWedge.BufferedWedgeInfo.InfoLabel>().Any());
+            AddAssert("check no info labels", () => !infoWedge.Info.ChildrenOfType<BeatmapInfoWedge.WedgeInfoText.InfoLabel>().Any());
         }
 
         [Test]
@@ -135,15 +136,15 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private void selectBeatmap([CanBeNull] IBeatmap b)
         {
-            BeatmapInfoWedge.BufferedWedgeInfo infoBefore = null;
+            Container containerBefore = null;
 
             AddStep($"select {b?.Metadata.Title ?? "null"} beatmap", () =>
             {
-                infoBefore = infoWedge.Info;
+                containerBefore = infoWedge.DisplayedContent;
                 infoWedge.Beatmap = Beatmap.Value = b == null ? Beatmap.Default : CreateWorkingBeatmap(b);
             });
 
-            AddUntilStep("wait for async load", () => infoWedge.Info != infoBefore);
+            AddUntilStep("wait for async load", () => infoWedge.DisplayedContent != containerBefore);
         }
 
         private IBeatmap createTestBeatmap(RulesetInfo ruleset)
@@ -193,7 +194,9 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private class TestBeatmapInfoWedge : BeatmapInfoWedge
         {
-            public new BufferedWedgeInfo Info => base.Info;
+            public new Container DisplayedContent => base.DisplayedContent;
+
+            public new WedgeInfoText Info => base.Info;
         }
 
         private class TestHitObject : ConvertHitObject, IHasPosition

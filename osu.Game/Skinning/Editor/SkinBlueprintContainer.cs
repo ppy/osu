@@ -29,6 +29,8 @@ namespace osu.Game.Skinning.Editor
         {
             foreach (var c in target.ChildrenOfType<ISkinnableComponent>().ToArray()) AddBlueprintFor(c);
 
+            // We'd hope to eventually be running this in a more sensible way, but this handles situations where new drawables become present (ie. during ongoing gameplay)
+            // or when drawables in the target are loaded asynchronously and may not be immediately available when this BlueprintContainer is loaded.
             Scheduler.AddDelayed(checkForComponents, 1000);
         }
 
