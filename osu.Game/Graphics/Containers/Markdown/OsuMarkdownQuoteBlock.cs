@@ -33,13 +33,11 @@ namespace osu.Game.Graphics.Containers.Markdown
 
         public override MarkdownTextFlowContainer CreateTextFlow()
         {
-            var textFlow = base.CreateTextFlow();
-            textFlow.Margin = new MarginPadding
+            return base.CreateTextFlow().With(f => f.Margin = new MarginPadding
             {
                 Vertical = 10,
                 Horizontal = 20,
-            };
-            return textFlow;
+            });
         }
     }
 }
