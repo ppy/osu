@@ -9,13 +9,12 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osuTK;
@@ -42,10 +41,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private readonly List<SelectionBlueprint<T>> selectedBlueprints;
 
-        private Drawable content;
-
-        private OsuSpriteText selectionDetailsText;
-
         protected SelectionBox SelectionBox { get; private set; }
 
         [Resolved(CanBeNull = true)]
@@ -57,39 +52,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             RelativeSizeAxes = Axes.Both;
             AlwaysPresent = true;
-            Alpha = 0;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            InternalChild = content = new Container
-            {
-                Children = new Drawable[]
-                {
-                    // todo: should maybe be inside the SelectionBox?
-                    new Container
-                    {
-                        Name = "info text",
-                        AutoSizeAxes = Axes.Both,
-                        Children = new Drawable[]
-                        {
-                            new Box
-                            {
-                                Colour = colours.YellowDark,
-                                RelativeSizeAxes = Axes.Both,
-                            },
-                            selectionDetailsText = new OsuSpriteText
-                            {
-                                Padding = new MarginPadding(2),
-                                Colour = colours.Gray0,
-                                Font = OsuFont.Default.With(size: 11)
-                            }
-                        }
-                    },
-                    SelectionBox = CreateSelectionBox(),
-                }
-            };
+            InternalChild = SelectionBox = CreateSelectionBox();
 
             SelectedItems.CollectionChanged += (sender, args) =>
             {
@@ -269,6 +237,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
         }
 
         /// <summary>
+        /// Given a selection target and a function of truth, retrieve the correct ternary state for display.
+        /// </summary>
+        protected static TernaryState GetStateFromSelection<TObject>(IEnumerable<TObject> selection, Func<TObject, bool> func)
+        {
+            if (selection.Any(func))
+                return selection.All(func) ? TernaryState.True : TernaryState.Indeterminate;
+
+            return TernaryState.False;
+        }
+
+        /// <summary>
         /// Called whenever the deletion of items has been requested.
         /// </summary>
         /// <param name="items">The items to be deleted.</param>
@@ -305,9 +284,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             int count = SelectedItems.Count;
 
-            selectionDetailsText.Text = count > 0 ? count.ToString() : string.Empty;
+            SelectionBox.Text = count > 0 ? count.ToString() : string.Empty;
+            SelectionBox.FadeTo(count > 0 ? 1 : 0);
 
-            this.FadeTo(count > 0 ? 1 : 0);
             OnSelectionChanged();
         }
 
@@ -327,20 +306,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 return;
 
             // Move the rectangle to cover the items
-            var topLeft = new Vector2(float.MaxValue, float.MaxValue);
-            var bottomRight = new Vector2(float.MinValue, float.MinValue);
+            RectangleF selectionRect = ToLocalSpace(selectedBlueprints[0].SelectionQuad).AABBFloat;
 
-            foreach (var blueprint in selectedBlueprints)
-            {
-                topLeft = Vector2.ComponentMin(topLeft, ToLocalSpace(blueprint.SelectionQuad.TopLeft));
-                bottomRight = Vector2.ComponentMax(bottomRight, ToLocalSpace(blueprint.SelectionQuad.BottomRight));
-            }
+            for (int i = 1; i < selectedBlueprints.Count; i++)
+                selectionRect = RectangleF.Union(selectionRect, ToLocalSpace(selectedBlueprints[i].SelectionQuad).AABBFloat);
 
-            topLeft -= new Vector2(5);
-            bottomRight += new Vector2(5);
+            selectionRect = selectionRect.Inflate(5f);
 
-            content.Size = bottomRight - topLeft;
-            content.Position = topLeft;
+            SelectionBox.Position = selectionRect.Location;
+            SelectionBox.Size = selectionRect.Size;
         }
 
         #endregion

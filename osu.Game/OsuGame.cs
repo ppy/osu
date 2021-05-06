@@ -80,6 +80,23 @@ namespace osu.Game
 
         private BeatmapSetOverlay beatmapSetOverlay;
 
+        private SkinEditorOverlay skinEditor;
+
+        private Container overlayContent;
+
+        private Container rightFloatingOverlayContent;
+
+        private Container leftFloatingOverlayContent;
+
+        private Container topMostOverlayContent;
+
+        private ScalingContainer screenContainer;
+
+        private Container screenOffsetContainer;
+
+        [Resolved]
+        private FrameworkConfigManager frameworkConfig { get; set; }
+
         [Cached]
         private readonly DifficultyRecommender difficultyRecommender = new DifficultyRecommender();
 
@@ -695,7 +712,7 @@ namespace osu.Game
             var changelogOverlay = loadComponentSingleFile(new ChangelogOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(skinEditor = new SkinEditorContainer(screenContainer), overlayContent.Add);
+            loadComponentSingleFile(skinEditor = new SkinEditorOverlay(screenContainer), overlayContent.Add);
 
             loadComponentSingleFile(new LoginOverlay
             {
@@ -939,23 +956,6 @@ namespace osu.Game
         public void OnReleased(GlobalAction action)
         {
         }
-
-        private Container overlayContent;
-
-        private Container rightFloatingOverlayContent;
-
-        private Container leftFloatingOverlayContent;
-
-        private Container topMostOverlayContent;
-
-        [Resolved]
-        private FrameworkConfigManager frameworkConfig { get; set; }
-
-        private ScalingContainer screenContainer;
-
-        private Container screenOffsetContainer;
-
-        private SkinEditorContainer skinEditor;
 
         protected override bool OnExiting()
         {

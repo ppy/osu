@@ -18,7 +18,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osuTK;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Settings
 {
@@ -36,9 +36,14 @@ namespace osu.Game.Overlays.Settings
 
         private SpriteText labelText;
 
+        private OsuTextFlowContainer warningText;
+
         public bool ShowsDefaultIndicator = true;
 
         public string TooltipText { get; set; }
+
+        [Resolved]
+        private OsuColour colours { get; set; }
 
         public virtual LocalisableString LabelText
         {
@@ -54,6 +59,31 @@ namespace osu.Game.Overlays.Settings
                 }
 
                 labelText.Text = value;
+            }
+        }
+
+        /// <summary>
+        /// Text to be displayed at the bottom of this <see cref="SettingsItem{T}"/>.
+        /// Generally used to recommend the user change their setting as the current one is considered sub-optimal.
+        /// </summary>
+        public string WarningText
+        {
+            set
+            {
+                if (warningText == null)
+                {
+                    // construct lazily for cases where the label is not needed (may be provided by the Control).
+                    FlowContent.Add(warningText = new OsuTextFlowContainer
+                    {
+                        Colour = colours.Yellow,
+                        Margin = new MarginPadding { Bottom = 5 },
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                    });
+                }
+
+                warningText.Alpha = string.IsNullOrWhiteSpace(value) ? 0 : 1;
+                warningText.Text = value;
             }
         }
 
@@ -92,7 +122,10 @@ namespace osu.Game.Overlays.Settings
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Padding = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS },
-                    Child = Control = CreateControl()
+                    Children = new[]
+                    {
+                        Control = CreateControl(),
+                    },
                 },
             };
 
@@ -141,6 +174,7 @@ namespace osu.Game.Overlays.Settings
             {
                 RelativeSizeAxes = Axes.Y;
                 Width = SettingsPanel.CONTENT_MARGINS;
+                Padding = new MarginPadding { Vertical = 1.5f };
                 Alpha = 0f;
             }
 
@@ -163,7 +197,7 @@ namespace osu.Game.Overlays.Settings
                         Type = EdgeEffectType.Glow,
                         Radius = 2,
                     },
-                    Size = new Vector2(0.33f, 0.8f),
+                    Width = 0.33f,
                     Child = new Box { RelativeSizeAxes = Axes.Both },
                 };
             }
@@ -193,12 +227,6 @@ namespace osu.Game.Overlays.Settings
             protected override void OnHoverLost(HoverLostEvent e)
             {
                 hovering = false;
-                UpdateState();
-            }
-
-            public void SetButtonColour(Color4 buttonColour)
-            {
-                this.buttonColour = buttonColour;
                 UpdateState();
             }
 

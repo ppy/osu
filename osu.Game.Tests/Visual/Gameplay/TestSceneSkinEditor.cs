@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("add editor overlay", () =>
             {
                 skinEditor?.Expire();
-                Player.ScaleTo(SkinEditorContainer.VISIBLE_TARGET_SCALE);
+                Player.ScaleTo(SkinEditorOverlay.VISIBLE_TARGET_SCALE);
                 LoadComponentAsync(skinEditor = new SkinEditor(Player), Add);
             });
         }
