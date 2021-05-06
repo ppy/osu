@@ -7,7 +7,7 @@ using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Rulesets.EmptyScrolling.Replays
 {
-    public class EmptyScrollingAutoGenerator : FramedAutoGenerator<EmptyScrollingReplayFrame>
+    public class EmptyScrollingAutoGenerator : AutoGenerator<EmptyScrollingReplayFrame>
     {
         public new Beatmap<EmptyScrollingHitObject> Beatmap => (Beatmap<EmptyScrollingHitObject>)base.Beatmap;
 

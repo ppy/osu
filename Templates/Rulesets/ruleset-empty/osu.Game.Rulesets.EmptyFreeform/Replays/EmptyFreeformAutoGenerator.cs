@@ -7,7 +7,7 @@ using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Rulesets.EmptyFreeform.Replays
 {
-    public class EmptyFreeformAutoGenerator : FramedAutoGenerator<EmptyFreeformReplayFrame>
+    public class EmptyFreeformAutoGenerator : AutoGenerator<EmptyFreeformReplayFrame>
     {
         public new Beatmap<EmptyFreeformHitObject> Beatmap => (Beatmap<EmptyFreeformHitObject>)base.Beatmap;
 

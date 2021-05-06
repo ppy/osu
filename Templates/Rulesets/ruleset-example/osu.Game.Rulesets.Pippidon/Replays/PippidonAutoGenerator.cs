@@ -7,7 +7,7 @@ using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Rulesets.Pippidon.Replays
 {
-    public class PippidonAutoGenerator : FramedAutoGenerator<PippidonReplayFrame>
+    public class PippidonAutoGenerator : AutoGenerator<PippidonReplayFrame>
     {
         public new Beatmap<PippidonHitObject> Beatmap => (Beatmap<PippidonHitObject>)base.Beatmap;
 
