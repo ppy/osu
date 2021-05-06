@@ -4,23 +4,24 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers.Markdown;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.Containers.Markdown
 {
     public class OsuMarkdownSeparator : MarkdownSeparator
     {
-        private Drawable separator;
+        protected override Drawable CreateSeparator() => new Separator();
 
-        [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private class Separator : Box
         {
-            separator.Colour = colourProvider.Background3;
-        }
-
-        protected override Drawable CreateSeparator()
-        {
-            return separator = base.CreateSeparator();
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                RelativeSizeAxes = Axes.X;
+                Height = 1;
+                Colour = colourProvider.Background3;
+            }
         }
     }
 }
