@@ -57,11 +57,11 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
         {
             base.LoadComplete();
 
-            backgroundSourceDropdown.Current.BindValueChanged(source =>
+            user.BindValueChanged(u =>
             {
                 const string not_supporter_note = "Changes to this setting will only apply with an active osu!supporter tag.";
 
-                backgroundSourceDropdown.WarningText = user.Value?.IsSupporter != true ? not_supporter_note : string.Empty;
+                backgroundSourceDropdown.WarningText = u.NewValue?.IsSupporter != true ? not_supporter_note : string.Empty;
             }, true);
         }
     }
