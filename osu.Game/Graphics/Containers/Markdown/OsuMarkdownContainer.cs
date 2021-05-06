@@ -16,6 +16,11 @@ namespace osu.Game.Graphics.Containers.Markdown
 {
     public class OsuMarkdownContainer : MarkdownContainer
     {
+        public OsuMarkdownContainer()
+        {
+            LineSpacing = 21;
+        }
+
         protected override void AddMarkdownComponent(IMarkdownObject markdownObject, FillFlowContainer container, int level)
         {
             switch (markdownObject)
