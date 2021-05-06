@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers.Markdown;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.Containers.Markdown
@@ -30,7 +31,6 @@ namespace osu.Game.Graphics.Containers.Markdown
                 RelativeSizeAxes = Axes.X,
             };
 
-            // TODO : Change font weight to 700 for heading
             if (isHeading)
             {
                 border.Colour = colourProvider.Background3;
@@ -47,6 +47,24 @@ namespace osu.Game.Graphics.Containers.Markdown
             }
 
             AddInternal(border);
+        }
+
+        public override MarkdownTextFlowContainer CreateTextFlow() => new TableCellTextFlowContainer
+        {
+            Weight = isHeading ? FontWeight.Bold : FontWeight.Regular,
+            Padding = new MarginPadding(10),
+        };
+
+        private class TableCellTextFlowContainer : OsuMarkdownTextFlowContainer
+        {
+            public FontWeight Weight { get; set; }
+
+            protected override SpriteText CreateSpriteText()
+            {
+                var spriteText = base.CreateSpriteText();
+                spriteText.Font = spriteText.Font.With(weight: Weight);
+                return spriteText;
+            }
         }
     }
 }
