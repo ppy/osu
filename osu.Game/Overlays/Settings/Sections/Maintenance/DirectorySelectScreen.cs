@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
     {
         private TriangleButton selectionButton;
 
-        protected DirectorySelector DirectorySelector { get; private set; }
+        private DirectorySelector directorySelector;
 
         protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
 
@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                             },
                             new Drawable[]
                             {
-                                DirectorySelector = new DirectorySelector
+                                directorySelector = new DirectorySelector
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 }
@@ -92,7 +92,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                                     Origin = Anchor.Centre,
                                     Width = 300,
                                     Text = "Select directory",
-                                    Action = () => OnSelection(DirectorySelector.CurrentPath.Value)
+                                    Action = () => OnSelection(directorySelector.CurrentPath.Value)
                                 },
                             }
                         }
@@ -104,9 +104,9 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         protected override void LoadComplete()
         {
             if (InitialPath != null)
-                DirectorySelector.CurrentPath.Value = InitialPath;
+                directorySelector.CurrentPath.Value = InitialPath;
 
-            DirectorySelector.CurrentPath.BindValueChanged(e => selectionButton.Enabled.Value = IsValidDirectory(e.NewValue), true);
+            directorySelector.CurrentPath.BindValueChanged(e => selectionButton.Enabled.Value = IsValidDirectory(e.NewValue), true);
             base.LoadComplete();
         }
 
