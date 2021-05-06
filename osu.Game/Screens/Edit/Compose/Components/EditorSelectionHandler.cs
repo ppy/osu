@@ -108,17 +108,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        /// <summary>
-        /// Given a selection target and a function of truth, retrieve the correct ternary state for display.
-        /// </summary>
-        protected TernaryState GetStateFromSelection<T>(IEnumerable<T> selection, Func<T, bool> func)
-        {
-            if (selection.Any(func))
-                return selection.All(func) ? TernaryState.True : TernaryState.Indeterminate;
-
-            return TernaryState.False;
-        }
-
         #endregion
 
         #region Ternary state changes
