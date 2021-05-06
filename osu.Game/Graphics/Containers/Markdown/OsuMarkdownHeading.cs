@@ -24,6 +24,9 @@ namespace osu.Game.Graphics.Containers.Markdown
 
         protected override float GetFontSizeByLevel(int level)
         {
+            // Reference for this font size
+            // https://github.com/ppy/osu-web/blob/376cac43a051b9c85ce95e2c446099be187b3e45/resources/assets/less/bem/osu-md.less#L9
+            // https://github.com/ppy/osu-web/blob/376cac43a051b9c85ce95e2c446099be187b3e45/resources/assets/less/variables.less#L161
             const float base_font_size = 14;
 
             switch (level)
