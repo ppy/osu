@@ -91,16 +91,16 @@ namespace osu.Game.Screens.Play
                         {
                             new Drawable[]
                             {
-                                new Container
+                                new MainHUDElements
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Children = new Drawable[]
                                     {
-                                        HealthDisplay = CreateHealthDisplay(),
-                                        AccuracyCounter = CreateAccuracyCounter(),
-                                        ScoreCounter = CreateScoreCounter(),
-                                        CreateComboCounter(),
-                                        CreateHitErrorDisplayOverlay(),
+                                        HealthDisplay = new SkinnableHealthDisplay(),
+                                        AccuracyCounter = new SkinnableAccuracyCounter(),
+                                        ScoreCounter = new SkinnableScoreCounter(),
+                                        new SkinnableComboCounter(),
+                                        new HitErrorDisplay(this.drawableRuleset?.FirstAvailableHitWindows),
                                     }
                                 },
                             },
@@ -263,48 +263,38 @@ namespace osu.Game.Screens.Play
             Progress.BindDrawableRuleset(drawableRuleset);
         }
 
-        protected SkinnableAccuracyCounter CreateAccuracyCounter() => new SkinnableAccuracyCounter();
-
-        protected SkinnableScoreCounter CreateScoreCounter() => new SkinnableScoreCounter();
-
-        protected SkinnableComboCounter CreateComboCounter() => new SkinnableComboCounter();
-
-        protected SkinnableHealthDisplay CreateHealthDisplay() => new SkinnableHealthDisplay();
-
-        protected virtual FailingLayer CreateFailingLayer() => new FailingLayer
+        protected FailingLayer CreateFailingLayer() => new FailingLayer
         {
             ShowHealth = { BindTarget = ShowHealthbar }
         };
 
-        protected virtual KeyCounterDisplay CreateKeyCounter() => new KeyCounterDisplay
+        protected KeyCounterDisplay CreateKeyCounter() => new KeyCounterDisplay
         {
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,
         };
 
-        protected virtual SongProgress CreateProgress() => new SongProgress
+        protected SongProgress CreateProgress() => new SongProgress
         {
             Anchor = Anchor.BottomLeft,
             Origin = Anchor.BottomLeft,
             RelativeSizeAxes = Axes.X,
         };
 
-        protected virtual HoldForMenuButton CreateHoldForMenuButton() => new HoldForMenuButton
+        protected HoldForMenuButton CreateHoldForMenuButton() => new HoldForMenuButton
         {
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,
         };
 
-        protected virtual ModDisplay CreateModsContainer() => new ModDisplay
+        protected ModDisplay CreateModsContainer() => new ModDisplay
         {
             Anchor = Anchor.TopRight,
             Origin = Anchor.TopRight,
             AutoSizeAxes = Axes.Both,
         };
 
-        protected virtual HitErrorDisplay CreateHitErrorDisplayOverlay() => new HitErrorDisplay(drawableRuleset?.FirstAvailableHitWindows);
-
-        protected virtual PlayerSettingsOverlay CreatePlayerSettingsOverlay() => new PlayerSettingsOverlay();
+        protected PlayerSettingsOverlay CreatePlayerSettingsOverlay() => new PlayerSettingsOverlay();
 
         public bool OnPressed(GlobalAction action)
         {
@@ -346,6 +336,10 @@ namespace osu.Game.Screens.Play
                     updateVisibility();
                     break;
             }
+        }
+
+        public class MainHUDElements : SkinnableElementTargetContainer
+        {
         }
     }
 }

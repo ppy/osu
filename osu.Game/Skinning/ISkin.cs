@@ -57,5 +57,7 @@ namespace osu.Game.Skinning
         /// <returns>A matching value boxed in an <see cref="IBindable{TValue}"/>, or null if unavailable.</returns>
         [CanBeNull]
         IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup);
+
+        // IEnumerable<ISkinnableInfo> ComponentInfo { get; }
     }
 }

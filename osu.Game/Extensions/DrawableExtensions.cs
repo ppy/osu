@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Threading;
+using osu.Game.Screens.Play.HUD;
 using osuTK;
 
 namespace osu.Game.Extensions
@@ -43,5 +44,7 @@ namespace osu.Game.Extensions
         /// <returns>The delta vector in Parent's coordinates.</returns>
         public static Vector2 ScreenSpaceDeltaToParentSpace(this Drawable drawable, Vector2 delta) =>
             drawable.Parent.ToLocalSpace(drawable.Parent.ToScreenSpace(Vector2.Zero) + delta);
+
+        public static StoredSkinnableInfo CreateSerialisedInformation(this Drawable component) => new StoredSkinnableInfo(component);
     }
 }
