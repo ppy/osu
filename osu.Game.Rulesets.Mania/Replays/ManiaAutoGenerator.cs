@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Rulesets.Mania.Replays
 {
-    internal class ManiaAutoGenerator : FramedAutoGenerator<ManiaReplayFrame>
+    internal class ManiaAutoGenerator : AutoGenerator<ManiaReplayFrame>
     {
         public const double RELEASE_DELAY = 20;
 

@@ -12,7 +12,7 @@ using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Rulesets.Catch.Replays
 {
-    internal class CatchAutoGenerator : FramedAutoGenerator<CatchReplayFrame>
+    internal class CatchAutoGenerator : AutoGenerator<CatchReplayFrame>
     {
         public new CatchBeatmap Beatmap => (CatchBeatmap)base.Beatmap;
 

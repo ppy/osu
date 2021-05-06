@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Replays
 {
-    public class TaikoAutoGenerator : FramedAutoGenerator<TaikoReplayFrame>
+    public class TaikoAutoGenerator : AutoGenerator<TaikoReplayFrame>
     {
         public new TaikoBeatmap Beatmap => (TaikoBeatmap)base.Beatmap;
 
