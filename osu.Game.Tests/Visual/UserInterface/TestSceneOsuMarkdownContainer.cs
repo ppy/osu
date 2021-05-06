@@ -96,6 +96,19 @@ _**italic with underscore, bold with asterisk**_";
         }
 
         [Test]
+        public void TestParagraph()
+        {
+            AddStep("Add paragraph", () =>
+            {
+                markdownContainer.Text = @"first paragraph
+
+second paragraph
+
+third paragraph";
+            });
+        }
+
+        [Test]
         public void TestFencedCodeBlock()
         {
             AddStep("Add Code Block", () =>
