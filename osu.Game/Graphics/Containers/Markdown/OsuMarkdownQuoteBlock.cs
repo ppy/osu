@@ -5,31 +5,19 @@ using Markdig.Syntax;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers.Markdown;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.Containers.Markdown
 {
     public class OsuMarkdownQuoteBlock : MarkdownQuoteBlock
     {
-        private Drawable background;
-
         public OsuMarkdownQuoteBlock(QuoteBlock quoteBlock)
             : base(quoteBlock)
         {
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
-        {
-            background.Colour = colourProvider.Content2;
-        }
-
-        protected override Drawable CreateBackground()
-        {
-            background = base.CreateBackground();
-            background.Width = 2;
-            return background;
-        }
+        protected override Drawable CreateBackground() => new QuoteBackground();
 
         public override MarkdownTextFlowContainer CreateTextFlow()
         {
@@ -38,6 +26,19 @@ namespace osu.Game.Graphics.Containers.Markdown
                 Vertical = 10,
                 Horizontal = 20,
             });
+        }
+
+        private class QuoteBackground : Box
+        {
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                Anchor = Anchor.CentreLeft;
+                Origin = Anchor.CentreLeft;
+                RelativeSizeAxes = Axes.Y;
+                Width = 2;
+                Colour = colourProvider.Content2;
+            }
         }
     }
 }
