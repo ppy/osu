@@ -12,33 +12,34 @@ namespace osu.Game.Graphics.Containers.Markdown
 {
     public class OsuMarkdownFencedCodeBlock : MarkdownFencedCodeBlock
     {
-        private Box background;
-        private MarkdownTextFlowContainer textFlow;
-
+        // TODO : change to monospace font for this component
         public OsuMarkdownFencedCodeBlock(FencedCodeBlock fencedCodeBlock)
             : base(fencedCodeBlock)
         {
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
-        {
-            // TODO : Change to monospace font to match with osu-web
-            background.Colour = colourProvider.Background6;
-            textFlow.Colour = colourProvider.Light1;
-        }
+        protected override Drawable CreateBackground() => new CodeBlockBackground();
 
-        protected override Drawable CreateBackground()
+        public override MarkdownTextFlowContainer CreateTextFlow() => new CodeBlockTextFlowContainer();
+
+        private class CodeBlockBackground : Box
         {
-            return background = new Box
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
             {
-                RelativeSizeAxes = Axes.Both,
-            };
+                RelativeSizeAxes = Axes.Both;
+                Colour = colourProvider.Background6;
+            }
         }
 
-        public override MarkdownTextFlowContainer CreateTextFlow()
+        private class CodeBlockTextFlowContainer : OsuMarkdownTextFlowContainer
         {
-            return textFlow = base.CreateTextFlow();
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                Colour = colourProvider.Light1;
+                Margin = new MarginPadding(10);
+            }
         }
     }
 }
