@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class DefaultComboCounter : RollingCounter<int>, IComboCounter
+    public class DefaultComboCounter : RollingCounter<int>
     {
         private readonly Vector2 offset = new Vector2(20, 5);
 
