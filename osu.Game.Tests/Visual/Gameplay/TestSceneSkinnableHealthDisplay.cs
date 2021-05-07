@@ -10,6 +10,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Judgements;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
 
@@ -21,7 +22,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override Ruleset CreateRulesetForSkinProvider() => new OsuRuleset();
 
-        [Cached]
+        [Cached(typeof(HealthProcessor))]
         private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
 
         [SetUpSteps]
@@ -53,7 +54,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddRepeatStep(@"increase hp with flash", delegate
             {
                 healthProcessor.Health.Value = 0.1f;
-                healthProcessor.ApplyResult(new JudgementResult(null, new OsuJudgement()));
+                healthProcessor.ApplyResult(new JudgementResult(new HitCircle(), new OsuJudgement()));
             }, 3);
         }
     }

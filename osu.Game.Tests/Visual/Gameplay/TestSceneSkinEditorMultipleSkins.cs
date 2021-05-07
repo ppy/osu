@@ -21,6 +21,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached]
         private readonly ScoreProcessor scoreProcessor = new ScoreProcessor();
 
+        [Cached(typeof(HealthProcessor))]
+        private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
+
         [SetUpSteps]
         public void SetUpSteps()
         {

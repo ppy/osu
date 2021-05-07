@@ -27,6 +27,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached]
         private ScoreProcessor scoreProcessor = new ScoreProcessor();
 
+        [Cached(typeof(HealthProcessor))]
+        private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
+
         private IEnumerable<HUDOverlay> hudOverlays => CreatedDrawables.OfType<HUDOverlay>();
 
         // best way to check without exposing.
