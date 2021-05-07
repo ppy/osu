@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestLayerFading()
         {
-            create(new DrainingHealthProcessor(1));
+            create(new DrainingHealthProcessor(0));
 
             AddSliderStep("current health", 0.0, 1.0, 1.0, val =>
             {
@@ -62,7 +62,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestLayerDisabledViaConfig()
         {
-            create(new DrainingHealthProcessor(1));
+            create(new DrainingHealthProcessor(0));
             AddUntilStep("layer is visible", () => layer.IsPresent);
             AddStep("disable layer", () => config.SetValue(OsuSetting.FadePlayfieldWhenHealthLow, false));
             AddStep("set health to 0.10", () => layer.Current.Value = 0.1);
@@ -81,7 +81,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestLayerVisibilityWithDrainingProcessor()
         {
-            create(new DrainingHealthProcessor(1));
+            create(new DrainingHealthProcessor(0));
             AddStep("set health to 0.10", () => layer.Current.Value = 0.1);
             AddWaitStep("wait for potential fade", 10);
             AddAssert("layer is still visible", () => layer.IsPresent);
@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestLayerVisibilityWithDifferentOptions()
         {
-            create(new DrainingHealthProcessor(1));
+            create(new DrainingHealthProcessor(0));
 
             AddStep("set health to 0.10", () => layer.Current.Value = 0.1);
 
