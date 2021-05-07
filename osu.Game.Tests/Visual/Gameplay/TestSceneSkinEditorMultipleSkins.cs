@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                     var drawableRuleset = ruleset.CreateDrawableRulesetWith(beatmap);
 
-                    var hudOverlay = new HUDOverlay(scoreProcessor, null, drawableRuleset, Array.Empty<Mod>())
+                    var hudOverlay = new HUDOverlay(scoreProcessor, drawableRuleset, Array.Empty<Mod>())
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -40,7 +40,6 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                     // Add any key just to display the key counter visually.
                     hudOverlay.KeyCounter.Add(new KeyCounterKeyboard(Key.Space));
-                    hudOverlay.ComboCounter.Current.Value = 1;
 
                     return new Container
                     {
