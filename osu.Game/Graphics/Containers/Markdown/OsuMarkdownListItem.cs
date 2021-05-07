@@ -1,41 +1,34 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using Markdig.Syntax;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Containers.Markdown;
+using osu.Framework.Graphics.Sprites;
 using osuTK;
 
 namespace osu.Game.Graphics.Containers.Markdown
 {
-    public class OsuMarkdownListItem : CompositeDrawable
+    public abstract class OsuMarkdownListItem : CompositeDrawable
     {
-        private const float ordered_left_padding = 30;
-        private const float unordered_left_padding = 20;
-
-        private readonly int level;
-        private readonly int order;
-        private readonly bool isOrdered;
-
         [Resolved]
         private IMarkdownTextComponent parentTextComponent { get; set; }
 
-        public FillFlowContainer Content { get; }
+        public FillFlowContainer Content { get; private set; }
 
-        public OsuMarkdownListItem(ListItemBlock listItemBlock, int level)
+        protected OsuMarkdownListItem()
         {
-            this.level = level;
-            order = listItemBlock.Order;
-            isOrdered = ((ListBlock)listItemBlock.Parent).IsOrdered;
-
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
-            Padding = new MarginPadding { Left = isOrdered ? ordered_left_padding : unordered_left_padding };
+        }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             InternalChildren = new Drawable[]
             {
+                CreateMarker(),
                 Content = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Y,
@@ -46,51 +39,6 @@ namespace osu.Game.Graphics.Containers.Markdown
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            var marker = parentTextComponent.CreateSpriteText();
-            marker.Text = GetTextMarker(level, isOrdered);
-
-            if (isOrdered)
-            {
-                marker.X = -ordered_left_padding;
-            }
-            else
-            {
-                marker.Font = OsuFont.GetFont(size: marker.Font.Size / 2);
-                marker.Origin = Anchor.Centre;
-                marker.X = -unordered_left_padding / 2;
-                marker.Y = marker.Font.Size;
-            }
-
-            AddInternal(marker);
-        }
-
-        /// <summary>
-        /// Get text marker based on <paramref name="level"/> and <paramref name="isOrdered"/>.
-        /// </summary>
-        /// <param name="level">The markdown level of current list item.</param>
-        /// <param name="isOrdered">Is true if the list item is an ordered list.</param>
-        /// <returns></returns>
-        protected virtual string GetTextMarker(int level, bool isOrdered)
-        {
-            if (isOrdered)
-            {
-                return $"{order}.";
-            }
-
-            switch (level)
-            {
-                case 1:
-                    return "●";
-
-                case 2:
-                    return "○";
-
-                default:
-                    return "■";
-            }
-        }
+        protected virtual SpriteText CreateMarker() => parentTextComponent.CreateSpriteText();
     }
 }
