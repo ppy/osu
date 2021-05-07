@@ -30,7 +30,8 @@ namespace osu.Game.Graphics.Containers.Markdown
                     break;
 
                 case ListItemBlock listItemBlock:
-                    var childContainer = CreateListItem(listItemBlock, level);
+                    var isOrdered = ((ListBlock)listItemBlock.Parent).IsOrdered;
+                    var childContainer = CreateListItem(listItemBlock, level, isOrdered);
                     container.Add(childContainer);
                     foreach (var single in listItemBlock)
                         base.AddMarkdownComponent(single, childContainer.Content, level);
@@ -64,7 +65,13 @@ namespace osu.Game.Graphics.Containers.Markdown
             Padding = new MarginPadding(0)
         };
 
-        protected virtual OsuMarkdownListItem CreateListItem(ListItemBlock listItemBlock, int level) => new OsuMarkdownListItem(listItemBlock, level);
+        protected virtual OsuMarkdownListItem CreateListItem(ListItemBlock listItemBlock, int level, bool isOrdered)
+        {
+            if (isOrdered)
+                return new OsuMarkdownOrderedListItem(listItemBlock.Order);
+
+            return new OsuMarkdownUnorderedListItem(level);
+        }
 
         protected override MarkdownPipeline CreateBuilder()
             => new MarkdownPipelineBuilder().UseAutoIdentifiers(AutoIdentifierOptions.GitHub)
