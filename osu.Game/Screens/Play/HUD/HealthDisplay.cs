@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Judgements;
@@ -11,26 +12,42 @@ namespace osu.Game.Screens.Play.HUD
 {
     /// <summary>
     /// A container for components displaying the current player health.
-    /// Gets bound automatically to the <see cref="HealthProcessor"/> when inserted to <see cref="DrawableRuleset.Overlays"/> hierarchy.
+    /// Gets bound automatically to the <see cref="Rulesets.Scoring.HealthProcessor"/> when inserted to <see cref="DrawableRuleset.Overlays"/> hierarchy.
     /// </summary>
-    public abstract class HealthDisplay : Container, IHealthDisplay
+    public abstract class HealthDisplay : Container
     {
+        [Resolved]
+        protected HealthProcessor HealthProcessor { get; private set; }
+
         public Bindable<double> Current { get; } = new BindableDouble(1)
         {
             MinValue = 0,
             MaxValue = 1
         };
 
-        public virtual void Flash(JudgementResult result)
+        protected virtual void Flash(JudgementResult result)
         {
         }
 
-        /// <summary>
-        /// Bind the tracked fields of <see cref="HealthProcessor"/> to this health display.
-        /// </summary>
-        public virtual void BindHealthProcessor(HealthProcessor processor)
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            Current.BindTo(processor.Health);
+            Current.BindTo(HealthProcessor.Health);
+
+            HealthProcessor.NewJudgement += onNewJudgement;
+        }
+
+        private void onNewJudgement(JudgementResult judgement)
+        {
+            if (judgement.IsHit && judgement.Type != HitResult.IgnoreHit) Flash(judgement);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (HealthProcessor != null)
+                HealthProcessor.NewJudgement -= onNewJudgement;
         }
     }
 }
