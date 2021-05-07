@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private ScoreProcessor scoreProcessor = new ScoreProcessor();
 
         [Cached(typeof(HealthProcessor))]
-        private HealthProcessor healthProcessor = new DrainingHealthProcessor(1);
+        private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
 
         // best way to check without exposing.
         private Drawable hideTarget => hudOverlay.KeyCounter;
