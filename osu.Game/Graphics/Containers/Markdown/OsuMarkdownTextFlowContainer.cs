@@ -3,6 +3,7 @@
 
 using Markdig.Syntax.Inlines;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers.Markdown;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
@@ -28,10 +29,6 @@ namespace osu.Game.Graphics.Containers.Markdown
             => AddText(codeInline.Content, t => { t.Colour = colourProvider.Light1; });
 
         protected override SpriteText CreateEmphasisedSpriteText(bool bold, bool italic)
-        {
-            var spriteText = CreateSpriteText();
-            spriteText.Font = spriteText.Font.With(weight: bold ? FontWeight.Bold : FontWeight.Regular, italics: italic);
-            return spriteText;
-        }
+            => CreateSpriteText().With(t => t.Font = t.Font.With(weight: bold ? FontWeight.Bold : FontWeight.Regular, italics: italic));
     }
 }
