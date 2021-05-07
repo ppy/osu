@@ -12,7 +12,7 @@ using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    internal class TimingSection : Section<TimingControlPoint>
+    internal class TimingSection : ControlPointSection<TimingControlPoint>
     {
         private SettingsSlider<double> bpmSlider;
         private SettingsEnumDropdown<TimeSignatures> timeSignature;

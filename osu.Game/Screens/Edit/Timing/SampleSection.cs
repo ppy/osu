@@ -9,7 +9,7 @@ using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    internal class SampleSection : Section<SampleControlPoint>
+    internal class SampleSection : ControlPointSection<SampleControlPoint>
     {
         private LabelledTextBox bank;
         private SliderWithTextBoxInput<int> volume;

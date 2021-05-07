@@ -7,7 +7,7 @@ using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    internal class DifficultySection : Section<DifficultyControlPoint>
+    internal class DifficultySection : ControlPointSection<DifficultyControlPoint>
     {
         private SliderWithTextBoxInput<double> multiplierSlider;
 

@@ -8,7 +8,7 @@ using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Screens.Edit.Timing
 {
-    internal class EffectSection : Section<EffectControlPoint>
+    internal class EffectSection : ControlPointSection<EffectControlPoint>
     {
         private LabelledSwitchButton kiai;
         private LabelledSwitchButton omitBarLine;
