@@ -11,7 +11,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -50,7 +49,9 @@ namespace osu.Game.Screens.Select
 
         private IBindable<StarDifficulty?> beatmapDifficulty;
 
-        protected BufferedWedgeInfo Info;
+        protected Container DisplayedContent { get; private set; }
+
+        protected WedgeInfoText Info { get; private set; }
 
         public BeatmapInfoWedge()
         {
@@ -111,9 +112,9 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        public override bool IsPresent => base.IsPresent || Info == null; // Visibility is updated in the LoadComponentAsync callback
+        public override bool IsPresent => base.IsPresent || DisplayedContent == null; // Visibility is updated in the LoadComponentAsync callback
 
-        private BufferedWedgeInfo loadingInfo;
+        private Container loadingInfo;
 
         private void updateDisplay()
         {
@@ -125,9 +126,9 @@ namespace osu.Game.Screens.Select
                 {
                     State.Value = beatmap == null ? Visibility.Hidden : Visibility.Visible;
 
-                    Info?.FadeOut(250);
-                    Info?.Expire();
-                    Info = null;
+                    DisplayedContent?.FadeOut(250);
+                    DisplayedContent?.Expire();
+                    DisplayedContent = null;
                 }
 
                 if (beatmap == null)
@@ -136,17 +137,23 @@ namespace osu.Game.Screens.Select
                     return;
                 }
 
-                LoadComponentAsync(loadingInfo = new BufferedWedgeInfo(beatmap, ruleset.Value, mods.Value, beatmapDifficulty.Value ?? new StarDifficulty())
+                LoadComponentAsync(loadingInfo = new Container
                 {
+                    RelativeSizeAxes = Axes.Both,
                     Shear = -Shear,
-                    Depth = Info?.Depth + 1 ?? 0
+                    Depth = DisplayedContent?.Depth + 1 ?? 0,
+                    Children = new Drawable[]
+                    {
+                        new BeatmapInfoWedgeBackground(beatmap),
+                        Info = new WedgeInfoText(beatmap, ruleset.Value, mods.Value, beatmapDifficulty.Value ?? new StarDifficulty()),
+                    }
                 }, loaded =>
                 {
                     // ensure we are the most recent loaded wedge.
                     if (loaded != loadingInfo) return;
 
                     removeOldInfo();
-                    Add(Info = loaded);
+                    Add(DisplayedContent = loaded);
                 });
             }
         }
@@ -157,7 +164,7 @@ namespace osu.Game.Screens.Select
             cancellationSource?.Cancel();
         }
 
-        public class BufferedWedgeInfo : BufferedContainer
+        public class WedgeInfoText : Container
         {
             public OsuSpriteText VersionLabel { get; private set; }
             public OsuSpriteText TitleLabel { get; private set; }
@@ -177,8 +184,7 @@ namespace osu.Game.Screens.Select
 
             private ModSettingChangeTracker settingChangeTracker;
 
-            public BufferedWedgeInfo(WorkingBeatmap beatmap, RulesetInfo userRuleset, IReadOnlyList<Mod> mods, StarDifficulty difficulty)
-                : base(pixelSnapping: true)
+            public WedgeInfoText(WorkingBeatmap beatmap, RulesetInfo userRuleset, IReadOnlyList<Mod> mods, StarDifficulty difficulty)
             {
                 this.beatmap = beatmap;
                 ruleset = userRuleset ?? beatmap.BeatmapInfo.Ruleset;
@@ -192,7 +198,6 @@ namespace osu.Game.Screens.Select
                 var beatmapInfo = beatmap.BeatmapInfo;
                 var metadata = beatmapInfo.Metadata ?? beatmap.BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
 
-                CacheDrawnFrameBuffer = true;
                 RelativeSizeAxes = Axes.Both;
 
                 titleBinding = localisation.GetLocalisedString(new RomanisableString(metadata.TitleUnicode, metadata.Title));
@@ -200,32 +205,6 @@ namespace osu.Game.Screens.Select
 
                 Children = new Drawable[]
                 {
-                    // We will create the white-to-black gradient by modulating transparency and having
-                    // a black backdrop. This results in an sRGB-space gradient and not linear space,
-                    // transitioning from white to black more perceptually uniformly.
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black,
-                    },
-                    // We use a container, such that we can set the colour gradient to go across the
-                    // vertices of the masked container instead of the vertices of the (larger) sprite.
-                    new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = ColourInfo.GradientVertical(Color4.White, Color4.White.Opacity(0.3f)),
-                        Children = new[]
-                        {
-                            // Zoomed-in and cropped beatmap background
-                            new BeatmapBackgroundSprite(beatmap)
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                FillMode = FillMode.Fill,
-                            },
-                        },
-                    },
                     new DifficultyColourBar(starDifficulty)
                     {
                         RelativeSizeAxes = Axes.Y,
@@ -341,7 +320,6 @@ namespace osu.Game.Screens.Select
             {
                 ArtistLabel.Text = artistBinding.Value;
                 TitleLabel.Text = string.IsNullOrEmpty(source) ? titleBinding.Value : source + " — " + titleBinding.Value;
-                ForceRedraw();
             }
 
             private void addInfoLabels()
@@ -427,8 +405,6 @@ namespace osu.Game.Screens.Select
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Bpm),
                     Content = labelText
                 });
-
-                ForceRedraw();
             }
 
             private Drawable getMapper(BeatmapMetadata metadata)
