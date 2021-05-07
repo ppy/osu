@@ -6,7 +6,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class SkinnableAccuracyCounter : SkinnableDrawable, IAccuracyCounter
+    public class SkinnableAccuracyCounter : SkinnableDrawable
     {
         public Bindable<double> Current { get; } = new Bindable<double>();
 
@@ -14,16 +14,6 @@ namespace osu.Game.Screens.Play.HUD
             : base(new HUDSkinComponent(HUDSkinComponents.AccuracyCounter), _ => new DefaultAccuracyCounter())
         {
             CentreComponent = false;
-        }
-
-        private IAccuracyCounter skinnedCounter;
-
-        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
-        {
-            base.SkinChanged(skin, allowFallback);
-
-            skinnedCounter = Drawable as IAccuracyCounter;
-            skinnedCounter?.Current.BindTo(Current);
         }
     }
 }
