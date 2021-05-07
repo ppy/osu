@@ -167,7 +167,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 GetModButton(mod).SelectNext(1);
 
             public void SetModSettingsWidth(float newWidth) =>
-                ModSettingsContainer.Width = newWidth;
+                ModSettingsContainer.Parent.Width = newWidth;
         }
 
         public class TestRulesetInfo : RulesetInfo

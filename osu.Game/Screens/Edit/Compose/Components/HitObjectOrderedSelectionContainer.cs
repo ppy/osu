@@ -11,17 +11,17 @@ using osu.Game.Rulesets.Objects;
 namespace osu.Game.Screens.Edit.Compose.Components
 {
     /// <summary>
-    /// A container for <see cref="SelectionBlueprint"/> ordered by their <see cref="HitObject"/> start times.
+    /// A container for <see cref="SelectionBlueprint{HitObject}"/> ordered by their <see cref="HitObject"/> start times.
     /// </summary>
-    public sealed class HitObjectOrderedSelectionContainer : Container<SelectionBlueprint>
+    public sealed class HitObjectOrderedSelectionContainer : Container<SelectionBlueprint<HitObject>>
     {
-        public override void Add(SelectionBlueprint drawable)
+        public override void Add(SelectionBlueprint<HitObject> drawable)
         {
             base.Add(drawable);
             bindStartTime(drawable);
         }
 
-        public override bool Remove(SelectionBlueprint drawable)
+        public override bool Remove(SelectionBlueprint<HitObject> drawable)
         {
             if (!base.Remove(drawable))
                 return false;
@@ -36,11 +36,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
             unbindAllStartTimes();
         }
 
-        private readonly Dictionary<SelectionBlueprint, IBindable> startTimeMap = new Dictionary<SelectionBlueprint, IBindable>();
+        private readonly Dictionary<SelectionBlueprint<HitObject>, IBindable> startTimeMap = new Dictionary<SelectionBlueprint<HitObject>, IBindable>();
 
-        private void bindStartTime(SelectionBlueprint blueprint)
+        private void bindStartTime(SelectionBlueprint<HitObject> blueprint)
         {
-            var bindable = blueprint.HitObject.StartTimeBindable.GetBoundCopy();
+            var bindable = blueprint.Item.StartTimeBindable.GetBoundCopy();
 
             bindable.BindValueChanged(_ =>
             {
@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             startTimeMap[blueprint] = bindable;
         }
 
-        private void unbindStartTime(SelectionBlueprint blueprint)
+        private void unbindStartTime(SelectionBlueprint<HitObject> blueprint)
         {
             startTimeMap[blueprint].UnbindAll();
             startTimeMap.Remove(blueprint);
@@ -66,16 +66,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override int Compare(Drawable x, Drawable y)
         {
-            var xObj = (SelectionBlueprint)x;
-            var yObj = (SelectionBlueprint)y;
+            var xObj = (SelectionBlueprint<HitObject>)x;
+            var yObj = (SelectionBlueprint<HitObject>)y;
 
             // Put earlier blueprints towards the end of the list, so they handle input first
-            int i = yObj.HitObject.StartTime.CompareTo(xObj.HitObject.StartTime);
+            int i = yObj.Item.StartTime.CompareTo(xObj.Item.StartTime);
 
             if (i != 0) return i;
 
             // Fall back to end time if the start time is equal.
-            i = yObj.HitObject.GetEndTime().CompareTo(xObj.HitObject.GetEndTime());
+            i = yObj.Item.GetEndTime().CompareTo(xObj.Item.GetEndTime());
 
             return i == 0 ? CompareReverseChildID(y, x) : i;
         }
