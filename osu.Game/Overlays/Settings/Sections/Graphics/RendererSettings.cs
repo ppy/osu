@@ -13,6 +13,8 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
     {
         protected override string Header => "Renderer";
 
+        private SettingsEnumDropdown<FrameSync> frameLimiterDropdown;
+
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager config, OsuConfigManager osuConfig)
         {
@@ -20,7 +22,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             Children = new Drawable[]
             {
                 // TODO: this needs to be a custom dropdown at some point
-                new SettingsEnumDropdown<FrameSync>
+                frameLimiterDropdown = new SettingsEnumDropdown<FrameSync>
                 {
                     LabelText = "Frame limiter",
                     Current = config.GetBindable<FrameSync>(FrameworkSetting.FrameSync)
@@ -36,6 +38,18 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     Current = osuConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay)
                 },
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            frameLimiterDropdown.Current.BindValueChanged(limit =>
+            {
+                const string unlimited_frames_note = "Using unlimited frame limiter can lead to stutters, bad performance and overheating. It will not improve perceived latency. \"2x refresh rate\" is recommended.";
+
+                frameLimiterDropdown.WarningText = limit.NewValue == FrameSync.Unlimited ? unlimited_frames_note : string.Empty;
+            }, true);
         }
     }
 }

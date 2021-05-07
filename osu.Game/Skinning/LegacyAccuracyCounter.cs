@@ -10,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Skinning
 {
-    public class LegacyAccuracyCounter : GameplayAccuracyCounter
+    public class LegacyAccuracyCounter : GameplayAccuracyCounter, ISkinnableComponent
     {
         private readonly ISkin skin;
 
