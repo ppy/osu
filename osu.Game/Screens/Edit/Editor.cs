@@ -17,6 +17,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
+using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -306,7 +307,11 @@ namespace osu.Game.Screens.Edit
         /// <summary>
         /// If the beatmap's track has changed, this method must be called to keep the editor in a valid state.
         /// </summary>
-        public void UpdateClockSource() => clock.ChangeSource(Beatmap.Value.Track);
+        public void UpdateClockSource()
+        {
+            var sourceClock = (IAdjustableClock)Beatmap.Value.Track ?? new StopwatchClock();
+            clock.ChangeSource(sourceClock);
+        }
 
         protected void Save()
         {
@@ -577,7 +582,7 @@ namespace osu.Game.Screens.Edit
 
         private void resetTrack(bool seekToStart = false)
         {
-            Beatmap.Value.Track.Stop();
+            Beatmap.Value.Track?.Stop();
 
             if (seekToStart)
             {

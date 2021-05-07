@@ -298,7 +298,6 @@ namespace osu.Game.Beatmaps
         /// Get the loaded audio track instance. <see cref="LoadTrack"/> must have first been called.
         /// This generally happens via MusicController when changing the global beatmap.
         /// </summary>
-        [NotNull]
         public Track Track
         {
             get
