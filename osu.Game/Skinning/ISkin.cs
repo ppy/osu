@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
@@ -57,7 +59,5 @@ namespace osu.Game.Skinning
         /// <returns>A matching value boxed in an <see cref="IBindable{TValue}"/>, or null if unavailable.</returns>
         [CanBeNull]
         IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup);
-
-        // IEnumerable<ISkinnableInfo> ComponentInfo { get; }
     }
 }
