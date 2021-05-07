@@ -9,7 +9,7 @@ using osuTK;
 
 namespace osu.Game.Skinning
 {
-    public class LegacyScoreCounter : GameplayScoreCounter
+    public class LegacyScoreCounter : GameplayScoreCounter, ISkinnableComponent
     {
         private readonly ISkin skin;
 
