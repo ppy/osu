@@ -17,7 +17,6 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -144,7 +143,7 @@ namespace osu.Game.Screens.Edit
 
             // Todo: should probably be done at a DrawableRuleset level to share logic with Player.
             clock = new EditorClock(playableBeatmap, beatDivisor) { IsCoupled = false };
-            clock.ChangeSource((IAdjustableClock)loadableBeatmap.Track ?? new StopwatchClock());
+            clock.ChangeSource(loadableBeatmap.Track);
 
             dependencies.CacheAs(clock);
             AddInternal(clock);
