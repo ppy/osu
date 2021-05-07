@@ -26,27 +26,10 @@ namespace osu.Game.Graphics.Containers.Markdown
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
-            var border = new Box
-            {
-                RelativeSizeAxes = Axes.X,
-            };
-
             if (isHeading)
-            {
-                border.Colour = colourProvider.Background3;
-                border.Height = 2;
-                border.Anchor = Anchor.BottomLeft;
-                border.Origin = Anchor.BottomLeft;
-            }
+                AddInternal(new TableHeadBorder());
             else
-            {
-                border.Colour = colourProvider.Background4;
-                border.Height = 1;
-                border.Anchor = Anchor.TopLeft;
-                border.Origin = Anchor.TopLeft;
-            }
-
-            AddInternal(border);
+                AddInternal(new TableBodyBorder());
         }
 
         public override MarkdownTextFlowContainer CreateTextFlow() => new TableCellTextFlowContainer
@@ -54,6 +37,30 @@ namespace osu.Game.Graphics.Containers.Markdown
             Weight = isHeading ? FontWeight.Bold : FontWeight.Regular,
             Padding = new MarginPadding(10),
         };
+
+        private class TableHeadBorder : Box
+        {
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                Colour = colourProvider.Background3;
+                RelativeSizeAxes = Axes.X;
+                Height = 2;
+                Anchor = Anchor.BottomLeft;
+                Origin = Anchor.BottomLeft;
+            }
+        }
+
+        private class TableBodyBorder : Box
+        {
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                Colour = colourProvider.Background4;
+                RelativeSizeAxes = Axes.X;
+                Height = 1;
+            }
+        }
 
         private class TableCellTextFlowContainer : OsuMarkdownTextFlowContainer
         {
