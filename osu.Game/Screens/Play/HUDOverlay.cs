@@ -320,7 +320,6 @@ namespace osu.Game.Screens.Play
 
         protected virtual void BindScoreProcessor(ScoreProcessor processor)
         {
-            ScoreCounter?.Current.BindTo(processor.TotalScore);
             AccuracyCounter?.Current.BindTo(processor.Accuracy);
 
             if (HealthDisplay is IHealthDisplay shd)
