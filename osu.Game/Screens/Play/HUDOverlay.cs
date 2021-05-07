@@ -91,16 +91,37 @@ namespace osu.Game.Screens.Play
                         {
                             new Drawable[]
                             {
-                                new MainHUDElements
+                                new Container
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Children = new Drawable[]
                                     {
-                                        HealthDisplay = new SkinnableHealthDisplay(),
-                                        AccuracyCounter = new SkinnableAccuracyCounter(),
-                                        ScoreCounter = new SkinnableScoreCounter(),
-                                        new SkinnableComboCounter(),
-                                        new HitErrorDisplay(this.drawableRuleset?.FirstAvailableHitWindows),
+                                        new SkinnableElementTargetContainer(SkinnableTarget.MainHUDComponents)
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                        new Container
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Alpha = 0,
+                                            Children = new Drawable[]
+                                            {
+                                                // remaining cross-dependencies need tidying.
+                                                // kept to ensure non-null, but hidden for testing.
+                                                HealthDisplay = new SkinnableHealthDisplay(),
+                                                AccuracyCounter = new SkinnableAccuracyCounter(),
+                                                ScoreCounter = new SkinnableScoreCounter(),
+                                            }
+                                        },
+                                        new Container
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Children = new Drawable[]
+                                            {
+                                                // still need to be migrated; a bit more involved.
+                                                new HitErrorDisplay(this.drawableRuleset?.FirstAvailableHitWindows),
+                                            }
+                                        },
                                     }
                                 },
                             },
@@ -336,10 +357,6 @@ namespace osu.Game.Screens.Play
                     updateVisibility();
                     break;
             }
-        }
-
-        public class MainHUDElements : SkinnableElementTargetContainer
-        {
         }
     }
 }

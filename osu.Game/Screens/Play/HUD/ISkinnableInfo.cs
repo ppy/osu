@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Game.IO.Serialization;
+using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
@@ -12,7 +13,7 @@ namespace osu.Game.Screens.Play.HUD
     {
         public Type Type { get; set; }
 
-        public Type Target { get; set; }
+        public SkinnableTarget? Target { get; set; }
 
         public Vector2 Position { get; set; }
 
@@ -21,12 +22,5 @@ namespace osu.Game.Screens.Play.HUD
         public Vector2 Scale { get; set; }
 
         public Anchor Anchor { get; set; }
-    }
-
-    /// <summary>
-    /// A container which supports skinnable components being added to it.
-    /// </summary>
-    public interface ISkinnableTarget
-    {
     }
 }
