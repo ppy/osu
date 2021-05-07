@@ -4,12 +4,12 @@
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Play.HUD;
 using osuTK;
 
 namespace osu.Game.Skinning
 {
-    public class LegacyScoreCounter : ScoreCounter
+    public class LegacyScoreCounter : GameplayScoreCounter
     {
         private readonly ISkin skin;
 
