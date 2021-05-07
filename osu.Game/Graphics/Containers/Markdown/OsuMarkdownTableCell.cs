@@ -24,12 +24,9 @@ namespace osu.Game.Graphics.Containers.Markdown
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load()
         {
-            if (isHeading)
-                AddInternal(new TableHeadBorder());
-            else
-                AddInternal(new TableBodyBorder());
+            AddInternal(CreateBorder(isHeading));
         }
 
         public override MarkdownTextFlowContainer CreateTextFlow() => new TableCellTextFlowContainer
@@ -37,6 +34,14 @@ namespace osu.Game.Graphics.Containers.Markdown
             Weight = isHeading ? FontWeight.Bold : FontWeight.Regular,
             Padding = new MarginPadding(10),
         };
+
+        protected virtual Box CreateBorder(bool isHeading)
+        {
+            if (isHeading)
+                return new TableHeadBorder();
+
+            return new TableBodyBorder();
+        }
 
         private class TableHeadBorder : Box
         {
