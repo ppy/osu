@@ -36,7 +36,9 @@ namespace osu.Game.Beatmaps.Drawables
             };
         }
 
-        protected override double TransformDuration => 400.0;
+        protected override double LoadDelay => 500;
+
+        protected override double TransformDuration => 400;
 
         protected override DelayedLoadWrapper CreateDelayedLoadWrapper(Func<Drawable> createContentFunc, double timeBeforeLoad)
             => new DelayedLoadUnloadWrapper(createContentFunc, timeBeforeLoad);
