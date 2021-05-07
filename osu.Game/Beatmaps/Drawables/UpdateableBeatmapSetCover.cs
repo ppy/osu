@@ -41,10 +41,6 @@ namespace osu.Game.Beatmaps.Drawables
         protected override DelayedLoadWrapper CreateDelayedLoadWrapper(Func<Drawable> createContentFunc, double timeBeforeLoad)
             => new DelayedLoadUnloadWrapper(createContentFunc, timeBeforeLoad);
 
-        // by default, ModelBackedDrawable hides the old drawable only after the new one has been fully loaded.
-        // this can lead to weird appearance if the cover is not fully opaque, so fade out as soon as a new load is requested in this particular case.
-        protected override void OnLoadStarted() => ApplyHideTransforms(DisplayedDrawable);
-
         protected override Drawable CreateDrawable(BeatmapSetInfo model)
         {
             if (model == null)
