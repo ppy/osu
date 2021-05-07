@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Skinning
 {
-    public class LegacyAccuracyCounter : PercentageCounter, IAccuracyCounter
+    public class LegacyAccuracyCounter : PercentageCounter, IAccuracyCounter, ISkinnableComponent
     {
         private readonly ISkin skin;
 
