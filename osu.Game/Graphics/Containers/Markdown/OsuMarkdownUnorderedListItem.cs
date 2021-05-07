@@ -32,7 +32,7 @@ namespace osu.Game.Graphics.Containers.Markdown
         /// Get text marker based on <paramref name="level"/>
         /// </summary>
         /// <param name="level">The markdown level of current list item.</param>
-        /// <returns></returns>
+        /// <returns>The marker string of this list item</returns>
         protected virtual string GetTextMarker(int level)
         {
             switch (level)
