@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                     var drawableRuleset = ruleset.CreateDrawableRulesetWith(beatmap);
 
-                    var hudOverlay = new HUDOverlay(scoreProcessor, drawableRuleset, Array.Empty<Mod>())
+                    var hudOverlay = new HUDOverlay(drawableRuleset, Array.Empty<Mod>())
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,

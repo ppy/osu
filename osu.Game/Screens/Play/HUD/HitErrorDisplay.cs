@@ -22,11 +22,11 @@ namespace osu.Game.Screens.Play.HUD
 
         private readonly HitWindows hitWindows;
 
-        private readonly ScoreProcessor processor;
+        [Resolved]
+        private ScoreProcessor processor { get; set; }
 
-        public HitErrorDisplay(ScoreProcessor processor, HitWindows hitWindows)
+        public HitErrorDisplay(HitWindows hitWindows)
         {
-            this.processor = processor;
             this.hitWindows = hitWindows;
 
             RelativeSizeAxes = Axes.Both;
