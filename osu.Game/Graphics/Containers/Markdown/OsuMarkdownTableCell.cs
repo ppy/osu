@@ -59,12 +59,7 @@ namespace osu.Game.Graphics.Containers.Markdown
         {
             public FontWeight Weight { get; set; }
 
-            protected override SpriteText CreateSpriteText()
-            {
-                var spriteText = base.CreateSpriteText();
-                spriteText.Font = spriteText.Font.With(weight: Weight);
-                return spriteText;
-            }
+            protected override SpriteText CreateSpriteText() => base.CreateSpriteText().With(t => t.Font = t.Font.With(weight: Weight));
         }
     }
 }
