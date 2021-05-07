@@ -237,6 +237,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
         }
 
         /// <summary>
+        /// Given a selection target and a function of truth, retrieve the correct ternary state for display.
+        /// </summary>
+        protected static TernaryState GetStateFromSelection<TObject>(IEnumerable<TObject> selection, Func<TObject, bool> func)
+        {
+            if (selection.Any(func))
+                return selection.All(func) ? TernaryState.True : TernaryState.Indeterminate;
+
+            return TernaryState.False;
+        }
+
+        /// <summary>
         /// Called whenever the deletion of items has been requested.
         /// </summary>
         /// <param name="items">The items to be deleted.</param>
@@ -274,8 +285,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             int count = SelectedItems.Count;
 
             SelectionBox.Text = count > 0 ? count.ToString() : string.Empty;
-
             SelectionBox.FadeTo(count > 0 ? 1 : 0);
+
             OnSelectionChanged();
         }
 
