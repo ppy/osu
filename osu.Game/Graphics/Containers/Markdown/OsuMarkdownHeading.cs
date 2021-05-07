@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using Markdig.Syntax;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers.Markdown;
 using osu.Framework.Graphics.Sprites;
 
@@ -68,12 +69,7 @@ namespace osu.Game.Graphics.Containers.Markdown
         {
             public FontWeight Weight { get; set; }
 
-            protected override SpriteText CreateSpriteText()
-            {
-                var spriteText = base.CreateSpriteText();
-                spriteText.Font = spriteText.Font.With(weight: Weight);
-                return spriteText;
-            }
+            protected override SpriteText CreateSpriteText() => base.CreateSpriteText().With(t => t.Font = t.Font.With(weight: Weight));
         }
     }
 }
