@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
@@ -17,6 +18,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestSceneSkinEditorMultipleSkins : SkinnableTestScene
     {
+        [Cached]
+        private readonly ScoreProcessor scoreProcessor = new ScoreProcessor();
+
         [SetUpSteps]
         public void SetUpSteps()
         {
@@ -28,8 +32,6 @@ namespace osu.Game.Tests.Visual.Gameplay
                     var working = CreateWorkingBeatmap(ruleset.RulesetInfo);
                     var beatmap = working.GetPlayableBeatmap(ruleset.RulesetInfo);
 
-                    ScoreProcessor scoreProcessor = new ScoreProcessor();
-
                     var drawableRuleset = ruleset.CreateDrawableRulesetWith(beatmap);
 
                     var hudOverlay = new HUDOverlay(scoreProcessor, null, drawableRuleset, Array.Empty<Mod>())
@@ -40,7 +42,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                     // Add any key just to display the key counter visually.
                     hudOverlay.KeyCounter.Add(new KeyCounterKeyboard(Key.Space));
-                    hudOverlay.ComboCounter.Current.Value = 1;
+                    scoreProcessor.Combo.Value = 1;
 
                     return new Container
                     {
