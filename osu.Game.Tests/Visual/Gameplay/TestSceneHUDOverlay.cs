@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached]
         private ScoreProcessor scoreProcessor = new ScoreProcessor();
 
-        [Cached]
+        [Cached(typeof(HealthProcessor))]
         private HealthProcessor healthProcessor = new DrainingHealthProcessor(1);
 
         // best way to check without exposing.
