@@ -4,10 +4,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -18,37 +20,27 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override Ruleset CreateRulesetForSkinProvider() => new OsuRuleset();
 
+        [Cached]
+        private ScoreProcessor scoreProcessor = new ScoreProcessor();
+
         [SetUpSteps]
         public void SetUpSteps()
         {
-            AddStep("Create combo counters", () => SetContents(() =>
-            {
-                var comboCounter = new SkinnableScoreCounter();
-                comboCounter.Current.Value = 1;
-                return comboCounter;
-            }));
+            AddStep("Create score counters", () => SetContents(() => new SkinnableScoreCounter()));
         }
 
         [Test]
         public void TestScoreCounterIncrementing()
         {
-            AddStep(@"Reset all", delegate
-            {
-                foreach (var s in scoreCounters)
-                    s.Current.Value = 0;
-            });
+            AddStep(@"Reset all", () => scoreProcessor.TotalScore.Value = 0);
 
-            AddStep(@"Hit! :D", delegate
-            {
-                foreach (var s in scoreCounters)
-                    s.Current.Value += 300;
-            });
+            AddStep(@"Hit! :D", () => scoreProcessor.TotalScore.Value += 300);
         }
 
         [Test]
         public void TestVeryLargeScore()
         {
-            AddStep("set large score", () => scoreCounters.ForEach(counter => counter.Current.Value = 1_000_000_000));
+            AddStep("set large score", () => scoreCounters.ForEach(counter => scoreProcessor.TotalScore.Value = 1_000_000_000));
         }
     }
 }
