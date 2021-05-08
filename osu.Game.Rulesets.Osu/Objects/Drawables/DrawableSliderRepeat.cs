@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableSliderRepeat : DrawableOsuHitObject, ITrackSnaking
+    public class DrawableSliderRepeat : DrawableOsuHitObject, ITrackSnaking, IHasMainCirclePiece
     {
         public new SliderRepeat HitObject => (SliderRepeat)base.HitObject;
 
@@ -26,9 +26,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private double animDuration;
 
-        public Drawable CirclePiece { get; private set; }
+        public SkinnableDrawable CirclePiece { get; private set; }
+
+        public ReverseArrowPiece Arrow { get; private set; }
+
         private Drawable scaleContainer;
-        private ReverseArrowPiece arrow;
 
         public override bool DisplayResult => false;
 
@@ -53,11 +55,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Children = new[]
+                Children = new Drawable[]
                 {
                     // no default for this; only visible in legacy skins.
-                    CirclePiece = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderTailHitCircle), _ => Empty()),
-                    arrow = new ReverseArrowPiece(),
+                    CirclePiece = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderTailHitCircle), _ => Empty())
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    },
+                    Arrow = new ReverseArrowPiece(),
                 }
             };
 
@@ -91,6 +97,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdateHitStateTransforms(state);
 
+            (CirclePiece.Drawable as IMainCirclePiece)?.Animate(state);
+
             switch (state)
             {
                 case ArmedState.Idle:
@@ -102,8 +110,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     break;
 
                 case ArmedState.Hit:
-                    this.FadeOut(animDuration, Easing.Out)
-                        .ScaleTo(Scale * 1.5f, animDuration, Easing.Out);
+                    this.FadeOut(animDuration, Easing.Out);
+
+                    const float final_scale = 1.5f;
+
+                    Arrow.ScaleTo(Scale * final_scale, animDuration, Easing.Out);
+                    CirclePiece.ScaleTo(Scale * final_scale, animDuration, Easing.Out);
                     break;
             }
         }
@@ -139,18 +151,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
 
             float aimRotation = MathUtils.RadiansToDegrees(MathF.Atan2(aimRotationVector.Y - Position.Y, aimRotationVector.X - Position.X));
-            while (Math.Abs(aimRotation - arrow.Rotation) > 180)
-                aimRotation += aimRotation < arrow.Rotation ? 360 : -360;
+            while (Math.Abs(aimRotation - Arrow.Rotation) > 180)
+                aimRotation += aimRotation < Arrow.Rotation ? 360 : -360;
 
             if (!hasRotation)
             {
-                arrow.Rotation = aimRotation;
+                Arrow.Rotation = aimRotation;
                 hasRotation = true;
             }
             else
             {
                 // If we're already snaking, interpolate to smooth out sharp curves (linear sliders, mainly).
-                arrow.Rotation = Interpolation.ValueAt(Math.Clamp(Clock.ElapsedFrameTime, 0, 100), arrow.Rotation, aimRotation, 0, 50, Easing.OutQuint);
+                Arrow.Rotation = Interpolation.ValueAt(Math.Clamp(Clock.ElapsedFrameTime, 0, 100), Arrow.Rotation, aimRotation, 0, 50, Easing.OutQuint);
             }
         }
     }

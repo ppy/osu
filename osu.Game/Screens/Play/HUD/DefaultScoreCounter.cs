@@ -8,7 +8,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class DefaultScoreCounter : ScoreCounter
+    public class DefaultScoreCounter : ScoreCounter, ISkinnableComponent
     {
         public DefaultScoreCounter()
             : base(6)
