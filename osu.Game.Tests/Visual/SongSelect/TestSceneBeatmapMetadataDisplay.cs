@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private void createDisplay(Func<WorkingBeatmap> getBeatmap)
         {
-            AddStep("setup display", () => Child = display = new BeatmapMetadataDisplay(getBeatmap(), Ruleset.Value, new Bindable<IReadOnlyList<Mod>>(randomMods), null)
+            AddStep("setup display", () => Child = display = new BeatmapMetadataDisplay(getBeatmap(), new Bindable<IReadOnlyList<Mod>>(randomMods), null)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
