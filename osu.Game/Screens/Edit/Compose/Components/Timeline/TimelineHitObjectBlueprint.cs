@@ -26,7 +26,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class TimelineHitObjectBlueprint : SelectionBlueprint
+    public class TimelineHitObjectBlueprint : SelectionBlueprint<HitObject>
     {
         private const float circle_size = 38;
 
@@ -49,13 +49,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [Resolved]
         private ISkinSource skin { get; set; }
 
-        public TimelineHitObjectBlueprint(HitObject hitObject)
-            : base(hitObject)
+        public TimelineHitObjectBlueprint(HitObject item)
+            : base(item)
         {
             Anchor = Anchor.CentreLeft;
             Origin = Anchor.CentreLeft;
 
-            startTime = hitObject.StartTimeBindable.GetBoundCopy();
+            startTime = item.StartTimeBindable.GetBoundCopy();
             startTime.BindValueChanged(time => X = (float)time.NewValue, true);
 
             RelativePositionAxes = Axes.X;
@@ -95,9 +95,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 },
             });
 
-            if (hitObject is IHasDuration)
+            if (item is IHasDuration)
             {
-                colouredComponents.Add(new DragArea(hitObject)
+                colouredComponents.Add(new DragArea(item)
                 {
                     OnDragHandled = e => OnDragHandled?.Invoke(e)
                 });
@@ -108,7 +108,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             base.LoadComplete();
 
-            if (HitObject is IHasComboInformation comboInfo)
+            if (Item is IHasComboInformation comboInfo)
             {
                 indexInCurrentComboBindable = comboInfo.IndexInCurrentComboBindable.GetBoundCopy();
                 indexInCurrentComboBindable.BindValueChanged(_ => updateComboIndex(), true);
@@ -136,7 +136,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private void updateComboColour()
         {
-            if (!(HitObject is IHasComboInformation combo))
+            if (!(Item is IHasComboInformation combo))
                 return;
 
             var comboColours = skin.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value ?? Array.Empty<Color4>();
@@ -152,7 +152,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 border.Hide();
             }
 
-            if (HitObject is IHasDuration duration && duration.Duration > 0)
+            if (Item is IHasDuration duration && duration.Duration > 0)
                 circle.Colour = ColourInfo.GradientHorizontal(comboColour, comboColour.Lighten(0.4f));
             else
                 circle.Colour = comboColour;
@@ -166,14 +166,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             base.Update();
 
             // no bindable so we perform this every update
-            float duration = (float)(HitObject.GetEndTime() - HitObject.StartTime);
+            float duration = (float)(Item.GetEndTime() - Item.StartTime);
 
             if (Width != duration)
             {
                 Width = duration;
 
                 // kind of haphazard but yeah, no bindables.
-                if (HitObject is IHasRepeats repeats)
+                if (Item is IHasRepeats repeats)
                     updateRepeats(repeats);
             }
         }

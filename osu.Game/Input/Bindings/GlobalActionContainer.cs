@@ -48,6 +48,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.O }, GlobalAction.ToggleSettings),
             new KeyBinding(new[] { InputKey.Control, InputKey.D }, GlobalAction.ToggleBeatmapListing),
             new KeyBinding(new[] { InputKey.Control, InputKey.N }, GlobalAction.ToggleNotifications),
+            new KeyBinding(new[] { InputKey.Shift, InputKey.F2 }, GlobalAction.ToggleSkinEditor),
 
             new KeyBinding(InputKey.Escape, GlobalAction.Back),
             new KeyBinding(InputKey.ExtraMouseButton1, GlobalAction.Back),
@@ -71,6 +72,8 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.F3 }, GlobalAction.EditorTimingMode),
             new KeyBinding(new[] { InputKey.F4 }, GlobalAction.EditorSetupMode),
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.A }, GlobalAction.EditorVerifyMode),
+            new KeyBinding(new[] { InputKey.J }, GlobalAction.EditorNudgeLeft),
+            new KeyBinding(new[] { InputKey.K }, GlobalAction.EditorNudgeRight),
         };
 
         public IEnumerable<KeyBinding> InGameKeyBindings => new[]
@@ -251,5 +254,14 @@ namespace osu.Game.Input.Bindings
 
         [Description("Verify mode")]
         EditorVerifyMode,
+
+        [Description("Nudge selection left")]
+        EditorNudgeLeft,
+
+        [Description("Nudge selection right")]
+        EditorNudgeRight,
+
+        [Description("Toggle skin editor")]
+        ToggleSkinEditor,
     }
 }

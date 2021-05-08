@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Utils;
+using osu.Game.Extensions;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
@@ -15,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public class OsuSelectionHandler : SelectionHandler
+    public class OsuSelectionHandler : EditorSelectionHandler
     {
         protected override void OnSelectionChanged()
         {
@@ -36,13 +37,13 @@ namespace osu.Game.Rulesets.Osu.Edit
             referencePathTypes = null;
         }
 
-        public override bool HandleMovement(MoveSelectionEvent moveEvent)
+        public override bool HandleMovement(MoveSelectionEvent<HitObject> moveEvent)
         {
             var hitObjects = selectedMovableObjects;
 
             // this will potentially move the selection out of bounds...
             foreach (var h in hitObjects)
-                h.Position += moveEvent.InstantDelta;
+                h.Position += this.ScreenSpaceDeltaToParentSpace(moveEvent.ScreenSpaceDelta);
 
             // but this will be corrected.
             moveSelectionInBounds();
@@ -374,8 +375,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// <summary>
         /// All osu! hitobjects which can be moved/rotated/scaled.
         /// </summary>
-        private OsuHitObject[] selectedMovableObjects => EditorBeatmap.SelectedHitObjects
-                                                                      .OfType<OsuHitObject>()
+        private OsuHitObject[] selectedMovableObjects => SelectedItems.OfType<OsuHitObject>()
                                                                       .Where(h => !(h is Spinner))
                                                                       .ToArray();
 
