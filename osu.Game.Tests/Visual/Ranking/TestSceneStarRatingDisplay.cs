@@ -12,12 +12,12 @@ namespace osu.Game.Tests.Visual.Ranking
 {
     public class TestSceneStarRatingDisplay : OsuTestScene
     {
-        [SetUp]
-        public void SetUp() => Schedule(() =>
+        [Test]
+        public void TestDisplay()
         {
-            StarRatingDisplay changingStarRating;
+            StarRatingDisplay changingStarRating = null;
 
-            Child = new FillFlowContainer
+            AddStep("load displays", () => Child = new FillFlowContainer
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -32,12 +32,12 @@ namespace osu.Game.Tests.Visual.Ranking
                     new StarRatingDisplay(new StarDifficulty(10.11, 0)),
                     changingStarRating = new StarRatingDisplay(),
                 }
-            };
+            });
 
-            Scheduler.AddDelayed(() =>
+            AddRepeatStep("change bottom rating", () =>
             {
                 changingStarRating.Current.Value = new StarDifficulty(RNG.NextDouble(0, 10), RNG.Next());
-            }, 500, true);
-        });
+            }, 10);
+        }
     }
 }
