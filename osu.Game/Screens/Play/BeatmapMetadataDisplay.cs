@@ -180,8 +180,8 @@ namespace osu.Game.Screens.Play
             starDifficulty = difficultyCache.GetBindableDifficulty(beatmap.BeatmapInfo);
             starDifficulty.BindValueChanged(difficulty =>
             {
-                if (difficulty.NewValue is StarDifficulty diff)
-                    starRatingDisplay.Current.Value = diff;
+                if (difficulty.NewValue.HasValue)
+                    starRatingDisplay.Current.Value = difficulty.NewValue.Value;
             }, true);
 
             Loading = true;
