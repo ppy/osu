@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -27,7 +28,7 @@ namespace osu.Game.Screens.Play
     {
         private readonly WorkingBeatmap beatmap;
         private readonly Bindable<IReadOnlyList<Mod>> mods;
-        private readonly Drawable facade;
+        private readonly Drawable logoFacade;
         private LoadingSpinner loading;
 
         public IBindable<IReadOnlyList<Mod>> Mods => mods;
@@ -46,10 +47,10 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        public BeatmapMetadataDisplay(WorkingBeatmap beatmap, Bindable<IReadOnlyList<Mod>> mods, Drawable facade)
+        public BeatmapMetadataDisplay(WorkingBeatmap beatmap, Bindable<IReadOnlyList<Mod>> mods, [CanBeNull] Drawable logoFacade)
         {
             this.beatmap = beatmap;
-            this.facade = facade;
+            this.logoFacade = logoFacade;
 
             this.mods = new Bindable<IReadOnlyList<Mod>>();
             this.mods.BindTo(mods);
@@ -73,11 +74,11 @@ namespace osu.Game.Screens.Play
                     Direction = FillDirection.Vertical,
                     Children = new[]
                     {
-                        facade.With(d =>
+                        logoFacade?.With(d =>
                         {
                             d.Anchor = Anchor.TopCentre;
                             d.Origin = Anchor.TopCentre;
-                        }),
+                        }) ?? Drawable.Empty(),
                         new OsuSpriteText
                         {
                             Text = new RomanisableString(metadata.TitleUnicode, metadata.Title),
