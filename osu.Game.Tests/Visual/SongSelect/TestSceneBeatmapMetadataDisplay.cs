@@ -30,8 +30,10 @@ namespace osu.Game.Tests.Visual.SongSelect
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Scale = new Vector2(1.5f),
+                Alpha = 0f,
             });
 
+            AddStep("fade in", () => display.FadeIn(400, Easing.OutQuint));
             AddToggleStep("trigger loading", v => display.Loading = v);
         }
 
