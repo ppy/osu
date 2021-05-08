@@ -12,8 +12,10 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Ranking.Expanded;
 using osuTK;
 
 namespace osu.Game.Screens.Play
@@ -29,6 +31,9 @@ namespace osu.Game.Screens.Play
         private LoadingSpinner loading;
 
         public IBindable<IReadOnlyList<Mod>> Mods => mods;
+
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; }
 
         public bool Loading
         {
@@ -51,9 +56,11 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(BeatmapDifficultyCache difficultyCache)
         {
             var metadata = beatmap.BeatmapInfo?.Metadata ?? new BeatmapMetadata();
+
+            var starDifficulty = difficultyCache.GetDifficultyAsync(beatmap.BeatmapInfo, ruleset.Value, mods.Value).Result;
 
             AutoSizeAxes = Axes.Both;
             Children = new Drawable[]
@@ -107,16 +114,29 @@ namespace osu.Game.Screens.Play
                                 loading = new LoadingLayer(true)
                             }
                         },
-                        new OsuSpriteText
+                        new FillFlowContainer
                         {
-                            Text = beatmap?.BeatmapInfo?.Version,
-                            Font = OsuFont.GetFont(size: 26, italics: true),
-                            Origin = Anchor.TopCentre,
+                            AutoSizeAxes = Axes.Both,
                             Anchor = Anchor.TopCentre,
-                            Margin = new MarginPadding
+                            Origin = Anchor.TopCentre,
+                            Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(5f),
+                            Margin = new MarginPadding { Bottom = 40 },
+                            Children = new Drawable[]
                             {
-                                Bottom = 40
-                            },
+                                new OsuSpriteText
+                                {
+                                    Text = beatmap?.BeatmapInfo?.Version,
+                                    Font = OsuFont.GetFont(size: 26, italics: true),
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                },
+                                new StarRatingDisplay(starDifficulty)
+                                {
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                }
+                            }
                         },
                         new GridContainer
                         {
