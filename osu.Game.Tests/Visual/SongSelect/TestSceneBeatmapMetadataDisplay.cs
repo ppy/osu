@@ -10,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play;
 using osuTK;
@@ -23,7 +24,18 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Resolved]
         private BeatmapManager manager { get; set; }
 
-        private void createDisplay(Func<WorkingBeatmap> getBeatmap)
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            foreach (var ruleset in rulesets.AvailableRulesets)
+                AddStep($"switch to {ruleset.Name}", () => Ruleset.Value = ruleset);
+        }
+
+        private void createTest(Func<WorkingBeatmap> getBeatmap)
         {
             AddStep("setup display", () => Child = display = new BeatmapMetadataDisplay(getBeatmap(), new Bindable<IReadOnlyList<Mod>>(getRandomMods()), Empty())
             {
@@ -43,7 +55,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                               [Values("Trial", "Some1's very hardest difficulty")]
                               string version)
         {
-            createDisplay(() => CreateWorkingBeatmap(new Beatmap
+            createTest(() => CreateWorkingBeatmap(new Beatmap
             {
                 BeatmapInfo =
                 {
@@ -60,7 +72,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestRandomFromDatabase()
         {
-            createDisplay(() =>
+            createTest(() =>
             {
                 var allBeatmapSets = manager.GetAllUsableBeatmapSets(IncludedDetails.Minimal);
                 if (allBeatmapSets.Count == 0)
