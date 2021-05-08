@@ -23,15 +23,9 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Resolved]
         private BeatmapManager manager { get; set; }
 
-        private IReadOnlyList<Mod> randomMods => Ruleset.Value.CreateInstance()
-                                                        .GetAllMods()
-                                                        .OrderBy(_ => RNG.Next())
-                                                        .Take(5)
-                                                        .ToList();
-
         private void createDisplay(Func<WorkingBeatmap> getBeatmap)
         {
-            AddStep("setup display", () => Child = display = new BeatmapMetadataDisplay(getBeatmap(), new Bindable<IReadOnlyList<Mod>>(randomMods), null)
+            AddStep("setup display", () => Child = display = new BeatmapMetadataDisplay(getBeatmap(), new Bindable<IReadOnlyList<Mod>>(getRandomMods()), Empty())
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -76,5 +70,11 @@ namespace osu.Game.Tests.Visual.SongSelect
                 return manager.GetWorkingBeatmap(randomBeatmap);
             });
         }
+
+        private IReadOnlyList<Mod> getRandomMods() => Ruleset.Value.CreateInstance()
+                                                             .GetAllMods()
+                                                             .OrderBy(_ => RNG.Next())
+                                                             .Take(5)
+                                                             .ToList();
     }
 }
