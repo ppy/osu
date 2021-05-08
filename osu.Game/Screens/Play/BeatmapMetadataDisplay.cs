@@ -55,12 +55,14 @@ namespace osu.Game.Screens.Play
             this.mods.BindTo(mods);
         }
 
+        private IBindable<StarDifficulty?> starDifficulty;
+
         [BackgroundDependencyLoader]
         private void load(BeatmapDifficultyCache difficultyCache)
         {
-            var metadata = beatmap.BeatmapInfo?.Metadata ?? new BeatmapMetadata();
+            StarRatingDisplay starRatingDisplay;
 
-            var starDifficulty = difficultyCache.GetDifficultyAsync(beatmap.BeatmapInfo, ruleset, mods.Value).Result;
+            var metadata = beatmap.BeatmapInfo?.Metadata ?? new BeatmapMetadata();
 
             AutoSizeAxes = Axes.Both;
             Children = new Drawable[]
@@ -131,7 +133,7 @@ namespace osu.Game.Screens.Play
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                 },
-                                new StarRatingDisplay(starDifficulty)
+                                starRatingDisplay = new StarRatingDisplay
                                 {
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
@@ -178,6 +180,13 @@ namespace osu.Game.Screens.Play
                     },
                 }
             };
+
+            starDifficulty = difficultyCache.GetBindableDifficulty(beatmap.BeatmapInfo);
+            starDifficulty.BindValueChanged(difficulty =>
+            {
+                if (difficulty.NewValue is StarDifficulty diff)
+                    starRatingDisplay.Current.Value = diff;
+            }, true);
 
             Loading = true;
         }
