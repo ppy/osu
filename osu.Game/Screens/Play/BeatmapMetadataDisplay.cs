@@ -178,11 +178,7 @@ namespace osu.Game.Screens.Play
             };
 
             starDifficulty = difficultyCache.GetBindableDifficulty(beatmap.BeatmapInfo);
-            starDifficulty.BindValueChanged(difficulty =>
-            {
-                if (difficulty.NewValue.HasValue)
-                    starRatingDisplay.Current.Value = difficulty.NewValue.Value;
-            }, true);
+            starDifficulty.BindValueChanged(d => starRatingDisplay.Current.Value = d.NewValue, true);
 
             Loading = true;
         }
