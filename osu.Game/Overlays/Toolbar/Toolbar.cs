@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.Toolbar
             base.UpdateAfterChildren();
 
             // this only needed to be set for the initial LoadComplete/Update, so layout completes and gets buttons in a state they can correctly handle keyboard input for hotkeys.
-            AlwaysPresent = false;
+            AlwaysPresent = true;
         }
 
         [BackgroundDependencyLoader(true)]
