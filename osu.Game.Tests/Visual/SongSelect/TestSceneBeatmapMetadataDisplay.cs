@@ -16,7 +16,6 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
-    [System.ComponentModel.Description("player loader beatmap metadata")]
     public class TestSceneBeatmapMetadataDisplay : OsuTestScene
     {
         private BeatmapMetadataDisplay display;
