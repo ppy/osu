@@ -27,14 +27,12 @@ namespace osu.Game.Screens.Play
     public class BeatmapMetadataDisplay : Container
     {
         private readonly WorkingBeatmap beatmap;
+        private readonly RulesetInfo ruleset;
         private readonly Bindable<IReadOnlyList<Mod>> mods;
         private readonly Drawable logoFacade;
         private LoadingSpinner loading;
 
         public IBindable<IReadOnlyList<Mod>> Mods => mods;
-
-        [Resolved]
-        private IBindable<RulesetInfo> ruleset { get; set; }
 
         public bool Loading
         {
@@ -47,9 +45,10 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        public BeatmapMetadataDisplay(WorkingBeatmap beatmap, Bindable<IReadOnlyList<Mod>> mods, [CanBeNull] Drawable logoFacade)
+        public BeatmapMetadataDisplay(WorkingBeatmap beatmap, RulesetInfo ruleset, Bindable<IReadOnlyList<Mod>> mods, [CanBeNull] Drawable logoFacade)
         {
             this.beatmap = beatmap;
+            this.ruleset = ruleset;
             this.logoFacade = logoFacade;
 
             this.mods = new Bindable<IReadOnlyList<Mod>>();
@@ -61,7 +60,7 @@ namespace osu.Game.Screens.Play
         {
             var metadata = beatmap.BeatmapInfo?.Metadata ?? new BeatmapMetadata();
 
-            var starDifficulty = difficultyCache.GetDifficultyAsync(beatmap.BeatmapInfo, ruleset.Value, mods.Value).Result;
+            var starDifficulty = difficultyCache.GetDifficultyAsync(beatmap.BeatmapInfo, ruleset, mods.Value).Result;
 
             AutoSizeAxes = Axes.Both;
             Children = new Drawable[]
