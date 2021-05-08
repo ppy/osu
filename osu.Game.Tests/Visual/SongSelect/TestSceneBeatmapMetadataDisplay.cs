@@ -68,6 +68,9 @@ namespace osu.Game.Tests.Visual.SongSelect
             createDisplay(() =>
             {
                 var allBeatmapSets = manager.GetAllUsableBeatmapSets(IncludedDetails.Minimal);
+                if (allBeatmapSets.Count == 0)
+                    return manager.DefaultBeatmap;
+
                 var randomBeatmapSet = allBeatmapSets[RNG.Next(0, allBeatmapSets.Count - 1)];
                 var randomBeatmap = randomBeatmapSet.Beatmaps[RNG.Next(0, randomBeatmapSet.Beatmaps.Count - 1)];
 
