@@ -30,6 +30,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
+using osu.Framework.Platform.Linux;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
@@ -121,9 +122,11 @@ namespace osu.Game
         protected SettingsOverlay Settings;
 
         private VolumeOverlay volume;
+
         private OsuLogo osuLogo;
 
         private MvisPluginManager mvisPlManager;
+        private Bindable<GamemodeActivateCondition> gamemodeCondition;
 
         private MainMenu menuScreen;
 
@@ -284,6 +287,8 @@ namespace osu.Game
                 SkinManager.CurrentSkinInfo.Value = skinInfo;
             };
             configSkin.TriggerChange();
+
+            gamemodeCondition = MConfig.GetBindable<GamemodeActivateCondition>(MSetting.Gamemode);
 
             IsActive.BindValueChanged(active => updateActiveState(active.NewValue), true);
 
@@ -695,13 +700,15 @@ namespace osu.Game
 
             if (host.Window is SDL2DesktopWindow sdl2DesktopWindow)
             {
-                windowOpacity.Value = MfConfig.Get<bool>(MSetting.FadeInWindowWhenEntering)
+                windowOpacity.Value = MConfig.Get<bool>(MSetting.FadeInWindowWhenEntering)
                     ? 0
                     : 1;
                 windowOpacity.BindValueChanged(v => SetWindowOpacity(v.NewValue), true);
 
                 sdl2DesktopWindow.Visible = true;
             }
+
+            gamemodeCondition.BindValueChanged(v => gamemodeConditionChanged(v.NewValue));
 
             loadComponentSingleFile(osuLogo, logo =>
             {
@@ -1084,6 +1091,31 @@ namespace osu.Game
                     BackButton.Show();
                 else
                     BackButton.Hide();
+            }
+
+            gamemodeCondition.TriggerChange();
+        }
+
+        private void gamemodeConditionChanged(GamemodeActivateCondition newCondition)
+        {
+            if (!(host is LinuxGameHost linuxGameHost)) return;
+
+            switch (newCondition)
+            {
+                case GamemodeActivateCondition.Always:
+                    linuxGameHost.GamemodeStart();
+                    break;
+
+                case GamemodeActivateCondition.InGame:
+                    if (ScreenStack.CurrentScreen is Player)
+                        linuxGameHost.GamemodeStart();
+                    else
+                        linuxGameHost.GamemodeEnd();
+                    break;
+
+                case GamemodeActivateCondition.Never:
+                    linuxGameHost.GamemodeEnd();
+                    break;
             }
         }
 
