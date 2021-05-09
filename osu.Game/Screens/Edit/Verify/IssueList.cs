@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Edit.Verify
         [Resolved]
         private Bindable<Issue> selectedIssue { get; set; }
 
-        public Bindable<bool> ShowNegligible { get; set; }
+        public Dictionary<IssueType, Bindable<bool>> ShowType { get; set; }
 
         private IBeatmapVerifier rulesetVerifier;
         private BeatmapVerifier generalVerifier;
@@ -42,7 +42,11 @@ namespace osu.Game.Screens.Edit.Verify
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colours)
         {
-            ShowNegligible = new Bindable<bool>();
+            // Reflects the user interface. Only types in this dictionary have configurable visibility.
+            ShowType = new Dictionary<IssueType, Bindable<bool>>
+            {
+                { IssueType.Negligible, new Bindable<bool>(false) }
+            };
 
             generalVerifier = new BeatmapVerifier();
             rulesetVerifier = beatmap.BeatmapInfo.Ruleset?.CreateInstance()?.CreateBeatmapVerifier();
@@ -105,8 +109,11 @@ namespace osu.Game.Screens.Edit.Verify
 
         private IEnumerable<Issue> filter(IEnumerable<Issue> issues)
         {
-            if (!ShowNegligible.Value)
-                issues = issues.Where(issue => issue.Template.Type != IssueType.Negligible);
+            foreach (IssueType issueType in ShowType.Keys)
+            {
+                if (!ShowType[issueType].Value)
+                    issues = issues.Where(issue => issue.Template.Type != issueType);
+            }
 
             return issues;
         }
