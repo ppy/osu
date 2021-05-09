@@ -82,6 +82,9 @@ namespace osu.Game.Screens.Select.Carousel
 
                 case SortMode.Difficulty:
                     return compareUsingAggregateMax(otherSet, b => b.StarDifficulty);
+
+                case SortMode.Source:
+                    return string.Compare(BeatmapSet.Metadata.Source, otherSet.BeatmapSet.Metadata.Source, StringComparison.OrdinalIgnoreCase);
             }
         }
 
