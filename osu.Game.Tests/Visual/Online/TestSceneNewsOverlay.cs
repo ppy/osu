@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("Show More button is hidden", () => showMoreButton?.Alpha == 0);
         }
 
-        private ShowMoreButton showMoreButton => overlay.ChildrenOfType<ShowMoreButton>().First();
+        private ShowMoreButton showMoreButton => overlay.ChildrenOfType<ShowMoreButton>().FirstOrDefault();
 
         private void setUpNewsResponse(GetNewsResponse r, string testName = "Set up response")
             => AddStep(testName, () =>
