@@ -81,8 +81,6 @@ namespace osu.Game.Database
 
         public virtual IEnumerable<string> HandledExtensions => new[] { ".zip" };
 
-        public virtual bool SupportsImportFromStable => RuntimeInfo.IsDesktop;
-
         protected readonly FileStore Files;
 
         protected readonly IDatabaseContextFactory ContextFactory;
@@ -700,9 +698,8 @@ namespace osu.Game.Database
         /// <summary>
         /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
         /// </summary>
-        public Task ImportFromStableAsync()
+        public Task ImportFromStableAsync(StableStorage stableStorage)
         {
-            var stableStorage = GetStableStorage?.Invoke();
 
             if (stableStorage == null)
             {

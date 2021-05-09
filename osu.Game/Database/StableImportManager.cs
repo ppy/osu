@@ -3,9 +3,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
@@ -19,7 +18,7 @@ using osu.Game.Scoring;
 using osu.Game.Skinning;
 
 namespace osu.Game.Database
-{
+{    
     public class StableImportManager : Component
     {
         [Resolved]
@@ -42,22 +41,24 @@ namespace osu.Game.Database
 
         private StableStorage cachedStorage;
 
+        public bool SupportsImportFromStable => RuntimeInfo.IsDesktop;
+
         public async Task ImportFromStableAsync(StableContent content)
         {
-            //var stableStorage = await getStableStorage().ConfigureAwait(false);
+            var stableStorage = await getStableStorage().ConfigureAwait(false);
             var importTasks = new List<Task>();
 
             if (content.HasFlagFast(StableContent.Beatmaps))
-                importTasks.Add(beatmaps.ImportFromStableAsync());
+                importTasks.Add(beatmaps.ImportFromStableAsync(stableStorage));
 
             if (content.HasFlagFast(StableContent.Collections))
-                importTasks.Add(collections.ImportFromStableAsync());
+                importTasks.Add(collections.ImportFromStableAsync(stableStorage));
 
             if (content.HasFlagFast(StableContent.Scores))
-                importTasks.Add(scores.ImportFromStableAsync());
+                importTasks.Add(scores.ImportFromStableAsync(stableStorage));
 
             if (content.HasFlagFast(StableContent.Skins))
-                importTasks.Add(skins.ImportFromStableAsync());
+                importTasks.Add(skins.ImportFromStableAsync(stableStorage));
 
             await Task.WhenAll(importTasks.ToArray()).ConfigureAwait(false);
         }
@@ -83,10 +84,10 @@ namespace osu.Game.Database
     [Flags]
     public enum StableContent
     {
-        Beatmaps = 0x1,
-        Scores = 0x2,
-        Skins = 0x3,
-        Collections = 0x4,
+        Beatmaps = 1,
+        Scores = 2,
+        Skins = 4,
+        Collections = 8,
         All = Beatmaps | Scores | Skins | Collections
     }
 }
