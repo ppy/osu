@@ -35,6 +35,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             setUpNewsResponse(responseWithCursor, "Set up cursor response");
             AddStep("Show", () => overlay.Show());
+            AddUntilStep("Show more button is ready", () => showMoreButton != null);
             AddAssert("Show More button is visible", () => showMoreButton.Alpha == 1);
             setUpNewsResponse(responseWithNoCursor, "Set up no cursor response");
             AddStep("Click Show More", () => showMoreButton.Click());
