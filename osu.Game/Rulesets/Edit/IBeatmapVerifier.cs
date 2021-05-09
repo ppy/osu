@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit.Checks.Components;
 
@@ -12,6 +13,11 @@ namespace osu.Game.Rulesets.Edit
     /// </summary>
     public interface IBeatmapVerifier
     {
+        /// <summary>
+        /// The difficulty level which the current beatmap is considered to be.
+        /// </summary>
+        public Bindable<DifficultyRating> InterpretedDifficulty { get; set; }
+
         public IEnumerable<Issue> Run(IBeatmap playableBeatmap, WorkingBeatmap workingBeatmap);
     }
 }
