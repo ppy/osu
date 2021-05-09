@@ -30,6 +30,8 @@ namespace osu.Game.Screens.Edit.Verify
                     LabelText = "Negligible"
                 }
             });
+
+            checkboxNegligible.Current.BindTo(IssueList.ShowNegligible);
         }
     }
 }

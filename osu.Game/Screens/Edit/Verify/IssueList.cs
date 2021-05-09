@@ -34,6 +34,8 @@ namespace osu.Game.Screens.Edit.Verify
         [Resolved]
         private Bindable<Issue> selectedIssue { get; set; }
 
+        public Bindable<bool> ShowNegligible { get; set; }
+
         private IBeatmapVerifier rulesetVerifier;
         private BeatmapVerifier generalVerifier;
 
@@ -94,8 +96,19 @@ namespace osu.Game.Screens.Edit.Verify
             if (rulesetVerifier != null)
                 issues = issues.Concat(rulesetVerifier.Run(beatmap, workingBeatmap.Value));
 
+            issues = filter(issues);
+
             table.Issues = issues
                            .OrderBy(issue => issue.Template.Type)
                            .ThenBy(issue => issue.Check.Metadata.Category);
         }
+
+        private IEnumerable<Issue> filter(IEnumerable<Issue> issues)
+        {
+            if (!ShowNegligible.Value)
+                issues = issues.Where(issue => issue.Template.Type != IssueType.Negligible);
+
+            return issues;
+        }
+    }
 }
