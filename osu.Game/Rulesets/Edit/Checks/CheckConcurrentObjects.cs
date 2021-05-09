@@ -22,15 +22,15 @@ namespace osu.Game.Rulesets.Edit.Checks
             new IssueTemplateConcurrentDifferent(this)
         };
 
-        public IEnumerable<Issue> Run(IBeatmap playableBeatmap, IWorkingBeatmap workingBeatmap)
+        public IEnumerable<Issue> Run(IBeatmap beatmap, IBeatmapVerifier.Context context)
         {
-            for (int i = 0; i < playableBeatmap.HitObjects.Count - 1; ++i)
+            for (int i = 0; i < beatmap.HitObjects.Count - 1; ++i)
             {
-                var hitobject = playableBeatmap.HitObjects[i];
+                var hitobject = beatmap.HitObjects[i];
 
-                for (int j = i + 1; j < playableBeatmap.HitObjects.Count; ++j)
+                for (int j = i + 1; j < beatmap.HitObjects.Count; ++j)
                 {
-                    var nextHitobject = playableBeatmap.HitObjects[j];
+                    var nextHitobject = beatmap.HitObjects[j];
 
                     // Accounts for rulesets with hitobjects separated by columns, such as Mania.
                     // In these cases we only care about concurrent objects within the same column.

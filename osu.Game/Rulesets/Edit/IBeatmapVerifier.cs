@@ -13,11 +13,25 @@ namespace osu.Game.Rulesets.Edit
     /// </summary>
     public interface IBeatmapVerifier
     {
-        /// <summary>
-        /// The difficulty level which the current beatmap is considered to be.
-        /// </summary>
-        public Bindable<DifficultyRating> InterpretedDifficulty { get; set; }
+        public class Context
+        {
+            /// <summary>
+            /// The working beatmap instance of the current beatmap.
+            /// </summary>
+            public readonly IWorkingBeatmap WorkingBeatmap;
 
-        public IEnumerable<Issue> Run(IBeatmap playableBeatmap, WorkingBeatmap workingBeatmap);
+            /// <summary>
+            /// The difficulty level which the current beatmap is considered to be.
+            /// </summary>
+            public readonly Bindable<DifficultyRating> InterpretedDifficulty;
+
+            public Context(IWorkingBeatmap workingBeatmap)
+            {
+                WorkingBeatmap = workingBeatmap;
+                InterpretedDifficulty = new Bindable<DifficultyRating>();
+            }
+        }
+
+        public IEnumerable<Issue> Run(IBeatmap beatmap, Context context);
     }
 }

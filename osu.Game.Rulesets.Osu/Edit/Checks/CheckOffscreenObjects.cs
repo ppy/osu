@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks.Components;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
@@ -31,9 +32,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
             new IssueTemplateOffscreenSlider(this)
         };
 
-        public IEnumerable<Issue> Run(IBeatmap playableBeatmap, IWorkingBeatmap workingBeatmap)
+        public IEnumerable<Issue> Run(IBeatmap beatmap, IBeatmapVerifier.Context context)
         {
-            foreach (var hitobject in playableBeatmap.HitObjects)
+            foreach (var hitobject in beatmap.HitObjects)
             {
                 switch (hitobject)
                 {
