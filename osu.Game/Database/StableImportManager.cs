@@ -9,16 +9,16 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
-using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.IO;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Settings.Sections.Maintenance;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 
 namespace osu.Game.Database
-{    
+{
     public class StableImportManager : Component
     {
         [Resolved]
@@ -34,7 +34,7 @@ namespace osu.Game.Database
         private CollectionManager collections { get; set; }
 
         [Resolved]
-        private OsuGame game { get; set; }
+        private DialogOverlay dialogOverlay { get; set; }
 
         [Resolved(CanBeNull = true)]
         private DesktopGameHost desktopGameHost { get; set; }
@@ -83,8 +83,8 @@ namespace osu.Game.Database
             if (cachedStorage != null)
                 return cachedStorage;
 
-            var taskCompletionSource = new TaskCompletionSource<string>();
-            Schedule(() => game.PerformFromScreen(t => t.Push(new StableDirectorySelectScreen(taskCompletionSource))));
+            var taskCompletionSource = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
+            dialogOverlay.Push(new StableDirectoryLocationDialog(taskCompletionSource));
             var stablePath = await taskCompletionSource.Task.ConfigureAwait(false);
 
             return cachedStorage = new StableStorage(stablePath, desktopGameHost);
