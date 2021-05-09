@@ -105,7 +105,7 @@ namespace osu.Game.Tests.Visual.Settings
         }
 
         [Test]
-        public void TestSingleBindResetButton()
+        public void TestResetButtonOnBindings()
         {
             KeyBindingRow multiBindingRow = null;
 
