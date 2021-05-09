@@ -15,6 +15,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
+using osu.Game.IO;
 using osu.Game.IO.Legacy;
 using osu.Game.Overlays.Notifications;
 
@@ -37,8 +38,6 @@ namespace osu.Game.Collections
         private const string database_name = "collection.db";
 
         public readonly BindableList<BeatmapCollection> Collections = new BindableList<BeatmapCollection>();
-
-        public bool SupportsImportFromStable => RuntimeInfo.IsDesktop;
 
         [Resolved]
         private GameHost host { get; set; }
@@ -104,17 +103,16 @@ namespace osu.Game.Collections
         /// <summary>
         /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
         /// </summary>
-        public Task ImportFromStableAsync()
+        public Task ImportFromStableAsync(StableStorage stableStorage)
         {
-            var stable = GetStableStorage?.Invoke();
 
-            if (stable == null)
+            if (stableStorage == null)
             {
                 Logger.Log("No osu!stable installation available!", LoggingTarget.Information, LogLevel.Error);
                 return Task.CompletedTask;
             }
 
-            if (!stable.Exists(database_name))
+            if (!stableStorage.Exists(database_name))
             {
                 // This handles situations like when the user does not have a collections.db file
                 Logger.Log($"No {database_name} available in osu!stable installation", LoggingTarget.Information, LogLevel.Error);
@@ -123,7 +121,7 @@ namespace osu.Game.Collections
 
             return Task.Run(async () =>
             {
-                using (var stream = stable.GetStream(database_name))
+                using (var stream = stableStorage.GetStream(database_name))
                     await Import(stream).ConfigureAwait(false);
             });
         }
