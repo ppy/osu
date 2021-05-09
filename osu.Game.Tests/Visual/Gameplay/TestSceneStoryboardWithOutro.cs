@@ -140,7 +140,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("disable storyboard", () => LocalConfig.SetValue(OsuSetting.ShowStoryboard, false));
             AddUntilStep("completion set by processor", () => Player.ScoreProcessor.HasCompleted.Value);
             AddStep("exit via pause", () => Player.ExitViaPause());
-            AddAssert("score not shown", () => !Player.IsScoreShown);
+            AddAssert("player exited", () => Stack.CurrentScreen == null);
         }
 
         protected override bool AllowFail => true;
