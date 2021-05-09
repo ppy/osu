@@ -34,6 +34,9 @@ namespace osu.Game.Database
         private CollectionManager collections { get; set; }
 
         [Resolved]
+        private OsuGame game { get; set; }
+
+        [Resolved]
         private DialogOverlay dialogOverlay { get; set; }
 
         [Resolved(CanBeNull = true)]
