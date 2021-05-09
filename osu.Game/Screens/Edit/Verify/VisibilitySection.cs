@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Screens.Edit.Verify
@@ -21,15 +21,16 @@ namespace osu.Game.Screens.Edit.Verify
         [BackgroundDependencyLoader]
         private void load()
         {
-            var checkboxes = new List<OsuCheckbox>();
+            var checkboxes = new List<SettingsCheckbox>();
 
             foreach (IssueType issueType in IssueList.ShowType.Keys)
             {
-                var checkbox = new OsuCheckbox
+                var checkbox = new SettingsCheckbox
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    LabelText = issueType.ToString()
+                    LabelText = issueType.ToString(),
+                    TooltipText = "Whether to show negligible issues"
                 };
 
                 checkbox.Current.BindTo(IssueList.ShowType[issueType]);
