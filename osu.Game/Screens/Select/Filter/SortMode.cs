@@ -28,10 +28,10 @@ namespace osu.Game.Screens.Select.Filter
         [Description("Rank Achieved")]
         RankAchieved,
 
-        [Description("Title")]
-        Title,
-
         [Description("Source")]
         Source,
+
+        [Description("Title")]
+        Title,
     }
 }
