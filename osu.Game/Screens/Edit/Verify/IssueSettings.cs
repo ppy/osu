@@ -8,8 +8,16 @@ namespace osu.Game.Screens.Edit.Verify
 {
     public class IssueSettings : EditorSettings
     {
+        private IssueList issueList;
+
+        public IssueSettings(IssueList issueList)
+        {
+            this.issueList = issueList;
+        }
+
         protected override IReadOnlyList<Drawable> CreateSections() => new Drawable[]
         {
+            new VisibilitySection(issueList)
         };
     }
 }

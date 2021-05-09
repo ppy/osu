@@ -22,6 +22,8 @@ namespace osu.Game.Screens.Edit.Verify
         [BackgroundDependencyLoader]
         private void load()
         {
+            IssueList issueList;
+
             Child = new Container
             {
                 RelativeSizeAxes = Axes.Both,
@@ -37,8 +39,8 @@ namespace osu.Game.Screens.Edit.Verify
                     {
                         new Drawable[]
                         {
-                            new IssueList(),
-                            new IssueSettings(),
+                            issueList = new IssueList(),
+                            new IssueSettings(issueList),
                         },
                     }
                 }
