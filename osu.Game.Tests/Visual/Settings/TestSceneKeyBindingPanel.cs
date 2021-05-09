@@ -105,6 +105,46 @@ namespace osu.Game.Tests.Visual.Settings
         }
 
         [Test]
+        public void TestSingleBindResetButton()
+        {
+            KeyBindingRow multiBindingRow = null;
+
+            AddStep("click first row with two bindings", () =>
+            {
+                multiBindingRow = panel.ChildrenOfType<KeyBindingRow>().First(row => row.Defaults.Count() > 1);
+                InputManager.MoveMouseTo(multiBindingRow);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            clickSingleBindResetButton();
+
+            AddAssert("first binding cleared", () => multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(0).KeyBinding.KeyCombination.Equals(multiBindingRow.Defaults.ElementAt(0)));
+
+            AddStep("click second binding", () =>
+            {
+                var target = multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(1);
+
+                InputManager.MoveMouseTo(target);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            clickSingleBindResetButton();
+
+            AddAssert("second binding cleared", () => multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(1).KeyBinding.KeyCombination.Equals(multiBindingRow.Defaults.ElementAt(1)));
+
+            void clickSingleBindResetButton()
+            {
+                AddStep("click reset button for single binding", () =>
+                {
+                    var clearButton = multiBindingRow.ChildrenOfType<KeyBindingRow.SingleBindResetButton>().Single();
+
+                    InputManager.MoveMouseTo(clearButton);
+                    InputManager.Click(MouseButton.Left);
+                });
+            }
+        }
+
+        [Test]
         public void TestClickRowSelectsFirstBinding()
         {
             KeyBindingRow multiBindingRow = null;

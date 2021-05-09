@@ -109,6 +109,7 @@ namespace osu.Game.Overlays.KeyBinding
                     Children = new Drawable[]
                     {
                         new CancelButton { Action = finalise },
+                        new SingleBindResetButton { Action = singleBindReset },
                         new ClearButton { Action = clear },
                     },
                 }
@@ -281,6 +282,15 @@ namespace osu.Game.Overlays.KeyBinding
             finalise();
         }
 
+        private void singleBindReset()
+        {
+            if (bindTarget == null)
+                return;
+
+            bindTarget.UpdateKeyCombination(Defaults.ElementAt(buttons.IndexOf(bindTarget)));
+            finalise();
+        }
+
         private void finalise()
         {
             if (bindTarget != null)
@@ -336,6 +346,24 @@ namespace osu.Game.Overlays.KeyBinding
             {
                 Text = "Cancel";
                 Size = new Vector2(80, 20);
+            }
+        }
+
+        public class SingleBindResetButton : TriangleButton
+        {
+            public SingleBindResetButton()
+            {
+                Text = "Reset";
+                Size = new Vector2(80, 20);
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                BackgroundColour = colours.Green;
+
+                Triangles.ColourDark = colours.GreenDark;
+                Triangles.ColourLight = colours.GreenLight;
             }
         }
 
