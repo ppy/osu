@@ -87,7 +87,7 @@ namespace osu.Game.Database
                 return cachedStorage;
 
             var taskCompletionSource = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
-            dialogOverlay.Push(new StableDirectoryLocationDialog(taskCompletionSource));
+            Schedule(() => dialogOverlay.Push(new StableDirectoryLocationDialog(taskCompletionSource)));
             var stablePath = await taskCompletionSource.Task.ConfigureAwait(false);
 
             return cachedStorage = new StableStorage(stablePath, desktopGameHost);
