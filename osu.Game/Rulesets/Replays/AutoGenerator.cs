@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
 using JetBrains.Annotations;
 using osu.Game.Beatmaps;
 using osu.Game.Replays;
@@ -62,7 +61,7 @@ namespace osu.Game.Rulesets.Replays
             Frames.Clear();
             GenerateFrames();
 
-            return new Replay(Frames.OrderBy(frame => frame.Time));
+            return new Replay(Frames);
         }
 
         /// <summary>
