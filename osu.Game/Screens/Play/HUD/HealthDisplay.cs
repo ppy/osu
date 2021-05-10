@@ -37,13 +37,18 @@ namespace osu.Game.Screens.Play.HUD
         {
             Current.BindTo(HealthProcessor.Health);
 
-            HealthProcessor.NewJudgement += onNewJudgement;
-
             if (hud != null)
             {
                 showHealthbar = hud.ShowHealthbar.GetBoundCopy();
                 showHealthbar.BindValueChanged(healthBar => this.FadeTo(healthBar.NewValue ? 1 : 0, HUDOverlay.FADE_DURATION, HUDOverlay.FADE_EASING), true);
             }
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            HealthProcessor.NewJudgement += onNewJudgement;
         }
 
         private void onNewJudgement(JudgementResult judgement)
