@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 {
     public class Slider : OsuHitObject, IHasPathWithRepeats
     {
-        public double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
+        public virtual double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
 
         [JsonIgnore]
         public double Duration

@@ -25,10 +25,10 @@ namespace osu.Game.Rulesets.Edit
             /// </summary>
             public readonly Bindable<DifficultyRating> InterpretedDifficulty;
 
-            public Context(IWorkingBeatmap workingBeatmap)
+            public Context(IWorkingBeatmap workingBeatmap, DifficultyRating difficultyRating = DifficultyRating.ExpertPlus)
             {
                 WorkingBeatmap = workingBeatmap;
-                InterpretedDifficulty = new Bindable<DifficultyRating>();
+                InterpretedDifficulty = new Bindable<DifficultyRating>(difficultyRating);
             }
         }
 
