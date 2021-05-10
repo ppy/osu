@@ -29,8 +29,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         {
             base.LoadComplete();
 
-            if (processor != null)
-                processor.NewJudgement += onNewJudgement;
+            processor.NewJudgement += onNewJudgement;
         }
 
         private void onNewJudgement(JudgementResult result)
