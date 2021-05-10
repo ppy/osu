@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Threading.Tasks;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Text;
 using osu.Game.Graphics.Sprites;
@@ -9,19 +10,26 @@ using osuTK;
 
 namespace osu.Game.Skinning
 {
-    public class LegacySpriteText : OsuSpriteText
+    public sealed class LegacySpriteText : OsuSpriteText
     {
-        private readonly LegacyGlyphStore glyphStore;
+        private readonly LegacyFont font;
+
+        private LegacyGlyphStore glyphStore;
 
         protected override char FixedWidthReferenceCharacter => '5';
 
         protected override char[] FixedWidthExcludeCharacters => new[] { ',', '.', '%', 'x' };
 
-        public LegacySpriteText(ISkin skin, LegacyFont font)
+        public LegacySpriteText(LegacyFont font)
         {
+            this.font = font;
             Shadow = false;
             UseFullGlyphHeight = false;
+        }
 
+        [BackgroundDependencyLoader]
+        private void load(ISkinSource skin)
+        {
             Font = new FontUsage(skin.GetFontPrefix(font), 1, fixedWidth: true);
             Spacing = new Vector2(-skin.GetFontOverlap(font), 0);
 

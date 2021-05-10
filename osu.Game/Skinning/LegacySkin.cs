@@ -334,13 +334,13 @@ namespace osu.Game.Skinning
                             return new LegacyComboCounter();
 
                         case HUDSkinComponents.ScoreCounter:
-                            return new LegacyScoreCounter(this);
+                            return new LegacyScoreCounter();
 
                         case HUDSkinComponents.AccuracyCounter:
-                            return new LegacyAccuracyCounter(this);
+                            return new LegacyAccuracyCounter();
 
                         case HUDSkinComponents.HealthDisplay:
-                            return new LegacyHealthDisplay(this);
+                            return new LegacyHealthDisplay();
                     }
 
                     return null;
