@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Replays
         public override Replay Generate()
         {
             if (Beatmap.HitObjects.Count == 0)
-                return Replay;
+                return new Replay();
 
             buttonIndex = 0;
 
@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Osu.Replays
                 addHitObjectReplay(h);
             }
 
-            return Replay;
+            return new Replay(Frames);
         }
 
         private void addDelayedMovements(OsuHitObject h, OsuHitObject prev)

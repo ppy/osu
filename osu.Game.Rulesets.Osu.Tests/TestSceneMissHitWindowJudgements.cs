@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 AddFrameToReplay(new OsuReplayFrame(Beatmap.HitObjects[0].StartTime - 350, Beatmap.HitObjects[0].StackedPosition, OsuAction.LeftButton));
                 AddFrameToReplay(new OsuReplayFrame(Beatmap.HitObjects[0].StartTime - 325, Beatmap.HitObjects[0].StackedPosition));
 
-                return Replay;
+                return new Replay(Frames);
             }
         }
     }

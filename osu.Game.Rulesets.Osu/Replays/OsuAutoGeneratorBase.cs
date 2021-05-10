@@ -6,7 +6,6 @@ using osu.Game.Beatmaps;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Game.Replays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Replays;
@@ -28,15 +27,12 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         #region Construction / Initialisation
 
-        protected Replay Replay;
-        protected List<ReplayFrame> Frames => Replay.Frames;
+        protected readonly List<ReplayFrame> Frames = new List<ReplayFrame>();
         private readonly IReadOnlyList<IApplicableToRate> timeAffectingMods;
 
         protected OsuAutoGeneratorBase(IBeatmap beatmap, IReadOnlyList<Mod> mods)
             : base(beatmap)
         {
-            Replay = new Replay();
-
             timeAffectingMods = mods.OfType<IApplicableToRate>().ToList();
         }
 
