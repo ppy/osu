@@ -212,7 +212,7 @@ namespace osu.Game.Screens.Spectate
                 if (!gameplayStates.TryGetValue(userId, out var gameplayState))
                     return;
 
-                gameplayState.Score.Replay.HasReceivedAllFrames = true;
+                gameplayState.Score.Replay.IsComplete = true;
 
                 gameplayStates.Remove(userId);
                 Schedule(() => EndGameplay(userId));

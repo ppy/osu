@@ -10,30 +10,30 @@ namespace osu.Game.Replays
 {
     /// <summary>
     /// The list of frames of a replay.
-    /// Frames may be added at the end when <see cref="HasReceivedAllFrames"/> is <c>false</c>.
+    /// Frames may be added at the end when <see cref="IsComplete"/> is <c>false</c>.
     /// </summary>
     public class Replay
     {
         /// <summary>
-        /// Whether all frames for this replay have been received.
+        /// Whether no more frames would be added to this replay.
         /// If false, gameplay would be paused to wait for further data, for instance.
         /// </summary>
-        public bool HasReceivedAllFrames
+        public bool IsComplete
         {
-            get => hasReceivedAllFrames;
+            get => isComplete;
 
             set
             {
-                if (hasReceivedAllFrames == value) return;
+                if (isComplete == value) return;
 
                 if (!value)
-                    throw new InvalidOperationException($"May not change {nameof(HasReceivedAllFrames)} of a {nameof(Replay)} from true to false.");
+                    throw new InvalidOperationException($"May not change {nameof(IsComplete)} of a {nameof(Replay)} from true to false.");
 
-                hasReceivedAllFrames = true;
+                isComplete = true;
             }
         }
 
-        private bool hasReceivedAllFrames;
+        private bool isComplete;
 
         /// <summary>
         /// The list of frames of this replay.
@@ -53,7 +53,7 @@ namespace osu.Game.Replays
         public Replay(bool isComplete)
         {
             Frames = new List<ReplayFrame>();
-            hasReceivedAllFrames = isComplete;
+            this.isComplete = isComplete;
         }
 
         /// <summary>
@@ -61,11 +61,11 @@ namespace osu.Game.Replays
         /// Frames are automatically sorted by its time.
         /// </summary>
         /// <param name="frames">The frames of the replay.</param>
-        /// <param name="isComplete">Whether no more frames are added to this replay.</param>
+        /// <param name="isComplete">Whether no more frames would be added to this replay.</param>
         public Replay(IEnumerable<ReplayFrame> frames, bool isComplete = true)
         {
             Frames = frames.OrderBy(f => f.Time).ToList();
-            hasReceivedAllFrames = isComplete;
+            this.isComplete = isComplete;
         }
     }
 }

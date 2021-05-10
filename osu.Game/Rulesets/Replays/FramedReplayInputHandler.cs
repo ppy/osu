@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Replays
         /// <summary>
         /// Whether we are waiting for new frames to be received.
         /// </summary>
-        public bool WaitingForFrame => !replay.HasReceivedAllFrames && currentFrameIndex == Frames.Count - 1;
+        public bool WaitingForFrame => !replay.IsComplete && currentFrameIndex == Frames.Count - 1;
 
         /// <summary>
         /// The current frame of the replay.
@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.Replays
             if (!HasFrames)
             {
                 // In the case all frames are received, allow time to progress regardless.
-                if (replay.HasReceivedAllFrames)
+                if (replay.IsComplete)
                     return CurrentTime = time;
 
                 return null;
