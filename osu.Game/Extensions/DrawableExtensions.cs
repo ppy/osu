@@ -47,7 +47,7 @@ namespace osu.Game.Extensions
 
         public static SkinnableInfo CreateSerialisedInformation(this Drawable component) => new SkinnableInfo(component);
 
-        public static void ApplySerialisedInformation(this Drawable component, ISkinnableInfo info)
+        public static void ApplySerialisedInformation(this Drawable component, SkinnableInfo info)
         {
             // todo: can probably make this better via deserialisation directly using a common interface.
             component.Position = info.Position;
