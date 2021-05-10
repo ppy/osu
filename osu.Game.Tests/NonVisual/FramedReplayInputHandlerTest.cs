@@ -208,7 +208,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestReplayStreaming()
         {
-            handler = new TestInputHandler(replay = new Replay(false));
+            handler = new TestInputHandler(replay = new StreamingReplay());
 
             // no frames are arrived yet
             setTime(0, null);

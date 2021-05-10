@@ -166,7 +166,7 @@ namespace osu.Game.Screens.Spectate
                         Mods = spectatorState.Mods.Select(m => m.ToMod(resolvedRuleset)).ToArray(),
                         Ruleset = resolvedRuleset.RulesetInfo,
                     },
-                    Replay = new Replay(false),
+                    Replay = new StreamingReplay(),
                 };
 
                 var gameplayState = new GameplayState(score, resolvedRuleset, beatmaps.GetWorkingBeatmap(resolvedBeatmap));
@@ -212,7 +212,7 @@ namespace osu.Game.Screens.Spectate
                 if (!gameplayStates.TryGetValue(userId, out var gameplayState))
                     return;
 
-                gameplayState.Score.Replay.IsComplete = true;
+                ((StreamingReplay)gameplayState.Score.Replay).MarkCompleted();
 
                 gameplayStates.Remove(userId);
                 Schedule(() => EndGameplay(userId));
