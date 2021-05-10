@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private TestRulesetInputManager playbackManager;
         private TestRulesetInputManager recordingManager;
 
-        private Replay replay;
+        private StreamingReplay replay;
 
         private readonly IBindableList<int> users = new BindableList<int>();
 
@@ -67,7 +67,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            replay = new Replay();
+            replay = new StreamingReplay();
 
             users.BindTo(streamingClient.PlayingUsers);
             users.BindCollectionChanged((obj, args) =>
@@ -180,7 +180,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 var frame = new TestReplayFrame();
                 frame.FromLegacy(legacyFrame, null, null);
-                replay.Frames.Add(frame);
+                replay.Add(frame);
             }
         }
 
@@ -354,7 +354,10 @@ namespace osu.Game.Tests.Visual.Gameplay
         internal class TestReplayRecorder : ReplayRecorder<TestAction>
         {
             public TestReplayRecorder()
-                : base(new Score())
+                : base(new Score
+                {
+                    Replay = new StreamingReplay()
+                })
             {
             }
 

@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private TestRulesetInputManager playbackManager;
         private TestRulesetInputManager recordingManager;
 
-        private Replay replay;
+        private StreamingReplay replay;
 
         private TestReplayRecorder recorder;
 
@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            replay = new Replay();
+            replay = new StreamingReplay();
 
             Add(new GridContainer
             {

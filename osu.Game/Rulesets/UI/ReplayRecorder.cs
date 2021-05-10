@@ -10,6 +10,7 @@ using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Online.Spectator;
+using osu.Game.Replays;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
@@ -21,6 +22,7 @@ namespace osu.Game.Rulesets.UI
         where T : struct
     {
         private readonly Score target;
+        private readonly StreamingReplay targetReplay;
 
         private readonly List<T> pressedActions = new List<T>();
 
@@ -36,7 +38,11 @@ namespace osu.Game.Rulesets.UI
 
         protected ReplayRecorder(Score target)
         {
+            if (!(target.Replay is StreamingReplay streamingReplay))
+                throw new InvalidOperationException($"{nameof(ReplayRecorder)} cannot target a non-{nameof(StreamingReplay)} replay.");
+
             this.target = target;
+            targetReplay = streamingReplay;
 
             RelativeSizeAxes = Axes.Both;
 
@@ -85,7 +91,7 @@ namespace osu.Game.Rulesets.UI
 
         private void recordFrame(bool important)
         {
-            var last = target.Replay.Frames.LastOrDefault();
+            var last = targetReplay.Frames.LastOrDefault();
 
             if (!important && last != null && Time.Current - last.Time < (1000d / RecordFrameRate))
                 return;
@@ -96,7 +102,7 @@ namespace osu.Game.Rulesets.UI
 
             if (frame != null)
             {
-                target.Replay.Frames.Add(frame);
+                targetReplay.Add(frame);
 
                 spectatorStreaming?.HandleFrame(frame);
             }

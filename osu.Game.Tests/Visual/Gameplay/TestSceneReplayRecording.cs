@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         public TestSceneReplayRecording()
         {
-            Replay replay = new Replay();
+            var replay = new StreamingReplay();
 
             Add(new GridContainer
             {

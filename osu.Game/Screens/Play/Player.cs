@@ -169,7 +169,10 @@ namespace osu.Game.Screens.Play
         /// </summary>
         protected virtual void PrepareReplay()
         {
-            DrawableRuleset.SetRecordTarget(recordingScore = new Score());
+            DrawableRuleset.SetRecordTarget(recordingScore = new Score
+            {
+                Replay = new StreamingReplay()
+            });
 
             ScoreProcessor.NewJudgement += result => ScoreProcessor.PopulateScore(recordingScore.ScoreInfo);
         }
