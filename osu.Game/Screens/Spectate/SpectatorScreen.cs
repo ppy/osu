@@ -197,7 +197,7 @@ namespace osu.Game.Screens.Spectate
                     var convertedFrame = (ReplayFrame)convertibleFrame;
                     convertedFrame.Time = frame.Time;
 
-                    gameplayState.Score.Replay.Frames.Add(convertedFrame);
+                    ((StreamingReplay)gameplayState.Score.Replay).Add(convertedFrame);
                 }
             }
         }
