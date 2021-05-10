@@ -39,7 +39,8 @@ namespace osu.Game.Screens.Play.HUD
 
         private void onNewJudgement(JudgementResult judgement)
         {
-            if (judgement.IsHit && judgement.Type != HitResult.IgnoreHit) Flash(judgement);
+            if (judgement.IsHit && judgement.Type != HitResult.IgnoreHit)
+                Flash(judgement);
         }
 
         protected override void Dispose(bool isDisposing)
