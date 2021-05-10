@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Threading;
 using osu.Game.Screens.Play.HUD;
@@ -54,6 +55,12 @@ namespace osu.Game.Extensions
             component.Rotation = info.Rotation;
             component.Scale = info.Scale;
             component.Anchor = info.Anchor;
+
+            if (component is Container container)
+            {
+                foreach (var child in info.Children)
+                    container.Add(child.CreateInstance());
+            }
         }
     }
 }
