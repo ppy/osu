@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using osu.Game.Beatmaps;
@@ -106,7 +107,7 @@ namespace osu.Game.Scoring.Legacy
 
                         using (var lzma = new LzmaStream(properties, replayInStream, compressedSize, outSize))
                         using (var reader = new StreamReader(lzma))
-                            readLegacyReplay(score.Replay, reader);
+                            score.Replay = readLegacyReplay(reader);
                     }
                 }
             }
@@ -219,10 +220,10 @@ namespace osu.Game.Scoring.Legacy
             }
         }
 
-        private void readLegacyReplay(Replay replay, StreamReader reader)
+        private Replay readLegacyReplay(StreamReader reader)
         {
             float lastTime = 0;
-            ReplayFrame currentFrame = null;
+            var convertedFrames = new List<ReplayFrame>();
 
             var frames = reader.ReadToEnd().Split(',');
 
@@ -256,13 +257,13 @@ namespace osu.Game.Scoring.Legacy
                 if (diff < 0)
                     continue;
 
-                currentFrame = convertFrame(new LegacyReplayFrame(lastTime,
+                convertedFrames.Add(convertFrame(new LegacyReplayFrame(lastTime,
                     mouseX,
                     mouseY,
-                    (ReplayButtonState)Parsing.ParseInt(split[3])), currentFrame);
-
-                replay.Frames.Add(currentFrame);
+                    (ReplayButtonState)Parsing.ParseInt(split[3])), convertedFrames.LastOrDefault()));
             }
+
+            return new Replay(convertedFrames);
         }
 
         private ReplayFrame convertFrame(LegacyReplayFrame currentFrame, ReplayFrame lastFrame)
