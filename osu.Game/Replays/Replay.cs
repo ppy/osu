@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Replays;
@@ -23,14 +24,16 @@ namespace osu.Game.Replays
         /// The list of frames of this replay.
         /// This list should be sorted based on <see cref="ReplayFrame.Time"/>.
         /// </summary>
-        public List<ReplayFrame> Frames { get; }
+        public virtual IReadOnlyList<ReplayFrame> Frames => frames;
+
+        private readonly ReplayFrame[] frames;
 
         /// <summary>
         /// Construct an empty replay.
         /// </summary>
         public Replay()
         {
-            Frames = new List<ReplayFrame>();
+            frames = Array.Empty<ReplayFrame>();
         }
 
         /// <summary>
@@ -40,7 +43,7 @@ namespace osu.Game.Replays
         /// <param name="frames">The frames of the replay.</param>
         public Replay(IEnumerable<ReplayFrame> frames)
         {
-            Frames = frames.OrderBy(f => f.Time).ToList();
+            this.frames = frames.OrderBy(f => f.Time).ToArray();
         }
     }
 }

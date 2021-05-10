@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Replays
@@ -20,8 +21,12 @@ namespace osu.Game.Replays
         /// </summary>
         public void MarkCompleted() => isComplete = true;
 
+        public sealed override IReadOnlyList<ReplayFrame> Frames => frameList;
+
+        private readonly List<ReplayFrame> frameList = new List<ReplayFrame>();
+
         /// <summary>
-        /// Add a new frame to this replay.
+        /// Add a new frame at the end of this replay.
         /// </summary>
         /// <param name="newFrame">The new frame. The <see cref="ReplayFrame.Time"/> of this frame must be later or equals to </param>
         /// <exception cref="InvalidOperationException"></exception>
@@ -30,10 +35,10 @@ namespace osu.Game.Replays
             if (IsComplete)
                 throw new InvalidOperationException("May not add frames to a completed replay.");
 
-            if (Frames.Count != 0 && !(Frames[^1].Time <= newFrame.Time))
+            if (frameList.Count != 0 && !(frameList[^1].Time <= newFrame.Time))
                 throw new InvalidOperationException("May not add a new frame to a replay without respecting the frame time ordering.");
 
-            Frames.Add(newFrame);
+            frameList.Add(newFrame);
         }
     }
 }
