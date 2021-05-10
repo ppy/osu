@@ -1,7 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using osu.Game.Beatmaps;
+using osu.Game.Replays;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 
@@ -15,7 +18,18 @@ namespace osu.Game.Screens.Spectate
         /// <summary>
         /// The score which the user is playing.
         /// </summary>
-        public readonly Score Score;
+        public readonly ScoreInfo ScoreInfo;
+
+        /// <summary>
+        /// The replay of the user play.
+        /// </summary>
+        public readonly StreamingReplay Replay;
+
+        public Score Score => new Score
+        {
+            ScoreInfo = ScoreInfo,
+            Replay = Replay
+        };
 
         /// <summary>
         /// The ruleset which the user is playing.
@@ -27,9 +41,10 @@ namespace osu.Game.Screens.Spectate
         /// </summary>
         public readonly WorkingBeatmap Beatmap;
 
-        public GameplayState(Score score, Ruleset ruleset, WorkingBeatmap beatmap)
+        public GameplayState(ScoreInfo scoreInfo, Ruleset ruleset, WorkingBeatmap beatmap)
         {
-            Score = score;
+            ScoreInfo = scoreInfo;
+            Replay = new StreamingReplay();
             Ruleset = ruleset;
             Beatmap = beatmap;
         }

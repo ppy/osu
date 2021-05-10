@@ -12,7 +12,6 @@ using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.Spectator;
-using osu.Game.Replays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
@@ -157,19 +156,15 @@ namespace osu.Game.Screens.Spectate
                 if (resolvedBeatmap == null)
                     return;
 
-                var score = new Score
+                var scoreInfo = new ScoreInfo
                 {
-                    ScoreInfo = new ScoreInfo
-                    {
-                        Beatmap = resolvedBeatmap,
-                        User = user,
-                        Mods = spectatorState.Mods.Select(m => m.ToMod(resolvedRuleset)).ToArray(),
-                        Ruleset = resolvedRuleset.RulesetInfo,
-                    },
-                    Replay = new StreamingReplay(),
+                    Beatmap = resolvedBeatmap,
+                    User = user,
+                    Mods = spectatorState.Mods.Select(m => m.ToMod(resolvedRuleset)).ToArray(),
+                    Ruleset = resolvedRuleset.RulesetInfo,
                 };
 
-                var gameplayState = new GameplayState(score, resolvedRuleset, beatmaps.GetWorkingBeatmap(resolvedBeatmap));
+                var gameplayState = new GameplayState(scoreInfo, resolvedRuleset, beatmaps.GetWorkingBeatmap(resolvedBeatmap));
 
                 gameplayStates[userId] = gameplayState;
                 Schedule(() => StartGameplay(userId, gameplayState));
@@ -187,7 +182,7 @@ namespace osu.Game.Screens.Spectate
                     return;
 
                 // The ruleset instance should be guaranteed to be in sync with the score via ScoreLock.
-                Debug.Assert(gameplayState.Ruleset != null && gameplayState.Ruleset.RulesetInfo.Equals(gameplayState.Score.ScoreInfo.Ruleset));
+                Debug.Assert(gameplayState.Ruleset != null && gameplayState.Ruleset.RulesetInfo.Equals(gameplayState.ScoreInfo.Ruleset));
 
                 foreach (var frame in bundle.Frames)
                 {
@@ -197,7 +192,7 @@ namespace osu.Game.Screens.Spectate
                     var convertedFrame = (ReplayFrame)convertibleFrame;
                     convertedFrame.Time = frame.Time;
 
-                    ((StreamingReplay)gameplayState.Score.Replay).Add(convertedFrame);
+                    gameplayState.Replay.Add(convertedFrame);
                 }
             }
         }
@@ -212,7 +207,7 @@ namespace osu.Game.Screens.Spectate
                 if (!gameplayStates.TryGetValue(userId, out var gameplayState))
                     return;
 
-                ((StreamingReplay)gameplayState.Score.Replay).MarkCompleted();
+                gameplayState.Replay.MarkCompleted();
 
                 gameplayStates.Remove(userId);
                 Schedule(() => EndGameplay(userId));
