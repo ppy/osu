@@ -79,13 +79,10 @@ namespace osu.Game.Overlays.News.Sidebar
         {
             protected override IEnumerable<Drawable> EffectTargets => new[] { text };
 
-            private readonly int year;
             private readonly OsuSpriteText text;
 
             public YearButton(int year)
             {
-                this.year = year;
-
                 Size = new Vector2(33.75f, 15);
                 Child = text = new OsuSpriteText
                 {

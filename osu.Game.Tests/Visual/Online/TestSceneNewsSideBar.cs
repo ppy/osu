@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Visual.Online
             Metadata = { Value = metadata }
         });
 
-        private static APINewsSidebar metadata = new APINewsSidebar
+        private static readonly APINewsSidebar metadata = new APINewsSidebar
         {
             CurrentYear = 2021,
             Years = new[]

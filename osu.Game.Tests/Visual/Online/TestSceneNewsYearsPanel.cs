@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Visual.Online
 
         public TestSceneNewsYearsPanel()
         {
-            Add(panel = new YearsPanel()
+            Add(panel = new YearsPanel
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre
