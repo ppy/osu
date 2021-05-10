@@ -36,7 +36,6 @@ namespace osu.Game.Screens.Play
         public readonly KeyCounterDisplay KeyCounter;
         public readonly SkinnableScoreCounter ScoreCounter;
         public readonly SkinnableAccuracyCounter AccuracyCounter;
-        public readonly SkinnableHealthDisplay HealthDisplay;
         public readonly SongProgress Progress;
         public readonly ModDisplay ModDisplay;
         public readonly HoldForMenuButton HoldToQuit;
@@ -108,7 +107,6 @@ namespace osu.Game.Screens.Play
                                             {
                                                 // remaining cross-dependencies need tidying.
                                                 // kept to ensure non-null, but hidden for testing.
-                                                HealthDisplay = new SkinnableHealthDisplay(),
                                                 AccuracyCounter = new SkinnableAccuracyCounter(),
                                                 ScoreCounter = new SkinnableScoreCounter(),
                                             }
@@ -206,7 +204,6 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
-            ShowHealthbar.BindValueChanged(healthBar => HealthDisplay.FadeTo(healthBar.NewValue ? 1 : 0, FADE_DURATION, FADE_EASING), true);
             ShowHud.BindValueChanged(visible => hideTargets.ForEach(d => d.FadeTo(visible.NewValue ? 1 : 0, FADE_DURATION, FADE_EASING)));
 
             IsBreakTime.BindValueChanged(_ => updateVisibility());
