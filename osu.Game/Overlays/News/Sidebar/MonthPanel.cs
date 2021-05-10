@@ -125,13 +125,10 @@ namespace osu.Game.Overlays.News.Sidebar
         {
             protected override IEnumerable<Drawable> EffectTargets => new[] { text };
 
-            private readonly APINewsPost post;
             private readonly TextFlowContainer text;
 
             public PostButton(APINewsPost post)
             {
-                this.post = post;
-
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
 
