@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 using osuTK;
 
@@ -65,12 +66,16 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 var randomMods = Ruleset.Value.CreateInstance().GetAllMods().OrderBy(_ => RNG.Next()).Take(5).ToList();
 
-                Child = display = new BeatmapMetadataDisplay(getBeatmap(), new Bindable<IReadOnlyList<Mod>>(randomMods), Empty())
+                OsuLogo logo = new OsuLogo { Scale = new Vector2(0.15f) };
+
+                Children = new Drawable[]
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Scale = new Vector2(1.5f),
-                    Alpha = 0f,
+                    display = new BeatmapMetadataDisplay(getBeatmap(), new Bindable<IReadOnlyList<Mod>>(randomMods), logo)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Alpha = 0f,
+                    }
                 };
 
                 display.FadeIn(400, Easing.OutQuint);
