@@ -72,10 +72,13 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Scale = new Vector2(1.5f),
                     Alpha = 0f,
                 };
+
+                display.FadeIn(400, Easing.OutQuint);
             });
 
-            AddStep("fade in", () => display.FadeIn(400, Easing.OutQuint));
-            AddToggleStep("trigger loading", v => display.Loading = v);
+            AddWaitStep("wait a bit", 5);
+
+            AddStep("finish loading", () => display.Loading = false);
         }
     }
 }
