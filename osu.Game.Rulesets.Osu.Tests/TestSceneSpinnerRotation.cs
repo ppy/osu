@@ -18,7 +18,6 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.UI;
-using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
@@ -123,19 +122,15 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("spinner symbol direction correct", () => clockwise ? spinnerSymbol.Rotation > 0 : spinnerSymbol.Rotation < 0);
         }
 
-        private Replay flip(Replay scoreReplay) => new Replay
-        {
-            Frames = scoreReplay
-                     .Frames
-                     .Cast<OsuReplayFrame>()
-                     .Select(replayFrame =>
-                     {
-                         var flippedPosition = new Vector2(OsuPlayfield.BASE_SIZE.X - replayFrame.Position.X, replayFrame.Position.Y);
-                         return new OsuReplayFrame(replayFrame.Time, flippedPosition, replayFrame.Actions.ToArray());
-                     })
-                     .Cast<ReplayFrame>()
-                     .ToList()
-        };
+        private Replay flip(Replay scoreReplay) => new Replay(
+            scoreReplay
+                .Frames
+                .Cast<OsuReplayFrame>()
+                .Select(replayFrame =>
+                {
+                    var flippedPosition = new Vector2(OsuPlayfield.BASE_SIZE.X - replayFrame.Position.X, replayFrame.Position.Y);
+                    return new OsuReplayFrame(replayFrame.Time, flippedPosition, replayFrame.Actions.ToArray());
+                }));
 
         [Test]
         public void TestSpinnerNormalBonusRewinding()
@@ -201,19 +196,15 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("spm almost same", () => Precision.AlmostEquals(expectedSpm, drawableSpinner.SpinsPerMinute.Value, 2.0));
         }
 
-        private Replay applyRateAdjustment(Replay scoreReplay, double rate) => new Replay
-        {
-            Frames = scoreReplay
-                     .Frames
-                     .Cast<OsuReplayFrame>()
-                     .Select(replayFrame =>
-                     {
-                         var adjustedTime = replayFrame.Time * rate;
-                         return new OsuReplayFrame(adjustedTime, replayFrame.Position, replayFrame.Actions.ToArray());
-                     })
-                     .Cast<ReplayFrame>()
-                     .ToList()
-        };
+        private Replay applyRateAdjustment(Replay scoreReplay, double rate) => new Replay(
+            scoreReplay
+                .Frames
+                .Cast<OsuReplayFrame>()
+                .Select(replayFrame =>
+                {
+                    var adjustedTime = replayFrame.Time * rate;
+                    return new OsuReplayFrame(adjustedTime, replayFrame.Position, replayFrame.Actions.ToArray());
+                }));
 
         private void addSeekStep(double time)
         {

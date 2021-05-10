@@ -5,7 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using JetBrains.Annotations;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
@@ -96,10 +95,6 @@ namespace osu.Game.Rulesets.Replays
 
         protected FramedReplayInputHandler(Replay replay)
         {
-            // TODO: This replay frame ordering should be enforced on the Replay type.
-            // Currently, the ordering can be broken if the frames are added after this construction.
-            replay.Frames = replay.Frames.OrderBy(f => f.Time).ToList();
-
             this.replay = replay;
             currentFrameIndex = -1;
             CurrentTime = double.NegativeInfinity;

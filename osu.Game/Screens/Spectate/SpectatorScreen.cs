@@ -166,7 +166,7 @@ namespace osu.Game.Screens.Spectate
                         Mods = spectatorState.Mods.Select(m => m.ToMod(resolvedRuleset)).ToArray(),
                         Ruleset = resolvedRuleset.RulesetInfo,
                     },
-                    Replay = new Replay { HasReceivedAllFrames = false },
+                    Replay = new Replay(false),
                 };
 
                 var gameplayState = new GameplayState(score, resolvedRuleset, beatmaps.GetWorkingBeatmap(resolvedBeatmap));

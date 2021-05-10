@@ -397,7 +397,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             {
                 Beatmap.Value = CreateWorkingBeatmap(beatmap);
 
-                var p = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = frames } });
+                var p = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay(frames) });
 
                 p.OnLoadComplete += _ =>
                 {

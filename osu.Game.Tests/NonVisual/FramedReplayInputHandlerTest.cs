@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Game.Replays;
@@ -16,19 +15,10 @@ namespace osu.Game.Tests.NonVisual
         private Replay replay;
         private TestInputHandler handler;
 
-        [SetUp]
-        public void SetUp()
-        {
-            handler = new TestInputHandler(replay = new Replay
-            {
-                HasReceivedAllFrames = false
-            });
-        }
-
         [Test]
         public void TestNormalPlayback()
         {
-            setReplayFrames();
+            setupDefaultReplay();
 
             setTime(0, 0);
             confirmCurrentFrame(0);
@@ -95,7 +85,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestIntroTime()
         {
-            setReplayFrames();
+            setupDefaultReplay();
 
             setTime(-1000, -1000);
             confirmCurrentFrame(null);
@@ -113,7 +103,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestBasicRewind()
         {
-            setReplayFrames();
+            setupDefaultReplay();
 
             setTime(2800, 0);
             setTime(2800, 1000);
@@ -153,7 +143,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestRewindInsideImportantSection()
         {
-            setReplayFrames();
+            setupDefaultReplay();
             fastForwardToPoint(3000);
 
             setTime(4000, 4000);
@@ -196,7 +186,7 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestRewindOutOfImportantSection()
         {
-            setReplayFrames();
+            setupDefaultReplay();
             fastForwardToPoint(3500);
 
             confirmCurrentFrame(3);
@@ -218,6 +208,8 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestReplayStreaming()
         {
+            handler = new TestInputHandler(replay = new Replay(false));
+
             // no frames are arrived yet
             setTime(0, null);
             setTime(1000, null);
@@ -258,11 +250,15 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestMultipleFramesSameTime()
         {
-            replay.Frames.Add(new TestReplayFrame(0));
-            replay.Frames.Add(new TestReplayFrame(0));
-            replay.Frames.Add(new TestReplayFrame(1000));
-            replay.Frames.Add(new TestReplayFrame(1000));
-            replay.Frames.Add(new TestReplayFrame(2000));
+            replay = new Replay(new[]
+            {
+                new TestReplayFrame(0),
+                new TestReplayFrame(0),
+                new TestReplayFrame(1000),
+                new TestReplayFrame(1000),
+                new TestReplayFrame(2000)
+            });
+            handler = new TestInputHandler(replay);
 
             // forward direction is prioritized when multiple frames have the same time.
             setTime(0, 0);
@@ -288,7 +284,7 @@ namespace osu.Game.Tests.NonVisual
             // data is hand-picked and breaks if the unstable List<T>.Sort() is used.
             // in theory this can still return a false-positive with another unstable algorithm if extremely unlucky,
             // but there is no conceivable fool-proof way to prevent that anyways.
-            replay.Frames.AddRange(new[]
+            replay = new Replay(new[]
             {
                 repeating_time,
                 0,
@@ -313,11 +309,6 @@ namespace osu.Game.Tests.NonVisual
                 10000
             }.Select((time, index) => new TestReplayFrame(time, true, index)));
 
-            replay.HasReceivedAllFrames = true;
-
-            // create a new handler with the replay for the sort to be performed.
-            handler = new TestInputHandler(replay);
-
             // ensure sort stability by checking that the frames with time == repeating_time are sorted in ascending frame index order themselves.
             var repeatingTimeFramesData = replay.Frames
                                                 .Cast<TestReplayFrame>()
@@ -327,9 +318,9 @@ namespace osu.Game.Tests.NonVisual
             Assert.That(repeatingTimeFramesData, Is.Ordered.Ascending);
         }
 
-        private void setReplayFrames()
+        private void setupDefaultReplay()
         {
-            replay.Frames = new List<ReplayFrame>
+            replay = new Replay(new[]
             {
                 new TestReplayFrame(0),
                 new TestReplayFrame(1000),
@@ -339,9 +330,12 @@ namespace osu.Game.Tests.NonVisual
                 new TestReplayFrame(5000, true),
                 new TestReplayFrame(7000, true),
                 new TestReplayFrame(8000),
-            };
-            replay.HasReceivedAllFrames = true;
+            });
+            handler = new TestInputHandler(replay);
         }
+
+        [TearDown]
+        public void TearDown() => handler = null;
 
         private void fastForwardToPoint(double destination)
         {
