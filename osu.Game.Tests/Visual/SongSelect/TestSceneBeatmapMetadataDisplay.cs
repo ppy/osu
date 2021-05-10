@@ -35,27 +35,13 @@ namespace osu.Game.Tests.Visual.SongSelect
                 AddStep($"switch to {ruleset.Name}", () => Ruleset.Value = ruleset);
         }
 
-        private void createTest(Func<WorkingBeatmap> getBeatmap)
-        {
-            AddStep("setup display", () => Child = display = new BeatmapMetadataDisplay(getBeatmap(), new Bindable<IReadOnlyList<Mod>>(getRandomMods()), Empty())
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Scale = new Vector2(1.5f),
-                Alpha = 0f,
-            });
-
-            AddStep("fade in", () => display.FadeIn(400, Easing.OutQuint));
-            AddToggleStep("trigger loading", v => display.Loading = v);
-        }
-
         [Test]
         public void TestLocal([Values("Beatmap", "Some long title and stuff")]
                               string title,
                               [Values("Trial", "Some1's very hardest difficulty")]
                               string version)
         {
-            createTest(() => CreateWorkingBeatmap(new Beatmap
+            showMetadataForBeatmap(() => CreateWorkingBeatmap(new Beatmap
             {
                 BeatmapInfo =
                 {
@@ -72,7 +58,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestRandomFromDatabase()
         {
-            createTest(() =>
+            showMetadataForBeatmap(() =>
             {
                 var allBeatmapSets = manager.GetAllUsableBeatmapSets(IncludedDetails.Minimal);
                 if (allBeatmapSets.Count == 0)
@@ -85,10 +71,23 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
         }
 
-        private IReadOnlyList<Mod> getRandomMods() => Ruleset.Value.CreateInstance()
-                                                             .GetAllMods()
-                                                             .OrderBy(_ => RNG.Next())
-                                                             .Take(5)
-                                                             .ToList();
+        private void showMetadataForBeatmap(Func<WorkingBeatmap> getBeatmap)
+        {
+            AddStep("setup display", () =>
+            {
+                var randomMods = Ruleset.Value.CreateInstance().GetAllMods().OrderBy(_ => RNG.Next()).Take(5).ToList();
+
+                Child = display = new BeatmapMetadataDisplay(getBeatmap(), new Bindable<IReadOnlyList<Mod>>(randomMods), Empty())
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Scale = new Vector2(1.5f),
+                    Alpha = 0f,
+                };
+            });
+
+            AddStep("fade in", () => display.FadeIn(400, Easing.OutQuint));
+            AddToggleStep("trigger loading", v => display.Loading = v);
+        }
     }
 }
