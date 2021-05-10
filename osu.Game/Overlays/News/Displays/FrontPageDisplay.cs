@@ -100,7 +100,7 @@ namespace osu.Game.Overlays.News.Displays
             {
                 content.Add(loaded);
                 showMore.IsLoading = false;
-                showMore.Show();
+                showMore.Alpha = lastCursor == null ? 0 : 1;
             }, (cancellationToken = new CancellationTokenSource()).Token);
         }
 

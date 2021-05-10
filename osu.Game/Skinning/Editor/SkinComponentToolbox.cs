@@ -14,7 +14,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Screens.Play.HUD;
 using osuTK;
 using osuTK.Graphics;
 
@@ -129,17 +128,6 @@ namespace osu.Game.Skinning.Editor
                 // adjust provided component to fit / display in a known state.
                 component.Anchor = Anchor.Centre;
                 component.Origin = Anchor.Centre;
-
-                switch (component)
-                {
-                    case IScoreCounter score:
-                        score.Current.Value = 133773;
-                        break;
-
-                    case IComboCounter combo:
-                        combo.Current.Value = 727;
-                        break;
-                }
             }
 
             protected override void LoadComplete()
