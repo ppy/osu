@@ -18,6 +18,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestSceneSkinEditorMultipleSkins : SkinnableTestScene
     {
+        [Cached]
         private readonly ScoreProcessor scoreProcessor = new ScoreProcessor();
 
         [Cached(typeof(HealthProcessor))]
