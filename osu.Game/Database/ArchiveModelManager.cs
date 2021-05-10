@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using Humanizer;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
-using osu.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -668,16 +667,6 @@ namespace osu.Game.Database
         #region osu-stable import
 
         /// <summary>
-        /// Set a storage with access to an osu-stable install for import purposes.
-        /// </summary>
-        public Func<StableStorage> GetStableStorage { private get; set; }
-
-        /// <summary>
-        /// Denotes whether an osu-stable installation is present to perform automated imports from.
-        /// </summary>
-        public bool StableInstallationAvailable => GetStableStorage?.Invoke() != null;
-
-        /// <summary>
         /// The relative path from osu-stable's data directory to import items from.
         /// </summary>
         protected virtual string ImportFromStablePath => null;
@@ -700,7 +689,6 @@ namespace osu.Game.Database
         /// </summary>
         public Task ImportFromStableAsync(StableStorage stableStorage)
         {
-
             if (stableStorage == null)
             {
                 Logger.Log("No osu!stable installation available!", LoggingTarget.Information, LogLevel.Error);

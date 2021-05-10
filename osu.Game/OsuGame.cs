@@ -569,14 +569,11 @@ namespace osu.Game
 
             // todo: all archive managers should be able to be looped here.
             SkinManager.PostNotification = n => notifications.Post(n);
-            SkinManager.GetStableStorage = GetStorageForStableInstall;
 
             BeatmapManager.PostNotification = n => notifications.Post(n);
-            BeatmapManager.GetStableStorage = GetStorageForStableInstall;
             BeatmapManager.PresentImport = items => PresentBeatmap(items.First());
 
             ScoreManager.PostNotification = n => notifications.Post(n);
-            ScoreManager.GetStableStorage = GetStorageForStableInstall;
             ScoreManager.PresentImport = items => PresentScore(items.First());
 
             // make config aware of how to lookup skins for on-screen display purposes.
@@ -693,7 +690,6 @@ namespace osu.Game
             loadComponentSingleFile(new CollectionManager(Storage)
             {
                 PostNotification = n => notifications.Post(n),
-                GetStableStorage = GetStorageForStableInstall
             }, Add, true);
 
             loadComponentSingleFile(difficultyRecommender, Add);
