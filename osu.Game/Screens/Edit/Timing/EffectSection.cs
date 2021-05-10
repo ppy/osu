@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Edit.Timing
         {
             Flow.AddRange(new[]
             {
-                kiai = new LabelledSwitchButton { Label = "高潮" },
+                kiai = new LabelledSwitchButton { Label = "高潮/副歌" },
                 omitBarLine = new LabelledSwitchButton { Label = "移除第一条横线" },
             });
         }

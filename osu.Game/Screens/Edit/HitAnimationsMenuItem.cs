@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Edit
         private readonly Bindable<bool> hitAnimations;
 
         public HitAnimationsMenuItem(Bindable<bool> hitAnimations)
-            : base("Hit animations")
+            : base("击打动画")
         {
             State.BindTo(this.hitAnimations = hitAnimations);
         }

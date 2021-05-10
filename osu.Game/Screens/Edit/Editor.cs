@@ -695,14 +695,14 @@ namespace osu.Game.Screens.Edit
         {
             var fileMenuItems = new List<MenuItem>
             {
-                new EditorMenuItem("Save", MenuItemType.Standard, Save)
+                new EditorMenuItem("保存", MenuItemType.Standard, Save)
             };
 
             if (RuntimeInfo.IsDesktop)
-                fileMenuItems.Add(new EditorMenuItem("Export package", MenuItemType.Standard, exportBeatmap));
+                fileMenuItems.Add(new EditorMenuItem("导出图包", MenuItemType.Standard, exportBeatmap));
 
             fileMenuItems.Add(new EditorMenuItemSpacer());
-            fileMenuItems.Add(new EditorMenuItem("Exit", MenuItemType.Standard, this.Exit));
+            fileMenuItems.Add(new EditorMenuItem("退出", MenuItemType.Standard, this.Exit));
             return fileMenuItems;
         }
 

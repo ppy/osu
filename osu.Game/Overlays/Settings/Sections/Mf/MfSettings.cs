@@ -65,23 +65,23 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 new SettingsCheckbox
                 {
                     LabelText = "使用系统光标",
+                    TooltipText = "与高精度模式、数位板功能冲突，启用后会导致这些功能失效或光标鬼畜",
                     Current = config.GetBindable<bool>(MSetting.UseSystemCursor)
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "使用自定义开屏页背景",
                     Current = config.GetBindable<bool>(MSetting.UseCustomGreetingPicture)
-                },
+                }
             };
 
             if (host is LinuxGameHost)
-            {
                 Add(new SettingsEnumDropdown<GamemodeActivateCondition>
                 {
                     LabelText = "Gamemode启用条件",
+                    TooltipText = "依赖libgamemode",
                     Current = config.GetBindable<GamemodeActivateCondition>(MSetting.Gamemode)
                 });
-            }
         }
     }
 }
