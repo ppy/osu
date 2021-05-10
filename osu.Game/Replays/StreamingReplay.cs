@@ -29,14 +29,15 @@ namespace osu.Game.Replays
         /// Add a new frame at the end of this replay.
         /// </summary>
         /// <param name="newFrame">The new frame. The <see cref="ReplayFrame.Time"/> of this frame must be later or equals to </param>
-        /// <exception cref="InvalidOperationException"></exception>
+        /// <exception cref="ArgumentException">The time of <paramref name="newFrame"/> is earlier than the last frame time.</exception>
+        /// <exception cref="InvalidOperationException">This replay is marked as completed.</exception>
         public void Add(ReplayFrame newFrame)
         {
             if (IsComplete)
-                throw new InvalidOperationException("May not add frames to a completed replay.");
+                throw new InvalidOperationException("May not add a frame to the completed replay.");
 
             if (frameList.Count != 0 && !(frameList[^1].Time <= newFrame.Time))
-                throw new InvalidOperationException("May not add a new frame to a replay without respecting the frame time ordering.");
+                throw new ArgumentException("The time of the new frame must not be earlier than the last frame time of the replay.");
 
             frameList.Add(newFrame);
         }

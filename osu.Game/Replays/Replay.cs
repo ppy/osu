@@ -10,7 +10,6 @@ namespace osu.Game.Replays
 {
     /// <summary>
     /// The list of frames of a replay.
-    /// Frames may be added at the end when <see cref="IsComplete"/> is <c>false</c>.
     /// </summary>
     public class Replay
     {
@@ -21,9 +20,13 @@ namespace osu.Game.Replays
         public virtual bool IsComplete => true;
 
         /// <summary>
-        /// The list of frames of this replay.
-        /// This list should be sorted based on <see cref="ReplayFrame.Time"/>.
+        /// The list of frames of this replay, sorted by <see cref="ReplayFrame.Time"/>.
         /// </summary>
+        /// <remarks>
+        /// Consumers of this replay may assume this list doesn't change randomly.
+        /// That is, this list shouldn't change when <see cref="IsComplete"/> is <c>true</c>.
+        /// Even if this replay is not complete, new frames should be only added at the end of the list.
+        /// </remarks>
         public virtual IReadOnlyList<ReplayFrame> Frames => frames;
 
         private readonly ReplayFrame[] frames;
