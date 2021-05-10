@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.News.Sidebar
 
         private readonly FillFlowContainer postsFlow;
 
-        public MonthPanel(DateTime date, APINewsPost[] posts)
+        public MonthPanel(List<APINewsPost> posts)
         {
             Width = 160;
             AutoSizeDuration = 250;
@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.News.Sidebar
                 Spacing = new Vector2(0, 5),
                 Children = new Drawable[]
                 {
-                    new DropdownButton(date)
+                    new DropdownButton(posts[0].PublishedAt)
                     {
                         IsOpen = { BindTarget = IsOpen }
                     },
@@ -87,7 +87,7 @@ namespace osu.Game.Overlays.News.Sidebar
 
             private readonly SpriteIcon icon;
 
-            public DropdownButton(DateTime date)
+            public DropdownButton(DateTimeOffset date)
             {
                 Size = new Vector2(160, 15);
                 Action = IsOpen.Toggle;
