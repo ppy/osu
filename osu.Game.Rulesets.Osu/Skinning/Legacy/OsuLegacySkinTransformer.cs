@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     if (!this.HasFont(LegacyFont.HitCircle))
                         return null;
 
-                    return new LegacySpriteText(Source, LegacyFont.HitCircle)
+                    return new LegacySpriteText(LegacyFont.HitCircle)
                     {
                         // stable applies a blanket 0.8x scale to hitcircle fonts
                         Scale = new Vector2(0.8f),
