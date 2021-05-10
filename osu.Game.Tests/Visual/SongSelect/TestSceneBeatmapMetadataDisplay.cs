@@ -10,7 +10,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play;
 using osuTK;
@@ -23,17 +22,6 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         [Resolved]
         private BeatmapManager manager { get; set; }
-
-        [Resolved]
-        private RulesetStore rulesets { get; set; }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            foreach (var ruleset in rulesets.AvailableRulesets)
-                AddStep($"switch to {ruleset.Name}", () => Ruleset.Value = ruleset);
-        }
 
         [Test]
         public void TestLocal([Values("Beatmap", "Some long title and stuff")]
