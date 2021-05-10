@@ -60,18 +60,14 @@ namespace osu.Game.Database
 
             if (content.HasFlagFast(StableContent.Collections))
             {
-                if (beatmapImportTask != null)
-                    importTasks.Add(beatmapImportTask.ContinueWith(_ => collections.ImportFromStableAsync(stableStorage), TaskContinuationOptions.OnlyOnRanToCompletion));
-                else
-                    importTasks.Add(collections.ImportFromStableAsync(stableStorage));
+                importTasks.Add(beatmapImportTask?.ContinueWith(_ => collections.ImportFromStableAsync(stableStorage), TaskContinuationOptions.OnlyOnRanToCompletion)
+                                ?? collections.ImportFromStableAsync(stableStorage));
             }
 
             if (content.HasFlagFast(StableContent.Scores))
             {
-                if (beatmapImportTask != null)
-                    importTasks.Add(beatmapImportTask.ContinueWith(_ => scores.ImportFromStableAsync(stableStorage), TaskContinuationOptions.OnlyOnRanToCompletion));
-                else
-                    importTasks.Add(scores.ImportFromStableAsync(stableStorage));
+                importTasks.Add(beatmapImportTask?.ContinueWith(_ => scores.ImportFromStableAsync(stableStorage), TaskContinuationOptions.OnlyOnRanToCompletion)
+                                ?? scores.ImportFromStableAsync(stableStorage));
             }
 
             await Task.WhenAll(importTasks.ToArray()).ConfigureAwait(false);
@@ -92,7 +88,6 @@ namespace osu.Game.Database
 
             return cachedStorage = new StableStorage(stablePath, desktopGameHost);
         }
-
     }
 
     [Flags]

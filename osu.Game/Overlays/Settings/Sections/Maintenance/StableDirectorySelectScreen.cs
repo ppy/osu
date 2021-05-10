@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         }
 
         protected override void OnSelection(DirectoryInfo directory)
-        { 
+        {
             taskCompletionSource.TrySetResult(directory.FullName);
             this.Exit();
         }
