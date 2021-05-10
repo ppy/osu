@@ -14,7 +14,6 @@ using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
@@ -39,14 +38,11 @@ namespace osu.Game.Screens.Play
         public readonly SkinnableHealthDisplay HealthDisplay;
         public readonly SongProgress Progress;
         public readonly ModDisplay ModDisplay;
-        public readonly HitErrorDisplay HitErrorDisplay;
         public readonly HoldForMenuButton HoldToQuit;
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
-        public readonly FailingLayer FailingLayer;
 
         public Bindable<bool> ShowHealthbar = new Bindable<bool>(true);
 
-        private readonly ScoreProcessor scoreProcessor;
         private readonly DrawableRuleset drawableRuleset;
         private readonly IReadOnlyList<Mod> mods;
 
@@ -74,9 +70,8 @@ namespace osu.Game.Screens.Play
 
         private IEnumerable<Drawable> hideTargets => new Drawable[] { visibilityContainer, KeyCounter, topRightElements };
 
-        public HUDOverlay(ScoreProcessor scoreProcessor, DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
+        public HUDOverlay(DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
         {
-            this.scoreProcessor = scoreProcessor;
             this.drawableRuleset = drawableRuleset;
             this.mods = mods;
 
@@ -84,7 +79,7 @@ namespace osu.Game.Screens.Play
 
             Children = new Drawable[]
             {
-                FailingLayer = CreateFailingLayer(),
+                CreateFailingLayer(),
                 visibilityContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -104,7 +99,7 @@ namespace osu.Game.Screens.Play
                                         AccuracyCounter = CreateAccuracyCounter(),
                                         ScoreCounter = CreateScoreCounter(),
                                         CreateComboCounter(),
-                                        HitErrorDisplay = CreateHitErrorDisplayOverlay(),
+                                        CreateHitErrorDisplayOverlay(),
                                     }
                                 },
                             },
@@ -306,7 +301,7 @@ namespace osu.Game.Screens.Play
             AutoSizeAxes = Axes.Both,
         };
 
-        protected virtual HitErrorDisplay CreateHitErrorDisplayOverlay() => new HitErrorDisplay(scoreProcessor, drawableRuleset?.FirstAvailableHitWindows);
+        protected virtual HitErrorDisplay CreateHitErrorDisplayOverlay() => new HitErrorDisplay(drawableRuleset?.FirstAvailableHitWindows);
 
         protected virtual PlayerSettingsOverlay CreatePlayerSettingsOverlay() => new PlayerSettingsOverlay();
 
