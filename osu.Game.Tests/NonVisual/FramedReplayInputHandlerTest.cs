@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using NUnit.Framework;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Replays;
@@ -276,49 +275,6 @@ namespace osu.Game.Tests.NonVisual
             setTime(-100, -100);
         }
 
-        [Test]
-        public void TestReplayFramesSortStability()
-        {
-            const double repeating_time = 5000;
-
-            // add a collection of frames in shuffled order time-wise; each frame also stores its original index to check stability later.
-            // data is hand-picked and breaks if the unstable List<T>.Sort() is used.
-            // in theory this can still return a false-positive with another unstable algorithm if extremely unlucky,
-            // but there is no conceivable fool-proof way to prevent that anyways.
-            replay = new Replay(new[]
-            {
-                repeating_time,
-                0,
-                3000,
-                repeating_time,
-                repeating_time,
-                6000,
-                9000,
-                repeating_time,
-                repeating_time,
-                1000,
-                11000,
-                21000,
-                4000,
-                repeating_time,
-                repeating_time,
-                8000,
-                2000,
-                7000,
-                repeating_time,
-                repeating_time,
-                10000
-            }.Select((time, index) => new TestReplayFrame(time, true, index)));
-
-            // ensure sort stability by checking that the frames with time == repeating_time are sorted in ascending frame index order themselves.
-            var repeatingTimeFramesData = replay.Frames
-                                                .Cast<TestReplayFrame>()
-                                                .Where(f => f.Time == repeating_time)
-                                                .Select(f => f.FrameIndex);
-
-            Assert.That(repeatingTimeFramesData, Is.Ordered.Ascending);
-        }
-
         private void setupDefaultReplay()
         {
             replay = new Replay(new[]
@@ -368,13 +324,11 @@ namespace osu.Game.Tests.NonVisual
         private class TestReplayFrame : ReplayFrame
         {
             public readonly bool IsImportant;
-            public readonly int FrameIndex;
 
-            public TestReplayFrame(double time, bool isImportant = false, int frameIndex = 0)
+            public TestReplayFrame(double time, bool isImportant = false)
                 : base(time)
             {
                 IsImportant = isImportant;
-                FrameIndex = frameIndex;
             }
         }
 
