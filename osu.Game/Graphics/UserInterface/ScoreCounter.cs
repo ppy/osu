@@ -4,11 +4,10 @@
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public abstract class ScoreCounter : RollingCounter<double>, IScoreCounter
+    public abstract class ScoreCounter : RollingCounter<double>
     {
         protected override double RollingDuration => 1000;
         protected override Easing RollingEasing => Easing.Out;
