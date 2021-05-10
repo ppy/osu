@@ -203,8 +203,12 @@ namespace osu.Game.Screens.Play
             ScoreProcessor.ApplyBeatmap(playableBeatmap);
             ScoreProcessor.Mods.BindTo(Mods);
 
+            dependencies.CacheAs(ScoreProcessor);
+
             HealthProcessor = ruleset.CreateHealthProcessor(playableBeatmap.HitObjects[0].StartTime);
             HealthProcessor.ApplyBeatmap(playableBeatmap);
+
+            dependencies.CacheAs(HealthProcessor);
 
             if (!ScoreProcessor.Mode.Disabled)
                 config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
@@ -341,7 +345,7 @@ namespace osu.Game.Screens.Play
                     // display the cursor above some HUD elements.
                     DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),
                     DrawableRuleset.ResumeOverlay?.CreateProxy() ?? new Container(),
-                    HUDOverlay = new HUDOverlay(ScoreProcessor, HealthProcessor, DrawableRuleset, Mods.Value)
+                    HUDOverlay = new HUDOverlay(DrawableRuleset, Mods.Value)
                     {
                         HoldToQuit =
                         {
@@ -541,8 +545,10 @@ namespace osu.Game.Screens.Play
                 }
 
                 // if the score is ready for display but results screen has not been pushed yet (e.g. storyboard is still playing beyond gameplay), then transition to results screen instead of exiting.
-                if (prepareScoreForDisplayTask != null)
+                if (prepareScoreForDisplayTask != null && completionProgressDelegate == null)
+                {
                     updateCompletionState(true);
+                }
             }
 
             this.Exit();
