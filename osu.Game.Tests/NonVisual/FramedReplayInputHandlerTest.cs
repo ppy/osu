@@ -208,15 +208,16 @@ namespace osu.Game.Tests.NonVisual
         [Test]
         public void TestReplayStreaming()
         {
-            handler = new TestInputHandler(replay = new StreamingReplay());
+            var streamingReplay = new StreamingReplay();
+            handler = new TestInputHandler(replay = streamingReplay);
 
             // no frames are arrived yet
             setTime(0, null);
             setTime(1000, null);
             Assert.IsTrue(handler.WaitingForFrame, "Should be waiting for the first frame");
 
-            replay.Frames.Add(new TestReplayFrame(0));
-            replay.Frames.Add(new TestReplayFrame(1000));
+            streamingReplay.Add(new TestReplayFrame(0));
+            streamingReplay.Add(new TestReplayFrame(1000));
 
             // should always play from beginning
             setTime(1000, 0);
@@ -241,7 +242,7 @@ namespace osu.Game.Tests.NonVisual
 
             fastForwardToPoint(1000);
             setTime(3000, null);
-            replay.Frames.Add(new TestReplayFrame(2000));
+            streamingReplay.Add(new TestReplayFrame(2000));
             confirmCurrentFrame(1);
             setTime(1000, 1000);
             setTime(3000, 2000);

@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Replays
 
         protected virtual double AllowedImportantTimeSpan => sixty_frame_time * 1.2;
 
-        protected List<ReplayFrame> Frames => replay.Frames;
+        protected IReadOnlyList<ReplayFrame> Frames => replay.Frames;
 
         private readonly Replay replay;
 
