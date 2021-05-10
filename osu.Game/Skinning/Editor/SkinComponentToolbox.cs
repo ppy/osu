@@ -14,6 +14,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Scoring;
 using osuTK;
 using osuTK.Graphics;
 
@@ -24,6 +25,16 @@ namespace osu.Game.Skinning.Editor
         public Action<Type> RequestPlacement;
 
         private const float component_display_scale = 0.8f;
+
+        [Cached]
+        private ScoreProcessor scoreProcessor = new ScoreProcessor
+        {
+            Combo = { Value = 727 },
+            TotalScore = { Value = 1337377 }
+        };
+
+        [Cached(typeof(HealthProcessor))]
+        private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
 
         public SkinComponentToolbox(float height)
             : base("Components", height)
