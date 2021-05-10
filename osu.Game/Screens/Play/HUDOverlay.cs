@@ -156,9 +156,6 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader(true)]
         private void load(OsuConfigManager config, NotificationOverlay notificationOverlay)
         {
-            if (scoreProcessor != null)
-                BindScoreProcessor(scoreProcessor);
-
             if (drawableRuleset != null)
             {
                 BindDrawableRuleset(drawableRuleset);
@@ -312,12 +309,6 @@ namespace osu.Game.Screens.Play
         protected virtual HitErrorDisplay CreateHitErrorDisplayOverlay() => new HitErrorDisplay(scoreProcessor, drawableRuleset?.FirstAvailableHitWindows);
 
         protected virtual PlayerSettingsOverlay CreatePlayerSettingsOverlay() => new PlayerSettingsOverlay();
-
-        protected virtual void BindScoreProcessor(ScoreProcessor processor)
-        {
-            ScoreCounter?.Current.BindTo(processor.TotalScore);
-            AccuracyCounter?.Current.BindTo(processor.Accuracy);
-        }
 
         public bool OnPressed(GlobalAction action)
         {
