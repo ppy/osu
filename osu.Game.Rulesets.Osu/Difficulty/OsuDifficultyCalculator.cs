@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Audio.Track;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
@@ -87,7 +89,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 new Tap(mods)
             };
 
-            (skills[1] as Tap).SetHitWindow(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
+            var track = new TrackVirtual(10000);
+            mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
+
+            (skills[1] as Tap).SetHitWindow(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty, track.Rate);
             (skills[0] as Aim).SetTapSkill(skills[1] as Tap);
 
             return skills;

@@ -25,6 +25,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double currentStrain;
         private double strainMultiplier = 35;
 
+        private double hitWindowGreat;
+
         public Tap(Mod[] mods)
             : base(mods)
         {
@@ -78,15 +80,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return currentStrain;
         }
 
-        public void setHitWindow(double od, double clockRate)
+        public void SetHitWindow(double od, double clockRate)
         {
             HitWindows hitWindows = new OsuHitWindows();
             hitWindows.SetDifficulty(od);
 
                     // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be removed in the future
             hitWindowGreat = (int)(hitWindows.WindowFor(HitResult.Great)) / clockRate;
-
-            return;
         }
 
         protected override void Process(DifficultyHitObject current)
