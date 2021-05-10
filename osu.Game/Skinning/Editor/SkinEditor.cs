@@ -11,6 +11,8 @@ using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Skinning.Editor
 {
@@ -23,6 +25,9 @@ namespace osu.Game.Skinning.Editor
         private OsuTextFlowContainer headerText;
 
         protected override bool StartHidden => true;
+
+        [Resolved]
+        private SkinManager skins { get; set; }
 
         public SkinEditor(Drawable target)
         {
@@ -53,7 +58,24 @@ namespace osu.Game.Skinning.Editor
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         RequestPlacement = placeComponent
-                    }
+                    },
+                    new TriangleButton
+                    {
+                        Text = "Save Changes",
+                        Width = 140,
+                        Height = 50,
+                        Padding = new MarginPadding
+                        {
+                            Top = 10,
+                            Left = 10,
+                        },
+                        Margin = new MarginPadding
+                        {
+                            Right = 10,
+                            Bottom = 10,
+                        },
+                        Action = save,
+                    },
                 }
             };
 
@@ -71,13 +93,30 @@ namespace osu.Game.Skinning.Editor
 
             var targetContainer = target.ChildrenOfType<IDefaultSkinnableTarget>().FirstOrDefault();
 
-            targetContainer?.Add(instance);
+            (targetContainer as Container)?.Add(instance);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
             Show();
+        }
+
+        private void save()
+        {
+            var currentSkin = skins.CurrentSkin.Value;
+
+            var legacySkin = currentSkin as LegacySkin;
+
+            if (legacySkin == null)
+                return;
+
+            SkinnableElementTargetContainer[] targetContainers = target.ChildrenOfType<SkinnableElementTargetContainer>().ToArray();
+
+            foreach (var t in targetContainers)
+                legacySkin.UpdateDrawableTarget(t);
+
+            skins.Save(skins.CurrentSkin.Value);
         }
 
         protected override bool OnHover(HoverEvent e) => true;

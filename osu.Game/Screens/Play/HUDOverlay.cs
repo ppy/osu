@@ -22,7 +22,7 @@ using osuTK;
 namespace osu.Game.Screens.Play
 {
     [Cached]
-    public class HUDOverlay : Container, IKeyBindingHandler<GlobalAction>, IDefaultSkinnableTarget
+    public class HUDOverlay : Container, IKeyBindingHandler<GlobalAction>
     {
         public const float FADE_DURATION = 300;
 

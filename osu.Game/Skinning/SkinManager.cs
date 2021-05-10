@@ -6,9 +6,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
@@ -17,6 +19,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
@@ -156,6 +159,35 @@ namespace osu.Game.Skinning
                 return new DefaultLegacySkin(legacyDefaultResources, this);
 
             return new LegacySkin(skinInfo, this);
+        }
+
+        public void Save(Skin skin)
+        {
+            // some skins don't support saving just yet.
+            // eventually we will want to create a copy of the skin to allow for customisation.
+            if (skin.SkinInfo.Files == null)
+                return;
+
+            foreach (var drawableInfo in skin.DrawableComponentInfo)
+            {
+                // todo: the OfType() call can be removed with better IDrawable support.
+                string json = JsonConvert.SerializeObject(drawableInfo.Value, new JsonSerializerSettings { Formatting = Formatting.Indented });
+
+                using (var streamContent = new MemoryStream(Encoding.UTF8.GetBytes(json)))
+                {
+                    string filename = $"{drawableInfo.Key}.json";
+
+                    var oldFile = skin.SkinInfo.Files.FirstOrDefault(f => f.Filename == filename);
+
+                    if (oldFile != null)
+                        ReplaceFile(skin.SkinInfo, oldFile, streamContent, oldFile.Filename);
+                    else
+                        AddFile(skin.SkinInfo, streamContent, filename);
+
+                    Logger.Log($"Saving out {filename} with {json.Length} bytes");
+                    Logger.Log(json);
+                }
+            }
         }
 
         /// <summary>
