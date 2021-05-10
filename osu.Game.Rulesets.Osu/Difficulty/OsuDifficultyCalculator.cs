@@ -32,16 +32,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (beatmap.HitObjects.Count == 0)
                 return new OsuDifficultyAttributes { Mods = mods, Skills = skills };
 
-            double aimRating = Math.Pow(skills[3].DifficultyValue(), .65) * difficulty_multiplier;
-            double speedRating = Math.Pow(skills[2].DifficultyValue(), .5) * difficulty_multiplier;
-            double starRating = aimRating + speedRating + Math.Abs(aimRating - speedRating) / 2;
-
             HitWindows hitWindows = new OsuHitWindows();
             hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
 
             // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be removed in the future
             double hitWindowGreat = (int)(hitWindows.WindowFor(HitResult.Great)) / clockRate;
             double preempt = (int)BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / clockRate;
+
+            double aimRating = Math.Pow(skills[0].DifficultyValue(), .65) * difficulty_multiplier;
+            double speedRating = Math.Pow(skills[1].DifficultyValue(), .5) * difficulty_multiplier;
+            double starRating = aimRating + speedRating + Math.Abs(aimRating - speedRating) / 2;
 
             int maxCombo = beatmap.HitObjects.Count;
             // Add the ticks + tail of the slider. 1 is subtracted because the head circle would be counted twice (once for the slider itself in the line above)
@@ -83,14 +83,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             Skill[] skills = new Skill[]
             {
-                new Speed(mods),
-                new Stamina(mods),
-                new Tapping(mods),
-                new Aim(mods)
+                new Aim(mods),
+                new Tap(mods)
             };
 
-            (skills[3] as Aim).SetTappingSkill(skills[2] as Tapping);
-            (skills[2] as Tapping).SetStrainSkills(skills[0] as Speed, skills[1] as Stamina);
+            (skills[1] as Tap).SetHitWindow(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
+            (skills[0] as Aim).SetTapSkill(skills[1] as Tap);
 
             return skills;
         }

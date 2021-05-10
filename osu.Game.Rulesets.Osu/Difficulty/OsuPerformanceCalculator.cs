@@ -144,10 +144,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (Attributes.MaxCombo > 0)
                 speedValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(Attributes.MaxCombo, 0.8), 1.0);
 
-            // Scale the speed value with accuracy and OD
-            speedValue *= (0.95 + Math.Pow(Attributes.OverallDifficulty, 2) / 750) * Math.Pow(accuracy, (14.5 - Math.Max(Attributes.OverallDifficulty, 8)) / 2);
-            // Scale the speed value with # of 50s to punish doubletapping.
-            speedValue *= Math.Pow(0.98, countMeh < totalHits / 500.0 ? 0 : countMeh - totalHits / 500.0);
+            speedValue *= Math.Pow((10 + Attributes.OverallDifficulty) / 10, 2) / 4;
 
             return speedValue;
         }
@@ -179,7 +176,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModFlashlight))
                 accuracyValue *= 1.02;
 
-            return accuracyValue;
+            return 0;//accuracyValue;
         }
 
         private int totalHits => countGreat + countOk + countMeh + countMiss;

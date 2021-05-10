@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         // private double hybridScaler = 1.5;
 
-        private Tapping tappingSkill;
+        private Tap tapSkill;
 
         public Aim(Mod[] mods)
             : base(mods)
@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double nextDiffStrain = Vector2.Add(currVector, nextVector).Length * osuNextObj.SnapProbability;
             double prevDiffStrain = Vector2.Add(prevVector, currVector).Length * osuPrevObj.SnapProbability;
 
-            double strain = 2 * currVector.Length + prevDiffStrain + Math.Abs(prevDiffStrain - nextDiffStrain) * Math.Min(osuNextObj.FlowProbability, osuPrevObj.FlowProbability);
+            double strain = 2 * currVector.Length + prevDiffStrain + Math.Abs(prevDiffStrain - nextDiffStrain) * Math.Min(osuNextObj.SnapProbability, osuPrevObj.SnapProbability);
 
             strain *= osuCurrObj.StrainTime / (osuCurrObj.StrainTime - 20);
 
@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double strain = 0;
 
-            double tappingStrain = tappingSkill.TappingStrain / 1000;
+            double tapStrain = tapSkill.TapStrain / 1000;
 
             if (Previous.Count > 1)
             {
@@ -130,7 +130,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return strain;// * Math.Sqrt(4 + tappingStrain) / 2;
         }
 
-        public void SetTappingSkill(Tapping tapping) => tappingSkill = tapping;
+        public void SetTapSkill(Tap tap) => tapSkill = tap;
 
         protected override void Process(DifficultyHitObject current)
         {
