@@ -133,6 +133,16 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("storyboard ends", () => Player.GameplayClockContainer.GameplayClock.CurrentTime >= currentStoryboardDuration);
         }
 
+        [Test]
+        public void TestPerformExitNoOutro()
+        {
+            CreateTest(null);
+            AddStep("disable storyboard", () => LocalConfig.SetValue(OsuSetting.ShowStoryboard, false));
+            AddUntilStep("completion set by processor", () => Player.ScoreProcessor.HasCompleted.Value);
+            AddStep("exit via pause", () => Player.ExitViaPause());
+            AddAssert("player exited", () => Stack.CurrentScreen == null);
+        }
+
         protected override bool AllowFail => true;
 
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
