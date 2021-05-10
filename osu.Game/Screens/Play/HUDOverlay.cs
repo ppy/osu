@@ -14,7 +14,6 @@ using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
@@ -39,15 +38,11 @@ namespace osu.Game.Screens.Play
         public readonly SkinnableHealthDisplay HealthDisplay;
         public readonly SongProgress Progress;
         public readonly ModDisplay ModDisplay;
-        public readonly HitErrorDisplay HitErrorDisplay;
         public readonly HoldForMenuButton HoldToQuit;
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
-        public readonly FailingLayer FailingLayer;
 
         public Bindable<bool> ShowHealthbar = new Bindable<bool>(true);
 
-        private readonly ScoreProcessor scoreProcessor;
-        private readonly HealthProcessor healthProcessor;
         private readonly DrawableRuleset drawableRuleset;
         private readonly IReadOnlyList<Mod> mods;
 
@@ -75,10 +70,8 @@ namespace osu.Game.Screens.Play
 
         private IEnumerable<Drawable> hideTargets => new Drawable[] { visibilityContainer, KeyCounter, topRightElements };
 
-        public HUDOverlay(ScoreProcessor scoreProcessor, HealthProcessor healthProcessor, DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
+        public HUDOverlay(DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
         {
-            this.scoreProcessor = scoreProcessor;
-            this.healthProcessor = healthProcessor;
             this.drawableRuleset = drawableRuleset;
             this.mods = mods;
 
@@ -86,7 +79,7 @@ namespace osu.Game.Screens.Play
 
             Children = new Drawable[]
             {
-                FailingLayer = CreateFailingLayer(),
+                CreateFailingLayer(),
                 visibilityContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -106,7 +99,7 @@ namespace osu.Game.Screens.Play
                                         AccuracyCounter = CreateAccuracyCounter(),
                                         ScoreCounter = CreateScoreCounter(),
                                         CreateComboCounter(),
-                                        HitErrorDisplay = CreateHitErrorDisplayOverlay(),
+                                        CreateHitErrorDisplayOverlay(),
                                     }
                                 },
                             },
@@ -158,12 +151,6 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader(true)]
         private void load(OsuConfigManager config, NotificationOverlay notificationOverlay)
         {
-            if (scoreProcessor != null)
-                BindScoreProcessor(scoreProcessor);
-
-            if (healthProcessor != null)
-                BindHealthProcessor(healthProcessor);
-
             if (drawableRuleset != null)
             {
                 BindDrawableRuleset(drawableRuleset);
@@ -314,27 +301,9 @@ namespace osu.Game.Screens.Play
             AutoSizeAxes = Axes.Both,
         };
 
-        protected virtual HitErrorDisplay CreateHitErrorDisplayOverlay() => new HitErrorDisplay(scoreProcessor, drawableRuleset?.FirstAvailableHitWindows);
+        protected virtual HitErrorDisplay CreateHitErrorDisplayOverlay() => new HitErrorDisplay(drawableRuleset?.FirstAvailableHitWindows);
 
         protected virtual PlayerSettingsOverlay CreatePlayerSettingsOverlay() => new PlayerSettingsOverlay();
-
-        protected virtual void BindScoreProcessor(ScoreProcessor processor)
-        {
-            if (HealthDisplay is IHealthDisplay shd)
-            {
-                processor.NewJudgement += judgement =>
-                {
-                    if (judgement.IsHit && judgement.Type != HitResult.IgnoreHit)
-                        shd.Flash(judgement);
-                };
-            }
-        }
-
-        protected virtual void BindHealthProcessor(HealthProcessor processor)
-        {
-            HealthDisplay?.BindHealthProcessor(processor);
-            FailingLayer?.BindHealthProcessor(processor);
-        }
 
         public bool OnPressed(GlobalAction action)
         {
