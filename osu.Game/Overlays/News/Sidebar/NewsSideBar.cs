@@ -9,7 +9,6 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Framework.Graphics.Shapes;
 using osuTK;
 using System.Collections.Generic;
-using System;
 
 namespace osu.Game.Overlays.News.Sidebar
 {
@@ -100,7 +99,7 @@ namespace osu.Game.Overlays.News.Sidebar
 
                     foreach (var keyValuePair in dict)
                     {
-                        monthsFlow.Add(new MonthPanel(new DateTime(metadata.NewValue.CurrentYear, keyValuePair.Key, 1), keyValuePair.Value.ToArray())
+                        monthsFlow.Add(new MonthPanel(keyValuePair.Value)
                         {
                             IsOpen = { Value = isFirst }
                         });

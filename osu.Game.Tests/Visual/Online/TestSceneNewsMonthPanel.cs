@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -33,7 +34,7 @@ namespace osu.Game.Tests.Visual.Online
                         RelativeSizeAxes = Axes.Both,
                         Colour = colourProvider.Background2,
                     },
-                    new MonthPanel(DateTime.Now, posts),
+                    new MonthPanel(posts),
                 }
             });
         }
@@ -53,7 +54,7 @@ namespace osu.Game.Tests.Visual.Online
                         RelativeSizeAxes = Axes.Both,
                         Colour = colourProvider.Background2,
                     },
-                    new MonthPanel(DateTime.Now, posts)
+                    new MonthPanel(posts)
                     {
                         IsOpen = { Value = true }
                     },
@@ -61,11 +62,12 @@ namespace osu.Game.Tests.Visual.Online
             });
         }
 
-        private static APINewsPost[] posts => new[]
+        private static List<APINewsPost> posts => new List<APINewsPost>
         {
             new APINewsPost
             {
-                Title = "Short title"
+                Title = "Short title",
+                PublishedAt = DateTimeOffset.Now
             },
             new APINewsPost
             {
