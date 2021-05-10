@@ -58,7 +58,7 @@ namespace osu.Game.Skinning
         }
 
         protected LegacySkin(SkinInfo skin, [CanBeNull] IResourceStore<byte[]> storage, [CanBeNull] IStorageResourceProvider resources, string filename)
-            : base(skin)
+            : base(skin, resources)
         {
             using (var stream = storage?.GetStream(filename))
             {
@@ -321,8 +321,32 @@ namespace osu.Game.Skinning
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {
+            if (base.GetDrawableComponent(component) is Drawable c)
+                return c;
+
             switch (component)
             {
+                case SkinnableTargetComponent target:
+
+                    switch (target.Target)
+                    {
+                        case SkinnableTarget.MainHUDComponents:
+                            return new SkinnableTargetWrapper(target.Target)
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Children = new[]
+                                {
+                                    // TODO: these should fallback to the osu!classic skin.
+                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ComboCounter)) ?? new DefaultComboCounter(),
+                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ScoreCounter)) ?? new DefaultScoreCounter(),
+                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.AccuracyCounter)) ?? new DefaultAccuracyCounter(),
+                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.HealthDisplay)) ?? new DefaultHealthDisplay(),
+                                }
+                            };
+                    }
+
+                    return null;
+
                 case HUDSkinComponent hudComponent:
                 {
                     if (!this.HasFont(LegacyFont.Score))

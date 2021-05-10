@@ -2,17 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Newtonsoft.Json;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
-using osu.Game.Screens.Play.HUD;
 using osuTK.Graphics;
 
 namespace osu.Game.Skinning
@@ -20,33 +14,9 @@ namespace osu.Game.Skinning
     public class DefaultSkin : Skin
     {
         public DefaultSkin()
-            : base(SkinInfo.Default)
+            : base(SkinInfo.Default, null)
         {
             Configuration = new DefaultSkinConfiguration();
-        }
-
-        public override Drawable GetDrawableComponent(ISkinComponent component)
-        {
-            switch (component)
-            {
-                case SkinnableTargetComponent target:
-                    switch (target.Target)
-                    {
-                        case SkinnableTarget.MainHUDComponents:
-                            var infos = JsonConvert.DeserializeObject<IEnumerable<SkinnableInfo>>(File.ReadAllText("/Users/Dean/json-out.json")).Where(i => i.Target == SkinnableTarget.MainHUDComponents);
-
-                            var container = new SkinnableTargetWrapper(target.Target)
-                            {
-                                ChildrenEnumerable = infos.Select(i => i.CreateInstance())
-                            };
-
-                            return container;
-                    }
-
-                    break;
-            }
-
-            return null;
         }
 
         public override Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => null;
@@ -70,16 +40,6 @@ namespace osu.Game.Skinning
             }
 
             return null;
-        }
-    }
-
-    public class SkinnableTargetWrapper : Container, ISkinnableTarget
-    {
-        public SkinnableTarget Target { get; }
-
-        public SkinnableTargetWrapper(SkinnableTarget target)
-        {
-            Target = target;
         }
     }
 }
