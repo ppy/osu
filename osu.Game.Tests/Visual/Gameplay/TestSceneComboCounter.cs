@@ -4,9 +4,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -17,31 +19,21 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override Ruleset CreateRulesetForSkinProvider() => new OsuRuleset();
 
+        [Cached]
+        private ScoreProcessor scoreProcessor = new ScoreProcessor();
+
         [SetUpSteps]
         public void SetUpSteps()
         {
-            AddStep("Create combo counters", () => SetContents(() =>
-            {
-                var comboCounter = new SkinnableComboCounter();
-                comboCounter.Current.Value = 1;
-                return comboCounter;
-            }));
+            AddStep("Create combo counters", () => SetContents(() => new SkinnableComboCounter()));
         }
 
         [Test]
         public void TestComboCounterIncrementing()
         {
-            AddRepeatStep("increase combo", () =>
-            {
-                foreach (var counter in comboCounters)
-                    counter.Current.Value++;
-            }, 10);
+            AddRepeatStep("increase combo", () => scoreProcessor.Combo.Value++, 10);
 
-            AddStep("reset combo", () =>
-            {
-                foreach (var counter in comboCounters)
-                    counter.Current.Value = 0;
-            });
+            AddStep("reset combo", () => scoreProcessor.Combo.Value = 0);
         }
     }
 }
