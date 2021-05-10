@@ -69,13 +69,15 @@ namespace osu.Game.Overlays.Toolbar
             base.LoadComplete();
 
             Current.BindDisabledChanged(disabled => this.FadeColour(disabled ? Color4.Gray : Color4.White, 300), true);
-            Current.BindValueChanged(_ => moveLineToCurrent(), true);
+            Current.BindValueChanged(_ => moveLineToCurrent());
+
+            // Scheduled to allow the button flow layout to be computed before the line position is updated
+            ScheduleAfterChildren(moveLineToCurrent);
         }
 
         private bool hasInitialPosition;
 
-        // Scheduled to allow the flow layout to be computed before the line position is updated
-        private void moveLineToCurrent() => ScheduleAfterChildren(() =>
+        private void moveLineToCurrent()
         {
             if (SelectedTab != null)
             {
@@ -86,7 +88,7 @@ namespace osu.Game.Overlays.Toolbar
 
                 hasInitialPosition = true;
             }
-        });
+        }
 
         public override bool HandleNonPositionalInput => !Current.Disabled && base.HandleNonPositionalInput;
 
