@@ -2,9 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Extensions;
 using osu.Game.IO.Serialization;
 using osu.Game.Skinning;
@@ -18,6 +21,21 @@ namespace osu.Game.Screens.Play.HUD
     [Serializable]
     public class SkinnableInfo : IJsonSerializable
     {
+        public Type Type { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public SkinnableTarget? Target { get; set; }
+
+        public Vector2 Position { get; set; }
+
+        public float Rotation { get; set; }
+
+        public Vector2 Scale { get; set; }
+
+        public Anchor Anchor { get; set; }
+
+        public List<SkinnableInfo> Children { get; } = new List<SkinnableInfo>();
+
         public SkinnableInfo()
         {
         }
@@ -34,20 +52,13 @@ namespace osu.Game.Screens.Play.HUD
             Rotation = component.Rotation;
             Scale = component.Scale;
             Anchor = component.Anchor;
+
+            if (component is Container container)
+            {
+                foreach (var child in container.Children.OfType<ISkinnableComponent>().OfType<Drawable>())
+                    Children.Add(child.CreateSerialisedInformation());
+            }
         }
-
-        public Type Type { get; set; }
-
-        [JsonConverter(typeof(StringEnumConverter))]
-        public SkinnableTarget? Target { get; set; }
-
-        public Vector2 Position { get; set; }
-
-        public float Rotation { get; set; }
-
-        public Vector2 Scale { get; set; }
-
-        public Anchor Anchor { get; set; }
 
         public Drawable CreateInstance()
         {
