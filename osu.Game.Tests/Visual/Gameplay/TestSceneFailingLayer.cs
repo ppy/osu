@@ -4,8 +4,8 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
@@ -21,17 +21,13 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Resolved]
         private OsuConfigManager config { get; set; }
 
-        [SetUpSteps]
-        public void SetUpSteps()
-        {
-        }
-
         private void create(HealthProcessor healthProcessor)
         {
             AddStep("create layer", () =>
             {
                 Child = new HealthProcessorContainer(healthProcessor)
                 {
+                    RelativeSizeAxes = Axes.Both,
                     Child = layer = new FailingLayer()
                 };
 
