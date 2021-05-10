@@ -214,7 +214,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         private const int max_concurrent_judgements = 50;
 
-        public override void OnNewJudgement(JudgementResult judgement)
+        protected override void OnNewJudgement(JudgementResult judgement)
         {
             if (!judgement.IsHit)
                 return;

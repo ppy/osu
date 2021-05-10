@@ -21,6 +21,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached]
         private readonly ScoreProcessor scoreProcessor = new ScoreProcessor();
 
+        [Cached(typeof(HealthProcessor))]
+        private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
+
         [SetUpSteps]
         public void SetUpSteps()
         {
@@ -34,7 +37,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                     var drawableRuleset = ruleset.CreateDrawableRulesetWith(beatmap);
 
-                    var hudOverlay = new HUDOverlay(scoreProcessor, null, drawableRuleset, Array.Empty<Mod>())
+                    var hudOverlay = new HUDOverlay(drawableRuleset, Array.Empty<Mod>())
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
