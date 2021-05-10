@@ -43,18 +43,21 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddRepeatStep(@"decrease hp", delegate
             {
-                healthProcessor.Health.Value = 0.08f;
+                healthProcessor.Health.Value -= 0.08f;
             }, 10);
 
             AddRepeatStep(@"increase hp without flash", delegate
             {
-                healthProcessor.Health.Value = 0.1f;
+                healthProcessor.Health.Value += 0.1f;
             }, 3);
 
             AddRepeatStep(@"increase hp with flash", delegate
             {
-                healthProcessor.Health.Value = 0.1f;
-                healthProcessor.ApplyResult(new JudgementResult(new HitCircle(), new OsuJudgement()));
+                healthProcessor.Health.Value += 0.1f;
+                healthProcessor.ApplyResult(new JudgementResult(new HitCircle(), new OsuJudgement())
+                {
+                    Type = HitResult.Perfect
+                });
             }, 3);
         }
     }
