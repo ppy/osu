@@ -17,7 +17,7 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.News.Sidebar
 {
-    public class MonthPanel : CompositeDrawable
+    public class MonthDropdown : CompositeDrawable
     {
         private const int header_height = 15;
         private const int animation_duration = 250;
@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.News.Sidebar
 
         private readonly FillFlowContainer postsFlow;
 
-        public MonthPanel(IEnumerable<APINewsPost> posts)
+        public MonthDropdown(IEnumerable<APINewsPost> posts)
         {
             Width = 160;
             Masking = true;
