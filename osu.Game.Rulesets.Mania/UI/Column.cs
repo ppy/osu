@@ -31,9 +31,6 @@ namespace osu.Game.Rulesets.Mania.UI
         /// For hitsounds played by this <see cref="Column"/> (i.e. not as a result of hitting a hitobject),
         /// a certain number of samples are allowed to be played concurrently so that it feels better when spam-pressing the key.
         /// </summary>
-        /// <remarks>
-        ///
-        /// </remarks>
         private const int max_concurrent_hitsounds = OsuGameBase.SAMPLE_CONCURRENCY;
 
         /// <summary>
