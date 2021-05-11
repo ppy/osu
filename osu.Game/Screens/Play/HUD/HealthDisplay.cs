@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Play.HUD
     /// A container for components displaying the current player health.
     /// Gets bound automatically to the <see cref="Rulesets.Scoring.HealthProcessor"/> when inserted to <see cref="DrawableRuleset.Overlays"/> hierarchy.
     /// </summary>
-    public abstract class HealthDisplay : Container
+    public abstract class HealthDisplay : CompositeDrawable
     {
         private Bindable<bool> showHealthbar;
 
