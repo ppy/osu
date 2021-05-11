@@ -107,7 +107,7 @@ namespace osu.Game.Screens.Play.HUD
             GlowColour = colours.BlueDarker;
         }
 
-        public override void Flash(JudgementResult result) => Scheduler.AddOnce(flash);
+        protected override void Flash(JudgementResult result) => Scheduler.AddOnce(flash);
 
         private void flash()
         {

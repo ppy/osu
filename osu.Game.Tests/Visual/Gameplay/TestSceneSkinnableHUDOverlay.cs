@@ -27,6 +27,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached]
         private ScoreProcessor scoreProcessor = new ScoreProcessor();
 
+        [Cached(typeof(HealthProcessor))]
+        private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
+
         private IEnumerable<HUDOverlay> hudOverlays => CreatedDrawables.OfType<HUDOverlay>();
 
         // best way to check without exposing.
@@ -76,7 +79,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 SetContents(() =>
                 {
-                    hudOverlay = new HUDOverlay(scoreProcessor, null, null, Array.Empty<Mod>());
+                    hudOverlay = new HUDOverlay(scoreProcessor, null, Array.Empty<Mod>());
 
                     // Add any key just to display the key counter visually.
                     hudOverlay.KeyCounter.Add(new KeyCounterKeyboard(Key.Space));
