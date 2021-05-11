@@ -55,6 +55,7 @@ namespace osu.Game.Extensions
             component.Rotation = info.Rotation;
             component.Scale = info.Scale;
             component.Anchor = info.Anchor;
+            component.Origin = info.Origin;
 
             if (component is Container container)
             {

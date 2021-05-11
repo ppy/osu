@@ -29,6 +29,8 @@ namespace osu.Game.Screens.Play.HUD
 
         public Anchor Anchor { get; set; }
 
+        public Anchor Origin { get; set; }
+
         public List<SkinnableInfo> Children { get; } = new List<SkinnableInfo>();
 
         public SkinnableInfo()
@@ -43,6 +45,7 @@ namespace osu.Game.Screens.Play.HUD
             Rotation = component.Rotation;
             Scale = component.Scale;
             Anchor = component.Anchor;
+            Origin = component.Origin;
 
             if (component is Container container)
             {
