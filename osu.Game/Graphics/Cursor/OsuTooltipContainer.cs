@@ -1,13 +1,13 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Sprites;
 
@@ -17,7 +17,8 @@ namespace osu.Game.Graphics.Cursor
     {
         protected override ITooltip CreateTooltip() => new OsuTooltip();
 
-        public OsuTooltipContainer(CursorContainer cursor) : base(cursor)
+        public OsuTooltipContainer(CursorContainer cursor)
+            : base(cursor)
         {
         }
 
@@ -29,24 +30,25 @@ namespace osu.Game.Graphics.Cursor
             private readonly OsuSpriteText text;
             private bool instantMovement = true;
 
-            public override string TooltipText
+            public override bool SetContent(object content)
             {
-                set
+                if (!(content is string contentString))
+                    return false;
+
+                if (contentString == text.Text) return true;
+
+                text.Text = contentString;
+
+                if (IsPresent)
                 {
-                    if (value == text.Text) return;
-
-                    text.Text = value;
-                    if (IsPresent)
-                    {
-                        AutoSizeDuration = 250;
-                        background.FlashColour(OsuColour.Gray(0.4f), 1000, Easing.OutQuint);
-                    }
-                    else
-                        AutoSizeDuration = 0;
+                    AutoSizeDuration = 250;
+                    background.FlashColour(OsuColour.Gray(0.4f), 1000, Easing.OutQuint);
                 }
-            }
+                else
+                    AutoSizeDuration = 0;
 
-            private const float text_size = 16;
+                return true;
+            }
 
             public OsuTooltip()
             {
@@ -69,9 +71,8 @@ namespace osu.Game.Graphics.Cursor
                     },
                     text = new OsuSpriteText
                     {
-                        TextSize = text_size,
                         Padding = new MarginPadding(5),
-                        Font = @"Exo2.0-Regular",
+                        Font = OsuFont.GetFont(weight: FontWeight.Regular)
                     }
                 };
             }

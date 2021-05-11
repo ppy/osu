@@ -1,10 +1,11 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Replays;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Input.StateChanges;
+using osu.Game.Replays;
 
 namespace osu.Game.Rulesets.Taiko.Replays
 {
@@ -17,6 +18,9 @@ namespace osu.Game.Rulesets.Taiko.Replays
 
         protected override bool IsImportant(TaikoReplayFrame frame) => frame.Actions.Any();
 
-        public override List<IInput> GetPendingInputs() => new List<IInput> { new ReplayState<TaikoAction> { PressedActions = CurrentFrame.Actions } };
+        public override void CollectPendingInputs(List<IInput> inputs)
+        {
+            inputs.Add(new ReplayState<TaikoAction> { PressedActions = CurrentFrame?.Actions ?? new List<TaikoAction>() });
+        }
     }
 }

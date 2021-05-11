@@ -1,130 +1,127 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Replays;
-using osu.Game.Users;
+using osu.Game.Rulesets.Taiko.Beatmaps;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Replays
 {
-    public class TaikoAutoGenerator : AutoGenerator<TaikoHitObject>
+    public class TaikoAutoGenerator : AutoGenerator<TaikoReplayFrame>
     {
+        public new TaikoBeatmap Beatmap => (TaikoBeatmap)base.Beatmap;
+
         private const double swell_hit_speed = 50;
 
-        public TaikoAutoGenerator(Beatmap<TaikoHitObject> beatmap)
+        public TaikoAutoGenerator(IBeatmap beatmap)
             : base(beatmap)
         {
-            Replay = new Replay
-            {
-                User = new User
-                {
-                    Username = @"Autoplay",
-                }
-            };
         }
 
-        protected Replay Replay;
-        protected List<ReplayFrame> Frames => Replay.Frames;
-
-        public override Replay Generate()
+        protected override void GenerateFrames()
         {
+            if (Beatmap.HitObjects.Count == 0)
+                return;
+
             bool hitButton = true;
 
-            Frames.Add(new TaikoReplayFrame(-100000));
             Frames.Add(new TaikoReplayFrame(Beatmap.HitObjects[0].StartTime - 1000));
 
             for (int i = 0; i < Beatmap.HitObjects.Count; i++)
             {
                 TaikoHitObject h = Beatmap.HitObjects[i];
+                double endTime = h.GetEndTime();
 
-                IHasEndTime endTimeData = h as IHasEndTime;
-                double endTime = endTimeData?.EndTime ?? h.StartTime;
-
-                Swell swell = h as Swell;
-                DrumRoll drumRoll = h as DrumRoll;
-                Hit hit = h as Hit;
-
-                if (swell != null)
+                switch (h)
                 {
-                    int d = 0;
-                    int count = 0;
-                    int req = swell.RequiredHits;
-                    double hitRate = Math.Min(swell_hit_speed, swell.Duration / req);
-                    for (double j = h.StartTime; j < endTime; j += hitRate)
+                    case Swell swell:
                     {
-                        TaikoAction action;
+                        int d = 0;
+                        int count = 0;
+                        int req = swell.RequiredHits;
+                        double hitRate = Math.Min(swell_hit_speed, swell.Duration / req);
 
-                        switch (d)
+                        for (double j = h.StartTime; j < endTime; j += hitRate)
                         {
-                            default:
-                            case 0:
-                                action = TaikoAction.LeftCentre;
-                                break;
-                            case 1:
-                                action = TaikoAction.LeftRim;
-                                break;
-                            case 2:
-                                action = TaikoAction.RightCentre;
-                                break;
-                            case 3:
-                                action = TaikoAction.RightRim;
+                            TaikoAction action;
+
+                            switch (d)
+                            {
+                                default:
+                                case 0:
+                                    action = TaikoAction.LeftCentre;
+                                    break;
+
+                                case 1:
+                                    action = TaikoAction.LeftRim;
+                                    break;
+
+                                case 2:
+                                    action = TaikoAction.RightCentre;
+                                    break;
+
+                                case 3:
+                                    action = TaikoAction.RightRim;
+                                    break;
+                            }
+
+                            Frames.Add(new TaikoReplayFrame(j, action));
+                            d = (d + 1) % 4;
+                            if (++count == req)
                                 break;
                         }
 
-                        Frames.Add(new TaikoReplayFrame(j, action));
-                        d = (d + 1) % 4;
-                        if (++count == req)
-                            break;
+                        break;
                     }
-                }
-                else if (drumRoll != null)
-                {
-                    foreach (var tick in drumRoll.NestedHitObjects.OfType<DrumRollTick>())
+
+                    case DrumRoll drumRoll:
                     {
-                        Frames.Add(new TaikoReplayFrame(tick.StartTime, hitButton ? TaikoAction.LeftCentre : TaikoAction.RightCentre));
-                        hitButton = !hitButton;
-                    }
-                }
-                else if (hit != null)
-                {
-                    TaikoAction[] actions;
+                        foreach (var tick in drumRoll.NestedHitObjects.OfType<DrumRollTick>())
+                        {
+                            Frames.Add(new TaikoReplayFrame(tick.StartTime, hitButton ? TaikoAction.LeftCentre : TaikoAction.RightCentre));
+                            hitButton = !hitButton;
+                        }
 
-                    if (hit is CentreHit)
+                        break;
+                    }
+
+                    case Hit hit:
                     {
-                        actions = h.IsStrong
-                            ? new[] { TaikoAction.LeftCentre, TaikoAction.RightCentre }
-                            : new[] { hitButton ? TaikoAction.LeftCentre : TaikoAction.RightCentre };
+                        TaikoAction[] actions;
+
+                        if (hit.Type == HitType.Centre)
+                        {
+                            actions = hit.IsStrong
+                                ? new[] { TaikoAction.LeftCentre, TaikoAction.RightCentre }
+                                : new[] { hitButton ? TaikoAction.LeftCentre : TaikoAction.RightCentre };
+                        }
+                        else
+                        {
+                            actions = hit.IsStrong
+                                ? new[] { TaikoAction.LeftRim, TaikoAction.RightRim }
+                                : new[] { hitButton ? TaikoAction.LeftRim : TaikoAction.RightRim };
+                        }
+
+                        Frames.Add(new TaikoReplayFrame(h.StartTime, actions));
+                        break;
                     }
-                    else
-                    {
-                        actions = h.IsStrong
-                            ? new[] { TaikoAction.LeftRim, TaikoAction.RightRim }
-                            : new[] { hitButton ? TaikoAction.LeftRim : TaikoAction.RightRim };
-                    }
 
-                    Frames.Add(new TaikoReplayFrame(h.StartTime, actions));
+                    default:
+                        throw new InvalidOperationException("Unknown hit object type.");
                 }
-                else
-                    throw new InvalidOperationException("Unknown hit object type.");
 
-                Frames.Add(new TaikoReplayFrame(endTime + KEY_UP_DELAY));
+                var nextHitObject = GetNextObject(i); // Get the next object that requires pressing the same button
 
-                if (i < Beatmap.HitObjects.Count - 1)
-                {
-                    double waitTime = Beatmap.HitObjects[i + 1].StartTime - 1000;
-                    if (waitTime > endTime)
-                        Frames.Add(new TaikoReplayFrame(waitTime));
-                }
+                bool canDelayKeyUp = nextHitObject == null || nextHitObject.StartTime > endTime + KEY_UP_DELAY;
+                double calculatedDelay = canDelayKeyUp ? KEY_UP_DELAY : (nextHitObject.StartTime - endTime) * 0.9;
+                Frames.Add(new TaikoReplayFrame(endTime + calculatedDelay));
 
                 hitButton = !hitButton;
             }
-
-            return Replay;
         }
     }
 }

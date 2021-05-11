@@ -1,23 +1,39 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Objects.Types;
 using System;
+using System.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Taiko.Beatmaps;
+using osu.Game.Rulesets.Taiko.Judgements;
+using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects
 {
-    public class DrumRoll : TaikoHitObject, IHasEndTime
+    public class DrumRoll : TaikoStrongableHitObject, IHasPath
     {
         /// <summary>
         /// Drum roll distance that results in a duration of 1 speed-adjusted beat length.
         /// </summary>
         private const float base_distance = 100;
 
-        public double EndTime => StartTime + Duration;
+        public double EndTime
+        {
+            get => StartTime + Duration;
+            set => Duration = value - StartTime;
+        }
 
         public double Duration { get; set; }
+
+        /// <summary>
+        /// Velocity of this <see cref="DrumRoll"/>.
+        /// </summary>
+        public double Velocity { get; private set; }
 
         /// <summary>
         /// Numer of ticks per beat length.
@@ -47,29 +63,36 @@ namespace osu.Game.Rulesets.Taiko.Objects
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
+            DifficultyControlPoint difficultyPoint = controlPointInfo.DifficultyPointAt(StartTime);
+
+            double scoringDistance = base_distance * difficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier;
+            Velocity = scoringDistance / timingPoint.BeatLength;
 
             tickSpacing = timingPoint.BeatLength / TickRate;
             overallDifficulty = difficulty.OverallDifficulty;
         }
 
-        protected override void CreateNestedHitObjects()
+        protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
         {
-            createTicks();
+            createTicks(cancellationToken);
 
             RequiredGoodHits = NestedHitObjects.Count * Math.Min(0.15, 0.05 + 0.10 / 6 * overallDifficulty);
             RequiredGreatHits = NestedHitObjects.Count * Math.Min(0.30, 0.10 + 0.20 / 6 * overallDifficulty);
 
-            base.CreateNestedHitObjects();
+            base.CreateNestedHitObjects(cancellationToken);
         }
 
-        private void createTicks()
+        private void createTicks(CancellationToken cancellationToken)
         {
             if (tickSpacing == 0)
                 return;
 
             bool first = true;
+
             for (double t = StartTime; t < EndTime + tickSpacing / 2; t += tickSpacing)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 AddNested(new DrumRollTick
                 {
                     FirstTick = first,
@@ -81,5 +104,24 @@ namespace osu.Game.Rulesets.Taiko.Objects
                 first = false;
             }
         }
+
+        public override Judgement CreateJudgement() => new TaikoDrumRollJudgement();
+
+        protected override HitWindows CreateHitWindows() => HitWindows.Empty;
+
+        protected override StrongNestedHitObject CreateStrongNestedHit(double startTime) => new StrongNestedHit { StartTime = startTime };
+
+        public class StrongNestedHit : StrongNestedHitObject
+        {
+        }
+
+        #region LegacyBeatmapEncoder
+
+        double IHasDistance.Distance => Duration * Velocity;
+
+        SliderPath IHasPath.Path
+            => new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(1) }, ((IHasDistance)this).Distance / TaikoBeatmapConverter.LEGACY_VELOCITY_MULTIPLIER);
+
+        #endregion
     }
 }

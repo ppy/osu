@@ -1,137 +1,41 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Taiko.Difficulty.Skills;
 using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.Taiko.Scoring;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty
 {
-    internal class TaikoDifficultyCalculator : DifficultyCalculator
+    public class TaikoDifficultyCalculator : DifficultyCalculator
     {
-        private const double star_scaling_factor = 0.04125;
-
-        /// <summary>
-        /// In milliseconds. For difficulty calculation we will only look at the highest strain value in each time interval of size STRAIN_STEP.
-        /// This is to eliminate higher influence of stream over aim by simply having more HitObjects with high strain.
-        /// The higher this value, the less strains there will be, indirectly giving long beatmaps an advantage.
-        /// </summary>
-        private const double strain_step = 400;
-
-        /// <summary>
-        /// The weighting of each strain value decays to this number * it's previous value
-        /// </summary>
-        private const double decay_weight = 0.9;
+        private const double rhythm_skill_multiplier = 0.014;
+        private const double colour_skill_multiplier = 0.01;
+        private const double stamina_skill_multiplier = 0.02;
 
         public TaikoDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
         }
 
-        protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate)
+        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods) => new Skill[]
         {
-            if (!beatmap.HitObjects.Any())
-                return new TaikoDifficultyAttributes(mods, 0);
-
-            var difficultyHitObjects = new List<TaikoHitObjectDifficulty>();
-
-            foreach (var hitObject in beatmap.HitObjects)
-                difficultyHitObjects.Add(new TaikoHitObjectDifficulty((TaikoHitObject)hitObject));
-
-            // Sort DifficultyHitObjects by StartTime of the HitObjects - just to make sure.
-            difficultyHitObjects.Sort((a, b) => a.BaseHitObject.StartTime.CompareTo(b.BaseHitObject.StartTime));
-
-            if (!calculateStrainValues(difficultyHitObjects, timeRate))
-                return new DifficultyAttributes(mods, 0);
-
-            double starRating = calculateDifficulty(difficultyHitObjects, timeRate) * star_scaling_factor;
-
-            return new TaikoDifficultyAttributes(mods, starRating)
-            {
-                // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be remoevd in the future
-                GreatHitWindow = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / timeRate,
-                MaxCombo = beatmap.HitObjects.Count(h => h is Hit)
-            };
-        }
-
-        private bool calculateStrainValues(List<TaikoHitObjectDifficulty> objects, double timeRate)
-        {
-            // Traverse hitObjects in pairs to calculate the strain value of NextHitObject from the strain value of CurrentHitObject and environment.
-            using (var hitObjectsEnumerator = objects.GetEnumerator())
-            {
-                if (!hitObjectsEnumerator.MoveNext()) return false;
-
-                TaikoHitObjectDifficulty current = hitObjectsEnumerator.Current;
-
-                // First hitObject starts at strain 1. 1 is the default for strain values, so we don't need to set it here. See DifficultyHitObject.
-                while (hitObjectsEnumerator.MoveNext())
-                {
-                    var next = hitObjectsEnumerator.Current;
-                    next?.CalculateStrains(current, timeRate);
-                    current = next;
-                }
-
-                return true;
-            }
-        }
-
-        private double calculateDifficulty(List<TaikoHitObjectDifficulty> objects, double timeRate)
-        {
-            double actualStrainStep = strain_step * timeRate;
-
-            // Find the highest strain value within each strain step
-            List<double> highestStrains = new List<double>();
-            double intervalEndTime = actualStrainStep;
-            double maximumStrain = 0; // We need to keep track of the maximum strain in the current interval
-
-            TaikoHitObjectDifficulty previousHitObject = null;
-            foreach (var hitObject in objects)
-            {
-                // While we are beyond the current interval push the currently available maximum to our strain list
-                while (hitObject.BaseHitObject.StartTime > intervalEndTime)
-                {
-                    highestStrains.Add(maximumStrain);
-
-                    // The maximum strain of the next interval is not zero by default! We need to take the last hitObject we encountered, take its strain and apply the decay
-                    // until the beginning of the next interval.
-                    if (previousHitObject == null)
-                    {
-                        maximumStrain = 0;
-                    }
-                    else
-                    {
-                        double decay = Math.Pow(TaikoHitObjectDifficulty.DECAY_BASE, (intervalEndTime - previousHitObject.BaseHitObject.StartTime) / 1000);
-                        maximumStrain = previousHitObject.Strain * decay;
-                    }
-
-                    // Go to the next time interval
-                    intervalEndTime += actualStrainStep;
-                }
-
-                // Obtain maximum strain
-                maximumStrain = Math.Max(hitObject.Strain, maximumStrain);
-
-                previousHitObject = hitObject;
-            }
-
-            // Build the weighted sum over the highest strains for each interval
-            double difficulty = 0;
-            double weight = 1;
-            highestStrains.Sort((a, b) => b.CompareTo(a)); // Sort from highest to lowest strain.
-
-            foreach (double strain in highestStrains)
-            {
-                difficulty += weight * strain;
-                weight *= decay_weight;
-            }
-
-            return difficulty;
-        }
+            new Colour(mods),
+            new Rhythm(mods),
+            new Stamina(mods, true),
+            new Stamina(mods, false),
+        };
 
         protected override Mod[] DifficultyAdjustmentMods => new Mod[]
         {
@@ -140,5 +44,129 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             new TaikoModEasy(),
             new TaikoModHardRock(),
         };
+
+        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
+        {
+            List<TaikoDifficultyHitObject> taikoDifficultyHitObjects = new List<TaikoDifficultyHitObject>();
+
+            for (int i = 2; i < beatmap.HitObjects.Count; i++)
+            {
+                taikoDifficultyHitObjects.Add(
+                    new TaikoDifficultyHitObject(
+                        beatmap.HitObjects[i], beatmap.HitObjects[i - 1], beatmap.HitObjects[i - 2], clockRate, i
+                    )
+                );
+            }
+
+            new StaminaCheeseDetector(taikoDifficultyHitObjects).FindCheese();
+            return taikoDifficultyHitObjects;
+        }
+
+        protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
+        {
+            if (beatmap.HitObjects.Count == 0)
+                return new TaikoDifficultyAttributes { Mods = mods, Skills = skills };
+
+            var colour = (Colour)skills[0];
+            var rhythm = (Rhythm)skills[1];
+            var staminaRight = (Stamina)skills[2];
+            var staminaLeft = (Stamina)skills[3];
+
+            double colourRating = colour.DifficultyValue() * colour_skill_multiplier;
+            double rhythmRating = rhythm.DifficultyValue() * rhythm_skill_multiplier;
+            double staminaRating = (staminaRight.DifficultyValue() + staminaLeft.DifficultyValue()) * stamina_skill_multiplier;
+
+            double staminaPenalty = simpleColourPenalty(staminaRating, colourRating);
+            staminaRating *= staminaPenalty;
+
+            double combinedRating = locallyCombinedDifficulty(colour, rhythm, staminaRight, staminaLeft, staminaPenalty);
+            double separatedRating = norm(1.5, colourRating, rhythmRating, staminaRating);
+            double starRating = 1.4 * separatedRating + 0.5 * combinedRating;
+            starRating = rescale(starRating);
+
+            HitWindows hitWindows = new TaikoHitWindows();
+            hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
+
+            return new TaikoDifficultyAttributes
+            {
+                StarRating = starRating,
+                Mods = mods,
+                StaminaStrain = staminaRating,
+                RhythmStrain = rhythmRating,
+                ColourStrain = colourRating,
+                // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be removed in the future
+                GreatHitWindow = (int)hitWindows.WindowFor(HitResult.Great) / clockRate,
+                MaxCombo = beatmap.HitObjects.Count(h => h is Hit),
+                Skills = skills
+            };
+        }
+
+        /// <summary>
+        /// Calculates the penalty for the stamina skill for maps with low colour difficulty.
+        /// </summary>
+        /// <remarks>
+        /// Some maps (especially converts) can be easy to read despite a high note density.
+        /// This penalty aims to reduce the star rating of such maps by factoring in colour difficulty to the stamina skill.
+        /// </remarks>
+        private double simpleColourPenalty(double staminaDifficulty, double colorDifficulty)
+        {
+            if (colorDifficulty <= 0) return 0.79 - 0.25;
+
+            return 0.79 - Math.Atan(staminaDifficulty / colorDifficulty - 12) / Math.PI / 2;
+        }
+
+        /// <summary>
+        /// Returns the <i>p</i>-norm of an <i>n</i>-dimensional vector.
+        /// </summary>
+        /// <param name="p">The value of <i>p</i> to calculate the norm for.</param>
+        /// <param name="values">The coefficients of the vector.</param>
+        private double norm(double p, params double[] values) => Math.Pow(values.Sum(x => Math.Pow(x, p)), 1 / p);
+
+        /// <summary>
+        /// Returns the partial star rating of the beatmap, calculated using peak strains from all sections of the map.
+        /// </summary>
+        /// <remarks>
+        /// For each section, the peak strains of all separate skills are combined into a single peak strain for the section.
+        /// The resulting partial rating of the beatmap is a weighted sum of the combined peaks (higher peaks are weighted more).
+        /// </remarks>
+        private double locallyCombinedDifficulty(Colour colour, Rhythm rhythm, Stamina staminaRight, Stamina staminaLeft, double staminaPenalty)
+        {
+            List<double> peaks = new List<double>();
+
+            var colourPeaks = colour.GetCurrentStrainPeaks().ToList();
+            var rhythmPeaks = rhythm.GetCurrentStrainPeaks().ToList();
+            var staminaRightPeaks = staminaRight.GetCurrentStrainPeaks().ToList();
+            var staminaLeftPeaks = staminaLeft.GetCurrentStrainPeaks().ToList();
+
+            for (int i = 0; i < colourPeaks.Count; i++)
+            {
+                double colourPeak = colourPeaks[i] * colour_skill_multiplier;
+                double rhythmPeak = rhythmPeaks[i] * rhythm_skill_multiplier;
+                double staminaPeak = (staminaRightPeaks[i] + staminaLeftPeaks[i]) * stamina_skill_multiplier * staminaPenalty;
+                peaks.Add(norm(2, colourPeak, rhythmPeak, staminaPeak));
+            }
+
+            double difficulty = 0;
+            double weight = 1;
+
+            foreach (double strain in peaks.OrderByDescending(d => d))
+            {
+                difficulty += strain * weight;
+                weight *= 0.9;
+            }
+
+            return difficulty;
+        }
+
+        /// <summary>
+        /// Applies a final re-scaling of the star rating to bring maps with recorded full combos below 9.5 stars.
+        /// </summary>
+        /// <param name="sr">The raw star rating value before re-scaling.</param>
+        private double rescale(double sr)
+        {
+            if (sr < 0) return sr;
+
+            return 10.43 * Math.Log(sr / 8 + 1);
+        }
     }
 }

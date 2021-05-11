@@ -1,33 +1,37 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Game.Graphics;
 using osu.Framework.Allocation;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Shapes;
-using OpenTK.Input;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
+using Humanizer;
+using osu.Framework.Graphics.Effects;
 
 namespace osu.Game.Screens.Play
 {
     public abstract class GameplayMenuOverlay : OverlayContainer, IKeyBindingHandler<GlobalAction>
     {
-        private const int transition_duration = 200;
+        protected const int TRANSITION_DURATION = 200;
+
         private const int button_height = 70;
         private const float background_alpha = 0.75f;
 
         protected override bool BlockNonPositionalInput => true;
+
+        protected override bool BlockScrollInput => false;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
@@ -37,12 +41,18 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Action that is invoked when <see cref="GlobalAction.Back"/> is triggered.
         /// </summary>
-        protected virtual Action BackAction => () => InternalButtons.Children.Last().Click();
+        protected virtual Action BackAction => () => InternalButtons.Children.LastOrDefault()?.Click();
+
+        /// <summary>
+        /// Action that is invoked when <see cref="GlobalAction.Select"/> is triggered.
+        /// </summary>
+        protected virtual Action SelectAction => () => InternalButtons.Children.FirstOrDefault(f => f.Selected.Value)?.Click();
 
         public abstract string Header { get; }
+
         public abstract string Description { get; }
 
-        protected internal FillFlowContainer<DialogButton> InternalButtons;
+        protected ButtonContainer InternalButtons;
         public IReadOnlyList<DialogButton> Buttons => InternalButtons;
 
         private FillFlowContainer retryCounterContainer;
@@ -51,7 +61,7 @@ namespace osu.Game.Screens.Play
         {
             RelativeSizeAxes = Axes.Both;
 
-            StateChanged += s => selectionIndex = -1;
+            State.ValueChanged += s => InternalButtons.Deselect();
         }
 
         [BackgroundDependencyLoader]
@@ -88,11 +98,10 @@ namespace osu.Game.Screens.Play
                                 new OsuSpriteText
                                 {
                                     Text = Header,
-                                    Font = @"Exo2.0-Medium",
+                                    Font = OsuFont.GetFont(size: 30),
                                     Spacing = new Vector2(5, 0),
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
-                                    TextSize = 30,
                                     Colour = colours.Yellow,
                                     Shadow = true,
                                     ShadowColour = new Color4(0, 0, 0, 0.25f)
@@ -107,7 +116,7 @@ namespace osu.Game.Screens.Play
                                 }
                             }
                         },
-                        InternalButtons = new FillFlowContainer<DialogButton>
+                        InternalButtons = new ButtonContainer
                         {
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
@@ -150,13 +159,11 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        protected override void PopIn() => this.FadeIn(transition_duration, Easing.In);
-        protected override void PopOut() => this.FadeOut(transition_duration, Easing.In);
+        protected override void PopIn() => this.FadeIn(TRANSITION_DURATION, Easing.In);
+        protected override void PopOut() => this.FadeOut(TRANSITION_DURATION, Easing.In);
 
         // Don't let mouse down events through the overlay or people can click circles while paused.
         protected override bool OnMouseDown(MouseDownEvent e) => true;
-
-        protected override bool OnMouseUp(MouseUpEvent e) => true;
 
         protected override bool OnMouseMove(MouseMoveEvent e) => true;
 
@@ -176,76 +183,45 @@ namespace osu.Game.Screens.Play
                 }
             };
 
-            button.Selected.ValueChanged += s => buttonSelectionChanged(button, s);
+            button.Selected.ValueChanged += selected => buttonSelectionChanged(button, selected.NewValue);
 
             InternalButtons.Add(button);
         }
 
-        private int _selectionIndex = -1;
-
-        private int selectionIndex
-        {
-            get { return _selectionIndex; }
-            set
-            {
-                if (_selectionIndex == value)
-                    return;
-
-                // Deselect the previously-selected button
-                if (_selectionIndex != -1)
-                    InternalButtons[_selectionIndex].Selected.Value = false;
-
-                _selectionIndex = value;
-
-                // Select the newly-selected button
-                if (_selectionIndex != -1)
-                    InternalButtons[_selectionIndex].Selected.Value = true;
-            }
-        }
-
-        protected override bool OnKeyDown(KeyDownEvent e)
-        {
-            if (!e.Repeat)
-            {
-                switch (e.Key)
-                {
-                    case Key.Up:
-                        if (selectionIndex == -1 || selectionIndex == 0)
-                            selectionIndex = InternalButtons.Count - 1;
-                        else
-                            selectionIndex--;
-                        return true;
-                    case Key.Down:
-                        if (selectionIndex == -1 || selectionIndex == InternalButtons.Count - 1)
-                            selectionIndex = 0;
-                        else
-                            selectionIndex++;
-                        return true;
-                }
-            }
-
-            return base.OnKeyDown(e);
-        }
-
         public bool OnPressed(GlobalAction action)
         {
-            if (action == GlobalAction.Back)
+            switch (action)
             {
-                BackAction.Invoke();
-                return true;
+                case GlobalAction.SelectPrevious:
+                    InternalButtons.SelectPrevious();
+                    return true;
+
+                case GlobalAction.SelectNext:
+                    InternalButtons.SelectNext();
+                    return true;
+
+                case GlobalAction.Back:
+                    BackAction.Invoke();
+                    return true;
+
+                case GlobalAction.Select:
+                    SelectAction.Invoke();
+                    return true;
             }
 
             return false;
         }
 
-        public bool OnReleased(GlobalAction action) => action == GlobalAction.Back;
+        public void OnReleased(GlobalAction action)
+        {
+        }
 
         private void buttonSelectionChanged(DialogButton button, bool isSelected)
         {
             if (!isSelected)
-                selectionIndex = -1;
+                InternalButtons.Deselect();
             else
-                selectionIndex = InternalButtons.IndexOf(button);
+                InternalButtons.Select(button);
         }
 
         private void updateRetryCount()
@@ -260,28 +236,68 @@ namespace osu.Game.Screens.Play
                     Text = "You've retried ",
                     Shadow = true,
                     ShadowColour = new Color4(0, 0, 0, 0.25f),
-                    TextSize = 18
+                    Font = OsuFont.GetFont(size: 18),
                 },
                 new OsuSpriteText
                 {
-                    Text = $"{retries:n0}",
-                    Font = @"Exo2.0-Bold",
+                    Text = "time".ToQuantity(retries),
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 18),
                     Shadow = true,
                     ShadowColour = new Color4(0, 0, 0, 0.25f),
-                    TextSize = 18
                 },
                 new OsuSpriteText
                 {
-                    Text = $" time{(retries == 1 ? "" : "s")} in this session",
+                    Text = " in this session",
                     Shadow = true,
                     ShadowColour = new Color4(0, 0, 0, 0.25f),
-                    TextSize = 18
+                    Font = OsuFont.GetFont(size: 18),
                 }
             };
         }
 
+        protected class ButtonContainer : FillFlowContainer<DialogButton>
+        {
+            private int selectedIndex = -1;
+
+            private void setSelected(int value)
+            {
+                if (selectedIndex == value)
+                    return;
+
+                // Deselect the previously-selected button
+                if (selectedIndex != -1)
+                    this[selectedIndex].Selected.Value = false;
+
+                selectedIndex = value;
+
+                // Select the newly-selected button
+                if (selectedIndex != -1)
+                    this[selectedIndex].Selected.Value = true;
+            }
+
+            public void SelectNext()
+            {
+                if (selectedIndex == -1 || selectedIndex == Count - 1)
+                    setSelected(0);
+                else
+                    setSelected(selectedIndex + 1);
+            }
+
+            public void SelectPrevious()
+            {
+                if (selectedIndex == -1 || selectedIndex == 0)
+                    setSelected(Count - 1);
+                else
+                    setSelected(selectedIndex - 1);
+            }
+
+            public void Deselect() => setSelected(-1);
+            public void Select(DialogButton button) => setSelected(IndexOf(button));
+        }
+
         private class Button : DialogButton
         {
+            // required to ensure keyboard navigation always starts from an extremity (unless the cursor is moved)
             protected override bool OnHover(HoverEvent e) => true;
 
             protected override bool OnMouseMove(MouseMoveEvent e)
@@ -289,15 +305,23 @@ namespace osu.Game.Screens.Play
                 Selected.Value = true;
                 return base.OnMouseMove(e);
             }
+        }
 
-            protected override bool OnKeyDown(KeyDownEvent e)
+        [Resolved]
+        private GlobalActionContainer globalAction { get; set; }
+
+        protected override bool Handle(UIEvent e)
+        {
+            switch (e)
             {
-                if (e.Repeat || e.Key != Key.Enter || !Selected)
-                    return false;
+                case ScrollEvent _:
+                    if (ReceivePositionalInputAt(e.ScreenSpaceMousePosition))
+                        return globalAction.TriggerEvent(e);
 
-                Click();
-                return true;
+                    break;
             }
+
+            return base.Handle(e);
         }
     }
 }

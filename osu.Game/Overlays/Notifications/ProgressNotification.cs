@@ -1,15 +1,16 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Notifications
 {
@@ -17,71 +18,77 @@ namespace osu.Game.Overlays.Notifications
     {
         public string Text
         {
-            set
-            {
-                Schedule(() => textDrawable.Text = value);
-            }
+            set => Schedule(() => textDrawable.Text = value);
         }
 
         public string CompletionText { get; set; } = "Task has completed!";
 
+        private float progress;
+
         public float Progress
         {
-            get { return progressBar.Progress; }
-            set { Schedule(() => progressBar.Progress = value); }
+            get => progress;
+            set
+            {
+                progress = value;
+                Scheduler.AddOnce(() => progressBar.Progress = progress);
+            }
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            //we may have received changes before we were displayed.
-            State = state;
+            // we may have received changes before we were displayed.
+            updateState();
         }
 
-        public virtual ProgressNotificationState State
+        private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+
+        public CancellationToken CancellationToken => cancellationTokenSource.Token;
+
+        public ProgressNotificationState State
         {
-            get { return state; }
+            get => state;
             set
             {
-                Schedule(() =>
-                {
-                    bool stateChanged = state != value;
-                    state = value;
+                if (state == value) return;
 
-                    if (IsLoaded)
-                    {
-                        switch (state)
-                        {
-                            case ProgressNotificationState.Queued:
-                                Light.Colour = colourQueued;
-                                Light.Pulsate = false;
-                                progressBar.Active = false;
-                                break;
-                            case ProgressNotificationState.Active:
-                                Light.Colour = colourActive;
-                                Light.Pulsate = true;
-                                progressBar.Active = true;
-                                break;
-                            case ProgressNotificationState.Cancelled:
-                                Light.Colour = colourCancelled;
-                                Light.Pulsate = false;
-                                progressBar.Active = false;
-                                break;
-                        }
-                    }
+                state = value;
 
-                    if (stateChanged)
-                    {
-                        switch (state)
-                        {
-                            case ProgressNotificationState.Completed:
-                                NotificationContent.MoveToY(-DrawSize.Y / 2, 200, Easing.OutQuint);
-                                this.FadeOut(200).Finally(d => Completed());
-                                break;
-                        }
-                    }
-                });
+                if (IsLoaded)
+                    Schedule(updateState);
+            }
+        }
+
+        private void updateState()
+        {
+            switch (state)
+            {
+                case ProgressNotificationState.Queued:
+                    Light.Colour = colourQueued;
+                    Light.Pulsate = false;
+                    progressBar.Active = false;
+                    break;
+
+                case ProgressNotificationState.Active:
+                    Light.Colour = colourActive;
+                    Light.Pulsate = true;
+                    progressBar.Active = true;
+                    break;
+
+                case ProgressNotificationState.Cancelled:
+                    cancellationTokenSource.Cancel();
+
+                    Light.Colour = colourCancelled;
+                    Light.Pulsate = false;
+                    progressBar.Active = false;
+                    break;
+
+                case ProgressNotificationState.Completed:
+                    NotificationContent.MoveToY(-DrawSize.Y / 2, 200, Easing.OutQuint);
+                    this.FadeOut(200).Finally(d => Completed());
+                    break;
             }
         }
 
@@ -115,10 +122,7 @@ namespace osu.Game.Overlays.Notifications
                 RelativeSizeAxes = Axes.Both,
             });
 
-            Content.Add(textDrawable = new OsuTextFlowContainer(t =>
-            {
-                t.TextSize = 16;
-            })
+            Content.Add(textDrawable = new OsuTextFlowContainer
             {
                 Colour = OsuColour.Gray(128),
                 AutoSizeAxes = Axes.Y,
@@ -146,13 +150,14 @@ namespace osu.Game.Overlays.Notifications
             colourCancelled = colours.Red;
         }
 
-        public override void Close()
+        public override void Close(bool playSound = true)
         {
             switch (State)
             {
                 case ProgressNotificationState.Cancelled:
-                    base.Close();
+                    base.Close(playSound);
                     break;
+
                 case ProgressNotificationState.Active:
                 case ProgressNotificationState.Queued:
                     if (CancelRequested?.Invoke() != false)
@@ -181,9 +186,10 @@ namespace osu.Game.Overlays.Notifications
             private Color4 colourInactive;
 
             private float progress;
+
             public float Progress
             {
-                get { return progress; }
+                get => progress;
                 set
                 {
                     if (progress == value) return;
@@ -197,7 +203,7 @@ namespace osu.Game.Overlays.Notifications
 
             public bool Active
             {
-                get { return active; }
+                get => active;
                 set
                 {
                     active = value;

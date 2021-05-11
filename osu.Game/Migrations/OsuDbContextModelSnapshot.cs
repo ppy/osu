@@ -14,7 +14,7 @@ namespace osu.Game.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.2-rtm-30932");
+                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity("osu.Game.Beatmaps.BeatmapDifficulty", b =>
                 {
@@ -43,7 +43,9 @@ namespace osu.Game.Migrations
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("AudioLeadIn");
+                    b.Property<double>("AudioLeadIn");
+
+                    b.Property<double>("BPM");
 
                     b.Property<int>("BaseDifficultyID");
 
@@ -55,11 +57,15 @@ namespace osu.Game.Migrations
 
                     b.Property<double>("DistanceSpacing");
 
+                    b.Property<bool>("EpilepsyWarning");
+
                     b.Property<int>("GridSize");
 
                     b.Property<string>("Hash");
 
                     b.Property<bool>("Hidden");
+
+                    b.Property<double>("Length");
 
                     b.Property<bool>("LetterboxInBreaks");
 
@@ -135,6 +141,8 @@ namespace osu.Game.Migrations
 
                     b.Property<string>("TitleUnicode");
 
+                    b.Property<string>("VideoFile");
+
                     b.HasKey("ID");
 
                     b.ToTable("BeatmapMetadata");
@@ -165,6 +173,8 @@ namespace osu.Game.Migrations
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
+
+                    b.Property<DateTimeOffset>("DateAdded");
 
                     b.Property<bool>("DeletePending");
 
@@ -198,10 +208,12 @@ namespace osu.Game.Migrations
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("IntKey")
+                    b.Property<string>("Key")
                         .HasColumnName("Key");
 
                     b.Property<int?>("RulesetID");
+
+                    b.Property<int?>("SkinInfoID");
 
                     b.Property<string>("StringValue")
                         .HasColumnName("Value");
@@ -210,9 +222,30 @@ namespace osu.Game.Migrations
 
                     b.HasKey("ID");
 
+                    b.HasIndex("SkinInfoID");
+
                     b.HasIndex("RulesetID", "Variant");
 
                     b.ToTable("Settings");
+                });
+
+            modelBuilder.Entity("osu.Game.IO.FileInfo", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Hash");
+
+                    b.Property<int>("ReferenceCount");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("Hash")
+                        .IsUnique();
+
+                    b.HasIndex("ReferenceCount");
+
+                    b.ToTable("FileInfo");
                 });
 
             modelBuilder.Entity("osu.Game.Input.Bindings.DatabasedKeyBinding", b =>
@@ -239,25 +272,6 @@ namespace osu.Game.Migrations
                     b.ToTable("KeyBinding");
                 });
 
-            modelBuilder.Entity("osu.Game.IO.FileInfo", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Hash");
-
-                    b.Property<int>("ReferenceCount");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("Hash")
-                        .IsUnique();
-
-                    b.HasIndex("ReferenceCount");
-
-                    b.ToTable("FileInfo");
-                });
-
             modelBuilder.Entity("osu.Game.Rulesets.RulesetInfo", b =>
                 {
                     b.Property<int?>("ID")
@@ -279,6 +293,81 @@ namespace osu.Game.Migrations
                         .IsUnique();
 
                     b.ToTable("RulesetInfo");
+                });
+
+            modelBuilder.Entity("osu.Game.Scoring.ScoreFileInfo", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("FileInfoID");
+
+                    b.Property<string>("Filename")
+                        .IsRequired();
+
+                    b.Property<int?>("ScoreInfoID");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("FileInfoID");
+
+                    b.HasIndex("ScoreInfoID");
+
+                    b.ToTable("ScoreFileInfo");
+                });
+
+            modelBuilder.Entity("osu.Game.Scoring.ScoreInfo", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<double>("Accuracy")
+                        .HasColumnType("DECIMAL(1,4)");
+
+                    b.Property<int>("BeatmapInfoID");
+
+                    b.Property<int>("Combo");
+
+                    b.Property<DateTimeOffset>("Date");
+
+                    b.Property<bool>("DeletePending");
+
+                    b.Property<string>("Hash");
+
+                    b.Property<int>("MaxCombo");
+
+                    b.Property<string>("ModsJson")
+                        .HasColumnName("Mods");
+
+                    b.Property<long?>("OnlineScoreID");
+
+                    b.Property<double?>("PP");
+
+                    b.Property<int>("Rank");
+
+                    b.Property<int>("RulesetID");
+
+                    b.Property<string>("StatisticsJson")
+                        .HasColumnName("Statistics");
+
+                    b.Property<long>("TotalScore");
+
+                    b.Property<long?>("UserID")
+                        .HasColumnName("UserID");
+
+                    b.Property<string>("UserString")
+                        .HasColumnName("User");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("BeatmapInfoID");
+
+                    b.HasIndex("OnlineScoreID")
+                        .IsUnique();
+
+                    b.HasIndex("RulesetID");
+
+                    b.ToTable("ScoreInfo");
                 });
 
             modelBuilder.Entity("osu.Game.Skinning.SkinFileInfo", b =>
@@ -311,9 +400,16 @@ namespace osu.Game.Migrations
 
                     b.Property<bool>("DeletePending");
 
+                    b.Property<string>("Hash");
+
                     b.Property<string>("Name");
 
                     b.HasKey("ID");
+
+                    b.HasIndex("DeletePending");
+
+                    b.HasIndex("Hash")
+                        .IsUnique();
 
                     b.ToTable("SkinInfo");
                 });
@@ -358,6 +454,38 @@ namespace osu.Game.Migrations
                     b.HasOne("osu.Game.Beatmaps.BeatmapMetadata", "Metadata")
                         .WithMany("BeatmapSets")
                         .HasForeignKey("MetadataID");
+                });
+
+            modelBuilder.Entity("osu.Game.Configuration.DatabasedSetting", b =>
+                {
+                    b.HasOne("osu.Game.Skinning.SkinInfo")
+                        .WithMany("Settings")
+                        .HasForeignKey("SkinInfoID");
+                });
+
+            modelBuilder.Entity("osu.Game.Scoring.ScoreFileInfo", b =>
+                {
+                    b.HasOne("osu.Game.IO.FileInfo", "FileInfo")
+                        .WithMany()
+                        .HasForeignKey("FileInfoID")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("osu.Game.Scoring.ScoreInfo")
+                        .WithMany("Files")
+                        .HasForeignKey("ScoreInfoID");
+                });
+
+            modelBuilder.Entity("osu.Game.Scoring.ScoreInfo", b =>
+                {
+                    b.HasOne("osu.Game.Beatmaps.BeatmapInfo", "Beatmap")
+                        .WithMany("Scores")
+                        .HasForeignKey("BeatmapInfoID")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("osu.Game.Rulesets.RulesetInfo", "Ruleset")
+                        .WithMany()
+                        .HasForeignKey("RulesetID")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("osu.Game.Skinning.SkinFileInfo", b =>

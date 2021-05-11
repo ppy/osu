@@ -1,7 +1,6 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -12,27 +11,35 @@ namespace osu.Game.Storyboards
     public class CommandTimeline<T> : ICommandTimeline
     {
         private readonly List<TypedCommand> commands = new List<TypedCommand>();
+
         public IEnumerable<TypedCommand> Commands => commands.OrderBy(c => c.StartTime);
+
         public bool HasCommands => commands.Count > 0;
 
-        private Cached<double> startTimeBacking;
-        public double StartTime => startTimeBacking.IsValid ? startTimeBacking : startTimeBacking.Value = HasCommands ? commands.Min(c => c.StartTime) : double.MinValue;
+        public double StartTime { get; private set; } = double.MaxValue;
+        public double EndTime { get; private set; } = double.MinValue;
 
-        private Cached<double> endTimeBacking;
-        public double EndTime => endTimeBacking.IsValid ? endTimeBacking : endTimeBacking.Value = HasCommands ? commands.Max(c => c.EndTime) : double.MaxValue;
-
-        public T StartValue => HasCommands ? commands.OrderBy(c => c.StartTime).First().StartValue : default(T);
-        public T EndValue => HasCommands ? commands.OrderByDescending(c => c.EndTime).First().EndValue : default(T);
+        public T StartValue { get; private set; }
+        public T EndValue { get; private set; }
 
         public void Add(Easing easing, double startTime, double endTime, T startValue, T endValue)
         {
             if (endTime < startTime)
                 return;
 
-            commands.Add(new TypedCommand { Easing = easing, StartTime = startTime, EndTime = endTime, StartValue = startValue, EndValue = endValue, });
+            commands.Add(new TypedCommand { Easing = easing, StartTime = startTime, EndTime = endTime, StartValue = startValue, EndValue = endValue });
 
-            startTimeBacking.Invalidate();
-            endTimeBacking.Invalidate();
+            if (startTime < StartTime)
+            {
+                StartValue = startValue;
+                StartTime = startTime;
+            }
+
+            if (endTime > EndTime)
+            {
+                EndValue = endValue;
+                EndTime = endTime;
+            }
         }
 
         public override string ToString()
@@ -52,6 +59,7 @@ namespace osu.Game.Storyboards
             {
                 var result = StartTime.CompareTo(other.StartTime);
                 if (result != 0) return result;
+
                 return EndTime.CompareTo(other.EndTime);
             }
 

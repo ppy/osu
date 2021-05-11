@@ -1,26 +1,30 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
 using System;
 using System.Collections.Generic;
-using OpenTK.Graphics;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public abstract class RollingCounter<T> : Container, IHasAccentColour
+    public abstract class RollingCounter<T> : Container, IHasCurrentValue<T>
         where T : struct, IEquatable<T>
     {
-        /// <summary>
-        /// The current value.
-        /// </summary>
-        public Bindable<T> Current = new Bindable<T>();
+        private readonly BindableWithCurrent<T> current = new BindableWithCurrent<T>();
 
-        protected SpriteText DisplayedCountSpriteText;
+        public Bindable<T> Current
+        {
+            get => current.Current;
+            set => current.Current = value;
+        }
+
+        private SpriteText displayedCountSpriteText;
 
         /// <summary>
         /// If true, the roll-up duration will be proportional to change in value.
@@ -45,38 +49,15 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public virtual T DisplayedCount
         {
-            get
-            {
-                return displayedCount;
-            }
-
+            get => displayedCount;
             set
             {
                 if (EqualityComparer<T>.Default.Equals(displayedCount, value))
                     return;
+
                 displayedCount = value;
-                DisplayedCountSpriteText.Text = FormatCount(value);
+                UpdateDisplay();
             }
-        }
-
-        public abstract void Increment(T amount);
-
-        private float textSize;
-
-        public float TextSize
-        {
-            get { return textSize; }
-            set
-            {
-                textSize = value;
-                DisplayedCountSpriteText.TextSize = value;
-            }
-        }
-
-        public Color4 AccentColour
-        {
-            get { return DisplayedCountSpriteText.Colour; }
-            set { DisplayedCountSpriteText.Colour = value; }
         }
 
         /// <summary>
@@ -84,30 +65,29 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         protected RollingCounter()
         {
-            Children = new Drawable[]
-            {
-                DisplayedCountSpriteText = new OsuSpriteText
-                {
-                    Font = @"Venera"
-                },
-            };
-
-            TextSize = 40;
             AutoSizeAxes = Axes.Both;
+        }
 
-            DisplayedCount = Current;
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            displayedCountSpriteText = CreateSpriteText();
 
-            Current.ValueChanged += newValue =>
-            {
-                if (IsLoaded) TransformCount(displayedCount, newValue);
-            };
+            UpdateDisplay();
+            Child = displayedCountSpriteText;
+        }
+
+        protected void UpdateDisplay()
+        {
+            if (displayedCountSpriteText != null)
+                displayedCountSpriteText.Text = FormatCount(DisplayedCount);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            DisplayedCountSpriteText.Text = FormatCount(Current);
+            Current.BindValueChanged(val => TransformCount(DisplayedCount, val.NewValue), true);
         }
 
         /// <summary>
@@ -126,7 +106,7 @@ namespace osu.Game.Graphics.UserInterface
         public virtual void StopRolling()
         {
             FinishTransforms(false, nameof(DisplayedCount));
-            DisplayedCount = Current;
+            DisplayedCount = Current.Value;
         }
 
         /// <summary>
@@ -134,7 +114,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public virtual void ResetCount()
         {
-            SetCountWithoutRolling(default(T));
+            SetCountWithoutRolling(default);
         }
 
         /// <summary>
@@ -178,5 +158,10 @@ namespace osu.Game.Graphics.UserInterface
 
             this.TransformTo(nameof(DisplayedCount), newValue, rollingTotalDuration, RollingEasing);
         }
+
+        protected virtual OsuSpriteText CreateSpriteText() => new OsuSpriteText
+        {
+            Font = OsuFont.Numeric.With(size: 40f),
+        };
     }
 }

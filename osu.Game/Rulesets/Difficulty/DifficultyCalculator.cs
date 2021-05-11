@@ -1,13 +1,16 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Difficulty
 {
@@ -29,13 +32,14 @@ namespace osu.Game.Rulesets.Difficulty
         /// <returns>A structure describing the difficulty of the beatmap.</returns>
         public DifficultyAttributes Calculate(params Mod[] mods)
         {
-            beatmap.Mods.Value = mods;
-            IBeatmap playableBeatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo);
+            mods = mods.Select(m => m.CreateCopy()).ToArray();
 
-            var clock = new StopwatchClock();
-            mods.OfType<IApplicableToClock>().ForEach(m => m.ApplyToClock(clock));
+            IBeatmap playableBeatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, mods);
 
-            return Calculate(playableBeatmap, mods, clock.Rate);
+            var track = new TrackVirtual(10000);
+            mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
+
+            return calculate(playableBeatmap, mods, track.Rate);
         }
 
         /// <summary>
@@ -53,40 +57,99 @@ namespace osu.Game.Rulesets.Difficulty
             }
         }
 
+        private DifficultyAttributes calculate(IBeatmap beatmap, Mod[] mods, double clockRate)
+        {
+            var skills = CreateSkills(beatmap, mods);
+
+            if (!beatmap.HitObjects.Any())
+                return CreateDifficultyAttributes(beatmap, mods, skills, clockRate);
+
+            var difficultyHitObjects = SortObjects(CreateDifficultyHitObjects(beatmap, clockRate)).ToList();
+
+            foreach (var hitObject in difficultyHitObjects)
+            {
+                foreach (var skill in skills)
+                {
+                    skill.ProcessInternal(hitObject);
+                }
+            }
+
+            return CreateDifficultyAttributes(beatmap, mods, skills, clockRate);
+        }
+
+        /// <summary>
+        /// Sorts a given set of <see cref="DifficultyHitObject"/>s.
+        /// </summary>
+        /// <param name="input">The <see cref="DifficultyHitObject"/>s to sort.</param>
+        /// <returns>The sorted <see cref="DifficultyHitObject"/>s.</returns>
+        protected virtual IEnumerable<DifficultyHitObject> SortObjects(IEnumerable<DifficultyHitObject> input)
+            => input.OrderBy(h => h.BaseObject.StartTime);
+
         /// <summary>
         /// Creates all <see cref="Mod"/> combinations which adjust the <see cref="Beatmap"/> difficulty.
         /// </summary>
         public Mod[] CreateDifficultyAdjustmentModCombinations()
         {
-            return createDifficultyAdjustmentModCombinations(Enumerable.Empty<Mod>(), DifficultyAdjustmentMods).ToArray();
+            return createDifficultyAdjustmentModCombinations(DifficultyAdjustmentMods, Array.Empty<Mod>()).ToArray();
 
-            IEnumerable<Mod> createDifficultyAdjustmentModCombinations(IEnumerable<Mod> currentSet, Mod[] adjustmentSet, int currentSetCount = 0, int adjustmentSetStart = 0)
+            static IEnumerable<Mod> createDifficultyAdjustmentModCombinations(ReadOnlyMemory<Mod> remainingMods, IEnumerable<Mod> currentSet, int currentSetCount = 0)
             {
+                // Return the current set.
                 switch (currentSetCount)
                 {
                     case 0:
                         // Initial-case: Empty current set
-                        yield return new NoModMod();
+                        yield return new ModNoMod();
+
                         break;
+
                     case 1:
                         yield return currentSet.Single();
+
                         break;
+
                     default:
                         yield return new MultiMod(currentSet.ToArray());
+
                         break;
                 }
 
-                // Apply mods in the adjustment set recursively. Using the entire adjustment set would result in duplicate multi-mod mod
-                // combinations in further recursions, so a moving subset is used to eliminate this effect
-                for (int i = adjustmentSetStart; i < adjustmentSet.Length; i++)
+                // Apply the rest of the remaining mods recursively.
+                for (int i = 0; i < remainingMods.Length; i++)
                 {
-                    var adjustmentMod = adjustmentSet[i];
-                    if (currentSet.Any(c => c.IncompatibleMods.Any(m => m.IsInstanceOfType(adjustmentMod))))
+                    var (nextSet, nextCount) = flatten(remainingMods.Span[i]);
+
+                    // Check if any mods in the next set are incompatible with any of the current set.
+                    if (currentSet.SelectMany(m => m.IncompatibleMods).Any(c => nextSet.Any(c.IsInstanceOfType)))
                         continue;
 
-                    foreach (var combo in createDifficultyAdjustmentModCombinations(currentSet.Append(adjustmentMod), adjustmentSet, currentSetCount + 1, i + 1))
+                    // Check if any mods in the next set are the same type as the current set. Mods of the exact same type are not incompatible with themselves.
+                    if (currentSet.Any(c => nextSet.Any(n => c.GetType() == n.GetType())))
+                        continue;
+
+                    // If all's good, attach the next set to the current set and recurse further.
+                    foreach (var combo in createDifficultyAdjustmentModCombinations(remainingMods.Slice(i + 1), currentSet.Concat(nextSet), currentSetCount + nextCount))
                         yield return combo;
                 }
+            }
+
+            // Flattens a mod hierarchy (through MultiMod) as an IEnumerable<Mod>
+            static (IEnumerable<Mod> set, int count) flatten(Mod mod)
+            {
+                if (!(mod is MultiMod multi))
+                    return (mod.Yield(), 1);
+
+                IEnumerable<Mod> set = Enumerable.Empty<Mod>();
+                int count = 0;
+
+                foreach (var nested in multi.Mods)
+                {
+                    var (nestedSet, nestedCount) = flatten(nested);
+                    set = set.Concat(nestedSet);
+                    count += nestedCount;
+                }
+
+                return (set, count);
             }
         }
 
@@ -96,12 +159,28 @@ namespace osu.Game.Rulesets.Difficulty
         protected virtual Mod[] DifficultyAdjustmentMods => Array.Empty<Mod>();
 
         /// <summary>
-        /// Calculates the difficulty of a <see cref="Beatmap"/> using a specific <see cref="Mod"/> combination.
+        /// Creates <see cref="DifficultyAttributes"/> to describe beatmap's calculated difficulty.
         /// </summary>
-        /// <param name="beatmap">The <see cref="IBeatmap"/> to compute the difficulty for.</param>
-        /// <param name="mods">The <see cref="Mod"/>s that should be applied.</param>
-        /// <param name="timeRate">The rate of time in <paramref name="beatmap"/>.</param>
-        /// <returns>A structure containing the difficulty attributes.</returns>
-        protected abstract DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate);
+        /// <param name="beatmap">The <see cref="IBeatmap"/> whose difficulty was calculated.</param>
+        /// <param name="mods">The <see cref="Mod"/>s that difficulty was calculated with.</param>
+        /// <param name="skills">The skills which processed the beatmap.</param>
+        /// <param name="clockRate">The rate at which the gameplay clock is run at.</param>
+        protected abstract DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate);
+
+        /// <summary>
+        /// Enumerates <see cref="DifficultyHitObject"/>s to be processed from <see cref="HitObject"/>s in the <see cref="IBeatmap"/>.
+        /// </summary>
+        /// <param name="beatmap">The <see cref="IBeatmap"/> providing the <see cref="HitObject"/>s to enumerate.</param>
+        /// <param name="clockRate">The rate at which the gameplay clock is run at.</param>
+        /// <returns>The enumerated <see cref="DifficultyHitObject"/>s.</returns>
+        protected abstract IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate);
+
+        /// <summary>
+        /// Creates the <see cref="Skill"/>s to calculate the difficulty of an <see cref="IBeatmap"/>.
+        /// </summary>
+        /// <param name="beatmap">The <see cref="IBeatmap"/> whose difficulty will be calculated.</param>
+        /// <param name="mods">Mods to calculate difficulty with.</param>
+        /// <returns>The <see cref="Skill"/>s.</returns>
+        protected abstract Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods);
     }
 }

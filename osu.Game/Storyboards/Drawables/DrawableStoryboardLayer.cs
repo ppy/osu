@@ -1,15 +1,16 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public class DrawableStoryboardLayer : Container
+    public class DrawableStoryboardLayer : CompositeDrawable
     {
-        public StoryboardLayer Layer { get; private set; }
+        public StoryboardLayer Layer { get; }
         public bool Enabled;
 
         public override bool IsPresent => Enabled && base.IsPresent;
@@ -20,16 +21,36 @@ namespace osu.Game.Storyboards.Drawables
             RelativeSizeAxes = Axes.Both;
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
-            Enabled = layer.EnabledWhenPassing;
+            Enabled = layer.VisibleWhenPassing;
+            Masking = layer.Masking;
+
+            InternalChild = new LayerElementContainer(layer);
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        private class LayerElementContainer : LifetimeManagementContainer
         {
-            foreach (var element in Layer.Elements)
+            private readonly StoryboardLayer storyboardLayer;
+
+            public LayerElementContainer(StoryboardLayer layer)
             {
-                if (element.IsDrawable)
-                    Add(element.CreateDrawable());
+                storyboardLayer = layer;
+
+                Width = 640;
+                Height = 480;
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(CancellationToken? cancellationToken)
+            {
+                foreach (var element in storyboardLayer.Elements)
+                {
+                    cancellationToken?.ThrowIfCancellationRequested();
+
+                    if (element.IsDrawable)
+                        AddInternal(element.CreateDrawable());
+                }
             }
         }
     }

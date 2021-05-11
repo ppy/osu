@@ -1,22 +1,24 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using System.Linq;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
-using osu.Framework.Threading;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Screens.Select.Details;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API.Requests;
+using osu.Game.Rulesets;
+using osu.Game.Online;
 
 namespace osu.Game.Screens.Select
 {
@@ -25,31 +27,31 @@ namespace osu.Game.Screens.Select
         private const float spacing = 10;
         private const float transition_duration = 250;
 
-        private readonly FillFlowContainer top, statsFlow;
         private readonly AdvancedStats advanced;
-        private readonly DetailBox ratingsContainer;
         private readonly UserRatings ratings;
-        private readonly ScrollContainer metadataScroll;
         private readonly MetadataSection description, source, tags;
         private readonly Container failRetryContainer;
         private readonly FailRetryGraph failRetryGraph;
-        private readonly DimmedLoadingAnimation loading;
+        private readonly LoadingLayer loading;
 
-        private APIAccess api;
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
-        private ScheduledDelegate pendingBeatmapSwitch;
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
 
         private BeatmapInfo beatmap;
+
         public BeatmapInfo Beatmap
         {
-            get { return beatmap; }
+            get => beatmap;
             set
             {
                 if (value == beatmap) return;
+
                 beatmap = value;
 
-                pendingBeatmapSwitch?.Cancel();
-                pendingBeatmapSwitch = Schedule(updateStatistics);
+                Scheduler.AddOnce(updateStatistics);
             }
         }
 
@@ -68,174 +70,190 @@ namespace osu.Game.Screens.Select
                     Padding = new MarginPadding { Horizontal = spacing },
                     Children = new Drawable[]
                     {
-                        top = new FillFlowContainer
+                        new GridContainer
                         {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Horizontal,
-                            Children = new Drawable[]
+                            RelativeSizeAxes = Axes.Both,
+                            RowDimensions = new[]
                             {
-                                statsFlow = new FillFlowContainer
+                                new Dimension(GridSizeMode.AutoSize),
+                                new Dimension()
+                            },
+                            Content = new[]
+                            {
+                                new Drawable[]
                                 {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Width = 0.5f,
-                                    Spacing = new Vector2(spacing),
-                                    Padding = new MarginPadding { Right = spacing / 2 },
-                                    Children = new[]
-                                    {
-                                        new DetailBox
-                                        {
-                                            Child = advanced = new AdvancedStats
-                                            {
-                                                RelativeSizeAxes = Axes.X,
-                                                AutoSizeAxes = Axes.Y,
-                                                Padding = new MarginPadding { Horizontal = spacing, Top = spacing * 2, Bottom = spacing },
-                                            },
-                                        },
-                                        ratingsContainer = new DetailBox
-                                        {
-                                            Child = ratings = new UserRatings
-                                            {
-                                                RelativeSizeAxes = Axes.X,
-                                                Height = 134,
-                                                Padding = new MarginPadding { Horizontal = spacing, Top = spacing },
-                                            },
-                                        },
-                                    },
-                                },
-                                metadataScroll = new ScrollContainer
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    Width = 0.5f,
-                                    ScrollbarVisible = false,
-                                    Padding = new MarginPadding { Left = spacing / 2 },
-                                    Child = new FillFlowContainer
+                                    new FillFlowContainer
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
-                                        LayoutDuration = transition_duration,
-                                        Spacing = new Vector2(spacing * 2),
-                                        Margin = new MarginPadding { Top = spacing * 2 },
-                                        Children = new[]
+                                        Direction = FillDirection.Horizontal,
+                                        Children = new Drawable[]
                                         {
-                                            description = new MetadataSection("Description"),
-                                            source = new MetadataSection("Source"),
-                                            tags = new MetadataSection("Tags"),
+                                            new FillFlowContainer
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                AutoSizeAxes = Axes.Y,
+                                                Width = 0.5f,
+                                                Spacing = new Vector2(spacing),
+                                                Padding = new MarginPadding { Right = spacing / 2 },
+                                                Children = new[]
+                                                {
+                                                    new DetailBox().WithChild(advanced = new AdvancedStats
+                                                    {
+                                                        RelativeSizeAxes = Axes.X,
+                                                        AutoSizeAxes = Axes.Y,
+                                                        Padding = new MarginPadding { Horizontal = spacing, Top = spacing * 2, Bottom = spacing },
+                                                    }),
+                                                    new DetailBox().WithChild(new OnlineViewContainer(string.Empty)
+                                                    {
+                                                        RelativeSizeAxes = Axes.X,
+                                                        Height = 134,
+                                                        Padding = new MarginPadding { Horizontal = spacing, Top = spacing },
+                                                        Child = ratings = new UserRatings
+                                                        {
+                                                            RelativeSizeAxes = Axes.Both,
+                                                        },
+                                                    }),
+                                                },
+                                            },
+                                            new OsuScrollContainer
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Width = 0.5f,
+                                                ScrollbarVisible = false,
+                                                Padding = new MarginPadding { Left = spacing / 2 },
+                                                Child = new FillFlowContainer
+                                                {
+                                                    RelativeSizeAxes = Axes.X,
+                                                    AutoSizeAxes = Axes.Y,
+                                                    LayoutDuration = transition_duration,
+                                                    LayoutEasing = Easing.OutQuad,
+                                                    Spacing = new Vector2(spacing * 2),
+                                                    Margin = new MarginPadding { Top = spacing * 2 },
+                                                    Children = new[]
+                                                    {
+                                                        description = new MetadataSection("Description"),
+                                                        source = new MetadataSection("Source"),
+                                                        tags = new MetadataSection("Tags"),
+                                                    },
+                                                },
+                                            },
                                         },
                                     },
                                 },
-                            },
-                        },
-                        failRetryContainer = new Container
-                        {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            RelativeSizeAxes = Axes.X,
-                            Children = new Drawable[]
-                            {
-                                new OsuSpriteText
+                                new Drawable[]
                                 {
-                                    Text = "Points of Failure",
-                                    Font = @"Exo2.0-Bold",
-                                    TextSize = 14,
-                                },
-                                failRetryGraph = new FailRetryGraph
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Padding = new MarginPadding { Top = 14 + spacing / 2 },
-                                },
-                            },
+                                    failRetryContainer = new OnlineViewContainer("Sign in to view more details")
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Children = new Drawable[]
+                                        {
+                                            new OsuSpriteText
+                                            {
+                                                Text = "Points of Failure",
+                                                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14),
+                                            },
+                                            failRetryGraph = new FailRetryGraph
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Padding = new MarginPadding { Top = 14 + spacing / 2 },
+                                            },
+                                        },
+                                    },
+                                }
+                            }
                         },
                     },
                 },
-                loading = new DimmedLoadingAnimation
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
+                loading = new LoadingLayer(true)
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(APIAccess api)
-        {
-            this.api = api;
-        }
-
-        protected override void UpdateAfterChildren()
-        {
-            base.UpdateAfterChildren();
-
-            metadataScroll.Height = statsFlow.DrawHeight;
-            failRetryContainer.Height = DrawHeight - Padding.TotalVertical - (top.DrawHeight + spacing / 2);
         }
 
         private void updateStatistics()
         {
-            if (Beatmap == null)
+            advanced.Beatmap = Beatmap;
+            description.Text = Beatmap?.Version;
+            source.Text = Beatmap?.Metadata?.Source;
+            tags.Text = Beatmap?.Metadata?.Tags;
+
+            // metrics may have been previously fetched
+            if (Beatmap?.BeatmapSet?.Metrics != null && Beatmap?.Metrics != null)
             {
-                clearStats();
+                updateMetrics();
                 return;
             }
 
-            ratingsContainer.FadeIn(transition_duration);
-            advanced.Beatmap = Beatmap;
-            description.Text = Beatmap.Version;
-            source.Text = Beatmap.Metadata.Source;
-            tags.Text = Beatmap.Metadata.Tags;
-
-            var requestedBeatmap = Beatmap;
-            if (requestedBeatmap.Metrics == null)
+            // for now, let's early abort if an OnlineBeatmapID is not present (should have been populated at import time).
+            if (Beatmap?.OnlineBeatmapID == null || api.State.Value == APIState.Offline)
             {
-                var lookup = new GetBeatmapDetailsRequest(requestedBeatmap);
-                lookup.Success += res =>
-                {
-                    if (beatmap != requestedBeatmap)
-                        //the beatmap has been changed since we started the lookup.
-                        return;
-
-                    requestedBeatmap.Metrics = res;
-                    Schedule(() => displayMetrics(res));
-                };
-                lookup.Failure += e => Schedule(() => displayMetrics(null));
-
-                api.Queue(lookup);
-                loading.Show();
+                updateMetrics();
+                return;
             }
 
-            displayMetrics(requestedBeatmap.Metrics, false);
+            var requestedBeatmap = Beatmap;
+
+            var lookup = new GetBeatmapRequest(requestedBeatmap);
+
+            lookup.Success += res =>
+            {
+                Schedule(() =>
+                {
+                    if (beatmap != requestedBeatmap)
+                        // the beatmap has been changed since we started the lookup.
+                        return;
+
+                    var b = res.ToBeatmap(rulesets);
+
+                    if (requestedBeatmap.BeatmapSet == null)
+                        requestedBeatmap.BeatmapSet = b.BeatmapSet;
+                    else
+                        requestedBeatmap.BeatmapSet.Metrics = b.BeatmapSet.Metrics;
+
+                    requestedBeatmap.Metrics = b.Metrics;
+
+                    updateMetrics();
+                });
+            };
+
+            lookup.Failure += e =>
+            {
+                Schedule(() =>
+                {
+                    if (beatmap != requestedBeatmap)
+                        // the beatmap has been changed since we started the lookup.
+                        return;
+
+                    updateMetrics();
+                });
+            };
+
+            api.Queue(lookup);
+            loading.Show();
         }
 
-        private void displayMetrics(BeatmapMetrics metrics, bool failOnMissing = true)
+        private void updateMetrics()
         {
-            var hasRatings = metrics?.Ratings?.Any() ?? false;
-            var hasRetriesFails = (metrics?.Retries?.Any() ?? false) && (metrics.Fails?.Any() ?? false);
-
-            if (failOnMissing) loading.Hide();
+            var hasRatings = beatmap?.BeatmapSet?.Metrics?.Ratings?.Any() ?? false;
+            var hasRetriesFails = (beatmap?.Metrics?.Retries?.Any() ?? false) || (beatmap?.Metrics?.Fails?.Any() ?? false);
 
             if (hasRatings)
             {
-                ratings.Metrics = metrics;
+                ratings.Metrics = beatmap.BeatmapSet.Metrics;
                 ratings.FadeIn(transition_duration);
-            }
-            else if (failOnMissing)
-            {
-                ratings.Metrics = new BeatmapMetrics
-                {
-                    Ratings = new int[10],
-                };
             }
             else
             {
+                // loading or just has no data server-side.
+                ratings.Metrics = new BeatmapSetMetrics { Ratings = new int[10] };
                 ratings.FadeTo(0.25f, transition_duration);
             }
 
             if (hasRetriesFails)
             {
-                failRetryGraph.Metrics = metrics;
+                failRetryGraph.Metrics = beatmap.Metrics;
                 failRetryContainer.FadeIn(transition_duration);
             }
-            else if (failOnMissing)
+            else
             {
                 failRetryGraph.Metrics = new BeatmapMetrics
                 {
@@ -243,33 +261,8 @@ namespace osu.Game.Screens.Select
                     Retries = new int[100],
                 };
             }
-            else
-            {
-                failRetryContainer.FadeTo(0.25f, transition_duration);
-            }
-        }
-
-        private void clearStats()
-        {
-            description.Text = null;
-            source.Text = null;
-            tags.Text = null;
-
-            advanced.Beatmap = new BeatmapInfo
-            {
-                StarDifficulty = 0,
-                BaseDifficulty = new BeatmapDifficulty
-                {
-                    CircleSize = 0,
-                    DrainRate = 0,
-                    OverallDifficulty = 0,
-                    ApproachRate = 0,
-                },
-            };
 
             loading.Hide();
-            ratingsContainer.FadeOut(transition_duration);
-            failRetryContainer.FadeOut(transition_duration);
         }
 
         private class DetailBox : Container
@@ -305,12 +298,13 @@ namespace osu.Game.Screens.Select
 
             public MetadataSection(string title)
             {
+                Alpha = 0;
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
-                Alpha = 0;
 
                 InternalChild = textContainer = new FillFlowContainer
                 {
+                    Alpha = 0,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Spacing = new Vector2(spacing / 2),
@@ -323,8 +317,7 @@ namespace osu.Game.Screens.Select
                             Child = new OsuSpriteText
                             {
                                 Text = title,
-                                Font = @"Exo2.0-Bold",
-                                TextSize = 14,
+                                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14),
                             },
                         },
                     },
@@ -341,15 +334,15 @@ namespace osu.Game.Screens.Select
                         return;
                     }
 
+                    this.FadeIn(transition_duration);
+
                     setTextAsync(value);
                 }
             }
 
-            public override bool IsPresent => base.IsPresent || textFlow == null; // Visibility is updated in the LoadComponentAsync callback
-
             private void setTextAsync(string text)
             {
-                LoadComponentAsync(new OsuTextFlowContainer(s => s.TextSize = 14)
+                LoadComponentAsync(new OsuTextFlowContainer(s => s.Font = s.Font.With(size: 14))
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
@@ -361,38 +354,8 @@ namespace osu.Game.Screens.Select
                     textContainer.Add(textFlow = loaded);
 
                     // fade in if we haven't yet.
-                    this.FadeIn(transition_duration);
+                    textContainer.FadeIn(transition_duration);
                 });
-            }
-        }
-
-        private class DimmedLoadingAnimation : VisibilityContainer
-        {
-            private readonly LoadingAnimation loading;
-
-            public DimmedLoadingAnimation()
-            {
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black.Opacity(0.5f),
-                    },
-                    loading = new LoadingAnimation(),
-                };
-            }
-
-            protected override void PopIn()
-            {
-                this.FadeIn(transition_duration, Easing.OutQuint);
-                loading.State = Visibility.Visible;
-            }
-
-            protected override void PopOut()
-            {
-                this.FadeOut(transition_duration, Easing.OutQuint);
-                loading.State = Visibility.Hidden;
             }
         }
     }

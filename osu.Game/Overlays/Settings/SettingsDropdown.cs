@@ -1,37 +1,45 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings
 {
     public class SettingsDropdown<T> : SettingsItem<T>
     {
-        private Dropdown<T> dropdown;
+        protected new OsuDropdown<T> Control => (OsuDropdown<T>)base.Control;
 
-        private IEnumerable<KeyValuePair<string, T>> items = new KeyValuePair<string, T>[] { };
-        public IEnumerable<KeyValuePair<string, T>> Items
+        public IEnumerable<T> Items
         {
-            get
-            {
-                return items;
-            }
-            set
-            {
-                items = value;
-                if (dropdown != null)
-                    dropdown.Items = value;
-            }
+            get => Control.Items;
+            set => Control.Items = value;
         }
 
-        protected override Drawable CreateControl() => dropdown = new OsuDropdown<T>
+        public IBindableList<T> ItemSource
         {
-            Margin = new MarginPadding { Top = 5 },
-            RelativeSizeAxes = Axes.X,
-            Items = Items,
-        };
+            get => Control.ItemSource;
+            set => Control.ItemSource = value;
+        }
+
+        public override IEnumerable<string> FilterTerms => base.FilterTerms.Concat(Control.Items.Select(i => i.ToString()));
+
+        protected sealed override Drawable CreateControl() => CreateDropdown();
+
+        protected virtual OsuDropdown<T> CreateDropdown() => new DropdownControl();
+
+        protected class DropdownControl : OsuDropdown<T>
+        {
+            public DropdownControl()
+            {
+                Margin = new MarginPadding { Top = 5 };
+                RelativeSizeAxes = Axes.X;
+            }
+
+            protected override DropdownMenu CreateMenu() => base.CreateMenu().With(m => m.MaxHeight = 200);
+        }
     }
 }

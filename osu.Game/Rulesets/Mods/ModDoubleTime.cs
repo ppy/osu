@@ -1,25 +1,34 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Timing;
+using System.Linq;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModDoubleTime : Mod, IApplicableToClock
+    public abstract class ModDoubleTime : ModRateAdjust
     {
         public override string Name => "Double Time";
-        public override string ShortenedName => "DT";
-        public override FontAwesome Icon => FontAwesome.fa_osu_mod_doubletime;
+        public override string Acronym => "DT";
+        public override IconUsage? Icon => OsuIcon.ModDoubletime;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Zoooooooooom...";
         public override bool Ranked => true;
-        public override Type[] IncompatibleMods => new[] { typeof(ModHalfTime) };
 
-        public virtual void ApplyToClock(IAdjustableClock clock)
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModHalfTime)).ToArray();
+
+        [SettingSource("Speed increase", "The actual increase to apply")]
+        public override BindableNumber<double> SpeedChange { get; } = new BindableDouble
         {
-            clock.Rate = 1.5;
-        }
+            MinValue = 1.01,
+            MaxValue = 2,
+            Default = 1.5,
+            Value = 1.5,
+            Precision = 0.01,
+        };
     }
 }

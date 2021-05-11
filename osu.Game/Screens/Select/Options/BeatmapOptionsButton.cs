@@ -1,16 +1,18 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Input;
+using osuTK;
+using osuTK.Graphics;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Select.Options
@@ -28,29 +30,27 @@ namespace osu.Game.Screens.Select.Options
 
         public Color4 ButtonColour
         {
-            get { return background.Colour; }
-            set { background.Colour = value; }
+            get => background.Colour;
+            set => background.Colour = value;
         }
 
-        public FontAwesome Icon
+        public IconUsage Icon
         {
-            get { return iconText.Icon; }
-            set { iconText.Icon = value; }
+            get => iconText.Icon;
+            set => iconText.Icon = value;
         }
 
-        public string FirstLineText
+        public LocalisableString FirstLineText
         {
-            get { return firstLine.Text; }
-            set { firstLine.Text = value; }
+            get => firstLine.Text;
+            set => firstLine.Text = value;
         }
 
-        public string SecondLineText
+        public LocalisableString SecondLineText
         {
-            get { return secondLine.Text; }
-            set { secondLine.Text = value; }
+            get => secondLine.Text;
+            set => secondLine.Text = value;
         }
-
-        public Key? HotKey;
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
@@ -58,10 +58,10 @@ namespace osu.Game.Screens.Select.Options
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             flash.FadeTo(0, 1000, Easing.OutQuint);
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -71,17 +71,6 @@ namespace osu.Game.Screens.Select.Options
             flash.FadeOut(800, Easing.OutExpo);
 
             return base.OnClick(e);
-        }
-
-        protected override bool OnKeyDown(KeyDownEvent e)
-        {
-            if (!e.Repeat && e.Key == HotKey)
-            {
-                Click();
-                return true;
-            }
-
-            return false;
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => box.ReceivePositionalInputAt(screenSpacePos);
@@ -119,7 +108,7 @@ namespace osu.Game.Screens.Select.Options
                         {
                             RelativeSizeAxes = Axes.Both,
                             EdgeSmoothness = new Vector2(1.5f, 0),
-                            Blending = BlendingMode.Additive,
+                            Blending = BlendingParameters.Additive,
                             Colour = Color4.White,
                             Alpha = 0,
                         },
@@ -140,7 +129,7 @@ namespace osu.Game.Screens.Select.Options
                             Anchor = Anchor.TopCentre,
                             Size = new Vector2(30),
                             Shadow = true,
-                            Icon = FontAwesome.fa_close,
+                            Icon = FontAwesome.Solid.TimesCircle,
                             Margin = new MarginPadding
                             {
                                 Bottom = 5,
@@ -150,14 +139,14 @@ namespace osu.Game.Screens.Select.Options
                         {
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
-                            Font = @"Exo2.0-Bold",
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold),
                             Text = @"",
                         },
                         secondLine = new OsuSpriteText
                         {
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
-                            Font = @"Exo2.0-Bold",
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold),
                             Text = @"",
                         },
                     },

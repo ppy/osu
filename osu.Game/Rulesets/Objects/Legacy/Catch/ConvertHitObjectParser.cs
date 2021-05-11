@@ -1,9 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
+using osuTK;
 using osu.Game.Audio;
-using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Objects.Legacy.Catch
@@ -37,7 +36,8 @@ namespace osu.Game.Rulesets.Objects.Legacy.Catch
             };
         }
 
-        protected override HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, List<Vector2> controlPoints, double length, CurveType curveType, int repeatCount, List<List<SampleInfo>> repeatSamples)
+        protected override HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, PathControlPoint[] controlPoints, double? length, int repeatCount,
+                                                  List<IList<HitSampleInfo>> nodeSamples)
         {
             newCombo |= forceNewCombo;
             comboOffset += extraComboOffset;
@@ -50,15 +50,13 @@ namespace osu.Game.Rulesets.Objects.Legacy.Catch
                 X = position.X,
                 NewCombo = FirstObject || newCombo,
                 ComboOffset = comboOffset,
-                ControlPoints = controlPoints,
-                Distance = length,
-                CurveType = curveType,
-                RepeatSamples = repeatSamples,
+                Path = new SliderPath(controlPoints, length),
+                NodeSamples = nodeSamples,
                 RepeatCount = repeatCount
             };
         }
 
-        protected override HitObject CreateSpinner(Vector2 position, bool newCombo, int comboOffset, double endTime)
+        protected override HitObject CreateSpinner(Vector2 position, bool newCombo, int comboOffset, double duration)
         {
             // Convert spinners don't create the new combo themselves, but force the next non-spinner hitobject to create a new combo
             // Their combo offset is still added to that next hitobject's combo index
@@ -67,11 +65,11 @@ namespace osu.Game.Rulesets.Objects.Legacy.Catch
 
             return new ConvertSpinner
             {
-                EndTime = endTime
+                Duration = duration
             };
         }
 
-        protected override HitObject CreateHold(Vector2 position, bool newCombo, int comboOffset, double endTime)
+        protected override HitObject CreateHold(Vector2 position, bool newCombo, int comboOffset, double duration)
         {
             return null;
         }

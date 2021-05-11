@@ -1,7 +1,10 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Graphics;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Utils;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -21,23 +24,17 @@ namespace osu.Game.Graphics.UserInterface
 
         public PercentageCounter()
         {
-            DisplayedCountSpriteText.FixedWidth = true;
             Current.Value = DisplayedCount = 1.0f;
         }
 
-        protected override string FormatCount(double count)
-        {
-            return $@"{count:P2}";
-        }
+        protected override string FormatCount(double count) => count.FormatAccuracy();
 
         protected override double GetProportionalDuration(double currentValue, double newValue)
         {
             return Math.Abs(currentValue - newValue) * RollingDuration * 100.0f;
         }
 
-        public override void Increment(double amount)
-        {
-            Current.Value = Current + amount;
-        }
+        protected override OsuSpriteText CreateSpriteText()
+            => base.CreateSpriteText().With(s => s.Font = s.Font.With(size: 20f, fixedWidth: true));
     }
 }

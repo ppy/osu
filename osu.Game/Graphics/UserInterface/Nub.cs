@@ -1,12 +1,14 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
-using OpenTK.Graphics;
+using System;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 
@@ -40,13 +42,7 @@ namespace osu.Game.Graphics.UserInterface
                 },
             };
 
-            Current.ValueChanged += newValue =>
-            {
-                if (newValue)
-                    fill.FadeIn(200, Easing.OutQuint);
-                else
-                    fill.FadeTo(0.01f, 200, Easing.OutQuint); //todo: remove once we figure why containers aren't drawing at all times
-            };
+            Current.ValueChanged += filled => fill.FadeTo(filled.NewValue ? 1 : 0, 200, Easing.OutQuint);
         }
 
         [BackgroundDependencyLoader]
@@ -71,9 +67,10 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         private bool glowing;
+
         public bool Glowing
         {
-            get { return glowing; }
+            get => glowing;
             set
             {
                 glowing = value;
@@ -93,18 +90,29 @@ namespace osu.Game.Graphics.UserInterface
 
         public bool Expanded
         {
+            set => this.ResizeTo(new Vector2(value ? EXPANDED_SIZE : COLLAPSED_SIZE, 12), 500, Easing.OutQuint);
+        }
+
+        private readonly Bindable<bool> current = new Bindable<bool>();
+
+        public Bindable<bool> Current
+        {
+            get => current;
             set
             {
-                this.ResizeTo(new Vector2(value ? EXPANDED_SIZE : COLLAPSED_SIZE, 12), 500, Easing.OutQuint);
+                if (value == null)
+                    throw new ArgumentNullException(nameof(value));
+
+                current.UnbindBindings();
+                current.BindTo(value);
             }
         }
 
-        public Bindable<bool> Current { get; } = new Bindable<bool>();
-
         private Color4 accentColour;
+
         public Color4 AccentColour
         {
-            get { return accentColour; }
+            get => accentColour;
             set
             {
                 accentColour = value;
@@ -114,9 +122,10 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         private Color4 glowingAccentColour;
+
         public Color4 GlowingAccentColour
         {
-            get { return glowingAccentColour; }
+            get => glowingAccentColour;
             set
             {
                 glowingAccentColour = value;
@@ -126,9 +135,10 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         private Color4 glowColour;
+
         public Color4 GlowColour
         {
-            get { return glowColour; }
+            get => glowColour;
             set
             {
                 glowColour = value;

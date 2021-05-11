@@ -1,34 +1,35 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class ScoreCounter : RollingCounter<double>
+    public abstract class ScoreCounter : RollingCounter<double>
     {
         protected override double RollingDuration => 1000;
         protected override Easing RollingEasing => Easing.Out;
 
-        public bool UseCommaSeparator;
-
         /// <summary>
-        /// How many leading zeroes the counter has.
+        /// Whether comma separators should be displayed.
         /// </summary>
-        public uint LeadingZeroes
-        {
-            get;
-            protected set;
-        }
+        public bool UseCommaSeparator { get; }
+
+        public Bindable<int> RequiredDisplayDigits { get; } = new Bindable<int>();
 
         /// <summary>
         /// Displays score.
         /// </summary>
         /// <param name="leading">How many leading zeroes the counter will have.</param>
-        public ScoreCounter(uint leading = 0)
+        /// <param name="useCommaSeparator">Whether comma separators should be displayed.</param>
+        protected ScoreCounter(int leading = 0, bool useCommaSeparator = false)
         {
-            DisplayedCountSpriteText.FixedWidth = true;
-            LeadingZeroes = leading;
+            UseCommaSeparator = useCommaSeparator;
+
+            RequiredDisplayDigits.Value = leading;
+            RequiredDisplayDigits.BindValueChanged(_ => UpdateDisplay());
         }
 
         protected override double GetProportionalDuration(double currentValue, double newValue)
@@ -38,17 +39,18 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override string FormatCount(double count)
         {
-            string format = new string('0', (int)LeadingZeroes);
+            string format = new string('0', RequiredDisplayDigits.Value);
+
             if (UseCommaSeparator)
+            {
                 for (int i = format.Length - 3; i > 0; i -= 3)
                     format = format.Insert(i, @",");
+            }
 
             return ((long)count).ToString(format);
         }
 
-        public override void Increment(double amount)
-        {
-            Current.Value = Current + amount;
-        }
+        protected override OsuSpriteText CreateSpriteText()
+            => base.CreateSpriteText().With(s => s.Font = s.Font.With(fixedWidth: true));
     }
 }

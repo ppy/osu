@@ -1,9 +1,9 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -14,12 +14,12 @@ using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays.Volume;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class VolumeOverlay : OverlayContainer
+    public class VolumeOverlay : VisibilityContainer
     {
         private const float offset = 10;
 
@@ -28,9 +28,9 @@ namespace osu.Game.Overlays
         private VolumeMeter volumeMeterMusic;
         private MuteButton muteButton;
 
-        protected override bool BlockPositionalInput => false;
-
         private readonly BindableDouble muteAdjustment = new BindableDouble();
+
+        public Bindable<bool> IsMuted { get; } = new Bindable<bool>();
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colours)
@@ -46,6 +46,13 @@ namespace osu.Game.Overlays
                     Width = 300,
                     Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.75f), Color4.Black.Opacity(0))
                 },
+                muteButton = new MuteButton
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Margin = new MarginPadding(10),
+                    Current = { BindTarget = IsMuted }
+                },
                 new FillFlowContainer
                 {
                     Direction = FillDirection.Vertical,
@@ -56,31 +63,24 @@ namespace osu.Game.Overlays
                     Margin = new MarginPadding { Left = offset },
                     Children = new Drawable[]
                     {
-                        volumeMeterEffect = new VolumeMeter("EFFECTS", 125, colours.BlueDarker)
-                        {
-                            Margin = new MarginPadding { Top = 100 + MuteButton.HEIGHT } //to counter the mute button and re-center the volume meters
-                        },
+                        volumeMeterEffect = new VolumeMeter("EFFECTS", 125, colours.BlueDarker),
                         volumeMeterMaster = new VolumeMeter("MASTER", 150, colours.PinkDarker),
                         volumeMeterMusic = new VolumeMeter("MUSIC", 125, colours.BlueDarker),
-                        muteButton = new MuteButton
-                        {
-                            Margin = new MarginPadding { Top = 100 }
-                        }
                     }
-                },
+                }
             });
 
             volumeMeterMaster.Bindable.BindTo(audio.Volume);
             volumeMeterEffect.Bindable.BindTo(audio.VolumeSample);
             volumeMeterMusic.Bindable.BindTo(audio.VolumeTrack);
 
-            muteButton.Current.ValueChanged += mute =>
+            IsMuted.BindValueChanged(muted =>
             {
-                if (mute)
+                if (muted.NewValue)
                     audio.AddAdjustment(AdjustableProperty.Volume, muteAdjustment);
                 else
                     audio.RemoveAdjustment(AdjustableProperty.Volume, muteAdjustment);
-            };
+            });
         }
 
         protected override void LoadComplete()
@@ -100,20 +100,30 @@ namespace osu.Game.Overlays
             switch (action)
             {
                 case GlobalAction.DecreaseVolume:
-                    if (State == Visibility.Hidden)
+                    if (State.Value == Visibility.Hidden)
                         Show();
+                    else if (volumeMeterMusic.IsHovered)
+                        volumeMeterMusic.Decrease(amount, isPrecise);
+                    else if (volumeMeterEffect.IsHovered)
+                        volumeMeterEffect.Decrease(amount, isPrecise);
                     else
                         volumeMeterMaster.Decrease(amount, isPrecise);
                     return true;
+
                 case GlobalAction.IncreaseVolume:
-                    if (State == Visibility.Hidden)
+                    if (State.Value == Visibility.Hidden)
                         Show();
+                    else if (volumeMeterMusic.IsHovered)
+                        volumeMeterMusic.Increase(amount, isPrecise);
+                    else if (volumeMeterEffect.IsHovered)
+                        volumeMeterEffect.Increase(amount, isPrecise);
                     else
                         volumeMeterMaster.Increase(amount, isPrecise);
                     return true;
+
                 case GlobalAction.ToggleMute:
                     Show();
-                    muteButton.Current.Value = !muteButton.Current;
+                    muteButton.Current.Value = !muteButton.Current.Value;
                     return true;
             }
 
@@ -124,7 +134,7 @@ namespace osu.Game.Overlays
 
         public override void Show()
         {
-            if (State == Visibility.Visible)
+            if (State.Value == Visibility.Visible)
                 schedulePopOut();
 
             base.Show();

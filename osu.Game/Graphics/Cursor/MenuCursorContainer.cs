@@ -1,11 +1,11 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
+using osu.Framework.Input.StateChanges;
 
 namespace osu.Game.Graphics.Cursor
 {
@@ -29,7 +29,7 @@ namespace osu.Game.Graphics.Cursor
         {
             AddRangeInternal(new Drawable[]
             {
-                Cursor = new MenuCursor { State = Visibility.Hidden },
+                Cursor = new MenuCursor { State = { Value = Visibility.Hidden } },
                 content = new Container { RelativeSizeAxes = Axes.Both }
             });
         }
@@ -43,17 +43,31 @@ namespace osu.Game.Graphics.Cursor
         }
 
         private IProvideCursor currentTarget;
+
         protected override void Update()
         {
             base.Update();
 
-            if (!CanShowCursor)
+            var lastMouseSource = inputManager.CurrentState.Mouse.LastSource;
+            bool hasValidInput = lastMouseSource != null && !(lastMouseSource is ISourcedFromTouch);
+
+            if (!hasValidInput || !CanShowCursor)
             {
                 currentTarget?.Cursor?.Hide();
+                currentTarget = null;
                 return;
             }
 
-            var newTarget = inputManager.HoveredDrawables.OfType<IProvideCursor>().FirstOrDefault(t => t.ProvidingUserCursor) ?? this;
+            IProvideCursor newTarget = this;
+
+            foreach (var d in inputManager.HoveredDrawables)
+            {
+                if (d is IProvideCursor p && p.ProvidingUserCursor)
+                {
+                    newTarget = p;
+                    break;
+                }
+            }
 
             if (currentTarget == newTarget)
                 return;

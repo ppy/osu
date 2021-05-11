@@ -1,10 +1,10 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Timing;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Play.PlayerSettings
@@ -13,16 +13,21 @@ namespace osu.Game.Screens.Play.PlayerSettings
     {
         private const int padding = 10;
 
-        protected override string Title => @"playback";
+        public readonly Bindable<double> UserPlaybackRate = new BindableDouble(1)
+        {
+            Default = 1,
+            MinValue = 0.5,
+            MaxValue = 2,
+            Precision = 0.1,
+        };
 
-        public IAdjustableClock AdjustableClock { set; get; }
+        private readonly PlayerSliderBar<double> rateSlider;
 
-        private readonly PlayerSliderBar<double> sliderbar;
+        private readonly OsuSpriteText multiplierText;
 
         public PlaybackSettings()
+            : base("playback")
         {
-            OsuSpriteText multiplierText;
-
             Children = new Drawable[]
             {
                 new Container
@@ -42,35 +47,18 @@ namespace osu.Game.Screens.Play.PlayerSettings
                         {
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
-                            Font = @"Exo2.0-Bold",
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold),
                         }
                     },
                 },
-                sliderbar = new PlayerSliderBar<double>
-                {
-                    Bindable = new BindableDouble(1)
-                    {
-                        Default = 1,
-                        MinValue = 0.5,
-                        MaxValue = 2,
-                        Precision = 0.1,
-                    },
-                }
+                rateSlider = new PlayerSliderBar<double> { Current = UserPlaybackRate }
             };
-
-            sliderbar.Bindable.ValueChanged += rateMultiplier => multiplierText.Text = $"{sliderbar.Bar.TooltipText}x";
-            sliderbar.Bindable.TriggerChange();
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            if (AdjustableClock == null)
-                return;
-
-            var clockRate = AdjustableClock.Rate;
-            sliderbar.Bindable.ValueChanged += rateMultiplier => AdjustableClock.Rate = clockRate * rateMultiplier;
+            rateSlider.Current.BindValueChanged(multiplier => multiplierText.Text = $"{multiplier.NewValue:0.0}x", true);
         }
     }
 }

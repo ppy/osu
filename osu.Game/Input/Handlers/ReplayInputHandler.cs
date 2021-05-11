@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using osu.Framework.Input.StateChanges.Events;
 using osu.Framework.Input.States;
 using osu.Framework.Platform;
 using osu.Game.Rulesets.UI;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Input.Handlers
 {
@@ -31,10 +31,6 @@ namespace osu.Game.Input.Handlers
         public abstract double? SetFrameFromTime(double time);
 
         public override bool Initialize(GameHost host) => true;
-
-        public override bool IsActive => true;
-
-        public override int Priority => 0;
 
         public class ReplayState<T> : IInput
             where T : struct

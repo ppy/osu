@@ -1,9 +1,8 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using Newtonsoft.Json;
 using osu.Game.Users;
 
@@ -14,12 +13,8 @@ namespace osu.Game.Online.Chat
         [JsonProperty(@"message_id")]
         public readonly long? Id;
 
-        //todo: this should be inside sender.
-        [JsonProperty(@"sender_id")]
-        public int UserId;
-
         [JsonProperty(@"channel_id")]
-        public int ChannelId;
+        public long ChannelId;
 
         [JsonProperty(@"is_action")]
         public bool IsAction;
@@ -64,17 +59,9 @@ namespace osu.Game.Online.Chat
             return Id.Value.CompareTo(other.Id.Value);
         }
 
-        public virtual bool Equals(Message other) => Id == other?.Id;
+        public virtual bool Equals(Message other) => Id.HasValue && Id == other?.Id;
 
         // ReSharper disable once ImpureMethodCallOnReadonlyValueField
         public override int GetHashCode() => Id.GetHashCode();
-    }
-
-    public enum TargetType
-    {
-        [Description(@"channel")]
-        Channel,
-        [Description(@"user")]
-        User
     }
 }

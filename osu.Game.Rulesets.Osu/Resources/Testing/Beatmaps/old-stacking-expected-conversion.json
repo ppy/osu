@@ -1,0 +1,278 @@
+{
+    "Mappings": [{
+        "StartTime": 32165,
+        "Objects": [{
+            "StartTime": 32165,
+            "EndTime": 32165,
+            "X": 32,
+            "Y": 320
+        }]
+    },
+        {
+            "StartTime": 32517,
+            "Objects": [{
+                "StartTime": 32517,
+                "EndTime": 32517,
+                "X": 246.396057,
+                "Y": 182.396057
+            }]
+        },
+        {
+            "StartTime": 32605,
+            "Objects": [{
+                "StartTime": 32605,
+                "EndTime": 32605,
+                "X": 249.597382,
+                "Y": 185.597382
+            }]
+        },
+        {
+            "StartTime": 32693,
+            "Objects": [{
+                "StartTime": 32693,
+                "EndTime": 32693,
+                "X": 252.798691,
+                "Y": 188.798691
+            }]
+        },
+        {
+            "StartTime": 32781,
+            "Objects": [{
+                "StartTime": 32781,
+                "EndTime": 32781,
+                "X": 256,
+                "Y": 192
+            }]
+        },
+        {
+            "StartTime": 33248,
+            "Objects": [{
+                "StartTime": 33248,
+                "EndTime": 33248,
+                "X": 39.3960648,
+                "Y": 76.3960648
+            }]
+        },
+        {
+            "StartTime": 33307,
+            "Objects": [{
+                "StartTime": 33307,
+                "EndTime": 33307,
+                "X": 42.5973778,
+                "Y": 79.597374
+            }]
+        },
+        {
+            "StartTime": 33383,
+            "Objects": [{
+                "StartTime": 33383,
+                "EndTime": 33383,
+                "X": 45.798687,
+                "Y": 82.79869
+            }]
+        },
+        {
+            "StartTime": 33459,
+            "Objects": [{
+                "StartTime": 33459,
+                "EndTime": 33459,
+                "X": 49,
+                "Y": 86
+            },
+                {
+                    "StartTime": 33635,
+                    "EndTime": 33635,
+                    "X": 123.847847,
+                    "Y": 85.7988
+                },
+                {
+                    "StartTime": 33811,
+                    "EndTime": 33811,
+                    "X": 198.6957,
+                    "Y": 85.5975952
+                },
+                {
+                    "StartTime": 33988,
+                    "EndTime": 33988,
+                    "X": 273.9688,
+                    "Y": 85.39525
+                },
+                {
+                    "StartTime": 34164,
+                    "EndTime": 34164,
+                    "X": 348.816681,
+                    "Y": 85.19404
+                },
+                {
+                    "StartTime": 34246,
+                    "EndTime": 34246,
+                    "X": 398.998718,
+                    "Y": 85.05914
+                }
+            ]
+        },
+        {
+            "StartTime": 34341,
+            "Objects": [{
+                "StartTime": 34341,
+                "EndTime": 34341,
+                "X": 401.201324,
+                "Y": 88.20131
+            }]
+        },
+        {
+            "StartTime": 34400,
+            "Objects": [{
+                "StartTime": 34400,
+                "EndTime": 34400,
+                "X": 404.402618,
+                "Y": 91.402626
+            }]
+        },
+        {
+            "StartTime": 34459,
+            "Objects": [{
+                "StartTime": 34459,
+                "EndTime": 34459,
+                "X": 407.603943,
+                "Y": 94.6039352
+            }]
+        },
+        {
+            "StartTime": 34989,
+            "Objects": [{
+                "StartTime": 34989,
+                "EndTime": 34989,
+                "X": 156.597382,
+                "Y": 131.597382
+            },
+                {
+                    "StartTime": 35018,
+                    "EndTime": 35018,
+                    "X": 181.597382,
+                    "Y": 131.597382
+                }
+            ]
+        },
+        {
+            "StartTime": 35106,
+            "Objects": [{
+                "StartTime": 35106,
+                "EndTime": 35106,
+                "X": 159.798691,
+                "Y": 134.798691
+            },
+                {
+                    "StartTime": 35135,
+                    "EndTime": 35135,
+                    "X": 184.798691,
+                    "Y": 134.798691
+                }
+            ]
+        },
+        {
+            "StartTime": 35224,
+            "Objects": [{
+                "StartTime": 35224,
+                "EndTime": 35224,
+                "X": 163,
+                "Y": 138
+            },
+                {
+                    "StartTime": 35253,
+                    "EndTime": 35253,
+                    "X": 188,
+                    "Y": 138
+                }
+            ]
+        },
+        {
+            "StartTime": 35695,
+            "Objects": [{
+                "StartTime": 35695,
+                "EndTime": 35695,
+                "X": 162.798691,
+                "Y": 72.79869
+            },
+                {
+                    "StartTime": 35871,
+                    "EndTime": 35871,
+                    "X": 237.797241,
+                    "Y": 72.33286
+                },
+                {
+                    "StartTime": 36011,
+                    "EndTime": 36011,
+                    "X": 312.795776,
+                    "Y": 71.8670349
+                }
+            ]
+        },
+        {
+            "StartTime": 36106,
+            "Objects": [{
+                "StartTime": 36106,
+                "EndTime": 36106,
+                "X": 315,
+                "Y": 75
+            },
+                {
+                    "StartTime": 36282,
+                    "EndTime": 36282,
+                    "X": 240.001526,
+                    "Y": 75.47769
+                },
+                {
+                    "StartTime": 36422,
+                    "EndTime": 36422,
+                    "X": 165.003052,
+                    "Y": 75.95539
+                }
+            ]
+        },
+        {
+            "StartTime": 36518,
+            "Objects": [{
+                "StartTime": 36518,
+                "EndTime": 36518,
+                "X": 169.201309,
+                "Y": 79.20131
+            },
+                {
+                    "StartTime": 36694,
+                    "EndTime": 36694,
+                    "X": 244.19986,
+                    "Y": 78.73548
+                },
+                {
+                    "StartTime": 36834,
+                    "EndTime": 36834,
+                    "X": 319.198425,
+                    "Y": 78.26965
+                }
+            ]
+        },
+        {
+            "StartTime": 36929,
+            "Objects": [{
+                "StartTime": 36929,
+                "EndTime": 36929,
+                "X": 324.603943,
+                "Y": 84.6039352
+            },
+                {
+                    "StartTime": 37105,
+                    "EndTime": 37105,
+                    "X": 249.605469,
+                    "Y": 85.08163
+                },
+                {
+                    "StartTime": 37245,
+                    "EndTime": 37245,
+                    "X": 174.607,
+                    "Y": 85.5593262
+                }
+            ]
+        }
+    ]
+}

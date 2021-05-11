@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RuleSet Name="osu! Rule Set" Description=" " ToolsVersion="16.0">
+  <Rules AnalyzerId="Microsoft.CodeQuality.Analyzers" RuleNamespace="Microsoft.CodeQuality.Analyzers">
+    <Rule Id="CA1016" Action="None" />
+    <Rule Id="CA1028" Action="None" />
+    <Rule Id="CA1031" Action="None" />
+    <Rule Id="CA1034" Action="None" />
+    <Rule Id="CA1036" Action="None" />
+    <Rule Id="CA1040" Action="None" />
+    <Rule Id="CA1044" Action="None" />
+    <Rule Id="CA1051" Action="None" />
+    <Rule Id="CA1054" Action="None" />
+    <Rule Id="CA1056" Action="None" />
+    <Rule Id="CA1062" Action="None" />
+    <Rule Id="CA1063" Action="None" />
+    <Rule Id="CA1067" Action="None" />
+    <Rule Id="CA1707" Action="None" />
+    <Rule Id="CA1710" Action="None" />
+    <Rule Id="CA1714" Action="None" />
+    <Rule Id="CA1716" Action="None" />
+    <Rule Id="CA1717" Action="None" />
+    <Rule Id="CA1720" Action="None" />
+    <Rule Id="CA1721" Action="None" />
+    <Rule Id="CA1724" Action="None" />
+    <Rule Id="CA1801" Action="None" />
+    <Rule Id="CA1806" Action="None" />
+    <Rule Id="CA1812" Action="None" />
+    <Rule Id="CA1814" Action="None" />
+    <Rule Id="CA1815" Action="None" />
+    <Rule Id="CA1819" Action="None" />
+    <Rule Id="CA1822" Action="None" />
+    <Rule Id="CA1823" Action="None" />
+    <Rule Id="CA2007" Action="Warning" />
+    <Rule Id="CA2214" Action="None" />
+    <Rule Id="CA2227" Action="None" />
+  </Rules>
+  <Rules AnalyzerId="Microsoft.CodeQuality.CSharp.Analyzers" RuleNamespace="Microsoft.CodeQuality.CSharp.Analyzers">
+    <Rule Id="CA1001" Action="None" />
+    <Rule Id="CA1032" Action="None" />
+  </Rules>
+  <Rules AnalyzerId="Microsoft.NetCore.Analyzers" RuleNamespace="Microsoft.NetCore.Analyzers">
+    <Rule Id="CA1303" Action="None" />
+    <Rule Id="CA1304" Action="None" />
+    <Rule Id="CA1305" Action="None" />
+    <Rule Id="CA1307" Action="None" />
+    <Rule Id="CA1308" Action="None" />
+    <Rule Id="CA1816" Action="None" />
+    <Rule Id="CA1826" Action="None" />
+    <Rule Id="CA2000" Action="None" />
+    <Rule Id="CA2008" Action="None" />
+    <Rule Id="CA2213" Action="None" />
+    <Rule Id="CA2235" Action="None" />
+  </Rules>
+  <Rules AnalyzerId="Microsoft.NetCore.CSharp.Analyzers" RuleNamespace="Microsoft.NetCore.CSharp.Analyzers">
+    <Rule Id="CA1309" Action="Warning" />
+    <Rule Id="CA2201" Action="Warning" />
+  </Rules>
+</RuleSet>

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using System.IO;
@@ -14,6 +14,8 @@ namespace osu.Game.IO.Archives
         /// Opens a stream for reading a specific file from this archive.
         /// </summary>
         public abstract Stream GetStream(string name);
+
+        public IEnumerable<string> GetAvailableResources() => Filenames;
 
         public abstract void Dispose();
 
@@ -39,11 +41,9 @@ namespace osu.Game.IO.Archives
                     return null;
 
                 byte[] buffer = new byte[input.Length];
-                await input.ReadAsync(buffer, 0, buffer.Length);
+                await input.ReadAsync(buffer).ConfigureAwait(false);
                 return buffer;
             }
         }
-
-        public abstract Stream GetUnderlyingStream();
     }
 }

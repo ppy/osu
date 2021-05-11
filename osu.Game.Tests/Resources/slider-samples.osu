@@ -1,0 +1,23 @@
+osu file format v14
+
+[General]
+SampleSet: Normal
+
+[Difficulty]
+
+SliderMultiplier:1.6
+SliderTickRate:2
+
+[TimingPoints]
+24735,389.61038961039,4,1,1,25,1,0
+
+[HitObjects]
+// Unified: Normal, Normal, Normal
+168,256,30579,6,0,B|248:320|320:248,2,160
+
+// Unified: Normal+Clap, Normal+Clap, Normal+Clap
+168,256,32137,6,8,B|248:320|320:248,2,160
+
+// Nodal: Normal+Whistle, Normal, Normal+Clap
+// Nodal sounds should override the unified clap sound
+168,256,33696,6,8,B|248:320|320:248,2,160,2|0|8

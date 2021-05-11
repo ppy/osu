@@ -1,19 +1,18 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
+    [Timeout(10000)]
     public class OsuBeatmapConversionTest : BeatmapConversionTest<ConvertValue>
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Osu";
@@ -21,10 +20,11 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase("basic")]
         [TestCase("colinear-perfect-curve")]
         [TestCase("slider-ticks")]
-        public new void Test(string name)
-        {
-            base.Test(name);
-        }
+        [TestCase("repeat-slider")]
+        [TestCase("uneven-repeat-slider")]
+        [TestCase("old-stacking")]
+        [TestCase("multi-segment-slider")]
+        public void Test(string name) => base.Test(name);
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)
         {
@@ -32,19 +32,22 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 case Slider slider:
                     foreach (var nested in slider.NestedHitObjects)
-                        yield return createConvertValue(nested);
+                        yield return createConvertValue((OsuHitObject)nested);
+
                     break;
+
                 default:
-                    yield return createConvertValue(hitObject);
+                    yield return createConvertValue((OsuHitObject)hitObject);
+
                     break;
             }
 
-            ConvertValue createConvertValue(HitObject obj) => new ConvertValue
+            static ConvertValue createConvertValue(OsuHitObject obj) => new ConvertValue
             {
                 StartTime = obj.StartTime,
-                EndTime = (obj as IHasEndTime)?.EndTime ?? obj.StartTime,
-                X = (obj as IHasPosition)?.X ?? OsuPlayfield.BASE_SIZE.X / 2,
-                Y = (obj as IHasPosition)?.Y ?? OsuPlayfield.BASE_SIZE.Y / 2,
+                EndTime = obj.GetEndTime(),
+                X = obj.StackedPosition.X,
+                Y = obj.StackedPosition.Y
             };
         }
 

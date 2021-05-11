@@ -1,7 +1,8 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Screens.Select.Carousel
 {
@@ -10,7 +11,7 @@ namespace osu.Game.Screens.Select.Carousel
     /// </summary>
     public class CarouselGroup : CarouselItem
     {
-        protected override DrawableCarouselItem CreateDrawableRepresentation() => null;
+        public override DrawableCarouselItem CreateDrawableRepresentation() => null;
 
         public IReadOnlyList<CarouselItem> Children => InternalChildren;
 
@@ -21,22 +22,6 @@ namespace osu.Game.Screens.Select.Carousel
         /// incremented whenever a child is added.
         /// </summary>
         private ulong currentChildID;
-
-        public override List<DrawableCarouselItem> Drawables
-        {
-            get
-            {
-                var drawables = base.Drawables;
-
-                // if we are explicitly not present, don't ever present children.
-                // without this check, children drawables can potentially be presented without their group header.
-                if (DrawableRepresentation.Value?.IsPresent == false) return drawables;
-
-                foreach (var c in InternalChildren)
-                    drawables.AddRange(c.Drawables);
-                return drawables;
-            }
-        }
 
         public virtual void RemoveChild(CarouselItem i)
         {
@@ -49,7 +34,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         public virtual void AddChild(CarouselItem i)
         {
-            i.State.ValueChanged += v => ChildItemStateChanged(i, v);
+            i.State.ValueChanged += state => ChildItemStateChanged(i, state.NewValue);
             i.ChildID = ++currentChildID;
             InternalChildren.Add(i);
         }
@@ -58,18 +43,19 @@ namespace osu.Game.Screens.Select.Carousel
         {
             if (items != null) InternalChildren = items;
 
-            State.ValueChanged += v =>
+            State.ValueChanged += state =>
             {
-                switch (v)
+                switch (state.NewValue)
                 {
                     case CarouselItemState.Collapsed:
                     case CarouselItemState.NotSelected:
                         InternalChildren.ForEach(c => c.State.Value = CarouselItemState.Collapsed);
                         break;
+
                     case CarouselItemState.Selected:
                         InternalChildren.ForEach(c =>
                         {
-                            if (c.State == CarouselItemState.Collapsed) c.State.Value = CarouselItemState.NotSelected;
+                            if (c.State.Value == CarouselItemState.Collapsed) c.State.Value = CarouselItemState.NotSelected;
                         });
                         break;
                 }
@@ -80,12 +66,10 @@ namespace osu.Game.Screens.Select.Carousel
         {
             base.Filter(criteria);
 
-            var children = new List<CarouselItem>(InternalChildren);
-
-            children.Sort((x, y) => x.CompareTo(criteria, y));
-            children.ForEach(c => c.Filter(criteria));
-
-            InternalChildren = children;
+            InternalChildren.ForEach(c => c.Filter(criteria));
+            // IEnumerable<T>.OrderBy() is used instead of List<T>.Sort() to ensure sorting stability
+            var criteriaComparer = Comparer<CarouselItem>.Create((x, y) => x.CompareTo(criteria, y));
+            InternalChildren = InternalChildren.OrderBy(c => c, criteriaComparer).ToList();
         }
 
         protected virtual void ChildItemStateChanged(CarouselItem item, CarouselItemState value)
@@ -96,6 +80,7 @@ namespace osu.Game.Screens.Select.Carousel
                 foreach (var b in InternalChildren)
                 {
                     if (item == b) continue;
+
                     b.State.Value = CarouselItemState.NotSelected;
                 }
 

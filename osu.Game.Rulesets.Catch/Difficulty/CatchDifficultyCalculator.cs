@@ -1,149 +1,91 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Difficulty;
-using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Catch.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Catch.Difficulty.Skills;
+using osu.Game.Rulesets.Catch.Mods;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
+using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Catch.Difficulty
 {
     public class CatchDifficultyCalculator : DifficultyCalculator
     {
+        private const double star_scaling_factor = 0.153;
 
-        /// <summary>
-        /// In milliseconds. For difficulty calculation we will only look at the highest strain value in each time interval of size STRAIN_STEP.
-        /// This is to eliminate higher influence of stream over aim by simply having more HitObjects with high strain.
-        /// The higher this value, the less strains there will be, indirectly giving long beatmaps an advantage.
-        /// </summary>
-        private const double strain_step = 750;
-
-        /// <summary>
-        /// The weighting of each strain value decays to this number * it's previous value
-        /// </summary>
-        private const double decay_weight = 0.94;
-
-        private const double star_scaling_factor = 0.145;
+        private float halfCatcherWidth;
 
         public CatchDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
         }
 
-        protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate)
+        protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
-            if (!beatmap.HitObjects.Any())
-                return new CatchDifficultyAttributes(mods, 0);
-
-            var catcher = new CatcherArea.Catcher(beatmap.BeatmapInfo.BaseDifficulty);
-            float halfCatchWidth = catcher.CatchWidth * 0.5f;
-
-            var difficultyHitObjects = new List<CatchDifficultyHitObject>();
-
-            foreach (var hitObject in beatmap.HitObjects)
-            {
-                switch (hitObject)
-                {
-                    // We want to only consider fruits that contribute to the combo. Droplets are addressed as accuracy and spinners are not relevant for "skill" calculations.
-                    case Fruit fruit:
-                        difficultyHitObjects.Add(new CatchDifficultyHitObject(fruit, halfCatchWidth));
-                        break;
-                    case JuiceStream _:
-                        difficultyHitObjects.AddRange(hitObject.NestedHitObjects.OfType<CatchHitObject>().Where(o => !(o is TinyDroplet)).Select(o => new CatchDifficultyHitObject(o, halfCatchWidth)));
-                        break;
-                }
-            }
-
-            difficultyHitObjects.Sort((a, b) => a.BaseHitObject.StartTime.CompareTo(b.BaseHitObject.StartTime));
-
-            if (!calculateStrainValues(difficultyHitObjects, timeRate))
-                return new CatchDifficultyAttributes(mods, 0);
+            if (beatmap.HitObjects.Count == 0)
+                return new CatchDifficultyAttributes { Mods = mods, Skills = skills };
 
             // this is the same as osu!, so there's potential to share the implementation... maybe
-            double preempt = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / timeRate;
-            double starRating = Math.Sqrt(calculateDifficulty(difficultyHitObjects, timeRate)) * star_scaling_factor;
+            double preempt = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / clockRate;
 
-            return new CatchDifficultyAttributes(mods, starRating)
+            return new CatchDifficultyAttributes
             {
+                StarRating = Math.Sqrt(skills[0].DifficultyValue()) * star_scaling_factor,
+                Mods = mods,
                 ApproachRate = preempt > 1200.0 ? -(preempt - 1800.0) / 120.0 : -(preempt - 1200.0) / 150.0 + 5.0,
-                MaxCombo = difficultyHitObjects.Count
+                MaxCombo = beatmap.HitObjects.Count(h => h is Fruit) + beatmap.HitObjects.OfType<JuiceStream>().SelectMany(j => j.NestedHitObjects).Count(h => !(h is TinyDroplet)),
+                Skills = skills
             };
         }
 
-        private bool calculateStrainValues(List<CatchDifficultyHitObject> objects, double timeRate)
+        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
-            CatchDifficultyHitObject lastObject = null;
+            CatchHitObject lastObject = null;
 
-            if (!objects.Any()) return false;
-
-            // Traverse hitObjects in pairs to calculate the strain value of NextHitObject from the strain value of CurrentHitObject and environment.
-            foreach (var currentObject in objects)
+            // In 2B beatmaps, it is possible that a normal Fruit is placed in the middle of a JuiceStream.
+            foreach (var hitObject in beatmap.HitObjects
+                                             .SelectMany(obj => obj is JuiceStream stream ? stream.NestedHitObjects : new[] { obj })
+                                             .Cast<CatchHitObject>()
+                                             .OrderBy(x => x.StartTime))
             {
+                // We want to only consider fruits that contribute to the combo.
+                if (hitObject is BananaShower || hitObject is TinyDroplet)
+                    continue;
+
                 if (lastObject != null)
-                    currentObject.CalculateStrains(lastObject, timeRate);
+                    yield return new CatchDifficultyHitObject(hitObject, lastObject, clockRate, halfCatcherWidth);
 
-                lastObject = currentObject;
+                lastObject = hitObject;
             }
-
-            return true;
         }
 
-        private double calculateDifficulty(List<CatchDifficultyHitObject> objects, double timeRate)
+        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods)
         {
-            // The strain step needs to be adjusted for the algorithm to be considered equal with speed changing mods
-            double actualStrainStep = strain_step * timeRate;
+            halfCatcherWidth = Catcher.CalculateCatchWidth(beatmap.BeatmapInfo.BaseDifficulty) * 0.5f;
 
-            // Find the highest strain value within each strain step
-            var highestStrains = new List<double>();
-            double intervalEndTime = actualStrainStep;
-            double maximumStrain = 0; // We need to keep track of the maximum strain in the current interval
+            // For circle sizes above 5.5, reduce the catcher width further to simulate imperfect gameplay.
+            halfCatcherWidth *= 1 - (Math.Max(0, beatmap.BeatmapInfo.BaseDifficulty.CircleSize - 5.5f) * 0.0625f);
 
-            CatchDifficultyHitObject previousHitObject = null;
-            foreach (CatchDifficultyHitObject hitObject in objects)
+            return new Skill[]
             {
-                // While we are beyond the current interval push the currently available maximum to our strain list
-                while (hitObject.BaseHitObject.StartTime > intervalEndTime)
-                {
-                    highestStrains.Add(maximumStrain);
-
-                    // The maximum strain of the next interval is not zero by default! We need to take the last hitObject we encountered, take its strain and apply the decay
-                    // until the beginning of the next interval.
-                    if (previousHitObject == null)
-                    {
-                        maximumStrain = 0;
-                    }
-                    else
-                    {
-                        double decay = Math.Pow(CatchDifficultyHitObject.DECAY_BASE, (intervalEndTime - previousHitObject.BaseHitObject.StartTime) / 1000);
-                        maximumStrain = previousHitObject.Strain * decay;
-                    }
-
-                    // Go to the next time interval
-                    intervalEndTime += actualStrainStep;
-                }
-
-                // Obtain maximum strain
-                maximumStrain = Math.Max(hitObject.Strain, maximumStrain);
-
-                previousHitObject = hitObject;
-            }
-
-            // Build the weighted sum over the highest strains for each interval
-            double difficulty = 0;
-            double weight = 1;
-            highestStrains.Sort((a, b) => b.CompareTo(a)); // Sort from highest to lowest strain.
-
-            foreach (double strain in highestStrains)
-            {
-                difficulty += weight * strain;
-                weight *= decay_weight;
-            }
-
-            return difficulty;
+                new Movement(mods, halfCatcherWidth),
+            };
         }
+
+        protected override Mod[] DifficultyAdjustmentMods => new Mod[]
+        {
+            new CatchModDoubleTime(),
+            new CatchModHalfTime(),
+            new CatchModHardRock(),
+            new CatchModEasy(),
+        };
     }
 }

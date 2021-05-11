@@ -1,10 +1,10 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -15,29 +15,46 @@ namespace osu.Game.Rulesets.Mania.UI
         {
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        public DrawableManiaJudgement()
         {
-            if (JudgementText != null)
-                JudgementText.TextSize = 25;
         }
 
-        protected override void LoadComplete()
+        protected override Drawable CreateDefaultJudgement(HitResult result) => new DefaultManiaJudgementPiece(result);
+
+        private class DefaultManiaJudgementPiece : DefaultJudgementPiece
         {
-            base.LoadComplete();
-
-            this.FadeInFromZero(50, Easing.OutQuint);
-
-            if (Result.IsHit)
+            public DefaultManiaJudgementPiece(HitResult result)
+                : base(result)
             {
-                JudgementBody.ScaleTo(0.8f);
-                JudgementBody.ScaleTo(1, 250, Easing.OutElastic);
-
-                JudgementBody.Delay(50).ScaleTo(0.75f, 250);
-                this.Delay(50).FadeOut(200);
             }
 
-            Expire();
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                JudgementText.Font = JudgementText.Font.With(size: 25);
+            }
+
+            public override void PlayAnimation()
+            {
+                base.PlayAnimation();
+
+                switch (Result)
+                {
+                    case HitResult.None:
+                    case HitResult.Miss:
+                        break;
+
+                    default:
+                        this.ScaleTo(0.8f);
+                        this.ScaleTo(1, 250, Easing.OutElastic);
+
+                        this.Delay(50)
+                            .ScaleTo(0.75f, 250)
+                            .FadeOut(200);
+                        break;
+                }
+            }
         }
     }
 }

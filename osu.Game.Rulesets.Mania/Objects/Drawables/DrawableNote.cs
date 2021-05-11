@@ -1,14 +1,20 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Extensions.Color4Extensions;
-using OpenTK.Graphics;
+using System.Diagnostics;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
-using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
+using osu.Game.Beatmaps;
+using osu.Game.Graphics;
+using osu.Game.Rulesets.Mania.Configuration;
+using osu.Game.Rulesets.Mania.Skinning.Default;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Screens.Edit;
+using osu.Game.Skinning;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -17,7 +23,17 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// </summary>
     public class DrawableNote : DrawableManiaHitObject<Note>, IKeyBindingHandler<ManiaAction>
     {
-        private readonly NotePiece headPiece;
+        [Resolved]
+        private OsuColour colours { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private IBeatmap beatmap { get; set; }
+
+        private readonly Bindable<bool> configTimingBasedNoteColouring = new Bindable<bool>();
+
+        protected virtual ManiaSkinComponents Component => ManiaSkinComponents.Note;
+
+        private readonly Drawable headPiece;
 
         public DrawableNote(Note hitObject)
             : base(hitObject)
@@ -25,42 +41,40 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            CornerRadius = 5;
-            Masking = true;
-
-            InternalChild = headPiece = new NotePiece();
-        }
-
-        protected override void OnDirectionChanged(ScrollingDirection direction)
-        {
-            base.OnDirectionChanged(direction);
-
-            headPiece.Anchor = headPiece.Origin = direction == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
-        }
-
-        public override Color4 AccentColour
-        {
-            get { return base.AccentColour; }
-            set
+            AddInternal(headPiece = new SkinnableDrawable(new ManiaSkinComponent(Component, hitObject.Column), _ => new DefaultNotePiece())
             {
-                base.AccentColour = value;
-                headPiece.AccentColour = AccentColour;
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y
+            });
+        }
 
-                EdgeEffect = new EdgeEffectParameters
-                {
-                    Type = EdgeEffectType.Glow,
-                    Colour = AccentColour.Lighten(1f).Opacity(0.6f),
-                    Radius = 10,
-                };
-            }
+        [BackgroundDependencyLoader(true)]
+        private void load(ManiaRulesetConfigManager rulesetConfig)
+        {
+            rulesetConfig?.BindWith(ManiaRulesetSetting.TimingBasedNoteColouring, configTimingBasedNoteColouring);
+        }
+
+        protected override void LoadComplete()
+        {
+            HitObject.StartTimeBindable.BindValueChanged(_ => updateSnapColour());
+            configTimingBasedNoteColouring.BindValueChanged(_ => updateSnapColour(), true);
+        }
+
+        protected override void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)
+        {
+            base.OnDirectionChanged(e);
+
+            headPiece.Anchor = headPiece.Origin = e.NewValue == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
+            Debug.Assert(HitObject.HitWindows != null);
+
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    ApplyResult(r => r.Type = HitResult.Miss);
+                    ApplyResult(r => r.Type = r.Judgement.MinResult);
                 return;
             }
 
@@ -76,9 +90,23 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (action != Action.Value)
                 return false;
 
+            if (CheckHittable?.Invoke(this, Time.Current) == false)
+                return false;
+
             return UpdateResult(true);
         }
 
-        public virtual bool OnReleased(ManiaAction action) => false;
+        public virtual void OnReleased(ManiaAction action)
+        {
+        }
+
+        private void updateSnapColour()
+        {
+            if (beatmap == null) return;
+
+            int snapDivisor = beatmap.ControlPointInfo.GetClosestBeatDivisor(HitObject.StartTime);
+
+            Colour = configTimingBasedNoteColouring.Value ? BindableBeatDivisor.GetColourFor(snapDivisor, colours) : Color4.White;
+        }
     }
 }

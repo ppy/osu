@@ -1,10 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Graphics.ES30;
-using osu.Framework.Configuration;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.Colour;
@@ -13,13 +11,22 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics;
 using System;
+using System.Collections.Generic;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Track;
+using osu.Framework.Bindables;
+using osu.Framework.Utils;
+using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Screens.Menu
 {
-    public class LogoVisualisation : Drawable, IHasAccentColour
+    /// <summary>
+    /// A visualiser that reacts to music coming from beatmaps.
+    /// </summary>
+    public class LogoVisualisation : Drawable
     {
         private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
@@ -44,7 +51,7 @@ namespace osu.Game.Screens.Menu
         private const float visualiser_rounds = 5;
 
         /// <summary>
-        /// How much should each bar go down each milisecond (based on a full bar).
+        /// How much should each bar go down each millisecond (based on a full bar).
         /// </summary>
         private const float decay_per_milisecond = 0.0024f;
 
@@ -60,58 +67,69 @@ namespace osu.Game.Screens.Menu
 
         private int indexOffset;
 
-        public Color4 AccentColour { get; set; }
+        /// <summary>
+        /// The relative movement of bars based on input amplification. Defaults to 1.
+        /// </summary>
+        public float Magnitude { get; set; } = 1;
 
         private readonly float[] frequencyAmplitudes = new float[256];
 
-        private Shader shader;
+        private IShader shader;
         private readonly Texture texture;
 
         public LogoVisualisation()
         {
             texture = Texture.WhitePixel;
-            AccentColour = new Color4(1, 1, 1, 0.2f);
-            Blending = BlendingMode.Additive;
+            Blending = BlendingParameters.Additive;
+        }
+
+        private readonly List<IHasAmplitudes> amplitudeSources = new List<IHasAmplitudes>();
+
+        public void AddAmplitudeSource(IHasAmplitudes amplitudeSource)
+        {
+            amplitudeSources.Add(amplitudeSource);
         }
 
         [BackgroundDependencyLoader]
-        private void load(ShaderManager shaders, IBindableBeatmap beatmap)
+        private void load(ShaderManager shaders, IBindable<WorkingBeatmap> beatmap)
         {
             this.beatmap.BindTo(beatmap);
             shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
         }
 
+        private readonly float[] temporalAmplitudes = new float[ChannelAmplitudes.AMPLITUDES_SIZE];
+
         private void updateAmplitudes()
         {
-            var track = beatmap.Value.TrackLoaded ? beatmap.Value.Track : null;
-            var effect = beatmap.Value.BeatmapLoaded ? beatmap.Value.Beatmap.ControlPointInfo.EffectPointAt(track?.CurrentTime ?? Time.Current) : null;
+            var effect = beatmap.Value.BeatmapLoaded && beatmap.Value.TrackLoaded
+                ? beatmap.Value.Beatmap?.ControlPointInfo.EffectPointAt(beatmap.Value.Track.CurrentTime)
+                : null;
 
-            float[] temporalAmplitudes = track?.CurrentAmplitudes.FrequencyAmplitudes ?? new float[256];
+            for (int i = 0; i < temporalAmplitudes.Length; i++)
+                temporalAmplitudes[i] = 0;
+
+            if (beatmap.Value.TrackLoaded)
+                addAmplitudesFromSource(beatmap.Value.Track);
+
+            foreach (var source in amplitudeSources)
+                addAmplitudesFromSource(source);
 
             for (int i = 0; i < bars_per_visualiser; i++)
             {
-                if (track?.IsRunning ?? false)
-                {
-                    float targetAmplitude = temporalAmplitudes[(i + indexOffset) % bars_per_visualiser] * (effect?.KiaiMode == true ? 1 : 0.5f);
-                    if (targetAmplitude > frequencyAmplitudes[i])
-                        frequencyAmplitudes[i] = targetAmplitude;
-                }
-                else
-                {
-                    int index = (i + index_change) % bars_per_visualiser;
-                    if (frequencyAmplitudes[index] > frequencyAmplitudes[i])
-                        frequencyAmplitudes[i] = frequencyAmplitudes[index];
-                }
+                float targetAmplitude = (temporalAmplitudes[(i + indexOffset) % bars_per_visualiser]) * (effect?.KiaiMode == true ? 1 : 0.5f);
+                if (targetAmplitude > frequencyAmplitudes[i])
+                    frequencyAmplitudes[i] = targetAmplitude;
             }
 
             indexOffset = (indexOffset + index_change) % bars_per_visualiser;
-            Scheduler.AddDelayed(updateAmplitudes, time_between_updates);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            updateAmplitudes();
+
+            var delayed = Scheduler.AddDelayed(updateAmplitudes, time_between_updates, true);
+            delayed.PerformRepeatCatchUpExecutions = false;
         }
 
         protected override void Update()
@@ -119,6 +137,7 @@ namespace osu.Game.Screens.Menu
             base.Update();
 
             float decayFactor = (float)Time.Elapsed * decay_per_milisecond;
+
             for (int i = 0; i < bars_per_visualiser; i++)
             {
                 //3% of extra bar length to make it a little faster when bar is almost at it's minimum
@@ -127,74 +146,85 @@ namespace osu.Game.Screens.Menu
                     frequencyAmplitudes[i] = 0;
             }
 
-            Invalidate(Invalidation.DrawNode, shallPropagate: false);
+            Invalidate(Invalidation.DrawNode);
         }
 
-        protected override DrawNode CreateDrawNode() => new VisualisationDrawNode();
+        protected override DrawNode CreateDrawNode() => new VisualisationDrawNode(this);
 
-        private readonly VisualiserSharedData sharedData = new VisualiserSharedData();
-
-        protected override void ApplyDrawNode(DrawNode node)
+        private void addAmplitudesFromSource([NotNull] IHasAmplitudes source)
         {
-            base.ApplyDrawNode(node);
+            if (source == null) throw new ArgumentNullException(nameof(source));
 
-            var visNode = (VisualisationDrawNode)node;
+            var amplitudes = source.CurrentAmplitudes.FrequencyAmplitudes.Span;
 
-            visNode.Shader = shader;
-            visNode.Texture = texture;
-            visNode.Size = DrawSize.X;
-            visNode.Shared = sharedData;
-            visNode.Colour = AccentColour;
-            visNode.AudioData = frequencyAmplitudes;
-        }
-
-        private class VisualiserSharedData
-        {
-            public readonly LinearBatch<TexturedVertex2D> VertexBatch = new LinearBatch<TexturedVertex2D>(100 * 4, 10, PrimitiveType.Quads);
+            for (int i = 0; i < amplitudes.Length; i++)
+            {
+                if (i < temporalAmplitudes.Length)
+                    temporalAmplitudes[i] += amplitudes[i];
+            }
         }
 
         private class VisualisationDrawNode : DrawNode
         {
-            public Shader Shader;
-            public Texture Texture;
-            public VisualiserSharedData Shared;
-            //Asuming the logo is a circle, we don't need a second dimension.
-            public float Size;
+            protected new LogoVisualisation Source => (LogoVisualisation)base.Source;
 
-            public Color4 Colour;
-            public float[] AudioData;
+            private IShader shader;
+            private Texture texture;
+
+            // Assuming the logo is a circle, we don't need a second dimension.
+            private float size;
+
+            private static readonly Color4 transparent_white = Color4.White.Opacity(0.2f);
+
+            private float[] audioData;
+
+            private readonly QuadBatch<TexturedVertex2D> vertexBatch = new QuadBatch<TexturedVertex2D>(100, 10);
+
+            public VisualisationDrawNode(LogoVisualisation source)
+                : base(source)
+            {
+            }
+
+            public override void ApplyState()
+            {
+                base.ApplyState();
+
+                shader = Source.shader;
+                texture = Source.texture;
+                size = Source.DrawSize.X;
+                audioData = Source.frequencyAmplitudes;
+            }
 
             public override void Draw(Action<TexturedVertex2D> vertexAction)
             {
                 base.Draw(vertexAction);
 
-                Shader.Bind();
-                Texture.TextureGL.Bind();
+                shader.Bind();
 
                 Vector2 inflation = DrawInfo.MatrixInverse.ExtractScale().Xy;
 
                 ColourInfo colourInfo = DrawColourInfo.Colour;
-                colourInfo.ApplyChild(Colour);
+                colourInfo.ApplyChild(transparent_white);
 
-                if (AudioData != null)
+                if (audioData != null)
                 {
                     for (int j = 0; j < visualiser_rounds; j++)
                     {
                         for (int i = 0; i < bars_per_visualiser; i++)
                         {
-                            if (AudioData[i] < amplitude_dead_zone)
+                            if (audioData[i] < amplitude_dead_zone)
                                 continue;
 
-                            float rotation = MathHelper.DegreesToRadians(i / (float)bars_per_visualiser * 360 + j * 360 / visualiser_rounds);
-                            float rotationCos = (float)Math.Cos(rotation);
-                            float rotationSin = (float)Math.Sin(rotation);
-                            //taking the cos and sin to the 0..1 range
-                            var barPosition = new Vector2(rotationCos / 2 + 0.5f, rotationSin / 2 + 0.5f) * Size;
+                            float rotation = MathUtils.DegreesToRadians(i / (float)bars_per_visualiser * 360 + j * 360 / visualiser_rounds);
+                            float rotationCos = MathF.Cos(rotation);
+                            float rotationSin = MathF.Sin(rotation);
+                            // taking the cos and sin to the 0..1 range
+                            var barPosition = new Vector2(rotationCos / 2 + 0.5f, rotationSin / 2 + 0.5f) * size;
 
-                            var barSize = new Vector2(Size * (float)Math.Sqrt(2 * (1 - Math.Cos(MathHelper.DegreesToRadians(360f / bars_per_visualiser)))) / 2f, bar_length * AudioData[i]);
-                            //The distance between the position and the sides of the bar.
+                            var barSize = new Vector2(size * MathF.Sqrt(2 * (1 - MathF.Cos(MathUtils.DegreesToRadians(360f / bars_per_visualiser)))) / 2f, bar_length * audioData[i]);
+                            // The distance between the position and the sides of the bar.
                             var bottomOffset = new Vector2(-rotationSin * barSize.X / 2, rotationCos * barSize.X / 2);
-                            //The distance between the bottom side of the bar and the top side.
+                            // The distance between the bottom side of the bar and the top side.
                             var amplitudeOffset = new Vector2(rotationCos * barSize.Y, rotationSin * barSize.Y);
 
                             var rectangle = new Quad(
@@ -204,17 +234,26 @@ namespace osu.Game.Screens.Menu
                                 Vector2Extensions.Transform(barPosition + bottomOffset + amplitudeOffset, DrawInfo.Matrix)
                             );
 
-                            Texture.DrawQuad(
+                            DrawQuad(
+                                texture,
                                 rectangle,
                                 colourInfo,
                                 null,
-                                Shared.VertexBatch.AddAction,
-                                //barSize by itself will make it smooth more in the X axis than in the Y axis, this reverts that.
+                                vertexBatch.AddAction,
+                                // barSize by itself will make it smooth more in the X axis than in the Y axis, this reverts that.
                                 Vector2.Divide(inflation, barSize.Yx));
                         }
                     }
                 }
-                Shader.Unbind();
+
+                shader.Unbind();
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+
+                vertexBatch.Dispose();
             }
         }
     }

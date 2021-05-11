@@ -1,24 +1,31 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
+using osu.Framework.Testing;
+using osu.Game.Database;
 using osu.Game.Users;
 
 namespace osu.Game.Beatmaps
 {
+    [ExcludeFromDynamicCompile]
     [Serializable]
-    public class BeatmapMetadata : IEquatable<BeatmapMetadata>
+    public class BeatmapMetadata : IEquatable<BeatmapMetadata>, IHasPrimaryKey
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
 
         public string Title { get; set; }
+
+        [JsonProperty("title_unicode")]
         public string TitleUnicode { get; set; }
+
         public string Artist { get; set; }
+
+        [JsonProperty("artist_unicode")]
         public string ArtistUnicode { get; set; }
 
         [JsonIgnore]
@@ -34,8 +41,8 @@ namespace osu.Game.Beatmaps
         [Column("Author")]
         public string AuthorString
         {
-            get { return Author?.Username; }
-            set { Author = new User { Username = value }; }
+            get => Author?.Username;
+            set => Author = new User { Username = value };
         }
 
         /// <summary>
@@ -48,11 +55,21 @@ namespace osu.Game.Beatmaps
 
         [JsonProperty(@"tags")]
         public string Tags { get; set; }
+
+        /// <summary>
+        /// The time in milliseconds to begin playing the track for preview purposes.
+        /// If -1, the track should begin playing at 40% of its length.
+        /// </summary>
         public int PreviewTime { get; set; }
+
         public string AudioFile { get; set; }
         public string BackgroundFile { get; set; }
 
-        public override string ToString() => $"{Artist} - {Title} ({Author})";
+        public override string ToString()
+        {
+            string author = Author == null ? string.Empty : $"({Author})";
+            return $"{Artist} - {Title} {author}".Trim();
+        }
 
         [JsonIgnore]
         public string[] SearchableTerms => new[]
@@ -72,15 +89,15 @@ namespace osu.Game.Beatmaps
                 return false;
 
             return Title == other.Title
-                && TitleUnicode == other.TitleUnicode
-                && Artist == other.Artist
-                && ArtistUnicode == other.ArtistUnicode
-                && AuthorString == other.AuthorString
-                && Source == other.Source
-                && Tags == other.Tags
-                && PreviewTime == other.PreviewTime
-                && AudioFile == other.AudioFile
-                && BackgroundFile == other.BackgroundFile;
+                   && TitleUnicode == other.TitleUnicode
+                   && Artist == other.Artist
+                   && ArtistUnicode == other.ArtistUnicode
+                   && AuthorString == other.AuthorString
+                   && Source == other.Source
+                   && Tags == other.Tags
+                   && PreviewTime == other.PreviewTime
+                   && AudioFile == other.AudioFile
+                   && BackgroundFile == other.BackgroundFile;
         }
     }
 }

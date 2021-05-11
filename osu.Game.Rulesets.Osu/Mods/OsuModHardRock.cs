@@ -1,14 +1,13 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -23,21 +22,17 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             osuObject.Position = new Vector2(osuObject.Position.X, OsuPlayfield.BASE_SIZE.Y - osuObject.Y);
 
-            var slider = hitObject as Slider;
-            if (slider == null)
+            if (!(hitObject is Slider slider))
                 return;
 
-            slider.HeadCircle.Position = new Vector2(slider.HeadCircle.Position.X, OsuPlayfield.BASE_SIZE.Y - slider.HeadCircle.Position.Y);
-            slider.TailCircle.Position = new Vector2(slider.TailCircle.Position.X, OsuPlayfield.BASE_SIZE.Y - slider.TailCircle.Position.Y);
-
             slider.NestedHitObjects.OfType<SliderTick>().ForEach(h => h.Position = new Vector2(h.Position.X, OsuPlayfield.BASE_SIZE.Y - h.Position.Y));
-            slider.NestedHitObjects.OfType<RepeatPoint>().ForEach(h => h.Position = new Vector2(h.Position.X, OsuPlayfield.BASE_SIZE.Y - h.Position.Y));
+            slider.NestedHitObjects.OfType<SliderRepeat>().ForEach(h => h.Position = new Vector2(h.Position.X, OsuPlayfield.BASE_SIZE.Y - h.Position.Y));
 
-            var newControlPoints = new List<Vector2>();
-            slider.ControlPoints.ForEach(c => newControlPoints.Add(new Vector2(c.X, -c.Y)));
+            var controlPoints = slider.Path.ControlPoints.Select(p => new PathControlPoint(p.Position.Value, p.Type.Value)).ToArray();
+            foreach (var point in controlPoints)
+                point.Position.Value = new Vector2(point.Position.Value.X, -point.Position.Value.Y);
 
-            slider.ControlPoints = newControlPoints;
-            slider.Curve?.Calculate(); // Recalculate the slider curve
+            slider.Path = new SliderPath(controlPoints, slider.Path.ExpectedDistance.Value);
         }
     }
 }

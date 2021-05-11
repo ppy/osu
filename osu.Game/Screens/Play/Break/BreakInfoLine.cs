@@ -1,12 +1,15 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Utils;
 
 namespace osu.Game.Screens.Play.Break
 {
@@ -34,7 +37,7 @@ namespace osu.Game.Screens.Play.Break
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreRight,
                     Text = name,
-                    TextSize = 17,
+                    Font = OsuFont.GetFont(size: 17),
                     Margin = new MarginPadding { Right = margin }
                 },
                 valueText = new OsuSpriteText
@@ -42,8 +45,7 @@ namespace osu.Game.Screens.Play.Break
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreLeft,
                     Text = prefix + @"-",
-                    TextSize = 17,
-                    Font = "Exo2.0-Bold",
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17),
                     Margin = new MarginPadding { Left = margin }
                 }
             };
@@ -51,9 +53,9 @@ namespace osu.Game.Screens.Play.Break
             Current.ValueChanged += currentValueChanged;
         }
 
-        private void currentValueChanged(T newValue)
+        private void currentValueChanged(ValueChangedEvent<T> e)
         {
-            var newText = prefix + Format(newValue);
+            var newText = prefix + Format(e.NewValue);
 
             if (valueText.Text == newText)
                 return;
@@ -61,7 +63,13 @@ namespace osu.Game.Screens.Play.Break
             valueText.Text = newText;
         }
 
-        protected virtual string Format(T count) => count.ToString();
+        protected virtual string Format(T count)
+        {
+            if (count is Enum countEnum)
+                return countEnum.GetDescription();
+
+            return count.ToString();
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -73,10 +81,11 @@ namespace osu.Game.Screens.Play.Break
 
     public class PercentageBreakInfoLine : BreakInfoLine<double>
     {
-        public PercentageBreakInfoLine(string name, string prefix = "") : base(name, prefix)
+        public PercentageBreakInfoLine(string name, string prefix = "")
+            : base(name, prefix)
         {
         }
 
-        protected override string Format(double count) => $@"{count:P2}";
+        protected override string Format(double count) => count.FormatAccuracy();
     }
 }

@@ -1,13 +1,15 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Utils;
+using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Play
 {
@@ -17,26 +19,45 @@ namespace osu.Game.Screens.Play
 
         private readonly Box fill;
         private readonly Container handleBase;
+        private readonly Container handleContainer;
+
+        private bool showHandle;
+
+        public bool ShowHandle
+        {
+            get => showHandle;
+            set
+            {
+                if (value == showHandle)
+                    return;
+
+                showHandle = value;
+
+                handleBase.FadeTo(showHandle ? 1 : 0, 200);
+            }
+        }
 
         public Color4 FillColour
         {
-            set { fill.Colour = value; }
+            set => fill.Colour = value;
         }
 
         public double StartTime
         {
-            set { CurrentNumber.MinValue = value; }
+            set => CurrentNumber.MinValue = value;
         }
 
         public double EndTime
         {
-            set { CurrentNumber.MaxValue = value; }
+            set => CurrentNumber.MaxValue = value;
         }
 
         public double CurrentTime
         {
-            set { CurrentNumber.Value = value; }
+            set => CurrentNumber.Value = value;
         }
+
+        protected override bool AllowKeyboardInputWhenNotHovered => true;
 
         public SongProgressBar(float barHeight, float handleBarHeight, Vector2 handleSize)
         {
@@ -72,7 +93,7 @@ namespace osu.Game.Screens.Play
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
                     Width = 2,
-                    Height = barHeight + handleBarHeight,
+                    Alpha = 0,
                     Colour = Color4.White,
                     Position = new Vector2(2, 0),
                     Children = new Drawable[]
@@ -82,7 +103,7 @@ namespace osu.Game.Screens.Play
                             Name = "HandleBar box",
                             RelativeSizeAxes = Axes.Both,
                         },
-                        new Container
+                        handleContainer = new Container
                         {
                             Name = "Handle container",
                             Origin = Anchor.BottomCentre,
@@ -107,11 +128,30 @@ namespace osu.Game.Screens.Play
 
         protected override void UpdateValue(float value)
         {
-            var xFill = value * UsableWidth;
-            fill.Width = xFill;
-            handleBase.X = xFill;
+            // handled in update
         }
 
-        protected override void OnUserChange() => OnSeek?.Invoke(Current);
+        protected override void Update()
+        {
+            base.Update();
+
+            handleBase.Height = Height - handleContainer.Height;
+            float newX = (float)Interpolation.Lerp(handleBase.X, NormalizedValue * UsableWidth, Math.Clamp(Time.Elapsed / 40, 0, 1));
+
+            fill.Width = newX;
+            handleBase.X = newX;
+        }
+
+        private ScheduledDelegate scheduledSeek;
+
+        protected override void OnUserChange(double value)
+        {
+            scheduledSeek?.Cancel();
+            scheduledSeek = Schedule(() =>
+            {
+                if (showHandle)
+                    OnSeek?.Invoke(value);
+            });
+        }
     }
 }

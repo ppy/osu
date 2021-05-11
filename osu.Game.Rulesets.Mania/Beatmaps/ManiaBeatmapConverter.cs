@@ -1,19 +1,19 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Mania.Objects;
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using osu.Framework.MathUtils;
+using System.Threading;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns;
 using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy;
-using OpenTK;
-using osu.Game.Audio;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps
 {
@@ -24,10 +24,11 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// </summary>
         private const int max_notes_for_density = 7;
 
-        protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasXPosition) };
-
         public int TargetColumns;
+        public bool Dual;
         public readonly bool IsForCurrentRuleset;
+
+        private readonly int originalTargetColumns;
 
         // Internal for testing purposes
         internal FastRandom Random { get; private set; }
@@ -36,19 +37,27 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         private ManiaBeatmap beatmap;
 
-        public ManiaBeatmapConverter(IBeatmap beatmap)
-            : base(beatmap)
+        public ManiaBeatmapConverter(IBeatmap beatmap, Ruleset ruleset)
+            : base(beatmap, ruleset)
         {
-            IsForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.Equals(new ManiaRuleset().RulesetInfo);
+            IsForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.Equals(ruleset.RulesetInfo);
 
             var roundedCircleSize = Math.Round(beatmap.BeatmapInfo.BaseDifficulty.CircleSize);
             var roundedOverallDifficulty = Math.Round(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
 
             if (IsForCurrentRuleset)
-                TargetColumns = (int)Math.Max(1, roundedCircleSize);
+            {
+                TargetColumns = GetColumnCountForNonConvert(beatmap.BeatmapInfo);
+
+                if (TargetColumns > ManiaRuleset.MAX_STAGE_KEYS)
+                {
+                    TargetColumns /= 2;
+                    Dual = true;
+                }
+            }
             else
             {
-                float percentSliderOrSpinner = (float)beatmap.HitObjects.Count(h => h is IHasEndTime) / beatmap.HitObjects.Count();
+                float percentSliderOrSpinner = (float)beatmap.HitObjects.Count(h => h is IHasDuration) / beatmap.HitObjects.Count;
                 if (percentSliderOrSpinner < 0.2)
                     TargetColumns = 7;
                 else if (percentSliderOrSpinner < 0.3 || roundedCircleSize >= 5)
@@ -58,26 +67,44 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 else
                     TargetColumns = Math.Max(4, Math.Min((int)roundedOverallDifficulty + 1, 7));
             }
+
+            originalTargetColumns = TargetColumns;
         }
 
-        protected override Beatmap<ManiaHitObject> ConvertBeatmap(IBeatmap original)
+        public static int GetColumnCountForNonConvert(BeatmapInfo beatmap)
+        {
+            var roundedCircleSize = Math.Round(beatmap.BaseDifficulty.CircleSize);
+            return (int)Math.Max(1, roundedCircleSize);
+        }
+
+        public override bool CanConvert() => Beatmap.HitObjects.All(h => h is IHasXPosition);
+
+        protected override Beatmap<ManiaHitObject> ConvertBeatmap(IBeatmap original, CancellationToken cancellationToken)
         {
             BeatmapDifficulty difficulty = original.BeatmapInfo.BaseDifficulty;
 
-            int seed = (int)Math.Round(difficulty.DrainRate + difficulty.CircleSize) * 20 + (int)(difficulty.OverallDifficulty * 41.2) + (int)Math.Round(difficulty.ApproachRate);
+            int seed = (int)MathF.Round(difficulty.DrainRate + difficulty.CircleSize) * 20 + (int)(difficulty.OverallDifficulty * 41.2) + (int)MathF.Round(difficulty.ApproachRate);
             Random = new FastRandom(seed);
 
-            return base.ConvertBeatmap(original);
+            return base.ConvertBeatmap(original, cancellationToken);
         }
 
-        protected override Beatmap<ManiaHitObject> CreateBeatmap() => beatmap = new ManiaBeatmap(new StageDefinition { Columns = TargetColumns });
-
-        protected override IEnumerable<ManiaHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap)
+        protected override Beatmap<ManiaHitObject> CreateBeatmap()
         {
-            var maniaOriginal = original as ManiaHitObject;
-            if (maniaOriginal != null)
+            beatmap = new ManiaBeatmap(new StageDefinition { Columns = TargetColumns }, originalTargetColumns);
+
+            if (Dual)
+                beatmap.Stages.Add(new StageDefinition { Columns = TargetColumns });
+
+            return beatmap;
+        }
+
+        protected override IEnumerable<ManiaHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap, CancellationToken cancellationToken)
+        {
+            if (original is ManiaHitObject maniaOriginal)
             {
                 yield return maniaOriginal;
+
                 yield break;
             }
 
@@ -92,18 +119,21 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         private readonly List<double> prevNoteTimes = new List<double>(max_notes_for_density);
         private double density = int.MaxValue;
+
         private void computeDensity(double newNoteTime)
         {
             if (prevNoteTimes.Count == max_notes_for_density)
                 prevNoteTimes.RemoveAt(0);
             prevNoteTimes.Add(newNoteTime);
 
-            density = (prevNoteTimes[prevNoteTimes.Count - 1] - prevNoteTimes[0]) / prevNoteTimes.Count;
+            if (prevNoteTimes.Count >= 2)
+                density = (prevNoteTimes[^1] - prevNoteTimes[0]) / prevNoteTimes.Count;
         }
 
         private double lastTime;
         private Vector2 lastPosition;
         private PatternType lastStair = PatternType.Stair;
+
         private void recordNote(double time, Vector2 position)
         {
             lastTime = time;
@@ -137,37 +167,46 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// <returns>The hit objects generated.</returns>
         private IEnumerable<ManiaHitObject> generateConverted(HitObject original, IBeatmap originalBeatmap)
         {
-            var endTimeData = original as IHasEndTime;
-            var distanceData = original as IHasDistance;
-            var positionData = original as IHasPosition;
-
             Patterns.PatternGenerator conversion = null;
 
-            if (distanceData != null)
+            switch (original)
             {
-                var generator = new DistanceObjectPatternGenerator(Random, original, beatmap, lastPattern, originalBeatmap);
-                conversion = generator;
-
-                for (double time = original.StartTime; !Precision.DefinitelyBigger(time, generator.EndTime); time += generator.SegmentDuration)
+                case IHasDistance _:
                 {
-                    recordNote(time, positionData?.Position ?? Vector2.Zero);
-                    computeDensity(time);
+                    var generator = new DistanceObjectPatternGenerator(Random, original, beatmap, lastPattern, originalBeatmap);
+                    conversion = generator;
+
+                    var positionData = original as IHasPosition;
+
+                    for (int i = 0; i <= generator.SpanCount; i++)
+                    {
+                        double time = original.StartTime + generator.SegmentDuration * i;
+
+                        recordNote(time, positionData?.Position ?? Vector2.Zero);
+                        computeDensity(time);
+                    }
+
+                    break;
                 }
-            }
-            else if (endTimeData != null)
-            {
-                conversion = new EndTimeObjectPatternGenerator(Random, original, beatmap, originalBeatmap);
 
-                recordNote(endTimeData.EndTime, new Vector2(256, 192));
-                computeDensity(endTimeData.EndTime);
-            }
-            else if (positionData != null)
-            {
-                computeDensity(original.StartTime);
+                case IHasDuration endTimeData:
+                {
+                    conversion = new EndTimeObjectPatternGenerator(Random, original, beatmap, lastPattern, originalBeatmap);
 
-                conversion = new HitObjectPatternGenerator(Random, original, beatmap, lastPattern, lastTime, lastPosition, density, lastStair, originalBeatmap);
+                    recordNote(endTimeData.EndTime, new Vector2(256, 192));
+                    computeDensity(endTimeData.EndTime);
+                    break;
+                }
 
-                recordNote(original.StartTime, positionData.Position);
+                case IHasPosition positionData:
+                {
+                    computeDensity(original.StartTime);
+
+                    conversion = new HitObjectPatternGenerator(Random, original, beatmap, lastPattern, lastTime, lastPosition, density, lastStair, originalBeatmap);
+
+                    recordNote(original.StartTime, positionData.Position);
+                    break;
+                }
             }
 
             if (conversion == null)
@@ -180,7 +219,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
                 foreach (var obj in newPattern.HitObjects)
                     yield return obj;
-
             }
         }
 
@@ -201,25 +239,24 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
             private Pattern generate()
             {
-                var endTimeData = HitObject as IHasEndTime;
                 var positionData = HitObject as IHasXPosition;
 
                 int column = GetColumn(positionData?.X ?? 0);
 
                 var pattern = new Pattern();
 
-                if (endTimeData != null)
+                if (HitObject is IHasDuration endTimeData)
                 {
                     pattern.Add(new HoldNote
                     {
                         StartTime = HitObject.StartTime,
                         Duration = endTimeData.Duration,
                         Column = column,
-                        Head = { Samples = sampleInfoListAt(HitObject.StartTime) },
-                        Tail = { Samples = sampleInfoListAt(endTimeData.EndTime) },
+                        Samples = HitObject.Samples,
+                        NodeSamples = (HitObject as IHasRepeats)?.NodeSamples ?? defaultNodeSamples
                     });
                 }
-                else if (positionData != null)
+                else if (HitObject is IHasXPosition)
                 {
                     pattern.Add(new Note
                     {
@@ -232,23 +269,15 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 return pattern;
             }
 
-            /// <summary>
-            /// Retrieves the sample info list at a point in time.
-            /// </summary>
-            /// <param name="time">The time to retrieve the sample info list from.</param>
-            /// <returns></returns>
-            private List<SampleInfo> sampleInfoListAt(double time)
-            {
-                var curveData = HitObject as IHasCurve;
-
-                if (curveData == null)
-                    return HitObject.Samples;
-
-                double segmentTime = (curveData.EndTime - HitObject.StartTime) / curveData.SpanCount();
-
-                int index = (int)(segmentTime == 0 ? 0 : (time - HitObject.StartTime) / segmentTime);
-                return curveData.RepeatSamples[index];
-            }
+            /// <remarks>
+            /// osu!mania-specific beatmaps in stable only play samples at the start of the hold note.
+            /// </remarks>
+            private List<IList<HitSampleInfo>> defaultNodeSamples
+                => new List<IList<HitSampleInfo>>
+                {
+                    HitObject.Samples,
+                    new List<HitSampleInfo>()
+                };
         }
     }
 }

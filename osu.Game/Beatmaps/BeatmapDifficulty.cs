@@ -1,20 +1,17 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using System.ComponentModel.DataAnnotations.Schema;
-using Newtonsoft.Json;
+using osu.Game.Database;
 
 namespace osu.Game.Beatmaps
 {
-    public class BeatmapDifficulty
+    public class BeatmapDifficulty : IHasPrimaryKey
     {
         /// <summary>
         /// The default value used for all difficulty settings except <see cref="SliderMultiplier"/> and <see cref="SliderTickRate"/>.
         /// </summary>
         public const float DEFAULT_DIFFICULTY = 5;
 
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        [JsonIgnore]
         public int ID { get; set; }
 
         public float DrainRate { get; set; } = DEFAULT_DIFFICULTY;
@@ -51,6 +48,7 @@ namespace osu.Game.Beatmaps
                 return mid + (max - mid) * (difficulty - 5) / 5;
             if (difficulty < 5)
                 return mid - (mid - min) * (5 - difficulty) / 5;
+
             return mid;
         }
 
@@ -58,10 +56,22 @@ namespace osu.Game.Beatmaps
         /// Maps a difficulty value [0, 10] to a two-piece linear range of values.
         /// </summary>
         /// <param name="difficulty">The difficulty value to be mapped.</param>
-        /// <param name="range">The values that define the two linear ranges.</param>
-        /// <param name="range.od0">Minimum of the resulting range which will be achieved by a difficulty value of 0.</param>
-        /// <param name="range.od5">Midpoint of the resulting range which will be achieved by a difficulty value of 5.</param>
-        /// <param name="range.od10">Maximum of the resulting range which will be achieved by a difficulty value of 10.</param>
+        /// <param name="range">The values that define the two linear ranges.
+        /// <list type="table">
+        ///   <item>
+        ///     <term>od0</term>
+        ///     <description>Minimum of the resulting range which will be achieved by a difficulty value of 0.</description>
+        ///   </item>
+        ///   <item>
+        ///     <term>od5</term>
+        ///     <description>Midpoint of the resulting range which will be achieved by a difficulty value of 5.</description>
+        ///   </item>
+        ///   <item>
+        ///     <term>od10</term>
+        ///     <description>Maximum of the resulting range which will be achieved by a difficulty value of 10.</description>
+        ///   </item>
+        /// </list>
+        /// </param>
         /// <returns>Value to which the difficulty value maps in the specified range.</returns>
         public static double DifficultyRange(double difficulty, (double od0, double od5, double od10) range)
             => DifficultyRange(difficulty, range.od0, range.od5, range.od10);

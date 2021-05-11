@@ -1,10 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
-using OpenTK.Graphics;
-using osu.Framework.Configuration;
-using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Bindables;
+using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -13,6 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Profile.Sections.Kudosu
 {
@@ -23,70 +22,45 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
         public KudosuInfo(Bindable<User> user)
         {
             this.user.BindTo(user);
-
             CountSection total;
-            CountSection avaliable;
-
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Masking = true;
             CornerRadius = 3;
-            EdgeEffect = new EdgeEffectParameters
-            {
-                Type = EdgeEffectType.Shadow,
-                Offset = new Vector2(0f, 1f),
-                Radius = 3f,
-                Colour = Color4.Black.Opacity(0.2f),
-            };
-            Children = new Drawable[]
-            {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.Gray(0.2f)
-                },
-                new FillFlowContainer
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Children = new[]
-                    {
-                        total = new CountSection(
-                            "Total Kudosu Earned",
-                            "Based on how much of a contribution the user has made to beatmap moderation. See this link for more information."
-                        ),
-                        avaliable = new CountSection(
-                            "Kudosu Avaliable",
-                            "Kudosu can be traded for kudosu stars, which will help your beatmap get more attention. This is the number of kudosu you haven't traded in yet."
-                        ),
-                    }
-                }
-            };
+            Child = total = new CountTotal();
 
-            this.user.ValueChanged += newUser =>
-            {
-                total.Count = newUser?.Kudosu.Total ?? 0;
-                avaliable.Count = newUser?.Kudosu.Available ?? 0;
-            };
+            this.user.ValueChanged += u => total.Count = u.NewValue?.Kudosu.Total ?? 0;
         }
 
         protected override bool OnClick(ClickEvent e) => true;
 
+        private class CountTotal : CountSection
+        {
+            public CountTotal()
+                : base("Total Kudosu Earned")
+            {
+                DescriptionText.AddText("Based on how much of a contribution the user has made to beatmap moderation. See ");
+                DescriptionText.AddLink("this page", "https://osu.ppy.sh/wiki/Kudosu");
+                DescriptionText.AddText(" for more information.");
+            }
+        }
+
         private class CountSection : Container
         {
             private readonly OsuSpriteText valueText;
+            protected readonly LinkFlowContainer DescriptionText;
+            private readonly Box lineBackground;
 
             public new int Count
             {
-                set { valueText.Text = value.ToString(); }
+                set => valueText.Text = value.ToString("N0");
             }
 
-            public CountSection(string header, string description)
+            public CountSection(string header)
             {
                 RelativeSizeAxes = Axes.X;
-                Width = 0.5f;
                 AutoSizeAxes = Axes.Y;
-                Padding = new MarginPadding { Horizontal = 10, Top = 10, Bottom = 20 };
+                Padding = new MarginPadding { Top = 10, Bottom = 20 };
                 Child = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Y,
@@ -95,40 +69,40 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                     Spacing = new Vector2(0, 5),
                     Children = new Drawable[]
                     {
-                        new FillFlowContainer
+                        new CircularContainer
                         {
-                            AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(5, 0),
-                            Children = new Drawable[]
+                            Masking = true,
+                            RelativeSizeAxes = Axes.X,
+                            Height = 2,
+                            Child = lineBackground = new Box
                             {
-                                new OsuSpriteText
-                                {
-                                    Anchor = Anchor.BottomLeft,
-                                    Origin = Anchor.BottomLeft,
-                                    Text = header + ":",
-                                    TextSize = 20,
-                                    Font = @"Exo2.0-RegularItalic",
-                                },
-                                valueText = new OsuSpriteText
-                                {
-                                    Anchor = Anchor.BottomLeft,
-                                    Origin = Anchor.BottomLeft,
-                                    Text = "0",
-                                    TextSize = 40,
-                                    UseFullGlyphHeight = false,
-                                    Font = @"Exo2.0-RegularItalic"
-                                }
+                                RelativeSizeAxes = Axes.Both,
                             }
                         },
-                        new OsuTextFlowContainer(t => { t.TextSize = 19; })
+                        new OsuSpriteText
+                        {
+                            Text = header,
+                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold)
+                        },
+                        valueText = new OsuSpriteText
+                        {
+                            Text = "0",
+                            Font = OsuFont.GetFont(size: 40, weight: FontWeight.Light),
+                            UseFullGlyphHeight = false,
+                        },
+                        DescriptionText = new LinkFlowContainer(t => t.Font = t.Font.With(size: 14))
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Text = description
                         }
                     }
                 };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                lineBackground.Colour = colourProvider.Highlight1;
             }
         }
     }

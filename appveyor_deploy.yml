@@ -1,30 +1,86 @@
 clone_depth: 1
 version: '{build}'
+image: Visual Studio 2019
+test: off
 skip_non_tags: true
-image: Visual Studio 2017
-install:
-  - git clone https://github.com/ppy/osu-deploy
-before_build:
-  - ps: if($env:appveyor_repo_tag -eq 'True') { Update-AppveyorBuild -Version $env:appveyor_repo_tag_name }
-  - cmd: git submodule update --init --recursive --depth=5
-  - cmd: nuget restore -verbosity quiet
-build_script:
-  - ps: iex ((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/appveyor/secure-file/master/install.ps1'))
-  - appveyor DownloadFile https://puu.sh/BCrS8/7faccf7876.enc # signing certificate
-  - cmd: appveyor-tools\secure-file -decrypt 7faccf7876.enc -secret %decode_secret% -out %HOMEPATH%\deanherbert.pfx
-  - appveyor DownloadFile https://puu.sh/A6g75/fdc6f19b04.enc # deploy configuration
-  - cd osu-deploy
-  - nuget restore -verbosity quiet
-  - msbuild osu.Desktop.Deploy.csproj
-  - cmd: ..\appveyor-tools\secure-file -decrypt ..\fdc6f19b04.enc -secret %decode_secret% -out bin\Debug\netcoreapp2.1\osu.Desktop.Deploy.dll.config
-  - dotnet bin/Debug/netcoreapp2.1/osu.Desktop.Deploy.dll %code_signing_password% %APPVEYOR_REPO_TAG_NAME%
+configuration: Release
+
 environment:
-  decode_secret:
-    secure: i67IC2xj6DjjxmA6Oj2jing3+MwzLkq6CbGsjfZ7rdY=
-  code_signing_password:
-    secure: 34tLNqvjmmZEi97MLKfrnQ==
+  matrix:
+    - job_name: osu-game
+    - job_name: osu-ruleset
+      job_depends_on: osu-game
+    - job_name: taiko-ruleset
+      job_depends_on: osu-game
+    - job_name: catch-ruleset
+      job_depends_on: osu-game
+    - job_name: mania-ruleset
+      job_depends_on: osu-game
+    - job_name: templates
+      job_depends_on: osu-game
+
+nuget:
+  project_feed: true
+
+for:
+  -
+    matrix:
+      only:
+        - job_name: osu-game
+    build_script:
+      - cmd: dotnet pack osu.Game\osu.Game.csproj /p:Version=%APPVEYOR_REPO_TAG_NAME%
+  -
+    matrix:
+      only:
+        - job_name: osu-ruleset
+    build_script:
+      - cmd: dotnet remove osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj reference osu.Game\osu.Game.csproj
+      - cmd: dotnet add osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj package ppy.osu.Game -v %APPVEYOR_REPO_TAG_NAME%
+      - cmd: dotnet pack osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj /p:Version=%APPVEYOR_REPO_TAG_NAME%
+  -
+    matrix:
+      only:
+        - job_name: taiko-ruleset
+    build_script:
+      - cmd: dotnet remove osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj reference osu.Game\osu.Game.csproj
+      - cmd: dotnet add osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj package ppy.osu.Game -v %APPVEYOR_REPO_TAG_NAME%
+      - cmd: dotnet pack osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj /p:Version=%APPVEYOR_REPO_TAG_NAME%
+  -
+    matrix:
+      only:
+        - job_name: catch-ruleset
+    build_script:
+      - cmd: dotnet remove osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj reference osu.Game\osu.Game.csproj
+      - cmd: dotnet add osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj package ppy.osu.Game -v %APPVEYOR_REPO_TAG_NAME%
+      - cmd: dotnet pack osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj /p:Version=%APPVEYOR_REPO_TAG_NAME%
+  -
+    matrix:
+      only:
+        - job_name: mania-ruleset
+    build_script:
+      - cmd: dotnet remove osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj reference osu.Game\osu.Game.csproj
+      - cmd: dotnet add osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj package ppy.osu.Game -v %APPVEYOR_REPO_TAG_NAME%
+      - cmd: dotnet pack osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj /p:Version=%APPVEYOR_REPO_TAG_NAME%
+  -
+    matrix:
+      only:
+        - job_name: templates
+    build_script:
+      - cmd: dotnet remove Templates\Rulesets\ruleset-empty\osu.Game.Rulesets.EmptyFreeform\osu.Game.Rulesets.EmptyFreeform.csproj reference osu.Game\osu.Game.csproj
+      - cmd: dotnet remove Templates\Rulesets\ruleset-example\osu.Game.Rulesets.Pippidon\osu.Game.Rulesets.Pippidon.csproj reference osu.Game\osu.Game.csproj
+      - cmd: dotnet remove Templates\Rulesets\ruleset-scrolling-empty\osu.Game.Rulesets.EmptyScrolling\osu.Game.Rulesets.EmptyScrolling.csproj reference osu.Game\osu.Game.csproj
+      - cmd: dotnet remove Templates\Rulesets\ruleset-scrolling-example\osu.Game.Rulesets.Pippidon\osu.Game.Rulesets.Pippidon.csproj reference osu.Game\osu.Game.csproj
+
+      - cmd: dotnet add Templates\Rulesets\ruleset-empty\osu.Game.Rulesets.EmptyFreeform\osu.Game.Rulesets.EmptyFreeform.csproj package ppy.osu.Game -v %APPVEYOR_REPO_TAG_NAME%
+      - cmd: dotnet add Templates\Rulesets\ruleset-example\osu.Game.Rulesets.Pippidon\osu.Game.Rulesets.Pippidon.csproj package ppy.osu.Game -v %APPVEYOR_REPO_TAG_NAME%
+      - cmd: dotnet add Templates\Rulesets\ruleset-scrolling-empty\osu.Game.Rulesets.EmptyScrolling\osu.Game.Rulesets.EmptyScrolling.csproj package ppy.osu.Game -v %APPVEYOR_REPO_TAG_NAME%
+      - cmd: dotnet add Templates\Rulesets\ruleset-scrolling-example\osu.Game.Rulesets.Pippidon\osu.Game.Rulesets.Pippidon.csproj package ppy.osu.Game -v %APPVEYOR_REPO_TAG_NAME%
+
+      - cmd: dotnet pack Templates\osu.Game.Templates.csproj /p:Version=%APPVEYOR_REPO_TAG_NAME%
+
 artifacts:
-  - path: 'osu-deploy/releases/*'
+  - path: '**\*.nupkg'
+
 deploy:
   - provider: Environment
-    name: github
+    name: nuget

@@ -1,9 +1,9 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -18,7 +18,8 @@ namespace osu.Game.Screens.Edit.Components
         private const float contents_padding = 15;
 
         protected readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
-        protected Track Track => Beatmap.Value.Track;
+
+        protected readonly IBindable<Track> Track = new Bindable<Track>();
 
         private readonly Drawable background;
         private readonly Container content;
@@ -42,9 +43,11 @@ namespace osu.Game.Screens.Edit.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindableBeatmap beatmap, OsuColour colours)
+        private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours, EditorClock clock)
         {
             Beatmap.BindTo(beatmap);
+            Track.BindTo(clock.Track);
+
             background.Colour = colours.Gray1;
         }
     }

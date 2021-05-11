@@ -1,22 +1,27 @@
 clone_depth: 1
 version: '{branch}-{build}'
-image: Visual Studio 2017
-configuration: Debug
+image: Visual Studio 2019
+dotnet_csproj:
+  patch: true
+  file: 'osu.Game\osu.Game.csproj' # Use wildcard when it's able to exclude Xamarin projects
+  version: '0.0.{build}'
 cache:
-  - C:\ProgramData\chocolatey\bin -> appveyor.yml
-  - C:\ProgramData\chocolatey\lib -> appveyor.yml
-install:
-  - cmd: git submodule update --init --recursive --depth=5
-  - cmd: choco install resharper-clt -y
-  - cmd: choco install nvika -y
-  - cmd: dotnet tool install CodeFileSanity --version 0.0.16 --global
+  - '%LOCALAPPDATA%\NuGet\v3-cache -> appveyor.yml'
 before_build:
-  - cmd: CodeFileSanity
-  - cmd: nuget restore -verbosity quiet
+  - ps: dotnet --info # Useful when version mismatch between CI and local
+  - ps: nuget restore -verbosity quiet # Only nuget.exe knows both new (.NET Core) and old (Xamarin) projects
 build:
   project: osu.sln
   parallel: true
   verbosity: minimal
+  publish_nuget: true
 after_build:
-  - cmd: inspectcode --o="inspectcodereport.xml" --projects:osu.Game* --caches-home="inspectcode" osu.sln > NUL
-  - cmd: NVika parsereport "inspectcodereport.xml" --treatwarningsaserrors
+  - ps: dotnet tool restore
+  - ps: dotnet format --dry-run --check
+  - ps: .\InspectCode.ps1
+test:
+  assemblies:
+    except:
+      - '**\*Android*'
+      - '**\*iOS*'
+      - 'build\**\*'

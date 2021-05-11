@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -32,7 +32,24 @@ namespace osu.Game.Input
 
         public void Register(KeyBindingContainer manager) => insertDefaults(manager.DefaultKeyBindings);
 
-        private void insertDefaults(IEnumerable<KeyBinding> defaults, int? rulesetId = null, int? variant = null)
+        /// <summary>
+        /// Retrieve all user-defined key combinations (in a format that can be displayed) for a specific action.
+        /// </summary>
+        /// <param name="globalAction">The action to lookup.</param>
+        /// <returns>A set of display strings for all the user's key configuration for the action.</returns>
+        public IEnumerable<string> GetReadableKeyCombinationsFor(GlobalAction globalAction)
+        {
+            foreach (var action in Query().Where(b => (GlobalAction)b.Action == globalAction))
+            {
+                string str = action.KeyCombination.ReadableString();
+
+                // even if found, the readable string may be empty for an unbound action.
+                if (str.Length > 0)
+                    yield return str;
+            }
+        }
+
+        private void insertDefaults(IEnumerable<IKeyBinding> defaults, int? rulesetId = null, int? variant = null)
         {
             using (var usage = ContextFactory.GetForWrite())
             {
@@ -46,6 +63,7 @@ namespace osu.Game.Input
                         continue;
 
                     foreach (var insertable in group.Skip(count).Take(aimCount - count))
+                    {
                         // insert any defaults which are missing.
                         usage.Context.DatabasedKeyBinding.Add(new DatabasedKeyBinding
                         {
@@ -54,6 +72,10 @@ namespace osu.Game.Input
                             RulesetID = rulesetId,
                             Variant = variant
                         });
+
+                        // required to ensure stable insert order (https://github.com/dotnet/efcore/issues/11686)
+                        usage.Context.SaveChanges();
+                    }
                 }
             }
         }
@@ -63,7 +85,6 @@ namespace osu.Game.Input
         /// </summary>
         /// <param name="rulesetId">The ruleset's internal ID.</param>
         /// <param name="variant">An optional variant.</param>
-        /// <returns></returns>
         public List<DatabasedKeyBinding> Query(int? rulesetId = null, int? variant = null) =>
             ContextFactory.Get().DatabasedKeyBinding.Where(b => b.RulesetID == rulesetId && b.Variant == variant).ToList();
 

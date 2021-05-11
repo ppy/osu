@@ -1,21 +1,12 @@
 <Project>
-  <Import Project="osu.Game.props" />
   <PropertyGroup>
     <StartupObject>osu.Game.Tests.VisualTestRunner</StartupObject>
   </PropertyGroup>
-  <ItemGroup Label="Service">
-    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
-  </ItemGroup>
   <ItemGroup Label="Project References">
-    <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
-    <ProjectReference Include="..\osu-resources\osu.Game.Resources\osu.Game.Resources.csproj" />
-  </ItemGroup>
-  <ItemGroup Label="Package References">
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.3" />
-    <PackageReference Include="DeepEqual" Version="1.6.0" />
+    <ProjectReference Include="$(MSBuildThisFileDirectory)osu.Game\osu.Game.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\osu.Game\Tests\VisualTestRunner.cs">
+    <Compile Include="$(MSBuildThisFileDirectory)osu.Game\Tests\VisualTestRunner.cs">
       <Link>VisualTestRunner.cs</Link>
     </Compile>
   </ItemGroup>

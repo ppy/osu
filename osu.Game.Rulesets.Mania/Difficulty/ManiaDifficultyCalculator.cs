@@ -1,144 +1,77 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mania.Beatmaps;
+using osu.Game.Rulesets.Mania.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Mania.Difficulty.Skills;
+using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mania.Scoring;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Difficulty
 {
-    internal class ManiaDifficultyCalculator : DifficultyCalculator
+    public class ManiaDifficultyCalculator : DifficultyCalculator
     {
         private const double star_scaling_factor = 0.018;
 
-        /// <summary>
-        /// In milliseconds. For difficulty calculation we will only look at the highest strain value in each time interval of size strain_step.
-        /// This is to eliminate higher influence of stream over aim by simply having more HitObjects with high strain.
-        /// The higher this value, the less strains there will be, indirectly giving long beatmaps an advantage.
-        /// </summary>
-        private const double strain_step = 400;
-
-        /// <summary>
-        /// The weighting of each strain value decays to this number * it's previous value
-        /// </summary>
-        private const double decay_weight = 0.9;
-
         private readonly bool isForCurrentRuleset;
+        private readonly double originalOverallDifficulty;
 
         public ManiaDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
             isForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.Equals(ruleset.RulesetInfo);
+            originalOverallDifficulty = beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty;
         }
 
-        protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate)
+        protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
-            if (!beatmap.HitObjects.Any())
-                return new ManiaDifficultyAttributes(mods, 0);
+            if (beatmap.HitObjects.Count == 0)
+                return new ManiaDifficultyAttributes { Mods = mods, Skills = skills };
 
-            var difficultyHitObjects = new List<ManiaHitObjectDifficulty>();
+            HitWindows hitWindows = new ManiaHitWindows();
+            hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
 
-            int columnCount = ((ManiaBeatmap)beatmap).TotalColumns;
-
-            // Sort DifficultyHitObjects by StartTime of the HitObjects - just to make sure.
-            // Note: Stable sort is done so that the ordering of hitobjects with equal start times doesn't change
-            difficultyHitObjects.AddRange(beatmap.HitObjects.Select(h => new ManiaHitObjectDifficulty((ManiaHitObject)h, columnCount)).OrderBy(h => h.BaseHitObject.StartTime));
-
-            if (!calculateStrainValues(difficultyHitObjects, timeRate))
-                return new DifficultyAttributes(mods, 0);
-
-
-            double starRating = calculateDifficulty(difficultyHitObjects, timeRate) * star_scaling_factor;
-
-            return new ManiaDifficultyAttributes(mods, starRating)
+            return new ManiaDifficultyAttributes
             {
-                // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be remoevd in the future
-                GreatHitWindow = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / timeRate
+                StarRating = skills[0].DifficultyValue() * star_scaling_factor,
+                Mods = mods,
+                // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be removed in the future
+                GreatHitWindow = (int)Math.Ceiling(getHitWindow300(mods) / clockRate),
+                ScoreMultiplier = getScoreMultiplier(beatmap, mods),
+                MaxCombo = beatmap.HitObjects.Sum(h => h is HoldNote ? 2 : 1),
+                Skills = skills
             };
         }
 
-        private bool calculateStrainValues(List<ManiaHitObjectDifficulty> objects, double timeRate)
+        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
-            // Traverse hitObjects in pairs to calculate the strain value of NextHitObject from the strain value of CurrentHitObject and environment.
-            using (var hitObjectsEnumerator = objects.GetEnumerator())
-            {
-                if (!hitObjectsEnumerator.MoveNext())
-                    return false;
+            var sortedObjects = beatmap.HitObjects.ToArray();
 
-                ManiaHitObjectDifficulty current = hitObjectsEnumerator.Current;
+            LegacySortHelper<HitObject>.Sort(sortedObjects, Comparer<HitObject>.Create((a, b) => (int)Math.Round(a.StartTime) - (int)Math.Round(b.StartTime)));
 
-                // First hitObject starts at strain 1. 1 is the default for strain values, so we don't need to set it here. See DifficultyHitObject.
-                while (hitObjectsEnumerator.MoveNext())
-                {
-                    var next = hitObjectsEnumerator.Current;
-                    next?.CalculateStrains(current, timeRate);
-                    current = next;
-                }
-
-                return true;
-            }
+            for (int i = 1; i < sortedObjects.Length; i++)
+                yield return new ManiaDifficultyHitObject(sortedObjects[i], sortedObjects[i - 1], clockRate);
         }
 
-        private double calculateDifficulty(List<ManiaHitObjectDifficulty> objects, double timeRate)
+        // Sorting is done in CreateDifficultyHitObjects, since the full list of hitobjects is required.
+        protected override IEnumerable<DifficultyHitObject> SortObjects(IEnumerable<DifficultyHitObject> input) => input;
+
+        protected override Skill[] CreateSkills(IBeatmap beatmap, Mod[] mods) => new Skill[]
         {
-            double actualStrainStep = strain_step * timeRate;
-
-            // Find the highest strain value within each strain step
-            List<double> highestStrains = new List<double>();
-            double intervalEndTime = actualStrainStep;
-            double maximumStrain = 0; // We need to keep track of the maximum strain in the current interval
-
-            ManiaHitObjectDifficulty previousHitObject = null;
-            foreach (var hitObject in objects)
-            {
-                // While we are beyond the current interval push the currently available maximum to our strain list
-                while (hitObject.BaseHitObject.StartTime > intervalEndTime)
-                {
-                    highestStrains.Add(maximumStrain);
-
-                    // The maximum strain of the next interval is not zero by default! We need to take the last hitObject we encountered, take its strain and apply the decay
-                    // until the beginning of the next interval.
-                    if (previousHitObject == null)
-                    {
-                        maximumStrain = 0;
-                    }
-                    else
-                    {
-                        double individualDecay = Math.Pow(ManiaHitObjectDifficulty.INDIVIDUAL_DECAY_BASE, (intervalEndTime - previousHitObject.BaseHitObject.StartTime) / 1000);
-                        double overallDecay = Math.Pow(ManiaHitObjectDifficulty.OVERALL_DECAY_BASE, (intervalEndTime - previousHitObject.BaseHitObject.StartTime) / 1000);
-                        maximumStrain = previousHitObject.IndividualStrain * individualDecay + previousHitObject.OverallStrain * overallDecay;
-                    }
-
-                    // Go to the next time interval
-                    intervalEndTime += actualStrainStep;
-                }
-
-                // Obtain maximum strain
-                double strain = hitObject.IndividualStrain + hitObject.OverallStrain;
-                maximumStrain = Math.Max(strain, maximumStrain);
-
-                previousHitObject = hitObject;
-            }
-
-            // Build the weighted sum over the highest strains for each interval
-            double difficulty = 0;
-            double weight = 1;
-            highestStrains.Sort((a, b) => b.CompareTo(a)); // Sort from highest to lowest strain.
-
-            foreach (double strain in highestStrains)
-            {
-                difficulty += weight * strain;
-                weight *= decay_weight;
-            }
-
-            return difficulty;
-        }
+            new Strain(mods, ((ManiaBeatmap)beatmap).TotalColumns)
+        };
 
         protected override Mod[] DifficultyAdjustmentMods
         {
@@ -163,12 +96,73 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                     new ManiaModKey3(),
                     new ManiaModKey4(),
                     new ManiaModKey5(),
+                    new MultiMod(new ManiaModKey5(), new ManiaModDualStages()),
                     new ManiaModKey6(),
+                    new MultiMod(new ManiaModKey6(), new ManiaModDualStages()),
                     new ManiaModKey7(),
+                    new MultiMod(new ManiaModKey7(), new ManiaModDualStages()),
                     new ManiaModKey8(),
+                    new MultiMod(new ManiaModKey8(), new ManiaModDualStages()),
                     new ManiaModKey9(),
+                    new MultiMod(new ManiaModKey9(), new ManiaModDualStages()),
                 }).ToArray();
             }
+        }
+
+        private int getHitWindow300(Mod[] mods)
+        {
+            if (isForCurrentRuleset)
+            {
+                double od = Math.Min(10.0, Math.Max(0, 10.0 - originalOverallDifficulty));
+                return applyModAdjustments(34 + 3 * od, mods);
+            }
+
+            if (Math.Round(originalOverallDifficulty) > 4)
+                return applyModAdjustments(34, mods);
+
+            return applyModAdjustments(47, mods);
+
+            static int applyModAdjustments(double value, Mod[] mods)
+            {
+                if (mods.Any(m => m is ManiaModHardRock))
+                    value /= 1.4;
+                else if (mods.Any(m => m is ManiaModEasy))
+                    value *= 1.4;
+
+                if (mods.Any(m => m is ManiaModDoubleTime))
+                    value *= 1.5;
+                else if (mods.Any(m => m is ManiaModHalfTime))
+                    value *= 0.75;
+
+                return (int)value;
+            }
+        }
+
+        private double getScoreMultiplier(IBeatmap beatmap, Mod[] mods)
+        {
+            double scoreMultiplier = 1;
+
+            foreach (var m in mods)
+            {
+                switch (m)
+                {
+                    case ManiaModNoFail _:
+                    case ManiaModEasy _:
+                    case ManiaModHalfTime _:
+                        scoreMultiplier *= 0.5;
+                        break;
+                }
+            }
+
+            var maniaBeatmap = (ManiaBeatmap)beatmap;
+            int diff = maniaBeatmap.TotalColumns - maniaBeatmap.OriginalTotalColumns;
+
+            if (diff > 0)
+                scoreMultiplier *= 0.9;
+            else if (diff < 0)
+                scoreMultiplier *= 0.9 + 0.04 * diff;
+
+            return scoreMultiplier;
         }
     }
 }

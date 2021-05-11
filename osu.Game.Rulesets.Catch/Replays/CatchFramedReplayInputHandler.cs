@@ -1,9 +1,11 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Input.StateChanges;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
+using osu.Game.Replays;
 using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Rulesets.Catch.Replays
@@ -15,41 +17,17 @@ namespace osu.Game.Rulesets.Catch.Replays
         {
         }
 
-        protected override bool IsImportant(CatchReplayFrame frame) => frame.Position > 0;
+        protected override bool IsImportant(CatchReplayFrame frame) => frame.Actions.Any();
 
-        protected float? Position
+        public override void CollectPendingInputs(List<IInput> inputs)
         {
-            get
+            var position = Interpolation.ValueAt(CurrentTime, StartFrame.Position, EndFrame.Position, StartFrame.Time, EndFrame.Time);
+
+            inputs.Add(new CatchReplayState
             {
-                if (!HasFrames)
-                    return null;
-
-                return Interpolation.ValueAt(CurrentTime, CurrentFrame.Position, NextFrame.Position, CurrentFrame.Time, NextFrame.Time);
-            }
-        }
-
-        public override List<IInput> GetPendingInputs()
-        {
-            if (!Position.HasValue) return new List<IInput>();
-
-            var actions = new List<CatchAction>();
-
-            if (CurrentFrame.Dashing)
-                actions.Add(CatchAction.Dash);
-
-            if (Position.Value > CurrentFrame.Position)
-                actions.Add(CatchAction.MoveRight);
-            else if (Position.Value < CurrentFrame.Position)
-                actions.Add(CatchAction.MoveLeft);
-
-            return new List<IInput>
-            {
-                new CatchReplayState
-                {
-                    PressedActions = actions,
-                    CatcherX = Position.Value
-                },
-            };
+                PressedActions = CurrentFrame?.Actions ?? new List<CatchAction>(),
+                CatcherX = position
+            });
         }
 
         public class CatchReplayState : ReplayState<CatchAction>

@@ -1,37 +1,39 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays.BeatmapSet.Buttons;
 using osu.Game.Screens.Select.Details;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
     public class Details : FillFlowContainer
     {
+        protected readonly UserRatings Ratings;
+
         private readonly PreviewButton preview;
         private readonly BasicStats basic;
         private readonly AdvancedStats advanced;
-        private readonly UserRatings ratings;
+        private readonly DetailBox ratingBox;
 
         private BeatmapSetInfo beatmapSet;
 
         public BeatmapSetInfo BeatmapSet
         {
-            get { return beatmapSet; }
+            get => beatmapSet;
             set
             {
                 if (value == beatmapSet) return;
+
                 beatmapSet = value;
 
                 basic.BeatmapSet = preview.BeatmapSet = BeatmapSet;
+                updateDisplay();
             }
         }
 
@@ -39,19 +41,19 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public BeatmapInfo Beatmap
         {
-            get { return beatmap; }
+            get => beatmap;
             set
             {
                 if (value == beatmap) return;
 
                 basic.Beatmap = advanced.Beatmap = beatmap = value;
-                updateDisplay();
             }
         }
 
         private void updateDisplay()
         {
-            ratings.Metrics = Beatmap?.Metrics;
+            Ratings.Metrics = BeatmapSet?.Metrics;
+            ratingBox.Alpha = BeatmapSet?.OnlineInfo?.Status > 0 ? 1 : 0;
         }
 
         public Details()
@@ -72,7 +74,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Margin = new MarginPadding { Vertical = 10 },
+                        Padding = new MarginPadding { Vertical = 10 }
                     },
                 },
                 new DetailBox
@@ -84,9 +86,9 @@ namespace osu.Game.Overlays.BeatmapSet
                         Margin = new MarginPadding { Vertical = 7.5f },
                     },
                 },
-                new DetailBox
+                ratingBox = new DetailBox
                 {
-                    Child = ratings = new UserRatings
+                    Child = Ratings = new UserRatings
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = 95,
@@ -105,6 +107,8 @@ namespace osu.Game.Overlays.BeatmapSet
         private class DetailBox : Container
         {
             private readonly Container content;
+            private readonly Box background;
+
             protected override Container<Drawable> Content => content;
 
             public DetailBox()
@@ -114,10 +118,10 @@ namespace osu.Game.Overlays.BeatmapSet
 
                 InternalChildren = new Drawable[]
                 {
-                    new Box
+                    background = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black.Opacity(0.5f),
+                        Alpha = 0.5f
                     },
                     content = new Container
                     {
@@ -126,6 +130,12 @@ namespace osu.Game.Overlays.BeatmapSet
                         Padding = new MarginPadding { Horizontal = 15 },
                     },
                 };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                background.Colour = colourProvider.Background6;
             }
         }
     }

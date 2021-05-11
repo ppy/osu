@@ -1,7 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Game.Configuration;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Configuration;
 
@@ -9,7 +10,7 @@ namespace osu.Game.Overlays.Settings
 {
     /// <summary>
     /// A <see cref="SettingsSubsection"/> which provides subclasses with the <see cref="IRulesetConfigManager"/>
-    /// from the <see cref="Ruleset"/>'s <see cref="Ruleset.CreateConfig()"/>.
+    /// from the <see cref="Ruleset"/>'s <see cref="Ruleset.CreateConfig(SettingsStore)"/>.
     /// </summary>
     public abstract class RulesetSettingsSubsection : SettingsSubsection
     {

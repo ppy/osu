@@ -1,11 +1,13 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Localisation;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings.Sections.Audio
 {
@@ -13,14 +15,10 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
     {
         protected override string Header => "Devices";
 
-        private AudioManager audio;
-        private SettingsDropdown<string> dropdown;
+        [Resolved]
+        private AudioManager audio { get; set; }
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
-        {
-            this.audio = audio;
-        }
+        private SettingsDropdown<string> dropdown;
 
         protected override void Dispose(bool isDisposing)
         {
@@ -35,12 +33,12 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
         private void updateItems()
         {
-            var deviceItems = new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>("Default", string.Empty) };
-            deviceItems.AddRange(audio.AudioDeviceNames.Select(d => new KeyValuePair<string, string>(d, d)));
+            var deviceItems = new List<string> { string.Empty };
+            deviceItems.AddRange(audio.AudioDeviceNames);
 
             var preferredDeviceName = audio.AudioDevice.Value;
-            if (deviceItems.All(kv => kv.Value != preferredDeviceName))
-                deviceItems.Add(new KeyValuePair<string, string>(preferredDeviceName, preferredDeviceName));
+            if (deviceItems.All(kv => kv != preferredDeviceName))
+                deviceItems.Add(preferredDeviceName);
 
             // The option dropdown for audio device selection lists all audio
             // device names. Dropdowns, however, may not have multiple identical
@@ -59,15 +57,29 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
             Children = new Drawable[]
             {
-                dropdown = new SettingsDropdown<string>()
+                dropdown = new AudioDeviceSettingsDropdown
+                {
+                    Keywords = new[] { "speaker", "headphone", "output" }
+                }
             };
 
             updateItems();
 
-            dropdown.Bindable = audio.AudioDevice;
+            dropdown.Current = audio.AudioDevice;
 
             audio.OnNewDevice += onDeviceChanged;
             audio.OnLostDevice += onDeviceChanged;
+        }
+
+        private class AudioDeviceSettingsDropdown : SettingsDropdown<string>
+        {
+            protected override OsuDropdown<string> CreateDropdown() => new AudioDeviceDropdownControl();
+
+            private class AudioDeviceDropdownControl : DropdownControl
+            {
+                protected override LocalisableString GenerateItemText(string item)
+                    => string.IsNullOrEmpty(item) ? "Default" : base.GenerateItemText(item);
+            }
         }
     }
 }

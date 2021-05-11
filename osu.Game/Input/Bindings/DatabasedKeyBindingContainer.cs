@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -23,16 +23,17 @@ namespace osu.Game.Input.Bindings
 
         private KeyBindingStore store;
 
-        public override IEnumerable<KeyBinding> DefaultKeyBindings => ruleset.CreateInstance().GetDefaultKeyBindings(variant ?? 0);
+        public override IEnumerable<IKeyBinding> DefaultKeyBindings => ruleset.CreateInstance().GetDefaultKeyBindings(variant ?? 0);
 
         /// <summary>
         /// Create a new instance.
         /// </summary>
         /// <param name="ruleset">A reference to identify the current <see cref="Ruleset"/>. Used to lookup mappings. Null for global mappings.</param>
         /// <param name="variant">An optional variant for the specified <see cref="Ruleset"/>. Used when a ruleset has more than one possible keyboard layouts.</param>
-        /// <param name="simultaneousMode">Specify how to deal with multiple matches of <see cref="KeyCombination"/>s and <see cref="T"/>s.</param>
-        public DatabasedKeyBindingContainer(RulesetInfo ruleset = null, int? variant = null, SimultaneousBindingMode simultaneousMode = SimultaneousBindingMode.None)
-            : base(simultaneousMode)
+        /// <param name="simultaneousMode">Specify how to deal with multiple matches of <see cref="KeyCombination"/>s and <typeparamref name="T"/>s.</param>
+        /// <param name="matchingMode">Specify how to deal with exact <see cref="KeyCombination"/> matches.</param>
+        public DatabasedKeyBindingContainer(RulesetInfo ruleset = null, int? variant = null, SimultaneousBindingMode simultaneousMode = SimultaneousBindingMode.None, KeyCombinationMatchingMode matchingMode = KeyCombinationMatchingMode.Any)
+            : base(simultaneousMode, matchingMode)
         {
             this.ruleset = ruleset;
             this.variant = variant;
@@ -61,6 +62,22 @@ namespace osu.Game.Input.Bindings
                 store.KeyBindingChanged -= ReloadMappings;
         }
 
-        protected override void ReloadMappings() => KeyBindings = store.Query(ruleset?.ID, variant).ToList();
+        protected override void ReloadMappings()
+        {
+            var defaults = DefaultKeyBindings.ToList();
+
+            if (ruleset != null && !ruleset.ID.HasValue)
+                // if the provided ruleset is not stored to the database, we have no way to retrieve custom bindings.
+                // fallback to defaults instead.
+                KeyBindings = defaults;
+            else
+            {
+                KeyBindings = store.Query(ruleset?.ID, variant)
+                                   // this ordering is important to ensure that we read entries from the database in the order
+                                   // enforced by DefaultKeyBindings. allow for song select to handle actions that may otherwise
+                                   // have been eaten by the music controller due to query order.
+                                   .OrderBy(b => defaults.FindIndex(d => (int)d.Action == b.IntAction)).ToList();
+            }
+        }
     }
 }

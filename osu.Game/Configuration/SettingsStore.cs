@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -22,7 +22,6 @@ namespace osu.Game.Configuration
         /// </summary>
         /// <param name="rulesetId">The ruleset's internal ID.</param>
         /// <param name="variant">An optional variant.</param>
-        /// <returns></returns>
         public List<DatabasedSetting> Query(int? rulesetId = null, int? variant = null) =>
             ContextFactory.Get().DatabasedSetting.Where(b => b.RulesetID == rulesetId && b.Variant == variant).ToList();
 
@@ -36,6 +35,12 @@ namespace osu.Game.Configuration
             }
 
             SettingChanged?.Invoke();
+        }
+
+        public void Delete(DatabasedSetting setting)
+        {
+            using (var usage = ContextFactory.GetForWrite())
+                usage.Context.Remove(setting);
         }
     }
 }

@@ -1,9 +1,10 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using osu.Framework.IO.Stores;
 using SharpCompress.Archives.Zip;
 
 namespace osu.Game.IO.Archives
@@ -43,8 +44,6 @@ namespace osu.Game.IO.Archives
             archiveStream.Dispose();
         }
 
-        public override IEnumerable<string> Filenames => archive.Entries.Select(e => e.Key).ToArray();
-
-        public override Stream GetUnderlyingStream() => archiveStream;
+        public override IEnumerable<string> Filenames => archive.Entries.Select(e => e.Key).ExcludeSystemFileNames();
     }
 }

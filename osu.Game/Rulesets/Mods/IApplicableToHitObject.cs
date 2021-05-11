@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Objects;
 
@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mods
     public interface IApplicableToHitObject : IApplicableMod
     {
         /// <summary>
-        /// Applies this <see cref="IApplicableToHitObject{TObject}"/> to a <see cref="HitObject"/>.
+        /// Applies this <see cref="IApplicableToHitObject"/> to a <see cref="HitObject"/>.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> to apply to.</param>
         void ApplyToHitObject(HitObject hitObject);

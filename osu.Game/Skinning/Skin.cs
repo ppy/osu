@@ -1,32 +1,31 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Audio;
 
 namespace osu.Game.Skinning
 {
-    public abstract class Skin : IDisposable, ISkinSource
+    public abstract class Skin : IDisposable, ISkin
     {
         public readonly SkinInfo SkinInfo;
 
-        public virtual SkinConfiguration Configuration { get; protected set; }
+        public SkinConfiguration Configuration { get; protected set; }
 
-        public event Action SourceChanged;
+        public abstract Drawable GetDrawableComponent(ISkinComponent componentName);
 
-        public abstract Drawable GetDrawableComponent(string componentName);
+        public abstract ISample GetSample(ISampleInfo sampleInfo);
 
-        public abstract SampleChannel GetSample(string sampleName);
+        public Texture GetTexture(string componentName) => GetTexture(componentName, default, default);
 
-        public abstract Texture GetTexture(string componentName);
+        public abstract Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT);
 
-        public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration where TValue : class
-            => Configuration is TConfiguration conf ? query?.Invoke(conf) : null;
-
-        public TValue? GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue?> query) where TConfiguration : SkinConfiguration where TValue : struct
-            => Configuration is TConfiguration conf ? query?.Invoke(conf) : null;
+        public abstract IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup);
 
         protected Skin(SkinInfo skin)
         {
@@ -37,6 +36,7 @@ namespace osu.Game.Skinning
 
         ~Skin()
         {
+            // required to potentially clean up sample store from audio hierarchy.
             Dispose(false);
         }
 
@@ -52,6 +52,7 @@ namespace osu.Game.Skinning
         {
             if (isDisposed)
                 return;
+
             isDisposed = true;
         }
 

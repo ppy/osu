@@ -1,9 +1,9 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
@@ -24,7 +24,13 @@ namespace osu.Game.Graphics.UserInterface
             Height = 30;
         }
 
-        public class PageTabItem : TabItem<T>
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            AccentColour = colours.Yellow;
+        }
+
+        public class PageTabItem : TabItem<T>, IHasAccentColour
         {
             private const float transition_duration = 100;
 
@@ -32,7 +38,20 @@ namespace osu.Game.Graphics.UserInterface
 
             protected readonly SpriteText Text;
 
-            public PageTabItem(T value) : base(value)
+            private Color4 accentColour;
+
+            public Color4 AccentColour
+            {
+                get => accentColour;
+                set
+                {
+                    accentColour = value;
+                    box.Colour = accentColour;
+                }
+            }
+
+            public PageTabItem(T value)
+                : base(value)
             {
                 AutoSizeAxes = Axes.X;
                 RelativeSizeAxes = Axes.Y;
@@ -44,9 +63,8 @@ namespace osu.Game.Graphics.UserInterface
                         Margin = new MarginPadding { Top = 8, Bottom = 8 },
                         Origin = Anchor.BottomLeft,
                         Anchor = Anchor.BottomLeft,
-                        Text = (value as Enum)?.GetDescription() ?? value.ToString(),
-                        TextSize = 14,
-                        Font = @"Exo2.0-Bold",
+                        Text = CreateText(),
+                        Font = OsuFont.GetFont(size: 14)
                     },
                     box = new Box
                     {
@@ -59,24 +77,22 @@ namespace osu.Game.Graphics.UserInterface
                     },
                     new HoverClickSounds()
                 };
+
+                Active.BindValueChanged(active => Text.Font = Text.Font.With(Typeface.Torus, weight: active.NewValue ? FontWeight.Bold : FontWeight.Medium), true);
             }
 
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                box.Colour = colours.Yellow;
-            }
+            protected virtual string CreateText() => (Value as Enum)?.GetDescription() ?? Value.ToString();
 
             protected override bool OnHover(HoverEvent e)
             {
-                if (!Active)
+                if (!Active.Value)
                     slideActive();
                 return true;
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                if (!Active)
+                if (!Active.Value)
                     slideInactive();
             }
 

@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -9,12 +9,12 @@ using Newtonsoft.Json.Linq;
 namespace osu.Game.IO.Serialization.Converters
 {
     /// <summary>
-    /// A type of <see cref="JsonConverter"/> that serializes a <see cref="List{T}"/> alongside
+    /// A type of <see cref="JsonConverter"/> that serializes an <see cref="IReadOnlyList{T}"/> alongside
     /// a lookup table for the types contained. The lookup table is used in deserialization to
     /// reconstruct the objects with their original types.
     /// </summary>
-    /// <typeparam name="T">The type of objects contained in the <see cref="List{T}"/> this attribute is attached to.</typeparam>
-    public class TypedListConverter<T> : JsonConverter
+    /// <typeparam name="T">The type of objects contained in the <see cref="IReadOnlyList{T}"/> this attribute is attached to.</typeparam>
+    public class TypedListConverter<T> : JsonConverter<IReadOnlyList<T>>
     {
         private readonly bool requiresTypeVersion;
 
@@ -36,20 +36,30 @@ namespace osu.Game.IO.Serialization.Converters
             this.requiresTypeVersion = requiresTypeVersion;
         }
 
-        public override bool CanConvert(Type objectType) => objectType == typeof(List<T>);
-
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override IReadOnlyList<T> ReadJson(JsonReader reader, Type objectType, IReadOnlyList<T> existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             var list = new List<T>();
 
             var obj = JObject.Load(reader);
-            var lookupTable = serializer.Deserialize<List<string>>(obj["lookup_table"].CreateReader());
 
-            foreach (var tok in obj["items"])
+            if (obj["$lookup_table"] == null)
+                return list;
+
+            var lookupTable = serializer.Deserialize<List<string>>(obj["$lookup_table"].CreateReader());
+            if (lookupTable == null)
+                return list;
+
+            if (obj["$items"] == null)
+                return list;
+
+            foreach (var tok in obj["$items"])
             {
                 var itemReader = tok.CreateReader();
 
-                var typeName = lookupTable[(int)tok["type"]];
+                if (tok["$type"] == null)
+                    throw new JsonException("Expected $type token.");
+
+                var typeName = lookupTable[(int)tok["$type"]];
                 var instance = (T)Activator.CreateInstance(Type.GetType(typeName));
                 serializer.Populate(itemReader, instance);
 
@@ -59,13 +69,12 @@ namespace osu.Game.IO.Serialization.Converters
             return list;
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, IReadOnlyList<T> value, JsonSerializer serializer)
         {
-            var list = (List<T>)value;
-
             var lookupTable = new List<string>();
             var objects = new List<JObject>();
-            foreach (var item in list)
+
+            foreach (var item in value)
             {
                 var type = item.GetType();
                 var assemblyName = type.Assembly.GetName();
@@ -75,6 +84,7 @@ namespace osu.Game.IO.Serialization.Converters
                     typeString += $", {assemblyName.Version}";
 
                 int typeId = lookupTable.IndexOf(typeString);
+
                 if (typeId == -1)
                 {
                     lookupTable.Add(typeString);
@@ -82,16 +92,16 @@ namespace osu.Game.IO.Serialization.Converters
                 }
 
                 var itemObject = JObject.FromObject(item, serializer);
-                itemObject.AddFirst(new JProperty("type", typeId));
+                itemObject.AddFirst(new JProperty("$type", typeId));
                 objects.Add(itemObject);
             }
 
             writer.WriteStartObject();
 
-            writer.WritePropertyName("lookup_table");
+            writer.WritePropertyName("$lookup_table");
             serializer.Serialize(writer, lookupTable);
 
-            writer.WritePropertyName("items");
+            writer.WritePropertyName("$items");
             serializer.Serialize(writer, objects);
 
             writer.WriteEndObject();

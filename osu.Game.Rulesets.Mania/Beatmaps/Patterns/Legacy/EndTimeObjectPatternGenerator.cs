@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using osu.Game.Rulesets.Mania.MathUtils;
@@ -14,12 +14,17 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 {
     internal class EndTimeObjectPatternGenerator : PatternGenerator
     {
-        private readonly double endTime;
+        private readonly int endTime;
+        private readonly PatternType convertType;
 
-        public EndTimeObjectPatternGenerator(FastRandom random, HitObject hitObject, ManiaBeatmap beatmap, IBeatmap originalBeatmap)
-            : base(random, hitObject, beatmap, new Pattern(), originalBeatmap)
+        public EndTimeObjectPatternGenerator(FastRandom random, HitObject hitObject, ManiaBeatmap beatmap, Pattern previousPattern, IBeatmap originalBeatmap)
+            : base(random, hitObject, beatmap, previousPattern, originalBeatmap)
         {
-            endTime = (HitObject as IHasEndTime)?.EndTime ?? 0;
+            endTime = (int)((HitObject as IHasDuration)?.EndTime ?? 0);
+
+            convertType = PreviousPattern.ColumnWithObjects == TotalColumns
+                ? PatternType.None
+                : PatternType.ForceNotStack;
         }
 
         public override IEnumerable<Pattern> Generate()
@@ -35,19 +40,28 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             switch (TotalColumns)
             {
-                case 8 when HitObject.Samples.Any(s => s.Name == SampleInfo.HIT_FINISH) && endTime - HitObject.StartTime < 1000:
+                case 8 when HitObject.Samples.Any(s => s.Name == HitSampleInfo.HIT_FINISH) && endTime - HitObject.StartTime < 1000:
                     addToPattern(pattern, 0, generateHold);
                     break;
+
                 case 8:
-                    addToPattern(pattern, FindAvailableColumn(GetRandomColumn(), PreviousPattern), generateHold);
+                    addToPattern(pattern, getRandomColumn(), generateHold);
                     break;
+
                 default:
-                    if (TotalColumns > 0)
-                        addToPattern(pattern, GetRandomColumn(), generateHold);
+                    addToPattern(pattern, getRandomColumn(0), generateHold);
                     break;
             }
 
             return pattern;
+        }
+
+        private int getRandomColumn(int? lowerBound = null)
+        {
+            if ((convertType & PatternType.ForceNotStack) > 0)
+                return FindAvailableColumn(GetRandomColumn(lowerBound), lowerBound, patterns: PreviousPattern);
+
+            return FindAvailableColumn(GetRandomColumn(lowerBound), lowerBound);
         }
 
         /// <summary>
@@ -62,21 +76,14 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             if (holdNote)
             {
-                var hold = new HoldNote
+                newObject = new HoldNote
                 {
                     StartTime = HitObject.StartTime,
+                    Duration = endTime - HitObject.StartTime,
                     Column = column,
-                    Duration = endTime - HitObject.StartTime
+                    Samples = HitObject.Samples,
+                    NodeSamples = (HitObject as IHasRepeats)?.NodeSamples
                 };
-
-                if (hold.Head.Samples == null)
-                    hold.Head.Samples = new List<SampleInfo>();
-
-                hold.Head.Samples.Add(new SampleInfo { Name = SampleInfo.HIT_NORMAL });
-
-                hold.Tail.Samples = HitObject.Samples;
-
-                newObject = hold;
             }
             else
             {

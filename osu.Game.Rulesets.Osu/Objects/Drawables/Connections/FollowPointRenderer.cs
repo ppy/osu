@@ -1,113 +1,185 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
-using OpenTK;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Objects.Types;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Performance;
+using osu.Framework.Graphics.Pooling;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 {
-    public class FollowPointRenderer : ConnectionRenderer<OsuHitObject>
+    /// <summary>
+    /// Visualises connections between <see cref="DrawableOsuHitObject"/>s.
+    /// </summary>
+    public class FollowPointRenderer : CompositeDrawable
     {
-        private int pointDistance = 32;
-        /// <summary>
-        /// Determines how much space there is between points.
-        /// </summary>
-        public int PointDistance
-        {
-            get { return pointDistance; }
-            set
-            {
-                if (pointDistance == value) return;
-                pointDistance = value;
-                update();
-            }
-        }
-
-        private int preEmpt = 800;
-        /// <summary>
-        /// Follow points to the next hitobject start appearing for this many milliseconds before an hitobject's end time.
-        /// </summary>
-        public int PreEmpt
-        {
-            get { return preEmpt; }
-            set
-            {
-                if (preEmpt == value) return;
-                preEmpt = value;
-                update();
-            }
-        }
-
-        private IEnumerable<OsuHitObject> hitObjects;
-        public override IEnumerable<OsuHitObject> HitObjects
-        {
-            get { return hitObjects; }
-            set
-            {
-                hitObjects = value;
-                update();
-            }
-        }
-
         public override bool RemoveCompletedTransforms => false;
 
-        private void update()
+        public IReadOnlyList<FollowPointLifetimeEntry> Entries => lifetimeEntries;
+
+        private DrawablePool<FollowPointConnection> connectionPool;
+        private DrawablePool<FollowPoint> pointPool;
+
+        private readonly List<FollowPointLifetimeEntry> lifetimeEntries = new List<FollowPointLifetimeEntry>();
+        private readonly Dictionary<LifetimeEntry, FollowPointConnection> connectionsInUse = new Dictionary<LifetimeEntry, FollowPointConnection>();
+        private readonly Dictionary<HitObject, IBindable> startTimeMap = new Dictionary<HitObject, IBindable>();
+        private readonly LifetimeEntryManager lifetimeManager = new LifetimeEntryManager();
+
+        public FollowPointRenderer()
         {
-            Clear();
+            lifetimeManager.EntryBecameAlive += onEntryBecameAlive;
+            lifetimeManager.EntryBecameDead += onEntryBecameDead;
+        }
 
-            if (hitObjects == null)
-                return;
-
-            OsuHitObject prevHitObject = null;
-            foreach (var currHitObject in hitObjects)
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            InternalChildren = new Drawable[]
             {
-                if (prevHitObject != null && !currHitObject.NewCombo && !(prevHitObject is Spinner) && !(currHitObject is Spinner))
-                {
-                    Vector2 startPosition = prevHitObject.EndPosition;
-                    Vector2 endPosition = currHitObject.Position;
-                    double startTime = (prevHitObject as IHasEndTime)?.EndTime ?? prevHitObject.StartTime;
-                    double endTime = currHitObject.StartTime;
+                connectionPool = new DrawablePoolNoLifetime<FollowPointConnection>(1, 200),
+                pointPool = new DrawablePoolNoLifetime<FollowPoint>(50, 1000)
+            };
+        }
 
-                    Vector2 distanceVector = endPosition - startPosition;
-                    int distance = (int)distanceVector.Length;
-                    float rotation = (float)(Math.Atan2(distanceVector.Y, distanceVector.X) * (180 / Math.PI));
-                    double duration = endTime - startTime;
+        public void AddFollowPoints(OsuHitObject hitObject)
+        {
+            addEntry(hitObject);
 
-                    for (int d = (int)(PointDistance * 1.5); d < distance - PointDistance; d += PointDistance)
-                    {
-                        float fraction = (float)d / distance;
-                        Vector2 pointStartPosition = startPosition + (fraction - 0.1f) * distanceVector;
-                        Vector2 pointEndPosition = startPosition + fraction * distanceVector;
-                        double fadeOutTime = startTime + fraction * duration;
-                        double fadeInTime = fadeOutTime - PreEmpt;
+            var startTimeBindable = hitObject.StartTimeBindable.GetBoundCopy();
+            startTimeBindable.ValueChanged += _ => onStartTimeChanged(hitObject);
+            startTimeMap[hitObject] = startTimeBindable;
+        }
 
-                        FollowPoint fp;
+        public void RemoveFollowPoints(OsuHitObject hitObject)
+        {
+            removeEntry(hitObject);
 
-                        Add(fp = new FollowPoint
-                        {
-                            Position = pointStartPosition,
-                            Rotation = rotation,
-                            Alpha = 0,
-                            Scale = new Vector2(1.5f),
-                        });
+            startTimeMap[hitObject].UnbindAll();
+            startTimeMap.Remove(hitObject);
+        }
 
-                        using (fp.BeginAbsoluteSequence(fadeInTime))
-                        {
-                            fp.FadeIn(currHitObject.TimeFadeIn);
-                            fp.ScaleTo(1, currHitObject.TimeFadeIn, Easing.Out);
+        private void addEntry(OsuHitObject hitObject)
+        {
+            var newEntry = new FollowPointLifetimeEntry(hitObject);
 
-                            fp.MoveTo(pointEndPosition, currHitObject.TimeFadeIn, Easing.Out);
+            var index = lifetimeEntries.AddInPlace(newEntry, Comparer<FollowPointLifetimeEntry>.Create((e1, e2) =>
+            {
+                int comp = e1.Start.StartTime.CompareTo(e2.Start.StartTime);
 
-                            fp.Delay(fadeOutTime - fadeInTime).FadeOut(currHitObject.TimeFadeIn);
-                        }
+                if (comp != 0)
+                    return comp;
 
-                        fp.Expire(true);
-                    }
-                }
-                prevHitObject = currHitObject;
+                // we always want to insert the new item after equal ones.
+                // this is important for beatmaps with multiple hitobjects at the same point in time.
+                // if we use standard comparison insert order, there will be a churn of connections getting re-updated to
+                // the next object at the point-in-time, adding a construction/disposal overhead (see FollowPointConnection.End implementation's ClearInternal).
+                // this is easily visible on https://osu.ppy.sh/beatmapsets/150945#osu/372245
+                return -1;
+            }));
+
+            if (index < lifetimeEntries.Count - 1)
+            {
+                // Update the connection's end point to the next connection's start point
+                //     h1 -> -> -> h2
+                //    connection    nextGroup
+
+                FollowPointLifetimeEntry nextEntry = lifetimeEntries[index + 1];
+                newEntry.End = nextEntry.Start;
+            }
+            else
+            {
+                // The end point may be non-null during re-ordering
+                newEntry.End = null;
+            }
+
+            if (index > 0)
+            {
+                // Update the previous connection's end point to the current connection's start point
+                //     h1 -> -> -> h2
+                //  prevGroup    connection
+
+                FollowPointLifetimeEntry previousEntry = lifetimeEntries[index - 1];
+                previousEntry.End = newEntry.Start;
+            }
+
+            lifetimeManager.AddEntry(newEntry);
+        }
+
+        private void removeEntry(OsuHitObject hitObject)
+        {
+            int index = lifetimeEntries.FindIndex(e => e.Start == hitObject);
+
+            var entry = lifetimeEntries[index];
+            entry.UnbindEvents();
+
+            lifetimeEntries.RemoveAt(index);
+            lifetimeManager.RemoveEntry(entry);
+
+            if (index > 0)
+            {
+                // Update the previous connection's end point to the next connection's start point
+                //     h1 -> -> -> h2 -> -> -> h3
+                //  prevGroup    connection       nextGroup
+                // The current connection's end point is used since there may not be a next connection
+                FollowPointLifetimeEntry previousEntry = lifetimeEntries[index - 1];
+                previousEntry.End = entry.End;
+            }
+        }
+
+        protected override bool CheckChildrenLife()
+        {
+            bool anyAliveChanged = base.CheckChildrenLife();
+            anyAliveChanged |= lifetimeManager.Update(Time.Current);
+            return anyAliveChanged;
+        }
+
+        private void onEntryBecameAlive(LifetimeEntry entry)
+        {
+            var connection = connectionPool.Get(c =>
+            {
+                c.Entry = (FollowPointLifetimeEntry)entry;
+                c.Pool = pointPool;
+            });
+
+            connectionsInUse[entry] = connection;
+
+            AddInternal(connection);
+        }
+
+        private void onEntryBecameDead(LifetimeEntry entry)
+        {
+            RemoveInternal(connectionsInUse[entry]);
+            connectionsInUse.Remove(entry);
+        }
+
+        private void onStartTimeChanged(OsuHitObject hitObject)
+        {
+            removeEntry(hitObject);
+            addEntry(hitObject);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            foreach (var entry in lifetimeEntries)
+                entry.UnbindEvents();
+            lifetimeEntries.Clear();
+        }
+
+        private class DrawablePoolNoLifetime<T> : DrawablePool<T>
+            where T : PoolableDrawable, new()
+        {
+            public override bool RemoveWhenNotAlive => false;
+
+            public DrawablePoolNoLifetime(int initialSize, int? maximumSize = null)
+                : base(initialSize, maximumSize)
+            {
             }
         }
     }

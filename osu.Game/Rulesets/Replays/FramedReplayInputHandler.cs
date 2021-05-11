@@ -1,12 +1,14 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+#nullable enable
 
 using System;
 using System.Collections.Generic;
-using osu.Framework.Input.StateChanges;
+using System.Linq;
+using JetBrains.Annotations;
 using osu.Game.Input.Handlers;
-using OpenTK;
-using OpenTK.Input;
+using osu.Game.Replays;
 
 namespace osu.Game.Rulesets.Replays
 {
@@ -17,59 +19,105 @@ namespace osu.Game.Rulesets.Replays
     public abstract class FramedReplayInputHandler<TFrame> : ReplayInputHandler
         where TFrame : ReplayFrame
     {
-        private readonly Replay replay;
+        /// <summary>
+        /// Whether we have at least one replay frame.
+        /// </summary>
+        public bool HasFrames => Frames.Count != 0;
 
-        protected List<ReplayFrame> Frames => replay.Frames;
+        /// <summary>
+        /// Whether we are waiting for new frames to be received.
+        /// </summary>
+        public bool WaitingForFrame => !replay.HasReceivedAllFrames && currentFrameIndex == Frames.Count - 1;
 
-        public TFrame CurrentFrame => !HasFrames ? null : (TFrame)Frames[currentFrameIndex];
-        public TFrame NextFrame => !HasFrames ? null : (TFrame)Frames[nextFrameIndex];
+        /// <summary>
+        /// The current frame of the replay.
+        /// The current time is always between the start and the end time of the current frame.
+        /// </summary>
+        /// <remarks>Returns null if the current time is strictly before the first frame.</remarks>
+        public TFrame? CurrentFrame => currentFrameIndex == -1 ? null : (TFrame)Frames[currentFrameIndex];
 
-        private int currentFrameIndex;
+        /// <summary>
+        /// The next frame of the replay.
+        /// The start time of <see cref="NextFrame"/> is always greater or equal to the start time of <see cref="CurrentFrame"/> regardless of the seeking direction.
+        /// </summary>
+        /// <remarks>Returns null if the current frame is the last frame.</remarks>
+        public TFrame? NextFrame => currentFrameIndex == Frames.Count - 1 ? null : (TFrame)Frames[currentFrameIndex + 1];
 
-        private int nextFrameIndex => MathHelper.Clamp(currentFrameIndex + (currentDirection > 0 ? 1 : -1), 0, Frames.Count - 1);
-
-        protected FramedReplayInputHandler(Replay replay)
+        /// <summary>
+        /// The frame for the start value of the interpolation of the replay movement.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">The replay is empty.</exception>
+        public TFrame StartFrame
         {
-            this.replay = replay;
+            get
+            {
+                if (!HasFrames)
+                    throw new InvalidOperationException($"Attempted to get {nameof(StartFrame)} of an empty replay");
+
+                return (TFrame)Frames[Math.Max(0, currentFrameIndex)];
+            }
         }
 
-        private bool advanceFrame()
+        /// <summary>
+        /// The frame for the end value of the interpolation of the replay movement.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">The replay is empty.</exception>
+        public TFrame EndFrame
         {
-            int newFrame = nextFrameIndex;
+            get
+            {
+                if (!HasFrames)
+                    throw new InvalidOperationException($"Attempted to get {nameof(EndFrame)} of an empty replay");
 
-            //ensure we aren't at an extent.
-            if (newFrame == currentFrameIndex) return false;
-
-            currentFrameIndex = newFrame;
-            return true;
+                return (TFrame)Frames[Math.Min(currentFrameIndex + 1, Frames.Count - 1)];
+            }
         }
-
-        public override List<IInput> GetPendingInputs() => new List<IInput>();
-
-        public bool AtLastFrame => currentFrameIndex == Frames.Count - 1;
-        public bool AtFirstFrame => currentFrameIndex == 0;
-
-        private const double sixty_frame_time = 1000.0 / 60;
-
-        protected double CurrentTime { get; private set; }
-        private int currentDirection;
 
         /// <summary>
         /// When set, we will ensure frames executed by nested drawables are frame-accurate to replay data.
         /// Disabling this can make replay playback smoother (useful for autoplay, currently).
         /// </summary>
-        public bool FrameAccuratePlayback = true;
+        public bool FrameAccuratePlayback;
 
-        protected bool HasFrames => Frames.Count > 0;
+        // This input handler should be enabled only if there is at least one replay frame.
+        public override bool IsActive => HasFrames;
 
-        private bool inImportantSection =>
-            HasFrames && FrameAccuratePlayback &&
-            //a button is in a pressed state
-            IsImportant(currentDirection > 0 ? CurrentFrame : NextFrame) &&
-            //the next frame is within an allowable time span
-            Math.Abs(CurrentTime - NextFrame?.Time ?? 0) <= sixty_frame_time * 1.2;
+        protected double CurrentTime { get; private set; }
 
-        protected virtual bool IsImportant(TFrame frame) => false;
+        protected virtual double AllowedImportantTimeSpan => sixty_frame_time * 1.2;
+
+        protected List<ReplayFrame> Frames => replay.Frames;
+
+        private readonly Replay replay;
+
+        private int currentFrameIndex;
+
+        private const double sixty_frame_time = 1000.0 / 60;
+
+        protected FramedReplayInputHandler(Replay replay)
+        {
+            // TODO: This replay frame ordering should be enforced on the Replay type.
+            // Currently, the ordering can be broken if the frames are added after this construction.
+            replay.Frames = replay.Frames.OrderBy(f => f.Time).ToList();
+
+            this.replay = replay;
+            currentFrameIndex = -1;
+            CurrentTime = double.NegativeInfinity;
+        }
+
+        private bool inImportantSection
+        {
+            get
+            {
+                if (!HasFrames || !FrameAccuratePlayback || currentFrameIndex == -1)
+                    return false;
+
+                return IsImportant(StartFrame) && // a button is in a pressed state
+                       Math.Abs(CurrentTime - EndFrame.Time) <= AllowedImportantTimeSpan; // the next frame is within an allowable time span
+            }
+        }
+
+        protected virtual bool IsImportant([NotNull] TFrame frame) => false;
 
         /// <summary>
         /// Update the current frame based on an incoming time value.
@@ -80,46 +128,52 @@ namespace osu.Game.Rulesets.Replays
         /// <returns>The usable time value. If null, we should not advance time as we do not have enough data.</returns>
         public override double? SetFrameFromTime(double time)
         {
-            currentDirection = time.CompareTo(CurrentTime);
-            if (currentDirection == 0) currentDirection = 1;
-
-            if (HasFrames)
+            if (!HasFrames)
             {
-                // check if the next frame is in the "future" for the current playback direction
-                if (currentDirection != time.CompareTo(NextFrame.Time))
-                {
-                    // if we didn't change frames, we need to ensure we are allowed to run frames in between, else return null.
-                    if (inImportantSection)
-                        return null;
-                }
-                else if (advanceFrame())
-                {
-                    // If going backwards, we need to execute once _before_ the frame time to reverse any judgements
-                    // that would occur as a result of this frame in forward playback
-                    if (currentDirection == -1)
-                        return CurrentTime = CurrentFrame.Time - 1;
-                    return CurrentTime = CurrentFrame.Time;
-                }
+                // In the case all frames are received, allow time to progress regardless.
+                if (replay.HasReceivedAllFrames)
+                    return CurrentTime = time;
+
+                return null;
             }
 
-            return CurrentTime = time;
+            double frameStart = getFrameTime(currentFrameIndex);
+            double frameEnd = getFrameTime(currentFrameIndex + 1);
+
+            // If the proposed time is after the current frame end time, we progress forwards to precisely the new frame's time (regardless of incoming time).
+            if (frameEnd <= time)
+            {
+                time = frameEnd;
+                currentFrameIndex++;
+            }
+            // If the proposed time is before the current frame start time, and we are at the frame boundary, we progress backwards.
+            else if (time < frameStart && CurrentTime == frameStart)
+                currentFrameIndex--;
+
+            frameStart = getFrameTime(currentFrameIndex);
+            frameEnd = getFrameTime(currentFrameIndex + 1);
+
+            // Pause until more frames are arrived.
+            if (WaitingForFrame && frameStart < time)
+            {
+                CurrentTime = frameStart;
+                return null;
+            }
+
+            CurrentTime = Math.Clamp(time, frameStart, frameEnd);
+
+            // In an important section, a mid-frame time cannot be used and a null is returned instead.
+            return inImportantSection && frameStart < time && time < frameEnd ? null : (double?)CurrentTime;
         }
 
-        protected class ReplayMouseState : osu.Framework.Input.States.MouseState
+        private double getFrameTime(int index)
         {
-            public ReplayMouseState(Vector2 position)
-            {
-                Position = position;
-            }
-        }
+            if (index < 0)
+                return double.NegativeInfinity;
+            if (index >= Frames.Count)
+                return double.PositiveInfinity;
 
-        protected class ReplayKeyboardState : osu.Framework.Input.States.KeyboardState
-        {
-            public ReplayKeyboardState(List<Key> keys)
-            {
-                foreach (var key in keys)
-                    Keys.Add(key);
-            }
+            return Frames[index].Time;
         }
     }
 }

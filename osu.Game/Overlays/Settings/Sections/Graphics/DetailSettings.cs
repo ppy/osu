@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -18,23 +18,23 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "Storyboards",
-                    Bindable = config.GetBindable<bool>(OsuSetting.ShowStoryboard)
+                    LabelText = "Storyboard / Video",
+                    Current = config.GetBindable<bool>(OsuSetting.ShowStoryboard)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Rotate cursor when dragging",
-                    Bindable = config.GetBindable<bool>(OsuSetting.CursorRotation)
+                    LabelText = "Hit Lighting",
+                    Current = config.GetBindable<bool>(OsuSetting.HitLighting)
                 },
                 new SettingsEnumDropdown<ScreenshotFormat>
                 {
                     LabelText = "Screenshot format",
-                    Bindable = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat)
+                    Current = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat)
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "Show menu cursor in screenshots",
-                    Bindable = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor)
+                    Current = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor)
                 }
             };
         }

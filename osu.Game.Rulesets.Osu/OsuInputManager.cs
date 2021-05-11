@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -18,12 +18,25 @@ namespace osu.Game.Rulesets.Osu
             set => ((OsuKeyBindingContainer)KeyBindingContainer).AllowUserPresses = value;
         }
 
-        protected override RulesetKeyBindingContainer CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
+        /// <summary>
+        /// Whether the user's cursor movement events should be accepted.
+        /// Can be used to block only movement while still accepting button input.
+        /// </summary>
+        public bool AllowUserCursorMovement { get; set; } = true;
+
+        protected override KeyBindingContainer<OsuAction> CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
             => new OsuKeyBindingContainer(ruleset, variant, unique);
 
         public OsuInputManager(RulesetInfo ruleset)
             : base(ruleset, 0, SimultaneousBindingMode.Unique)
         {
+        }
+
+        protected override bool Handle(UIEvent e)
+        {
+            if ((e is MouseMoveEvent || e is TouchMoveEvent) && !AllowUserCursorMovement) return false;
+
+            return base.Handle(e);
         }
 
         private class OsuKeyBindingContainer : RulesetKeyBindingContainer
@@ -38,6 +51,7 @@ namespace osu.Game.Rulesets.Osu
             protected override bool Handle(UIEvent e)
             {
                 if (!AllowUserPresses) return false;
+
                 return base.Handle(e);
             }
         }

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
@@ -7,7 +7,6 @@ using JetBrains.Annotations;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Objects;
-using OpenTK;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 {
@@ -54,11 +53,11 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             if (allowSpecial && TotalColumns == 8)
             {
                 const float local_x_divisor = 512f / 7;
-                return MathHelper.Clamp((int)Math.Floor(position / local_x_divisor), 0, 6) + 1;
+                return Math.Clamp((int)MathF.Floor(position / local_x_divisor), 0, 6) + 1;
             }
 
             float localXDivisor = 512f / TotalColumns;
-            return MathHelper.Clamp((int)Math.Floor(position / localXDivisor), 0, TotalColumns - 1);
+            return Math.Clamp((int)MathF.Floor(position / localXDivisor), 0, TotalColumns - 1);
         }
 
         /// <summary>
@@ -87,6 +86,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 return 4;
             if (val >= 1 - p3)
                 return 3;
+
             return val >= 1 - p2 ? 2 : 1;
         }
 
@@ -112,7 +112,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     drainTime = 10000;
 
                 BeatmapDifficulty difficulty = OriginalBeatmap.BeatmapInfo.BaseDifficulty;
-                conversionDifficulty = ((difficulty.DrainRate + MathHelper.Clamp(difficulty.ApproachRate, 4, 7)) / 1.5 + (double)OriginalBeatmap.HitObjects.Count() / drainTime * 9f) / 38f * 5f / 1.15;
+                conversionDifficulty = ((difficulty.DrainRate + Math.Clamp(difficulty.ApproachRate, 4, 7)) / 1.5 + (double)OriginalBeatmap.HitObjects.Count / drainTime * 9f) / 38f * 5f / 1.15;
                 conversionDifficulty = Math.Min(conversionDifficulty.Value, 12);
 
                 return conversionDifficulty.Value;
@@ -138,7 +138,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// <param name="nextColumn">A function to retrieve the next column. If null, a randomisation scheme will be used.</param>
         /// <param name="validation">A function to perform additional validation checks to determine if a column is a valid candidate for a <see cref="HitObject"/>.</param>
         /// <param name="lowerBound">The minimum column index. If null, <see cref="RandomStart"/> is used.</param>
-        /// <param name="upperBound">The maximum column index. If null, <see cref="PatternGenerator.TotalColumns"/> is used.</param>
+        /// <param name="upperBound">The maximum column index. If null, <see cref="Patterns.PatternGenerator.TotalColumns">TotalColumns</see> is used.</param>
         /// <param name="patterns">A list of patterns for which the validity of a column should be checked against.
         /// A column is not a valid candidate if a <see cref="HitObject"/> occupies the same column in any of the patterns.</param>
         /// <returns>A column which has passed the <paramref name="validation"/> check and for which there are no
@@ -147,9 +147,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         protected int FindAvailableColumn(int initialColumn, int? lowerBound = null, int? upperBound = null, Func<int, int> nextColumn = null, [InstantHandle] Func<int, bool> validation = null,
                                           params Pattern[] patterns)
         {
-            lowerBound = lowerBound ?? RandomStart;
-            upperBound = upperBound ?? TotalColumns;
-            nextColumn = nextColumn ?? (_ => GetRandomColumn(lowerBound, upperBound));
+            lowerBound ??= RandomStart;
+            upperBound ??= TotalColumns;
+            nextColumn ??= (_ => GetRandomColumn(lowerBound, upperBound));
 
             // Check for the initial column
             if (isValid(initialColumn))
@@ -157,6 +157,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             // Ensure that we have at least one free column, so that an endless loop is avoided
             bool hasValidColumns = false;
+
             for (int i = lowerBound.Value; i < upperBound.Value; i++)
             {
                 hasValidColumns = isValid(i);
@@ -182,7 +183,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// Returns a random column index in the range [<paramref name="lowerBound"/>, <paramref name="upperBound"/>).
         /// </summary>
         /// <param name="lowerBound">The minimum column index. If null, <see cref="RandomStart"/> is used.</param>
-        /// <param name="upperBound">The maximum column index. If null, <see cref="PatternGenerator.TotalColumns"/> is used.</param>
+        /// <param name="upperBound">The maximum column index. If null, <see cref="Patterns.PatternGenerator.TotalColumns"/> is used.</param>
         protected int GetRandomColumn(int? lowerBound = null, int? upperBound = null) => Random.Next(lowerBound ?? RandomStart, upperBound ?? TotalColumns);
 
         /// <summary>

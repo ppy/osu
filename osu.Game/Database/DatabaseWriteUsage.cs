@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -26,11 +26,12 @@ namespace osu.Game.Database
         /// Whether this write usage will commit a transaction on completion.
         /// If false, there is a parent usage responsible for transaction commit.
         /// </summary>
-        public bool IsTransactionLeader = false;
+        public bool IsTransactionLeader;
 
         protected void Dispose(bool disposing)
         {
             if (isDisposed) return;
+
             isDisposed = true;
 
             try
@@ -52,11 +53,6 @@ namespace osu.Game.Database
         {
             Dispose(true);
             GC.SuppressFinalize(this);
-        }
-
-        ~DatabaseWriteUsage()
-        {
-            Dispose(false);
         }
     }
 }

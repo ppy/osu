@@ -1,26 +1,22 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
     public abstract class PlayerSettingsGroup : Container
     {
-        /// <summary>
-        /// The title to be displayed in the header of this group.
-        /// </summary>
-        protected abstract string Title { get; }
-
         private const float transition_duration = 250;
         private const int container_width = 270;
         private const int border_thickness = 2;
@@ -34,10 +30,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         public bool Expanded
         {
-            get { return expanded; }
+            get => expanded;
             set
             {
                 if (expanded == value) return;
+
                 expanded = value;
 
                 content.ClearTransforms();
@@ -56,7 +53,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         private Color4 expandedColour;
 
-        protected PlayerSettingsGroup()
+        /// <summary>
+        /// Create a new instance.
+        /// </summary>
+        /// <param name="title">The title to be displayed in the header of this group.</param>
+        protected PlayerSettingsGroup(string title)
         {
             AutoSizeAxes = Axes.Y;
             Width = container_width;
@@ -93,9 +94,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
                                 {
                                     Origin = Anchor.CentreLeft,
                                     Anchor = Anchor.CentreLeft,
-                                    Text = Title.ToUpperInvariant(),
-                                    TextSize = 17,
-                                    Font = @"Exo2.0-Bold",
+                                    Text = title.ToUpperInvariant(),
+                                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17),
                                     Margin = new MarginPadding { Left = 10 },
                                 },
                                 button = new IconButton
@@ -103,7 +103,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                                     Origin = Anchor.Centre,
                                     Anchor = Anchor.CentreRight,
                                     Position = new Vector2(-15, 0),
-                                    Icon = FontAwesome.fa_bars,
+                                    Icon = FontAwesome.Solid.Bars,
                                     Scale = new Vector2(0.75f),
                                     Action = () => Expanded = !Expanded,
                                 },

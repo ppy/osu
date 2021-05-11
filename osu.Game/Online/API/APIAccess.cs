@@ -1,12 +1,18 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
+using System.Net.Http;
+using System.Net.Sockets;
 using System.Threading;
-using osu.Framework.Configuration;
+using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions.ExceptionExtensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Configuration;
@@ -18,13 +24,16 @@ namespace osu.Game.Online.API
     public class APIAccess : Component, IAPIProvider
     {
         private readonly OsuConfigManager config;
+
+        private readonly string versionHash;
+
         private readonly OAuth authentication;
 
-        public string Endpoint = @"https://osu.ppy.sh";
-        private const string client_id = @"5";
-        private const string client_secret = @"FGc9GAtyHzeQDshWP5Ah7dega8hJACAJpQtw6OXk";
-
         private readonly Queue<APIRequest> queue = new Queue<APIRequest>();
+
+        public string APIEndpointUrl { get; }
+
+        public string WebsiteRootUrl { get; }
 
         /// <summary>
         /// The username/email provided by the user when initiating a login.
@@ -33,25 +42,43 @@ namespace osu.Game.Online.API
 
         private string password;
 
-        public Bindable<User> LocalUser { get; } = new Bindable<User>(createGuestUser());
+        public IBindable<User> LocalUser => localUser;
+        public IBindableList<User> Friends => friends;
+        public IBindable<UserActivity> Activity => activity;
 
-        protected bool HasLogin => authentication.Token.Value != null || !string.IsNullOrEmpty(ProvidedUsername) && !string.IsNullOrEmpty(password);
+        private Bindable<User> localUser { get; } = new Bindable<User>(createGuestUser());
+
+        private BindableList<User> friends { get; } = new BindableList<User>();
+
+        private Bindable<UserActivity> activity { get; } = new Bindable<UserActivity>();
+
+        protected bool HasLogin => authentication.Token.Value != null || (!string.IsNullOrEmpty(ProvidedUsername) && !string.IsNullOrEmpty(password));
 
         private readonly CancellationTokenSource cancellationToken = new CancellationTokenSource();
 
         private readonly Logger log;
 
-        public APIAccess(OsuConfigManager config)
+        public APIAccess(OsuConfigManager config, EndpointConfiguration endpointConfiguration, string versionHash)
         {
             this.config = config;
+            this.versionHash = versionHash;
 
-            authentication = new OAuth(client_id, client_secret, Endpoint);
+            APIEndpointUrl = endpointConfiguration.APIEndpointUrl;
+            WebsiteRootUrl = endpointConfiguration.WebsiteRootUrl;
+
+            authentication = new OAuth(endpointConfiguration.APIClientID, endpointConfiguration.APIClientSecret, APIEndpointUrl);
             log = Logger.GetLogger(LoggingTarget.Network);
 
             ProvidedUsername = config.Get<string>(OsuSetting.Username);
 
             authentication.TokenString = config.Get<string>(OsuSetting.Token);
             authentication.Token.ValueChanged += onTokenChanged;
+
+            localUser.BindValueChanged(u =>
+            {
+                u.OldValue?.Activity.UnbindFrom(activity);
+                u.NewValue.Activity.BindTo(activity);
+            }, true);
 
             var thread = new Thread(run)
             {
@@ -62,25 +89,9 @@ namespace osu.Game.Online.API
             thread.Start();
         }
 
-        private void onTokenChanged(OAuthToken token) => config.Set(OsuSetting.Token, config.Get<bool>(OsuSetting.SavePassword) ? authentication.TokenString : string.Empty);
-
-        private readonly List<IOnlineComponent> components = new List<IOnlineComponent>();
+        private void onTokenChanged(ValueChangedEvent<OAuthToken> e) => config.SetValue(OsuSetting.Token, config.Get<bool>(OsuSetting.SavePassword) ? authentication.TokenString : string.Empty);
 
         internal new void Schedule(Action action) => base.Schedule(action);
-
-        public void Register(IOnlineComponent component)
-        {
-            Scheduler.Add(delegate
-            {
-                components.Add(component);
-                component.APIStateChanged(this, state);
-            });
-        }
-
-        public void Unregister(IOnlineComponent component)
-        {
-            Scheduler.Add(delegate { components.Remove(component); });
-        }
 
         public string AccessToken => authentication.RequestAccessToken();
 
@@ -93,33 +104,37 @@ namespace osu.Game.Online.API
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                switch (State)
+                switch (State.Value)
                 {
                     case APIState.Failing:
                         //todo: replace this with a ping request.
                         log.Add(@"In a failing state, waiting a bit before we try again...");
                         Thread.Sleep(5000);
+
+                        if (!IsLoggedIn) goto case APIState.Connecting;
+
                         if (queue.Count == 0)
                         {
                             log.Add(@"Queueing a ping request");
-                            Queue(new ListChannelsRequest { Timeout = 5000 });
+                            Queue(new GetUserRequest());
                         }
 
                         break;
+
                     case APIState.Offline:
                     case APIState.Connecting:
-                        //work to restore a connection...
+                        // work to restore a connection...
                         if (!HasLogin)
                         {
-                            State = APIState.Offline;
+                            state.Value = APIState.Offline;
                             Thread.Sleep(50);
                             continue;
                         }
 
-                        State = APIState.Connecting;
+                        state.Value = APIState.Connecting;
 
                         // save the username at this point, if the user requested for it to be.
-                        config.Set(OsuSetting.Username, config.Get<bool>(OsuSetting.SaveUsername) ? ProvidedUsername : string.Empty);
+                        config.SetValue(OsuSetting.Username, config.Get<bool>(OsuSetting.SaveUsername) ? ProvidedUsername : string.Empty);
 
                         if (!authentication.HasValidAccessToken && !authentication.AuthenticateWithLogin(ProvidedUsername, password))
                         {
@@ -132,34 +147,53 @@ namespace osu.Game.Online.API
                         }
 
                         var userReq = new GetUserRequest();
+
                         userReq.Success += u =>
                         {
-                            LocalUser.Value = u;
-                            failureCount = 0;
+                            localUser.Value = u;
 
-                            //we're connected!
-                            State = APIState.Online;
+                            // todo: save/pull from settings
+                            localUser.Value.Status.Value = new UserStatusOnline();
+
+                            failureCount = 0;
                         };
 
                         if (!handleRequest(userReq))
                         {
-                            Thread.Sleep(500);
+                            failConnectionProcess();
+                            continue;
+                        }
+
+                        // getting user's friends is considered part of the connection process.
+                        var friendsReq = new GetFriendsRequest();
+
+                        friendsReq.Success += res =>
+                        {
+                            friends.AddRange(res);
+
+                            //we're connected!
+                            state.Value = APIState.Online;
+                        };
+
+                        if (!handleRequest(friendsReq))
+                        {
+                            failConnectionProcess();
                             continue;
                         }
 
                         // The Success callback event is fired on the main thread, so we should wait for that to run before proceeding.
                         // Without this, we will end up circulating this Connecting loop multiple times and queueing up many web requests
                         // before actually going online.
-                        while (State > APIState.Offline && State < APIState.Online)
+                        while (State.Value > APIState.Offline && State.Value < APIState.Online)
                             Thread.Sleep(500);
 
                         break;
                 }
 
-                //hard bail if we can't get a valid access token.
+                // hard bail if we can't get a valid access token.
                 if (authentication.RequestAccessToken() == null)
                 {
-                    Logout(false);
+                    Logout();
                     continue;
                 }
 
@@ -170,122 +204,184 @@ namespace osu.Game.Online.API
                     lock (queue)
                     {
                         if (queue.Count == 0) break;
+
                         req = queue.Dequeue();
                     }
 
-                    // TODO: handle failures better
                     handleRequest(req);
                 }
 
                 Thread.Sleep(50);
             }
+
+            void failConnectionProcess()
+            {
+                // if something went wrong during the connection process, we want to reset the state (but only if still connecting).
+                if (State.Value == APIState.Connecting)
+                    state.Value = APIState.Failing;
+            }
         }
+
+        public void Perform(APIRequest request)
+        {
+            try
+            {
+                request.Perform(this);
+            }
+            catch (Exception e)
+            {
+                // todo: fix exception handling
+                request.Fail(e);
+            }
+        }
+
+        public Task PerformAsync(APIRequest request) =>
+            Task.Factory.StartNew(() => Perform(request), TaskCreationOptions.LongRunning);
 
         public void Login(string username, string password)
         {
-            Debug.Assert(State == APIState.Offline);
+            Debug.Assert(State.Value == APIState.Offline);
 
             ProvidedUsername = username;
             this.password = password;
         }
 
+        public IHubClientConnector GetHubConnector(string clientName, string endpoint) =>
+            new HubClientConnector(clientName, endpoint, this, versionHash);
+
+        public RegistrationRequest.RegistrationRequestErrors CreateAccount(string email, string username, string password)
+        {
+            Debug.Assert(State.Value == APIState.Offline);
+
+            var req = new RegistrationRequest
+            {
+                Url = $@"{APIEndpointUrl}/users",
+                Method = HttpMethod.Post,
+                Username = username,
+                Email = email,
+                Password = password
+            };
+
+            try
+            {
+                req.Perform();
+            }
+            catch (Exception e)
+            {
+                try
+                {
+                    return JObject.Parse(req.GetResponseString()).SelectToken("form_error", true).AsNonNull().ToObject<RegistrationRequest.RegistrationRequestErrors>();
+                }
+                catch
+                {
+                    // if we couldn't deserialize the error message let's throw the original exception outwards.
+                    e.Rethrow();
+                }
+            }
+
+            return null;
+        }
+
         /// <summary>
         /// Handle a single API request.
+        /// Ensures all exceptions are caught and dealt with correctly.
         /// </summary>
         /// <param name="req">The request.</param>
-        /// <returns>true if we should remove this request from the queue.</returns>
+        /// <returns>true if the request succeeded.</returns>
         private bool handleRequest(APIRequest req)
         {
             try
             {
-                Logger.Log($@"Performing request {req}", LoggingTarget.Network);
                 req.Perform(this);
 
-                //we could still be in initialisation, at which point we don't want to say we're Online yet.
-                if (IsLoggedIn)
-                    State = APIState.Online;
+                // we could still be in initialisation, at which point we don't want to say we're Online yet.
+                if (IsLoggedIn) state.Value = APIState.Online;
 
                 failureCount = 0;
                 return true;
             }
+            catch (HttpRequestException re)
+            {
+                log.Add($"{nameof(HttpRequestException)} while performing request {req}: {re.Message}");
+                handleFailure();
+                return false;
+            }
+            catch (SocketException se)
+            {
+                log.Add($"{nameof(SocketException)} while performing request {req}: {se.Message}");
+                handleFailure();
+                return false;
+            }
             catch (WebException we)
             {
-                HttpStatusCode statusCode = (we.Response as HttpWebResponse)?.StatusCode
-                                            ?? (we.Status == WebExceptionStatus.UnknownError ? HttpStatusCode.NotAcceptable : HttpStatusCode.RequestTimeout);
-
-                // special cases for un-typed but useful message responses.
-                switch (we.Message)
-                {
-                    case "Unauthorized":
-                        statusCode = HttpStatusCode.Unauthorized;
-                        break;
-                }
-
-                switch (statusCode)
-                {
-                    case HttpStatusCode.Unauthorized:
-                        Logout(false);
-                        return true;
-                    case HttpStatusCode.RequestTimeout:
-                        failureCount++;
-                        log.Add($@"API failure count is now {failureCount}");
-
-                        if (failureCount < 3)
-                            //we might try again at an api level.
-                            return false;
-
-                        State = APIState.Failing;
-                        flushQueue();
-                        return true;
-                }
-
-                req.Fail(we);
-                return true;
+                log.Add($"{nameof(WebException)} while performing request {req}: {we.Message}");
+                handleWebException(we);
+                return false;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                if (e is TimeoutException)
-                    log.Add(@"API level timeout exception was hit");
-
-                req.Fail(e);
-                return true;
+                Logger.Error(ex, "Error occurred while handling an API request.");
+                return false;
             }
         }
 
-        private APIState state;
+        private readonly Bindable<APIState> state = new Bindable<APIState>();
 
-        public APIState State
+        /// <summary>
+        /// The current connectivity state of the API.
+        /// </summary>
+        public IBindable<APIState> State => state;
+
+        private void handleWebException(WebException we)
         {
-            get { return state; }
-            private set
+            HttpStatusCode statusCode = (we.Response as HttpWebResponse)?.StatusCode
+                                        ?? (we.Status == WebExceptionStatus.UnknownError ? HttpStatusCode.NotAcceptable : HttpStatusCode.RequestTimeout);
+
+            // special cases for un-typed but useful message responses.
+            switch (we.Message)
             {
-                APIState oldState = state;
-                APIState newState = value;
+                case "Unauthorized":
+                case "Forbidden":
+                    statusCode = HttpStatusCode.Unauthorized;
+                    break;
+            }
 
-                state = value;
+            switch (statusCode)
+            {
+                case HttpStatusCode.Unauthorized:
+                    Logout();
+                    break;
 
-                if (oldState != newState)
-                {
-                    log.Add($@"We just went {newState}!");
-                    Scheduler.Add(delegate
-                    {
-                        components.ForEach(c => c.APIStateChanged(this, newState));
-                        OnStateChange?.Invoke(oldState, newState);
-                    });
-                }
+                case HttpStatusCode.RequestTimeout:
+                    handleFailure();
+                    break;
             }
         }
 
-        public bool IsLoggedIn => LocalUser.Value.Id > 1;
+        private void handleFailure()
+        {
+            failureCount++;
+            log.Add($@"API failure count is now {failureCount}");
+
+            if (failureCount >= 3 && State.Value == APIState.Online)
+            {
+                state.Value = APIState.Failing;
+                flushQueue();
+            }
+        }
+
+        public bool IsLoggedIn => localUser.Value.Id > 1;
 
         public void Queue(APIRequest request)
         {
-            lock (queue) queue.Enqueue(request);
+            lock (queue)
+            {
+                if (state.Value == APIState.Offline)
+                    return;
+
+                queue.Enqueue(request);
+            }
         }
-
-        public event StateChangeDelegate OnStateChange;
-
-        public delegate void StateChangeDelegate(APIState oldState, APIState newState);
 
         private void flushQueue(bool failOldRequests = true)
         {
@@ -303,21 +399,23 @@ namespace osu.Game.Online.API
             }
         }
 
-        public void Logout(bool clearUsername = true)
+        public void Logout()
         {
-            flushQueue();
-            if (clearUsername) ProvidedUsername = null;
             password = null;
             authentication.Clear();
-            LocalUser.Value = createGuestUser();
-            State = APIState.Offline;
+
+            // Scheduled prior to state change such that the state changed event is invoked with the correct user and their friends present
+            Schedule(() =>
+            {
+                localUser.Value = createGuestUser();
+                friends.Clear();
+            });
+
+            state.Value = APIState.Offline;
+            flushQueue();
         }
 
-        private static User createGuestUser() => new User
-        {
-            Username = @"Guest",
-            Id = 1,
-        };
+        private static User createGuestUser() => new GuestUser();
 
         protected override void Dispose(bool isDisposing)
         {
@@ -325,6 +423,15 @@ namespace osu.Game.Online.API
 
             flushQueue();
             cancellationToken.Cancel();
+        }
+    }
+
+    internal class GuestUser : User
+    {
+        public GuestUser()
+        {
+            Username = @"Guest";
+            Id = 1;
         }
     }
 

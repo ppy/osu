@@ -1,10 +1,9 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Beatmaps
@@ -22,20 +21,20 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                 new BeatmapStatistic
                 {
                     Name = @"Hit Count",
+                    CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles),
                     Content = hits.ToString(),
-                    Icon = FontAwesome.fa_circle_o
                 },
                 new BeatmapStatistic
                 {
                     Name = @"Drumroll Count",
+                    CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Sliders),
                     Content = drumrolls.ToString(),
-                    Icon = FontAwesome.fa_circle
                 },
                 new BeatmapStatistic
                 {
                     Name = @"Swell Count",
+                    CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Spinners),
                     Content = swells.ToString(),
-                    Icon = FontAwesome.fa_circle
                 }
             };
         }

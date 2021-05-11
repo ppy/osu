@@ -1,19 +1,14 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Linq;
-using OpenTK;
-using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Audio.Track;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Logging;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
@@ -21,228 +16,366 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Select.Options;
+using osu.Game.Skinning;
+using osuTK;
+using osuTK.Graphics;
+using osuTK.Input;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using osu.Framework.Audio.Track;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Bindings;
+using osu.Game.Collections;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Scoring;
+using System.Diagnostics;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.Select
 {
-    public abstract class SongSelect : OsuScreen
+    public abstract class SongSelect : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>
     {
-        private static readonly Vector2 wedged_container_size = new Vector2(0.5f, 245);
-        private static readonly Vector2 background_blur = new Vector2(20);
+        public static readonly float WEDGE_HEIGHT = 245;
+
+        protected const float BACKGROUND_BLUR = 20;
         private const float left_area_padding = 20;
 
-        public readonly FilterControl FilterControl;
+        public FilterControl FilterControl { get; private set; }
 
         protected virtual bool ShowFooter => true;
 
         /// <summary>
         /// Can be null if <see cref="ShowFooter"/> is false.
         /// </summary>
-        protected readonly BeatmapOptionsOverlay BeatmapOptions;
+        protected BeatmapOptionsOverlay BeatmapOptions { get; private set; }
 
         /// <summary>
         /// Can be null if <see cref="ShowFooter"/> is false.
         /// </summary>
-        protected readonly Footer Footer;
+        protected Footer Footer { get; private set; }
 
         /// <summary>
         /// Contains any panel which is triggered by a footer button.
         /// Helps keep them located beneath the footer itself.
         /// </summary>
-        protected readonly Container FooterPanels;
+        protected Container FooterPanels { get; private set; }
 
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap();
+        /// <summary>
+        /// Whether entering editor mode should be allowed.
+        /// </summary>
+        public virtual bool AllowEditing => true;
 
-        protected Container LeftContent;
+        [Resolved]
+        private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; }
 
-        protected readonly BeatmapCarousel Carousel;
-        private readonly BeatmapInfoWedge beatmapInfoWedge;
+        protected BeatmapCarousel Carousel { get; private set; }
+
+        private BeatmapInfoWedge beatmapInfoWedge;
         private DialogOverlay dialogOverlay;
-        private BeatmapManager beatmaps;
 
-        private SampleChannel sampleChangeDifficulty;
-        private SampleChannel sampleChangeBeatmap;
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; }
 
-        protected new readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+        protected ModSelectOverlay ModSelect { get; private set; }
+
+        protected Sample SampleConfirm { get; private set; }
+
+        private Sample sampleChangeDifficulty;
+        private Sample sampleChangeBeatmap;
+
+        private Container carouselContainer;
+
+        protected BeatmapDetailArea BeatmapDetails { get; private set; }
+
+        private readonly Bindable<RulesetInfo> decoupledRuleset = new Bindable<RulesetInfo>();
+
+        [Resolved]
+        private MusicController music { get; set; }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, ScoreManager scores, CollectionManager collections, ManageCollectionsDialog manageCollectionsDialog, DifficultyRecommender recommender)
+        {
+            // initial value transfer is required for FilterControl (it uses our re-cached bindables in its async load for the initial filter).
+            transferRulesetValue();
+
+            LoadComponentAsync(Carousel = new BeatmapCarousel
+            {
+                AllowSelection = false, // delay any selection until our bindables are ready to make a good choice.
+                Anchor = Anchor.CentreRight,
+                Origin = Anchor.CentreRight,
+                RelativeSizeAxes = Axes.Both,
+                BleedTop = FilterControl.HEIGHT,
+                BleedBottom = Footer.HEIGHT,
+                SelectionChanged = updateSelectedBeatmap,
+                BeatmapSetsChanged = carouselBeatmapsLoaded,
+                GetRecommendedBeatmap = s => recommender?.GetRecommendedBeatmap(s),
+            }, c => carouselContainer.Child = c);
+
+            AddRangeInternal(new Drawable[]
+            {
+                new ResetScrollContainer(() => Carousel.ScrollToSelected())
+                {
+                    RelativeSizeAxes = Axes.Y,
+                    Width = 250,
+                },
+                new VerticalMaskingContainer
+                {
+                    Children = new Drawable[]
+                    {
+                        new GridContainer // used for max width implementation
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            ColumnDimensions = new[]
+                            {
+                                new Dimension(),
+                                new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 850),
+                            },
+                            Content = new[]
+                            {
+                                new Drawable[]
+                                {
+                                    new ParallaxContainer
+                                    {
+                                        ParallaxAmount = 0.005f,
+                                        RelativeSizeAxes = Axes.Both,
+                                        Child = new WedgeBackground
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Padding = new MarginPadding { Right = -150 },
+                                        },
+                                    },
+                                    carouselContainer = new Container
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Padding = new MarginPadding
+                                        {
+                                            Top = FilterControl.HEIGHT,
+                                            Bottom = Footer.HEIGHT
+                                        },
+                                        Child = new LoadingSpinner(true) { State = { Value = Visibility.Visible } }
+                                    }
+                                },
+                            }
+                        },
+                        FilterControl = new FilterControl
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Height = FilterControl.HEIGHT,
+                            FilterChanged = ApplyFilterToCarousel,
+                        },
+                        new GridContainer // used for max width implementation
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            ColumnDimensions = new[]
+                            {
+                                new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 650),
+                            },
+                            Content = new[]
+                            {
+                                new Drawable[]
+                                {
+                                    new Container
+                                    {
+                                        Origin = Anchor.BottomLeft,
+                                        Anchor = Anchor.BottomLeft,
+                                        RelativeSizeAxes = Axes.Both,
+
+                                        Children = new Drawable[]
+                                        {
+                                            beatmapInfoWedge = new BeatmapInfoWedge
+                                            {
+                                                Height = WEDGE_HEIGHT,
+                                                RelativeSizeAxes = Axes.X,
+                                                Margin = new MarginPadding
+                                                {
+                                                    Top = left_area_padding,
+                                                    Right = left_area_padding,
+                                                },
+                                            },
+                                            new Container
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Padding = new MarginPadding
+                                                {
+                                                    Bottom = Footer.HEIGHT,
+                                                    Top = WEDGE_HEIGHT + left_area_padding,
+                                                    Left = left_area_padding,
+                                                    Right = left_area_padding * 2,
+                                                },
+                                                Child = BeatmapDetails = CreateBeatmapDetailArea().With(d =>
+                                                {
+                                                    d.RelativeSizeAxes = Axes.Both;
+                                                    d.Padding = new MarginPadding { Top = 10, Right = 5 };
+                                                })
+                                            },
+                                        }
+                                    },
+                                },
+                            }
+                        }
+                    }
+                },
+            });
+
+            if (ShowFooter)
+            {
+                AddRangeInternal(new Drawable[]
+                {
+                    new GridContainer // used for max height implementation
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        RowDimensions = new[]
+                        {
+                            new Dimension(),
+                            new Dimension(GridSizeMode.Relative, 1f, maxSize: ModSelectOverlay.HEIGHT + Footer.HEIGHT),
+                        },
+                        Content = new[]
+                        {
+                            null,
+                            new Drawable[]
+                            {
+                                FooterPanels = new Container
+                                {
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Padding = new MarginPadding { Bottom = Footer.HEIGHT },
+                                    Children = new Drawable[]
+                                    {
+                                        BeatmapOptions = new BeatmapOptionsOverlay(),
+                                        ModSelect = CreateModSelectOverlay()
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    Footer = new Footer()
+                });
+            }
+
+            if (Footer != null)
+            {
+                foreach (var (button, overlay) in CreateFooterButtons())
+                    Footer.AddButton(button, overlay);
+
+                BeatmapOptions.AddButton(@"Manage", @"collections", FontAwesome.Solid.Book, colours.Green, () => manageCollectionsDialog?.Show());
+                BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.Solid.Trash, colours.Pink, () => delete(Beatmap.Value.BeatmapSetInfo));
+                BeatmapOptions.AddButton(@"Remove", @"from unplayed", FontAwesome.Regular.TimesCircle, colours.Purple, null);
+                BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.Solid.Eraser, colours.Purple, () => clearScores(Beatmap.Value.BeatmapInfo));
+            }
+
+            dialogOverlay = dialog;
+
+            sampleChangeDifficulty = audio.Samples.Get(@"SongSelect/select-difficulty");
+            sampleChangeBeatmap = audio.Samples.Get(@"SongSelect/select-expand");
+            SampleConfirm = audio.Samples.Get(@"SongSelect/confirm-selection");
+
+            if (dialogOverlay != null)
+            {
+                Schedule(() =>
+                {
+                    // if we have no beatmaps but osu-stable is found, let's prompt the user to import.
+                    if (!beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.Minimal).Any() && beatmaps.StableInstallationAvailable)
+                    {
+                        dialogOverlay.Push(new ImportFromStablePopup(() =>
+                        {
+                            Task.Run(beatmaps.ImportFromStableAsync)
+                                .ContinueWith(_ =>
+                                {
+                                    Task.Run(scores.ImportFromStableAsync);
+                                    Task.Run(collections.ImportFromStableAsync);
+                                }, TaskContinuationOptions.OnlyOnRanToCompletion);
+                            Task.Run(skins.ImportFromStableAsync);
+                        }));
+                    }
+                });
+            }
+        }
+
+        /// <summary>
+        /// Creates the buttons to be displayed in the footer.
+        /// </summary>
+        /// <returns>A set of <see cref="FooterButton"/> and an optional <see cref="OverlayContainer"/> which the button opens when pressed.</returns>
+        protected virtual IEnumerable<(FooterButton, OverlayContainer)> CreateFooterButtons() => new (FooterButton, OverlayContainer)[]
+        {
+            (new FooterButtonMods { Current = Mods }, ModSelect),
+            (new FooterButtonRandom
+            {
+                NextRandom = () => Carousel.SelectNextRandom(),
+                PreviousRandom = Carousel.SelectPreviousRandom
+            }, null),
+            (new FooterButtonOptions(), BeatmapOptions)
+        };
+
+        protected virtual ModSelectOverlay CreateModSelectOverlay() => new LocalPlayerModSelectOverlay();
+
+        protected virtual void ApplyFilterToCarousel(FilterCriteria criteria)
+        {
+            // if not the current screen, we want to get carousel in a good presentation state before displaying (resume or enter).
+            bool shouldDebounce = this.IsCurrentScreen();
+
+            Carousel.Filter(criteria, shouldDebounce);
+        }
 
         private DependencyContainer dependencies;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
             dependencies.CacheAs(this);
-            dependencies.CacheAs(Ruleset);
-            dependencies.CacheAs<IBindable<RulesetInfo>>(Ruleset);
+            dependencies.CacheAs(decoupledRuleset);
+            dependencies.CacheAs<IBindable<RulesetInfo>>(decoupledRuleset);
 
             return dependencies;
         }
 
-        protected SongSelect()
+        /// <summary>
+        /// Creates the beatmap details to be displayed underneath the wedge.
+        /// </summary>
+        protected abstract BeatmapDetailArea CreateBeatmapDetailArea();
+
+        public void Edit(BeatmapInfo beatmap = null)
         {
-            const float carousel_width = 640;
-            const float filter_height = 100;
+            if (!AllowEditing)
+                throw new InvalidOperationException($"Attempted to edit when {nameof(AllowEditing)} is disabled");
 
-            AddRange(new Drawable[]
-            {
-                new ParallaxContainer
-                {
-                    Padding = new MarginPadding { Top = filter_height },
-                    ParallaxAmount = 0.005f,
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new[]
-                    {
-                        new WedgeBackground
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Right = carousel_width * 0.76f },
-                        }
-                    }
-                },
-                LeftContent = new Container
-                {
-                    Origin = Anchor.BottomLeft,
-                    Anchor = Anchor.BottomLeft,
-                    RelativeSizeAxes = Axes.Both,
-                    Size = new Vector2(wedged_container_size.X, 1),
-                    Padding = new MarginPadding
-                    {
-                        Bottom = 50,
-                        Top = wedged_container_size.Y + left_area_padding,
-                        Left = left_area_padding,
-                        Right = left_area_padding * 2,
-                    }
-                },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Width = 2, //avoid horizontal masking so the panels don't clip when screen stack is pushed.
-                    Child = new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Width = 0.5f,
-                        Children = new Drawable[]
-                        {
-                            Carousel = new BeatmapCarousel
-                            {
-                                Masking = false,
-                                RelativeSizeAxes = Axes.Y,
-                                Size = new Vector2(carousel_width, 1),
-                                Anchor = Anchor.CentreRight,
-                                Origin = Anchor.CentreRight,
-                                SelectionChanged = updateSelectedBeatmap,
-                                BeatmapSetsChanged = carouselBeatmapsLoaded,
-                            },
-                            FilterControl = new FilterControl
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                Height = filter_height,
-                                FilterChanged = c => Carousel.Filter(c),
-                                Background = { Width = 2 },
-                                Exit = () =>
-                                {
-                                    if (IsCurrentScreen)
-                                        Exit();
-                                },
-                            },
-                        }
-                    },
-                },
-                beatmapInfoWedge = new BeatmapInfoWedge
-                {
-                    Size = wedged_container_size,
-                    RelativeSizeAxes = Axes.X,
-                    Margin = new MarginPadding
-                    {
-                        Top = left_area_padding,
-                        Right = left_area_padding,
-                    },
-                },
-                new ResetScrollContainer(() => Carousel.ScrollToSelected())
-                {
-                    RelativeSizeAxes = Axes.Y,
-                    Width = 250,
-                }
-            });
-
-            if (ShowFooter)
-            {
-                Add(FooterPanels = new Container
-                {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Margin = new MarginPadding
-                    {
-                        Bottom = Footer.HEIGHT,
-                    },
-                });
-                Add(Footer = new Footer
-                {
-                    OnBack = Exit,
-                });
-
-                FooterPanels.Add(BeatmapOptions = new BeatmapOptionsOverlay());
-            }
-        }
-
-        [BackgroundDependencyLoader(true)]
-        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuColour colours)
-        {
-            if (Footer != null)
-            {
-                Footer.AddButton(@"random", colours.Green, triggerRandom, Key.F2);
-                Footer.AddButton(@"options", colours.Blue, BeatmapOptions, Key.F3);
-
-                BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.fa_trash, colours.Pink, () => delete(Beatmap.Value.BeatmapSetInfo), Key.Number4, float.MaxValue);
-            }
-
-            if (this.beatmaps == null)
-                this.beatmaps = beatmaps;
-
-            this.beatmaps.ItemAdded += onBeatmapSetAdded;
-            this.beatmaps.ItemRemoved += onBeatmapSetRemoved;
-            this.beatmaps.BeatmapHidden += onBeatmapHidden;
-            this.beatmaps.BeatmapRestored += onBeatmapRestored;
-
-            dialogOverlay = dialog;
-
-            sampleChangeDifficulty = audio.Sample.Get(@"SongSelect/select-difficulty");
-            sampleChangeBeatmap = audio.Sample.Get(@"SongSelect/select-expand");
-
-            Carousel.LoadBeatmapSetsFromManager(this.beatmaps);
-        }
-
-        public void Edit(BeatmapInfo beatmap)
-        {
-            Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, Beatmap.Value);
-            Push(new Editor());
+            Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap ?? beatmapNoDebounce);
+            this.Push(new Editor());
         }
 
         /// <summary>
         /// Call to make a selection and perform the default action for this SongSelect.
         /// </summary>
         /// <param name="beatmap">An optional beatmap to override the current carousel selection.</param>
-        /// <param name="performStartAction">Whether to trigger <see cref="OnStart"/>.</param>
-        public void FinaliseSelection(BeatmapInfo beatmap = null, bool performStartAction = true)
+        /// <param name="ruleset">An optional ruleset to override the current carousel selection.</param>
+        /// <param name="customStartAction">An optional custom action to perform instead of <see cref="OnStart"/>.</param>
+        public void FinaliseSelection(BeatmapInfo beatmap = null, RulesetInfo ruleset = null, Action customStartAction = null)
         {
+            // This is very important as we have not yet bound to screen-level bindables before the carousel load is completed.
+            if (!Carousel.BeatmapSetsLoaded)
+                return;
+
+            if (ruleset != null)
+                Ruleset.Value = ruleset;
+
+            transferRulesetValue();
+
+            // while transferRulesetValue will flush, it only does so if the ruleset changes.
+            // the user could have changed a filter, and we want to ensure we are 100% up-to-date and consistent here.
+            Carousel.FlushPendingFilterOperations();
+
             // avoid attempting to continue before a selection has been obtained.
             // this could happen via a user interaction while the carousel is still in a loading state.
             if (Carousel.SelectedBeatmap == null) return;
-
-            // if we have a pending filter operation, we want to run it now.
-            // it could change selection (ie. if the ruleset has been changed).
-            Carousel.FlushPendingFilterOperations();
 
             if (beatmap != null)
                 Carousel.SelectBeatmap(beatmap);
@@ -250,12 +383,17 @@ namespace osu.Game.Screens.Select
             if (selectionChangedDebounce?.Completed == false)
             {
                 selectionChangedDebounce.RunTask();
-                selectionChangedDebounce.Cancel(); // cancel the already scheduled task.
+                selectionChangedDebounce?.Cancel(); // cancel the already scheduled task.
                 selectionChangedDebounce = null;
             }
 
-            if (performStartAction)
-                OnStart();
+            if (customStartAction != null)
+            {
+                customStartAction();
+                Carousel.AllowSelection = false;
+            }
+            else if (OnStart())
+                Carousel.AllowSelection = false;
         }
 
         /// <summary>
@@ -266,17 +404,32 @@ namespace osu.Game.Screens.Select
 
         private ScheduledDelegate selectionChangedDebounce;
 
-        private void workingBeatmapChanged(WorkingBeatmap beatmap)
+        private void workingBeatmapChanged(ValueChangedEvent<WorkingBeatmap> e)
         {
-            if (beatmap is DummyWorkingBeatmap) return;
+            if (e.NewValue is DummyWorkingBeatmap || !this.IsCurrentScreen()) return;
 
-            if (IsCurrentScreen && !Carousel.SelectBeatmap(beatmap?.BeatmapInfo, false))
-                // If selecting new beatmap without bypassing filters failed, there's possibly a ruleset mismatch
-                if (beatmap?.BeatmapInfo?.Ruleset != null && beatmap.BeatmapInfo.Ruleset != Ruleset.Value)
+            Logger.Log($"working beatmap updated to {e.NewValue}");
+
+            if (!Carousel.SelectBeatmap(e.NewValue.BeatmapInfo, false))
+            {
+                // A selection may not have been possible with filters applied.
+
+                // There was possibly a ruleset mismatch. This is a case we can help things along by updating the game-wide ruleset to match.
+                if (e.NewValue.BeatmapInfo.Ruleset != null && !e.NewValue.BeatmapInfo.Ruleset.Equals(decoupledRuleset.Value))
                 {
-                    base.Ruleset.Value = beatmap.BeatmapInfo.Ruleset;
-                    Carousel.SelectBeatmap(beatmap.BeatmapInfo);
+                    Ruleset.Value = e.NewValue.BeatmapInfo.Ruleset;
+                    transferRulesetValue();
                 }
+
+                // Even if a ruleset mismatch was not the cause (ie. a text filter is applied),
+                // we still want to temporarily show the new beatmap, bypassing filters.
+                // This will be undone the next time the user changes the filter.
+                var criteria = FilterControl.CreateCriteria();
+                criteria.SelectedBeatmapSet = e.NewValue.BeatmapInfo.BeatmapSet;
+                Carousel.Filter(criteria);
+
+                Carousel.SelectBeatmap(e.NewValue.BeatmapInfo);
+            }
         }
 
         // We need to keep track of the last selected beatmap ignoring debounce to play the correct selection sounds.
@@ -285,6 +438,9 @@ namespace osu.Game.Screens.Select
 
         private void updateSelectedBeatmap(BeatmapInfo beatmap)
         {
+            if (beatmap == null && beatmapNoDebounce == null)
+                return;
+
             if (beatmap?.Equals(beatmapNoDebounce) == true)
                 return;
 
@@ -294,6 +450,9 @@ namespace osu.Game.Screens.Select
 
         private void updateSelectedRuleset(RulesetInfo ruleset)
         {
+            if (ruleset == null && rulesetNoDebounce == null)
+                return;
+
             if (ruleset?.Equals(rulesetNoDebounce) == true)
                 return;
 
@@ -302,80 +461,81 @@ namespace osu.Game.Screens.Select
         }
 
         /// <summary>
-        /// selection has been changed as the result of a user interaction.
+        /// Selection has been changed as the result of a user interaction.
         /// </summary>
         private void performUpdateSelected()
         {
             var beatmap = beatmapNoDebounce;
             var ruleset = rulesetNoDebounce;
 
+            selectionChangedDebounce?.Cancel();
+
+            if (beatmapNoDebounce == null)
+                run();
+            else
+                selectionChangedDebounce = Scheduler.AddDelayed(run, 200);
+
             void run()
             {
+                // clear pending task immediately to track any potential nested debounce operation.
+                selectionChangedDebounce = null;
+
                 Logger.Log($"updating selection with beatmap:{beatmap?.ID.ToString() ?? "null"} ruleset:{ruleset?.ID.ToString() ?? "null"}");
 
-                bool preview = false;
-
-                if (ruleset?.Equals(Ruleset.Value) == false)
+                if (transferRulesetValue())
                 {
-                    Logger.Log($"ruleset changed from \"{Ruleset.Value}\" to \"{ruleset}\"");
+                    Mods.Value = Array.Empty<Mod>();
 
-                    Beatmap.Value.Mods.Value = Enumerable.Empty<Mod>();
-                    Ruleset.Value = ruleset;
+                    // transferRulesetValue() may trigger a re-filter. If the current selection does not match the new ruleset, we want to switch away from it.
+                    // The default logic on WorkingBeatmap change is to switch to a matching ruleset (see workingBeatmapChanged()), but we don't want that here.
+                    // We perform an early selection attempt and clear out the beatmap selection to avoid a second ruleset change (revert).
+                    if (beatmap != null && !Carousel.SelectBeatmap(beatmap, false))
+                        beatmap = null;
+                }
 
-                    // force a filter before attempting to change the beatmap.
-                    // we may still be in the wrong ruleset as there is a debounce delay on ruleset changes.
-                    Carousel.Filter(null, false);
-
-                    // Filtering only completes after the carousel runs Update.
-                    // If we also have a pending beatmap change we should delay it one frame.
-                    selectionChangedDebounce = Schedule(run);
+                if (selectionChangedDebounce != null)
+                {
+                    // a new nested operation was started; switch to it for further selection.
+                    // this avoids having two separate debounces trigger from the same source.
+                    selectionChangedDebounce.RunTask();
                     return;
                 }
 
                 // We may be arriving here due to another component changing the bindable Beatmap.
                 // In these cases, the other component has already loaded the beatmap, so we don't need to do so again.
-                if (!Equals(beatmap, Beatmap.Value.BeatmapInfo))
+                if (!EqualityComparer<BeatmapInfo>.Default.Equals(beatmap, Beatmap.Value.BeatmapInfo))
                 {
                     Logger.Log($"beatmap changed from \"{Beatmap.Value.BeatmapInfo}\" to \"{beatmap}\"");
 
-                    preview = beatmap?.BeatmapSetInfoID != Beatmap.Value?.BeatmapInfo.BeatmapSetInfoID;
-                    Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, Beatmap.Value);
+                    WorkingBeatmap previous = Beatmap.Value;
+                    Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, previous);
 
                     if (beatmap != null)
                     {
-                        if (beatmap.BeatmapSetInfoID == beatmapNoDebounce?.BeatmapSetInfoID)
+                        if (beatmap.BeatmapSetInfoID == previous?.BeatmapInfo.BeatmapSetInfoID)
                             sampleChangeDifficulty.Play();
                         else
                             sampleChangeBeatmap.Play();
                     }
                 }
 
-                ensurePlayingSelected(preview);
-                UpdateBeatmap(Beatmap.Value);
+                if (this.IsCurrentScreen())
+                    ensurePlayingSelected();
+
+                updateComponentFromBeatmap(Beatmap.Value);
             }
-
-            selectionChangedDebounce?.Cancel();
-
-            if (beatmap == null)
-                run();
-            else
-                selectionChangedDebounce = Scheduler.AddDelayed(run, 200);
         }
 
-        private void triggerRandom()
-        {
-            if (GetContainingInputManager().CurrentState.Keyboard.ShiftPressed)
-                Carousel.SelectPreviousRandom();
-            else
-                Carousel.SelectNextRandom();
-        }
-
-        protected override void OnEntering(Screen last)
+        public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
 
-            Content.FadeInFromZero(250);
+            this.FadeInFromZero(250);
             FilterControl.Activate();
+
+            ModSelect.SelectedMods.BindTo(selectedMods);
+
+            beginLooping();
         }
 
         private const double logo_transition = 250;
@@ -384,7 +544,6 @@ namespace osu.Game.Screens.Select
         {
             base.LogoArriving(logo, resuming);
 
-            logo.RelativePositionAxes = Axes.Both;
             Vector2 position = new Vector2(0.95f, 0.96f);
 
             if (logo.Alpha > 0.8f)
@@ -415,59 +574,115 @@ namespace osu.Game.Screens.Select
             logo.FadeOut(logo_transition / 2, Easing.Out);
         }
 
-        protected override void OnResuming(Screen last)
+        public override void OnResuming(IScreen last)
         {
-            if (Beatmap != null && !Beatmap.Value.BeatmapSetInfo.DeletePending)
-            {
-                UpdateBeatmap(Beatmap.Value);
-                ensurePlayingSelected();
-            }
-
             base.OnResuming(last);
 
-            Content.FadeIn(250);
+            // required due to https://github.com/ppy/osu-framework/issues/3218
+            ModSelect.SelectedMods.Disabled = false;
+            ModSelect.SelectedMods.BindTo(selectedMods);
 
-            Content.ScaleTo(1, 250, Easing.OutSine);
+            Carousel.AllowSelection = true;
+
+            BeatmapDetails.Refresh();
+
+            beginLooping();
+            music.ResetTrackAdjustments();
+
+            if (Beatmap != null && !Beatmap.Value.BeatmapSetInfo.DeletePending)
+            {
+                updateComponentFromBeatmap(Beatmap.Value);
+
+                // restart playback on returning to song select, regardless.
+                // not sure this should be a permanent thing (we may want to leave a user pause paused even on returning)
+                music.Play(requestedByUser: true);
+            }
+
+            this.FadeIn(250);
+
+            this.ScaleTo(1, 250, Easing.OutSine);
 
             FilterControl.Activate();
         }
 
-        protected override void OnSuspending(Screen next)
+        public override void OnSuspending(IScreen next)
         {
-            Content.ScaleTo(1.1f, 250, Easing.InSine);
+            ModSelect.SelectedMods.UnbindFrom(selectedMods);
+            ModSelect.Hide();
 
-            Content.FadeOut(250);
+            BeatmapOptions.Hide();
+
+            endLooping();
+
+            this.ScaleTo(1.1f, 250, Easing.InSine);
+
+            this.FadeOut(250);
 
             FilterControl.Deactivate();
             base.OnSuspending(next);
         }
 
-        protected override bool OnExiting(Screen next)
+        public override bool OnExiting(IScreen next)
         {
-            FinaliseSelection(performStartAction: false);
+            if (base.OnExiting(next))
+                return true;
 
-            beatmapInfoWedge.State = Visibility.Hidden;
+            beatmapInfoWedge.Hide();
 
-            Content.FadeOut(100);
+            this.FadeOut(100);
 
             FilterControl.Deactivate();
 
-            return base.OnExiting(next);
+            endLooping();
+
+            return false;
+        }
+
+        private bool isHandlingLooping;
+
+        private void beginLooping()
+        {
+            Debug.Assert(!isHandlingLooping);
+
+            isHandlingLooping = true;
+
+            ensureTrackLooping(Beatmap.Value, TrackChangeDirection.None);
+            music.TrackChanged += ensureTrackLooping;
+        }
+
+        private void endLooping()
+        {
+            // may be called multiple times during screen exit process.
+            if (!isHandlingLooping)
+                return;
+
+            music.CurrentTrack.Looping = isHandlingLooping = false;
+
+            music.TrackChanged -= ensureTrackLooping;
+        }
+
+        private void ensureTrackLooping(WorkingBeatmap beatmap, TrackChangeDirection changeDirection)
+            => beatmap.PrepareTrackForPreviewLooping();
+
+        public override bool OnBackButton()
+        {
+            if (ModSelect.State.Value == Visibility.Visible)
+            {
+                ModSelect.Hide();
+                return true;
+            }
+
+            return false;
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
 
-            Ruleset.UnbindAll();
+            decoupledRuleset.UnbindAll();
 
-            if (beatmaps != null)
-            {
-                beatmaps.ItemAdded -= onBeatmapSetAdded;
-                beatmaps.ItemRemoved -= onBeatmapSetRemoved;
-                beatmaps.BeatmapHidden -= onBeatmapHidden;
-                beatmaps.BeatmapRestored -= onBeatmapRestored;
-            }
+            if (music != null)
+                music.TrackChanged -= ensureTrackLooping;
         }
 
         /// <summary>
@@ -475,57 +690,63 @@ namespace osu.Game.Screens.Select
         /// This is a debounced call (unlike directly binding to WorkingBeatmap.ValueChanged).
         /// </summary>
         /// <param name="beatmap">The working beatmap.</param>
-        protected virtual void UpdateBeatmap(WorkingBeatmap beatmap)
+        private void updateComponentFromBeatmap(WorkingBeatmap beatmap)
         {
-            Logger.Log($"working beatmap updated to {beatmap}");
-
-            if (Background is BackgroundScreenBeatmap backgroundModeBeatmap)
+            ApplyToBackground(backgroundModeBeatmap =>
             {
                 backgroundModeBeatmap.Beatmap = beatmap;
-                backgroundModeBeatmap.BlurTo(background_blur, 750, Easing.OutQuint);
-                backgroundModeBeatmap.FadeTo(1, 250);
-            }
+                backgroundModeBeatmap.BlurAmount.Value = BACKGROUND_BLUR;
+                backgroundModeBeatmap.FadeColour(Color4.White, 250);
+            });
 
             beatmapInfoWedge.Beatmap = beatmap;
+
+            BeatmapDetails.Beatmap = beatmap;
         }
 
-        private void ensurePlayingSelected(bool preview = false)
+        private readonly WeakReference<ITrack> lastTrack = new WeakReference<ITrack>(null);
+
+        /// <summary>
+        /// Ensures some music is playing for the current track.
+        /// Will resume playback from a manual user pause if the track has changed.
+        /// </summary>
+        private void ensurePlayingSelected()
         {
-            Track track = Beatmap.Value.Track;
+            ITrack track = music.CurrentTrack;
 
-            if (!track.IsRunning)
-            {
-                // Ensure the track is added to the TrackManager, since it is removed after the player finishes the map.
-                // Using AddItemToList rather than AddItem so that it doesn't attempt to register adjustment dependencies more than once.
-                Game.Audio.Track.AddItemToList(track);
-                if (preview) track.Seek(Beatmap.Value.Metadata.PreviewTime);
-                track.Start();
-            }
+            bool isNewTrack = !lastTrack.TryGetTarget(out var last) || last != track;
+
+            if (!track.IsRunning && (music.UserPauseRequested != true || isNewTrack))
+                music.Play(true);
+
+            lastTrack.SetTarget(track);
         }
-
-        private void onBeatmapSetAdded(BeatmapSetInfo s) => Carousel.UpdateBeatmapSet(s);
-        private void onBeatmapSetRemoved(BeatmapSetInfo s) => Carousel.RemoveBeatmapSet(s);
-        private void onBeatmapRestored(BeatmapInfo b) => Carousel.UpdateBeatmapSet(beatmaps.QueryBeatmapSet(s => s.ID == b.BeatmapSetInfoID));
-        private void onBeatmapHidden(BeatmapInfo b) => Carousel.UpdateBeatmapSet(beatmaps.QueryBeatmapSet(s => s.ID == b.BeatmapSetInfoID));
 
         private void carouselBeatmapsLoaded()
         {
-            if (rulesetNoDebounce == null)
-            {
-                // manual binding to parent ruleset to allow for delayed load in the incoming direction.
-                rulesetNoDebounce = Ruleset.Value = base.Ruleset.Value;
-                base.Ruleset.ValueChanged += updateSelectedRuleset;
-                Ruleset.ValueChanged += r => base.Ruleset.Value = r;
+            bindBindables();
 
-                Beatmap.BindDisabledChanged(disabled => Carousel.AllowSelection = !disabled, true);
-                Beatmap.BindValueChanged(workingBeatmapChanged);
-            }
+            Carousel.AllowSelection = true;
 
-            if (!Beatmap.IsDefault && Beatmap.Value.BeatmapSetInfo?.DeletePending == false && Beatmap.Value.BeatmapSetInfo?.Protected == false
-                && Carousel.SelectBeatmap(Beatmap.Value.BeatmapInfo, false))
+            // If a selection was already obtained, do not attempt to update the selected beatmap.
+            if (Carousel.SelectedBeatmapSet != null)
                 return;
 
-            if (Carousel.SelectedBeatmapSet == null && !Carousel.SelectNextRandom())
+            // Attempt to select the current beatmap on the carousel, if it is valid to be selected.
+            if (!Beatmap.IsDefault && Beatmap.Value.BeatmapSetInfo?.DeletePending == false && Beatmap.Value.BeatmapSetInfo?.Protected == false)
+            {
+                if (Carousel.SelectBeatmap(Beatmap.Value.BeatmapInfo, false))
+                    return;
+
+                // prefer not changing ruleset at this point, so look for another difficulty in the currently playing beatmap
+                var found = Beatmap.Value.BeatmapSetInfo.Beatmaps.FirstOrDefault(b => b.Ruleset.Equals(decoupledRuleset.Value));
+
+                if (found != null && Carousel.SelectBeatmap(found, false))
+                    return;
+            }
+
+            // If the current active beatmap could not be selected, select a new random beatmap.
+            if (!Carousel.SelectNextRandom())
             {
                 // in the case random selection failed, we want to trigger selectionChanged
                 // to show the dummy beatmap (we have nothing else to display).
@@ -533,15 +754,64 @@ namespace osu.Game.Screens.Select
             }
         }
 
+        private bool boundLocalBindables;
+
+        private void bindBindables()
+        {
+            if (boundLocalBindables)
+                return;
+
+            // manual binding to parent ruleset to allow for delayed load in the incoming direction.
+            transferRulesetValue();
+
+            Ruleset.ValueChanged += r => updateSelectedRuleset(r.NewValue);
+
+            decoupledRuleset.ValueChanged += r => Ruleset.Value = r.NewValue;
+            decoupledRuleset.DisabledChanged += r => Ruleset.Disabled = r;
+
+            Beatmap.BindValueChanged(workingBeatmapChanged);
+
+            boundLocalBindables = true;
+        }
+
+        /// <summary>
+        /// Transfer the game-wide ruleset to the local decoupled ruleset.
+        /// Will immediately run filter operations if required.
+        /// </summary>
+        /// <returns>Whether a transfer occurred.</returns>
+        private bool transferRulesetValue()
+        {
+            if (decoupledRuleset.Value?.Equals(Ruleset.Value) == true)
+                return false;
+
+            Logger.Log($"decoupled ruleset transferred (\"{decoupledRuleset.Value}\" -> \"{Ruleset.Value}\")");
+            rulesetNoDebounce = decoupledRuleset.Value = Ruleset.Value;
+
+            // if we have a pending filter operation, we want to run it now.
+            // it could change selection (ie. if the ruleset has been changed).
+            Carousel?.FlushPendingFilterOperations();
+            return true;
+        }
+
         private void delete(BeatmapSetInfo beatmap)
         {
             if (beatmap == null || beatmap.ID <= 0) return;
+
             dialogOverlay?.Push(new BeatmapDeleteDialog(beatmap));
         }
 
-        public override bool OnPressed(GlobalAction action)
+        private void clearScores(BeatmapInfo beatmap)
         {
-            if (!IsCurrentScreen) return false;
+            if (beatmap == null || beatmap.ID <= 0) return;
+
+            dialogOverlay?.Push(new BeatmapClearScoresDialog(beatmap, () =>
+                // schedule done here rather than inside the dialog as the dialog may fade out and never callback.
+                Schedule(() => BeatmapDetails.Refresh())));
+        }
+
+        public virtual bool OnPressed(GlobalAction action)
+        {
+            if (!this.IsCurrentScreen()) return false;
 
             switch (action)
             {
@@ -550,7 +820,11 @@ namespace osu.Game.Screens.Select
                     return true;
             }
 
-            return base.OnPressed(action);
+            return false;
+        }
+
+        public void OnReleased(GlobalAction action)
+        {
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -571,6 +845,29 @@ namespace osu.Game.Screens.Select
             }
 
             return base.OnKeyDown(e);
+        }
+
+        private class VerticalMaskingContainer : Container
+        {
+            private const float panel_overflow = 1.2f;
+
+            protected override Container<Drawable> Content { get; }
+
+            public VerticalMaskingContainer()
+            {
+                RelativeSizeAxes = Axes.Both;
+                Masking = true;
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+                Width = panel_overflow; // avoid horizontal masking so the panels don't clip when screen stack is pushed.
+                InternalChild = Content = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Width = 1 / panel_overflow,
+                };
+            }
         }
 
         private class ResetScrollContainer : Container

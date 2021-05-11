@@ -1,26 +1,50 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
+using osu.Framework.Bindables;
+using osu.Game.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
     public class DifficultyControlPoint : ControlPoint
     {
+        public static readonly DifficultyControlPoint DEFAULT = new DifficultyControlPoint
+        {
+            SpeedMultiplierBindable = { Disabled = true },
+        };
+
+        /// <summary>
+        /// The speed multiplier at this control point.
+        /// </summary>
+        public readonly BindableDouble SpeedMultiplierBindable = new BindableDouble(1)
+        {
+            Precision = 0.01,
+            Default = 1,
+            MinValue = 0.1,
+            MaxValue = 10
+        };
+
+        public override Color4 GetRepresentingColour(OsuColour colours) => colours.Lime1;
+
         /// <summary>
         /// The speed multiplier at this control point.
         /// </summary>
         public double SpeedMultiplier
         {
-            get => speedMultiplier;
-            set => speedMultiplier = MathHelper.Clamp(value, 0.1, 10);
+            get => SpeedMultiplierBindable.Value;
+            set => SpeedMultiplierBindable.Value = value;
         }
 
-        private double speedMultiplier = 1;
+        public override bool IsRedundant(ControlPoint existing)
+            => existing is DifficultyControlPoint existingDifficulty
+               && SpeedMultiplier == existingDifficulty.SpeedMultiplier;
 
-        public override bool EquivalentTo(ControlPoint other)
-            => base.EquivalentTo(other)
-               && other is DifficultyControlPoint difficulty
-               && SpeedMultiplier.Equals(difficulty.SpeedMultiplier);
+        public override void CopyFrom(ControlPoint other)
+        {
+            SpeedMultiplier = ((DifficultyControlPoint)other).SpeedMultiplier;
+
+            base.CopyFrom(other);
+        }
     }
 }

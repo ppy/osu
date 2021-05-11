@@ -1,99 +1,53 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
-using osu.Framework.Configuration;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
+using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
-using OpenTK.Graphics;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.UI.Components
 {
-    public class ColumnHitObjectArea : Container, IHasAccentColour
+    public class ColumnHitObjectArea : HitObjectArea
     {
-        private const float hit_target_height = 10;
-        private const float hit_target_bar_height = 2;
+        public readonly Container Explosions;
 
-        private Container<Drawable> content;
-        protected override Container<Drawable> Content => content;
+        public readonly Container UnderlayElements;
 
-        private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
+        private readonly Drawable hitTarget;
 
-        private Container hitTargetLine;
-
-        [BackgroundDependencyLoader]
-        private void load(IScrollingInfo scrollingInfo)
+        public ColumnHitObjectArea(int columnIndex, HitObjectContainer hitObjectContainer)
+            : base(hitObjectContainer)
         {
-            Drawable hitTargetBar;
-
-            InternalChildren = new[]
+            AddRangeInternal(new[]
             {
-                hitTargetBar = new Box
+                UnderlayElements = new Container
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Height = hit_target_height,
-                    Colour = Color4.Black
-                },
-                hitTargetLine = new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Height = hit_target_bar_height,
-                    Masking = true,
-                    Child = new Box { RelativeSizeAxes = Axes.Both }
-                },
-                content = new Container
-                {
-                    Name = "Hit objects",
                     RelativeSizeAxes = Axes.Both,
+                    Depth = 2,
                 },
-            };
-
-            direction.BindTo(scrollingInfo.Direction);
-            direction.BindValueChanged(direction =>
-            {
-                Anchor anchor = direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
-
-                hitTargetBar.Anchor = hitTargetBar.Origin = anchor;
-                hitTargetLine.Anchor = hitTargetLine.Origin = anchor;
-            }, true);
+                hitTarget = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HitTarget, columnIndex), _ => new DefaultHitTarget())
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Depth = 1
+                },
+                Explosions = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Depth = -1,
+                }
+            });
         }
 
-        protected override void LoadComplete()
+        protected override void UpdateHitPosition()
         {
-            base.LoadComplete();
-            updateColours();
-        }
+            base.UpdateHitPosition();
 
-        private Color4 accentColour;
-
-        public Color4 AccentColour
-        {
-            get => accentColour;
-            set
-            {
-                if (accentColour == value)
-                    return;
-                accentColour = value;
-
-                updateColours();
-            }
-        }
-
-        private void updateColours()
-        {
-            if (!IsLoaded)
-                return;
-
-            hitTargetLine.EdgeEffect = new EdgeEffectParameters
-            {
-                Type = EdgeEffectType.Glow,
-                Radius = 5,
-                Colour = accentColour.Opacity(0.5f),
-            };
+            if (Direction.Value == ScrollingDirection.Up)
+                hitTarget.Anchor = hitTarget.Origin = Anchor.TopLeft;
+            else
+                hitTarget.Anchor = hitTarget.Origin = Anchor.BottomLeft;
         }
     }
 }

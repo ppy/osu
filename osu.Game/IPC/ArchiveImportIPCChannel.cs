@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Diagnostics;
 using System.IO;
@@ -32,13 +32,13 @@ namespace osu.Game.IPC
         {
             if (importer == null)
             {
-                //we want to contact a remote osu! to handle the import.
-                await SendMessageAsync(new ArchiveImportMessage { Path = path });
+                // we want to contact a remote osu! to handle the import.
+                await SendMessageAsync(new ArchiveImportMessage { Path = path }).ConfigureAwait(false);
                 return;
             }
 
             if (importer.HandledExtensions.Contains(Path.GetExtension(path)?.ToLowerInvariant()))
-                importer.Import(path);
+                await importer.Import(path).ConfigureAwait(false);
         }
     }
 

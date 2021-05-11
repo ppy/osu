@@ -1,36 +1,84 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Configuration;
-using osu.Game.Configuration;
+using System;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
-using System.Collections.Generic;
-using System.Linq;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModHidden : Mod, IReadFromConfig, IApplicableToDrawableHitObjects
+    public abstract class ModHidden : ModWithVisibilityAdjustment, IApplicableToScoreProcessor
     {
         public override string Name => "Hidden";
-        public override string ShortenedName => "HD";
-        public override FontAwesome Icon => FontAwesome.fa_osu_mod_hidden;
+        public override string Acronym => "HD";
+        public override IconUsage? Icon => OsuIcon.ModHidden;
         public override ModType Type => ModType.DifficultyIncrease;
         public override bool Ranked => true;
 
-        protected Bindable<bool> IncreaseFirstObjectVisibility = new Bindable<bool>();
+        /// <summary>
+        /// Check whether the provided hitobject should be considered the "first" hideable object.
+        /// Can be used to skip spinners, for instance.
+        /// </summary>
+        /// <param name="hitObject">The hitobject to check.</param>
+        [Obsolete("Use IsFirstAdjustableObject() instead.")] // Can be removed 20210506
+        protected virtual bool IsFirstHideableObject(DrawableHitObject hitObject) => true;
 
-        public void ReadFromConfig(OsuConfigManager config)
+        public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
-            IncreaseFirstObjectVisibility = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility);
+            // Default value of ScoreProcessor's Rank in Hidden Mod should be SS+
+            scoreProcessor.Rank.Value = ScoreRank.XH;
         }
 
-        public virtual void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
+        public ScoreRank AdjustRank(ScoreRank rank, double accuracy)
         {
-            foreach (var d in drawables.Skip(IncreaseFirstObjectVisibility ? 1 : 0))
-                d.ApplyCustomUpdateState += ApplyHiddenState;
+            switch (rank)
+            {
+                case ScoreRank.X:
+                    return ScoreRank.XH;
+
+                case ScoreRank.S:
+                    return ScoreRank.SH;
+
+                default:
+                    return rank;
+            }
         }
 
-        protected virtual void ApplyHiddenState(DrawableHitObject hitObject, ArmedState state) { }
+        protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
+        {
+#pragma warning disable 618
+            ApplyFirstObjectIncreaseVisibilityState(hitObject, state);
+#pragma warning restore 618
+        }
+
+        protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
+        {
+#pragma warning disable 618
+            ApplyHiddenState(hitObject, state);
+#pragma warning restore 618
+        }
+
+        /// <summary>
+        /// Apply a special visibility state to the first object in a beatmap, if the user chooses to turn on the "increase first object visibility" setting.
+        /// </summary>
+        /// <param name="hitObject">The hit object to apply the state change to.</param>
+        /// <param name="state">The state of the hit object.</param>
+        [Obsolete("Use ApplyIncreasedVisibilityState() instead.")] // Can be removed 20210506
+        protected virtual void ApplyFirstObjectIncreaseVisibilityState(DrawableHitObject hitObject, ArmedState state)
+        {
+        }
+
+        /// <summary>
+        /// Apply a hidden state to the provided object.
+        /// </summary>
+        /// <param name="hitObject">The hit object to apply the state change to.</param>
+        /// <param name="state">The state of the hit object.</param>
+        [Obsolete("Use ApplyNormalVisibilityState() instead.")] // Can be removed 20210506
+        protected virtual void ApplyHiddenState(DrawableHitObject hitObject, ArmedState state)
+        {
+        }
     }
 }

@@ -1,12 +1,12 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
+using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Replays;
-using osu.Game.Rulesets.Replays.Legacy;
 using osu.Game.Rulesets.Replays.Types;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Replays
 {
@@ -26,11 +26,23 @@ namespace osu.Game.Rulesets.Osu.Replays
             Actions.AddRange(actions);
         }
 
-        public void ConvertFrom(LegacyReplayFrame legacyFrame, IBeatmap beatmap)
+        public void FromLegacy(LegacyReplayFrame currentFrame, IBeatmap beatmap, ReplayFrame lastFrame = null)
         {
-            Position = legacyFrame.Position;
-            if (legacyFrame.MouseLeft) Actions.Add(OsuAction.LeftButton);
-            if (legacyFrame.MouseRight) Actions.Add(OsuAction.RightButton);
+            Position = currentFrame.Position;
+            if (currentFrame.MouseLeft) Actions.Add(OsuAction.LeftButton);
+            if (currentFrame.MouseRight) Actions.Add(OsuAction.RightButton);
+        }
+
+        public LegacyReplayFrame ToLegacy(IBeatmap beatmap)
+        {
+            ReplayButtonState state = ReplayButtonState.None;
+
+            if (Actions.Contains(OsuAction.LeftButton))
+                state |= ReplayButtonState.Left1;
+            if (Actions.Contains(OsuAction.RightButton))
+                state |= ReplayButtonState.Right1;
+
+            return new LegacyReplayFrame(Time, Position.X, Position.Y, state);
         }
     }
 }

@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -18,7 +18,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public Color4 FillColour
         {
-            set { fill.FadeColour(value, 150, Easing.OutQuint); }
+            set => fill.FadeColour(value, 150, Easing.OutQuint);
         }
 
         public Color4 BackgroundColour
@@ -32,16 +32,27 @@ namespace osu.Game.Graphics.UserInterface
 
         public double EndTime
         {
-            set { CurrentNumber.MaxValue = value; }
+            set => CurrentNumber.MaxValue = value;
         }
 
         public double CurrentTime
         {
-            set { CurrentNumber.Value = value; }
+            set => CurrentNumber.Value = value;
         }
 
-        public ProgressBar()
+        private readonly bool allowSeek;
+
+        public override bool HandlePositionalInput => allowSeek;
+        public override bool HandleNonPositionalInput => allowSeek;
+
+        /// <summary>
+        /// Construct a new progress bar.
+        /// </summary>
+        /// <param name="allowSeek">Whether the user should be allowed to click/drag to adjust the value.</param>
+        public ProgressBar(bool allowSeek)
         {
+            this.allowSeek = allowSeek;
+
             CurrentNumber.MinValue = 0;
             CurrentNumber.MaxValue = 1;
             RelativeSizeAxes = Axes.X;
@@ -62,6 +73,6 @@ namespace osu.Game.Graphics.UserInterface
             fill.Width = value * UsableWidth;
         }
 
-        protected override void OnUserChange() => OnSeek?.Invoke(Current);
+        protected override void OnUserChange(double value) => OnSeek?.Invoke(value);
     }
 }

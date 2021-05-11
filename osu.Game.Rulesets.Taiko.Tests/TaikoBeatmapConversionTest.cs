@@ -1,18 +1,18 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
     [TestFixture]
+    [Timeout(10000)]
     public class TaikoBeatmapConversionTest : BeatmapConversionTest<ConvertValue>
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Taiko";
@@ -20,22 +20,23 @@ namespace osu.Game.Rulesets.Taiko.Tests
         [NonParallelizable]
         [TestCase("basic")]
         [TestCase("slider-generating-drumroll")]
-        public new void Test(string name)
-        {
-            base.Test(name);
-        }
+        [TestCase("sample-to-type-conversions")]
+        [TestCase("slider-conversion-v6")]
+        [TestCase("slider-conversion-v14")]
+        [TestCase("slider-generating-drumroll-2")]
+        public void Test(string name) => base.Test(name);
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)
         {
             yield return new ConvertValue
             {
                 StartTime = hitObject.StartTime,
-                EndTime = (hitObject as IHasEndTime)?.EndTime ?? hitObject.StartTime,
-                IsRim = hitObject is RimHit,
-                IsCentre = hitObject is CentreHit,
+                EndTime = hitObject.GetEndTime(),
+                IsRim = (hitObject as Hit)?.Type == HitType.Rim,
+                IsCentre = (hitObject as Hit)?.Type == HitType.Centre,
                 IsDrumRoll = hitObject is DrumRoll,
                 IsSwell = hitObject is Swell,
-                IsStrong = ((TaikoHitObject)hitObject).IsStrong
+                IsStrong = (hitObject as TaikoStrongableHitObject)?.IsStrong == true
             };
         }
 
@@ -45,7 +46,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
     public struct ConvertValue : IEquatable<ConvertValue>
     {
         /// <summary>
-        /// A sane value to account for osu!stable using ints everwhere.
+        /// A sane value to account for osu!stable using ints everywhere.
         /// </summary>
         private const float conversion_lenience = 2;
 

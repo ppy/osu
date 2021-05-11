@@ -1,15 +1,15 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
-using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.IO;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
 
@@ -17,34 +17,34 @@ namespace osu.Game.Beatmaps
 {
     public partial class BeatmapManager
     {
-        protected class BeatmapManagerWorkingBeatmap : WorkingBeatmap
+        [ExcludeFromDynamicCompile]
+        private class BeatmapManagerWorkingBeatmap : WorkingBeatmap
         {
-            private readonly IResourceStore<byte[]> store;
-            private readonly AudioManager audioManager;
+            [NotNull]
+            private readonly IBeatmapResourceProvider resources;
 
-            public BeatmapManagerWorkingBeatmap(IResourceStore<byte[]> store, BeatmapInfo beatmapInfo, AudioManager audioManager)
-                : base(beatmapInfo)
+            public BeatmapManagerWorkingBeatmap(BeatmapInfo beatmapInfo, [NotNull] IBeatmapResourceProvider resources)
+                : base(beatmapInfo, resources.AudioManager)
             {
-                this.store = store;
-                this.audioManager = audioManager;
+                this.resources = resources;
             }
 
             protected override IBeatmap GetBeatmap()
             {
+                if (BeatmapInfo.Path == null)
+                    return new Beatmap { BeatmapInfo = BeatmapInfo };
+
                 try
                 {
-                    using (var stream = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
+                    using (var stream = new LineBufferedReader(GetStream(BeatmapSetInfo.GetPathForFile(BeatmapInfo.Path))))
                         return Decoder.GetDecoder<Beatmap>(stream).Decode(stream);
                 }
-                catch
+                catch (Exception e)
                 {
+                    Logger.Error(e, "Beatmap failed to load");
                     return null;
                 }
             }
-
-            private string getPathForFile(string filename) => BeatmapSetInfo.Files.First(f => string.Equals(f.Filename, filename, StringComparison.InvariantCultureIgnoreCase)).FileInfo.StoragePath;
-
-            private LargeTextureStore textureStore;
 
             protected override bool BackgroundStillValid(Texture b) => false; // bypass lazy logic. we want to return a new background each time for refcounting purposes.
 
@@ -55,44 +55,44 @@ namespace osu.Game.Beatmaps
 
                 try
                 {
-                    return (textureStore ?? (textureStore = new LargeTextureStore(new TextureLoaderStore(store)))).Get(getPathForFile(Metadata.BackgroundFile));
+                    return resources.LargeTextureStore.Get(BeatmapSetInfo.GetPathForFile(Metadata.BackgroundFile));
                 }
-                catch
+                catch (Exception e)
                 {
+                    Logger.Error(e, "Background failed to load");
                     return null;
                 }
             }
 
-            protected override Track GetTrack()
+            protected override Track GetBeatmapTrack()
             {
+                if (Metadata?.AudioFile == null)
+                    return null;
+
                 try
                 {
-                    var trackData = store.GetStream(getPathForFile(Metadata.AudioFile));
-                    return trackData == null ? null : new TrackBass(trackData);
+                    return resources.Tracks.Get(BeatmapSetInfo.GetPathForFile(Metadata.AudioFile));
                 }
-                catch
+                catch (Exception e)
                 {
+                    Logger.Error(e, "Track failed to load");
                     return null;
                 }
-            }
-
-            public override void TransferTo(WorkingBeatmap other)
-            {
-                base.TransferTo(other);
-
-                if (other is BeatmapManagerWorkingBeatmap owb && textureStore != null && BeatmapInfo.BackgroundEquals(other.BeatmapInfo))
-                    owb.textureStore = textureStore;
             }
 
             protected override Waveform GetWaveform()
             {
+                if (Metadata?.AudioFile == null)
+                    return null;
+
                 try
                 {
-                    var trackData = store.GetStream(getPathForFile(Metadata.AudioFile));
+                    var trackData = GetStream(BeatmapSetInfo.GetPathForFile(Metadata.AudioFile));
                     return trackData == null ? null : new Waveform(trackData);
                 }
-                catch
+                catch (Exception e)
                 {
+                    Logger.Error(e, "Waveform failed to load");
                     return null;
                 }
             }
@@ -100,9 +100,10 @@ namespace osu.Game.Beatmaps
             protected override Storyboard GetStoryboard()
             {
                 Storyboard storyboard;
+
                 try
                 {
-                    using (var stream = new StreamReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
+                    using (var stream = new LineBufferedReader(GetStream(BeatmapSetInfo.GetPathForFile(BeatmapInfo.Path))))
                     {
                         var decoder = Decoder.GetDecoder<Storyboard>(stream);
 
@@ -111,7 +112,7 @@ namespace osu.Game.Beatmaps
                             storyboard = decoder.Decode(stream);
                         else
                         {
-                            using (var secondaryStream = new StreamReader(store.GetStream(getPathForFile(BeatmapSetInfo.StoryboardFile))))
+                            using (var secondaryStream = new LineBufferedReader(GetStream(BeatmapSetInfo.GetPathForFile(BeatmapSetInfo.StoryboardFile))))
                                 storyboard = decoder.Decode(stream, secondaryStream);
                         }
                     }
@@ -127,21 +128,20 @@ namespace osu.Game.Beatmaps
                 return storyboard;
             }
 
-            protected override Skin GetSkin()
+            protected override ISkin GetSkin()
             {
-                Skin skin;
                 try
                 {
-                    skin = new LegacyBeatmapSkin(BeatmapInfo, store, audioManager);
+                    return new LegacyBeatmapSkin(BeatmapInfo, resources.Files, resources);
                 }
                 catch (Exception e)
                 {
                     Logger.Error(e, "Skin failed to load");
-                    skin = new DefaultSkin();
+                    return null;
                 }
-
-                return skin;
             }
+
+            public override Stream GetStream(string storagePath) => resources.Files.GetStream(storagePath);
         }
     }
 }

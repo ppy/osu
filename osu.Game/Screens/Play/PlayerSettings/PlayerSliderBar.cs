@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
@@ -11,7 +11,7 @@ using osu.Game.Overlays.Settings;
 namespace osu.Game.Screens.Play.PlayerSettings
 {
     public class PlayerSliderBar<T> : SettingsSlider<T>
-        where T : struct, IEquatable<T>, IComparable, IConvertible
+        where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
         public OsuSliderBar<T> Bar => (OsuSliderBar<T>)Control;
 

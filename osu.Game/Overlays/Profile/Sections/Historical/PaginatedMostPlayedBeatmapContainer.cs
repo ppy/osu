@@ -1,59 +1,38 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
-using osu.Framework.Configuration;
+using System.Collections.Generic;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
 {
-    public class PaginatedMostPlayedBeatmapContainer : PaginatedContainer
+    public class PaginatedMostPlayedBeatmapContainer : PaginatedProfileSubsection<APIUserMostPlayedBeatmap>
     {
-        private GetUserMostPlayedBeatmapsRequest request;
-
         public PaginatedMostPlayedBeatmapContainer(Bindable<User> user)
-            :base(user, "Most Played Beatmaps", "No records. :(")
+            : base(user, "Most Played Beatmaps")
         {
             ItemsPerPage = 5;
+        }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             ItemsContainer.Direction = FillDirection.Vertical;
         }
 
-        protected override void ShowMore()
-        {
-            base.ShowMore();
+        protected override int GetCount(User user) => user.BeatmapPlaycountsCount;
 
-            request = new GetUserMostPlayedBeatmapsRequest(User.Value.Id, VisiblePages++ * ItemsPerPage);
-            request.Success += beatmaps => Schedule(() =>
-            {
-                ShowMoreButton.FadeTo(beatmaps.Count == ItemsPerPage ? 1 : 0);
-                ShowMoreLoading.Hide();
+        protected override APIRequest<List<APIUserMostPlayedBeatmap>> CreateRequest() =>
+            new GetUserMostPlayedBeatmapsRequest(User.Value.Id, VisiblePages++, ItemsPerPage);
 
-                if (!beatmaps.Any() && VisiblePages == 1)
-                {
-                    MissingText.Show();
-                    return;
-                }
-
-                MissingText.Hide();
-
-                foreach (var beatmap in beatmaps)
-                {
-                    ItemsContainer.Add(new DrawableMostPlayedRow(beatmap.GetBeatmapInfo(Rulesets), beatmap.PlayCount));
-                }
-            });
-
-            Api.Queue(request);
-        }
-
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            request?.Cancel();
-        }
+        protected override Drawable CreateDrawableItem(APIUserMostPlayedBeatmap model) =>
+            new DrawableMostPlayedBeatmap(model.GetBeatmapInfo(Rulesets), model.PlayCount);
     }
 }

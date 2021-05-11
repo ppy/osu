@@ -9,12 +9,10 @@
             "command": "dotnet",
             "args": [
                 "build",
-                "--no-restore",
                 "osu.Desktop",
-                "/p:TargetFramework=netcoreapp2.1",
-                "/p:GenerateFullPaths=true",
-                "/m",
-                "/verbosity:m"
+                "-p:GenerateFullPaths=true",
+                "-m",
+                "-verbosity:m"
             ],
             "group": "build",
             "problemMatcher": "$msCompile"
@@ -25,13 +23,11 @@
             "command": "dotnet",
             "args": [
                 "build",
-                "--no-restore",
                 "osu.Desktop",
-                "/p:TargetFramework=netcoreapp2.1",
-                "/p:Configuration=Release",
-                "/p:GenerateFullPaths=true",
-                "/m",
-                "/verbosity:m"
+                "-p:Configuration=Release",
+                "-p:GenerateFullPaths=true",
+                "-m",
+                "-verbosity:m"
             ],
             "group": "build",
             "problemMatcher": "$msCompile"
@@ -42,12 +38,10 @@
             "command": "dotnet",
             "args": [
                 "build",
-                "--no-restore",
                 "osu.Game.Tests",
-                "/p:TargetFramework=netcoreapp2.1",
-                "/p:GenerateFullPaths=true",
-                "/m",
-                "/verbosity:m"
+                "-p:GenerateFullPaths=true",
+                "-m",
+                "-verbosity:m"
             ],
             "group": "build",
             "problemMatcher": "$msCompile"
@@ -58,25 +52,58 @@
             "command": "dotnet",
             "args": [
                 "build",
-                "--no-restore",
                 "osu.Game.Tests",
-                "/p:TargetFramework=netcoreapp2.1",
-                "/p:Configuration=Release",
-                "/p:GenerateFullPaths=true",
-                "/m",
-                "/verbosity:m"
+                "-p:Configuration=Release",
+                "-p:GenerateFullPaths=true",
+                "-m",
+                "-verbosity:m"
             ],
             "group": "build",
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "Restore (netcoreapp2.1)",
+            "label": "Build tournament tests (Debug)",
             "type": "shell",
             "command": "dotnet",
             "args": [
-                "restore"
+                "build",
+                "osu.Game.Tournament.Tests",
+                "-p:GenerateFullPaths=true",
+                "-m",
+                "-verbosity:m"
             ],
-            "problemMatcher": []
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Build tournament tests (Release)",
+            "type": "shell",
+            "command": "dotnet",
+            "args": [
+                "build",
+                "osu.Game.Tournament.Tests",
+                "-p:Configuration=Release",
+                "-p:GenerateFullPaths=true",
+                "-m",
+                "-verbosity:m"
+            ],
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Build benchmarks",
+            "type": "shell",
+            "command": "dotnet",
+            "args": [
+                "build",
+                "osu.Game.Benchmarks",
+                "-p:Configuration=Release",
+                "-p:GenerateFullPaths=true",
+                "-m",
+                "-verbosity:m"
+            ],
+            "group": "build",
+            "problemMatcher": "$msCompile"
         }
     ]
 }

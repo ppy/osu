@@ -1,20 +1,23 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Game.Graphics;
+using osu.Framework.Graphics;
+using osu.Game.Input.Bindings;
 
 namespace osu.Game.Overlays.Toolbar
 {
     public class ToolbarMusicButton : ToolbarOverlayToggleButton
     {
+        protected override Anchor TooltipAnchor => Anchor.TopRight;
+
         public ToolbarMusicButton()
         {
-            Icon = FontAwesome.fa_music;
+            Hotkey = GlobalAction.ToggleNowPlaying;
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(MusicController music)
+        private void load(NowPlayingOverlay music)
         {
             StateContainer = music;
         }

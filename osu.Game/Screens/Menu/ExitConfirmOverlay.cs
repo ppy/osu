@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Input.Bindings;
 using osu.Game.Input.Bindings;
@@ -9,6 +9,15 @@ namespace osu.Game.Screens.Menu
 {
     public class ExitConfirmOverlay : HoldToConfirmOverlay, IKeyBindingHandler<GlobalAction>
     {
+        protected override bool AllowMultipleFires => true;
+
+        public void Abort() => AbortConfirm();
+
+        public ExitConfirmOverlay()
+            : base(0.7f)
+        {
+        }
+
         public bool OnPressed(GlobalAction action)
         {
             if (action == GlobalAction.Back)
@@ -20,15 +29,13 @@ namespace osu.Game.Screens.Menu
             return false;
         }
 
-        public bool OnReleased(GlobalAction action)
+        public void OnReleased(GlobalAction action)
         {
             if (action == GlobalAction.Back)
             {
-                AbortConfirm();
-                return true;
+                if (!Fired)
+                    AbortConfirm();
             }
-
-            return false;
         }
     }
 }

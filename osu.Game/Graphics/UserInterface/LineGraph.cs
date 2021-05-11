@@ -1,14 +1,15 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Caching;
-using OpenTK;
+using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
+using osu.Framework.Layout;
+using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -44,7 +45,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public IEnumerable<float> Values
         {
-            get { return values; }
+            get => values;
             set
             {
                 values = value.ToArray();
@@ -63,29 +64,35 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
+        public Color4 LineColour
+        {
+            get => maskingContainer.Colour;
+            set => maskingContainer.Colour = value;
+        }
+
         public LineGraph()
         {
             Add(maskingContainer = new Container<Path>
             {
                 Masking = true,
                 RelativeSizeAxes = Axes.Both,
-                Child = path = new Path { RelativeSizeAxes = Axes.Both, PathWidth = 1 }
+                Child = path = new SmoothPath
+                {
+                    AutoSizeAxes = Axes.None,
+                    RelativeSizeAxes = Axes.Both,
+                    PathRadius = 1
+                }
             });
+
+            AddLayout(pathCached);
         }
 
-        public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
-        {
-            if ((invalidation & Invalidation.DrawSize) > 0)
-                pathCached.Invalidate();
-
-            return base.Invalidate(invalidation, source, shallPropagate);
-        }
-
-        private Cached pathCached = new Cached();
+        private readonly LayoutValue pathCached = new LayoutValue(Invalidation.DrawSize);
 
         protected override void Update()
         {
             base.Update();
+
             if (!pathCached.IsValid)
             {
                 applyPath();
@@ -102,16 +109,22 @@ namespace osu.Game.Graphics.UserInterface
 
             for (int i = 0; i < values.Length; i++)
             {
-                float x = (i + count - values.Length) / (float)(count - 1) * DrawWidth - 1;
-                float y = GetYPosition(values[i]) * DrawHeight - 1;
-                // the -1 is for inner offset in path (actually -PathWidth)
+                // Make sure that we are accounting for path width when calculating vertex positions
+                // We need to apply 2x the path radius to account for it because the full diameter of the line accounts into height
+                float x = (i + count - values.Length) / (float)(count - 1) * (DrawWidth - 2 * path.PathRadius);
+                float y = GetYPosition(values[i]) * (DrawHeight - 2 * path.PathRadius);
                 path.AddVertex(new Vector2(x, y));
             }
         }
 
         protected float GetYPosition(float value)
         {
-            if (ActualMaxValue == ActualMinValue) return 0;
+            if (ActualMaxValue == ActualMinValue)
+                // show line at top if the only value on the graph is positive,
+                // and at bottom if the only value on the graph is zero or negative.
+                // just kind of makes most sense intuitively.
+                return value > 1 ? 0 : 1;
+
             return (ActualMaxValue - value) / (ActualMaxValue - ActualMinValue);
         }
     }

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 new SettingsCheckbox
                 {
                     LabelText = "Prefer metadata in original language",
-                    Bindable = frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowUnicode)
+                    Current = frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowUnicode)
                 },
             };
         }

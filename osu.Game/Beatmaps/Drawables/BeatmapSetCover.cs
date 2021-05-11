@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Beatmaps.Drawables
 {
+    [LongRunningLoad]
     public class BeatmapSetCover : Sprite
     {
         private readonly BeatmapSetInfo set;
@@ -23,7 +24,7 @@ namespace osu.Game.Beatmaps.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
+        private void load(LargeTextureStore textures)
         {
             string resource = null;
 
@@ -32,9 +33,11 @@ namespace osu.Game.Beatmaps.Drawables
                 case BeatmapSetCoverType.Cover:
                     resource = set.OnlineInfo.Covers.Cover;
                     break;
+
                 case BeatmapSetCoverType.Card:
                     resource = set.OnlineInfo.Covers.Card;
                     break;
+
                 case BeatmapSetCoverType.List:
                     resource = set.OnlineInfo.Covers.List;
                     break;

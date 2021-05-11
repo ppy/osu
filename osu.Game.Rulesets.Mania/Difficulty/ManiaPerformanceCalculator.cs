@@ -1,13 +1,14 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Game.Beatmaps;
+using osu.Framework.Extensions;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Difficulty
 {
@@ -27,8 +28,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         private int countMeh;
         private int countMiss;
 
-        public ManiaPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, Score score)
-            : base(ruleset, beatmap, score)
+        public ManiaPerformanceCalculator(Ruleset ruleset, DifficultyAttributes attributes, ScoreInfo score)
+            : base(ruleset, attributes, score)
         {
         }
 
@@ -36,12 +37,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         {
             mods = Score.Mods;
             scaledScore = Score.TotalScore;
-            countPerfect = Convert.ToInt32(Score.Statistics[HitResult.Perfect]);
-            countGreat = Convert.ToInt32(Score.Statistics[HitResult.Great]);
-            countGood = Convert.ToInt32(Score.Statistics[HitResult.Good]);
-            countOk = Convert.ToInt32(Score.Statistics[HitResult.Ok]);
-            countMeh = Convert.ToInt32(Score.Statistics[HitResult.Meh]);
-            countMiss = Convert.ToInt32(Score.Statistics[HitResult.Miss]);
+            countPerfect = Score.Statistics.GetOrDefault(HitResult.Perfect);
+            countGreat = Score.Statistics.GetOrDefault(HitResult.Great);
+            countGood = Score.Statistics.GetOrDefault(HitResult.Good);
+            countOk = Score.Statistics.GetOrDefault(HitResult.Ok);
+            countMeh = Score.Statistics.GetOrDefault(HitResult.Meh);
+            countMiss = Score.Statistics.GetOrDefault(HitResult.Miss);
 
             if (mods.Any(m => !m.Ranked))
                 return 0;
@@ -113,8 +114,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             // Lots of arbitrary values from testing.
             // Considering to use derivation from perfect accuracy in a probabilistic manner - assume normal distribution
             double accuracyValue = Math.Max(0.0, 0.2 - (Attributes.GreatHitWindow - 34) * 0.006667)
-                                       * strainValue
-                                       * Math.Pow(Math.Max(0.0, scaledScore - 960000) / 40000, 1.1);
+                                   * strainValue
+                                   * Math.Pow(Math.Max(0.0, scaledScore - 960000) / 40000, 1.1);
 
             // Bonus for many hitcircles - it's harder to keep good accuracy up for longer
             // accuracyValue *= Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));

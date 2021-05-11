@@ -2,54 +2,15 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "VisualTests (Debug)",
-            "type": "coreclr",
-            "request": "launch",
-            "program": "dotnet",
-            "args": [
-                "${workspaceRoot}/osu.Game.Tests/bin/Debug/netcoreapp2.1/osu.Game.Tests.dll"
-            ],
-            "cwd": "${workspaceRoot}",
-            "preLaunchTask": "Build tests (Debug)",
-            "linux": {
-                "env": {
-                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Game.Tests/bin/Debug/netcoreapp2.1:${env:LD_LIBRARY_PATH}"
-                }
-            },
-            "console": "internalConsole"
-        },
-        {
-            "name": "VisualTests (Release)",
-            "type": "coreclr",
-            "request": "launch",
-            "program": "dotnet",
-            "args": [
-                "${workspaceRoot}/osu.Game.Tests/bin/Release/netcoreapp2.1/osu.Game.Tests.dll"
-            ],
-            "cwd": "${workspaceRoot}",
-            "preLaunchTask": "Build tests (Release)",
-            "linux": {
-                "env": {
-                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Game.Tests/bin/Release/netcoreapp2.1:${env:LD_LIBRARY_PATH}"
-                }
-            },
-            "console": "internalConsole"
-        },
-        {
             "name": "osu! (Debug)",
             "type": "coreclr",
             "request": "launch",
             "program": "dotnet",
             "args": [
-                "${workspaceRoot}/osu.Desktop/bin/Debug/netcoreapp2.1/osu!.dll"
+                "${workspaceRoot}/osu.Desktop/bin/Debug/net5.0/osu!.dll"
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build osu! (Debug)",
-            "linux": {
-                "env": {
-                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Desktop/bin/Debug/netcoreapp2.1:${env:LD_LIBRARY_PATH}"
-                }
-            },
             "console": "internalConsole"
         },
         {
@@ -58,16 +19,114 @@
             "request": "launch",
             "program": "dotnet",
             "args": [
-                "${workspaceRoot}/osu.Desktop/bin/Release/netcoreapp2.1/osu!.dll"
+                "${workspaceRoot}/osu.Desktop/bin/Release/net5.0/osu!.dll"
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build osu! (Release)",
-            "linux": {
-                "env": {
-                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Desktop/bin/Release/netcoreapp2.1:${env:LD_LIBRARY_PATH}"
-                }
-            },
             "console": "internalConsole"
+        },
+        {
+            "name": "osu! (Tests, Debug)",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "dotnet",
+            "args": [
+                "${workspaceRoot}/osu.Game.Tests/bin/Debug/net5.0/osu.Game.Tests.dll"
+            ],
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "Build tests (Debug)",
+            "console": "internalConsole"
+        },
+        {
+            "name": "osu! (Tests, Release)",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "dotnet",
+            "args": [
+                "${workspaceRoot}/osu.Game.Tests/bin/Release/net5.0/osu.Game.Tests.dll"
+            ],
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "Build tests (Release)",
+            "console": "internalConsole"
+        },
+        {
+            "name": "Tournament (Debug)",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "dotnet",
+            "args": [
+                "${workspaceRoot}/osu.Desktop/bin/Debug/net5.0/osu!.dll",
+                "--tournament"
+            ],
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "Build osu! (Debug)",
+            "console": "internalConsole"
+        },
+        {
+            "name": "Tournament (Release)",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "dotnet",
+            "args": [
+                "${workspaceRoot}/osu.Desktop/bin/Release/net5.0/osu!.dll",
+                "--tournament"
+            ],
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "Build osu! (Release)",
+            "console": "internalConsole"
+        },
+        {
+            "name": "Tournament (Tests, Debug)",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "dotnet",
+            "args": [
+                "${workspaceRoot}/osu.Game.Tournament.Tests/bin/Debug/net5.0/osu.Game.Tournament.Tests.dll",
+                "--tournament"
+            ],
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "Build tournament tests (Debug)",
+            "console": "internalConsole"
+        },
+        {
+            "name": "Tournament (Tests, Release)",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "dotnet",
+            "args": [
+                "${workspaceRoot}/osu.Game.Tournament.Tests/bin/Debug/net5.0/osu.Game.Tournament.Tests.dll",
+                "--tournament"
+            ],
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "Build tournament tests (Release)",
+            "console": "internalConsole"
+        },
+        {
+            "name": "Benchmark",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${workspaceRoot}/osu.Game.Benchmarks/bin/Release/net5.0/osu.Game.Benchmarks.dll",
+            "args": [
+                "--filter",
+                "*"
+            ],
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "Build benchmarks",
+            "console": "internalConsole"
+        },
+        {
+            "name": "Cake: Debug Script",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${workspaceRoot}/build/tools/Cake.CoreCLR/0.30.0/Cake.dll",
+            "args": [
+                "${workspaceRoot}/build/build.cake",
+                "--debug",
+                "--verbosity=diagnostic"
+            ],
+            "cwd": "${workspaceRoot}/build",
+            "stopAtEntry": true,
+            "externalConsole": false
         }
     ]
 }

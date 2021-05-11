@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Audio;
 using System.Collections.Generic;
@@ -9,17 +9,23 @@ namespace osu.Game.Rulesets.Objects.Types
     /// <summary>
     /// A HitObject that spans some length.
     /// </summary>
-    public interface IHasRepeats : IHasEndTime
+    public interface IHasRepeats : IHasDuration
     {
         /// <summary>
         /// The amount of times the HitObject repeats.
         /// </summary>
-        int RepeatCount { get; }
+        int RepeatCount { get; set; }
 
         /// <summary>
-        /// The samples to be played when each repeat node is hit (0 -> first repeat node, 1 -> second repeat node, etc).
+        /// The samples to be played when each node of the <see cref="IHasRepeats"/> is hit.<br />
+        /// 0: The first node.<br />
+        /// 1: The first repeat.<br />
+        /// 2: The second repeat.<br />
+        /// ...<br />
+        /// n-1: The last repeat.<br />
+        /// n: The last node.
         /// </summary>
-        List<List<SampleInfo>> RepeatSamples { get; }
+        List<IList<HitSampleInfo>> NodeSamples { get; }
     }
 
     public static class HasRepeatsExtensions
@@ -29,5 +35,15 @@ namespace osu.Game.Rulesets.Objects.Types
         /// </summary>
         /// <param name="obj">The object that has repeats.</param>
         public static int SpanCount(this IHasRepeats obj) => obj.RepeatCount + 1;
+
+        /// <summary>
+        /// Retrieves the samples at a particular node in a <see cref="IHasRepeats"/> object.
+        /// </summary>
+        /// <param name="obj">The <see cref="HitObject"/>.</param>
+        /// <param name="nodeIndex">The node to attempt to retrieve the samples at.</param>
+        /// <returns>The samples at the given node index, or <paramref name="obj"/>'s default samples if the given node doesn't exist.</returns>
+        public static IList<HitSampleInfo> GetNodeSamples<T>(this T obj, int nodeIndex)
+            where T : HitObject, IHasRepeats
+            => nodeIndex < obj.NodeSamples.Count ? obj.NodeSamples[nodeIndex] : obj.Samples;
     }
 }

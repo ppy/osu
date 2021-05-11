@@ -1,24 +1,24 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
 using osu.Framework;
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
-using osu.Game.Overlays.Toolbar;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
+using osuTK;
 
 namespace osu.Game.Overlays.Settings
 {
     public class Sidebar : Container<SidebarButton>, IStateful<ExpandedState>
     {
         private readonly FillFlowContainer<SidebarButton> content;
-        public const float DEFAULT_WIDTH = ToolbarButton.WIDTH;
+        public const float DEFAULT_WIDTH = Toolbar.Toolbar.HEIGHT * 1.4f;
         public const int EXPANDED_WIDTH = 200;
 
         public event Action<ExpandedState> StateChanged;
@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Settings
             {
                 new Box
                 {
-                    Colour = Color4.Black,
+                    Colour = OsuColour.Gray(0.02f),
                     RelativeSizeAxes = Axes.Both,
                 },
                 new SidebarScrollContainer
@@ -76,19 +76,20 @@ namespace osu.Game.Overlays.Settings
             return base.OnMouseMove(e);
         }
 
-        private class SidebarScrollContainer : ScrollContainer
+        private class SidebarScrollContainer : OsuScrollContainer
         {
             public SidebarScrollContainer()
             {
                 Content.Anchor = Anchor.CentreLeft;
                 Content.Origin = Anchor.CentreLeft;
                 RelativeSizeAxes = Axes.Both;
+                ScrollbarVisible = false;
             }
         }
 
         public ExpandedState State
         {
-            get { return state; }
+            get => state;
             set
             {
                 expandEvent?.Cancel();
@@ -102,6 +103,7 @@ namespace osu.Game.Overlays.Settings
                     default:
                         this.ResizeTo(new Vector2(DEFAULT_WIDTH, Height), 500, Easing.OutQuint);
                         break;
+
                     case ExpandedState.Expanded:
                         this.ResizeTo(new Vector2(EXPANDED_WIDTH, Height), 500, Easing.OutQuint);
                         break;

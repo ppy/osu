@@ -1,144 +1,80 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Linq;
-using OpenTK.Input;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
-using osu.Framework.Configuration;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Framework.Screens;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Mods;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Screens.Edit;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
-using osu.Game.Skinning;
+using osu.Game.Users;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Select
 {
     public class PlaySongSelect : SongSelect
     {
-        private OsuScreen player;
-        private readonly ModSelectOverlay modSelect;
-        protected readonly BeatmapDetailArea BeatmapDetails;
         private bool removeAutoModOnResume;
+        private OsuScreen player;
 
-        public PlaySongSelect()
+        [Resolved(CanBeNull = true)]
+        private NotificationOverlay notifications { get; set; }
+
+        public override bool AllowExternalScreenChange => true;
+
+        protected override UserActivity InitialActivity => new UserActivity.ChoosingBeatmap();
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
         {
-            FooterPanels.Add(modSelect = new ModSelectOverlay
-            {
-                RelativeSizeAxes = Axes.X,
-                Origin = Anchor.BottomCentre,
-                Anchor = Anchor.BottomCentre,
-            });
+            BeatmapOptions.AddButton(@"Edit", @"beatmap", FontAwesome.Solid.PencilAlt, colours.Yellow, () => Edit());
 
-            LeftContent.Add(BeatmapDetails = new BeatmapDetailArea
-            {
-                RelativeSizeAxes = Axes.Both,
-                Padding = new MarginPadding { Top = 10, Right = 5 },
-            });
-
-            BeatmapDetails.Leaderboard.ScoreSelected += s => Push(new Results(s));
+            ((PlayBeatmapDetailArea)BeatmapDetails).Leaderboard.ScoreSelected += PresentScore;
         }
 
-        private SampleChannel sampleConfirm;
+        protected void PresentScore(ScoreInfo score) =>
+            FinaliseSelection(score.Beatmap, score.Ruleset, () => this.Push(new SoloResultsScreen(score, false)));
 
-        [Cached]
-        [Cached(Type = typeof(IBindable<IEnumerable<Mod>>))]
-        private readonly Bindable<IEnumerable<Mod>> selectedMods = new Bindable<IEnumerable<Mod>>(new Mod[] { });
+        protected override BeatmapDetailArea CreateBeatmapDetailArea() => new PlayBeatmapDetailArea();
 
-        [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, AudioManager audio, BeatmapManager beatmaps, SkinManager skins, DialogOverlay dialogOverlay, Bindable<IEnumerable<Mod>> selectedMods)
+        private ModAutoplay getAutoplayMod() => Ruleset.Value.CreateInstance().GetAutoplayMod();
+
+        public override void OnResuming(IScreen last)
         {
-            if (selectedMods != null) this.selectedMods.BindTo(selectedMods);
+            base.OnResuming(last);
 
-            sampleConfirm = audio.Sample.Get(@"SongSelect/confirm-selection");
-
-            Footer.AddButton(@"mods", colours.Yellow, modSelect, Key.F1, float.MaxValue);
-
-            BeatmapOptions.AddButton(@"Remove", @"from unplayed", FontAwesome.fa_times_circle_o, colours.Purple, null, Key.Number1);
-            BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.fa_eraser, colours.Purple, null, Key.Number2);
-            BeatmapOptions.AddButton(@"Edit", @"beatmap", FontAwesome.fa_pencil, colours.Yellow, () =>
-            {
-                ValidForResume = false;
-                Push(new Editor());
-            }, Key.Number3);
-
-            if (dialogOverlay != null)
-            {
-                Schedule(() =>
-                {
-                    // if we have no beatmaps but osu-stable is found, let's prompt the user to import.
-                    if (!beatmaps.GetAllUsableBeatmapSets().Any() && beatmaps.StableInstallationAvailable)
-                        dialogOverlay.Push(new ImportFromStablePopup(() =>
-                        {
-                            beatmaps.ImportFromStableAsync();
-                            skins.ImportFromStableAsync();
-                        }));
-                });
-            }
-        }
-
-        protected override void UpdateBeatmap(WorkingBeatmap beatmap)
-        {
-            beatmap.Mods.BindTo(selectedMods);
-
-            base.UpdateBeatmap(beatmap);
-
-            BeatmapDetails.Beatmap = beatmap;
-
-            if (beatmap.Track != null)
-                beatmap.Track.Looping = true;
-        }
-
-        protected override void OnResuming(Screen last)
-        {
             player = null;
 
             if (removeAutoModOnResume)
             {
-                var autoType = Ruleset.Value.CreateInstance().GetAutoplayMod().GetType();
-                modSelect.DeselectTypes(new[] { autoType }, true);
+                var autoType = getAutoplayMod()?.GetType();
+
+                if (autoType != null)
+                    Mods.Value = Mods.Value.Where(m => m.GetType() != autoType).ToArray();
+
                 removeAutoModOnResume = false;
             }
-
-            Beatmap.Value.Track.Looping = true;
-
-            base.OnResuming(last);
         }
 
-        protected override void OnSuspending(Screen next)
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
-            modSelect.Hide();
-
-            base.OnSuspending(next);
-        }
-
-        protected override bool OnExiting(Screen next)
-        {
-            if (modSelect.State == Visibility.Visible)
+            switch (e.Key)
             {
-                modSelect.Hide();
-                return true;
+                case Key.Enter:
+                case Key.KeypadEnter:
+                    // this is a special hard-coded case; we can't rely on OnPressed (of SongSelect) as GlobalActionContainer is
+                    // matching with exact modifier consideration (so Ctrl+Enter would be ignored).
+                    FinaliseSelection();
+                    return true;
             }
 
-            if (base.OnExiting(next))
-                return true;
-
-            if (Beatmap.Value.Track != null)
-                Beatmap.Value.Track.Looping = false;
-
-            selectedMods.UnbindAll();
-            Beatmap.Value.Mods.Value = new Mod[] { };
-
-            return false;
+            return base.OnKeyDown(e);
         }
 
         protected override bool OnStart()
@@ -148,26 +84,29 @@ namespace osu.Game.Screens.Select
             // Ctrl+Enter should start map with autoplay enabled.
             if (GetContainingInputManager().CurrentState?.Keyboard.ControlPressed == true)
             {
-                var auto = Ruleset.Value.CreateInstance().GetAutoplayMod();
-                var autoType = auto.GetType();
+                var autoplayMod = getAutoplayMod();
 
-                var mods = selectedMods.Value;
-                if (mods.All(m => m.GetType() != autoType))
+                if (autoplayMod == null)
                 {
-                    selectedMods.Value = mods.Append(auto);
+                    notifications?.Post(new SimpleNotification
+                    {
+                        Text = "The current ruleset doesn't have an autoplay mod avalaible!"
+                    });
+                    return false;
+                }
+
+                var mods = Mods.Value;
+
+                if (mods.All(m => m.GetType() != autoplayMod.GetType()))
+                {
+                    Mods.Value = mods.Append(autoplayMod).ToArray();
                     removeAutoModOnResume = true;
                 }
             }
 
-            Beatmap.Value.Track.Looping = false;
-            Beatmap.Disabled = true;
+            SampleConfirm?.Play();
 
-            sampleConfirm?.Play();
-
-            LoadComponentAsync(player = new PlayerLoader(new Player()), l =>
-            {
-                if (IsCurrentScreen) Push(player);
-            });
+            this.Push(player = new PlayerLoader(() => new SoloPlayer()));
 
             return true;
         }

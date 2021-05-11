@@ -1,10 +1,9 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
 
@@ -23,12 +22,19 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         public int TotalColumns => Stages.Sum(g => g.Columns);
 
         /// <summary>
+        /// The total number of columns that were present in this <see cref="ManiaBeatmap"/> before any user adjustments.
+        /// </summary>
+        public readonly int OriginalTotalColumns;
+
+        /// <summary>
         /// Creates a new <see cref="ManiaBeatmap"/>.
         /// </summary>
         /// <param name="defaultStage">The initial stages.</param>
-        public ManiaBeatmap(StageDefinition defaultStage)
+        /// <param name="originalTotalColumns">The total number of columns present before any user adjustments. Defaults to the total columns in <paramref name="defaultStage"/>.</param>
+        public ManiaBeatmap(StageDefinition defaultStage, int? originalTotalColumns = null)
         {
             Stages.Add(defaultStage);
+            OriginalTotalColumns = originalTotalColumns ?? defaultStage.Columns;
         }
 
         public override IEnumerable<BeatmapStatistic> GetStatistics()
@@ -41,14 +47,14 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 new BeatmapStatistic
                 {
                     Name = @"Note Count",
+                    CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Circles),
                     Content = notes.ToString(),
-                    Icon = FontAwesome.fa_circle_o
                 },
                 new BeatmapStatistic
                 {
                     Name = @"Hold Note Count",
+                    CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Sliders),
                     Content = holdnotes.ToString(),
-                    Icon = FontAwesome.fa_circle
                 },
             };
         }

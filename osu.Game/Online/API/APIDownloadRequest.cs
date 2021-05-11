@@ -1,33 +1,52 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.IO;
 using osu.Framework.IO.Network;
 
 namespace osu.Game.Online.API
 {
     public abstract class APIDownloadRequest : APIRequest
     {
+        private string filename;
+
+        /// <summary>
+        /// Used to set the extension of the file returned by this request.
+        /// </summary>
+        protected virtual string FileExtension { get; } = @".tmp";
+
         protected override WebRequest CreateWebRequest()
         {
-            var request = new WebRequest(Uri);
+            var file = Path.GetTempFileName();
+
+            File.Move(file, filename = Path.ChangeExtension(file, FileExtension));
+
+            var request = new FileWebRequest(filename, Uri);
             request.DownloadProgress += request_Progress;
             return request;
         }
 
-        private void request_Progress(long current, long total) => API.Schedule(() => Progress?.Invoke(current, total));
+        private void request_Progress(long current, long total) => API.Schedule(() => Progressed?.Invoke(current, total));
 
-        protected APIDownloadRequest()
+        protected void TriggerSuccess(string filename)
         {
-            base.Success += onSuccess;
+            if (this.filename != null)
+                throw new InvalidOperationException("Attempted to trigger success more than once");
+
+            this.filename = filename;
+
+            TriggerSuccess();
         }
 
-        private void onSuccess()
+        internal override void TriggerSuccess()
         {
-            Success?.Invoke(WebRequest.ResponseData);
+            base.TriggerSuccess();
+            Success?.Invoke(filename);
         }
 
-        public event APIProgressHandler Progress;
+        public event APIProgressHandler Progressed;
 
-        public new event APISuccessHandler<byte[]> Success;
+        public new event APISuccessHandler<string> Success;
     }
 }

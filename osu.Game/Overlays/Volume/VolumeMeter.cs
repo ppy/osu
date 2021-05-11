@@ -1,31 +1,34 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Globalization;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.MathUtils;
+using osu.Framework.Threading;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using OpenTK;
-using OpenTK.Graphics;
+using osu.Game.Input.Bindings;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Volume
 {
-    public class VolumeMeter : Container
+    public class VolumeMeter : Container, IKeyBindingHandler<GlobalAction>
     {
         private CircularProgress volumeCircle;
         private CircularProgress volumeCircleGlow;
 
-        public BindableDouble Bindable { get; } = new BindableDouble { MinValue = 0, MaxValue = 1 };
+        public BindableDouble Bindable { get; } = new BindableDouble { MinValue = 0, MaxValue = 1, Precision = 0.01 };
         private readonly float circleSize;
         private readonly Color4 meterColour;
         private readonly string name;
@@ -140,8 +143,7 @@ namespace osu.Game.Overlays.Volume
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = "Venera",
-                            TextSize = 0.16f * circleSize
+                            Font = OsuFont.Numeric.With(size: 0.16f * circleSize)
                         }).WithEffect(new GlowEffect
                         {
                             Colour = Color4.Transparent,
@@ -169,19 +171,21 @@ namespace osu.Game.Overlays.Volume
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = "Exo2.0-Bold",
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold),
                             Text = name
                         }
                     }
                 }
             };
-            Bindable.ValueChanged += newVolume =>
+
+            Bindable.ValueChanged += volume =>
             {
                 this.TransformTo("DisplayVolume",
-                    newVolume,
+                    volume.NewValue,
                     400,
                     Easing.OutQuint);
             };
+
             bgProgress.Current.Value = 0.75f;
         }
 
@@ -200,7 +204,7 @@ namespace osu.Game.Overlays.Volume
             {
                 displayVolume = value;
 
-                if (displayVolume > 0.99f)
+                if (displayVolume >= 0.995f)
                 {
                     text.Text = "MAX";
                     maxGlow.EffectColour = meterColour.Opacity(2f);
@@ -218,25 +222,56 @@ namespace osu.Game.Overlays.Volume
 
         public double Volume
         {
-            get => Bindable;
+            get => Bindable.Value;
             private set => Bindable.Value = value;
         }
 
-        private const float adjust_step = 0.05f;
+        private const double adjust_step = 0.01;
 
         public void Increase(double amount = 1, bool isPrecise = false) => adjust(amount, isPrecise);
         public void Decrease(double amount = 1, bool isPrecise = false) => adjust(-amount, isPrecise);
 
         // because volume precision is set to 0.01, this local is required to keep track of more precise adjustments and only apply when possible.
-        private double adjustAccumulator;
+        private double scrollAccumulation;
+
+        private double accelerationModifier = 1;
+
+        private const double max_acceleration = 5;
+        private const double acceleration_multiplier = 1.8;
+
+        private ScheduledDelegate accelerationDebounce;
+
+        private void resetAcceleration() => accelerationModifier = 1;
 
         private void adjust(double delta, bool isPrecise)
         {
-            adjustAccumulator += delta * adjust_step * (isPrecise ? 0.1 : 1);
-            if (Math.Abs(adjustAccumulator) < Bindable.Precision)
+            if (delta == 0)
                 return;
-            Volume += adjustAccumulator;
-            adjustAccumulator = 0;
+
+            // every adjust increment increases the rate at which adjustments happen up to a cutoff.
+            // this debounce will reset on inactivity.
+            accelerationDebounce?.Cancel();
+            accelerationDebounce = Scheduler.AddDelayed(resetAcceleration, 150);
+
+            delta *= accelerationModifier;
+            accelerationModifier = Math.Min(max_acceleration, accelerationModifier * acceleration_multiplier);
+
+            var precision = Bindable.Precision;
+
+            if (isPrecise)
+            {
+                scrollAccumulation += delta * adjust_step * 0.1;
+
+                while (Precision.AlmostBigger(Math.Abs(scrollAccumulation), precision))
+                {
+                    Volume += Math.Sign(scrollAccumulation) * precision;
+                    scrollAccumulation = scrollAccumulation < 0 ? Math.Min(0, scrollAccumulation + precision) : Math.Max(0, scrollAccumulation - precision);
+                }
+            }
+            else
+            {
+                Volume += Math.Sign(delta) * Math.Max(precision, Math.Abs(delta * adjust_step));
+            }
         }
 
         protected override bool OnScroll(ScrollEvent e)
@@ -256,6 +291,29 @@ namespace osu.Game.Overlays.Volume
         protected override void OnHoverLost(HoverLostEvent e)
         {
             this.ScaleTo(1f, transition_length, Easing.OutExpo);
+        }
+
+        public bool OnPressed(GlobalAction action)
+        {
+            if (!IsHovered)
+                return false;
+
+            switch (action)
+            {
+                case GlobalAction.SelectPrevious:
+                    adjust(1, false);
+                    return true;
+
+                case GlobalAction.SelectNext:
+                    adjust(-1, false);
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void OnReleased(GlobalAction action)
+        {
         }
     }
 }

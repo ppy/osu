@@ -1,9 +1,9 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework;
-using OpenTK;
+using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -16,6 +16,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Overlays.MedalSplash
 {
+    [LongRunningLoad]
     public class DrawableMedal : Container, IStateful<DisplayState>
     {
         private const float scale_when_unlocked = 0.76f;
@@ -29,6 +30,7 @@ namespace osu.Game.Overlays.MedalSplash
         private readonly OsuSpriteText unlocked, name;
         private readonly TextFlowContainer description;
         private DisplayState state;
+
         public DrawableMedal(Medal medal)
         {
             this.medal = medal;
@@ -49,7 +51,7 @@ namespace osu.Game.Overlays.MedalSplash
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Scale = new Vector2(0.81f),
+                            Scale = new Vector2(0.41f),
                         },
                         medalGlow = new Sprite
                         {
@@ -63,8 +65,7 @@ namespace osu.Game.Overlays.MedalSplash
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Text = "Medal Unlocked".ToUpperInvariant(),
-                    TextSize = 24,
-                    Font = @"Exo2.0-Light",
+                    Font = OsuFont.GetFont(size: 24, weight: FontWeight.Light),
                     Alpha = 0f,
                     Scale = new Vector2(1f / scale_when_unlocked),
                 },
@@ -84,8 +85,7 @@ namespace osu.Game.Overlays.MedalSplash
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Text = medal.Name,
-                            TextSize = 20,
-                            Font = @"Exo2.0-Bold",
+                            Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
                             Alpha = 0f,
                             Scale = new Vector2(1f / scale_when_full),
                         },
@@ -107,10 +107,10 @@ namespace osu.Game.Overlays.MedalSplash
             {
                 s.Anchor = Anchor.TopCentre;
                 s.Origin = Anchor.TopCentre;
-                s.TextSize = 16;
+                s.Font = s.Font.With(size: 16);
             });
 
-            medalContainer.OnLoadComplete = d =>
+            medalContainer.OnLoadComplete += d =>
             {
                 unlocked.Position = new Vector2(0f, medalContainer.DrawSize.Y / 2 + 10);
                 infoFlow.Position = new Vector2(0f, unlocked.Position.Y + 90);
@@ -134,7 +134,7 @@ namespace osu.Game.Overlays.MedalSplash
 
         public DisplayState State
         {
-            get { return state; }
+            get => state;
             set
             {
                 if (state == value) return;
@@ -157,11 +157,13 @@ namespace osu.Game.Overlays.MedalSplash
                 case DisplayState.None:
                     medalContainer.ScaleTo(0);
                     break;
+
                 case DisplayState.Icon:
                     medalContainer
                         .FadeIn(duration)
                         .ScaleTo(1, duration, Easing.OutElastic);
                     break;
+
                 case DisplayState.MedalUnlocked:
                     medalContainer
                         .FadeTo(1)
@@ -171,6 +173,7 @@ namespace osu.Game.Overlays.MedalSplash
                     this.MoveToY(MedalOverlay.DISC_SIZE / 2 - 30, duration, Easing.OutExpo);
                     unlocked.FadeInFromZero(duration);
                     break;
+
                 case DisplayState.Full:
                     medalContainer
                         .FadeTo(1)

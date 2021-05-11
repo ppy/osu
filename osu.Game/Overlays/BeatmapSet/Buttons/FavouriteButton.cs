@@ -1,74 +1,106 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Backgrounds;
-using OpenTK;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
+using osu.Game.Overlays.Notifications;
+using osu.Game.Users;
+using osuTK;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
-    public class FavouriteButton : HeaderButton
+    public class FavouriteButton : HeaderButton, IHasTooltip
     {
-        public readonly Bindable<bool> Favourited = new Bindable<bool>();
+        public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
 
-        [BackgroundDependencyLoader]
-        private void load()
+        private readonly BindableBool favourited = new BindableBool();
+
+        private PostBeatmapFavouriteRequest request;
+        private LoadingLayer loading;
+
+        private readonly IBindable<User> localUser = new Bindable<User>();
+
+        public string TooltipText
         {
-            Container pink;
+            get
+            {
+                if (!Enabled.Value) return string.Empty;
+
+                return (favourited.Value ? "Unfavourite" : "Favourite") + " this beatmapset";
+            }
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(IAPIProvider api, NotificationOverlay notifications)
+        {
             SpriteIcon icon;
+
             AddRange(new Drawable[]
             {
-                pink = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Alpha = 0f,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = OsuColour.FromHex(@"9f015f"),
-                        },
-                        new Triangles
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            ColourLight = OsuColour.FromHex(@"cb2187"),
-                            ColourDark = OsuColour.FromHex(@"9f015f"),
-                            TriangleScale = 1.5f,
-                        },
-                    },
-                },
                 icon = new SpriteIcon
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Icon = FontAwesome.fa_heart_o,
+                    Icon = FontAwesome.Regular.Heart,
                     Size = new Vector2(18),
                     Shadow = false,
                 },
+                loading = new LoadingLayer(true, false),
             });
 
-            Favourited.ValueChanged += value =>
+            Action = () =>
             {
-                if (value)
+                // guaranteed by disabled state above.
+                Debug.Assert(BeatmapSet.Value.OnlineBeatmapSetID != null);
+
+                loading.Show();
+
+                request?.Cancel();
+
+                request = new PostBeatmapFavouriteRequest(BeatmapSet.Value.OnlineBeatmapSetID.Value, favourited.Value ? BeatmapFavouriteAction.UnFavourite : BeatmapFavouriteAction.Favourite);
+
+                request.Success += () =>
                 {
-                    pink.FadeIn(200);
-                    icon.Icon = FontAwesome.fa_heart;
-                }
-                else
+                    favourited.Toggle();
+                    loading.Hide();
+                };
+
+                request.Failure += e =>
                 {
-                    pink.FadeOut(200);
-                    icon.Icon = FontAwesome.fa_heart_o;
-                }
+                    notifications?.Post(new SimpleNotification
+                    {
+                        Text = e.Message,
+                        Icon = FontAwesome.Solid.Times,
+                    });
+
+                    loading.Hide();
+                };
+
+                api.Queue(request);
             };
 
-            Action = () => Favourited.Value = !Favourited.Value;
+            favourited.ValueChanged += favourited => icon.Icon = favourited.NewValue ? FontAwesome.Solid.Heart : FontAwesome.Regular.Heart;
+
+            localUser.BindTo(api.LocalUser);
+            localUser.BindValueChanged(_ => updateEnabled());
+
+            // must be run after setting the Action to ensure correct enabled state (setting an Action forces a button to be enabled).
+            BeatmapSet.BindValueChanged(setInfo =>
+            {
+                updateEnabled();
+                favourited.Value = setInfo.NewValue?.OnlineInfo?.HasFavourited ?? false;
+            }, true);
         }
+
+        private void updateEnabled() => Enabled.Value = !(localUser.Value is GuestUser) && BeatmapSet.Value?.OnlineBeatmapSetID > 0;
 
         protected override void UpdateAfterChildren()
         {
