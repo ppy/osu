@@ -9,7 +9,6 @@ using Newtonsoft.Json;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
@@ -119,13 +118,5 @@ namespace osu.Game.Skinning
         }
 
         #endregion
-    }
-
-    public class SkinnableTargetWrapper : Container, ISkinSerialisable
-    {
-        public SkinnableTargetWrapper()
-        {
-            RelativeSizeAxes = Axes.Both;
-        }
     }
 }
