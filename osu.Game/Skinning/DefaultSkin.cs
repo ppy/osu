@@ -8,14 +8,20 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
+using osu.Game.IO;
 using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {
     public class DefaultSkin : Skin
     {
-        public DefaultSkin()
-            : base(SkinInfo.Default)
+        public DefaultSkin(IStorageResourceProvider resources)
+            : this(SkinInfo.Default, resources)
+        {
+        }
+
+        public DefaultSkin(SkinInfo skin, IStorageResourceProvider resources)
+            : base(skin)
         {
             Configuration = new DefaultSkinConfiguration();
         }

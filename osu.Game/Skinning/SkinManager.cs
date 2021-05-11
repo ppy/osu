@@ -36,7 +36,7 @@ namespace osu.Game.Skinning
 
         private readonly IResourceStore<byte[]> legacyDefaultResources;
 
-        public readonly Bindable<Skin> CurrentSkin = new Bindable<Skin>(new DefaultSkin());
+        public readonly Bindable<Skin> CurrentSkin = new Bindable<Skin>(new DefaultSkin(null));
         public readonly Bindable<SkinInfo> CurrentSkinInfo = new Bindable<SkinInfo>(SkinInfo.Default) { Default = SkinInfo.Default };
 
         public override IEnumerable<string> HandledExtensions => new[] { ".osk" };
@@ -105,7 +105,7 @@ namespace osu.Game.Skinning
         {
             // we need to populate early to create a hash based off skin.ini contents
             if (item.Name?.Contains(".osk", StringComparison.OrdinalIgnoreCase) == true)
-                populateMetadata(item);
+                populateMetadata(item, GetSkin(item));
 
             if (item.Creator != null && item.Creator != unknown_creator_string)
             {
@@ -122,18 +122,20 @@ namespace osu.Game.Skinning
         {
             await base.Populate(model, archive, cancellationToken).ConfigureAwait(false);
 
+            var instance = GetSkin(model);
+
+            model.InstantiationInfo ??= instance.GetType().AssemblyQualifiedName;
+
             if (model.Name?.Contains(".osk", StringComparison.OrdinalIgnoreCase) == true)
-                populateMetadata(model);
+                populateMetadata(model, instance);
         }
 
-        private void populateMetadata(SkinInfo item)
+        private void populateMetadata(SkinInfo item, Skin instance)
         {
-            Skin reference = GetSkin(item);
-
-            if (!string.IsNullOrEmpty(reference.Configuration.SkinInfo.Name))
+            if (!string.IsNullOrEmpty(instance.Configuration.SkinInfo.Name))
             {
-                item.Name = reference.Configuration.SkinInfo.Name;
-                item.Creator = reference.Configuration.SkinInfo.Creator;
+                item.Name = instance.Configuration.SkinInfo.Name;
+                item.Creator = instance.Configuration.SkinInfo.Creator;
             }
             else
             {
@@ -147,16 +149,7 @@ namespace osu.Game.Skinning
         /// </summary>
         /// <param name="skinInfo">The skin to lookup.</param>
         /// <returns>A <see cref="Skin"/> instance correlating to the provided <see cref="SkinInfo"/>.</returns>
-        public Skin GetSkin(SkinInfo skinInfo)
-        {
-            if (skinInfo == SkinInfo.Default)
-                return new DefaultSkin();
-
-            if (skinInfo == DefaultLegacySkin.Info)
-                return new DefaultLegacySkin(legacyDefaultResources, this);
-
-            return new LegacySkin(skinInfo, this);
-        }
+        public Skin GetSkin(SkinInfo skinInfo) => skinInfo.CreateInstance(legacyDefaultResources, this);
 
         /// <summary>
         /// Perform a lookup query on available <see cref="SkinInfo"/>s.

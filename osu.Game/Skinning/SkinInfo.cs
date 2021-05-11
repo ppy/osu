@@ -3,8 +3,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using osu.Framework.IO.Stores;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.IO;
 
 namespace osu.Game.Skinning
 {
@@ -22,7 +25,35 @@ namespace osu.Game.Skinning
 
         public string Creator { get; set; }
 
-        public List<SkinFileInfo> Files { get; set; }
+        private string instantiationInfo;
+
+        public string InstantiationInfo
+        {
+            get => instantiationInfo;
+            set => instantiationInfo = abbreviateInstantiationInfo(value);
+        }
+
+        private string abbreviateInstantiationInfo(string value)
+        {
+            // exclude version onwards, matching only on namespace and type.
+            // this is mainly to allow for new versions of already loaded rulesets to "upgrade" from old.
+            return string.Join(',', value.Split(',').Take(2));
+        }
+
+        public virtual Skin CreateInstance(IResourceStore<byte[]> legacyDefaultResources, IStorageResourceProvider resources)
+        {
+            var type = string.IsNullOrEmpty(InstantiationInfo)
+                // handle the case of skins imported before InstantiationInfo was added.
+                ? typeof(LegacySkin)
+                : Type.GetType(InstantiationInfo);
+
+            if (type == typeof(DefaultLegacySkin))
+                return (Skin)Activator.CreateInstance(type, this, legacyDefaultResources, resources);
+
+            return (Skin)Activator.CreateInstance(type, this, resources);
+        }
+
+        public List<SkinFileInfo> Files { get; set; } = new List<SkinFileInfo>();
 
         public List<DatabasedSetting> Settings { get; set; }
 
@@ -32,7 +63,8 @@ namespace osu.Game.Skinning
         {
             ID = DEFAULT_SKIN,
             Name = "osu!lazer",
-            Creator = "team osu!"
+            Creator = "team osu!",
+            InstantiationInfo = typeof(DefaultSkin).AssemblyQualifiedName,
         };
 
         public bool Equals(SkinInfo other) => other != null && ID == other.ID;
