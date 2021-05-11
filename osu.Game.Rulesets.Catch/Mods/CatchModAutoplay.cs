@@ -5,10 +5,8 @@ using System;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Replays;
-using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.UI;
 using osu.Game.Users;
 
 namespace osu.Game.Rulesets.Catch.Mods
@@ -23,13 +21,6 @@ namespace osu.Game.Rulesets.Catch.Mods
                 User = new User { Username = "osu!salad!" },
                 Replay = new CatchAutoGenerator(beatmap).Generate(),
             };
-        }
-
-        public override void ApplyToRulesetContainer(RulesetContainer<CatchHitObject> rulesetContainer)
-        {
-            if (rulesetContainer is CatchRulesetContainer)
-                ((CatchRulesetContainer)rulesetContainer).AutoMod = true;
-            base.ApplyToRulesetContainer(rulesetContainer);
         }
     }
 }

@@ -25,12 +25,8 @@ namespace osu.Game.Rulesets.Catch.UI
         }
 
         public override ScoreProcessor CreateScoreProcessor() => new CatchScoreProcessor(this);
-        public bool AutoMod = false;
 
-        protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new CatchFramedReplayInputHandler(replay)
-        {
-            FrameAccuratePlayback = !AutoMod
-        };
+        protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new CatchFramedReplayInputHandler(replay);
 
         protected override Playfield CreatePlayfield() => new CatchPlayfield(Beatmap.BeatmapInfo.BaseDifficulty, GetVisualRepresentation);
 
