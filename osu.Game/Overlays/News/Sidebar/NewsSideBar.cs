@@ -8,7 +8,7 @@ using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Framework.Graphics.Shapes;
 using osuTK;
-using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Overlays.News.Sidebar
 {
@@ -81,30 +81,17 @@ namespace osu.Game.Overlays.News.Sidebar
 
                 if (metadata.NewValue != null)
                 {
-                    var dict = new Dictionary<int, List<APINewsPost>>();
+                    var lookup = metadata.NewValue.NewsPosts.ToLookup(post => post.PublishedAt.Month);
 
-                    foreach (var p in metadata.NewValue.NewsPosts)
+                    var keys = lookup.Select(kvp => kvp.Key);
+                    var sortedKeys = keys.OrderByDescending(k => k).ToList();
+
+                    for (int i = 0; i < sortedKeys.Count; i++)
                     {
-                        var month = p.PublishedAt.Month;
-
-                        if (dict.ContainsKey(month))
-                            dict[month].Add(p);
-                        else
+                        monthsFlow.Add(new MonthPanel(lookup[sortedKeys[i]])
                         {
-                            dict.Add(month, new List<APINewsPost>(new[] { p }));
-                        }
-                    }
-
-                    bool isFirst = true;
-
-                    foreach (var keyValuePair in dict)
-                    {
-                        monthsFlow.Add(new MonthPanel(keyValuePair.Value)
-                        {
-                            IsOpen = { Value = isFirst }
+                            IsOpen = { Value = i == 0 }
                         });
-
-                        isFirst = false;
                     }
                 }
             }, true);

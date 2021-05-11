@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.News.Sidebar
 
         private readonly FillFlowContainer postsFlow;
 
-        public MonthPanel(List<APINewsPost> posts)
+        public MonthPanel(IEnumerable<APINewsPost> posts)
         {
             Width = 160;
             Masking = true;
@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.News.Sidebar
                 Spacing = new Vector2(0, 5),
                 Children = new Drawable[]
                 {
-                    new DropdownButton(posts[0].PublishedAt)
+                    new DropdownButton(posts.ElementAt(0).PublishedAt)
                     {
                         IsOpen = { BindTarget = IsOpen }
                     },
