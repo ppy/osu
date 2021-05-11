@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -29,6 +30,8 @@ namespace osu.Game.Skinning.Editor
 
         [Resolved]
         private SkinManager skins { get; set; }
+
+        private Bindable<Skin> currentSkin;
 
         public SkinEditor(Drawable targetScreen)
         {
@@ -119,23 +122,25 @@ namespace osu.Game.Skinning.Editor
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
             Show();
+
+            // as long as the skin editor is loaded, let's make sure we can modify the current skin.
+            currentSkin = skins.CurrentSkin.GetBoundCopy();
+
+            // schedule ensures this only happens when the skin editor is visible.
+            // also avoid some weird endless recursion / bindable feedback loop (something to do with tracking skins across three different bindable types).
+            // probably something which will be factored out in a future database refactor so not too concerning for now.
+            currentSkin.BindValueChanged(skin => Scheduler.AddOnce(skins.EnsureMutableSkin), true);
         }
 
         private void revert()
         {
-            var currentSkin = skins.CurrentSkin.Value;
-
-            var legacySkin = currentSkin as LegacySkin;
-
-            if (legacySkin == null)
-                return;
-
             SkinnableElementTargetContainer[] targetContainers = targetScreen.ChildrenOfType<SkinnableElementTargetContainer>().ToArray();
 
             foreach (var t in targetContainers)
             {
-                legacySkin.ResetDrawableTarget(t);
+                currentSkin.Value.ResetDrawableTarget(t);
 
                 // add back default components
                 getTarget(t.Target).Reload();
@@ -144,17 +149,10 @@ namespace osu.Game.Skinning.Editor
 
         private void save()
         {
-            var currentSkin = skins.CurrentSkin.Value;
-
-            var legacySkin = currentSkin as LegacySkin;
-
-            if (legacySkin == null)
-                return;
-
             SkinnableElementTargetContainer[] targetContainers = targetScreen.ChildrenOfType<SkinnableElementTargetContainer>().ToArray();
 
             foreach (var t in targetContainers)
-                legacySkin.UpdateDrawableTarget(t);
+                currentSkin.Value.UpdateDrawableTarget(t);
 
             skins.Save(skins.CurrentSkin.Value);
         }

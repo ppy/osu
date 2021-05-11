@@ -153,22 +153,30 @@ namespace osu.Game.Skinning
         /// <param name="skinInfo">The skin to lookup.</param>
         /// <returns>A <see cref="Skin"/> instance correlating to the provided <see cref="SkinInfo"/>.</returns>
         public Skin GetSkin(SkinInfo skinInfo) => skinInfo.CreateInstance(legacyDefaultResources, this);
+
+        /// <summary>
+        /// Ensure that the current skin is in a state it can accept user modifications.
+        /// This will create a copy of any internal skin and being tracking in the database if not already.
+        /// </summary>
+        public void EnsureMutableSkin()
         {
-            if (skinInfo == SkinInfo.Default)
-                return new DefaultSkin();
+            if (CurrentSkinInfo.Value.ID >= 1) return;
 
-            if (skinInfo == DefaultLegacySkin.Info)
-                return new DefaultLegacySkin(legacyDefaultResources, this);
+            var skin = CurrentSkin.Value;
 
-            return new LegacySkin(skinInfo, this);
+            // if the user is attempting to save one of the default skin implementations, create a copy first.
+            CurrentSkinInfo.Value = Import(new SkinInfo
+            {
+                Name = skin.SkinInfo.Name + " (modified)",
+                Creator = skin.SkinInfo.Creator,
+                InstantiationInfo = skin.SkinInfo.InstantiationInfo,
+            }).Result;
         }
 
         public void Save(Skin skin)
         {
-            // some skins don't support saving just yet.
-            // eventually we will want to create a copy of the skin to allow for customisation.
-            if (skin.SkinInfo.Files == null)
-                return;
+            if (skin.SkinInfo.ID <= 0)
+                throw new InvalidOperationException($"Attempting to save a skin which is not yet tracked. Call {nameof(EnsureMutableSkin)} first.");
 
             foreach (var drawableInfo in skin.DrawableComponentInfo)
             {
