@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Play
             // Token request construction should happen post-load to allow derived classes to potentially prepare DI backings that are used to create the request.
             var tcs = new TaskCompletionSource<bool>();
 
-            if (DrawableRuleset.HasReplayLoaded.Value || Mods.Value.Any(m => m is ModAutoplay))
+            if (Mods.Value.Any(m => m is ModAutoplay))
             {
                 handleTokenFailure(new InvalidOperationException("Replay loaded."));
                 return false;
