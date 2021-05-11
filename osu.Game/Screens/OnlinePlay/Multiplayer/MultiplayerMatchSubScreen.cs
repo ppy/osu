@@ -14,6 +14,7 @@ using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Online;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
@@ -354,10 +355,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             client.ChangeBeatmapAvailability(availability.NewValue);
 
-            // while this flow is handled server-side, this covers the edge case of the local user being in a ready state and then deleting the current beatmap.
-            if (availability.NewValue != Online.Rooms.BeatmapAvailability.LocallyAvailable()
-                && client.LocalUser?.State == MultiplayerUserState.Ready)
-                client.ChangeState(MultiplayerUserState.Idle);
+            if (availability.NewValue.State != DownloadState.LocallyAvailable)
+            {
+                // while this flow is handled server-side, this covers the edge case of the local user being in a ready state and then deleting the current beatmap.
+                if (client.LocalUser?.State == MultiplayerUserState.Ready)
+                    client.ChangeState(MultiplayerUserState.Idle);
+            }
+            else
+            {
+                if (client.LocalUser?.State == MultiplayerUserState.Spectating && (client.Room?.State == MultiplayerRoomState.WaitingForLoad || client.Room?.State == MultiplayerRoomState.Playing))
+                    onLoadRequested();
+            }
         }
 
         private void onReadyClick()
@@ -413,6 +421,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private void onLoadRequested()
         {
+            if (BeatmapAvailability.Value.State != DownloadState.LocallyAvailable)
+                return;
+
             // In the case of spectating, IMultiplayerClient.LoadRequested can be fired while the game is still spectating a previous session.
             // For now, we want to game to switch to the new game so need to request exiting from the play screen.
             if (!ParentScreen.IsCurrentScreen())
