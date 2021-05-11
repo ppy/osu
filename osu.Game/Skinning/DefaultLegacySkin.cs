@@ -10,7 +10,12 @@ namespace osu.Game.Skinning
     public class DefaultLegacySkin : LegacySkin
     {
         public DefaultLegacySkin(IResourceStore<byte[]> storage, IStorageResourceProvider resources)
-            : base(Info, storage, resources, string.Empty)
+            : this(Info, storage, resources)
+        {
+        }
+
+        public DefaultLegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, IStorageResourceProvider resources)
+            : base(skin, storage, resources, string.Empty)
         {
             Configuration.CustomColours["SliderBall"] = new Color4(2, 170, 255, 255);
             Configuration.AddComboColours(
@@ -27,7 +32,8 @@ namespace osu.Game.Skinning
         {
             ID = SkinInfo.CLASSIC_SKIN, // this is temporary until database storage is decided upon.
             Name = "osu!classic",
-            Creator = "team osu!"
+            Creator = "team osu!",
+            InstantiationInfo = typeof(DefaultLegacySkin).AssemblyQualifiedName,
         };
     }
 }
