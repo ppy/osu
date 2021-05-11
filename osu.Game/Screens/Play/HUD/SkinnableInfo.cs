@@ -4,8 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Extensions;
@@ -22,9 +20,6 @@ namespace osu.Game.Screens.Play.HUD
     public class SkinnableInfo : IJsonSerializable
     {
         public Type Type { get; set; }
-
-        [JsonConverter(typeof(StringEnumConverter))]
-        public SkinnableTarget? Target { get; set; }
 
         public Vector2 Position { get; set; }
 
@@ -43,10 +38,6 @@ namespace osu.Game.Screens.Play.HUD
         public SkinnableInfo(Drawable component)
         {
             Type = component.GetType();
-
-            ISkinnableTarget target = component.Parent as ISkinnableTarget;
-
-            Target = target?.Target;
 
             Position = component.Position;
             Rotation = component.Rotation;
