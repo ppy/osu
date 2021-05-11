@@ -44,6 +44,32 @@ namespace osu.Game.Skinning
 
             // may be null for default skin.
             this.resources = resources;
+
+            // we may want to move this to some kind of async operation in the future.
+            foreach (SkinnableTarget skinnableTarget in Enum.GetValues(typeof(SkinnableTarget)))
+            {
+                string filename = $"{skinnableTarget}.json";
+
+                // skininfo files may be null for default skin.
+                var fileInfo = SkinInfo.Files?.FirstOrDefault(f => f.Filename == filename);
+
+                if (fileInfo == null)
+                    continue;
+
+                var bytes = resources?.Files.Get(fileInfo.FileInfo.StoragePath);
+
+                if (bytes == null)
+                    continue;
+
+                string jsonContent = Encoding.UTF8.GetString(bytes);
+
+                DrawableComponentInfo[skinnableTarget] = JsonConvert.DeserializeObject<IEnumerable<SkinnableInfo>>(jsonContent).ToArray();
+            }
+        }
+
+        public void ResetDrawableTarget(SkinnableElementTargetContainer targetContainer)
+        {
+            DrawableComponentInfo.Remove(targetContainer.Target);
         }
 
         public void UpdateDrawableTarget(SkinnableElementTargetContainer targetContainer)
@@ -60,34 +86,9 @@ namespace osu.Game.Skinning
                     var skinnableTarget = target.Target;
 
                     if (!DrawableComponentInfo.TryGetValue(skinnableTarget, out var skinnableInfo))
-                    {
-                        switch (skinnableTarget)
-                        {
-                            case SkinnableTarget.MainHUDComponents:
-
-                                // skininfo files may be null for default skin.
-                                var fileInfo = SkinInfo.Files?.FirstOrDefault(f => f.Filename == $"{skinnableTarget}.json");
-
-                                if (fileInfo == null)
-                                    return null;
-
-                                var bytes = resources?.Files.Get(fileInfo.FileInfo.StoragePath);
-
-                                if (bytes == null)
-                                    return null;
-
-                                string jsonContent = Encoding.UTF8.GetString(bytes);
-
-                                DrawableComponentInfo[skinnableTarget] = skinnableInfo =
-                                    JsonConvert.DeserializeObject<IEnumerable<SkinnableInfo>>(jsonContent).Where(i => i.Target == SkinnableTarget.MainHUDComponents).ToArray();
-                                break;
-                        }
-                    }
-
-                    if (skinnableInfo == null)
                         return null;
 
-                    return new SkinnableTargetWrapper(skinnableTarget)
+                    return new SkinnableTargetWrapper
                     {
                         ChildrenEnumerable = skinnableInfo.Select(i => i.CreateInstance())
                     };
@@ -123,15 +124,10 @@ namespace osu.Game.Skinning
         #endregion
     }
 
-    public class SkinnableTargetWrapper : Container, IDefaultSkinnableTarget
+    public class SkinnableTargetWrapper : Container, ISkinnableComponent
     {
-        // this is just here to implement the interface and allow a silly parent lookup to work (where the target is not the direct parent for reasons).
-        // TODO: need to fix this.
-        public SkinnableTarget Target { get; }
-
-        public SkinnableTargetWrapper(SkinnableTarget target)
+        public SkinnableTargetWrapper()
         {
-            Target = target;
             RelativeSizeAxes = Axes.Both;
         }
     }
