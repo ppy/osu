@@ -327,11 +327,20 @@ namespace osu.Game.Skinning
             switch (component)
             {
                 case SkinnableTargetComponent target:
-
                     switch (target.Target)
                     {
                         case SkinnableTarget.MainHUDComponents:
-                            return new SkinnableTargetWrapper
+
+                            var skinnableTargetWrapper = new SkinnableTargetWrapper(container =>
+                            {
+                                var score = container.OfType<LegacyScoreCounter>().FirstOrDefault();
+                                var accuracy = container.OfType<GameplayAccuracyCounter>().FirstOrDefault();
+
+                                if (score != null && accuracy != null)
+                                {
+                                    accuracy.Y = container.ToLocalSpace(score.ScreenSpaceDrawQuad.BottomRight).Y;
+                                }
+                            })
                             {
                                 Children = new[]
                                 {
@@ -342,6 +351,8 @@ namespace osu.Game.Skinning
                                     GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.HealthDisplay)) ?? new DefaultHealthDisplay(),
                                 }
                             };
+
+                            return skinnableTargetWrapper;
                     }
 
                     return null;

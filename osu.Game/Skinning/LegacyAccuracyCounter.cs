@@ -32,16 +32,5 @@ namespace osu.Game.Skinning
             Anchor = Anchor.TopRight,
             Origin = Anchor.TopRight,
         };
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (hud?.ScoreCounter?.Drawable is LegacyScoreCounter score)
-            {
-                // for now align with the score counter. eventually this will be user customisable.
-                Y = Parent.ToLocalSpace(score.ScreenSpaceDrawQuad.BottomRight).Y;
-            }
-        }
     }
 }
