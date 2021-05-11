@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.News.Sidebar
                 Spacing = new Vector2(0, 5),
                 Children = new Drawable[]
                 {
-                    new DropdownButton(posts.ElementAt(0).PublishedAt)
+                    new DropdownHeader(posts.ElementAt(0).PublishedAt)
                     {
                         IsOpen = { BindTarget = IsOpen }
                     },
@@ -96,15 +96,16 @@ namespace osu.Game.Overlays.News.Sidebar
             }
         }
 
-        private class DropdownButton : OsuClickableContainer
+        private class DropdownHeader : OsuClickableContainer
         {
             public readonly BindableBool IsOpen = new BindableBool();
 
             private readonly SpriteIcon icon;
 
-            public DropdownButton(DateTimeOffset date)
+            public DropdownHeader(DateTimeOffset date)
             {
-                Size = new Vector2(160, header_height);
+                RelativeSizeAxes = Axes.X;
+                Height = header_height;
                 Action = IsOpen.Toggle;
                 Children = new Drawable[]
                 {
