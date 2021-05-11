@@ -5,14 +5,13 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osuTK;
-using System.Linq;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using System.Collections.Generic;
 using osu.Game.Graphics;
 using osu.Framework.Bindables;
 using osu.Game.Online.API.Requests.Responses;
+using System;
 
 namespace osu.Game.Overlays.News.Sidebar
 {
@@ -20,15 +19,15 @@ namespace osu.Game.Overlays.News.Sidebar
     {
         private readonly Bindable<APINewsSidebar> metadata = new Bindable<APINewsSidebar>();
 
-        private FillFlowContainer<YearButton> flow;
+        private Container gridPlaceholder;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, Bindable<APINewsSidebar> metadata)
         {
             this.metadata.BindTo(metadata);
 
-            Width = 160;
             AutoSizeAxes = Axes.Y;
+            RelativeSizeAxes = Axes.X;
             Masking = true;
             CornerRadius = 6;
             InternalChildren = new Drawable[]
@@ -38,17 +37,11 @@ namespace osu.Game.Overlays.News.Sidebar
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background3
                 },
-                new Container
+                gridPlaceholder = new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding(5),
-                    Child = flow = new FillFlowContainer<YearButton>
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Spacing = new Vector2(5)
-                    }
+                    Padding = new MarginPadding(5)
                 }
             };
         }
@@ -65,7 +58,7 @@ namespace osu.Game.Overlays.News.Sidebar
                     return;
                 }
 
-                flow.Children = m.NewValue.Years.Select(y => new YearButton(y)).ToArray();
+                gridPlaceholder.Child = new YearsGridContainer(m.NewValue.Years);
                 Show();
             }, true);
         }
@@ -78,7 +71,8 @@ namespace osu.Game.Overlays.News.Sidebar
 
             public YearButton(int year)
             {
-                Size = new Vector2(33.75f, 15);
+                RelativeSizeAxes = Axes.X;
+                Height = 15;
                 Child = text = new OsuSpriteText
                 {
                     Anchor = Anchor.Centre,
@@ -94,6 +88,77 @@ namespace osu.Game.Overlays.News.Sidebar
                 IdleColour = colourProvider.Light2;
                 HoverColour = colourProvider.Light1;
                 Action = () => { }; // Avoid button being disabled since there's no proper action assigned.
+            }
+        }
+
+        private class YearsGridContainer : GridContainer
+        {
+            private const int column_count = 4;
+            private const float spacing = 5f;
+
+            private readonly int rowCount;
+            private readonly int[] years;
+
+            public YearsGridContainer(int[] years)
+            {
+                this.years = years;
+                rowCount = (int)Math.Ceiling((float)years.Length / column_count);
+
+                RelativeSizeAxes = Axes.X;
+                AutoSizeAxes = Axes.Y;
+                RowDimensions = getRowDimensions();
+                ColumnDimensions = getColumnDimensions();
+                Content = createContent();
+            }
+
+            private Dimension[] getRowDimensions()
+            {
+                var rowDimensions = new Dimension[rowCount];
+                for (int i = 0; i < rowCount; i++)
+                    rowDimensions[i] = new Dimension(GridSizeMode.AutoSize);
+
+                return rowDimensions;
+            }
+
+            private Dimension[] getColumnDimensions()
+            {
+                var columnDimensions = new Dimension[column_count];
+                for (int i = 0; i < column_count; i++)
+                    columnDimensions[i] = new Dimension(GridSizeMode.Relative, size: 1f / column_count);
+
+                return columnDimensions;
+            }
+
+            private Drawable[][] createContent()
+            {
+                var buttons = new Drawable[rowCount][];
+
+                for (int i = 0; i < rowCount; i++)
+                {
+                    buttons[i] = new Drawable[column_count];
+
+                    for (int j = 0; j < column_count; j++)
+                    {
+                        var index = i * column_count + j;
+                        buttons[i][j] = index >= years.Length
+                            ? Empty()
+                            : new Container
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Padding = new MarginPadding
+                                {
+                                    Top = i == 0 ? 0 : spacing / 2,
+                                    Bottom = i == rowCount - 1 ? 0 : spacing / 2,
+                                    Left = j == 0 ? 0 : spacing / 2,
+                                    Right = j == column_count - 1 ? 0 : spacing / 2
+                                },
+                                Child = new YearButton(years[index])
+                            };
+                    }
+                }
+
+                return buttons;
             }
         }
     }
