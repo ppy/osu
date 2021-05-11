@@ -86,11 +86,14 @@ namespace osu.Game.Overlays.News.Sidebar
             var keys = lookup.Select(kvp => kvp.Key);
             var sortedKeys = keys.OrderByDescending(k => k).ToList();
 
+            var year = metadata.NewValue.CurrentYear;
+
             for (int i = 0; i < sortedKeys.Count; i++)
             {
-                var posts = lookup[sortedKeys[i]];
+                var month = sortedKeys[i];
+                var posts = lookup[month];
 
-                monthsFlow.Add(new MonthDropdown(posts)
+                monthsFlow.Add(new MonthDropdown(month, year, posts)
                 {
                     IsOpen = { Value = i == 0 }
                 });
