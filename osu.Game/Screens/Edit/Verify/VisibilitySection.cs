@@ -31,6 +31,7 @@ namespace osu.Game.Screens.Edit.Verify
                 };
 
                 checkbox.Current.BindTo(IssueList.ShowType[issueType]);
+                checkbox.Current.BindValueChanged(_ => IssueList.Refresh());
                 Flow.Add(checkbox);
             }
         }
