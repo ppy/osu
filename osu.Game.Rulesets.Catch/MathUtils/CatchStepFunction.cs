@@ -5,16 +5,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Game.Rulesets.Catch.UI;
 
 namespace osu.Game.Rulesets.Catch.MathUtils
 {
     ///<summary>
-    /// Step function on [0;1]
+    /// Step function on [0;<see cref="CatchStepFunction.WIDTH"/>]
     ///</summary>
     public class CatchStepFunction
     {
+        public const float WIDTH = CatchPlayfield.WIDTH;
+
         ///<summary>
-        /// Partition of the step function, on [0;1]
+        /// Partition of the step function, on [0;<see cref="CatchStepFunction.WIDTH"/>]
         ///</summary>
         private readonly List<float> partition = new List<float>();
 
@@ -30,7 +33,7 @@ namespace osu.Game.Rulesets.Catch.MathUtils
         public CatchStepFunction()
         {
             partition.Add(0);
-            partition.Add(1);
+            partition.Add(WIDTH);
             values.Add(0);
         }
 
@@ -47,7 +50,7 @@ namespace osu.Game.Rulesets.Catch.MathUtils
             Queue<int> window = new Queue<int>();
 
             // Extend the input function left and right, to simplify things
-            input.partition.Add(1 + halfWindowWidth);
+            input.partition.Add(WIDTH + halfWindowWidth);
             input.values.Add(0);
             input.partition.Insert(0, -halfWindowWidth);
             input.values.Insert(0, 0);
@@ -91,7 +94,7 @@ namespace osu.Game.Rulesets.Catch.MathUtils
                     partition.RemoveAt(partition.Count - 1);
             }
 
-            partition.Add(1);
+            partition.Add(WIDTH);
 
             // Revert the extension
             input.partition.RemoveAt(0);
@@ -130,7 +133,7 @@ namespace osu.Game.Rulesets.Catch.MathUtils
         {
             Assert.GreaterOrEqual(from, 0);
             Assert.GreaterOrEqual(to, from);
-            Assert.GreaterOrEqual(1, to);
+            Assert.GreaterOrEqual(WIDTH, to);
 
             int indexStart, indexEnd;
             for (indexStart = 0; partition[indexStart] <= from; ++indexStart)
@@ -154,7 +157,7 @@ namespace osu.Game.Rulesets.Catch.MathUtils
         {
             Assert.GreaterOrEqual(from, 0);
             Assert.GreaterOrEqual(to, from);
-            Assert.GreaterOrEqual(1, to);
+            Assert.GreaterOrEqual(WIDTH, to);
 
             int indexStart, indexEnd;
             for (indexStart = 0; partition[indexStart] <= from; ++indexStart)

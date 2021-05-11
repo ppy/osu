@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Catch.Replays
             float halfCatcherWidth = Catcher.CalculateCatchWidth(Beatmap.BeatmapInfo.BaseDifficulty) / 2;
             const double dash_speed = Catcher.BASE_SPEED;
             // Todo: Realistically this shouldn't be needed, but the first frame is skipped with the way replays are currently handled
-            Replay.Frames.Add(new CatchReplayFrame(-100000, 0.5f));
+            Replay.Frames.Add(new CatchReplayFrame(-100000, CatchPlayfield.CENTER_X));
             List<PalpableCatchHitObject> objects = new List<PalpableCatchHitObject>();
             // List of all catch objects
             foreach (var obj in Beatmap.HitObjects)
@@ -71,14 +71,14 @@ namespace osu.Game.Rulesets.Catch.Replays
                 if (obj.HyperDash)
                 {
                     float distance = Math.Abs(obj.HyperDashTarget.EffectiveX - obj.EffectiveX);
-                    scores[0].Set(Math.Max(0, obj.EffectiveX - halfCatcherWidth), Math.Min(1, obj.EffectiveX + halfCatcherWidth),
+                    scores[0].Set(Math.Max(0, obj.EffectiveX - halfCatcherWidth), Math.Min(CatchPlayfield.WIDTH, obj.EffectiveX + halfCatcherWidth),
                         scores[1].Max(obj.EffectiveX - distance, obj.EffectiveX + distance));
                 }
 
-                scores[0].Add(Math.Max(0, obj.EffectiveX - halfCatcherWidth), Math.Min(1, obj.EffectiveX + halfCatcherWidth), value);
+                scores[0].Add(Math.Max(0, obj.EffectiveX - halfCatcherWidth), Math.Min(CatchPlayfield.WIDTH, obj.EffectiveX + halfCatcherWidth), value);
             }
 
-            float lastPosition = 0.5f;
+            float lastPosition = CatchPlayfield.CENTER_X;
             double lastTime = -10000;
 
             void moveToNext(float target, double time)
@@ -115,7 +115,7 @@ namespace osu.Game.Rulesets.Catch.Replays
                 lastPosition = target;
             }
 
-            moveToNext(0.5f, -1000);
+            moveToNext(CatchPlayfield.CENTER_X, -1000);
             float hyperDashDistance = 0;
             int j = 0;
             foreach (var obj in objects)
