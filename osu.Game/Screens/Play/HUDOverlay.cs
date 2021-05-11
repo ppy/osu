@@ -16,12 +16,13 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Screens.Play
 {
     [Cached]
-    public class HUDOverlay : Container, IKeyBindingHandler<GlobalAction>
+    public class HUDOverlay : Container, IKeyBindingHandler<GlobalAction>, IDefaultSkinnableTarget
     {
         public const float FADE_DURATION = 300;
 
