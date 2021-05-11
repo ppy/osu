@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Play.HUD
             RelativeSizeAxes = Axes.X;
             Margin = new MarginPadding { Top = 20 };
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 new Box
                 {

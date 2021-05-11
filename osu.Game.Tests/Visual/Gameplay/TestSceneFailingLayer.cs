@@ -1,11 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
@@ -50,9 +52,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
 
             AddStep("set health to 0.10", () => layer.Current.Value = 0.1);
-            AddUntilStep("layer fade is visible", () => layer.Child.Alpha > 0.1f);
+            AddUntilStep("layer fade is visible", () => layer.ChildrenOfType<Container>().First().Alpha > 0.1f);
             AddStep("set health to 1", () => layer.Current.Value = 1f);
-            AddUntilStep("layer fade is invisible", () => !layer.Child.IsPresent);
+            AddUntilStep("layer fade is invisible", () => !layer.ChildrenOfType<Container>().First().IsPresent);
         }
 
         [Test]
