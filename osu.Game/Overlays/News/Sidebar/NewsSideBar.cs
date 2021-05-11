@@ -14,9 +14,9 @@ namespace osu.Game.Overlays.News.Sidebar
 {
     public class NewsSideBar : CompositeDrawable
     {
+        [Cached]
         public readonly Bindable<APINewsSidebar> Metadata = new Bindable<APINewsSidebar>();
 
-        private YearsPanel yearsPanel;
         private FillFlowContainer<MonthPanel> monthsFlow;
 
         [BackgroundDependencyLoader]
@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.News.Sidebar
                         Spacing = new Vector2(0, 20),
                         Children = new Drawable[]
                         {
-                            yearsPanel = new YearsPanel(),
+                            new YearsPanel(),
                             monthsFlow = new FillFlowContainer<MonthPanel>
                             {
                                 AutoSizeAxes = Axes.Both,
@@ -69,15 +69,6 @@ namespace osu.Game.Overlays.News.Sidebar
             Metadata.BindValueChanged(metadata =>
             {
                 monthsFlow.Clear();
-
-                if (metadata.NewValue == null)
-                {
-                    yearsPanel.Hide();
-                    return;
-                }
-
-                yearsPanel.Years = metadata.NewValue.Years;
-                yearsPanel.Show();
 
                 if (metadata.NewValue != null)
                 {

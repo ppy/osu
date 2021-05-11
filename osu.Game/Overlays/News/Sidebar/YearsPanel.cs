@@ -12,28 +12,21 @@ using osu.Game.Graphics.Sprites;
 using System.Collections.Generic;
 using osu.Game.Graphics;
 using osu.Framework.Bindables;
-using System.Collections.Specialized;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.News.Sidebar
 {
     public class YearsPanel : CompositeDrawable
     {
-        public int[] Years
-        {
-            set
-            {
-                years.Clear();
-                years.AddRange(value);
-            }
-        }
-
-        private readonly BindableList<int> years = new BindableList<int>();
+        private readonly Bindable<APINewsSidebar> metadata = new Bindable<APINewsSidebar>();
 
         private FillFlowContainer<YearButton> flow;
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load(OverlayColourProvider colourProvider, Bindable<APINewsSidebar> metadata)
         {
+            this.metadata.BindTo(metadata);
+
             Width = 160;
             AutoSizeAxes = Axes.Y;
             Masking = true;
@@ -64,14 +57,16 @@ namespace osu.Game.Overlays.News.Sidebar
         {
             base.LoadComplete();
 
-            years.BindCollectionChanged((u, v) =>
+            metadata.BindValueChanged(m =>
             {
-                switch (v.Action)
+                if (m.NewValue == null)
                 {
-                    case NotifyCollectionChangedAction.Add:
-                        flow.Children = years.Select(y => new YearButton(y)).ToArray();
-                        break;
+                    Hide();
+                    return;
                 }
+
+                flow.Children = m.NewValue.Years.Select(y => new YearButton(y)).ToArray();
+                Show();
             }, true);
         }
 
