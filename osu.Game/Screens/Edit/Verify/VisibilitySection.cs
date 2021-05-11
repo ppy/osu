@@ -29,8 +29,7 @@ namespace osu.Game.Screens.Edit.Verify
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    LabelText = issueType.ToString(),
-                    TooltipText = "Whether to show negligible issues"
+                    LabelText = issueType.ToString()
                 };
 
                 checkbox.Current.BindTo(IssueList.ShowType[issueType]);

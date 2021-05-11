@@ -48,6 +48,8 @@ namespace osu.Game.Screens.Edit.Verify
             // Reflects the user interface. Only types in this dictionary have configurable visibility.
             ShowType = new Dictionary<IssueType, Bindable<bool>>
             {
+                { IssueType.Warning, new Bindable<bool>(true) },
+                { IssueType.Error, new Bindable<bool>(true) },
                 { IssueType.Negligible, new Bindable<bool>(false) }
             };
 
