@@ -70,13 +70,18 @@ namespace osu.Game.Skinning.Editor
         {
             yield return new OsuMenuItem("Anchor")
             {
-                Items = createAnchorItems().ToArray()
+                Items = createAnchorItems(d => d.Anchor, applyAnchor).ToArray()
+            };
+
+            yield return new OsuMenuItem("Origin")
+            {
+                Items = createAnchorItems(d => d.Origin, applyOrigin).ToArray()
             };
 
             foreach (var item in base.GetContextMenuItemsForSelection(selection))
                 yield return item;
 
-            IEnumerable<AnchorMenuItem> createAnchorItems()
+            IEnumerable<AnchorMenuItem> createAnchorItems(Func<Drawable, Anchor> checkFunction, Action<Anchor> applyFunction)
             {
                 var displayableAnchors = new[]
                 {
@@ -93,12 +98,18 @@ namespace osu.Game.Skinning.Editor
 
                 return displayableAnchors.Select(a =>
                 {
-                    return new AnchorMenuItem(a, selection, _ => applyAnchor(a))
+                    return new AnchorMenuItem(a, selection, _ => applyFunction(a))
                     {
-                        State = { Value = GetStateFromSelection(selection, c => ((Drawable)c.Item).Anchor == a) }
+                        State = { Value = GetStateFromSelection(selection, c => checkFunction((Drawable)c.Item) == a) }
                     };
                 });
             }
+        }
+
+        private void applyOrigin(Anchor anchor)
+        {
+            foreach (var item in SelectedItems)
+                ((Drawable)item).Origin = anchor;
         }
 
         private void applyAnchor(Anchor anchor)
