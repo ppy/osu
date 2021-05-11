@@ -18,6 +18,7 @@ using osuTK;
 
 namespace osu.Game.Skinning.Editor
 {
+    [Cached(typeof(SkinEditor))]
     public class SkinEditor : FocusedOverlayContainer
     {
         public const double TRANSITION_DURATION = 500;
@@ -28,10 +29,14 @@ namespace osu.Game.Skinning.Editor
 
         protected override bool StartHidden => true;
 
+        public readonly BindableList<ISkinnableComponent> SelectedComponents = new BindableList<ISkinnableComponent>();
+
         [Resolved]
         private SkinManager skins { get; set; }
 
         private Bindable<Skin> currentSkin;
+
+        private SkinBlueprintContainer blueprintContainer;
 
         public SkinEditor(Drawable targetScreen)
         {
@@ -56,7 +61,7 @@ namespace osu.Game.Skinning.Editor
                         Origin = Anchor.TopCentre,
                         RelativeSizeAxes = Axes.X
                     },
-                    new SkinBlueprintContainer(targetScreen),
+                    blueprintContainer = new SkinBlueprintContainer(targetScreen),
                     new SkinComponentToolbox(600)
                     {
                         Anchor = Anchor.CentreLeft,
@@ -109,9 +114,15 @@ namespace osu.Game.Skinning.Editor
 
         private void placeComponent(Type type)
         {
-            Drawable instance = (Drawable)Activator.CreateInstance(type);
+            var instance = (Drawable)Activator.CreateInstance(type) as ISkinnableComponent;
+
+            if (instance == null)
+                throw new InvalidOperationException("Attempted to instantiate a component for placement which was not an {typeof(ISkinnableComponent)}.");
 
             getTarget(SkinnableTarget.MainHUDComponents)?.Add(instance);
+
+            SelectedComponents.Clear();
+            SelectedComponents.Add(instance);
         }
 
         private ISkinnableTarget getTarget(SkinnableTarget target)
