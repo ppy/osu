@@ -78,7 +78,7 @@ namespace osu.Game.Overlays.News.Sidebar
 
             var allPosts = metadata.NewValue.NewsPosts;
 
-            if (!allPosts?.Any() ?? false)
+            if (!allPosts?.Any() ?? true)
                 return;
 
             var lookup = metadata.NewValue.NewsPosts.ToLookup(post => post.PublishedAt.Month);
