@@ -36,6 +36,9 @@ namespace osu.Game.Skinning
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {
+            if (base.GetDrawableComponent(component) is Drawable c)
+                return c;
+
             switch (component)
             {
                 case SkinnableTargetComponent target:
