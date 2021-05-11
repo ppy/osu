@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.News.Sidebar
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding
                     {
-                        Top = 20,
+                        Vertical = 20,
                         Left = 50,
                         Right = 30
                     },
