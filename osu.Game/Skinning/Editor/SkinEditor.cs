@@ -13,6 +13,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Play.HUD;
+using osuTK;
 
 namespace osu.Game.Skinning.Editor
 {
@@ -20,7 +21,7 @@ namespace osu.Game.Skinning.Editor
     {
         public const double TRANSITION_DURATION = 500;
 
-        private readonly Drawable target;
+        private readonly Drawable targetScreen;
 
         private OsuTextFlowContainer headerText;
 
@@ -29,9 +30,9 @@ namespace osu.Game.Skinning.Editor
         [Resolved]
         private SkinManager skins { get; set; }
 
-        public SkinEditor(Drawable target)
+        public SkinEditor(Drawable targetScreen)
         {
-            this.target = target;
+            this.targetScreen = targetScreen;
 
             RelativeSizeAxes = Axes.Both;
         }
@@ -52,18 +53,20 @@ namespace osu.Game.Skinning.Editor
                         Origin = Anchor.TopCentre,
                         RelativeSizeAxes = Axes.X
                     },
-                    new SkinBlueprintContainer(target),
+                    new SkinBlueprintContainer(targetScreen),
                     new SkinComponentToolbox(600)
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         RequestPlacement = placeComponent
                     },
-                    new TriangleButton
+                    new FillFlowContainer
                     {
-                        Text = "Save Changes",
-                        Width = 140,
-                        Height = 50,
+                        Direction = FillDirection.Horizontal,
+                        AutoSizeAxes = Axes.Both,
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                        Spacing = new Vector2(5),
                         Padding = new MarginPadding
                         {
                             Top = 10,
@@ -74,7 +77,21 @@ namespace osu.Game.Skinning.Editor
                             Right = 10,
                             Bottom = 10,
                         },
-                        Action = save,
+                        Children = new Drawable[]
+                        {
+                            new TriangleButton
+                            {
+                                Text = "Save Changes",
+                                Width = 140,
+                                Action = save,
+                            },
+                            new DangerousTriangleButton
+                            {
+                                Text = "Revert to default",
+                                Width = 140,
+                                Action = revert,
+                            },
+                        }
                     },
                 }
             };
@@ -89,17 +106,40 @@ namespace osu.Game.Skinning.Editor
 
         private void placeComponent(Type type)
         {
-            var instance = (Drawable)Activator.CreateInstance(type);
+            Drawable instance = (Drawable)Activator.CreateInstance(type);
 
-            var targetContainer = target.ChildrenOfType<IDefaultSkinnableTarget>().FirstOrDefault();
+            getTarget(SkinnableTarget.MainHUDComponents)?.Add(instance);
+        }
 
-            (targetContainer as Container)?.Add(instance);
+        private ISkinnableTarget getTarget(SkinnableTarget target)
+        {
+            return targetScreen.ChildrenOfType<ISkinnableTarget>().FirstOrDefault(c => c.Target == target);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
             Show();
+        }
+
+        private void revert()
+        {
+            var currentSkin = skins.CurrentSkin.Value;
+
+            var legacySkin = currentSkin as LegacySkin;
+
+            if (legacySkin == null)
+                return;
+
+            SkinnableElementTargetContainer[] targetContainers = targetScreen.ChildrenOfType<SkinnableElementTargetContainer>().ToArray();
+
+            foreach (var t in targetContainers)
+            {
+                legacySkin.ResetDrawableTarget(t);
+
+                // add back default components
+                getTarget(t.Target).Reload();
+            }
         }
 
         private void save()
@@ -111,7 +151,7 @@ namespace osu.Game.Skinning.Editor
             if (legacySkin == null)
                 return;
 
-            SkinnableElementTargetContainer[] targetContainers = target.ChildrenOfType<SkinnableElementTargetContainer>().ToArray();
+            SkinnableElementTargetContainer[] targetContainers = targetScreen.ChildrenOfType<SkinnableElementTargetContainer>().ToArray();
 
             foreach (var t in targetContainers)
                 legacySkin.UpdateDrawableTarget(t);
