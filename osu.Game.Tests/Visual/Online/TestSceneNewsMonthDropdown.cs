@@ -14,7 +14,7 @@ using osu.Game.Overlays.News.Sidebar;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneNewsMonthPanel : OsuTestScene
+    public class TestSceneNewsMonthDropdown : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Visual.Online
                         RelativeSizeAxes = Axes.Both,
                         Colour = colourProvider.Background2,
                     },
-                    new MonthPanel(posts),
+                    new MonthDropdown(posts),
                 }
             });
         }
@@ -54,7 +54,7 @@ namespace osu.Game.Tests.Visual.Online
                         RelativeSizeAxes = Axes.Both,
                         Colour = colourProvider.Background2,
                     },
-                    new MonthPanel(posts)
+                    new MonthDropdown(posts)
                     {
                         IsOpen = { Value = true }
                     },
