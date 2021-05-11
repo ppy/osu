@@ -213,11 +213,11 @@ namespace osu.Game.Screens.Play
                 foreach (var element in mainComponents.Children)
                 {
                     // for now align top-right components with the bottom-edge of the lowest top-anchored hud element.
-                    if (!element.Anchor.HasFlagFast(Anchor.TopRight))
+                    if (!element.Anchor.HasFlagFast(Anchor.TopRight) && !element.RelativeSizeAxes.HasFlagFast(Axes.X))
                         continue;
 
                     // health bars are excluded for the sake of hacky legacy skins which extend the health bar to take up the full screen area.
-                    if (element is HealthDisplay)
+                    if (element is LegacyHealthDisplay)
                         continue;
 
                     var bottomRight = element.ScreenSpaceDrawQuad.BottomRight;
