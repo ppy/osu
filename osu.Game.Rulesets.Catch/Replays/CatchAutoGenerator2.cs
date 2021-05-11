@@ -32,14 +32,18 @@ namespace osu.Game.Rulesets.Catch.Replays
             // Todo: Realistically this shouldn't be needed, but the first frame is skipped with the way replays are currently handled
             Replay.Frames.Add(new CatchReplayFrame(-100000, CatchPlayfield.CENTER_X));
             List<PalpableCatchHitObject> objects = new List<PalpableCatchHitObject>();
+
             // List of all catch objects
             foreach (var obj in Beatmap.HitObjects)
             {
                 if (obj is Fruit fruit)
                     objects.Add(fruit);
+
                 if (obj is BananaShower || obj is JuiceStream)
+                {
                     foreach (var nested in obj.NestedHitObjects.OfType<PalpableCatchHitObject>())
                         objects.Add(nested);
+                }
             }
 
             objects.Sort((h1, h2) => h1.StartTime.CompareTo(h2.StartTime) +
@@ -47,21 +51,26 @@ namespace osu.Game.Rulesets.Catch.Replays
 
             // Removing droplets/banana that are during an hyperdash from the list
             bool skipping = false;
+
             for (int i = 0; i < objects.Count; ++i)
+            {
                 if (skipping && (objects[i] is Banana || objects[i] is TinyDroplet))
                     objects.RemoveAt(i--);
                 else
                     skipping = objects[i].HyperDash;
+            }
 
             //Building the score
             List<CatchStepFunction> scores = new List<CatchStepFunction>();
             List<double> times = new List<double>();
             scores.Insert(0, new CatchStepFunction()); // After the last object, there is no more score to be made
-            times.Insert(0, 1 + objects[objects.Count - 1].StartTime); //some time after the last object
+            times.Insert(0, 1 + objects[^1].StartTime); //some time after the last object
+
             for (int i = objects.Count - 1; i >= 0; --i)
             {
                 var obj = objects[i];
                 int value = obj is Banana || obj is TinyDroplet ? 1 : obj is Fruit ? 300 : 20;
+
                 if (obj.StartTime != times[0])
                 {
                     scores.Insert(0, new CatchStepFunction(scores[0], (float)(dash_speed * (times[0] - obj.StartTime))));
@@ -89,10 +98,12 @@ namespace osu.Game.Rulesets.Catch.Replays
                 //So we can either make it there without a dash or not.
                 double speedRequired = positionChange / timeAvailable;
                 bool dashRequired = speedRequired > movement_speed && time != 0;
+
                 if (dashRequired)
                 {
                     //we do a movement in two parts - the dash part then the normal part...
                     double timeAtDashSpeed = (positionChange - movement_speed * timeAvailable) / (dash_speed - movement_speed);
+
                     if (timeAtDashSpeed <= timeAvailable)
                     {
                         float midPosition = lastPosition + Math.Sign(target - lastPosition) * (float)(timeAtDashSpeed * dash_speed);
@@ -118,6 +129,7 @@ namespace osu.Game.Rulesets.Catch.Replays
             moveToNext(CatchPlayfield.CENTER_X, -1000);
             float hyperDashDistance = 0;
             int j = 0;
+
             foreach (var obj in objects)
             {
                 if (obj.StartTime != lastTime)

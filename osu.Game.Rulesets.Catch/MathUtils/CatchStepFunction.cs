@@ -64,17 +64,20 @@ namespace osu.Game.Rulesets.Catch.MathUtils
             // At each iteration we slide the windows one step to the right,
             // adding a new value and partition each time, until the end.
             partition.Add(0);
+
             while (true)
             {
                 values.Add(windowMax);
                 // This distance is used to know if it is the left side or the right side of the windows
                 // that will meet with the next partition first. (or both at the same time if the distance is 0)
                 float distance = input.partition[windowRight] - input.partition[windowLeft] - 2 * halfWindowWidth;
+
                 if (distance <= 0)
                 {
                     //if we reach the end, stop. The last partition (1) is added after the loop.
                     if (windowRight == input.partition.Count - 1)
                         break;
+
                     windowMax = Math.Max(windowMax, input.values[windowRight]);
                     window.Enqueue(input.values[windowRight]);
                     partition.Add(input.partition[windowRight] - halfWindowWidth);
@@ -111,18 +114,22 @@ namespace osu.Game.Rulesets.Catch.MathUtils
         private void cleanup()
         {
             for (int i = values.Count - 1; i > 1; --i)
+            {
                 if (values[i] == values[i - 1])
                 {
                     values.RemoveAt(i);
                     partition.RemoveAt(i);
                 }
+            }
 
             for (int i = partition.Count - 1; i > 1; --i)
+            {
                 if (partition[i] == partition[i - 1])
                 {
                     values.RemoveAt(i - 1);
                     partition.RemoveAt(i);
                 }
+            }
         }
 
         ///<summary>
@@ -136,12 +143,14 @@ namespace osu.Game.Rulesets.Catch.MathUtils
             Assert.GreaterOrEqual(WIDTH, to);
 
             int indexStart, indexEnd;
+
             for (indexStart = 0; partition[indexStart] <= from; ++indexStart)
             {
             }
 
             partition.Insert(indexStart, from);
             values.Insert(indexStart, values[indexStart - 1]);
+
             for (indexEnd = indexStart; partition[indexEnd] < to; ++indexEnd)
             {
             }
@@ -160,12 +169,14 @@ namespace osu.Game.Rulesets.Catch.MathUtils
             Assert.GreaterOrEqual(WIDTH, to);
 
             int indexStart, indexEnd;
+
             for (indexStart = 0; partition[indexStart] <= from; ++indexStart)
             {
             }
 
             partition.Insert(indexStart, from);
             values.Insert(indexStart, values[indexStart - 1]);
+
             for (indexEnd = indexStart; partition[indexEnd] < to; ++indexEnd)
             {
             }
@@ -183,9 +194,13 @@ namespace osu.Game.Rulesets.Catch.MathUtils
         public int Max(float from, float to)
         {
             int max = 0;
+
             for (int i = 0; i < values.Count; ++i)
+            {
                 if (values[i] > max && partition[i] < to && partition[i + 1] > from)
                     max = values[i];
+            }
+
             return max;
         }
 
@@ -203,18 +218,23 @@ namespace osu.Game.Rulesets.Catch.MathUtils
 
             int max = Max(from, to);
             float ret = -1, value = -1;
+
             for (int i = 0; i < values.Count; ++i)
+            {
                 if (values[i] == max && partition[i] <= to && partition[i + 1] >= from)
                 {
                     if (target >= partition[i] && target <= partition[i + 1])
                         return target;
+
                     float newValue = partition[i + 1] - partition[i];
+
                     if (newValue > value)
                     {
                         value = newValue;
                         ret = Math.Clamp((partition[i + 1] + partition[i]) / 2, from, to);
                     }
                 }
+            }
 
             return ret;
         }
