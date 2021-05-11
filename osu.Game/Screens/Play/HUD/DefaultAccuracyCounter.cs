@@ -4,12 +4,11 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class DefaultAccuracyCounter : PercentageCounter, IAccuracyCounter
+    public class DefaultAccuracyCounter : GameplayAccuracyCounter, ISkinnableComponent
     {
         private readonly Vector2 offset = new Vector2(-20, 5);
 

@@ -16,7 +16,7 @@ using osu.Framework.Utils;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class DefaultHealthDisplay : HealthDisplay, IHasAccentColour
+    public class DefaultHealthDisplay : HealthDisplay, IHasAccentColour, ISkinnableComponent
     {
         /// <summary>
         /// The base opacity of the glow.
@@ -107,7 +107,7 @@ namespace osu.Game.Screens.Play.HUD
             GlowColour = colours.BlueDarker;
         }
 
-        public override void Flash(JudgementResult result) => Scheduler.AddOnce(flash);
+        protected override void Flash(JudgementResult result) => Scheduler.AddOnce(flash);
 
         private void flash()
         {

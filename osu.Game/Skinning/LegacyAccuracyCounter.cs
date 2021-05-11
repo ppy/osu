@@ -4,14 +4,13 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
 
 namespace osu.Game.Skinning
 {
-    public class LegacyAccuracyCounter : PercentageCounter, IAccuracyCounter
+    public class LegacyAccuracyCounter : GameplayAccuracyCounter, ISkinnableComponent
     {
         private readonly ISkin skin;
 

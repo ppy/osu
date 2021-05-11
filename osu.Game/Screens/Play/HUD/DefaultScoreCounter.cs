@@ -4,11 +4,10 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class DefaultScoreCounter : ScoreCounter
+    public class DefaultScoreCounter : GameplayScoreCounter, ISkinnableComponent
     {
         public DefaultScoreCounter()
             : base(6)
