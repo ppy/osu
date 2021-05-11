@@ -20,6 +20,8 @@ namespace osu.Game.Screens.Play.HUD
             Target = target;
         }
 
+        public IReadOnlyList<Drawable> Children => content?.Children;
+
         public void Reload()
         {
             content = CurrentSkin.GetDrawableComponent(new SkinnableTargetComponent(Target)) as SkinnableTargetWrapper;
