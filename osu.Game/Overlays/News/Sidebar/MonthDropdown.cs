@@ -14,6 +14,7 @@ using System.Linq;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
+using System.Diagnostics;
 
 namespace osu.Game.Overlays.News.Sidebar
 {
@@ -26,8 +27,10 @@ namespace osu.Game.Overlays.News.Sidebar
 
         private readonly FillFlowContainer postsFlow;
 
-        public MonthDropdown(IEnumerable<APINewsPost> posts)
+        public MonthDropdown(int month, int year, IEnumerable<APINewsPost> posts)
         {
+            Debug.Assert(posts.All(p => p.PublishedAt.Month == month && p.PublishedAt.Year == year));
+
             RelativeSizeAxes = Axes.X;
             Masking = true;
             InternalChild = new FillFlowContainer
@@ -38,7 +41,7 @@ namespace osu.Game.Overlays.News.Sidebar
                 Spacing = new Vector2(0, 5),
                 Children = new Drawable[]
                 {
-                    new DropdownHeader(posts.ElementAt(0).PublishedAt)
+                    new DropdownHeader(month, year)
                     {
                         IsOpen = { BindTarget = IsOpen }
                     },
@@ -102,8 +105,10 @@ namespace osu.Game.Overlays.News.Sidebar
 
             private readonly SpriteIcon icon;
 
-            public DropdownHeader(DateTimeOffset date)
+            public DropdownHeader(int month, int year)
             {
+                var date = new DateTime(year, month, 1);
+
                 RelativeSizeAxes = Axes.X;
                 Height = header_height;
                 Action = IsOpen.Toggle;
