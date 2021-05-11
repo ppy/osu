@@ -111,9 +111,9 @@ namespace osu.Game.Tests.Editing.Checks
             Assert.That(issues.Single().Template is CheckBackgroundQuality.IssueTemplateTooUncompressed);
         }
 
-        private IBeatmapVerifier.Context getContext(Texture background, [CanBeNull] byte[] fileBytes = null)
+        private BeatmapVerifierContext getContext(Texture background, [CanBeNull] byte[] fileBytes = null)
         {
-            return new IBeatmapVerifier.Context(getMockWorkingBeatmap(background, fileBytes).Object);
+            return new BeatmapVerifierContext(getMockWorkingBeatmap(background, fileBytes).Object);
         }
 
         /// <summary>

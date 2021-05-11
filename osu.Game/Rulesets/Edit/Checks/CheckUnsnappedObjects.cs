@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             new IssueTemplateSmallUnsnap(this)
         };
 
-        public IEnumerable<Issue> Run(IBeatmap beatmap, IBeatmapVerifier.Context context)
+        public IEnumerable<Issue> Run(IBeatmap beatmap, BeatmapVerifierContext context)
         {
             var controlPointInfo = beatmap.ControlPointInfo;
 

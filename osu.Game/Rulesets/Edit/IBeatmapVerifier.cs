@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit.Checks.Components;
 
@@ -13,25 +12,6 @@ namespace osu.Game.Rulesets.Edit
     /// </summary>
     public interface IBeatmapVerifier
     {
-        public class Context
-        {
-            /// <summary>
-            /// The working beatmap instance of the current beatmap.
-            /// </summary>
-            public readonly IWorkingBeatmap WorkingBeatmap;
-
-            /// <summary>
-            /// The difficulty level which the current beatmap is considered to be.
-            /// </summary>
-            public readonly Bindable<DifficultyRating> InterpretedDifficulty;
-
-            public Context(IWorkingBeatmap workingBeatmap, DifficultyRating difficultyRating = DifficultyRating.ExpertPlus)
-            {
-                WorkingBeatmap = workingBeatmap;
-                InterpretedDifficulty = new Bindable<DifficultyRating>(difficultyRating);
-            }
-        }
-
-        public IEnumerable<Issue> Run(IBeatmap beatmap, Context context);
+        public IEnumerable<Issue> Run(IBeatmap beatmap, BeatmapVerifierContext context);
     }
 }

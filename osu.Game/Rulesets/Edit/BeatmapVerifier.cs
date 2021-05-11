@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Edit
             new CheckConcurrentObjects()
         };
 
-        public IEnumerable<Issue> Run(IBeatmap beatmap, IBeatmapVerifier.Context context)
+        public IEnumerable<Issue> Run(IBeatmap beatmap, BeatmapVerifierContext context)
         {
             return checks.SelectMany(check => check.Run(beatmap, context));
         }

@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Editing.Checks
             mock.SetupGet(w => w.Beatmap).Returns(beatmap);
             mock.SetupGet(w => w.Track).Returns((Track)null);
 
-            Assert.That(check.Run(beatmap, new IBeatmapVerifier.Context(mock.Object)), Is.Empty);
+            Assert.That(check.Run(beatmap, new BeatmapVerifierContext(mock.Object)), Is.Empty);
         }
 
         [Test]
@@ -96,9 +96,9 @@ namespace osu.Game.Tests.Editing.Checks
             Assert.That(issues.Single().Template is CheckAudioQuality.IssueTemplateTooLowBitrate);
         }
 
-        private IBeatmapVerifier.Context getContext(int? audioBitrate)
+        private BeatmapVerifierContext getContext(int? audioBitrate)
         {
-            return new IBeatmapVerifier.Context(getMockWorkingBeatmap(audioBitrate).Object);
+            return new BeatmapVerifierContext(getMockWorkingBeatmap(audioBitrate).Object);
         }
 
         /// <summary>

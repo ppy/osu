@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestBackgroundSetAndInFiles()
         {
-            var context = new IBeatmapVerifier.Context(new TestWorkingBeatmap(beatmap));
+            var context = new BeatmapVerifierContext(new TestWorkingBeatmap(beatmap));
             Assert.That(check.Run(beatmap, context), Is.Empty);
         }
 
@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             beatmap.BeatmapInfo.BeatmapSet.Files.Clear();
 
-            var context = new IBeatmapVerifier.Context(new TestWorkingBeatmap(beatmap));
+            var context = new BeatmapVerifierContext(new TestWorkingBeatmap(beatmap));
             var issues = check.Run(beatmap, context).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
@@ -67,7 +67,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             beatmap.Metadata.BackgroundFile = null;
 
-            var context = new IBeatmapVerifier.Context(new TestWorkingBeatmap(beatmap));
+            var context = new BeatmapVerifierContext(new TestWorkingBeatmap(beatmap));
             var issues = check.Run(beatmap, context).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));

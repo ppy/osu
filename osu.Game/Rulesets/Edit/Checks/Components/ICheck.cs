@@ -26,6 +26,6 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         /// </summary>
         /// <param name="beatmap">The playable beatmap of the beatmap to run the check on.</param>
         /// <param name="context">The beatmap verifier context associated with the beatmap.</param>
-        public IEnumerable<Issue> Run(IBeatmap beatmap, IBeatmapVerifier.Context context);
+        public IEnumerable<Issue> Run(IBeatmap beatmap, BeatmapVerifierContext context);
     }
 }

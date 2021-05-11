@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             new CheckTooShortSliders()
         };
 
-        public IEnumerable<Issue> Run(IBeatmap beatmap, IBeatmapVerifier.Context context)
+        public IEnumerable<Issue> Run(IBeatmap beatmap, BeatmapVerifierContext context)
         {
             return checks.SelectMany(check => check.Run(beatmap, context));
         }

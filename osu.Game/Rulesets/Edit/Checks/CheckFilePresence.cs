@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             new IssueTemplateDoesNotExist(this)
         };
 
-        public IEnumerable<Issue> Run(IBeatmap beatmap, IBeatmapVerifier.Context context)
+        public IEnumerable<Issue> Run(IBeatmap beatmap, BeatmapVerifierContext context)
         {
             var filename = GetFilename(beatmap);
 

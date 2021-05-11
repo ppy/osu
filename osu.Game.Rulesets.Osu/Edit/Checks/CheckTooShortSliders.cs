@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
             new IssueTemplateTooShort(this)
         };
 
-        public IEnumerable<Issue> Run(IBeatmap beatmap, IBeatmapVerifier.Context context)
+        public IEnumerable<Issue> Run(IBeatmap beatmap, BeatmapVerifierContext context)
         {
             if (context.InterpretedDifficulty.Value != DifficultyRating.Easy)
                 yield break;

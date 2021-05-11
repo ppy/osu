@@ -104,9 +104,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
             Assert.That(issues.Single().Template is CheckTooShortSliders.IssueTemplateTooShort);
         }
 
-        private IBeatmapVerifier.Context getContext(IBeatmap beatmap, DifficultyRating difficultyRating)
+        private BeatmapVerifierContext getContext(IBeatmap beatmap, DifficultyRating difficultyRating)
         {
-            return new IBeatmapVerifier.Context(new TestWorkingBeatmap(beatmap), difficultyRating);
+            return new BeatmapVerifierContext(new TestWorkingBeatmap(beatmap), difficultyRating);
         }
     }
 }

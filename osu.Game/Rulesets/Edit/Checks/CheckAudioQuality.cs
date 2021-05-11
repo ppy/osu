@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             new IssueTemplateNoBitrate(this)
         };
 
-        public IEnumerable<Issue> Run(IBeatmap playableBeatmap, IBeatmapVerifier.Context context)
+        public IEnumerable<Issue> Run(IBeatmap playableBeatmap, BeatmapVerifierContext context)
         {
             var audioFile = playableBeatmap.Metadata?.AudioFile;
             if (audioFile == null)
