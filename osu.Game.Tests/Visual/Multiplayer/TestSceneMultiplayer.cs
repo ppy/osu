@@ -15,7 +15,6 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
-using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
 using osu.Game.Users;
 using osuTK.Input;
@@ -43,9 +42,37 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
             Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, host, Beatmap.Default));
-            beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).Wait();
+        }
 
+        [SetUp]
+        public void Setup() => Schedule(() =>
+        {
+            beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).Wait();
             importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First();
+        });
+
+        [Test]
+        public void TestUserSetToIdleWhenBeatmapDeleted()
+        {
+            loadMultiplayer();
+
+            createRoom(new Room
+            {
+                Name = { Value = "Test Room" },
+                Playlist =
+                {
+                    new PlaylistItem
+                    {
+                        Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
+                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                    }
+                }
+            });
+
+            AddStep("set user ready", () => client.ChangeState(MultiplayerUserState.Ready));
+            AddStep("delete beatmap", () => beatmaps.Delete(importedSet));
+
+            AddAssert("user state is idle", () => client.LocalUser?.State == MultiplayerUserState.Idle);
         }
 
         [Test]
