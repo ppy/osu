@@ -19,6 +19,9 @@ namespace osu.Game.Overlays.News.Sidebar
 {
     public class MonthPanel : CompositeDrawable
     {
+        private const int header_height = 15;
+        private const int animation_duration = 250;
+
         public readonly BindableBool IsOpen = new BindableBool();
 
         private readonly FillFlowContainer postsFlow;
@@ -26,8 +29,7 @@ namespace osu.Game.Overlays.News.Sidebar
         public MonthPanel(List<APINewsPost> posts)
         {
             Width = 160;
-            AutoSizeDuration = 250;
-            AutoSizeEasing = Easing.OutQuint;
+            Masking = true;
             InternalChild = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
@@ -63,33 +65,46 @@ namespace osu.Game.Overlays.News.Sidebar
                 if (open.NewValue)
                 {
                     AutoSizeAxes = Axes.Y;
-                    postsFlow.FadeIn(250, Easing.OutQuint);
+                    postsFlow.FadeIn(animation_duration, Easing.OutQuint);
                 }
                 else
                 {
                     AutoSizeAxes = Axes.None;
-                    this.ResizeHeightTo(15, 250, Easing.OutQuint);
+                    this.ResizeHeightTo(header_height, animation_duration, Easing.OutQuint);
 
-                    postsFlow.FadeOut(250, Easing.OutQuint);
+                    postsFlow.FadeOut(animation_duration, Easing.OutQuint);
                 }
             }, true);
 
             // First state change should be instant.
-            FinishTransforms();
-            postsFlow.FinishTransforms();
+            FinishTransforms(true);
         }
 
-        private class DropdownButton : OsuHoverContainer
+        private bool shouldUpdateAutosize = true;
+
+        // Workaround to allow the dropdown to be opened immediately since FinishTransforms doesn't work for AutosizeDuration.
+        protected override void UpdateAfterAutoSize()
+        {
+            base.UpdateAfterAutoSize();
+
+            if (shouldUpdateAutosize)
+            {
+                AutoSizeDuration = animation_duration;
+                AutoSizeEasing = Easing.OutQuint;
+
+                shouldUpdateAutosize = false;
+            }
+        }
+
+        private class DropdownButton : OsuClickableContainer
         {
             public readonly BindableBool IsOpen = new BindableBool();
-
-            protected override IEnumerable<Drawable> EffectTargets => null;
 
             private readonly SpriteIcon icon;
 
             public DropdownButton(DateTimeOffset date)
             {
-                Size = new Vector2(160, 15);
+                Size = new Vector2(160, header_height);
                 Action = IsOpen.Toggle;
                 Children = new Drawable[]
                 {
