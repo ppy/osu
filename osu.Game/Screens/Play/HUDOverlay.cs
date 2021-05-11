@@ -35,7 +35,6 @@ namespace osu.Game.Screens.Play
         public float TopScoringElementsHeight { get; private set; }
 
         public readonly KeyCounterDisplay KeyCounter;
-        public readonly SkinnableScoreCounter ScoreCounter;
         public readonly SongProgress Progress;
         public readonly ModDisplay ModDisplay;
         public readonly HoldForMenuButton HoldToQuit;
@@ -100,17 +99,6 @@ namespace osu.Game.Screens.Play
                                         mainComponents = new SkinnableElementTargetContainer(SkinnableTarget.MainHUDComponents)
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                        },
-                                        new Container
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Alpha = 0,
-                                            Children = new Drawable[]
-                                            {
-                                                // remaining cross-dependencies need tidying.
-                                                // kept to ensure non-null, but hidden for testing.
-                                                ScoreCounter = new SkinnableScoreCounter(),
-                                            }
                                         },
                                         new Container
                                         {
