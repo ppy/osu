@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
-using osu.Game.Replays;
 using osu.Game.Rulesets.Catch.MathUtils;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
@@ -13,27 +12,20 @@ using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Rulesets.Catch.Replays
 {
-    internal class CatchAutoGenerator2 : AutoGenerator
+    public class CatchAutoGenerator2 : AutoGenerator<CatchReplayFrame>
     {
-        protected new Beatmap<CatchHitObject> Beatmap => (Beatmap<CatchHitObject>)base.Beatmap;
-
         public CatchAutoGenerator2(Beatmap<CatchHitObject> beatmap)
             : base(beatmap)
         {
-            Replay = new Replay();
         }
 
-        protected Replay Replay;
-
-        public override Replay Generate()
+        protected override void GenerateFrames()
         {
             float halfCatcherWidth = Catcher.CalculateCatchWidth(Beatmap.BeatmapInfo.BaseDifficulty) / 2;
             const double dash_speed = Catcher.BASE_SPEED;
-            // Todo: Realistically this shouldn't be needed, but the first frame is skipped with the way replays are currently handled
-            Replay.Frames.Add(new CatchReplayFrame(-100000, CatchPlayfield.CENTER_X));
-            List<PalpableCatchHitObject> objects = new List<PalpableCatchHitObject>();
 
-            // List of all catch objects
+            var objects = new List<PalpableCatchHitObject>();
+
             foreach (var obj in Beatmap.HitObjects)
             {
                 if (obj is Fruit fruit)
@@ -108,18 +100,18 @@ namespace osu.Game.Rulesets.Catch.Replays
                     {
                         float midPosition = lastPosition + Math.Sign(target - lastPosition) * (float)(timeAtDashSpeed * dash_speed);
                         //dash movement
-                        Replay.Frames.Add(new CatchReplayFrame(lastTime + timeAtDashSpeed, midPosition, true));
-                        Replay.Frames.Add(new CatchReplayFrame(time, target));
+                        Frames.Add(new CatchReplayFrame(lastTime + timeAtDashSpeed, midPosition, true));
+                        Frames.Add(new CatchReplayFrame(time, target));
                     }
                     else
-                        Replay.Frames.Add(new CatchReplayFrame(time, target, true));
+                        Frames.Add(new CatchReplayFrame(time, target, true));
                 }
                 else
                 {
                     double timeBefore = positionChange / movement_speed;
 
-                    Replay.Frames.Add(new CatchReplayFrame(lastTime + timeBefore, target));
-                    Replay.Frames.Add(new CatchReplayFrame(time, target));
+                    Frames.Add(new CatchReplayFrame(lastTime + timeBefore, target));
+                    Frames.Add(new CatchReplayFrame(time, target));
                 }
 
                 lastTime = time;
@@ -143,8 +135,6 @@ namespace osu.Game.Rulesets.Catch.Replays
                     ? Math.Abs(obj.HyperDashTarget.EffectiveX - lastPosition)
                     : 0;
             }
-
-            return Replay;
         }
     }
 }
