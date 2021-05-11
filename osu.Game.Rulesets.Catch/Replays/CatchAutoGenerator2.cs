@@ -3,40 +3,43 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Beatmaps;
+using osu.Game.Replays;
 using osu.Game.Rulesets.Catch.MathUtils;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Replays;
-using osu.Game.Users;
 
 namespace osu.Game.Rulesets.Catch.Replays
 {
-    internal class CatchAutoGenerator2 : AutoGenerator<CatchHitObject>
+    internal class CatchAutoGenerator2 : AutoGenerator
     {
+        protected new Beatmap<CatchHitObject> Beatmap => (Beatmap<CatchHitObject>)base.Beatmap;
+
         public CatchAutoGenerator2(Beatmap<CatchHitObject> beatmap)
             : base(beatmap)
         {
-            Replay = new Replay { User = new User { Username = @"osu!salad!" } };
+            Replay = new Replay();
         }
 
         protected Replay Replay;
 
         public override Replay Generate()
         {
-            float halfCatcherWidth = CatcherArea.GetCatcherSize(Beatmap.BeatmapInfo.BaseDifficulty) / 2;
-            const double dash_speed = CatcherArea.Catcher.BASE_SPEED;
+            float halfCatcherWidth = Catcher.CalculateCatchWidth(Beatmap.BeatmapInfo.BaseDifficulty) / 2;
+            const double dash_speed = Catcher.BASE_SPEED;
             // Todo: Realistically this shouldn't be needed, but the first frame is skipped with the way replays are currently handled
             Replay.Frames.Add(new CatchReplayFrame(-100000, 0.5f));
-            List<CatchHitObject> objects = new List<CatchHitObject>();
+            List<PalpableCatchHitObject> objects = new List<PalpableCatchHitObject>();
             // List of all catch objects
             foreach (var obj in Beatmap.HitObjects)
             {
-                if (obj is Fruit)
-                    objects.Add(obj);
+                if (obj is Fruit fruit)
+                    objects.Add(fruit);
                 if (obj is BananaShower || obj is JuiceStream)
-                    foreach (var nested in obj.NestedHitObjects)
-                        objects.Add((CatchHitObject)nested);
+                    foreach (var nested in obj.NestedHitObjects.OfType<PalpableCatchHitObject>())
+                        objects.Add(nested);
             }
 
             objects.Sort((h1, h2) => h1.StartTime.CompareTo(h2.StartTime) +
@@ -57,7 +60,7 @@ namespace osu.Game.Rulesets.Catch.Replays
             times.Insert(0, 1 + objects[objects.Count - 1].StartTime); //some time after the last object
             for (int i = objects.Count - 1; i >= 0; --i)
             {
-                CatchHitObject obj = objects[i];
+                var obj = objects[i];
                 int value = obj is Banana || obj is TinyDroplet ? 1 : obj is Fruit ? 300 : 20;
                 if (obj.StartTime != times[0])
                 {
@@ -67,12 +70,12 @@ namespace osu.Game.Rulesets.Catch.Replays
 
                 if (obj.HyperDash)
                 {
-                    float distance = Math.Abs(obj.HyperDashTarget.X - obj.X);
-                    scores[0].Set(Math.Max(0, obj.X - halfCatcherWidth), Math.Min(1, obj.X + halfCatcherWidth),
-                        scores[1].Max(obj.X - distance, obj.X + distance));
+                    float distance = Math.Abs(obj.HyperDashTarget.EffectiveX - obj.EffectiveX);
+                    scores[0].Set(Math.Max(0, obj.EffectiveX - halfCatcherWidth), Math.Min(1, obj.EffectiveX + halfCatcherWidth),
+                        scores[1].Max(obj.EffectiveX - distance, obj.EffectiveX + distance));
                 }
 
-                scores[0].Add(Math.Max(0, obj.X - halfCatcherWidth), Math.Min(1, obj.X + halfCatcherWidth), value);
+                scores[0].Add(Math.Max(0, obj.EffectiveX - halfCatcherWidth), Math.Min(1, obj.EffectiveX + halfCatcherWidth), value);
             }
 
             float lastPosition = 0.5f;
@@ -124,8 +127,8 @@ namespace osu.Game.Rulesets.Catch.Replays
                     moveToNext(target, times[j++]);
                 }
 
-                hyperDashDistance = obj.HyperDash && lastPosition >= obj.X - halfCatcherWidth && lastPosition <= obj.X + halfCatcherWidth
-                    ? Math.Abs(obj.HyperDashTarget.X - lastPosition)
+                hyperDashDistance = obj.HyperDash && lastPosition >= obj.EffectiveX - halfCatcherWidth && lastPosition <= obj.EffectiveX + halfCatcherWidth
+                    ? Math.Abs(obj.HyperDashTarget.EffectiveX - lastPosition)
                     : 0;
             }
 

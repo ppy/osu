@@ -2,37 +2,27 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Replays;
-using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.UI;
-using osu.Game.Users;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Catch.Mods
 {
     public class CatchModAutoplay2 : ModAutoplay<CatchHitObject>
     {
         public override string Name => "Autoplay2";
-        public override string ShortenedName => "A2";
+        public override string Acronym => "A2";
         public override Type[] IncompatibleMods => new[] { typeof(CatchModRelax), typeof(CatchModSuddenDeath), typeof(CatchModNoFail), typeof(CatchModAutoplay) };
 
-        protected override Score CreateReplayScore(Beatmap<CatchHitObject> beatmap)
+        public override Score CreateReplayScore(IBeatmap beatmap, IReadOnlyList<Mod> mods)
         {
             return new Score
             {
-                User = new User { Username = "osu!salad!" },
-                Replay = new CatchAutoGenerator2(beatmap).Generate(),
+                Replay = new CatchAutoGenerator2((Beatmap<CatchHitObject>)beatmap).Generate(),
             };
-        }
-
-        public override void ApplyToRulesetContainer(RulesetContainer<CatchHitObject> rulesetContainer)
-        {
-            if (rulesetContainer is CatchRulesetContainer)
-                ((CatchRulesetContainer)rulesetContainer).AutoMod = true;
-            base.ApplyToRulesetContainer(rulesetContainer);
         }
     }
 }

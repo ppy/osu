@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using OpenTK;
 
 namespace osu.Game.Rulesets.Catch.MathUtils
 {
@@ -188,9 +187,9 @@ namespace osu.Game.Rulesets.Catch.MathUtils
         }
 
         ///<summary>
-        /// Returns a point of [<param name="from"></param>, <param name="to"></param>] that reach the
-        /// maximal value on [<param name="from"></param>, <param name="to"></param>].
-        /// Returns <param name="target"></param> if it works,
+        /// Returns a point of [<paramref name="from"></paramref>, <paramref name="to"></paramref>] that reach the
+        /// maximal value on [<paramref name="from"></paramref>, <paramref name="to"></paramref>].
+        /// Returns <paramref name="target"></paramref> if it works,
         /// we return the point furthest away from a suboptimal point otherwise,
         /// as it will often be the easiest optimal path, from a gameplay perspective.
         ///</summary>
@@ -210,7 +209,7 @@ namespace osu.Game.Rulesets.Catch.MathUtils
                     if (newValue > value)
                     {
                         value = newValue;
-                        ret = MathHelper.Clamp((partition[i + 1] + partition[i]) / 2, from, to);
+                        ret = Math.Clamp((partition[i + 1] + partition[i]) / 2, from, to);
                     }
                 }
 
