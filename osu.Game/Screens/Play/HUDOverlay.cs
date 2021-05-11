@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
@@ -207,27 +208,24 @@ namespace osu.Game.Screens.Play
 
             Vector2 lowestScreenSpace = Vector2.Zero;
 
-            // TODO: may be null during skin switching. not sure if there's a better way of exposing these children.
-            if (mainComponents.Children != null)
+            // LINQ cast can be removed when IDrawable interface includes Anchor / RelativeSizeAxes.
+            foreach (var element in mainComponents.Components.Cast<Drawable>())
             {
-                foreach (var element in mainComponents.Children)
-                {
-                    // for now align top-right components with the bottom-edge of the lowest top-anchored hud element.
-                    if (!element.Anchor.HasFlagFast(Anchor.TopRight) && !element.RelativeSizeAxes.HasFlagFast(Axes.X))
-                        continue;
+                // for now align top-right components with the bottom-edge of the lowest top-anchored hud element.
+                if (!element.Anchor.HasFlagFast(Anchor.TopRight) && !element.RelativeSizeAxes.HasFlagFast(Axes.X))
+                    continue;
 
-                    // health bars are excluded for the sake of hacky legacy skins which extend the health bar to take up the full screen area.
-                    if (element is LegacyHealthDisplay)
-                        continue;
+                // health bars are excluded for the sake of hacky legacy skins which extend the health bar to take up the full screen area.
+                if (element is LegacyHealthDisplay)
+                    continue;
 
-                    var bottomRight = element.ScreenSpaceDrawQuad.BottomRight;
-                    if (bottomRight.Y > lowestScreenSpace.Y)
-                        lowestScreenSpace = bottomRight;
-                }
-
-                topRightElements.Y = TopScoringElementsHeight = ToLocalSpace(lowestScreenSpace).Y;
-                bottomRightElements.Y = -Progress.Height;
+                var bottomRight = element.ScreenSpaceDrawQuad.BottomRight;
+                if (bottomRight.Y > lowestScreenSpace.Y)
+                    lowestScreenSpace = bottomRight;
             }
+
+            topRightElements.Y = TopScoringElementsHeight = ToLocalSpace(lowestScreenSpace).Y;
+            bottomRightElements.Y = -Progress.Height;
         }
 
         private void updateVisibility()

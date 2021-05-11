@@ -1,8 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Extensions;
 using osu.Game.Skinning;
@@ -15,30 +17,46 @@ namespace osu.Game.Screens.Play.HUD
 
         public SkinnableTarget Target { get; }
 
+        public IBindableList<ISkinnableComponent> Components => components;
+
+        private readonly BindableList<ISkinnableComponent> components = new BindableList<ISkinnableComponent>();
+
         public SkinnableElementTargetContainer(SkinnableTarget target)
         {
             Target = target;
         }
 
-        public IReadOnlyList<Drawable> Children => content?.Children;
-
         public void Reload()
         {
+            ClearInternal();
+            components.Clear();
+
             content = CurrentSkin.GetDrawableComponent(new SkinnableTargetComponent(Target)) as SkinnableTargetWrapper;
 
-            ClearInternal();
-
             if (content != null)
-                LoadComponentAsync(content, AddInternal);
+            {
+                LoadComponentAsync(content, wrapper =>
+                {
+                    AddInternal(wrapper);
+                    components.AddRange(wrapper.Children.OfType<ISkinnableComponent>());
+                });
+            }
         }
 
-        public void Add(Drawable drawable)
+        public void Add(ISkinnableComponent component)
         {
+            if (content == null)
+                throw new NotSupportedException("Attempting to add a new component to a target container which is not supported by the current skin.");
+
+            if (!(component is Drawable drawable))
+                throw new ArgumentException("Provided argument must be of type {nameof(ISkinnableComponent)}.", nameof(drawable));
+
             content.Add(drawable);
+            components.Add(component);
         }
 
         public IEnumerable<SkinnableInfo> CreateSerialisedChildren() =>
-            content.Select(d => d.CreateSerialisedInformation());
+            components.Select(d => ((Drawable)d).CreateSerialisedInformation());
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
