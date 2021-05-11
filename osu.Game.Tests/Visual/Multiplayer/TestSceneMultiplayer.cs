@@ -49,33 +49,22 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        public void TestMatchStartWhileSpectatingWithNoBeatmap()
+        public void TestLocalPlayDoesNotStartWhileSpectatingWithNoBeatmap()
         {
             loadMultiplayer();
 
-            AddStep("open room", () =>
+            createRoom(new Room
             {
-                multiplayerScreen.OpenNewRoom(new Room
+                Name = { Value = "Test Room" },
+                Playlist =
                 {
-                    Name = { Value = "Test Room" },
-                    Playlist =
+                    new PlaylistItem
                     {
-                        new PlaylistItem
-                        {
-                            Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
-                            Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                        }
+                        Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
+                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
                     }
-                });
+                }
             });
-
-            AddStep("create room", () =>
-            {
-                InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>().Single());
-                InputManager.Click(MouseButton.Left);
-            });
-
-            AddUntilStep("wait for join", () => client.Room != null);
 
             AddStep("join other user (ready, host)", () =>
             {
@@ -84,13 +73,44 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 client.ChangeUserState(MultiplayerTestScene.PLAYER_1_ID, MultiplayerUserState.Ready);
             });
 
-            AddStep("change playlist", () =>
+            AddStep("delete beatmap", () => beatmaps.Delete(importedSet));
+
+            AddStep("click spectate button", () =>
             {
-                room.Playlist.Add(new PlaylistItem
+                InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerSpectateButton>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddStep("start match externally", () => client.StartMatch());
+
+            AddAssert("play not started", () => multiplayerScreen.IsCurrentScreen());
+        }
+
+        [Test]
+        public void TestLocalPlayStartsWhileSpectatingWhenBeatmapBecomesAvailable()
+        {
+            loadMultiplayer();
+
+            createRoom(new Room
+            {
+                Name = { Value = "Test Room" },
+                Playlist =
                 {
-                    Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
-                    Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                });
+                    new PlaylistItem
+                    {
+                        Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
+                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                    }
+                }
+            });
+
+            AddStep("delete beatmap", () => beatmaps.Delete(importedSet));
+
+            AddStep("join other user (ready, host)", () =>
+            {
+                client.AddUser(new User { Id = MultiplayerTestScene.PLAYER_1_ID, Username = "Other" });
+                client.TransferHost(MultiplayerTestScene.PLAYER_1_ID);
+                client.ChangeUserState(MultiplayerTestScene.PLAYER_1_ID, MultiplayerUserState.Ready);
             });
 
             AddStep("click spectate button", () =>
@@ -101,7 +121,29 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("start match externally", () => client.StartMatch());
 
-            AddAssert("screen not changed", () => multiplayerScreen.IsCurrentScreen());
+            AddStep("restore beatmap", () =>
+            {
+                beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).Wait();
+                importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First();
+            });
+
+            AddUntilStep("play started", () => !multiplayerScreen.IsCurrentScreen());
+        }
+
+        private void createRoom(Room room)
+        {
+            AddStep("open room", () =>
+            {
+                multiplayerScreen.OpenNewRoom(room);
+            });
+
+            AddStep("create room", () =>
+            {
+                InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>().Single());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("wait for join", () => client.Room != null);
         }
 
         private void loadMultiplayer()
