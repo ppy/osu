@@ -22,24 +22,21 @@ namespace osu.Game.Tests.Visual.Online
         private YearsPanel panel;
 
         [SetUp]
-        public void SetUp()
+        public void SetUp() => Schedule(() => Child = panel = new YearsPanel
         {
-            Child = panel = new YearsPanel
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre
-            };
-        }
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre
+        });
 
         [Test]
         public void TestVisibility()
         {
             AddStep("Change metadata to null", () => metadataBindable.Value = null);
-            AddAssert("Panel is hidden", () => !panel.IsPresent);
+            AddUntilStep("Panel is hidden", () => panel?.Alpha == 0);
             AddStep("Change metadata", () => metadataBindable.Value = metadata);
-            AddAssert("Panel is visible", () => panel.IsPresent);
+            AddUntilStep("Panel is visible", () => panel?.Alpha == 1);
             AddStep("Change metadata to null", () => metadataBindable.Value = null);
-            AddAssert("Panel is hidden", () => !panel.IsPresent);
+            AddUntilStep("Panel is hidden", () => panel?.Alpha == 0);
         }
 
         private static readonly APINewsSidebar metadata = new APINewsSidebar
