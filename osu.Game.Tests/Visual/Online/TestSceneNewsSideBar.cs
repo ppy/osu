@@ -24,11 +24,18 @@ namespace osu.Game.Tests.Visual.Online
         public void SetUp() => Schedule(() => Child = sidebar = new NewsSideBar());
 
         [Test]
-        public void TestMetadataChange()
+        public void TestYearsPanelVisibility()
         {
             AddUntilStep("Years panel is hidden", () => yearsPanel?.Alpha == 0);
             AddStep("Add data", () => sidebar.Metadata.Value = metadata);
             AddUntilStep("Years panel is visible", () => yearsPanel?.Alpha == 1);
+        }
+
+        [Test]
+        public void TestMetadataWithNoPosts()
+        {
+            AddStep("Add data with no posts", () => sidebar.Metadata.Value = metadata_with_no_posts);
+            AddUntilStep("No dropdowns were created", () => !sidebar.ChildrenOfType<MonthDropdown>().Any());
         }
 
         private YearsPanel yearsPanel => sidebar.ChildrenOfType<YearsPanel>().FirstOrDefault();
@@ -96,6 +103,25 @@ namespace osu.Game.Tests.Visual.Online
                     PublishedAt = new DateTime(2021, 1, 1)
                 }
             }
+        };
+
+        private static readonly APINewsSidebar metadata_with_no_posts = new APINewsSidebar
+        {
+            CurrentYear = 2022,
+            Years = new[]
+            {
+                2022,
+                2021,
+                2020,
+                2019,
+                2018,
+                2017,
+                2016,
+                2015,
+                2014,
+                2013
+            },
+            NewsPosts = Array.Empty<APINewsPost>()
         };
     }
 }
