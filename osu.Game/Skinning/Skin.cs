@@ -22,8 +22,6 @@ namespace osu.Game.Skinning
     {
         public readonly SkinInfo SkinInfo;
 
-        private readonly IStorageResourceProvider resources;
-
         public SkinConfiguration Configuration { get; protected set; }
 
         public IDictionary<SkinnableTarget, SkinnableInfo[]> DrawableComponentInfo => drawableComponentInfo;
@@ -43,7 +41,6 @@ namespace osu.Game.Skinning
             SkinInfo = skin;
 
             // may be null for default skin.
-            this.resources = resources;
 
             // we may want to move this to some kind of async operation in the future.
             foreach (SkinnableTarget skinnableTarget in Enum.GetValues(typeof(SkinnableTarget)))
@@ -124,7 +121,7 @@ namespace osu.Game.Skinning
         #endregion
     }
 
-    public class SkinnableTargetWrapper : Container, ISkinnableComponent
+    public class SkinnableTargetWrapper : Container, ISkinSerialisable
     {
         public SkinnableTargetWrapper()
         {
