@@ -14,7 +14,7 @@ using osu.Framework.Timing;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Play.HUD;
+using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play
 {
@@ -76,10 +76,6 @@ namespace osu.Game.Screens.Play
             {
                 new SongProgressDisplay
                 {
-                    Masking = true,
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
                     Children = new Drawable[]
                     {
                         info = new SongProgressInfo
@@ -187,8 +183,16 @@ namespace osu.Game.Screens.Play
 
         public class SongProgressDisplay : Container, ISkinnableComponent
         {
-            // TODO: move actual implementation into this.
-            // exists for skin customisation purposes.
+            public SongProgressDisplay()
+            {
+                // TODO: move actual implementation into this.
+                // exists for skin customisation purposes.
+
+                Masking = true;
+                RelativeSizeAxes = Axes.Both;
+                Anchor = Anchor.BottomCentre;
+                Origin = Anchor.BottomCentre;
+            }
         }
     }
 }
