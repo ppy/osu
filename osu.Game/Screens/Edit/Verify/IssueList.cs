@@ -34,12 +34,22 @@ namespace osu.Game.Screens.Edit.Verify
         [Resolved]
         private Bindable<Issue> selectedIssue { get; set; }
 
+        public Dictionary<IssueType, Bindable<bool>> ShowType { get; set; }
+
         private IBeatmapVerifier rulesetVerifier;
         private BeatmapVerifier generalVerifier;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colours)
         {
+            // Reflects the user interface. Only types in this dictionary have configurable visibility.
+            ShowType = new Dictionary<IssueType, Bindable<bool>>
+            {
+                { IssueType.Warning, new Bindable<bool>(true) },
+                { IssueType.Error, new Bindable<bool>(true) },
+                { IssueType.Negligible, new Bindable<bool>(false) }
+            };
+
             generalVerifier = new BeatmapVerifier();
             rulesetVerifier = beatmap.BeatmapInfo.Ruleset?.CreateInstance()?.CreateBeatmapVerifier();
 
