@@ -331,9 +331,8 @@ namespace osu.Game.Skinning
                     switch (target.Target)
                     {
                         case SkinnableTarget.MainHUDComponents:
-                            return new SkinnableTargetWrapper(target.Target)
+                            return new SkinnableTargetWrapper
                             {
-                                RelativeSizeAxes = Axes.Both,
                                 Children = new[]
                                 {
                                     // TODO: these should fallback to the osu!classic skin.

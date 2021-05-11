@@ -8,8 +8,18 @@ namespace osu.Game.Skinning
     /// <summary>
     /// Denotes a container which can house <see cref="ISkinnableComponent"/>s.
     /// </summary>
-    public interface ISkinnableTarget : IDrawable
+    public interface ISkinnableTarget
     {
         public SkinnableTarget Target { get; }
+
+        /// <summary>
+        /// Reload this target from the current skin.
+        /// </summary>
+        public void Reload();
+
+        /// <summary>
+        /// Add the provided item to this target.
+        /// </summary>
+        public void Add(Drawable drawable);
     }
 }

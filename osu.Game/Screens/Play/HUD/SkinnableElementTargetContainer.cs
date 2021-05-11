@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Graphics;
 using osu.Game.Extensions;
 using osu.Game.Skinning;
 
@@ -19,6 +20,21 @@ namespace osu.Game.Screens.Play.HUD
             Target = target;
         }
 
+        public void Reload()
+        {
+            content = CurrentSkin.GetDrawableComponent(new SkinnableTargetComponent(Target)) as SkinnableTargetWrapper;
+
+            ClearInternal();
+
+            if (content != null)
+                LoadComponentAsync(content, AddInternal);
+        }
+
+        public void Add(Drawable drawable)
+        {
+            content.Add(drawable);
+        }
+
         public IEnumerable<SkinnableInfo> CreateSerialisedChildren() =>
             content.Select(d => d.CreateSerialisedInformation());
 
@@ -26,12 +42,7 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.SkinChanged(skin, allowFallback);
 
-            content = skin.GetDrawableComponent(new SkinnableTargetComponent(Target)) as SkinnableTargetWrapper;
-
-            ClearInternal();
-
-            if (content != null)
-                LoadComponentAsync(content, AddInternal);
+            Reload();
         }
     }
 }
