@@ -6,7 +6,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Screens.Edit.Verify
 {
-    public class IssueSettings : EditorSettings
+    public class IssueSettings : Settings
     {
         private IssueList issueList;
 

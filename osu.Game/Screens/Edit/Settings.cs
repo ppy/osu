@@ -11,7 +11,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Edit
 {
-    public abstract class EditorSettings : CompositeDrawable
+    public abstract class Settings : CompositeDrawable
     {
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colours)
