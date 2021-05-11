@@ -22,13 +22,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         [SetUpSteps]
         public override void SetUpSteps()
         {
-            AddStep("set empty legacy skin", () =>
-            {
-                var imported = skinManager.Import(new SkinInfo { Name = "test skin" }).Result;
-
-                skinManager.CurrentSkinInfo.Value = imported;
-            });
-
             base.SetUpSteps();
 
             AddStep("reload skin editor", () =>
