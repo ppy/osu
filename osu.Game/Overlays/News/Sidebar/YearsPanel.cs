@@ -93,7 +93,7 @@ namespace osu.Game.Overlays.News.Sidebar
             {
                 IdleColour = colourProvider.Light2;
                 HoverColour = colourProvider.Light1;
-                Action = () => { }; // TODO
+                Action = () => { }; // Avoid button being disabled since there's no proper action assigned.
             }
         }
     }
