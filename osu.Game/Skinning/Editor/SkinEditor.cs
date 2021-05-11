@@ -36,7 +36,8 @@ namespace osu.Game.Skinning.Editor
 
         private Bindable<Skin> currentSkin;
 
-        private SkinBlueprintContainer blueprintContainer;
+        [Resolved]
+        private OsuColour colours { get; set; }
 
         public SkinEditor(Drawable targetScreen)
         {
@@ -46,7 +47,7 @@ namespace osu.Game.Skinning.Editor
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             InternalChild = new OsuContextMenuContainer
             {
@@ -61,7 +62,7 @@ namespace osu.Game.Skinning.Editor
                         Origin = Anchor.TopCentre,
                         RelativeSizeAxes = Axes.X
                     },
-                    blueprintContainer = new SkinBlueprintContainer(targetScreen),
+                    new SkinBlueprintContainer(targetScreen),
                     new SkinComponentToolbox(600)
                     {
                         Anchor = Anchor.CentreLeft,
@@ -103,13 +104,42 @@ namespace osu.Game.Skinning.Editor
                     },
                 }
             };
+        }
 
-            headerText.AddParagraph("Skin editor (preview)", cp => cp.Font = OsuFont.Default.With(size: 24));
-            headerText.AddParagraph("This is a preview of what is to come. Changes are lost on changing screens.", cp =>
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Show();
+
+            // as long as the skin editor is loaded, let's make sure we can modify the current skin.
+            currentSkin = skins.CurrentSkin.GetBoundCopy();
+
+            // schedule ensures this only happens when the skin editor is visible.
+            // also avoid some weird endless recursion / bindable feedback loop (something to do with tracking skins across three different bindable types).
+            // probably something which will be factored out in a future database refactor so not too concerning for now.
+            currentSkin.BindValueChanged(skin => Scheduler.AddOnce(skinChanged), true);
+        }
+
+        private void skinChanged()
+        {
+            headerText.Clear();
+
+            headerText.AddParagraph("Skin editor", cp => cp.Font = OsuFont.Default.With(size: 24));
+            headerText.NewParagraph();
+            headerText.AddText("Currently editing ", cp =>
             {
                 cp.Font = OsuFont.Default.With(size: 12);
                 cp.Colour = colours.Yellow;
             });
+
+            headerText.AddText($"{currentSkin.Value.SkinInfo}", cp =>
+            {
+                cp.Font = OsuFont.Default.With(size: 12, weight: FontWeight.Bold);
+                cp.Colour = colours.Yellow;
+            });
+
+            skins.EnsureMutableSkin();
         }
 
         private void placeComponent(Type type)
@@ -128,21 +158,6 @@ namespace osu.Game.Skinning.Editor
         private ISkinnableTarget getTarget(SkinnableTarget target)
         {
             return targetScreen.ChildrenOfType<ISkinnableTarget>().FirstOrDefault(c => c.Target == target);
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            Show();
-
-            // as long as the skin editor is loaded, let's make sure we can modify the current skin.
-            currentSkin = skins.CurrentSkin.GetBoundCopy();
-
-            // schedule ensures this only happens when the skin editor is visible.
-            // also avoid some weird endless recursion / bindable feedback loop (something to do with tracking skins across three different bindable types).
-            // probably something which will be factored out in a future database refactor so not too concerning for now.
-            currentSkin.BindValueChanged(skin => Scheduler.AddOnce(skins.EnsureMutableSkin), true);
         }
 
         private void revert()
