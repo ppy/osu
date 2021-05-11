@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Edit.Verify
                         new TriangleButton
                         {
                             Text = "Refresh",
-                            Action = refresh,
+                            Action = Refresh,
                             Size = new Vector2(120, 40),
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.BottomRight,
@@ -100,10 +100,10 @@ namespace osu.Game.Screens.Edit.Verify
         {
             base.LoadComplete();
 
-            refresh();
+            Refresh();
         }
 
-        private void refresh()
+        public void Refresh()
         {
             var issues = generalVerifier.Run(beatmap, context);
 

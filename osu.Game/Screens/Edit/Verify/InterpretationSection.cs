@@ -35,6 +35,8 @@ namespace osu.Game.Screens.Edit.Verify
             };
 
             dropdown.Current.BindTo(issueList.InterpretedDifficulty);
+            dropdown.Current.BindValueChanged(change => { issueList.Refresh(); });
+
             InternalChildren = new Drawable[] { dropdown };
         }
     }
