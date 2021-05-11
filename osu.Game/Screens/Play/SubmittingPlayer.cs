@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Play
 
             if (Mods.Value.Any(m => m is ModAutoplay))
             {
-                handleTokenFailure(new InvalidOperationException("Replay loaded."));
+                handleTokenFailure(new InvalidOperationException("Autoplay loaded."));
                 return false;
             }
 
