@@ -100,18 +100,18 @@ namespace osu.Game.Rulesets.Catch.Replays
                     {
                         float midPosition = lastPosition + Math.Sign(target - lastPosition) * (float)(timeAtDashSpeed * dash_speed);
                         //dash movement
-                        Frames.Add(new CatchReplayFrame(lastTime + timeAtDashSpeed, midPosition, true));
-                        Frames.Add(new CatchReplayFrame(time, target));
+                        addFrame(lastTime + timeAtDashSpeed, midPosition, true);
+                        addFrame(time, target);
                     }
                     else
-                        Frames.Add(new CatchReplayFrame(time, target, true));
+                        addFrame(time, target, true);
                 }
                 else
                 {
                     double timeBefore = positionChange / movement_speed;
 
-                    Frames.Add(new CatchReplayFrame(lastTime + timeBefore, target));
-                    Frames.Add(new CatchReplayFrame(time, target));
+                    addFrame(lastTime + timeBefore, target);
+                    addFrame(time, target);
                 }
 
                 lastTime = time;
@@ -135,6 +135,11 @@ namespace osu.Game.Rulesets.Catch.Replays
                     ? Math.Abs(obj.HyperDashTarget.EffectiveX - lastPosition)
                     : 0;
             }
+        }
+
+        private void addFrame(double time, float? position = null, bool dashing = false)
+        {
+            Frames.Add(new CatchReplayFrame(time, position, dashing, LastFrame));
         }
     }
 }
