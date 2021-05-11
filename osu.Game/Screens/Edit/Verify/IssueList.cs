@@ -102,9 +102,22 @@ namespace osu.Game.Screens.Edit.Verify
             if (rulesetVerifier != null)
                 issues = issues.Concat(rulesetVerifier.Run(beatmap, workingBeatmap.Value));
 
+            issues = filter(issues);
+
             table.Issues = issues
                            .OrderBy(issue => issue.Template.Type)
                            .ThenBy(issue => issue.Check.Metadata.Category);
+        }
+
+        private IEnumerable<Issue> filter(IEnumerable<Issue> issues)
+        {
+            foreach (IssueType issueType in ShowType.Keys)
+            {
+                if (!ShowType[issueType].Value)
+                    issues = issues.Where(issue => issue.Template.Type != issueType);
+            }
+
+            return issues;
         }
     }
 }
