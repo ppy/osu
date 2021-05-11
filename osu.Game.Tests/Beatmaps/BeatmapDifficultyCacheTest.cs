@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Osu.Mods;
 namespace osu.Game.Tests.Beatmaps
 {
     [TestFixture]
-    public class BeatmapDifficultyManagerTest
+    public class BeatmapDifficultyCacheTest
     {
         [Test]
         public void TestKeyEqualsWithDifferentModInstances()
