@@ -29,7 +29,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
     <PackageReference Include="Microsoft.NETCore.Targets" Version="3.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="ppy.osu.Framework" Version="2021.507.0" />
+    <PackageReference Include="ppy.osu.Framework" Version="2021.510.0" />
     <PackageReference Include="ppy.osu.Game.Resources" Version="2021.422.0" />
     <PackageReference Include="Sentry" Version="3.3.4" />
     <PackageReference Include="SharpCompress" Version="0.28.2" />
