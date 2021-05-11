@@ -62,46 +62,68 @@ namespace osu.Game.Skinning.Editor
                         Origin = Anchor.TopCentre,
                         RelativeSizeAxes = Axes.X
                     },
-                    new SkinBlueprintContainer(targetScreen),
-                    new SkinComponentToolbox(600)
+                    new GridContainer
                     {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        RequestPlacement = placeComponent
-                    },
-                    new FillFlowContainer
-                    {
-                        Direction = FillDirection.Horizontal,
-                        AutoSizeAxes = Axes.Both,
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
-                        Spacing = new Vector2(5),
-                        Padding = new MarginPadding
+                        RelativeSizeAxes = Axes.Both,
+                        ColumnDimensions = new[]
                         {
-                            Top = 10,
-                            Left = 10,
+                            new Dimension(GridSizeMode.AutoSize),
+                            new Dimension()
                         },
-                        Margin = new MarginPadding
+                        Content = new[]
                         {
-                            Right = 10,
-                            Bottom = 10,
-                        },
-                        Children = new Drawable[]
-                        {
-                            new TriangleButton
+                            new Drawable[]
                             {
-                                Text = "Save Changes",
-                                Width = 140,
-                                Action = save,
-                            },
-                            new DangerousTriangleButton
-                            {
-                                Text = "Revert to default",
-                                Width = 140,
-                                Action = revert,
-                            },
+                                new SkinComponentToolbox(600)
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    RequestPlacement = placeComponent
+                                },
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        new SkinBlueprintContainer(targetScreen),
+                                        new FillFlowContainer
+                                        {
+                                            Direction = FillDirection.Horizontal,
+                                            AutoSizeAxes = Axes.Both,
+                                            Anchor = Anchor.TopRight,
+                                            Origin = Anchor.TopRight,
+                                            Spacing = new Vector2(5),
+                                            Padding = new MarginPadding
+                                            {
+                                                Top = 10,
+                                                Left = 10,
+                                            },
+                                            Margin = new MarginPadding
+                                            {
+                                                Right = 10,
+                                                Bottom = 10,
+                                            },
+                                            Children = new Drawable[]
+                                            {
+                                                new TriangleButton
+                                                {
+                                                    Text = "Save Changes",
+                                                    Width = 140,
+                                                    Action = save,
+                                                },
+                                                new DangerousTriangleButton
+                                                {
+                                                    Text = "Revert to default",
+                                                    Width = 140,
+                                                    Action = revert,
+                                                },
+                                            }
+                                        },
+                                    }
+                                },
+                            }
                         }
-                    },
+                    }
                 }
             };
         }

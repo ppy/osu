@@ -7,8 +7,10 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Screens;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Screens.Play.HUD;
 
@@ -36,7 +38,17 @@ namespace osu.Game.Skinning.Editor
             base.LoadComplete();
 
             // track each target container on the current screen.
-            foreach (var targetContainer in target.ChildrenOfType<SkinnableElementTargetContainer>())
+            var targetContainers = target.ChildrenOfType<SkinnableElementTargetContainer>().ToArray();
+
+            if (targetContainers.Length == 0)
+            {
+                var targetScreen = target.ChildrenOfType<Screen>().LastOrDefault()?.GetType().Name ?? "this screen";
+
+                AddInternal(new ScreenWhiteBox.UnderConstructionMessage(targetScreen, "doesn't support skin customisation just yet."));
+                return;
+            }
+
+            foreach (var targetContainer in targetContainers)
             {
                 var bindableList = new BindableList<ISkinnableComponent> { BindTarget = targetContainer.Components };
                 bindableList.BindCollectionChanged(componentsChanged, true);
