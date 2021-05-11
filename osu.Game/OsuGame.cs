@@ -51,6 +51,7 @@ using osu.Game.Utils;
 using LogLevel = osu.Framework.Logging.LogLevel;
 using osu.Game.Database;
 using osu.Game.IO;
+using osu.Game.Skinning.Editor;
 
 namespace osu.Game
 {
@@ -78,6 +79,8 @@ namespace osu.Game
         private UserProfileOverlay userProfile;
 
         private BeatmapSetOverlay beatmapSetOverlay;
+
+        private SkinEditorOverlay skinEditor;
 
         [Cached]
         private readonly DifficultyRecommender difficultyRecommender = new DifficultyRecommender();
@@ -597,6 +600,8 @@ namespace osu.Game
                 screenContainer = new ScalingContainer(ScalingMode.ExcludeOverlays)
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     Children = new Drawable[]
                     {
                         receptor = new BackButton.Receptor(),
@@ -685,6 +690,7 @@ namespace osu.Game
             var changelogOverlay = loadComponentSingleFile(new ChangelogOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add, true);
+            loadComponentSingleFile(skinEditor = new SkinEditorOverlay(screenContainer), overlayContent.Add);
 
             loadComponentSingleFile(new LoginOverlay
             {
@@ -968,6 +974,8 @@ namespace osu.Game
 
         protected virtual void ScreenChanged(IScreen current, IScreen newScreen)
         {
+            skinEditor.Reset();
+
             switch (newScreen)
             {
                 case IntroScreen intro:

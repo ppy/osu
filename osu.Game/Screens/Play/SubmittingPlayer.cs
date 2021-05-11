@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -9,6 +10,7 @@ using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Play
@@ -33,15 +35,20 @@ namespace osu.Game.Screens.Play
 
         protected override void LoadAsyncComplete()
         {
-            if (!handleTokenRetrieval()) return;
-
             base.LoadAsyncComplete();
+            handleTokenRetrieval();
         }
 
         private bool handleTokenRetrieval()
         {
             // Token request construction should happen post-load to allow derived classes to potentially prepare DI backings that are used to create the request.
             var tcs = new TaskCompletionSource<bool>();
+
+            if (Mods.Value.Any(m => m is ModAutoplay))
+            {
+                handleTokenFailure(new InvalidOperationException("Autoplay loaded."));
+                return false;
+            }
 
             if (!api.IsLoggedIn)
             {

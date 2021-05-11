@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 {
-    public class BarHitErrorMeter : HitErrorMeter
+    public class BarHitErrorMeter : HitErrorMeter, ISkinnableComponent
     {
         private readonly Anchor alignment;
 
@@ -214,7 +214,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         private const int max_concurrent_judgements = 50;
 
-        public override void OnNewJudgement(JudgementResult judgement)
+        protected override void OnNewJudgement(JudgementResult judgement)
         {
             if (!judgement.IsHit)
                 return;
