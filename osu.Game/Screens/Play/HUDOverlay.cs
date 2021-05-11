@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -35,7 +36,6 @@ namespace osu.Game.Screens.Play
 
         public readonly KeyCounterDisplay KeyCounter;
         public readonly SkinnableScoreCounter ScoreCounter;
-        public readonly SkinnableAccuracyCounter AccuracyCounter;
         public readonly SongProgress Progress;
         public readonly ModDisplay ModDisplay;
         public readonly HoldForMenuButton HoldToQuit;
@@ -68,6 +68,8 @@ namespace osu.Game.Screens.Play
 
         private bool holdingForHUD;
 
+        private readonly SkinnableElementTargetContainer mainComponents;
+
         private IEnumerable<Drawable> hideTargets => new Drawable[] { visibilityContainer, KeyCounter, topRightElements };
 
         public HUDOverlay(DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
@@ -95,7 +97,7 @@ namespace osu.Game.Screens.Play
                                     RelativeSizeAxes = Axes.Both,
                                     Children = new Drawable[]
                                     {
-                                        new SkinnableElementTargetContainer(SkinnableTarget.MainHUDComponents)
+                                        mainComponents = new SkinnableElementTargetContainer(SkinnableTarget.MainHUDComponents)
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                         },
@@ -107,7 +109,6 @@ namespace osu.Game.Screens.Play
                                             {
                                                 // remaining cross-dependencies need tidying.
                                                 // kept to ensure non-null, but hidden for testing.
-                                                AccuracyCounter = new SkinnableAccuracyCounter(),
                                                 ScoreCounter = new SkinnableScoreCounter(),
                                             }
                                         },
@@ -216,12 +217,29 @@ namespace osu.Game.Screens.Play
         {
             base.Update();
 
-            // HACK: for now align with the accuracy counter.
-            // this is done for the sake of hacky legacy skins which extend the health bar to take up the full screen area.
-            // it only works with the default skin due to padding offsetting it *just enough* to coexist.
-            topRightElements.Y = TopScoringElementsHeight = ToLocalSpace(AccuracyCounter.Drawable.ScreenSpaceDrawQuad.BottomRight).Y;
+            Vector2 lowestScreenSpace = Vector2.Zero;
 
-            bottomRightElements.Y = -Progress.Height;
+            // TODO: may be null during skin switching. not sure if there's a better way of exposing these children.
+            if (mainComponents.Children != null)
+            {
+                foreach (var element in mainComponents.Children)
+                {
+                    // for now align top-right components with the bottom-edge of the lowest top-anchored hud element.
+                    if (!element.Anchor.HasFlagFast(Anchor.TopRight))
+                        continue;
+
+                    // health bars are excluded for the sake of hacky legacy skins which extend the health bar to take up the full screen area.
+                    if (element is HealthDisplay)
+                        continue;
+
+                    var bottomRight = element.ScreenSpaceDrawQuad.BottomRight;
+                    if (bottomRight.Y > lowestScreenSpace.Y)
+                        lowestScreenSpace = bottomRight;
+                }
+
+                topRightElements.Y = TopScoringElementsHeight = ToLocalSpace(lowestScreenSpace).Y;
+                bottomRightElements.Y = -Progress.Height;
+            }
         }
 
         private void updateVisibility()
