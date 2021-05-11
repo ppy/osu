@@ -66,26 +66,35 @@ namespace osu.Game.Overlays.News.Sidebar
         {
             base.LoadComplete();
 
-            Metadata.BindValueChanged(metadata =>
+            Metadata.BindValueChanged(onMetadataChanged, true);
+        }
+
+        private void onMetadataChanged(ValueChangedEvent<APINewsSidebar> metadata)
+        {
+            monthsFlow.Clear();
+
+            if (metadata.NewValue == null)
+                return;
+
+            var allPosts = metadata.NewValue.NewsPosts;
+
+            if (!allPosts?.Any() ?? false)
+                return;
+
+            var lookup = metadata.NewValue.NewsPosts.ToLookup(post => post.PublishedAt.Month);
+
+            var keys = lookup.Select(kvp => kvp.Key);
+            var sortedKeys = keys.OrderByDescending(k => k).ToList();
+
+            for (int i = 0; i < sortedKeys.Count; i++)
             {
-                monthsFlow.Clear();
+                var posts = lookup[sortedKeys[i]];
 
-                if (metadata.NewValue != null)
+                monthsFlow.Add(new MonthPanel(posts)
                 {
-                    var lookup = metadata.NewValue.NewsPosts.ToLookup(post => post.PublishedAt.Month);
-
-                    var keys = lookup.Select(kvp => kvp.Key);
-                    var sortedKeys = keys.OrderByDescending(k => k).ToList();
-
-                    for (int i = 0; i < sortedKeys.Count; i++)
-                    {
-                        monthsFlow.Add(new MonthPanel(lookup[sortedKeys[i]])
-                        {
-                            IsOpen = { Value = i == 0 }
-                        });
-                    }
-                }
-            }, true);
+                    IsOpen = { Value = i == 0 }
+                });
+            }
         }
     }
 }

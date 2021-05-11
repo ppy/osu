@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
-        public void TestMetadata()
+        public void TestVisibility()
         {
             AddStep("Change metadata to null", () => metadataBindable.Value = null);
             AddAssert("Panel is hidden", () => panel.IsPresent == false);
