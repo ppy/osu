@@ -10,6 +10,7 @@ using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Extensions;
+using osu.Game.IO;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
 using osuTK.Graphics;
@@ -18,8 +19,13 @@ namespace osu.Game.Skinning
 {
     public class DefaultSkin : Skin
     {
-        public DefaultSkin()
-            : base(SkinInfo.Default, null)
+        public DefaultSkin(IStorageResourceProvider resources)
+            : this(SkinInfo.Default, resources)
+        {
+        }
+
+        public DefaultSkin(SkinInfo skin, IStorageResourceProvider resources)
+            : base(skin, resources)
         {
             Configuration = new DefaultSkinConfiguration();
         }
