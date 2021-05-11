@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -14,6 +15,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.OnlinePlay.Components;
+using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Tests.Resources;
 using osu.Game.Users;
@@ -56,7 +58,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             loadMultiplayer();
 
-            createRoom(new Room
+            createRoom(() => new Room
             {
                 Name = { Value = "Test Room" },
                 Playlist =
@@ -80,7 +82,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             loadMultiplayer();
 
-            createRoom(new Room
+            createRoom(() => new Room
             {
                 Name = { Value = "Test Room" },
                 Playlist =
@@ -118,7 +120,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             loadMultiplayer();
 
-            createRoom(new Room
+            createRoom(() => new Room
             {
                 Name = { Value = "Test Room" },
                 Playlist =
@@ -157,12 +159,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("play started", () => !multiplayerScreen.IsCurrentScreen());
         }
 
-        private void createRoom(Room room)
+        private void createRoom(Func<Room> room)
         {
             AddStep("open room", () =>
             {
-                multiplayerScreen.OpenNewRoom(room);
+                multiplayerScreen.OpenNewRoom(room());
             });
+
+            AddUntilStep("wait for room open", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().FirstOrDefault()?.IsLoaded == true);
+            AddWaitStep("wait for transition", 2);
 
             AddStep("create room", () =>
             {
