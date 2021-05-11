@@ -3,8 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Testing;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.News.Sidebar;
@@ -18,33 +20,18 @@ namespace osu.Game.Tests.Visual.Online
 
         private NewsSideBar sidebar;
 
-        [Test]
-        public void TestCreateEmpty()
-        {
-            createSidebar(null);
-        }
+        [SetUp]
+        public void SetUp() => Schedule(() => Child = sidebar = new NewsSideBar());
 
         [Test]
-        public void TestCreateWithData()
+        public void TestMetadataChange()
         {
-            createSidebar(metadata);
+            AddUntilStep("Years panel is hidden", () => yearsPanel?.Alpha == 0);
+            AddStep("Add data", () => sidebar.Metadata.Value = metadata);
+            AddUntilStep("Years panel is visible", () => yearsPanel?.Alpha == 1);
         }
 
-        [Test]
-        public void TestDataChange()
-        {
-            createSidebar(null);
-            AddStep("Add data", () =>
-            {
-                if (sidebar != null)
-                    sidebar.Metadata.Value = metadata;
-            });
-        }
-
-        private void createSidebar(APINewsSidebar metadata) => AddStep("Create", () => Child = sidebar = new NewsSideBar
-        {
-            Metadata = { Value = metadata }
-        });
+        private YearsPanel yearsPanel => sidebar.ChildrenOfType<YearsPanel>().FirstOrDefault();
 
         private static readonly APINewsSidebar metadata = new APINewsSidebar
         {
