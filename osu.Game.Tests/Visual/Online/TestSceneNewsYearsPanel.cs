@@ -35,11 +35,11 @@ namespace osu.Game.Tests.Visual.Online
         public void TestVisibility()
         {
             AddStep("Change metadata to null", () => metadataBindable.Value = null);
-            AddAssert("Panel is hidden", () => panel.IsPresent == false);
+            AddAssert("Panel is hidden", () => !panel.IsPresent);
             AddStep("Change metadata", () => metadataBindable.Value = metadata);
-            AddAssert("Panel is visible", () => panel.IsPresent == true);
+            AddAssert("Panel is visible", () => panel.IsPresent);
             AddStep("Change metadata to null", () => metadataBindable.Value = null);
-            AddAssert("Panel is hidden", () => panel.IsPresent == false);
+            AddAssert("Panel is hidden", () => !panel.IsPresent);
         }
 
         private static readonly APINewsSidebar metadata = new APINewsSidebar
