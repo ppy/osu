@@ -1,10 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
+using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
@@ -45,6 +48,12 @@ namespace osu.Game.Skinning.Editor
                         RelativeSizeAxes = Axes.X
                     },
                     new SkinBlueprintContainer(target),
+                    new SkinComponentToolbox(600)
+                    {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        RequestPlacement = placeComponent
+                    }
                 }
             };
 
@@ -54,6 +63,15 @@ namespace osu.Game.Skinning.Editor
                 cp.Font = OsuFont.Default.With(size: 12);
                 cp.Colour = colours.Yellow;
             });
+        }
+
+        private void placeComponent(Type type)
+        {
+            var instance = (Drawable)Activator.CreateInstance(type);
+
+            var targetContainer = target.ChildrenOfType<IDefaultSkinnableTarget>().FirstOrDefault();
+
+            targetContainer?.Add(instance);
         }
 
         protected override void LoadComplete()

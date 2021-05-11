@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
@@ -21,6 +22,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("add editor overlay", () =>
             {
                 skinEditor?.Expire();
+                Player.ScaleTo(SkinEditorOverlay.VISIBLE_TARGET_SCALE);
                 LoadComponentAsync(skinEditor = new SkinEditor(Player), Add);
             });
         }

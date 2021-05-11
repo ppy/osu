@@ -2,13 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 
-namespace osu.Game.Screens.Play.HUD
+namespace osu.Game.Skinning
 {
     /// <summary>
-    /// Denotes a drawable which, as a drawable, can be adjusted via skinning specifications.
+    /// Denotes a container which can house <see cref="ISkinnableComponent"/>s.
     /// </summary>
-    public interface ISkinnableComponent : IDrawable
+    public interface ISkinnableTarget : IContainerCollection<Drawable>
     {
     }
 }
