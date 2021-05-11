@@ -8,7 +8,11 @@ namespace osu.Game.Screens.Edit.Verify
 {
     public class IssueSettings : Settings
     {
+        private readonly IssueList issueList;
 
+        public IssueSettings(IssueList issueList)
+        {
+            this.issueList = issueList;
         }
 
         protected override IReadOnlyList<Drawable> CreateSections() => new Drawable[]
