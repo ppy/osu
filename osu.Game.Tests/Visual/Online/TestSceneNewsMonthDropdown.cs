@@ -22,45 +22,34 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void CreateClosedMonthPanel()
         {
-            AddStep("Create", () => Child = new Container
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.TopCentre,
-                AutoSizeAxes = Axes.Both,
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider.Background2,
-                    },
-                    new MonthDropdown(posts),
-                }
-            });
+            create(false);
         }
 
         [Test]
         public void CreateOpenMonthPanel()
         {
-            AddStep("Create", () => Child = new Container
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.TopCentre,
-                AutoSizeAxes = Axes.Both,
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider.Background2,
-                    },
-                    new MonthDropdown(posts)
-                    {
-                        IsOpen = { Value = true }
-                    },
-                }
-            });
+            create(true);
         }
+
+        private void create(bool isOpen) => AddStep("Create", () => Child = new Container
+        {
+            Anchor = Anchor.Centre,
+            Origin = Anchor.TopCentre,
+            AutoSizeAxes = Axes.Y,
+            Width = 160,
+            Children = new Drawable[]
+            {
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = colourProvider.Background2,
+                },
+                new MonthDropdown(posts)
+                {
+                    IsOpen = { Value = isOpen }
+                }
+            }
+        });
 
         private static List<APINewsPost> posts => new List<APINewsPost>
         {

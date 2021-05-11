@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.News.Sidebar
 
         public MonthDropdown(IEnumerable<APINewsPost> posts)
         {
-            Width = 160;
+            RelativeSizeAxes = Axes.X;
             Masking = true;
             InternalChild = new FillFlowContainer
             {

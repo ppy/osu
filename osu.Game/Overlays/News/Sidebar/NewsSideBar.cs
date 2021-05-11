@@ -42,17 +42,17 @@ namespace osu.Game.Overlays.News.Sidebar
                     },
                     Child = new FillFlowContainer
                     {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
                         Direction = FillDirection.Vertical,
-                        AutoSizeAxes = Axes.Both,
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
                         Spacing = new Vector2(0, 20),
                         Children = new Drawable[]
                         {
                             new YearsPanel(),
                             monthsFlow = new FillFlowContainer<MonthDropdown>
                             {
-                                AutoSizeAxes = Axes.Both,
+                                AutoSizeAxes = Axes.Y,
+                                RelativeSizeAxes = Axes.X,
                                 Direction = FillDirection.Vertical,
                                 Spacing = new Vector2(0, 10)
                             }
