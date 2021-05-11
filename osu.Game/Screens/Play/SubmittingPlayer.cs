@@ -33,9 +33,8 @@ namespace osu.Game.Screens.Play
 
         protected override void LoadAsyncComplete()
         {
-            if (!handleTokenRetrieval()) return;
-
             base.LoadAsyncComplete();
+            handleTokenRetrieval();
         }
 
         private bool handleTokenRetrieval()
