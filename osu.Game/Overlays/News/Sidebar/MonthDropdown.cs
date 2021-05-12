@@ -20,83 +20,35 @@ namespace osu.Game.Overlays.News.Sidebar
 {
     public class MonthDropdown : CompositeDrawable
     {
-        private const int header_height = 15;
         private const int animation_duration = 250;
 
         public readonly BindableBool IsOpen = new BindableBool();
-
-        private readonly FillFlowContainer postsFlow;
 
         public MonthDropdown(int month, int year, IEnumerable<APINewsPost> posts)
         {
             Debug.Assert(posts.All(p => p.PublishedAt.Month == month && p.PublishedAt.Year == year));
 
             RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
             Masking = true;
             InternalChild = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Direction = FillDirection.Vertical,
-                Spacing = new Vector2(0, 5),
                 Children = new Drawable[]
                 {
                     new DropdownHeader(month, year)
                     {
                         IsOpen = { BindTarget = IsOpen }
                     },
-                    postsFlow = new FillFlowContainer
+                    new PostsContainer
                     {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 5),
+                        IsOpen = { BindTarget = IsOpen },
                         Children = posts.Select(p => new PostButton(p)).ToArray()
                     }
                 }
             };
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            IsOpen.BindValueChanged(open =>
-            {
-                ClearTransforms();
-
-                if (open.NewValue)
-                {
-                    AutoSizeAxes = Axes.Y;
-                    postsFlow.FadeIn(animation_duration, Easing.OutQuint);
-                }
-                else
-                {
-                    AutoSizeAxes = Axes.None;
-                    this.ResizeHeightTo(header_height, animation_duration, Easing.OutQuint);
-
-                    postsFlow.FadeOut(animation_duration, Easing.OutQuint);
-                }
-            }, true);
-
-            // First state change should be instant.
-            FinishTransforms(true);
-        }
-
-        private bool shouldUpdateAutosize = true;
-
-        // Workaround to allow the dropdown to be opened immediately since FinishTransforms doesn't work for AutosizeDuration.
-        protected override void UpdateAfterAutoSize()
-        {
-            base.UpdateAfterAutoSize();
-
-            if (shouldUpdateAutosize)
-            {
-                AutoSizeDuration = animation_duration;
-                AutoSizeEasing = Easing.OutQuint;
-
-                shouldUpdateAutosize = false;
-            }
         }
 
         private class DropdownHeader : OsuClickableContainer
@@ -110,7 +62,7 @@ namespace osu.Game.Overlays.News.Sidebar
                 var date = new DateTime(year, month, 1);
 
                 RelativeSizeAxes = Axes.X;
-                Height = header_height;
+                Height = 15;
                 Action = IsOpen.Toggle;
                 Children = new Drawable[]
                 {
@@ -152,7 +104,6 @@ namespace osu.Game.Overlays.News.Sidebar
             {
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
-
                 Child = text = new TextFlowContainer(t => t.Font = OsuFont.GetFont(size: 12))
                 {
                     RelativeSizeAxes = Axes.X,
@@ -167,6 +118,71 @@ namespace osu.Game.Overlays.News.Sidebar
                 IdleColour = colourProvider.Light2;
                 HoverColour = colourProvider.Light1;
                 Action = () => { }; // Avoid button being disabled since there's no proper action assigned.
+            }
+        }
+
+        private class PostsContainer : Container
+        {
+            public readonly BindableBool IsOpen = new BindableBool();
+
+            protected override Container<Drawable> Content => content;
+
+            private readonly FillFlowContainer content;
+
+            public PostsContainer()
+            {
+                RelativeSizeAxes = Axes.X;
+                AutoSizeAxes = Axes.Y;
+                InternalChild = content = new FillFlowContainer
+                {
+                    Margin = new MarginPadding { Top = 5 },
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(0, 5)
+                };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                IsOpen.BindValueChanged(open =>
+                {
+                    ClearTransforms();
+
+                    if (open.NewValue)
+                    {
+                        AutoSizeAxes = Axes.Y;
+                        content.FadeIn(animation_duration, Easing.OutQuint);
+                    }
+                    else
+                    {
+                        AutoSizeAxes = Axes.None;
+                        this.ResizeHeightTo(0, animation_duration, Easing.OutQuint);
+
+                        content.FadeOut(animation_duration, Easing.OutQuint);
+                    }
+                }, true);
+
+                // First state change should be instant.
+                FinishTransforms(true);
+            }
+
+            private bool shouldUpdateAutosize = true;
+
+            // Workaround to allow the dropdown to be opened immediately since FinishTransforms doesn't work for AutosizeDuration.
+            protected override void UpdateAfterAutoSize()
+            {
+                base.UpdateAfterAutoSize();
+
+                if (shouldUpdateAutosize)
+                {
+                    AutoSizeDuration = animation_duration;
+                    AutoSizeEasing = Easing.OutQuint;
+
+                    shouldUpdateAutosize = false;
+                }
             }
         }
     }
