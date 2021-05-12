@@ -35,68 +35,46 @@ namespace osu.Game.Rulesets.Osu.Mods
         private const byte border_distance_x = 192;
         private const byte border_distance_y = 144;
 
-        private static readonly Bindable<int> seed = new Bindable<int>
+        [SettingSource("Custom seed", "Use a custom seed instead of a random one", SettingControlType = typeof(OsuModRandomSettingsControl))]
+        public Bindable<int?> CustomSeed { get; } = new Bindable<int?>
         {
-            Default = -1
+            Default = null,
+            Value = null
         };
 
-        private static readonly BindableBool random_seed = new BindableBool
+        public void ApplyToBeatmap(IBeatmap beatmap)
         {
-            Value = true,
-            Default = true
-        };
-
-        [SettingSource("Random seed", "Generate a random seed for the beatmap generation")]
-        public BindableBool RandomSeed => random_seed;
-
-        [SettingSource("Seed", "Seed for the random beatmap generation", SettingControlType = typeof(OsuModRandomSettingsControl))]
-        public Bindable<int> Seed => seed;
-
-        internal static bool CustomSeedDisabled => random_seed.Value;
-
-        public OsuModRandom()
-        {
-            if (seed.Default != -1)
+            if (!(beatmap is OsuBeatmap osuBeatmap))
                 return;
 
-            var random = RNG.Next();
-            seed.Value = random;
-            seed.Default = random;
-            seed.BindValueChanged(e => seed.Default = e.NewValue);
-        }
+            var seed = RNG.Next();
 
-        public void ApplyToBeatmap(IBeatmap iBeatmap)
-        {
-            if (!(iBeatmap is OsuBeatmap beatmap))
-                return;
+            if (CustomSeed.Value != null)
+                seed = (int)CustomSeed.Value;
 
-            if (RandomSeed.Value)
-                seed.Value = RNG.Next();
+            Seed = seed;
 
-            var rng = new Random(seed.Value);
+            var rng = new Random(seed);
 
-            // Absolute angle
-            float prevAngleRad = 0;
-
-            // Absolute positions
-            Vector2 prevPosUnchanged = beatmap.HitObjects[0].Position;
-            Vector2 prevPosChanged = beatmap.HitObjects[0].Position;
+            var prevObjectInfo = new HitObjectInfo
+            {
+                AngleRad = 0,
+                PosUnchanged = osuBeatmap.HitObjects[0].Position,
+                PosChanged = osuBeatmap.HitObjects[0].Position
+            };
 
             // rateOfChangeMultiplier changes every i iterations to prevent shaky-line-shaped streams
             byte i = 3;
             float rateOfChangeMultiplier = 0;
 
-            foreach (var beatmapHitObject in beatmap.HitObjects)
+            foreach (var currentHitObject in osuBeatmap.HitObjects)
             {
-                if (!(beatmapHitObject is OsuHitObject hitObject))
-                    return;
-
-                // posUnchanged: position from the original beatmap (not randomised)
-                var posUnchanged = hitObject.EndPosition;
-                var posChanged = Vector2.Zero;
-
-                // Angle of the vector pointing from the last to the current hit object
-                float angleRad = 0;
+                var currentObjectInfo = new HitObjectInfo
+                {
+                    AngleRad = 0,
+                    PosUnchanged = currentHitObject.EndPosition,
+                    PosChanged = Vector2.Zero
+                };
 
                 if (i >= 3)
                 {
@@ -104,24 +82,23 @@ namespace osu.Game.Rulesets.Osu.Mods
                     rateOfChangeMultiplier = (float)rng.NextDouble() * 2 - 1;
                 }
 
-                if (hitObject is HitCircle circle)
+                if (currentHitObject is HitCircle circle)
                 {
-                    var distanceToPrev = Vector2.Distance(posUnchanged, prevPosUnchanged);
+                    var distanceToPrev = Vector2.Distance(currentObjectInfo.PosUnchanged, prevObjectInfo.PosUnchanged);
 
-                    circle.Position = posChanged = getRandomisedPosition(
+                    getObjectInfo(
                         rateOfChangeMultiplier,
-                        prevPosChanged,
-                        prevAngleRad,
+                        prevObjectInfo,
                         distanceToPrev,
-                        out angleRad
+                        ref currentObjectInfo
                     );
+
+                    circle.Position = currentObjectInfo.PosChanged;
                 }
 
                 // TODO: Implement slider position randomisation
 
-                prevAngleRad = angleRad;
-                prevPosUnchanged = posUnchanged;
-                prevPosChanged = posChanged;
+                prevObjectInfo = currentObjectInfo;
                 i++;
             }
         }
@@ -130,12 +107,11 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// Returns the final position of the hit object
         /// </summary>
         /// <returns>Final position of the hit object</returns>
-        private Vector2 getRandomisedPosition(
+        private void getObjectInfo(
             float rateOfChangeMultiplier,
-            Vector2 prevPosChanged,
-            float prevAngleRad,
+            HitObjectInfo prevObjectInfo,
             float distanceToPrev,
-            out float newAngle)
+            ref HitObjectInfo currentObjectInfo)
         {
             // The max. angle (relative to the angle of the vector pointing from the 2nd last to the last hit object)
             // is proportional to the distance between the last and the current hit object
@@ -143,19 +119,19 @@ namespace osu.Game.Rulesets.Osu.Mods
             var maxDistance = OsuPlayfield.BASE_SIZE.LengthFast;
             var randomAngleRad = rateOfChangeMultiplier * 2 * Math.PI * distanceToPrev / maxDistance;
 
-            newAngle = (float)randomAngleRad + prevAngleRad;
-            if (newAngle < 0)
-                newAngle += 2 * (float)Math.PI;
+            currentObjectInfo.AngleRad = (float)randomAngleRad + prevObjectInfo.AngleRad;
+            if (currentObjectInfo.AngleRad < 0)
+                currentObjectInfo.AngleRad += 2 * (float)Math.PI;
 
             var posRelativeToPrev = new Vector2(
-                distanceToPrev * (float)Math.Cos(newAngle),
-                distanceToPrev * (float)Math.Sin(newAngle)
+                distanceToPrev * (float)Math.Cos(currentObjectInfo.AngleRad),
+                distanceToPrev * (float)Math.Sin(currentObjectInfo.AngleRad)
             );
 
-            posRelativeToPrev = getRotatedVector(prevPosChanged, posRelativeToPrev);
+            posRelativeToPrev = getRotatedVector(prevObjectInfo.PosChanged, posRelativeToPrev);
 
-            newAngle = (float)Math.Atan2(posRelativeToPrev.Y, posRelativeToPrev.X);
-            var position = Vector2.Add(prevPosChanged, posRelativeToPrev);
+            currentObjectInfo.AngleRad = (float)Math.Atan2(posRelativeToPrev.Y, posRelativeToPrev.X);
+            var position = Vector2.Add(prevObjectInfo.PosChanged, posRelativeToPrev);
 
             // Move hit objects back into the playfield if they are outside of it,
             // which would sometimes happen during big jumps otherwise.
@@ -169,7 +145,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             else if (position.Y > OsuPlayfield.BASE_SIZE.Y)
                 position.Y = OsuPlayfield.BASE_SIZE.Y;
 
-            return position;
+            currentObjectInfo.PosChanged = position;
         }
 
         /// <summary>
@@ -214,7 +190,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             return rotateVectorTowardsVector(
                 posRelativeToPrev,
                 Vector2.Subtract(playfieldMiddle, prevPosChanged),
-                relativeRotationDistance
+                relativeRotationDistance / 2
             );
         }
 
@@ -230,10 +206,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             var initialAngleRad = Math.Atan2(initial.Y, initial.X);
             var destAngleRad = Math.Atan2(destination.Y, destination.X);
 
-            // Divide by 2 to limit the max. angle to 90°
-            // (90° is enough to prevent the hit objects from leaving the playfield)
-            relativeDistance /= 2;
-
             var diff = destAngleRad - initialAngleRad;
 
             while (diff < -Math.PI)
@@ -246,46 +218,45 @@ namespace osu.Game.Rulesets.Osu.Mods
                 diff -= 2 * Math.PI;
             }
 
-            var finalAngle = 0d;
-
-            if (diff > 0)
-            {
-                finalAngle = initialAngleRad + relativeDistance * diff;
-            }
-            else if (diff < 0)
-            {
-                finalAngle = initialAngleRad + relativeDistance * diff;
-            }
+            var finalAngleRad = initialAngleRad + relativeDistance * diff;
 
             return new Vector2(
-                initial.Length * (float)Math.Cos(finalAngle),
-                initial.Length * (float)Math.Sin(finalAngle)
+                initial.Length * (float)Math.Cos(finalAngleRad),
+                initial.Length * (float)Math.Sin(finalAngleRad)
             );
+        }
+
+        private struct HitObjectInfo
+        {
+            internal float AngleRad { get; set; }
+            internal Vector2 PosUnchanged { get; set; }
+            internal Vector2 PosChanged { get; set; }
         }
     }
 
-    public class OsuModRandomSettingsControl : SettingsItem<int>
+    public class OsuModRandomSettingsControl : SettingsItem<int?>
     {
-        [Resolved]
-        private static GameHost host { get; set; }
-
-        [BackgroundDependencyLoader]
-        private void load(GameHost gameHost) => host = gameHost;
-
         protected override Drawable CreateControl() => new SeedControl
         {
             RelativeSizeAxes = Axes.X,
             Margin = new MarginPadding { Top = 5 }
         };
 
-        private sealed class SeedControl : CompositeDrawable, IHasCurrentValue<int>
+        private sealed class SeedControl : CompositeDrawable, IHasCurrentValue<int?>
         {
-            private readonly BindableWithCurrent<int> current = new BindableWithCurrent<int>();
+            [Resolved]
+            private GameHost host { get; set; }
 
-            public Bindable<int> Current
+            private readonly BindableWithCurrent<int?> current = new BindableWithCurrent<int?>();
+
+            public Bindable<int?> Current
             {
                 get => current;
-                set => Scheduler.Add(() => current.Current = value);
+                set
+                {
+                    current.Current = value;
+                    seedNumberBox.Text = value.Value.ToString();
+                }
             }
 
             private readonly OsuNumberBox seedNumberBox;
@@ -324,40 +295,29 @@ namespace osu.Game.Rulesets.Osu.Mods
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Height = 1,
-                                    Text = "Copy",
-                                    Action = copySeedToClipboard
+                                    Text = "Paste",
+                                    Action = () => seedNumberBox.Text = host.GetClipboard().GetText()
                                 }
                             }
                         }
                     }
                 };
 
-                seedNumberBox.Current.BindValueChanged(onTextBoxValueChanged);
+                seedNumberBox.Current.BindValueChanged(e =>
+                {
+                    int? value = null;
+
+                    if (int.TryParse(e.NewValue, out var intVal))
+                        value = intVal;
+
+                    current.Value = value;
+                });
             }
-
-            private void onTextBoxValueChanged(ValueChangedEvent<string> e)
-            {
-                string seed = e.NewValue;
-
-                while (!string.IsNullOrEmpty(seed) && !int.TryParse(seed, out _))
-                    seed = seed[..^1];
-
-                if (!int.TryParse(seed, out var intVal))
-                    intVal = 0;
-
-                current.Value = intVal;
-            }
-
-            private void copySeedToClipboard() => host.GetClipboard().SetText(seedNumberBox.Text);
 
             protected override void Update()
             {
-                seedNumberBox.ReadOnly = OsuModRandom.CustomSeedDisabled;
-
-                if (seedNumberBox.HasFocus)
-                    return;
-
-                seedNumberBox.Text = current.Current.Value.ToString();
+                if (current.Value == null)
+                    seedNumberBox.Text = current.Current.Value.ToString();
             }
         }
     }
