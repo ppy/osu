@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
@@ -16,6 +17,8 @@ namespace osu.Game.Screens.Play.HUD
     /// </summary>
     public abstract class HealthDisplay : CompositeDrawable
     {
+        private readonly Bindable<bool> showHealthbar = new Bindable<bool>(true);
+
         [Resolved]
         protected HealthProcessor HealthProcessor { get; private set; }
 
@@ -29,12 +32,21 @@ namespace osu.Game.Screens.Play.HUD
         {
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            Current.BindTo(HealthProcessor.Health);
+        [Resolved(canBeNull: true)]
+        private HUDOverlay hudOverlay { get; set; }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Current.BindTo(HealthProcessor.Health);
             HealthProcessor.NewJudgement += onNewJudgement;
+
+            if (hudOverlay != null)
+                showHealthbar.BindTo(hudOverlay.ShowHealthbar);
+
+            // this probably shouldn't be operating on `this.`
+            showHealthbar.BindValueChanged(healthBar => this.FadeTo(healthBar.NewValue ? 1 : 0, HUDOverlay.FADE_DURATION, HUDOverlay.FADE_EASING), true);
         }
 
         private void onNewJudgement(JudgementResult judgement)
