@@ -109,13 +109,25 @@ namespace osu.Game.Skinning.Editor
         private void applyOrigin(Anchor anchor)
         {
             foreach (var item in SelectedItems)
-                ((Drawable)item).Origin = anchor;
+            {
+                var drawable = (Drawable)item;
+
+                var previousOrigin = drawable.OriginPosition;
+                drawable.Origin = anchor;
+                drawable.Position += drawable.OriginPosition - previousOrigin;
+            }
         }
 
         private void applyAnchor(Anchor anchor)
         {
             foreach (var item in SelectedItems)
-                ((Drawable)item).Anchor = anchor;
+            {
+                var drawable = (Drawable)item;
+
+                var previousAnchor = (drawable.AnchorPosition);
+                drawable.Anchor = anchor;
+                drawable.Position -= drawable.AnchorPosition - previousAnchor;
+            }
         }
 
         private static void adjustScaleFromAnchor(ref Vector2 scale, Anchor reference)
