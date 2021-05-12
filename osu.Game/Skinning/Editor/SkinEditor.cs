@@ -166,15 +166,13 @@ namespace osu.Game.Skinning.Editor
 
         private void placeComponent(Type type)
         {
-            var instance = (Drawable)Activator.CreateInstance(type) as ISkinnableComponent;
-
-            if (instance == null)
+            if (!(Activator.CreateInstance(type) is ISkinnableComponent component))
                 throw new InvalidOperationException("Attempted to instantiate a component for placement which was not an {typeof(ISkinnableComponent)}.");
 
-            getTarget(SkinnableTarget.MainHUDComponents)?.Add(instance);
+            getTarget(SkinnableTarget.MainHUDComponents)?.Add(component);
 
             SelectedComponents.Clear();
-            SelectedComponents.Add(instance);
+            SelectedComponents.Add(component);
         }
 
         private ISkinnableTarget getTarget(SkinnableTarget target)
