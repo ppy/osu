@@ -11,6 +11,7 @@ using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI.Components;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -132,10 +133,37 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            NewResult += OnNewResult;
+        }
+
+        public override void Add(HitObject hitObject)
+        {
+            var maniaObject = (ManiaHitObject)hitObject;
+            int columnIndex = -1;
+
+            maniaObject.ColumnBindable.BindValueChanged(_ =>
+            {
+                if (columnIndex != -1)
+                    Columns.ElementAt(columnIndex).Remove(hitObject);
+
+                columnIndex = maniaObject.Column - firstColumnIndex;
+                Columns.ElementAt(columnIndex).Add(hitObject);
+            }, true);
+        }
+
+        public override bool Remove(HitObject hitObject)
+        {
+            var maniaObject = (ManiaHitObject)hitObject;
+            int columnIndex = maniaObject.Column - firstColumnIndex;
+            return Columns.ElementAt(columnIndex).Remove(hitObject);
+        }
+
         public override void Add(DrawableHitObject h)
         {
             var maniaObject = (ManiaHitObject)h.HitObject;
-
             int columnIndex = -1;
 
             maniaObject.ColumnBindable.BindValueChanged(_ =>
@@ -146,18 +174,13 @@ namespace osu.Game.Rulesets.Mania.UI
                 columnIndex = maniaObject.Column - firstColumnIndex;
                 Columns.ElementAt(columnIndex).Add(h);
             }, true);
-
-            h.OnNewResult += OnNewResult;
         }
 
         public override bool Remove(DrawableHitObject h)
         {
             var maniaObject = (ManiaHitObject)h.HitObject;
             int columnIndex = maniaObject.Column - firstColumnIndex;
-            Columns.ElementAt(columnIndex).Remove(h);
-
-            h.OnNewResult -= OnNewResult;
-            return true;
+            return Columns.ElementAt(columnIndex).Remove(h);
         }
 
         public void Add(BarLine barline) => base.Add(new DrawableBarLine(barline));
