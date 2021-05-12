@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Mania.UI
         internal readonly Container TopLevelContainer;
         private readonly DrawablePool<PoolableHitExplosion> hitExplosionPool;
         private readonly OrderedHitPolicy hitPolicy;
-        private readonly SkinnableSound[] hitSounds;
+        private readonly Container<SkinnableSound> hitSounds;
 
         public Container UnderlayElements => HitObjectArea.UnderlayElements;
 
@@ -71,11 +71,11 @@ namespace osu.Game.Rulesets.Mania.UI
                     RelativeSizeAxes = Axes.Both
                 },
                 background,
-                new Container
+                hitSounds = new Container<SkinnableSound>
                 {
                     Name = "Column samples pool",
                     RelativeSizeAxes = Axes.Both,
-                    Children = hitSounds = Enumerable.Range(0, max_concurrent_hitsounds).Select(_ => new SkinnableSound()).ToArray()
+                    Children = Enumerable.Range(0, max_concurrent_hitsounds).Select(_ => new SkinnableSound()).ToArray()
                 },
                 TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
             };
