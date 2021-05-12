@@ -230,7 +230,7 @@ namespace osu.Game.Online.Spectator
             connection.SendAsync(nameof(ISpectatorServer.StartWatchingUser), userId);
         }
 
-        public void StopWatchingUser(int userId)
+        public virtual void StopWatchingUser(int userId)
         {
             lock (userLock)
             {

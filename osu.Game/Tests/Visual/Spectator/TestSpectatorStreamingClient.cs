@@ -38,7 +38,8 @@ namespace osu.Game.Tests.Visual.Spectator
                 RulesetID = 0,
             });
 
-            userSentStateDictionary[userId] = false;
+            userBeatmapDictionary.Remove(userId);
+            userSentStateDictionary.Remove(userId);
         }
 
         public void SendFrames(int userId, int index, int count)
@@ -66,8 +67,13 @@ namespace osu.Game.Tests.Visual.Spectator
                 sendState(userId, userBeatmapDictionary[userId]);
 
             base.WatchUser(userId);
-
             watchingUsers.Add(userId);
+        }
+
+        public override void StopWatchingUser(int userId)
+        {
+            base.StopWatchingUser(userId);
+            watchingUsers.Remove(userId);
         }
 
         private void sendState(int userId, int beatmapId)
