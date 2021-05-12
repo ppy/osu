@@ -85,13 +85,13 @@ namespace osu.Game.Skinning.Editor
 
         protected override void OnSelected()
         {
-            // base logic hides selected blueprints when not selected, but timeline doesn't do that.
+            // base logic hides selected blueprints when not selected, but skin blueprints don't do that.
             updateSelectedState();
         }
 
         protected override void OnDeselected()
         {
-            // base logic hides selected blueprints when not selected, but timeline doesn't do that.
+            // base logic hides selected blueprints when not selected, but skin blueprints don't do that.
             updateSelectedState();
         }
 
