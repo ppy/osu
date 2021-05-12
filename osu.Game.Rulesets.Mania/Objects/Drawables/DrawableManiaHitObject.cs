@@ -60,6 +60,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 Action.BindTo(action);
 
             Direction.BindTo(scrollingInfo.Direction);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
             Direction.BindValueChanged(OnDirectionChanged, true);
         }
 

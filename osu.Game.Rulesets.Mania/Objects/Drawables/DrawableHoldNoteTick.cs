@@ -41,25 +41,22 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChildren = new[]
+            AddInternal(glowContainer = new CircularContainer
             {
-                glowContainer = new CircularContainer
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+                RelativeSizeAxes = Axes.Both,
+                Masking = true,
+                Children = new[]
                 {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    Children = new[]
+                    new Box
                     {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Alpha = 0,
-                            AlwaysPresent = true
-                        }
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0,
+                        AlwaysPresent = true
                     }
                 }
-            };
+            });
         }
 
         protected override void LoadComplete()
