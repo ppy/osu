@@ -127,14 +127,8 @@ namespace osu.Game.Tests.Gameplay
             {
                 switch (lookup)
                 {
-                    case GlobalSkinColours global:
-                        switch (global)
-                        {
-                            case GlobalSkinColours.ComboColours:
-                                return SkinUtils.As<TValue>(new Bindable<IReadOnlyList<Color4>>(ComboColours));
-                        }
-
-                        break;
+                    case SkinComboColourLookup comboColour:
+                        return SkinUtils.As<TValue>(new Bindable<Color4>(ComboColours[comboColour.ColourIndex % ComboColours.Count]));
                 }
 
                 throw new NotImplementedException();
