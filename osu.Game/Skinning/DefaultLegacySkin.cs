@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using JetBrains.Annotations;
 using osu.Framework.IO.Stores;
 using osu.Game.IO;
 using osuTK.Graphics;
@@ -9,6 +10,7 @@ namespace osu.Game.Skinning
 {
     public class DefaultLegacySkin : LegacySkin
     {
+        [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
         public DefaultLegacySkin(IResourceStore<byte[]> storage, IStorageResourceProvider resources)
             : this(Info, storage, resources)
         {
