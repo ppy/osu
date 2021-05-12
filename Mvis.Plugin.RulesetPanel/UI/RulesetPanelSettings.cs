@@ -156,11 +156,6 @@ namespace Mvis.Plugin.RulesetPanel.UI
                             }
                         }
                     }
-                },
-                new SettingsCheckbox
-                {
-                    LabelText = "使用lazer自带频谱效果",
-                    Current = config.GetBindable<bool>(RulesetPanelSetting.UseOsuLogoVisualisation),
                 }
             };
         }

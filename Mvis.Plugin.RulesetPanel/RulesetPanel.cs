@@ -157,7 +157,7 @@ namespace Mvis.Plugin.RulesetPanel
         {
             this.FadeTo(MvisScreen?.OverlaysHidden ?? false ? idleAlpha.Value : 1, 300).ScaleTo(1, 400, Easing.OutQuint);
 
-           // beatmapLogo?.ResponseOnBeatmapChanges();
+            // beatmapLogo?.ResponseOnBeatmapChanges();
 
             return base.Enable();
         }

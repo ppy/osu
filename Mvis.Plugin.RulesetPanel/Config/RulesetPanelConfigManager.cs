@@ -34,7 +34,6 @@ namespace Mvis.Plugin.RulesetPanel.Config
 
             //插件
             SetDefault(RulesetPanelSetting.EnableRulesetPanel, true);
-            SetDefault(RulesetPanelSetting.UseOsuLogoVisualisation, false);
             SetDefault(RulesetPanelSetting.IdleAlpha, 1f, 0, 1f);
         }
 
@@ -45,7 +44,6 @@ namespace Mvis.Plugin.RulesetPanel.Config
     {
         //插件
         EnableRulesetPanel,
-        UseOsuLogoVisualisation,
         IdleAlpha,
 
         //上游
