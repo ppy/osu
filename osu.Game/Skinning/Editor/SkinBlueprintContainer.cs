@@ -12,7 +12,6 @@ using osu.Framework.Testing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens;
 using osu.Game.Screens.Edit.Compose.Components;
-using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Skinning.Editor
 {
@@ -38,7 +37,7 @@ namespace osu.Game.Skinning.Editor
             base.LoadComplete();
 
             // track each target container on the current screen.
-            var targetContainers = target.ChildrenOfType<SkinnableElementTargetContainer>().ToArray();
+            var targetContainers = target.ChildrenOfType<ISkinnableTarget>().ToArray();
 
             if (targetContainers.Length == 0)
             {
