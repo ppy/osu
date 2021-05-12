@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
@@ -17,6 +18,23 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
         public OsuBeatmapProcessor(IBeatmap beatmap)
             : base(beatmap)
         {
+        }
+
+        public override void PreProcess()
+        {
+            base.PreProcess();
+
+            OsuHitObject lastObj = null;
+
+            foreach (var obj in Beatmap.HitObjects.OfType<OsuHitObject>())
+            {
+                if (obj.NewCombo)
+                    obj.LegacyBeatmapComboIndex = (lastObj?.LegacyBeatmapComboIndex ?? 0) + obj.LegacyBeatmapComboOffset + 1;
+                else if (lastObj != null)
+                    obj.LegacyBeatmapComboIndex = lastObj.LegacyBeatmapComboIndex;
+
+                lastObj = obj;
+            }
         }
 
         public override void PostProcess()

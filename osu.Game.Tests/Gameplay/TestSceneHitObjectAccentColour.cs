@@ -82,7 +82,6 @@ namespace osu.Game.Tests.Gameplay
         private class TestHitObjectWithCombo : ConvertHitObject, IHasComboInformation
         {
             public bool NewCombo { get; set; }
-            public int ComboOffset => 0;
 
             public Bindable<int> IndexInCurrentComboBindable { get; } = new Bindable<int>();
 
@@ -127,14 +126,8 @@ namespace osu.Game.Tests.Gameplay
             {
                 switch (lookup)
                 {
-                    case GlobalSkinColours global:
-                        switch (global)
-                        {
-                            case GlobalSkinColours.ComboColours:
-                                return SkinUtils.As<TValue>(new Bindable<IReadOnlyList<Color4>>(ComboColours));
-                        }
-
-                        break;
+                    case SkinComboColourLookup comboColour:
+                        return SkinUtils.As<TValue>(new Bindable<Color4>(ComboColours[comboColour.ColourIndex % ComboColours.Count]));
                 }
 
                 throw new NotImplementedException();

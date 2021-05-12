@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
             {
                 Position = position,
                 NewCombo = FirstObject || newCombo,
-                ComboOffset = comboOffset
+                LegacyBeatmapComboOffset = comboOffset
             };
         }
 
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
             {
                 Position = position,
                 NewCombo = FirstObject || newCombo,
-                ComboOffset = comboOffset,
+                LegacyBeatmapComboOffset = comboOffset,
                 Path = new SliderPath(controlPoints, length),
                 NodeSamples = nodeSamples,
                 RepeatCount = repeatCount

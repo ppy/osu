@@ -16,6 +16,7 @@ using osu.Framework.IO.Stores;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osuTK.Graphics;
@@ -118,6 +119,9 @@ namespace osu.Game.Skinning
                     }
 
                     break;
+
+                case SkinComboColourLookup comboColour:
+                    return SkinUtils.As<TValue>(GetComboColour(Configuration, comboColour.ColourIndex, comboColour.Combo));
 
                 case SkinCustomColourLookup customColour:
                     return SkinUtils.As<TValue>(getCustomColour(Configuration, customColour.Lookup.ToString()));
@@ -274,6 +278,18 @@ namespace osu.Game.Skinning
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Retrieves the correct combo colour for a given colour index and information on the combo.
+        /// </summary>
+        /// <param name="source">The source to retrieve the combo colours from.</param>
+        /// <param name="colourIndex">The preferred index for retrieving the combo colour with.</param>
+        /// <param name="combo">Information on the combo whose using the returned colour.</param>
+        protected virtual IBindable<Color4> GetComboColour(IHasComboColours source, int colourIndex, IHasComboInformation combo)
+        {
+            var colour = source.ComboColours?[colourIndex % source.ComboColours.Count];
+            return colour.HasValue ? new Bindable<Color4>(colour.Value) : null;
         }
 
         private IBindable<Color4> getCustomColour(IHasCustomColours source, string lookup)

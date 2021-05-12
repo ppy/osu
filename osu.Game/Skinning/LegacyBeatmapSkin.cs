@@ -6,8 +6,11 @@ using osu.Framework.Bindables;
 using osu.Framework.IO.Stores;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.Rulesets.Objects.Legacy;
+using osu.Game.Rulesets.Objects.Types;
+using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {
@@ -37,6 +40,14 @@ namespace osu.Game.Skinning
             }
 
             return base.GetConfig<TLookup, TValue>(lookup);
+        }
+
+        protected override IBindable<Color4> GetComboColour(IHasComboColours source, int comboIndex, IHasComboInformation combo)
+        {
+            if (combo is IHasLegacyBeatmapComboOffset legacyBeatmapCombo)
+                return base.GetComboColour(source, legacyBeatmapCombo.LegacyBeatmapComboIndex, combo);
+
+            return base.GetComboColour(source, comboIndex, combo);
         }
 
         public override ISample GetSample(ISampleInfo sampleInfo)

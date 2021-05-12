@@ -38,7 +38,6 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                         RepeatCount = curveData.RepeatCount,
                         X = positionData?.X ?? 0,
                         NewCombo = comboData?.NewCombo ?? false,
-                        ComboOffset = comboData?.ComboOffset ?? 0,
                         LegacyLastTickOffset = (obj as IHasLegacyLastTickOffset)?.LegacyLastTickOffset ?? 0
                     }.Yield();
 
@@ -49,7 +48,6 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                         Samples = obj.Samples,
                         Duration = endTime.Duration,
                         NewCombo = comboData?.NewCombo ?? false,
-                        ComboOffset = comboData?.ComboOffset ?? 0,
                     }.Yield();
 
                 default:
@@ -58,7 +56,6 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                         StartTime = obj.StartTime,
                         Samples = obj.Samples,
                         NewCombo = comboData?.NewCombo ?? false,
-                        ComboOffset = comboData?.ComboOffset ?? 0,
                         X = positionData?.X ?? 0
                     }.Yield();
             }

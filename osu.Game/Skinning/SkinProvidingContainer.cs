@@ -72,7 +72,7 @@ namespace osu.Game.Skinning
         {
             if (skin != null)
             {
-                if (lookup is GlobalSkinColours || lookup is SkinCustomColourLookup)
+                if (lookup is GlobalSkinColours || lookup is SkinComboColourLookup || lookup is SkinCustomColourLookup)
                     return lookupWithFallback<TLookup, TValue>(lookup, AllowColourLookup);
 
                 return lookupWithFallback<TLookup, TValue>(lookup, AllowConfigurationLookup);
