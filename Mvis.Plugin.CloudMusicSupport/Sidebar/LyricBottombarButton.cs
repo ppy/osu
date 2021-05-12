@@ -8,7 +8,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
         public LyricBottombarButton(PluginSidebarPage page)
             : base(page)
         {
-            ButtonIcon = FontAwesome.Solid.ListAlt;
+            ButtonIcon = FontAwesome.Solid.Music;
             TooltipText = "打开歌词面板";
         }
     }
