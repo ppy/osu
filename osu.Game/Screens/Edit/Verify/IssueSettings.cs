@@ -6,7 +6,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Screens.Edit.Verify
 {
-    public class IssueSettings : Settings
+    public class IssueSettings : RoundedContentEditorScreenSettings
     {
         private readonly IssueList issueList;
 
