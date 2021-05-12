@@ -54,7 +54,7 @@ namespace osu.Game.Tests.Visual.Spectator
                 frames.Add(new LegacyReplayFrame(i * 100, RNG.Next(0, 512), RNG.Next(0, 512), buttonState));
             }
 
-            var bundle = new FrameDataBundle(new ScoreInfo(), frames);
+            var bundle = new FrameDataBundle(new ScoreInfo { Combo = index + count }, frames);
             ((ISpectatorClient)this).UserSentFrames(userId, bundle);
 
             if (!userSentStateDictionary[userId])
