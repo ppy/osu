@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Play.HUD
     /// </summary>
     public abstract class HealthDisplay : Container
     {
-        private Bindable<bool> showHealthbar;
+        private readonly Bindable<bool> showHealthbar = new Bindable<bool>(true);
 
         [Resolved]
         protected HealthProcessor HealthProcessor { get; private set; }
@@ -32,18 +32,21 @@ namespace osu.Game.Screens.Play.HUD
         {
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(HUDOverlay hud)
-        {
-            Current.BindTo(HealthProcessor.Health);
+        [Resolved(canBeNull: true)]
+        private HUDOverlay hudOverlay { get; set; }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Current.BindTo(HealthProcessor.Health);
             HealthProcessor.NewJudgement += onNewJudgement;
 
-            if (hud != null)
-            {
-                showHealthbar = hud.ShowHealthbar.GetBoundCopy();
-                showHealthbar.BindValueChanged(healthBar => this.FadeTo(healthBar.NewValue ? 1 : 0, HUDOverlay.FADE_DURATION, HUDOverlay.FADE_EASING), true);
-            }
+            if (hudOverlay != null)
+                showHealthbar.BindTo(hudOverlay.ShowHealthbar);
+
+            // this probably shouldn't be operating on `this.`
+            showHealthbar.BindValueChanged(healthBar => this.FadeTo(healthBar.NewValue ? 1 : 0, HUDOverlay.FADE_DURATION, HUDOverlay.FADE_EASING), true);
         }
 
         private void onNewJudgement(JudgementResult judgement)
