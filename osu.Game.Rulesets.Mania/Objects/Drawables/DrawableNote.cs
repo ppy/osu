@@ -60,6 +60,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             configTimingBasedNoteColouring.BindValueChanged(_ => updateSnapColour());
             StartTimeBindable.BindValueChanged(_ => updateSnapColour(), true);
         }
