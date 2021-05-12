@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             new IssueTemplateConcurrentDifferent(this)
         };
 
-        public IEnumerable<Issue> Run(IBeatmap playableBeatmap, IWorkingBeatmap workingBeatmap)
+        public IEnumerable<Issue> Run(IBeatmap playableBeatmap, BeatmapVerifierContext context)
         {
             for (int i = 0; i < playableBeatmap.HitObjects.Count - 1; ++i)
             {

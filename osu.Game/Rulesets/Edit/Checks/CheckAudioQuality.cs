@@ -26,13 +26,13 @@ namespace osu.Game.Rulesets.Edit.Checks
             new IssueTemplateNoBitrate(this)
         };
 
-        public IEnumerable<Issue> Run(IBeatmap playableBeatmap, IWorkingBeatmap workingBeatmap)
+        public IEnumerable<Issue> Run(IBeatmap playableBeatmap, BeatmapVerifierContext context)
         {
             var audioFile = playableBeatmap.Metadata?.AudioFile;
             if (audioFile == null)
                 yield break;
 
-            var track = workingBeatmap.Track;
+            var track = context.WorkingBeatmap.Track;
 
             if (track?.Bitrate == null || track.Bitrate.Value == 0)
                 yield return new IssueTemplateNoBitrate(this).Create();
