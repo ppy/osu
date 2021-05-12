@@ -11,15 +11,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
-using osu.Framework.Utils;
 using osu.Game.Database;
-using osu.Game.Online;
 using osu.Game.Online.Spectator;
-using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Osu.Scoring;
-using osu.Game.Scoring;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Tests.Visual.Spectator;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
@@ -148,71 +145,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void assertCombo(int userId, int expectedCombo)
             => AddUntilStep($"player {userId} has {expectedCombo} combo", () => this.ChildrenOfType<GameplayLeaderboardScore>().Single(s => s.User?.Id == userId).Combo.Value == expectedCombo);
-
-        private class TestSpectatorStreamingClient : SpectatorStreamingClient
-        {
-            private readonly Dictionary<int, int> userBeatmapDictionary = new Dictionary<int, int>();
-            private readonly Dictionary<int, bool> userSentStateDictionary = new Dictionary<int, bool>();
-
-            public TestSpectatorStreamingClient()
-                : base(new DevelopmentEndpointConfiguration())
-            {
-            }
-
-            public void StartPlay(int userId, int beatmapId)
-            {
-                userBeatmapDictionary[userId] = beatmapId;
-                userSentStateDictionary[userId] = false;
-                sendState(userId, beatmapId);
-            }
-
-            public void EndPlay(int userId, int beatmapId)
-            {
-                ((ISpectatorClient)this).UserFinishedPlaying(userId, new SpectatorState
-                {
-                    BeatmapID = beatmapId,
-                    RulesetID = 0,
-                });
-                userSentStateDictionary[userId] = false;
-            }
-
-            public void SendFrames(int userId, int index, int count)
-            {
-                var frames = new List<LegacyReplayFrame>();
-
-                for (int i = index; i < index + count; i++)
-                {
-                    var buttonState = i == index + count - 1 ? ReplayButtonState.None : ReplayButtonState.Left1;
-                    frames.Add(new LegacyReplayFrame(i * 100, RNG.Next(0, 512), RNG.Next(0, 512), buttonState));
-                }
-
-                var bundle = new FrameDataBundle(new ScoreInfo { Combo = index + count }, frames);
-                ((ISpectatorClient)this).UserSentFrames(userId, bundle);
-                if (!userSentStateDictionary[userId])
-                    sendState(userId, userBeatmapDictionary[userId]);
-            }
-
-            public override void WatchUser(int userId)
-            {
-                if (userSentStateDictionary[userId])
-                {
-                    // usually the server would do this.
-                    sendState(userId, userBeatmapDictionary[userId]);
-                }
-
-                base.WatchUser(userId);
-            }
-
-            private void sendState(int userId, int beatmapId)
-            {
-                ((ISpectatorClient)this).UserBeganPlaying(userId, new SpectatorState
-                {
-                    BeatmapID = beatmapId,
-                    RulesetID = 0,
-                });
-                userSentStateDictionary[userId] = true;
-            }
-        }
 
         private class TestUserLookupCache : UserLookupCache
         {
