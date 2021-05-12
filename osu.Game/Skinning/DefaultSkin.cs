@@ -91,6 +91,26 @@ namespace osu.Game.Skinning
                     }
 
                     return null;
+
+                case HUDSkinComponent hudComponent:
+                {
+                    switch (hudComponent.Component)
+                    {
+                        case HUDSkinComponents.ComboCounter:
+                            return new DefaultComboCounter();
+
+                        case HUDSkinComponents.ScoreCounter:
+                            return new DefaultScoreCounter();
+
+                        case HUDSkinComponents.AccuracyCounter:
+                            return new DefaultAccuracyCounter();
+
+                        case HUDSkinComponents.HealthDisplay:
+                            return new DefaultHealthDisplay();
+                    }
+
+                    return null;
+                }
             }
 
             return base.GetDrawableComponent(component);

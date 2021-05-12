@@ -8,6 +8,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -22,7 +23,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void SetUpSteps()
         {
             AddStep("Set initial accuracy", () => scoreProcessor.Accuracy.Value = 1);
-            AddStep("Create accuracy counters", () => SetContents(() => new SkinnableAccuracyCounter()));
+            AddStep("Create accuracy counters", () => SetContents(() => new SkinnableDrawable(new HUDSkinComponent(HUDSkinComponents.AccuracyCounter))));
         }
 
         [Test]
