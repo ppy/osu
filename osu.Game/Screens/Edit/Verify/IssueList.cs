@@ -59,6 +59,7 @@ namespace osu.Game.Screens.Edit.Verify
             InterpretedDifficulty = new Bindable<DifficultyRating>(beatmap.BeatmapInfo.DifficultyRating);
 
             context = new BeatmapVerifierContext(workingBeatmap.Value);
+            context.InterpretedDifficulty.BindTo(InterpretedDifficulty);
 
             RelativeSizeAxes = Axes.Both;
 
