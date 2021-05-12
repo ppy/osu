@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.IO.Stores;
 using osu.Game.Configuration;
 using osu.Game.Database;
@@ -25,20 +24,7 @@ namespace osu.Game.Skinning
 
         public string Creator { get; set; }
 
-        private string instantiationInfo;
-
-        public string InstantiationInfo
-        {
-            get => instantiationInfo;
-            set => instantiationInfo = abbreviateInstantiationInfo(value);
-        }
-
-        private string abbreviateInstantiationInfo(string value)
-        {
-            // exclude version onwards, matching only on namespace and type.
-            // this is mainly to allow for new versions of already loaded rulesets to "upgrade" from old.
-            return string.Join(',', value.Split(',').Take(2));
-        }
+        public string InstantiationInfo { get; set; }
 
         public virtual Skin CreateInstance(IResourceStore<byte[]> legacyDefaultResources, IStorageResourceProvider resources)
         {
