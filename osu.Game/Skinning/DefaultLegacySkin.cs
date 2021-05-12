@@ -3,6 +3,7 @@
 
 using JetBrains.Annotations;
 using osu.Framework.IO.Stores;
+using osu.Game.Extensions;
 using osu.Game.IO;
 using osuTK.Graphics;
 
@@ -35,7 +36,7 @@ namespace osu.Game.Skinning
             ID = SkinInfo.CLASSIC_SKIN, // this is temporary until database storage is decided upon.
             Name = "osu!classic",
             Creator = "team osu!",
-            InstantiationInfo = typeof(DefaultLegacySkin).AssemblyQualifiedName,
+            InstantiationInfo = typeof(DefaultLegacySkin).GetInvariantInstantiationInfo()
         };
     }
 }
