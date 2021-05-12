@@ -17,6 +17,7 @@ using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
 using osuTK;
 using osu.Game.Rulesets.Mania.Beatmaps;
+using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.UI
@@ -55,7 +56,7 @@ namespace osu.Game.Rulesets.Mania.UI
             RelativeSizeAxes = Axes.Y;
             Width = COLUMN_WIDTH;
 
-            Drawable background = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ColumnBackground, Index), _ => new DefaultColumnBackground())
+            Drawable background = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ColumnBackground), _ => new DefaultColumnBackground())
             {
                 RelativeSizeAxes = Axes.Both
             };
@@ -66,7 +67,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 // For input purposes, the background is added at the highest depth, but is then proxied back below all other elements
                 background.CreateProxy(),
                 HitObjectArea = new ColumnHitObjectArea(Index, HitObjectContainer) { RelativeSizeAxes = Axes.Both },
-                new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.KeyArea, Index), _ => new DefaultKeyArea())
+                new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.KeyArea), _ => new DefaultKeyArea())
                 {
                     RelativeSizeAxes = Axes.Both
                 },
@@ -83,6 +84,12 @@ namespace osu.Game.Rulesets.Mania.UI
             hitPolicy = new OrderedHitPolicy(HitObjectContainer);
 
             TopLevelContainer.Add(HitObjectArea.Explosions.CreateProxy());
+
+            RegisterPool<Note, DrawableNote>(5, 20);
+            RegisterPool<HoldNote, DrawableHoldNote>(5, 20);
+            RegisterPool<HeadNote, DrawableHoldNoteHead>(5, 20);
+            RegisterPool<TailNote, DrawableHoldNoteTail>(5, 20);
+            RegisterPool<HoldNoteTick, DrawableHoldNoteTick>(50, 200);
         }
 
         public ColumnType ColumnType { get; set; }
