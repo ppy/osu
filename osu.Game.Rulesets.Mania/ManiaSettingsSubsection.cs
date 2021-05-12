@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Mania
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Timing-based note colouring",
+                    LabelText = "基于Timing的note颜色",
                     Current = config.GetBindable<bool>(ManiaRulesetSetting.TimingBasedNoteColouring),
                 }
             };

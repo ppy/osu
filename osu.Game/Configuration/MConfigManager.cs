@@ -58,6 +58,9 @@ namespace osu.Game.Configuration
             SetDefault(MSetting.UseSystemCursor, false);
             SetDefault(MSetting.PreferredFont, "Torus");
 
+            //Gamemode集成
+            SetDefault(MSetting.Gamemode, GamemodeActivateCondition.InGame);
+
             //已分离
             SetDefault(MSetting.MvisEnableStoryboard, true);
             SetDefault(MSetting.MvisEnableFakeEditor, false);
@@ -109,6 +112,7 @@ namespace osu.Game.Configuration
         PreferredFont,
         AlwaysHideTextIndicator,
         MvisCurrentAudioProvider,
+        Gamemode,
 
         //已分离(MvisPanel)
         MvisEnableRulesetPanel,
@@ -137,5 +141,17 @@ namespace osu.Game.Configuration
 
         [Description("打砖块")]
         Fall
+    }
+
+    public enum GamemodeActivateCondition
+    {
+        [Description("从不")]
+        Never,
+
+        [Description("仅游戏内")]
+        InGame,
+
+        [Description("总是")]
+        Always
     }
 }
