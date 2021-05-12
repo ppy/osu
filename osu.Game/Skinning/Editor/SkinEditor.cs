@@ -108,7 +108,7 @@ namespace osu.Game.Skinning.Editor
                                                 {
                                                     Text = "Save Changes",
                                                     Width = 140,
-                                                    Action = save,
+                                                    Action = Save,
                                                 },
                                                 new DangerousTriangleButton
                                                 {
@@ -192,7 +192,7 @@ namespace osu.Game.Skinning.Editor
             }
         }
 
-        private void save()
+        public void Save()
         {
             SkinnableElementTargetContainer[] targetContainers = targetScreen.ChildrenOfType<SkinnableElementTargetContainer>().ToArray();
 

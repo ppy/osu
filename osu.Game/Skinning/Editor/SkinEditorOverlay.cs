@@ -92,8 +92,10 @@ namespace osu.Game.Skinning.Editor
         /// </summary>
         public void Reset()
         {
+            skinEditor?.Save();
             skinEditor?.Hide();
             skinEditor?.Expire();
+
             skinEditor = null;
         }
     }
