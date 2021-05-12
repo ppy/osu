@@ -13,18 +13,27 @@ namespace Mvis.Plugin.RulesetPanel.Config
 
         protected override void InitialiseDefaults()
         {
-            SetDefault(RulesetPanelSetting.EnableRulesetPanel, true);
-            SetDefault(RulesetPanelSetting.ParticleAmount, 350, 0, 350);
+            //上游
             SetDefault(RulesetPanelSetting.ShowParticles, true);
-            SetDefault(RulesetPanelSetting.BarType, MvisBarType.Rounded);
-            SetDefault(RulesetPanelSetting.VisualizerAmount, 3, 1, 5);
+            SetDefault(RulesetPanelSetting.ParticlesCount, 300, 50, 1000);
+            SetDefault(RulesetPanelSetting.BarType, BarType.Rounded);
+            SetDefault(RulesetPanelSetting.VisualizerAmount, 3, 1, 10);
             SetDefault(RulesetPanelSetting.BarWidth, 3.0, 1, 20);
-            SetDefault(RulesetPanelSetting.BarsPerVisual, 120, 1, 200);
+            SetDefault(RulesetPanelSetting.BarsPerVisual, 120, 1, 3500);
             SetDefault(RulesetPanelSetting.Rotation, 0, 0, 359);
             SetDefault(RulesetPanelSetting.UseCustomColour, false);
             SetDefault(RulesetPanelSetting.Red, 0, 0, 255);
             SetDefault(RulesetPanelSetting.Green, 0, 0, 255);
             SetDefault(RulesetPanelSetting.Blue, 0, 0, 255);
+            SetDefault(RulesetPanelSetting.Decay, 200, 100, 500);
+            SetDefault(RulesetPanelSetting.Multiplier, 400, 200, 500);
+            SetDefault(RulesetPanelSetting.Radius, 350, 100, 450);
+            SetDefault(RulesetPanelSetting.LogoPositionX, 0.5f, 0, 1);
+            SetDefault(RulesetPanelSetting.LogoPositionY, 0.5f, 0, 1);
+            SetDefault(RulesetPanelSetting.Symmetry, false);
+
+            //插件
+            SetDefault(RulesetPanelSetting.EnableRulesetPanel, true);
             SetDefault(RulesetPanelSetting.UseOsuLogoVisualisation, false);
             SetDefault(RulesetPanelSetting.IdleAlpha, 1f, 0, 1f);
         }
@@ -34,9 +43,14 @@ namespace Mvis.Plugin.RulesetPanel.Config
 
     public enum RulesetPanelSetting
     {
+        //插件
         EnableRulesetPanel,
-        ParticleAmount,
+        UseOsuLogoVisualisation,
+        IdleAlpha,
+
+        //上游
         ShowParticles,
+        ParticlesCount,
         VisualizerAmount,
         BarWidth,
         BarsPerVisual,
@@ -46,11 +60,15 @@ namespace Mvis.Plugin.RulesetPanel.Config
         Red,
         Green,
         Blue,
-        UseOsuLogoVisualisation,
-        IdleAlpha
+        Decay,
+        Multiplier,
+        Radius,
+        LogoPositionX,
+        LogoPositionY,
+        Symmetry
     }
 
-    public enum MvisBarType
+    public enum BarType
     {
         [Description("基本")]
         Basic,
@@ -59,6 +77,9 @@ namespace Mvis.Plugin.RulesetPanel.Config
         Rounded,
 
         [Description("打砖块")]
-        Fall
+        Fall,
+
+        [Description("点状")]
+        Dots
     }
 }

@@ -9,4 +9,8 @@
   <ItemGroup Label="Project References">
     <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Textures\**\*" />
+  </ItemGroup>
 </Project>

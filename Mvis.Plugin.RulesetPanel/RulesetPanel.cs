@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Mvis.Plugins;
 using osu.Game.Screens.Mvis.Plugins.Config;
 using osu.Game.Screens.Mvis.Plugins.Types;
@@ -42,9 +41,8 @@ namespace Mvis.Plugin.RulesetPanel
         private readonly Bindable<bool> showParticles = new BindableBool();
         private readonly BindableFloat idleAlpha = new BindableFloat();
 
-        private Container particles;
-
-        private BeatmapLogo beatmapLogo;
+        private readonly Bindable<float> xPos = new Bindable<float>(0.5f);
+        private readonly Bindable<float> yPos = new Bindable<float>(0.5f);
 
         [BackgroundDependencyLoader]
         private void load()
@@ -54,6 +52,10 @@ namespace Mvis.Plugin.RulesetPanel
             config.BindWith(RulesetPanelSetting.ShowParticles, showParticles);
             config.BindWith(RulesetPanelSetting.EnableRulesetPanel, Value);
             config.BindWith(RulesetPanelSetting.IdleAlpha, idleAlpha);
+
+            config.BindWith(RulesetPanelSetting.LogoPositionX, xPos);
+            config.BindWith(RulesetPanelSetting.LogoPositionY, yPos);
+
             idleAlpha.BindValueChanged(onIdleAlphaChanged);
 
             if (MvisScreen != null)
@@ -69,6 +71,10 @@ namespace Mvis.Plugin.RulesetPanel
         }
 
         public Action<WorkingBeatmap> OnMvisBeatmapChanged;
+
+        private Container particlesPlaceholder;
+        private BeatmapLogo logo;
+
         private void onMvisBeatmapChanged(WorkingBeatmap b) => OnMvisBeatmapChanged?.Invoke(b);
 
         private void onIdleAlphaChanged(ValueChangedEvent<float> v)
@@ -88,17 +94,13 @@ namespace Mvis.Plugin.RulesetPanel
             RelativeSizeAxes = Axes.Both,
             Children = new Drawable[]
             {
-                particles = new Container
+                particlesPlaceholder = new Container
                 {
                     RelativeSizeAxes = Axes.Both
                 },
-                new ParallaxContainer
+                logo = new BeatmapLogo
                 {
-                    ParallaxAmount = -0.0025f,
-                    Child = beatmapLogo = new BeatmapLogo
-                    {
-                        Anchor = Anchor.Centre,
-                    }
+                    RelativePositionAxes = Axes.Both
                 }
             }
         };
@@ -107,26 +109,26 @@ namespace Mvis.Plugin.RulesetPanel
         {
             showParticles.BindValueChanged(v =>
             {
-                switch (v.NewValue)
+                if (v.NewValue)
                 {
-                    case true:
-                        particles.Child = new SpaceParticlesContainer();
-                        break;
-
-                    case false:
-                        particles.Clear();
-                        break;
+                    particlesPlaceholder.Child = new Particles();
+                    return;
                 }
+
+                particlesPlaceholder.Clear();
             }, true);
 
-            MvisScreen.OnScreenExiting += beatmapLogo.StopResponseOnBeatmapChanges;
-            MvisScreen.OnScreenSuspending += beatmapLogo.StopResponseOnBeatmapChanges;
-            MvisScreen.OnScreenResuming += () =>
-            {
-                if (!Disabled.Value) beatmapLogo.ResponseOnBeatmapChanges();
-            };
+            xPos.BindValueChanged(x => logo.X = x.NewValue, true);
+            yPos.BindValueChanged(y => logo.Y = y.NewValue, true);
 
-            beatmapLogo.ResponseOnBeatmapChanges();
+            //MvisScreen.OnScreenExiting += beatmapLogo.StopResponseOnBeatmapChanges;
+            //MvisScreen.OnScreenSuspending += beatmapLogo.StopResponseOnBeatmapChanges;
+            //MvisScreen.OnScreenResuming += () =>
+            //{
+            //    if (!Disabled.Value) beatmapLogo.ResponseOnBeatmapChanges();
+            //};
+            //
+            //beatmapLogo.ResponseOnBeatmapChanges();
 
             return true;
         }
@@ -136,7 +138,7 @@ namespace Mvis.Plugin.RulesetPanel
         public override bool Disable()
         {
             this.FadeOut(300, Easing.OutQuint).ScaleTo(0.8f, 400, Easing.OutQuint);
-            beatmapLogo?.StopResponseOnBeatmapChanges();
+            //beatmapLogo?.StopResponseOnBeatmapChanges();
 
             return base.Disable();
         }
@@ -145,7 +147,7 @@ namespace Mvis.Plugin.RulesetPanel
         {
             this.FadeTo(MvisScreen?.OverlaysHidden ?? false ? idleAlpha.Value : 1, 300).ScaleTo(1, 400, Easing.OutQuint);
 
-            beatmapLogo?.ResponseOnBeatmapChanges();
+           // beatmapLogo?.ResponseOnBeatmapChanges();
 
             return base.Enable();
         }
@@ -156,8 +158,8 @@ namespace Mvis.Plugin.RulesetPanel
 
             if (ContentLoaded)
             {
-                MvisScreen.OnScreenExiting -= beatmapLogo.StopResponseOnBeatmapChanges;
-                MvisScreen.OnScreenSuspending -= beatmapLogo.StopResponseOnBeatmapChanges;
+                //MvisScreen.OnScreenExiting -= beatmapLogo.StopResponseOnBeatmapChanges;
+                //MvisScreen.OnScreenSuspending -= beatmapLogo.StopResponseOnBeatmapChanges;
             }
 
             Value.UnbindAll();

@@ -2,39 +2,27 @@
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
-using osu.Game.Screens.Mvis;
 
-namespace Mvis.Plugin.RulesetPanel.Objects.Helpers
+namespace Mvis.Plugin.RulesetPanel.UI.Objects.Helpers
 {
     public class CurrentBeatmapProvider : Container
     {
-        [Resolved]
-        private MvisScreen mvisScreen { get; set; }
-
-        protected Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+        protected IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(IBindable<WorkingBeatmap> working)
         {
-            Beatmap.BindValueChanged(OnBeatmapChanged);
+            Beatmap.BindTo(working);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            Beatmap.BindValueChanged(OnBeatmapChanged, true);
         }
 
         protected virtual void OnBeatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)
         {
-        }
-
-        public virtual void StopResponseOnBeatmapChanges()
-        {
-            Beatmap.UnbindFrom(mvisScreen.Beatmap);
-            Beatmap.Disabled = false;
-        }
-
-        public virtual void ResponseOnBeatmapChanges()
-        {
-            StopResponseOnBeatmapChanges();
-
-            Beatmap.BindTo(mvisScreen.Beatmap);
-            Beatmap.TriggerChange();
         }
     }
 }

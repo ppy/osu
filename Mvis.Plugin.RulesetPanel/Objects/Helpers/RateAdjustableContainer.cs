@@ -1,7 +1,7 @@
 ﻿using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 
-namespace Mvis.Plugin.RulesetPanel.Objects.Helpers
+namespace Mvis.Plugin.RulesetPanel.UI.Objects.Helpers
 {
     public class RateAdjustableContainer : Container
     {

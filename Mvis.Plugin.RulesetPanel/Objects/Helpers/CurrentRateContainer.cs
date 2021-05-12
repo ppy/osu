@@ -1,10 +1,13 @@
-﻿using osu.Framework.Graphics;
+﻿using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 
-namespace Mvis.Plugin.RulesetPanel.Objects.Helpers
+namespace Mvis.Plugin.RulesetPanel.UI.Objects.Helpers
 {
     public class CurrentRateContainer : RateAdjustableContainer
     {
+        protected readonly BindableBool IsKiai = new BindableBool();
+
         protected override Container<Drawable> Content => content;
 
         private readonly MusicIntensityController intensityController;
@@ -22,6 +25,8 @@ namespace Mvis.Plugin.RulesetPanel.Objects.Helpers
                 },
                 intensityController = new MusicIntensityController()
             });
+
+            IsKiai.BindTo(intensityController.IsKiai);
         }
 
         protected override void LoadComplete()
