@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Utils;
@@ -14,7 +15,7 @@ namespace osu.Game.Tests.Visual.Spectator
     public class TestSpectatorStreamingClient : SpectatorStreamingClient
     {
         public new BindableList<int> PlayingUsers => (BindableList<int>)base.PlayingUsers;
-        private readonly HashSet<int> watchingUsers = new HashSet<int>();
+        private readonly ConcurrentDictionary<int, byte> watchingUsers = new ConcurrentDictionary<int, byte>();
 
         private readonly Dictionary<int, int> userBeatmapDictionary = new Dictionary<int, int>();
         private readonly Dictionary<int, bool> userSentStateDictionary = new Dictionary<int, bool>();
@@ -62,18 +63,17 @@ namespace osu.Game.Tests.Visual.Spectator
 
         public override void WatchUser(int userId)
         {
-            // When newly watching a user, the server sends the playing state immediately.
-            if (!watchingUsers.Contains(userId) && PlayingUsers.Contains(userId))
-                sendState(userId, userBeatmapDictionary[userId]);
-
             base.WatchUser(userId);
-            watchingUsers.Add(userId);
+
+            // When newly watching a user, the server sends the playing state immediately.
+            if (watchingUsers.TryAdd(userId, 0) && PlayingUsers.Contains(userId))
+                sendState(userId, userBeatmapDictionary[userId]);
         }
 
         public override void StopWatchingUser(int userId)
         {
             base.StopWatchingUser(userId);
-            watchingUsers.Remove(userId);
+            watchingUsers.TryRemove(userId, out _);
         }
 
         private void sendState(int userId, int beatmapId)
