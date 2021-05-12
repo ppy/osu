@@ -1,6 +1,6 @@
 ﻿using Mvis.Plugin.RulesetPanel.Config;
+using Mvis.Plugin.RulesetPanel.Objects.Helpers;
 using Mvis.Plugin.RulesetPanel.Objects.MusicVisualizers;
-using Mvis.Plugin.RulesetPanel.UI.Objects.Helpers;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;

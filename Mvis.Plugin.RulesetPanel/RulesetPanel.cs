@@ -22,9 +22,9 @@ namespace Mvis.Plugin.RulesetPanel
 
         public RulesetPanel()
         {
-            Name = "Mvis面板";
-            Description = "用于提供Mvis面板功能(中心的谱面图及周围的粒子效果)";
-            Author = "mf-osu; EVAST9919";
+            Name = "Mvis2Player";
+            Description = "可能是最好的osu!音乐可视化";
+            Author = "EVAST9919; mf-osu";
 
             Flags.AddRange(new[]
             {
@@ -118,8 +118,18 @@ namespace Mvis.Plugin.RulesetPanel
                 particlesPlaceholder.Clear();
             }, true);
 
-            xPos.BindValueChanged(x => logo.X = x.NewValue, true);
-            yPos.BindValueChanged(y => logo.Y = y.NewValue, true);
+            logo.X = xPos.Value;
+            logo.Y = yPos.Value;
+
+            xPos.BindValueChanged(x =>
+            {
+                logo.MoveToX(x.NewValue, 200, Easing.OutQuint);
+            }, true);
+
+            yPos.BindValueChanged(y =>
+            {
+                logo.MoveToY(y.NewValue, 200, Easing.OutQuint);
+            }, true);
 
             //MvisScreen.OnScreenExiting += beatmapLogo.StopResponseOnBeatmapChanges;
             //MvisScreen.OnScreenSuspending += beatmapLogo.StopResponseOnBeatmapChanges;

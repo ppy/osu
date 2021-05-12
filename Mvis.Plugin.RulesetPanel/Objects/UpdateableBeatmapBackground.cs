@@ -1,5 +1,6 @@
-﻿using Mvis.Plugin.RulesetPanel.Config;
-using Mvis.Plugin.RulesetPanel.UI.Objects.Helpers;
+﻿using System;
+using Mvis.Plugin.RulesetPanel.Config;
+using Mvis.Plugin.RulesetPanel.Objects.Helpers;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -199,13 +200,13 @@ namespace Mvis.Plugin.RulesetPanel.Objects
                     }
                 }
 
-                if (newTitle.EndsWith(" "))
+                if (newTitle.EndsWith(" ", StringComparison.Ordinal))
                     newTitle = newTitle[0..^1];
 
                 return newTitle;
             }
 
-            private static readonly char[] title_chars = new[]
+            private static readonly char[] title_chars =
             {
                 '(',
                 '-',

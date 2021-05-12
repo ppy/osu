@@ -148,22 +148,22 @@ namespace Mvis.Plugin.RulesetPanel.Objects
             private void drawPart(Quad quad, float alpha, Action<TexturedVertex2D> vertexAction)
             {
                 DrawQuad(Texture, quad, DrawColourInfo.Colour.MultiplyAlpha(alpha), null, vertexAction,
-                        new Vector2(InflationAmount.X / DrawRectangle.Width, InflationAmount.Y / DrawRectangle.Height),
-                        null, TextureCoords);
+                    new Vector2(InflationAmount.X / DrawRectangle.Width, InflationAmount.Y / DrawRectangle.Height),
+                    null, TextureCoords);
             }
 
             private Quad getQuad(RectangleF rect) => new Quad(
-                        Vector2Extensions.Transform(rect.TopLeft, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(rect.TopRight, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(rect.BottomLeft, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(rect.BottomRight, DrawInfo.Matrix)
-                    );
+                Vector2Extensions.Transform(rect.TopLeft, DrawInfo.Matrix),
+                Vector2Extensions.Transform(rect.TopRight, DrawInfo.Matrix),
+                Vector2Extensions.Transform(rect.BottomLeft, DrawInfo.Matrix),
+                Vector2Extensions.Transform(rect.BottomRight, DrawInfo.Matrix)
+            );
 
             private RectangleF getPartRectangle(Vector2 pos, float size) => new RectangleF(
-                        pos.X * sourceSize.X + sourceSize.X / 2 - size / 2,
-                        pos.Y * sourceSize.Y + sourceSize.Y / 2 - size / 2,
-                        size,
-                        size);
+                pos.X * sourceSize.X + sourceSize.X / 2 - size / 2,
+                pos.Y * sourceSize.Y + sourceSize.Y / 2 - size / 2,
+                size,
+                size);
         }
 
         private class Particle
@@ -203,11 +203,13 @@ namespace Mvis.Plugin.RulesetPanel.Objects
                         currentDepth = maxDepth ? max_depth : RNG.NextSingle(min_depth, max_depth);
                         initialPosition = new Vector2(RNG.NextSingle(-0.5f, 0.5f), RNG.NextSingle(-0.5f, 0.5f)) * max_depth;
                         CurrentPosition = getCurrentPosition(direction);
+
                         if (outOfBounds)
                         {
                             reset(direction, maxDepth);
                             return;
                         }
+
                         break;
 
                     case MoveDirection.Left:
@@ -274,6 +276,7 @@ namespace Mvis.Plugin.RulesetPanel.Objects
                         {
                             reset(direction);
                         }
+
                         break;
 
                     case MoveDirection.Right:
@@ -284,6 +287,7 @@ namespace Mvis.Plugin.RulesetPanel.Objects
                         {
                             reset(direction);
                         }
+
                         break;
 
                     case MoveDirection.Up:
@@ -294,6 +298,7 @@ namespace Mvis.Plugin.RulesetPanel.Objects
                         {
                             reset(direction);
                         }
+
                         break;
 
                     case MoveDirection.Down:

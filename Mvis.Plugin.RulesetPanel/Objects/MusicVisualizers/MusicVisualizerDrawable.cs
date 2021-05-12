@@ -27,7 +27,7 @@ namespace Mvis.Plugin.RulesetPanel.Objects.MusicVisualizers
 
         private IShader shader;
 
-        public MusicVisualizerDrawable()
+        protected MusicVisualizerDrawable()
         {
             Texture = Texture.WhitePixel;
         }

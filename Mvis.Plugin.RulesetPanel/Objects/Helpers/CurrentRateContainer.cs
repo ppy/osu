@@ -2,7 +2,7 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 
-namespace Mvis.Plugin.RulesetPanel.UI.Objects.Helpers
+namespace Mvis.Plugin.RulesetPanel.Objects.Helpers
 {
     public class CurrentRateContainer : RateAdjustableContainer
     {

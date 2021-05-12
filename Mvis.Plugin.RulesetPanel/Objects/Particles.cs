@@ -1,4 +1,4 @@
-﻿using Mvis.Plugin.RulesetPanel.UI.Objects.Helpers;
+﻿using Mvis.Plugin.RulesetPanel.Objects.Helpers;
 using osu.Framework.Graphics;
 
 namespace Mvis.Plugin.RulesetPanel.Objects
