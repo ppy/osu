@@ -30,9 +30,9 @@ namespace osu.Game.Rulesets.Edit.Checks
             new IssueTemplateTooUncompressed(this)
         };
 
-        public IEnumerable<Issue> Run(IBeatmap playableBeatmap, BeatmapVerifierContext context)
+        public IEnumerable<Issue> Run(IBeatmap beatmap, BeatmapVerifierContext context)
         {
-            var backgroundFile = playableBeatmap.Metadata?.BackgroundFile;
+            var backgroundFile = beatmap.Metadata?.BackgroundFile;
             if (backgroundFile == null)
                 yield break;
 
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             else if (texture.Width < low_width || texture.Height < low_height)
                 yield return new IssueTemplateLowResolution(this).Create(texture.Width, texture.Height);
 
-            string storagePath = playableBeatmap.BeatmapInfo.BeatmapSet.GetPathForFile(backgroundFile);
+            string storagePath = beatmap.BeatmapInfo.BeatmapSet.GetPathForFile(backgroundFile);
             double filesizeMb = context.WorkingBeatmap.GetStream(storagePath).Length / (1024d * 1024d);
 
             if (filesizeMb > max_filesize_mb)
