@@ -143,6 +143,8 @@ namespace osu.Game.Skinning.Editor
             // probably something which will be factored out in a future database refactor so not too concerning for now.
             currentSkin.BindValueChanged(skin =>
             {
+                Save();
+
                 hasBegunMutating = false;
                 Scheduler.AddOnce(skinChanged);
             }, true);
