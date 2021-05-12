@@ -8,12 +8,10 @@ using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Screens.Edit.Verify
 {
-    internal class InterpretationSection : Section
+    internal class InterpretationSection : EditorRoundedScreenSettingsSection
     {
-        public InterpretationSection(IssueList issueList)
-            : base(issueList)
-        {
-        }
+        [Resolved]
+        private VerifyScreen verify { get; set; }
 
         protected override string Header => "Interpretation";
 
@@ -26,7 +24,8 @@ namespace osu.Game.Screens.Edit.Verify
                 Origin = Anchor.CentreLeft,
                 TooltipText = "Affects checks that depend on difficulty level"
             };
-            dropdown.Current.BindTo(IssueList.InterpretedDifficulty);
+
+            dropdown.Current.BindTo(verify.InterpretedDifficulty);
 
             Flow.Add(dropdown);
         }

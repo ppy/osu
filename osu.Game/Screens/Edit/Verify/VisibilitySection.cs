@@ -9,19 +9,17 @@ using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Screens.Edit.Verify
 {
-    internal class VisibilitySection : Section
+    internal class VisibilitySection : EditorRoundedScreenSettingsSection
     {
-        public VisibilitySection(IssueList issueList)
-            : base(issueList)
-        {
-        }
+        [Resolved]
+        private VerifyScreen verify { get; set; }
 
         protected override string Header => "Visibility";
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colours)
         {
-            foreach (IssueType issueType in IssueList.ShowType.Keys)
+            foreach (IssueType issueType in verify.IssueList.ShowType.Keys)
             {
                 var checkbox = new SettingsCheckbox
                 {
@@ -30,8 +28,8 @@ namespace osu.Game.Screens.Edit.Verify
                     LabelText = issueType.ToString()
                 };
 
-                checkbox.Current.BindTo(IssueList.ShowType[issueType]);
-                checkbox.Current.BindValueChanged(_ => IssueList.Refresh());
+                checkbox.Current.BindTo(verify.IssueList.ShowType[issueType]);
+                checkbox.Current.BindValueChanged(_ => verify.IssueList.Refresh());
                 Flow.Add(checkbox);
             }
         }

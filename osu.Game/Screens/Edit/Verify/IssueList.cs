@@ -18,6 +18,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Verify
 {
+    [Cached]
     public class IssueList : CompositeDrawable
     {
         private IssueTable table;
@@ -32,7 +33,7 @@ namespace osu.Game.Screens.Edit.Verify
         private EditorBeatmap beatmap { get; set; }
 
         [Resolved]
-        private Bindable<Issue> selectedIssue { get; set; }
+        private VerifyScreen verify { get; set; }
 
         public Dictionary<IssueType, Bindable<bool>> ShowType { get; set; }
 
@@ -55,7 +56,7 @@ namespace osu.Game.Screens.Edit.Verify
             generalVerifier = new BeatmapVerifier();
             rulesetVerifier = beatmap.BeatmapInfo.Ruleset?.CreateInstance()?.CreateBeatmapVerifier();
 
-            InterpretedDifficulty = new Bindable<DifficultyRating>(beatmap.BeatmapInfo.DifficultyRating);
+            InterpretedDifficulty = verify.InterpretedDifficulty.GetBoundCopy();
 
             RelativeSizeAxes = Axes.Both;
 

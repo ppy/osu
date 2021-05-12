@@ -9,21 +9,14 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osuTK;
 
-namespace osu.Game.Screens.Edit.Verify
+namespace osu.Game.Screens.Edit
 {
-    public abstract class Section : CompositeDrawable
+    public abstract class EditorRoundedScreenSettingsSection : CompositeDrawable
     {
         private const int header_height = 50;
 
-        protected readonly IssueList IssueList;
-
         protected FillFlowContainer Flow;
         protected abstract string Header { get; }
-
-        protected Section(IssueList issueList)
-        {
-            IssueList = issueList;
-        }
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colours)
