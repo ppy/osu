@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
+
 namespace osu.Game.Skinning
 {
     /// <summary>
@@ -8,16 +10,24 @@ namespace osu.Game.Skinning
     /// </summary>
     public interface ISkinnableTarget
     {
-        public SkinnableTarget Target { get; }
+        /// <summary>
+        /// The definition of this target.
+        /// </summary>
+        SkinnableTarget Target { get; }
+
+        /// <summary>
+        /// A bindable list of components which are being tracked by this skinnable target.
+        /// </summary>
+        IBindableList<ISkinnableComponent> Components { get; }
 
         /// <summary>
         /// Reload this target from the current skin.
         /// </summary>
-        public void Reload();
+        void Reload();
 
         /// <summary>
         /// Add the provided item to this target.
         /// </summary>
-        public void Add(ISkinnableComponent drawable);
+        void Add(ISkinnableComponent drawable);
     }
 }
