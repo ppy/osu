@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -112,6 +113,16 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 tickContainer.CreateProxy(),
                 tailContainer.CreateProxy(),
             });
+        }
+
+        protected override void OnApply()
+        {
+            base.OnApply();
+
+            sizingContainer.Size = Vector2.One;
+            HoldStartTime = null;
+            HoldBrokenTime = null;
+            releaseTime = null;
         }
 
         protected override void AddNestedHitObject(DrawableHitObject hitObject)
