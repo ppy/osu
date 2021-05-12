@@ -88,6 +88,24 @@ namespace osu.Game.Scoring
             }
         }
 
+        public bool ContainsModOfType<T>(out T mod)
+        {
+            if (mods != null)
+            {
+                foreach (var currentMod in mods)
+                {
+                    if (!(currentMod is T modOfType))
+                        continue;
+
+                    mod = modOfType;
+                    return true;
+                }
+            }
+
+            mod = default;
+            return false;
+        }
+
         // Used for API serialisation/deserialisation.
         [JsonProperty("mods")]
         [NotMapped]

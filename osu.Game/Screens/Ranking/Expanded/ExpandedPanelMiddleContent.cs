@@ -7,11 +7,13 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
+using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
@@ -54,6 +56,9 @@ namespace osu.Game.Screens.Ranking.Expanded
 
             Padding = new MarginPadding(padding);
         }
+
+        [Resolved]
+        private GameHost host { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(BeatmapDifficultyCache beatmapDifficultyCache)
@@ -224,7 +229,47 @@ namespace osu.Game.Screens.Ranking.Expanded
                                     }
                                 }
                             }
-                        }
+                        }.With(t =>
+                        {
+                            if (!score.ContainsModOfType<ModRandom>(out var mod) || mod.Seed == null)
+                                return;
+
+                            t.Add(new GridContainer
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Content = new[]
+                                {
+                                    new Drawable[]
+                                    {
+                                        new OsuSpriteText
+                                        {
+                                            Anchor = Anchor.CentreRight,
+                                            Origin = Anchor.CentreRight,
+                                            Margin = new MarginPadding
+                                            {
+                                                Top = 3f,
+                                                Right = 5f
+                                            },
+                                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.Medium),
+                                            Text = $"Seed: {mod.Seed}"
+                                        },
+                                        new TriangleButton
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Height = 1.2f,
+                                            Width = 0.5f,
+                                            Text = "Copy",
+                                            Action = () => host.GetClipboard().SetText(mod.Seed.ToString())
+                                        }
+                                    }
+                                },
+                                RowDimensions = new[]
+                                {
+                                    new Dimension(GridSizeMode.AutoSize),
+                                }
+                            });
+                        })
                     }
                 },
                 new OsuSpriteText
