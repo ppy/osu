@@ -80,10 +80,10 @@ namespace osu.Game.Skinning
                             {
                                 Children = new Drawable[]
                                 {
-                                    new DefaultComboCounter(),
-                                    new DefaultScoreCounter(),
-                                    new DefaultAccuracyCounter(),
-                                    new DefaultHealthDisplay(),
+                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ComboCounter)),
+                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ScoreCounter)),
+                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.AccuracyCounter)),
+                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.HealthDisplay)),
                                 }
                             };
 
