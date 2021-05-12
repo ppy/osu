@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 {
                     Name = "Column samples pool",
                     RelativeSizeAxes = Axes.Both,
-                    ChildrenEnumerable = hitSounds = Enumerable.Range(0, max_concurrent_hitsounds).Select(_ => new SkinnableSound()).ToArray()
+                    Children = hitSounds = Enumerable.Range(0, max_concurrent_hitsounds).Select(_ => new SkinnableSound()).ToArray()
                 },
                 TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
             };
