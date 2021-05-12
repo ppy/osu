@@ -78,7 +78,7 @@ namespace osu.Game.Skinning
                                 }
                             })
                             {
-                                Children = new Drawable[]
+                                Children = new[]
                                 {
                                     GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ComboCounter)),
                                     GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ScoreCounter)),
