@@ -92,6 +92,13 @@ namespace osu.Game.Rulesets.Mania.UI
             RegisterPool<HoldNoteTick, DrawableHoldNoteTick>(50, 200);
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            NewResult += OnNewResult;
+        }
+
         public ColumnType ColumnType { get; set; }
 
         public bool IsSpecial => ColumnType == ColumnType.Special;
@@ -105,28 +112,14 @@ namespace osu.Game.Rulesets.Mania.UI
             return dependencies;
         }
 
-        /// <summary>
-        /// Adds a DrawableHitObject to this Playfield.
-        /// </summary>
-        /// <param name="hitObject">The DrawableHitObject to add.</param>
-        public override void Add(DrawableHitObject hitObject)
+        protected override void OnNewDrawableHitObject(DrawableHitObject drawableHitObject)
         {
-            hitObject.AccentColour.Value = AccentColour;
-            hitObject.OnNewResult += OnNewResult;
+            base.OnNewDrawableHitObject(drawableHitObject);
 
-            DrawableManiaHitObject maniaObject = (DrawableManiaHitObject)hitObject;
+            drawableHitObject.AccentColour.Value = AccentColour;
+
+            DrawableManiaHitObject maniaObject = (DrawableManiaHitObject)drawableHitObject;
             maniaObject.CheckHittable = hitPolicy.IsHittable;
-
-            base.Add(hitObject);
-        }
-
-        public override bool Remove(DrawableHitObject h)
-        {
-            if (!base.Remove(h))
-                return false;
-
-            h.OnNewResult -= OnNewResult;
-            return true;
         }
 
         internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
