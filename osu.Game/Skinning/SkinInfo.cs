@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using osu.Framework.IO.Stores;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.IO;
 
 namespace osu.Game.Skinning
@@ -50,7 +51,7 @@ namespace osu.Game.Skinning
             ID = DEFAULT_SKIN,
             Name = "osu!lazer",
             Creator = "team osu!",
-            InstantiationInfo = typeof(DefaultSkin).AssemblyQualifiedName,
+            InstantiationInfo = typeof(DefaultSkin).GetInvariantInstantiationInfo()
         };
 
         public bool Equals(SkinInfo other) => other != null && ID == other.ID;
