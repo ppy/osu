@@ -7,9 +7,9 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Extensions;
-using osu.Game.Skinning;
+using osu.Game.Screens.Play.HUD;
 
-namespace osu.Game.Screens.Play.HUD
+namespace osu.Game.Skinning
 {
     public class SkinnableElementTargetContainer : SkinReloadableDrawable, ISkinnableTarget
     {
