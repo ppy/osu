@@ -21,7 +21,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             base.OnResuming(last);
 
-            if (client.Room != null)
+            if (client.Room != null && client.LocalUser?.State != MultiplayerUserState.Spectating)
                 client.ChangeState(MultiplayerUserState.Idle);
         }
 

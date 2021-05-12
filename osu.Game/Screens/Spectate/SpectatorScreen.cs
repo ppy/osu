@@ -26,7 +26,9 @@ namespace osu.Game.Screens.Spectate
     /// </summary>
     public abstract class SpectatorScreen : OsuScreen
     {
-        private readonly int[] userIds;
+        protected IReadOnlyList<int> UserIds => userIds;
+
+        private readonly List<int> userIds = new List<int>();
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -54,7 +56,7 @@ namespace osu.Game.Screens.Spectate
         /// <param name="userIds">The users to spectate.</param>
         protected SpectatorScreen(params int[] userIds)
         {
-            this.userIds = userIds;
+            this.userIds.AddRange(userIds);
         }
 
         protected override void LoadComplete()
@@ -80,20 +82,18 @@ namespace osu.Game.Screens.Spectate
 
         private Task populateAllUsers()
         {
-            var userLookupTasks = new Task[userIds.Length];
+            var userLookupTasks = new List<Task>();
 
-            for (int i = 0; i < userIds.Length; i++)
+            foreach (var u in userIds)
             {
-                var userId = userIds[i];
-
-                userLookupTasks[i] = userLookupCache.GetUserAsync(userId).ContinueWith(task =>
+                userLookupTasks.Add(userLookupCache.GetUserAsync(u).ContinueWith(task =>
                 {
                     if (!task.IsCompletedSuccessfully)
                         return;
 
                     lock (stateLock)
-                        userMap[userId] = task.Result;
-                });
+                        userMap[u] = task.Result;
+                }));
             }
 
             return Task.WhenAll(userLookupTasks);
@@ -238,6 +238,23 @@ namespace osu.Game.Screens.Spectate
         /// </summary>
         /// <param name="userId">The user to end gameplay for.</param>
         protected abstract void EndGameplay(int userId);
+
+        /// <summary>
+        /// Stops spectating a user.
+        /// </summary>
+        /// <param name="userId">The user to stop spectating.</param>
+        protected void RemoveUser(int userId)
+        {
+            lock (stateLock)
+            {
+                userFinishedPlaying(userId, null);
+
+                userIds.Remove(userId);
+                userMap.Remove(userId);
+
+                spectatorClient.StopWatchingUser(userId);
+            }
+        }
 
         protected override void Dispose(bool isDisposing)
         {
