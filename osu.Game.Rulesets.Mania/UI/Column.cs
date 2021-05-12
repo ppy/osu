@@ -73,6 +73,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 background,
                 new Container
                 {
+                    Name = "Column samples pool",
                     RelativeSizeAxes = Axes.Both,
                     ChildrenEnumerable = hitSounds = Enumerable.Range(0, max_concurrent_hitsounds).Select(_ => new SkinnableSound()).ToArray()
                 },
@@ -132,7 +133,7 @@ namespace osu.Game.Rulesets.Mania.UI
             HitObjectArea.Explosions.Add(hitExplosionPool.Get(e => e.Apply(result)));
         }
 
-        private int nextHitSound;
+        private int nextHitSoundIndex;
 
         public bool OnPressed(ManiaAction action)
         {
@@ -147,12 +148,12 @@ namespace osu.Game.Rulesets.Mania.UI
 
             if (nextObject is DrawableManiaHitObject maniaObject)
             {
-                var hitSound = hitSounds[nextHitSound];
+                var hitSound = hitSounds[nextHitSoundIndex];
 
                 hitSound.Samples = maniaObject.GetGameplaySamples();
                 hitSound.Play();
 
-                nextHitSound = (nextHitSound + 1) % max_concurrent_hitsounds;
+                nextHitSoundIndex = (nextHitSoundIndex + 1) % max_concurrent_hitsounds;
             }
 
             return true;
