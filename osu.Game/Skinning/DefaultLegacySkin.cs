@@ -11,12 +11,12 @@ namespace osu.Game.Skinning
 {
     public class DefaultLegacySkin : LegacySkin
     {
-        [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
         public DefaultLegacySkin(IResourceStore<byte[]> storage, IStorageResourceProvider resources)
             : this(Info, storage, resources)
         {
         }
 
+        [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
         public DefaultLegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, IStorageResourceProvider resources)
             : base(skin, storage, resources, string.Empty)
         {
