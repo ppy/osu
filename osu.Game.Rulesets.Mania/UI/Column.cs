@@ -85,11 +85,11 @@ namespace osu.Game.Rulesets.Mania.UI
 
             TopLevelContainer.Add(HitObjectArea.Explosions.CreateProxy());
 
-            RegisterPool<Note, DrawableNote>(5, 20);
-            RegisterPool<HoldNote, DrawableHoldNote>(5, 20);
-            RegisterPool<HeadNote, DrawableHoldNoteHead>(5, 20);
-            RegisterPool<TailNote, DrawableHoldNoteTail>(5, 20);
-            RegisterPool<HoldNoteTick, DrawableHoldNoteTick>(50, 200);
+            RegisterPool<Note, DrawableNote>(10, 50);
+            RegisterPool<HoldNote, DrawableHoldNote>(10, 50);
+            RegisterPool<HeadNote, DrawableHoldNoteHead>(10, 50);
+            RegisterPool<TailNote, DrawableHoldNoteTail>(10, 50);
+            RegisterPool<HoldNoteTick, DrawableHoldNoteTick>(50, 250);
         }
 
         protected override void LoadComplete()
