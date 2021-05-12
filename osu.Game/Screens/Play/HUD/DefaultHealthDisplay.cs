@@ -13,6 +13,7 @@ using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
+using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -77,7 +78,7 @@ namespace osu.Game.Screens.Play.HUD
             RelativeSizeAxes = Axes.X;
             Margin = new MarginPadding { Top = 20 };
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 new Box
                 {
