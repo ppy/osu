@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         protected abstract string TypeOfFile { get; }
         protected abstract string GetFilename(IBeatmap playableBeatmap);
 
-        public CheckMetadata Metadata => new CheckMetadata(Category, $"Missing {TypeOfFile}");
+        public CheckMetadata Metadata => new CheckMetadata(Category, $"缺少 {TypeOfFile}");
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         public class IssueTemplateNoneSet : IssueTemplate
         {
             public IssueTemplateNoneSet(ICheck check)
-                : base(check, IssueType.Problem, "No {0} has been set.")
+                : base(check, IssueType.Problem, "{0} 未被设置.")
             {
             }
 
@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         public class IssueTemplateDoesNotExist : IssueTemplate
         {
             public IssueTemplateDoesNotExist(ICheck check)
-                : base(check, IssueType.Problem, "The {0} file \"{1}\" does not exist.")
+                : base(check, IssueType.Problem, "与 {0} 对应的文件 \"{1}\" 未找到.")
             {
             }
 

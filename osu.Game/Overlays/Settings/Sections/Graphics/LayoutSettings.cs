@@ -141,7 +141,14 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             scalingSettings.ForEach(s => bindPreviewEvent(s.Current));
 
-            windowModeDropdown.Current.ValueChanged += _ => updateResolutionDropdown();
+            windowModeDropdown.Current.BindValueChanged(mode =>
+            {
+                updateResolutionDropdown();
+
+                const string not_fullscreen_note = "Running without fullscreen mode will increase your input latency!";
+
+                windowModeDropdown.WarningText = mode.NewValue != WindowMode.Fullscreen ? not_fullscreen_note : string.Empty;
+            }, true);
 
             windowModes.BindCollectionChanged((sender, args) =>
             {

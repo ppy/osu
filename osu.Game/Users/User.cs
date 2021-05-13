@@ -144,8 +144,14 @@ namespace osu.Game.Users
         [JsonProperty(@"unranked_beatmapset_count")]
         public int UnrankedBeatmapsetCount;
 
+        [JsonProperty(@"scores_best_count")]
+        public int ScoresBestCount;
+
         [JsonProperty(@"scores_first_count")]
         public int ScoresFirstCount;
+
+        [JsonProperty(@"scores_recent_count")]
+        public int ScoresRecentCount;
 
         [JsonProperty(@"beatmap_playcounts_count")]
         public int BeatmapPlaycountsCount;

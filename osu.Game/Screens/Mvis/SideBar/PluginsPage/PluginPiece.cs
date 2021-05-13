@@ -15,7 +15,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Dialog;
 using osu.Game.Screens.Mvis.Plugins;
 using osuTK;
 using osuTK.Graphics;
@@ -216,10 +215,7 @@ namespace osu.Game.Screens.Mvis.SideBar.PluginsPage
             {
                 unloadButton.Action = () =>
                 {
-                    dialog.Push(new ConfirmDialog($"你确定要卸载{Plugin.Name}吗?", () => manager.UnLoadPlugin(Plugin))
-                    {
-                        BodyText = "卸载后该插件在本次osu!会话中将不再可用!"
-                    });
+                    dialog.Push(new PluginRemoveConfirmDialog($"你确定要卸载{Plugin.Name}吗?", blockPlugin => manager.UnLoadPlugin(Plugin, blockPlugin)));
                 };
                 unloadButton.TooltipText = "卸载此插件";
                 unloadIcon.Icon = FontAwesome.Solid.TrashAlt;

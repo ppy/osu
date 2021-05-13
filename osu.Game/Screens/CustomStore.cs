@@ -58,6 +58,22 @@ namespace osu.Game.Screens
             prepareLoad();
         }
 
+        public bool Contains(string path)
+        {
+            try
+            {
+                customStorage.Exists(path);
+                return true;
+            }
+            catch (Exception e)
+            {
+                if (!(e is ArgumentException))
+                    Logger.Error(e, "获取文件路径时发生了错误");
+
+                return false;
+            }
+        }
+
         private void prepareLoad()
         {
             //获取custom下面所有以Font.dll、.Mvis.dll结尾的文件

@@ -1,4 +1,5 @@
 ﻿using System;
+using Mvis.Plugin.RulesetPanel.Config;
 using Mvis.Plugin.RulesetPanel.Objects.Helpers;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -6,12 +7,9 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Screens.Mvis.Misc;
 using osuTK;
 using osuTK.Graphics;
 
@@ -25,7 +23,7 @@ namespace Mvis.Plugin.RulesetPanel.Objects
         private readonly Container nameContainer;
         private readonly MusicIntensityController intensityController;
 
-        private BeatmapCover.Cover background;
+        private BeatmapBackground background;
         private BeatmapName name;
 
         public UpdateableBeatmapBackground()
@@ -45,16 +43,11 @@ namespace Mvis.Plugin.RulesetPanel.Objects
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         },
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black.Opacity(0.25f)
-                        },
                         nameContainer = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
                             Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
+                            Origin = Anchor.Centre
                         },
                     }
                 },
@@ -83,11 +76,12 @@ namespace Mvis.Plugin.RulesetPanel.Objects
 
         protected override void OnBeatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)
         {
-            LoadComponentAsync(new BeatmapCover.Cover(beatmap.NewValue)
+            LoadComponentAsync(new BeatmapBackground(beatmap.NewValue)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Alpha = 0
+                Alpha = 0,
+                Colour = Color4.LightGray
             }, newBackground =>
             {
                 background?.FadeOut(animation_duration, Easing.OutQuint);
@@ -119,39 +113,32 @@ namespace Mvis.Plugin.RulesetPanel.Objects
 
         private class BeatmapName : CompositeDrawable
         {
-            private readonly OsuSpriteText titleText;
-            private ILocalisedBindableString title;
-            private readonly WorkingBeatmap beatmap;
-
             [Resolved]
-            private LocalisationManager localisation { get; set; }
+            private RulesetPanelConfigManager config { get; set; }
 
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
+            private readonly Bindable<int> radius = new Bindable<int>(350);
 
-                title = localisation.GetLocalisedString(new RomanisableString(beatmap.Metadata.TitleUnicode, beatmap.Metadata.Title));
-                title.BindValueChanged(v =>
-                {
-                    titleText.Text = getShortTitle(v.NewValue);
-                }, true);
-            }
+            private readonly WorkingBeatmap beatmap;
 
             public BeatmapName(WorkingBeatmap beatmap = null)
             {
-                RelativeSizeAxes = Axes.Both;
+                this.beatmap = beatmap;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                AutoSizeAxes = Axes.Both;
                 RelativePositionAxes = Axes.Y;
 
                 if (beatmap == null)
                     return;
 
-                this.beatmap = beatmap;
-
                 AddInternal(new FillFlowContainer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
+                    AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
                     Spacing = new Vector2(0, 10),
                     Children = new Drawable[]
@@ -161,23 +148,36 @@ namespace Mvis.Plugin.RulesetPanel.Objects
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Font = OsuFont.GetFont(size: 26, weight: FontWeight.SemiBold),
-                            Text = new RomanisableString(beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist),
-                            Shadow = false
+                            Text = beatmap.Metadata.Artist
                         },
-                        titleText = new OsuSpriteText
+                        new OsuSpriteText
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Font = OsuFont.GetFont(size: 20, weight: FontWeight.SemiBold),
-                            Shadow = false
+                            Text = getShortTitle(beatmap.Metadata.Title)
                         }
                     }
                 }.WithEffect(new BlurEffect
                 {
-                    Colour = Color4.Black.Opacity(0.7f),
+                    Colour = Color4.Black.Opacity(0.8f),
                     DrawOriginal = true,
+                    PadExtent = true,
                     Sigma = new Vector2(5)
                 }));
+
+                config.BindWith(RulesetPanelSetting.Radius, radius);
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                radius.BindValueChanged(r =>
+                {
+                    if (beatmap != null)
+                        Scale = new Vector2(r.NewValue / 350f);
+                }, true);
             }
 
             /// <summary>
@@ -185,7 +185,7 @@ namespace Mvis.Plugin.RulesetPanel.Objects
             /// </summary>
             /// <param name="longTitle">The title to trim.</param>
             /// <returns></returns>
-            private string getShortTitle(string longTitle)
+            private static string getShortTitle(string longTitle)
             {
                 var newTitle = longTitle;
 
@@ -201,7 +201,7 @@ namespace Mvis.Plugin.RulesetPanel.Objects
                 }
 
                 if (newTitle.EndsWith(" ", StringComparison.Ordinal))
-                    newTitle = newTitle.Substring(0, newTitle.Length - 1);
+                    newTitle = newTitle[0..^1];
 
                 return newTitle;
             }

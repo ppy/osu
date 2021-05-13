@@ -23,7 +23,6 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         [Description("错误")]
         Error,
 
-        // TODO: Negligible issues should be hidden by default.
         /// <summary> A possible mistake so minor/unlikely that it can often be safely ignored. </summary>
         [Description("小毛病")]
         Negligible,

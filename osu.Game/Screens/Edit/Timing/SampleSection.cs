@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 bank = new LabelledTextBox
                 {
-                    Label = "Bank名称",
+                    Label = "Bank name",
                 },
                 volume = new SliderWithTextBoxInput<int>("音量")
                 {

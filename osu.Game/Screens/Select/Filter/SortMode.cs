@@ -28,7 +28,10 @@ namespace osu.Game.Screens.Select.Filter
         [Description("取得的成绩")]
         RankAchieved,
 
+        [Description("来源")]
+        Source,
+
         [Description("标题")]
-        Title
+        Title,
     }
 }

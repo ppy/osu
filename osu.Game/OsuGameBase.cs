@@ -62,7 +62,7 @@ namespace osu.Game
         public bool UseDevelopmentServer { get; }
 
         protected OsuConfigManager LocalConfig;
-        protected MConfigManager MfConfig;
+        protected MConfigManager MConfig;
 
         protected SessionStatics SessionStatics { get; private set; }
 
@@ -199,7 +199,7 @@ namespace osu.Game
 
             dependencies.CacheAs(this);
             dependencies.CacheAs(LocalConfig);
-            dependencies.Cache(MfConfig);
+            dependencies.Cache(MConfig);
 
             //fallback机制: 先加载的字体会覆盖后加载的字体，即从上到下覆盖(如果在OsuFont.Typeface中)
             AddFont(Resources, @"Fonts/osuFont");
@@ -421,7 +421,7 @@ namespace osu.Game
                 ? new DevelopmentOsuConfigManager(Storage)
                 : new OsuConfigManager(Storage);
 
-            MfConfig ??= new MConfigManager(Storage);
+            MConfig ??= new MConfigManager(Storage);
         }
 
         /// <summary>

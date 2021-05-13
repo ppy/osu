@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Edit.Checks
     public class CheckAudioPresence : CheckFilePresence
     {
         protected override CheckCategory Category => CheckCategory.Audio;
-        protected override string TypeOfFile => "audio";
+        protected override string TypeOfFile => "音频";
         protected override string GetFilename(IBeatmap playableBeatmap) => playableBeatmap.Metadata?.AudioFile;
     }
 }

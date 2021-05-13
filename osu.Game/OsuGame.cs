@@ -30,6 +30,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
+using osu.Framework.Platform.Linux;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
@@ -55,6 +56,7 @@ using LogLevel = osu.Framework.Logging.LogLevel;
 using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Screens.Mvis.Plugins;
+using osu.Game.Skinning.Editor;
 
 namespace osu.Game
 {
@@ -85,6 +87,23 @@ namespace osu.Game
         private UserProfileOverlay userProfile;
 
         private BeatmapSetOverlay beatmapSetOverlay;
+
+        private SkinEditorOverlay skinEditor;
+
+        private Container overlayContent;
+
+        private Container rightFloatingOverlayContent;
+
+        private Container leftFloatingOverlayContent;
+
+        private Container topMostOverlayContent;
+
+        private ScalingContainer screenContainer;
+
+        private Container screenOffsetContainer;
+
+        [Resolved]
+        private FrameworkConfigManager frameworkConfig { get; set; }
 
         [Cached]
         private readonly DifficultyRecommender difficultyRecommender = new DifficultyRecommender();
@@ -121,9 +140,11 @@ namespace osu.Game
         protected SettingsOverlay Settings;
 
         private VolumeOverlay volume;
+
         private OsuLogo osuLogo;
 
         private MvisPluginManager mvisPlManager;
+        private Bindable<GamemodeActivateCondition> gamemodeCondition;
 
         private MainMenu menuScreen;
 
@@ -284,6 +305,8 @@ namespace osu.Game
                 SkinManager.CurrentSkinInfo.Value = skinInfo;
             };
             configSkin.TriggerChange();
+
+            gamemodeCondition = MConfig.GetBindable<GamemodeActivateCondition>(MSetting.Gamemode);
 
             IsActive.BindValueChanged(active => updateActiveState(active.NewValue), true);
 
@@ -658,26 +681,35 @@ namespace osu.Game
                     ActionRequested = action => volume.Adjust(action),
                     ScrollActionRequested = (action, amount, isPrecise) => volume.Adjust(action, amount, isPrecise),
                 },
-                screenContainer = new ScalingContainer(ScalingMode.ExcludeOverlays)
+                screenOffsetContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        receptor = new BackButton.Receptor(),
-                        ScreenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
-                        BackButton = new BackButton(receptor)
+                        screenContainer = new ScalingContainer(ScalingMode.ExcludeOverlays)
                         {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            Action = () =>
+                            RelativeSizeAxes = Axes.Both,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Children = new Drawable[]
                             {
-                                var currentScreen = ScreenStack.CurrentScreen as IOsuScreen;
+                                receptor = new BackButton.Receptor(),
+                                ScreenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
+                                BackButton = new BackButton(receptor)
+                                {
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft,
+                                    Action = () =>
+                                    {
+                                        var currentScreen = ScreenStack.CurrentScreen as IOsuScreen;
 
-                                if (currentScreen?.AllowBackButton == true && !currentScreen.OnBackButton())
-                                    ScreenStack.Exit();
+                                        if (currentScreen?.AllowBackButton == true && !currentScreen.OnBackButton())
+                                            ScreenStack.Exit();
+                                    }
+                                },
+                                logoContainer = new Container { RelativeSizeAxes = Axes.Both },
                             }
                         },
-                        logoContainer = new Container { RelativeSizeAxes = Axes.Both },
                     }
                 },
                 overlayContent = new Container { RelativeSizeAxes = Axes.Both },
@@ -695,13 +727,15 @@ namespace osu.Game
 
             if (host.Window is SDL2DesktopWindow sdl2DesktopWindow)
             {
-                windowOpacity.Value = MfConfig.Get<bool>(MSetting.FadeInWindowWhenEntering)
+                windowOpacity.Value = MConfig.Get<bool>(MSetting.FadeInWindowWhenEntering)
                     ? 0
                     : 1;
                 windowOpacity.BindValueChanged(v => SetWindowOpacity(v.NewValue), true);
 
                 sdl2DesktopWindow.Visible = true;
             }
+
+            gamemodeCondition.BindValueChanged(v => gamemodeConditionChanged(v.NewValue));
 
             loadComponentSingleFile(osuLogo, logo =>
             {
@@ -765,6 +799,7 @@ namespace osu.Game
             var changelogOverlay = loadComponentSingleFile(new ChangelogOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add, true);
+            loadComponentSingleFile(skinEditor = new SkinEditorOverlay(screenContainer), overlayContent.Add);
 
             loadComponentSingleFile(new LoginOverlay
             {
@@ -842,7 +877,7 @@ namespace osu.Game
                 if (notifications.State.Value == Visibility.Visible)
                     offset -= Toolbar.HEIGHT / 2;
 
-                screenContainer.MoveToX(offset, SettingsPanel.TRANSITION_LENGTH, Easing.OutQuint);
+                screenOffsetContainer.MoveToX(offset, SettingsPanel.TRANSITION_LENGTH, Easing.OutQuint);
             }
 
             Settings.State.ValueChanged += _ => updateScreenOffset();
@@ -1009,19 +1044,6 @@ namespace osu.Game
         {
         }
 
-        private Container overlayContent;
-
-        private Container rightFloatingOverlayContent;
-
-        private Container leftFloatingOverlayContent;
-
-        private Container topMostOverlayContent;
-
-        [Resolved]
-        private FrameworkConfigManager frameworkConfig { get; set; }
-
-        private ScalingContainer screenContainer;
-
         protected override bool OnExiting()
         {
             if (ScreenStack.CurrentScreen is Loader)
@@ -1040,7 +1062,7 @@ namespace osu.Game
         {
             base.UpdateAfterChildren();
 
-            screenContainer.Padding = new MarginPadding { Top = ToolbarOffset };
+            screenOffsetContainer.Padding = new MarginPadding { Top = ToolbarOffset };
             overlayContent.Padding = new MarginPadding { Top = ToolbarOffset };
 
             MenuCursorContainer.CanShowCursor = (ScreenStack.CurrentScreen as IOsuScreen)?.CursorVisible ?? false;
@@ -1048,6 +1070,8 @@ namespace osu.Game
 
         protected virtual void ScreenChanged(IScreen current, IScreen newScreen)
         {
+            skinEditor.Reset();
+
             switch (newScreen)
             {
                 case IntroScreen intro:
@@ -1084,6 +1108,31 @@ namespace osu.Game
                     BackButton.Show();
                 else
                     BackButton.Hide();
+            }
+
+            gamemodeCondition.TriggerChange();
+        }
+
+        private void gamemodeConditionChanged(GamemodeActivateCondition newCondition)
+        {
+            if (!(host is LinuxGameHost linuxGameHost)) return;
+
+            switch (newCondition)
+            {
+                case GamemodeActivateCondition.Always:
+                    linuxGameHost.GamemodeStart();
+                    break;
+
+                case GamemodeActivateCondition.InGame:
+                    if (ScreenStack.CurrentScreen is Player)
+                        linuxGameHost.GamemodeStart();
+                    else
+                        linuxGameHost.GamemodeEnd();
+                    break;
+
+                case GamemodeActivateCondition.Never:
+                    linuxGameHost.GamemodeEnd();
+                    break;
             }
         }
 

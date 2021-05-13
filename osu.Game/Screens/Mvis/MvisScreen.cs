@@ -248,6 +248,8 @@ namespace osu.Game.Screens.Mvis
 
         public float BottombarHeight => (bottomBar?.Height - bottomBar?.Y ?? 0) + 10 + 5;
 
+        public new string Name => "123";
+
         #endregion
 
         public MvisScreen()
