@@ -3,17 +3,18 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Edit.Blueprints.Components;
+using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
-    public class HoldNoteNoteSelectionBlueprint : ManiaSelectionBlueprint
+    public class HoldNoteNoteSelectionBlueprint : ManiaSelectionBlueprint<HoldNote>
     {
         protected new DrawableHoldNote DrawableObject => (DrawableHoldNote)base.DrawableObject;
 
         private readonly HoldNotePosition position;
 
-        public HoldNoteNoteSelectionBlueprint(DrawableHoldNote holdNote, HoldNotePosition position)
+        public HoldNoteNoteSelectionBlueprint(HoldNote holdNote, HoldNotePosition position)
             : base(holdNote)
         {
             this.position = position;
