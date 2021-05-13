@@ -172,6 +172,9 @@ namespace osu.Game.Skinning.Editor
         {
             base.Update();
 
+            if (drawable.Parent == null)
+                return;
+
             originBox.Position = drawable.ToSpaceOfOtherDrawable(drawable.OriginPosition, this);
             anchorBox.Position = drawable.Parent.ToSpaceOfOtherDrawable(drawable.AnchorPosition, this);
 
