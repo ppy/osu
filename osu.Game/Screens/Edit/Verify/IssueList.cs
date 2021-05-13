@@ -35,8 +35,6 @@ namespace osu.Game.Screens.Edit.Verify
         [Resolved]
         private VerifyScreen verify { get; set; }
 
-        public Dictionary<IssueType, Bindable<bool>> ShowType { get; set; }
-
         public Bindable<DifficultyRating> InterpretedDifficulty { get; set; }
 
         private IBeatmapVerifier rulesetVerifier;
@@ -45,14 +43,6 @@ namespace osu.Game.Screens.Edit.Verify
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colours)
         {
-            // Reflects the user interface. Only types in this dictionary have configurable visibility.
-            ShowType = new Dictionary<IssueType, Bindable<bool>>
-            {
-                { IssueType.Warning, new Bindable<bool>(true) },
-                { IssueType.Error, new Bindable<bool>(true) },
-                { IssueType.Negligible, new Bindable<bool>(false) }
-            };
-
             generalVerifier = new BeatmapVerifier();
             rulesetVerifier = beatmap.BeatmapInfo.Ruleset?.CreateInstance()?.CreateBeatmapVerifier();
 
@@ -116,9 +106,9 @@ namespace osu.Game.Screens.Edit.Verify
 
         private IEnumerable<Issue> filter(IEnumerable<Issue> issues)
         {
-            foreach (IssueType issueType in ShowType.Keys)
+            foreach (var issueType in verify.ShowIssueType.Keys)
             {
-                if (!ShowType[issueType].Value)
+                if (!verify.ShowIssueType[issueType].Value)
                     issues = issues.Where(issue => issue.Template.Type != issueType);
             }
 
