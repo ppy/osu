@@ -14,12 +14,19 @@ namespace osu.Game.Screens.Edit.Verify
         [Resolved]
         private VerifyScreen verify { get; set; }
 
+        private readonly IssueType[] configurableIssueTypes =
+        {
+            IssueType.Warning,
+            IssueType.Error,
+            IssueType.Negligible
+        };
+
         protected override string Header => "Visibility";
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colours)
         {
-            foreach (IssueType issueType in verify.ShowIssueType.Keys)
+            foreach (IssueType issueType in configurableIssueTypes)
             {
                 var checkbox = new SettingsCheckbox
                 {
@@ -28,8 +35,18 @@ namespace osu.Game.Screens.Edit.Verify
                     LabelText = issueType.ToString()
                 };
 
-                checkbox.Current.BindTo(verify.ShowIssueType[issueType]);
-                checkbox.Current.BindValueChanged(_ => verify.IssueList.Refresh());
+                checkbox.Current.Default = !verify.HiddenIssueTypes.Contains(issueType);
+                checkbox.Current.SetDefault();
+                checkbox.Current.BindValueChanged(state =>
+                {
+                    if (!state.NewValue)
+                        verify.HiddenIssueTypes.Add(issueType);
+                    else
+                        verify.HiddenIssueTypes.Remove(issueType);
+
+                    verify.IssueList.Refresh();
+                });
+
                 Flow.Add(checkbox);
             }
         }
