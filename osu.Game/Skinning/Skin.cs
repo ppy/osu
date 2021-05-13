@@ -39,8 +39,6 @@ namespace osu.Game.Skinning
         {
             SkinInfo = skin;
 
-            // may be null for default skin.
-
             // we may want to move this to some kind of async operation in the future.
             foreach (SkinnableTarget skinnableTarget in Enum.GetValues(typeof(SkinnableTarget)))
             {
