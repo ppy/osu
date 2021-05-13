@@ -8,27 +8,20 @@ using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Screens.Edit.Verify
 {
-    internal class InterpretationSection : Section
+    internal class InterpretationSection : EditorRoundedScreenSettingsSection
     {
-        public InterpretationSection(IssueList issueList)
-            : base(issueList)
-        {
-        }
-
-        protected override string Header => "Interpretation";
+        protected override string HeaderText => "Interpretation";
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(VerifyScreen verify)
         {
-            var dropdown = new SettingsEnumDropdown<DifficultyRating>
+            Flow.Add(new SettingsEnumDropdown<DifficultyRating>
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
-                TooltipText = "Affects checks that depend on difficulty level"
-            };
-            dropdown.Current.BindTo(IssueList.InterpretedDifficulty);
-
-            Flow.Add(dropdown);
+                TooltipText = "Affects checks that depend on difficulty level",
+                Current = verify.InterpretedDifficulty.GetBoundCopy()
+            });
         }
     }
 }

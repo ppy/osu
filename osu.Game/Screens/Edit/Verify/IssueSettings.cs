@@ -6,19 +6,12 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Screens.Edit.Verify
 {
-    public class IssueSettings : Settings
+    public class IssueSettings : EditorRoundedScreenSettings
     {
-        private readonly IssueList issueList;
-
-        public IssueSettings(IssueList issueList)
-        {
-            this.issueList = issueList;
-        }
-
         protected override IReadOnlyList<Drawable> CreateSections() => new Drawable[]
         {
-            new InterpretationSection(issueList),
-            new VisibilitySection(issueList)
+            new InterpretationSection(),
+            new VisibilitySection()
         };
     }
 }

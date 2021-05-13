@@ -9,9 +9,9 @@ using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 {
-    public class MultiplayerSpectatorLeaderboard : MultiplayerGameplayLeaderboard
+    public class MultiSpectatorLeaderboard : MultiplayerGameplayLeaderboard
     {
-        public MultiplayerSpectatorLeaderboard(ScoreProcessor scoreProcessor, int[] userIds)
+        public MultiSpectatorLeaderboard([NotNull] ScoreProcessor scoreProcessor, int[] userIds)
             : base(scoreProcessor, userIds)
         {
         }

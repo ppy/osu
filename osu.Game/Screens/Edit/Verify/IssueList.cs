@@ -18,6 +18,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Verify
 {
+    [Cached]
     public class IssueList : CompositeDrawable
     {
         private IssueTable table;
@@ -32,11 +33,7 @@ namespace osu.Game.Screens.Edit.Verify
         private EditorBeatmap beatmap { get; set; }
 
         [Resolved]
-        private Bindable<Issue> selectedIssue { get; set; }
-
-        public Dictionary<IssueType, Bindable<bool>> ShowType { get; set; }
-
-        public Bindable<DifficultyRating> InterpretedDifficulty { get; set; }
+        private VerifyScreen verify { get; set; }
 
         private IBeatmapVerifier rulesetVerifier;
         private BeatmapVerifier generalVerifier;
@@ -45,21 +42,11 @@ namespace osu.Game.Screens.Edit.Verify
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colours)
         {
-            // Reflects the user interface. Only types in this dictionary have configurable visibility.
-            ShowType = new Dictionary<IssueType, Bindable<bool>>
-            {
-                { IssueType.Warning, new Bindable<bool>(true) },
-                { IssueType.Error, new Bindable<bool>(true) },
-                { IssueType.Negligible, new Bindable<bool>(false) }
-            };
-
             generalVerifier = new BeatmapVerifier();
             rulesetVerifier = beatmap.BeatmapInfo.Ruleset?.CreateInstance()?.CreateBeatmapVerifier();
 
-            InterpretedDifficulty = new Bindable<DifficultyRating>(beatmap.BeatmapInfo.DifficultyRating);
-
             context = new BeatmapVerifierContext(workingBeatmap.Value);
-            context.InterpretedDifficulty.BindTo(InterpretedDifficulty);
+            context.InterpretedDifficulty.BindTo(verify.InterpretedDifficulty.GetBoundCopy());
 
             RelativeSizeAxes = Axes.Both;
 
@@ -86,7 +73,7 @@ namespace osu.Game.Screens.Edit.Verify
                         new TriangleButton
                         {
                             Text = "Refresh",
-                            Action = Refresh,
+                            Action = refresh,
                             Size = new Vector2(120, 40),
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.BottomRight,
@@ -100,10 +87,13 @@ namespace osu.Game.Screens.Edit.Verify
         {
             base.LoadComplete();
 
-            Refresh();
+            verify.InterpretedDifficulty.BindValueChanged(_ => refresh());
+            verify.HiddenIssueTypes.BindCollectionChanged((_, __) => refresh());
+
+            refresh();
         }
 
-        public void Refresh()
+        private void refresh()
         {
             var issues = generalVerifier.Run(beatmap, context);
 
@@ -119,13 +109,7 @@ namespace osu.Game.Screens.Edit.Verify
 
         private IEnumerable<Issue> filter(IEnumerable<Issue> issues)
         {
-            foreach (IssueType issueType in ShowType.Keys)
-            {
-                if (!ShowType[issueType].Value)
-                    issues = issues.Where(issue => issue.Template.Type != issueType);
-            }
-
-            return issues;
+            return issues.Where(issue => !verify.HiddenIssueTypes.Contains(issue.Template.Type));
         }
     }
 }

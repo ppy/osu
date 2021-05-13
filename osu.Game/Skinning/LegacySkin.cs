@@ -52,6 +52,7 @@ namespace osu.Game.Skinning
 
         private readonly Dictionary<int, LegacyManiaSkinConfiguration> maniaConfigurations = new Dictionary<int, LegacyManiaSkinConfiguration>();
 
+        [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
         public LegacySkin(SkinInfo skin, IStorageResourceProvider resources)
             : this(skin, new LegacySkinResourceStore<SkinFileInfo>(skin, resources.Files), resources, "skin.ini")
         {

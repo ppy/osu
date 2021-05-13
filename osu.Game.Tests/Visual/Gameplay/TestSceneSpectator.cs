@@ -1,34 +1,32 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
-using osu.Game.Online;
 using osu.Game.Online.Spectator;
-using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.UI;
-using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Beatmaps.IO;
+using osu.Game.Tests.Visual.Multiplayer;
+using osu.Game.Tests.Visual.Spectator;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestSceneSpectator : ScreenTestScene
     {
+        private readonly User streamingUser = new User { Id = MultiplayerTestScene.PLAYER_1_ID, Username = "Test user" };
+
         [Cached(typeof(SpectatorStreamingClient))]
         private TestSpectatorStreamingClient testSpectatorStreamingClient = new TestSpectatorStreamingClient();
 
@@ -214,9 +212,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void waitForPlayer() => AddUntilStep("wait for player", () => Stack.CurrentScreen is Player);
 
-        private void start(int? beatmapId = null) => AddStep("start play", () => testSpectatorStreamingClient.StartPlay(beatmapId ?? importedBeatmapId));
+        private void start(int? beatmapId = null) => AddStep("start play", () => testSpectatorStreamingClient.StartPlay(streamingUser.Id, beatmapId ?? importedBeatmapId));
 
-        private void finish(int? beatmapId = null) => AddStep("end play", () => testSpectatorStreamingClient.EndPlay(beatmapId ?? importedBeatmapId));
+        private void finish(int? beatmapId = null) => AddStep("end play", () => testSpectatorStreamingClient.EndPlay(streamingUser.Id, beatmapId ?? importedBeatmapId));
 
         private void checkPaused(bool state) =>
             AddUntilStep($"game is {(state ? "paused" : "playing")}", () => player.ChildrenOfType<DrawableRuleset>().First().IsPaused.Value == state);
@@ -225,87 +223,15 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("send frames", () =>
             {
-                testSpectatorStreamingClient.SendFrames(nextFrame, count);
+                testSpectatorStreamingClient.SendFrames(streamingUser.Id, nextFrame, count);
                 nextFrame += count;
             });
         }
 
         private void loadSpectatingScreen()
         {
-            AddStep("load screen", () => LoadScreen(spectatorScreen = new SoloSpectator(testSpectatorStreamingClient.StreamingUser)));
+            AddStep("load screen", () => LoadScreen(spectatorScreen = new SoloSpectator(streamingUser)));
             AddUntilStep("wait for screen load", () => spectatorScreen.LoadState == LoadState.Loaded);
-        }
-
-        public class TestSpectatorStreamingClient : SpectatorStreamingClient
-        {
-            public readonly User StreamingUser = new User { Id = 55, Username = "Test user" };
-
-            public new BindableList<int> PlayingUsers => (BindableList<int>)base.PlayingUsers;
-
-            private int beatmapId;
-
-            public TestSpectatorStreamingClient()
-                : base(new DevelopmentEndpointConfiguration())
-            {
-            }
-
-            public void StartPlay(int beatmapId)
-            {
-                this.beatmapId = beatmapId;
-                sendState(beatmapId);
-            }
-
-            public void EndPlay(int beatmapId)
-            {
-                ((ISpectatorClient)this).UserFinishedPlaying(StreamingUser.Id, new SpectatorState
-                {
-                    BeatmapID = beatmapId,
-                    RulesetID = 0,
-                });
-
-                sentState = false;
-            }
-
-            private bool sentState;
-
-            public void SendFrames(int index, int count)
-            {
-                var frames = new List<LegacyReplayFrame>();
-
-                for (int i = index; i < index + count; i++)
-                {
-                    var buttonState = i == index + count - 1 ? ReplayButtonState.None : ReplayButtonState.Left1;
-
-                    frames.Add(new LegacyReplayFrame(i * 100, RNG.Next(0, 512), RNG.Next(0, 512), buttonState));
-                }
-
-                var bundle = new FrameDataBundle(new ScoreInfo(), frames);
-                ((ISpectatorClient)this).UserSentFrames(StreamingUser.Id, bundle);
-
-                if (!sentState)
-                    sendState(beatmapId);
-            }
-
-            public override void WatchUser(int userId)
-            {
-                if (!PlayingUsers.Contains(userId) && sentState)
-                {
-                    // usually the server would do this.
-                    sendState(beatmapId);
-                }
-
-                base.WatchUser(userId);
-            }
-
-            private void sendState(int beatmapId)
-            {
-                sentState = true;
-                ((ISpectatorClient)this).UserBeganPlaying(StreamingUser.Id, new SpectatorState
-                {
-                    BeatmapID = beatmapId,
-                    RulesetID = 0,
-                });
-            }
         }
 
         internal class TestUserLookupCache : UserLookupCache
