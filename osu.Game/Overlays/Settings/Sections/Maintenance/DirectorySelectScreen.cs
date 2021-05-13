@@ -108,7 +108,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             if (InitialPath != null)
                 directorySelector.CurrentPath.Value = InitialPath;
 
-            directorySelector.CurrentPath.BindValueChanged(e => selectionButton.Enabled.Value = e.NewValue != null ? IsValidDirectory(e.NewValue) : false, true);
+            directorySelector.CurrentPath.BindValueChanged(e => selectionButton.Enabled.Value = e.NewValue != null && IsValidDirectory(e.NewValue), true);
             base.LoadComplete();
         }
 
