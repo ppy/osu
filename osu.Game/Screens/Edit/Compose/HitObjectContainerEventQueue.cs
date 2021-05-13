@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -23,7 +24,7 @@ namespace osu.Game.Screens.Edit.Compose
         /// <remarks>
         /// If the ruleset uses pooled objects, this represents the time when the <see cref="HitObject"/>s become alive.
         /// </remarks>
-        public event Action<HitObject, DrawableHitObject> HitObjectUsageBegan;
+        public event Action<HitObject> HitObjectUsageBegan;
 
         /// <summary>
         /// Invoked when a <see cref="HitObject"/> becomes unused by a <see cref="DrawableHitObject"/>.
@@ -44,20 +45,12 @@ namespace osu.Game.Screens.Edit.Compose
         /// Creates a new <see cref="HitObjectContainerEventQueue"/>.
         /// </summary>
         /// <param name="playfield">The most top-level <see cref="Playfield"/>.</param>
-        public HitObjectContainerEventQueue(Playfield playfield)
+        public HitObjectContainerEventQueue([NotNull] Playfield playfield)
         {
             this.playfield = playfield;
 
-            bindPlayfieldRecursive(playfield);
-        }
-
-        private void bindPlayfieldRecursive(Playfield p)
-        {
-            p.HitObjectContainer.HitObjectUsageBegan += onHitObjectUsageBegan;
-            p.HitObjectContainer.HitObjectUsageFinished += onHitObjectUsageFinished;
-
-            foreach (var nested in p.NestedPlayfields)
-                bindPlayfieldRecursive(nested);
+            playfield.HitObjectUsageBegan += onHitObjectUsageBegan;
+            playfield.HitObjectUsageFinished += onHitObjectUsageFinished;
         }
 
         private readonly Dictionary<HitObject, int> pendingUsagesBegan = new Dictionary<HitObject, int>();
@@ -87,7 +80,7 @@ namespace osu.Game.Screens.Edit.Compose
                 else
                 {
                     // This is a new usage of the hitobject.
-                    HitObjectUsageBegan?.Invoke(hitObject, playfield.AllHitObjects.Single(d => d.HitObject == hitObject));
+                    HitObjectUsageBegan?.Invoke(hitObject);
                 }
             }
 
@@ -97,6 +90,14 @@ namespace osu.Game.Screens.Edit.Compose
 
             pendingUsagesBegan.Clear();
             pendingUsagesFinished.Clear();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            playfield.HitObjectUsageBegan -= onHitObjectUsageBegan;
+            playfield.HitObjectUsageFinished -= onHitObjectUsageFinished;
         }
     }
 }
