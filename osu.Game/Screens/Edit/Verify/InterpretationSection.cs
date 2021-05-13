@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays.Settings;
@@ -15,9 +16,13 @@ namespace osu.Game.Screens.Edit.Verify
 
         protected override string Header => "Interpretation";
 
+        private Bindable<DifficultyRating> interpretedDifficulty;
+
         [BackgroundDependencyLoader]
         private void load()
         {
+            interpretedDifficulty = verify.InterpretedDifficulty.GetBoundCopy();
+
             var dropdown = new SettingsEnumDropdown<DifficultyRating>
             {
                 Anchor = Anchor.CentreLeft,
@@ -25,7 +30,7 @@ namespace osu.Game.Screens.Edit.Verify
                 TooltipText = "Affects checks that depend on difficulty level"
             };
 
-            dropdown.Current.BindTo(verify.InterpretedDifficulty);
+            dropdown.Current.BindTo(interpretedDifficulty);
 
             Flow.Add(dropdown);
         }
