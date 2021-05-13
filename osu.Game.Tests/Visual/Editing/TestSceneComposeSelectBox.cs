@@ -167,5 +167,21 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("move mouse away", () => InputManager.MoveMouseTo(selectionBox, new Vector2(20)));
             AddUntilStep("rotation handle hidden", () => rotationHandle.Alpha == 0);
         }
+
+        /// <summary>
+        /// Tests that hovering over two handles instantaneously from one to another does not crash or cause issues to the visibility state.
+        /// </summary>
+        [Test]
+        public void TestHoverOverTwoHandlesInstantaneously()
+        {
+            AddStep("hover over top-left scale handle", () =>
+                InputManager.MoveMouseTo(this.ChildrenOfType<SelectionBoxScaleHandle>().Single(s => s.Anchor == Anchor.TopLeft)));
+            AddStep("hover over top-right scale handle", () =>
+                InputManager.MoveMouseTo(this.ChildrenOfType<SelectionBoxScaleHandle>().Single(s => s.Anchor == Anchor.TopRight)));
+            AddUntilStep("top-left rotation handle hidden", () =>
+                this.ChildrenOfType<SelectionBoxRotationHandle>().Single(r => r.Anchor == Anchor.TopLeft).Alpha == 0);
+            AddUntilStep("top-right rotation handle shown", () =>
+                this.ChildrenOfType<SelectionBoxRotationHandle>().Single(r => r.Anchor == Anchor.TopRight).Alpha == 1);
+        }
     }
 }

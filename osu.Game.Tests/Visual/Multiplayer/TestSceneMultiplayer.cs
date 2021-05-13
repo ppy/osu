@@ -74,7 +74,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("set user ready", () => client.ChangeState(MultiplayerUserState.Ready));
             AddStep("delete beatmap", () => beatmaps.Delete(importedSet));
 
-            AddAssert("user state is idle", () => client.LocalUser?.State == MultiplayerUserState.Idle);
+            AddUntilStep("user state is idle", () => client.LocalUser?.State == MultiplayerUserState.Idle);
         }
 
         [Test]
