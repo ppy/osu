@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Play
 
         private bool holdingForHUD;
 
-        private readonly SkinnableElementTargetContainer mainComponents;
+        private readonly SkinnableTargetContainer mainComponents;
 
         private IEnumerable<Drawable> hideTargets => new Drawable[] { visibilityContainer, KeyCounter, topRightElements };
 
@@ -97,7 +97,7 @@ namespace osu.Game.Screens.Play
                                     RelativeSizeAxes = Axes.Both,
                                     Children = new Drawable[]
                                     {
-                                        mainComponents = new SkinnableElementTargetContainer(SkinnableTarget.MainHUDComponents)
+                                        mainComponents = new SkinnableTargetContainer(SkinnableTarget.MainHUDComponents)
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                         },

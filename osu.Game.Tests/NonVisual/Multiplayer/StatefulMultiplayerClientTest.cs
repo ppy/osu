@@ -53,9 +53,9 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
                 Client.RoomSetupAction = room =>
                 {
                     room.State = MultiplayerRoomState.Playing;
-                    room.Users.Add(new MultiplayerRoomUser(55)
+                    room.Users.Add(new MultiplayerRoomUser(PLAYER_1_ID)
                     {
-                        User = new User { Id = 55 },
+                        User = new User { Id = PLAYER_1_ID },
                         State = MultiplayerUserState.Playing
                     });
                 };

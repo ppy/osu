@@ -25,6 +25,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public override IBindable<bool> IsConnected => isConnected;
         private readonly Bindable<bool> isConnected = new Bindable<bool>(true);
 
+        public Room? APIRoom { get; private set; }
+
         public Action<MultiplayerRoom>? RoomSetupAction;
 
         [Resolved]
@@ -138,10 +140,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
             RoomSetupAction?.Invoke(room);
             RoomSetupAction = null;
 
+            APIRoom = apiRoom;
+
             return Task.FromResult(room);
         }
 
-        protected override Task LeaveRoomInternal() => Task.CompletedTask;
+        protected override Task LeaveRoomInternal()
+        {
+            APIRoom = null;
+            return Task.CompletedTask;
+        }
 
         public override Task TransferHost(int userId) => ((IMultiplayerClient)this).HostChanged(userId);
 
