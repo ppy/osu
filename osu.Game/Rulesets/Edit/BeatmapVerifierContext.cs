@@ -12,6 +12,11 @@ namespace osu.Game.Rulesets.Edit
     public class BeatmapVerifierContext
     {
         /// <summary>
+        /// The playable beatmap instance of the current beatmap.
+        /// </summary>
+        public readonly IBeatmap Beatmap;
+
+        /// <summary>
         /// The working beatmap instance of the current beatmap.
         /// </summary>
         public readonly IWorkingBeatmap WorkingBeatmap;
@@ -21,8 +26,9 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         public DifficultyRating InterpretedDifficulty;
 
-        public BeatmapVerifierContext(IWorkingBeatmap workingBeatmap, DifficultyRating difficultyRating = DifficultyRating.ExpertPlus)
+        public BeatmapVerifierContext(IBeatmap beatmap, IWorkingBeatmap workingBeatmap, DifficultyRating difficultyRating = DifficultyRating.ExpertPlus)
         {
+            Beatmap = beatmap;
             WorkingBeatmap = workingBeatmap;
             InterpretedDifficulty = difficultyRating;
         }

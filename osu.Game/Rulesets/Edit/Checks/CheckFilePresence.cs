@@ -21,9 +21,9 @@ namespace osu.Game.Rulesets.Edit.Checks
             new IssueTemplateDoesNotExist(this)
         };
 
-        public IEnumerable<Issue> Run(IBeatmap beatmap, BeatmapVerifierContext context)
+        public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            var filename = GetFilename(beatmap);
+            var filename = GetFilename(context.Beatmap);
 
             if (filename == null)
             {
@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             }
 
             // If the file is set, also make sure it still exists.
-            var storagePath = beatmap.BeatmapInfo.BeatmapSet.GetPathForFile(filename);
+            var storagePath = context.Beatmap.BeatmapInfo.BeatmapSet.GetPathForFile(filename);
             if (storagePath != null)
                 yield break;
 

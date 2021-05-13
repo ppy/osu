@@ -7,6 +7,7 @@ using Moq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -105,7 +106,7 @@ namespace osu.Game.Tests.Editing.Checks
                 getSliderMock(startTime: 98, endTime: 398.75d).Object
             };
 
-            var issues = check.Run(getPlayableBeatmap(hitobjects), null).ToList();
+            var issues = check.Run(getContext(hitobjects)).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(2));
             Assert.That(issues.Any(issue => issue.Template is CheckUnsnappedObjects.IssueTemplateSmallUnsnap));
@@ -124,12 +125,12 @@ namespace osu.Game.Tests.Editing.Checks
 
         private void assertOk(List<HitObject> hitobjects)
         {
-            Assert.That(check.Run(getPlayableBeatmap(hitobjects), null), Is.Empty);
+            Assert.That(check.Run(getContext(hitobjects)), Is.Empty);
         }
 
         private void assert1Ms(List<HitObject> hitobjects, int count = 1)
         {
-            var issues = check.Run(getPlayableBeatmap(hitobjects), null).ToList();
+            var issues = check.Run(getContext(hitobjects)).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(count));
             Assert.That(issues.All(issue => issue.Template is CheckUnsnappedObjects.IssueTemplateSmallUnsnap));
@@ -137,19 +138,19 @@ namespace osu.Game.Tests.Editing.Checks
 
         private void assert2Ms(List<HitObject> hitobjects, int count = 1)
         {
-            var issues = check.Run(getPlayableBeatmap(hitobjects), null).ToList();
+            var issues = check.Run(getContext(hitobjects)).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(count));
             Assert.That(issues.All(issue => issue.Template is CheckUnsnappedObjects.IssueTemplateLargeUnsnap));
         }
 
-        private IBeatmap getPlayableBeatmap(List<HitObject> hitobjects)
+        private BeatmapVerifierContext getContext(List<HitObject> hitobjects)
         {
-            return new Beatmap<HitObject>
+            return new BeatmapVerifierContext(new Beatmap<HitObject>
             {
                 ControlPointInfo = cpi,
                 HitObjects = hitobjects
-            };
+            }, null);
         }
     }
 }
