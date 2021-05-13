@@ -194,9 +194,6 @@ namespace osu.Game.Skinning
                         ReplaceFile(skin.SkinInfo, oldFile, streamContent, oldFile.Filename);
                     else
                         AddFile(skin.SkinInfo, streamContent, filename);
-
-                    Logger.Log($"Saving out {filename} with {json.Length} bytes");
-                    Logger.Log(json);
                 }
             }
         }
