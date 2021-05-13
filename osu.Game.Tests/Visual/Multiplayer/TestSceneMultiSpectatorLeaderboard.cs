@@ -11,20 +11,17 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
-using osu.Framework.Utils;
 using osu.Game.Database;
-using osu.Game.Online;
 using osu.Game.Online.Spectator;
-using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Osu.Scoring;
-using osu.Game.Scoring;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Tests.Visual.Spectator;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMultiplayerSpectatorLeaderboard : MultiplayerTestScene
+    public class TestSceneMultiSpectatorLeaderboard : MultiplayerTestScene
     {
         [Cached(typeof(SpectatorStreamingClient))]
         private TestSpectatorStreamingClient streamingClient = new TestSpectatorStreamingClient();
@@ -37,11 +34,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private readonly Dictionary<int, ManualClock> clocks = new Dictionary<int, ManualClock>
         {
-            { 55, new ManualClock() },
-            { 56, new ManualClock() }
+            { PLAYER_1_ID, new ManualClock() },
+            { PLAYER_2_ID, new ManualClock() }
         };
 
-        public TestSceneMultiplayerSpectatorLeaderboard()
+        public TestSceneMultiSpectatorLeaderboard()
         {
             base.Content.AddRange(new Drawable[]
             {
@@ -54,7 +51,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [SetUpSteps]
         public new void SetUpSteps()
         {
-            MultiplayerSpectatorLeaderboard leaderboard = null;
+            MultiSpectatorLeaderboard leaderboard = null;
 
             AddStep("reset", () =>
             {
@@ -78,7 +75,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 var scoreProcessor = new OsuScoreProcessor();
                 scoreProcessor.ApplyBeatmap(playable);
 
-                LoadComponentAsync(leaderboard = new MultiplayerSpectatorLeaderboard(scoreProcessor, clocks.Keys.ToArray()) { Expanded = { Value = true } }, Add);
+                LoadComponentAsync(leaderboard = new MultiSpectatorLeaderboard(scoreProcessor, clocks.Keys.ToArray()) { Expanded = { Value = true } }, Add);
             });
 
             AddUntilStep("wait for load", () => leaderboard.IsLoaded);
@@ -95,46 +92,46 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("send frames", () =>
             {
-                // For user 55, send frames in sets of 1.
-                // For user 56, send frames in sets of 10.
+                // For player 1, send frames in sets of 1.
+                // For player 2, send frames in sets of 10.
                 for (int i = 0; i < 100; i++)
                 {
-                    streamingClient.SendFrames(55, i, 1);
+                    streamingClient.SendFrames(PLAYER_1_ID, i, 1);
 
                     if (i % 10 == 0)
-                        streamingClient.SendFrames(56, i, 10);
+                        streamingClient.SendFrames(PLAYER_2_ID, i, 10);
                 }
             });
 
-            assertCombo(55, 1);
-            assertCombo(56, 10);
+            assertCombo(PLAYER_1_ID, 1);
+            assertCombo(PLAYER_2_ID, 10);
 
-            // Advance to a point where only user 55's frame changes.
+            // Advance to a point where only user player 1's frame changes.
             setTime(500);
-            assertCombo(55, 5);
-            assertCombo(56, 10);
+            assertCombo(PLAYER_1_ID, 5);
+            assertCombo(PLAYER_2_ID, 10);
 
             // Advance to a point where both user's frame changes.
             setTime(1100);
-            assertCombo(55, 11);
-            assertCombo(56, 20);
+            assertCombo(PLAYER_1_ID, 11);
+            assertCombo(PLAYER_2_ID, 20);
 
-            // Advance user 56 only to a point where its frame changes.
-            setTime(56, 2100);
-            assertCombo(55, 11);
-            assertCombo(56, 30);
+            // Advance user player 2 only to a point where its frame changes.
+            setTime(PLAYER_2_ID, 2100);
+            assertCombo(PLAYER_1_ID, 11);
+            assertCombo(PLAYER_2_ID, 30);
 
             // Advance both users beyond their last frame
             setTime(101 * 100);
-            assertCombo(55, 100);
-            assertCombo(56, 100);
+            assertCombo(PLAYER_1_ID, 100);
+            assertCombo(PLAYER_2_ID, 100);
         }
 
         [Test]
         public void TestNoFrames()
         {
-            assertCombo(55, 0);
-            assertCombo(56, 0);
+            assertCombo(PLAYER_1_ID, 0);
+            assertCombo(PLAYER_2_ID, 0);
         }
 
         private void setTime(double time) => AddStep($"set time {time}", () =>
@@ -148,71 +145,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void assertCombo(int userId, int expectedCombo)
             => AddUntilStep($"player {userId} has {expectedCombo} combo", () => this.ChildrenOfType<GameplayLeaderboardScore>().Single(s => s.User?.Id == userId).Combo.Value == expectedCombo);
-
-        private class TestSpectatorStreamingClient : SpectatorStreamingClient
-        {
-            private readonly Dictionary<int, int> userBeatmapDictionary = new Dictionary<int, int>();
-            private readonly Dictionary<int, bool> userSentStateDictionary = new Dictionary<int, bool>();
-
-            public TestSpectatorStreamingClient()
-                : base(new DevelopmentEndpointConfiguration())
-            {
-            }
-
-            public void StartPlay(int userId, int beatmapId)
-            {
-                userBeatmapDictionary[userId] = beatmapId;
-                userSentStateDictionary[userId] = false;
-                sendState(userId, beatmapId);
-            }
-
-            public void EndPlay(int userId, int beatmapId)
-            {
-                ((ISpectatorClient)this).UserFinishedPlaying(userId, new SpectatorState
-                {
-                    BeatmapID = beatmapId,
-                    RulesetID = 0,
-                });
-                userSentStateDictionary[userId] = false;
-            }
-
-            public void SendFrames(int userId, int index, int count)
-            {
-                var frames = new List<LegacyReplayFrame>();
-
-                for (int i = index; i < index + count; i++)
-                {
-                    var buttonState = i == index + count - 1 ? ReplayButtonState.None : ReplayButtonState.Left1;
-                    frames.Add(new LegacyReplayFrame(i * 100, RNG.Next(0, 512), RNG.Next(0, 512), buttonState));
-                }
-
-                var bundle = new FrameDataBundle(new ScoreInfo { Combo = index + count }, frames);
-                ((ISpectatorClient)this).UserSentFrames(userId, bundle);
-                if (!userSentStateDictionary[userId])
-                    sendState(userId, userBeatmapDictionary[userId]);
-            }
-
-            public override void WatchUser(int userId)
-            {
-                if (userSentStateDictionary[userId])
-                {
-                    // usually the server would do this.
-                    sendState(userId, userBeatmapDictionary[userId]);
-                }
-
-                base.WatchUser(userId);
-            }
-
-            private void sendState(int userId, int beatmapId)
-            {
-                ((ISpectatorClient)this).UserBeganPlaying(userId, new SpectatorState
-                {
-                    BeatmapID = beatmapId,
-                    RulesetID = 0,
-                });
-                userSentStateDictionary[userId] = true;
-            }
-        }
 
         private class TestUserLookupCache : UserLookupCache
         {
