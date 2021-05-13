@@ -108,13 +108,13 @@ namespace osu.Game.Skinning.Editor
                                             {
                                                 new TriangleButton
                                                 {
-                                                    Text = "Save Changes",
+                                                    Text = "保存更改",
                                                     Width = 140,
                                                     Action = Save,
                                                 },
                                                 new DangerousTriangleButton
                                                 {
-                                                    Text = "Revert to default",
+                                                    Text = "重置",
                                                     Width = 140,
                                                     Action = revert,
                                                 },
@@ -152,17 +152,17 @@ namespace osu.Game.Skinning.Editor
         {
             headerText.Clear();
 
-            headerText.AddParagraph("Skin editor", cp => cp.Font = OsuFont.Default.With(size: 24));
+            headerText.AddParagraph("皮肤编辑器", cp => cp.Font = OsuFont.Default.With(size: 24));
             headerText.NewParagraph();
-            headerText.AddText("Currently editing ", cp =>
+            headerText.AddText("当前正在编辑: ", cp =>
             {
-                cp.Font = OsuFont.Default.With(size: 12);
+                cp.Font = OsuFont.Default.With(size: 15);
                 cp.Colour = colours.Yellow;
             });
 
             headerText.AddText($"{currentSkin.Value.SkinInfo}", cp =>
             {
-                cp.Font = OsuFont.Default.With(size: 12, weight: FontWeight.Bold);
+                cp.Font = OsuFont.Default.With(size: 15, weight: FontWeight.Bold);
                 cp.Colour = colours.Yellow;
             });
 

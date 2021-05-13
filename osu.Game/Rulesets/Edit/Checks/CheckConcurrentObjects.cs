@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         // We guarantee that the objects are either treated as concurrent or unsnapped when near the same beat divisor.
         private const double ms_leniency = CheckUnsnappedObjects.UNSNAP_MS_THRESHOLD;
 
-        public CheckMetadata Metadata { get; } = new CheckMetadata(CheckCategory.Compose, "Concurrent hitobjects");
+        public CheckMetadata Metadata { get; } = new CheckMetadata(CheckCategory.Compose, "重叠的物件");
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         public class IssueTemplateConcurrentSame : IssueTemplateConcurrent
         {
             public IssueTemplateConcurrentSame(ICheck check)
-                : base(check, "{0}s are concurrent here.")
+                : base(check, "{0}在时间线上叠在一起了.")
             {
             }
         }
@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         public class IssueTemplateConcurrentDifferent : IssueTemplateConcurrent
         {
             public IssueTemplateConcurrentDifferent(ICheck check)
-                : base(check, "{0} and {1} are concurrent here.")
+                : base(check, "{0} 和 {1} 在时间线上叠在一起了.")
             {
             }
         }

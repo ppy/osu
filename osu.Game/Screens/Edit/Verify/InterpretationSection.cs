@@ -10,7 +10,7 @@ namespace osu.Game.Screens.Edit.Verify
 {
     internal class InterpretationSection : EditorRoundedScreenSettingsSection
     {
-        protected override string HeaderText => "Interpretation";
+        protected override string HeaderText => "分级";
 
         [BackgroundDependencyLoader]
         private void load(VerifyScreen verify)
@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Edit.Verify
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
-                TooltipText = "Affects checks that depend on difficulty level",
+                TooltipText = "选择谱面检查的目标难度",
                 Current = verify.InterpretedDifficulty.GetBoundCopy()
             });
         }

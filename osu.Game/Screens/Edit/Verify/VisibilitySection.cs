@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
@@ -21,7 +22,7 @@ namespace osu.Game.Screens.Edit.Verify
 
         private BindableList<IssueType> hiddenIssueTypes;
 
-        protected override string HeaderText => "Visibility";
+        protected override string HeaderText => "显示";
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colours, VerifyScreen verify)
@@ -34,7 +35,7 @@ namespace osu.Game.Screens.Edit.Verify
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    LabelText = issueType.ToString(),
+                    LabelText = issueType.GetDescription(),
                     Current = { Default = !hiddenIssueTypes.Contains(issueType) }
                 };
 

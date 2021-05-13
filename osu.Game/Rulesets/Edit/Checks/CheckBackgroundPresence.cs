@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Edit.Checks
     public class CheckBackgroundPresence : CheckFilePresence
     {
         protected override CheckCategory Category => CheckCategory.Resources;
-        protected override string TypeOfFile => "background";
+        protected override string TypeOfFile => "背景";
         protected override string GetFilename(IBeatmap playableBeatmap) => playableBeatmap.Metadata?.BackgroundFile;
     }
 }

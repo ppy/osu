@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Edit.Checks
     {
         public const double UNSNAP_MS_THRESHOLD = 2;
 
-        public CheckMetadata Metadata { get; } = new CheckMetadata(CheckCategory.Timing, "Unsnapped hitobjects");
+        public CheckMetadata Metadata { get; } = new CheckMetadata(CheckCategory.Timing, "未对齐物件");
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             foreach (var hitobject in playableBeatmap.HitObjects)
             {
                 double startUnsnap = hitobject.StartTime - controlPointInfo.GetClosestSnappedTime(hitobject.StartTime);
-                string startPostfix = hitobject is IHasDuration ? "start" : "";
+                string startPostfix = hitobject is IHasDuration ? "开头" : "";
                 foreach (var issue in getUnsnapIssues(hitobject, startUnsnap, hitobject.StartTime, startPostfix))
                     yield return issue;
 
@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Edit.Checks
                         double spanDuration = hasRepeats.Duration / (hasRepeats.RepeatCount + 1);
                         double repeatTime = hitobject.StartTime + spanDuration * (repeatIndex + 1);
                         double repeatUnsnap = repeatTime - controlPointInfo.GetClosestSnappedTime(repeatTime);
-                        foreach (var issue in getUnsnapIssues(hitobject, repeatUnsnap, repeatTime, "repeat"))
+                        foreach (var issue in getUnsnapIssues(hitobject, repeatUnsnap, repeatTime, "折返"))
                             yield return issue;
                     }
                 }
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Edit.Checks
                 if (hitobject is IHasDuration hasDuration)
                 {
                     double endUnsnap = hasDuration.EndTime - controlPointInfo.GetClosestSnappedTime(hasDuration.EndTime);
-                    foreach (var issue in getUnsnapIssues(hitobject, endUnsnap, hasDuration.EndTime, "end"))
+                    foreach (var issue in getUnsnapIssues(hitobject, endUnsnap, hasDuration.EndTime, "尾"))
                         yield return issue;
                 }
             }
@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         public abstract class IssueTemplateUnsnap : IssueTemplate
         {
             protected IssueTemplateUnsnap(ICheck check, IssueType type)
-                : base(check, type, "{0} is unsnapped by {1:0.##} ms.")
+                : base(check, type, "{0} 没有和时间线对齐 ({1:0.##} 毫秒).")
             {
             }
 

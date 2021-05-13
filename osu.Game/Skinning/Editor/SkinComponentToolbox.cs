@@ -37,7 +37,7 @@ namespace osu.Game.Skinning.Editor
         private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
 
         public SkinComponentToolbox(float height)
-            : base("Components", height)
+            : base("组件", height)
         {
             RelativeSizeAxes = Axes.None;
             Width = 200;

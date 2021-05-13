@@ -41,9 +41,9 @@ namespace osu.Game.Skinning.Editor
 
             if (targetContainers.Length == 0)
             {
-                var targetScreen = target.ChildrenOfType<Screen>().LastOrDefault()?.GetType().Name ?? "this screen";
+                var targetScreen = target.ChildrenOfType<Screen>().LastOrDefault()?.GetType().Name ?? "该屏幕";
 
-                AddInternal(new ScreenWhiteBox.UnderConstructionMessage(targetScreen, "doesn't support skin customisation just yet."));
+                AddInternal(new ScreenWhiteBox.UnderConstructionMessage(targetScreen, "尚不支持皮肤编辑"));
                 return;
             }
 

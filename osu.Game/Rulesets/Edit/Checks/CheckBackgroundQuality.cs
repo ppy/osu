@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         private const int low_width = 960;
         private const int low_height = 540;
 
-        public CheckMetadata Metadata { get; } = new CheckMetadata(CheckCategory.Resources, "Too high or low background resolution");
+        public CheckMetadata Metadata { get; } = new CheckMetadata(CheckCategory.Resources, "过高或过低的背景分辨率");
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         public class IssueTemplateTooHighResolution : IssueTemplate
         {
             public IssueTemplateTooHighResolution(ICheck check)
-                : base(check, IssueType.Problem, "The background resolution ({0} x {1}) exceeds {2} x {3}.")
+                : base(check, IssueType.Problem, "背景分辨率 ({0} x {1}) 超过了 {2} x {3}.")
             {
             }
 
@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         public class IssueTemplateTooLowResolution : IssueTemplate
         {
             public IssueTemplateTooLowResolution(ICheck check)
-                : base(check, IssueType.Problem, "The background resolution ({0} x {1}) is lower than {2} x {3}.")
+                : base(check, IssueType.Problem, "背景分辨率 ({0} x {1}) 小于 {2} x {3}.")
             {
             }
 
@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         public class IssueTemplateLowResolution : IssueTemplate
         {
             public IssueTemplateLowResolution(ICheck check)
-                : base(check, IssueType.Warning, "The background resolution ({0} x {1}) is lower than {2} x {3}.")
+                : base(check, IssueType.Warning, "背景分辨率 ({0} x {1}) 小于 {2} x {3}.")
             {
             }
 
@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         public class IssueTemplateTooUncompressed : IssueTemplate
         {
             public IssueTemplateTooUncompressed(ICheck check)
-                : base(check, IssueType.Problem, "The background filesize ({0:0.##} MB) exceeds {1} MB.")
+                : base(check, IssueType.Problem, "背景图大小 ({0:0.##} MB) 超过了 {1} MB.")
             {
             }
 

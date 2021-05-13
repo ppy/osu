@@ -83,12 +83,12 @@ namespace osu.Game.Skinning.Editor
 
         protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<ISkinnableDrawable>> selection)
         {
-            yield return new OsuMenuItem("Anchor")
+            yield return new OsuMenuItem("锚点(Anchor)")
             {
                 Items = createAnchorItems(d => d.Anchor, applyAnchor).ToArray()
             };
 
-            yield return new OsuMenuItem("Origin")
+            yield return new OsuMenuItem("原点(Origin)")
             {
                 Items = createAnchorItems(d => d.Origin, applyOrigin).ToArray()
             };
