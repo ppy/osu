@@ -19,12 +19,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
-using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
 
@@ -127,7 +127,7 @@ namespace osu.Game.Skinning
 
             var instance = GetSkin(model);
 
-            model.InstantiationInfo ??= instance.GetType().AssemblyQualifiedName;
+            model.InstantiationInfo ??= instance.GetType().GetInvariantInstantiationInfo();
 
             if (model.Name?.Contains(".osk", StringComparison.OrdinalIgnoreCase) == true)
                 populateMetadata(model, instance);
@@ -180,7 +180,6 @@ namespace osu.Game.Skinning
 
             foreach (var drawableInfo in skin.DrawableComponentInfo)
             {
-                // todo: the OfType() call can be removed with better IDrawable support.
                 string json = JsonConvert.SerializeObject(drawableInfo.Value, new JsonSerializerSettings { Formatting = Formatting.Indented });
 
                 using (var streamContent = new MemoryStream(Encoding.UTF8.GetBytes(json)))
@@ -193,9 +192,6 @@ namespace osu.Game.Skinning
                         ReplaceFile(skin.SkinInfo, oldFile, streamContent, oldFile.Filename);
                     else
                         AddFile(skin.SkinInfo, streamContent, filename);
-
-                    Logger.Log($"Saving out {filename} with {json.Length} bytes");
-                    Logger.Log(json);
                 }
             }
         }

@@ -2,30 +2,35 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using Newtonsoft.Json;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Skinning
 {
     /// <summary>
-    /// A container which is serialised and can encapsulate multiple skinnable elements into a single return type (for consumption via <see cref="ISkin.GetDrawableComponent"/>.
-    /// Will also optionally apply default cross-element layout dependencies when initialised from a non-deserialised source.
+    /// A container which groups the components of a <see cref="SkinnableTargetContainer"/> into a single object.
+    /// Optionally also applies a default layout to the components.
     /// </summary>
-    public class SkinnableTargetWrapper : Container, ISkinSerialisable
+    [Serializable]
+    public class SkinnableTargetComponentsContainer : Container, ISkinnableDrawable
     {
+        public bool IsEditable => false;
+
         private readonly Action<Container> applyDefaults;
 
         /// <summary>
         /// Construct a wrapper with defaults that should be applied once.
         /// </summary>
-        /// <param name="applyDefaults">A function with default to apply after the initial layout (ie. consuming autosize)</param>
-        public SkinnableTargetWrapper(Action<Container> applyDefaults)
+        /// <param name="applyDefaults">A function to apply the default layout.</param>
+        public SkinnableTargetComponentsContainer(Action<Container> applyDefaults)
             : this()
         {
             this.applyDefaults = applyDefaults;
         }
 
-        public SkinnableTargetWrapper()
+        [JsonConstructor]
+        public SkinnableTargetComponentsContainer()
         {
             RelativeSizeAxes = Axes.Both;
         }
@@ -35,7 +40,7 @@ namespace osu.Game.Skinning
             base.LoadComplete();
 
             // schedule is required to allow children to run their LoadComplete and take on their correct sizes.
-            Schedule(() => applyDefaults?.Invoke(this));
+            ScheduleAfterChildren(() => applyDefaults?.Invoke(this));
         }
     }
 }

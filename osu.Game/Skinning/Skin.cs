@@ -39,8 +39,6 @@ namespace osu.Game.Skinning
         {
             SkinInfo = skin;
 
-            // may be null for default skin.
-
             // we may want to move this to some kind of async operation in the future.
             foreach (SkinnableTarget skinnableTarget in Enum.GetValues(typeof(SkinnableTarget)))
             {
@@ -63,14 +61,22 @@ namespace osu.Game.Skinning
             }
         }
 
-        public void ResetDrawableTarget(SkinnableElementTargetContainer targetContainer)
+        /// <summary>
+        /// Remove all stored customisations for the provided target.
+        /// </summary>
+        /// <param name="targetContainer">The target container to reset.</param>
+        public void ResetDrawableTarget(ISkinnableTarget targetContainer)
         {
             DrawableComponentInfo.Remove(targetContainer.Target);
         }
 
-        public void UpdateDrawableTarget(SkinnableElementTargetContainer targetContainer)
+        /// <summary>
+        /// Update serialised information for the provided target.
+        /// </summary>
+        /// <param name="targetContainer">The target container to serialise to this skin.</param>
+        public void UpdateDrawableTarget(ISkinnableTarget targetContainer)
         {
-            DrawableComponentInfo[targetContainer.Target] = targetContainer.CreateSerialisedChildren().ToArray();
+            DrawableComponentInfo[targetContainer.Target] = targetContainer.CreateSkinnableInfo().ToArray();
         }
 
         public virtual Drawable GetDrawableComponent(ISkinComponent component)
@@ -78,13 +84,10 @@ namespace osu.Game.Skinning
             switch (component)
             {
                 case SkinnableTargetComponent target:
-
-                    var skinnableTarget = target.Target;
-
-                    if (!DrawableComponentInfo.TryGetValue(skinnableTarget, out var skinnableInfo))
+                    if (!DrawableComponentInfo.TryGetValue(target.Target, out var skinnableInfo))
                         return null;
 
-                    return new SkinnableTargetWrapper
+                    return new SkinnableTargetComponentsContainer
                     {
                         ChildrenEnumerable = skinnableInfo.Select(i => i.CreateInstance())
                     };

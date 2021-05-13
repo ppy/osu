@@ -13,7 +13,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Play.HUD;
 using osuTK;
 
 namespace osu.Game.Skinning.Editor
@@ -23,18 +22,18 @@ namespace osu.Game.Skinning.Editor
     {
         public const double TRANSITION_DURATION = 500;
 
+        public readonly BindableList<ISkinnableDrawable> SelectedComponents = new BindableList<ISkinnableDrawable>();
+
+        protected override bool StartHidden => true;
+
         private readonly Drawable targetScreen;
 
         private OsuTextFlowContainer headerText;
 
-        protected override bool StartHidden => true;
-
-        public readonly BindableList<ISkinnableComponent> SelectedComponents = new BindableList<ISkinnableComponent>();
+        private Bindable<Skin> currentSkin;
 
         [Resolved]
         private SkinManager skins { get; set; }
-
-        private Bindable<Skin> currentSkin;
 
         [Resolved]
         private OsuColour colours { get; set; }
@@ -171,8 +170,8 @@ namespace osu.Game.Skinning.Editor
             if (targetContainer == null)
                 return;
 
-            if (!(Activator.CreateInstance(type) is ISkinnableComponent component))
-                throw new InvalidOperationException("Attempted to instantiate a component for placement which was not an {typeof(ISkinnableComponent)}.");
+            if (!(Activator.CreateInstance(type) is ISkinnableDrawable component))
+                throw new InvalidOperationException($"Attempted to instantiate a component for placement which was not an {typeof(ISkinnableDrawable)}.");
 
             var drawableComponent = (Drawable)component;
 
@@ -194,7 +193,7 @@ namespace osu.Game.Skinning.Editor
 
         private void revert()
         {
-            SkinnableElementTargetContainer[] targetContainers = targetScreen.ChildrenOfType<SkinnableElementTargetContainer>().ToArray();
+            SkinnableTargetContainer[] targetContainers = targetScreen.ChildrenOfType<SkinnableTargetContainer>().ToArray();
 
             foreach (var t in targetContainers)
             {
@@ -207,7 +206,7 @@ namespace osu.Game.Skinning.Editor
 
         private void save()
         {
-            SkinnableElementTargetContainer[] targetContainers = targetScreen.ChildrenOfType<SkinnableElementTargetContainer>().ToArray();
+            SkinnableTargetContainer[] targetContainers = targetScreen.ChildrenOfType<SkinnableTargetContainer>().ToArray();
 
             foreach (var t in targetContainers)
                 currentSkin.Value.UpdateDrawableTarget(t);
