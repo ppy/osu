@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
@@ -18,10 +20,15 @@ namespace osu.Game.Screens.Mvis.Plugins
         private readonly BindableList<MvisPlugin> avaliablePlugins = new BindableList<MvisPlugin>();
         private readonly BindableList<MvisPlugin> activePlugins = new BindableList<MvisPlugin>();
         private readonly List<MvisPluginProvider> providers = new List<MvisPluginProvider>();
+        private List<string> blockedProviders;
+
         private readonly ConcurrentDictionary<Type, IPluginConfigManager> configManagers = new ConcurrentDictionary<Type, IPluginConfigManager>();
 
         [Resolved]
         private Storage storage { get; set; }
+
+        [Resolved]
+        private CustomStore customStore { get; set; }
 
         internal Action<MvisPlugin> OnPluginAdd;
         internal Action<MvisPlugin> OnPluginUnLoad;
@@ -30,13 +37,34 @@ namespace osu.Game.Screens.Mvis.Plugins
         public int MinimumPluginVersion => 2;
         private const bool experimental = true;
 
+        private string blockedPluginFilePath => storage.GetFullPath("custom/blocked_plugins.json");
+
         [BackgroundDependencyLoader]
-        private void load(CustomStore customStore)
+        private void load()
         {
+            try
+            {
+                using (var writer = new StreamReader(File.OpenRead(blockedPluginFilePath)))
+                {
+                    blockedProviders = JsonConvert.DeserializeObject<List<string>>(writer.ReadToEnd())
+                                       ?? new List<string>();
+                }
+            }
+            catch (Exception e)
+            {
+                if (!(e is FileNotFoundException))
+                    Logger.Error(e, "读取黑名单插件列表时出现了问题");
+
+                blockedProviders = new List<string>();
+            }
+
             foreach (var provider in customStore.LoadedPluginProviders)
             {
-                AddPlugin(provider.CreatePlugin);
-                providers.Add(provider);
+                if (!blockedProviders.Contains(provider.GetType().Assembly.ToString()))
+                {
+                    AddPlugin(provider.CreatePlugin);
+                    providers.Add(provider);
+                }
             }
 
             if (!DebugUtils.IsDebugBuild && experimental)
@@ -65,7 +93,7 @@ namespace osu.Game.Screens.Mvis.Plugins
             return true;
         }
 
-        internal bool UnLoadPlugin(MvisPlugin pl)
+        internal bool UnLoadPlugin(MvisPlugin pl, bool blockFromFutureLoad = false)
         {
             if (!avaliablePlugins.Contains(pl) || pl == null) return false;
 
@@ -79,6 +107,25 @@ namespace osu.Game.Screens.Mvis.Plugins
             {
                 pl.UnLoad();
                 OnPluginUnLoad?.Invoke(pl);
+
+                var providerAssembly = provider.GetType().Assembly;
+                var gameAssembly = GetType().Assembly;
+
+                if (providerAssembly != gameAssembly && blockFromFutureLoad)
+                {
+                    if (customStore.Contains(providerAssembly.Location))
+                        File.Move(providerAssembly.Location, $"{providerAssembly.Location.Replace(".dll", ".blocked")}");
+                    else
+                    {
+                        blockedProviders.Add(providerAssembly.ToString());
+
+                        using (var writer = new StreamWriter(File.OpenWrite(blockedPluginFilePath)))
+                        {
+                            var serializedString = JsonConvert.SerializeObject(blockedProviders);
+                            writer.Write(serializedString);
+                        }
+                    }
+                }
             }
             catch (Exception e)
             {
