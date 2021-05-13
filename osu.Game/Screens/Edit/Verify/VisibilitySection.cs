@@ -26,6 +26,8 @@ namespace osu.Game.Screens.Edit.Verify
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colours)
         {
+            var hiddenIssueTypes = verify.HiddenIssueTypes.GetBoundCopy();
+
             foreach (IssueType issueType in configurableIssueTypes)
             {
                 var checkbox = new SettingsCheckbox
@@ -35,14 +37,14 @@ namespace osu.Game.Screens.Edit.Verify
                     LabelText = issueType.ToString()
                 };
 
-                checkbox.Current.Default = !verify.HiddenIssueTypes.Contains(issueType);
+                checkbox.Current.Default = !hiddenIssueTypes.Contains(issueType);
                 checkbox.Current.SetDefault();
                 checkbox.Current.BindValueChanged(state =>
                 {
                     if (!state.NewValue)
-                        verify.HiddenIssueTypes.Add(issueType);
+                        hiddenIssueTypes.Add(issueType);
                     else
-                        verify.HiddenIssueTypes.Remove(issueType);
+                        hiddenIssueTypes.Remove(issueType);
                 });
 
                 Flow.Add(checkbox);
