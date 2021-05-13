@@ -37,10 +37,10 @@ namespace osu.Game.Screens.Edit.Verify
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    LabelText = issueType.ToString()
+                    LabelText = issueType.ToString(),
+                    Current = { Default = !hiddenIssueTypes.Contains(issueType) }
                 };
 
-                checkbox.Current.Default = !hiddenIssueTypes.Contains(issueType);
                 checkbox.Current.SetDefault();
                 checkbox.Current.BindValueChanged(state =>
                 {
