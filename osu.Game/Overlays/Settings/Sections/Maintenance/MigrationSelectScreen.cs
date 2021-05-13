@@ -19,6 +19,12 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
         protected override DirectoryInfo InitialPath => new DirectoryInfo(storage.GetFullPath(string.Empty)).Parent;
 
+        public override bool AllowExternalScreenChange => false;
+
+        public override bool DisallowExternalBeatmapRulesetChanges => true;
+
+        public override bool HideOverlaysOnEnter => true;
+
         protected override OsuSpriteText CreateHeader() => new OsuSpriteText
         {
             Text = "Please select a new location",
