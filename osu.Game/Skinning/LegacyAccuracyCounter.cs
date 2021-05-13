@@ -12,9 +12,6 @@ namespace osu.Game.Skinning
 {
     public class LegacyAccuracyCounter : GameplayAccuracyCounter, ISkinnableComponent
     {
-        [Resolved]
-        private ISkinSource skin { get; set; }
-
         public LegacyAccuracyCounter()
         {
             Anchor = Anchor.TopRight;
