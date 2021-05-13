@@ -25,6 +25,7 @@ using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
 
@@ -127,7 +128,7 @@ namespace osu.Game.Skinning
 
             var instance = GetSkin(model);
 
-            model.InstantiationInfo ??= instance.GetType().AssemblyQualifiedName;
+            model.InstantiationInfo ??= instance.GetType().GetInvariantInstantiationInfo();
 
             if (model.Name?.Contains(".osk", StringComparison.OrdinalIgnoreCase) == true)
                 populateMetadata(model, instance);

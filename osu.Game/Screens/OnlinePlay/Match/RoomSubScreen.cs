@@ -17,7 +17,6 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.OnlinePlay.Match
 {
@@ -148,11 +147,17 @@ namespace osu.Game.Screens.OnlinePlay.Match
             return base.OnExiting(next);
         }
 
-        protected void StartPlay(Func<Player> player)
+        protected void StartPlay()
         {
             sampleStart?.Play();
-            ParentScreen?.Push(new PlayerLoader(player));
+            ParentScreen?.Push(CreateGameplayScreen());
         }
+
+        /// <summary>
+        /// Creates the gameplay screen to be entered.
+        /// </summary>
+        /// <returns>The screen to enter.</returns>
+        protected abstract Screen CreateGameplayScreen();
 
         private void selectedItemChanged()
         {

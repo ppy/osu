@@ -120,9 +120,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
             };
         });
 
-        [Test]
-        public void TestEnabledWhenRoomOpen()
+        [TestCase(MultiplayerRoomState.Open)]
+        [TestCase(MultiplayerRoomState.WaitingForLoad)]
+        [TestCase(MultiplayerRoomState.Playing)]
+        public void TestEnabledWhenRoomOpenOrInGameplay(MultiplayerRoomState roomState)
         {
+            AddStep($"change room to {roomState}", () => Client.ChangeRoomState(roomState));
             assertSpectateButtonEnablement(true);
         }
 
@@ -137,12 +140,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("user is idle", () => Client.Room?.Users[0].State == MultiplayerUserState.Idle);
         }
 
-        [TestCase(MultiplayerRoomState.WaitingForLoad)]
-        [TestCase(MultiplayerRoomState.Playing)]
         [TestCase(MultiplayerRoomState.Closed)]
-        public void TestDisabledDuringGameplayOrClosed(MultiplayerRoomState roomState)
+        public void TestDisabledWhenClosed(MultiplayerRoomState roomState)
         {
-            AddStep($"change user to {roomState}", () => Client.ChangeRoomState(roomState));
+            AddStep($"change room to {roomState}", () => Client.ChangeRoomState(roomState));
             assertSpectateButtonEnablement(false);
         }
 
@@ -156,8 +157,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestReadyButtonEnabledWhenHostAndUsersReady()
         {
-            AddStep("add user", () => Client.AddUser(new User { Id = 55 }));
-            AddStep("set user ready", () => Client.ChangeUserState(55, MultiplayerUserState.Ready));
+            AddStep("add user", () => Client.AddUser(new User { Id = PLAYER_1_ID }));
+            AddStep("set user ready", () => Client.ChangeUserState(PLAYER_1_ID, MultiplayerUserState.Ready));
 
             addClickSpectateButtonStep();
             assertReadyButtonEnablement(true);
@@ -168,11 +169,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("add user and transfer host", () =>
             {
-                Client.AddUser(new User { Id = 55 });
-                Client.TransferHost(55);
+                Client.AddUser(new User { Id = PLAYER_1_ID });
+                Client.TransferHost(PLAYER_1_ID);
             });
 
-            AddStep("set user ready", () => Client.ChangeUserState(55, MultiplayerUserState.Ready));
+            AddStep("set user ready", () => Client.ChangeUserState(PLAYER_1_ID, MultiplayerUserState.Ready));
 
             addClickSpectateButtonStep();
             assertReadyButtonEnablement(false);
