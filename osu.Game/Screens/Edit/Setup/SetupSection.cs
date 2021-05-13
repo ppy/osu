@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Edit.Setup
             Padding = new MarginPadding
             {
                 Vertical = 10,
-                Horizontal = RoundedContentEditorScreen.HORIZONTAL_PADDING
+                Horizontal = EditorRoundedScreen.HORIZONTAL_PADDING
             };
 
             InternalChild = new FillFlowContainer
