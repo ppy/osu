@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Mania.Edit.Blueprints;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -23,8 +22,8 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         public override bool HandleMovement(MoveSelectionEvent<HitObject> moveEvent)
         {
-            var maniaBlueprint = (ManiaSelectionBlueprint)moveEvent.Blueprint;
-            int lastColumn = maniaBlueprint.DrawableObject.HitObject.Column;
+            var hitObjectBlueprint = (HitObjectSelectionBlueprint)moveEvent.Blueprint;
+            int lastColumn = ((ManiaHitObject)hitObjectBlueprint.Item).Column;
 
             performColumnMovement(lastColumn, moveEvent);
 

@@ -3,7 +3,6 @@
 
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 {
@@ -13,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private readonly SliderPosition position;
 
-        public SliderCircleSelectionBlueprint(DrawableSlider slider, SliderPosition position)
+        public SliderCircleSelectionBlueprint(Slider slider, SliderPosition position)
             : base(slider)
         {
             this.position = position;
