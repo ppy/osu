@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         public StableDirectoryLocationDialog(TaskCompletionSource<string> taskCompletionSource)
         {
             HeaderText = "Failed to automatically locate an osu!stable installation.";
-            BodyText = "osu! failed to automatically locate a stable installation. Maybe you can tell osu! where it is located?";
+            BodyText = "An existing install could not be located. If you know where it is, you can help locate it.";
             Icon = FontAwesome.Solid.QuestionCircle;
 
             Buttons = new PopupDialogButton[]
