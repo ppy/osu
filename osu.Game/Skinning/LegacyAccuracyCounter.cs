@@ -10,11 +10,8 @@ using osuTK;
 
 namespace osu.Game.Skinning
 {
-    public class LegacyAccuracyCounter : GameplayAccuracyCounter, ISkinnableComponent
+    public class LegacyAccuracyCounter : GameplayAccuracyCounter, ISkinnableDrawable
     {
-        [Resolved]
-        private ISkinSource skin { get; set; }
-
         public LegacyAccuracyCounter()
         {
             Anchor = Anchor.TopRight;
