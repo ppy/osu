@@ -76,7 +76,7 @@ namespace osu.Game.Skinning
         /// <param name="targetContainer">The target container to serialise to this skin.</param>
         public void UpdateDrawableTarget(SkinnableElementTargetContainer targetContainer)
         {
-            DrawableComponentInfo[targetContainer.Target] = targetContainer.CreateSerialisedChildren().ToArray();
+            DrawableComponentInfo[targetContainer.Target] = targetContainer.CreateSkinnableInfo().ToArray();
         }
 
         public virtual Drawable GetDrawableComponent(ISkinComponent component)
