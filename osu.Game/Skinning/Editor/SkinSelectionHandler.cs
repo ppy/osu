@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Skinning.Editor
 {
-    public class SkinSelectionHandler : SelectionHandler<ISkinnableComponent>
+    public class SkinSelectionHandler : SelectionHandler<ISkinnableDrawable>
     {
         public override bool HandleRotation(float angle)
         {
@@ -36,7 +36,7 @@ namespace osu.Game.Skinning.Editor
             return true;
         }
 
-        public override bool HandleMovement(MoveSelectionEvent<ISkinnableComponent> moveEvent)
+        public override bool HandleMovement(MoveSelectionEvent<ISkinnableDrawable> moveEvent)
         {
             foreach (var c in SelectedBlueprints)
             {
@@ -57,7 +57,7 @@ namespace osu.Game.Skinning.Editor
             SelectionBox.CanReverse = false;
         }
 
-        protected override void DeleteItems(IEnumerable<ISkinnableComponent> items)
+        protected override void DeleteItems(IEnumerable<ISkinnableDrawable> items)
         {
             foreach (var i in items)
             {
@@ -66,17 +66,22 @@ namespace osu.Game.Skinning.Editor
             }
         }
 
-        protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<ISkinnableComponent>> selection)
+        protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<ISkinnableDrawable>> selection)
         {
             yield return new OsuMenuItem("Anchor")
             {
-                Items = createAnchorItems().ToArray()
+                Items = createAnchorItems(d => d.Anchor, applyAnchor).ToArray()
+            };
+
+            yield return new OsuMenuItem("Origin")
+            {
+                Items = createAnchorItems(d => d.Origin, applyOrigin).ToArray()
             };
 
             foreach (var item in base.GetContextMenuItemsForSelection(selection))
                 yield return item;
 
-            IEnumerable<AnchorMenuItem> createAnchorItems()
+            IEnumerable<AnchorMenuItem> createAnchorItems(Func<Drawable, Anchor> checkFunction, Action<Anchor> applyFunction)
             {
                 var displayableAnchors = new[]
                 {
@@ -93,18 +98,36 @@ namespace osu.Game.Skinning.Editor
 
                 return displayableAnchors.Select(a =>
                 {
-                    return new AnchorMenuItem(a, selection, _ => applyAnchor(a))
+                    return new AnchorMenuItem(a, selection, _ => applyFunction(a))
                     {
-                        State = { Value = GetStateFromSelection(selection, c => ((Drawable)c.Item).Anchor == a) }
+                        State = { Value = GetStateFromSelection(selection, c => checkFunction((Drawable)c.Item) == a) }
                     };
                 });
+            }
+        }
+
+        private void applyOrigin(Anchor anchor)
+        {
+            foreach (var item in SelectedItems)
+            {
+                var drawable = (Drawable)item;
+
+                var previousOrigin = drawable.OriginPosition;
+                drawable.Origin = anchor;
+                drawable.Position += drawable.OriginPosition - previousOrigin;
             }
         }
 
         private void applyAnchor(Anchor anchor)
         {
             foreach (var item in SelectedItems)
-                ((Drawable)item).Anchor = anchor;
+            {
+                var drawable = (Drawable)item;
+
+                var previousAnchor = drawable.AnchorPosition;
+                drawable.Anchor = anchor;
+                drawable.Position -= drawable.AnchorPosition - previousAnchor;
+            }
         }
 
         private static void adjustScaleFromAnchor(ref Vector2 scale, Anchor reference)
@@ -120,7 +143,7 @@ namespace osu.Game.Skinning.Editor
 
         public class AnchorMenuItem : TernaryStateMenuItem
         {
-            public AnchorMenuItem(Anchor anchor, IEnumerable<SelectionBlueprint<ISkinnableComponent>> selection, Action<TernaryState> action)
+            public AnchorMenuItem(Anchor anchor, IEnumerable<SelectionBlueprint<ISkinnableDrawable>> selection, Action<TernaryState> action)
                 : base(anchor.ToString(), getNextState, MenuItemType.Standard, action)
             {
             }

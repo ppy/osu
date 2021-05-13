@@ -71,7 +71,7 @@ namespace osu.Game.Skinning.Editor
                 target.RelativePositionAxes = Axes.Both;
 
                 target.ScaleTo(VISIBLE_TARGET_SCALE, SkinEditor.TRANSITION_DURATION, Easing.OutQuint);
-                target.MoveToX(0.1f, SkinEditor.TRANSITION_DURATION, Easing.OutQuint);
+                target.MoveToX(0.095f, SkinEditor.TRANSITION_DURATION, Easing.OutQuint);
             }
             else
             {
@@ -92,8 +92,10 @@ namespace osu.Game.Skinning.Editor
         /// </summary>
         public void Reset()
         {
+            skinEditor?.Save();
             skinEditor?.Hide();
             skinEditor?.Expire();
+
             skinEditor = null;
         }
     }
