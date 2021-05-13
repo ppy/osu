@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -24,6 +25,7 @@ namespace osu.Game.Skinning
         {
         }
 
+        [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
         public DefaultSkin(SkinInfo skin, IStorageResourceProvider resources)
             : base(skin, resources)
         {
@@ -45,7 +47,7 @@ namespace osu.Game.Skinning
                     switch (target.Target)
                     {
                         case SkinnableTarget.MainHUDComponents:
-                            var skinnableTargetWrapper = new SkinnableTargetWrapper(container =>
+                            var skinnableTargetWrapper = new SkinnableTargetComponentsContainer(container =>
                             {
                                 var score = container.OfType<DefaultScoreCounter>().FirstOrDefault();
                                 var accuracy = container.OfType<DefaultAccuracyCounter>().FirstOrDefault();
@@ -90,10 +92,10 @@ namespace osu.Game.Skinning
                             return skinnableTargetWrapper;
                     }
 
-                    return null;
+                    break;
             }
 
-            return base.GetDrawableComponent(component);
+            return null;
         }
 
         public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
