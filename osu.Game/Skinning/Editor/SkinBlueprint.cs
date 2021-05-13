@@ -15,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Skinning.Editor
 {
-    public class SkinBlueprint : SelectionBlueprint<ISkinnableComponent>
+    public class SkinBlueprint : SelectionBlueprint<ISkinnableDrawable>
     {
         private Container box;
 
@@ -33,7 +33,7 @@ namespace osu.Game.Skinning.Editor
         [Resolved]
         private OsuColour colours { get; set; }
 
-        public SkinBlueprint(ISkinnableComponent component)
+        public SkinBlueprint(ISkinnableDrawable component)
             : base(component)
         {
         }
