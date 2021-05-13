@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Edit.Verify
         [Resolved]
         private VerifyScreen verify { get; set; }
 
-        protected override string Header => "Interpretation";
+        protected override string HeaderText => "Interpretation";
 
         private Bindable<DifficultyRating> interpretedDifficulty;
 

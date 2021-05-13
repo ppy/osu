@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Edit.Verify
 
         private BindableList<IssueType> hiddenIssueTypes;
 
-        protected override string Header => "Visibility";
+        protected override string HeaderText => "Visibility";
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colours)

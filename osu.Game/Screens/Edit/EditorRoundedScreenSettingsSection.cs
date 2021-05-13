@@ -15,8 +15,9 @@ namespace osu.Game.Screens.Edit
     {
         private const int header_height = 50;
 
-        protected FillFlowContainer Flow;
-        protected abstract string Header { get; }
+        protected abstract string HeaderText { get; }
+
+        protected FillFlowContainer Flow { get; private set; }
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colours)
@@ -36,7 +37,7 @@ namespace osu.Game.Screens.Edit
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Text = Header,
+                        Text = HeaderText,
                         Font = new FontUsage(size: 25, weight: "bold")
                     }
                 },
