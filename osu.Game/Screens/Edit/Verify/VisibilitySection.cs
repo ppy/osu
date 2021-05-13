@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Edit.Verify
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colours)
         {
-            foreach (IssueType issueType in verify.IssueList.ShowType.Keys)
+            foreach (IssueType issueType in verify.ShowIssueType.Keys)
             {
                 var checkbox = new SettingsCheckbox
                 {
@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Edit.Verify
                     LabelText = issueType.ToString()
                 };
 
-                checkbox.Current.BindTo(verify.IssueList.ShowType[issueType]);
+                checkbox.Current.BindTo(verify.ShowIssueType[issueType]);
                 checkbox.Current.BindValueChanged(_ => verify.IssueList.Refresh());
                 Flow.Add(checkbox);
             }
