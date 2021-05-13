@@ -35,8 +35,6 @@ namespace osu.Game.Screens.Edit.Verify
         [Resolved]
         private VerifyScreen verify { get; set; }
 
-        public Bindable<DifficultyRating> InterpretedDifficulty { get; set; }
-
         private IBeatmapVerifier rulesetVerifier;
         private BeatmapVerifier generalVerifier;
 
@@ -45,8 +43,6 @@ namespace osu.Game.Screens.Edit.Verify
         {
             generalVerifier = new BeatmapVerifier();
             rulesetVerifier = beatmap.BeatmapInfo.Ruleset?.CreateInstance()?.CreateBeatmapVerifier();
-
-            InterpretedDifficulty = verify.InterpretedDifficulty.GetBoundCopy();
 
             RelativeSizeAxes = Axes.Both;
 
