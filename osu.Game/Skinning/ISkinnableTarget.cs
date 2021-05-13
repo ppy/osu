@@ -6,7 +6,7 @@ using osu.Framework.Bindables;
 namespace osu.Game.Skinning
 {
     /// <summary>
-    /// Denotes a container which can house <see cref="ISkinnableComponent"/>s.
+    /// Denotes a container which can house <see cref="ISkinnableDrawable"/>s.
     /// </summary>
     public interface ISkinnableTarget
     {
@@ -18,7 +18,7 @@ namespace osu.Game.Skinning
         /// <summary>
         /// A bindable list of components which are being tracked by this skinnable target.
         /// </summary>
-        IBindableList<ISkinnableComponent> Components { get; }
+        IBindableList<ISkinnableDrawable> Components { get; }
 
         /// <summary>
         /// Reload this target from the current skin.
@@ -28,6 +28,6 @@ namespace osu.Game.Skinning
         /// <summary>
         /// Add the provided item to this target.
         /// </summary>
-        void Add(ISkinnableComponent drawable);
+        void Add(ISkinnableDrawable drawable);
     }
 }

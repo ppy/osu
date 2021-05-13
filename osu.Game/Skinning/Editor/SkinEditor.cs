@@ -22,7 +22,7 @@ namespace osu.Game.Skinning.Editor
     {
         public const double TRANSITION_DURATION = 500;
 
-        public readonly BindableList<ISkinnableComponent> SelectedComponents = new BindableList<ISkinnableComponent>();
+        public readonly BindableList<ISkinnableDrawable> SelectedComponents = new BindableList<ISkinnableDrawable>();
 
         protected override bool StartHidden => true;
 
@@ -165,7 +165,7 @@ namespace osu.Game.Skinning.Editor
 
         private void placeComponent(Type type)
         {
-            if (!(Activator.CreateInstance(type) is ISkinnableComponent component))
+            if (!(Activator.CreateInstance(type) is ISkinnableDrawable component))
                 throw new InvalidOperationException("Attempted to instantiate a component for placement which was not an {typeof(ISkinnableComponent)}.");
 
             getTarget(SkinnableTarget.MainHUDComponents)?.Add(component);

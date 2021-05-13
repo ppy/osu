@@ -15,7 +15,7 @@ using osuTK;
 namespace osu.Game.Screens.Play.HUD
 {
     /// <summary>
-    /// Serialised information governing custom changes to an <see cref="ISkinnableComponent"/>.
+    /// Serialised information governing custom changes to an <see cref="ISkinnableDrawable"/>.
     /// </summary>
     [Serializable]
     public class SkinnableInfo : IJsonSerializable
@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Play.HUD
 
             if (component is Container<Drawable> container)
             {
-                foreach (var child in container.OfType<ISkinnableComponent>().OfType<Drawable>())
+                foreach (var child in container.OfType<ISkinnableDrawable>().OfType<Drawable>())
                     Children.Add(child.CreateSkinnableInfo());
             }
         }
