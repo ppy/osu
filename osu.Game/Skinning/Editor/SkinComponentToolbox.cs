@@ -56,7 +56,7 @@ namespace osu.Game.Skinning.Editor
                 Spacing = new Vector2(20)
             };
 
-            var skinnableTypes = typeof(OsuGame).Assembly.GetTypes().Where(t => typeof(ISkinnableComponent).IsAssignableFrom(t)).ToArray();
+            var skinnableTypes = typeof(OsuGame).Assembly.GetTypes().Where(t => typeof(ISkinnableDrawable).IsAssignableFrom(t)).ToArray();
 
             foreach (var type in skinnableTypes)
             {
@@ -78,7 +78,7 @@ namespace osu.Game.Skinning.Editor
 
                 Debug.Assert(instance != null);
 
-                if (!((ISkinnableComponent)instance).IsEditable)
+                if (!((ISkinnableDrawable)instance).IsEditable)
                     return null;
 
                 return new ToolboxComponentButton(instance);

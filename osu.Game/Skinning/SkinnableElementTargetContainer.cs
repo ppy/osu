@@ -17,9 +17,9 @@ namespace osu.Game.Skinning
 
         public SkinnableTarget Target { get; }
 
-        public IBindableList<ISkinnableComponent> Components => components;
+        public IBindableList<ISkinnableDrawable> Components => components;
 
-        private readonly BindableList<ISkinnableComponent> components = new BindableList<ISkinnableComponent>();
+        private readonly BindableList<ISkinnableDrawable> components = new BindableList<ISkinnableDrawable>();
 
         public SkinnableElementTargetContainer(SkinnableTarget target)
         {
@@ -41,7 +41,7 @@ namespace osu.Game.Skinning
                 LoadComponentAsync(content, wrapper =>
                 {
                     AddInternal(wrapper);
-                    components.AddRange(wrapper.Children.OfType<ISkinnableComponent>());
+                    components.AddRange(wrapper.Children.OfType<ISkinnableDrawable>());
                 });
             }
         }
@@ -52,7 +52,7 @@ namespace osu.Game.Skinning
         /// <param name="component">The component to add.</param>
         /// <exception cref="NotSupportedException">Thrown when attempting to add an element to a target which is not supported by the current skin.</exception>
         /// <exception cref="ArgumentException">Thrown if the provided instance is not a <see cref="Drawable"/>.</exception>
-        public void Add(ISkinnableComponent component)
+        public void Add(ISkinnableDrawable component)
         {
             if (content == null)
                 throw new NotSupportedException("Attempting to add a new component to a target container which is not supported by the current skin.");

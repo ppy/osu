@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Skinning.Editor
 {
-    public class SkinSelectionHandler : SelectionHandler<ISkinnableComponent>
+    public class SkinSelectionHandler : SelectionHandler<ISkinnableDrawable>
     {
         public override bool HandleRotation(float angle)
         {
@@ -36,7 +36,7 @@ namespace osu.Game.Skinning.Editor
             return true;
         }
 
-        public override bool HandleMovement(MoveSelectionEvent<ISkinnableComponent> moveEvent)
+        public override bool HandleMovement(MoveSelectionEvent<ISkinnableDrawable> moveEvent)
         {
             foreach (var c in SelectedBlueprints)
             {
@@ -57,7 +57,7 @@ namespace osu.Game.Skinning.Editor
             SelectionBox.CanReverse = false;
         }
 
-        protected override void DeleteItems(IEnumerable<ISkinnableComponent> items)
+        protected override void DeleteItems(IEnumerable<ISkinnableDrawable> items)
         {
             foreach (var i in items)
             {
@@ -66,7 +66,7 @@ namespace osu.Game.Skinning.Editor
             }
         }
 
-        protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<ISkinnableComponent>> selection)
+        protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<ISkinnableDrawable>> selection)
         {
             yield return new OsuMenuItem("Anchor")
             {
@@ -131,7 +131,7 @@ namespace osu.Game.Skinning.Editor
 
         public class AnchorMenuItem : TernaryStateMenuItem
         {
-            public AnchorMenuItem(Anchor anchor, IEnumerable<SelectionBlueprint<ISkinnableComponent>> selection, Action<TernaryState> action)
+            public AnchorMenuItem(Anchor anchor, IEnumerable<SelectionBlueprint<ISkinnableDrawable>> selection, Action<TernaryState> action)
                 : base(anchor.ToString(), getNextState, MenuItemType.Standard, action)
             {
             }
