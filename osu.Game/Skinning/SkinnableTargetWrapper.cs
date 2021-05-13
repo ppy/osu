@@ -20,7 +20,7 @@ namespace osu.Game.Skinning
         /// <summary>
         /// Construct a wrapper with defaults that should be applied once.
         /// </summary>
-        /// <param name="applyDefaults">A function with default to apply after the initial layout (ie. consuming autosize)</param>
+        /// <param name="applyDefaults">A function to apply the default layout.</param>
         public SkinnableTargetWrapper(Action<Container> applyDefaults)
             : this()
         {
