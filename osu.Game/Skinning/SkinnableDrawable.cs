@@ -23,7 +23,7 @@ namespace osu.Game.Skinning
         /// Whether the drawable component should be centered in available space.
         /// Defaults to true.
         /// </summary>
-        public bool CentreComponent { get; set; } = true;
+        public bool CentreComponent = true;
 
         public new Axes AutoSizeAxes
         {
@@ -42,7 +42,8 @@ namespace osu.Game.Skinning
         /// <param name="defaultImplementation">A function to create the default skin implementation of this element.</param>
         /// <param name="allowFallback">A conditional to decide whether to allow fallback to the default implementation if a skinned element is not present.</param>
         /// <param name="confineMode">How (if at all) the <see cref="Drawable"/> should be resize to fit within our own bounds.</param>
-        public SkinnableDrawable(ISkinComponent component, Func<ISkinComponent, Drawable> defaultImplementation = null, Func<ISkinSource, bool> allowFallback = null, ConfineMode confineMode = ConfineMode.NoScaling)
+        public SkinnableDrawable(ISkinComponent component, Func<ISkinComponent, Drawable> defaultImplementation = null, Func<ISkinSource, bool> allowFallback = null,
+                                 ConfineMode confineMode = ConfineMode.NoScaling)
             : this(component, allowFallback, confineMode)
         {
             createDefault = defaultImplementation;
