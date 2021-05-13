@@ -64,8 +64,11 @@ namespace osu.Game.Skinning
             components.Add(component);
         }
 
-        public IEnumerable<SkinnableInfo> CreateSerialisedChildren() =>
-            components.Select(d => ((Drawable)d).CreateSerialisedInformation());
+        /// <summary>
+        /// Serialise all children as <see cref="SkinnableInfo"/>.
+        /// </summary>
+        /// <returns>The serialised content.</returns>
+        public IEnumerable<SkinnableInfo> CreateSkinnableInfo() => components.Select(d => ((Drawable)d).CreateSkinnableInfo());
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {

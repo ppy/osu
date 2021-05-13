@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Play.HUD
             if (component is Container<Drawable> container)
             {
                 foreach (var child in container.OfType<ISkinSerialisable>().OfType<Drawable>())
-                    Children.Add(child.CreateSerialisedInformation());
+                    Children.Add(child.CreateSkinnableInfo());
             }
         }
 
@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Play.HUD
         public Drawable CreateInstance()
         {
             Drawable d = (Drawable)Activator.CreateInstance(Type);
-            d.ApplySerialisedInformation(this);
+            d.ApplySkinnableInfo(this);
             return d;
         }
     }
