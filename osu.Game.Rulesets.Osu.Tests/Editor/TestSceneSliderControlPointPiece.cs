@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             slider.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = 2 });
 
             Add(drawableObject = new DrawableSlider(slider));
-            AddBlueprint(new TestSliderBlueprint(drawableObject));
+            AddBlueprint(new TestSliderBlueprint(slider), drawableObject);
         });
 
         [Test]
@@ -154,19 +154,19 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             public new TestSliderCircleBlueprint TailBlueprint => (TestSliderCircleBlueprint)base.TailBlueprint;
             public new PathControlPointVisualiser ControlPointVisualiser => base.ControlPointVisualiser;
 
-            public TestSliderBlueprint(DrawableSlider slider)
+            public TestSliderBlueprint(Slider slider)
                 : base(slider)
             {
             }
 
-            protected override SliderCircleSelectionBlueprint CreateCircleSelectionBlueprint(DrawableSlider slider, SliderPosition position) => new TestSliderCircleBlueprint(slider, position);
+            protected override SliderCircleSelectionBlueprint CreateCircleSelectionBlueprint(Slider slider, SliderPosition position) => new TestSliderCircleBlueprint(slider, position);
         }
 
         private class TestSliderCircleBlueprint : SliderCircleSelectionBlueprint
         {
             public new HitCirclePiece CirclePiece => base.CirclePiece;
 
-            public TestSliderCircleBlueprint(DrawableSlider slider, SliderPosition position)
+            public TestSliderCircleBlueprint(Slider slider, SliderPosition position)
                 : base(slider, position)
             {
             }
