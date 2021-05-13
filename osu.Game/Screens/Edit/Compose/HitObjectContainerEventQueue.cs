@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Graphics;
@@ -53,43 +52,59 @@ namespace osu.Game.Screens.Edit.Compose
             playfield.HitObjectUsageFinished += onHitObjectUsageFinished;
         }
 
-        private readonly Dictionary<HitObject, int> pendingUsagesBegan = new Dictionary<HitObject, int>();
-        private readonly Dictionary<HitObject, int> pendingUsagesFinished = new Dictionary<HitObject, int>();
+        private readonly Dictionary<HitObject, EventType> pendingEvents = new Dictionary<HitObject, EventType>();
 
-        private void onHitObjectUsageBegan(HitObject hitObject) => pendingUsagesBegan[hitObject] = pendingUsagesBegan.GetValueOrDefault(hitObject, 0) + 1;
+        private void onHitObjectUsageBegan(HitObject hitObject) => updateEvent(hitObject, EventType.Began);
 
-        private void onHitObjectUsageFinished(HitObject hitObject) => pendingUsagesFinished[hitObject] = pendingUsagesFinished.GetValueOrDefault(hitObject, 0) + 1;
+        private void onHitObjectUsageFinished(HitObject hitObject) => updateEvent(hitObject, EventType.Finished);
+
+        private void updateEvent(HitObject hitObject, EventType newEvent)
+        {
+            if (!pendingEvents.TryGetValue(hitObject, out EventType existingEvent))
+            {
+                pendingEvents[hitObject] = newEvent;
+                return;
+            }
+
+            switch (existingEvent, newEvent)
+            {
+                case (EventType.Transferred, EventType.Finished):
+                    pendingEvents[hitObject] = EventType.Finished;
+                    break;
+
+                case (EventType.Began, EventType.Finished):
+                case (EventType.Finished, EventType.Began):
+                    pendingEvents[hitObject] = EventType.Transferred;
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException($"Unexpected event update ({existingEvent} => {newEvent}).");
+            }
+        }
 
         protected override void Update()
         {
             base.Update();
 
-            foreach (var (hitObject, countBegan) in pendingUsagesBegan)
+            foreach (var (hitObject, e) in pendingEvents)
             {
-                if (pendingUsagesFinished.TryGetValue(hitObject, out int countFinished))
+                switch (e)
                 {
-                    Debug.Assert(countFinished > 0);
+                    case EventType.Began:
+                        HitObjectUsageBegan?.Invoke(hitObject);
+                        break;
 
-                    if (countBegan > countFinished)
-                    {
-                        // The hitobject is still in use, but transferred to a different HOC.
+                    case EventType.Transferred:
                         HitObjectUsageTransferred?.Invoke(hitObject, playfield.AllHitObjects.Single(d => d.HitObject == hitObject));
-                        pendingUsagesFinished.Remove(hitObject);
-                    }
-                }
-                else
-                {
-                    // This is a new usage of the hitobject.
-                    HitObjectUsageBegan?.Invoke(hitObject);
+                        break;
+
+                    case EventType.Finished:
+                        HitObjectUsageFinished?.Invoke(hitObject);
+                        break;
                 }
             }
 
-            // Go through any remaining pending finished usages.
-            foreach (var (hitObject, _) in pendingUsagesFinished)
-                HitObjectUsageFinished?.Invoke(hitObject);
-
-            pendingUsagesBegan.Clear();
-            pendingUsagesFinished.Clear();
+            pendingEvents.Clear();
         }
 
         protected override void Dispose(bool isDisposing)
@@ -98,6 +113,13 @@ namespace osu.Game.Screens.Edit.Compose
 
             playfield.HitObjectUsageBegan -= onHitObjectUsageBegan;
             playfield.HitObjectUsageFinished -= onHitObjectUsageFinished;
+        }
+
+        private enum EventType
+        {
+            Began,
+            Finished,
+            Transferred
         }
     }
 }
