@@ -6,9 +6,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
@@ -151,6 +153,48 @@ namespace osu.Game.Skinning
         /// <param name="skinInfo">The skin to lookup.</param>
         /// <returns>A <see cref="Skin"/> instance correlating to the provided <see cref="SkinInfo"/>.</returns>
         public Skin GetSkin(SkinInfo skinInfo) => skinInfo.CreateInstance(legacyDefaultResources, this);
+
+        /// <summary>
+        /// Ensure that the current skin is in a state it can accept user modifications.
+        /// This will create a copy of any internal skin and being tracking in the database if not already.
+        /// </summary>
+        public void EnsureMutableSkin()
+        {
+            if (CurrentSkinInfo.Value.ID >= 1) return;
+
+            var skin = CurrentSkin.Value;
+
+            // if the user is attempting to save one of the default skin implementations, create a copy first.
+            CurrentSkinInfo.Value = Import(new SkinInfo
+            {
+                Name = skin.SkinInfo.Name + " (modified)",
+                Creator = skin.SkinInfo.Creator,
+                InstantiationInfo = skin.SkinInfo.InstantiationInfo,
+            }).Result;
+        }
+
+        public void Save(Skin skin)
+        {
+            if (skin.SkinInfo.ID <= 0)
+                throw new InvalidOperationException($"Attempting to save a skin which is not yet tracked. Call {nameof(EnsureMutableSkin)} first.");
+
+            foreach (var drawableInfo in skin.DrawableComponentInfo)
+            {
+                string json = JsonConvert.SerializeObject(drawableInfo.Value, new JsonSerializerSettings { Formatting = Formatting.Indented });
+
+                using (var streamContent = new MemoryStream(Encoding.UTF8.GetBytes(json)))
+                {
+                    string filename = $"{drawableInfo.Key}.json";
+
+                    var oldFile = skin.SkinInfo.Files.FirstOrDefault(f => f.Filename == filename);
+
+                    if (oldFile != null)
+                        ReplaceFile(skin.SkinInfo, oldFile, streamContent, oldFile.Filename);
+                    else
+                        AddFile(skin.SkinInfo, streamContent, filename);
+                }
+            }
+        }
 
         /// <summary>
         /// Perform a lookup query on available <see cref="SkinInfo"/>s.

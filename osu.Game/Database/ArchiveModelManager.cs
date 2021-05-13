@@ -472,7 +472,7 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Delete new file.
+        /// Delete an existing file.
         /// </summary>
         /// <param name="model">The item to operate on.</param>
         /// <param name="file">The existing file to be deleted.</param>

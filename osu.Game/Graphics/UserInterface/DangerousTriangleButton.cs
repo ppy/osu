@@ -2,20 +2,17 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Game.Graphics;
-using osu.Game.Skinning;
 
-namespace osu.Game.Screens.Play.HUD
+namespace osu.Game.Graphics.UserInterface
 {
-    public class DefaultAccuracyCounter : GameplayAccuracyCounter, ISkinnableDrawable
+    public class DangerousTriangleButton : TriangleButton
     {
-        [Resolved(canBeNull: true)]
-        private HUDOverlay hud { get; set; }
-
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Colour = colours.BlueLighter;
+            BackgroundColour = colours.PinkDark;
+            Triangles.ColourDark = colours.PinkDarker;
+            Triangles.ColourLight = colours.Pink;
         }
     }
 }

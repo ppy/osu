@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         Scale = new Vector2(SPRITE_SCALE),
                         Y = SPINNER_TOP_OFFSET + 115,
                     },
-                    bonusCounter = new LegacySpriteText(source, LegacyFont.Score)
+                    bonusCounter = new LegacySpriteText(LegacyFont.Score)
                     {
                         Alpha = 0f,
                         Anchor = Anchor.TopCentre,
@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         Scale = new Vector2(SPRITE_SCALE),
                         Position = new Vector2(-87, 445 + spm_hide_offset),
                     },
-                    spmCounter = new LegacySpriteText(source, LegacyFont.Score)
+                    spmCounter = new LegacySpriteText(LegacyFont.Score)
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopRight,
