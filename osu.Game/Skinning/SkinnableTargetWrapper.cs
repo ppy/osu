@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using Newtonsoft.Json;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 
@@ -11,6 +12,7 @@ namespace osu.Game.Skinning
     /// A container which is serialised and can encapsulate multiple skinnable elements into a single return type (for consumption via <see cref="ISkin.GetDrawableComponent"/>.
     /// Will also optionally apply default cross-element layout dependencies when initialised from a non-deserialised source.
     /// </summary>
+    [Serializable]
     public class SkinnableTargetWrapper : Container, ISkinSerialisable
     {
         private readonly Action<Container> applyDefaults;
@@ -25,6 +27,7 @@ namespace osu.Game.Skinning
             this.applyDefaults = applyDefaults;
         }
 
+        [JsonConstructor]
         public SkinnableTargetWrapper()
         {
             RelativeSizeAxes = Axes.Both;
