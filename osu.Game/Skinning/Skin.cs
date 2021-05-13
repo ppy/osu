@@ -65,7 +65,7 @@ namespace osu.Game.Skinning
         /// Remove all stored customisations for the provided target.
         /// </summary>
         /// <param name="targetContainer">The target container to reset.</param>
-        public void ResetDrawableTarget(SkinnableElementTargetContainer targetContainer)
+        public void ResetDrawableTarget(SkinnableTargetContainer targetContainer)
         {
             DrawableComponentInfo.Remove(targetContainer.Target);
         }
@@ -74,7 +74,7 @@ namespace osu.Game.Skinning
         /// Update serialised information for the provided target.
         /// </summary>
         /// <param name="targetContainer">The target container to serialise to this skin.</param>
-        public void UpdateDrawableTarget(SkinnableElementTargetContainer targetContainer)
+        public void UpdateDrawableTarget(SkinnableTargetContainer targetContainer)
         {
             DrawableComponentInfo[targetContainer.Target] = targetContainer.CreateSkinnableInfo().ToArray();
         }

@@ -11,7 +11,7 @@ using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Skinning
 {
-    public class SkinnableElementTargetContainer : SkinReloadableDrawable, ISkinnableTarget
+    public class SkinnableTargetContainer : SkinReloadableDrawable, ISkinnableTarget
     {
         private SkinnableTargetWrapper content;
 
@@ -21,7 +21,7 @@ namespace osu.Game.Skinning
 
         private readonly BindableList<ISkinnableDrawable> components = new BindableList<ISkinnableDrawable>();
 
-        public SkinnableElementTargetContainer(SkinnableTarget target)
+        public SkinnableTargetContainer(SkinnableTarget target)
         {
             Target = target;
         }
