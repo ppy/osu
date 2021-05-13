@@ -32,8 +32,16 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         /// <param name="directory">The selected directory</param>
         protected abstract void OnSelection(DirectoryInfo directory);
 
+        /// <summary>
+        /// Whether the current directory is considered to be valid and can be selected.
+        /// </summary>
+        /// <param name="info">The current directory.</param>
+        /// <returns>Whether the selected directory is considered valid.</returns>
         protected virtual bool IsValidDirectory(DirectoryInfo info) => true;
 
+        /// <summary>
+        /// The path at which to start selection from.
+        /// </summary>
         protected virtual DirectoryInfo InitialPath => null;
 
         public override bool AllowExternalScreenChange => false;
