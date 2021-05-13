@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Extensions;
@@ -33,10 +34,15 @@ namespace osu.Game.Screens.Play.HUD
 
         public List<SkinnableInfo> Children { get; } = new List<SkinnableInfo>();
 
+        [JsonConstructor]
         public SkinnableInfo()
         {
         }
 
+        /// <summary>
+        /// Construct a new instance populating all attributes from the provided drawable.
+        /// </summary>
+        /// <param name="component">The drawable which attributes should be sourced from.</param>
         public SkinnableInfo(Drawable component)
         {
             Type = component.GetType();
@@ -47,13 +53,17 @@ namespace osu.Game.Screens.Play.HUD
             Anchor = component.Anchor;
             Origin = component.Origin;
 
-            if (component is Container container)
+            if (component is Container<Drawable> container)
             {
-                foreach (var child in container.Children.OfType<ISkinSerialisable>().OfType<Drawable>())
+                foreach (var child in container.OfType<ISkinSerialisable>().OfType<Drawable>())
                     Children.Add(child.CreateSerialisedInformation());
             }
         }
 
+        /// <summary>
+        /// Construct an instance of the drawable with all attributes applied.
+        /// </summary>
+        /// <returns>The new instance.</returns>
         public Drawable CreateInstance()
         {
             Drawable d = (Drawable)Activator.CreateInstance(Type);
