@@ -158,10 +158,8 @@ namespace osu.Game.Skinning.Editor
             // for now aspect lock scale adjustments that occur at corners.
             if (!reference.HasFlagFast(Anchor.x1) && !reference.HasFlagFast(Anchor.y1))
             {
-                if (reference.HasFlagFast(Anchor.x0) || reference.HasFlagFast(Anchor.x2))
-                    scale.Y = scale.X;
-                else
-                    scale.X = scale.Y;
+                // TODO: temporary implementation - only dragging the corner handles across the X axis changes size.
+                scale.Y = scale.X;
             }
         }
 
