@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -11,28 +12,41 @@ using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
+using osu.Game.Graphics.UserInterface;
+using osuTK;
 
 namespace osu.Game.Skinning.Editor
 {
+    [Cached(typeof(SkinEditor))]
     public class SkinEditor : FocusedOverlayContainer
     {
         public const double TRANSITION_DURATION = 500;
 
-        private readonly Drawable target;
-
-        private OsuTextFlowContainer headerText;
+        public readonly BindableList<ISkinnableDrawable> SelectedComponents = new BindableList<ISkinnableDrawable>();
 
         protected override bool StartHidden => true;
 
-        public SkinEditor(Drawable target)
+        private readonly Drawable targetScreen;
+
+        private OsuTextFlowContainer headerText;
+
+        private Bindable<Skin> currentSkin;
+
+        [Resolved]
+        private SkinManager skins { get; set; }
+
+        [Resolved]
+        private OsuColour colours { get; set; }
+
+        public SkinEditor(Drawable targetScreen)
         {
-            this.target = target;
+            this.targetScreen = targetScreen;
 
             RelativeSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             InternalChild = new OsuContextMenuContainer
             {
@@ -47,37 +61,145 @@ namespace osu.Game.Skinning.Editor
                         Origin = Anchor.TopCentre,
                         RelativeSizeAxes = Axes.X
                     },
-                    new SkinBlueprintContainer(target),
-                    new SkinComponentToolbox(600)
+                    new GridContainer
                     {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        RequestPlacement = placeComponent
+                        RelativeSizeAxes = Axes.Both,
+                        ColumnDimensions = new[]
+                        {
+                            new Dimension(GridSizeMode.AutoSize),
+                            new Dimension()
+                        },
+                        Content = new[]
+                        {
+                            new Drawable[]
+                            {
+                                new SkinComponentToolbox(600)
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    RequestPlacement = placeComponent
+                                },
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        new SkinBlueprintContainer(targetScreen),
+                                        new FillFlowContainer
+                                        {
+                                            Direction = FillDirection.Horizontal,
+                                            AutoSizeAxes = Axes.Both,
+                                            Anchor = Anchor.TopRight,
+                                            Origin = Anchor.TopRight,
+                                            Spacing = new Vector2(5),
+                                            Padding = new MarginPadding
+                                            {
+                                                Top = 10,
+                                                Left = 10,
+                                            },
+                                            Margin = new MarginPadding
+                                            {
+                                                Right = 10,
+                                                Bottom = 10,
+                                            },
+                                            Children = new Drawable[]
+                                            {
+                                                new TriangleButton
+                                                {
+                                                    Text = "Save Changes",
+                                                    Width = 140,
+                                                    Action = save,
+                                                },
+                                                new DangerousTriangleButton
+                                                {
+                                                    Text = "Revert to default",
+                                                    Width = 140,
+                                                    Action = revert,
+                                                },
+                                            }
+                                        },
+                                    }
+                                },
+                            }
+                        }
                     }
                 }
             };
-
-            headerText.AddParagraph("Skin editor (preview)", cp => cp.Font = OsuFont.Default.With(size: 24));
-            headerText.AddParagraph("This is a preview of what is to come. Changes are lost on changing screens.", cp =>
-            {
-                cp.Font = OsuFont.Default.With(size: 12);
-                cp.Colour = colours.Yellow;
-            });
-        }
-
-        private void placeComponent(Type type)
-        {
-            var instance = (Drawable)Activator.CreateInstance(type);
-
-            var targetContainer = target.ChildrenOfType<IDefaultSkinnableTarget>().FirstOrDefault();
-
-            targetContainer?.Add(instance);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
             Show();
+
+            // as long as the skin editor is loaded, let's make sure we can modify the current skin.
+            currentSkin = skins.CurrentSkin.GetBoundCopy();
+
+            // schedule ensures this only happens when the skin editor is visible.
+            // also avoid some weird endless recursion / bindable feedback loop (something to do with tracking skins across three different bindable types).
+            // probably something which will be factored out in a future database refactor so not too concerning for now.
+            currentSkin.BindValueChanged(skin => Scheduler.AddOnce(skinChanged), true);
+        }
+
+        private void skinChanged()
+        {
+            headerText.Clear();
+
+            headerText.AddParagraph("Skin editor", cp => cp.Font = OsuFont.Default.With(size: 24));
+            headerText.NewParagraph();
+            headerText.AddText("Currently editing ", cp =>
+            {
+                cp.Font = OsuFont.Default.With(size: 12);
+                cp.Colour = colours.Yellow;
+            });
+
+            headerText.AddText($"{currentSkin.Value.SkinInfo}", cp =>
+            {
+                cp.Font = OsuFont.Default.With(size: 12, weight: FontWeight.Bold);
+                cp.Colour = colours.Yellow;
+            });
+
+            skins.EnsureMutableSkin();
+        }
+
+        private void placeComponent(Type type)
+        {
+            if (!(Activator.CreateInstance(type) is ISkinnableDrawable component))
+                throw new InvalidOperationException($"Attempted to instantiate a component for placement which was not an {typeof(ISkinnableDrawable)}.");
+
+            getTarget(SkinnableTarget.MainHUDComponents)?.Add(component);
+
+            SelectedComponents.Clear();
+            SelectedComponents.Add(component);
+        }
+
+        private ISkinnableTarget getTarget(SkinnableTarget target)
+        {
+            return targetScreen.ChildrenOfType<ISkinnableTarget>().FirstOrDefault(c => c.Target == target);
+        }
+
+        private void revert()
+        {
+            SkinnableTargetContainer[] targetContainers = targetScreen.ChildrenOfType<SkinnableTargetContainer>().ToArray();
+
+            foreach (var t in targetContainers)
+            {
+                currentSkin.Value.ResetDrawableTarget(t);
+
+                // add back default components
+                getTarget(t.Target).Reload();
+            }
+        }
+
+        private void save()
+        {
+            SkinnableTargetContainer[] targetContainers = targetScreen.ChildrenOfType<SkinnableTargetContainer>().ToArray();
+
+            foreach (var t in targetContainers)
+                currentSkin.Value.UpdateDrawableTarget(t);
+
+            skins.Save(skins.CurrentSkin.Value);
         }
 
         protected override bool OnHover(HoverEvent e) => true;
