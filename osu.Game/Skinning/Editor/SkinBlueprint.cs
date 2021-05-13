@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Skinning.Editor
 {
-    public class SkinBlueprint : SelectionBlueprint<ISkinnableComponent>
+    public class SkinBlueprint : SelectionBlueprint<ISkinnableDrawable>
     {
         private Container box;
 
@@ -26,7 +26,7 @@ namespace osu.Game.Skinning.Editor
 
         protected override bool ShouldBeAlive => (drawable.IsAlive && Item.IsPresent) || (AlwaysShowWhenSelected && State == SelectionState.Selected);
 
-        public SkinBlueprint(ISkinnableComponent component)
+        public SkinBlueprint(ISkinnableDrawable component)
             : base(component)
         {
         }
