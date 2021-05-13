@@ -22,8 +22,8 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         public override bool HandleMovement(MoveSelectionEvent<HitObject> moveEvent)
         {
-            var maniaBlueprint = (HitObjectSelectionBlueprint<ManiaHitObject>)moveEvent.Blueprint;
-            int lastColumn = maniaBlueprint.HitObject.Column;
+            var hitObjectBlueprint = (HitObjectSelectionBlueprint)moveEvent.Blueprint;
+            int lastColumn = ((ManiaHitObject)hitObjectBlueprint.Item).Column;
 
             performColumnMovement(lastColumn, moveEvent);
 
