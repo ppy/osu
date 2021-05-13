@@ -13,6 +13,5 @@ namespace osu.Game.Rulesets.Mods
         public override ModType Type => ModType.Conversion;
         public override IconUsage? Icon => OsuIcon.Dice;
         public override double ScoreMultiplier => 1;
-        public int? Seed { get; protected set; }
     }
 }

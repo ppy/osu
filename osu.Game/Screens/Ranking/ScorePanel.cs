@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Contracted;
 using osu.Game.Screens.Ranking.Expanded;
@@ -207,12 +206,7 @@ namespace osu.Game.Screens.Ranking
             switch (state)
             {
                 case PanelState.Expanded:
-                    var height = expanded_height;
-
-                    if (Score.ContainsModOfType<ModRandom>(out var mod) && mod.Seed != null)
-                        height += 20f;
-
-                    Size = new Vector2(EXPANDED_WIDTH, height);
+                    Size = new Vector2(EXPANDED_WIDTH, expanded_height);
 
                     topLayerBackground.FadeColour(expanded_top_layer_colour, resize_duration, Easing.OutQuint);
                     middleLayerBackground.FadeColour(expanded_middle_layer_colour, resize_duration, Easing.OutQuint);
