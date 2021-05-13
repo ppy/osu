@@ -78,6 +78,9 @@ namespace osu.Game.Skinning.Editor
 
                 Debug.Assert(instance != null);
 
+                if (!((ISkinnableComponent)instance).IsEditable)
+                    return null;
+
                 return new ToolboxComponentButton(instance);
             }
             catch

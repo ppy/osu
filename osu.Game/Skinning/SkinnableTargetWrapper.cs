@@ -13,8 +13,10 @@ namespace osu.Game.Skinning
     /// Will also optionally apply default cross-element layout dependencies when initialised from a non-deserialised source.
     /// </summary>
     [Serializable]
-    public class SkinnableTargetWrapper : Container, ISkinSerialisable
+    public class SkinnableTargetWrapper : Container, ISkinnableComponent
     {
+        public bool IsEditable => false;
+
         private readonly Action<Container> applyDefaults;
 
         /// <summary>

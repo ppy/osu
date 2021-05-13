@@ -81,6 +81,14 @@ namespace osu.Game.Skinning.Editor
             }
         }
 
+        protected override void AddBlueprintFor(ISkinnableComponent item)
+        {
+            if (!item.IsEditable)
+                return;
+
+            base.AddBlueprintFor(item);
+        }
+
         protected override SelectionHandler<ISkinnableComponent> CreateSelectionHandler() => new SkinSelectionHandler();
 
         protected override SelectionBlueprint<ISkinnableComponent> CreateBlueprintFor(ISkinnableComponent component)
