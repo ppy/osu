@@ -19,6 +19,8 @@ namespace osu.Game.Skinning.Editor
     {
         private readonly Drawable target;
 
+        private readonly List<BindableList<ISkinnableComponent>> targetComponents = new List<BindableList<ISkinnableComponent>>();
+
         public SkinBlueprintContainer(Drawable target)
         {
             this.target = target;
@@ -29,8 +31,6 @@ namespace osu.Game.Skinning.Editor
         {
             SelectedItems.BindTo(editor.SelectedComponents);
         }
-
-        private readonly List<BindableList<ISkinnableComponent>> targetComponents = new List<BindableList<ISkinnableComponent>>();
 
         protected override void LoadComplete()
         {
