@@ -10,7 +10,7 @@ namespace osu.Game.Skinning
 {
     public class SkinnableTargetContainer : SkinReloadableDrawable, ISkinnableTarget
     {
-        private SkinnableTargetWrapper content;
+        private SkinnableTargetComponentsContainer content;
 
         public SkinnableTarget Target { get; }
 
@@ -31,7 +31,7 @@ namespace osu.Game.Skinning
             ClearInternal();
             components.Clear();
 
-            content = CurrentSkin.GetDrawableComponent(new SkinnableTargetComponent(Target)) as SkinnableTargetWrapper;
+            content = CurrentSkin.GetDrawableComponent(new SkinnableTargetComponent(Target)) as SkinnableTargetComponentsContainer;
 
             if (content != null)
             {

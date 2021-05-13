@@ -87,7 +87,7 @@ namespace osu.Game.Skinning
                     if (!DrawableComponentInfo.TryGetValue(target.Target, out var skinnableInfo))
                         return null;
 
-                    return new SkinnableTargetWrapper
+                    return new SkinnableTargetComponentsContainer
                     {
                         ChildrenEnumerable = skinnableInfo.Select(i => i.CreateInstance())
                     };
