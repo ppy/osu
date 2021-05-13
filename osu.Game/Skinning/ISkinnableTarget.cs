@@ -13,7 +13,7 @@ namespace osu.Game.Skinning
     /// <summary>
     /// Denotes a container which can house <see cref="ISkinnableDrawable"/>s.
     /// </summary>
-    public interface ISkinnableTarget
+    public interface ISkinnableTarget : IDrawable
     {
         /// <summary>
         /// The definition of this target.
