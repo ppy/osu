@@ -166,7 +166,7 @@ namespace osu.Game.Skinning.Editor
         private void placeComponent(Type type)
         {
             if (!(Activator.CreateInstance(type) is ISkinnableDrawable component))
-                throw new InvalidOperationException("Attempted to instantiate a component for placement which was not an {typeof(ISkinnableComponent)}.");
+                throw new InvalidOperationException($"Attempted to instantiate a component for placement which was not an {typeof(ISkinnableDrawable)}.");
 
             getTarget(SkinnableTarget.MainHUDComponents)?.Add(component);
 
