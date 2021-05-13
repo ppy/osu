@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit.Checks;
 using osu.Game.Rulesets.Edit.Checks.Components;
 
@@ -29,9 +28,9 @@ namespace osu.Game.Rulesets.Edit
             new CheckConcurrentObjects()
         };
 
-        public IEnumerable<Issue> Run(IBeatmap beatmap, BeatmapVerifierContext context)
+        public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            return checks.SelectMany(check => check.Run(beatmap, context));
+            return checks.SelectMany(check => check.Run(context));
         }
     }
 }

@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Editing.Checks
             mock.SetupGet(w => w.Beatmap).Returns(beatmap);
             mock.SetupGet(w => w.Track).Returns((Track)null);
 
-            Assert.That(check.Run(beatmap, new BeatmapVerifierContext(mock.Object)), Is.Empty);
+            Assert.That(check.Run(new BeatmapVerifierContext(beatmap, mock.Object)), Is.Empty);
         }
 
         [Test]
@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             var context = getContext(192);
 
-            Assert.That(check.Run(beatmap, context), Is.Empty);
+            Assert.That(check.Run(context), Is.Empty);
         }
 
         [Test]
@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             var context = getContext(null);
 
-            var issues = check.Run(beatmap, context).ToList();
+            var issues = check.Run(context).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues.Single().Template is CheckAudioQuality.IssueTemplateNoBitrate);
@@ -68,7 +68,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             var context = getContext(0);
 
-            var issues = check.Run(beatmap, context).ToList();
+            var issues = check.Run(context).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues.Single().Template is CheckAudioQuality.IssueTemplateNoBitrate);
@@ -79,7 +79,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             var context = getContext(320);
 
-            var issues = check.Run(beatmap, context).ToList();
+            var issues = check.Run(context).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues.Single().Template is CheckAudioQuality.IssueTemplateTooHighBitrate);
@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             var context = getContext(64);
 
-            var issues = check.Run(beatmap, context).ToList();
+            var issues = check.Run( context).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues.Single().Template is CheckAudioQuality.IssueTemplateTooLowBitrate);
@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Editing.Checks
 
         private BeatmapVerifierContext getContext(int? audioBitrate)
         {
-            return new BeatmapVerifierContext(getMockWorkingBeatmap(audioBitrate).Object);
+            return new BeatmapVerifierContext(beatmap, getMockWorkingBeatmap(audioBitrate).Object);
         }
 
         /// <summary>

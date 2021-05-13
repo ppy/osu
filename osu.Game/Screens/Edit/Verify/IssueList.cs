@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Edit.Verify
             generalVerifier = new BeatmapVerifier();
             rulesetVerifier = beatmap.BeatmapInfo.Ruleset?.CreateInstance()?.CreateBeatmapVerifier();
 
-            context = new BeatmapVerifierContext(workingBeatmap.Value, verify.InterpretedDifficulty.Value);
+            context = new BeatmapVerifierContext(beatmap, workingBeatmap.Value, verify.InterpretedDifficulty.Value);
             verify.InterpretedDifficulty.BindValueChanged(change =>
             {
                 context.InterpretedDifficulty = change.NewValue;
@@ -98,10 +98,10 @@ namespace osu.Game.Screens.Edit.Verify
 
         private void refresh()
         {
-            var issues = generalVerifier.Run(beatmap, context);
+            var issues = generalVerifier.Run(context);
 
             if (rulesetVerifier != null)
-                issues = issues.Concat(rulesetVerifier.Run(beatmap, context));
+                issues = issues.Concat(rulesetVerifier.Run(context));
 
             issues = filter(issues);
 

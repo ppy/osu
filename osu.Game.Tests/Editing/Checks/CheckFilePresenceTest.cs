@@ -46,8 +46,8 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestBackgroundSetAndInFiles()
         {
-            var context = new BeatmapVerifierContext(new TestWorkingBeatmap(beatmap));
-            Assert.That(check.Run(beatmap, context), Is.Empty);
+            var context = new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));
+            Assert.That(check.Run(context), Is.Empty);
         }
 
         [Test]
@@ -55,8 +55,8 @@ namespace osu.Game.Tests.Editing.Checks
         {
             beatmap.BeatmapInfo.BeatmapSet.Files.Clear();
 
-            var context = new BeatmapVerifierContext(new TestWorkingBeatmap(beatmap));
-            var issues = check.Run(beatmap, context).ToList();
+            var context = new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));
+            var issues = check.Run(context).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues.Single().Template is CheckFilePresence.IssueTemplateDoesNotExist);
@@ -67,8 +67,8 @@ namespace osu.Game.Tests.Editing.Checks
         {
             beatmap.Metadata.BackgroundFile = null;
 
-            var context = new BeatmapVerifierContext(new TestWorkingBeatmap(beatmap));
-            var issues = check.Run(beatmap, context).ToList();
+            var context = new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));
+            var issues = check.Run(context).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues.Single().Template is CheckFilePresence.IssueTemplateNoneSet);

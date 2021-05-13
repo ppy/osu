@@ -56,7 +56,7 @@ namespace osu.Game.Tests.Editing.Checks
             beatmap.Metadata.BackgroundFile = null;
             var context = getContext(null, System.Array.Empty<byte>());
 
-            Assert.That(check.Run(beatmap, context), Is.Empty);
+            Assert.That(check.Run(context), Is.Empty);
         }
 
         [Test]
@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             var context = getContext(new Texture(1920, 1080));
 
-            Assert.That(check.Run(beatmap, context), Is.Empty);
+            Assert.That(check.Run(context), Is.Empty);
         }
 
         [Test]
@@ -72,7 +72,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             var context = getContext(new Texture(3840, 2160));
 
-            var issues = check.Run(beatmap, context).ToList();
+            var issues = check.Run(context).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues.Single().Template is CheckBackgroundQuality.IssueTemplateTooHighResolution);
@@ -83,7 +83,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             var context = getContext(new Texture(640, 480));
 
-            var issues = check.Run(beatmap, context).ToList();
+            var issues = check.Run(context).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues.Single().Template is CheckBackgroundQuality.IssueTemplateLowResolution);
@@ -94,7 +94,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             var context = getContext(new Texture(100, 100));
 
-            var issues = check.Run(beatmap, context).ToList();
+            var issues = check.Run(context).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues.Single().Template is CheckBackgroundQuality.IssueTemplateTooLowResolution);
@@ -105,7 +105,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             var context = getContext(new Texture(1920, 1080), new byte[1024 * 1024 * 3]);
 
-            var issues = check.Run(beatmap, context).ToList();
+            var issues = check.Run(context).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues.Single().Template is CheckBackgroundQuality.IssueTemplateTooUncompressed);
@@ -113,7 +113,7 @@ namespace osu.Game.Tests.Editing.Checks
 
         private BeatmapVerifierContext getContext(Texture background, [CanBeNull] byte[] fileBytes = null)
         {
-            return new BeatmapVerifierContext(getMockWorkingBeatmap(background, fileBytes).Object);
+            return new BeatmapVerifierContext(beatmap, getMockWorkingBeatmap(background, fileBytes).Object);
         }
 
         /// <summary>

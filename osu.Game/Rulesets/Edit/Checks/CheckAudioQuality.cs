@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit.Checks
@@ -26,9 +25,9 @@ namespace osu.Game.Rulesets.Edit.Checks
             new IssueTemplateNoBitrate(this)
         };
 
-        public IEnumerable<Issue> Run(IBeatmap beatmap, BeatmapVerifierContext context)
+        public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            var audioFile = beatmap.Metadata?.AudioFile;
+            var audioFile = context.Beatmap.Metadata?.AudioFile;
             if (audioFile == null)
                 yield break;
 
