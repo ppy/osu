@@ -112,8 +112,13 @@ namespace osu.Game.Skinning.Editor
             drawableQuad = drawable.ScreenSpaceDrawQuad;
             var quad = ToLocalSpace(drawable.ScreenSpaceDrawQuad);
 
-            box.Position = quad.TopLeft;
+            box.Position = new Vector2(
+                drawable.Scale.X < 0 ? quad.TopRight.X : quad.TopLeft.X,
+                drawable.Scale.Y < 0 ? quad.BottomLeft.Y : quad.TopLeft.Y
+            );
+
             box.Size = quad.Size;
+
             box.Rotation = drawable.Rotation;
         }
 
