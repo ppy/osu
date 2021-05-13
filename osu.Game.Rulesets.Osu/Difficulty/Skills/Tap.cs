@@ -17,13 +17,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Tap : OsuSkill
     {
-        protected override double StarsPerDouble => 1.175;
-        protected override int HistoryLength => 16;
+        protected override double StarsPerDouble => 1.075;
+        protected override int HistoryLength => 8;
+        private int averageLength = 4;
 
         private int decayExcessThreshold = 500;
 
         private double currentStrain;
-        private double strainMultiplier = 35;
+        private double strainMultiplier = 5.0;
 
         private double hitWindowGreat;
 
@@ -52,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             var osuCurrent = (OsuDifficultyHitObject)current;
 
-            double strainValue = 0;
+            double strainValue = .25;
 
             int deltaTimeDeltaCount = 0;
             double sumDeltaTime = 0;
@@ -61,21 +62,29 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             {
                 if (i != 0 && Math.Abs(((OsuDifficultyHitObject)Previous[i - 1]).StrainTime - ((OsuDifficultyHitObject)Previous[i]).StrainTime) > 15)
                     deltaTimeDeltaCount++;
-                sumDeltaTime += ((OsuDifficultyHitObject)Previous[i]).StrainTime;
+                if (i < averageLength)
+                    sumDeltaTime += ((OsuDifficultyHitObject)Previous[i]).StrainTime;
             }
 
-            double avgDeltaTime = (sumDeltaTime / Previous.Count);
+            double avgDeltaTime = sumDeltaTime / Math.Min(Previous.Count, averageLength);
+
+            // Console.WriteLine("Delta: " + avgDeltaTime);
 
             if (75 / avgDeltaTime > 1)
-                strainValue = Math.Pow(75 / avgDeltaTime, 1.5);
+                strainValue += Math.Pow(75 / avgDeltaTime, 2);
             else
-                strainValue = 75 / avgDeltaTime;
+                strainValue += 75 / avgDeltaTime;
 
+            // strainValue += 1.5 / Math.Sqrt(hitWindowGreat);
 
-            strainValue *= (Previous.Count / HistoryLength) * Math.Sqrt(4 + deltaTimeDeltaCount);
+//2.5 / Math.Sqrt(hitWindowGreat);
+            // strainValue *= 1.75;//* (Previous.Count / HistoryLength) * Math.Sqrt(9 + deltaTimeDeltaCount) / 3;
 
-            currentStrain *= computeDecay(.5, Math.Max(50, osuCurrent.DeltaTime));
+            currentStrain *= computeDecay(.85, osuCurrent.StrainTime);
             currentStrain += strainValue * strainMultiplier;
+
+
+// Console.WriteLine("Strain: " + currentStrain);
 
             return currentStrain;
         }
@@ -93,6 +102,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             currentStrain = strainValueAt(current);
             AddStrain(currentStrain);
+            // Console.WriteLine(hitWindowGreat);
         }
     }
 }

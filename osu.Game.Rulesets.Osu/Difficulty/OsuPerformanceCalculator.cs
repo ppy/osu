@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             else if (Attributes.ApproachRate < 8.0)
                 approachRateFactor += 0.01 * (8.0 - Attributes.ApproachRate);
 
-            aimValue *= 1.0 + approachRateFactor; //Math.Min(approachRateFactor, approachRateFactor * (totalHits / 1000.0));
+            aimValue *= 1.0 + Math.Min(approachRateFactor, approachRateFactor * (totalHits / 1000.0));
 
             // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
             if (mods.Any(h => h is OsuModHidden))
@@ -128,10 +128,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             double speedValue = Math.Pow(5.0 * Math.Max(1.0, Attributes.SpeedStrain / 0.0675) - 4.0, 3.0) / 100000.0;
 
-            // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
-            if (countMiss > 0)
-                speedValue *= 0.97 * Math.Pow(1 - Math.Pow((double)countMiss / totalHits, 0.775), Math.Pow(countMiss, .875));
-
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
                 approachRateFactor += 0.25 * (Attributes.ApproachRate - 10.33);
@@ -144,7 +140,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (Attributes.MaxCombo > 0)
                 speedValue *= Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(Attributes.MaxCombo, 0.8), 1.0);
 
-            speedValue *= Math.Pow((10 + Attributes.OverallDifficulty) / 10, 2) / 4;
+            // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
+            if (countMiss > 0)
+                speedValue *= 0.97 * Math.Pow(1 - Math.Pow((double)countMiss / totalHits, 0.775), countMiss);
+
+            // Scale the speed value with accuracy and OD
+            speedValue *= (0.9 + Math.Pow(Attributes.OverallDifficulty, 2) / 750) * Math.Pow(accuracy, (14.5 - Math.Max(Attributes.OverallDifficulty, 8)) / 2);
 
             return speedValue;
         }
@@ -176,7 +177,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModFlashlight))
                 accuracyValue *= 1.02;
 
-            return 0;//accuracyValue;
+            return accuracyValue;
         }
 
         private int totalHits => countGreat + countOk + countMeh + countMiss;
