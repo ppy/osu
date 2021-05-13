@@ -92,10 +92,10 @@ namespace osu.Game.Skinning
                             return skinnableTargetWrapper;
                     }
 
-                    return null;
+                    break;
             }
 
-            return base.GetDrawableComponent(component);
+            return null;
         }
 
         public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
