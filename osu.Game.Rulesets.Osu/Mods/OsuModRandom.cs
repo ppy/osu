@@ -2,12 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Platform;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -51,8 +49,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             if (CustomSeed.Value != null)
                 seed = (int)CustomSeed.Value;
-
-            Seed = seed;
 
             var rng = new Random(seed);
 
@@ -244,9 +240,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private sealed class SeedControl : CompositeDrawable, IHasCurrentValue<int?>
         {
-            [Resolved]
-            private GameHost host { get; set; }
-
             private readonly BindableWithCurrent<int?> current = new BindableWithCurrent<int?>();
 
             public Bindable<int?> Current
@@ -289,14 +282,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     CommitOnFocusLost = true
-                                },
-                                null,
-                                new TriangleButton
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Height = 1,
-                                    Text = "Paste",
-                                    Action = () => seedNumberBox.Text = host.GetClipboard().GetText()
                                 }
                             }
                         }
