@@ -124,7 +124,7 @@ namespace osu.Game.Skinning.Editor
             {
                 var drawable = (Drawable)item;
 
-                var previousAnchor = (drawable.AnchorPosition);
+                var previousAnchor = drawable.AnchorPosition;
                 drawable.Anchor = anchor;
                 drawable.Position -= drawable.AnchorPosition - previousAnchor;
             }
