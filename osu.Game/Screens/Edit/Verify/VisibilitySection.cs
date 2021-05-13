@@ -43,8 +43,6 @@ namespace osu.Game.Screens.Edit.Verify
                         verify.HiddenIssueTypes.Add(issueType);
                     else
                         verify.HiddenIssueTypes.Remove(issueType);
-
-                    verify.IssueList.Refresh();
                 });
 
                 Flow.Add(checkbox);
