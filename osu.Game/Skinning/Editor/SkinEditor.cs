@@ -38,6 +38,8 @@ namespace osu.Game.Skinning.Editor
         [Resolved]
         private OsuColour colours { get; set; }
 
+        private bool hasBegunMutating;
+
         public SkinEditor(Drawable targetScreen)
         {
             this.targetScreen = targetScreen;
@@ -108,7 +110,7 @@ namespace osu.Game.Skinning.Editor
                                                 {
                                                     Text = "Save Changes",
                                                     Width = 140,
-                                                    Action = save,
+                                                    Action = Save,
                                                 },
                                                 new DangerousTriangleButton
                                                 {
@@ -139,7 +141,11 @@ namespace osu.Game.Skinning.Editor
             // schedule ensures this only happens when the skin editor is visible.
             // also avoid some weird endless recursion / bindable feedback loop (something to do with tracking skins across three different bindable types).
             // probably something which will be factored out in a future database refactor so not too concerning for now.
-            currentSkin.BindValueChanged(skin => Scheduler.AddOnce(skinChanged), true);
+            currentSkin.BindValueChanged(skin =>
+            {
+                hasBegunMutating = false;
+                Scheduler.AddOnce(skinChanged);
+            }, true);
         }
 
         private void skinChanged()
@@ -161,6 +167,7 @@ namespace osu.Game.Skinning.Editor
             });
 
             skins.EnsureMutableSkin();
+            hasBegunMutating = true;
         }
 
         private void placeComponent(Type type)
@@ -204,8 +211,11 @@ namespace osu.Game.Skinning.Editor
             }
         }
 
-        private void save()
+        public void Save()
         {
+            if (!hasBegunMutating)
+                return;
+
             SkinnableTargetContainer[] targetContainers = targetScreen.ChildrenOfType<SkinnableTargetContainer>().ToArray();
 
             foreach (var t in targetContainers)
