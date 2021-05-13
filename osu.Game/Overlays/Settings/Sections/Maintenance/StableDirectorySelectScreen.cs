@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
         protected override OsuSpriteText CreateHeader() => new OsuSpriteText
         {
-            Text = "Please select stable location",
+            Text = "Please select your osu!stable install location",
             Font = OsuFont.Default.With(size: 40)
         };
 
