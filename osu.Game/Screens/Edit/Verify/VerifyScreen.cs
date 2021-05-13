@@ -35,6 +35,9 @@ namespace osu.Game.Screens.Edit.Verify
         [BackgroundDependencyLoader]
         private void load()
         {
+            InterpretedDifficulty.Default = EditorBeatmap.BeatmapInfo.DifficultyRating;
+            InterpretedDifficulty.SetDefault();
+
             IssueList = new IssueList();
             Child = new Container
             {
