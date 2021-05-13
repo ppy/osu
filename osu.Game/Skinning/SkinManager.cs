@@ -180,7 +180,6 @@ namespace osu.Game.Skinning
 
             foreach (var drawableInfo in skin.DrawableComponentInfo)
             {
-                // todo: the OfType() call can be removed with better IDrawable support.
                 string json = JsonConvert.SerializeObject(drawableInfo.Value, new JsonSerializerSettings { Formatting = Formatting.Indented });
 
                 using (var streamContent = new MemoryStream(Encoding.UTF8.GetBytes(json)))
