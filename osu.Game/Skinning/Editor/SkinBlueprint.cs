@@ -23,11 +23,6 @@ namespace osu.Game.Skinning.Editor
 
         private Drawable drawable => (Drawable)Item;
 
-        /// <summary>
-        /// Whether the blueprint should be shown even when the <see cref="SelectionBlueprint{T}.Item"/> is not alive.
-        /// </summary>
-        protected virtual bool AlwaysShowWhenSelected => true;
-
         protected override bool ShouldBeAlive => drawable.IsAlive && Item.IsPresent;
 
         [Resolved]
