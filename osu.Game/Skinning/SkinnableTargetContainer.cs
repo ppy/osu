@@ -2,12 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Extensions;
-using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Skinning
 {
@@ -63,12 +60,6 @@ namespace osu.Game.Skinning
             content.Add(drawable);
             components.Add(component);
         }
-
-        /// <summary>
-        /// Serialise all children as <see cref="SkinnableInfo"/>.
-        /// </summary>
-        /// <returns>The serialised content.</returns>
-        public IEnumerable<SkinnableInfo> CreateSkinnableInfo() => components.Select(d => ((Drawable)d).CreateSkinnableInfo());
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
