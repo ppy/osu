@@ -9,11 +9,11 @@ using osu.Framework.Graphics.Containers;
 namespace osu.Game.Skinning
 {
     /// <summary>
-    /// A container which groups the elements of a <see cref="SkinnableTargetContainer"/> into a single object.
-    /// Optionally also applies a default layout to the elements.
+    /// A container which groups the components of a <see cref="SkinnableTargetContainer"/> into a single object.
+    /// Optionally also applies a default layout to the components.
     /// </summary>
     [Serializable]
-    public class SkinnableTargetWrapper : Container, ISkinnableDrawable
+    public class SkinnableTargetComponentsContainer : Container, ISkinnableDrawable
     {
         public bool IsEditable => false;
 
@@ -23,14 +23,14 @@ namespace osu.Game.Skinning
         /// Construct a wrapper with defaults that should be applied once.
         /// </summary>
         /// <param name="applyDefaults">A function to apply the default layout.</param>
-        public SkinnableTargetWrapper(Action<Container> applyDefaults)
+        public SkinnableTargetComponentsContainer(Action<Container> applyDefaults)
             : this()
         {
             this.applyDefaults = applyDefaults;
         }
 
         [JsonConstructor]
-        public SkinnableTargetWrapper()
+        public SkinnableTargetComponentsContainer()
         {
             RelativeSizeAxes = Axes.Both;
         }
