@@ -40,7 +40,7 @@ namespace osu.Game.Skinning
             base.LoadComplete();
 
             // schedule is required to allow children to run their LoadComplete and take on their correct sizes.
-            Schedule(() => applyDefaults?.Invoke(this));
+            ScheduleAfterChildren(() => applyDefaults?.Invoke(this));
         }
     }
 }
