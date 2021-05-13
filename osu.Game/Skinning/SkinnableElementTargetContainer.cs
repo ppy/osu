@@ -26,6 +26,9 @@ namespace osu.Game.Skinning
             Target = target;
         }
 
+        /// <summary>
+        /// Reload all components in this container from the current skin.
+        /// </summary>
         public void Reload()
         {
             ClearInternal();
@@ -43,6 +46,12 @@ namespace osu.Game.Skinning
             }
         }
 
+        /// <summary>
+        /// Add a new skinnable component to this target.
+        /// </summary>
+        /// <param name="component">The component to add.</param>
+        /// <exception cref="NotSupportedException">Thrown when attempting to add an element to a target which is not supported by the current skin.</exception>
+        /// <exception cref="ArgumentException">Thrown if the provided instance is not a <see cref="Drawable"/>.</exception>
         public void Add(ISkinnableComponent component)
         {
             if (content == null)
