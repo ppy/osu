@@ -21,11 +21,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private int decayExcessThreshold = 500;
 
-        private double currSnapStrain = 1;
-        private double currFlowStrain = 1;
+        private double currStrain = 1;
 
-        private double snapStrainMultiplier = 11.5;
+        private double snapStrainMultiplier = 7.875;
         private double flowStrainMultiplier = 20;
+        private double hybridStrainMultiplier = 30;
+        private double sliderStrainMultiplier = 20;
         private double totalStrainMultiplier = .1225;
 
         // private double hybridScaler = 1.5;
@@ -54,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double nextDiffStrain = Vector2.Subtract(currVector, nextVector).Length * osuNextObj.FlowProbability;
             double prevDiffStrain = Vector2.Subtract(prevVector, currVector).Length * osuPrevObj.FlowProbability;
 
-            double strain = 2 * currVector.Length + Math.Min(currVector.Length, prevDiffStrain) + Math.Abs(prevDiffStrain - nextDiffStrain) * Math.Min(osuNextObj.FlowProbability, osuPrevObj.FlowProbability);
+            double strain = 2 * currVector.Length + prevDiffStrain + Math.Abs(prevDiffStrain - nextDiffStrain) * Math.Min(osuNextObj.FlowProbability, osuPrevObj.FlowProbability);
 
             // strain = Math.Pow(strain, 1.1);
 
@@ -67,9 +68,27 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double nextDiffStrain = Vector2.Add(currVector, nextVector).Length * osuNextObj.SnapProbability;
             double prevDiffStrain = Vector2.Add(prevVector, currVector).Length * osuPrevObj.SnapProbability;
 
-            double strain = 2 * currVector.Length + prevDiffStrain + Math.Abs(prevDiffStrain - nextDiffStrain) * Math.Min(osuNextObj.SnapProbability, osuPrevObj.SnapProbability);
+            double strain = 100 / osuCurrObj.StrainTime + 2 * currVector.Length + prevDiffStrain + Math.Abs(prevDiffStrain - nextDiffStrain) * Math.Min(osuNextObj.SnapProbability, osuPrevObj.SnapProbability);
 
             strain *= osuCurrObj.StrainTime / (osuCurrObj.StrainTime - 20);
+
+            return strain;
+        }
+
+        private double hybridStrainAt(OsuDifficultyHitObject osuPrevObj, OsuDifficultyHitObject osuCurrObj, OsuDifficultyHitObject osuNextObj,
+                                      Vector2 prevVector, Vector2 currVector, Vector2 nextVector)
+        {
+            double flowToSnap = Math.Sqrt(prevVector.Length * currVector.Length) * osuCurrObj.SnapProbability * osuPrevObj.FlowProbability;
+            double snapToFlow = Math.Sqrt(prevVector.Length * currVector.Length) * osuPrevObj.SnapProbability * osuCurrObj.FlowProbability;
+
+            double strain = flowToSnap + snapToFlow;
+
+            return strain;
+        }
+
+        private double sliderStrainAt(OsuDifficultyHitObject osuPrevObj, OsuDifficultyHitObject osuCurrObj, OsuDifficultyHitObject osuNextObj)
+        {
+            double strain = (Math.Sqrt(osuCurrObj.JumpDistance * osuCurrObj.TravelDistance) + osuCurrObj.TravelDistance) / osuCurrObj.StrainTime;
 
             return strain;
         }
@@ -95,30 +114,40 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 Vector2 currVector = Vector2.Divide(osuCurrObj.DistanceVector, (float)osuCurrObj.StrainTime);
                 Vector2 prevVector = Vector2.Divide(osuPrevObj.DistanceVector, (float)osuPrevObj.StrainTime);
 
-                double flowProb = osuCurrObj.FlowProbability;
-                double snapProb = osuCurrObj.SnapProbability;
-
-                double snapStrain = snapStrainAt(osuPrevObj,
+                double snapStrain = osuCurrObj.SnapProbability *
+                                    snapStrainAt(osuPrevObj,
                                                  osuCurrObj,
                                                  osuNextObj,
-                                                 Vector2.Multiply(prevVector, (float)osuPrevObj.SnapProbability),
-                                                 Vector2.Multiply(currVector, (float)osuCurrObj.SnapProbability),
-                                                 Vector2.Multiply(prevVector, (float)osuNextObj.SnapProbability));
+                                                 prevVector,
+                                                 currVector,
+                                                 prevVector);
 
-                double flowStrain = flowStrainAt(osuPrevObj,
+                double flowStrain = osuCurrObj.FlowProbability *
+                                    flowStrainAt(osuPrevObj,
                                                  osuCurrObj,
                                                  osuNextObj,
-                                                 Vector2.Multiply(prevVector, (float)osuPrevObj.FlowProbability),
-                                                 Vector2.Multiply(currVector, (float)osuCurrObj.FlowProbability),
-                                                 Vector2.Multiply(prevVector, (float)osuNextObj.FlowProbability));
+                                                 prevVector,
+                                                 currVector,
+                                                 prevVector);
 
-                currSnapStrain *= computeDecay(.66, Math.Max(50, osuCurrObj.StrainTime));// - osuCurrObj.TravelTime));
-                currSnapStrain += snapStrain * snapStrainMultiplier;
+                double hybridStrain = hybridStrainAt(osuPrevObj,
+                                                     osuCurrObj,
+                                                     osuNextObj,
+                                                     prevVector,
+                                                     currVector,
+                                                     prevVector);
 
-                currFlowStrain *= computeDecay(.75, Math.Max(50, osuCurrObj.StrainTime));// - osuCurrObj.TravelTime));
-                currFlowStrain += flowStrain * flowStrainMultiplier;
+                double sliderStrain = sliderStrainAt(osuPrevObj,
+                                                     osuCurrObj,
+                                                     osuNextObj);
 
-                strain = totalStrainMultiplier * (Math.Max(currFlowStrain, currSnapStrain) + Math.Min(currFlowStrain, currSnapStrain));
+                currStrain *= computeDecay(.75, Math.Max(50, osuCurrObj.StrainTime));// - osuCurrObj.TravelTime));
+                currStrain += snapStrain * snapStrainMultiplier;
+                currStrain += flowStrain * flowStrainMultiplier;
+                currStrain += hybridStrain * hybridStrainMultiplier;
+                currStrain += sliderStrain * sliderStrainMultiplier;
+
+                strain = totalStrainMultiplier * currStrain;
       // (Math.Max(currFlowStrain, currSnapStrain) + Math.Min(currFlowStrain, currSnapStrain));
     // (currFlowStrain + currSnapStrain);
     // Math.Pow(Math.Pow(currSnapStrain, hybridScaler) + Math.Pow(currFlowStrain, hybridScaler), 1.0 / hybridScaler);
