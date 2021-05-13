@@ -9,8 +9,8 @@ using osu.Framework.Graphics.Containers;
 namespace osu.Game.Skinning
 {
     /// <summary>
-    /// A container which is serialised and can encapsulate multiple skinnable elements into a single return type (for consumption via <see cref="ISkin.GetDrawableComponent"/>.
-    /// Will also optionally apply default cross-element layout dependencies when initialised from a non-deserialised source.
+    /// A container which groups the elements of a <see cref="SkinnableTargetContainer"/> into a single object.
+    /// Optionally also applies a default layout to the elements.
     /// </summary>
     [Serializable]
     public class SkinnableTargetWrapper : Container, ISkinnableDrawable
