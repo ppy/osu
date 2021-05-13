@@ -141,8 +141,6 @@ namespace osu.Game.Migrations
 
                     b.Property<string>("TitleUnicode");
 
-                    b.Property<string>("VideoFile");
-
                     b.HasKey("ID");
 
                     b.ToTable("BeatmapMetadata");
@@ -352,7 +350,7 @@ namespace osu.Game.Migrations
 
                     b.Property<long>("TotalScore");
 
-                    b.Property<long?>("UserID")
+                    b.Property<int?>("UserID")
                         .HasColumnName("UserID");
 
                     b.Property<string>("UserString")
@@ -401,6 +399,8 @@ namespace osu.Game.Migrations
                     b.Property<bool>("DeletePending");
 
                     b.Property<string>("Hash");
+
+                    b.Property<string>("InstantiationInfo");
 
                     b.Property<string>("Name");
 
