@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Aim : OsuSkill
     {
-        protected override double StarsPerDouble => 1.125;
+        protected override double StarsPerDouble => 1.1;
         protected override int HistoryLength => 2;
 
         private int decayExcessThreshold = 500;
@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double flowStrainMultiplier = 20;
         private double hybridStrainMultiplier = 30;
         private double sliderStrainMultiplier = 20;
-        private double totalStrainMultiplier = .1225;
+        private double totalStrainMultiplier = .145;
 
         // private double hybridScaler = 1.5;
 
