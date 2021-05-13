@@ -2,14 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Edit;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Skinning.Editor
 {
@@ -17,14 +19,14 @@ namespace osu.Game.Skinning.Editor
     {
         private Container box;
 
+        private Container outlineBox;
+
         private Drawable drawable => (Drawable)Item;
 
-        /// <summary>
-        /// Whether the blueprint should be shown even when the <see cref="SelectionBlueprint{T}.Item"/> is not alive.
-        /// </summary>
-        protected virtual bool AlwaysShowWhenSelected => false;
+        protected override bool ShouldBeAlive => drawable.IsAlive && Item.IsPresent;
 
-        protected override bool ShouldBeAlive => (drawable.IsAlive && Item.IsPresent) || (AlwaysShowWhenSelected && State == SelectionState.Selected);
+        [Resolved]
+        private OsuColour colours { get; set; }
 
         public SkinBlueprint(ISkinnableDrawable component)
             : base(component)
@@ -32,24 +34,66 @@ namespace osu.Game.Skinning.Editor
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             InternalChildren = new Drawable[]
             {
                 box = new Container
                 {
-                    Colour = colours.Yellow,
                     Children = new Drawable[]
                     {
-                        new Box
+                        outlineBox = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Alpha = 0.2f,
-                            AlwaysPresent = true,
+                            Masking = true,
+                            BorderThickness = 3,
+                            BorderColour = Color4.White,
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Alpha = 0f,
+                                    AlwaysPresent = true,
+                                },
+                            }
                         },
-                    }
+                        new OsuSpriteText
+                        {
+                            Text = Item.GetType().Name,
+                            Font = OsuFont.Default.With(size: 10, weight: FontWeight.Bold),
+                            Anchor = Anchor.BottomRight,
+                            Origin = Anchor.TopRight,
+                        }
+                    },
                 },
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            updateSelectedState();
+            box.FadeInFromZero(200, Easing.OutQuint);
+        }
+
+        protected override void OnSelected()
+        {
+            // base logic hides selected blueprints when not selected, but skin blueprints don't do that.
+            updateSelectedState();
+        }
+
+        protected override void OnDeselected()
+        {
+            // base logic hides selected blueprints when not selected, but skin blueprints don't do that.
+            updateSelectedState();
+        }
+
+        private void updateSelectedState()
+        {
+            outlineBox.FadeColour(colours.Pink.Opacity(IsSelected ? 1 : 0.5f), 200, Easing.OutQuint);
+            outlineBox.Child.FadeTo(IsSelected ? 0.2f : 0, 200, Easing.OutQuint);
         }
 
         private Quad drawableQuad;
