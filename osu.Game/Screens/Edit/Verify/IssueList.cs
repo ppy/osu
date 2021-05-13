@@ -102,13 +102,7 @@ namespace osu.Game.Screens.Edit.Verify
 
         private IEnumerable<Issue> filter(IEnumerable<Issue> issues)
         {
-            foreach (var issueType in verify.ShowIssueType.Keys)
-            {
-                if (!verify.ShowIssueType[issueType].Value)
-                    issues = issues.Where(issue => issue.Template.Type != issueType);
-            }
-
-            return issues;
+            return issues.Where(issue => !verify.HiddenIssueTypes.Contains(issue.Template.Type));
         }
     }
 }
