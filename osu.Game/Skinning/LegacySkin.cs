@@ -52,6 +52,7 @@ namespace osu.Game.Skinning
 
         private readonly Dictionary<int, LegacyManiaSkinConfiguration> maniaConfigurations = new Dictionary<int, LegacyManiaSkinConfiguration>();
 
+        [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
         public LegacySkin(SkinInfo skin, IStorageResourceProvider resources)
             : this(skin, new LegacySkinResourceStore<SkinFileInfo>(skin, resources.Files), resources, "skin.ini")
         {
@@ -331,7 +332,7 @@ namespace osu.Game.Skinning
                     {
                         case SkinnableTarget.MainHUDComponents:
 
-                            var skinnableTargetWrapper = new SkinnableTargetWrapper(container =>
+                            var skinnableTargetWrapper = new SkinnableTargetComponentsContainer(container =>
                             {
                                 var score = container.OfType<LegacyScoreCounter>().FirstOrDefault();
                                 var accuracy = container.OfType<GameplayAccuracyCounter>().FirstOrDefault();

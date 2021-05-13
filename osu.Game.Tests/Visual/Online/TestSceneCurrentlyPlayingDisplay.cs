@@ -12,7 +12,7 @@ using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Online.Spectator;
 using osu.Game.Overlays.Dashboard;
-using osu.Game.Tests.Visual.Gameplay;
+using osu.Game.Tests.Visual.Spectator;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual.Online
     public class TestSceneCurrentlyPlayingDisplay : OsuTestScene
     {
         [Cached(typeof(SpectatorStreamingClient))]
-        private TestSceneSpectator.TestSpectatorStreamingClient testSpectatorStreamingClient = new TestSceneSpectator.TestSpectatorStreamingClient();
+        private TestSpectatorStreamingClient testSpectatorStreamingClient = new TestSpectatorStreamingClient();
 
         private CurrentlyPlayingDisplay currentlyPlaying;
 
