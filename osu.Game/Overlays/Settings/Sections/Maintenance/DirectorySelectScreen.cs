@@ -22,8 +22,6 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
         private DirectorySelector directorySelector;
 
-        protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
-
         protected abstract OsuSpriteText CreateHeader();
 
         /// <summary>
@@ -43,10 +41,6 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         /// The path at which to start selection from.
         /// </summary>
         protected virtual DirectoryInfo InitialPath => null;
-
-        public override bool AllowExternalScreenChange => false;
-
-        public override bool DisallowExternalBeatmapRulesetChanges => true;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
