@@ -16,8 +16,8 @@ namespace osu.Game.Overlays.Profile.Sections
         {
             Children = new[]
             {
-                new PaginatedScoreContainer(ScoreType.Best, User, "最好成绩", CounterVisibilityState.AlwaysHidden, "No performance records. :("),
-                new PaginatedScoreContainer(ScoreType.Firsts, User, "第一名", CounterVisibilityState.AlwaysVisible)
+                new PaginatedScoreContainer(ScoreType.Best, User, "最好成绩"),
+                new PaginatedScoreContainer(ScoreType.Firsts, User, "第一名")
             };
         }
     }

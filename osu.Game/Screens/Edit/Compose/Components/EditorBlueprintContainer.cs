@@ -2,10 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -24,8 +22,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected readonly HitObjectComposer Composer;
 
-        private readonly BindableList<HitObject> selectedHitObjects = new BindableList<HitObject>();
-
         protected EditorBlueprintContainer(HitObjectComposer composer)
         {
             Composer = composer;
@@ -34,30 +30,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            // For non-pooled rulesets, hitobjects are already present in the playfield which allows the blueprints to be loaded in the async context.
-            if (Composer != null)
-            {
-                foreach (var obj in Composer.HitObjects)
-                    AddBlueprintFor(obj.HitObject);
-            }
-
-            selectedHitObjects.BindTo(Beatmap.SelectedHitObjects);
-            selectedHitObjects.CollectionChanged += (selectedObjects, args) =>
-            {
-                switch (args.Action)
-                {
-                    case NotifyCollectionChangedAction.Add:
-                        foreach (var o in args.NewItems)
-                            SelectionBlueprints.FirstOrDefault(b => b.Item == o)?.Select();
-                        break;
-
-                    case NotifyCollectionChangedAction.Remove:
-                        foreach (var o in args.OldItems)
-                            SelectionBlueprints.FirstOrDefault(b => b.Item == o)?.Deselect();
-
-                        break;
-                }
-            };
+            SelectedItems.BindTo(Beatmap.SelectedHitObjects);
         }
 
         protected override void LoadComplete()
@@ -69,7 +42,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             if (Composer != null)
             {
-                // For pooled rulesets, blueprints must be added for hitobjects already "current" as they would've not been "current" during the async load addition process above.
                 foreach (var obj in Composer.HitObjects)
                     AddBlueprintFor(obj.HitObject);
 

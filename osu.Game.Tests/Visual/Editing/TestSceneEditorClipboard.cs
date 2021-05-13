@@ -132,8 +132,8 @@ namespace osu.Game.Tests.Visual.Editing
             {
                 AddStep("deselect", () => EditorBeatmap.SelectedHitObjects.Clear());
 
-                AddUntilStep("timeline selection box is not visible", () => Editor.ChildrenOfType<Timeline>().First().ChildrenOfType<EditorSelectionHandler>().First().Alpha == 0);
-                AddUntilStep("composer selection box is not visible", () => Editor.ChildrenOfType<HitObjectComposer>().First().ChildrenOfType<EditorSelectionHandler>().First().Alpha == 0);
+                AddUntilStep("timeline selection box is not visible", () => Editor.ChildrenOfType<Timeline>().First().ChildrenOfType<SelectionBox>().First().Alpha == 0);
+                AddUntilStep("composer selection box is not visible", () => Editor.ChildrenOfType<HitObjectComposer>().First().ChildrenOfType<SelectionBox>().First().Alpha == 0);
             }
 
             AddStep("paste hitobject", () => Editor.Paste());

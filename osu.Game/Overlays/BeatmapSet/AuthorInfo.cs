@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -13,7 +14,8 @@ using osuTK.Graphics;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
-using osu.Framework.Extensions;
+using osu.Game.Users;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
@@ -51,8 +53,8 @@ namespace osu.Game.Overlays.BeatmapSet
 
             fields.Children = new Drawable[]
             {
-                new Field("谱师：", BeatmapSet.Metadata.Author.Username, OsuFont.GetFont(weight: FontWeight.Regular, italics: true)),
-                new Field("提交日期 ", online.Submitted, OsuFont.GetFont(weight: FontWeight.Bold))
+                new Field("谱师:", BeatmapSet.Metadata.Author, OsuFont.GetFont(weight: FontWeight.Regular, italics: true)),
+                new Field("提交日期", online.Submitted, OsuFont.GetFont(weight: FontWeight.Bold))
                 {
                     Margin = new MarginPadding { Top = 5 },
                 },
@@ -60,12 +62,10 @@ namespace osu.Game.Overlays.BeatmapSet
 
             if (online.Ranked.HasValue)
             {
-                fields.Add(
-                    new Field(
-                              $"{online.Status.GetDescription().ToString() ?? ToString().ToLowerInvariant()}于",
-                              online.Ranked.Value, OsuFont.GetFont(weight: FontWeight.Bold)
-                             )
-                          );
+                fields.Add(new Field(
+                    $"{online.Status.GetDescription() ?? ToString().ToLowerInvariant()}于",
+                    online.Ranked.Value, OsuFont.GetFont(weight: FontWeight.Bold)
+                ));
             }
             else if (online.LastUpdated.HasValue)
             {
@@ -150,6 +150,25 @@ namespace osu.Game.Overlays.BeatmapSet
                     {
                         Font = secondFont.With(size: 17)
                     }
+                };
+            }
+
+            public Field(string first, User second, FontUsage secondFont)
+            {
+                AutoSizeAxes = Axes.Both;
+                Direction = FillDirection.Horizontal;
+
+                Children = new[]
+                {
+                    new LinkFlowContainer(s =>
+                    {
+                        s.Font = OsuFont.GetFont(size: 11);
+                    }).With(d =>
+                    {
+                        d.AutoSizeAxes = Axes.Both;
+                        d.AddText($"{first} ");
+                        d.AddUserLink(second, s => s.Font = secondFont.With(size: 11));
+                    }),
                 };
             }
         }

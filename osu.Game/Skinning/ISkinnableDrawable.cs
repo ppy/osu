@@ -1,19 +1,18 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 
-namespace osu.Game.Screens.Play.HUD
+namespace osu.Game.Skinning
 {
     /// <summary>
-    /// An interface providing a set of methods to update a combo counter.
+    /// Denotes a drawable which, as a drawable, can be adjusted via skinning specifications.
     /// </summary>
-    public interface IComboCounter : IDrawable
+    public interface ISkinnableDrawable : IDrawable
     {
         /// <summary>
-        /// The current combo to be displayed.
+        /// Whether this component should be editable by an end user.
         /// </summary>
-        Bindable<int> Current { get; }
+        bool IsEditable => true;
     }
 }
