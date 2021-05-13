@@ -10,13 +10,10 @@ namespace osu.Game.Screens.Edit.Verify
 {
     internal class InterpretationSection : EditorRoundedScreenSettingsSection
     {
-        [Resolved]
-        private VerifyScreen verify { get; set; }
-
         protected override string HeaderText => "Interpretation";
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(VerifyScreen verify)
         {
             Flow.Add(new SettingsEnumDropdown<DifficultyRating>
             {

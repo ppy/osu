@@ -12,9 +12,6 @@ namespace osu.Game.Screens.Edit.Verify
 {
     internal class VisibilitySection : EditorRoundedScreenSettingsSection
     {
-        [Resolved]
-        private VerifyScreen verify { get; set; }
-
         private readonly IssueType[] configurableIssueTypes =
         {
             IssueType.Warning,
@@ -27,7 +24,7 @@ namespace osu.Game.Screens.Edit.Verify
         protected override string HeaderText => "Visibility";
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colours)
+        private void load(OverlayColourProvider colours, VerifyScreen verify)
         {
             hiddenIssueTypes = verify.HiddenIssueTypes.GetBoundCopy();
 
