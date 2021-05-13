@@ -14,7 +14,6 @@ using osu.Framework.Timing;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
-using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play
 {
@@ -181,12 +180,12 @@ namespace osu.Game.Screens.Play
             info.TransformTo(nameof(info.Margin), new MarginPadding { Bottom = finalMargin }, transition_duration, Easing.In);
         }
 
-        public class SongProgressDisplay : Container, ISkinnableComponent
+        public class SongProgressDisplay : Container
         {
             public SongProgressDisplay()
             {
                 // TODO: move actual implementation into this.
-                // exists for skin customisation purposes.
+                // exists for skin customisation purposes (interface should be added to this container).
 
                 Masking = true;
                 RelativeSizeAxes = Axes.Both;
