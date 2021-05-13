@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         /// <param name="directory">The selected directory</param>
         protected abstract void OnSelection(DirectoryInfo directory);
 
-        protected virtual bool IsValidDirectory(DirectoryInfo info) => info != null;
+        protected virtual bool IsValidDirectory(DirectoryInfo info) => true;
 
         protected virtual DirectoryInfo InitialPath => null;
 
@@ -106,7 +106,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             if (InitialPath != null)
                 directorySelector.CurrentPath.Value = InitialPath;
 
-            directorySelector.CurrentPath.BindValueChanged(e => selectionButton.Enabled.Value = IsValidDirectory(e.NewValue), true);
+            directorySelector.CurrentPath.BindValueChanged(e => selectionButton.Enabled.Value = e.NewValue != null ? IsValidDirectory(e.NewValue) : false, true);
             base.LoadComplete();
         }
 
