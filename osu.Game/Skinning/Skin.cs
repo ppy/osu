@@ -61,11 +61,19 @@ namespace osu.Game.Skinning
             }
         }
 
+        /// <summary>
+        /// Remove all stored customisations for the provided target.
+        /// </summary>
+        /// <param name="targetContainer">The target container to reset.</param>
         public void ResetDrawableTarget(SkinnableElementTargetContainer targetContainer)
         {
             DrawableComponentInfo.Remove(targetContainer.Target);
         }
 
+        /// <summary>
+        /// Update serialised information for the provided target.
+        /// </summary>
+        /// <param name="targetContainer">The target container to serialise to this skin.</param>
         public void UpdateDrawableTarget(SkinnableElementTargetContainer targetContainer)
         {
             DrawableComponentInfo[targetContainer.Target] = targetContainer.CreateSerialisedChildren().ToArray();
@@ -76,10 +84,7 @@ namespace osu.Game.Skinning
             switch (component)
             {
                 case SkinnableTargetComponent target:
-
-                    var skinnableTarget = target.Target;
-
-                    if (!DrawableComponentInfo.TryGetValue(skinnableTarget, out var skinnableInfo))
+                    if (!DrawableComponentInfo.TryGetValue(target.Target, out var skinnableInfo))
                         return null;
 
                     return new SkinnableTargetWrapper
