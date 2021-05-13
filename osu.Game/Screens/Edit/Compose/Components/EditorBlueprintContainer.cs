@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
@@ -65,8 +66,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 foreach (var obj in Composer.HitObjects)
                     AddBlueprintFor(obj.HitObject);
 
-                Composer.Playfield.HitObjectUsageBegan += AddBlueprintFor;
-                Composer.Playfield.HitObjectUsageFinished += RemoveBlueprintFor;
+                var eventQueue = new HitObjectContainerEventQueue(Composer.Playfield);
+                eventQueue.HitObjectUsageBegan += AddBlueprintFor;
+                eventQueue.HitObjectUsageFinished += RemoveBlueprintFor;
+                eventQueue.HitObjectUsageTransferred += TransferBlueprintFor;
+                AddInternal(eventQueue);
             }
         }
 
@@ -98,6 +102,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 return;
 
             base.AddBlueprintFor(item);
+        }
+
+        protected virtual void TransferBlueprintFor(HitObject hitObject, DrawableHitObject drawableObject)
+        {
         }
 
         protected override void DragOperationCompleted()
@@ -151,12 +159,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 Beatmap.HitObjectAdded -= AddBlueprintFor;
                 Beatmap.HitObjectRemoved -= RemoveBlueprintFor;
-            }
-
-            if (Composer != null)
-            {
-                Composer.Playfield.HitObjectUsageBegan -= AddBlueprintFor;
-                Composer.Playfield.HitObjectUsageFinished -= RemoveBlueprintFor;
             }
         }
     }
