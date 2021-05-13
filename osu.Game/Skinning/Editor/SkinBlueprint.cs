@@ -116,9 +116,10 @@ namespace osu.Game.Skinning.Editor
             drawableQuad = drawable.ScreenSpaceDrawQuad;
             var quad = ToLocalSpace(drawable.ScreenSpaceDrawQuad);
 
-            box.Position = quad.TopLeft;
+            box.Position = drawable.ToSpaceOfOtherDrawable(Vector2.Zero, this);
             box.Size = quad.Size;
             box.Rotation = drawable.Rotation;
+            box.Scale = new Vector2(MathF.Sign(drawable.Scale.X), MathF.Sign(drawable.Scale.Y));
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => drawable.ReceivePositionalInputAt(screenSpacePos);

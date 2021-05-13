@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Extensions;
@@ -32,6 +33,20 @@ namespace osu.Game.Skinning.Editor
             foreach (var c in SelectedBlueprints)
                 // TODO: this is temporary and will be fixed with a separate refactor of selection transform logic.
                 ((Drawable)c.Item).Scale += scale * 0.02f;
+
+            return true;
+        }
+
+        public override bool HandleFlip(Direction direction)
+        {
+            // TODO: this is temporary as well.
+            foreach (var c in SelectedBlueprints)
+            {
+                ((Drawable)c.Item).Scale *= new Vector2(
+                    direction == Direction.Horizontal ? -1 : 1,
+                    direction == Direction.Vertical ? -1 : 1
+                );
+            }
 
             return true;
         }
@@ -139,6 +154,13 @@ namespace osu.Game.Skinning.Editor
             // reverse the scale direction if dragging from top or left.
             if ((reference & Anchor.x0) > 0) scale.X = -scale.X;
             if ((reference & Anchor.y0) > 0) scale.Y = -scale.Y;
+
+            // for now aspect lock scale adjustments that occur at corners.
+            if (!reference.HasFlagFast(Anchor.x1) && !reference.HasFlagFast(Anchor.y1))
+            {
+                // TODO: temporary implementation - only dragging the corner handles across the X axis changes size.
+                scale.Y = scale.X;
+            }
         }
 
         public class AnchorMenuItem : TernaryStateMenuItem
