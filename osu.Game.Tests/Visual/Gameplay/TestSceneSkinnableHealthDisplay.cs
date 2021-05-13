@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Testing;
@@ -12,14 +10,12 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Screens.Play.HUD;
+using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestSceneSkinnableHealthDisplay : SkinnableTestScene
     {
-        private IEnumerable<SkinnableHealthDisplay> healthDisplays => CreatedDrawables.OfType<SkinnableHealthDisplay>();
-
         protected override Ruleset CreateRulesetForSkinProvider() => new OsuRuleset();
 
         [Cached(typeof(HealthProcessor))]
@@ -28,10 +24,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [SetUpSteps]
         public void SetUpSteps()
         {
-            AddStep("Create health displays", () =>
-            {
-                SetContents(() => new SkinnableHealthDisplay());
-            });
+            AddStep("Create health displays", () => SetContents(() => new SkinnableDrawable(new HUDSkinComponent(HUDSkinComponents.HealthDisplay))));
             AddStep(@"Reset all", delegate
             {
                 healthProcessor.Health.Value = 1;
