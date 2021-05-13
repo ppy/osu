@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -112,14 +113,10 @@ namespace osu.Game.Skinning.Editor
             drawableQuad = drawable.ScreenSpaceDrawQuad;
             var quad = ToLocalSpace(drawable.ScreenSpaceDrawQuad);
 
-            box.Position = new Vector2(
-                drawable.Scale.X < 0 ? quad.TopRight.X : quad.TopLeft.X,
-                drawable.Scale.Y < 0 ? quad.BottomLeft.Y : quad.TopLeft.Y
-            );
-
+            box.Position = drawable.ToSpaceOfOtherDrawable(Vector2.Zero, this);
             box.Size = quad.Size;
-
             box.Rotation = drawable.Rotation;
+            box.Scale = new Vector2(MathF.Sign(drawable.Scale.X), MathF.Sign(drawable.Scale.Y));
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => drawable.ReceivePositionalInputAt(screenSpacePos);
