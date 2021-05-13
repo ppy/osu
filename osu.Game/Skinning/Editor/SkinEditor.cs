@@ -22,18 +22,18 @@ namespace osu.Game.Skinning.Editor
     {
         public const double TRANSITION_DURATION = 500;
 
+        public readonly BindableList<ISkinnableComponent> SelectedComponents = new BindableList<ISkinnableComponent>();
+
+        protected override bool StartHidden => true;
+
         private readonly Drawable targetScreen;
 
         private OsuTextFlowContainer headerText;
 
-        protected override bool StartHidden => true;
-
-        public readonly BindableList<ISkinnableComponent> SelectedComponents = new BindableList<ISkinnableComponent>();
+        private Bindable<Skin> currentSkin;
 
         [Resolved]
         private SkinManager skins { get; set; }
-
-        private Bindable<Skin> currentSkin;
 
         [Resolved]
         private OsuColour colours { get; set; }
