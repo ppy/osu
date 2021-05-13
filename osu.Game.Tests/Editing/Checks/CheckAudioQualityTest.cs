@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             var context = getContext(64);
 
-            var issues = check.Run( context).ToList();
+            var issues = check.Run(context).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(1));
             Assert.That(issues.Single().Template is CheckAudioQuality.IssueTemplateTooLowBitrate);
