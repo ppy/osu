@@ -12,6 +12,7 @@ using osu.Game.Graphics;
 using osu.Framework.Bindables;
 using osu.Game.Online.API.Requests.Responses;
 using System;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.News.Sidebar
 {
@@ -58,7 +59,7 @@ namespace osu.Game.Overlays.News.Sidebar
                     return;
                 }
 
-                gridPlaceholder.Child = new YearsGridContainer(m.NewValue.Years);
+                gridPlaceholder.Child = new YearsGridContainer(m.NewValue.Years, m.NewValue.CurrentYear);
                 Show();
             }, true);
         }
@@ -68,16 +69,19 @@ namespace osu.Game.Overlays.News.Sidebar
             protected override IEnumerable<Drawable> EffectTargets => new[] { text };
 
             private readonly OsuSpriteText text;
+            private readonly bool isCurrent;
 
-            public YearButton(int year)
+            public YearButton(int year, bool isCurrent)
             {
+                this.isCurrent = isCurrent;
+
                 RelativeSizeAxes = Axes.X;
                 Height = 15;
                 Child = text = new OsuSpriteText
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Font = OsuFont.GetFont(size: 12),
+                    Font = OsuFont.GetFont(size: 12, weight: isCurrent ? FontWeight.SemiBold : FontWeight.Medium),
                     Text = year.ToString()
                 };
             }
@@ -85,8 +89,8 @@ namespace osu.Game.Overlays.News.Sidebar
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
             {
-                IdleColour = colourProvider.Light2;
-                HoverColour = colourProvider.Light1;
+                IdleColour = isCurrent ? Color4.White : colourProvider.Light2;
+                HoverColour = isCurrent ? Color4.White : colourProvider.Light1;
                 Action = () => { }; // Avoid button being disabled since there's no proper action assigned.
             }
         }
@@ -97,18 +101,16 @@ namespace osu.Game.Overlays.News.Sidebar
             private const float spacing = 5f;
 
             private readonly int rowCount;
-            private readonly int[] years;
 
-            public YearsGridContainer(int[] years)
+            public YearsGridContainer(int[] years, int currentYear)
             {
-                this.years = years;
                 rowCount = (int)Math.Ceiling((float)years.Length / column_count);
 
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
                 RowDimensions = getRowDimensions();
                 ColumnDimensions = getColumnDimensions();
-                Content = createContent();
+                Content = createContent(years, currentYear);
             }
 
             private Dimension[] getRowDimensions()
@@ -129,7 +131,7 @@ namespace osu.Game.Overlays.News.Sidebar
                 return columnDimensions;
             }
 
-            private Drawable[][] createContent()
+            private Drawable[][] createContent(int[] years, int currentYear)
             {
                 var buttons = new Drawable[rowCount][];
 
@@ -140,9 +142,17 @@ namespace osu.Game.Overlays.News.Sidebar
                     for (int j = 0; j < column_count; j++)
                     {
                         var index = i * column_count + j;
-                        buttons[i][j] = index >= years.Length
-                            ? Empty()
-                            : new Container
+
+                        if (index >= years.Length)
+                        {
+                            buttons[i][j] = Empty();
+                        }
+                        else
+                        {
+                            var year = years[index];
+                            var isCurrent = year == currentYear;
+
+                            buttons[i][j] = new Container
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
@@ -153,8 +163,9 @@ namespace osu.Game.Overlays.News.Sidebar
                                     Left = j == 0 ? 0 : spacing / 2,
                                     Right = j == column_count - 1 ? 0 : spacing / 2
                                 },
-                                Child = new YearButton(years[index])
+                                Child = new YearButton(year, isCurrent)
                             };
+                        }
                     }
                 }
 
