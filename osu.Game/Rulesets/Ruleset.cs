@@ -26,6 +26,7 @@ using JetBrains.Annotations;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Testing;
+using osu.Game.Extensions;
 using osu.Game.Rulesets.Filter;
 using osu.Game.Screens.Ranking.Statistics;
 
@@ -135,7 +136,7 @@ namespace osu.Game.Rulesets
                 Name = Description,
                 ShortName = ShortName,
                 ID = (this as ILegacyRuleset)?.LegacyID,
-                InstantiationInfo = GetType().AssemblyQualifiedName,
+                InstantiationInfo = GetType().GetInvariantInstantiationInfo(),
                 Available = true,
             };
         }

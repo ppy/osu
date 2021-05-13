@@ -5,14 +5,21 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Screens.Edit.Verify
 {
-    public class VerifyScreen : RoundedContentEditorScreen
+    [Cached]
+    public class VerifyScreen : EditorRoundedScreen
     {
-        [Cached]
-        private Bindable<Issue> selectedIssue = new Bindable<Issue>();
+        public readonly Bindable<Issue> SelectedIssue = new Bindable<Issue>();
+
+        public readonly Bindable<DifficultyRating> InterpretedDifficulty = new Bindable<DifficultyRating>();
+
+        public readonly BindableList<IssueType> HiddenIssueTypes = new BindableList<IssueType> { IssueType.Negligible };
+
+        public IssueList IssueList { get; private set; }
 
         public VerifyScreen()
             : base(EditorScreenMode.Verify)
@@ -22,8 +29,10 @@ namespace osu.Game.Screens.Edit.Verify
         [BackgroundDependencyLoader]
         private void load()
         {
-            IssueList issueList;
+            InterpretedDifficulty.Default = EditorBeatmap.BeatmapInfo.DifficultyRating;
+            InterpretedDifficulty.SetDefault();
 
+            IssueList = new IssueList();
             Child = new Container
             {
                 RelativeSizeAxes = Axes.Both,
@@ -39,8 +48,8 @@ namespace osu.Game.Screens.Edit.Verify
                     {
                         new Drawable[]
                         {
-                            issueList = new IssueList(),
-                            new IssueSettings(issueList),
+                            IssueList,
+                            new IssueSettings(),
                         },
                     }
                 }

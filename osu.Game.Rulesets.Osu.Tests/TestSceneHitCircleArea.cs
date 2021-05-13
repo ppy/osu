@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             hitCircle.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-            Child = new SkinProvidingContainer(new DefaultSkin())
+            Child = new SkinProvidingContainer(new DefaultSkin(null))
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = drawableHitCircle = new DrawableHitCircle(hitCircle)
