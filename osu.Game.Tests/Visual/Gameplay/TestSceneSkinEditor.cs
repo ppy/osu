@@ -19,6 +19,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Resolved]
         private SkinManager skinManager { get; set; }
 
+        protected override bool Autoplay => true;
+
         [SetUpSteps]
         public override void SetUpSteps()
         {

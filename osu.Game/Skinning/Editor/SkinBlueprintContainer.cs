@@ -12,13 +12,14 @@ using osu.Framework.Testing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens;
 using osu.Game.Screens.Edit.Compose.Components;
-using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Skinning.Editor
 {
-    public class SkinBlueprintContainer : BlueprintContainer<ISkinnableComponent>
+    public class SkinBlueprintContainer : BlueprintContainer<ISkinnableDrawable>
     {
         private readonly Drawable target;
+
+        private readonly List<BindableList<ISkinnableDrawable>> targetComponents = new List<BindableList<ISkinnableDrawable>>();
 
         public SkinBlueprintContainer(Drawable target)
         {
@@ -31,14 +32,12 @@ namespace osu.Game.Skinning.Editor
             SelectedItems.BindTo(editor.SelectedComponents);
         }
 
-        private readonly List<BindableList<ISkinnableComponent>> targetComponents = new List<BindableList<ISkinnableComponent>>();
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             // track each target container on the current screen.
-            var targetContainers = target.ChildrenOfType<SkinnableElementTargetContainer>().ToArray();
+            var targetContainers = target.ChildrenOfType<ISkinnableTarget>().ToArray();
 
             if (targetContainers.Length == 0)
             {
@@ -50,7 +49,7 @@ namespace osu.Game.Skinning.Editor
 
             foreach (var targetContainer in targetContainers)
             {
-                var bindableList = new BindableList<ISkinnableComponent> { BindTarget = targetContainer.Components };
+                var bindableList = new BindableList<ISkinnableDrawable> { BindTarget = targetContainer.Components };
                 bindableList.BindCollectionChanged(componentsChanged, true);
 
                 targetComponents.Add(bindableList);
@@ -62,29 +61,37 @@ namespace osu.Game.Skinning.Editor
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    foreach (var item in e.NewItems.Cast<ISkinnableComponent>())
+                    foreach (var item in e.NewItems.Cast<ISkinnableDrawable>())
                         AddBlueprintFor(item);
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
                 case NotifyCollectionChangedAction.Reset:
-                    foreach (var item in e.OldItems.Cast<ISkinnableComponent>())
+                    foreach (var item in e.OldItems.Cast<ISkinnableDrawable>())
                         RemoveBlueprintFor(item);
                     break;
 
                 case NotifyCollectionChangedAction.Replace:
-                    foreach (var item in e.OldItems.Cast<ISkinnableComponent>())
+                    foreach (var item in e.OldItems.Cast<ISkinnableDrawable>())
                         RemoveBlueprintFor(item);
 
-                    foreach (var item in e.NewItems.Cast<ISkinnableComponent>())
+                    foreach (var item in e.NewItems.Cast<ISkinnableDrawable>())
                         AddBlueprintFor(item);
                     break;
             }
         }
 
-        protected override SelectionHandler<ISkinnableComponent> CreateSelectionHandler() => new SkinSelectionHandler();
+        protected override void AddBlueprintFor(ISkinnableDrawable item)
+        {
+            if (!item.IsEditable)
+                return;
 
-        protected override SelectionBlueprint<ISkinnableComponent> CreateBlueprintFor(ISkinnableComponent component)
+            base.AddBlueprintFor(item);
+        }
+
+        protected override SelectionHandler<ISkinnableDrawable> CreateSelectionHandler() => new SkinSelectionHandler();
+
+        protected override SelectionBlueprint<ISkinnableDrawable> CreateBlueprintFor(ISkinnableDrawable component)
             => new SkinBlueprint(component);
     }
 }

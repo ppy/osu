@@ -46,9 +46,9 @@ namespace osu.Game.Extensions
         public static Vector2 ScreenSpaceDeltaToParentSpace(this Drawable drawable, Vector2 delta) =>
             drawable.Parent.ToLocalSpace(drawable.Parent.ToScreenSpace(Vector2.Zero) + delta);
 
-        public static SkinnableInfo CreateSerialisedInformation(this Drawable component) => new SkinnableInfo(component);
+        public static SkinnableInfo CreateSkinnableInfo(this Drawable component) => new SkinnableInfo(component);
 
-        public static void ApplySerialisedInformation(this Drawable component, SkinnableInfo info)
+        public static void ApplySkinnableInfo(this Drawable component, SkinnableInfo info)
         {
             // todo: can probably make this better via deserialisation directly using a common interface.
             component.Position = info.Position;

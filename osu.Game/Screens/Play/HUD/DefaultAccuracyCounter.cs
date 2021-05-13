@@ -7,7 +7,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class DefaultAccuracyCounter : GameplayAccuracyCounter, ISkinnableComponent
+    public class DefaultAccuracyCounter : GameplayAccuracyCounter, ISkinnableDrawable
     {
         [Resolved(canBeNull: true)]
         private HUDOverlay hud { get; set; }
