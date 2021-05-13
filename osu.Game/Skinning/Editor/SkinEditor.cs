@@ -181,7 +181,7 @@ namespace osu.Game.Skinning.Editor
 
         private void revert()
         {
-            SkinnableElementTargetContainer[] targetContainers = targetScreen.ChildrenOfType<SkinnableElementTargetContainer>().ToArray();
+            SkinnableTargetContainer[] targetContainers = targetScreen.ChildrenOfType<SkinnableTargetContainer>().ToArray();
 
             foreach (var t in targetContainers)
             {
@@ -194,7 +194,7 @@ namespace osu.Game.Skinning.Editor
 
         private void save()
         {
-            SkinnableElementTargetContainer[] targetContainers = targetScreen.ChildrenOfType<SkinnableElementTargetContainer>().ToArray();
+            SkinnableTargetContainer[] targetContainers = targetScreen.ChildrenOfType<SkinnableTargetContainer>().ToArray();
 
             foreach (var t in targetContainers)
                 currentSkin.Value.UpdateDrawableTarget(t);
