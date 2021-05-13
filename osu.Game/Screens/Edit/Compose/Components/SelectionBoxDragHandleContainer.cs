@@ -84,8 +84,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (activeHandle?.IsHeld == true)
                 return;
 
-            activeHandle = rotationHandles.SingleOrDefault(h => h.IsHeld || h.IsHovered);
-            activeHandle ??= allDragHandles.SingleOrDefault(h => h.IsHovered);
+            activeHandle = rotationHandles.FirstOrDefault(h => h.IsHeld || h.IsHovered);
+            activeHandle ??= allDragHandles.FirstOrDefault(h => h.IsHovered);
 
             if (activeHandle != null)
             {

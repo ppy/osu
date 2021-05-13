@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Skinning.Editor
 {
-    public class SkinBlueprint : SelectionBlueprint<ISkinnableComponent>
+    public class SkinBlueprint : SelectionBlueprint<ISkinnableDrawable>
     {
         private Container box;
 
@@ -26,17 +26,12 @@ namespace osu.Game.Skinning.Editor
 
         private Drawable drawable => (Drawable)Item;
 
-        /// <summary>
-        /// Whether the blueprint should be shown even when the <see cref="SelectionBlueprint{T}.Item"/> is not alive.
-        /// </summary>
-        protected virtual bool AlwaysShowWhenSelected => true;
-
         protected override bool ShouldBeAlive => drawable.IsAlive && Item.IsPresent;
 
         [Resolved]
         private OsuColour colours { get; set; }
 
-        public SkinBlueprint(ISkinnableComponent component)
+        public SkinBlueprint(ISkinnableDrawable component)
             : base(component)
         {
         }
@@ -92,13 +87,13 @@ namespace osu.Game.Skinning.Editor
 
         protected override void OnSelected()
         {
-            // base logic hides selected blueprints when not selected, but timeline doesn't do that.
+            // base logic hides selected blueprints when not selected, but skin blueprints don't do that.
             updateSelectedState();
         }
 
         protected override void OnDeselected()
         {
-            // base logic hides selected blueprints when not selected, but timeline doesn't do that.
+            // base logic hides selected blueprints when not selected, but skin blueprints don't do that.
             updateSelectedState();
         }
 
