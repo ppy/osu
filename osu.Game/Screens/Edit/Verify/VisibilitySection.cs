@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
@@ -21,12 +22,14 @@ namespace osu.Game.Screens.Edit.Verify
             IssueType.Negligible
         };
 
+        private BindableList<IssueType> hiddenIssueTypes;
+
         protected override string Header => "Visibility";
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colours)
         {
-            var hiddenIssueTypes = verify.HiddenIssueTypes.GetBoundCopy();
+            hiddenIssueTypes = verify.HiddenIssueTypes.GetBoundCopy();
 
             foreach (IssueType issueType in configurableIssueTypes)
             {
