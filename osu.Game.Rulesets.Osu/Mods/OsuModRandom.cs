@@ -33,8 +33,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         private const byte border_distance_x = 192;
         private const byte border_distance_y = 144;
 
-        [SettingSource("Custom seed", "Use a custom seed instead of a random one", SettingControlType = typeof(OsuModRandomSettingsControl))]
-        public Bindable<int?> CustomSeed { get; } = new Bindable<int?>
+        [SettingSource("Seed", "Use a custom seed instead of a random one", SettingControlType = typeof(OsuModRandomSettingsControl))]
+        public Bindable<int?> Seed { get; } = new Bindable<int?>
         {
             Default = null,
             Value = null
@@ -45,12 +45,9 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (!(beatmap is OsuBeatmap osuBeatmap))
                 return;
 
-            var seed = RNG.Next();
+            Seed.Value ??= RNG.Next();
 
-            if (CustomSeed.Value != null)
-                seed = (int)CustomSeed.Value;
-
-            var rng = new Random(seed);
+            var rng = new Random((int)Seed.Value);
 
             var prevObjectInfo = new HitObjectInfo
             {
