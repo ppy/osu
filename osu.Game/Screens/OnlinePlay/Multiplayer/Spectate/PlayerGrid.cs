@@ -15,6 +15,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
     /// </summary>
     public partial class PlayerGrid : CompositeDrawable
     {
+        /// <summary>
+        /// A temporary limitation on the number of players, because only layouts up to 16 players are supported for a single screen.
+        /// Todo: Can be removed in the future with scrolling support + performance improvements.
+        /// </summary>
+        public const int MAX_PLAYERS = 16;
+
         private const float player_spacing = 5;
 
         /// <summary>
@@ -58,11 +64,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// Adds a new cell with content to this grid.
         /// </summary>
         /// <param name="content">The content the cell should contain.</param>
-        /// <exception cref="InvalidOperationException">If more than 16 cells are added.</exception>
+        /// <exception cref="InvalidOperationException">If more than <see cref="MAX_PLAYERS"/> cells are added.</exception>
         public void Add(Drawable content)
         {
-            if (cellContainer.Count == 16)
-                throw new InvalidOperationException("Only 16 cells are supported.");
+            if (cellContainer.Count == MAX_PLAYERS)
+                throw new InvalidOperationException($"Only {MAX_PLAYERS} cells are supported.");
 
             int index = cellContainer.Count;
 

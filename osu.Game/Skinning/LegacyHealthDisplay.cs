@@ -16,22 +16,19 @@ using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {
-    public class LegacyHealthDisplay : HealthDisplay
+    public class LegacyHealthDisplay : HealthDisplay, ISkinnableDrawable
     {
         private const double epic_cutoff = 0.5;
 
-        private readonly Skin skin;
+        [Resolved]
+        private ISkinSource skin { get; set; }
+
         private LegacyHealthPiece fill;
         private LegacyHealthPiece marker;
 
         private float maxFillWidth;
 
         private bool isNewStyle;
-
-        public LegacyHealthDisplay(Skin skin)
-        {
-            this.skin = skin;
-        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -79,7 +76,7 @@ namespace osu.Game.Skinning
 
         protected override void Flash(JudgementResult result) => marker.Flash(result);
 
-        private static Texture getTexture(Skin skin, string name) => skin.GetTexture($"scorebar-{name}");
+        private static Texture getTexture(ISkinSource skin, string name) => skin.GetTexture($"scorebar-{name}");
 
         private static Color4 getFillColour(double hp)
         {
@@ -98,7 +95,7 @@ namespace osu.Game.Skinning
             private readonly Texture dangerTexture;
             private readonly Texture superDangerTexture;
 
-            public LegacyOldStyleMarker(Skin skin)
+            public LegacyOldStyleMarker(ISkinSource skin)
             {
                 normalTexture = getTexture(skin, "ki");
                 dangerTexture = getTexture(skin, "kidanger");
@@ -129,9 +126,9 @@ namespace osu.Game.Skinning
 
         public class LegacyNewStyleMarker : LegacyMarker
         {
-            private readonly Skin skin;
+            private readonly ISkinSource skin;
 
-            public LegacyNewStyleMarker(Skin skin)
+            public LegacyNewStyleMarker(ISkinSource skin)
             {
                 this.skin = skin;
             }
@@ -153,7 +150,7 @@ namespace osu.Game.Skinning
 
         internal class LegacyOldStyleFill : LegacyHealthPiece
         {
-            public LegacyOldStyleFill(Skin skin)
+            public LegacyOldStyleFill(ISkinSource skin)
             {
                 // required for sizing correctly..
                 var firstFrame = getTexture(skin, "colour-0");
@@ -176,7 +173,7 @@ namespace osu.Game.Skinning
 
         internal class LegacyNewStyleFill : LegacyHealthPiece
         {
-            public LegacyNewStyleFill(Skin skin)
+            public LegacyNewStyleFill(ISkinSource skin)
             {
                 InternalChild = new Sprite
                 {
