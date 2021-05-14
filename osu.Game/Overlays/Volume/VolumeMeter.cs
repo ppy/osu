@@ -204,7 +204,7 @@ namespace osu.Game.Overlays.Volume
             {
                 displayVolume = value;
 
-                if (displayVolume > 0.99f)
+                if (displayVolume >= 0.995f)
                 {
                     text.Text = "MAX";
                     maxGlow.EffectColour = meterColour.Opacity(2f);

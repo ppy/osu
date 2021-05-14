@@ -8,14 +8,12 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Scoring;
-using osuTK;
+using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class DefaultComboCounter : RollingCounter<int>, ISkinnableComponent
+    public class DefaultComboCounter : RollingCounter<int>, ISkinnableDrawable
     {
-        private readonly Vector2 offset = new Vector2(20, 5);
-
         [Resolved(canBeNull: true)]
         private HUDOverlay hud { get; set; }
 
@@ -29,17 +27,6 @@ namespace osu.Game.Screens.Play.HUD
         {
             Colour = colours.BlueLighter;
             Current.BindTo(scoreProcessor.Combo);
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (hud?.ScoreCounter.Drawable is DefaultScoreCounter score)
-            {
-                // for now align with the score counter. eventually this will be user customisable.
-                Position = Parent.ToLocalSpace(score.ScreenSpaceDrawQuad.TopRight) + offset;
-            }
         }
 
         protected override string FormatCount(int count)

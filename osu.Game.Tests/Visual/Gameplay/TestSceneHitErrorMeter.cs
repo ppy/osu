@@ -2,15 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
-using osu.Game.Rulesets.Judgements;
-using osu.Framework.Utils;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
+using osu.Framework.Utils;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Catch.Scoring;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Scoring;
-using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Scoring;
@@ -20,13 +21,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestSceneHitErrorMeter : OsuTestScene
     {
-        private BarHitErrorMeter barMeter;
-        private BarHitErrorMeter barMeter2;
-        private BarHitErrorMeter barMeter3;
-        private ColourHitErrorMeter colourMeter;
-        private ColourHitErrorMeter colourMeter2;
-        private ColourHitErrorMeter colourMeter3;
         private HitWindows hitWindows;
+
+        [Cached]
+        private ScoreProcessor scoreProcessor = new ScoreProcessor();
 
         public TestSceneHitErrorMeter()
         {
@@ -105,40 +103,40 @@ namespace osu.Game.Tests.Visual.Gameplay
                 }
             });
 
-            Add(barMeter = new BarHitErrorMeter(hitWindows, true)
+            Add(new BarHitErrorMeter(hitWindows, true)
             {
                 Anchor = Anchor.CentreRight,
                 Origin = Anchor.CentreRight,
             });
 
-            Add(barMeter2 = new BarHitErrorMeter(hitWindows, false)
+            Add(new BarHitErrorMeter(hitWindows, false)
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
             });
 
-            Add(barMeter3 = new BarHitErrorMeter(hitWindows, true)
+            Add(new BarHitErrorMeter(hitWindows, true)
             {
                 Anchor = Anchor.BottomCentre,
                 Origin = Anchor.CentreLeft,
                 Rotation = 270,
             });
 
-            Add(colourMeter = new ColourHitErrorMeter(hitWindows)
+            Add(new ColourHitErrorMeter(hitWindows)
             {
                 Anchor = Anchor.CentreRight,
                 Origin = Anchor.CentreRight,
                 Margin = new MarginPadding { Right = 50 }
             });
 
-            Add(colourMeter2 = new ColourHitErrorMeter(hitWindows)
+            Add(new ColourHitErrorMeter(hitWindows)
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
                 Margin = new MarginPadding { Left = 50 }
             });
 
-            Add(colourMeter3 = new ColourHitErrorMeter(hitWindows)
+            Add(new ColourHitErrorMeter(hitWindows)
             {
                 Anchor = Anchor.BottomCentre,
                 Origin = Anchor.CentreLeft,
@@ -149,18 +147,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void newJudgement(double offset = 0)
         {
-            var judgement = new JudgementResult(new HitObject(), new Judgement())
+            scoreProcessor.ApplyResult(new JudgementResult(new HitCircle { HitWindows = hitWindows }, new Judgement())
             {
                 TimeOffset = offset == 0 ? RNG.Next(-150, 150) : offset,
                 Type = HitResult.Perfect,
-            };
-
-            barMeter.OnNewJudgement(judgement);
-            barMeter2.OnNewJudgement(judgement);
-            barMeter3.OnNewJudgement(judgement);
-            colourMeter.OnNewJudgement(judgement);
-            colourMeter2.OnNewJudgement(judgement);
-            colourMeter3.OnNewJudgement(judgement);
+            });
         }
     }
 }
