@@ -689,12 +689,6 @@ namespace osu.Game.Database
         /// </summary>
         public Task ImportFromStableAsync(StableStorage stableStorage)
         {
-            if (stableStorage == null)
-            {
-                Logger.Log("No osu!stable installation available!", LoggingTarget.Information, LogLevel.Error);
-                return Task.CompletedTask;
-            }
-
             var storage = PrepareStableStorage(stableStorage);
 
             if (!storage.ExistsDirectory(ImportFromStablePath))

@@ -99,12 +99,6 @@ namespace osu.Game.Collections
         /// </summary>
         public Task ImportFromStableAsync(StableStorage stableStorage)
         {
-            if (stableStorage == null)
-            {
-                Logger.Log("No osu!stable installation available!", LoggingTarget.Information, LogLevel.Error);
-                return Task.CompletedTask;
-            }
-
             if (!stableStorage.Exists(database_name))
             {
                 // This handles situations like when the user does not have a collections.db file
