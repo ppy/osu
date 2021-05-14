@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             for (int i = 0; i < Previous.Count; i++)
             {
-                if (i != 0 && Math.Abs(((OsuDifficultyHitObject)Previous[i - 1]).StrainTime - ((OsuDifficultyHitObject)Previous[i]).StrainTime) > 15)
+                if (i != 0 && Math.Abs(((OsuDifficultyHitObject)Previous[i - 1]).StrainTime - ((OsuDifficultyHitObject)Previous[i]).StrainTime) > 15 && !(Previous[i - 1].BaseObject is Slider))
                     deltaTimeDeltaCount++;
                 if (i < averageLength)
                     sumDeltaTime += ((OsuDifficultyHitObject)Previous[i]).StrainTime;
@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // strainValue += 1.5 / Math.Sqrt(hitWindowGreat);
 
 //2.5 / Math.Sqrt(hitWindowGreat);
-            // strainValue *= 1.75;//* (Previous.Count / HistoryLength) * Math.Sqrt(9 + deltaTimeDeltaCount) / 3;
+            strainValue *= (Previous.Count / HistoryLength) * Math.Sqrt(9 + deltaTimeDeltaCount) / 3;
 
             currentStrain *= computeDecay(.85, osuCurrent.StrainTime);
             currentStrain += strainValue * strainMultiplier;
