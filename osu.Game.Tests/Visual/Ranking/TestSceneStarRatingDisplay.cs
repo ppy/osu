@@ -34,6 +34,17 @@ namespace osu.Game.Tests.Visual.Ranking
         }
 
         [Test]
+        public void TestNullStarRatingDisplay()
+        {
+            AddStep("load null", () => Child = new StarRatingDisplay
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Scale = new Vector2(3f),
+            });
+        }
+
+        [Test]
         public void TestChangingStarRatingDisplay()
         {
             StarRatingDisplay starRating = null;
