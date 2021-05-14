@@ -27,6 +27,7 @@ using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Participants;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Users;
 using osuTK;
@@ -452,7 +453,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     return new MultiSpectatorScreen(userIds);
 
                 default:
-                    return new MultiplayerPlayer(SelectedItem.Value, userIds);
+                    return new PlayerLoader(() => new MultiplayerPlayer(SelectedItem.Value, userIds));
             }
         }
 
