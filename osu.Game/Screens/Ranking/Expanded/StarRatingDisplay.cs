@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Ranking.Expanded
     /// <summary>
     /// A pill that displays the star rating of a <see cref="BeatmapInfo"/>.
     /// </summary>
-    public class StarRatingDisplay : CompositeDrawable, IHasCurrentValue<StarDifficulty?>
+    public class StarRatingDisplay : CompositeDrawable, IHasCurrentValue<StarDifficulty>
     {
         private Box background;
         private OsuTextFlowContainer textFlow;
@@ -30,19 +30,12 @@ namespace osu.Game.Screens.Ranking.Expanded
         [Resolved]
         private OsuColour colours { get; set; }
 
-        private readonly BindableWithCurrent<StarDifficulty?> current = new BindableWithCurrent<StarDifficulty?>();
+        private readonly BindableWithCurrent<StarDifficulty> current = new BindableWithCurrent<StarDifficulty>();
 
-        public Bindable<StarDifficulty?> Current
+        public Bindable<StarDifficulty> Current
         {
             get => current.Current;
             set => current.Current = value;
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="StarRatingDisplay"/> without any <see cref="StarDifficulty"/> set, displaying a placeholder until <see cref="Current"/> is changed.
-        /// </summary>
-        public StarRatingDisplay()
-        {
         }
 
         /// <summary>
@@ -112,26 +105,16 @@ namespace osu.Game.Screens.Ranking.Expanded
 
         private void updateDisplay()
         {
-            const double duration = 400;
-            const Easing easing = Easing.OutQuint;
-
-            double stars = Current.Value?.Stars ?? 0.00f;
-
-            var starRatingParts = stars.ToString("0.00", CultureInfo.InvariantCulture).Split('.');
+            var starRatingParts = Current.Value.Stars.ToString("0.00", CultureInfo.InvariantCulture).Split('.');
             string wholePart = starRatingParts[0];
             string fractionPart = starRatingParts[1];
             string separator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
 
-            if (Current.Value == null)
-                background.FadeColour(Color4.SlateGray.Opacity(0.3f));
-            else
-            {
-                var rating = Current.Value.Value.DifficultyRating;
+            var rating = Current.Value.DifficultyRating;
 
-                background.FadeColour(rating == DifficultyRating.ExpertPlus
-                    ? ColourInfo.GradientVertical(Color4Extensions.FromHex("#C1C1C1"), Color4Extensions.FromHex("#595959"))
-                    : (ColourInfo)colours.ForDifficultyRating(rating), duration, easing);
-            }
+            background.Colour = rating == DifficultyRating.ExpertPlus
+                ? ColourInfo.GradientVertical(Color4Extensions.FromHex("#C1C1C1"), Color4Extensions.FromHex("#595959"))
+                : (ColourInfo)colours.ForDifficultyRating(rating);
 
             textFlow.Clear();
 
