@@ -8,6 +8,7 @@ using System.Text;
 using Newtonsoft.Json;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
@@ -57,7 +58,7 @@ namespace osu.Game.Skinning
 
                 string jsonContent = Encoding.UTF8.GetString(bytes);
 
-                DrawableComponentInfo[skinnableTarget] = JsonConvert.DeserializeObject<IEnumerable<SkinnableInfo>>(jsonContent).ToArray();
+                DrawableComponentInfo[skinnableTarget] = JsonConvert.DeserializeObject<IEnumerable<SkinnableInfo>>(jsonContent).AsNonNull().ToArray();
             }
         }
 
