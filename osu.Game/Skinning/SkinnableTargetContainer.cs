@@ -43,10 +43,7 @@ namespace osu.Game.Skinning
             }
         }
 
-        /// <summary>
-        /// Add a new skinnable component to this target.
-        /// </summary>
-        /// <param name="component">The component to add.</param>
+        /// <inheritdoc cref="ISkinnableTarget"/>
         /// <exception cref="NotSupportedException">Thrown when attempting to add an element to a target which is not supported by the current skin.</exception>
         /// <exception cref="ArgumentException">Thrown if the provided instance is not a <see cref="Drawable"/>.</exception>
         public void Add(ISkinnableDrawable component)
@@ -59,6 +56,21 @@ namespace osu.Game.Skinning
 
             content.Add(drawable);
             components.Add(component);
+        }
+
+        /// <inheritdoc cref="ISkinnableTarget"/>
+        /// <exception cref="NotSupportedException">Thrown when attempting to add an element to a target which is not supported by the current skin.</exception>
+        /// <exception cref="ArgumentException">Thrown if the provided instance is not a <see cref="Drawable"/>.</exception>
+        public void Remove(ISkinnableDrawable component)
+        {
+            if (content == null)
+                throw new NotSupportedException("Attempting to add a new component to a target container which is not supported by the current skin.");
+
+            if (!(component is Drawable drawable))
+                throw new ArgumentException($"Provided argument must be of type {nameof(Drawable)}.", nameof(drawable));
+
+            content.Remove(drawable);
+            components.Remove(component);
         }
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
