@@ -46,10 +46,7 @@ namespace osu.Game.Screens.Edit.Verify
             rulesetVerifier = beatmap.BeatmapInfo.Ruleset?.CreateInstance()?.CreateBeatmapVerifier();
 
             context = new BeatmapVerifierContext(beatmap, workingBeatmap.Value, verify.InterpretedDifficulty.Value);
-            verify.InterpretedDifficulty.BindValueChanged(change =>
-            {
-                context.InterpretedDifficulty = change.NewValue;
-            });
+            verify.InterpretedDifficulty.BindValueChanged(difficulty => context.InterpretedDifficulty = difficulty.NewValue);
 
             RelativeSizeAxes = Axes.Both;
 
