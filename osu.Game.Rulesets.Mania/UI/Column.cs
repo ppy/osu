@@ -28,6 +28,12 @@ namespace osu.Game.Rulesets.Mania.UI
         public const float SPECIAL_COLUMN_WIDTH = 70;
 
         /// <summary>
+        /// For hitsounds played by this <see cref="Column"/> (i.e. not as a result of hitting a hitobject),
+        /// a certain number of samples are allowed to be played concurrently so that it feels better when spam-pressing the key.
+        /// </summary>
+        private const int max_concurrent_hitsounds = OsuGameBase.SAMPLE_CONCURRENCY;
+
+        /// <summary>
         /// The index of this column as part of the whole playfield.
         /// </summary>
         public readonly int Index;
@@ -38,6 +44,7 @@ namespace osu.Game.Rulesets.Mania.UI
         internal readonly Container TopLevelContainer;
         private readonly DrawablePool<PoolableHitExplosion> hitExplosionPool;
         private readonly OrderedHitPolicy hitPolicy;
+        private readonly Container<SkinnableSound> hitSounds;
 
         public Container UnderlayElements => HitObjectArea.UnderlayElements;
 
@@ -64,6 +71,12 @@ namespace osu.Game.Rulesets.Mania.UI
                     RelativeSizeAxes = Axes.Both
                 },
                 background,
+                hitSounds = new Container<SkinnableSound>
+                {
+                    Name = "Column samples pool",
+                    RelativeSizeAxes = Axes.Both,
+                    Children = Enumerable.Range(0, max_concurrent_hitsounds).Select(_ => new SkinnableSound()).ToArray()
+                },
                 TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
             };
 
@@ -120,6 +133,8 @@ namespace osu.Game.Rulesets.Mania.UI
             HitObjectArea.Explosions.Add(hitExplosionPool.Get(e => e.Apply(result)));
         }
 
+        private int nextHitSoundIndex;
+
         public bool OnPressed(ManiaAction action)
         {
             if (action != Action.Value)
@@ -131,7 +146,15 @@ namespace osu.Game.Rulesets.Mania.UI
                 HitObjectContainer.Objects.FirstOrDefault(h => h.HitObject.StartTime > Time.Current) ??
                 HitObjectContainer.Objects.LastOrDefault();
 
-            nextObject?.PlaySamples();
+            if (nextObject is DrawableManiaHitObject maniaObject)
+            {
+                var hitSound = hitSounds[nextHitSoundIndex];
+
+                hitSound.Samples = maniaObject.GetGameplaySamples();
+                hitSound.Play();
+
+                nextHitSoundIndex = (nextHitSoundIndex + 1) % max_concurrent_hitsounds;
+            }
 
             return true;
         }

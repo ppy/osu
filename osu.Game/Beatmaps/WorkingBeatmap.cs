@@ -324,7 +324,7 @@ namespace osu.Game.Beatmaps
         public bool SkinLoaded => skin.IsResultAvailable;
         public ISkin Skin => skin.Value;
 
-        protected virtual ISkin GetSkin() => new DefaultSkin();
+        protected virtual ISkin GetSkin() => new DefaultSkin(null);
         private readonly RecyclableLazy<ISkin> skin;
 
         public abstract Stream GetStream(string storagePath);
