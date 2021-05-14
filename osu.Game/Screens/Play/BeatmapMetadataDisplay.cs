@@ -53,11 +53,12 @@ namespace osu.Game.Screens.Play
 
         private IBindable<StarDifficulty?> starDifficulty;
 
+        private FillFlowContainer versionFlow;
+        private StarRatingDisplay starRatingDisplay;
+
         [BackgroundDependencyLoader]
         private void load(BeatmapDifficultyCache difficultyCache)
         {
-            StarRatingDisplay starRatingDisplay;
-
             var metadata = beatmap.BeatmapInfo?.Metadata ?? new BeatmapMetadata();
 
             AutoSizeAxes = Axes.Both;
@@ -112,7 +113,7 @@ namespace osu.Game.Screens.Play
                                 loading = new LoadingLayer(true)
                             }
                         },
-                        new FillFlowContainer
+                        versionFlow = new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
                             Anchor = Anchor.TopCentre,
@@ -178,9 +179,30 @@ namespace osu.Game.Screens.Play
             };
 
             starDifficulty = difficultyCache.GetBindableDifficulty(beatmap.BeatmapInfo);
-            starDifficulty.BindValueChanged(d => starRatingDisplay.Current.Value = d.NewValue, true);
 
             Loading = true;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            if (starDifficulty.Value != null)
+                starRatingDisplay.Current.Value = starDifficulty.Value;
+            else
+            {
+                starRatingDisplay.Hide();
+
+                starDifficulty.ValueChanged += d =>
+                {
+                    starRatingDisplay.Current.Value = d.NewValue;
+
+                    versionFlow.AutoSizeDuration = 300;
+                    versionFlow.AutoSizeEasing = Easing.OutQuint;
+
+                    starRatingDisplay.FadeIn(300, Easing.InQuint);
+                };
+            }
         }
 
         private class MetadataLineLabel : OsuSpriteText
