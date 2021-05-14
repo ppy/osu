@@ -65,13 +65,13 @@ namespace osu.Game.Rulesets.Osu.Mods
             switch (drawableObject)
             {
                 case DrawableSliderTail _:
-                    using (drawableObject.BeginAbsoluteSequence(fadeOut.startTime, true))
+                    using (drawableObject.BeginAbsoluteSequence(fadeOut.startTime))
                         drawableObject.FadeOut(fadeOut.duration);
 
                     break;
 
                 case DrawableSliderRepeat sliderRepeat:
-                    using (drawableObject.BeginAbsoluteSequence(fadeOut.startTime, true))
+                    using (drawableObject.BeginAbsoluteSequence(fadeOut.startTime))
                         // only apply to circle piece – reverse arrow is not affected by hidden.
                         sliderRepeat.CirclePiece.FadeOut(fadeOut.duration);
 
@@ -88,22 +88,22 @@ namespace osu.Game.Rulesets.Osu.Mods
                     else
                     {
                         // we don't want to see the approach circle
-                        using (circle.BeginAbsoluteSequence(hitObject.StartTime - hitObject.TimePreempt, true))
+                        using (circle.BeginAbsoluteSequence(hitObject.StartTime - hitObject.TimePreempt))
                             circle.ApproachCircle.Hide();
                     }
 
-                    using (drawableObject.BeginAbsoluteSequence(fadeOut.startTime, true))
+                    using (drawableObject.BeginAbsoluteSequence(fadeOut.startTime))
                         fadeTarget.FadeOut(fadeOut.duration);
                     break;
 
                 case DrawableSlider slider:
-                    using (slider.BeginAbsoluteSequence(fadeOut.startTime, true))
+                    using (slider.BeginAbsoluteSequence(fadeOut.startTime))
                         slider.Body.FadeOut(fadeOut.duration, Easing.Out);
 
                     break;
 
                 case DrawableSliderTick sliderTick:
-                    using (sliderTick.BeginAbsoluteSequence(fadeOut.startTime, true))
+                    using (sliderTick.BeginAbsoluteSequence(fadeOut.startTime))
                         sliderTick.FadeOut(fadeOut.duration);
 
                     break;
@@ -112,7 +112,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     // hide elements we don't care about.
                     // todo: hide background
 
-                    using (spinner.BeginAbsoluteSequence(fadeOut.startTime, true))
+                    using (spinner.BeginAbsoluteSequence(fadeOut.startTime))
                         spinner.FadeOut(fadeOut.duration);
 
                     break;
