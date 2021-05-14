@@ -12,6 +12,7 @@ using osu.Game.Rulesets.Edit.Checks;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Editing.Checks
 {
@@ -146,11 +147,13 @@ namespace osu.Game.Tests.Editing.Checks
 
         private BeatmapVerifierContext getContext(List<HitObject> hitobjects)
         {
-            return new BeatmapVerifierContext(new Beatmap<HitObject>
+            var beatmap = new Beatmap<HitObject>
             {
                 ControlPointInfo = cpi,
                 HitObjects = hitobjects
-            }, null);
+            };
+
+            return new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));
         }
     }
 }

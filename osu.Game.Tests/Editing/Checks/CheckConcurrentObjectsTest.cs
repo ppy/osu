@@ -12,6 +12,7 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Editing.Checks
 {
@@ -186,10 +187,8 @@ namespace osu.Game.Tests.Editing.Checks
 
         private BeatmapVerifierContext getContext(List<HitObject> hitobjects)
         {
-            return new BeatmapVerifierContext(new Beatmap<HitObject>
-            {
-                HitObjects = hitobjects
-            }, null);
+            var beatmap = new Beatmap<HitObject> { HitObjects = hitobjects };
+            return new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));
         }
     }
 }
