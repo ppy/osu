@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -29,8 +30,8 @@ namespace osu.Game.Skinning.Editor
         [Cached]
         private ScoreProcessor scoreProcessor = new ScoreProcessor
         {
-            Combo = { Value = 727 },
-            TotalScore = { Value = 1337377 }
+            Combo = { Value = RNG.Next(1, 1000) },
+            TotalScore = { Value = RNG.Next(1000, 10000000) }
         };
 
         [Cached(typeof(HealthProcessor))]

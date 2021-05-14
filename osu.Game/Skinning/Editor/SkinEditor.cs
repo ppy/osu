@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -193,14 +194,16 @@ namespace osu.Game.Skinning.Editor
             SelectedComponents.Add(component);
         }
 
+        private IEnumerable<ISkinnableTarget> availableTargets => targetScreen.ChildrenOfType<ISkinnableTarget>();
+
         private ISkinnableTarget getTarget(SkinnableTarget target)
         {
-            return targetScreen.ChildrenOfType<ISkinnableTarget>().FirstOrDefault(c => c.Target == target);
+            return availableTargets.FirstOrDefault(c => c.Target == target);
         }
 
         private void revert()
         {
-            SkinnableTargetContainer[] targetContainers = targetScreen.ChildrenOfType<SkinnableTargetContainer>().ToArray();
+            ISkinnableTarget[] targetContainers = availableTargets.ToArray();
 
             foreach (var t in targetContainers)
             {
@@ -216,7 +219,7 @@ namespace osu.Game.Skinning.Editor
             if (!hasBegunMutating)
                 return;
 
-            SkinnableTargetContainer[] targetContainers = targetScreen.ChildrenOfType<SkinnableTargetContainer>().ToArray();
+            ISkinnableTarget[] targetContainers = availableTargets.ToArray();
 
             foreach (var t in targetContainers)
                 currentSkin.Value.UpdateDrawableTarget(t);
@@ -236,6 +239,12 @@ namespace osu.Game.Skinning.Editor
         protected override void PopOut()
         {
             this.FadeOut(TRANSITION_DURATION, Easing.OutQuint);
+        }
+
+        public void DeleteItems(ISkinnableDrawable[] items)
+        {
+            foreach (var item in items)
+                availableTargets.FirstOrDefault(t => t.Components.Contains(item))?.Remove(item);
         }
     }
 }
