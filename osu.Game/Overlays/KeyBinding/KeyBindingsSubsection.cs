@@ -11,7 +11,6 @@ using osu.Game.Input;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets;
 using osuTK;
-using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.KeyBinding
 {

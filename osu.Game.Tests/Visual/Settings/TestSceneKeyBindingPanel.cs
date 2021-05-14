@@ -143,13 +143,11 @@ namespace osu.Game.Tests.Visual.Settings
         [Test]
         public void TestResetAllBindingsButton()
         {
-            SettingsKeyBindingRow multiSettingsBindingRow = null;
             KeyBindingRow multiBindingRow = null;
 
             AddStep("click first row and press p", () =>
             {
-                multiSettingsBindingRow = panel.ChildrenOfType<SettingsKeyBindingRow>().First(row => row.KeyBindingRow.Defaults.Count() > 1);
-                multiBindingRow = panel.ChildrenOfType<KeyBindingRow>().First();
+                multiBindingRow = panel.ChildrenOfType<SettingsKeyBindingRow>().First().KeyBindingRow;
                 InputManager.MoveMouseTo(multiBindingRow);
                 InputManager.Click(MouseButton.Left);
                 InputManager.PressKey(Key.P);
