@@ -108,7 +108,6 @@ namespace osu.Game.Overlays.Settings
 
         protected SettingsItem()
         {
-
             RestoreDefaultValueButton<T> restoreDefaultButton;
 
             RelativeSizeAxes = Axes.X;

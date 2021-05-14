@@ -85,7 +85,6 @@ namespace osu.Game.Overlays.KeyBinding
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-
             isKeysDefaultValue.Value = bindings.Select(b => b.KeyCombination).SequenceEqual(Defaults);
             isKeysDefaultValue.BindValueChanged(resetButtons =>
             {

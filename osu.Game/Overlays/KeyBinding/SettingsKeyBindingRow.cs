@@ -45,7 +45,6 @@ namespace osu.Game.Overlays.KeyBinding
                 Defaults = defaultGroup.Select(d => d.KeyCombination)
             };
 
-
             RestoreDefaultValueButton<bool> restoreDefaultButton;
 
             RelativeSizeAxes = Axes.X;
