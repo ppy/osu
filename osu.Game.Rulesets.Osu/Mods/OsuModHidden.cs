@@ -60,20 +60,20 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             OsuHitObject hitObject = drawableOsuObject.HitObject;
 
-            (double startTime, double duration) fadeOut = getFadeOutParameters(drawableOsuObject);
+            (double startTime, double fadeDuration) = getFadeOutParameters(drawableOsuObject);
 
             switch (drawableObject)
             {
                 case DrawableSliderTail _:
-                    using (drawableObject.BeginAbsoluteSequence(fadeOut.startTime))
-                        drawableObject.FadeOut(fadeOut.duration);
+                    using (drawableObject.BeginAbsoluteSequence(startTime))
+                        drawableObject.FadeOut(fadeDuration);
 
                     break;
 
                 case DrawableSliderRepeat sliderRepeat:
-                    using (drawableObject.BeginAbsoluteSequence(fadeOut.startTime))
+                    using (drawableObject.BeginAbsoluteSequence(startTime))
                         // only apply to circle piece – reverse arrow is not affected by hidden.
-                        sliderRepeat.CirclePiece.FadeOut(fadeOut.duration);
+                        sliderRepeat.CirclePiece.FadeOut(fadeDuration);
 
                     break;
 
@@ -92,19 +92,19 @@ namespace osu.Game.Rulesets.Osu.Mods
                             circle.ApproachCircle.Hide();
                     }
 
-                    using (drawableObject.BeginAbsoluteSequence(fadeOut.startTime))
-                        fadeTarget.FadeOut(fadeOut.duration);
+                    using (drawableObject.BeginAbsoluteSequence(startTime))
+                        fadeTarget.FadeOut(fadeDuration);
                     break;
 
                 case DrawableSlider slider:
-                    using (slider.BeginAbsoluteSequence(fadeOut.startTime))
-                        slider.Body.FadeOut(fadeOut.duration, Easing.Out);
+                    using (slider.BeginAbsoluteSequence(startTime))
+                        slider.Body.FadeOut(fadeDuration, Easing.Out);
 
                     break;
 
                 case DrawableSliderTick sliderTick:
-                    using (sliderTick.BeginAbsoluteSequence(fadeOut.startTime))
-                        sliderTick.FadeOut(fadeOut.duration);
+                    using (sliderTick.BeginAbsoluteSequence(startTime))
+                        sliderTick.FadeOut(fadeDuration);
 
                     break;
 
@@ -112,14 +112,14 @@ namespace osu.Game.Rulesets.Osu.Mods
                     // hide elements we don't care about.
                     // todo: hide background
 
-                    using (spinner.BeginAbsoluteSequence(fadeOut.startTime))
-                        spinner.FadeOut(fadeOut.duration);
+                    using (spinner.BeginAbsoluteSequence(startTime))
+                        spinner.FadeOut(fadeDuration);
 
                     break;
             }
         }
 
-        private (double startTime, double duration) getFadeOutParameters(DrawableOsuHitObject drawableObject)
+        private (double startTime, double fadeDuration) getFadeOutParameters(DrawableOsuHitObject drawableObject)
         {
             switch (drawableObject)
             {
@@ -137,7 +137,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     return getParameters(drawableObject.HitObject);
             }
 
-            static (double startTime, double duration) getParameters(OsuHitObject hitObject)
+            static (double startTime, double fadeDuration) getParameters(OsuHitObject hitObject)
             {
                 var fadeOutStartTime = hitObject.StartTime - hitObject.TimePreempt + hitObject.TimeFadeIn;
                 var fadeOutDuration = hitObject.TimePreempt * fade_out_duration_multiplier;
