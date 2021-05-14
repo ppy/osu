@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -130,8 +131,9 @@ namespace osu.Game.Screens.Play
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                 },
-                                starRatingDisplay = new StarRatingDisplay
+                                starRatingDisplay = new StarRatingDisplay(default)
                                 {
+                                    Alpha = 0f,
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                 }
@@ -188,14 +190,19 @@ namespace osu.Game.Screens.Play
             base.LoadComplete();
 
             if (starDifficulty.Value != null)
-                starRatingDisplay.Current.Value = starDifficulty.Value;
+            {
+                starRatingDisplay.Current.Value = starDifficulty.Value.Value;
+                starRatingDisplay.Show();
+            }
             else
             {
                 starRatingDisplay.Hide();
 
                 starDifficulty.ValueChanged += d =>
                 {
-                    starRatingDisplay.Current.Value = d.NewValue;
+                    Debug.Assert(d.NewValue != null);
+
+                    starRatingDisplay.Current.Value = d.NewValue.Value;
 
                     versionFlow.AutoSizeDuration = 300;
                     versionFlow.AutoSizeEasing = Easing.OutQuint;
