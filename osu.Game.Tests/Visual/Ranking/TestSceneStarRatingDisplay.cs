@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Ranking.Expanded;
+using osuTK;
 
 namespace osu.Game.Tests.Visual.Ranking
 {
@@ -15,29 +16,45 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestDisplay()
         {
-            StarRatingDisplay changingStarRating = null;
-
             AddStep("load displays", () => Child = new FillFlowContainer
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Children = new Drawable[]
                 {
-                    new StarRatingDisplay(new StarDifficulty(1.23, 0)),
-                    new StarRatingDisplay(new StarDifficulty(2.34, 0)),
-                    new StarRatingDisplay(new StarDifficulty(3.45, 0)),
-                    new StarRatingDisplay(new StarDifficulty(4.56, 0)),
-                    new StarRatingDisplay(new StarDifficulty(5.67, 0)),
-                    new StarRatingDisplay(new StarDifficulty(6.78, 0)),
-                    new StarRatingDisplay(new StarDifficulty(10.11, 0)),
-                    changingStarRating = new StarRatingDisplay(),
+                    new StarRatingDisplay(new StarDifficulty(1.23, 0)) { Anchor = Anchor.Centre, Origin = Anchor.Centre },
+                    new StarRatingDisplay(new StarDifficulty(2.34, 0)) { Anchor = Anchor.Centre, Origin = Anchor.Centre },
+                    new StarRatingDisplay(new StarDifficulty(3.45, 0)) { Anchor = Anchor.Centre, Origin = Anchor.Centre },
+                    new StarRatingDisplay(new StarDifficulty(4.56, 0)) { Anchor = Anchor.Centre, Origin = Anchor.Centre },
+                    new StarRatingDisplay(new StarDifficulty(5.67, 0)) { Anchor = Anchor.Centre, Origin = Anchor.Centre },
+                    new StarRatingDisplay(new StarDifficulty(6.78, 0)) { Anchor = Anchor.Centre, Origin = Anchor.Centre },
+                    new StarRatingDisplay(new StarDifficulty(10.11, 0)) { Anchor = Anchor.Centre, Origin = Anchor.Centre },
                 }
             });
+        }
 
-            AddRepeatStep("change bottom rating", () =>
+        [Test]
+        public void TestChangingStarRatingDisplay()
+        {
+            StarRatingDisplay starRating = null;
+
+            AddStep("load display", () => Child = starRating = new StarRatingDisplay(new StarDifficulty(5.55, 1))
             {
-                changingStarRating.Current.Value = new StarDifficulty(RNG.NextDouble(0, 10), RNG.Next());
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Scale = new Vector2(3f),
+            });
+
+            AddRepeatStep("set random value", () =>
+            {
+                starRating.Current.Value = new StarDifficulty(RNG.NextDouble(0.0, 11.0), 1);
             }, 10);
+
+            AddSliderStep("set exact stars", 0.0, 11.0, 5.55, d =>
+            {
+                if (starRating != null)
+                    starRating.Current.Value = new StarDifficulty(d, 1);
+            });
         }
     }
 }
