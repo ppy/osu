@@ -108,7 +108,8 @@ namespace osu.Game.Overlays.Settings
 
         protected SettingsItem()
         {
-            RestoreDefaultValueButton restoreDefaultButton;
+
+            RestoreDefaultValueButton<T> restoreDefaultButton;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -116,7 +117,7 @@ namespace osu.Game.Overlays.Settings
 
             InternalChildren = new Drawable[]
             {
-                restoreDefaultButton = new RestoreDefaultValueButton(),
+                restoreDefaultButton = new RestoreDefaultValueButton<T>(),
                 FlowContent = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
@@ -145,102 +146,6 @@ namespace osu.Game.Overlays.Settings
         {
             if (labelText != null)
                 labelText.Alpha = controlWithCurrent.Current.Disabled ? 0.3f : 1;
-        }
-
-        protected internal class RestoreDefaultValueButton : Container, IHasTooltip
-        {
-            public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
-
-            private Bindable<T> bindable;
-
-            public Bindable<T> Bindable
-            {
-                get => bindable;
-                set
-                {
-                    bindable = value;
-                    bindable.ValueChanged += _ => UpdateState();
-                    bindable.DisabledChanged += _ => UpdateState();
-                    bindable.DefaultChanged += _ => UpdateState();
-                    UpdateState();
-                }
-            }
-
-            private Color4 buttonColour;
-
-            private bool hovering;
-
-            public RestoreDefaultValueButton()
-            {
-                RelativeSizeAxes = Axes.Y;
-                Width = SettingsPanel.CONTENT_MARGINS;
-                Padding = new MarginPadding { Vertical = 1.5f };
-                Alpha = 0f;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colour)
-            {
-                buttonColour = colour.Yellow;
-
-                Child = new Container
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    CornerRadius = 3,
-                    Masking = true,
-                    Colour = buttonColour,
-                    EdgeEffect = new EdgeEffectParameters
-                    {
-                        Colour = buttonColour.Opacity(0.1f),
-                        Type = EdgeEffectType.Glow,
-                        Radius = 2,
-                    },
-                    Width = 0.33f,
-                    Child = new Box { RelativeSizeAxes = Axes.Both },
-                };
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                UpdateState();
-            }
-
-            public string TooltipText => "revert to default";
-
-            protected override bool OnClick(ClickEvent e)
-            {
-                if (bindable != null && !bindable.Disabled)
-                    bindable.SetDefault();
-                return true;
-            }
-
-            protected override bool OnHover(HoverEvent e)
-            {
-                hovering = true;
-                UpdateState();
-                return false;
-            }
-
-            protected override void OnHoverLost(HoverLostEvent e)
-            {
-                hovering = false;
-                UpdateState();
-            }
-
-            public void UpdateState() => Scheduler.AddOnce(updateState);
-
-            private void updateState()
-            {
-                if (bindable == null)
-                    return;
-
-                this.FadeTo(bindable.IsDefault ? 0f :
-                    hovering && !bindable.Disabled ? 1f : 0.65f, 200, Easing.OutQuint);
-                this.FadeColour(bindable.Disabled ? Color4.Gray : buttonColour, 200, Easing.OutQuint);
-            }
         }
     }
 }

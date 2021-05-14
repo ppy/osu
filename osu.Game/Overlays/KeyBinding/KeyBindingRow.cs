@@ -4,12 +4,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
@@ -22,7 +24,7 @@ using osuTK.Input;
 
 namespace osu.Game.Overlays.KeyBinding
 {
-    public class KeyBindingRow : Container, IFilterable
+    public class KeyBindingRow : Container, IFilterable, IHasCurrentValue<bool>
     {
         private readonly object action;
         private readonly IEnumerable<Framework.Input.Bindings.KeyBinding> bindings;
@@ -51,12 +53,24 @@ namespace osu.Game.Overlays.KeyBinding
         private FillFlowContainer cancelAndClearButtons;
         private FillFlowContainer<KeyButton> buttons;
 
+        private BindableWithCurrent<bool> isKeysDefaultValue;
+        public Bindable<bool> Current
+        {
+            get => isKeysDefaultValue.Current;
+            set => isKeysDefaultValue.Current = value;
+        }
+
         public IEnumerable<string> FilterTerms => bindings.Select(b => b.KeyCombination.ReadableString()).Prepend(text.Text.ToString());
 
         public KeyBindingRow(object action, IEnumerable<Framework.Input.Bindings.KeyBinding> bindings)
         {
             this.action = action;
             this.bindings = bindings;
+
+            isKeysDefaultValue = new BindableWithCurrent<bool>()
+            {
+                Default = true
+            };
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -71,6 +85,17 @@ namespace osu.Game.Overlays.KeyBinding
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
+
+            isKeysDefaultValue.Value = bindings.Select(b => b.KeyCombination).SequenceEqual(Defaults);
+            isKeysDefaultValue.BindValueChanged(resetButtons =>
+            {
+                if (resetButtons.NewValue != resetButtons.OldValue && resetButtons.NewValue && !bindings.Select(b => b.KeyCombination).SequenceEqual(Defaults))
+                {
+                    RestoreDefaults();
+                    finalise();
+                }
+            });
+
             EdgeEffect = new EdgeEffectParameters
             {
                 Radius = 2,
@@ -109,7 +134,6 @@ namespace osu.Game.Overlays.KeyBinding
                     Children = new Drawable[]
                     {
                         new CancelButton { Action = finalise },
-                        new SingleBindResetButton { Action = singleBindReset },
                         new ClearButton { Action = clear },
                     },
                 }
@@ -129,6 +153,8 @@ namespace osu.Game.Overlays.KeyBinding
                 button.UpdateKeyCombination(d);
                 store.Update(button.KeyBinding);
             }
+
+            isKeysDefaultValue.Value = true;
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -282,20 +308,28 @@ namespace osu.Game.Overlays.KeyBinding
             finalise();
         }
 
-        private void singleBindReset()
-        {
-            if (bindTarget == null)
-                return;
-
-            bindTarget.UpdateKeyCombination(Defaults.ElementAt(buttons.IndexOf(bindTarget)));
-            finalise();
-        }
-
         private void finalise()
         {
             if (bindTarget != null)
             {
                 store.Update(bindTarget.KeyBinding);
+
+                KeyCombination keyDefault = Defaults.ElementAt(buttons.IndexOf(bindTarget));
+                if (isKeysDefaultValue.Value)
+                {
+                    if (!keyDefault.Equals(bindTarget.KeyBinding.KeyCombination))
+                    {
+                        isKeysDefaultValue.Value = false;
+                    }
+                }
+                else
+                {
+                    if (keyDefault.Equals(bindTarget.KeyBinding.KeyCombination) &&
+                        buttons.Select(b => b.KeyBinding.KeyCombination).SequenceEqual(Defaults))
+                    {
+                        isKeysDefaultValue.Value = true;
+                    }
+                }
 
                 bindTarget.IsBinding = false;
                 Schedule(() =>
@@ -346,24 +380,6 @@ namespace osu.Game.Overlays.KeyBinding
             {
                 Text = "Cancel";
                 Size = new Vector2(80, 20);
-            }
-        }
-
-        public class SingleBindResetButton : TriangleButton
-        {
-            public SingleBindResetButton()
-            {
-                Text = "Reset";
-                Size = new Vector2(80, 20);
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                BackgroundColour = colours.Green;
-
-                Triangles.ColourDark = colours.GreenDark;
-                Triangles.ColourLight = colours.GreenLight;
             }
         }
 
