@@ -43,13 +43,11 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
-            base.ApplyIncreasedVisibilityState(hitObject, state);
             applyState(hitObject, true);
         }
 
         protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
         {
-            base.ApplyNormalVisibilityState(hitObject, state);
             applyState(hitObject, false);
         }
 
