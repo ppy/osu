@@ -1,13 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
@@ -21,6 +19,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached]
         private readonly ScoreProcessor scoreProcessor = new ScoreProcessor();
 
+        [Cached(typeof(HealthProcessor))]
+        private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
+
         [SetUpSteps]
         public void SetUpSteps()
         {
@@ -29,12 +30,13 @@ namespace osu.Game.Tests.Visual.Gameplay
                 SetContents(() =>
                 {
                     var ruleset = new OsuRuleset();
+                    var mods = new[] { ruleset.GetAutoplayMod() };
                     var working = CreateWorkingBeatmap(ruleset.RulesetInfo);
-                    var beatmap = working.GetPlayableBeatmap(ruleset.RulesetInfo);
+                    var beatmap = working.GetPlayableBeatmap(ruleset.RulesetInfo, mods);
 
-                    var drawableRuleset = ruleset.CreateDrawableRulesetWith(beatmap);
+                    var drawableRuleset = ruleset.CreateDrawableRulesetWith(beatmap, mods);
 
-                    var hudOverlay = new HUDOverlay(scoreProcessor, null, drawableRuleset, Array.Empty<Mod>())
+                    var hudOverlay = new HUDOverlay(drawableRuleset, mods)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
