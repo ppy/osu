@@ -25,8 +25,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double snapStrainMultiplier = 7.875;
         private double flowStrainMultiplier = 20;
-        private double hybridStrainMultiplier = 70;
-        private double sliderStrainMultiplier = 20;
+        private double hybridStrainMultiplier = 55;
+        private double sliderStrainMultiplier = 30;
         private double totalStrainMultiplier = .205;
 
         private int curr = 0;
