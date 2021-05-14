@@ -4,12 +4,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
@@ -23,6 +26,9 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         [Resolved]
         private BeatmapManager manager { get; set; }
+
+        [Cached(typeof(BeatmapDifficultyCache))]
+        private readonly TestBeatmapDifficultyCache testDifficultyCache = new TestBeatmapDifficultyCache();
 
         [Test]
         public void TestLocal([Values("Beatmap", "Some long title and stuff")]
@@ -42,6 +48,27 @@ namespace osu.Game.Tests.Visual.SongSelect
                     StarDifficulty = RNG.NextDouble(0, 10),
                 }
             }));
+        }
+
+        [Test]
+        public void TestDelayedStarRating()
+        {
+            AddStep("block calculation", () => testDifficultyCache.BlockCalculation = true);
+
+            showMetadataForBeatmap(() => CreateWorkingBeatmap(new Beatmap
+            {
+                BeatmapInfo =
+                {
+                    Metadata = new BeatmapMetadata
+                    {
+                        Title = "Heavy beatmap",
+                    },
+                    Version = "10k objects",
+                    StarDifficulty = 99.99f,
+                }
+            }));
+
+            AddStep("allow calculation", () => testDifficultyCache.BlockCalculation = false);
         }
 
         [Test]
@@ -68,8 +95,11 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 OsuLogo logo = new OsuLogo { Scale = new Vector2(0.15f) };
 
+                Remove(testDifficultyCache);
+
                 Children = new Drawable[]
                 {
+                    testDifficultyCache,
                     display = new BeatmapMetadataDisplay(getBeatmap(), new Bindable<IReadOnlyList<Mod>>(randomMods), logo)
                     {
                         Anchor = Anchor.Centre,
@@ -84,6 +114,38 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddWaitStep("wait a bit", 5);
 
             AddStep("finish loading", () => display.Loading = false);
+        }
+
+        private class TestBeatmapDifficultyCache : BeatmapDifficultyCache
+        {
+            private TaskCompletionSource<bool> calculationBlocker;
+
+            private bool blockCalculation;
+
+            public bool BlockCalculation
+            {
+                get => blockCalculation;
+                set
+                {
+                    if (value == blockCalculation)
+                        return;
+
+                    blockCalculation = value;
+
+                    if (value)
+                        calculationBlocker = new TaskCompletionSource<bool>();
+                    else
+                        calculationBlocker?.SetResult(false);
+                }
+            }
+
+            public override async Task<StarDifficulty> GetDifficultyAsync(BeatmapInfo beatmapInfo, RulesetInfo rulesetInfo = null, IEnumerable<Mod> mods = null, CancellationToken cancellationToken = default)
+            {
+                if (blockCalculation)
+                    await calculationBlocker.Task;
+
+                return await base.GetDifficultyAsync(beatmapInfo, rulesetInfo, mods, cancellationToken);
+            }
         }
     }
 }
