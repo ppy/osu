@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double snapStrainMultiplier = 7.875;
         private double flowStrainMultiplier = 20;
-        private double hybridStrainMultiplier = 30;
+        private double hybridStrainMultiplier = 60;
         private double sliderStrainMultiplier = 20;
         private double totalStrainMultiplier = .145;
 
@@ -55,7 +55,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double nextDiffStrain = Vector2.Subtract(currVector, nextVector).Length * osuNextObj.FlowProbability;
             double prevDiffStrain = Vector2.Subtract(prevVector, currVector).Length * osuPrevObj.FlowProbability;
 
-            double strain = 2 * currVector.Length + prevDiffStrain + Math.Abs(prevDiffStrain - nextDiffStrain) * Math.Min(osuNextObj.FlowProbability, osuPrevObj.FlowProbability);
+            double strain = 2 * currVector.Length + Math.Min(prevDiffStrain, currVector.Length)
+                    + Math.Abs(prevDiffStrain - nextDiffStrain) * Math.Min(osuNextObj.FlowProbability, osuPrevObj.FlowProbability);
 
             // strain = Math.Pow(strain, 1.1);
 
@@ -114,7 +115,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 Vector2 currVector = Vector2.Divide(osuCurrObj.DistanceVector, (float)osuCurrObj.StrainTime);
                 Vector2 prevVector = Vector2.Divide(osuPrevObj.DistanceVector, (float)osuPrevObj.StrainTime);
 
-                double snapStrain = osuCurrObj.SnapProbability *
+                double snapStrain = Math.Min(osuCurrObj.SnapProbability, osuPrevObj.SnapProbability) *
                                     snapStrainAt(osuPrevObj,
                                                  osuCurrObj,
                                                  osuNextObj,
@@ -122,7 +123,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                                                  currVector,
                                                  prevVector);
 
-                double flowStrain = osuCurrObj.FlowProbability *
+                double flowStrain = Math.Min(osuCurrObj.FlowProbability, osuPrevObj.FlowProbability) *
                                     flowStrainAt(osuPrevObj,
                                                  osuCurrObj,
                                                  osuNextObj,
