@@ -1,20 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets;
 using osuTK;
 using osu.Game.Graphics;
-using osu.Framework.Input.Bindings;
 
 namespace osu.Game.Overlays.KeyBinding
 {
@@ -41,8 +38,6 @@ namespace osu.Game.Overlays.KeyBinding
 
             foreach (var defaultGroup in Defaults.GroupBy(d => d.Action))
             {
-                int intKey = (int)defaultGroup.Key;
-
                 // one row per valid action.
                 Add(new SettingsKeyBindingRow(defaultGroup, bindings, Ruleset));
             }

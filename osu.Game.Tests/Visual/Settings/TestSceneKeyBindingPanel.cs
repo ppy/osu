@@ -4,7 +4,6 @@
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Input.Bindings;
 using osu.Framework.Testing;
 using osu.Framework.Threading;
 using osu.Game.Overlays;
@@ -32,16 +31,14 @@ namespace osu.Game.Tests.Visual.Settings
         [Test]
         public void TestClickTwiceOnClearButton()
         {
-            SettingsKeyBindingRow firstSettingRow = null;
             KeyBindingRow firstRow = null;
 
             AddStep("click first row", () =>
             {
-                firstSettingRow = panel.ChildrenOfType<SettingsKeyBindingRow>().First();
-                InputManager.MoveMouseTo(firstSettingRow);
+                InputManager.MoveMouseTo(panel.ChildrenOfType<SettingsKeyBindingRow>().First());
                 InputManager.Click(MouseButton.Left);
 
-                firstRow = firstSettingRow.KeyBindingRow;
+                firstRow = panel.ChildrenOfType<SettingsKeyBindingRow>().First().KeyBindingRow;
             });
 
             AddStep("schedule button clicks", () =>
@@ -111,12 +108,10 @@ namespace osu.Game.Tests.Visual.Settings
         [Test]
         public void TestSingleBindResetButton()
         {
-            SettingsKeyBindingRow multiSettingsBindingRow = null;
             KeyBindingRow multiBindingRow = null;
 
             AddStep("click first row with two bindings", () =>
             {
-                multiSettingsBindingRow = panel.ChildrenOfType<SettingsKeyBindingRow>().First(row => row.KeyBindingRow.Defaults.Count() > 1);
                 multiBindingRow = panel.ChildrenOfType<KeyBindingRow>().First(row => row.Defaults.Count() > 1);
                 InputManager.MoveMouseTo(multiBindingRow);
                 InputManager.Click(MouseButton.Left);
@@ -124,20 +119,20 @@ namespace osu.Game.Tests.Visual.Settings
                 InputManager.ReleaseKey(Key.P);
             });
 
-            AddUntilStep("restore button shown", () => multiSettingsBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().First().Alpha > 0);
+            AddUntilStep("restore button shown", () => panel.ChildrenOfType<SettingsKeyBindingRow>().First(row => row.KeyBindingRow.Defaults.Count() > 1).ChildrenOfType<RestoreDefaultValueButton<bool>>().First().Alpha > 0);
 
             clickSingleBindResetButton();
 
-            AddAssert("first binding cleared", () => multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(0).KeyBinding.KeyCombination.Equals(multiBindingRow.Defaults.ElementAt(0)));
-            AddAssert("second binding cleared", () => multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(1).KeyBinding.KeyCombination.Equals(multiBindingRow.Defaults.ElementAt(1)));
+            AddAssert("first binding cleared", () => panel.ChildrenOfType<SettingsKeyBindingRow>().First(row => row.KeyBindingRow.Defaults.Count() > 1).ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(0).KeyBinding.KeyCombination.Equals(multiBindingRow.Defaults.ElementAt(0)));
+            AddAssert("second binding cleared", () => panel.ChildrenOfType<SettingsKeyBindingRow>().First(row => row.KeyBindingRow.Defaults.Count() > 1).ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(1).KeyBinding.KeyCombination.Equals(multiBindingRow.Defaults.ElementAt(1)));
 
-            AddUntilStep("restore button hidden", () => multiSettingsBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().First().Alpha == 0);
+            AddUntilStep("restore button hidden", () => panel.ChildrenOfType<SettingsKeyBindingRow>().First(row => row.KeyBindingRow.Defaults.Count() > 1).ChildrenOfType<RestoreDefaultValueButton<bool>>().First().Alpha == 0);
 
             void clickSingleBindResetButton()
             {
                 AddStep("click reset button for bindings", () =>
                 {
-                    var clearButton = multiSettingsBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().Single();
+                    var clearButton = panel.ChildrenOfType<SettingsKeyBindingRow>().First(row => row.KeyBindingRow.Defaults.Count() > 1).ChildrenOfType<RestoreDefaultValueButton<bool>>().Single();
 
                     InputManager.MoveMouseTo(clearButton);
                     InputManager.Click(MouseButton.Left);

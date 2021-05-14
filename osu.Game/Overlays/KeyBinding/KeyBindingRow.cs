@@ -53,7 +53,8 @@ namespace osu.Game.Overlays.KeyBinding
         private FillFlowContainer cancelAndClearButtons;
         private FillFlowContainer<KeyButton> buttons;
 
-        private BindableWithCurrent<bool> isKeysDefaultValue;
+        private readonly BindableWithCurrent<bool> isKeysDefaultValue;
+
         public Bindable<bool> Current
         {
             get => isKeysDefaultValue.Current;
@@ -67,7 +68,7 @@ namespace osu.Game.Overlays.KeyBinding
             this.action = action;
             this.bindings = bindings;
 
-            isKeysDefaultValue = new BindableWithCurrent<bool>()
+            isKeysDefaultValue = new BindableWithCurrent<bool>
             {
                 Default = true
             };
@@ -314,6 +315,7 @@ namespace osu.Game.Overlays.KeyBinding
                 store.Update(bindTarget.KeyBinding);
 
                 KeyCombination keyDefault = Defaults.ElementAt(buttons.IndexOf(bindTarget));
+
                 if (isKeysDefaultValue.Value)
                 {
                     if (!keyDefault.Equals(bindTarget.KeyBinding.KeyCombination))
