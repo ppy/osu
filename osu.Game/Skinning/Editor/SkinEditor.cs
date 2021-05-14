@@ -243,7 +243,7 @@ namespace osu.Game.Skinning.Editor
 
         public void DeleteItems(ISkinnableDrawable[] items)
         {
-            foreach (var item in items.ToArray())
+            foreach (var item in items)
                 availableTargets.FirstOrDefault(t => t.Components.Contains(item))?.Remove(item);
         }
     }
