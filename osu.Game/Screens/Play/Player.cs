@@ -154,8 +154,7 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
-            // BDL load may have aborted early.
-            if (DrawableRuleset == null)
+            if (!LoadedBeatmapSuccessfully)
                 return;
 
             // replays should never be recorded or played back when autoplay is enabled
