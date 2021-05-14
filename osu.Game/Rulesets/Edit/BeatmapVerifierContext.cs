@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Beatmaps;
- #nullable enable
+
+#nullable enable
+
 namespace osu.Game.Rulesets.Edit
 {
     /// <summary>
