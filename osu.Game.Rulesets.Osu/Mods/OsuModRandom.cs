@@ -45,6 +45,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (!(beatmap is OsuBeatmap osuBeatmap))
                 return;
 
+            var hitObjects = osuBeatmap.HitObjects;
+
             Seed.Value ??= RNG.Next();
 
             var rng = new Random((int)Seed.Value);
@@ -52,30 +54,28 @@ namespace osu.Game.Rulesets.Osu.Mods
             var prevObjectInfo = new HitObjectInfo
             {
                 AngleRad = 0,
-                PosUnchanged = osuBeatmap.HitObjects[0].Position,
-                PosChanged = osuBeatmap.HitObjects[0].Position
+                PosUnchanged = hitObjects[0].Position,
+                PosChanged = hitObjects[0].Position
             };
 
-            // rateOfChangeMultiplier changes every i iterations to prevent shaky-line-shaped streams
-            byte i = 3;
             float rateOfChangeMultiplier = 0;
 
-            foreach (var currentHitObject in osuBeatmap.HitObjects)
+            for (int i = 0; i < hitObjects.Count; i++)
             {
+                var h = hitObjects[i];
+
                 var currentObjectInfo = new HitObjectInfo
                 {
                     AngleRad = 0,
-                    PosUnchanged = currentHitObject.EndPosition,
+                    PosUnchanged = h.EndPosition,
                     PosChanged = Vector2.Zero
                 };
 
-                if (i >= 3)
-                {
-                    i = 0;
+                // rateOfChangeMultiplier only changes every i iterations to prevent shaky-line-shaped streams
+                if (i % 3 == 0)
                     rateOfChangeMultiplier = (float)rng.NextDouble() * 2 - 1;
-                }
 
-                if (currentHitObject is HitCircle circle)
+                if (h is HitCircle circle)
                 {
                     var distanceToPrev = Vector2.Distance(currentObjectInfo.PosUnchanged, prevObjectInfo.PosUnchanged);
 
@@ -92,7 +92,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                 // TODO: Implement slider position randomisation
 
                 prevObjectInfo = currentObjectInfo;
-                i++;
             }
         }
 
@@ -100,11 +99,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// Returns the final position of the hit object
         /// </summary>
         /// <returns>Final position of the hit object</returns>
-        private void getObjectInfo(
-            float rateOfChangeMultiplier,
-            HitObjectInfo prevObjectInfo,
-            float distanceToPrev,
-            ref HitObjectInfo currentObjectInfo)
+        private void getObjectInfo(float rateOfChangeMultiplier, HitObjectInfo prevObjectInfo, float distanceToPrev, ref HitObjectInfo currentObjectInfo)
         {
             // The max. angle (relative to the angle of the vector pointing from the 2nd last to the last hit object)
             // is proportional to the distance between the last and the current hit object
