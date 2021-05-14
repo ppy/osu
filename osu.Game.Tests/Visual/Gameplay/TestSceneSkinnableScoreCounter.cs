@@ -1,23 +1,18 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Screens.Play.HUD;
+using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestSceneSkinnableScoreCounter : SkinnableTestScene
     {
-        private IEnumerable<SkinnableScoreCounter> scoreCounters => CreatedDrawables.OfType<SkinnableScoreCounter>();
-
         protected override Ruleset CreateRulesetForSkinProvider() => new OsuRuleset();
 
         [Cached]
@@ -26,7 +21,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [SetUpSteps]
         public void SetUpSteps()
         {
-            AddStep("Create score counters", () => SetContents(() => new SkinnableScoreCounter()));
+            AddStep("Create score counters", () => SetContents(() => new SkinnableDrawable(new HUDSkinComponent(HUDSkinComponents.ScoreCounter))));
         }
 
         [Test]
@@ -40,7 +35,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestVeryLargeScore()
         {
-            AddStep("set large score", () => scoreCounters.ForEach(counter => scoreProcessor.TotalScore.Value = 1_000_000_000));
+            AddStep("set large score", () => scoreProcessor.TotalScore.Value = 1_000_000_000);
         }
     }
 }
