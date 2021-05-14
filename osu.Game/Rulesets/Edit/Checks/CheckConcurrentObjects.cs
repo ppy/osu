@@ -23,13 +23,15 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            for (int i = 0; i < context.Beatmap.HitObjects.Count - 1; ++i)
-            {
-                var hitobject = context.Beatmap.HitObjects[i];
+            var hitObjects = context.Beatmap.HitObjects;
 
-                for (int j = i + 1; j < context.Beatmap.HitObjects.Count; ++j)
+            for (int i = 0; i < hitObjects.Count - 1; ++i)
+            {
+                var hitobject = hitObjects[i];
+
+                for (int j = i + 1; j < hitObjects.Count; ++j)
                 {
-                    var nextHitobject = context.Beatmap.HitObjects[j];
+                    var nextHitobject = hitObjects[j];
 
                     // Accounts for rulesets with hitobjects separated by columns, such as Mania.
                     // In these cases we only care about concurrent objects within the same column.
