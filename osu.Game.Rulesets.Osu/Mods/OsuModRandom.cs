@@ -53,9 +53,10 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             var prevObjectInfo = new HitObjectInfo
             {
-                AngleRad = 0,
-                PosUnchanged = hitObjects[0].Position,
-                PosChanged = hitObjects[0].Position
+                StartPosUnchanged = hitObjects[0].Position,
+                EndPosUnchanged = hitObjects[0].EndPosition,
+                StartPosChanged = hitObjects[0].Position,
+                EndPosChanged = hitObjects[0].EndPosition
             };
 
             float rateOfChangeMultiplier = 0;
@@ -66,30 +67,50 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 var currentObjectInfo = new HitObjectInfo
                 {
-                    AngleRad = 0,
-                    PosUnchanged = h.EndPosition,
-                    PosChanged = Vector2.Zero
+                    StartPosUnchanged = h.Position,
+                    EndPosUnchanged = h.EndPosition,
+                    StartPosChanged = Vector2.Zero,
+                    EndPosChanged = Vector2.Zero
                 };
 
                 // rateOfChangeMultiplier only changes every i iterations to prevent shaky-line-shaped streams
                 if (i % 3 == 0)
                     rateOfChangeMultiplier = (float)rng.NextDouble() * 2 - 1;
 
-                if (h is HitCircle circle)
+                var distanceToPrev = Vector2.Distance(prevObjectInfo.EndPosUnchanged, currentObjectInfo.StartPosUnchanged);
+
+                switch (h)
                 {
-                    var distanceToPrev = Vector2.Distance(currentObjectInfo.PosUnchanged, prevObjectInfo.PosUnchanged);
+                    case HitCircle circle:
+                        getObjectInfo(
+                            rateOfChangeMultiplier,
+                            prevObjectInfo,
+                            distanceToPrev,
+                            ref currentObjectInfo
+                        );
 
-                    getObjectInfo(
-                        rateOfChangeMultiplier,
-                        prevObjectInfo,
-                        distanceToPrev,
-                        ref currentObjectInfo
-                    );
+                        circle.Position = currentObjectInfo.StartPosChanged;
+                        currentObjectInfo.EndPosChanged = currentObjectInfo.StartPosChanged;
+                        break;
 
-                    circle.Position = currentObjectInfo.PosChanged;
+                    case Slider slider:
+                        currentObjectInfo.EndPosUnchanged = slider.EndPosition;
+
+                        currentObjectInfo.EndPosUnchanged = slider.TailCircle.Position;
+
+                        getObjectInfo(
+                            rateOfChangeMultiplier,
+                            prevObjectInfo,
+                            distanceToPrev,
+                            ref currentObjectInfo
+                        );
+
+                        slider.Position = currentObjectInfo.StartPosChanged;
+                        currentObjectInfo.EndPosChanged = slider.TailCircle.Position;
+
+                        moveSliderIntoPlayfield(ref slider, ref currentObjectInfo);
+                        break;
                 }
-
-                // TODO: Implement slider position randomisation
 
                 prevObjectInfo = currentObjectInfo;
             }
@@ -116,10 +137,10 @@ namespace osu.Game.Rulesets.Osu.Mods
                 distanceToPrev * (float)Math.Sin(currentObjectInfo.AngleRad)
             );
 
-            posRelativeToPrev = getRotatedVector(prevObjectInfo.PosChanged, posRelativeToPrev);
+            posRelativeToPrev = getRotatedVector(prevObjectInfo.EndPosChanged, posRelativeToPrev);
 
             currentObjectInfo.AngleRad = (float)Math.Atan2(posRelativeToPrev.Y, posRelativeToPrev.X);
-            var position = Vector2.Add(prevObjectInfo.PosChanged, posRelativeToPrev);
+            var position = Vector2.Add(prevObjectInfo.EndPosChanged, posRelativeToPrev);
 
             // Move hit objects back into the playfield if they are outside of it,
             // which would sometimes happen during big jumps otherwise.
@@ -133,7 +154,30 @@ namespace osu.Game.Rulesets.Osu.Mods
             else if (position.Y > OsuPlayfield.BASE_SIZE.Y)
                 position.Y = OsuPlayfield.BASE_SIZE.Y;
 
-            currentObjectInfo.PosChanged = position;
+            currentObjectInfo.StartPosChanged = position;
+        }
+
+        private void moveSliderIntoPlayfield(ref Slider slider, ref HitObjectInfo currentObjectInfo)
+        {
+            foreach (var controlPoint in slider.Path.ControlPoints)
+            {
+                // Position of controlPoint relative to slider.Position
+                var pos = controlPoint.Position.Value;
+
+                var playfieldSize = OsuPlayfield.BASE_SIZE;
+
+                if (pos.X + slider.Position.X < 0)
+                    slider.Position = new Vector2(-pos.X, slider.Position.Y);
+                else if (pos.X + slider.Position.X > playfieldSize.X)
+                    slider.Position = new Vector2(playfieldSize.X - pos.X, slider.Position.Y);
+
+                if (pos.Y + slider.Position.Y < 0)
+                    slider.Position = new Vector2(slider.Position.X, -pos.Y);
+                else if (pos.Y + slider.Position.Y > playfieldSize.Y)
+                    slider.Position = new Vector2(slider.Position.X, playfieldSize.Y - pos.Y);
+            }
+
+            currentObjectInfo.EndPosChanged = slider.TailCircle.Position;
         }
 
         /// <summary>
@@ -217,8 +261,10 @@ namespace osu.Game.Rulesets.Osu.Mods
         private struct HitObjectInfo
         {
             internal float AngleRad { get; set; }
-            internal Vector2 PosUnchanged { get; set; }
-            internal Vector2 PosChanged { get; set; }
+            internal Vector2 StartPosUnchanged { get; set; }
+            internal Vector2 EndPosUnchanged { get; set; }
+            internal Vector2 StartPosChanged { get; set; }
+            internal Vector2 EndPosChanged { get; set; }
         }
     }
 
