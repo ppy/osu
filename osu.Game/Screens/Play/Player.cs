@@ -154,6 +154,10 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
+            // BDL load may have aborted early.
+            if (DrawableRuleset == null)
+                return;
+
             // replays should never be recorded or played back when autoplay is enabled
             if (!Mods.Value.Any(m => m is ModAutoplay))
                 PrepareReplay();
