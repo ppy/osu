@@ -102,12 +102,12 @@ namespace osu.Game.Tests.Editing.Checks
             }, count: 2);
 
             // Start and end are 2 ms and 1.25 ms off respectively, hence two different issues in one object.
-            var hitobjects = new List<HitObject>
+            var hitObjects = new List<HitObject>
             {
                 getSliderMock(startTime: 98, endTime: 398.75d).Object
             };
 
-            var issues = check.Run(getContext(hitobjects)).ToList();
+            var issues = check.Run(getContext(hitObjects)).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(2));
             Assert.That(issues.Any(issue => issue.Template is CheckUnsnappedObjects.IssueTemplateSmallUnsnap));
@@ -124,33 +124,33 @@ namespace osu.Game.Tests.Editing.Checks
             return mockSlider;
         }
 
-        private void assertOk(List<HitObject> hitobjects)
+        private void assertOk(List<HitObject> hitObjects)
         {
-            Assert.That(check.Run(getContext(hitobjects)), Is.Empty);
+            Assert.That(check.Run(getContext(hitObjects)), Is.Empty);
         }
 
-        private void assert1Ms(List<HitObject> hitobjects, int count = 1)
+        private void assert1Ms(List<HitObject> hitObjects, int count = 1)
         {
-            var issues = check.Run(getContext(hitobjects)).ToList();
+            var issues = check.Run(getContext(hitObjects)).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(count));
             Assert.That(issues.All(issue => issue.Template is CheckUnsnappedObjects.IssueTemplateSmallUnsnap));
         }
 
-        private void assert2Ms(List<HitObject> hitobjects, int count = 1)
+        private void assert2Ms(List<HitObject> hitObjects, int count = 1)
         {
-            var issues = check.Run(getContext(hitobjects)).ToList();
+            var issues = check.Run(getContext(hitObjects)).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(count));
             Assert.That(issues.All(issue => issue.Template is CheckUnsnappedObjects.IssueTemplateLargeUnsnap));
         }
 
-        private BeatmapVerifierContext getContext(List<HitObject> hitobjects)
+        private BeatmapVerifierContext getContext(List<HitObject> hitObjects)
         {
             var beatmap = new Beatmap<HitObject>
             {
                 ControlPointInfo = cpi,
-                HitObjects = hitobjects
+                HitObjects = hitObjects
             };
 
             return new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));
