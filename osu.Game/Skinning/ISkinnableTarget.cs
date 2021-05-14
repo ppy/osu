@@ -43,9 +43,9 @@ namespace osu.Game.Skinning
         void Add(ISkinnableDrawable drawable);
 
         /// <summary>
-        /// Remove an existing skinnable component to this target.
+        /// Remove an existing skinnable component from this target.
         /// </summary>
-        /// <param name="component">The component to add.</param>
+        /// <param name="component">The component to remove.</param>
         public void Remove(ISkinnableDrawable component);
     }
 }
