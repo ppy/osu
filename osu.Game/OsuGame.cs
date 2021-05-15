@@ -251,7 +251,7 @@ namespace osu.Game
             LocalUserPlaying.BindValueChanged(_ => updateVolumeDampeningState());
 
             configVolumeDampened = LocalConfig.GetBindable<double>(OsuSetting.VolumeDampened);
-            configVolumeDampened.BindValueChanged(volume => this.TransformBindableTo(this.volumeFade, volume.NewValue), true);
+            configVolumeDampened.BindValueChanged(volume => this.TransformBindableTo(volumeFade, volume.NewValue), true);
 
             configVolumeDampenInactive = LocalConfig.GetBindable<bool>(OsuSetting.VolumeDampenInactive);
             configVolumeDampenInactive.BindValueChanged(_ => updateVolumeDampeningState());
