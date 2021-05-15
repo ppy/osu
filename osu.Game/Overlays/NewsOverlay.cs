@@ -114,17 +114,7 @@ namespace osu.Game.Overlays
             cancellationToken?.Cancel();
             Loading.Show();
 
-            if (year != 0)
-            {
-                Header.SetFrontPage();
-
-                var page = new FrontPageDisplay(year);
-                page.ResponseReceived += r => sidebar.Metadata.Value = r.SidebarMetadata;
-                LoadDisplay(page);
-                return;
-            }
-
-            ShowFrontPage();
+            loadFrontPage(year);
         }
 
         private void onArticleChanged(ValueChangedEvent<string> e)
@@ -134,16 +124,33 @@ namespace osu.Game.Overlays
 
             if (e.NewValue == null)
             {
-                Header.SetFrontPage();
-
-                var page = new FrontPageDisplay();
-                page.ResponseReceived += r => sidebar.Metadata.Value = r.SidebarMetadata;
-                LoadDisplay(page);
+                loadFrontPage();
                 return;
             }
 
-            Header.SetArticle(e.NewValue);
+            loadArticle(e.NewValue);
+        }
+
+        private void loadFrontPage(int year = 0)
+        {
+            Header.SetFrontPage();
+
+            var page = new FrontPageDisplay(year);
+            page.ResponseReceived += r =>
+            {
+                sidebar.Metadata.Value = r.SidebarMetadata;
+                Loading.Hide();
+            };
+            LoadDisplay(page);
+        }
+
+        private void loadArticle(string article)
+        {
+            Header.SetArticle(article);
             LoadDisplay(Empty());
+
+            // Temporary, should be handled by ArticleDisplay later
+            Loading.Hide();
         }
 
         protected void LoadDisplay(Drawable display)
@@ -152,7 +159,6 @@ namespace osu.Game.Overlays
             LoadComponentAsync(display, loaded =>
             {
                 Child = loaded;
-                Loading.Hide();
             }, (cancellationToken = new CancellationTokenSource()).Token);
         }
 

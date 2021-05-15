@@ -91,16 +91,10 @@ namespace osu.Game.Overlays.News.Displays
 
         private CancellationTokenSource cancellationToken;
 
-        private bool firstResponse = true;
+        private bool initialLoad = true;
 
         private void onSuccess(GetNewsResponse response)
         {
-            if (firstResponse)
-            {
-                ResponseReceived?.Invoke(response);
-                firstResponse = false;
-            }
-
             cancellationToken?.Cancel();
 
             lastCursor = response.Cursor;
@@ -119,6 +113,12 @@ namespace osu.Game.Overlays.News.Displays
                 content.Add(loaded);
                 showMore.IsLoading = false;
                 showMore.Alpha = lastCursor == null ? 0 : 1;
+
+                if (initialLoad)
+                {
+                    ResponseReceived?.Invoke(response);
+                    initialLoad = false;
+                }
             }, (cancellationToken = new CancellationTokenSource()).Token);
         }
 

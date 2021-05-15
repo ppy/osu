@@ -72,6 +72,9 @@ namespace osu.Game.Overlays.News.Sidebar
             private readonly bool isCurrent;
             private readonly int year;
 
+            [Resolved(canBeNull: true)]
+            private NewsOverlay overlay { get; set; }
+
             public YearButton(int year, bool isCurrent)
             {
                 this.year = year;
@@ -89,10 +92,11 @@ namespace osu.Game.Overlays.News.Sidebar
             }
 
             [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider, NewsOverlay overlay)
+            private void load(OverlayColourProvider colourProvider)
             {
                 IdleColour = isCurrent ? Color4.White : colourProvider.Light2;
                 HoverColour = isCurrent ? Color4.White : colourProvider.Light1;
+
                 Action = () =>
                 {
                     if (overlay != null)
