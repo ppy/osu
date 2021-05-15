@@ -21,12 +21,13 @@ namespace osu.Game.Overlays
     {
         public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
 
-        private BindableWithCurrent<T> current = new BindableWithCurrent<T>();
+        private readonly BindableWithCurrent<T> current = new BindableWithCurrent<T>();
 
         public Bindable<T> Current
         {
             get => current.Current;
-            set {
+            set
+            {
                 current.Current = value;
                 current.ValueChanged += _ => UpdateState();
                 current.DisabledChanged += _ => UpdateState();
