@@ -149,7 +149,7 @@ namespace osu.Game.Overlays.News.Sidebar
 
                 IsOpen.BindValueChanged(open =>
                 {
-                    ClearTransforms();
+                    ClearTransforms(true);
 
                     if (open.NewValue)
                     {
