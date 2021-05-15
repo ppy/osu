@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(BeatmapDifficultyCache difficultyCache)
         {
-            var metadata = beatmap.BeatmapInfo?.Metadata ?? new BeatmapMetadata();
+            var metadata = beatmap.BeatmapInfo.Metadata;
 
             AutoSizeAxes = Axes.Both;
             Children = new Drawable[]
