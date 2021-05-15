@@ -4,6 +4,7 @@
 using System.Linq;
 using Humanizer;
 using NUnit.Framework;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Testing;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Tests.Visual.Multiplayer;
@@ -34,7 +35,7 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
             changeState(6, MultiplayerUserState.WaitingForLoad);
             checkPlayingUserCount(6);
 
-            AddStep("another user left", () => Client.RemoveUser(Client.Room?.Users.Last().User));
+            AddStep("another user left", () => Client.RemoveUser((Client.Room?.Users.Last().User).AsNonNull()));
             checkPlayingUserCount(5);
 
             AddStep("leave room", () => Client.LeaveRoom());

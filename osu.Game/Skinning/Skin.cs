@@ -56,8 +56,12 @@ namespace osu.Game.Skinning
                     continue;
 
                 string jsonContent = Encoding.UTF8.GetString(bytes);
+                var deserializedContent = JsonConvert.DeserializeObject<IEnumerable<SkinnableInfo>>(jsonContent);
 
-                DrawableComponentInfo[skinnableTarget] = JsonConvert.DeserializeObject<IEnumerable<SkinnableInfo>>(jsonContent).ToArray();
+                if (deserializedContent == null)
+                    continue;
+
+                DrawableComponentInfo[skinnableTarget] = deserializedContent.ToArray();
             }
         }
 
