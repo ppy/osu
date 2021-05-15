@@ -14,6 +14,7 @@ namespace osu.Game.Skinning
     public class LegacyBeatmapSkin : LegacySkin
     {
         protected override bool AllowManiaSkin => false;
+        protected override bool AllowDefaultHUDComponentsFallback => false;
         protected override bool UseCustomSampleBanks => true;
 
         public LegacyBeatmapSkin(BeatmapInfo beatmap, IResourceStore<byte[]> storage, IStorageResourceProvider resources)
