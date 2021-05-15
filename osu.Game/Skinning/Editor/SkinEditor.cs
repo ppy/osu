@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -37,6 +38,8 @@ namespace osu.Game.Skinning.Editor
 
         [Resolved]
         private OsuColour colours { get; set; }
+
+        private bool hasBegunMutating;
 
         public SkinEditor(Drawable targetScreen)
         {
@@ -108,7 +111,7 @@ namespace osu.Game.Skinning.Editor
                                                 {
                                                     Text = "Save Changes",
                                                     Width = 140,
-                                                    Action = save,
+                                                    Action = Save,
                                                 },
                                                 new DangerousTriangleButton
                                                 {
@@ -139,7 +142,11 @@ namespace osu.Game.Skinning.Editor
             // schedule ensures this only happens when the skin editor is visible.
             // also avoid some weird endless recursion / bindable feedback loop (something to do with tracking skins across three different bindable types).
             // probably something which will be factored out in a future database refactor so not too concerning for now.
-            currentSkin.BindValueChanged(skin => Scheduler.AddOnce(skinChanged), true);
+            currentSkin.BindValueChanged(skin =>
+            {
+                hasBegunMutating = false;
+                Scheduler.AddOnce(skinChanged);
+            }, true);
         }
 
         private void skinChanged()
@@ -161,6 +168,7 @@ namespace osu.Game.Skinning.Editor
             });
 
             skins.EnsureMutableSkin();
+            hasBegunMutating = true;
         }
 
         private void placeComponent(Type type)
@@ -186,14 +194,16 @@ namespace osu.Game.Skinning.Editor
             SelectedComponents.Add(component);
         }
 
+        private IEnumerable<ISkinnableTarget> availableTargets => targetScreen.ChildrenOfType<ISkinnableTarget>();
+
         private ISkinnableTarget getTarget(SkinnableTarget target)
         {
-            return targetScreen.ChildrenOfType<ISkinnableTarget>().FirstOrDefault(c => c.Target == target);
+            return availableTargets.FirstOrDefault(c => c.Target == target);
         }
 
         private void revert()
         {
-            SkinnableTargetContainer[] targetContainers = targetScreen.ChildrenOfType<SkinnableTargetContainer>().ToArray();
+            ISkinnableTarget[] targetContainers = availableTargets.ToArray();
 
             foreach (var t in targetContainers)
             {
@@ -204,9 +214,12 @@ namespace osu.Game.Skinning.Editor
             }
         }
 
-        private void save()
+        public void Save()
         {
-            SkinnableTargetContainer[] targetContainers = targetScreen.ChildrenOfType<SkinnableTargetContainer>().ToArray();
+            if (!hasBegunMutating)
+                return;
+
+            ISkinnableTarget[] targetContainers = availableTargets.ToArray();
 
             foreach (var t in targetContainers)
                 currentSkin.Value.UpdateDrawableTarget(t);
@@ -226,6 +239,12 @@ namespace osu.Game.Skinning.Editor
         protected override void PopOut()
         {
             this.FadeOut(TRANSITION_DURATION, Easing.OutQuint);
+        }
+
+        public void DeleteItems(ISkinnableDrawable[] items)
+        {
+            foreach (var item in items)
+                availableTargets.FirstOrDefault(t => t.Components.Contains(item))?.Remove(item);
         }
     }
 }
