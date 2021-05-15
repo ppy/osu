@@ -117,7 +117,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
         }
 
-        private (double startTime, double fadeDuration) getFadeOutParameters(DrawableOsuHitObject drawableObject)
+        private (double fadeStartTime, double fadeDuration) getFadeOutParameters(DrawableOsuHitObject drawableObject)
         {
             switch (drawableObject)
             {
@@ -135,7 +135,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     return getParameters(drawableObject.HitObject);
             }
 
-            static (double startTime, double fadeDuration) getParameters(OsuHitObject hitObject)
+            static (double fadeStartTime, double fadeDuration) getParameters(OsuHitObject hitObject)
             {
                 var fadeOutStartTime = hitObject.StartTime - hitObject.TimePreempt + hitObject.TimeFadeIn;
                 var fadeOutDuration = hitObject.TimePreempt * fade_out_duration_multiplier;
