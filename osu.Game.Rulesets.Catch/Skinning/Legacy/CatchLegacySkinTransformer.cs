@@ -1,8 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 
@@ -22,14 +24,17 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {
-            if (component is HUDSkinComponent hudComponent)
+            if (component is SkinnableTargetComponent targetComponent && targetComponent.Target == SkinnableTarget.MainHUDComponents)
             {
-                switch (hudComponent.Component)
-                {
-                    case HUDSkinComponents.ComboCounter:
-                        // catch may provide its own combo counter; hide the default.
-                        return providesComboCounter ? Drawable.Empty() : null;
-                }
+                if (!providesComboCounter || !(Source.GetDrawableComponent(component) is SkinnableTargetComponentsContainer components))
+                    return null;
+
+                // catch may provide its own combo counter; hide the default.
+                // todo: this should probably be done in an elegant way.
+                foreach (var legacyComboCounter in components.OfType<LegacyComboCounter>())
+                    legacyComboCounter.Expire();
+
+                return components;
             }
 
             if (!(component is CatchSkinComponent catchSkinComponent))
