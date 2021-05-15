@@ -37,12 +37,16 @@ namespace osu.Game.Screens.Edit.Verify
 
         private IBeatmapVerifier rulesetVerifier;
         private BeatmapVerifier generalVerifier;
+        private BeatmapVerifierContext context;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colours)
         {
             generalVerifier = new BeatmapVerifier();
             rulesetVerifier = beatmap.BeatmapInfo.Ruleset?.CreateInstance()?.CreateBeatmapVerifier();
+
+            context = new BeatmapVerifierContext(beatmap, workingBeatmap.Value, verify.InterpretedDifficulty.Value);
+            verify.InterpretedDifficulty.BindValueChanged(difficulty => context.InterpretedDifficulty = difficulty.NewValue);
 
             RelativeSizeAxes = Axes.Both;
 
@@ -91,10 +95,10 @@ namespace osu.Game.Screens.Edit.Verify
 
         private void refresh()
         {
-            var issues = generalVerifier.Run(beatmap, workingBeatmap.Value);
+            var issues = generalVerifier.Run(context);
 
             if (rulesetVerifier != null)
-                issues = issues.Concat(rulesetVerifier.Run(beatmap, workingBeatmap.Value));
+                issues = issues.Concat(rulesetVerifier.Run(context));
 
             issues = filter(issues);
 
