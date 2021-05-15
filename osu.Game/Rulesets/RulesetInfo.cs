@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Testing;
 
 namespace osu.Game.Rulesets
@@ -27,7 +28,7 @@ namespace osu.Game.Rulesets
         {
             if (!Available) return null;
 
-            var ruleset = (Ruleset)Activator.CreateInstance(Type.GetType(InstantiationInfo));
+            var ruleset = (Ruleset)Activator.CreateInstance(Type.GetType(InstantiationInfo).AsNonNull());
 
             // overwrite the pre-populated RulesetInfo with a potentially database attached copy.
             ruleset.RulesetInfo = this;

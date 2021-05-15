@@ -635,6 +635,9 @@ namespace osu.Game.Screens.Edit
                     case EditorScreenMode.Verify:
                         currentScreen = new VerifyScreen();
                         break;
+
+                    default:
+                        throw new InvalidOperationException("Editor menu bar switched to an unsupported mode");
                 }
 
                 LoadComponentAsync(currentScreen, newScreen =>
