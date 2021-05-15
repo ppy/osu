@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -15,6 +16,8 @@ namespace osu.Game.Overlays.News.Displays
 {
     public class FrontPageDisplay : CompositeDrawable
     {
+        public Action<GetNewsResponse> ResponseReceived;
+
         [Resolved]
         private IAPIProvider api { get; set; }
 
@@ -81,8 +84,16 @@ namespace osu.Game.Overlays.News.Displays
 
         private CancellationTokenSource cancellationToken;
 
+        private bool firstResponse = true;
+
         private void onSuccess(GetNewsResponse response)
         {
+            if (firstResponse)
+            {
+                ResponseReceived?.Invoke(response);
+                firstResponse = false;
+            }
+
             cancellationToken?.Cancel();
 
             lastCursor = response.Cursor;

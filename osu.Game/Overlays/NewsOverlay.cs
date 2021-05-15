@@ -4,8 +4,10 @@
 using System.Threading;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays.News;
 using osu.Game.Overlays.News.Displays;
+using osu.Game.Overlays.News.Sidebar;
 
 namespace osu.Game.Overlays
 {
@@ -13,9 +15,40 @@ namespace osu.Game.Overlays
     {
         private readonly Bindable<string> article = new Bindable<string>(null);
 
+        protected override Container<Drawable> Content => content;
+
+        private readonly Container content;
+        private readonly NewsSideBar sidebar;
+
         public NewsOverlay()
             : base(OverlayColourScheme.Purple, false)
         {
+            base.Content.Add(new GridContainer
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                RowDimensions = new[]
+                {
+                    new Dimension(GridSizeMode.AutoSize)
+                },
+                ColumnDimensions = new[]
+                {
+                    new Dimension(GridSizeMode.AutoSize),
+                    new Dimension()
+                },
+                Content = new[]
+                {
+                    new Drawable[]
+                    {
+                        sidebar = new NewsSideBar(),
+                        content = new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y
+                        }
+                    }
+                }
+            });
         }
 
         protected override void LoadComplete()
@@ -72,7 +105,10 @@ namespace osu.Game.Overlays
             if (e.NewValue == null)
             {
                 Header.SetFrontPage();
-                LoadDisplay(new FrontPageDisplay());
+
+                var page = new FrontPageDisplay();
+                page.ResponseReceived += r => sidebar.Metadata.Value = r.SidebarMetadata;
+                LoadDisplay(page);
                 return;
             }
 
