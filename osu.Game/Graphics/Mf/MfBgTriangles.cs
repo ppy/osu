@@ -9,38 +9,38 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Backgrounds;
 
-namespace osu.Game.Graphics
+namespace osu.Game.Graphics.Mf
 {
-    public class MfBgTriangles : VisibilityContainer
+    public class MBgTriangles : VisibilityContainer
     {
-        private readonly Bindable<bool> Optui = new Bindable<bool>();
-        private BackgroundTriangles BackgroundTriangle;
+        private readonly Bindable<bool> optui = new Bindable<bool>();
+        private readonly BackgroundTriangles backgroundTriangle;
         public bool EnableBeatSync { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(MConfigManager config, OsuColour colour)
         {
-            config.BindWith(MSetting.OptUI, Optui);
+            config.BindWith(MSetting.OptUI, optui);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Optui.BindValueChanged(UpdateIcons, true);
+            optui.BindValueChanged(updateIcons, true);
         }
 
-        public MfBgTriangles(float alpha = 0.65f, bool highLight = false, float triangleScale = 2f, bool sync = false)
+        public MBgTriangles(float alpha = 0.65f, bool highLight = false, float triangleScale = 2f, bool sync = false)
         {
-            this.Alpha = alpha;
+            Alpha = alpha;
             Masking = true;
             RelativeSizeAxes = Axes.Both;
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
             Children = new Drawable[]
             {
-                BackgroundTriangle = new BackgroundTriangles(highLight, triangleScale)
+                backgroundTriangle = new BackgroundTriangles(highLight, triangleScale)
                 {
-                    beatSync = sync,
+                    BeatSync = sync,
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                 },
@@ -49,55 +49,52 @@ namespace osu.Game.Graphics
 
         private class BackgroundTriangles : Container
         {
-            private Triangles triangles;
-            public bool beatSync;
-            public bool highLight;
-            public float scale;
+            private readonly Triangles triangles;
+            public readonly float TriangleScale;
+            public bool BeatSync;
 
             public BackgroundTriangles(bool highLight = false, float triangleScaleValue = 2f)
             {
                 RelativeSizeAxes = Axes.Both;
-                this.highLight = highLight;
-                this.scale = triangleScaleValue;
-                Masking = false;
+                TriangleScale = triangleScaleValue;
                 Child = triangles = new Triangles
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.Both,
-                    TriangleScale = scale,
+                    TriangleScale = TriangleScale,
                     Colour = highLight ? Color4Extensions.FromHex(@"88b300") : OsuColour.Gray(0.2f),
                 };
             }
 
             protected override void LoadComplete()
             {
-                triangles.EnableBeatSync = beatSync;
+                triangles.EnableBeatSync = BeatSync;
             }
         }
 
-        private void UpdateIcons(ValueChangedEvent<bool> value)
+        private void updateIcons(ValueChangedEvent<bool> value)
         {
             switch (value.NewValue)
             {
                 case true:
-                    BackgroundTriangle.FadeIn(250);
+                    backgroundTriangle.FadeIn(250);
                     break;
 
                 case false:
-                    BackgroundTriangle.FadeOut(250);
+                    backgroundTriangle.FadeOut(250);
                     break;
             }
         }
 
         protected override void PopIn()
         {
-            BackgroundTriangle.FadeIn(250);
+            backgroundTriangle.FadeIn(250);
         }
 
         protected override void PopOut()
         {
-            BackgroundTriangle.FadeOut(250);
+            backgroundTriangle.FadeOut(250);
         }
     }
 }

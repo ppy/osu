@@ -17,6 +17,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Mf;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
@@ -114,7 +115,7 @@ namespace osu.Game.Online.Leaderboards
                             Masking = true,
                             Children = new Drawable[]
                             {
-                                new MfBgTriangles(0.65f, user.Id == api.LocalUser.Value.Id && allowHighlight),
+                                new MBgTriangles(0.65f, user.Id == api.LocalUser.Value.Id && allowHighlight),
                                 background = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
