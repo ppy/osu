@@ -58,7 +58,6 @@ namespace osu.Game.Overlays.KeyBinding
             Default = true
         };
 
-
         public Bindable<bool> Current
         {
             get => isKeysDefaultValue.Current;
