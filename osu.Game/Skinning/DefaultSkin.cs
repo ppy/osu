@@ -80,12 +80,12 @@ namespace osu.Game.Skinning
                                 }
                             })
                             {
-                                Children = new Drawable[]
+                                Children = new[]
                                 {
-                                    new DefaultComboCounter(),
-                                    new DefaultScoreCounter(),
-                                    new DefaultAccuracyCounter(),
-                                    new DefaultHealthDisplay(),
+                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ComboCounter)),
+                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ScoreCounter)),
+                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.AccuracyCounter)),
+                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.HealthDisplay)),
                                 }
                             };
 
@@ -93,6 +93,26 @@ namespace osu.Game.Skinning
                     }
 
                     break;
+
+                case HUDSkinComponent hudComponent:
+                {
+                    switch (hudComponent.Component)
+                    {
+                        case HUDSkinComponents.ComboCounter:
+                            return new DefaultComboCounter();
+
+                        case HUDSkinComponents.ScoreCounter:
+                            return new DefaultScoreCounter();
+
+                        case HUDSkinComponents.AccuracyCounter:
+                            return new DefaultAccuracyCounter();
+
+                        case HUDSkinComponents.HealthDisplay:
+                            return new DefaultHealthDisplay();
+                    }
+
+                    break;
+                }
             }
 
             return null;
