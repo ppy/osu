@@ -100,12 +100,6 @@ namespace osu.Game.Overlays
             UpdateState();
         }
 
-        public void SetButtonColour(Color4 buttonColour)
-        {
-            this.buttonColour = buttonColour;
-            UpdateState();
-        }
-
         public void UpdateState() => Scheduler.AddOnce(updateState);
 
         private void updateState()
