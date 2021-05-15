@@ -36,7 +36,7 @@ namespace Mvis.Plugin.Yasp
         public override PluginSettingsSubSection CreateSettingsSubSection()
             => new YaspSettingsSubSection(this);
 
-        public override int Version => 3;
+        public override int Version => 4;
 
         public YaspPlugin()
         {
@@ -135,20 +135,17 @@ namespace Mvis.Plugin.Yasp
         public override bool Disable()
         {
             this.MoveToX(-10, 300, Easing.OutQuint).FadeOut(300, Easing.OutQuint);
-            MvisScreen.OnBeatmapChanged -= onBeatmapChanged;
             return base.Disable();
         }
 
         public override bool Enable()
         {
+            bool result = base.Enable();
+
             this.MoveToX(0, 300, Easing.OutQuint).FadeIn(300, Easing.OutQuint);
+            MvisScreen?.OnBeatmapChanged(onBeatmapChanged, this, true);
 
-            MvisScreen.OnBeatmapChanged += onBeatmapChanged;
-
-            if (MvisScreen.Beatmap.Value != currentWorkingBeatmap)
-                onBeatmapChanged(MvisScreen.Beatmap.Value);
-
-            return base.Enable();
+            return result;
         }
 
         private Bindable<float> scaleBindable;
@@ -176,6 +173,8 @@ namespace Mvis.Plugin.Yasp
 
         private void onBeatmapChanged(WorkingBeatmap working)
         {
+            if (Disabled.Value) return;
+
             currentWorkingBeatmap = working;
             refresh();
         }

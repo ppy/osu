@@ -10,9 +10,9 @@ namespace Mvis.Plugin.RulesetPanel.Objects.Helpers
         protected IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> working)
+        private void load(RulesetPanel panel)
         {
-            Beatmap.BindTo(working);
+            Beatmap.BindTo(panel.CurrentBeatmap);
         }
 
         protected override void LoadComplete()

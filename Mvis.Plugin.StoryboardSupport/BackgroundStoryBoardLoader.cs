@@ -88,8 +88,8 @@ namespace Mvis.Plugin.StoryboardSupport
             if (MvisScreen != null)
             {
                 MvisScreen.OnScreenExiting += UnLoad;
-                MvisScreen.OnBeatmapChanged += refresh;
                 MvisScreen.OnScreenSuspending += onScreenSuspending;
+                MvisScreen.OnBeatmapChanged(refresh, this);
             }
 
             if (MvisScreen != null)
@@ -158,7 +158,7 @@ namespace Mvis.Plugin.StoryboardSupport
             return true;
         }
 
-        public override int Version => 3;
+        public override int Version => 4;
 
         private Drawable prevProxy;
 
@@ -211,7 +211,6 @@ namespace Mvis.Plugin.StoryboardSupport
             if (MvisScreen != null)
             {
                 MvisScreen.OnScreenSuspending -= onScreenSuspending;
-                MvisScreen.OnBeatmapChanged -= refresh;
                 MvisScreen.OnScreenExiting -= UnLoad;
                 MvisScreen.OnSeek -= Seek;
             }
