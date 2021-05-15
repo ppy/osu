@@ -8,26 +8,22 @@ using osuTK;
 
 namespace osu.Game.Skinning
 {
-    public class LegacyScoreCounter : GameplayScoreCounter, ISkinnableComponent
+    public class LegacyScoreCounter : GameplayScoreCounter, ISkinnableDrawable
     {
-        private readonly ISkin skin;
-
         protected override double RollingDuration => 1000;
         protected override Easing RollingEasing => Easing.Out;
 
-        public LegacyScoreCounter(ISkin skin)
+        public LegacyScoreCounter()
             : base(6)
         {
             Anchor = Anchor.TopRight;
             Origin = Anchor.TopRight;
 
-            this.skin = skin;
-
             Scale = new Vector2(0.96f);
             Margin = new MarginPadding(10);
         }
 
-        protected sealed override OsuSpriteText CreateSpriteText() => new LegacySpriteText(skin, LegacyFont.Score)
+        protected sealed override OsuSpriteText CreateSpriteText() => new LegacySpriteText(LegacyFont.Score)
         {
             Anchor = Anchor.TopRight,
             Origin = Anchor.TopRight,

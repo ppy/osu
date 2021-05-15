@@ -3,8 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -14,9 +16,9 @@ using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Screens.Play
@@ -34,19 +36,13 @@ namespace osu.Game.Screens.Play
         public float TopScoringElementsHeight { get; private set; }
 
         public readonly KeyCounterDisplay KeyCounter;
-        public readonly SkinnableScoreCounter ScoreCounter;
-        public readonly SkinnableAccuracyCounter AccuracyCounter;
-        public readonly SkinnableHealthDisplay HealthDisplay;
         public readonly SongProgress Progress;
         public readonly ModDisplay ModDisplay;
-        public readonly HitErrorDisplay HitErrorDisplay;
         public readonly HoldForMenuButton HoldToQuit;
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
-        public readonly FailingLayer FailingLayer;
 
         public Bindable<bool> ShowHealthbar = new Bindable<bool>(true);
 
-        private readonly ScoreProcessor scoreProcessor;
         private readonly DrawableRuleset drawableRuleset;
         private readonly IReadOnlyList<Mod> mods;
 
@@ -72,11 +68,12 @@ namespace osu.Game.Screens.Play
 
         private bool holdingForHUD;
 
+        private readonly SkinnableTargetContainer mainComponents;
+
         private IEnumerable<Drawable> hideTargets => new Drawable[] { visibilityContainer, KeyCounter, topRightElements };
 
-        public HUDOverlay(ScoreProcessor scoreProcessor, DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
+        public HUDOverlay(DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
         {
-            this.scoreProcessor = scoreProcessor;
             this.drawableRuleset = drawableRuleset;
             this.mods = mods;
 
@@ -84,7 +81,7 @@ namespace osu.Game.Screens.Play
 
             Children = new Drawable[]
             {
-                FailingLayer = CreateFailingLayer(),
+                CreateFailingLayer(),
                 visibilityContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -100,11 +97,19 @@ namespace osu.Game.Screens.Play
                                     RelativeSizeAxes = Axes.Both,
                                     Children = new Drawable[]
                                     {
-                                        HealthDisplay = CreateHealthDisplay(),
-                                        AccuracyCounter = CreateAccuracyCounter(),
-                                        ScoreCounter = CreateScoreCounter(),
-                                        CreateComboCounter(),
-                                        HitErrorDisplay = CreateHitErrorDisplayOverlay(),
+                                        mainComponents = new SkinnableTargetContainer(SkinnableTarget.MainHUDComponents)
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                        new Container
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Children = new Drawable[]
+                                            {
+                                                // still need to be migrated; a bit more involved.
+                                                new HitErrorDisplay(this.drawableRuleset?.FirstAvailableHitWindows),
+                                            }
+                                        },
                                     }
                                 },
                             },
@@ -189,7 +194,6 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
-            ShowHealthbar.BindValueChanged(healthBar => HealthDisplay.FadeTo(healthBar.NewValue ? 1 : 0, FADE_DURATION, FADE_EASING), true);
             ShowHud.BindValueChanged(visible => hideTargets.ForEach(d => d.FadeTo(visible.NewValue ? 1 : 0, FADE_DURATION, FADE_EASING)));
 
             IsBreakTime.BindValueChanged(_ => updateVisibility());
@@ -202,11 +206,25 @@ namespace osu.Game.Screens.Play
         {
             base.Update();
 
-            // HACK: for now align with the accuracy counter.
-            // this is done for the sake of hacky legacy skins which extend the health bar to take up the full screen area.
-            // it only works with the default skin due to padding offsetting it *just enough* to coexist.
-            topRightElements.Y = TopScoringElementsHeight = ToLocalSpace(AccuracyCounter.Drawable.ScreenSpaceDrawQuad.BottomRight).Y;
+            Vector2 lowestScreenSpace = Vector2.Zero;
 
+            // LINQ cast can be removed when IDrawable interface includes Anchor / RelativeSizeAxes.
+            foreach (var element in mainComponents.Components.Cast<Drawable>())
+            {
+                // for now align top-right components with the bottom-edge of the lowest top-anchored hud element.
+                if (!element.Anchor.HasFlagFast(Anchor.TopRight) && !element.RelativeSizeAxes.HasFlagFast(Axes.X))
+                    continue;
+
+                // health bars are excluded for the sake of hacky legacy skins which extend the health bar to take up the full screen area.
+                if (element is LegacyHealthDisplay)
+                    continue;
+
+                var bottomRight = element.ScreenSpaceDrawQuad.BottomRight;
+                if (bottomRight.Y > lowestScreenSpace.Y)
+                    lowestScreenSpace = bottomRight;
+            }
+
+            topRightElements.Y = TopScoringElementsHeight = ToLocalSpace(lowestScreenSpace).Y;
             bottomRightElements.Y = -Progress.Height;
         }
 
@@ -267,48 +285,38 @@ namespace osu.Game.Screens.Play
             Progress.BindDrawableRuleset(drawableRuleset);
         }
 
-        protected SkinnableAccuracyCounter CreateAccuracyCounter() => new SkinnableAccuracyCounter();
-
-        protected SkinnableScoreCounter CreateScoreCounter() => new SkinnableScoreCounter();
-
-        protected SkinnableComboCounter CreateComboCounter() => new SkinnableComboCounter();
-
-        protected SkinnableHealthDisplay CreateHealthDisplay() => new SkinnableHealthDisplay();
-
-        protected virtual FailingLayer CreateFailingLayer() => new FailingLayer
+        protected FailingLayer CreateFailingLayer() => new FailingLayer
         {
             ShowHealth = { BindTarget = ShowHealthbar }
         };
 
-        protected virtual KeyCounterDisplay CreateKeyCounter() => new KeyCounterDisplay
+        protected KeyCounterDisplay CreateKeyCounter() => new KeyCounterDisplay
         {
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,
         };
 
-        protected virtual SongProgress CreateProgress() => new SongProgress
+        protected SongProgress CreateProgress() => new SongProgress
         {
             Anchor = Anchor.BottomLeft,
             Origin = Anchor.BottomLeft,
             RelativeSizeAxes = Axes.X,
         };
 
-        protected virtual HoldForMenuButton CreateHoldForMenuButton() => new HoldForMenuButton
+        protected HoldForMenuButton CreateHoldForMenuButton() => new HoldForMenuButton
         {
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,
         };
 
-        protected virtual ModDisplay CreateModsContainer() => new ModDisplay
+        protected ModDisplay CreateModsContainer() => new ModDisplay
         {
             Anchor = Anchor.TopRight,
             Origin = Anchor.TopRight,
             AutoSizeAxes = Axes.Both,
         };
 
-        protected virtual HitErrorDisplay CreateHitErrorDisplayOverlay() => new HitErrorDisplay(scoreProcessor, drawableRuleset?.FirstAvailableHitWindows);
-
-        protected virtual PlayerSettingsOverlay CreatePlayerSettingsOverlay() => new PlayerSettingsOverlay();
+        protected PlayerSettingsOverlay CreatePlayerSettingsOverlay() => new PlayerSettingsOverlay();
 
         public bool OnPressed(GlobalAction action)
         {

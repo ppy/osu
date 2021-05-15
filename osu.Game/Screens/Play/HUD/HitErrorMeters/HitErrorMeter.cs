@@ -15,6 +15,9 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         protected readonly HitWindows HitWindows;
 
         [Resolved]
+        private ScoreProcessor processor { get; set; }
+
+        [Resolved]
         private OsuColour colours { get; set; }
 
         protected HitErrorMeter(HitWindows hitWindows)
@@ -22,7 +25,22 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             HitWindows = hitWindows;
         }
 
-        public abstract void OnNewJudgement(JudgementResult judgement);
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            processor.NewJudgement += onNewJudgement;
+        }
+
+        private void onNewJudgement(JudgementResult result)
+        {
+            if (result.HitObject.HitWindows?.WindowFor(HitResult.Miss) == 0)
+                return;
+
+            OnNewJudgement(result);
+        }
+
+        protected abstract void OnNewJudgement(JudgementResult judgement);
 
         protected Color4 GetColourForHitResult(HitResult result)
         {
@@ -46,6 +64,14 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 default:
                     return colours.BlueLight;
             }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (processor != null)
+                processor.NewJudgement -= onNewJudgement;
         }
     }
 }

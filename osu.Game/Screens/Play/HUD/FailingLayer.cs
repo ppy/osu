@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Play.HUD
         public FailingLayer()
         {
             RelativeSizeAxes = Axes.Both;
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 boxes = new Container
                 {
