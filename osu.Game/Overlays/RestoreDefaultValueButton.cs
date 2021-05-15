@@ -10,27 +10,27 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osuTK;
 
 namespace osu.Game.Overlays
 {
-    public class RestoreDefaultValueButton<T> : Container, IHasTooltip
+    public class RestoreDefaultValueButton<T> : Container, IHasTooltip, IHasCurrentValue<T>
     {
         public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
 
-        private Bindable<T> bindable;
+        private BindableWithCurrent<T> current = new BindableWithCurrent<T>();
 
-        public Bindable<T> Bindable
+        public Bindable<T> Current
         {
-            get => bindable;
-            set
-            {
-                bindable = value;
-                bindable.ValueChanged += _ => UpdateState();
-                bindable.DisabledChanged += _ => UpdateState();
-                bindable.DefaultChanged += _ => UpdateState();
+            get => current.Current;
+            set {
+                current.Current = value;
+                current.ValueChanged += _ => UpdateState();
+                current.DisabledChanged += _ => UpdateState();
+                current.DefaultChanged += _ => UpdateState();
                 UpdateState();
             }
         }
@@ -43,6 +43,7 @@ namespace osu.Game.Overlays
         {
             RelativeSizeAxes = Axes.Y;
             Width = SettingsPanel.CONTENT_MARGINS;
+            Padding = new MarginPadding { Vertical = 1.5f };
             Alpha = 0f;
         }
 
@@ -80,8 +81,8 @@ namespace osu.Game.Overlays
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (bindable != null && !bindable.Disabled)
-                bindable.SetDefault();
+            if (current != null && !current.Disabled)
+                current.SetDefault();
             return true;
         }
 
@@ -108,12 +109,12 @@ namespace osu.Game.Overlays
 
         private void updateState()
         {
-            if (bindable == null)
+            if (current == null)
                 return;
 
-            this.FadeTo(bindable.IsDefault ? 0f :
-                hovering && !bindable.Disabled ? 1f : 0.65f, 200, Easing.OutQuint);
-            this.FadeColour(bindable.Disabled ? Color4.Gray : buttonColour, 200, Easing.OutQuint);
+            this.FadeTo(current.IsDefault ? 0f :
+                hovering && !current.Disabled ? 1f : 0.65f, 200, Easing.OutQuint);
+            this.FadeColour(current.Disabled ? Color4.Gray : buttonColour, 200, Easing.OutQuint);
         }
     }
 }

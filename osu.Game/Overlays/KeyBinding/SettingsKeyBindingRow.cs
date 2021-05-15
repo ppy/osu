@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.KeyBinding
     public class SettingsKeyBindingRow : Container, IFilterable
     {
         private readonly IGrouping<object, Framework.Input.Bindings.KeyBinding> defaultGroup;
-        private readonly IEnumerable<Framework.Input.Bindings.KeyBinding> bindings;
+        private readonly ICollection<Input.Bindings.DatabasedKeyBinding> bindings;
         public readonly KeyBindingRow KeyBindingRow;
 
         private bool matchingFilter;
@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.KeyBinding
 
         public SettingsKeyBindingRow(
             IGrouping<object, Framework.Input.Bindings.KeyBinding> defaultGroup,
-            IEnumerable<Framework.Input.Bindings.KeyBinding> bindings,
+            ICollection<Input.Bindings.DatabasedKeyBinding> bindings,
             RulesetInfo ruleset)
         {
             this.defaultGroup = defaultGroup;
@@ -63,7 +63,7 @@ namespace osu.Game.Overlays.KeyBinding
                 },
             };
 
-            restoreDefaultButton.Bindable = KeyBindingRow.Current;
+            restoreDefaultButton.Current = KeyBindingRow.Current;
         }
     }
 }

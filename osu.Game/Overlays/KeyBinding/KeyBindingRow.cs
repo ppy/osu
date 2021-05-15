@@ -53,7 +53,11 @@ namespace osu.Game.Overlays.KeyBinding
         private FillFlowContainer cancelAndClearButtons;
         private FillFlowContainer<KeyButton> buttons;
 
-        private readonly BindableWithCurrent<bool> isKeysDefaultValue;
+        private readonly BindableWithCurrent<bool> isKeysDefaultValue = new BindableWithCurrent<bool>
+        {
+            Default = true
+        };
+
 
         public Bindable<bool> Current
         {
@@ -67,12 +71,6 @@ namespace osu.Game.Overlays.KeyBinding
         {
             this.action = action;
             this.bindings = bindings;
-
-            isKeysDefaultValue = new BindableWithCurrent<bool>
-            {
-                Default = true
-            };
-
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
@@ -89,7 +87,7 @@ namespace osu.Game.Overlays.KeyBinding
             isKeysDefaultValue.Value = bindings.Select(b => b.KeyCombination).SequenceEqual(Defaults);
             isKeysDefaultValue.BindValueChanged(resetButtons =>
             {
-                if (resetButtons.NewValue != resetButtons.OldValue && resetButtons.NewValue && !bindings.Select(b => b.KeyCombination).SequenceEqual(Defaults))
+                if (resetButtons.NewValue && !bindings.Select(b => b.KeyCombination).SequenceEqual(Defaults))
                 {
                     RestoreDefaults();
                     finalise();
@@ -314,23 +312,7 @@ namespace osu.Game.Overlays.KeyBinding
             {
                 store.Update(bindTarget.KeyBinding);
 
-                KeyCombination keyDefault = Defaults.ElementAt(buttons.IndexOf(bindTarget));
-
-                if (isKeysDefaultValue.Value)
-                {
-                    if (!keyDefault.Equals(bindTarget.KeyBinding.KeyCombination))
-                    {
-                        isKeysDefaultValue.Value = false;
-                    }
-                }
-                else
-                {
-                    if (keyDefault.Equals(bindTarget.KeyBinding.KeyCombination) &&
-                        buttons.Select(b => b.KeyBinding.KeyCombination).SequenceEqual(Defaults))
-                    {
-                        isKeysDefaultValue.Value = true;
-                    }
-                }
+                isKeysDefaultValue.Value = buttons.Select(b => b.KeyBinding.KeyCombination).SequenceEqual(Defaults);
 
                 bindTarget.IsBinding = false;
                 Schedule(() =>

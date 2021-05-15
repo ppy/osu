@@ -35,10 +35,10 @@ namespace osu.Game.Tests.Visual.Settings
 
             AddStep("click first row", () =>
             {
-                InputManager.MoveMouseTo(panel.ChildrenOfType<SettingsKeyBindingRow>().First());
-                InputManager.Click(MouseButton.Left);
+                firstRow = panel.ChildrenOfType<KeyBindingRow>().First();
 
-                firstRow = panel.ChildrenOfType<SettingsKeyBindingRow>().First().KeyBindingRow;
+                InputManager.MoveMouseTo(firstRow);
+                InputManager.Click(MouseButton.Left);
             });
 
             AddStep("schedule button clicks", () =>
@@ -72,7 +72,7 @@ namespace osu.Game.Tests.Visual.Settings
 
             AddStep("click first row with two bindings", () =>
             {
-                multiBindingRow = panel.ChildrenOfType<SettingsKeyBindingRow>().First(row => row.KeyBindingRow.Defaults.Count() > 1).KeyBindingRow;
+                multiBindingRow = panel.ChildrenOfType<KeyBindingRow>().First(row => row.Defaults.Count() > 1);
                 InputManager.MoveMouseTo(multiBindingRow);
                 InputManager.Click(MouseButton.Left);
             });
@@ -108,66 +108,55 @@ namespace osu.Game.Tests.Visual.Settings
         [Test]
         public void TestSingleBindResetButton()
         {
-            KeyBindingRow multiBindingRow = null;
+            SettingsKeyBindingRow settingsKeyBindingRow = null;
 
             AddStep("click first row with two bindings", () =>
             {
-                multiBindingRow = panel.ChildrenOfType<KeyBindingRow>().First(row => row.Defaults.Count() > 1);
-                InputManager.MoveMouseTo(multiBindingRow);
+                settingsKeyBindingRow = panel.ChildrenOfType<SettingsKeyBindingRow>().First(row => row.KeyBindingRow.Defaults.Count() > 1);
+                InputManager.MoveMouseTo(settingsKeyBindingRow.KeyBindingRow);
                 InputManager.Click(MouseButton.Left);
                 InputManager.PressKey(Key.P);
                 InputManager.ReleaseKey(Key.P);
             });
 
-            AddUntilStep("restore button shown", () => panel.ChildrenOfType<SettingsKeyBindingRow>().First(row => row.KeyBindingRow.Defaults.Count() > 1).ChildrenOfType<RestoreDefaultValueButton<bool>>().First().Alpha > 0);
+            AddUntilStep("restore button shown", () => settingsKeyBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().First().Alpha > 0);
 
-            clickSingleBindResetButton();
-
-            AddAssert("first binding cleared", () => panel.ChildrenOfType<SettingsKeyBindingRow>().First(row => row.KeyBindingRow.Defaults.Count() > 1).ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(0).KeyBinding.KeyCombination.Equals(multiBindingRow.Defaults.ElementAt(0)));
-            AddAssert("second binding cleared", () => panel.ChildrenOfType<SettingsKeyBindingRow>().First(row => row.KeyBindingRow.Defaults.Count() > 1).ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(1).KeyBinding.KeyCombination.Equals(multiBindingRow.Defaults.ElementAt(1)));
-
-            AddUntilStep("restore button hidden", () => panel.ChildrenOfType<SettingsKeyBindingRow>().First(row => row.KeyBindingRow.Defaults.Count() > 1).ChildrenOfType<RestoreDefaultValueButton<bool>>().First().Alpha == 0);
-
-            void clickSingleBindResetButton()
+            AddStep("click reset button for bindings", () =>
             {
-                AddStep("click reset button for bindings", () =>
-                {
-                    var clearButton = panel.ChildrenOfType<SettingsKeyBindingRow>().First(row => row.KeyBindingRow.Defaults.Count() > 1).ChildrenOfType<RestoreDefaultValueButton<bool>>().Single();
+                var clearButton = settingsKeyBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().Single();
 
-                    InputManager.MoveMouseTo(clearButton);
-                    InputManager.Click(MouseButton.Left);
-                });
-            }
+                InputManager.MoveMouseTo(clearButton);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("restore button hidden", () => settingsKeyBindingRow.ChildrenOfType<RestoreDefaultValueButton<bool>>().First().Alpha == 0);
+
+            AddAssert("first binding cleared", () => settingsKeyBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(0).KeyBinding.KeyCombination.Equals(settingsKeyBindingRow.KeyBindingRow.Defaults.ElementAt(0)));
+            AddAssert("second binding cleared", () => settingsKeyBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(1).KeyBinding.KeyCombination.Equals(settingsKeyBindingRow.KeyBindingRow.Defaults.ElementAt(1)));
         }
 
         [Test]
         public void TestResetAllBindingsButton()
         {
-            KeyBindingRow multiBindingRow = null;
+            KeyBindingRow keyBindingRow = null;
 
             AddStep("click first row and press p", () =>
             {
-                multiBindingRow = panel.ChildrenOfType<SettingsKeyBindingRow>().First().KeyBindingRow;
-                InputManager.MoveMouseTo(multiBindingRow);
+                keyBindingRow = panel.ChildrenOfType<KeyBindingRow>().First();
+                InputManager.MoveMouseTo(keyBindingRow);
                 InputManager.Click(MouseButton.Left);
                 InputManager.PressKey(Key.P);
                 InputManager.ReleaseKey(Key.P);
             });
-
-            clickResetAllBindingsButton();
-
-            AddAssert("bindings cleared", () => multiBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(0).KeyBinding.KeyCombination.Equals(multiBindingRow.Defaults.ElementAt(0)));
-
-            void clickResetAllBindingsButton()
+            AddStep("click reset button for all bindings", () =>
             {
-                AddStep("click reset button for all bindings", () =>
-                {
-                    var clearButton = panel.ChildrenOfType<ResetButton>().First();
+                var clearButton = panel.ChildrenOfType<ResetButton>().First();
 
-                    InputManager.MoveMouseTo(clearButton);
-                    InputManager.Click(MouseButton.Left);
-                });
-            }
+                InputManager.MoveMouseTo(clearButton);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("bindings cleared", () => keyBindingRow.ChildrenOfType<KeyBindingRow.KeyButton>().ElementAt(0).KeyBinding.KeyCombination.Equals(keyBindingRow.Defaults.ElementAt(0)));
         }
 
         [Test]
