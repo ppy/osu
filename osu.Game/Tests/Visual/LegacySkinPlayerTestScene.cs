@@ -3,11 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
-using osu.Framework.Platform;
-using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Skinning;
 
