@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -16,6 +17,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Configuration;
+using osu.Game.Screens.Ranking.Expanded;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Rulesets;
@@ -30,7 +32,7 @@ namespace osu.Game.Screens.Play
     {
         private readonly WorkingBeatmap beatmap;
         private readonly Bindable<IReadOnlyList<Mod>> mods;
-        private readonly Drawable facade;
+        private readonly Drawable logoFacade;
         private LoadingSpinner loading;
         private SelectedRulesetIcon ruleseticon;
 
@@ -62,10 +64,10 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        public BeatmapMetadataDisplay(WorkingBeatmap beatmap, Bindable<IReadOnlyList<Mod>> mods, Drawable facade)
+        public BeatmapMetadataDisplay(WorkingBeatmap beatmap, Bindable<IReadOnlyList<Mod>> mods, Drawable logoFacade)
         {
             this.beatmap = beatmap;
-            this.facade = facade;
+            this.logoFacade = logoFacade;
 
             this.mods = new Bindable<IReadOnlyList<Mod>>();
             this.mods.BindTo(mods);
@@ -75,10 +77,15 @@ namespace osu.Game.Screens.Play
         private Container bg;
         private readonly Bindable<bool> optui = new Bindable<bool>();
 
+        private IBindable<StarDifficulty?> starDifficulty;
+
+        private FillFlowContainer versionFlow;
+        private StarRatingDisplay starRatingDisplay;
+
         [BackgroundDependencyLoader]
-        private void load(MConfigManager config)
+        private void load(BeatmapDifficultyCache difficultyCache, MConfigManager config)
         {
-            var metadata = beatmap.BeatmapInfo?.Metadata ?? new BeatmapMetadata();
+            var metadata = beatmap.BeatmapInfo.Metadata;
 
             AutoSizeAxes = Axes.Both;
             Children = new Drawable[]
@@ -119,7 +126,7 @@ namespace osu.Game.Screens.Play
                             Direction = FillDirection.Vertical,
                             Children = new[]
                             {
-                                facade.With(d =>
+                                logoFacade.With(d =>
                                 {
                                     d.Anchor = Anchor.TopCentre;
                                     d.Origin = Anchor.TopCentre;
@@ -161,15 +168,29 @@ namespace osu.Game.Screens.Play
                                         ruleseticon = new SelectedRulesetIcon(),
                                     }
                                 },
-                                new OsuSpriteText
+                                versionFlow = new FillFlowContainer
                                 {
-                                    Text = beatmap?.BeatmapInfo?.Version,
-                                    Font = OsuFont.GetFont(size: 26, italics: true),
-                                    Origin = Anchor.TopCentre,
+                                    AutoSizeAxes = Axes.Both,
                                     Anchor = Anchor.TopCentre,
-                                    Margin = new MarginPadding
+                                    Origin = Anchor.TopCentre,
+                                    Direction = FillDirection.Vertical,
+                                    Spacing = new Vector2(5f),
+                                    Margin = new MarginPadding { Bottom = 40 },
+                                    Children = new Drawable[]
                                     {
-                                        Bottom = 40
+                                        new OsuSpriteText
+                                        {
+                                            Text = beatmap?.BeatmapInfo?.Version,
+                                            Font = OsuFont.GetFont(size: 26, italics: true),
+                                            Anchor = Anchor.TopCentre,
+                                            Origin = Anchor.TopCentre,
+                                        },
+                                        starRatingDisplay = new StarRatingDisplay(default)
+                                        {
+                                            Alpha = 0f,
+                                            Anchor = Anchor.TopCentre,
+                                            Origin = Anchor.TopCentre,
+                                        }
                                     }
                                 },
                                 new GridContainer
@@ -215,17 +236,19 @@ namespace osu.Game.Screens.Play
                 }
             };
 
+            starDifficulty = difficultyCache.GetBindableDifficulty(beatmap.BeatmapInfo);
+
             Loading = true;
 
             config.BindWith(MSetting.OptUI, optui);
-            optui.ValueChanged += _ => updateVisualEffects();
+            optui.BindValueChanged(updateVisualEffects);
 
             entryAnimation();
         }
 
-        private void updateVisualEffects()
+        private void updateVisualEffects(ValueChangedEvent<bool> v)
         {
-            switch (optui.Value)
+            switch (v.NewValue)
             {
                 case true:
                     ruleseticon.Delay(500).Schedule(() => ruleseticon.AddRulesetSprite());
@@ -255,6 +278,54 @@ namespace osu.Game.Screens.Play
                     ruleseticon.ScaleTo(0.9f).FadeOut();
                     bg.ScaleTo(1.1f).FadeOut();
                     return;
+            }
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            if (starDifficulty.Value != null)
+            {
+                starRatingDisplay.Current.Value = starDifficulty.Value.Value;
+                starRatingDisplay.Show();
+            }
+            else
+            {
+                starRatingDisplay.Hide();
+
+                starDifficulty.ValueChanged += d =>
+                {
+                    Debug.Assert(d.NewValue != null);
+
+                    starRatingDisplay.Current.Value = d.NewValue.Value;
+
+                    versionFlow.AutoSizeDuration = 300;
+                    versionFlow.AutoSizeEasing = Easing.OutQuint;
+
+                    starRatingDisplay.FadeIn(300, Easing.InQuint);
+                };
+            }
+        }
+
+        private class MetadataLineLabel : OsuSpriteText
+        {
+            public MetadataLineLabel(string text)
+            {
+                Anchor = Anchor.TopRight;
+                Origin = Anchor.TopRight;
+                Margin = new MarginPadding { Right = 5 };
+                Colour = OsuColour.Gray(0.8f);
+                Text = text;
+            }
+        }
+
+        private class MetadataLineInfo : OsuSpriteText
+        {
+            public MetadataLineInfo(string text)
+            {
+                Margin = new MarginPadding { Left = 5 };
+                Text = string.IsNullOrEmpty(text) ? @"-" : text;
             }
         }
 
@@ -340,25 +411,5 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private class MetadataLineLabel : OsuSpriteText
-        {
-            public MetadataLineLabel(string text)
-            {
-                Anchor = Anchor.TopRight;
-                Origin = Anchor.TopRight;
-                Margin = new MarginPadding { Right = 5 };
-                Colour = OsuColour.Gray(0.8f);
-                Text = text;
-            }
-        }
-
-        private class MetadataLineInfo : OsuSpriteText
-        {
-            public MetadataLineInfo(string text)
-            {
-                Margin = new MarginPadding { Left = 5 };
-                Text = string.IsNullOrEmpty(text) ? @"-" : text;
-            }
-        }
     }
 }
