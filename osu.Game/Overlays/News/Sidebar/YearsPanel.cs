@@ -70,9 +70,11 @@ namespace osu.Game.Overlays.News.Sidebar
 
             private readonly OsuSpriteText text;
             private readonly bool isCurrent;
+            private readonly int year;
 
             public YearButton(int year, bool isCurrent)
             {
+                this.year = year;
                 this.isCurrent = isCurrent;
 
                 RelativeSizeAxes = Axes.X;
@@ -87,11 +89,15 @@ namespace osu.Game.Overlays.News.Sidebar
             }
 
             [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
+            private void load(OverlayColourProvider colourProvider, NewsOverlay overlay)
             {
                 IdleColour = isCurrent ? Color4.White : colourProvider.Light2;
                 HoverColour = isCurrent ? Color4.White : colourProvider.Light1;
-                Action = () => { }; // Avoid button being disabled since there's no proper action assigned.
+                Action = () =>
+                {
+                    if (overlay != null)
+                        overlay.ShowYear(year);
+                };
             }
         }
 

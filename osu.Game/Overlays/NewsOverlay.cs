@@ -89,6 +89,12 @@ namespace osu.Game.Overlays
             Show();
         }
 
+        public void ShowYear(int year)
+        {
+            showYear(year);
+            Show();
+        }
+
         public void ShowArticle(string slug)
         {
             article.Value = slug;
@@ -96,6 +102,24 @@ namespace osu.Game.Overlays
         }
 
         private CancellationTokenSource cancellationToken;
+
+        private void showYear(int year)
+        {
+            cancellationToken?.Cancel();
+            Loading.Show();
+
+            if (year != 0)
+            {
+                Header.SetFrontPage();
+
+                var page = new FrontPageDisplay(year);
+                page.ResponseReceived += r => sidebar.Metadata.Value = r.SidebarMetadata;
+                LoadDisplay(page);
+                return;
+            }
+
+            ShowFrontPage();
+        }
 
         private void onArticleChanged(ValueChangedEvent<string> e)
         {

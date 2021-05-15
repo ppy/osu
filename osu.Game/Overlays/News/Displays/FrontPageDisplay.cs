@@ -27,6 +27,13 @@ namespace osu.Game.Overlays.News.Displays
         private GetNewsRequest request;
         private Cursor lastCursor;
 
+        private readonly int year;
+
+        public FrontPageDisplay(int year = 0)
+        {
+            this.year = year;
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -77,7 +84,7 @@ namespace osu.Game.Overlays.News.Displays
         {
             request?.Cancel();
 
-            request = new GetNewsRequest(lastCursor);
+            request = new GetNewsRequest(year, lastCursor);
             request.Success += response => Schedule(() => onSuccess(response));
             api.PerformAsync(request);
         }
