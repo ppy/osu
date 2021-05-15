@@ -39,6 +39,11 @@ namespace osu.Game.Skinning
         protected virtual bool AllowManiaSkin => hasKeyTexture.Value;
 
         /// <summary>
+        /// Whether this skin will fall back to default HUD components if it has no fonts for use.
+        /// </summary>
+        protected virtual bool AllowDefaultHUDComponentsFallback => true;
+
+        /// <summary>
         /// Whether this skin can use samples with a custom bank (custom sample set in stable terminology).
         /// Added in order to match sample lookup logic from stable (in stable, only the beatmap skin could use samples with a custom sample bank).
         /// </summary>
@@ -331,6 +336,8 @@ namespace osu.Game.Skinning
                     switch (target.Target)
                     {
                         case SkinnableTarget.MainHUDComponents:
+                            if (!this.HasFont(LegacyFont.Score) && !AllowDefaultHUDComponentsFallback)
+                                return null;
 
                             var skinnableTargetWrapper = new SkinnableTargetComponentsContainer(container =>
                             {
