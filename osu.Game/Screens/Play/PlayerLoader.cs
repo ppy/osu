@@ -32,8 +32,8 @@ namespace osu.Game.Screens.Play
 {
     public class PlayerLoader : ScreenWithBeatmapBackground
     {
-        private float extra_delay = 750;
-        private readonly Bindable<bool> Optui = new Bindable<bool>();
+        private float extraDelay = 750;
+        private readonly Bindable<bool> optui = new Bindable<bool>();
 
         protected const float BACKGROUND_BLUR = 15;
 
@@ -128,7 +128,7 @@ namespace osu.Game.Screens.Play
         private void load(SessionStatics sessionStatics, MConfigManager config)
         {
             muteWarningShownOnce = sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce);
-            config.BindWith(MSetting.OptUI, Optui);
+            config.BindWith(MSetting.OptUI, optui);
             batteryWarningShownOnce = sessionStatics.GetBindable<bool>(Static.LowBatteryNotificationShownOnce);
 
             InternalChild = (content = new LogoTrackingContainer
@@ -161,7 +161,7 @@ namespace osu.Game.Screens.Play
                 idleTracker = new IdleTracker(750)
             });
 
-            Optui.BindValueChanged(_ => UpdateExtraDelay());
+            optui.BindValueChanged(_ => updateExtraDelay());
 
             if (Beatmap.Value.BeatmapInfo.EpilepsyWarning)
             {
@@ -173,16 +173,16 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private void UpdateExtraDelay()
+        private void updateExtraDelay()
         {
-            switch ( Optui.Value )
+            switch (optui.Value)
             {
                 case true:
-                    extra_delay = 750;
+                    extraDelay = 750;
                     break;
-                
+
                 case false:
-                    extra_delay = 0;
+                    extraDelay = 0;
                     break;
             }
         }
@@ -387,9 +387,9 @@ namespace osu.Game.Screens.Play
                 // ensure that once we have reached this "point of no return", readyForPush will be false for all future checks (until a new player instance is prepared).
                 var consumedPlayer = consumePlayer();
 
-                this.Delay(extra_delay).Schedule( () => contentOut() );
+                this.Delay(extraDelay).Schedule(contentOut);
 
-                TransformSequence<PlayerLoader> pushSequence = this.Delay(250 + extra_delay);
+                TransformSequence<PlayerLoader> pushSequence = this.Delay(250 + extraDelay);
 
                 // only show if the warning was created (i.e. the beatmap needs it)
                 // and this is not a restart of the map (the warning expires after first load).

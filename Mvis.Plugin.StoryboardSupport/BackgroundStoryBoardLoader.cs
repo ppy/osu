@@ -13,6 +13,7 @@ using osu.Game.Overlays;
 using osu.Game.Screens.Mvis.Plugins;
 using osu.Game.Screens.Mvis.Plugins.Config;
 using osu.Game.Screens.Mvis.Plugins.Types;
+using osu.Game.Screens.Play;
 
 namespace Mvis.Plugin.StoryboardSupport
 {
@@ -59,6 +60,16 @@ namespace Mvis.Plugin.StoryboardSupport
             });
         }
 
+        private readonly EpilepsyWarning epilepsyWarning = new EpilepsyWarning
+        {
+            Anchor = Anchor.TopCentre,
+            Origin = Anchor.TopCentre,
+            Margin = new MarginPadding(20),
+            RelativeSizeAxes = Axes.X,
+            AutoSizeAxes = Axes.Y,
+            Depth = -1
+        };
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -80,6 +91,11 @@ namespace Mvis.Plugin.StoryboardSupport
                 MvisScreen.OnBeatmapChanged += refresh;
                 MvisScreen.OnScreenSuspending += onScreenSuspending;
             }
+
+            if (MvisScreen != null)
+                MvisScreen.AddDrawableToProxy(epilepsyWarning);
+            else
+                AddInternal(epilepsyWarning);
         }
 
         private void onScreenSuspending()
@@ -120,7 +136,14 @@ namespace Mvis.Plugin.StoryboardSupport
         protected override bool PostInit()
         {
             if (targetBeatmap == null)
-                throw new InvalidOperationException("currentBeatmap 不能为 null");
+                throw new InvalidOperationException("targetBeatmap 不能为 null");
+
+            epilepsyWarning.ScaleTo(1);
+
+            if (targetBeatmap.BeatmapInfo.EpilepsyWarning)
+                epilepsyWarning.Show();
+            else
+                epilepsyWarning.Hide();
 
             sbLoaded.Value = false;
             NeedToHideTriangles.Value = false;
@@ -171,6 +194,9 @@ namespace Mvis.Plugin.StoryboardSupport
                 MvisScreen.HideTriangles.Value = NeedToHideTriangles.Value;
                 MvisScreen.HideScreenBackground.Value = targetBeatmap.Storyboard.ReplacesBackground;
             }
+
+            if (targetBeatmap.BeatmapInfo.EpilepsyWarning)
+                epilepsyWarning.ScaleTo(1.001f, 5000).OnComplete(_ => epilepsyWarning.Hide());
 
             return true;
         }

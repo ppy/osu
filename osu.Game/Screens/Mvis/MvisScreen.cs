@@ -325,27 +325,20 @@ namespace osu.Game.Screens.Mvis
                 {
                     Alpha = 0
                 },
-                new Container
+                bgTriangles = new BgTrianglesContainer(),
+                background = new Container
                 {
-                    Name = "Contents",
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING },
-                    Children = new Drawable[]
-                    {
-                        bgTriangles = new BgTrianglesContainer(),
-                        background = new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Name = "Background Layer",
-                        },
-                        foreground = new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Name = "Foreground Layer",
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre
-                        }
-                    }
+                    Name = "Background Layer"
+                },
+                foreground = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING },
+                    Name = "Foreground Layer",
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre
                 },
                 skinnableForeground = new FullScreenSkinnableComponent("MPlayer-foreground", confineMode: ConfineMode.ScaleToFill, defaultImplementation: _ => new PlaceHolder())
                 {

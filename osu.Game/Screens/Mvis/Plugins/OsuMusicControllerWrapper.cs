@@ -35,6 +35,8 @@ namespace osu.Game.Screens.Mvis.Plugins
         public OsuMusicControllerWrapper()
         {
             Name = "osu!";
+            Description = "osu!音乐兼容插件";
+            Author = "mf-osu";
         }
     }
 }
