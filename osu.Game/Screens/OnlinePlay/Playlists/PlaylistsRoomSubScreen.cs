@@ -13,6 +13,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Match.Components;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Users;
 using osuTK;
@@ -271,9 +272,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             }, true);
         }
 
-        protected override Screen CreateGameplayScreen() => new PlaylistsPlayer(SelectedItem.Value)
+        protected override Screen CreateGameplayScreen() => new PlayerLoader(() => new PlaylistsPlayer(SelectedItem.Value)
         {
             Exited = () => leaderboard.RefreshScores()
-        };
+        });
     }
 }

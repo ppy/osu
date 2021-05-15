@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             frameLimiterDropdown.Current.BindValueChanged(limit =>
             {
-                const string unlimited_frames_note = "Using unlimited frame limiter can lead to stutters, bad performance and overheating. It will not improve perceived latency. \"2x refresh rate\" is recommended.";
+                const string unlimited_frames_note = "使用无限制会导致顿卡, 性能下降和设备过热, 并不会改善感知到的延迟。 我们建议使用\"2倍刷新率\"。";
 
                 frameLimiterDropdown.WarningText = limit.NewValue == FrameSync.Unlimited ? unlimited_frames_note : string.Empty;
             }, true);

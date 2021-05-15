@@ -11,6 +11,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
 {
     public class MfSettings : SettingsSubsection
     {
+        private SettingsCheckbox systemCursor;
         protected override string Header => "Mf-osu";
 
         [BackgroundDependencyLoader]
@@ -62,10 +63,9 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                     TooltipText = "仅在开场样式为\"略过开场\"时生效",
                     Current = config.GetBindable<bool>(MSetting.IntroLoadDirectToSongSelect)
                 },
-                new SettingsCheckbox
+                systemCursor = new SettingsCheckbox
                 {
                     LabelText = "使用系统光标",
-                    TooltipText = "与高精度模式、数位板功能冲突，启用后会导致这些功能失效或光标鬼畜",
                     Current = config.GetBindable<bool>(MSetting.UseSystemCursor)
                 },
                 new SettingsCheckbox
@@ -76,12 +76,20 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
             };
 
             if (host is LinuxGameHost)
+            {
                 Add(new SettingsEnumDropdown<GamemodeActivateCondition>
                 {
                     LabelText = "Gamemode启用条件",
                     TooltipText = "依赖libgamemode",
                     Current = config.GetBindable<GamemodeActivateCondition>(MSetting.Gamemode)
                 });
+            }
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            systemCursor.WarningText = "与高精度模式、数位板功能冲突。\n启用后会导致上述功能失效或光标鬼畜。";
         }
     }
 }

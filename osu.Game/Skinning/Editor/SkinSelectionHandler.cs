@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
@@ -17,6 +18,9 @@ namespace osu.Game.Skinning.Editor
 {
     public class SkinSelectionHandler : SelectionHandler<ISkinnableDrawable>
     {
+        [Resolved]
+        private SkinEditor skinEditor { get; set; }
+
         public override bool HandleRotation(float angle)
         {
             // TODO: this doesn't correctly account for origin/anchor specs being different in a multi-selection.
@@ -72,14 +76,8 @@ namespace osu.Game.Skinning.Editor
             SelectionBox.CanReverse = false;
         }
 
-        protected override void DeleteItems(IEnumerable<ISkinnableDrawable> items)
-        {
-            foreach (var i in items)
-            {
-                ((Drawable)i).Expire();
-                SelectedItems.Remove(i);
-            }
-        }
+        protected override void DeleteItems(IEnumerable<ISkinnableDrawable> items) =>
+            skinEditor.DeleteItems(items.ToArray());
 
         protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<ISkinnableDrawable>> selection)
         {

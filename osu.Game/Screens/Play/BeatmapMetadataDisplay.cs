@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -16,6 +17,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Configuration;
+using osu.Game.Screens.Ranking.Expanded;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Rulesets;
@@ -30,7 +32,7 @@ namespace osu.Game.Screens.Play
     {
         private readonly WorkingBeatmap beatmap;
         private readonly Bindable<IReadOnlyList<Mod>> mods;
-        private readonly Drawable facade;
+        private readonly Drawable logoFacade;
         private LoadingSpinner loading;
         private SelectedRulesetIcon ruleseticon;
 
@@ -50,293 +52,241 @@ namespace osu.Game.Screens.Play
                     loading.Hide();
 
                     if (optui.Value)
-                    {
-                        ruleseticon.Loaded = true;
-                        ruleseticon.Delay(250).Then()
-                                   .ScaleTo(1.5f).FadeOut().Then()
-                                   .FadeIn(500, Easing.OutQuint).ScaleTo(1f, 500, Easing.OutQuint);
-                    }
+                        ruleseticon.Show();
                     else
                         ruleseticon.Hide();
                 }
             }
         }
 
-        public BeatmapMetadataDisplay(WorkingBeatmap beatmap, Bindable<IReadOnlyList<Mod>> mods, Drawable facade)
+        public BeatmapMetadataDisplay(WorkingBeatmap beatmap, Bindable<IReadOnlyList<Mod>> mods, Drawable logoFacade)
         {
             this.beatmap = beatmap;
-            this.facade = facade;
+            this.logoFacade = logoFacade;
 
             this.mods = new Bindable<IReadOnlyList<Mod>>();
             this.mods.BindTo(mods);
         }
 
-        private Container basePanel;
         private Container bg;
         private readonly Bindable<bool> optui = new Bindable<bool>();
 
+        private IBindable<StarDifficulty?> starDifficulty;
+
+        private FillFlowContainer versionFlow;
+        private StarRatingDisplay starRatingDisplay;
+
         [BackgroundDependencyLoader]
-        private void load(MConfigManager config)
+        private void load(BeatmapDifficultyCache difficultyCache, MConfigManager config)
         {
-            var metadata = beatmap.BeatmapInfo?.Metadata ?? new BeatmapMetadata();
+            var metadata = beatmap.BeatmapInfo.Metadata;
 
             AutoSizeAxes = Axes.Both;
             Children = new Drawable[]
             {
-                basePanel = new Container
+                bg = new Container
                 {
-                    AutoSizeAxes = Axes.Both,
-                    Origin = Anchor.TopCentre,
-                    Anchor = Anchor.TopCentre,
-                    Masking = false,
+                    RelativeSizeAxes = Axes.Both,
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
+                    CornerRadius = 20,
+                    CornerExponent = 2.5f,
+                    Masking = true,
+                    BorderColour = Color4.Black,
+                    BorderThickness = 4.5f,
                     Children = new Drawable[]
                     {
-                        bg = new Container
+                        new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Origin = Anchor.Centre,
-                            Anchor = Anchor.Centre,
-                            CornerRadius = 20,
-                            CornerExponent = 2.5f,
+                            Alpha = 0.5f,
+                            Colour = Color4.Black
+                        }
+                    }
+                },
+                new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
+                    Direction = FillDirection.Vertical,
+                    Margin = new MarginPadding(40),
+                    Children = new[]
+                    {
+                        logoFacade.With(d =>
+                        {
+                            d.Anchor = Anchor.TopCentre;
+                            d.Origin = Anchor.TopCentre;
+                        }),
+                        new OsuSpriteText
+                        {
+                            Text = new RomanisableString(metadata.TitleUnicode, metadata.Title),
+                            Font = OsuFont.GetFont(size: 36, italics: true),
+                            Origin = Anchor.TopCentre,
+                            Anchor = Anchor.TopCentre,
+                            Margin = new MarginPadding { Top = 15 }
+                        },
+                        new OsuSpriteText
+                        {
+                            Text = new RomanisableString(metadata.ArtistUnicode, metadata.Artist),
+                            Font = OsuFont.GetFont(size: 26, italics: true),
+                            Origin = Anchor.TopCentre,
+                            Anchor = Anchor.TopCentre
+                        },
+                        new Container
+                        {
+                            Size = new Vector2(300, 60),
+                            Margin = new MarginPadding(10),
+                            Origin = Anchor.TopCentre,
+                            Anchor = Anchor.TopCentre,
+                            CornerRadius = 10,
                             Masking = true,
-                            BorderColour = Color4.Black,
-                            BorderThickness = 3f,
                             Children = new Drawable[]
                             {
-                                new Box
+                                new Sprite
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Alpha = 0.5f,
-                                    Colour = Color4.Black,
-                                }
+                                    Texture = beatmap?.Background,
+                                    Origin = Anchor.Centre,
+                                    Anchor = Anchor.Centre,
+                                    FillMode = FillMode.Fill,
+                                },
+                                loading = new LoadingLayer(true),
+                                ruleseticon = new SelectedRulesetIcon(beatmap.BeatmapInfo.Ruleset),
                             }
                         },
-                        new FillFlowContainer
+                        versionFlow = new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
-                            Origin = Anchor.Centre,
-                            Anchor = Anchor.Centre,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
                             Direction = FillDirection.Vertical,
-                            Children = new[]
+                            Spacing = new Vector2(5f),
+                            Margin = new MarginPadding { Bottom = 40 },
+                            Children = new Drawable[]
                             {
-                                facade.With(d =>
-                                {
-                                    d.Anchor = Anchor.TopCentre;
-                                    d.Origin = Anchor.TopCentre;
-                                }),
-                                new OsuSpriteText
-                                {
-                                    Text = new RomanisableString(metadata.TitleUnicode, metadata.Title),
-                                    Font = OsuFont.GetFont(size: 36, italics: true),
-                                    Origin = Anchor.TopCentre,
-                                    Anchor = Anchor.TopCentre,
-                                    Margin = new MarginPadding { Top = 15 }
-                                },
-                                new OsuSpriteText
-                                {
-                                    Text = new RomanisableString(metadata.ArtistUnicode, metadata.Artist),
-                                    Font = OsuFont.GetFont(size: 26, italics: true),
-                                    Origin = Anchor.TopCentre,
-                                    Anchor = Anchor.TopCentre
-                                },
-                                new Container
-                                {
-                                    Size = new Vector2(300, 60),
-                                    Margin = new MarginPadding(10),
-                                    Origin = Anchor.TopCentre,
-                                    Anchor = Anchor.TopCentre,
-                                    CornerRadius = 10,
-                                    Masking = true,
-                                    Children = new Drawable[]
-                                    {
-                                        new Sprite
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Texture = beatmap?.Background,
-                                            Origin = Anchor.Centre,
-                                            Anchor = Anchor.Centre,
-                                            FillMode = FillMode.Fill,
-                                        },
-                                        loading = new LoadingLayer(true),
-                                        ruleseticon = new SelectedRulesetIcon(),
-                                    }
-                                },
                                 new OsuSpriteText
                                 {
                                     Text = beatmap?.BeatmapInfo?.Version,
                                     Font = OsuFont.GetFont(size: 26, italics: true),
-                                    Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
-                                    Margin = new MarginPadding
-                                    {
-                                        Bottom = 40
-                                    }
+                                    Origin = Anchor.TopCentre,
                                 },
-                                new GridContainer
+                                starRatingDisplay = new StarRatingDisplay(default)
                                 {
+                                    Alpha = 0f,
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
-                                    AutoSizeAxes = Axes.Both,
-                                    RowDimensions = new[]
-                                    {
-                                        new Dimension(GridSizeMode.AutoSize),
-                                        new Dimension(GridSizeMode.AutoSize),
-                                    },
-                                    ColumnDimensions = new[]
-                                    {
-                                        new Dimension(GridSizeMode.AutoSize),
-                                        new Dimension(GridSizeMode.AutoSize),
-                                    },
-                                    Content = new[]
-                                    {
-                                        new Drawable[]
-                                        {
-                                            new MetadataLineLabel("来源"),
-                                            new MetadataLineInfo(metadata.Source)
-                                        },
-                                        new Drawable[]
-                                        {
-                                            new MetadataLineLabel("谱师"),
-                                            new MetadataLineInfo(metadata.AuthorString)
-                                        }
-                                    }
-                                },
-                                new ModDisplay
-                                {
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-                                    AutoSizeAxes = Axes.Both,
-                                    Margin = new MarginPadding { Top = 20 },
-                                    Current = mods
                                 }
-                            },
+                            }
                         },
-                    },
+                        new GridContainer
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            AutoSizeAxes = Axes.Both,
+                            RowDimensions = new[]
+                            {
+                                new Dimension(GridSizeMode.AutoSize),
+                                new Dimension(GridSizeMode.AutoSize),
+                            },
+                            ColumnDimensions = new[]
+                            {
+                                new Dimension(GridSizeMode.AutoSize),
+                                new Dimension(GridSizeMode.AutoSize),
+                            },
+                            Content = new[]
+                            {
+                                new Drawable[]
+                                {
+                                    new MetadataLineLabel("来源"),
+                                    new MetadataLineInfo(metadata.Source)
+                                },
+                                new Drawable[]
+                                {
+                                    new MetadataLineLabel("谱师"),
+                                    new MetadataLineInfo(metadata.AuthorString)
+                                }
+                            }
+                        },
+                        new ModDisplay
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            AutoSizeAxes = Axes.Both,
+                            Margin = new MarginPadding { Top = 20 },
+                            Current = mods
+                        }
+                    }
                 }
             };
+
+            starDifficulty = difficultyCache.GetBindableDifficulty(beatmap.BeatmapInfo);
 
             Loading = true;
 
             config.BindWith(MSetting.OptUI, optui);
-            optui.ValueChanged += _ => updateVisualEffects();
+            optui.BindValueChanged(updateVisualEffects);
 
             entryAnimation();
         }
 
-        private void updateVisualEffects()
+        private void updateVisualEffects(ValueChangedEvent<bool> v)
         {
-            switch (optui.Value)
+            switch (v.NewValue)
             {
                 case true:
-                    ruleseticon.Delay(500).Schedule(() => ruleseticon.AddRulesetSprite());
-                    ruleseticon.ScaleTo(1, 500, Easing.OutQuint).FadeIn(500, Easing.OutQuint);
-                    bg.ScaleTo(1.2f, 500, Easing.OutQuint).FadeIn(500, Easing.OutQuint);
+                    ruleseticon.Show();
+                    bg.ResizeHeightTo(1, 500, Easing.OutQuint).FadeIn(500, Easing.OutQuint);
                     return;
 
                 case false:
-                    ruleseticon.ScaleTo(0.9f, 500, Easing.OutQuint).FadeOut(500, Easing.OutQuint);
-                    bg.FadeOut(500, Easing.OutQuint).ScaleTo(1.1f, 500, Easing.OutQuint);
+                    ruleseticon.Hide();
+                    bg.ResizeHeightTo(0, 500, Easing.OutQuint).FadeOut(500, Easing.OutQuint);
                     return;
             }
         }
 
         private void entryAnimation()
         {
+            bg.ScaleTo(1).FadeOut().ResizeHeightTo(0);
+
             switch (optui.Value)
             {
                 case true:
-                    bg.ScaleTo(1.2f);
-                    basePanel.ScaleTo(1.5f).Then()
-                             .Delay(750).FadeIn(500, Easing.OutQuint)
-                             .ScaleTo(1f, 500, Easing.OutQuint);
+                    bg.Delay(750).ResizeHeightTo(1, 500, Easing.OutQuint).FadeIn(500, Easing.OutQuint);
                     return;
 
                 case false:
-                    ruleseticon.ScaleTo(0.9f).FadeOut();
-                    bg.ScaleTo(1.1f).FadeOut();
+                    ruleseticon.Hide();
                     return;
             }
         }
 
-        private class SelectedRulesetIcon : Container
+        protected override void LoadComplete()
         {
-            public FillFlowContainer ContentFillFlow;
-            private OsuSpriteText rulesetSpriteText;
+            base.LoadComplete();
 
-            [Resolved]
-            private IBindable<RulesetInfo> rulesetInfo { get; set; }
-
-            [BackgroundDependencyLoader]
-            private void load()
+            if (starDifficulty.Value != null)
             {
-                Size = new Vector2(200, 40);
-                Origin = Anchor.Centre;
-                Anchor = Anchor.Centre;
-                CornerRadius = 10;
-                Masking = true;
-                Children = new Drawable[]
+                starRatingDisplay.Current.Value = starDifficulty.Value.Value;
+                starRatingDisplay.Show();
+            }
+            else
+            {
+                starRatingDisplay.Hide();
+
+                starDifficulty.ValueChanged += d =>
                 {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Alpha = 0.8f,
-                        Colour = Color4.Black,
-                    },
-                    ContentFillFlow = new FillFlowContainer
-                    {
-                        Direction = FillDirection.Horizontal,
-                        RelativeSizeAxes = Axes.Both,
-                        Spacing = new Vector2(10),
-                        LayoutDuration = 500,
-                        LayoutEasing = Easing.OutQuint,
-                        Child = new ConstrainedIconContainer
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Icon = rulesetInfo.Value.CreateInstance().CreateIcon(),
-                            Colour = Color4.White,
-                            Size = new Vector2(20),
-                        }
-                    },
+                    Debug.Assert(d.NewValue != null);
+
+                    starRatingDisplay.Current.Value = d.NewValue.Value;
+
+                    versionFlow.AutoSizeDuration = 300;
+                    versionFlow.AutoSizeEasing = Easing.OutQuint;
+
+                    starRatingDisplay.FadeIn(300, Easing.InQuint);
                 };
-
-                Loaded = false;
-            }
-
-            private bool loadAnimationDone;
-
-            public bool Loaded
-            {
-                set
-                {
-                    if (value)
-                    {
-                        this.Delay(750).Schedule(AddRulesetSprite);
-                    }
-                }
-            }
-
-            public void AddRulesetSprite()
-            {
-                if (!loadAnimationDone)
-                {
-                    ContentFillFlow.Add(
-                        new Container
-                        {
-                            AutoSizeAxes = Axes.Both,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Child = rulesetSpriteText = new OsuSpriteText
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Text = $"{rulesetInfo.Value.CreateInstance().Description}",
-                            }
-                        });
-                    rulesetSpriteText.FadeOut().Then().FadeIn(500, Easing.OutQuint);
-
-                    loadAnimationDone = true;
-                }
             }
         }
 
@@ -358,6 +308,98 @@ namespace osu.Game.Screens.Play
             {
                 Margin = new MarginPadding { Left = 5 };
                 Text = string.IsNullOrEmpty(text) ? @"-" : text;
+            }
+        }
+
+        private class SelectedRulesetIcon : Container
+        {
+            private Container rulesetTextContainer;
+            private ConstrainedIconContainer icon;
+
+            private const float target_width = 200;
+
+            private readonly Ruleset ruleset;
+
+            public SelectedRulesetIcon(RulesetInfo rulesetInfo)
+            {
+                ruleset = rulesetInfo.CreateInstance();
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                Size = new Vector2(0, 40);
+                Alpha = 0;
+                Origin = Anchor.Centre;
+                Anchor = Anchor.Centre;
+                CornerRadius = 10;
+                Masking = true;
+                Children = new Drawable[]
+                {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0.8f,
+                        Colour = Color4.Black,
+                    },
+                    new FillFlowContainer
+                    {
+                        Direction = FillDirection.Horizontal,
+                        RelativeSizeAxes = Axes.Both,
+                        Spacing = new Vector2(10),
+                        LayoutDuration = 500,
+                        LayoutEasing = Easing.OutQuint,
+                        Children = new Drawable[]
+                        {
+                            icon = new ConstrainedIconContainer
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Icon = ruleset.CreateIcon(),
+                                Colour = Color4.White,
+                                Size = new Vector2(20),
+                                Scale = new Vector2(2),
+                                Alpha = 0
+                            },
+                            rulesetTextContainer = new Container
+                            {
+                                AutoSizeAxes = Axes.Both,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Scale = new Vector2(0.9f),
+                                Alpha = 0,
+                                Child = new OsuSpriteText
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Text = ruleset.Description
+                                }
+                            }
+                        }
+                    }
+                };
+            }
+
+            private bool isFirstShow = true;
+
+            public override void Show()
+            {
+                this.ResizeWidthTo(target_width, 500, Easing.OutQuint).FadeIn(500, Easing.OutQuint);
+
+                if (isFirstShow)
+                {
+                    rulesetTextContainer.ScaleTo(1, 500)
+                                        .OnComplete(_ => rulesetTextContainer.FadeIn(500, Easing.OutQuint));
+
+                    icon.ScaleTo(1, 500, Easing.OutQuint).FadeIn(500, Easing.OutQuint);
+                }
+
+                isFirstShow = false;
+            }
+
+            public override void Hide()
+            {
+                this.ResizeWidthTo(0, 500, Easing.OutQuint).FadeOut(500, Easing.OutQuint);
             }
         }
     }

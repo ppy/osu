@@ -10,6 +10,6 @@ namespace osu.Game.Rulesets.Edit.Checks
     {
         protected override CheckCategory Category => CheckCategory.Resources;
         protected override string TypeOfFile => "背景";
-        protected override string GetFilename(IBeatmap playableBeatmap) => playableBeatmap.Metadata?.BackgroundFile;
+        protected override string GetFilename(IBeatmap beatmap) => beatmap.Metadata?.BackgroundFile;
     }
 }
