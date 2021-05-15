@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Threading;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -19,6 +20,7 @@ namespace osu.Game.Overlays
 
         private readonly Container content;
         private readonly NewsSideBar sidebar;
+        private readonly Container sidebarContainer;
 
         public NewsOverlay()
             : base(OverlayColourScheme.Purple, false)
@@ -40,7 +42,11 @@ namespace osu.Game.Overlays
                 {
                     new Drawable[]
                     {
-                        sidebar = new NewsSideBar(),
+                        sidebarContainer = new Container
+                        {
+                            AutoSizeAxes = Axes.X,
+                            Child = sidebar = new NewsSideBar()
+                        },
                         content = new Container
                         {
                             RelativeSizeAxes = Axes.X,
@@ -148,6 +154,14 @@ namespace osu.Game.Overlays
                 Child = loaded;
                 Loading.Hide();
             }, (cancellationToken = new CancellationTokenSource()).Token);
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            sidebarContainer.Height = DrawHeight;
+            sidebarContainer.Y = Math.Clamp(ScrollFlow.Current - Header.DrawHeight, 0, Math.Max(ScrollFlow.ScrollContent.DrawHeight - DrawHeight - Header.DrawHeight, 0));
         }
 
         protected override void Dispose(bool isDisposing)
