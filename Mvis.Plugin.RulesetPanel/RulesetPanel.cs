@@ -1,4 +1,3 @@
-using System;
 using Mvis.Plugin.RulesetPanel.Config;
 using Mvis.Plugin.RulesetPanel.Objects;
 using Mvis.Plugin.RulesetPanel.UI;
@@ -15,10 +14,12 @@ using osuTK;
 
 namespace Mvis.Plugin.RulesetPanel
 {
+    [Cached]
     public class RulesetPanel : BindableControlledPlugin
     {
         public override TargetLayer Target => TargetLayer.Foreground;
-        public override int Version => 3;
+        public override int Version => 4;
+        public Bindable<WorkingBeatmap> CurrentBeatmap = new Bindable<WorkingBeatmap>();
 
         public RulesetPanel()
         {
@@ -65,22 +66,23 @@ namespace Mvis.Plugin.RulesetPanel
                 {
                     if (Value.Value)
                         this.FadeTo(1, 750, Easing.OutQuint);
+
+                    CurrentBeatmap.Disabled = false;
+                    MvisScreen?.OnBeatmapChanged(onBeatmapChanged, this, true);
                 };
-                MvisScreen.OnBeatmapChanged += onMvisBeatmapChanged;
             }
         }
-
-        public Action<WorkingBeatmap> OnMvisBeatmapChanged;
 
         private Container particlesPlaceholder;
         private BeatmapLogo logo;
 
-        private void onMvisBeatmapChanged(WorkingBeatmap b) => OnMvisBeatmapChanged?.Invoke(b);
-
         private void onIdleAlphaChanged(ValueChangedEvent<float> v)
         {
             if ((MvisScreen?.OverlaysHidden ?? true) && Value.Value)
+            {
                 this.FadeTo(v.NewValue, 750, Easing.OutQuint);
+                if (v.NewValue == 0) CurrentBeatmap.Disabled = true;
+            }
         }
 
         public override IPluginConfigManager CreateConfigManager(Storage storage)
@@ -148,24 +150,29 @@ namespace Mvis.Plugin.RulesetPanel
         public override bool Disable()
         {
             this.FadeOut(300, Easing.OutQuint).ScaleTo(0.8f, 400, Easing.OutQuint);
-            //beatmapLogo?.StopResponseOnBeatmapChanges();
 
             return base.Disable();
         }
 
         public override bool Enable()
         {
+            bool result = base.Enable();
+
             this.FadeTo(MvisScreen?.OverlaysHidden ?? false ? idleAlpha.Value : 1, 300).ScaleTo(1, 400, Easing.OutQuint);
+            MvisScreen?.OnBeatmapChanged(onBeatmapChanged, this, true);
 
-            // beatmapLogo?.ResponseOnBeatmapChanges();
+            return result;
+        }
 
-            return base.Enable();
+        private void onBeatmapChanged(WorkingBeatmap working)
+        {
+            if (Disabled.Value || CurrentBeatmap.Disabled) return;
+
+            CurrentBeatmap.Value = working;
         }
 
         public override void UnLoad()
         {
-            MvisScreen.OnBeatmapChanged -= onMvisBeatmapChanged;
-
             if (ContentLoaded)
             {
                 //MvisScreen.OnScreenExiting -= beatmapLogo.StopResponseOnBeatmapChanges;

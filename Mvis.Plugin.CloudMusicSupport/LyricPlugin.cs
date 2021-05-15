@@ -33,7 +33,7 @@ namespace Mvis.Plugin.CloudMusicSupport
         public override PluginSidebarPage CreateSidebarPage()
             => new LyricSidebarPage(this, 0.4f);
 
-        public override int Version => 3;
+        public override int Version => 4;
 
         private WorkingBeatmap currentWorkingBeatmap;
         private LyricLine lrcLine;
@@ -112,6 +112,8 @@ namespace Mvis.Plugin.CloudMusicSupport
 
         private void onBeatmapChanged(WorkingBeatmap working)
         {
+            if (Disabled.Value) return;
+
             currentWorkingBeatmap = working;
             track = working.Track;
 
@@ -142,20 +144,19 @@ namespace Mvis.Plugin.CloudMusicSupport
         public override bool Disable()
         {
             this.MoveToX(-10, 300, Easing.OutQuint).FadeOut(300, Easing.OutQuint);
-            MvisScreen.OnBeatmapChanged -= onBeatmapChanged;
 
             return base.Disable();
         }
 
         public override bool Enable()
         {
+            bool result = base.Enable();
+
             this.MoveToX(0, 300, Easing.OutQuint).FadeIn(300, Easing.OutQuint);
-            MvisScreen.OnBeatmapChanged += onBeatmapChanged;
 
-            if (MvisScreen.Beatmap.Value != currentWorkingBeatmap)
-                onBeatmapChanged(MvisScreen.Beatmap.Value);
+            MvisScreen?.OnBeatmapChanged(onBeatmapChanged, this, true);
 
-            return base.Enable();
+            return result;
         }
 
         protected override bool PostInit() => true;

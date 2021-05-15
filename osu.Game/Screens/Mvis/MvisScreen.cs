@@ -102,7 +102,28 @@ namespace osu.Game.Screens.Mvis
         /// 谱面变更时调用<br/><br/>
         /// 传递: 当前谱面(WorkingBeatmap)<br/>
         /// </summary>
-        public Action<WorkingBeatmap> OnBeatmapChanged;
+        private Action<WorkingBeatmap> onBeatmapChangedAction;
+
+        public void OnBeatmapChanged(Action<WorkingBeatmap> action, Drawable sender, bool runOnce = false)
+        {
+            bool alreadyRegistered = onBeatmapChangedAction?.GetInvocationList().ToList().Contains(action) ?? false;
+
+            if (sender.GetType().IsSubclassOf(typeof(MvisPlugin))
+                && pluginManager.GetAllPlugins(false).Contains((MvisPlugin)sender)
+                && runOnce
+                && alreadyRegistered)
+            {
+                action.Invoke(Beatmap.Value);
+                return;
+            }
+
+            if (alreadyRegistered)
+                throw new InvalidOperationException($"{sender}已经注册过一个相同的{action}了。");
+
+            onBeatmapChangedAction += action;
+
+            if (runOnce) action.Invoke(Beatmap.Value);
+        }
 
         /// <summary>
         /// 拖动下方进度条时调用<br/><br/>
@@ -247,8 +268,6 @@ namespace osu.Game.Screens.Mvis
         private readonly OsuMusicControllerWrapper musicControllerWrapper = new OsuMusicControllerWrapper();
 
         public float BottombarHeight => (bottomBar?.Height - bottomBar?.Y ?? 0) + 10 + 5;
-
-        public new string Name => "123";
 
         #endregion
 
@@ -997,7 +1016,7 @@ namespace osu.Game.Screens.Mvis
             updateBackground(beatmap);
 
             activity.Value = new UserActivity.InMvis(beatmap.BeatmapInfo);
-            OnBeatmapChanged?.Invoke(beatmap);
+            onBeatmapChangedAction?.Invoke(beatmap);
         }
     }
 }

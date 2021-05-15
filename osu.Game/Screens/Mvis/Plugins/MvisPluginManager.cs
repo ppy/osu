@@ -33,8 +33,8 @@ namespace osu.Game.Screens.Mvis.Plugins
         internal Action<MvisPlugin> OnPluginAdd;
         internal Action<MvisPlugin> OnPluginUnLoad;
 
-        public int PluginVersion => 3;
-        public int MinimumPluginVersion => 2;
+        public int PluginVersion => 4;
+        public int MinimumPluginVersion => 4;
         private const bool experimental = true;
 
         private string blockedPluginFilePath => storage.GetFullPath("custom/blocked_plugins.json");

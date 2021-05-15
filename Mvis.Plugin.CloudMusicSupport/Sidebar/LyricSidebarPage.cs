@@ -249,7 +249,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
 
         protected override void LoadComplete()
         {
-            mvisScreen.OnBeatmapChanged += refreshBeatmap;
+            mvisScreen.OnBeatmapChanged(refreshBeatmap, this);
             refreshBeatmap(mvisScreen.Beatmap.Value);
 
             base.LoadComplete();
