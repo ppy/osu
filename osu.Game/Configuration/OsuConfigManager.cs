@@ -62,7 +62,9 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.ShowOnlineExplicitContent, false);
 
             // Audio
-            SetDefault(OsuSetting.VolumeInactive, 0.25, 0, 1, 0.01);
+            SetDefault(OsuSetting.VolumeDampened, 0.25, 0, 1, 0.01);
+            SetDefault(OsuSetting.VolumeDampenInactive, true);
+            SetDefault(OsuSetting.VolumeDampenNotPlaying, false);
 
             SetDefault(OsuSetting.MenuVoice, true);
             SetDefault(OsuSetting.MenuMusic, true);
@@ -223,7 +225,9 @@ namespace osu.Game.Configuration
         MouseDisableWheel,
         ConfineMouseMode,
         AudioOffset,
-        VolumeInactive,
+        VolumeDampened,
+        VolumeDampenInactive,
+        VolumeDampenNotPlaying,
         MenuMusic,
         MenuVoice,
         CursorRotation,

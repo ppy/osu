@@ -143,6 +143,10 @@ namespace osu.Game
 
         private Bindable<int> configSkin;
 
+        private Bindable<double> configVolumeDampened;
+        private Bindable<bool> configVolumeDampenInactive;
+        private Bindable<bool> configVolumeDampenNotPlaying;
+
         private readonly string[] args;
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
@@ -243,9 +247,19 @@ namespace osu.Game
             };
             configSkin.TriggerChange();
 
-            IsActive.BindValueChanged(active => updateActiveState(active.NewValue), true);
+            IsActive.BindValueChanged(_ => updateVolumeDampeningState());
+            LocalUserPlaying.BindValueChanged(_ => updateVolumeDampeningState());
 
-            Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeFade);
+            configVolumeDampened = LocalConfig.GetBindable<double>(OsuSetting.VolumeDampened);
+            configVolumeDampened.BindValueChanged(volume => this.TransformBindableTo(this.volumeFade, volume.NewValue), true);
+
+            configVolumeDampenInactive = LocalConfig.GetBindable<bool>(OsuSetting.VolumeDampenInactive);
+            configVolumeDampenInactive.BindValueChanged(_ => updateVolumeDampeningState());
+
+            configVolumeDampenNotPlaying = LocalConfig.GetBindable<bool>(OsuSetting.VolumeDampenNotPlaying);
+            configVolumeDampenNotPlaying.BindValueChanged(_ => updateVolumeDampeningState());
+
+            Audio.AddAdjustment(AdjustableProperty.Volume, volumeFade);
 
             SelectedMods.BindValueChanged(modsChanged);
             Beatmap.BindValueChanged(beatmapChanged, true);
@@ -939,16 +953,20 @@ namespace osu.Game
             return false;
         }
 
-        #region Inactive audio dimming
+        #region Audio dampening
 
-        private readonly BindableDouble inactiveVolumeFade = new BindableDouble();
+        private readonly BindableDouble volumeFade = new BindableDouble();
 
-        private void updateActiveState(bool isActive)
+        private bool shouldDampenVolume =>
+            (LocalConfig.Get<bool>(OsuSetting.VolumeDampenInactive) && !IsActive.Value)
+            || (LocalConfig.Get<bool>(OsuSetting.VolumeDampenNotPlaying) && !LocalUserPlaying.Value);
+
+        private void updateVolumeDampeningState()
         {
-            if (isActive)
-                this.TransformBindableTo(inactiveVolumeFade, 1, 400, Easing.OutQuint);
+            if (shouldDampenVolume)
+                this.TransformBindableTo(volumeFade, LocalConfig.Get<double>(OsuSetting.VolumeDampened), 4000, Easing.OutQuint);
             else
-                this.TransformBindableTo(inactiveVolumeFade, LocalConfig.Get<double>(OsuSetting.VolumeInactive), 4000, Easing.OutQuint);
+                this.TransformBindableTo(volumeFade, 1, 400, Easing.OutQuint);
         }
 
         #endregion

@@ -26,10 +26,20 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 },
                 new SettingsSlider<double>
                 {
-                    LabelText = "Master (window inactive)",
-                    Current = config.GetBindable<double>(OsuSetting.VolumeInactive),
+                    LabelText = "Master dampening",
+                    Current = config.GetBindable<double>(OsuSetting.VolumeDampened),
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "While window is inactive",
+                    Current = config.GetBindable<bool>(OsuSetting.VolumeDampenInactive)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "While not playing",
+                    Current = config.GetBindable<bool>(OsuSetting.VolumeDampenNotPlaying)
                 },
                 new SettingsSlider<double>
                 {
