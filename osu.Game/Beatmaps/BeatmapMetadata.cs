@@ -37,12 +37,31 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Helper property to deserialize a username to <see cref="User"/>.
         /// </summary>
+        [JsonProperty(@"user_id")]
+        [Column("AuthorID")]
+        public int AuthorID
+        {
+            get => Author?.Id ?? 1;
+            set
+            {
+                Author ??= new User();
+                Author.Id = value;
+            }
+        }
+
+        /// <summary>
+        /// Helper property to deserialize a username to <see cref="User"/>.
+        /// </summary>
         [JsonProperty(@"creator")]
         [Column("Author")]
         public string AuthorString
         {
             get => Author?.Username;
-            set => Author = new User { Username = value };
+            set
+            {
+                Author ??= new User();
+                Author.Username = value;
+            }
         }
 
         /// <summary>

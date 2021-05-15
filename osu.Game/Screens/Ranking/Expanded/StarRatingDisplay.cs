@@ -100,7 +100,6 @@ namespace osu.Game.Screens.Ranking.Expanded
             base.LoadComplete();
 
             Current.BindValueChanged(_ => updateDisplay(), true);
-            FinishTransforms(true);
         }
 
         private void updateDisplay()

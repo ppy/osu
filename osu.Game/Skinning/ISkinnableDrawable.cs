@@ -3,12 +3,16 @@
 
 using osu.Framework.Graphics;
 
-namespace osu.Game.Screens.Play.HUD
+namespace osu.Game.Skinning
 {
     /// <summary>
     /// Denotes a drawable which, as a drawable, can be adjusted via skinning specifications.
     /// </summary>
-    public interface ISkinnableComponent : IDrawable
+    public interface ISkinnableDrawable : IDrawable
     {
+        /// <summary>
+        /// Whether this component should be editable by an end user.
+        /// </summary>
+        bool IsEditable => true;
     }
 }
