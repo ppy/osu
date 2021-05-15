@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -38,8 +39,11 @@ namespace osu.Game.Screens.Play
 
         public IBindable<IReadOnlyList<Mod>> Mods => mods;
 
+        private bool isLoading;
+
         public bool Loading
         {
+            get => isLoading;
             set
             {
                 if (value)
@@ -51,11 +55,13 @@ namespace osu.Game.Screens.Play
                 {
                     loading.Hide();
 
-                    if (optui.Value)
+                    if (Optui.Value)
                         ruleseticon.Show();
                     else
                         ruleseticon.Hide();
                 }
+
+                isLoading = value;
             }
         }
 
@@ -69,7 +75,7 @@ namespace osu.Game.Screens.Play
         }
 
         private Container bg;
-        private readonly Bindable<bool> optui = new Bindable<bool>();
+        public readonly Bindable<bool> Optui = new Bindable<bool>();
 
         private IBindable<StarDifficulty?> starDifficulty;
 
@@ -152,7 +158,7 @@ namespace osu.Game.Screens.Play
                                     FillMode = FillMode.Fill,
                                 },
                                 loading = new LoadingLayer(true),
-                                ruleseticon = new SelectedRulesetIcon(beatmap.BeatmapInfo.Ruleset),
+                                ruleseticon = new SelectedRulesetIcon(beatmap.BeatmapInfo.Ruleset)
                             }
                         },
                         versionFlow = new FillFlowContainer
@@ -225,8 +231,8 @@ namespace osu.Game.Screens.Play
 
             Loading = true;
 
-            config.BindWith(MSetting.OptUI, optui);
-            optui.BindValueChanged(updateVisualEffects);
+            config.BindWith(MSetting.OptUI, Optui);
+            Optui.BindValueChanged(updateVisualEffects);
 
             entryAnimation();
         }
@@ -236,13 +242,15 @@ namespace osu.Game.Screens.Play
             switch (v.NewValue)
             {
                 case true:
-                    ruleseticon.Show();
-                    bg.ResizeHeightTo(1, 500, Easing.OutQuint).FadeIn(500, Easing.OutQuint);
+                    if (!isLoading)
+                        ruleseticon.Show();
+
+                    bg.ResizeHeightTo(1, 300, Easing.OutCubic).FadeIn(300, Easing.OutQuint);
                     return;
 
                 case false:
                     ruleseticon.Hide();
-                    bg.ResizeHeightTo(0, 500, Easing.OutQuint).FadeOut(500, Easing.OutQuint);
+                    bg.ResizeHeightTo(0.6f, 200, Easing.OutCubic).FadeOut(200, Easing.OutQuint);
                     return;
             }
         }
@@ -251,7 +259,7 @@ namespace osu.Game.Screens.Play
         {
             bg.ScaleTo(1).FadeOut().ResizeHeightTo(0);
 
-            switch (optui.Value)
+            switch (Optui.Value)
             {
                 case true:
                     bg.Delay(750).ResizeHeightTo(1, 500, Easing.OutQuint).FadeIn(500, Easing.OutQuint);
@@ -318,11 +326,12 @@ namespace osu.Game.Screens.Play
 
             private const float target_width = 200;
 
+            [CanBeNull]
             private readonly Ruleset ruleset;
 
             public SelectedRulesetIcon(RulesetInfo rulesetInfo)
             {
-                ruleset = rulesetInfo.CreateInstance();
+                ruleset = rulesetInfo?.CreateInstance();
             }
 
             [BackgroundDependencyLoader]
@@ -355,7 +364,7 @@ namespace osu.Game.Screens.Play
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Icon = ruleset.CreateIcon(),
+                                Icon = ruleset?.CreateIcon() ?? new SpriteIcon { Icon = FontAwesome.Regular.QuestionCircle },
                                 Colour = Color4.White,
                                 Size = new Vector2(20),
                                 Scale = new Vector2(2),
@@ -372,7 +381,7 @@ namespace osu.Game.Screens.Play
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Text = ruleset.Description
+                                    Text = ruleset?.Description ?? "missingno"
                                 }
                             }
                         }
@@ -384,7 +393,7 @@ namespace osu.Game.Screens.Play
 
             public override void Show()
             {
-                this.ResizeWidthTo(target_width, 500, Easing.OutQuint).FadeIn(500, Easing.OutQuint);
+                this.ResizeWidthTo(target_width, 300, Easing.OutQuint).FadeIn(300, Easing.OutQuint);
 
                 if (isFirstShow)
                 {
@@ -399,7 +408,7 @@ namespace osu.Game.Screens.Play
 
             public override void Hide()
             {
-                this.ResizeWidthTo(0, 500, Easing.OutQuint).FadeOut(500, Easing.OutQuint);
+                this.ResizeWidthTo(target_width * 0.6f, 200, Easing.OutCubic).FadeOut(200, Easing.OutQuint);
             }
         }
     }

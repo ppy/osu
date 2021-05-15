@@ -9,9 +9,13 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Menu;
@@ -87,11 +91,13 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
         }
 
+        private readonly BindableBool bindableBool = new BindableBool();
+
         private void showMetadataForBeatmap(Func<WorkingBeatmap> getBeatmap)
         {
             AddStep("setup display", () =>
             {
-                var randomMods = Ruleset.Value.CreateInstance().GetAllMods().OrderBy(_ => RNG.Next()).Take(5).ToList();
+                var randomMods = Ruleset.Value.CreateInstance().GetAllMods().OrderBy(_ => RNG.Next()).Take(15).ToList();
 
                 OsuLogo logo = new OsuLogo { Scale = new Vector2(0.15f) };
 
@@ -100,11 +106,23 @@ namespace osu.Game.Tests.Visual.SongSelect
                 Children = new Drawable[]
                 {
                     testDifficultyCache,
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#333"), Color4Extensions.FromHex("#777"))
+                    },
                     display = new BeatmapMetadataDisplay(getBeatmap(), new Bindable<IReadOnlyList<Mod>>(randomMods), logo)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Alpha = 0f,
+                        Optui = { BindTarget = bindableBool }
+                    },
+                    new TriangleButton
+                    {
+                        Action = () => bindableBool.Toggle(),
+                        Width = 40,
+                        Text = "切换optui"
                     }
                 };
 
