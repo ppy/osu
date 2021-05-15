@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -35,6 +36,14 @@ namespace osu.Game.Rulesets.Mods
                 default:
                     return rank;
             }
+        }
+
+        protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
+        {
+        }
+
+        protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state)
+        {
         }
     }
 }
