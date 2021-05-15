@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -91,6 +92,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                         circle.Position = currentObjectInfo.StartPosChanged;
                         currentObjectInfo.EndPosChanged = currentObjectInfo.StartPosChanged;
+
                         break;
 
                     case Slider slider:
@@ -109,6 +111,12 @@ namespace osu.Game.Rulesets.Osu.Mods
                         currentObjectInfo.EndPosChanged = slider.TailCircle.Position;
 
                         moveSliderIntoPlayfield(ref slider, ref currentObjectInfo);
+
+                        var sliderShift = Vector2.Subtract(slider.Position, currentObjectInfo.StartPosUnchanged);
+
+                        foreach (var tick in slider.NestedHitObjects.OfType<SliderTick>())
+                            tick.Position = Vector2.Add(tick.Position, sliderShift);
+
                         break;
                 }
 
