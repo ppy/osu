@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using System.Diagnostics;
+using osu.Framework.Platform;
 
 namespace osu.Game.Overlays.News.Sidebar
 {
@@ -99,9 +100,12 @@ namespace osu.Game.Overlays.News.Sidebar
             protected override IEnumerable<Drawable> EffectTargets => new[] { text };
 
             private readonly TextFlowContainer text;
+            private readonly APINewsPost post;
 
             public PostButton(APINewsPost post)
             {
+                this.post = post;
+
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
                 Child = text = new TextFlowContainer(t => t.Font = OsuFont.GetFont(size: 12))
@@ -113,11 +117,13 @@ namespace osu.Game.Overlays.News.Sidebar
             }
 
             [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
+            private void load(OverlayColourProvider colourProvider, GameHost host)
             {
                 IdleColour = colourProvider.Light2;
                 HoverColour = colourProvider.Light1;
-                Action = () => { }; // Avoid button being disabled since there's no proper action assigned.
+
+                TooltipText = "view in browser";
+                Action = () => host.OpenUrlExternally("https://osu.ppy.sh/home/news/" + post.Slug);
             }
         }
 
