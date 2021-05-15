@@ -132,7 +132,7 @@ namespace osu.Game.Overlays.Settings
                 controlWithCurrent.Current.DisabledChanged += _ => updateDisabled();
 
                 if (ShowsDefaultIndicator)
-                    restoreDefaultButton.Bindable = controlWithCurrent.Current;
+                    restoreDefaultButton.Current = controlWithCurrent.Current;
             }
         }
 
