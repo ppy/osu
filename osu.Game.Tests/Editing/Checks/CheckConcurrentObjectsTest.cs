@@ -6,11 +6,13 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Checks;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Editing.Checks
 {
@@ -105,7 +107,7 @@ namespace osu.Game.Tests.Editing.Checks
                 new HitCircle { StartTime = 300 }
             };
 
-            var issues = check.Run(getPlayableBeatmap(hitobjects), null).ToList();
+            var issues = check.Run(getContext(hitobjects)).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(3));
             Assert.That(issues.Where(issue => issue.Template is CheckConcurrentObjects.IssueTemplateConcurrentDifferent).ToList(), Has.Count.EqualTo(2));
@@ -164,12 +166,12 @@ namespace osu.Game.Tests.Editing.Checks
 
         private void assertOk(List<HitObject> hitobjects)
         {
-            Assert.That(check.Run(getPlayableBeatmap(hitobjects), null), Is.Empty);
+            Assert.That(check.Run(getContext(hitobjects)), Is.Empty);
         }
 
         private void assertConcurrentSame(List<HitObject> hitobjects, int count = 1)
         {
-            var issues = check.Run(getPlayableBeatmap(hitobjects), null).ToList();
+            var issues = check.Run(getContext(hitobjects)).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(count));
             Assert.That(issues.All(issue => issue.Template is CheckConcurrentObjects.IssueTemplateConcurrentSame));
@@ -177,18 +179,16 @@ namespace osu.Game.Tests.Editing.Checks
 
         private void assertConcurrentDifferent(List<HitObject> hitobjects, int count = 1)
         {
-            var issues = check.Run(getPlayableBeatmap(hitobjects), null).ToList();
+            var issues = check.Run(getContext(hitobjects)).ToList();
 
             Assert.That(issues, Has.Count.EqualTo(count));
             Assert.That(issues.All(issue => issue.Template is CheckConcurrentObjects.IssueTemplateConcurrentDifferent));
         }
 
-        private IBeatmap getPlayableBeatmap(List<HitObject> hitobjects)
+        private BeatmapVerifierContext getContext(List<HitObject> hitobjects)
         {
-            return new Beatmap<HitObject>
-            {
-                HitObjects = hitobjects
-            };
+            var beatmap = new Beatmap<HitObject> { HitObjects = hitobjects };
+            return new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));
         }
     }
 }
