@@ -309,6 +309,10 @@ namespace osu.Game
                         ShowUser(userId);
                     break;
 
+                case LinkAction.OpenWiki:
+                    ShowWiki(link.Argument);
+                    break;
+
                 default:
                     throw new NotImplementedException($"This {nameof(LinkAction)} ({link.Action.ToString()}) is missing an associated action.");
             }
@@ -355,6 +359,12 @@ namespace osu.Game
         /// </summary>
         /// <param name="beatmapId">The beatmap to show.</param>
         public void ShowBeatmap(int beatmapId) => waitForReady(() => beatmapSetOverlay, _ => beatmapSetOverlay.FetchAndShowBeatmap(beatmapId));
+
+        /// <summary>
+        /// Show a wiki's page as an overlay
+        /// </summary>
+        /// <param name="path">The wiki page to show</param>
+        public void ShowWiki(string path) => waitForReady(() => wikiOverlay, _ => wikiOverlay.ShowPage(path));
 
         /// <summary>
         /// Present a beatmap at song select immediately.
