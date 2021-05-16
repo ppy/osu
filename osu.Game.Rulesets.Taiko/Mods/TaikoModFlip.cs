@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
             foreach (var obj in taikoBeatmap.HitObjects)
             {
                 if (obj is Hit hit)
-                    hit.Type = hit.Type == HitType.Centre ? HitType.Rim : HitType.Centre; 
+                    hit.Type = hit.Type == HitType.Centre ? HitType.Rim : HitType.Centre;
             }
         }
     }
