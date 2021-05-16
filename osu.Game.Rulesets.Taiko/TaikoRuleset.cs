@@ -133,7 +133,8 @@ namespace osu.Game.Rulesets.Taiko
                 case ModType.Conversion:
                     return new Mod[]
                     {
-                        new MultiMod(new TaikoModFlip(), new TaikoModRandom()),
+                        new TaikoModFlip(),
+                        new TaikoModRandom(),
                         new TaikoModDifficultyAdjust(),
                         new TaikoModClassic(),
                     };
