@@ -29,9 +29,6 @@ namespace osu.Game.Overlays
             set
             {
                 current.Current = value;
-                current.ValueChanged += _ => UpdateState();
-                current.DisabledChanged += _ => UpdateState();
-                current.DefaultChanged += _ => UpdateState();
                 UpdateState();
             }
         }
@@ -46,6 +43,10 @@ namespace osu.Game.Overlays
             Width = SettingsPanel.CONTENT_MARGINS;
             Padding = new MarginPadding { Vertical = 1.5f };
             Alpha = 0f;
+
+            Current.ValueChanged += _ => UpdateState();
+            Current.DisabledChanged += _ => UpdateState();
+            Current.DefaultChanged += _ => UpdateState();
         }
 
         [BackgroundDependencyLoader]
