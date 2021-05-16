@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
     public class TaikoModRandom : ModRandom, IApplicableToBeatmap
     {
         public override string Description => @"Shuffle around the colours!";
-        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(TaikoModFlip)).ToArray();
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(TaikoModInvert)).ToArray();
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
