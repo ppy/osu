@@ -38,12 +38,12 @@ namespace osu.Game.Overlays.KeyBinding
             foreach (var defaultGroup in Defaults.GroupBy(d => d.Action))
             {
                 // one row per valid action.
-                Add(new SettingsKeyBindingRow(defaultGroup, bindings, Ruleset));
+                Add(new RestorableKeyBindingRow(defaultGroup.Key, bindings, Ruleset, defaultGroup.Select(d => d.KeyCombination)));
             }
 
             Add(new ResetButton
             {
-                Action = () => Children.OfType<SettingsKeyBindingRow>().ForEach(k => k.KeyBindingRow.RestoreDefaults())
+                Action = () => Children.OfType<RestorableKeyBindingRow>().ForEach(k => k.KeyBindingRow.RestoreDefaults())
             });
         }
     }

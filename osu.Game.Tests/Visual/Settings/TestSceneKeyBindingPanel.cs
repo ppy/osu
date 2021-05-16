@@ -108,11 +108,11 @@ namespace osu.Game.Tests.Visual.Settings
         [Test]
         public void TestSingleBindingResetButton()
         {
-            SettingsKeyBindingRow settingsKeyBindingRow = null;
+            RestorableKeyBindingRow settingsKeyBindingRow = null;
 
             AddStep("click first row", () =>
             {
-                settingsKeyBindingRow = panel.ChildrenOfType<SettingsKeyBindingRow>().First();
+                settingsKeyBindingRow = panel.ChildrenOfType<RestorableKeyBindingRow>().First();
 
                 InputManager.MoveMouseTo(settingsKeyBindingRow);
                 InputManager.Click(MouseButton.Left);
@@ -137,11 +137,11 @@ namespace osu.Game.Tests.Visual.Settings
         [Test]
         public void TestResetAllBindingsButton()
         {
-            SettingsKeyBindingRow settingsKeyBindingRow = null;
+            RestorableKeyBindingRow settingsKeyBindingRow = null;
 
             AddStep("click first row", () =>
             {
-                settingsKeyBindingRow = panel.ChildrenOfType<SettingsKeyBindingRow>().First();
+                settingsKeyBindingRow = panel.ChildrenOfType<RestorableKeyBindingRow>().First();
 
                 InputManager.MoveMouseTo(settingsKeyBindingRow);
                 InputManager.Click(MouseButton.Left);
