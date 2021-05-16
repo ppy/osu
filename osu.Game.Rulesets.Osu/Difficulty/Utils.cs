@@ -11,17 +11,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         public static bool IsRatioEqual(double ratio, double a, double b)
         {
-            return a + 5 > ratio * b && a - 5 < ratio * b;
+            return a + 15 > ratio * b && a - 15 < ratio * b;
         }
 
         public static bool IsRatioEqualGreater(double ratio, double a, double b)
         {
-            return a + 5 > ratio * b;
+            return a + 15 > ratio * b;
         }
 
         public static bool IsRatioEqualLess(double ratio, double a, double b)
         {
-            return a - 5 < ratio * b;
+            return a - 15 < ratio * b;
         }
 
         public static bool IsNullOrNaN(double? nullableDouble)
