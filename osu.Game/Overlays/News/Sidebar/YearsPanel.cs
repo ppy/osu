@@ -96,12 +96,7 @@ namespace osu.Game.Overlays.News.Sidebar
             {
                 IdleColour = isCurrent ? Color4.White : colourProvider.Light2;
                 HoverColour = isCurrent ? Color4.White : colourProvider.Light1;
-
-                Action = () =>
-                {
-                    if (overlay != null)
-                        overlay.ShowYear(year);
-                };
+                Action = () => overlay?.ShowYear(year);
             }
         }
 
