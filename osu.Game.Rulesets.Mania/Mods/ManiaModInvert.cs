@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
@@ -13,18 +12,9 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public class ManiaModInvert : Mod, IApplicableAfterBeatmapConversion
+    public class ManiaModInvert : ModInvert, IApplicableAfterBeatmapConversion
     {
-        public override string Name => "Invert";
-
-        public override string Acronym => "IN";
-        public override double ScoreMultiplier => 1;
-
         public override string Description => "Hold the keys. To the beat.";
-
-        public override IconUsage? Icon => FontAwesome.Solid.YinYang;
-
-        public override ModType Type => ModType.Conversion;
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {

@@ -10,13 +10,9 @@ using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
-    public class TaikoModFlip : Mod, IApplicableToBeatmap
+    public class TaikoModInvert : ModInvert, IApplicableToBeatmap
     {
-        public override string Name => "Flip";
-        public override string Acronym => "FP";
         public override string Description => @"Dons become kats, kats become dons";
-        public override ModType Type => ModType.Conversion;
-        public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModRandom)).ToArray();
 
         public void ApplyToBeatmap(IBeatmap beatmap)
