@@ -5,13 +5,14 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.KeyBinding
 {
-    public class SettingsKeyBindingRow : Container, IFilterable
+    public class RestorableKeyBindingRow : Container, IFilterable
     {
-        private readonly IGrouping<object, Framework.Input.Bindings.KeyBinding> defaultGroup;
+        private readonly object key;
         private readonly ICollection<Input.Bindings.DatabasedKeyBinding> bindings;
         public readonly KeyBindingRow KeyBindingRow;
 
@@ -29,27 +30,28 @@ namespace osu.Game.Overlays.KeyBinding
 
         public bool FilteringActive { get; set; }
 
-        public IEnumerable<string> FilterTerms => bindings.Select(b => b.KeyCombination.ReadableString()).Prepend(defaultGroup.Key.ToString());
+        public IEnumerable<string> FilterTerms => bindings.Select(b => b.KeyCombination.ReadableString()).Prepend(key.ToString());
 
-        public SettingsKeyBindingRow(
-            IGrouping<object, Framework.Input.Bindings.KeyBinding> defaultGroup,
+        public RestorableKeyBindingRow(
+            object key,
             ICollection<Input.Bindings.DatabasedKeyBinding> bindings,
-            RulesetInfo ruleset)
+            RulesetInfo ruleset,
+            IEnumerable<KeyCombination> defaults)
         {
-            this.defaultGroup = defaultGroup;
+            this.key = key;
             this.bindings = bindings;
-
-            KeyBindingRow = new KeyBindingRow(defaultGroup.Key, bindings.Where(b => ((int)b.Action).Equals((int)defaultGroup.Key)))
-            {
-                AllowMainMouseButtons = ruleset != null,
-                Defaults = defaultGroup.Select(d => d.KeyCombination)
-            };
 
             RestoreDefaultValueButton<bool> restoreDefaultButton;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Padding = new MarginPadding { Right = SettingsPanel.CONTENT_MARGINS };
+
+            KeyBindingRow = new KeyBindingRow(key, bindings.Where(b => ((int)b.Action).Equals((int)key)))
+            {
+                AllowMainMouseButtons = ruleset != null,
+                Defaults = defaults
+            };
 
             InternalChildren = new Drawable[]
             {
