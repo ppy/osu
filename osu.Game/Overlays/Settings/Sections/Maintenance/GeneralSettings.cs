@@ -30,9 +30,9 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         private TriangleButton undeleteButton;
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(BeatmapManager beatmaps, ScoreManager scores, SkinManager skins, [CanBeNull] CollectionManager collectionManager, StableImportManager stableImportManager, DialogOverlay dialogOverlay)
+        private void load(BeatmapManager beatmaps, ScoreManager scores, SkinManager skins, [CanBeNull] CollectionManager collectionManager, [CanBeNull] StableImportManager stableImportManager, DialogOverlay dialogOverlay)
         {
-            if (stableImportManager.SupportsImportFromStable)
+            if (stableImportManager?.SupportsImportFromStable ?? false)
             {
                 Add(importBeatmapsButton = new SettingsButton
                 {
@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 }
             });
 
-            if (stableImportManager.SupportsImportFromStable)
+            if (stableImportManager?.SupportsImportFromStable ?? false)
             {
                 Add(importScoresButton = new SettingsButton
                 {
@@ -84,7 +84,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 }
             });
 
-            if (stableImportManager.SupportsImportFromStable)
+            if (stableImportManager?.SupportsImportFromStable ?? false)
             {
                 Add(importSkinsButton = new SettingsButton
                 {
@@ -112,7 +112,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
             if (collectionManager != null)
             {
-                if (stableImportManager.SupportsImportFromStable)
+                if (stableImportManager?.SupportsImportFromStable ?? false)
                 {
                     Add(importCollectionsButton = new SettingsButton
                     {
