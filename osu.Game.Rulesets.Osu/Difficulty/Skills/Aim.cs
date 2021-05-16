@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Aim : OsuSkill
     {
-        protected override double StarsPerDouble => 1.125;
+        protected override double StarsPerDouble => 1.1125;
         protected override int HistoryLength => 2;
 
         private int decayExcessThreshold = 500;
@@ -25,9 +25,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double snapStrainMultiplier = 17.0;
         private double flowStrainMultiplier = 18.5;
-        private double hybridStrainMultiplier = 0;
+        private double hybridStrainMultiplier = 17.5;
         private double sliderStrainMultiplier = 30;
-        private double totalStrainMultiplier = .175;
+        private double totalStrainMultiplier = .1875;
 
         private int curr = 0;
 
@@ -64,8 +64,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             else
                 minDistance = Math.Min(prevDiffStrain, 150 / osuCurrObj.StrainTime);
 
-            double strain = 2 * currVector.Length + minDistance
-                    + Math.Abs(prevDiffStrain - nextDiffStrain) * Math.Min(osuNextObj.FlowProbability, osuPrevObj.FlowProbability);
+            double strain = 2 * currVector.Length + minDistance;
+                    // + Math.Abs(prevDiffStrain - nextDiffStrain) * Math.Min(osuNextObj.FlowProbability, osuPrevObj.FlowProbability);
 
             // strain = Math.Pow(strain, 1.1);
 
@@ -79,8 +79,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double prevDiffStrain = Vector2.Add(prevVector, currVector).Length;
 
             double strain = 100 / osuCurrObj.StrainTime + currVector.Length
- + Math.Max(0, prevDiffStrain - (Math.Max(currVector.Length, prevVector.Length) + Math.Abs(currVector.Length - prevVector.Length) / 2) / 2) / 1.5
-+ Math.Abs(prevDiffStrain - nextDiffStrain) * Math.Min(osuNextObj.SnapProbability, osuPrevObj.SnapProbability);
+ + osuPrevObj.SnapProbability * Math.Max(0, prevDiffStrain - (Math.Max(currVector.Length, prevVector.Length) + Math.Abs(currVector.Length - prevVector.Length)) / 2) / 2;
+// + Math.Abs(prevDiffStrain - nextDiffStrain) * Math.Min(osuNextObj.SnapProbability, osuPrevObj.SnapProbability);
 
             strain *= osuCurrObj.StrainTime / (osuCurrObj.StrainTime - 20);
 
@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                                       Vector2 prevVector, Vector2 currVector, Vector2 nextVector)
         {
             double flowToSnap = Math.Sqrt(prevVector.Length * Math.Min(currVector.Length, 150 / osuCurrObj.StrainTime)) * osuCurrObj.SnapProbability * osuPrevObj.FlowProbability;
-            double snapToFlow = Math.Sqrt(Math.Min(prevVector.Length, 150 / osuPrevObj.StrainTime) * currVector.Length) * osuPrevObj.SnapProbability * osuCurrObj.FlowProbability;
+            double snapToFlow = 0;//Math.Sqrt(Math.Min(prevVector.Length, 150 / osuPrevObj.StrainTime) * currVector.Length) * osuPrevObj.SnapProbability * osuCurrObj.FlowProbability;
 
             double strain = Math.Max(flowToSnap, snapToFlow);
 
@@ -156,8 +156,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
 
                 currStrain *= computeDecay(.75, Math.Max(50, osuCurrObj.StrainTime));// - osuCurrObj.TravelTime));
-                currStrain += snapStrain * snapStrainMultiplier * Math.Sqrt(1 + tapSkill.TapStrain / 400);
-                currStrain += flowStrain * flowStrainMultiplier * Math.Sqrt(1 + tapSkill.TapStrain / 150);
+                currStrain += snapStrain * snapStrainMultiplier;// * Math.Sqrt(1 + tapSkill.TapStrain / 400);
+                currStrain += flowStrain * flowStrainMultiplier;// * Math.Sqrt(1 + tapSkill.TapStrain / 150);
                 currStrain += hybridStrain * hybridStrainMultiplier;
                 currStrain += sliderStrain * sliderStrainMultiplier;
 
@@ -185,7 +185,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             double strain = strainValueAt(current);
 
-            // strain *= Math.Sqrt(1 + tapSkill.TapStrain / 100);
+            strain *= Math.Sqrt(1 + tapSkill.TapStrain / 200);
 
             // Console.WriteLine(Math.Sqrt(1 + tapSkill.TapStrain / 100));
 
