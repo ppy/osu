@@ -51,6 +51,8 @@ namespace osu.Game.Screens.Select
 
         protected virtual bool ShowFooter => true;
 
+        protected virtual bool DisplayStableImportPrompt => true;
+
         /// <summary>
         /// Can be null if <see cref="ShowFooter"/> is false.
         /// </summary>
@@ -282,7 +284,7 @@ namespace osu.Game.Screens.Select
                 Schedule(() =>
                 {
                     // if we have no beatmaps, let's prompt the user to import from over a stable install if he has one.
-                    if (!beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.Minimal).Any() && stableImportManager.SupportsImportFromStable)
+                    if (!beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.Minimal).Any() && stableImportManager.SupportsImportFromStable && DisplayStableImportPrompt)
                     {
                         dialogOverlay.Push(new ImportFromStablePopup(() =>
                         {
