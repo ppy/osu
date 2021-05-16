@@ -37,17 +37,17 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestPerformAtSongSelect()
         {
-            PushAndConfirm(() => new PlaySongSelect());
+            PushAndConfirm(() => new TestPlaySongSelect());
 
-            AddStep("perform immediately", () => Game.PerformFromScreen(_ => actionPerformed = true, new[] { typeof(PlaySongSelect) }));
+            AddStep("perform immediately", () => Game.PerformFromScreen(_ => actionPerformed = true, new[] { typeof(TestPlaySongSelect) }));
             AddAssert("did perform", () => actionPerformed);
-            AddAssert("screen didn't change", () => Game.ScreenStack.CurrentScreen is PlaySongSelect);
+            AddAssert("screen didn't change", () => Game.ScreenStack.CurrentScreen is TestPlaySongSelect);
         }
 
         [Test]
         public void TestPerformAtMenuFromSongSelect()
         {
-            PushAndConfirm(() => new PlaySongSelect());
+            PushAndConfirm(() => new TestPlaySongSelect());
 
             AddStep("try to perform", () => Game.PerformFromScreen(_ => actionPerformed = true));
             AddUntilStep("returned to menu", () => Game.ScreenStack.CurrentScreen is MainMenu);
@@ -57,18 +57,18 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestPerformAtSongSelectFromPlayerLoader()
         {
-            PushAndConfirm(() => new PlaySongSelect());
+            PushAndConfirm(() => new TestPlaySongSelect());
             PushAndConfirm(() => new PlayerLoader(() => new SoloPlayer()));
 
-            AddStep("try to perform", () => Game.PerformFromScreen(_ => actionPerformed = true, new[] { typeof(PlaySongSelect) }));
-            AddUntilStep("returned to song select", () => Game.ScreenStack.CurrentScreen is PlaySongSelect);
+            AddStep("try to perform", () => Game.PerformFromScreen(_ => actionPerformed = true, new[] { typeof(TestPlaySongSelect) }));
+            AddUntilStep("returned to song select", () => Game.ScreenStack.CurrentScreen is TestPlaySongSelect);
             AddAssert("did perform", () => actionPerformed);
         }
 
         [Test]
         public void TestPerformAtMenuFromPlayerLoader()
         {
-            PushAndConfirm(() => new PlaySongSelect());
+            PushAndConfirm(() => new TestPlaySongSelect());
             PushAndConfirm(() => new PlayerLoader(() => new SoloPlayer()));
 
             AddStep("try to perform", () => Game.PerformFromScreen(_ => actionPerformed = true));
@@ -186,6 +186,11 @@ namespace osu.Game.Tests.Visual.Navigation
 
                 return base.OnExiting(next);
             }
+        }
+
+        public class TestPlaySongSelect : PlaySongSelect
+        {
+            protected override bool DisplayStableImportPrompt => false;
         }
     }
 }
