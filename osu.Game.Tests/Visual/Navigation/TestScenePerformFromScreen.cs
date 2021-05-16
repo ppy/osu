@@ -11,8 +11,8 @@ using osu.Game.Overlays;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.Select;
 using osuTK.Input;
+using static osu.Game.Tests.Visual.Navigation.TestSceneScreenNavigation;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
@@ -186,11 +186,6 @@ namespace osu.Game.Tests.Visual.Navigation
 
                 return base.OnExiting(next);
             }
-        }
-
-        public class TestPlaySongSelect : PlaySongSelect
-        {
-            protected override bool DisplayStableImportPrompt => false;
         }
     }
 }
