@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(BeatmapManager beatmaps, ScoreManager scores, SkinManager skins, [CanBeNull] CollectionManager collectionManager, [CanBeNull] StableImportManager stableImportManager, DialogOverlay dialogOverlay)
         {
-            if (stableImportManager?.SupportsImportFromStable ?? false)
+            if (stableImportManager?.SupportsImportFromStable == true)
             {
                 Add(importBeatmapsButton = new SettingsButton
                 {
@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 }
             });
 
-            if (stableImportManager?.SupportsImportFromStable ?? false)
+            if (stableImportManager?.SupportsImportFromStable == true)
             {
                 Add(importScoresButton = new SettingsButton
                 {
@@ -84,7 +84,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 }
             });
 
-            if (stableImportManager?.SupportsImportFromStable ?? false)
+            if (stableImportManager?.SupportsImportFromStable == true)
             {
                 Add(importSkinsButton = new SettingsButton
                 {
@@ -112,7 +112,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
             if (collectionManager != null)
             {
-                if (stableImportManager?.SupportsImportFromStable ?? false)
+                if (stableImportManager?.SupportsImportFromStable == true)
                 {
                     Add(importCollectionsButton = new SettingsButton
                     {
