@@ -80,7 +80,7 @@ namespace osu.Game.Overlays
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (current != null && !current.Disabled)
+            if (!current.Disabled)
                 current.SetDefault();
             return true;
         }
