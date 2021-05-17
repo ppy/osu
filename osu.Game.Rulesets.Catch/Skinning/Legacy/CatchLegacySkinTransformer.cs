@@ -26,15 +26,20 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
         {
             if (component is SkinnableTargetComponent targetComponent && targetComponent.Target == SkinnableTarget.MainHUDComponents)
             {
-                if (!providesComboCounter || !(Source.GetDrawableComponent(component) is SkinnableTargetComponentsContainer components))
+                if (!providesComboCounter)
                     return null;
 
-                // catch may provide its own combo counter; hide the default.
-                // todo: this should probably be done in an elegant way.
-                foreach (var legacyComboCounter in components.OfType<LegacyComboCounter>())
-                    legacyComboCounter.Expire();
+                if (Source.GetDrawableComponent(component) is SkinnableTargetComponentsContainer components)
+                {
+                    // catch may provide its own combo counter; hide the default.
+                    // todo: this should probably be done in an elegant way.
+                    foreach (var legacyComboCounter in components.OfType<LegacyComboCounter>())
+                        legacyComboCounter.Expire();
 
-                return components;
+                    return components;
+                }
+
+                return null;
             }
 
             if (!(component is CatchSkinComponent catchSkinComponent))
