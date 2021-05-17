@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -256,6 +257,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }
         }
 
+        [Resolved]
+        private AudioManager audio { get; set; }
+
+        [Resolved]
+        private OsuConfigManager config { get; set; }
+
+        private readonly Bindable<double> volumeMultiplayerRoom = new Bindable<double>();
+
+        private readonly BindableNumber<double> trackVolumeAdjust = new BindableDouble(1);
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -274,6 +285,42 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 if (!connected.NewValue)
                     Schedule(this.Exit);
             }, true);
+
+            config.BindWith(OsuSetting.VolumeMultiplayerRoom, volumeMultiplayerRoom);
+        }
+
+        public override void OnResuming(IScreen last)
+        {
+            this.TransformBindableTo(trackVolumeAdjust, volumeMultiplayerRoom.Value, 1000, Easing.OutQuad);
+            volumeMultiplayerRoom.BindValueChanged(d => trackVolumeAdjust.Set(d.NewValue));
+
+            base.OnResuming(last);
+        }
+
+        public override void OnSuspending(IScreen next)
+        {
+            volumeMultiplayerRoom.UnbindEvents();
+            this.TransformBindableTo(trackVolumeAdjust, 1, 1000, Easing.OutQuad);
+
+            base.OnSuspending(next);
+        }
+
+        public override void OnEntering(IScreen last)
+        {
+            audio.Tracks.AddAdjustment(AdjustableProperty.Volume, trackVolumeAdjust);
+            this.TransformBindableTo(trackVolumeAdjust, volumeMultiplayerRoom.Value, 1000, Easing.OutQuad);
+            volumeMultiplayerRoom.BindValueChanged(d => trackVolumeAdjust.Set(d.NewValue));
+
+            base.OnEntering(last);
+        }
+
+        public override bool OnExiting(IScreen next)
+        {
+            volumeMultiplayerRoom.UnbindEvents();
+            var transform = this.TransformBindableTo(trackVolumeAdjust, 1, 1000, Easing.OutQuad);
+            transform.Finally(_ => audio.Tracks.RemoveAdjustment(AdjustableProperty.Volume, trackVolumeAdjust));
+
+            return base.OnExiting(next);
         }
 
         protected override void UpdateMods()
