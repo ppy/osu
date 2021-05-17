@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -11,6 +10,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.News.Sidebar
@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.News.Sidebar
     {
         private readonly Bindable<APINewsSidebar> metadata = new Bindable<APINewsSidebar>();
 
-        private Container gridContent;
+        private FillFlowContainer yearsFlow;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, Bindable<APINewsSidebar> metadata)
@@ -37,11 +37,17 @@ namespace osu.Game.Overlays.News.Sidebar
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background3
                 },
-                gridContent = new Container
+                new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding(5)
+                    Padding = new MarginPadding(5),
+                    Child = yearsFlow = new FillFlowContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Spacing = new Vector2(0, 5)
+                    }
                 }
             };
         }
@@ -52,13 +58,19 @@ namespace osu.Game.Overlays.News.Sidebar
 
             metadata.BindValueChanged(m =>
             {
+                yearsFlow.Clear();
+
                 if (m.NewValue == null)
                 {
                     Hide();
                     return;
                 }
 
-                gridContent.Child = new YearsGridContainer(m.NewValue.Years, m.NewValue.CurrentYear);
+                var currentYear = m.NewValue.CurrentYear;
+
+                foreach (var y in m.NewValue.Years)
+                    yearsFlow.Add(new YearButton(y, y == currentYear));
+
                 Show();
             }, true);
         }
@@ -72,8 +84,8 @@ namespace osu.Game.Overlays.News.Sidebar
                 this.isCurrent = isCurrent;
 
                 RelativeSizeAxes = Axes.X;
+                Width = 0.25f;
                 Height = 15;
-                Padding = new MarginPadding { Vertical = 2.5f };
 
                 Child = new OsuSpriteText
                 {
@@ -90,52 +102,6 @@ namespace osu.Game.Overlays.News.Sidebar
                 IdleColour = isCurrent ? Color4.White : colourProvider.Light2;
                 HoverColour = isCurrent ? Color4.White : colourProvider.Light1;
                 Action = () => { }; // Avoid button being disabled since there's no proper action assigned.
-            }
-        }
-
-        private class YearsGridContainer : GridContainer
-        {
-            private const int column_count = 4;
-
-            private readonly int rowCount;
-
-            public YearsGridContainer(int[] years, int currentYear)
-            {
-                rowCount = (years.Length + column_count - 1) / column_count;
-
-                RelativeSizeAxes = Axes.X;
-                AutoSizeAxes = Axes.Y;
-                RowDimensions = Enumerable.Range(0, rowCount).Select(_ => new Dimension(GridSizeMode.AutoSize)).ToArray();
-                Content = createContent(years, currentYear);
-            }
-
-            private Drawable[][] createContent(int[] years, int currentYear)
-            {
-                var buttons = new Drawable[rowCount][];
-
-                for (int i = 0; i < rowCount; i++)
-                {
-                    buttons[i] = new Drawable[column_count];
-
-                    for (int j = 0; j < column_count; j++)
-                    {
-                        var index = i * column_count + j;
-
-                        if (index >= years.Length)
-                        {
-                            buttons[i][j] = Empty();
-                        }
-                        else
-                        {
-                            var year = years[index];
-                            var isCurrent = year == currentYear;
-
-                            buttons[i][j] = new YearButton(year, isCurrent);
-                        }
-                    }
-                }
-
-                return buttons;
             }
         }
     }
