@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.News.Sidebar
         [Cached]
         public readonly Bindable<APINewsSidebar> Metadata = new Bindable<APINewsSidebar>();
 
-        private FillFlowContainer<MonthDropdown> monthsFlow;
+        private FillFlowContainer<MonthSection> monthsFlow;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.News.Sidebar
                         Children = new Drawable[]
                         {
                             new YearsPanel(),
-                            monthsFlow = new FillFlowContainer<MonthDropdown>
+                            monthsFlow = new FillFlowContainer<MonthSection>
                             {
                                 AutoSizeAxes = Axes.Y,
                                 RelativeSizeAxes = Axes.X,
@@ -93,7 +93,7 @@ namespace osu.Game.Overlays.News.Sidebar
                 var month = sortedKeys[i];
                 var posts = lookup[month];
 
-                monthsFlow.Add(new MonthDropdown(month, year, posts)
+                monthsFlow.Add(new MonthSection(month, year, posts)
                 {
                     IsOpen = { Value = i == 0 }
                 });
