@@ -10,7 +10,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Edit
 {
-    public class RoundedContentEditorScreen : EditorScreen
+    public class EditorRoundedScreen : EditorScreen
     {
         public const int HORIZONTAL_PADDING = 100;
 
@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Edit
 
         protected override Container<Drawable> Content => roundedContent;
 
-        public RoundedContentEditorScreen(EditorScreenMode mode)
+        public EditorRoundedScreen(EditorScreenMode mode)
             : base(mode)
         {
             ColourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);

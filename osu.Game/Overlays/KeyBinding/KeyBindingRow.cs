@@ -339,21 +339,12 @@ namespace osu.Game.Overlays.KeyBinding
             }
         }
 
-        public class ClearButton : TriangleButton
+        public class ClearButton : DangerousTriangleButton
         {
             public ClearButton()
             {
                 Text = "Clear";
                 Size = new Vector2(80, 20);
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                BackgroundColour = colours.Pink;
-
-                Triangles.ColourDark = colours.PinkDark;
-                Triangles.ColourLight = colours.PinkLight;
             }
         }
 
