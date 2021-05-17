@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double minDistance = 0;
 
             if (prevDiffVector.Length > currVector.Length && nextDiffVector.Length > currVector.Length)
-                minDistance = Math.Min(1, Math.Max(0, (osuCurrObj.JumpDistance - 75)) / 50) * Math.Max(0, Math.Min(125 / osuCurrObj.StrainTime, prevDiffVector.Length - Math.Max(currVector.Length, prevVector.Length) / 2));
+                minDistance = Math.Min(1, Math.Max(0, (osuCurrObj.JumpDistance - 75)) / 50) * Math.Max(0, Math.Min(100 / osuCurrObj.StrainTime, prevDiffVector.Length - Math.Max(currVector.Length, prevVector.Length) / 2));
             else
                 minDistance = Math.Max(0, Math.Min(125 / osuCurrObj.StrainTime, prevDiffVector.Length - Math.Max(currVector.Length, prevVector.Length) / 2));
 
