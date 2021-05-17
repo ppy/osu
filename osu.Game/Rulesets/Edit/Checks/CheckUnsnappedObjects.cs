@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit.Checks.Components;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -22,11 +21,11 @@ namespace osu.Game.Rulesets.Edit.Checks
             new IssueTemplateSmallUnsnap(this)
         };
 
-        public IEnumerable<Issue> Run(IBeatmap playableBeatmap, IWorkingBeatmap workingBeatmap)
+        public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            var controlPointInfo = playableBeatmap.ControlPointInfo;
+            var controlPointInfo = context.Beatmap.ControlPointInfo;
 
-            foreach (var hitobject in playableBeatmap.HitObjects)
+            foreach (var hitobject in context.Beatmap.HitObjects)
             {
                 double startUnsnap = hitobject.StartTime - controlPointInfo.GetClosestSnappedTime(hitobject.StartTime);
                 string startPostfix = hitobject is IHasDuration ? "start" : "";

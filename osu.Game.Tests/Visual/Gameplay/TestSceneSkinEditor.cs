@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Skinning;
 using osu.Game.Skinning.Editor;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -14,12 +16,17 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         private SkinEditor skinEditor;
 
+        [Resolved]
+        private SkinManager skinManager { get; set; }
+
+        protected override bool Autoplay => true;
+
         [SetUpSteps]
         public override void SetUpSteps()
         {
             base.SetUpSteps();
 
-            AddStep("add editor overlay", () =>
+            AddStep("reload skin editor", () =>
             {
                 skinEditor?.Expire();
                 Player.ScaleTo(SkinEditorOverlay.VISIBLE_TARGET_SCALE);

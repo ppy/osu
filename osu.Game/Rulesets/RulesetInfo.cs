@@ -3,8 +3,8 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using Newtonsoft.Json;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Testing;
 
 namespace osu.Game.Rulesets
@@ -18,20 +18,7 @@ namespace osu.Game.Rulesets
 
         public string ShortName { get; set; }
 
-        private string instantiationInfo;
-
-        public string InstantiationInfo
-        {
-            get => instantiationInfo;
-            set => instantiationInfo = abbreviateInstantiationInfo(value);
-        }
-
-        private string abbreviateInstantiationInfo(string value)
-        {
-            // exclude version onwards, matching only on namespace and type.
-            // this is mainly to allow for new versions of already loaded rulesets to "upgrade" from old.
-            return string.Join(',', value.Split(',').Take(2));
-        }
+        public string InstantiationInfo { get; set; }
 
         [JsonIgnore]
         public bool Available { get; set; }
@@ -41,7 +28,7 @@ namespace osu.Game.Rulesets
         {
             if (!Available) return null;
 
-            var ruleset = (Ruleset)Activator.CreateInstance(Type.GetType(InstantiationInfo));
+            var ruleset = (Ruleset)Activator.CreateInstance(Type.GetType(InstantiationInfo).AsNonNull());
 
             // overwrite the pre-populated RulesetInfo with a potentially database attached copy.
             ruleset.RulesetInfo = this;

@@ -146,7 +146,7 @@ namespace osu.Game.Tests.Mods
             if (isValid)
                 Assert.IsNull(invalid);
             else
-                Assert.That(invalid?.Select(t => t.GetType()), Is.EquivalentTo(expectedInvalid));
+                Assert.That(invalid.Select(t => t.GetType()), Is.EquivalentTo(expectedInvalid));
         }
 
         public abstract class CustomMod1 : Mod
