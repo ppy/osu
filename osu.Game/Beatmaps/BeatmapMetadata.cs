@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
+using osu.Framework.Localisation;
 using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Users;
@@ -88,6 +89,12 @@ namespace osu.Game.Beatmaps
         {
             string author = Author == null ? string.Empty : $"({Author})";
             return $"{Artist} - {Title} {author}".Trim();
+        }
+
+        public RomanisableString ToRomanisableString()
+        {
+            string author = Author == null ? string.Empty : $"({Author})";
+            return new RomanisableString($"{ArtistUnicode} - {TitleUnicode} {author}".Trim(), $"{Artist} - {Title} {author}".Trim());
         }
 
         [JsonIgnore]
