@@ -177,19 +177,19 @@ namespace osu.Game.Overlays.News.Sidebar
                 }
             }
 
-            private bool shouldUpdateAutosize = true;
+            private bool autoSizeTransitionApplied;
 
-            // Workaround to allow the dropdown to be opened immediately since FinishTransforms doesn't work for AutosizeDuration.
+            // Workaround to allow the dropdown to be opened immediately since FinishTransforms doesn't work for AutoSize{Duration,Easing}.
             protected override void UpdateAfterAutoSize()
             {
                 base.UpdateAfterAutoSize();
 
-                if (shouldUpdateAutosize)
+                if (!autoSizeTransitionApplied)
                 {
                     AutoSizeDuration = animation_duration;
                     AutoSizeEasing = Easing.OutQuint;
 
-                    shouldUpdateAutosize = false;
+                    autoSizeTransitionApplied = true;
                 }
             }
         }
