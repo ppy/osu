@@ -13,6 +13,8 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
     {
         private readonly TaskCompletionSource<string> taskCompletionSource;
 
+        protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
+
         protected override bool IsValidDirectory(DirectoryInfo info) => info?.GetFiles("osu!.*.cfg").Any() ?? false;
 
         public override LocalisableString HeaderText => "Please select your osu!stable install location";
@@ -28,10 +30,10 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             this.Exit();
         }
 
-        public override bool OnBackButton()
+        public override bool OnExiting(IScreen next)
         {
             taskCompletionSource.TrySetCanceled();
-            return base.OnBackButton();
+            return base.OnExiting(next);
         }
     }
 }
