@@ -45,6 +45,13 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                     KeyboardStep = 0.01f,
                     DisplayAsPercentage = true
                 },
+                new SettingsSlider<double>
+                {
+                    LabelText = "Music (multiplayer room)",
+                    Current = config.GetBindable<double>(OsuSetting.VolumeMultiplayerRoom),
+                    KeyboardStep = 0.01f,
+                    DisplayAsPercentage = true
+                },
             };
         }
     }
