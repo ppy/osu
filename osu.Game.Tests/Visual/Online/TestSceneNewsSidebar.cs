@@ -110,10 +110,9 @@ namespace osu.Game.Tests.Visual.Online
 
         private static readonly APINewsSidebar metadata_with_no_posts = new APINewsSidebar
         {
-            CurrentYear = 2022,
+            CurrentYear = 2021,
             Years = new[]
             {
-                2022,
                 2021,
                 2020,
                 2019,
