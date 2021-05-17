@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Extensions;
 using osu.Game.IO;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
 using osuTK.Graphics;
@@ -86,6 +87,7 @@ namespace osu.Game.Skinning
                                     GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ScoreCounter)),
                                     GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.AccuracyCounter)),
                                     GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.HealthDisplay)),
+                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.SongProgress)),
                                 }
                             };
 
@@ -109,6 +111,9 @@ namespace osu.Game.Skinning
 
                         case HUDSkinComponents.HealthDisplay:
                             return new DefaultHealthDisplay();
+
+                        case HUDSkinComponents.SongProgress:
+                            return new SongProgress();
                     }
 
                     break;
