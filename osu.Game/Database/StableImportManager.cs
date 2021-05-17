@@ -87,10 +87,10 @@ namespace osu.Game.Database
     [Flags]
     public enum StableContent
     {
-        Beatmaps = 1,
-        Scores = 2,
-        Skins = 4,
-        Collections = 8,
+        Beatmaps = 1 << 0,
+        Scores = 1 << 1,
+        Skins = 1 << 2,
+        Collections = 1 << 3,
         All = Beatmaps | Scores | Skins | Collections
     }
 }
