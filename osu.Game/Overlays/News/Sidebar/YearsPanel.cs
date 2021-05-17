@@ -56,23 +56,25 @@ namespace osu.Game.Overlays.News.Sidebar
         {
             base.LoadComplete();
 
-            metadata.BindValueChanged(m =>
+            metadata.BindValueChanged(_ => recreateDrawables(), true);
+        }
+
+        private void recreateDrawables()
+        {
+            yearsFlow.Clear();
+
+            if (metadata.Value == null)
             {
-                yearsFlow.Clear();
+                Hide();
+                return;
+            }
 
-                if (m.NewValue == null)
-                {
-                    Hide();
-                    return;
-                }
+            var currentYear = metadata.Value.CurrentYear;
 
-                var currentYear = m.NewValue.CurrentYear;
+            foreach (var y in metadata.Value.Years)
+                yearsFlow.Add(new YearButton(y, y == currentYear));
 
-                foreach (var y in m.NewValue.Years)
-                    yearsFlow.Add(new YearButton(y, y == currentYear));
-
-                Show();
-            }, true);
+            Show();
         }
 
         public class YearButton : OsuHoverContainer
