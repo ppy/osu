@@ -71,30 +71,34 @@ namespace osu.Game.Screens.Play
 
         public SongProgress()
         {
-            Masking = true;
-
             Children = new Drawable[]
             {
-                info = new SongProgressInfo
+                new SongProgressDisplay
                 {
-                    Origin = Anchor.BottomLeft,
-                    Anchor = Anchor.BottomLeft,
-                    RelativeSizeAxes = Axes.X,
-                    Height = info_height,
-                },
-                graph = new SongProgressGraph
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Origin = Anchor.BottomLeft,
-                    Anchor = Anchor.BottomLeft,
-                    Height = graph_height,
-                    Margin = new MarginPadding { Bottom = bottom_bar_height },
-                },
-                bar = new SongProgressBar(bottom_bar_height, graph_height, handle_size)
-                {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    OnSeek = time => RequestSeek?.Invoke(time),
+                    Children = new Drawable[]
+                    {
+                        info = new SongProgressInfo
+                        {
+                            Origin = Anchor.BottomLeft,
+                            Anchor = Anchor.BottomLeft,
+                            RelativeSizeAxes = Axes.X,
+                            Height = info_height,
+                        },
+                        graph = new SongProgressGraph
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Origin = Anchor.BottomLeft,
+                            Anchor = Anchor.BottomLeft,
+                            Height = graph_height,
+                            Margin = new MarginPadding { Bottom = bottom_bar_height },
+                        },
+                        bar = new SongProgressBar(bottom_bar_height, graph_height, handle_size)
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            OnSeek = time => RequestSeek?.Invoke(time),
+                        },
+                    }
                 },
             };
         }
@@ -174,6 +178,20 @@ namespace osu.Game.Screens.Play
         {
             float finalMargin = bottom_bar_height + (AllowSeeking.Value ? handle_size.Y : 0) + (ShowGraph.Value ? graph_height : 0);
             info.TransformTo(nameof(info.Margin), new MarginPadding { Bottom = finalMargin }, transition_duration, Easing.In);
+        }
+
+        public class SongProgressDisplay : Container
+        {
+            public SongProgressDisplay()
+            {
+                // TODO: move actual implementation into this.
+                // exists for skin customisation purposes (interface should be added to this container).
+
+                Masking = true;
+                RelativeSizeAxes = Axes.Both;
+                Anchor = Anchor.BottomCentre;
+                Origin = Anchor.BottomCentre;
+            }
         }
     }
 }

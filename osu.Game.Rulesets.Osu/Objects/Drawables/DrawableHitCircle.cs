@@ -19,7 +19,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableHitCircle : DrawableOsuHitObject
+    public class DrawableHitCircle : DrawableOsuHitObject, IHasMainCirclePiece
     {
         public OsuAction? HitAction => HitArea.HitAction;
         protected virtual OsuSkinComponents CirclePieceComponent => OsuSkinComponents.HitCircle;
@@ -66,7 +66,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                                 return true;
                             },
                         },
-                        CirclePiece = new SkinnableDrawable(new OsuSkinComponent(CirclePieceComponent), _ => new MainCirclePiece()),
+                        CirclePiece = new SkinnableDrawable(new OsuSkinComponent(CirclePieceComponent), _ => new MainCirclePiece())
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        },
                         ApproachCircle = new ApproachCircle
                         {
                             Alpha = 0,
@@ -177,6 +181,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             // todo: temporary / arbitrary, used for lifetime optimisation.
             this.Delay(800).FadeOut();
+
+            (CirclePiece.Drawable as IMainCirclePiece)?.Animate(state);
 
             switch (state)
             {

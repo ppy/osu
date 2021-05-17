@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using JetBrains.Annotations;
 using osu.Framework.Audio;
@@ -47,6 +48,8 @@ namespace osu.Game.Beatmaps
         protected override Texture GetBackground() => textures?.Get(@"Backgrounds/bg4");
 
         protected override Track GetBeatmapTrack() => GetVirtualTrack();
+
+        public override Stream GetStream(string storagePath) => null;
 
         private class DummyRulesetInfo : RulesetInfo
         {

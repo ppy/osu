@@ -7,7 +7,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Edit.Setup
 {
-    public class SetupScreen : RoundedContentEditorScreen
+    public class SetupScreen : EditorRoundedScreen
     {
         [Cached]
         private SectionsContainer<SetupSection> sections = new SectionsContainer<SetupSection>();
@@ -34,6 +34,7 @@ namespace osu.Game.Screens.Edit.Setup
                         new ResourcesSection(),
                         new MetadataSection(),
                         new DifficultySection(),
+                        new ColoursSection()
                     }
                 },
             });
