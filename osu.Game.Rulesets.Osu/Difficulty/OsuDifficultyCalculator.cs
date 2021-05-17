@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double hitWindowGreat = (int)(hitWindows.WindowFor(HitResult.Great)) / clockRate;
             double preempt = (int)BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / clockRate;
 
-            double aimRating = Math.Pow(skills[0].DifficultyValue(), .65) * difficulty_multiplier;
+            double aimRating = Math.Pow(skills[0].DifficultyValue(), .75) * difficulty_multiplier;
             double speedRating = Math.Pow(skills[1].DifficultyValue(), .75) * difficulty_multiplier;
             double starRating = aimRating + speedRating + Math.Abs(aimRating - speedRating) / 2;
 
