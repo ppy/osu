@@ -11,7 +11,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
@@ -24,7 +23,7 @@ using osuTK.Input;
 
 namespace osu.Game.Overlays.KeyBinding
 {
-    public class KeyBindingRow : Container, IFilterable, IHasCurrentValue<bool>
+    public class KeyBindingRow : Container, IFilterable
     {
         private readonly object action;
         private readonly IEnumerable<Framework.Input.Bindings.KeyBinding> bindings;
@@ -53,16 +52,10 @@ namespace osu.Game.Overlays.KeyBinding
         private FillFlowContainer cancelAndClearButtons;
         private FillFlowContainer<KeyButton> buttons;
 
-        private readonly BindableWithCurrent<bool> isKeysDefaultValue = new BindableWithCurrent<bool>
+        public Bindable<bool> IsDefault { get; } = new BindableBool(true)
         {
             Default = true
         };
-
-        public Bindable<bool> Current
-        {
-            get => isKeysDefaultValue.Current;
-            set => isKeysDefaultValue.Current = value;
-        }
 
         public IEnumerable<string> FilterTerms => bindings.Select(b => b.KeyCombination.ReadableString()).Prepend(text.Text.ToString());
 
@@ -83,15 +76,7 @@ namespace osu.Game.Overlays.KeyBinding
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            isKeysDefaultValue.Value = bindings.Select(b => b.KeyCombination).SequenceEqual(Defaults);
-            isKeysDefaultValue.BindValueChanged(resetButtons =>
-            {
-                if (resetButtons.NewValue && !bindings.Select(b => b.KeyCombination).SequenceEqual(Defaults))
-                {
-                    RestoreDefaults();
-                    finalise();
-                }
-            });
+            updateIsDefaultValue();
 
             EdgeEffect = new EdgeEffectParameters
             {
@@ -140,6 +125,24 @@ namespace osu.Game.Overlays.KeyBinding
                 buttons.Add(new KeyButton(b));
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            IsDefault.BindValueChanged(resetButtons =>
+            {
+                if (resetButtons.NewValue && !computeIsDefaultValue())
+                {
+                    RestoreDefaults();
+                    finalise();
+                }
+            });
+        }
+
+        private void updateIsDefaultValue() => IsDefault.Value = computeIsDefaultValue();
+
+        private bool computeIsDefaultValue() => bindings.Select(b => b.KeyCombination).SequenceEqual(Defaults);
+
         public void RestoreDefaults()
         {
             int i = 0;
@@ -151,7 +154,7 @@ namespace osu.Game.Overlays.KeyBinding
                 store.Update(button.KeyBinding);
             }
 
-            isKeysDefaultValue.Value = true;
+            updateIsDefaultValue();
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -311,7 +314,7 @@ namespace osu.Game.Overlays.KeyBinding
             {
                 store.Update(bindTarget.KeyBinding);
 
-                isKeysDefaultValue.Value = buttons.Select(b => b.KeyBinding.KeyCombination).SequenceEqual(Defaults);
+                updateIsDefaultValue();
 
                 bindTarget.IsBinding = false;
                 Schedule(() =>
