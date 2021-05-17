@@ -153,26 +153,28 @@ namespace osu.Game.Overlays.News.Sidebar
             {
                 base.LoadComplete();
 
-                IsOpen.BindValueChanged(open =>
-                {
-                    ClearTransforms(true);
-
-                    if (open.NewValue)
-                    {
-                        AutoSizeAxes = Axes.Y;
-                        content.FadeIn(animation_duration, Easing.OutQuint);
-                    }
-                    else
-                    {
-                        AutoSizeAxes = Axes.None;
-                        this.ResizeHeightTo(0, animation_duration, Easing.OutQuint);
-
-                        content.FadeOut(animation_duration, Easing.OutQuint);
-                    }
-                }, true);
+                IsOpen.BindValueChanged(_ => updateState(), true);
 
                 // First state change should be instant.
                 FinishTransforms(true);
+            }
+
+            private void updateState()
+            {
+                ClearTransforms(true);
+
+                if (IsOpen.Value)
+                {
+                    AutoSizeAxes = Axes.Y;
+                    content.FadeIn(animation_duration, Easing.OutQuint);
+                }
+                else
+                {
+                    AutoSizeAxes = Axes.None;
+                    this.ResizeHeightTo(0, animation_duration, Easing.OutQuint);
+
+                    content.FadeOut(animation_duration, Easing.OutQuint);
+                }
             }
 
             private bool shouldUpdateAutosize = true;
