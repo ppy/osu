@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.News.Sidebar
     {
         private readonly Bindable<APINewsSidebar> metadata = new Bindable<APINewsSidebar>();
 
-        private Container gridPlaceholder;
+        private Container gridContent;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider, Bindable<APINewsSidebar> metadata)
@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.News.Sidebar
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background3
                 },
-                gridPlaceholder = new Container
+                gridContent = new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.News.Sidebar
                     return;
                 }
 
-                gridPlaceholder.Child = new YearsGridContainer(m.NewValue.Years, m.NewValue.CurrentYear);
+                gridContent.Child = new YearsGridContainer(m.NewValue.Years, m.NewValue.CurrentYear);
                 Show();
             }, true);
         }
@@ -77,6 +77,7 @@ namespace osu.Game.Overlays.News.Sidebar
 
                 RelativeSizeAxes = Axes.X;
                 Height = 15;
+
                 Child = text = new OsuSpriteText
                 {
                     Anchor = Anchor.Centre,
