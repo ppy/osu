@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
-using osuTK;
 
 namespace osu.Game.Overlays
 {
@@ -60,7 +59,7 @@ namespace osu.Game.Overlays
                     Type = EdgeEffectType.Glow,
                     Radius = 2,
                 },
-                Size = new Vector2(0.33f, 0.8f),
+                Width = 0.33f,
                 Child = new Box { RelativeSizeAxes = Axes.Both },
             };
         }
