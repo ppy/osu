@@ -26,11 +26,7 @@ namespace osu.Game.Overlays
         public Bindable<T> Current
         {
             get => current.Current;
-            set
-            {
-                current.Current = value;
-                UpdateState();
-            }
+            set => current.Current = value;
         }
 
         private Color4 buttonColour;
@@ -43,10 +39,6 @@ namespace osu.Game.Overlays
             Width = SettingsPanel.CONTENT_MARGINS;
             Padding = new MarginPadding { Vertical = 1.5f };
             Alpha = 0f;
-
-            Current.ValueChanged += _ => UpdateState();
-            Current.DisabledChanged += _ => UpdateState();
-            Current.DefaultChanged += _ => UpdateState();
         }
 
         [BackgroundDependencyLoader]
@@ -76,6 +68,11 @@ namespace osu.Game.Overlays
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            Current.ValueChanged += _ => UpdateState();
+            Current.DisabledChanged += _ => UpdateState();
+            Current.DefaultChanged += _ => UpdateState();
+
             UpdateState();
         }
 
