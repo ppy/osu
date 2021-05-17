@@ -18,13 +18,13 @@ using System.Diagnostics;
 
 namespace osu.Game.Overlays.News.Sidebar
 {
-    public class MonthDropdown : CompositeDrawable
+    public class MonthSection : CompositeDrawable
     {
         private const int animation_duration = 250;
 
         public readonly BindableBool IsOpen = new BindableBool();
 
-        public MonthDropdown(int month, int year, IEnumerable<APINewsPost> posts)
+        public MonthSection(int month, int year, IEnumerable<APINewsPost> posts)
         {
             Debug.Assert(posts.All(p => p.PublishedAt.Month == month && p.PublishedAt.Year == year));
 
