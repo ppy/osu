@@ -17,6 +17,7 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osuTK.Graphics;
 
@@ -350,6 +351,7 @@ namespace osu.Game.Skinning
                                     GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ScoreCounter)) ?? new DefaultScoreCounter(),
                                     GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.AccuracyCounter)) ?? new DefaultAccuracyCounter(),
                                     GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.HealthDisplay)) ?? new DefaultHealthDisplay(),
+                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.SongProgress)) ?? new SongProgress(),
                                 }
                             };
 

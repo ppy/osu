@@ -201,6 +201,7 @@ namespace osu.Game.Screens.Play
                 LocalUserPlaying.BindTo(osuGame.LocalUserPlaying);
 
             DrawableRuleset = ruleset.CreateDrawableRulesetWith(playableBeatmap, Mods.Value);
+            dependencies.CacheAs(DrawableRuleset);
 
             ScoreProcessor = ruleset.CreateScoreProcessor();
             ScoreProcessor.ApplyBeatmap(playableBeatmap);
@@ -359,11 +360,6 @@ namespace osu.Game.Screens.Play
                         {
                             AlwaysVisible = { BindTarget = DrawableRuleset.HasReplayLoaded },
                             IsCounting = false
-                        },
-                        RequestSeek = time =>
-                        {
-                            GameplayClockContainer.Seek(time);
-                            GameplayClockContainer.Start();
                         },
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
@@ -568,6 +564,12 @@ namespace osu.Game.Screens.Play
             // return samplePlaybackDisabled.Value to what is defined by the beatmap's current state
             updateSampleDisabledState();
         }
+
+        /// <summary>
+        /// Seek to a specific time in gameplay.
+        /// </summary>
+        /// <param name="time">The destination time to seek to.</param>
+        public void Seek(double time) => GameplayClockContainer.Seek(time);
 
         /// <summary>
         /// Restart gameplay via a parent <see cref="PlayerLoader"/>.
