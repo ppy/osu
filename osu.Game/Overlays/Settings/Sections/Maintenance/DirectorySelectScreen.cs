@@ -10,6 +10,7 @@ using osu.Game.Screens;
 using osuTK;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Screens;
@@ -22,7 +23,10 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
         private DirectorySelector directorySelector;
 
-        protected abstract OsuSpriteText CreateHeader();
+        /// <summary>
+        /// Text to display in the header to inform the user of what they are selecting.
+        /// </summary>
+        public abstract LocalisableString HeaderText { get; }
 
         /// <summary>
         /// Called upon selection of a directory by the user.
@@ -73,11 +77,13 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         {
                             new Drawable[]
                             {
-                                CreateHeader().With(header =>
+                                new OsuSpriteText
                                 {
-                                    header.Origin = Anchor.Centre;
-                                    header.Anchor = Anchor.Centre;
-                                })
+                                    Text = HeaderText,
+                                    Font = OsuFont.Default.With(size: 40),
+                                    Origin = Anchor.Centre,
+                                    Anchor = Anchor.Centre,
+                                }
                             },
                             new Drawable[]
                             {

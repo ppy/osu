@@ -4,11 +4,10 @@
 using System;
 using System.IO;
 using osu.Framework.Allocation;
+using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
@@ -25,11 +24,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
         public override bool HideOverlaysOnEnter => true;
 
-        protected override OsuSpriteText CreateHeader() => new OsuSpriteText
-        {
-            Text = "Please select a new location",
-            Font = OsuFont.Default.With(size: 40)
-        };
+        public override LocalisableString HeaderText => "Please select a new location";
 
         protected override void OnSelection(DirectoryInfo directory)
         {
