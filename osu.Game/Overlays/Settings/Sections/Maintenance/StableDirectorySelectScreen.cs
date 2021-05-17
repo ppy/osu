@@ -4,9 +4,8 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using osu.Framework.Localisation;
 using osu.Framework.Screens;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
@@ -16,11 +15,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
         protected override bool IsValidDirectory(DirectoryInfo info) => info?.GetFiles("osu!.*.cfg").Any() ?? false;
 
-        protected override OsuSpriteText CreateHeader() => new OsuSpriteText
-        {
-            Text = "Please select your osu!stable install location",
-            Font = OsuFont.Default.With(size: 40)
-        };
+        public override LocalisableString HeaderText => "Please select your osu!stable install location";
 
         public StableDirectorySelectScreen(TaskCompletionSource<string> taskCompletionSource)
         {
