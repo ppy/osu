@@ -24,18 +24,18 @@ namespace osu.Game.Tests.Visual.Online
         public void SetUp() => Schedule(() => Child = sidebar = new NewsSidebar());
 
         [Test]
+        public void TestMetadataWithNoPosts()
+        {
+            AddStep("Add data with no posts", () => sidebar.Metadata.Value = metadata_with_no_posts);
+            AddUntilStep("No dropdowns were created", () => !sidebar.ChildrenOfType<MonthSection>().Any());
+        }
+
+        [Test]
         public void TestYearsPanelVisibility()
         {
             AddUntilStep("Years panel is hidden", () => yearsPanel?.Alpha == 0);
             AddStep("Add data", () => sidebar.Metadata.Value = metadata);
             AddUntilStep("Years panel is visible", () => yearsPanel?.Alpha == 1);
-        }
-
-        [Test]
-        public void TestMetadataWithNoPosts()
-        {
-            AddStep("Add data with no posts", () => sidebar.Metadata.Value = metadata_with_no_posts);
-            AddUntilStep("No dropdowns were created", () => !sidebar.ChildrenOfType<MonthSection>().Any());
         }
 
         private YearsPanel yearsPanel => sidebar.ChildrenOfType<YearsPanel>().FirstOrDefault();
