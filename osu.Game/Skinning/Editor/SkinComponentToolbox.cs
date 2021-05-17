@@ -92,7 +92,8 @@ namespace osu.Game.Skinning.Editor
 
         private class ToolboxComponentButton : OsuButton
         {
-            protected override bool ReceivePositionalInputAtSubTree(Vector2 screenSpacePos) => false;
+            protected override bool ShouldBeConsideredForInput(Drawable child) => false;
+
             public override bool PropagateNonPositionalInputSubTree => false;
 
             private readonly Drawable component;
