@@ -3,6 +3,7 @@
 
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.IO.Stores;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -14,7 +15,6 @@ namespace osu.Game.Skinning
     public class LegacyBeatmapSkin : LegacySkin
     {
         protected override bool AllowManiaSkin => false;
-        protected override bool AllowDefaultHUDComponentsFallback => false;
         protected override bool UseCustomSampleBanks => true;
 
         public LegacyBeatmapSkin(BeatmapInfo beatmap, IResourceStore<byte[]> storage, IStorageResourceProvider resources)
@@ -22,6 +22,19 @@ namespace osu.Game.Skinning
         {
             // Disallow default colours fallback on beatmap skins to allow using parent skin combo colours. (via SkinProvidingContainer)
             Configuration.AllowDefaultComboColoursFallback = false;
+        }
+
+        public override Drawable GetDrawableComponent(ISkinComponent component)
+        {
+            if (component is SkinnableTargetComponent targetComponent && targetComponent.Target == SkinnableTarget.MainHUDComponents)
+            {
+                // for now, if the beatmap skin doesn't skin the score font, fall back to current skin
+                // instead of potentially returning default lazer skin HUD components from here.
+                if (!this.HasFont(LegacyFont.Score))
+                    return null;
+            }
+
+            return base.GetDrawableComponent(component);
         }
 
         public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
