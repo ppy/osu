@@ -8,19 +8,19 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Threading;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Input.Bindings;
 using osu.Game.Screens.Ranking;
 using osuTK;
 using osuTK.Graphics;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics.Containers;
-using osu.Framework.Input.Bindings;
-using osu.Framework.Input.Events;
-using osu.Framework.Utils;
-using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Play
 {
@@ -90,7 +90,19 @@ namespace osu.Game.Screens.Play
 
         private const double fade_time = 300;
 
-        private double fadeOutBeginTime => startTime - GameplayClockContainer.MINIMUM_SKIP_TIME;
+        private double fadeOutBeginTime => startTime - MasterGameplayClockContainer.MINIMUM_SKIP_TIME;
+
+        public override void Hide()
+        {
+            base.Hide();
+            fadeContainer.Hide();
+        }
+
+        public override void Show()
+        {
+            base.Show();
+            fadeContainer.Show();
+        }
 
         protected override void LoadComplete()
         {
@@ -147,7 +159,7 @@ namespace osu.Game.Screens.Play
         {
         }
 
-        private class FadeContainer : Container, IStateful<Visibility>
+        public class FadeContainer : Container, IStateful<Visibility>
         {
             public event Action<Visibility> StateChanged;
 
@@ -170,7 +182,7 @@ namespace osu.Game.Screens.Play
                     switch (state)
                     {
                         case Visibility.Visible:
-                            // we may be triggered to become visible mnultiple times but we only want to transform once.
+                            // we may be triggered to become visible multiple times but we only want to transform once.
                             if (stateChanged)
                                 this.FadeIn(500, Easing.OutExpo);
 

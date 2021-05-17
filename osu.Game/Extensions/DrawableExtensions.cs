@@ -2,8 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Threading;
+using osu.Game.Screens.Play.HUD;
+using osuTK;
 
 namespace osu.Game.Extensions
 {
@@ -31,6 +35,33 @@ namespace osu.Game.Extensions
             ScheduledDelegate repeatDelegate = new ScheduledDelegate(action, handler.Time.Current + initialRepeatDelay, REPEAT_INTERVAL);
             scheduler.Add(repeatDelegate);
             return repeatDelegate;
+        }
+
+        /// <summary>
+        /// Accepts a delta vector in screen-space coordinates and converts it to one which can be applied to this drawable's position.
+        /// </summary>
+        /// <param name="drawable">The drawable.</param>
+        /// <param name="delta">A delta in screen-space coordinates.</param>
+        /// <returns>The delta vector in Parent's coordinates.</returns>
+        public static Vector2 ScreenSpaceDeltaToParentSpace(this Drawable drawable, Vector2 delta) =>
+            drawable.Parent.ToLocalSpace(drawable.Parent.ToScreenSpace(Vector2.Zero) + delta);
+
+        public static SkinnableInfo CreateSkinnableInfo(this Drawable component) => new SkinnableInfo(component);
+
+        public static void ApplySkinnableInfo(this Drawable component, SkinnableInfo info)
+        {
+            // todo: can probably make this better via deserialisation directly using a common interface.
+            component.Position = info.Position;
+            component.Rotation = info.Rotation;
+            component.Scale = info.Scale;
+            component.Anchor = info.Anchor;
+            component.Origin = info.Origin;
+
+            if (component is Container container)
+            {
+                foreach (var child in info.Children)
+                    container.Add(child.CreateInstance());
+            }
         }
     }
 }

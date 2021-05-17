@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.UI
             base.PopIn();
 
             GameplayCursor.ActiveCursor.Hide();
-            cursorScaleContainer.MoveTo(GameplayCursor.ActiveCursor.Position);
+            cursorScaleContainer.Position = ToLocalSpace(GameplayCursor.ActiveCursor.ScreenSpaceDrawQuad.Centre);
             clickToResumeCursor.Appear();
 
             if (localCursorContainer == null)

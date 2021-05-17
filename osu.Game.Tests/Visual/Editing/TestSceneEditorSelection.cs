@@ -12,6 +12,7 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
@@ -25,20 +26,42 @@ namespace osu.Game.Tests.Visual.Editing
 
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset, false);
 
-        private BlueprintContainer blueprintContainer
-            => Editor.ChildrenOfType<BlueprintContainer>().First();
+        private EditorBlueprintContainer blueprintContainer
+            => Editor.ChildrenOfType<EditorBlueprintContainer>().First();
 
         private void moveMouseToObject(Func<HitObject> targetFunc)
         {
             AddStep("move mouse to object", () =>
             {
                 var pos = blueprintContainer.SelectionBlueprints
-                                            .First(s => s.HitObject == targetFunc())
+                                            .First(s => s.Item == targetFunc())
                                             .ChildrenOfType<HitCirclePiece>()
                                             .First().ScreenSpaceDrawQuad.Centre;
 
                 InputManager.MoveMouseTo(pos);
             });
+        }
+
+        [Test]
+        public void TestNudgeSelection()
+        {
+            HitCircle[] addedObjects = null;
+
+            AddStep("add hitobjects", () => EditorBeatmap.AddRange(addedObjects = new[]
+            {
+                new HitCircle { StartTime = 100 },
+                new HitCircle { StartTime = 200, Position = new Vector2(100) },
+                new HitCircle { StartTime = 300, Position = new Vector2(200) },
+                new HitCircle { StartTime = 400, Position = new Vector2(300) },
+            }));
+
+            AddStep("select objects", () => EditorBeatmap.SelectedHitObjects.AddRange(addedObjects));
+
+            AddStep("nudge forwards", () => InputManager.Key(Key.K));
+            AddAssert("objects moved forwards in time", () => addedObjects[0].StartTime > 100);
+
+            AddStep("nudge backwards", () => InputManager.Key(Key.J));
+            AddAssert("objects reverted to original position", () => addedObjects[0].StartTime == 100);
         }
 
         [Test]
@@ -72,9 +95,9 @@ namespace osu.Game.Tests.Visual.Editing
             var addedObjects = new[]
             {
                 new HitCircle { StartTime = 100 },
-                new HitCircle { StartTime = 200, Position = new Vector2(50) },
-                new HitCircle { StartTime = 300, Position = new Vector2(100) },
-                new HitCircle { StartTime = 400, Position = new Vector2(150) },
+                new HitCircle { StartTime = 200, Position = new Vector2(100) },
+                new HitCircle { StartTime = 300, Position = new Vector2(200) },
+                new HitCircle { StartTime = 400, Position = new Vector2(300) },
             };
 
             AddStep("add hitobjects", () => EditorBeatmap.AddRange(addedObjects));
@@ -108,9 +131,9 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("add hitobjects", () => EditorBeatmap.AddRange(addedObjects = new[]
             {
                 new HitCircle { StartTime = 100 },
-                new HitCircle { StartTime = 200, Position = new Vector2(50) },
-                new HitCircle { StartTime = 300, Position = new Vector2(100) },
-                new HitCircle { StartTime = 400, Position = new Vector2(150) },
+                new HitCircle { StartTime = 200, Position = new Vector2(100) },
+                new HitCircle { StartTime = 300, Position = new Vector2(200) },
+                new HitCircle { StartTime = 400, Position = new Vector2(300) },
             }));
 
             moveMouseToObject(() => addedObjects[0]);
@@ -156,9 +179,35 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
-        public void TestQuickDeleteRemovesObject()
+        public void TestQuickDeleteRemovesObjectInPlacement()
         {
-            var addedObject = new HitCircle { StartTime = 1000 };
+            var addedObject = new HitCircle
+            {
+                StartTime = 0,
+                Position = OsuPlayfield.BASE_SIZE * 0.5f
+            };
+
+            AddStep("add hitobject", () => EditorBeatmap.Add(addedObject));
+
+            AddStep("enter placement mode", () => InputManager.PressKey(Key.Number2));
+
+            moveMouseToObject(() => addedObject);
+
+            AddStep("hold shift", () => InputManager.PressKey(Key.ShiftLeft));
+            AddStep("right click", () => InputManager.Click(MouseButton.Right));
+            AddStep("release shift", () => InputManager.ReleaseKey(Key.ShiftLeft));
+
+            AddAssert("no hitobjects in beatmap", () => EditorBeatmap.HitObjects.Count == 0);
+        }
+
+        [Test]
+        public void TestQuickDeleteRemovesObjectInSelection()
+        {
+            var addedObject = new HitCircle
+            {
+                StartTime = 0,
+                Position = OsuPlayfield.BASE_SIZE * 0.5f
+            };
 
             AddStep("add hitobject", () => EditorBeatmap.Add(addedObject));
 
