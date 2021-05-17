@@ -13,15 +13,15 @@ using osu.Game.Overlays.News.Sidebar;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneNewsSideBar : OsuTestScene
+    public class TestSceneNewsSidebar : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
-        private NewsSideBar sidebar;
+        private NewsSidebar sidebar;
 
         [SetUp]
-        public void SetUp() => Schedule(() => Child = sidebar = new NewsSideBar());
+        public void SetUp() => Schedule(() => Child = sidebar = new NewsSidebar());
 
         [Test]
         public void TestYearsPanelVisibility()
