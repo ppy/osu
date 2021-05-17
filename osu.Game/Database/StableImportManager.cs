@@ -69,12 +69,12 @@ namespace osu.Game.Database
 
         private async Task<StableStorage> getStableStorage()
         {
-            var stableStorage = game.GetStorageForStableInstall();
-            if (stableStorage != null)
-                return stableStorage;
-
             if (cachedStorage != null)
                 return cachedStorage;
+
+            var stableStorage = game.GetStorageForStableInstall();
+            if (stableStorage != null)
+                return cachedStorage = stableStorage;
 
             var taskCompletionSource = new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
             Schedule(() => dialogOverlay.Push(new StableDirectoryLocationDialog(taskCompletionSource)));
