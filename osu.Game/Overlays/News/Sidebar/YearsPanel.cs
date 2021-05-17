@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -66,9 +65,6 @@ namespace osu.Game.Overlays.News.Sidebar
 
         private class YearButton : OsuHoverContainer
         {
-            protected override IEnumerable<Drawable> EffectTargets => new[] { text };
-
-            private readonly OsuSpriteText text;
             private readonly bool isCurrent;
 
             public YearButton(int year, bool isCurrent)
@@ -79,7 +75,7 @@ namespace osu.Game.Overlays.News.Sidebar
                 Height = 15;
                 Padding = new MarginPadding { Vertical = 2.5f };
 
-                Child = text = new OsuSpriteText
+                Child = new OsuSpriteText
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
