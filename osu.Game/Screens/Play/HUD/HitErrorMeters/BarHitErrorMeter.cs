@@ -43,10 +43,10 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         private double maxHitWindow;
 
-        public BarHitErrorMeter(HitWindows hitWindows, bool rightAligned = false)
-            : base(hitWindows)
+        public BarHitErrorMeter()
         {
-            alignment = rightAligned ? Anchor.x0 : Anchor.x2;
+            // todo: investigate.
+            alignment = false ? Anchor.x0 : Anchor.x2;
 
             AutoSizeAxes = Axes.Both;
         }
@@ -152,14 +152,17 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         {
             var windows = HitWindows.GetAllAvailableWindows().ToArray();
 
-            maxHitWindow = windows.First().length;
+            // max to avoid div-by-zero.
+            maxHitWindow = Math.Max(1, windows.First().length);
 
             for (var i = 0; i < windows.Length; i++)
             {
                 var (result, length) = windows[i];
 
-                colourBarsEarly.Add(createColourBar(result, (float)(length / maxHitWindow), i == 0));
-                colourBarsLate.Add(createColourBar(result, (float)(length / maxHitWindow), i == 0));
+                var hitWindow = (float)(length / maxHitWindow);
+
+                colourBarsEarly.Add(createColourBar(result, hitWindow, i == 0));
+                colourBarsLate.Add(createColourBar(result, hitWindow, i == 0));
             }
 
             // a little nub to mark the centre point.
