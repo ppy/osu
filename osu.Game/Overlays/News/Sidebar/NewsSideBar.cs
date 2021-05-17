@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace osu.Game.Overlays.News.Sidebar
 {
-    public class NewsSideBar : CompositeDrawable
+    public class NewsSidebar : CompositeDrawable
     {
         [Cached]
         public readonly Bindable<APINewsSidebar> Metadata = new Bindable<APINewsSidebar>();
