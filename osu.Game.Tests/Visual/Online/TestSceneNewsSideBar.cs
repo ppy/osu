@@ -10,6 +10,7 @@ using osu.Framework.Testing;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.News.Sidebar;
+using static osu.Game.Overlays.News.Sidebar.YearsPanel;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -18,10 +19,10 @@ namespace osu.Game.Tests.Visual.Online
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
-        private NewsSidebar sidebar;
+        private TestNewsSidebar sidebar;
 
         [SetUp]
-        public void SetUp() => Schedule(() => Child = sidebar = new NewsSidebar());
+        public void SetUp() => Schedule(() => Child = sidebar = new TestNewsSidebar { YearChanged = onYearChanged });
 
         [Test]
         public void TestMetadataWithNoPosts()
@@ -34,15 +35,17 @@ namespace osu.Game.Tests.Visual.Online
         public void TestYearsPanelVisibility()
         {
             AddUntilStep("Years panel is hidden", () => yearsPanel?.Alpha == 0);
-            AddStep("Add data", () => sidebar.Metadata.Value = metadata);
+            AddStep("Add data", () => sidebar.Metadata.Value = getMetadata(2021));
             AddUntilStep("Years panel is visible", () => yearsPanel?.Alpha == 1);
         }
 
+        private void onYearChanged(int year) => sidebar.Metadata.Value = getMetadata(year);
+
         private YearsPanel yearsPanel => sidebar.ChildrenOfType<YearsPanel>().FirstOrDefault();
 
-        private static readonly APINewsSidebar metadata = new APINewsSidebar
+        private APINewsSidebar getMetadata(int year) => new APINewsSidebar
         {
-            CurrentYear = 2021,
+            CurrentYear = year,
             Years = new[]
             {
                 2021,
@@ -60,47 +63,47 @@ namespace osu.Game.Tests.Visual.Online
                 new APINewsPost
                 {
                     Title = "(Mar) Short title",
-                    PublishedAt = new DateTime(2021, 3, 1)
+                    PublishedAt = new DateTime(year, 3, 1)
                 },
                 new APINewsPost
                 {
                     Title = "(Mar) Oh boy that's a long post title I wonder if it will break anything",
-                    PublishedAt = new DateTime(2021, 3, 1)
+                    PublishedAt = new DateTime(year, 3, 1)
                 },
                 new APINewsPost
                 {
                     Title = "(Mar) Medium title, nothing to see here",
-                    PublishedAt = new DateTime(2021, 3, 1)
+                    PublishedAt = new DateTime(year, 3, 1)
                 },
                 new APINewsPost
                 {
                     Title = "(Feb) Short title",
-                    PublishedAt = new DateTime(2021, 2, 1)
+                    PublishedAt = new DateTime(year, 2, 1)
                 },
                 new APINewsPost
                 {
                     Title = "(Feb) Oh boy that's a long post title I wonder if it will break anything",
-                    PublishedAt = new DateTime(2021, 2, 1)
+                    PublishedAt = new DateTime(year, 2, 1)
                 },
                 new APINewsPost
                 {
                     Title = "(Feb) Medium title, nothing to see here",
-                    PublishedAt = new DateTime(2021, 2, 1)
+                    PublishedAt = new DateTime(year, 2, 1)
                 },
                 new APINewsPost
                 {
                     Title = "Short title",
-                    PublishedAt = new DateTime(2021, 1, 1)
+                    PublishedAt = new DateTime(year, 1, 1)
                 },
                 new APINewsPost
                 {
                     Title = "Oh boy that's a long post title I wonder if it will break anything",
-                    PublishedAt = new DateTime(2021, 1, 1)
+                    PublishedAt = new DateTime(year, 1, 1)
                 },
                 new APINewsPost
                 {
                     Title = "Medium title, nothing to see here",
-                    PublishedAt = new DateTime(2021, 1, 1)
+                    PublishedAt = new DateTime(year, 1, 1)
                 }
             }
         };
@@ -123,5 +126,21 @@ namespace osu.Game.Tests.Visual.Online
             },
             NewsPosts = Array.Empty<APINewsPost>()
         };
+
+        private class TestNewsSidebar : NewsSidebar
+        {
+            public Action<int> YearChanged;
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                Metadata.BindValueChanged(m =>
+                {
+                    foreach (var b in this.ChildrenOfType<YearButton>())
+                        b.Action = () => YearChanged?.Invoke(b.Year);
+                }, true);
+            }
+        }
     }
 }

@@ -75,12 +75,15 @@ namespace osu.Game.Overlays.News.Sidebar
             }, true);
         }
 
-        private class YearButton : OsuHoverContainer
+        public class YearButton : OsuHoverContainer
         {
+            public int Year { get; }
+
             private readonly bool isCurrent;
 
             public YearButton(int year, bool isCurrent)
             {
+                Year = year;
                 this.isCurrent = isCurrent;
 
                 RelativeSizeAxes = Axes.X;
