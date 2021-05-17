@@ -10,10 +10,10 @@ using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
-    public class TaikoModFlip : Mod, IApplicableToBeatmap
+    public class TaikoModSwap : Mod, IApplicableToBeatmap
     {
-        public override string Name => "Flip";
-        public override string Acronym => "FP";
+        public override string Name => "Swap";
+        public override string Acronym => "SW";
         public override string Description => @"Dons become kats, kats become dons";
         public override ModType Type => ModType.Conversion;
         public override double ScoreMultiplier => 1;
