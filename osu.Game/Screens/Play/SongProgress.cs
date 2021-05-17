@@ -66,7 +66,13 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        public IClock ReferenceClock;
+        [Resolved(canBeNull: true)]
+        private Player player { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private GameplayClock gameplayClock { get; set; }
+
+        private IClock referenceClock;
 
         public SongProgress()
         {
@@ -99,23 +105,12 @@ namespace osu.Game.Screens.Play
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                            OnSeek = seek,
+                            OnSeek = time => player?.Seek(time),
                         },
                     }
                 },
             };
         }
-
-        private void seek(double time)
-        {
-            if (gameplayClock == null)
-                return;
-
-            // TODO: implement
-        }
-
-        [Resolved(canBeNull: true)]
-        private GameplayClock gameplayClock { get; set; }
 
         [BackgroundDependencyLoader(true)]
         private void load(OsuColour colours, OsuConfigManager config, DrawableRuleset drawableRuleset)
@@ -125,6 +120,8 @@ namespace osu.Game.Screens.Play
             if (drawableRuleset != null)
             {
                 AllowSeeking.BindTo(drawableRuleset.HasReplayLoaded);
+
+                referenceClock = drawableRuleset.FrameStableClock;
                 Objects = drawableRuleset.Objects;
             }
 
@@ -159,7 +156,7 @@ namespace osu.Game.Screens.Play
                 return;
 
             double gameplayTime = gameplayClock?.CurrentTime ?? Time.Current;
-            double frameStableTime = ReferenceClock?.CurrentTime ?? gameplayTime;
+            double frameStableTime = referenceClock?.CurrentTime ?? gameplayTime;
 
             double progress = Math.Min(1, (frameStableTime - firstHitTime) / (lastHitTime - firstHitTime));
 

@@ -563,6 +563,12 @@ namespace osu.Game.Screens.Play
         }
 
         /// <summary>
+        /// Seek to a specific time in gameplay.
+        /// </summary>
+        /// <param name="time">The destination time to seek to.</param>
+        public void Seek(double time) => GameplayClockContainer.Seek(time);
+
+        /// <summary>
         /// Restart gameplay via a parent <see cref="PlayerLoader"/>.
         /// <remarks>This can be called from a child screen in order to trigger the restart process.</remarks>
         /// </summary>
