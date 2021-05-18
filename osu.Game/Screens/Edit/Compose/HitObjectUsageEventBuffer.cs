@@ -51,66 +51,23 @@ namespace osu.Game.Screens.Edit.Compose
             playfield.HitObjectUsageFinished += onHitObjectUsageFinished;
         }
 
-        private readonly Dictionary<HitObject, EventType> pendingEvents = new Dictionary<HitObject, EventType>();
+        private readonly List<HitObject> usageFinishedHitObjects = new List<HitObject>();
 
-        private void onHitObjectUsageBegan(HitObject hitObject) => updateEvent(hitObject, EventType.Began);
-
-        private void onHitObjectUsageFinished(HitObject hitObject) => updateEvent(hitObject, EventType.Finished);
-
-        private void updateEvent(HitObject hitObject, EventType newEvent)
+        private void onHitObjectUsageBegan(HitObject hitObject)
         {
-            if (!pendingEvents.TryGetValue(hitObject, out EventType existingEvent))
-            {
-                pendingEvents[hitObject] = newEvent;
-                return;
-            }
-
-            switch (existingEvent, newEvent)
-            {
-                // This exists as a safeguard to ensure that the sequence: { Began -> Finished }, where { ... } indicates a sequence within a single frame, does not trigger any events.
-                // This is unlikely to occur in practice as it requires the usage to finish immediately after the HitObjectContainer updates hitobject lifetimes,
-                // however, an Editor action scheduled somewhere between the lifetime update and this buffer's own Update() could cause this.
-                case (EventType.Began, EventType.Finished):
-                    pendingEvents.Remove(hitObject);
-                    break;
-
-                // This exists as a safeguard to ensure that the sequence: Began -> { Finished -> Began -> Finished }, where { ... } indicates a sequence within a single frame,
-                // correctly leads into a final "finished" state rather than remaining in the intermediate "transferred" state.
-                // As above, this is unlikely to occur in practice.
-                case (EventType.Transferred, EventType.Finished):
-                    pendingEvents[hitObject] = EventType.Finished;
-                    break;
-
-                case (EventType.Finished, EventType.Began):
-                    pendingEvents[hitObject] = EventType.Transferred;
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException($"Unexpected event update ({existingEvent} => {newEvent}).");
-            }
+            if (usageFinishedHitObjects.Remove(hitObject))
+                HitObjectUsageTransferred?.Invoke(hitObject, playfield.AllHitObjects.Single(d => d.HitObject == hitObject));
+            else
+                HitObjectUsageBegan?.Invoke(hitObject);
         }
+
+        private void onHitObjectUsageFinished(HitObject hitObject) => usageFinishedHitObjects.Add(hitObject);
 
         public void Update()
         {
-            foreach (var (hitObject, e) in pendingEvents)
-            {
-                switch (e)
-                {
-                    case EventType.Began:
-                        HitObjectUsageBegan?.Invoke(hitObject);
-                        break;
-
-                    case EventType.Transferred:
-                        HitObjectUsageTransferred?.Invoke(hitObject, playfield.AllHitObjects.Single(d => d.HitObject == hitObject));
-                        break;
-
-                    case EventType.Finished:
-                        HitObjectUsageFinished?.Invoke(hitObject);
-                        break;
-                }
-            }
-
-            pendingEvents.Clear();
+            foreach (var hitObject in usageFinishedHitObjects)
+                HitObjectUsageFinished?.Invoke(hitObject);
+            usageFinishedHitObjects.Clear();
         }
 
         public void Dispose()
@@ -120,29 +77,6 @@ namespace osu.Game.Screens.Edit.Compose
                 playfield.HitObjectUsageBegan -= onHitObjectUsageBegan;
                 playfield.HitObjectUsageFinished -= onHitObjectUsageFinished;
             }
-        }
-
-        private enum EventType
-        {
-            /// <summary>
-            /// A <see cref="HitObject"/> has started being used by a <see cref="DrawableHitObject"/>.
-            /// </summary>
-            Began,
-
-            /// <summary>
-            /// A <see cref="HitObject"/> has finished being used by a <see cref="DrawableHitObject"/>.
-            /// </summary>
-            Finished,
-
-            /// <summary>
-            /// An internal intermediate state that occurs when a <see cref="HitObject"/> has finished being used by one <see cref="DrawableHitObject"/>
-            /// and started being used by another <see cref="DrawableHitObject"/> in the same frame. The <see cref="DrawableHitObject"/> may be the same instance in both cases.
-            /// </summary>
-            /// <remarks>
-            /// This usually occurs when a <see cref="HitObject"/> is transferred between <see cref="HitObjectContainer"/>s,
-            /// but also occurs if the <see cref="HitObject"/> dies and becomes alive again in the same frame within the same <see cref="HitObjectContainer"/>.
-            /// </remarks>
-            Transferred
         }
     }
 }
