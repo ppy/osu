@@ -18,7 +18,7 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Play
 {
-    public class SongProgress : OverlayContainer
+    public class SongProgress : OverlayContainer, ISkinnableDrawable
     {
         private const int info_height = 20;
         private const int bottom_bar_height = 5;
@@ -40,15 +40,15 @@ namespace osu.Game.Screens.Play
 
         public readonly Bindable<bool> ShowGraph = new Bindable<bool>();
 
-        //TODO: this isn't always correct (consider mania where a non-last object may last for longer than the last in the list).
-        private double lastHitTime => objects.Last().GetEndTime() + 1;
-
         public override bool HandleNonPositionalInput => AllowSeeking.Value;
         public override bool HandlePositionalInput => AllowSeeking.Value;
 
         protected override bool BlockScrollInput => false;
 
         private double firstHitTime => objects.First().StartTime;
+
+        //TODO: this isn't always correct (consider mania where a non-last object may last for longer than the last in the list).
+        private double lastHitTime => objects.Last().GetEndTime() + 1;
 
         private IEnumerable<HitObject> objects;
 
@@ -66,51 +66,58 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        public IClock ReferenceClock;
+        [Resolved(canBeNull: true)]
+        private Player player { get; set; }
 
-        private IClock gameplayClock;
+        [Resolved(canBeNull: true)]
+        private GameplayClock gameplayClock { get; set; }
+
+        private IClock referenceClock;
 
         public SongProgress()
         {
+            RelativeSizeAxes = Axes.X;
+            Anchor = Anchor.BottomRight;
+            Origin = Anchor.BottomRight;
+
             Children = new Drawable[]
             {
-                new SongProgressDisplay
+                info = new SongProgressInfo
                 {
-                    Children = new Drawable[]
-                    {
-                        info = new SongProgressInfo
-                        {
-                            Origin = Anchor.BottomLeft,
-                            Anchor = Anchor.BottomLeft,
-                            RelativeSizeAxes = Axes.X,
-                            Height = info_height,
-                        },
-                        graph = new SongProgressGraph
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Origin = Anchor.BottomLeft,
-                            Anchor = Anchor.BottomLeft,
-                            Height = graph_height,
-                            Margin = new MarginPadding { Bottom = bottom_bar_height },
-                        },
-                        bar = new SongProgressBar(bottom_bar_height, graph_height, handle_size)
-                        {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            OnSeek = time => RequestSeek?.Invoke(time),
-                        },
-                    }
+                    Origin = Anchor.BottomLeft,
+                    Anchor = Anchor.BottomLeft,
+                    RelativeSizeAxes = Axes.X,
+                    Height = info_height,
+                },
+                graph = new SongProgressGraph
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Origin = Anchor.BottomLeft,
+                    Anchor = Anchor.BottomLeft,
+                    Height = graph_height,
+                    Margin = new MarginPadding { Bottom = bottom_bar_height },
+                },
+                bar = new SongProgressBar(bottom_bar_height, graph_height, handle_size)
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    OnSeek = time => player?.Seek(time),
                 },
             };
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, GameplayClock clock, OsuConfigManager config)
+        private void load(OsuColour colours, OsuConfigManager config, DrawableRuleset drawableRuleset)
         {
             base.LoadComplete();
 
-            if (clock != null)
-                gameplayClock = clock;
+            if (drawableRuleset != null)
+            {
+                AllowSeeking.BindTo(drawableRuleset.HasReplayLoaded);
+
+                referenceClock = drawableRuleset.FrameStableClock;
+                Objects = drawableRuleset.Objects;
+            }
 
             config.BindWith(OsuSetting.ShowProgressGraph, ShowGraph);
 
@@ -123,11 +130,6 @@ namespace osu.Game.Screens.Play
 
             AllowSeeking.BindValueChanged(_ => updateBarVisibility(), true);
             ShowGraph.BindValueChanged(_ => updateGraphVisibility(), true);
-        }
-
-        public void BindDrawableRuleset(DrawableRuleset drawableRuleset)
-        {
-            AllowSeeking.BindTo(drawableRuleset.HasReplayLoaded);
         }
 
         protected override void PopIn()
@@ -148,7 +150,7 @@ namespace osu.Game.Screens.Play
                 return;
 
             double gameplayTime = gameplayClock?.CurrentTime ?? Time.Current;
-            double frameStableTime = ReferenceClock?.CurrentTime ?? gameplayTime;
+            double frameStableTime = referenceClock?.CurrentTime ?? gameplayTime;
 
             double progress = Math.Min(1, (frameStableTime - firstHitTime) / (lastHitTime - firstHitTime));
 
@@ -179,20 +181,6 @@ namespace osu.Game.Screens.Play
         {
             float finalMargin = bottom_bar_height + (AllowSeeking.Value ? handle_size.Y : 0) + (ShowGraph.Value ? graph_height : 0);
             info.TransformTo(nameof(info.Margin), new MarginPadding { Bottom = finalMargin }, transition_duration, Easing.In);
-        }
-
-        public class SongProgressDisplay : Container, ISkinnableComponent
-        {
-            public SongProgressDisplay()
-            {
-                // TODO: move actual implementation into this.
-                // exists for skin customisation purposes.
-
-                Masking = true;
-                RelativeSizeAxes = Axes.Both;
-                Anchor = Anchor.BottomCentre;
-                Origin = Anchor.BottomCentre;
-            }
         }
     }
 }

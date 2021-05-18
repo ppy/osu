@@ -92,7 +92,7 @@ namespace osu.Game.Utils
         /// <param name="mods">The mods to check.</param>
         /// <param name="invalidMods">Invalid mods, if any were found. Can be null if all mods were valid.</param>
         /// <returns>Whether the input mods were all valid. If false, <paramref name="invalidMods"/> will contain all invalid entries.</returns>
-        public static bool CheckValidForGameplay(IEnumerable<Mod> mods, out List<Mod>? invalidMods)
+        public static bool CheckValidForGameplay(IEnumerable<Mod> mods, [NotNullWhen(false)] out List<Mod>? invalidMods)
         {
             mods = mods.ToArray();
 
