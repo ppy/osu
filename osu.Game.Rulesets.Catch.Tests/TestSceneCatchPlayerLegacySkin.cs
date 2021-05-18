@@ -20,7 +20,6 @@ namespace osu.Game.Rulesets.Catch.Tests
         protected override Ruleset CreatePlayerRuleset() => new CatchRuleset();
 
         [Test]
-        [Ignore("HUD components broken, remove when fixed.")]
         public void TestLegacyHUDComboCounterHidden([Values] bool withModifiedSkin)
         {
             if (withModifiedSkin)
@@ -33,7 +32,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             AddAssert("legacy HUD combo counter hidden", () =>
             {
-                return Player.ChildrenOfType<LegacyComboCounter>().All(c => !c.ChildrenOfType<Container>().Single().IsPresent);
+                return Player.ChildrenOfType<LegacyComboCounter>().All(c => c.ChildrenOfType<Container>().Single().Alpha == 0f);
             });
         }
     }
