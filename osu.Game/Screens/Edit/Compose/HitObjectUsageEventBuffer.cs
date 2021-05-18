@@ -12,7 +12,8 @@ using osu.Game.Rulesets.UI;
 namespace osu.Game.Screens.Edit.Compose
 {
     /// <summary>
-    /// Buffers events from the many <see cref="HitObjectContainer"/>s in a nested <see cref="Playfield"/> hierarchy.
+    /// Buffers events from the many <see cref="HitObjectContainer"/>s in a nested <see cref="Playfield"/> hierarchy
+    /// to ensure correct ordering of events.
     /// </summary>
     internal class HitObjectUsageEventBuffer : IDisposable
     {
