@@ -12,7 +12,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Tests.Editing
 {
-    public class TestSceneHitObjectContainerEventQueue : OsuTestScene
+    public class TestSceneHitObjectContainerEventBuffer : OsuTestScene
     {
         private readonly TestHitObject testObj = new TestHitObject();
 
@@ -50,7 +50,6 @@ namespace osu.Game.Tests.Editing
             {
                 topPlayfield,
                 intermediateDrawable = new TestDrawable(),
-                eventBuffer
             };
         });
 
@@ -115,6 +114,12 @@ namespace osu.Game.Tests.Editing
             });
 
             addCheckStep(finished: true);
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+            eventBuffer.Update();
         }
 
         private void addResetStep() => AddStep("reset", reset);

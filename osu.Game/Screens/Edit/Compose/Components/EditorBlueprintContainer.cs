@@ -23,6 +23,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected readonly HitObjectComposer Composer;
 
+        private HitObjectUsageEventBuffer usageEventBuffer;
+
         protected EditorBlueprintContainer(HitObjectComposer composer)
         {
             Composer = composer;
@@ -46,12 +48,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 foreach (var obj in Composer.HitObjects)
                     AddBlueprintFor(obj.HitObject);
 
-                var eventQueue = new HitObjectUsageEventBuffer(Composer.Playfield);
-                eventQueue.HitObjectUsageBegan += AddBlueprintFor;
-                eventQueue.HitObjectUsageFinished += RemoveBlueprintFor;
-                eventQueue.HitObjectUsageTransferred += TransferBlueprintFor;
-                AddInternal(eventQueue);
+                usageEventBuffer = new HitObjectUsageEventBuffer(Composer.Playfield);
+                usageEventBuffer.HitObjectUsageBegan += AddBlueprintFor;
+                usageEventBuffer.HitObjectUsageFinished += RemoveBlueprintFor;
+                usageEventBuffer.HitObjectUsageTransferred += TransferBlueprintFor;
             }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            usageEventBuffer?.Update();
         }
 
         protected override IEnumerable<SelectionBlueprint<HitObject>> SortForMovement(IReadOnlyList<SelectionBlueprint<HitObject>> blueprints)
@@ -145,6 +152,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 Beatmap.HitObjectAdded -= AddBlueprintFor;
                 Beatmap.HitObjectRemoved -= RemoveBlueprintFor;
             }
+
+            usageEventBuffer?.Dispose();
         }
     }
 }
