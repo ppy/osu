@@ -68,6 +68,9 @@ namespace osu.Game.Screens.Edit.Compose
 
             switch (existingEvent, newEvent)
             {
+                // This mostly exists as a safeguard to ensure that the sequence: Began -> { Finished -> Began } -> Finished, where { ... } indicates a transferral within a single frame,
+                // correctly leads into a final "Finished" state. It's unlikely for this to happen normally as it requires the hitobject usage to finish (for the final time)
+                // immediately after the HitObjectContainer updates lifetime, but it's not inconceivable to occur with the Editor's scheduling and execution order.
                 case (EventType.Transferred, EventType.Finished):
                     pendingEvents[hitObject] = EventType.Finished;
                     break;
@@ -117,8 +120,24 @@ namespace osu.Game.Screens.Edit.Compose
 
         private enum EventType
         {
+            /// <summary>
+            /// A <see cref="HitObject"/> has started being used by a <see cref="DrawableHitObject"/>.
+            /// </summary>
             Began,
+
+            /// <summary>
+            /// A <see cref="HitObject"/> has finished being used by a <see cref="DrawableHitObject"/>.
+            /// </summary>
             Finished,
+
+            /// <summary>
+            /// An internal intermediate state that occurs when a <see cref="HitObject"/> has finished being used by one <see cref="DrawableHitObject"/>
+            /// and started being used by another <see cref="DrawableHitObject"/> in the same frame. The <see cref="DrawableHitObject"/> may be the same instance in both cases.
+            /// </summary>
+            /// <remarks>
+            /// This usually occurs when a <see cref="HitObject"/> is transferred between <see cref="HitObjectContainer"/>s,
+            /// but also occurs if the <see cref="HitObject"/> dies and becomes alive again in the same frame within the same <see cref="HitObjectContainer"/>.
+            /// </remarks>
             Transferred
         }
     }
