@@ -129,19 +129,15 @@ namespace osu.Game.Overlays.KeyBinding
         {
             base.LoadComplete();
 
-            IsDefault.BindValueChanged(resetButtons =>
+            IsDefault.BindValueChanged(isDefault =>
             {
-                if (resetButtons.NewValue && !computeIsDefaultValue())
+                if (isDefault.NewValue && !computeIsDefaultValue())
                 {
                     RestoreDefaults();
                     finalise();
                 }
             });
         }
-
-        private void updateIsDefaultValue() => IsDefault.Value = computeIsDefaultValue();
-
-        private bool computeIsDefaultValue() => bindings.Select(b => b.KeyCombination).SequenceEqual(Defaults);
 
         public void RestoreDefaults()
         {
@@ -330,6 +326,10 @@ namespace osu.Game.Overlays.KeyBinding
             cancelAndClearButtons.FadeOut(300, Easing.OutQuint);
             cancelAndClearButtons.BypassAutoSizeAxes |= Axes.Y;
         }
+
+        private void updateIsDefaultValue() => IsDefault.Value = computeIsDefaultValue();
+
+        private bool computeIsDefaultValue() => bindings.Select(b => b.KeyCombination).SequenceEqual(Defaults);
 
         protected override void OnFocus(FocusEvent e)
         {
