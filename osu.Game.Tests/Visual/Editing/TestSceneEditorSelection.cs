@@ -26,15 +26,15 @@ namespace osu.Game.Tests.Visual.Editing
 
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset, false);
 
-        private BlueprintContainer blueprintContainer
-            => Editor.ChildrenOfType<BlueprintContainer>().First();
+        private EditorBlueprintContainer blueprintContainer
+            => Editor.ChildrenOfType<EditorBlueprintContainer>().First();
 
         private void moveMouseToObject(Func<HitObject> targetFunc)
         {
             AddStep("move mouse to object", () =>
             {
                 var pos = blueprintContainer.SelectionBlueprints
-                                            .First(s => s.HitObject == targetFunc())
+                                            .First(s => s.Item == targetFunc())
                                             .ChildrenOfType<HitCirclePiece>()
                                             .First().ScreenSpaceDrawQuad.Centre;
 
@@ -50,9 +50,9 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("add hitobjects", () => EditorBeatmap.AddRange(addedObjects = new[]
             {
                 new HitCircle { StartTime = 100 },
-                new HitCircle { StartTime = 200, Position = new Vector2(50) },
-                new HitCircle { StartTime = 300, Position = new Vector2(100) },
-                new HitCircle { StartTime = 400, Position = new Vector2(150) },
+                new HitCircle { StartTime = 200, Position = new Vector2(100) },
+                new HitCircle { StartTime = 300, Position = new Vector2(200) },
+                new HitCircle { StartTime = 400, Position = new Vector2(300) },
             }));
 
             AddStep("select objects", () => EditorBeatmap.SelectedHitObjects.AddRange(addedObjects));
@@ -95,9 +95,9 @@ namespace osu.Game.Tests.Visual.Editing
             var addedObjects = new[]
             {
                 new HitCircle { StartTime = 100 },
-                new HitCircle { StartTime = 200, Position = new Vector2(50) },
-                new HitCircle { StartTime = 300, Position = new Vector2(100) },
-                new HitCircle { StartTime = 400, Position = new Vector2(150) },
+                new HitCircle { StartTime = 200, Position = new Vector2(100) },
+                new HitCircle { StartTime = 300, Position = new Vector2(200) },
+                new HitCircle { StartTime = 400, Position = new Vector2(300) },
             };
 
             AddStep("add hitobjects", () => EditorBeatmap.AddRange(addedObjects));
@@ -131,9 +131,9 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("add hitobjects", () => EditorBeatmap.AddRange(addedObjects = new[]
             {
                 new HitCircle { StartTime = 100 },
-                new HitCircle { StartTime = 200, Position = new Vector2(50) },
-                new HitCircle { StartTime = 300, Position = new Vector2(100) },
-                new HitCircle { StartTime = 400, Position = new Vector2(150) },
+                new HitCircle { StartTime = 200, Position = new Vector2(100) },
+                new HitCircle { StartTime = 300, Position = new Vector2(200) },
+                new HitCircle { StartTime = 400, Position = new Vector2(300) },
             }));
 
             moveMouseToObject(() => addedObjects[0]);

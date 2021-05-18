@@ -147,7 +147,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 if (b.IsSelected)
                     continue;
 
-                var hitObject = (OsuHitObject)b.HitObject;
+                var hitObject = (OsuHitObject)b.Item;
 
                 Vector2? snap = checkSnap(hitObject.Position);
                 if (snap == null && hitObject.Position != hitObject.EndPosition)
