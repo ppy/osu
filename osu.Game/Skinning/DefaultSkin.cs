@@ -14,6 +14,7 @@ using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osuTK;
 using osuTK.Graphics;
 
@@ -78,6 +79,23 @@ namespace osu.Game.Skinning
                                         combo.Position = new Vector2(accuracy.ScreenSpaceDeltaToParentSpace(score.ScreenSpaceDrawQuad.Size).X / 2 + horizontal_padding, vertical_offset + 5);
                                         combo.Anchor = Anchor.TopCentre;
                                     }
+
+                                    var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
+
+                                    if (hitError != null)
+                                    {
+                                        hitError.Anchor = Anchor.CentreLeft;
+                                        hitError.Origin = Anchor.CentreLeft;
+                                    }
+
+                                    var hitError2 = container.OfType<HitErrorMeter>().LastOrDefault();
+
+                                    if (hitError2 != null)
+                                    {
+                                        hitError2.Anchor = Anchor.CentreRight;
+                                        hitError2.Origin = Anchor.CentreLeft;
+                                        hitError2.Scale = new Vector2(-1, 1);
+                                    }
                                 }
                             })
                             {
@@ -88,6 +106,8 @@ namespace osu.Game.Skinning
                                     GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.AccuracyCounter)),
                                     GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.HealthDisplay)),
                                     GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.SongProgress)),
+                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.BarHitErrorMeter)),
+                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.BarHitErrorMeter)),
                                 }
                             };
 
@@ -114,6 +134,12 @@ namespace osu.Game.Skinning
 
                         case HUDSkinComponents.SongProgress:
                             return new SongProgress();
+
+                        case HUDSkinComponents.BarHitErrorMeter:
+                            return new BarHitErrorMeter();
+
+                        case HUDSkinComponents.ColourHitErrorMeter:
+                            return new ColourHitErrorMeter();
                     }
 
                     break;
