@@ -22,16 +22,6 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {
-            if (component is HUDSkinComponent hudComponent)
-            {
-                switch (hudComponent.Component)
-                {
-                    case HUDSkinComponents.ComboCounter:
-                        // catch may provide its own combo counter; hide the default.
-                        return providesComboCounter ? Drawable.Empty() : null;
-                }
-            }
-
             if (!(component is CatchSkinComponent catchSkinComponent))
                 return null;
 
