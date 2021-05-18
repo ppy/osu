@@ -35,8 +35,12 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public float TopScoringElementsHeight { get; private set; }
 
+        /// <summary>
+        /// The total height of all the bottom of screen scoring elements.
+        /// </summary>
+        public float BottomScoringElementsHeight { get; private set; }
+
         public readonly KeyCounterDisplay KeyCounter;
-        public readonly SongProgress Progress;
         public readonly ModDisplay ModDisplay;
         public readonly HoldForMenuButton HoldToQuit;
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
@@ -58,8 +62,6 @@ namespace osu.Game.Screens.Play
         private readonly BindableBool replayLoaded = new BindableBool();
 
         private static bool hasShownNotificationOnce;
-
-        public Action<double> RequestSeek;
 
         private readonly FillFlowContainer bottomRightElements;
         private readonly FillFlowContainer topRightElements;
@@ -85,45 +87,22 @@ namespace osu.Game.Screens.Play
                 visibilityContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = new GridContainer
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Content = new[]
+                        mainComponents = new SkinnableTargetContainer(SkinnableTarget.MainHUDComponents)
                         {
-                            new Drawable[]
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Children = new Drawable[]
                             {
-                                new Container
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Children = new Drawable[]
-                                    {
-                                        mainComponents = new SkinnableTargetContainer(SkinnableTarget.MainHUDComponents)
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                        },
-                                        new Container
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Children = new Drawable[]
-                                            {
-                                                // still need to be migrated; a bit more involved.
-                                                new HitErrorDisplay(this.drawableRuleset?.FirstAvailableHitWindows),
-                                            }
-                                        },
-                                    }
-                                },
-                            },
-                            new Drawable[]
-                            {
-                                Progress = CreateProgress(),
+                                // still need to be migrated; a bit more involved.
+                                new HitErrorDisplay(this.drawableRuleset?.FirstAvailableHitWindows),
                             }
                         },
-                        RowDimensions = new[]
-                        {
-                            new Dimension(),
-                            new Dimension(GridSizeMode.AutoSize)
-                        }
-                    },
+                    }
                 },
                 topRightElements = new FillFlowContainer
                 {
@@ -164,10 +143,6 @@ namespace osu.Game.Screens.Play
             if (drawableRuleset != null)
             {
                 BindDrawableRuleset(drawableRuleset);
-
-                Progress.Objects = drawableRuleset.Objects;
-                Progress.RequestSeek = time => RequestSeek(time);
-                Progress.ReferenceClock = drawableRuleset.FrameStableClock;
             }
 
             ModDisplay.Current.Value = mods;
@@ -206,26 +181,43 @@ namespace osu.Game.Screens.Play
         {
             base.Update();
 
-            Vector2 lowestScreenSpace = Vector2.Zero;
+            Vector2? lowestTopScreenSpace = null;
+            Vector2? highestBottomScreenSpace = null;
 
             // LINQ cast can be removed when IDrawable interface includes Anchor / RelativeSizeAxes.
             foreach (var element in mainComponents.Components.Cast<Drawable>())
             {
                 // for now align top-right components with the bottom-edge of the lowest top-anchored hud element.
-                if (!element.Anchor.HasFlagFast(Anchor.TopRight) && !element.RelativeSizeAxes.HasFlagFast(Axes.X))
+                if (!element.RelativeSizeAxes.HasFlagFast(Axes.X))
                     continue;
 
-                // health bars are excluded for the sake of hacky legacy skins which extend the health bar to take up the full screen area.
-                if (element is LegacyHealthDisplay)
-                    continue;
+                if (element.Anchor.HasFlagFast(Anchor.TopRight))
+                {
+                    // health bars are excluded for the sake of hacky legacy skins which extend the health bar to take up the full screen area.
+                    if (element is LegacyHealthDisplay)
+                        continue;
 
-                var bottomRight = element.ScreenSpaceDrawQuad.BottomRight;
-                if (bottomRight.Y > lowestScreenSpace.Y)
-                    lowestScreenSpace = bottomRight;
+                    var bottomRight = element.ScreenSpaceDrawQuad.BottomRight;
+                    if (lowestTopScreenSpace == null || bottomRight.Y > lowestTopScreenSpace.Value.Y)
+                        lowestTopScreenSpace = bottomRight;
+                }
+                else if (element.Anchor.HasFlagFast(Anchor.y2))
+                {
+                    var topLeft = element.ScreenSpaceDrawQuad.TopLeft;
+                    if (highestBottomScreenSpace == null || topLeft.Y < highestBottomScreenSpace.Value.Y)
+                        highestBottomScreenSpace = topLeft;
+                }
             }
 
-            topRightElements.Y = TopScoringElementsHeight = ToLocalSpace(lowestScreenSpace).Y;
-            bottomRightElements.Y = -Progress.Height;
+            if (lowestTopScreenSpace.HasValue)
+                topRightElements.Y = TopScoringElementsHeight = ToLocalSpace(lowestTopScreenSpace.Value).Y;
+            else
+                topRightElements.Y = 0;
+
+            if (highestBottomScreenSpace.HasValue)
+                bottomRightElements.Y = BottomScoringElementsHeight = -(DrawHeight - ToLocalSpace(highestBottomScreenSpace.Value).Y);
+            else
+                bottomRightElements.Y = 0;
         }
 
         private void updateVisibility()
@@ -281,8 +273,6 @@ namespace osu.Game.Screens.Play
             (drawableRuleset as ICanAttachKeyCounter)?.Attach(KeyCounter);
 
             replayLoaded.BindTo(drawableRuleset.HasReplayLoaded);
-
-            Progress.BindDrawableRuleset(drawableRuleset);
         }
 
         protected FailingLayer CreateFailingLayer() => new FailingLayer
@@ -294,13 +284,6 @@ namespace osu.Game.Screens.Play
         {
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,
-        };
-
-        protected SongProgress CreateProgress() => new SongProgress
-        {
-            Anchor = Anchor.BottomLeft,
-            Origin = Anchor.BottomLeft,
-            RelativeSizeAxes = Axes.X,
         };
 
         protected HoldForMenuButton CreateHoldForMenuButton() => new HoldForMenuButton

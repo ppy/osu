@@ -15,8 +15,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles
 
         protected readonly HitCirclePiece CirclePiece;
 
-        public HitCircleSelectionBlueprint(DrawableHitCircle drawableCircle)
-            : base(drawableCircle)
+        public HitCircleSelectionBlueprint(HitCircle circle)
+            : base(circle)
         {
             InternalChild = CirclePiece = new HitCirclePiece();
         }

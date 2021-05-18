@@ -124,7 +124,7 @@ namespace osu.Game.Skinning.Editor
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => drawable.ReceivePositionalInputAt(screenSpacePos);
 
-        public override Vector2 ScreenSpaceSelectionPoint => drawable.ScreenSpaceDrawQuad.Centre;
+        public override Vector2 ScreenSpaceSelectionPoint => drawable.ToScreenSpace(drawable.OriginPosition);
 
         public override Quad SelectionQuad => drawable.ScreenSpaceDrawQuad;
     }
