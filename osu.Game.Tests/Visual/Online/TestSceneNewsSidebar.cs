@@ -25,10 +25,17 @@ namespace osu.Game.Tests.Visual.Online
         public void SetUp() => Schedule(() => Child = sidebar = new TestNewsSidebar { YearChanged = onYearChanged });
 
         [Test]
+        public void TestBasic()
+        {
+            AddStep("Add metadata", () => sidebar.Metadata.Value = getMetadata(2021));
+            AddUntilStep("Month sections exist", () => sidebar.ChildrenOfType<MonthSection>().Any());
+        }
+
+        [Test]
         public void TestMetadataWithNoPosts()
         {
             AddStep("Add data with no posts", () => sidebar.Metadata.Value = metadata_with_no_posts);
-            AddUntilStep("No dropdowns were created", () => !sidebar.ChildrenOfType<MonthSection>().Any());
+            AddUntilStep("No month sections were created", () => !sidebar.ChildrenOfType<MonthSection>().Any());
         }
 
         [Test]
@@ -134,7 +141,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 base.LoadComplete();
 
-                Metadata.BindValueChanged(m =>
+                Metadata.BindValueChanged(metadata =>
                 {
                     foreach (var b in this.ChildrenOfType<YearButton>())
                         b.Action = () => YearChanged?.Invoke(b.Year);
