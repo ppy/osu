@@ -146,6 +146,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Scale the speed value with accuracy and OD
             speedValue *= (0.9 + Math.Pow(Attributes.OverallDifficulty, 2) / 750) * Math.Pow(accuracy, (14.5 - Math.Max(Attributes.OverallDifficulty, 8)) / 2);
+            // Scale the speed value with # of 50s to punish doubletapping.
+            speedValue *= Math.Pow(0.98, countMeh < totalHits / 500.0 ? 0 : countMeh - totalHits / 500.0);
 
             return speedValue;
         }

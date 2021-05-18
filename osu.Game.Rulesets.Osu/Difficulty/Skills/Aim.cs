@@ -23,9 +23,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double currStrain = 1;
 
-        private double snapStrainMultiplier = 8.5;
-        private double flowStrainMultiplier = 20.0;
-        private double hybridStrainMultiplier = 10;
+        private double snapStrainMultiplier = 8.625;
+        private double flowStrainMultiplier = 18.5;
+        private double hybridStrainMultiplier = 9.5;
         private double sliderStrainMultiplier = 40;
         private double totalStrainMultiplier = .1075;
 
@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double strain = prevVector.Length * osuPrevObj.SnapProbability
                           + currVector.Length * osuCurrObj.SnapProbability
                           // + Math.Abs(currVector.Length - prevVector.Length) * osuCurrObj.SnapProbability * osuPrevObj.SnapProbability
-                          + Math.Max(0, prevDiffVector.Length - Math.Max(currVector.Length, prevVector.Length) / 2) * osuCurrObj.SnapProbability * osuPrevObj.SnapProbability;//, osuPrevObj.SnapProbability);
+                          + 1.0 * Math.Max(0, prevDiffVector.Length - Math.Max(currVector.Length, prevVector.Length) / 1.5) * osuCurrObj.SnapProbability * osuPrevObj.SnapProbability;//, osuPrevObj.SnapProbability);
 
             strain *= Math.Min(osuCurrObj.StrainTime / (osuCurrObj.StrainTime - 20) , osuPrevObj.StrainTime / (osuPrevObj.StrainTime - 20));
 
@@ -195,7 +195,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             double strain = strainValueAt(current);
 
-            strain *= Math.Sqrt(1 + tapSkill.TapStrain / 150);
+            strain *= Math.Sqrt(1 + tapSkill.TapStrain / 100);
 
             // Console.WriteLine(Math.Sqrt(1 + tapSkill.TapStrain / 100));
 
