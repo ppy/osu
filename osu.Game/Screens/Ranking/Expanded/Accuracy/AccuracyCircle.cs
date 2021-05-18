@@ -83,8 +83,6 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         private Container<RankBadge> badges;
         private RankText rankText;
 
-        private SkinnableSound applauseSound;
-
         public AccuracyCircle(ScoreInfo score, bool withFlair)
         {
             this.score = score;
@@ -211,13 +209,6 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                 },
                 rankText = new RankText(score.Rank)
             };
-
-            if (withFlair)
-            {
-                AddInternal(applauseSound = score.Rank >= ScoreRank.A
-                    ? new SkinnableSound(new SampleInfo("Results/rankpass", "applause"))
-                    : new SkinnableSound(new SampleInfo("Results/rankfail")));
-            }
         }
 
         private ScoreRank getRank(ScoreRank rank)
@@ -256,7 +247,6 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 
                 using (BeginDelayedSequence(TEXT_APPEAR_DELAY, true))
                 {
-                    this.Delay(-1440).Schedule(() => applauseSound?.Play());
                     rankText.Appear();
                 }
             }

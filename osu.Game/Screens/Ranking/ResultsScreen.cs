@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Screens;
+using osu.Game.Audio;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
@@ -19,7 +20,9 @@ using osu.Game.Online.API;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Ranking.Expanded.Accuracy;
 using osu.Game.Screens.Ranking.Statistics;
+using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Screens.Ranking
@@ -55,6 +58,8 @@ namespace osu.Game.Screens.Ranking
 
         private readonly bool allowRetry;
         private readonly bool allowWatchingReplay;
+
+        private SkinnableSound applauseSound;
 
         protected ResultsScreen(ScoreInfo score, bool allowRetry, bool allowWatchingReplay = true)
         {
@@ -146,6 +151,13 @@ namespace osu.Game.Screens.Ranking
                 bool shouldFlair = player != null && !Score.Mods.Any(m => m is ModAutoplay);
 
                 ScorePanelList.AddScore(Score, shouldFlair);
+
+                if (shouldFlair)
+                {
+                    AddInternal(applauseSound = Score.Rank >= ScoreRank.A
+                        ? new SkinnableSound(new SampleInfo("Results/rankpass", "applause"))
+                        : new SkinnableSound(new SampleInfo("Results/rankfail")));
+                }
             }
 
             if (allowWatchingReplay)
@@ -183,6 +195,11 @@ namespace osu.Game.Screens.Ranking
                 api.Queue(req);
 
             statisticsPanel.State.BindValueChanged(onStatisticsStateChanged, true);
+
+            using(BeginDelayedSequence(AccuracyCircle.ACCURACY_TRANSFORM_DELAY + AccuracyCircle.TEXT_APPEAR_DELAY, true))
+            {
+                this.Delay(-1000).Schedule(() => applauseSound?.Play());
+            }
         }
 
         protected override void Update()
