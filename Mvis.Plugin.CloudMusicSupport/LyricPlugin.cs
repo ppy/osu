@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using Mvis.Plugin.CloudMusicSupport.Config;
@@ -14,10 +15,13 @@ using osu.Game.Screens.Mvis.Plugins.Config;
 using osu.Game.Screens.Mvis.Plugins.Types;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Audio;
+using osu.Game.Configuration;
+using osu.Game.Overlays;
 
 namespace Mvis.Plugin.CloudMusicSupport
 {
-    public class LyricPlugin : BindableControlledPlugin
+    public class LyricPlugin : BindableControlledPlugin, IProvideAudioControlPlugin
     {
         /// <summary>
         /// 请参阅 <see cref="MvisPlugin.TargetLayer"/>
@@ -31,7 +35,7 @@ namespace Mvis.Plugin.CloudMusicSupport
             => new LyricSettingsSubSection(this);
 
         public override PluginSidebarPage CreateSidebarPage()
-            => new LyricSidebarPage(this, 0.4f);
+            => new LyricSidebarSectionContainer(this, 0.4f);
 
         public override int Version => 4;
 
@@ -47,6 +51,41 @@ namespace Mvis.Plugin.CloudMusicSupport
 
         [NotNull]
         public List<Lyric> Lyrics { get; private set; } = new List<Lyric>();
+
+        public void ReplaceLyricWith(List<Lyric> newList, bool saveToDisk)
+        {
+            CurrentStatus.Value = Status.Working;
+
+            Lyrics = newList;
+
+            if (saveToDisk)
+                WriteLyricToDisk();
+
+            CurrentStatus.Value = Status.Finish;
+        }
+
+        [Resolved]
+        private MusicController controller { get; set; }
+
+        [Resolved]
+        private MConfigManager mConfig { get; set; }
+
+        public void RequestControl(Action onAllow)
+        {
+            MvisScreen.RequestAudioControl(this,
+                "编辑歌词需要禁用切歌功能",
+                () => IsEditing = false,
+                onAllow);
+        }
+
+        public bool IsEditing
+        {
+            set
+            {
+                if (!value)
+                    MvisScreen.ReleaseAudioControlFrom(this);
+            }
+        }
 
         private Track track;
         private readonly BindableDouble offset = new BindableDouble();
@@ -174,13 +213,13 @@ namespace Mvis.Plugin.CloudMusicSupport
             {
                 var lrc = Lyrics.FindLast(l => targetTime >= l.Time) ?? defaultLrc;
 
-                if (lrc != currentLine)
+                if (!lrc.Equals(currentLine))
                 {
                     lrcLine.Text = lrc.Content;
                     lrcLine.TranslatedText = lrc.TranslatedString;
-                }
 
-                currentLine = lrc;
+                    currentLine = lrc.GetCopy();
+                }
             }
         }
 
@@ -190,5 +229,21 @@ namespace Mvis.Plugin.CloudMusicSupport
             Failed,
             Finish
         }
+
+        public void NextTrack()
+        {
+        }
+
+        public void PrevTrack()
+        {
+        }
+
+        public void TogglePause() => controller.TogglePause();
+
+        public void Seek(double position) => currentWorkingBeatmap?.Track.Seek(position);
+
+        public DrawableTrack GetCurrentTrack() => controller.CurrentTrack;
+
+        public bool IsCurrent { get; set; }
     }
 }

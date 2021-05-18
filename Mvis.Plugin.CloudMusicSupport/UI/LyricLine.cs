@@ -84,6 +84,12 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
 
         private void checkIfEmpty()
         {
+            if (LoadState < LoadState.Ready)
+            {
+                Schedule(checkIfEmpty);
+                return;
+            }
+
             if (string.IsNullOrEmpty(Text) && string.IsNullOrEmpty(TranslatedText))
                 this.FadeOut(200, Easing.OutQuint);
             else

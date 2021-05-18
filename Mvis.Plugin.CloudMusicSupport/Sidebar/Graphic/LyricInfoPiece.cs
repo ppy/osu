@@ -13,18 +13,16 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Mvis;
 using osuTK.Graphics;
 
-namespace Mvis.Plugin.CloudMusicSupport.Sidebar
+namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
 {
-    public class LyricInfoPiece : CompositeDrawable, IHasTooltip
+    public class LyricPiece : DrawableLyric, IHasTooltip
     {
-        public readonly Lyric Value;
-
         public Action<Lyric> Action;
         public string TooltipText { get; private set; }
 
         private Box hoverBox;
 
-        public LyricInfoPiece(Lyric lrc)
+        public LyricPiece(Lyric lrc)
         {
             CornerRadius = 5f;
             Masking = true;
