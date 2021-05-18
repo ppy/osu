@@ -139,24 +139,23 @@ namespace osu.Game.Overlays.News.Sidebar
             {
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
+                AutoSizeDuration = animation_duration;
+                AutoSizeEasing = Easing.Out;
                 InternalChild = content = new FillFlowContainer
                 {
                     Margin = new MarginPadding { Top = 5 },
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0, 5)
+                    Spacing = new Vector2(0, 5),
+                    Alpha = 0
                 };
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-
                 IsOpen.BindValueChanged(_ => updateState(), true);
-
-                // First state change should be instant.
-                FinishTransforms(true);
             }
 
             private void updateState()
@@ -174,22 +173,6 @@ namespace osu.Game.Overlays.News.Sidebar
                     this.ResizeHeightTo(0, animation_duration, Easing.OutQuint);
 
                     content.FadeOut(animation_duration, Easing.OutQuint);
-                }
-            }
-
-            private bool autoSizeTransitionApplied;
-
-            // Workaround to allow the dropdown to be opened immediately since FinishTransforms doesn't work for AutoSize{Duration,Easing}.
-            protected override void UpdateAfterAutoSize()
-            {
-                base.UpdateAfterAutoSize();
-
-                if (!autoSizeTransitionApplied)
-                {
-                    AutoSizeDuration = animation_duration;
-                    AutoSizeEasing = Easing.OutQuint;
-
-                    autoSizeTransitionApplied = true;
                 }
             }
         }
