@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Online.Chat
@@ -20,7 +21,10 @@ namespace osu.Game.Online.Chat
         /// <summary>
         /// Each word part of a chat link (split for word-wrap support).
         /// </summary>
-        public List<Drawable> Parts;
+        public readonly List<Drawable> Parts;
+
+        [Resolved(CanBeNull = true)]
+        private OverlayColourProvider overlayColourProvider { get; set; }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parts.Any(d => d.ReceivePositionalInputAt(screenSpacePos));
 
@@ -34,7 +38,7 @@ namespace osu.Game.Online.Chat
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            IdleColour = colours.Blue;
+            IdleColour = overlayColourProvider?.Light2 ?? colours.Blue;
         }
 
         protected override IEnumerable<Drawable> EffectTargets => Parts;

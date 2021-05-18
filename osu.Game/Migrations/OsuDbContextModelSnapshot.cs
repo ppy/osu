@@ -126,6 +126,9 @@ namespace osu.Game.Migrations
 
                     b.Property<string>("AudioFile");
 
+                    b.Property<int>("AuthorID")
+                        .HasColumnName("AuthorID");
+
                     b.Property<string>("AuthorString")
                         .HasColumnName("Author");
 

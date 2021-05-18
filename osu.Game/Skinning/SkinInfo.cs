@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.IO.Stores;
 using osu.Game.Configuration;
 using osu.Game.Database;
@@ -32,7 +33,7 @@ namespace osu.Game.Skinning
             var type = string.IsNullOrEmpty(InstantiationInfo)
                 // handle the case of skins imported before InstantiationInfo was added.
                 ? typeof(LegacySkin)
-                : Type.GetType(InstantiationInfo);
+                : Type.GetType(InstantiationInfo).AsNonNull();
 
             if (type == typeof(DefaultLegacySkin))
                 return (Skin)Activator.CreateInstance(type, this, legacyDefaultResources, resources);

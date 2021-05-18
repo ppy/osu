@@ -12,6 +12,7 @@ using osu.Framework.Platform;
 using osu.Game.IPC;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -264,7 +265,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                         // change filename
                         var firstFile = new FileInfo(Directory.GetFiles(extractedFolder).First());
-                        firstFile.MoveTo(Path.Combine(firstFile.DirectoryName, $"{firstFile.Name}-changed{firstFile.Extension}"));
+                        firstFile.MoveTo(Path.Combine(firstFile.DirectoryName.AsNonNull(), $"{firstFile.Name}-changed{firstFile.Extension}"));
 
                         using (var zip = ZipArchive.Create())
                         {

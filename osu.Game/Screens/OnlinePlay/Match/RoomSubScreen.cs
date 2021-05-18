@@ -150,7 +150,11 @@ namespace osu.Game.Screens.OnlinePlay.Match
         protected void StartPlay()
         {
             sampleStart?.Play();
-            ParentScreen?.Push(CreateGameplayScreen());
+
+            // fallback is to allow this class to operate when there is no parent OnlineScreen (testing purposes).
+            var targetScreen = (Screen)ParentScreen ?? this;
+
+            targetScreen.Push(CreateGameplayScreen());
         }
 
         /// <summary>
