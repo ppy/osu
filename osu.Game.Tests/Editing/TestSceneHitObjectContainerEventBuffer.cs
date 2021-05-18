@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Editing
                 intermediateDrawable.Schedule(() => playfield1.Remove(testObj));
             });
 
-            addCheckStep();
+            addCheckStep(began: true, finished: true);
         }
 
         [Test]
@@ -113,7 +113,7 @@ namespace osu.Game.Tests.Editing
                 intermediateDrawable.Schedule(() => playfield2.Remove(testObj));
             });
 
-            addCheckStep(finished: true);
+            addCheckStep(transferred: true, finished: true);
         }
 
         protected override void UpdateAfterChildren()
