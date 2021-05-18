@@ -43,10 +43,16 @@ namespace osu.Game.Skinning.Editor
 
         public override bool HandleFlip(Direction direction)
         {
-            // TODO: this is temporary as well.
-            foreach (var c in SelectedBlueprints)
+            var selectionQuad = GetSurroundingQuad(SelectedBlueprints.Select(b => b.ScreenSpaceSelectionPoint));
+
+            foreach (var b in SelectedBlueprints)
             {
-                ((Drawable)c.Item).Scale *= new Vector2(
+                var drawableItem = (Drawable)b.Item;
+
+                drawableItem.Position =
+                    drawableItem.Parent.ToLocalSpace(GetFlippedPosition(direction, selectionQuad, b.ScreenSpaceSelectionPoint)) - drawableItem.AnchorPosition;
+
+                drawableItem.Scale *= new Vector2(
                     direction == Direction.Horizontal ? -1 : 1,
                     direction == Direction.Vertical ? -1 : 1
                 );
