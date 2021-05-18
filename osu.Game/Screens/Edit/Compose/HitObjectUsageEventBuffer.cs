@@ -13,9 +13,9 @@ using osu.Game.Rulesets.UI;
 namespace osu.Game.Screens.Edit.Compose
 {
     /// <summary>
-    /// A queue which processes events from the many <see cref="HitObjectContainer"/>s in a nested <see cref="Playfield"/> hierarchy.
+    /// Buffers events from the many <see cref="HitObjectContainer"/>s in a nested <see cref="Playfield"/> hierarchy.
     /// </summary>
-    internal class HitObjectContainerEventQueue : Component
+    internal class HitObjectUsageEventBuffer : Component
     {
         /// <summary>
         /// Invoked when a <see cref="HitObject"/> becomes used by a <see cref="DrawableHitObject"/>.
@@ -41,10 +41,10 @@ namespace osu.Game.Screens.Edit.Compose
         private readonly Playfield playfield;
 
         /// <summary>
-        /// Creates a new <see cref="HitObjectContainerEventQueue"/>.
+        /// Creates a new <see cref="HitObjectUsageEventBuffer"/>.
         /// </summary>
         /// <param name="playfield">The most top-level <see cref="Playfield"/>.</param>
-        public HitObjectContainerEventQueue([NotNull] Playfield playfield)
+        public HitObjectUsageEventBuffer([NotNull] Playfield playfield)
         {
             this.playfield = playfield;
 
@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Edit.Compose
             {
                 // This exists as a safeguard to ensure that the sequence: { Began -> Finished }, where { ... } indicates a sequence within a single frame, does not trigger any events.
                 // This is unlikely to occur in practice as it requires the usage to finish immediately after the HitObjectContainer updates hitobject lifetimes,
-                // however, an Editor action scheduled somewhere between the lifetime update and this event queue's own Update() could cause this.
+                // however, an Editor action scheduled somewhere between the lifetime update and this buffer's own Update() could cause this.
                 case (EventType.Began, EventType.Finished):
                     pendingEvents.Remove(hitObject);
                     break;
