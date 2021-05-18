@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Play.HUD
     /// </summary>
     public class LegacyComboCounter : CompositeDrawable, ISkinnableDrawable
     {
-        public Bindable<int> Current { get; } = new BindableInt { MinValue = 0, };
+        public Bindable<int> Current { get; } = new BindableInt { MinValue = 0 };
 
         private uint scheduledPopOutCurrentId;
 
@@ -32,9 +32,9 @@ namespace osu.Game.Screens.Play.HUD
         /// </summary>
         private const double rolling_duration = 20;
 
-        private Drawable popOutCount;
+        private readonly Drawable popOutCount;
 
-        private Drawable displayedCountSpriteText;
+        private readonly Drawable displayedCountSpriteText;
 
         private int previousValue;
 
@@ -44,6 +44,13 @@ namespace osu.Game.Screens.Play.HUD
 
         [Resolved]
         private ISkinSource skin { get; set; }
+
+        private readonly Container counterContainer;
+
+        public bool ContentVisible
+        {
+            set => counterContainer.Alpha = value ? 1 : 0;
+        }
 
         public LegacyComboCounter()
         {
@@ -55,6 +62,25 @@ namespace osu.Game.Screens.Play.HUD
             Margin = new MarginPadding(10);
 
             Scale = new Vector2(1.2f);
+
+            InternalChild = counterContainer = new Container
+            {
+                AutoSizeAxes = Axes.Both,
+                AlwaysPresent = true,
+                Children = new[]
+                {
+                    popOutCount = new LegacySpriteText(LegacyFont.Combo)
+                    {
+                        Alpha = 0,
+                        Margin = new MarginPadding(0.05f),
+                        Blending = BlendingParameters.Additive,
+                    },
+                    displayedCountSpriteText = new LegacySpriteText(LegacyFont.Combo)
+                    {
+                        Alpha = 0,
+                    },
+                }
+            };
         }
 
         /// <summary>
@@ -82,20 +108,6 @@ namespace osu.Game.Screens.Play.HUD
         [BackgroundDependencyLoader]
         private void load(ScoreProcessor scoreProcessor)
         {
-            InternalChildren = new[]
-            {
-                popOutCount = new LegacySpriteText(LegacyFont.Combo)
-                {
-                    Alpha = 0,
-                    Margin = new MarginPadding(0.05f),
-                    Blending = BlendingParameters.Additive,
-                },
-                displayedCountSpriteText = new LegacySpriteText(LegacyFont.Combo)
-                {
-                    Alpha = 0,
-                },
-            };
-
             Current.BindTo(scoreProcessor.Combo);
         }
 
@@ -105,10 +117,12 @@ namespace osu.Game.Screens.Play.HUD
 
             ((IHasText)displayedCountSpriteText).Text = formatCount(Current.Value);
 
+            counterContainer.Anchor = Anchor;
+            counterContainer.Origin = Origin;
             displayedCountSpriteText.Anchor = Anchor;
             displayedCountSpriteText.Origin = Origin;
-            popOutCount.Origin = Origin;
             popOutCount.Anchor = Anchor;
+            popOutCount.Origin = Origin;
 
             Current.BindValueChanged(combo => updateCount(combo.NewValue == 0), true);
         }
