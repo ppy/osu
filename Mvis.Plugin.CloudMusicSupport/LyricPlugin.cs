@@ -52,11 +52,14 @@ namespace Mvis.Plugin.CloudMusicSupport
         [NotNull]
         public List<Lyric> Lyrics { get; private set; } = new List<Lyric>();
 
-        public void ReplaceLyricWith(List<Lyric> newList)
+        public void ReplaceLyricWith(List<Lyric> newList, bool saveToDisk)
         {
             CurrentStatus.Value = Status.Working;
 
             Lyrics = newList;
+
+            if (saveToDisk)
+                WriteLyricToDisk();
 
             CurrentStatus.Value = Status.Finish;
         }
@@ -210,13 +213,13 @@ namespace Mvis.Plugin.CloudMusicSupport
             {
                 var lrc = Lyrics.FindLast(l => targetTime >= l.Time) ?? defaultLrc;
 
-                if (lrc != currentLine)
+                if (!lrc.Equals(currentLine))
                 {
                     lrcLine.Text = lrc.Content;
                     lrcLine.TranslatedText = lrc.TranslatedString;
-                }
 
-                currentLine = lrc;
+                    currentLine = lrc.GetCopy();
+                }
             }
         }
 

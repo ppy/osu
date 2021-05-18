@@ -19,6 +19,8 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         [Resolved]
         private LyricPlugin plugin { get; set; }
 
+        protected LyricPlugin Plugin => plugin;
+
         [Resolved]
         private MvisScreen mvisScreen { get; set; }
 

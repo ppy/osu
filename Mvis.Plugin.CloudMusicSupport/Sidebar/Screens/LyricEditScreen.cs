@@ -20,11 +20,13 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
 {
     public class LyricEditScreen : LyricScreen
     {
+        private List<Lyric> localList = new List<Lyric>();
+
         protected override DrawableLyric CreateDrawableLyric(Lyric lyric)
         {
             var piece = new EditableLyricPiece(lyric)
             {
-                OnSeekTriggered = () => plugin.GetCurrentTrack().Seek(lyric.Time),
+                OnSeekTriggered = () => Plugin.GetCurrentTrack().Seek(lyric.Time),
                 OnDeleted = () => this.Delay(1).Schedule(applyChanges)
             };
 
@@ -35,8 +37,10 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
 
         private void adjustPieceTime(DrawableLyric drawableLyric)
         {
-            drawableLyric.Value.Time = (int)plugin.GetCurrentTrack().CurrentTime;
-            applyChanges();
+            LyricFlow.Remove(drawableLyric);
+            drawableLyric.Value.Time = (int)Plugin.GetCurrentTrack().CurrentTime;
+
+            sortPiece(drawableLyric);
         }
 
         public override Drawable[] Entries => new Drawable[]
@@ -46,7 +50,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
                 Icon = FontAwesome.Solid.IceCream,
                 TooltipText = "在当前时间添加新的歌词",
                 Size = new Vector2(45),
-                Action = () => addNewLyricAt(plugin.GetCurrentTrack().CurrentTime)
+                Action = () => addNewLyricAt(Plugin.GetCurrentTrack().CurrentTime)
             },
             new IconButton
             {
@@ -87,25 +91,25 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
                 list.Add(drawableLyric.Value);
             }
 
-            syncLyric(list);
+            localList = list;
+
+            performSave(false);
         }
 
         [Resolved]
         private MvisScreen mvisScreen { get; set; }
 
-        [Resolved]
-        private LyricPlugin plugin { get; set; }
-
         [BackgroundDependencyLoader]
         private void load()
         {
-            RefreshLrcInfo(plugin.Lyrics);
+            localList = Plugin.Lyrics;
+            RefreshLrcInfo(localList);
         }
 
         //From EditorClock.cs
         private void seek(int direction)
         {
-            var track = plugin.GetCurrentTrack();
+            var track = Plugin.GetCurrentTrack();
             double current = track.CurrentTime;
 
             var controlPointInfo = mvisScreen.Beatmap.Value.Beatmap.ControlPointInfo;
@@ -120,7 +124,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
 
             if (controlPointInfo.TimingPoints.Count == 0)
             {
-                plugin.Seek(seekTime);
+                Plugin.Seek(seekTime);
                 return;
             }
 
@@ -154,38 +158,58 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
 
             // Ensure the sought point is within the boundaries
             seekTime = Math.Clamp(seekTime, 0, track.Length);
-            plugin.Seek(seekTime);
+            Plugin.Seek(seekTime);
         }
 
-        private void syncLyric(List<Lyric> list) =>
-            plugin.ReplaceLyricWith(list);
+        private void performSave(bool saveToDisk)
+        {
+            Plugin.ReplaceLyricWith(localList, saveToDisk);
+        }
 
         private void addNewLyricAt(double time)
         {
+            //新建lyric
             var lrc = new Lyric
             {
                 Time = (int)time
             };
 
-            plugin.Lyrics.Add(lrc);
-            var list = plugin.Lyrics.OrderBy(l => l.Time).ToList();
+            //添加歌词至localList
+            localList.Add(lrc);
 
-            syncLyric(list);
+            //创建与lrc对应的drawable
+            var piece = CreateDrawableLyric(lrc);
 
-            //获取index
-            var targetIndex = list.IndexOf(lrc);
+            sortPiece(piece);
+        }
 
+        private void sortPiece(DrawableLyric piece)
+        {
+            var lrc = piece.Value;
+
+            //将歌词按时间排序，并同步至localList中。
+            localList = localList.OrderBy(l => l.Time).ToList();
+
+            //获取在歌词列表中的index
+            var targetIndex = localList.IndexOf(lrc);
+
+            //遍历LyricFlow，找到任何LyricFlow中Index大于等于目标Index的片，并将他们的Index+1以实现靠后
             foreach (var d in LyricFlow)
             {
+                //获取在LyricFlow中的Index
+                //drawableIndex不是目标index
                 var drawableIndex = LyricFlow.IndexOf(d);
 
+                //如果这个片比目标Index大，则将该片的Index+1
                 if (drawableIndex >= targetIndex)
                     LyricFlow.SetLayoutPosition(d, drawableIndex + 1);
             }
 
-            var piece = CreateDrawableLyric(lrc);
-
+            //插入
             LyricFlow.Insert(targetIndex, piece);
+
+            //临时保存
+            performSave(false);
         }
 
         protected override void UpdateStatus(LyricPlugin.Status status)
@@ -213,7 +237,8 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
 
         public override bool OnExiting(IScreen next)
         {
-            plugin.IsEditing = false;
+            Plugin.IsEditing = false;
+            performSave(true);
             this.MoveToX(10, 200, Easing.OutQuint).FadeOut(200, Easing.OutQuint);
             return base.OnExiting(next);
         }
