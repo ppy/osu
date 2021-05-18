@@ -14,7 +14,6 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
@@ -27,8 +26,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
     public class SliderSelectionBlueprint : OsuSelectionBlueprint<Slider>
     {
         protected SliderBodyPiece BodyPiece { get; private set; }
-        protected SliderCircleSelectionBlueprint HeadBlueprint { get; private set; }
-        protected SliderCircleSelectionBlueprint TailBlueprint { get; private set; }
+        protected SliderCircleOverlay HeadOverlay { get; private set; }
+        protected SliderCircleOverlay TailOverlay { get; private set; }
 
         [CanBeNull]
         protected PathControlPointVisualiser ControlPointVisualiser { get; private set; }
@@ -61,8 +60,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             InternalChildren = new Drawable[]
             {
                 BodyPiece = new SliderBodyPiece(),
-                HeadBlueprint = CreateCircleSelectionBlueprint(HitObject, SliderPosition.Start),
-                TailBlueprint = CreateCircleSelectionBlueprint(HitObject, SliderPosition.End),
+                HeadOverlay = CreateCircleOverlay(HitObject, SliderPosition.Start),
+                TailOverlay = CreateCircleOverlay(HitObject, SliderPosition.End),
             };
         }
 
@@ -76,14 +75,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             pathVersion.BindValueChanged(_ => updatePath());
 
             BodyPiece.UpdateFrom(HitObject);
-        }
-
-        public override void Apply(DrawableHitObject drawableObject)
-        {
-            base.Apply(drawableObject);
-
-            HeadBlueprint?.Apply(drawableObject);
-            TailBlueprint?.Apply(drawableObject);
         }
 
         public override bool HandleQuickDeletion()
@@ -250,6 +241,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
             BodyPiece.ReceivePositionalInputAt(screenSpacePos) || ControlPointVisualiser?.Pieces.Any(p => p.ReceivePositionalInputAt(screenSpacePos)) == true;
 
-        protected virtual SliderCircleSelectionBlueprint CreateCircleSelectionBlueprint(Slider slider, SliderPosition position) => new SliderCircleSelectionBlueprint(slider, position);
+        protected virtual SliderCircleOverlay CreateCircleOverlay(Slider slider, SliderPosition position) => new SliderCircleOverlay(slider, position);
     }
 }
