@@ -198,7 +198,7 @@ namespace osu.Game.Screens.Ranking
 
             using (BeginDelayedSequence(AccuracyCircle.ACCURACY_TRANSFORM_DELAY + AccuracyCircle.TEXT_APPEAR_DELAY, true))
             {
-                this.Delay(-1000).Schedule(() => applauseSound?.Play());
+                this.Delay(ScorePanel.RESIZE_DURATION + ScorePanel.TOP_LAYER_EXPAND_DELAY - AccuracyCircle.APPLAUSE_DELAY).Schedule(() => applauseSound?.Play());
             }
         }
 
