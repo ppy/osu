@@ -10,11 +10,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
-using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
-using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Screens.Ranking.Expanded.Accuracy
@@ -76,8 +74,6 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
 
         private readonly ScoreInfo score;
 
-        private readonly bool withFlair;
-
         private SmoothCircularProgress accuracyCircle;
         private SmoothCircularProgress innerMask;
         private Container<RankBadge> badges;
@@ -86,7 +82,6 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         public AccuracyCircle(ScoreInfo score, bool withFlair)
         {
             this.score = score;
-            this.withFlair = withFlair;
         }
 
         [BackgroundDependencyLoader]

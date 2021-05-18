@@ -196,7 +196,7 @@ namespace osu.Game.Screens.Ranking
 
             statisticsPanel.State.BindValueChanged(onStatisticsStateChanged, true);
 
-            using(BeginDelayedSequence(AccuracyCircle.ACCURACY_TRANSFORM_DELAY + AccuracyCircle.TEXT_APPEAR_DELAY, true))
+            using (BeginDelayedSequence(AccuracyCircle.ACCURACY_TRANSFORM_DELAY + AccuracyCircle.TEXT_APPEAR_DELAY, true))
             {
                 this.Delay(-1000).Schedule(() => applauseSound?.Play());
             }
