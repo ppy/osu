@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// The <see cref="DrawableHitObject"/> which this <see cref="HitObjectSelectionBlueprint"/> applies to.
         /// </summary>
-        public DrawableHitObject DrawableObject { get; internal set; }
+        public virtual DrawableHitObject DrawableObject { get; private set; }
 
         /// <summary>
         /// Whether the blueprint should be shown even when the <see cref="DrawableObject"/> is not alive.
@@ -26,6 +26,24 @@ namespace osu.Game.Rulesets.Edit
         protected HitObjectSelectionBlueprint(HitObject hitObject)
             : base(hitObject)
         {
+        }
+
+        protected override void LoadAsyncComplete()
+        {
+            // Must be done before base.LoadAsyncComplete() as this may affect children.
+            Apply(DrawableObject);
+
+            base.LoadAsyncComplete();
+        }
+
+        /// <summary>
+        /// Applies a <see cref="DrawableHitObject"/> to this <see cref="HitObjectSelectionBlueprint"/>.
+        /// The represented <see cref="HitObject"/> model does not change.
+        /// </summary>
+        /// <param name="drawableObject">The new <see cref="DrawableHitObject"/>.</param>
+        public virtual void Apply(DrawableHitObject drawableObject)
+        {
+            DrawableObject = drawableObject;
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => DrawableObject.ReceivePositionalInputAt(screenSpacePos);

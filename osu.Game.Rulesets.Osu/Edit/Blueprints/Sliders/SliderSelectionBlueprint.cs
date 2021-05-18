@@ -14,6 +14,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
@@ -75,6 +76,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             pathVersion.BindValueChanged(_ => updatePath());
 
             BodyPiece.UpdateFrom(HitObject);
+        }
+
+        public override void Apply(DrawableHitObject drawableObject)
+        {
+            base.Apply(drawableObject);
+
+            HeadBlueprint?.Apply(drawableObject);
+            TailBlueprint?.Apply(drawableObject);
         }
 
         public override bool HandleQuickDeletion()
