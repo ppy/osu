@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
                 Child = drawableObject = new DrawableNote(note)
             };
 
-            AddBlueprint(new NoteSelectionBlueprint(drawableObject));
+            AddBlueprint(new NoteSelectionBlueprint(note), drawableObject);
         }
     }
 }
