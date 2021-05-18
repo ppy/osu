@@ -26,11 +26,14 @@ namespace osu.Game.Overlays.AccountCreation
         [Resolved(CanBeNull = true)]
         private IAPIProvider api { get; set; }
 
+        [Resolved]
+        private OsuGameBase game { get; set; }
+
         private const string help_centre_url = "/help/wiki/Help_Centre#login";
 
         public override void OnEntering(IScreen last)
         {
-            if (string.IsNullOrEmpty(api?.ProvidedUsername))
+            if (string.IsNullOrEmpty(api?.ProvidedUsername) || game.UseDevelopmentServer)
             {
                 this.FadeOut();
                 this.Push(new ScreenEntry());
