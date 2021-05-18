@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Edit
         protected override bool ShouldBeConsideredForInput(Drawable child) => State == SelectionState.Selected;
 
         /// <summary>
-        /// Selects this <see cref="HitObjectSelectionBlueprint"/>, causing it to become visible.
+        /// Selects this <see cref="SelectionBlueprint"/>, causing it to become visible.
         /// </summary>
         public void Select() => State = SelectionState.Selected;
 
