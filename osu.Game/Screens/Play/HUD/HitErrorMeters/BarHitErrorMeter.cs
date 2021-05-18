@@ -20,8 +20,6 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 {
     public class BarHitErrorMeter : HitErrorMeter
     {
-        private readonly Anchor alignment;
-
         private const int arrow_move_duration = 400;
 
         private const int judgement_line_width = 6;
@@ -45,9 +43,6 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         public BarHitErrorMeter()
         {
-            // todo: investigate.
-            alignment = false ? Anchor.x0 : Anchor.x2;
-
             AutoSizeAxes = Axes.Both;
         }
 
@@ -63,33 +58,42 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 Margin = new MarginPadding(2),
                 Children = new Drawable[]
                 {
-                    judgementsContainer = new Container
+                    new Container
                     {
-                        Anchor = Anchor.y1 | alignment,
-                        Origin = Anchor.y1 | alignment,
-                        Width = judgement_line_width,
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Width = chevron_size,
                         RelativeSizeAxes = Axes.Y,
+                        Child = arrow = new SpriteIcon
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.Centre,
+                            RelativePositionAxes = Axes.Y,
+                            Y = 0.5f,
+                            Icon = FontAwesome.Solid.ChevronRight,
+                            Size = new Vector2(chevron_size),
+                        }
                     },
                     colourBars = new Container
                     {
                         Width = bar_width,
                         RelativeSizeAxes = Axes.Y,
-                        Anchor = Anchor.y1 | alignment,
-                        Origin = Anchor.y1 | alignment,
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
                         Children = new Drawable[]
                         {
                             colourBarsEarly = new Container
                             {
-                                Anchor = Anchor.y1 | alignment,
-                                Origin = alignment,
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.x2,
                                 RelativeSizeAxes = Axes.Both,
                                 Height = 0.5f,
                                 Scale = new Vector2(1, -1),
                             },
                             colourBarsLate = new Container
                             {
-                                Anchor = Anchor.y1 | alignment,
-                                Origin = alignment,
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.x2,
                                 RelativeSizeAxes = Axes.Both,
                                 Height = 0.5f,
                             },
@@ -115,21 +119,12 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                             }
                         }
                     },
-                    new Container
+                    judgementsContainer = new Container
                     {
-                        Anchor = Anchor.y1 | alignment,
-                        Origin = Anchor.y1 | alignment,
-                        Width = chevron_size,
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Width = judgement_line_width,
                         RelativeSizeAxes = Axes.Y,
-                        Child = arrow = new SpriteIcon
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.Centre,
-                            RelativePositionAxes = Axes.Y,
-                            Y = 0.5f,
-                            Icon = alignment == Anchor.x2 ? FontAwesome.Solid.ChevronRight : FontAwesome.Solid.ChevronLeft,
-                            Size = new Vector2(chevron_size),
-                        }
                     },
                 }
             };
@@ -167,7 +162,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
             // a little nub to mark the centre point.
             var centre = createColourBar(windows.Last().result, 0.01f);
-            centre.Anchor = centre.Origin = Anchor.y1 | (alignment == Anchor.x2 ? Anchor.x0 : Anchor.x2);
+            centre.Anchor = centre.Origin = Anchor.CentreLeft;
             centre.Width = 2.5f;
             colourBars.Add(centre);
 
@@ -239,8 +234,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             judgementsContainer.Add(new JudgementLine
             {
                 Y = getRelativeJudgementPosition(judgement.TimeOffset),
-                Anchor = alignment == Anchor.x2 ? Anchor.x0 : Anchor.x2,
-                Origin = Anchor.y1 | (alignment == Anchor.x2 ? Anchor.x0 : Anchor.x2),
+                Origin = Anchor.CentreLeft,
             });
 
             arrow.MoveToY(
