@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Editing
         private TestPlayfield playfield1;
         private TestPlayfield playfield2;
         private TestDrawable intermediateDrawable;
-        private HitObjectContainerEventQueue eventQueue;
+        private HitObjectUsageEventBuffer eventBuffer;
 
         private HitObject beganUsage;
         private HitObject finishedUsage;
@@ -30,27 +30,27 @@ namespace osu.Game.Tests.Editing
         {
             reset();
 
-            if (eventQueue != null)
+            if (eventBuffer != null)
             {
-                eventQueue.HitObjectUsageBegan -= onHitObjectUsageBegan;
-                eventQueue.HitObjectUsageFinished -= onHitObjectUsageFinished;
-                eventQueue.HitObjectUsageTransferred -= onHitObjectUsageTransferred;
+                eventBuffer.HitObjectUsageBegan -= onHitObjectUsageBegan;
+                eventBuffer.HitObjectUsageFinished -= onHitObjectUsageFinished;
+                eventBuffer.HitObjectUsageTransferred -= onHitObjectUsageTransferred;
             }
 
             var topPlayfield = new TestPlayfield();
             topPlayfield.AddNested(playfield1 = new TestPlayfield());
             topPlayfield.AddNested(playfield2 = new TestPlayfield());
 
-            eventQueue = new HitObjectContainerEventQueue(topPlayfield);
-            eventQueue.HitObjectUsageBegan += onHitObjectUsageBegan;
-            eventQueue.HitObjectUsageFinished += onHitObjectUsageFinished;
-            eventQueue.HitObjectUsageTransferred += onHitObjectUsageTransferred;
+            eventBuffer = new HitObjectUsageEventBuffer(topPlayfield);
+            eventBuffer.HitObjectUsageBegan += onHitObjectUsageBegan;
+            eventBuffer.HitObjectUsageFinished += onHitObjectUsageFinished;
+            eventBuffer.HitObjectUsageTransferred += onHitObjectUsageTransferred;
 
             Children = new Drawable[]
             {
                 topPlayfield,
                 intermediateDrawable = new TestDrawable(),
-                eventQueue
+                eventBuffer
             };
         });
 

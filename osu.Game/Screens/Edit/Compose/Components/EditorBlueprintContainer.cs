@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 foreach (var obj in Composer.HitObjects)
                     AddBlueprintFor(obj.HitObject);
 
-                var eventQueue = new HitObjectContainerEventQueue(Composer.Playfield);
+                var eventQueue = new HitObjectUsageEventBuffer(Composer.Playfield);
                 eventQueue.HitObjectUsageBegan += AddBlueprintFor;
                 eventQueue.HitObjectUsageFinished += RemoveBlueprintFor;
                 eventQueue.HitObjectUsageTransferred += TransferBlueprintFor;
