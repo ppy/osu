@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual
         {
             Add(blueprint.With(d =>
             {
-                d.Apply(drawableObject);
+                d.DrawableObject = drawableObject;
                 d.Depth = float.MinValue;
                 d.Select();
             }));

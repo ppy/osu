@@ -245,7 +245,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (drawable == null)
                 return null;
 
-            return CreateHitObjectBlueprintFor(item).With(b => b.Apply(drawable));
+            return CreateHitObjectBlueprintFor(item).With(b => b.DrawableObject = drawable);
         }
 
         public virtual HitObjectSelectionBlueprint CreateHitObjectBlueprintFor(HitObject hitObject) => null;
