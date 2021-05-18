@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Select
 
         protected virtual bool ShowFooter => true;
 
-        protected virtual bool DisplayStableImportPrompt => stableImportManager.SupportsImportFromStable;
+        protected virtual bool DisplayStableImportPrompt => stableImportManager?.SupportsImportFromStable == true;
 
         /// <summary>
         /// Can be null if <see cref="ShowFooter"/> is false.
@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private StableImportManager stableImportManager { get; set; }
 
         protected ModSelectOverlay ModSelect { get; private set; }
