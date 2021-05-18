@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Extensions;
 using osu.Game.IO;
-using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
 using osuTK.Graphics;
@@ -81,13 +80,12 @@ namespace osu.Game.Skinning
                                 }
                             })
                             {
-                                Children = new[]
+                                Children = new Drawable[]
                                 {
-                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ComboCounter)),
-                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.ScoreCounter)),
-                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.AccuracyCounter)),
-                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.HealthDisplay)),
-                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.SongProgress)),
+                                    new DefaultComboCounter(),
+                                    new DefaultScoreCounter(),
+                                    new DefaultAccuracyCounter(),
+                                    new DefaultHealthDisplay(),
                                 }
                             };
 
@@ -95,29 +93,6 @@ namespace osu.Game.Skinning
                     }
 
                     break;
-
-                case HUDSkinComponent hudComponent:
-                {
-                    switch (hudComponent.Component)
-                    {
-                        case HUDSkinComponents.ComboCounter:
-                            return new DefaultComboCounter();
-
-                        case HUDSkinComponents.ScoreCounter:
-                            return new DefaultScoreCounter();
-
-                        case HUDSkinComponents.AccuracyCounter:
-                            return new DefaultAccuracyCounter();
-
-                        case HUDSkinComponents.HealthDisplay:
-                            return new DefaultHealthDisplay();
-
-                        case HUDSkinComponents.SongProgress:
-                            return new SongProgress();
-                    }
-
-                    break;
-                }
             }
 
             return null;
