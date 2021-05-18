@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Mvis.SideBar.Footer
 
         protected override void Update()
         {
-            Height = Math.Max(mvisScreen?.BottombarHeight ?? 0, 10);
+            Height = Math.Max(mvisScreen?.BottombarHeight ?? 0, 10) + 5;
             base.Update();
         }
     }

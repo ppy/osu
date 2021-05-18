@@ -104,7 +104,28 @@ namespace osu.Game.Screens.Mvis
         /// 谱面变更时调用<br/><br/>
         /// 传递: 当前谱面(WorkingBeatmap)<br/>
         /// </summary>
-        public Action<WorkingBeatmap> OnBeatmapChanged;
+        private Action<WorkingBeatmap> onBeatmapChangedAction;
+
+        public void OnBeatmapChanged(Action<WorkingBeatmap> action, Drawable sender, bool runOnce = false)
+        {
+            bool alreadyRegistered = onBeatmapChangedAction?.GetInvocationList().ToList().Contains(action) ?? false;
+
+            if (sender.GetType().IsSubclassOf(typeof(MvisPlugin))
+                && pluginManager.GetAllPlugins(false).Contains((MvisPlugin)sender)
+                && runOnce
+                && alreadyRegistered)
+            {
+                action.Invoke(Beatmap.Value);
+                return;
+            }
+
+            if (alreadyRegistered)
+                throw new InvalidOperationException($"{sender}已经注册过一个相同的{action}了。");
+
+            onBeatmapChangedAction += action;
+
+            if (runOnce) action.Invoke(Beatmap.Value);
+        }
 
         /// <summary>
         /// 拖动下方进度条时调用<br/><br/>
@@ -325,27 +346,20 @@ namespace osu.Game.Screens.Mvis
                 {
                     Alpha = 0
                 },
-                new Container
+                bgTriangles = new BgTrianglesContainer(),
+                background = new Container
                 {
-                    Name = "Contents",
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING },
-                    Children = new Drawable[]
-                    {
-                        bgTriangles = new BgTrianglesContainer(),
-                        background = new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Name = "Background Layer",
-                        },
-                        foreground = new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Name = "Foreground Layer",
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre
-                        }
-                    }
+                    Name = "Background Layer"
+                },
+                foreground = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING },
+                    Name = "Foreground Layer",
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre
                 },
                 skinnableForeground = new FullScreenSkinnableComponent("MPlayer-foreground", confineMode: ConfineMode.ScaleToFill, defaultImplementation: _ => new PlaceHolder())
                 {
@@ -1030,7 +1044,7 @@ namespace osu.Game.Screens.Mvis
             updateBackground(beatmap);
 
             activity.Value = new UserActivity.InMvis(beatmap.BeatmapInfo);
-            OnBeatmapChanged?.Invoke(beatmap);
+            onBeatmapChangedAction?.Invoke(beatmap);
         }
     }
 }

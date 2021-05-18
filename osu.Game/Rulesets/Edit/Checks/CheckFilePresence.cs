@@ -11,9 +11,9 @@ namespace osu.Game.Rulesets.Edit.Checks
     {
         protected abstract CheckCategory Category { get; }
         protected abstract string TypeOfFile { get; }
-        protected abstract string GetFilename(IBeatmap playableBeatmap);
+        protected abstract string GetFilename(IBeatmap beatmap);
 
-        public CheckMetadata Metadata => new CheckMetadata(Category, $"Missing {TypeOfFile}");
+        public CheckMetadata Metadata => new CheckMetadata(Category, $"缺少 {TypeOfFile}");
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
@@ -21,9 +21,9 @@ namespace osu.Game.Rulesets.Edit.Checks
             new IssueTemplateDoesNotExist(this)
         };
 
-        public IEnumerable<Issue> Run(IBeatmap playableBeatmap, IWorkingBeatmap workingBeatmap)
+        public IEnumerable<Issue> Run(BeatmapVerifierContext context)
         {
-            var filename = GetFilename(playableBeatmap);
+            var filename = GetFilename(context.Beatmap);
 
             if (filename == null)
             {
@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             }
 
             // If the file is set, also make sure it still exists.
-            var storagePath = playableBeatmap.BeatmapInfo.BeatmapSet.GetPathForFile(filename);
+            var storagePath = context.Beatmap.BeatmapInfo.BeatmapSet.GetPathForFile(filename);
             if (storagePath != null)
                 yield break;
 
@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         public class IssueTemplateNoneSet : IssueTemplate
         {
             public IssueTemplateNoneSet(ICheck check)
-                : base(check, IssueType.Problem, "No {0} has been set.")
+                : base(check, IssueType.Problem, "{0} 未被设置.")
             {
             }
 
@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         public class IssueTemplateDoesNotExist : IssueTemplate
         {
             public IssueTemplateDoesNotExist(ICheck check)
-                : base(check, IssueType.Problem, "The {0} file \"{1}\" does not exist.")
+                : base(check, IssueType.Problem, "与 {0} 对应的文件 \"{1}\" 未找到.")
             {
             }
 

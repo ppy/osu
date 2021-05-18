@@ -2,6 +2,7 @@ using Mvis.Plugin.RulesetPanel.Config;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 using osu.Game.Screens.Mvis.Plugins;
 using osu.Game.Screens.Mvis.Plugins.Config;
@@ -47,13 +48,48 @@ namespace Mvis.Plugin.RulesetPanel.UI
                 {
                     LabelText = "粒子数",
                     TransferValueOnCommit = true,
-                    Current = config.GetBindable<int>(RulesetPanelSetting.ParticleAmount),
+                    Current = config.GetBindable<int>(RulesetPanelSetting.ParticlesCount),
                     KeyboardStep = 1,
                 },
-                new SettingsEnumDropdown<MvisBarType>
+                new SettingsEnumDropdown<BarType>
                 {
                     LabelText = "频谱类型",
-                    Current = config.GetBindable<MvisBarType>(RulesetPanelSetting.BarType)
+                    Current = config.GetBindable<BarType>(RulesetPanelSetting.BarType)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "对称",
+                    Current = config.GetBindable<bool>(RulesetPanelSetting.Symmetry)
+                },
+                new SettingsSlider<int>
+                {
+                    LabelText = "复原时间",
+                    Current = config.GetBindable<int>(RulesetPanelSetting.Decay),
+                    KeyboardStep = 1
+                },
+                new SettingsSlider<int>
+                {
+                    LabelText = "高度倍率",
+                    Current = config.GetBindable<int>(RulesetPanelSetting.Multiplier),
+                    KeyboardStep = 1
+                },
+                new SettingsSlider<int>
+                {
+                    LabelText = "半径",
+                    KeyboardStep = 1,
+                    Current = config.GetBindable<int>(RulesetPanelSetting.Radius)
+                },
+                new SettingsSlider<float, PositionSlider>
+                {
+                    LabelText = "水平位置",
+                    KeyboardStep = 0.01f,
+                    Current = config.GetBindable<float>(RulesetPanelSetting.LogoPositionX)
+                },
+                new SettingsSlider<float, PositionSlider>
+                {
+                    LabelText = "竖直位置",
+                    KeyboardStep = 0.01f,
+                    Current = config.GetBindable<float>(RulesetPanelSetting.LogoPositionY)
                 },
                 new SettingsSlider<int>
                 {
@@ -70,14 +106,14 @@ namespace Mvis.Plugin.RulesetPanel.UI
                 },
                 new SettingsSlider<int>
                 {
-                    LabelText = "每个分段的频谱密度",
+                    LabelText = "频谱密度",
                     Current = config.GetBindable<int>(RulesetPanelSetting.BarsPerVisual),
                     KeyboardStep = 1,
                     TransferValueOnCommit = true
                 },
                 new SettingsSlider<int>
                 {
-                    LabelText = "频谱旋转角度",
+                    LabelText = "旋转角度",
                     KeyboardStep = 1,
                     Current = config.GetBindable<int>(RulesetPanelSetting.Rotation)
                 },
@@ -120,11 +156,6 @@ namespace Mvis.Plugin.RulesetPanel.UI
                             }
                         }
                     }
-                },
-                new SettingsCheckbox
-                {
-                    LabelText = "使用lazer自带频谱效果",
-                    Current = config.GetBindable<bool>(RulesetPanelSetting.UseOsuLogoVisualisation),
                 }
             };
         }
@@ -146,6 +177,11 @@ namespace Mvis.Plugin.RulesetPanel.UI
             }, true);
 
             resizableContainer.FinishTransforms();
+        }
+
+        private class PositionSlider : OsuSliderBar<float>
+        {
+            public override string TooltipText => Current.Value.ToString(@"0.##");
         }
     }
 }

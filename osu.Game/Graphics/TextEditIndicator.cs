@@ -21,8 +21,8 @@ namespace osu.Game.Graphics
         private readonly OsuSpriteText spriteText;
         private readonly ProgressBar bg;
         private readonly Box flashBox;
-        private Bindable<bool> optUI = new Bindable<bool>();
-        private Bindable<bool> alwaysHide = new Bindable<bool>();
+        private readonly Bindable<bool> optUI = new Bindable<bool>();
+        private readonly Bindable<bool> alwaysHide = new Bindable<bool>();
         private readonly FillFlowContainer placeHolderContainer;
         private readonly Circle bar;
 

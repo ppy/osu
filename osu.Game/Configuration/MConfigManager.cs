@@ -60,25 +60,6 @@ namespace osu.Game.Configuration
 
             //Gamemode集成
             SetDefault(MSetting.Gamemode, GamemodeActivateCondition.InGame);
-
-            //已分离
-            SetDefault(MSetting.MvisEnableStoryboard, true);
-            SetDefault(MSetting.MvisEnableFakeEditor, false);
-
-            //Mvis Settings(Upstream; 已分离)
-            SetDefault(MSetting.MvisEnableRulesetPanel, true);
-            SetDefault(MSetting.MvisParticleAmount, 350, 0, 350);
-            SetDefault(MSetting.MvisShowParticles, true);
-            SetDefault(MSetting.MvisBarType, MvisBarType.Rounded);
-            SetDefault(MSetting.MvisVisualizerAmount, 3, 1, 5);
-            SetDefault(MSetting.MvisBarWidth, 3.0, 1, 20);
-            SetDefault(MSetting.MvisBarsPerVisual, 120, 1, 200);
-            SetDefault(MSetting.MvisRotation, 0, 0, 359);
-            SetDefault(MSetting.MvisUseCustomColour, false);
-            SetDefault(MSetting.MvisRed, 0, 0, 255);
-            SetDefault(MSetting.MvisGreen, 0, 0, 255);
-            SetDefault(MSetting.MvisBlue, 0, 0, 255);
-            SetDefault(MSetting.MvisUseOsuLogoVisualisation, false);
         }
     }
 
@@ -88,7 +69,6 @@ namespace osu.Game.Configuration
         TrianglesEnabled,
         UseSayobot,
         MvisBgBlur,
-        MvisEnableStoryboard,
         MvisStoryboardProxy,
         MvisIdleBgDim,
         MvisContentAlpha,
@@ -100,7 +80,6 @@ namespace osu.Game.Configuration
         MvisInterfaceRed,
         MvisInterfaceGreen,
         MvisInterfaceBlue,
-        MvisEnableFakeEditor,
         SamplePlaybackGain,
         SongSelectBgBlur,
         IntroLoadDirectToSongSelect,
@@ -113,34 +92,6 @@ namespace osu.Game.Configuration
         AlwaysHideTextIndicator,
         MvisCurrentAudioProvider,
         Gamemode,
-
-        //已分离(MvisPanel)
-        MvisEnableRulesetPanel,
-        MvisParticleAmount,
-        MvisShowParticles,
-        MvisVisualizerAmount,
-        MvisBarWidth,
-        MvisBarsPerVisual,
-        MvisBarType,
-        MvisRotation,
-        MvisUseCustomColour,
-        MvisRed,
-        MvisGreen,
-        MvisBlue,
-        MvisUseOsuLogoVisualisation,
-    }
-
-    //已分离(MvisPanel)
-    public enum MvisBarType
-    {
-        [Description("基本")]
-        Basic,
-
-        [Description("圆角")]
-        Rounded,
-
-        [Description("打砖块")]
-        Fall
     }
 
     public enum GamemodeActivateCondition

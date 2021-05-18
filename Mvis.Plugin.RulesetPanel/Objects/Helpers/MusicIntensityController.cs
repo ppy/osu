@@ -1,4 +1,5 @@
-﻿using osu.Framework.Bindables;
+﻿using Mvis.Plugin.RulesetPanel.UI.Objects.Helpers;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace Mvis.Plugin.RulesetPanel.Objects.Helpers

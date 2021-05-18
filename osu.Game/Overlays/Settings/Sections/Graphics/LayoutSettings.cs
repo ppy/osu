@@ -141,7 +141,14 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             scalingSettings.ForEach(s => bindPreviewEvent(s.Current));
 
-            windowModeDropdown.Current.ValueChanged += _ => updateResolutionDropdown();
+            windowModeDropdown.Current.BindValueChanged(mode =>
+            {
+                updateResolutionDropdown();
+
+                const string not_fullscreen_note = "非全屏运行可能会增加您的输入延迟!";
+
+                windowModeDropdown.WarningText = mode.NewValue != WindowMode.Fullscreen ? not_fullscreen_note : string.Empty;
+            }, true);
 
             windowModes.BindCollectionChanged((sender, args) =>
             {

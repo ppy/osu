@@ -63,6 +63,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.O }, GlobalAction.ToggleSettings),
             new KeyBinding(new[] { InputKey.Control, InputKey.D }, GlobalAction.ToggleBeatmapListing),
             new KeyBinding(new[] { InputKey.Control, InputKey.N }, GlobalAction.ToggleNotifications),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.S }, GlobalAction.ToggleSkinEditor),
 
             new KeyBinding(InputKey.Escape, GlobalAction.Back),
             new KeyBinding(InputKey.ExtraMouseButton1, GlobalAction.Back),
@@ -296,13 +297,16 @@ namespace osu.Game.Input.Bindings
         [Description("谱面选项")]
         ToggleBeatmapOptions,
 
-        [Description("Verify mode")]
+        [Description("谱面检查")]
         EditorVerifyMode,
 
-        [Description("Nudge selection left")]
+        [Description("向左移动选中物件")]
         EditorNudgeLeft,
 
-        [Description("Nudge selection right")]
-        EditorNudgeRight
+        [Description("向右移动选中物件")]
+        EditorNudgeRight,
+
+        [Description("切换皮肤编辑器")]
+        ToggleSkinEditor,
     }
 }

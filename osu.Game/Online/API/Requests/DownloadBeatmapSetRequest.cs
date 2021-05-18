@@ -21,7 +21,7 @@ namespace osu.Game.Online.API.Requests
             this.useSayobot = useSayobot;
         }
 
-        private string calcTarget()
+        private string getTarget()
         {
             if (useSayobot)
             {
@@ -42,7 +42,7 @@ namespace osu.Game.Online.API.Requests
             return $@"{API.WebsiteRootUrl}/api/v2/{Target}";
         }
 
-        protected override string Target => $@"{calcTarget()}";
+        protected override string Target => $@"{getTarget()}";
 
         protected override string Uri => $@"{selectUri()}";
 
@@ -52,5 +52,7 @@ namespace osu.Game.Online.API.Requests
             req.Timeout = 60000;
             return req;
         }
+
+        protected override string FileExtension => ".osz";
     }
 }

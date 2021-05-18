@@ -36,6 +36,8 @@ namespace Mvis.Plugin.FakeEditor
 
         private WorkingBeatmap beatmap;
 
+        public override int Version => 4;
+
         public FakeEditor()
         {
             Name = "谱面编辑器";
@@ -72,7 +74,7 @@ namespace Mvis.Plugin.FakeEditor
             if (MvisScreen != null)
             {
                 MvisScreen.OnSeek += Seek;
-                MvisScreen.OnBeatmapChanged += initDependencies;
+                MvisScreen.OnBeatmapChanged(initDependencies, this);
             }
         }
 
@@ -85,10 +87,7 @@ namespace Mvis.Plugin.FakeEditor
         public override void UnLoad()
         {
             if (MvisScreen != null)
-            {
                 MvisScreen.OnSeek -= Seek;
-                MvisScreen.OnBeatmapChanged -= initDependencies;
-            }
 
             base.UnLoad();
         }
@@ -160,10 +159,6 @@ namespace Mvis.Plugin.FakeEditor
             => new EditorContainer(beatmap);
 
         protected override bool PostInit() => true;
-        public override int Version => 3;
-
-        private void updateSamplePlaybackDisabled() =>
-            samplePlaybackDisabled.Value = !Value.Value || !musicController.CurrentTrack.IsRunning;
 
         protected override bool OnContentLoaded(Drawable content)
         {
@@ -183,6 +178,9 @@ namespace Mvis.Plugin.FakeEditor
 
             return true;
         }
+
+        private void updateSamplePlaybackDisabled() =>
+            samplePlaybackDisabled.Value = !Value.Value || !musicController.CurrentTrack.IsRunning;
 
         public double SnapTime(double time, double? referenceTime = null) => 0;
 
