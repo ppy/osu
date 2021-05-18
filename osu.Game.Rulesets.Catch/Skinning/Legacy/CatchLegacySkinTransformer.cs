@@ -32,9 +32,9 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                 if (Source.GetDrawableComponent(component) is SkinnableTargetComponentsContainer components)
                 {
                     // catch may provide its own combo counter; hide the default.
-                    // todo: this should probably be done in an elegant way.
+                    // todo: this should be done in an elegant way per ruleset, defining which HUD skin components should be displayed.
                     foreach (var legacyComboCounter in components.OfType<LegacyComboCounter>())
-                        legacyComboCounter.Expire();
+                        legacyComboCounter.ContentVisible = false;
 
                     return components;
                 }

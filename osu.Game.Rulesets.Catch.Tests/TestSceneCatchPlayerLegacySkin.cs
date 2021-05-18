@@ -4,6 +4,7 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Screens.Play.HUD;
@@ -32,7 +33,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             AddAssert("legacy HUD combo counter hidden", () =>
             {
-                return Player.ChildrenOfType<LegacyComboCounter>().All(counter => !counter.IsPresent || !counter.IsAlive);
+                return Player.ChildrenOfType<LegacyComboCounter>().All(c => !c.ChildrenOfType<Container>().Single().IsPresent);
             });
         }
     }
