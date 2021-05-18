@@ -26,8 +26,8 @@ namespace osu.Game.Overlays.AccountCreation
         [Resolved(CanBeNull = true)]
         private IAPIProvider api { get; set; }
 
-        [Resolved]
-        private OsuGameBase game { get; set; }
+        [Resolved(canBeNull: true)]
+        private OsuGame game { get; set; }
 
         private const string help_centre_url = "/help/wiki/Help_Centre#login";
 
@@ -44,7 +44,7 @@ namespace osu.Game.Overlays.AccountCreation
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, OsuGame game, TextureStore textures)
+        private void load(OsuColour colours, TextureStore textures)
         {
             if (string.IsNullOrEmpty(api?.ProvidedUsername))
                 return;
