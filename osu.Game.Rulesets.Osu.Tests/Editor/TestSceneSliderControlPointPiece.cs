@@ -150,8 +150,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         private class TestSliderBlueprint : SliderSelectionBlueprint
         {
             public new SliderBodyPiece BodyPiece => base.BodyPiece;
-            public new TestSliderCircleBlueprint HeadBlueprint => (TestSliderCircleBlueprint)base.HeadBlueprint;
-            public new TestSliderCircleBlueprint TailBlueprint => (TestSliderCircleBlueprint)base.TailBlueprint;
+            public new TestSliderCircleOverlay HeadOverlay => (TestSliderCircleOverlay)base.HeadOverlay;
+            public new TestSliderCircleOverlay TailOverlay => (TestSliderCircleOverlay)base.TailOverlay;
             public new PathControlPointVisualiser ControlPointVisualiser => base.ControlPointVisualiser;
 
             public TestSliderBlueprint(Slider slider)
@@ -159,14 +159,14 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             {
             }
 
-            protected override SliderCircleSelectionBlueprint CreateCircleSelectionBlueprint(Slider slider, SliderPosition position) => new TestSliderCircleBlueprint(slider, position);
+            protected override SliderCircleOverlay CreateCircleOverlay(Slider slider, SliderPosition position) => new TestSliderCircleOverlay(slider, position);
         }
 
-        private class TestSliderCircleBlueprint : SliderCircleSelectionBlueprint
+        private class TestSliderCircleOverlay : SliderCircleOverlay
         {
             public new HitCirclePiece CirclePiece => base.CirclePiece;
 
-            public TestSliderCircleBlueprint(Slider slider, SliderPosition position)
+            public TestSliderCircleOverlay(Slider slider, SliderPosition position)
                 : base(slider, position)
             {
             }

@@ -7,7 +7,7 @@ using osuTK;
 namespace osu.Game.Screens.Edit.Compose.Components
 {
     /// <summary>
-    /// An event which occurs when a <see cref="HitObjectSelectionBlueprint"/> is moved.
+    /// An event which occurs when a <see cref="SelectionBlueprint{T}"/> is moved.
     /// </summary>
     public class MoveSelectionEvent<T>
     {
