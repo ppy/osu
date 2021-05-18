@@ -68,14 +68,20 @@ namespace osu.Game.Screens.Edit.Compose
 
             switch (existingEvent, newEvent)
             {
-                // This mostly exists as a safeguard to ensure that the sequence: Began -> { Finished -> Began } -> Finished, where { ... } indicates a transferral within a single frame,
-                // correctly leads into a final "Finished" state. It's unlikely for this to happen normally as it requires the hitobject usage to finish (for the final time)
-                // immediately after the HitObjectContainer updates lifetime, but it's not inconceivable to occur with the Editor's scheduling and execution order.
+                // This exists as a safeguard to ensure that the sequence: { Began -> Finished }, where { ... } indicates a sequence within a single frame, does not trigger any events.
+                // This is unlikely to occur in practice as it requires the usage to finish immediately after the HitObjectContainer updates hitobject lifetimes,
+                // however, an Editor action scheduled somewhere between the lifetime update and this event queue's own Update() could cause this.
+                case (EventType.Began, EventType.Finished):
+                    pendingEvents.Remove(hitObject);
+                    break;
+
+                // This exists as a safeguard to ensure that the sequence: Began -> { Finished -> Began -> Finished }, where { ... } indicates a sequence within a single frame,
+                // correctly leads into a final "finished" state rather than remaining in the intermediate "transferred" state.
+                // As above, this is unlikely to occur in practice.
                 case (EventType.Transferred, EventType.Finished):
                     pendingEvents[hitObject] = EventType.Finished;
                     break;
 
-                case (EventType.Began, EventType.Finished):
                 case (EventType.Finished, EventType.Began):
                     pendingEvents[hitObject] = EventType.Transferred;
                     break;
