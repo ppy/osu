@@ -386,9 +386,6 @@ namespace osu.Game.Overlays.KeyBinding
 
                 Margin = new MarginPadding(padding);
 
-                // todo: use this in a meaningful way
-                // var isDefault = keyBinding.Action is Enum;
-
                 Masking = true;
                 CornerRadius = padding;
 
