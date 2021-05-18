@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
@@ -15,7 +14,7 @@ namespace osu.Game.Screens.Edit.Compose
     /// <summary>
     /// Buffers events from the many <see cref="HitObjectContainer"/>s in a nested <see cref="Playfield"/> hierarchy.
     /// </summary>
-    internal class HitObjectUsageEventBuffer : Component
+    internal class HitObjectUsageEventBuffer : IDisposable
     {
         /// <summary>
         /// Invoked when a <see cref="HitObject"/> becomes used by a <see cref="DrawableHitObject"/>.
@@ -91,10 +90,8 @@ namespace osu.Game.Screens.Edit.Compose
             }
         }
 
-        protected override void Update()
+        public void Update()
         {
-            base.Update();
-
             foreach (var (hitObject, e) in pendingEvents)
             {
                 switch (e)
@@ -116,12 +113,13 @@ namespace osu.Game.Screens.Edit.Compose
             pendingEvents.Clear();
         }
 
-        protected override void Dispose(bool isDisposing)
+        public void Dispose()
         {
-            base.Dispose(isDisposing);
-
-            playfield.HitObjectUsageBegan -= onHitObjectUsageBegan;
-            playfield.HitObjectUsageFinished -= onHitObjectUsageFinished;
+            if (playfield != null)
+            {
+                playfield.HitObjectUsageBegan -= onHitObjectUsageBegan;
+                playfield.HitObjectUsageFinished -= onHitObjectUsageFinished;
+            }
         }
 
         private enum EventType
