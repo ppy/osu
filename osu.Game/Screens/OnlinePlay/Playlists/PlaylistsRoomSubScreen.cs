@@ -13,6 +13,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Match.Components;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Users;
 using osuTK;
@@ -218,10 +219,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                         },
                         new Drawable[]
                         {
-                            new Footer
-                            {
-                                OnStart = onStart,
-                            }
+                            new Footer { OnStart = StartPlay }
                         }
                     },
                     RowDimensions = new[]
@@ -274,7 +272,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             }, true);
         }
 
-        private void onStart() => StartPlay(() => new PlaylistsPlayer(SelectedItem.Value)
+        protected override Screen CreateGameplayScreen() => new PlayerLoader(() => new PlaylistsPlayer(SelectedItem.Value)
         {
             Exited = () => leaderboard.RefreshScores()
         });

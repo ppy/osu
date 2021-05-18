@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 Child = drawableSpinner = new DrawableSpinner(spinner)
             });
 
-            AddBlueprint(new SpinnerSelectionBlueprint(drawableSpinner) { Size = new Vector2(0.5f) });
+            AddBlueprint(new SpinnerSelectionBlueprint(spinner) { Size = new Vector2(0.5f) }, drawableSpinner);
         }
     }
 }

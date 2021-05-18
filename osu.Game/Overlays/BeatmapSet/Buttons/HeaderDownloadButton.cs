@@ -47,52 +47,44 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         {
             FillFlowContainer textSprites;
 
-            AddRangeInternal(new Drawable[]
+            AddInternal(shakeContainer = new ShakeContainer
             {
-                shakeContainer = new ShakeContainer
+                RelativeSizeAxes = Axes.Both,
+                Masking = true,
+                CornerRadius = 5,
+                Child = button = new HeaderButton { RelativeSizeAxes = Axes.Both },
+            });
+
+            button.AddRange(new Drawable[]
+            {
+                new Container
                 {
-                    Depth = -1,
+                    Padding = new MarginPadding { Horizontal = 10 },
                     RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    CornerRadius = 5,
                     Children = new Drawable[]
                     {
-                        button = new HeaderButton { RelativeSizeAxes = Axes.Both },
-                        new Container
+                        textSprites = new FillFlowContainer
                         {
-                            // cannot nest inside here due to the structure of button (putting things in its own content).
-                            // requires framework fix.
-                            Padding = new MarginPadding { Horizontal = 10 },
-                            RelativeSizeAxes = Axes.Both,
-                            Children = new Drawable[]
-                            {
-                                textSprites = new FillFlowContainer
-                                {
-                                    Depth = -1,
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    AutoSizeAxes = Axes.Both,
-                                    AutoSizeDuration = 500,
-                                    AutoSizeEasing = Easing.OutQuint,
-                                    Direction = FillDirection.Vertical,
-                                },
-                                new SpriteIcon
-                                {
-                                    Depth = -1,
-                                    Anchor = Anchor.CentreRight,
-                                    Origin = Anchor.CentreRight,
-                                    Icon = FontAwesome.Solid.Download,
-                                    Size = new Vector2(18),
-                                },
-                            }
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            AutoSizeAxes = Axes.Both,
+                            AutoSizeDuration = 500,
+                            AutoSizeEasing = Easing.OutQuint,
+                            Direction = FillDirection.Vertical,
                         },
-                        new DownloadProgressBar(BeatmapSet.Value)
+                        new SpriteIcon
                         {
-                            Depth = -2,
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
+                            Icon = FontAwesome.Solid.Download,
+                            Size = new Vector2(18),
                         },
-                    },
+                    }
+                },
+                new DownloadProgressBar(BeatmapSet.Value)
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
                 },
             });
 
