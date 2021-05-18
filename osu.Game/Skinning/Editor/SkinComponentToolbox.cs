@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -29,8 +30,8 @@ namespace osu.Game.Skinning.Editor
         [Cached]
         private ScoreProcessor scoreProcessor = new ScoreProcessor
         {
-            Combo = { Value = 727 },
-            TotalScore = { Value = 1337377 }
+            Combo = { Value = RNG.Next(1, 1000) },
+            TotalScore = { Value = RNG.Next(1000, 10000000) }
         };
 
         [Cached(typeof(HealthProcessor))]
@@ -56,7 +57,10 @@ namespace osu.Game.Skinning.Editor
                 Spacing = new Vector2(20)
             };
 
-            var skinnableTypes = typeof(OsuGame).Assembly.GetTypes().Where(t => typeof(ISkinnableComponent).IsAssignableFrom(t)).ToArray();
+            var skinnableTypes = typeof(OsuGame).Assembly.GetTypes()
+                                                .Where(t => !t.IsInterface)
+                                                .Where(t => typeof(ISkinnableDrawable).IsAssignableFrom(t))
+                                                .ToArray();
 
             foreach (var type in skinnableTypes)
             {
@@ -78,6 +82,9 @@ namespace osu.Game.Skinning.Editor
 
                 Debug.Assert(instance != null);
 
+                if (!((ISkinnableDrawable)instance).IsEditable)
+                    return null;
+
                 return new ToolboxComponentButton(instance);
             }
             catch
@@ -88,6 +95,10 @@ namespace osu.Game.Skinning.Editor
 
         private class ToolboxComponentButton : OsuButton
         {
+            protected override bool ShouldBeConsideredForInput(Drawable child) => false;
+
+            public override bool PropagateNonPositionalInputSubTree => false;
+
             private readonly Drawable component;
 
             public Action<Type> RequestPlacement;

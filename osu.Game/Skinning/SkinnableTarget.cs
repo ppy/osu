@@ -3,10 +3,8 @@
 
 namespace osu.Game.Skinning
 {
-    /// <summary>
-    /// The default placement location for new <see cref="ISkinnableComponent"/>s.
-    /// </summary>
-    public interface IDefaultSkinnableTarget : ISkinnableTarget
+    public enum SkinnableTarget
     {
+        MainHUDComponents
     }
 }

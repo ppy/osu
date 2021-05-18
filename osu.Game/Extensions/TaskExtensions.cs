@@ -6,6 +6,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using osu.Framework.Extensions.ObjectExtensions;
 
 namespace osu.Game.Extensions
 {
@@ -50,7 +51,7 @@ namespace osu.Game.Extensions
                         }
                         else if (continuationTask.IsFaulted)
                         {
-                            tcs.TrySetException(continuationTask.Exception);
+                            tcs.TrySetException(continuationTask.Exception.AsNonNull());
                         }
                         else
                         {
