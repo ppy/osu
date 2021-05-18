@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private int decayExcessThreshold = 500;
 
         private double currentStrain;
-        private double strainMultiplier = 2.275;
+        private double strainMultiplier = 2.275;//3125;
 
         private double hitWindowGreat;
 
@@ -95,12 +95,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     {
                         if (islandSize > 6)
                         {
-                            islandTimes[6] = islandTimes[6] + 100.0 / Math.Min(((OsuDifficultyHitObject)Previous[i]).StrainTime, ((OsuDifficultyHitObject)Previous[i - 1]).StrainTime);
+                            islandTimes[6] = islandTimes[6] + 100.0 / Math.Sqrt(((OsuDifficultyHitObject)Previous[i]).StrainTime * ((OsuDifficultyHitObject)Previous[i - 1]).StrainTime);
                             islandSizes[6] = islandSizes[6] + 1;
                         }
                         else
                         {
-                            islandTimes[islandSize] = islandTimes[islandSize] + 100.0 / Math.Min(((OsuDifficultyHitObject)Previous[i]).StrainTime, ((OsuDifficultyHitObject)Previous[i - 1]).StrainTime);
+                            islandTimes[islandSize] = islandTimes[islandSize] + 100.0 / Math.Sqrt(((OsuDifficultyHitObject)Previous[i]).StrainTime * ((OsuDifficultyHitObject)Previous[i - 1]).StrainTime);
                             islandSizes[islandSize] = islandSizes[islandSize] + 1;
                         }
                         islandSize = 0;
@@ -115,12 +115,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     {
                         if (islandSize > 6)
                         {
-                            islandTimes[6] = islandTimes[6] + 100.0 / Math.Max(((OsuDifficultyHitObject)Previous[i]).StrainTime, ((OsuDifficultyHitObject)Previous[i - 1]).StrainTime);
+                            islandTimes[6] = islandTimes[6] + 100.0 / Math.Sqrt(((OsuDifficultyHitObject)Previous[i]).StrainTime * ((OsuDifficultyHitObject)Previous[i - 1]).StrainTime);
                             islandSizes[6] = islandSizes[6] + 1;
                         }
                         else
                         {
-                            islandTimes[islandSize] = islandTimes[islandSize] + 100.0 / Math.Max(((OsuDifficultyHitObject)Previous[i]).StrainTime, ((OsuDifficultyHitObject)Previous[i - 1]).StrainTime);
+                            islandTimes[islandSize] = islandTimes[islandSize] + 100.0 / Math.Sqrt(((OsuDifficultyHitObject)Previous[i]).StrainTime * ((OsuDifficultyHitObject)Previous[i - 1]).StrainTime);
                             islandSizes[islandSize] = islandSizes[islandSize] + 1;
                         }
                         islandSize = 0;
@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             for (int i = 0; i < islandSizes.Length; i++)
             {
                 if (islandSizes[i] != 0)
-                    rhythmComplexitySum += islandTimes[i] / Math.Pow(islandSizes[i], .5);
+                    rhythmComplexitySum += islandTimes[i] / Math.Pow(islandSizes[i], .75);
             }
 
             // rhythmComplexitySum += Math.Pow(islandSizes[0], .5);
