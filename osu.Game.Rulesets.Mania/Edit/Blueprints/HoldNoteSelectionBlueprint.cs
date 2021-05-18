@@ -33,16 +33,11 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         private void load(IScrollingInfo scrollingInfo)
         {
             direction.BindTo(scrollingInfo.Direction);
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
 
             InternalChildren = new Drawable[]
             {
-                new HoldNoteNoteSelectionBlueprint(HitObject, HoldNotePosition.Start),
-                new HoldNoteNoteSelectionBlueprint(HitObject, HoldNotePosition.End),
+                new HoldNoteNoteOverlay(this, HoldNotePosition.Start),
+                new HoldNoteNoteOverlay(this, HoldNotePosition.End),
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
