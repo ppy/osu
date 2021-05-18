@@ -84,6 +84,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
             base.AddBlueprintFor(item);
         }
 
+        /// <summary>
+        /// Invoked when a <see cref="HitObject"/> has been transferred to another <see cref="DrawableHitObject"/>.
+        /// </summary>
+        /// <param name="hitObject">The hit object which has been assigned to a new drawable.</param>
+        /// <param name="drawableObject">The new drawable that is representing the hit object.</param>
         protected virtual void TransferBlueprintFor(HitObject hitObject, DrawableHitObject drawableObject)
         {
         }
