@@ -2,35 +2,35 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Mania.Edit.Blueprints.Components;
-using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
-    public class HoldNoteNoteSelectionBlueprint : ManiaSelectionBlueprint<HoldNote>
+    public class HoldNoteNoteOverlay : CompositeDrawable
     {
-        protected new DrawableHoldNote DrawableObject => (DrawableHoldNote)base.DrawableObject;
-
+        private readonly HoldNoteSelectionBlueprint holdNoteBlueprint;
         private readonly HoldNotePosition position;
 
-        public HoldNoteNoteSelectionBlueprint(HoldNote holdNote, HoldNotePosition position)
-            : base(holdNote)
+        public HoldNoteNoteOverlay(HoldNoteSelectionBlueprint holdNoteBlueprint, HoldNotePosition position)
         {
+            this.holdNoteBlueprint = holdNoteBlueprint;
             this.position = position;
-            InternalChild = new EditNotePiece { RelativeSizeAxes = Axes.X };
 
-            Select();
+            InternalChild = new EditNotePiece { RelativeSizeAxes = Axes.X };
         }
 
         protected override void Update()
         {
             base.Update();
 
+            var drawableObject = holdNoteBlueprint.DrawableObject;
+
             // Todo: This shouldn't exist, mania should not reference the drawable hitobject directly.
-            if (DrawableObject.IsLoaded)
+            if (drawableObject.IsLoaded)
             {
-                DrawableNote note = position == HoldNotePosition.Start ? (DrawableNote)DrawableObject.Head : DrawableObject.Tail;
+                DrawableNote note = position == HoldNotePosition.Start ? (DrawableNote)drawableObject.Head : drawableObject.Tail;
 
                 Anchor = note.Anchor;
                 Origin = note.Origin;
@@ -39,8 +39,5 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
                 Position = note.DrawPosition;
             }
         }
-
-        // Todo: This is temporary, since the note masks don't do anything special yet. In the future they will handle input.
-        public override bool HandlePositionalInput => false;
     }
 }
