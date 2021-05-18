@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
 
@@ -20,6 +21,9 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         public new DrawableHoldNote DrawableObject => (DrawableHoldNote)base.DrawableObject;
 
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
+
+        private HoldNoteNoteSelectionBlueprint headBlueprint;
+        private HoldNoteNoteSelectionBlueprint tailBlueprint;
 
         [Resolved]
         private OsuColour colours { get; set; }
@@ -33,16 +37,11 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         private void load(IScrollingInfo scrollingInfo)
         {
             direction.BindTo(scrollingInfo.Direction);
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
 
             InternalChildren = new Drawable[]
             {
-                new HoldNoteNoteSelectionBlueprint(HitObject, HoldNotePosition.Start),
-                new HoldNoteNoteSelectionBlueprint(HitObject, HoldNotePosition.End),
+                headBlueprint = new HoldNoteNoteSelectionBlueprint(HitObject, HoldNotePosition.Start),
+                tailBlueprint = new HoldNoteNoteSelectionBlueprint(HitObject, HoldNotePosition.End),
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -57,6 +56,14 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
                     }
                 }
             };
+        }
+
+        public override void Apply(DrawableHitObject drawableObject)
+        {
+            base.Apply(drawableObject);
+
+            headBlueprint?.Apply(drawableObject);
+            tailBlueprint?.Apply(drawableObject);
         }
 
         protected override void Update()
