@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Diagnostics;
+using osu.Framework.Graphics;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
@@ -20,12 +21,18 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected override ManiaSkinComponents Component => ManiaSkinComponents.HoldNoteTail;
 
-        private readonly DrawableHoldNote holdNote;
+        protected DrawableHoldNote HoldNote => (DrawableHoldNote)ParentHitObject;
 
-        public DrawableHoldNoteTail(DrawableHoldNote holdNote)
-            : base(holdNote.HitObject.Tail)
+        public DrawableHoldNoteTail()
+            : this(null)
         {
-            this.holdNote = holdNote;
+        }
+
+        public DrawableHoldNoteTail(TailNote tailNote)
+            : base(tailNote)
+        {
+            Anchor = Anchor.TopCentre;
+            Origin = Anchor.TopCentre;
         }
 
         public void UpdateResult() => base.UpdateResult(true);
@@ -54,7 +61,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             ApplyResult(r =>
             {
                 // If the head wasn't hit or the hold note was broken, cap the max score to Meh.
-                if (result > HitResult.Meh && (!holdNote.Head.IsHit || holdNote.HoldBrokenTime != null))
+                if (result > HitResult.Meh && (!HoldNote.Head.IsHit || HoldNote.HoldBrokenTime != null))
                     result = HitResult.Meh;
 
                 r.Type = result;
