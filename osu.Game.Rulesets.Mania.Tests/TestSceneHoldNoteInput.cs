@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Replays;
@@ -407,6 +408,9 @@ namespace osu.Game.Rulesets.Mania.Tests
                 LoadScreen(currentPlayer = p);
                 judgementResults = new List<JudgementResult>();
             });
+
+            AddUntilStep("Beatmap at 0", () => Beatmap.Value.Track.CurrentTime == 0);
+            AddUntilStep("Wait until player is loaded", () => currentPlayer.IsCurrentScreen());
 
             AddUntilStep("Wait for completion", () => currentPlayer.ScoreProcessor?.HasCompleted.Value == true);
         }
