@@ -95,6 +95,8 @@ namespace osu.Game.Overlays.Dialog
             }
         }
 
+        protected override bool StartHidden => true;
+
         protected PopupDialog()
         {
             RelativeSizeAxes = Axes.Both;
@@ -205,6 +207,10 @@ namespace osu.Game.Overlays.Dialog
                     },
                 },
             };
+
+            // It's important we start in a visible state so our state fires on hide, even before load.
+            // This is used by the DialogOverlay to know when the dialog was dismissed.
+            Show();
         }
 
         /// <summary>
