@@ -43,37 +43,34 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestEmptyDefaultBeatmapSkinFallsBack()
         {
             CreateSkinTest(DefaultLegacySkin.Info, () => new TestWorkingBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo)).Skin);
-            AssertComponentsFromExpectedSource(SkinnableTarget.MainHUDComponents, () => skinManager.CurrentSkin.Value);
+            AddAssert("hud from default legacy skin", () => AssertComponentsFromExpectedSource(SkinnableTarget.MainHUDComponents, skinManager.CurrentSkin.Value));
         }
 
-        protected void CreateSkinTest(SkinInfo gameCurrentSkin, Func<ISkin> beatmapSkin)
+        protected void CreateSkinTest(SkinInfo gameCurrentSkin, Func<ISkin> getBeatmapSkin)
         {
             CreateTest(() =>
             {
                 AddStep("setup skins", () =>
                 {
                     skinManager.CurrentSkinInfo.Value = gameCurrentSkin;
-                    currentBeatmapSkin = beatmapSkin();
+                    currentBeatmapSkin = getBeatmapSkin();
                 });
             });
         }
 
-        protected void AssertComponentsFromExpectedSource(SkinnableTarget target, Func<ISkin> expectedSource)
+        protected bool AssertComponentsFromExpectedSource(SkinnableTarget target, ISkin expectedSource)
         {
-            AddAssert($"{target} from {expectedSource.GetType().Name}", () =>
-            {
-                var expectedComponentsContainer = (SkinnableTargetComponentsContainer)expectedSource().GetDrawableComponent(new SkinnableTargetComponent(target));
+            var expectedComponentsContainer = (SkinnableTargetComponentsContainer)expectedSource.GetDrawableComponent(new SkinnableTargetComponent(target));
 
-                Add(expectedComponentsContainer);
-                expectedComponentsContainer?.UpdateSubTree();
-                var expectedInfo = expectedComponentsContainer?.CreateSkinnableInfo();
-                Remove(expectedComponentsContainer);
+            Add(expectedComponentsContainer);
+            expectedComponentsContainer?.UpdateSubTree();
+            var expectedInfo = expectedComponentsContainer?.CreateSkinnableInfo();
+            Remove(expectedComponentsContainer);
 
-                var actualInfo = Player.ChildrenOfType<SkinnableTargetContainer>().First(s => s.Target == target)
-                                       .ChildrenOfType<SkinnableTargetComponentsContainer>().Single().CreateSkinnableInfo();
+            var actualInfo = Player.ChildrenOfType<SkinnableTargetContainer>().First(s => s.Target == target)
+                                   .ChildrenOfType<SkinnableTargetComponentsContainer>().Single().CreateSkinnableInfo();
 
-                return almostEqual(actualInfo, expectedInfo, 2f);
-            });
+            return almostEqual(actualInfo, expectedInfo, 2f);
 
             static bool almostEqual(SkinnableInfo info, SkinnableInfo other, float positionTolerance) =>
                 other != null
