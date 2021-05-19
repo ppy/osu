@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.News.Sidebar
         private FillFlowContainer yearsFlow;
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider, Bindable<APINewsSidebar> metadata)
+        private void load(OverlayColourProvider overlayColours, Bindable<APINewsSidebar> metadata)
         {
             this.metadata.BindTo(metadata);
 
@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.News.Sidebar
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background3
+                    Colour = overlayColours.Background3
                 },
                 new Container
                 {
