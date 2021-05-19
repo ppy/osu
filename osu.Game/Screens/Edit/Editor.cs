@@ -473,25 +473,23 @@ namespace osu.Game.Screens.Edit
         {
             if (!exitConfirmed)
             {
-                // if the confirm dialog is already showing (or we can't show it, ie. in tests) exit without save.
-                if (dialogOverlay == null || dialogOverlay.CurrentDialog is PromptForSaveDialog)
+                // dialog overlay may not be available in visual tests.
+                if (dialogOverlay == null)
                 {
                     confirmExit();
-                    return base.OnExiting(next);
+                    return true;
+                }
+
+                // if the dialog is already displayed, confirm exit with no save.
+                if (dialogOverlay.CurrentDialog is PromptForSaveDialog saveDialog)
+                {
+                    saveDialog.PerformOkAction();
+                    return true;
                 }
 
                 if (isNewBeatmap || HasUnsavedChanges)
                 {
-                    dialogOverlay?.Push(new PromptForSaveDialog(() =>
-                    {
-                        confirmExit();
-                        this.Exit();
-                    }, () =>
-                    {
-                        confirmExitWithSave();
-                        this.Exit();
-                    }));
-
+                    dialogOverlay?.Push(new PromptForSaveDialog(confirmExit, confirmExitWithSave));
                     return true;
                 }
             }
@@ -506,8 +504,10 @@ namespace osu.Game.Screens.Edit
 
         private void confirmExitWithSave()
         {
-            exitConfirmed = true;
             Save();
+
+            exitConfirmed = true;
+            this.Exit();
         }
 
         private void confirmExit()
@@ -529,6 +529,7 @@ namespace osu.Game.Screens.Edit
             }
 
             exitConfirmed = true;
+            this.Exit();
         }
 
         private readonly Bindable<string> clipboard = new Bindable<string>();
