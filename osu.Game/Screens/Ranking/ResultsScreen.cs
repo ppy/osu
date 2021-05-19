@@ -29,6 +29,11 @@ namespace osu.Game.Screens.Ranking
 {
     public abstract class ResultsScreen : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>
     {
+        /// <summary>
+        /// Delay before the default applause sound should be played, in order to match the grade display timing in <see cref="AccuracyCircle"/>.
+        /// </summary>
+        public const double APPLAUSE_DELAY = AccuracyCircle.ACCURACY_TRANSFORM_DELAY + AccuracyCircle.TEXT_APPEAR_DELAY + ScorePanel.RESIZE_DURATION + ScorePanel.TOP_LAYER_EXPAND_DELAY - 1440;
+
         protected const float BACKGROUND_BLUR = 20;
         private static readonly float screen_height = 768 - TwoLayerButton.SIZE_EXTENDED.Y;
 
@@ -196,10 +201,8 @@ namespace osu.Game.Screens.Ranking
 
             statisticsPanel.State.BindValueChanged(onStatisticsStateChanged, true);
 
-            using (BeginDelayedSequence(AccuracyCircle.ACCURACY_TRANSFORM_DELAY + AccuracyCircle.TEXT_APPEAR_DELAY, true))
-            {
-                this.Delay(ScorePanel.RESIZE_DURATION + ScorePanel.TOP_LAYER_EXPAND_DELAY - AccuracyCircle.APPLAUSE_DELAY).Schedule(() => applauseSound?.Play());
-            }
+            using (BeginDelayedSequence(APPLAUSE_DELAY))
+                Schedule(() => applauseSound?.Play());
         }
 
         protected override void Update()
