@@ -24,19 +24,25 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {
-            if (component is SkinnableTargetComponent targetComponent && targetComponent.Target == SkinnableTarget.MainHUDComponents)
+            if (component is SkinnableTargetComponent targetComponent)
             {
-                if (!providesComboCounter)
-                    return null;
-
-                if (Source.GetDrawableComponent(component) is SkinnableTargetComponentsContainer components)
+                switch (targetComponent.Target)
                 {
-                    // catch may provide its own combo counter; hide the default.
-                    // todo: this should be done in an elegant way per ruleset, defining which HUD skin components should be displayed.
-                    foreach (var legacyComboCounter in components.OfType<LegacyComboCounter>())
-                        legacyComboCounter.ContentVisible = false;
+                    case SkinnableTarget.MainHUDComponents:
+                        if (!providesComboCounter)
+                            break;
 
-                    return components;
+                        if (Source.GetDrawableComponent(component) is SkinnableTargetComponentsContainer components)
+                        {
+                            // catch may provide its own combo counter; hide the default.
+                            // todo: this should be done in an elegant way per ruleset, defining which HUD skin components should be displayed.
+                            foreach (var legacyComboCounter in components.OfType<LegacyComboCounter>())
+                                legacyComboCounter.ContentVisible = false;
+
+                            return components;
+                        }
+
+                        break;
                 }
 
                 return null;
