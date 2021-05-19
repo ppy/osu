@@ -57,7 +57,10 @@ namespace osu.Game.Skinning.Editor
                 Spacing = new Vector2(20)
             };
 
-            var skinnableTypes = typeof(OsuGame).Assembly.GetTypes().Where(t => typeof(ISkinnableDrawable).IsAssignableFrom(t)).ToArray();
+            var skinnableTypes = typeof(OsuGame).Assembly.GetTypes()
+                                                .Where(t => !t.IsInterface)
+                                                .Where(t => typeof(ISkinnableDrawable).IsAssignableFrom(t))
+                                                .ToArray();
 
             foreach (var type in skinnableTypes)
             {
