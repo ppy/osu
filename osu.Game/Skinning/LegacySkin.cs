@@ -19,6 +19,7 @@ using osu.Game.IO;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
+using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osuTK.Graphics;
 
 namespace osu.Game.Skinning
@@ -342,6 +343,20 @@ namespace osu.Game.Skinning
                                 {
                                     accuracy.Y = container.ToLocalSpace(score.ScreenSpaceDrawQuad.BottomRight).Y;
                                 }
+
+                                var songProgress = container.OfType<SongProgress>().FirstOrDefault();
+
+                                var hitError = container.OfType<HitErrorMeter>().FirstOrDefault();
+
+                                if (hitError != null)
+                                {
+                                    hitError.Anchor = Anchor.BottomCentre;
+                                    hitError.Origin = Anchor.CentreLeft;
+                                    hitError.Rotation = -90;
+
+                                    if (songProgress != null)
+                                        hitError.Y -= SongProgress.MAX_HEIGHT;
+                                }
                             })
                             {
                                 Children = new[]
@@ -352,6 +367,7 @@ namespace osu.Game.Skinning
                                     GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.AccuracyCounter)) ?? new DefaultAccuracyCounter(),
                                     GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.HealthDisplay)) ?? new DefaultHealthDisplay(),
                                     GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.SongProgress)) ?? new SongProgress(),
+                                    GetDrawableComponent(new HUDSkinComponent(HUDSkinComponents.BarHitErrorMeter)) ?? new BarHitErrorMeter(),
                                 }
                             };
 

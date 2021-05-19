@@ -20,10 +20,14 @@ namespace osu.Game.Screens.Play
 {
     public class SongProgress : OverlayContainer, ISkinnableDrawable
     {
-        private const int info_height = 20;
-        private const int bottom_bar_height = 5;
+        public const float MAX_HEIGHT = info_height + bottom_bar_height + graph_height + handle_height;
+
+        private const float info_height = 20;
+        private const float bottom_bar_height = 5;
         private const float graph_height = SquareGraph.Column.WIDTH * 6;
-        private static readonly Vector2 handle_size = new Vector2(10, 18);
+        private const float handle_height = 18;
+
+        private static readonly Vector2 handle_size = new Vector2(10, handle_height);
 
         private const float transition_duration = 200;
 
