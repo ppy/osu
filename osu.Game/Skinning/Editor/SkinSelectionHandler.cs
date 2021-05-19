@@ -34,92 +34,61 @@ namespace osu.Game.Skinning.Editor
         {
             adjustScaleFromAnchor(ref scale, anchor);
 
-            if (SelectedBlueprints.Count > 1)
+            var selectionQuad = GetSurroundingQuad(SelectedBlueprints.SelectMany(b =>
+                b.Item.ScreenSpaceDrawQuad.GetVertices().ToArray()));
+
+            // the selection quad is always upright, so use a rect to make mutating the values easier.
+            var adjustedRect = selectionQuad.AABBFloat;
+
+            // for now aspect lock scale adjustments that occur at corners.
+            if (!anchor.HasFlagFast(Anchor.x1) && !anchor.HasFlagFast(Anchor.y1))
+                scale.Y = scale.X / selectionQuad.Width * selectionQuad.Height;
+
+            if (anchor.HasFlagFast(Anchor.x0))
             {
-                var selectionQuad = GetSurroundingQuad(SelectedBlueprints.SelectMany(b =>
-                    b.Item.ScreenSpaceDrawQuad.GetVertices().ToArray()));
-
-                // the selection quad is always upright, so use a rect to make mutating the values easier.
-                var adjustedRect = selectionQuad.AABBFloat;
-
-                // for now aspect lock scale adjustments that occur at corners.
-                if (!anchor.HasFlagFast(Anchor.x1) && !anchor.HasFlagFast(Anchor.y1))
-                    scale.Y = scale.X / selectionQuad.Width * selectionQuad.Height;
-
-                if (anchor.HasFlagFast(Anchor.x0))
-                {
-                    adjustedRect.X -= scale.X;
-                    adjustedRect.Width += scale.X;
-                }
-                else if (anchor.HasFlagFast(Anchor.x2))
-                {
-                    adjustedRect.Width += scale.X;
-                }
-
-                if (anchor.HasFlagFast(Anchor.y0))
-                {
-                    adjustedRect.Y -= scale.Y;
-                    adjustedRect.Height += scale.Y;
-                }
-                else if (anchor.HasFlagFast(Anchor.y2))
-                {
-                    adjustedRect.Height += scale.Y;
-                }
-
-                // scale adjust should match that of the quad itself.
-                var scaledDelta = new Vector2(
-                    adjustedRect.Width / selectionQuad.Width - 1,
-                    adjustedRect.Height / selectionQuad.Height - 1
-                );
-
-                foreach (var b in SelectedBlueprints)
-                {
-                    var drawableItem = (Drawable)b.Item;
-
-                    if (SelectedBlueprints.Count > 1)
-                    {
-                        // each drawable's relative position should be maintained in the scaled quad.
-                        var screenPosition = b.ScreenSpaceSelectionPoint;
-
-                        var relativePositionInOriginal =
-                            new Vector2(
-                                (screenPosition.X - selectionQuad.TopLeft.X) / selectionQuad.Width,
-                                (screenPosition.Y - selectionQuad.TopLeft.Y) / selectionQuad.Height
-                            );
-
-                        var newPositionInAdjusted = new Vector2(
-                            adjustedRect.TopLeft.X + adjustedRect.Width * relativePositionInOriginal.X,
-                            adjustedRect.TopLeft.Y + adjustedRect.Height * relativePositionInOriginal.Y
-                        );
-
-                        drawableItem.Position = drawableItem.Parent.ToLocalSpace(newPositionInAdjusted) - drawableItem.AnchorPosition;
-                        drawableItem.Scale += scaledDelta;
-                    }
-                }
+                adjustedRect.X -= scale.X;
+                adjustedRect.Width += scale.X;
             }
-            else
+            else if (anchor.HasFlagFast(Anchor.x2))
             {
-                var blueprint = SelectedBlueprints.First();
-                var drawableItem = (Drawable)blueprint.Item;
+                adjustedRect.Width += scale.X;
+            }
 
-                // the number of local "pixels" the drag operation resulted in.
-                // our goal is to increase the drawable's draw size by this amount.
-                var scaledDelta = drawableItem.ScreenSpaceDeltaToParentSpace(scale);
+            if (anchor.HasFlagFast(Anchor.y0))
+            {
+                adjustedRect.Y -= scale.Y;
+                adjustedRect.Height += scale.Y;
+            }
+            else if (anchor.HasFlagFast(Anchor.y2))
+            {
+                adjustedRect.Height += scale.Y;
+            }
 
-                scaledDelta = new Vector2(
-                    scaledDelta.X / drawableItem.DrawWidth,
-                    scaledDelta.Y / drawableItem.DrawHeight
+            // scale adjust should match that of the quad itself.
+            var scaledDelta = new Vector2(
+                adjustedRect.Width / selectionQuad.Width - 1,
+                adjustedRect.Height / selectionQuad.Height - 1
+            );
+
+            foreach (var b in SelectedBlueprints)
+            {
+                var drawableItem = (Drawable)b.Item;
+
+                // each drawable's relative position should be maintained in the scaled quad.
+                var screenPosition = b.ScreenSpaceSelectionPoint;
+
+                var relativePositionInOriginal =
+                    new Vector2(
+                        (screenPosition.X - selectionQuad.TopLeft.X) / selectionQuad.Width,
+                        (screenPosition.Y - selectionQuad.TopLeft.Y) / selectionQuad.Height
+                    );
+
+                var newPositionInAdjusted = new Vector2(
+                    adjustedRect.TopLeft.X + adjustedRect.Width * relativePositionInOriginal.X,
+                    adjustedRect.TopLeft.Y + adjustedRect.Height * relativePositionInOriginal.Y
                 );
 
-                // handle the case where scaling with a centre origin needs double the adjustments to match
-                // user cursor movement.
-                if (drawableItem.Origin.HasFlagFast(Anchor.x1)) scaledDelta.X *= 2;
-                if (drawableItem.Origin.HasFlagFast(Anchor.y1)) scaledDelta.Y *= 2;
-
-                // for now aspect lock scale adjustments that occur at corners.
-                if (!anchor.HasFlagFast(Anchor.x1) && !anchor.HasFlagFast(Anchor.y1))
-                    scaledDelta.Y = scaledDelta.X;
-
+                drawableItem.Position = drawableItem.Parent.ToLocalSpace(newPositionInAdjusted) - drawableItem.AnchorPosition;
                 drawableItem.Scale += scaledDelta;
             }
 
