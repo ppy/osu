@@ -93,8 +93,9 @@ namespace osu.Game.Skinning
                                     if (hitError2 != null)
                                     {
                                         hitError2.Anchor = Anchor.CentreRight;
-                                        hitError2.Origin = Anchor.CentreLeft;
                                         hitError2.Scale = new Vector2(-1, 1);
+                                        // origin flipped to match scale above.
+                                        hitError2.Origin = Anchor.CentreLeft;
                                     }
                                 }
                             })
