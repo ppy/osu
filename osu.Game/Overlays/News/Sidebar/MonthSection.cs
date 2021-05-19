@@ -117,10 +117,10 @@ namespace osu.Game.Overlays.News.Sidebar
             }
 
             [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider, GameHost host)
+            private void load(OverlayColourProvider overlayColours, GameHost host)
             {
-                IdleColour = colourProvider.Light2;
-                HoverColour = colourProvider.Light1;
+                IdleColour = overlayColours.Light2;
+                HoverColour = overlayColours.Light1;
 
                 TooltipText = "view in browser";
                 Action = () => host.OpenUrlExternally("https://osu.ppy.sh/home/news/" + post.Slug);
@@ -131,9 +131,7 @@ namespace osu.Game.Overlays.News.Sidebar
         {
             public readonly BindableBool IsOpen = new BindableBool();
 
-            protected override Container<Drawable> Content => content;
-
-            private readonly FillFlowContainer content;
+            protected override Container<Drawable> Content { get; }
 
             public PostsContainer()
             {
@@ -141,7 +139,7 @@ namespace osu.Game.Overlays.News.Sidebar
                 AutoSizeAxes = Axes.Y;
                 AutoSizeDuration = animation_duration;
                 AutoSizeEasing = Easing.Out;
-                InternalChild = content = new FillFlowContainer
+                InternalChild = Content = new FillFlowContainer
                 {
                     Margin = new MarginPadding { Top = 5 },
                     RelativeSizeAxes = Axes.X,
@@ -155,24 +153,24 @@ namespace osu.Game.Overlays.News.Sidebar
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                IsOpen.BindValueChanged(_ => updateState(), true);
+                IsOpen.BindValueChanged(updateState, true);
             }
 
-            private void updateState()
+            private void updateState(ValueChangedEvent<bool> isOpen)
             {
                 ClearTransforms(true);
 
-                if (IsOpen.Value)
+                if (isOpen.NewValue)
                 {
                     AutoSizeAxes = Axes.Y;
-                    content.FadeIn(animation_duration, Easing.OutQuint);
+                    Content.FadeIn(animation_duration, Easing.OutQuint);
                 }
                 else
                 {
                     AutoSizeAxes = Axes.None;
                     this.ResizeHeightTo(0, animation_duration, Easing.OutQuint);
 
-                    content.FadeOut(animation_duration, Easing.OutQuint);
+                    Content.FadeOut(animation_duration, Easing.OutQuint);
                 }
             }
         }
