@@ -92,10 +92,6 @@ namespace osu.Game.Online.Multiplayer
         [Resolved]
         private UserLookupCache userLookupCache { get; set; } = null!;
 
-        // Only exists for compatibility with old osu-server-spectator build.
-        // Todo: Can be removed on 2021/02/26.
-        private long defaultPlaylistItemId;
-
         private Room? apiRoom;
 
         [BackgroundDependencyLoader]
@@ -143,7 +139,6 @@ namespace osu.Game.Online.Multiplayer
                 {
                     Room = joinedRoom;
                     apiRoom = room;
-                    defaultPlaylistItemId = apiRoom.Playlist.FirstOrDefault()?.ID ?? 0;
                     foreach (var user in joinedRoom.Users)
                         updateUserPlayingState(user.UserID, user.State);
                 }, cancellationSource.Token).ConfigureAwait(false);
@@ -581,7 +576,7 @@ namespace osu.Game.Online.Multiplayer
 
             void updateItem(PlaylistItem item)
             {
-                item.ID = settings.PlaylistItemId == 0 ? defaultPlaylistItemId : settings.PlaylistItemId;
+                item.ID = settings.PlaylistItemId;
                 item.Beatmap.Value = beatmap;
                 item.Ruleset.Value = ruleset.RulesetInfo;
                 item.RequiredMods.Clear();
