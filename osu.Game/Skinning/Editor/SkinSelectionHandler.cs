@@ -32,6 +32,9 @@ namespace osu.Game.Skinning.Editor
 
         public override bool HandleScale(Vector2 scale, Anchor anchor)
         {
+            // convert scale to screen space
+            scale = ToScreenSpace(scale) - ToScreenSpace(Vector2.Zero);
+
             adjustScaleFromAnchor(ref scale, anchor);
 
             var selectionQuad = GetSurroundingQuad(SelectedBlueprints.SelectMany(b =>
@@ -66,8 +69,8 @@ namespace osu.Game.Skinning.Editor
 
             // scale adjust should match that of the quad itself.
             var scaledDelta = new Vector2(
-                adjustedRect.Width / selectionQuad.Width - 1,
-                adjustedRect.Height / selectionQuad.Height - 1
+                adjustedRect.Width / selectionQuad.Width,
+                adjustedRect.Height / selectionQuad.Height
             );
 
             foreach (var b in SelectedBlueprints)
@@ -89,7 +92,7 @@ namespace osu.Game.Skinning.Editor
                 );
 
                 drawableItem.Position = drawableItem.Parent.ToLocalSpace(newPositionInAdjusted) - drawableItem.AnchorPosition;
-                drawableItem.Scale += scaledDelta;
+                drawableItem.Scale *= scaledDelta;
             }
 
             return true;
