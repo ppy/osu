@@ -207,6 +207,11 @@ namespace osu.Game.Overlays.Dialog
             };
         }
 
+        /// <summary>
+        /// Programmatically clicks the first <see cref="PopupDialogOkButton"/>.
+        /// </summary>
+        public void PerformOkAction() => Buttons.OfType<PopupDialogOkButton>().First().Click();
+
         protected override bool OnKeyDown(KeyDownEvent e)
         {
             if (e.Repeat) return false;
