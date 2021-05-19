@@ -20,7 +20,6 @@ namespace osu.Game.Rulesets.Catch.Tests
         protected override Ruleset CreatePlayerRuleset() => new CatchRuleset();
 
         [Test]
-        [Ignore("HUD components broken, remove when fixed.")]
         public void TestLegacyHUDComboCounterHidden([Values] bool withModifiedSkin)
         {
             if (withModifiedSkin)
