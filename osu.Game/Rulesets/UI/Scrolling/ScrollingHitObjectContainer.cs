@@ -50,9 +50,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
             timeRange.ValueChanged += _ => layoutCache.Invalidate();
         }
 
-        public override void Clear(bool disposeChildren = true)
+        public override void Clear()
         {
-            base.Clear(disposeChildren);
+            base.Clear();
 
             toComputeLifetime.Clear();
             layoutComputed.Clear();
