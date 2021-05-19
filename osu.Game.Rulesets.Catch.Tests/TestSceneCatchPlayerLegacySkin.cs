@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             AddAssert("legacy HUD combo counter hidden", () =>
             {
-                return Player.ChildrenOfType<LegacyComboCounter>().All(c => !c.ChildrenOfType<Container>().Single().IsPresent);
+                return Player.ChildrenOfType<LegacyComboCounter>().All(c => c.ChildrenOfType<Container>().Single().Alpha == 0f);
             });
         }
     }
