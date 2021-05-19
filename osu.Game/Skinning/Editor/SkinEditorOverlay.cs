@@ -65,8 +65,6 @@ namespace osu.Game.Skinning.Editor
             if (visibility.NewValue == Visibility.Visible)
             {
                 target.Masking = true;
-                target.BorderThickness = 5;
-                target.BorderColour = colours.Yellow;
                 target.AllowScaling = false;
                 target.RelativePositionAxes = Axes.Both;
 
@@ -75,7 +73,6 @@ namespace osu.Game.Skinning.Editor
             }
             else
             {
-                target.BorderThickness = 0;
                 target.AllowScaling = true;
 
                 target.ScaleTo(1, SkinEditor.TRANSITION_DURATION, Easing.OutQuint).OnComplete(_ => target.Masking = false);
