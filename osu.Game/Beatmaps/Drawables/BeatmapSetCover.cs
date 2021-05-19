@@ -3,16 +3,22 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Online;
 
 namespace osu.Game.Beatmaps.Drawables
 {
     [LongRunningLoad]
-    public class BeatmapSetCover : Sprite
+    public class BeatmapSetCover : CompositeDrawable
     {
         private readonly BeatmapSetInfo set;
         private readonly BeatmapSetCoverType type;
+
+        private readonly Sprite coverSprite;
 
         public BeatmapSetCover(BeatmapSetInfo set, BeatmapSetCoverType type = BeatmapSetCoverType.Cover)
         {
@@ -21,7 +27,16 @@ namespace osu.Game.Beatmaps.Drawables
 
             this.set = set;
             this.type = type;
+
+            InternalChild = coverSprite = new Sprite
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                RelativeSizeAxes = Axes.Both,
+            };
         }
+
+        private IBindable<bool> userAllowedExplicitContent;
 
         [BackgroundDependencyLoader]
         private void load(LargeTextureStore textures)
@@ -44,7 +59,34 @@ namespace osu.Game.Beatmaps.Drawables
             }
 
             if (resource != null)
-                Texture = textures.Get(resource);
+            {
+                coverSprite.Texture = textures.Get(resource);
+
+                // update fill aspect ratio with sprite's for FillMode to work on usages.
+                FillAspectRatio = coverSprite.FillAspectRatio;
+            }
+        }
+
+        [Resolved]
+        private IExplicitContentPermission explicitPermission { get; set; }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            if (set.OnlineInfo.HasExplicitContent)
+            {
+                userAllowedExplicitContent = explicitPermission.UserAllowed.GetBoundCopy();
+                userAllowedExplicitContent.BindValueChanged(allowed =>
+                {
+                    if (allowed.NewValue)
+                        coverSprite.FadeIn(300, Easing.OutQuint);
+                    else
+                        coverSprite.FadeOut(200, Easing.OutQuint);
+                }, true);
+
+                coverSprite.FinishTransforms();
+            }
         }
     }
 

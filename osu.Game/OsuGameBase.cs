@@ -85,6 +85,8 @@ namespace osu.Game
 
         protected IAPIProvider API;
 
+        private IExplicitContentPermission configExplicitPermission;
+
         private SpectatorStreamingClient spectatorStreaming;
         private StatefulMultiplayerClient multiplayerClient;
 
@@ -239,6 +241,8 @@ namespace osu.Game
             MessageFormatter.WebsiteRootUrl = endpoints.WebsiteRootUrl;
 
             dependencies.CacheAs(API ??= new APIAccess(LocalConfig, endpoints, VersionHash));
+
+            dependencies.CacheAs(configExplicitPermission ??= new ConfigExplicitContentPermission(LocalConfig));
 
             dependencies.CacheAs(spectatorStreaming = new SpectatorStreamingClient(endpoints));
             dependencies.CacheAs(multiplayerClient = new MultiplayerClient(endpoints));
