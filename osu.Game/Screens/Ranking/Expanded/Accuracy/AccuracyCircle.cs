@@ -38,11 +38,6 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         public const double ACCURACY_TRANSFORM_DURATION = 3000;
 
         /// <summary>
-        /// Delay before the default applause sound is played to match the <see cref="rankText"/> timing
-        /// </summary>
-        public const double APPLAUSE_DELAY = 1440;
-
-        /// <summary>
         /// Delay after <see cref="ACCURACY_TRANSFORM_DURATION"/> for the rank text (A/B/C/D/S/SS) to appear.
         /// </summary>
         public const double TEXT_APPEAR_DELAY = ACCURACY_TRANSFORM_DURATION / 2;
