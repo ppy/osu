@@ -8,7 +8,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
         public CollectionSupportEntryButton(PluginSidebarPage page)
             : base(page)
         {
-            ButtonIcon = FontAwesome.Solid.List;
+            ButtonIcon = FontAwesome.Solid.Check;
             TooltipText = "查看收藏夹";
         }
     }

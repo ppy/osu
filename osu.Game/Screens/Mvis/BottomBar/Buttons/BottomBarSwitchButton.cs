@@ -11,10 +11,12 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
 {
     public class BottomBarSwitchButton : BottomBarButton
     {
-        public BindableBool ToggleableValue = new BindableBool();
+        public BindableBool Value = new BindableBool();
+        public bool IsCoupled = true;
+
         private SkinnableSprite off;
         private SkinnableSprite on;
-        public bool DefaultValue { get; set; }
+        public bool Default { get; set; }
 
         protected override string BackgroundTextureName => "MButtonSwitchOff-background";
         protected virtual string SwitchOnBgTextureName => "MButtonSwitchOn-background";
@@ -45,8 +47,8 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
 
         protected override void LoadComplete()
         {
-            ToggleableValue.Value = DefaultValue;
-            ToggleableValue.BindValueChanged(_ => updateVisuals(true));
+            Value.Value = Default;
+            Value.BindValueChanged(_ => updateVisuals(true));
 
             updateVisuals();
 
@@ -61,14 +63,17 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
             return base.OnClick(e);
         }
 
-        public void Toggle() =>
-            ToggleableValue.Toggle();
+        public void Toggle()
+        {
+            if (IsCoupled)
+                Value.Toggle();
+        }
 
         private void updateVisuals(bool animate = false)
         {
             var duration = animate ? 500 : 0;
 
-            switch (ToggleableValue.Value)
+            switch (Value.Value)
             {
                 case true:
                     BgBox.FadeColour(ActivateColor, duration, Easing.OutQuint);

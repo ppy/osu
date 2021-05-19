@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Mvis
         private bool okForHide => IsHovered
                                   && isIdle.Value
                                   && !(bottomBar?.IsHovered ?? false)
-                                  && !(lockButton?.ToggleableValue.Value ?? false)
+                                  && !(lockButton?.Value.Value ?? false)
                                   && !lockChanges.Value
                                   && inputManager?.DraggedDrawable == null
                                   && inputManager?.FocusedDrawable == null;
@@ -467,14 +467,14 @@ namespace osu.Game.Screens.Mvis
 
                                         //防止手机端无法恢复界面
                                         lockChanges.Value = RuntimeInfo.IsDesktop;
-                                        lockButton.ToggleableValue.Value = !RuntimeInfo.IsDesktop;
+                                        lockButton.Value.Value = !RuntimeInfo.IsDesktop;
                                     },
                                     TooltipText = "锁定变更并隐藏界面"
                                 },
                                 loopToggleButton = new ToggleLoopButton
                                 {
                                     ButtonIcon = FontAwesome.Solid.Undo,
-                                    Action = () => CurrentTrack.Looping = loopToggleButton.ToggleableValue.Value,
+                                    Action = () => CurrentTrack.Looping = loopToggleButton.Value.Value,
                                     TooltipText = "单曲循环",
                                 },
                                 soloButton = new BottomBarButton
@@ -483,11 +483,13 @@ namespace osu.Game.Screens.Mvis
                                     Action = presentBeatmap,
                                     TooltipText = "在单人游戏选歌界面中查看",
                                 },
-                                sidebarToggleButton = new BottomBarButton
+                                sidebarToggleButton = new BottomBarSwitchButton
                                 {
-                                    ButtonIcon = FontAwesome.Solid.Cog,
+                                    ButtonIcon = FontAwesome.Solid.List,
                                     Action = () => updateSidebarState(settingsScroll),
-                                    TooltipText = "播放器设置",
+                                    TooltipText = "侧边栏(播放器设置)",
+                                    Value = { BindTarget = sidebar.IsVisible },
+                                    IsCoupled = false
                                 }
                             }
                         },
@@ -540,7 +542,7 @@ namespace osu.Game.Screens.Mvis
 
             inputManager = GetContainingInputManager();
 
-            songProgressButton.ToggleableValue.BindTo(trackRunning);
+            songProgressButton.Value.BindTo(trackRunning);
 
             allowProxy.BindValueChanged(v =>
             {
@@ -672,7 +674,7 @@ namespace osu.Game.Screens.Mvis
             keyBindings[GlobalAction.MvisForceLockOverlayChanges] = () => lockChanges.Toggle();
             keyBindings[GlobalAction.Back] = () =>
             {
-                if (sidebar.IsPresent && !sidebar.Hiding)
+                if (sidebar.IsPresent && sidebar.IsVisible.Value)
                 {
                     sidebar.Hide();
                     return;
@@ -681,7 +683,7 @@ namespace osu.Game.Screens.Mvis
                 if (OverlaysHidden)
                 {
                     lockChanges.Value = false;
-                    lockButton.ToggleableValue.Value = false;
+                    lockButton.Value.Value = false;
                     showOverlays(true);
                 }
                 else
@@ -774,7 +776,7 @@ namespace osu.Game.Screens.Mvis
             var sc = (ISidebarContent)d;
 
             //如果sc是上一个显示(mvis)或sc是侧边栏的当前显示并且侧边栏未隐藏
-            if (sc == sidebar.CurrentDisplay.Value && !sidebar.Hiding)
+            if (sc == sidebar.CurrentDisplay.Value && sidebar.IsVisible.Value)
             {
                 sidebar.Hide();
                 return;
@@ -913,7 +915,7 @@ namespace osu.Game.Screens.Mvis
         //当有弹窗或游戏失去焦点时要进行的动作
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (lockButton.ToggleableValue.Value && OverlaysHidden)
+            if (lockButton.Value.Value && OverlaysHidden)
                 lockButton.Toggle();
 
             showOverlays(false);
@@ -946,7 +948,7 @@ namespace osu.Game.Screens.Mvis
         private void showOverlays(bool force)
         {
             //在有锁并且悬浮界面已隐藏或悬浮界面可见的情况下显示悬浮锁
-            if (!force && ((lockButton.ToggleableValue.Value && OverlaysHidden) || !OverlaysHidden || lockChanges.Value))
+            if (!force && ((lockButton.Value.Value && OverlaysHidden) || !OverlaysHidden || lockChanges.Value))
             {
                 showPluginEntriesTemporary();
                 return;
@@ -997,7 +999,7 @@ namespace osu.Game.Screens.Mvis
         private void applyTrackAdjustments()
         {
             CurrentTrack.ResetSpeedAdjustments();
-            CurrentTrack.Looping = loopToggleButton.ToggleableValue.Value;
+            CurrentTrack.Looping = loopToggleButton.Value.Value;
             CurrentTrack.RestartPoint = 0;
             CurrentTrack.AddAdjustment(adjustFreq.Value ? AdjustableProperty.Frequency : AdjustableProperty.Tempo, musicSpeed);
 
