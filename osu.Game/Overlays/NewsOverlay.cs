@@ -14,7 +14,7 @@ namespace osu.Game.Overlays
         private readonly Bindable<string> article = new Bindable<string>(null);
 
         public NewsOverlay()
-            : base(OverlayColourScheme.Purple)
+            : base(OverlayColourScheme.Purple, false)
         {
         }
 

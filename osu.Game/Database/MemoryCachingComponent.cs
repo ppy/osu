@@ -29,7 +29,7 @@ namespace osu.Game.Database
             if (CheckExists(lookup, out TValue performance))
                 return performance;
 
-            var computed = await ComputeValueAsync(lookup, token);
+            var computed = await ComputeValueAsync(lookup, token).ConfigureAwait(false);
 
             if (computed != null || CacheNullValues)
                 cache[lookup] = computed;

@@ -40,6 +40,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
+using osu.Game.Utils;
 using osuTK.Input;
 using RuntimeInfo = osu.Framework.RuntimeInfo;
 
@@ -59,6 +60,8 @@ namespace osu.Game
         public bool UseDevelopmentServer { get; }
 
         protected OsuConfigManager LocalConfig;
+
+        protected SessionStatics SessionStatics { get; private set; }
 
         protected BeatmapManager BeatmapManager;
 
@@ -156,7 +159,14 @@ namespace osu.Game
 
         protected override UserInputManager CreateUserInputManager() => new OsuUserInputManager();
 
-        private readonly BindableNumber<double> globalTrackVolumeAdjust = new BindableNumber<double>(0.5f);
+        protected virtual BatteryInfo CreateBatteryInfo() => null;
+
+        /// <summary>
+        /// The maximum volume at which audio tracks should playback. This can be set lower than 1 to create some head-room for sound effects.
+        /// </summary>
+        internal const double GLOBAL_TRACK_VOLUME_ADJUST = 0.5;
+
+        private readonly BindableNumber<double> globalTrackVolumeAdjust = new BindableNumber<double>(GLOBAL_TRACK_VOLUME_ADJUST);
 
         [BackgroundDependencyLoader]
         private void load()
@@ -228,7 +238,7 @@ namespace osu.Game
 
             MessageFormatter.WebsiteRootUrl = endpoints.WebsiteRootUrl;
 
-            dependencies.CacheAs(API ??= new APIAccess(LocalConfig, endpoints));
+            dependencies.CacheAs(API ??= new APIAccess(LocalConfig, endpoints, VersionHash));
 
             dependencies.CacheAs(spectatorStreaming = new SpectatorStreamingClient(endpoints));
             dependencies.CacheAs(multiplayerClient = new MultiplayerClient(endpoints));
@@ -276,7 +286,12 @@ namespace osu.Game
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
             dependencies.Cache(RulesetConfigCache = new RulesetConfigCache(SettingsStore));
-            dependencies.Cache(new SessionStatics());
+
+            var powerStatus = CreateBatteryInfo();
+            if (powerStatus != null)
+                dependencies.CacheAs(powerStatus);
+
+            dependencies.Cache(SessionStatics = new SessionStatics());
             dependencies.Cache(new OsuColour());
 
             RegisterImportHandler(BeatmapManager);
@@ -303,17 +318,18 @@ namespace osu.Game
 
             AddInternal(RulesetConfigCache);
 
-            MenuCursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both };
-
             GlobalActionContainer globalBindings;
 
-            MenuCursorContainer.Child = globalBindings = new GlobalActionContainer(this)
+            var mainContent = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Child = content = new OsuTooltipContainer(MenuCursorContainer.Cursor) { RelativeSizeAxes = Axes.Both }
+                MenuCursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both },
+                // to avoid positional input being blocked by children, ensure the GlobalActionContainer is above everything.
+                globalBindings = new GlobalActionContainer(this)
             };
 
-            base.Content.Add(CreateScalingContainer().WithChild(MenuCursorContainer));
+            MenuCursorContainer.Child = content = new OsuTooltipContainer(MenuCursorContainer.Cursor) { RelativeSizeAxes = Axes.Both };
+
+            base.Content.Add(CreateScalingContainer().WithChildren(mainContent));
 
             KeyBindingStore.Register(globalBindings);
             dependencies.Cache(globalBindings);
@@ -424,12 +440,18 @@ namespace osu.Game
 
         public async Task Import(params string[] paths)
         {
-            var extension = Path.GetExtension(paths.First())?.ToLowerInvariant();
+            if (paths.Length == 0)
+                return;
 
-            foreach (var importer in fileImporters)
+            var filesPerExtension = paths.GroupBy(p => Path.GetExtension(p).ToLowerInvariant());
+
+            foreach (var groups in filesPerExtension)
             {
-                if (importer.HandledExtensions.Contains(extension))
-                    await importer.Import(paths);
+                foreach (var importer in fileImporters)
+                {
+                    if (importer.HandledExtensions.Contains(groups.Key))
+                        await importer.Import(groups.ToArray()).ConfigureAwait(false);
+                }
             }
         }
 
@@ -440,7 +462,7 @@ namespace osu.Game
             {
                 var importer = fileImporters.FirstOrDefault(i => i.HandledExtensions.Contains(taskGroup.Key));
                 return importer?.Import(taskGroup.ToArray()) ?? Task.CompletedTask;
-            }));
+            })).ConfigureAwait(false);
         }
 
         public IEnumerable<string> HandledExtensions => fileImporters.SelectMany(i => i.HandledExtensions);

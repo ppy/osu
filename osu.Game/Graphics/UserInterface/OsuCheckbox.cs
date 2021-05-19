@@ -46,8 +46,8 @@ namespace osu.Game.Graphics.UserInterface
         protected readonly Nub Nub;
 
         private readonly OsuTextFlowContainer labelText;
-        private SampleChannel sampleChecked;
-        private SampleChannel sampleUnchecked;
+        private Sample sampleChecked;
+        private Sample sampleUnchecked;
 
         public OsuCheckbox(bool nubOnRight = true)
         {

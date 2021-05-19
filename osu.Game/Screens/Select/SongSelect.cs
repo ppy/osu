@@ -86,10 +86,10 @@ namespace osu.Game.Screens.Select
 
         protected ModSelectOverlay ModSelect { get; private set; }
 
-        protected SampleChannel SampleConfirm { get; private set; }
+        protected Sample SampleConfirm { get; private set; }
 
-        private SampleChannel sampleChangeDifficulty;
-        private SampleChannel sampleChangeBeatmap;
+        private Sample sampleChangeDifficulty;
+        private Sample sampleChangeBeatmap;
 
         private Container carouselContainer;
 
@@ -307,7 +307,11 @@ namespace osu.Game.Screens.Select
         protected virtual IEnumerable<(FooterButton, OverlayContainer)> CreateFooterButtons() => new (FooterButton, OverlayContainer)[]
         {
             (new FooterButtonMods { Current = Mods }, ModSelect),
-            (new FooterButtonRandom { Action = triggerRandom }, null),
+            (new FooterButtonRandom
+            {
+                NextRandom = () => Carousel.SelectNextRandom(),
+                PreviousRandom = Carousel.SelectPreviousRandom
+            }, null),
             (new FooterButtonOptions(), BeatmapOptions)
         };
 
@@ -522,14 +526,6 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private void triggerRandom()
-        {
-            if (GetContainingInputManager().CurrentState.Keyboard.ShiftPressed)
-                Carousel.SelectPreviousRandom();
-            else
-                Carousel.SelectNextRandom();
-        }
-
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
@@ -648,8 +644,9 @@ namespace osu.Game.Screens.Select
         {
             Debug.Assert(!isHandlingLooping);
 
-            music.CurrentTrack.Looping = isHandlingLooping = true;
+            isHandlingLooping = true;
 
+            ensureTrackLooping(Beatmap.Value, TrackChangeDirection.None);
             music.TrackChanged += ensureTrackLooping;
         }
 
@@ -665,7 +662,7 @@ namespace osu.Game.Screens.Select
         }
 
         private void ensureTrackLooping(WorkingBeatmap beatmap, TrackChangeDirection changeDirection)
-            => music.CurrentTrack.Looping = true;
+            => beatmap.PrepareTrackForPreviewLooping();
 
         public override bool OnBackButton()
         {
@@ -718,8 +715,6 @@ namespace osu.Game.Screens.Select
             ITrack track = music.CurrentTrack;
 
             bool isNewTrack = !lastTrack.TryGetTarget(out var last) || last != track;
-
-            track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
 
             if (!track.IsRunning && (music.UserPauseRequested != true || isNewTrack))
                 music.Play(true);

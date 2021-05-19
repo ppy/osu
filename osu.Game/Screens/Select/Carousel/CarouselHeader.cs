@@ -25,7 +25,12 @@ namespace osu.Game.Screens.Select.Carousel
 
         public readonly Bindable<CarouselItemState> State = new Bindable<CarouselItemState>(CarouselItemState.NotSelected);
 
+        private readonly HoverLayer hoverLayer;
+
         protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
+
+        private const float corner_radius = 10;
+        private const float border_thickness = 2.5f;
 
         public CarouselHeader()
         {
@@ -36,12 +41,12 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
-                CornerRadius = 10,
+                CornerRadius = corner_radius,
                 BorderColour = new Color4(221, 255, 255, 255),
                 Children = new Drawable[]
                 {
                     Content,
-                    new HoverLayer()
+                    hoverLayer = new HoverLayer()
                 }
             };
         }
@@ -59,6 +64,8 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 case CarouselItemState.Collapsed:
                 case CarouselItemState.NotSelected:
+                    hoverLayer.InsetForBorder = false;
+
                     BorderContainer.BorderThickness = 0;
                     BorderContainer.EdgeEffect = new EdgeEffectParameters
                     {
@@ -70,7 +77,9 @@ namespace osu.Game.Screens.Select.Carousel
                     break;
 
                 case CarouselItemState.Selected:
-                    BorderContainer.BorderThickness = 2.5f;
+                    hoverLayer.InsetForBorder = true;
+
+                    BorderContainer.BorderThickness = border_thickness;
                     BorderContainer.EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Glow,
@@ -84,7 +93,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         public class HoverLayer : HoverSampleDebounceComponent
         {
-            private SampleChannel sampleHover;
+            private Sample sampleHover;
 
             private Box box;
 
@@ -107,6 +116,26 @@ namespace osu.Game.Screens.Select.Carousel
                 sampleHover = audio.Samples.Get("SongSelect/song-ping");
             }
 
+            public bool InsetForBorder
+            {
+                set
+                {
+                    if (value)
+                    {
+                        // apply same border as above to avoid applying additive overlay to it (and blowing out the colour).
+                        Masking = true;
+                        CornerRadius = corner_radius;
+                        BorderThickness = border_thickness;
+                    }
+                    else
+                    {
+                        BorderThickness = 0;
+                        CornerRadius = 0;
+                        Masking = false;
+                    }
+                }
+            }
+
             protected override bool OnHover(HoverEvent e)
             {
                 box.FadeIn(100, Easing.OutQuint);
@@ -123,7 +152,7 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 if (sampleHover == null) return;
 
-                sampleHover.Frequency.Value = 0.90 + RNG.NextDouble(0.2);
+                sampleHover.Frequency.Value = 0.99 + RNG.NextDouble(0.02);
                 sampleHover.Play();
             }
         }

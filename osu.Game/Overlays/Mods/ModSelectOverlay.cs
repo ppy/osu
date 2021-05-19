@@ -87,7 +87,7 @@ namespace osu.Game.Overlays.Mods
         private const float content_width = 0.8f;
         private const float footer_button_spacing = 20;
 
-        private SampleChannel sampleOn, sampleOff;
+        private Sample sampleOn, sampleOff;
 
         protected ModSelectOverlay()
         {
@@ -245,15 +245,21 @@ namespace osu.Game.Overlays.Mods
                                             },
                                         }
                                     },
-                                    ModSettingsContainer = new ModSettingsContainer
+                                    new Container
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         Anchor = Anchor.BottomRight,
                                         Origin = Anchor.BottomRight,
-                                        Width = 0.3f,
-                                        Alpha = 0,
                                         Padding = new MarginPadding(30),
-                                        SelectedMods = { BindTarget = SelectedMods },
+                                        Width = 0.3f,
+                                        Children = new Drawable[]
+                                        {
+                                            ModSettingsContainer = new ModSettingsContainer
+                                            {
+                                                Alpha = 0,
+                                                SelectedMods = { BindTarget = SelectedMods },
+                                            },
+                                        }
                                     },
                                 }
                             },
@@ -456,6 +462,7 @@ namespace osu.Game.Overlays.Mods
             }
 
             updateSelectedButtons();
+            OnAvailableModsChanged();
         }
 
         /// <summary>
@@ -532,6 +539,13 @@ namespace osu.Game.Overlays.Mods
 
         private void playSelectedSound() => sampleOn?.Play();
         private void playDeselectedSound() => sampleOff?.Play();
+
+        /// <summary>
+        /// Invoked after <see cref="availableMods"/> has changed.
+        /// </summary>
+        protected virtual void OnAvailableModsChanged()
+        {
+        }
 
         /// <summary>
         /// Invoked when a new <see cref="Mod"/> has been selected.

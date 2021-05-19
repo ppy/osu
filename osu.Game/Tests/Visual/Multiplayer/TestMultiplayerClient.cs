@@ -3,12 +3,15 @@
 
 #nullable enable
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
@@ -22,8 +25,22 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public override IBindable<bool> IsConnected => isConnected;
         private readonly Bindable<bool> isConnected = new Bindable<bool>(true);
 
+        public Room? APIRoom { get; private set; }
+
+        public Action<MultiplayerRoom>? RoomSetupAction;
+
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
+
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; } = null!;
+
+        private readonly TestMultiplayerRoomManager roomManager;
+
+        public TestMultiplayerClient(TestMultiplayerRoomManager roomManager)
+        {
+            this.roomManager = roomManager;
+        }
 
         public void Connect() => isConnected.Value = true;
 
@@ -45,6 +62,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
         }
 
+        public void ChangeRoomState(MultiplayerRoomState newState)
+        {
+            Debug.Assert(Room != null);
+            ((IMultiplayerClient)this).RoomStateChanged(newState);
+        }
+
         public void ChangeUserState(int userId, MultiplayerUserState newState)
         {
             Debug.Assert(Room != null);
@@ -58,6 +81,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     case MultiplayerUserState.Loaded:
                         if (Room.Users.All(u => u.State != MultiplayerUserState.WaitingForLoad))
                         {
+                            ChangeRoomState(MultiplayerRoomState.Playing);
                             foreach (var u in Room.Users.Where(u => u.State == MultiplayerUserState.Loaded))
                                 ChangeUserState(u.UserID, MultiplayerUserState.Playing);
 
@@ -69,6 +93,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     case MultiplayerUserState.FinishedPlay:
                         if (Room.Users.All(u => u.State != MultiplayerUserState.Playing))
                         {
+                            ChangeRoomState(MultiplayerRoomState.Open);
                             foreach (var u in Room.Users.Where(u => u.State == MultiplayerUserState.FinishedPlay))
                                 ChangeUserState(u.UserID, MultiplayerUserState.Results);
 
@@ -89,18 +114,42 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         protected override Task<MultiplayerRoom> JoinRoom(long roomId)
         {
-            var user = new MultiplayerRoomUser(api.LocalUser.Value.Id) { User = api.LocalUser.Value };
+            var apiRoom = roomManager.Rooms.Single(r => r.RoomID.Value == roomId);
 
-            var room = new MultiplayerRoom(roomId);
-            room.Users.Add(user);
+            var localUser = new MultiplayerRoomUser(api.LocalUser.Value.Id)
+            {
+                User = api.LocalUser.Value
+            };
 
-            if (room.Users.Count == 1)
-                room.Host = user;
+            var room = new MultiplayerRoom(roomId)
+            {
+                Settings =
+                {
+                    Name = apiRoom.Name.Value,
+                    BeatmapID = apiRoom.Playlist.Last().BeatmapID,
+                    RulesetID = apiRoom.Playlist.Last().RulesetID,
+                    BeatmapChecksum = apiRoom.Playlist.Last().Beatmap.Value.MD5Hash,
+                    RequiredMods = apiRoom.Playlist.Last().RequiredMods.Select(m => new APIMod(m)).ToArray(),
+                    AllowedMods = apiRoom.Playlist.Last().AllowedMods.Select(m => new APIMod(m)).ToArray(),
+                    PlaylistItemId = apiRoom.Playlist.Last().ID
+                },
+                Users = { localUser },
+                Host = localUser
+            };
+
+            RoomSetupAction?.Invoke(room);
+            RoomSetupAction = null;
+
+            APIRoom = apiRoom;
 
             return Task.FromResult(room);
         }
 
-        protected override Task LeaveRoomInternal() => Task.CompletedTask;
+        protected override Task LeaveRoomInternal()
+        {
+            APIRoom = null;
+            return Task.CompletedTask;
+        }
 
         public override Task TransferHost(int userId) => ((IMultiplayerClient)this).HostChanged(userId);
 
@@ -108,7 +157,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             Debug.Assert(Room != null);
 
-            await ((IMultiplayerClient)this).SettingsChanged(settings);
+            await ((IMultiplayerClient)this).SettingsChanged(settings).ConfigureAwait(false);
 
             foreach (var user in Room.Users.Where(u => u.State == MultiplayerUserState.Ready))
                 ChangeUserState(user.UserID, MultiplayerUserState.Idle);
@@ -145,10 +194,25 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             Debug.Assert(Room != null);
 
+            ChangeRoomState(MultiplayerRoomState.WaitingForLoad);
             foreach (var user in Room.Users.Where(u => u.State == MultiplayerUserState.Ready))
                 ChangeUserState(user.UserID, MultiplayerUserState.WaitingForLoad);
 
             return ((IMultiplayerClient)this).LoadRequested();
+        }
+
+        protected override Task<BeatmapSetInfo> GetOnlineBeatmapSet(int beatmapId, CancellationToken cancellationToken = default)
+        {
+            Debug.Assert(Room != null);
+
+            var apiRoom = roomManager.Rooms.Single(r => r.RoomID.Value == Room.RoomID);
+            var set = apiRoom.Playlist.FirstOrDefault(p => p.BeatmapID == beatmapId)?.Beatmap.Value.BeatmapSet
+                      ?? beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == beatmapId)?.BeatmapSet;
+
+            if (set == null)
+                throw new InvalidOperationException("Beatmap not found.");
+
+            return Task.FromResult(set);
         }
     }
 }

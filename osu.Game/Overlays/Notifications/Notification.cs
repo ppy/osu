@@ -42,8 +42,8 @@ namespace osu.Game.Overlays.Notifications
         /// </summary>
         public virtual bool DisplayOnTop => true;
 
-        private SampleChannel samplePopIn;
-        private SampleChannel samplePopOut;
+        private Sample samplePopIn;
+        private Sample samplePopOut;
         protected virtual string PopInSampleName => "UI/notification-pop-in";
         protected virtual string PopOutSampleName => "UI/overlay-pop-out"; // TODO: replace with a unique sample?
 

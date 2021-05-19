@@ -5,6 +5,7 @@ using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Difficulty.Utils;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Taiko.Objects;
 
@@ -16,7 +17,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
     /// <remarks>
     /// The reference play style chosen uses two hands, with full alternating (the hand changes after every hit).
     /// </remarks>
-    public class Stamina : Skill
+    public class Stamina : StrainSkill
     {
         protected override double SkillMultiplier => 1;
         protected override double StrainDecayBase => 0.4;
@@ -48,8 +49,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         /// <summary>
         /// Creates a <see cref="Stamina"/> skill.
         /// </summary>
+        /// <param name="mods">Mods for use in skill calculations.</param>
         /// <param name="rightHand">Whether this instance is performing calculations for the right hand.</param>
-        public Stamina(bool rightHand)
+        public Stamina(Mod[] mods, bool rightHand)
+            : base(mods)
         {
             hand = rightHand ? 1 : 0;
         }

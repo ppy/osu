@@ -7,7 +7,6 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
-using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
 
@@ -22,17 +21,11 @@ namespace osu.Game.Screens.Play.HUD
 
         private readonly HitWindows hitWindows;
 
-        private readonly ScoreProcessor processor;
-
-        public HitErrorDisplay(ScoreProcessor processor, HitWindows hitWindows)
+        public HitErrorDisplay(HitWindows hitWindows)
         {
-            this.processor = processor;
             this.hitWindows = hitWindows;
 
             RelativeSizeAxes = Axes.Both;
-
-            if (processor != null)
-                processor.NewJudgement += onNewJudgement;
         }
 
         [BackgroundDependencyLoader]
@@ -45,15 +38,6 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
             type.BindValueChanged(typeChanged, true);
-        }
-
-        private void onNewJudgement(JudgementResult result)
-        {
-            if (result.HitObject.HitWindows.WindowFor(HitResult.Miss) == 0)
-                return;
-
-            foreach (var c in Children)
-                c.OnNewJudgement(result);
         }
 
         private void typeChanged(ValueChangedEvent<ScoreMeterType> type)
@@ -138,14 +122,6 @@ namespace osu.Game.Screens.Play.HUD
         {
             Add(display);
             display.FadeInFromZero(fade_duration, Easing.OutQuint);
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (processor != null)
-                processor.NewJudgement -= onNewJudgement;
         }
     }
 }

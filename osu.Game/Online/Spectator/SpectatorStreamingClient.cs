@@ -8,13 +8,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Replays.Legacy;
@@ -34,7 +30,14 @@ namespace osu.Game.Online.Spectator
         /// </summary>
         public const double TIME_BETWEEN_SENDS = 200;
 
-        private HubConnection connection;
+        private readonly string endpoint;
+
+        [CanBeNull]
+        private IHubClientConnector connector;
+
+        private readonly IBindable<bool> isConnected = new BindableBool();
+
+        private HubConnection connection => connector?.CurrentConnection;
 
         private readonly List<int> watchingUsers = new List<int>();
 
@@ -44,12 +47,7 @@ namespace osu.Game.Online.Spectator
 
         private readonly BindableList<int> playingUsers = new BindableList<int>();
 
-        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
-
-        private bool isConnected;
-
-        [Resolved]
-        private IAPIProvider api { get; set; }
+        private readonly Dictionary<int, SpectatorState> playingUserStates = new Dictionary<int, SpectatorState>();
 
         [CanBeNull]
         private IBeatmap currentBeatmap;
@@ -73,7 +71,7 @@ namespace osu.Game.Online.Spectator
         public event Action<int, FrameDataBundle> OnNewFrames;
 
         /// <summary>
-        /// Called whenever a user starts a play session.
+        /// Called whenever a user starts a play session, or immediately if the user is being watched and currently in a play session.
         /// </summary>
         public event Action<int, SpectatorState> OnUserBeganPlaying;
 
@@ -82,85 +80,32 @@ namespace osu.Game.Online.Spectator
         /// </summary>
         public event Action<int, SpectatorState> OnUserFinishedPlaying;
 
-        private readonly string endpoint;
-
         public SpectatorStreamingClient(EndpointConfiguration endpoints)
         {
             endpoint = endpoints.SpectatorEndpointUrl;
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(IAPIProvider api)
         {
-            apiState.BindTo(api.State);
-            apiState.BindValueChanged(apiStateChanged, true);
-        }
+            connector = api.GetHubConnector(nameof(SpectatorStreamingClient), endpoint);
 
-        private void apiStateChanged(ValueChangedEvent<APIState> state)
-        {
-            switch (state.NewValue)
+            if (connector != null)
             {
-                case APIState.Failing:
-                case APIState.Offline:
-                    connection?.StopAsync();
-                    connection = null;
-                    break;
-
-                case APIState.Online:
-                    Task.Run(Connect);
-                    break;
-            }
-        }
-
-        protected virtual async Task Connect()
-        {
-            if (connection != null)
-                return;
-
-            var builder = new HubConnectionBuilder()
-                .WithUrl(endpoint, options => { options.Headers.Add("Authorization", $"Bearer {api.AccessToken}"); });
-
-            if (RuntimeInfo.SupportsJIT)
-                builder.AddMessagePackProtocol();
-            else
-            {
-                // eventually we will precompile resolvers for messagepack, but this isn't working currently
-                // see https://github.com/neuecc/MessagePack-CSharp/issues/780#issuecomment-768794308.
-                builder.AddNewtonsoftJsonProtocol(options => { options.PayloadSerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore; });
-            }
-
-            connection = builder.Build();
-            // until strong typed client support is added, each method must be manually bound (see https://github.com/dotnet/aspnetcore/issues/15198)
-            connection.On<int, SpectatorState>(nameof(ISpectatorClient.UserBeganPlaying), ((ISpectatorClient)this).UserBeganPlaying);
-            connection.On<int, FrameDataBundle>(nameof(ISpectatorClient.UserSentFrames), ((ISpectatorClient)this).UserSentFrames);
-            connection.On<int, SpectatorState>(nameof(ISpectatorClient.UserFinishedPlaying), ((ISpectatorClient)this).UserFinishedPlaying);
-
-            connection.Closed += async ex =>
-            {
-                isConnected = false;
-                playingUsers.Clear();
-
-                if (ex != null)
+                connector.ConfigureConnection = connection =>
                 {
-                    Logger.Log($"Spectator client lost connection: {ex}", LoggingTarget.Network);
-                    await tryUntilConnected();
-                }
-            };
+                    // until strong typed client support is added, each method must be manually bound
+                    // (see https://github.com/dotnet/aspnetcore/issues/15198)
+                    connection.On<int, SpectatorState>(nameof(ISpectatorClient.UserBeganPlaying), ((ISpectatorClient)this).UserBeganPlaying);
+                    connection.On<int, FrameDataBundle>(nameof(ISpectatorClient.UserSentFrames), ((ISpectatorClient)this).UserSentFrames);
+                    connection.On<int, SpectatorState>(nameof(ISpectatorClient.UserFinishedPlaying), ((ISpectatorClient)this).UserFinishedPlaying);
+                };
 
-            await tryUntilConnected();
-
-            async Task tryUntilConnected()
-            {
-                Logger.Log("Spectator client connecting...", LoggingTarget.Network);
-
-                while (api.State.Value == APIState.Online)
+                isConnected.BindTo(connector.IsConnected);
+                isConnected.BindValueChanged(connected =>
                 {
-                    try
+                    if (connected.NewValue)
                     {
-                        // reconnect on any failure
-                        await connection.StartAsync();
-                        Logger.Log("Spectator client connected!", LoggingTarget.Network);
-
                         // get all the users that were previously being watched
                         int[] users;
 
@@ -170,32 +115,39 @@ namespace osu.Game.Online.Spectator
                             watchingUsers.Clear();
                         }
 
-                        // success
-                        isConnected = true;
-
-                        // resubscribe to watched users
+                        // resubscribe to watched users.
                         foreach (var userId in users)
                             WatchUser(userId);
 
                         // re-send state in case it wasn't received
                         if (isPlaying)
                             beginPlaying();
-
-                        break;
                     }
-                    catch (Exception e)
+                    else
                     {
-                        Logger.Log($"Spectator client connection error: {e}", LoggingTarget.Network);
-                        await Task.Delay(5000);
+                        lock (userLock)
+                        {
+                            playingUsers.Clear();
+                            playingUserStates.Clear();
+                        }
                     }
-                }
+                }, true);
             }
         }
 
         Task ISpectatorClient.UserBeganPlaying(int userId, SpectatorState state)
         {
-            if (!playingUsers.Contains(userId))
-                playingUsers.Add(userId);
+            lock (userLock)
+            {
+                if (!playingUsers.Contains(userId))
+                    playingUsers.Add(userId);
+
+                // UserBeganPlaying() is called by the server regardless of whether the local user is watching the remote user, and is called a further time when the remote user is watched.
+                // This may be a temporary thing (see: https://github.com/ppy/osu-server-spectator/blob/2273778e02cfdb4a9c6a934f2a46a8459cb5d29c/osu.Server.Spectator/Hubs/SpectatorHub.cs#L28-L29).
+                // We don't want the user states to update unless the player is being watched, otherwise calling BindUserBeganPlaying() can lead to double invocations.
+                if (watchingUsers.Contains(userId))
+                    playingUserStates[userId] = state;
+            }
 
             OnUserBeganPlaying?.Invoke(userId, state);
 
@@ -204,7 +156,11 @@ namespace osu.Game.Online.Spectator
 
         Task ISpectatorClient.UserFinishedPlaying(int userId, SpectatorState state)
         {
-            playingUsers.Remove(userId);
+            lock (userLock)
+            {
+                playingUsers.Remove(userId);
+                playingUserStates.Remove(userId);
+            }
 
             OnUserFinishedPlaying?.Invoke(userId, state);
 
@@ -240,14 +196,14 @@ namespace osu.Game.Online.Spectator
         {
             Debug.Assert(isPlaying);
 
-            if (!isConnected) return;
+            if (!isConnected.Value) return;
 
             connection.SendAsync(nameof(ISpectatorServer.BeginPlaySession), currentState);
         }
 
         public void SendFrames(FrameDataBundle data)
         {
-            if (!isConnected) return;
+            if (!isConnected.Value) return;
 
             lastSend = connection.SendAsync(nameof(ISpectatorServer.SendFrameData), data);
         }
@@ -257,7 +213,7 @@ namespace osu.Game.Online.Spectator
             isPlaying = false;
             currentBeatmap = null;
 
-            if (!isConnected) return;
+            if (!isConnected.Value) return;
 
             connection.SendAsync(nameof(ISpectatorServer.EndPlaySession), currentState);
         }
@@ -271,20 +227,20 @@ namespace osu.Game.Online.Spectator
 
                 watchingUsers.Add(userId);
 
-                if (!isConnected)
+                if (!isConnected.Value)
                     return;
             }
 
             connection.SendAsync(nameof(ISpectatorServer.StartWatchingUser), userId);
         }
 
-        public void StopWatchingUser(int userId)
+        public virtual void StopWatchingUser(int userId)
         {
             lock (userLock)
             {
                 watchingUsers.Remove(userId);
 
-                if (!isConnected)
+                if (!isConnected.Value)
                     return;
             }
 
@@ -330,6 +286,38 @@ namespace osu.Game.Online.Spectator
             SendFrames(new FrameDataBundle(currentScore.ScoreInfo, frames));
 
             lastSendTime = Time.Current;
+        }
+
+        /// <summary>
+        /// Attempts to retrieve the <see cref="SpectatorState"/> for a currently-playing user.
+        /// </summary>
+        /// <param name="userId">The user.</param>
+        /// <param name="state">The current <see cref="SpectatorState"/> for the user, if they're playing. <c>null</c> if the user is not playing.</param>
+        /// <returns><c>true</c> if successful (the user is playing), <c>false</c> otherwise.</returns>
+        public bool TryGetPlayingUserState(int userId, out SpectatorState state)
+        {
+            lock (userLock)
+                return playingUserStates.TryGetValue(userId, out state);
+        }
+
+        /// <summary>
+        /// Bind an action to <see cref="OnUserBeganPlaying"/> with the option of running the bound action once immediately.
+        /// </summary>
+        /// <param name="callback">The action to perform when a user begins playing.</param>
+        /// <param name="runOnceImmediately">Whether the action provided in <paramref name="callback"/> should be run once immediately for all users currently playing.</param>
+        public void BindUserBeganPlaying(Action<int, SpectatorState> callback, bool runOnceImmediately = false)
+        {
+            // The lock is taken before the event is subscribed to to prevent doubling of events.
+            lock (userLock)
+            {
+                OnUserBeganPlaying += callback;
+
+                if (!runOnceImmediately)
+                    return;
+
+                foreach (var (userId, state) in playingUserStates)
+                    callback(userId, state);
+            }
         }
     }
 }

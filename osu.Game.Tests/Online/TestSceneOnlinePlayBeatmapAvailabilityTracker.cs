@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Online
         private BeatmapSetInfo testBeatmapSet;
 
         private readonly Bindable<PlaylistItem> selectedItem = new Bindable<PlaylistItem>();
-        private OnlinePlayBeatmapAvailablilityTracker availablilityTracker;
+        private OnlinePlayBeatmapAvailabilityTracker availabilityTracker;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, GameHost host)
@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Online
         {
             beatmaps.AllowImport = new TaskCompletionSource<bool>();
 
-            testBeatmapFile = TestResources.GetTestBeatmapForImport();
+            testBeatmapFile = TestResources.GetQuickTestBeatmapForImport();
 
             testBeatmapInfo = getTestBeatmapInfo(testBeatmapFile);
             testBeatmapSet = testBeatmapInfo.BeatmapSet;
@@ -67,7 +67,7 @@ namespace osu.Game.Tests.Online
                 Ruleset = { Value = testBeatmapInfo.Ruleset },
             };
 
-            Child = availablilityTracker = new OnlinePlayBeatmapAvailablilityTracker
+            Child = availabilityTracker = new OnlinePlayBeatmapAvailabilityTracker
             {
                 SelectedItem = { BindTarget = selectedItem, }
             };
@@ -118,7 +118,7 @@ namespace osu.Game.Tests.Online
             });
             addAvailabilityCheckStep("state still not downloaded", BeatmapAvailability.NotDownloaded);
 
-            AddStep("recreate tracker", () => Child = availablilityTracker = new OnlinePlayBeatmapAvailablilityTracker
+            AddStep("recreate tracker", () => Child = availabilityTracker = new OnlinePlayBeatmapAvailabilityTracker
             {
                 SelectedItem = { BindTarget = selectedItem }
             });
@@ -127,7 +127,7 @@ namespace osu.Game.Tests.Online
 
         private void addAvailabilityCheckStep(string description, Func<BeatmapAvailability> expected)
         {
-            AddAssert(description, () => availablilityTracker.Availability.Value.Equals(expected.Invoke()));
+            AddAssert(description, () => availabilityTracker.Availability.Value.Equals(expected.Invoke()));
         }
 
         private static BeatmapInfo getTestBeatmapInfo(string archiveFile)
@@ -165,10 +165,10 @@ namespace osu.Game.Tests.Online
             {
             }
 
-            public override async Task<BeatmapSetInfo> Import(BeatmapSetInfo item, ArchiveReader archive = null, CancellationToken cancellationToken = default)
+            public override async Task<BeatmapSetInfo> Import(BeatmapSetInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
             {
                 await AllowImport.Task;
-                return await (CurrentImportTask = base.Import(item, archive, cancellationToken));
+                return await (CurrentImportTask = base.Import(item, archive, lowPriority, cancellationToken));
             }
         }
 

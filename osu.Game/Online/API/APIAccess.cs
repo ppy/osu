@@ -25,6 +25,8 @@ namespace osu.Game.Online.API
     {
         private readonly OsuConfigManager config;
 
+        private readonly string versionHash;
+
         private readonly OAuth authentication;
 
         private readonly Queue<APIRequest> queue = new Queue<APIRequest>();
@@ -56,9 +58,10 @@ namespace osu.Game.Online.API
 
         private readonly Logger log;
 
-        public APIAccess(OsuConfigManager config, EndpointConfiguration endpointConfiguration)
+        public APIAccess(OsuConfigManager config, EndpointConfiguration endpointConfiguration, string versionHash)
         {
             this.config = config;
+            this.versionHash = versionHash;
 
             APIEndpointUrl = endpointConfiguration.APIEndpointUrl;
             WebsiteRootUrl = endpointConfiguration.WebsiteRootUrl;
@@ -86,7 +89,7 @@ namespace osu.Game.Online.API
             thread.Start();
         }
 
-        private void onTokenChanged(ValueChangedEvent<OAuthToken> e) => config.Set(OsuSetting.Token, config.Get<bool>(OsuSetting.SavePassword) ? authentication.TokenString : string.Empty);
+        private void onTokenChanged(ValueChangedEvent<OAuthToken> e) => config.SetValue(OsuSetting.Token, config.Get<bool>(OsuSetting.SavePassword) ? authentication.TokenString : string.Empty);
 
         internal new void Schedule(Action action) => base.Schedule(action);
 
@@ -131,7 +134,7 @@ namespace osu.Game.Online.API
                         state.Value = APIState.Connecting;
 
                         // save the username at this point, if the user requested for it to be.
-                        config.Set(OsuSetting.Username, config.Get<bool>(OsuSetting.SaveUsername) ? ProvidedUsername : string.Empty);
+                        config.SetValue(OsuSetting.Username, config.Get<bool>(OsuSetting.SaveUsername) ? ProvidedUsername : string.Empty);
 
                         if (!authentication.HasValidAccessToken && !authentication.AuthenticateWithLogin(ProvidedUsername, password))
                         {
@@ -243,6 +246,9 @@ namespace osu.Game.Online.API
             this.password = password;
         }
 
+        public IHubClientConnector GetHubConnector(string clientName, string endpoint) =>
+            new HubClientConnector(clientName, endpoint, this, versionHash);
+
         public RegistrationRequest.RegistrationRequestErrors CreateAccount(string email, string username, string password)
         {
             Debug.Assert(State.Value == APIState.Offline);
@@ -264,7 +270,7 @@ namespace osu.Game.Online.API
             {
                 try
                 {
-                    return JObject.Parse(req.GetResponseString()).SelectToken("form_error", true).AsNonNull().ToObject<RegistrationRequest.RegistrationRequestErrors>();
+                    return JObject.Parse(req.GetResponseString().AsNonNull()).SelectToken("form_error", true).AsNonNull().ToObject<RegistrationRequest.RegistrationRequestErrors>();
                 }
                 catch
                 {
@@ -368,7 +374,13 @@ namespace osu.Game.Online.API
 
         public void Queue(APIRequest request)
         {
-            lock (queue) queue.Enqueue(request);
+            lock (queue)
+            {
+                if (state.Value == APIState.Offline)
+                    return;
+
+                queue.Enqueue(request);
+            }
         }
 
         private void flushQueue(bool failOldRequests = true)
@@ -389,8 +401,6 @@ namespace osu.Game.Online.API
 
         public void Logout()
         {
-            flushQueue();
-
             password = null;
             authentication.Clear();
 
@@ -402,6 +412,7 @@ namespace osu.Game.Online.API
             });
 
             state.Value = APIState.Offline;
+            flushQueue();
         }
 
         private static User createGuestUser() => new GuestUser();

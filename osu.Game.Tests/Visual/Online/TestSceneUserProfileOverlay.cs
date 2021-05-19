@@ -33,7 +33,8 @@ namespace osu.Game.Tests.Visual.Online
             ProfileOrder = new[] { "me" },
             Statistics = new UserStatistics
             {
-                Ranks = new UserStatistics.UserRanks { Global = 2148, Country = 1 },
+                GlobalRank = 2148,
+                CountryRank = 1,
                 PP = 4567.89m,
                 Level = new UserStatistics.LevelInfo
                 {

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Rulesets;
@@ -42,6 +43,11 @@ namespace osu.Game.Beatmaps
         ISkin Skin { get; }
 
         /// <summary>
+        /// Retrieves the <see cref="Track"/> which this <see cref="WorkingBeatmap"/> has loaded.
+        /// </summary>
+        Track Track { get; }
+
+        /// <summary>
         /// Constructs a playable <see cref="IBeatmap"/> from <see cref="Beatmap"/> using the applicable converters for a specific <see cref="RulesetInfo"/>.
         /// <para>
         /// The returned <see cref="IBeatmap"/> is in a playable state - all <see cref="HitObject"/> and <see cref="BeatmapDifficulty"/> <see cref="Mod"/>s
@@ -67,5 +73,11 @@ namespace osu.Game.Beatmaps
         /// </remarks>
         /// <returns>A fresh track instance, which will also be available via <see cref="Track"/>.</returns>
         Track LoadTrack();
+
+        /// <summary>
+        /// Returns the stream of the file from the given storage path.
+        /// </summary>
+        /// <param name="storagePath">The storage path to the file.</param>
+        Stream GetStream(string storagePath);
     }
 }

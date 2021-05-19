@@ -81,7 +81,7 @@ namespace osu.Game.Screens.Menu
         private readonly List<Button> buttonsTopLevel = new List<Button>();
         private readonly List<Button> buttonsPlay = new List<Button>();
 
-        private SampleChannel sampleBack;
+        private Sample sampleBack;
 
         private readonly LogoTrackingContainer logoTrackingContainer;
 

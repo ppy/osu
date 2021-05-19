@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
@@ -13,16 +12,22 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Online;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
-using osu.Game.Overlays.Mods;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Dialog;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Participants;
+using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Users;
 using osuTK;
@@ -31,7 +36,7 @@ using ParticipantsList = osu.Game.Screens.OnlinePlay.Multiplayer.Participants.Pa
 namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
     [Cached]
-    public class MultiplayerMatchSubScreen : RoomSubScreen
+    public class MultiplayerMatchSubScreen : RoomSubScreen, IHandlePresentBeatmap
     {
         public override string Title { get; }
 
@@ -43,11 +48,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Resolved]
         private OngoingOperationTracker ongoingOperationTracker { get; set; }
 
-        private ModSelectOverlay userModsSelectOverlay;
         private MultiplayerMatchSettingsOverlay settingsOverlay;
-        private Drawable userModsSection;
 
-        private IBindable<bool> isConnected;
+        private readonly IBindable<bool> isConnected = new Bindable<bool>();
 
         [CanBeNull]
         private IDisposable readyClickOperation;
@@ -77,7 +80,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                 RelativeSizeAxes = Axes.Both,
                                 Padding = new MarginPadding
                                 {
-                                    Horizontal = 105,
+                                    Horizontal = HORIZONTAL_OVERFLOW_PADDING + 55,
                                     Vertical = 20
                                 },
                                 Child = new GridContainer
@@ -155,7 +158,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                                             new BeatmapSelectionControl { RelativeSizeAxes = Axes.X }
                                                                         }
                                                                     },
-                                                                    userModsSection = new FillFlowContainer
+                                                                    UserModsSection = new FillFlowContainer
                                                                     {
                                                                         RelativeSizeAxes = Axes.X,
                                                                         AutoSizeAxes = Axes.Y,
@@ -176,7 +179,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                                                         Origin = Anchor.CentreLeft,
                                                                                         Width = 90,
                                                                                         Text = "Select",
-                                                                                        Action = () => userModsSelectOverlay.Show()
+                                                                                        Action = ShowUserModSelect,
                                                                                     },
                                                                                     new ModDisplay
                                                                                     {
@@ -221,7 +224,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                         {
                             new MultiplayerMatchFooter
                             {
-                                OnReadyClick = onReadyClick
+                                OnReadyClick = onReadyClick,
+                                OnSpectateClick = onSpectateClick
                             }
                         }
                     },
@@ -229,18 +233,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     {
                         new Dimension(),
                         new Dimension(GridSizeMode.AutoSize),
-                    }
-                },
-                new Container
-                {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    RelativeSizeAxes = Axes.Both,
-                    Height = 0.5f,
-                    Child = userModsSelectOverlay = new UserModSelectOverlay
-                    {
-                        SelectedMods = { BindTarget = UserMods },
-                        IsValidMod = _ => false
                     }
                 },
                 settingsOverlay = new MultiplayerMatchSettingsOverlay
@@ -268,13 +260,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             base.LoadComplete();
 
-            Playlist.BindCollectionChanged(onPlaylistChanged, true);
+            SelectedItem.BindTo(client.CurrentMatchPlayingItem);
+
             BeatmapAvailability.BindValueChanged(updateBeatmapAvailability, true);
             UserMods.BindValueChanged(onUserModsChanged);
 
             client.LoadRequested += onLoadRequested;
+            client.RoomUpdated += onRoomUpdated;
 
-            isConnected = client.IsConnected.GetBoundCopy();
+            isConnected.BindTo(client.IsConnected);
             isConnected.BindValueChanged(connected =>
             {
                 if (!connected.NewValue)
@@ -282,38 +276,48 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }, true);
         }
 
+        protected override void UpdateMods()
+        {
+            if (SelectedItem.Value == null || client.LocalUser == null)
+                return;
+
+            // update local mods based on room's reported status for the local user (omitting the base call implementation).
+            // this makes the server authoritative, and avoids the local user potentially setting mods that the server is not aware of (ie. if the match was started during the selection being changed).
+            var ruleset = Ruleset.Value.CreateInstance();
+            Mods.Value = client.LocalUser.Mods.Select(m => m.ToMod(ruleset)).Concat(SelectedItem.Value.RequiredMods).ToList();
+        }
+
+        [Resolved(canBeNull: true)]
+        private DialogOverlay dialogOverlay { get; set; }
+
+        private bool exitConfirmed;
+
         public override bool OnBackButton()
         {
-            if (client.Room != null && settingsOverlay.State.Value == Visibility.Visible)
+            if (client.Room == null)
+            {
+                // room has not been created yet; exit immediately.
+                return base.OnBackButton();
+            }
+
+            if (settingsOverlay.State.Value == Visibility.Visible)
             {
                 settingsOverlay.Hide();
                 return true;
             }
 
-            if (userModsSelectOverlay.State.Value == Visibility.Visible)
+            if (!exitConfirmed && dialogOverlay != null)
             {
-                userModsSelectOverlay.Hide();
+                dialogOverlay.Push(new ConfirmDialog("Are you sure you want to leave this multiplayer match?", () =>
+                {
+                    exitConfirmed = true;
+                    this.Exit();
+                }));
+
                 return true;
             }
 
             return base.OnBackButton();
-        }
-
-        private void onPlaylistChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            SelectedItem.Value = Playlist.FirstOrDefault();
-
-            if (SelectedItem.Value?.AllowedMods.Any() != true)
-            {
-                userModsSection.Hide();
-                userModsSelectOverlay.Hide();
-                userModsSelectOverlay.IsValidMod = _ => false;
-            }
-            else
-            {
-                userModsSection.Show();
-                userModsSelectOverlay.IsValidMod = m => SelectedItem.Value.AllowedMods.Any(a => a.GetType() == m.GetType());
-            }
         }
 
         private ModSettingChangeTracker modSettingChangeTracker;
@@ -352,10 +356,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             client.ChangeBeatmapAvailability(availability.NewValue);
 
-            // while this flow is handled server-side, this covers the edge case of the local user being in a ready state and then deleting the current beatmap.
-            if (availability.NewValue != Online.Rooms.BeatmapAvailability.LocallyAvailable()
-                && client.LocalUser?.State == MultiplayerUserState.Ready)
-                client.ChangeState(MultiplayerUserState.Idle);
+            if (availability.NewValue.State != DownloadState.LocallyAvailable)
+            {
+                // while this flow is handled server-side, this covers the edge case of the local user being in a ready state and then deleting the current beatmap.
+                if (client.LocalUser?.State == MultiplayerUserState.Ready)
+                    client.ChangeState(MultiplayerUserState.Idle);
+            }
+            else
+            {
+                if (client.LocalUser?.State == MultiplayerUserState.Spectating && (client.Room?.State == MultiplayerRoomState.WaitingForLoad || client.Room?.State == MultiplayerRoomState.Playing))
+                    onLoadRequested();
+            }
         }
 
         private void onReadyClick()
@@ -363,7 +374,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             Debug.Assert(readyClickOperation == null);
             readyClickOperation = ongoingOperationTracker.BeginOperation();
 
-            if (client.IsHost && client.LocalUser?.State == MultiplayerUserState.Ready)
+            if (client.IsHost && (client.LocalUser?.State == MultiplayerUserState.Ready || client.LocalUser?.State == MultiplayerUserState.Spectating))
             {
                 client.StartMatch()
                       .ContinueWith(t =>
@@ -390,16 +401,60 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }
         }
 
+        private void onSpectateClick()
+        {
+            Debug.Assert(readyClickOperation == null);
+            readyClickOperation = ongoingOperationTracker.BeginOperation();
+
+            client.ToggleSpectate().ContinueWith(t => endOperation());
+
+            void endOperation()
+            {
+                readyClickOperation?.Dispose();
+                readyClickOperation = null;
+            }
+        }
+
+        private void onRoomUpdated()
+        {
+            Scheduler.AddOnce(UpdateMods);
+        }
+
         private void onLoadRequested()
         {
-            Debug.Assert(client.Room != null);
+            if (BeatmapAvailability.Value.State != DownloadState.LocallyAvailable)
+                return;
 
-            int[] userIds = client.CurrentMatchPlayingUserIds.ToArray();
+            // In the case of spectating, IMultiplayerClient.LoadRequested can be fired while the game is still spectating a previous session.
+            // For now, we want to game to switch to the new game so need to request exiting from the play screen.
+            if (!ParentScreen.IsCurrentScreen())
+            {
+                ParentScreen.MakeCurrent();
 
-            StartPlay(() => new MultiplayerPlayer(SelectedItem.Value, userIds));
+                Schedule(onLoadRequested);
+                return;
+            }
+
+            StartPlay();
 
             readyClickOperation?.Dispose();
             readyClickOperation = null;
+        }
+
+        protected override Screen CreateGameplayScreen()
+        {
+            Debug.Assert(client.LocalUser != null);
+
+            int[] userIds = client.CurrentMatchPlayingUserIds.ToArray();
+
+            switch (client.LocalUser.State)
+            {
+                case MultiplayerUserState.Spectating:
+                    return new MultiSpectatorScreen(userIds);
+
+                default:
+                    return new PlayerLoader(() => new MultiplayerPlayer(SelectedItem.Value, userIds));
+            }
         }
 
         protected override void Dispose(bool isDisposing)
@@ -407,13 +462,28 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.Dispose(isDisposing);
 
             if (client != null)
+            {
+                client.RoomUpdated -= onRoomUpdated;
                 client.LoadRequested -= onLoadRequested;
+            }
 
             modSettingChangeTracker?.Dispose();
         }
 
-        private class UserModSelectOverlay : LocalPlayerModSelectOverlay
+        public void PresentBeatmap(WorkingBeatmap beatmap, RulesetInfo ruleset)
         {
+            if (!this.IsCurrentScreen())
+                return;
+
+            if (!client.IsHost)
+            {
+                // todo: should handle this when the request queue is implemented.
+                // if we decide that the presentation should exit the user from the multiplayer game, the PresentBeatmap
+                // flow may need to change to support an "unable to present" return value.
+                return;
+            }
+
+            this.Push(new MultiplayerMatchSongSelect(beatmap, ruleset));
         }
     }
 }

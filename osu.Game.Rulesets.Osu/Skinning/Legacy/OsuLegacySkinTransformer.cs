@@ -97,17 +97,14 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     return null;
 
                 case OsuSkinComponents.HitCircleText:
-                    var font = GetConfig<OsuSkinConfiguration, string>(OsuSkinConfiguration.HitCirclePrefix)?.Value ?? "default";
-                    var overlap = GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.HitCircleOverlap)?.Value ?? -2;
+                    if (!this.HasFont(LegacyFont.HitCircle))
+                        return null;
 
-                    return !this.HasFont(font)
-                        ? null
-                        : new LegacySpriteText(Source, font)
-                        {
-                            // stable applies a blanket 0.8x scale to hitcircle fonts
-                            Scale = new Vector2(0.8f),
-                            Spacing = new Vector2(-overlap, 0)
-                        };
+                    return new LegacySpriteText(LegacyFont.HitCircle)
+                    {
+                        // stable applies a blanket 0.8x scale to hitcircle fonts
+                        Scale = new Vector2(0.8f),
+                    };
 
                 case OsuSkinComponents.SpinnerBody:
                     bool hasBackground = Source.GetTexture("spinner-background") != null;
