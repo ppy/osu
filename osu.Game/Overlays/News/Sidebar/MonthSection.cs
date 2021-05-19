@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.News.Sidebar
     {
         private const int animation_duration = 250;
 
-        public readonly BindableBool IsOpen = new BindableBool();
+        public readonly BindableBool Expanded = new BindableBool();
 
         public MonthSection(int month, int year, IEnumerable<APINewsPost> posts)
         {
@@ -32,6 +32,7 @@ namespace osu.Game.Overlays.News.Sidebar
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Masking = true;
+
             InternalChild = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
@@ -41,11 +42,11 @@ namespace osu.Game.Overlays.News.Sidebar
                 {
                     new DropdownHeader(month, year)
                     {
-                        IsOpen = { BindTarget = IsOpen }
+                        Expanded = { BindTarget = Expanded }
                     },
                     new PostsContainer
                     {
-                        IsOpen = { BindTarget = IsOpen },
+                        Expanded = { BindTarget = Expanded },
                         Children = posts.Select(p => new PostButton(p)).ToArray()
                     }
                 }
@@ -54,7 +55,7 @@ namespace osu.Game.Overlays.News.Sidebar
 
         private class DropdownHeader : OsuClickableContainer
         {
-            public readonly BindableBool IsOpen = new BindableBool();
+            public readonly BindableBool Expanded = new BindableBool();
 
             private readonly SpriteIcon icon;
 
@@ -64,7 +65,7 @@ namespace osu.Game.Overlays.News.Sidebar
 
                 RelativeSizeAxes = Axes.X;
                 Height = 15;
-                Action = IsOpen.Toggle;
+                Action = Expanded.Toggle;
                 Children = new Drawable[]
                 {
                     new OsuSpriteText
@@ -88,7 +89,7 @@ namespace osu.Game.Overlays.News.Sidebar
             {
                 base.LoadComplete();
 
-                IsOpen.BindValueChanged(open =>
+                Expanded.BindValueChanged(open =>
                 {
                     icon.Scale = new Vector2(1, open.NewValue ? -1 : 1);
                 }, true);
@@ -129,7 +130,7 @@ namespace osu.Game.Overlays.News.Sidebar
 
         private class PostsContainer : Container
         {
-            public readonly BindableBool IsOpen = new BindableBool();
+            public readonly BindableBool Expanded = new BindableBool();
 
             protected override Container<Drawable> Content { get; }
 
@@ -153,14 +154,14 @@ namespace osu.Game.Overlays.News.Sidebar
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                IsOpen.BindValueChanged(updateState, true);
+                Expanded.BindValueChanged(updateState, true);
             }
 
-            private void updateState(ValueChangedEvent<bool> isOpen)
+            private void updateState(ValueChangedEvent<bool> expanded)
             {
                 ClearTransforms(true);
 
-                if (isOpen.NewValue)
+                if (expanded.NewValue)
                 {
                     AutoSizeAxes = Axes.Y;
                     Content.FadeIn(animation_duration, Easing.OutQuint);
