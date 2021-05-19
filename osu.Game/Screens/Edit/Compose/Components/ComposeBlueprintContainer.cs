@@ -16,6 +16,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osuTK;
@@ -71,6 +72,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 kvp.Value.BindValueChanged(_ => updatePlacementSamples());
             }
+        }
+
+        protected override void TransferBlueprintFor(HitObject hitObject, DrawableHitObject drawableObject)
+        {
+            base.TransferBlueprintFor(hitObject, drawableObject);
+
+            var blueprint = (HitObjectSelectionBlueprint)GetBlueprintFor(hitObject);
+            blueprint.DrawableObject = drawableObject;
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
