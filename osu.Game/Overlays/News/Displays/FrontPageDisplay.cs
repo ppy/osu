@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -15,6 +16,8 @@ namespace osu.Game.Overlays.News.Displays
 {
     public class FrontPageDisplay : CompositeDrawable
     {
+        public Action<GetNewsResponse> ResponseReceived;
+
         [Resolved]
         private IAPIProvider api { get; set; }
 
@@ -23,6 +26,13 @@ namespace osu.Game.Overlays.News.Displays
 
         private GetNewsRequest request;
         private Cursor lastCursor;
+
+        private readonly int year;
+
+        public FrontPageDisplay(int year = 0)
+        {
+            this.year = year;
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -74,12 +84,14 @@ namespace osu.Game.Overlays.News.Displays
         {
             request?.Cancel();
 
-            request = new GetNewsRequest(cursor: lastCursor);
+            request = new GetNewsRequest(year, lastCursor);
             request.Success += response => Schedule(() => onSuccess(response));
             api.PerformAsync(request);
         }
 
         private CancellationTokenSource cancellationToken;
+
+        private bool initialLoad = true;
 
         private void onSuccess(GetNewsResponse response)
         {
@@ -101,6 +113,12 @@ namespace osu.Game.Overlays.News.Displays
                 content.Add(loaded);
                 showMore.IsLoading = false;
                 showMore.Alpha = lastCursor == null ? 0 : 1;
+
+                if (initialLoad)
+                {
+                    ResponseReceived?.Invoke(response);
+                    initialLoad = false;
+                }
             }, (cancellationToken = new CancellationTokenSource()).Token);
         }
 

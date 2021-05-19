@@ -20,6 +20,7 @@ namespace osu.Game.Overlays
 
         private readonly Container content;
         private readonly Container sidebarContainer;
+        private readonly NewsSidebar sidebar;
 
         public NewsOverlay()
             : base(OverlayColourScheme.Purple, false)
@@ -44,7 +45,7 @@ namespace osu.Game.Overlays
                         sidebarContainer = new Container
                         {
                             AutoSizeAxes = Axes.X,
-                            Child = new NewsSidebar()
+                            Child = sidebar = new NewsSidebar()
                         },
                         content = new Container
                         {
@@ -94,6 +95,12 @@ namespace osu.Game.Overlays
             Show();
         }
 
+        public void ShowYear(int year)
+        {
+            showYear(year);
+            Show();
+        }
+
         public void ShowArticle(string slug)
         {
             article.Value = slug;
@@ -102,6 +109,14 @@ namespace osu.Game.Overlays
 
         private CancellationTokenSource cancellationToken;
 
+        private void showYear(int year)
+        {
+            cancellationToken?.Cancel();
+            Loading.Show();
+
+            loadFrontPage(year);
+        }
+
         private void onArticleChanged(ValueChangedEvent<string> e)
         {
             cancellationToken?.Cancel();
@@ -109,13 +124,33 @@ namespace osu.Game.Overlays
 
             if (e.NewValue == null)
             {
-                Header.SetFrontPage();
-                LoadDisplay(new FrontPageDisplay());
+                loadFrontPage();
                 return;
             }
 
-            Header.SetArticle(e.NewValue);
+            loadArticle(e.NewValue);
+        }
+
+        private void loadFrontPage(int year = 0)
+        {
+            Header.SetFrontPage();
+
+            var page = new FrontPageDisplay(year);
+            page.ResponseReceived += r =>
+            {
+                sidebar.Metadata.Value = r.SidebarMetadata;
+                Loading.Hide();
+            };
+            LoadDisplay(page);
+        }
+
+        private void loadArticle(string article)
+        {
+            Header.SetArticle(article);
+
+            // Temporary, should be handled by ArticleDisplay later
             LoadDisplay(Empty());
+            Loading.Hide();
         }
 
         protected void LoadDisplay(Drawable display)
@@ -124,7 +159,6 @@ namespace osu.Game.Overlays
             LoadComponentAsync(display, loaded =>
             {
                 Child = loaded;
-                Loading.Hide();
             }, (cancellationToken = new CancellationTokenSource()).Token);
         }
 
