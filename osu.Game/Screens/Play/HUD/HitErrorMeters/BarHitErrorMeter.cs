@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                             colourBarsEarly = new Container
                             {
                                 Anchor = Anchor.CentreLeft,
-                                Origin = Anchor.x2,
+                                Origin = Anchor.TopRight,
                                 RelativeSizeAxes = Axes.Both,
                                 Height = 0.5f,
                                 Scale = new Vector2(1, -1),
@@ -93,7 +93,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                             colourBarsLate = new Container
                             {
                                 Anchor = Anchor.CentreLeft,
-                                Origin = Anchor.x2,
+                                Origin = Anchor.TopRight,
                                 RelativeSizeAxes = Axes.Both,
                                 Height = 0.5f,
                             },
