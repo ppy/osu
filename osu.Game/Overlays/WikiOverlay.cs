@@ -62,6 +62,12 @@ namespace osu.Game.Overlays
             });
         }
 
+        public void ShowPage(string pagePath = index_path)
+        {
+            path.Value = pagePath.Trim('/');
+            Show();
+        }
+
         protected override WikiHeader CreateHeader() => new WikiHeader();
 
         protected override void LoadComplete()
