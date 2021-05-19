@@ -12,6 +12,8 @@ namespace osu.Game.Tests.Visual
     [TestFixture]
     public abstract class LegacySkinPlayerTestScene : PlayerTestScene
     {
+        protected LegacySkin LegacySkin { get; private set; }
+
         private ISkinSource legacySkinSource;
 
         protected override TestPlayer CreatePlayer(Ruleset ruleset) => new SkinProvidingPlayer(legacySkinSource);
@@ -19,8 +21,8 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game, SkinManager skins)
         {
-            var legacySkin = new DefaultLegacySkin(new NamespacedResourceStore<byte[]>(game.Resources, "Skins/Legacy"), skins);
-            legacySkinSource = new SkinProvidingContainer(legacySkin);
+            LegacySkin = new DefaultLegacySkin(new NamespacedResourceStore<byte[]>(game.Resources, "Skins/Legacy"), skins);
+            legacySkinSource = new SkinProvidingContainer(LegacySkin);
         }
 
         public class SkinProvidingPlayer : TestPlayer
