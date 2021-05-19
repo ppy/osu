@@ -143,6 +143,7 @@ namespace Mvis.Plugin.CloudMusicSupport
             }
 
             Lyrics.Clear();
+            currentLine = null;
 
             processor.StartFetchLrcFor(currentWorkingBeatmap, noLocalFile, onLyricRequestFinished, onLyricRequestFail);
         }

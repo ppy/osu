@@ -1,22 +1,17 @@
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Screens.Mvis.Misc;
+using osu.Game.Online.Placeholders;
 using osu.Game.Screens.Mvis.Plugins.Config;
 using osu.Game.Screens.Mvis.SideBar;
-using osuTK;
-using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Screens.Mvis.Plugins
 {
     public abstract class PluginSidebarPage : Container, ISidebarContent
     {
-        private readonly Container placeholder;
+        private readonly ClickablePlaceholder placeholder;
         private readonly Container content;
 
         protected override Container<Drawable> Content => content;
@@ -33,6 +28,9 @@ namespace osu.Game.Screens.Mvis.Plugins
         public MvisPlugin Plugin { get; }
         protected IPluginConfigManager Config => Dependencies.Get<MvisPluginManager>().GetConfigManager(Plugin);
 
+        [Resolved]
+        private MvisPluginManager pluginManager { get; set; }
+
         protected PluginSidebarPage(MvisPlugin plugin, float resizeWidth)
         {
             ResizeWidth = resizeWidth;
@@ -47,43 +45,9 @@ namespace osu.Game.Screens.Mvis.Plugins
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0
                 },
-                placeholder = new Container
+                placeholder = new ClickablePlaceholder("请先启用该插件!", FontAwesome.Solid.Plug)
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Depth = float.MinValue,
-                    Children = new Drawable[]
-                    {
-                        new BlockMouseBox
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black.Opacity(0.5f),
-                        },
-                        new FillFlowContainer
-                        {
-                            AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Vertical,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Colour = Color4.White.Opacity(0.6f),
-                            Children = new Drawable[]
-                            {
-                                new SpriteIcon
-                                {
-                                    Icon = FontAwesome.Solid.Ban,
-                                    Size = new Vector2(60),
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                },
-                                new OsuSpriteText
-                                {
-                                    Text = "插件不可用",
-                                    Font = OsuFont.GetFont(size: 45, weight: FontWeight.Bold),
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                }
-                            }
-                        },
-                    }
+                    Action = () => pluginManager?.ActivePlugin(Plugin)
                 }
             };
         }
@@ -102,8 +66,16 @@ namespace osu.Game.Screens.Mvis.Plugins
 
             Plugin.Disabled.BindValueChanged(v =>
             {
-                content.FadeTo(v.NewValue ? 0 : 1);
-                placeholder.FadeTo(v.NewValue ? 1 : 0, 200);
+                if (v.NewValue)
+                {
+                    content.FadeOut();
+                    placeholder.Show();
+                }
+                else
+                {
+                    content.FadeIn(200, Easing.OutQuint);
+                    placeholder.Hide();
+                }
 
                 if (!v.NewValue && !contentInit)
                 {
