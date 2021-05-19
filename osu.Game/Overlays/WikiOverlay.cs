@@ -74,6 +74,7 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
             path.BindValueChanged(onPathChanged);
+            wikiData.BindTo(Header.WikiPageData);
         }
 
         protected override void PopIn()
