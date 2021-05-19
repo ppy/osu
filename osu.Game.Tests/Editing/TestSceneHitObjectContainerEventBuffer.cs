@@ -4,6 +4,7 @@
 using System;
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Testing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
@@ -12,6 +13,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Tests.Editing
 {
+    [HeadlessTest]
     public class TestSceneHitObjectContainerEventBuffer : OsuTestScene
     {
         private readonly TestHitObject testObj = new TestHitObject();

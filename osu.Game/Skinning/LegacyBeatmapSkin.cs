@@ -18,7 +18,7 @@ namespace osu.Game.Skinning
         protected override bool UseCustomSampleBanks => true;
 
         public LegacyBeatmapSkin(BeatmapInfo beatmap, IResourceStore<byte[]> storage, IStorageResourceProvider resources)
-            : base(createSkinInfo(beatmap), new LegacySkinResourceStore<BeatmapSetFileInfo>(beatmap.BeatmapSet, storage), resources, beatmap.Path)
+            : base(BeatmapSkinExtensions.CreateSkinInfo(beatmap), new LegacySkinResourceStore<BeatmapSetFileInfo>(beatmap.BeatmapSet, storage), resources, beatmap.Path)
         {
             // Disallow default colours fallback on beatmap skins to allow using parent skin combo colours. (via SkinProvidingContainer)
             Configuration.AllowDefaultComboColoursFallback = false;
@@ -26,12 +26,18 @@ namespace osu.Game.Skinning
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {
-            if (component is SkinnableTargetComponent targetComponent && targetComponent.Target == SkinnableTarget.MainHUDComponents)
+            if (component is SkinnableTargetComponent targetComponent)
             {
-                // for now, if the beatmap skin doesn't skin the score font, fall back to current skin
-                // instead of potentially returning default lazer skin HUD components from here.
-                if (!this.HasFont(LegacyFont.Score))
-                    return null;
+                switch (targetComponent.Target)
+                {
+                    case SkinnableTarget.MainHUDComponents:
+                        // this should exist in LegacySkin instead, but there isn't a fallback skin for LegacySkins yet.
+                        // therefore keep the check here until fallback default legacy skin is supported.
+                        if (!this.HasFont(LegacyFont.Score))
+                            return null;
+
+                        break;
+                }
             }
 
             return base.GetDrawableComponent(component);
@@ -63,8 +69,5 @@ namespace osu.Game.Skinning
 
             return base.GetSample(sampleInfo);
         }
-
-        private static SkinInfo createSkinInfo(BeatmapInfo beatmap) =>
-            new SkinInfo { Name = beatmap.ToString(), Creator = beatmap.Metadata.Author.ToString() };
     }
 }
