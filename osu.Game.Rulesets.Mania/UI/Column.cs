@@ -116,9 +116,9 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             base.OnNewDrawableHitObject(drawableHitObject);
 
-            drawableHitObject.AccentColour.Value = AccentColour;
-
             DrawableManiaHitObject maniaObject = (DrawableManiaHitObject)drawableHitObject;
+
+            maniaObject.AccentColour.Value = AccentColour;
             maniaObject.CheckHittable = hitPolicy.IsHittable;
         }
 
