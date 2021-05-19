@@ -17,6 +17,7 @@ using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Skinning;
 using osuTK;
 using osu.Game.Rulesets.Mania.Beatmaps;
+using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.UI
@@ -55,7 +56,7 @@ namespace osu.Game.Rulesets.Mania.UI
             RelativeSizeAxes = Axes.Y;
             Width = COLUMN_WIDTH;
 
-            Drawable background = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ColumnBackground, Index), _ => new DefaultColumnBackground())
+            Drawable background = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ColumnBackground), _ => new DefaultColumnBackground())
             {
                 RelativeSizeAxes = Axes.Both
             };
@@ -66,7 +67,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 // For input purposes, the background is added at the highest depth, but is then proxied back below all other elements
                 background.CreateProxy(),
                 HitObjectArea = new ColumnHitObjectArea(Index, HitObjectContainer) { RelativeSizeAxes = Axes.Both },
-                new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.KeyArea, Index), _ => new DefaultKeyArea())
+                new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.KeyArea), _ => new DefaultKeyArea())
                 {
                     RelativeSizeAxes = Axes.Both
                 },
@@ -83,6 +84,19 @@ namespace osu.Game.Rulesets.Mania.UI
             hitPolicy = new OrderedHitPolicy(HitObjectContainer);
 
             TopLevelContainer.Add(HitObjectArea.Explosions.CreateProxy());
+
+            RegisterPool<Note, DrawableNote>(10, 50);
+            RegisterPool<HoldNote, DrawableHoldNote>(10, 50);
+            RegisterPool<HeadNote, DrawableHoldNoteHead>(10, 50);
+            RegisterPool<TailNote, DrawableHoldNoteTail>(10, 50);
+            RegisterPool<HoldNoteTick, DrawableHoldNoteTick>(50, 250);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            NewResult += OnNewResult;
         }
 
         public ColumnType ColumnType { get; set; }
@@ -98,28 +112,14 @@ namespace osu.Game.Rulesets.Mania.UI
             return dependencies;
         }
 
-        /// <summary>
-        /// Adds a DrawableHitObject to this Playfield.
-        /// </summary>
-        /// <param name="hitObject">The DrawableHitObject to add.</param>
-        public override void Add(DrawableHitObject hitObject)
+        protected override void OnNewDrawableHitObject(DrawableHitObject drawableHitObject)
         {
-            hitObject.AccentColour.Value = AccentColour;
-            hitObject.OnNewResult += OnNewResult;
+            base.OnNewDrawableHitObject(drawableHitObject);
 
-            DrawableManiaHitObject maniaObject = (DrawableManiaHitObject)hitObject;
+            DrawableManiaHitObject maniaObject = (DrawableManiaHitObject)drawableHitObject;
+
+            maniaObject.AccentColour.Value = AccentColour;
             maniaObject.CheckHittable = hitPolicy.IsHittable;
-
-            base.Add(hitObject);
-        }
-
-        public override bool Remove(DrawableHitObject h)
-        {
-            if (!base.Remove(h))
-                return false;
-
-            h.OnNewResult -= OnNewResult;
-            return true;
         }
 
         internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
