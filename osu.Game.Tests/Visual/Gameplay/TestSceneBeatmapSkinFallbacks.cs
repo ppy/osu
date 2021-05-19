@@ -46,6 +46,13 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("hud from default legacy skin", () => AssertComponentsFromExpectedSource(SkinnableTarget.MainHUDComponents, skinManager.CurrentSkin.Value));
         }
 
+        [Test]
+        public void TestEmptyLegacyBeatmapSkinFallsBack()
+        {
+            CreateSkinTest(SkinInfo.Default, () => new LegacyBeatmapSkin(new BeatmapInfo(), null, null));
+            AddAssert("hud from default skin", () => AssertComponentsFromExpectedSource(SkinnableTarget.MainHUDComponents, skinManager.CurrentSkin.Value));
+        }
+
         protected void CreateSkinTest(SkinInfo gameCurrentSkin, Func<ISkin> getBeatmapSkin)
         {
             CreateTest(() =>
