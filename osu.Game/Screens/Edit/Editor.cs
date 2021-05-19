@@ -497,7 +497,11 @@ namespace osu.Game.Screens.Edit
             ApplyToBackground(b => b.FadeColour(Color4.White, 500));
             resetTrack();
 
-            Beatmap.Value = beatmapManager.GetWorkingBeatmap(Beatmap.Value.BeatmapInfo);
+            var refetchedBeatmap = beatmapManager.GetWorkingBeatmap(Beatmap.Value.BeatmapInfo);
+
+            // beatmap re-fetch may not be feasible in tests.
+            if (!(refetchedBeatmap is DummyWorkingBeatmap))
+                Beatmap.Value = refetchedBeatmap;
 
             return base.OnExiting(next);
         }
