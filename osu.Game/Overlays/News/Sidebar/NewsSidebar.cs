@@ -95,7 +95,7 @@ namespace osu.Game.Overlays.News.Sidebar
 
                 monthsFlow.Add(new MonthSection(month, year, posts)
                 {
-                    IsOpen = { Value = i == 0 }
+                    Expanded = { Value = i == 0 }
                 });
             }
         }
