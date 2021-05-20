@@ -286,10 +286,11 @@ namespace osu.Game.Beatmaps
         {
             if (beatmapInfo?.ID > 0 && previous != null && previous.BeatmapInfo?.ID == beatmapInfo.ID)
                 return previous;
+
             if (beatmapInfo?.BeatmapSet == null || beatmapInfo == DefaultBeatmap?.BeatmapInfo)
                 return DefaultBeatmap;
 
-            if (beatmapInfo.BeatmapSet.Files == null || beatmapInfo.ID == 0)
+            if (beatmapInfo.BeatmapSet.Files == null)
             {
                 var info = beatmapInfo;
                 beatmapInfo = QueryBeatmap(b => b.ID == info.ID);
