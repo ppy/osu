@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("finish previous gameplay", () =>
             {
                 foreach (var id in playingUserIds)
-                    spectatorClient.EndPlay(id, importedBeatmapId);
+                    spectatorClient.EndPlay(id);
                 playingUserIds.Clear();
             });
         }
@@ -258,11 +258,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
         }
 
-        private void finish(int userId, int? beatmapId = null)
+        private void finish(int userId)
         {
             AddStep("end play", () =>
             {
-                spectatorClient.EndPlay(userId, beatmapId ?? importedBeatmapId);
+                spectatorClient.EndPlay(userId);
                 playingUserIds.Remove(userId);
                 nextFrame.Remove(userId);
             });

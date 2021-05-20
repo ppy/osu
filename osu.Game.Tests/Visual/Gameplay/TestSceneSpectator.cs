@@ -214,7 +214,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void start(int? beatmapId = null) => AddStep("start play", () => testSpectatorClient.StartPlay(streamingUser.Id, beatmapId ?? importedBeatmapId));
 
-        private void finish(int? beatmapId = null) => AddStep("end play", () => testSpectatorClient.EndPlay(streamingUser.Id, beatmapId ?? importedBeatmapId));
+        private void finish() => AddStep("end play", () => testSpectatorClient.EndPlay(streamingUser.Id));
 
         private void checkPaused(bool state) =>
             AddUntilStep($"game is {(state ? "paused" : "playing")}", () => player.ChildrenOfType<DrawableRuleset>().First().IsPaused.Value == state);

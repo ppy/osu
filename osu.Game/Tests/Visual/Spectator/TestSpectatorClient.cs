@@ -3,8 +3,9 @@
 
 #nullable enable
 
-using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -20,33 +21,44 @@ namespace osu.Game.Tests.Visual.Spectator
     {
         public override IBindable<bool> IsConnected { get; } = new Bindable<bool>(true);
 
-        public new BindableList<int> PlayingUsers => (BindableList<int>)base.PlayingUsers;
-        private readonly ConcurrentDictionary<int, byte> watchingUsers = new ConcurrentDictionary<int, byte>();
-
         private readonly Dictionary<int, int> userBeatmapDictionary = new Dictionary<int, int>();
-        private readonly Dictionary<int, bool> userSentStateDictionary = new Dictionary<int, bool>();
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
 
+        /// <summary>
+        /// Starts play for an arbitrary user.
+        /// </summary>
+        /// <param name="userId">The user to start play for.</param>
+        /// <param name="beatmapId">The playing beatmap id.</param>
         public void StartPlay(int userId, int beatmapId)
         {
             userBeatmapDictionary[userId] = beatmapId;
-            sendState(userId, beatmapId);
+            sendPlayingState(userId);
         }
 
-        public void EndPlay(int userId, int beatmapId)
+        /// <summary>
+        /// Ends play for an arbitrary user.
+        /// </summary>
+        /// <param name="userId">The user to end play for.</param>
+        public void EndPlay(int userId)
         {
+            if (!PlayingUsers.Contains(userId))
+                return;
+
             ((ISpectatorClient)this).UserFinishedPlaying(userId, new SpectatorState
             {
-                BeatmapID = beatmapId,
+                BeatmapID = userBeatmapDictionary[userId],
                 RulesetID = 0,
             });
-
-            userBeatmapDictionary.Remove(userId);
-            userSentStateDictionary.Remove(userId);
         }
 
+        /// <summary>
+        /// Sends frames for an arbitrary user.
+        /// </summary>
+        /// <param name="userId">The user to send frames for.</param>
+        /// <param name="index">The frame index.</param>
+        /// <param name="count">The number of frames to send.</param>
         public void SendFrames(int userId, int index, int count)
         {
             var frames = new List<LegacyReplayFrame>();
@@ -60,12 +72,16 @@ namespace osu.Game.Tests.Visual.Spectator
 
             var bundle = new FrameDataBundle(new ScoreInfo { Combo = index + count }, frames);
             ((ISpectatorClient)this).UserSentFrames(userId, bundle);
-
-            if (!userSentStateDictionary[userId])
-                sendState(userId, userBeatmapDictionary[userId]);
         }
 
-        protected override Task BeginPlayingInternal(SpectatorState state) => ((ISpectatorClient)this).UserBeganPlaying(api.LocalUser.Value.Id, state);
+        protected override Task BeginPlayingInternal(SpectatorState state)
+        {
+            // Track the local user's playing beatmap ID.
+            Debug.Assert(state.BeatmapID != null);
+            userBeatmapDictionary[api.LocalUser.Value.Id] = state.BeatmapID.Value;
+
+            return ((ISpectatorClient)this).UserBeganPlaying(api.LocalUser.Value.Id, state);
+        }
 
         protected override Task SendFramesInternal(FrameDataBundle data) => ((ISpectatorClient)this).UserSentFrames(api.LocalUser.Value.Id, data);
 
@@ -74,27 +90,21 @@ namespace osu.Game.Tests.Visual.Spectator
         protected override Task WatchUserInternal(int userId)
         {
             // When newly watching a user, the server sends the playing state immediately.
-            if (watchingUsers.TryAdd(userId, 0) && PlayingUsers.Contains(userId))
-                sendState(userId, userBeatmapDictionary[userId]);
+            if (PlayingUsers.Contains(userId))
+                sendPlayingState(userId);
 
             return Task.CompletedTask;
         }
 
-        protected override Task StopWatchingUserInternal(int userId)
-        {
-            watchingUsers.TryRemove(userId, out _);
-            return Task.CompletedTask;
-        }
+        protected override Task StopWatchingUserInternal(int userId) => Task.CompletedTask;
 
-        private void sendState(int userId, int beatmapId)
+        private void sendPlayingState(int userId)
         {
             ((ISpectatorClient)this).UserBeganPlaying(userId, new SpectatorState
             {
-                BeatmapID = beatmapId,
+                BeatmapID = userBeatmapDictionary[userId],
                 RulesetID = 0,
             });
-
-            userSentStateDictionary[userId] = true;
         }
     }
 }

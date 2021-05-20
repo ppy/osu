@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 foreach (var (userId, clock) in clocks)
                 {
-                    spectatorClient.EndPlay(userId, 0);
+                    spectatorClient.EndPlay(userId);
                     clock.CurrentTime = 0;
                 }
             });

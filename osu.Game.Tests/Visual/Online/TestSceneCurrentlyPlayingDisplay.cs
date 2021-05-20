@@ -19,6 +19,8 @@ namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneCurrentlyPlayingDisplay : OsuTestScene
     {
+        private readonly User streamingUser = new User { Id = 2, Username = "Test user" };
+
         [Cached(typeof(SpectatorClient))]
         private TestSpectatorClient testSpectatorClient = new TestSpectatorClient();
 
@@ -55,15 +57,15 @@ namespace osu.Game.Tests.Visual.Online
                 };
             });
 
-            AddStep("Reset players", () => testSpectatorClient.PlayingUsers.Clear());
+            AddStep("Reset players", () => testSpectatorClient.EndPlay(streamingUser.Id));
         }
 
         [Test]
         public void TestBasicDisplay()
         {
-            AddStep("Add playing user", () => testSpectatorClient.PlayingUsers.Add(2));
+            AddStep("Add playing user", () => testSpectatorClient.StartPlay(streamingUser.Id, 0));
             AddUntilStep("Panel loaded", () => currentlyPlaying.ChildrenOfType<UserGridPanel>()?.FirstOrDefault()?.User.Id == 2);
-            AddStep("Remove playing user", () => testSpectatorClient.PlayingUsers.Remove(2));
+            AddStep("Remove playing user", () => testSpectatorClient.EndPlay(streamingUser.Id));
             AddUntilStep("Panel no longer present", () => !currentlyPlaying.ChildrenOfType<UserGridPanel>().Any());
         }
 
