@@ -46,11 +46,11 @@ namespace osu.Game.Tests.Gameplay
                 addProxy(new TestDrawableHitObject(5000));
             });
 
-            AddStep($"time = 1000", () => clock.CurrentTime = 1000);
+            AddStep("time = 1000", () => clock.CurrentTime = 1000);
             AddAssert("One proxy is alive", () => proxyContainer.AliveChildren.Count == 1);
-            AddStep($"time = 5000", () => clock.CurrentTime = 5000);
+            AddStep("time = 5000", () => clock.CurrentTime = 5000);
             AddAssert("One proxy is alive", () => proxyContainer.AliveChildren.Count == 1);
-            AddStep($"time = 6000", () => clock.CurrentTime = 6000);
+            AddStep("time = 6000", () => clock.CurrentTime = 6000);
             AddAssert("No proxy is alive", () => proxyContainer.AliveChildren.Count == 0);
         }
 
