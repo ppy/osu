@@ -7,7 +7,9 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Lists;
+using osu.Framework.Logging;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Framework.Utils;
@@ -60,24 +62,41 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected bool AssertComponentsFromExpectedSource(SkinnableTarget target, ISkin expectedSource)
         {
+            var actualComponentsContainer = Player.ChildrenOfType<SkinnableTargetContainer>().First(s => s.Target == target)
+                                                  .ChildrenOfType<SkinnableTargetComponentsContainer>().SingleOrDefault();
+
+            if (actualComponentsContainer == null)
+                return false;
+
+            var actualInfo = actualComponentsContainer.CreateSkinnableInfo();
+
             var expectedComponentsContainer = (SkinnableTargetComponentsContainer)expectedSource.GetDrawableComponent(new SkinnableTargetComponent(target));
+            if (expectedComponentsContainer == null)
+                return false;
 
-            Add(expectedComponentsContainer);
-            expectedComponentsContainer?.UpdateSubTree();
+            var expectedComponentsAdjustmentContainer = new Container
+            {
+                Position = actualComponentsContainer.Parent.ToSpaceOfOtherDrawable(actualComponentsContainer.DrawPosition, Content),
+                Size = actualComponentsContainer.DrawSize,
+                Child = expectedComponentsContainer,
+            };
+
+            Add(expectedComponentsAdjustmentContainer);
+            expectedComponentsAdjustmentContainer?.UpdateSubTree();
             var expectedInfo = expectedComponentsContainer?.CreateSkinnableInfo();
-            Remove(expectedComponentsContainer);
+            Remove(expectedComponentsAdjustmentContainer);
 
-            var actualInfo = Player.ChildrenOfType<SkinnableTargetContainer>().First(s => s.Target == target)
-                                   .ChildrenOfType<SkinnableTargetComponentsContainer>().Single().CreateSkinnableInfo();
+            return almostEqual(actualInfo, expectedInfo);
 
-            return almostEqual(actualInfo, expectedInfo, 2f);
-
-            static bool almostEqual(SkinnableInfo info, SkinnableInfo other, float positionTolerance) =>
+            static bool almostEqual(SkinnableInfo info, SkinnableInfo other) =>
                 other != null
+                && info.Type == other.Type
                 && info.Anchor == other.Anchor
                 && info.Origin == other.Origin
-                && Precision.AlmostEquals(info.Position, other.Position, positionTolerance)
-                && info.Children.SequenceEqual(other.Children, new FuncEqualityComparer<SkinnableInfo>((s1, s2) => almostEqual(s1, s2, positionTolerance)));
+                && Precision.AlmostEquals(info.Position, other.Position)
+                && Precision.AlmostEquals(info.Scale, other.Scale)
+                && Precision.AlmostEquals(info.Rotation, other.Rotation)
+                && info.Children.SequenceEqual(other.Children, new FuncEqualityComparer<SkinnableInfo>(almostEqual));
         }
 
         protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
