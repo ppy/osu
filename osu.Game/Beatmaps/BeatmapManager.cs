@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -245,8 +244,6 @@ namespace osu.Game.Beatmaps
         {
             var setInfo = info.BeatmapSet;
 
-            Debug.Assert(setInfo.Files != null);
-
             using (var stream = new MemoryStream())
             {
                 using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
@@ -287,20 +284,21 @@ namespace osu.Game.Beatmaps
         /// <returns>A <see cref="WorkingBeatmap"/> instance correlating to the provided <see cref="BeatmapInfo"/>.</returns>
         public virtual WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo, WorkingBeatmap previous = null)
         {
-            if (beatmapInfo?.ID > 0 && previous != null && previous.BeatmapInfo?.ID == beatmapInfo.ID)
-                return previous;
-
-            if (beatmapInfo?.BeatmapSet == null || beatmapInfo == DefaultBeatmap?.BeatmapInfo)
+            if (beatmapInfo?.BeatmapSet == null)
                 return DefaultBeatmap;
 
-            if (beatmapInfo.BeatmapSet.Files == null)
+            if (beatmapInfo == DefaultBeatmap?.BeatmapInfo)
+                return DefaultBeatmap;
+
+            // if there are no files, presume the full beatmap info has not yet been fetched from the database.
+            if (beatmapInfo.BeatmapSet.Files.Count == 0)
             {
-                var info = beatmapInfo;
-                beatmapInfo = QueryBeatmap(b => b.ID == info.ID);
+                int lookupId = beatmapInfo.ID;
+                beatmapInfo = QueryBeatmap(b => b.ID == lookupId);
             }
 
-            if (beatmapInfo == null)
-                return DefaultBeatmap;
+            if (beatmapInfo.ID > 0 && previous != null && previous.BeatmapInfo?.ID == beatmapInfo.ID)
+                return previous;
 
             lock (workingCache)
             {
