@@ -240,7 +240,7 @@ namespace osu.Game
 
             dependencies.CacheAs(API ??= new APIAccess(LocalConfig, endpoints, VersionHash));
 
-            dependencies.CacheAs(spectatorClient = new SpectatorClient(endpoints));
+            dependencies.CacheAs(spectatorClient = new OnlineSpectatorClient(endpoints));
             dependencies.CacheAs(multiplayerClient = new MultiplayerClient(endpoints));
 
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
