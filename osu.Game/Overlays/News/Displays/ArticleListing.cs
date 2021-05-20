@@ -14,7 +14,10 @@ using osuTK;
 
 namespace osu.Game.Overlays.News.Displays
 {
-    public class FrontPageDisplay : CompositeDrawable
+    /// <summary>
+    /// Lists articles in a vertical flow for a specified year.
+    /// </summary>
+    public class ArticleListing : CompositeDrawable
     {
         public Action<GetNewsResponse> ResponseReceived;
 
@@ -27,9 +30,13 @@ namespace osu.Game.Overlays.News.Displays
         private GetNewsRequest request;
         private Cursor lastCursor;
 
-        private readonly int year;
+        private readonly int? year;
 
-        public FrontPageDisplay(int year = 0)
+        /// <summary>
+        /// Instantiate a listing for the specified year.
+        /// </summary>
+        /// <param name="year">The year to load articles from. If null, will show the most recent articles.</param>
+        public ArticleListing(int? year = null)
         {
             this.year = year;
         }
