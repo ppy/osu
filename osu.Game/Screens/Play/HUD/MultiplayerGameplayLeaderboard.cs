@@ -55,8 +55,6 @@ namespace osu.Game.Screens.Play.HUD
 
             foreach (var userId in playingUsers)
             {
-                spectatorClient.WatchUser(userId);
-
                 // probably won't be required in the final implementation.
                 var resolvedUser = userLookupCache.GetUserAsync(userId).Result;
 
@@ -80,6 +78,8 @@ namespace osu.Game.Screens.Play.HUD
             // BindableList handles binding in a really bad way (Clear then AddRange) so we need to do this manually..
             foreach (int userId in playingUsers)
             {
+                spectatorClient.WatchUser(userId);
+
                 if (!multiplayerClient.CurrentMatchPlayingUserIds.Contains(userId))
                     usersChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, new[] { userId }));
             }
