@@ -31,7 +31,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         private SpectatorClient spectatorClient { get; set; }
 
         [Resolved]
-        private StatefulMultiplayerClient multiplayerClient { get; set; }
+        private MultiplayerClient multiplayerClient { get; set; }
 
         private readonly PlayerArea[] instances;
         private MasterGameplayClockContainer masterClockContainer;
