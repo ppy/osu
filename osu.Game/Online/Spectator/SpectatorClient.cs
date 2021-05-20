@@ -182,10 +182,14 @@ namespace osu.Game.Online.Spectator
 
         public void StopWatchingUser(int userId)
         {
-            watchingUsers.Remove(userId);
-            playingUserStates.Remove(userId);
-
-            StopWatchingUserInternal(userId);
+            // This method is most commonly called via Dispose(), which is asynchronous.
+            // Todo: This should not be a thing, but requires framework changes.
+            Schedule(() =>
+            {
+                watchingUsers.Remove(userId);
+                playingUserStates.Remove(userId);
+                StopWatchingUserInternal(userId);
+            });
         }
 
         protected abstract Task BeginPlayingInternal(SpectatorState state);
