@@ -183,6 +183,7 @@ namespace osu.Game.Online.Spectator
         public void StopWatchingUser(int userId)
         {
             watchingUsers.Remove(userId);
+            playingUserStates.Remove(userId);
 
             StopWatchingUserInternal(userId);
         }
