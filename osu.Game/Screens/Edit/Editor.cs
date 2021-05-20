@@ -497,9 +497,11 @@ namespace osu.Game.Screens.Edit
             ApplyToBackground(b => b.FadeColour(Color4.White, 500));
             resetTrack();
 
+            // To update the game-wide beatmap with any changes, perform a re-fetch on exit.
+            // This is required as the editor makes its local changes via EditorBeatmap
+            // (which are not propagated outwards to a potentially cached WorkingBeatmap).
             var refetchedBeatmap = beatmapManager.GetWorkingBeatmap(Beatmap.Value.BeatmapInfo);
 
-            // beatmap re-fetch may not be feasible in tests.
             if (!(refetchedBeatmap is DummyWorkingBeatmap))
                 Beatmap.Value = refetchedBeatmap;
 
