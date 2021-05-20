@@ -5,6 +5,9 @@ using System;
 
 namespace osu.Game.Graphics.UserInterface
 {
+    /// <summary>
+    /// A ternary state menu item which will always set the item to <c>true</c> on click, even if already <c>true</c>.
+    /// </summary>
     public class TernaryStateRadioMenuItem : TernaryStateMenuItem
     {
         /// <summary>
