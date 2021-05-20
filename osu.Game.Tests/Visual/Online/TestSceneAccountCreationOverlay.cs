@@ -40,8 +40,6 @@ namespace osu.Game.Tests.Visual.Online
         [BackgroundDependencyLoader]
         private void load()
         {
-            API.Logout();
-
             localUser = API.LocalUser.GetBoundCopy();
             localUser.BindValueChanged(user => { userPanelArea.Child = new UserGridPanel(user.NewValue) { Width = 200 }; }, true);
         }
@@ -50,13 +48,13 @@ namespace osu.Game.Tests.Visual.Online
         public void TestOverlayVisibility()
         {
             AddStep("start hidden", () => accountCreation.Hide());
-            AddStep("log out", API.Logout);
+            AddStep("log out", () => API.Logout());
 
             AddStep("show manually", () => accountCreation.Show());
             AddUntilStep("overlay is visible", () => accountCreation.State.Value == Visibility.Visible);
 
             AddStep("click button", () => accountCreation.ChildrenOfType<SettingsButton>().Single().Click());
-            AddUntilStep("warning screen is present", () => accountCreation.ChildrenOfType<ScreenWarning>().Single().IsPresent);
+            AddUntilStep("warning screen is present", () => accountCreation.ChildrenOfType<ScreenWarning>().SingleOrDefault()?.IsPresent == true);
 
             AddStep("log back in", () => API.Login("dummy", "password"));
             AddUntilStep("overlay is hidden", () => accountCreation.State.Value == Visibility.Hidden);
