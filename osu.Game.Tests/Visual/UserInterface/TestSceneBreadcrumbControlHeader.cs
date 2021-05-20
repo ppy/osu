@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             foreach (var item in items.Reverse().SkipLast(3))
                 AddStep($"Remove {item} item", () => header.RemoveItem(item));
 
-            AddStep($"Clear item", () => header.ClearItem());
+            AddStep("Clear item", () => header.ClearItem());
 
             foreach (var item in items)
                 AddStep($"Add {item} item", () => header.AddItem(item));
