@@ -75,7 +75,11 @@ namespace osu.Game.Overlays
             Show();
         }
 
-        protected override WikiHeader CreateHeader() => new WikiHeader();
+        protected override WikiHeader CreateHeader() => new WikiHeader
+        {
+            ShowIndexPage = () => ShowPage(),
+            ShowParentPage = showParentPage,
+        };
 
         protected override void LoadComplete()
         {
