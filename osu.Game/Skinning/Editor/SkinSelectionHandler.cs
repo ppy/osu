@@ -18,16 +18,42 @@ namespace osu.Game.Skinning.Editor
 {
     public class SkinSelectionHandler : SelectionHandler<ISkinnableDrawable>
     {
+        private Vector2? referenceOrigin;
+
         [Resolved]
         private SkinEditor skinEditor { get; set; }
 
+        protected override void OnOperationEnded()
+        {
+            base.OnOperationEnded();
+            referenceOrigin = null;
+        }
+
         public override bool HandleRotation(float angle)
         {
-            // TODO: this doesn't correctly account for origin/anchor specs being different in a multi-selection.
-            foreach (var c in SelectedBlueprints)
-                ((Drawable)c.Item).Rotation += angle;
+            if (SelectedBlueprints.Count == 1)
+            {
+                // for single items, rotate around the origin rather than the selection centre.
+                ((Drawable)SelectedBlueprints.First().Item).Rotation += angle;
+            }
+            else
+            {
+                var selectionQuad = GetSurroundingQuad(SelectedBlueprints.SelectMany(b =>
+                    b.Item.ScreenSpaceDrawQuad.GetVertices().ToArray()));
 
-            return base.HandleRotation(angle);
+                referenceOrigin ??= selectionQuad.Centre;
+
+                foreach (var b in SelectedBlueprints)
+                {
+                    var drawableItem = (Drawable)b.Item;
+
+                    drawableItem.Position = drawableItem.Parent.ToLocalSpace(RotatePointAroundOrigin(b.ScreenSpaceSelectionPoint, referenceOrigin.Value, angle)) - drawableItem.AnchorPosition;
+                    drawableItem.Rotation += angle;
+                }
+            }
+
+            // this isn't always the case but let's be lenient for now.
+            return true;
         }
 
         public override bool HandleScale(Vector2 scale, Anchor anchor)

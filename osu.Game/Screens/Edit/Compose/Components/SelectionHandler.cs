@@ -14,6 +14,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
@@ -352,6 +353,29 @@ namespace osu.Game.Screens.Edit.Compose.Components
         #endregion
 
         #region Helper Methods
+
+        /// <summary>
+        /// Rotate a point around an arbitrary origin.
+        /// </summary>
+        /// <param name="point">The point.</param>
+        /// <param name="origin">The centre origin to rotate around.</param>
+        /// <param name="angle">The angle to rotate (in degrees).</param>
+        protected static Vector2 RotatePointAroundOrigin(Vector2 point, Vector2 origin, float angle)
+        {
+            angle = -angle;
+
+            point.X -= origin.X;
+            point.Y -= origin.Y;
+
+            Vector2 ret;
+            ret.X = point.X * MathF.Cos(MathUtils.DegreesToRadians(angle)) + point.Y * MathF.Sin(MathUtils.DegreesToRadians(angle));
+            ret.Y = point.X * -MathF.Sin(MathUtils.DegreesToRadians(angle)) + point.Y * MathF.Cos(MathUtils.DegreesToRadians(angle));
+
+            ret.X += origin.X;
+            ret.Y += origin.Y;
+
+            return ret;
+        }
 
         /// <summary>
         /// Given a flip direction, a surrounding quad for all selected objects, and a position,
