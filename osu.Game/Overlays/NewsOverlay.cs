@@ -132,7 +132,7 @@ namespace osu.Game.Overlays
 
             Header.SetFrontPage();
 
-            var page = new FrontPageDisplay(year);
+            var page = new ArticleListing(year);
             page.ResponseReceived += r =>
             {
                 sidebar.Metadata.Value = r.SidebarMetadata;
