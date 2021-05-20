@@ -125,7 +125,7 @@ namespace osu.Game.Skinning.Editor
 
         public override bool HandleFlip(Direction direction)
         {
-            var selectionQuad = GetSurroundingQuad(SelectedBlueprints.Select(b => b.ScreenSpaceSelectionPoint));
+            var selectionQuad = getSelectionQuad();
 
             foreach (var b in SelectedBlueprints)
             {
