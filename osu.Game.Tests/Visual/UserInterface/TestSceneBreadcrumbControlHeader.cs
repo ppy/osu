@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             foreach (var item in items.Reverse().SkipLast(3))
                 AddStep($"Remove {item} item", () => header.RemoveItem(item));
 
-            AddStep("Clear item", () => header.ClearItem());
+            AddStep("Clear items", () => header.ClearItems());
 
             foreach (var item in items)
                 AddStep($"Add {item} item", () => header.AddItem(item));
@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Current.Value = TabControl.Items.LastOrDefault();
             }
 
-            public void ClearItem()
+            public void ClearItems()
             {
                 TabControl.Clear();
                 Current.Value = null;
