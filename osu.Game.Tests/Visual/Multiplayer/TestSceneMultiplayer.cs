@@ -195,7 +195,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private class TestMultiplayer : Screens.OnlinePlay.Multiplayer.Multiplayer
         {
-            [Cached(typeof(StatefulMultiplayerClient))]
+            [Cached(typeof(MultiplayerClient))]
             public readonly TestMultiplayerClient Client;
 
             public TestMultiplayer()
