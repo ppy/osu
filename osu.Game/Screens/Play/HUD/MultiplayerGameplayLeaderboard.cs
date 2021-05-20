@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Play.HUD
         protected readonly Dictionary<int, TrackedUserData> UserScores = new Dictionary<int, TrackedUserData>();
 
         [Resolved]
-        private SpectatorStreamingClient streamingClient { get; set; }
+        private SpectatorClient spectatorClient { get; set; }
 
         [Resolved]
         private MultiplayerClient multiplayerClient { get; set; }
@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Play.HUD
 
             foreach (var userId in playingUsers)
             {
-                streamingClient.WatchUser(userId);
+                spectatorClient.WatchUser(userId);
 
                 // probably won't be required in the final implementation.
                 var resolvedUser = userLookupCache.GetUserAsync(userId).Result;
@@ -88,7 +88,7 @@ namespace osu.Game.Screens.Play.HUD
             playingUsers.BindCollectionChanged(usersChanged);
 
             // this leaderboard should be guaranteed to be completely loaded before the gameplay starts (is a prerequisite in MultiplayerPlayer).
-            streamingClient.OnNewFrames += handleIncomingFrames;
+            spectatorClient.OnNewFrames += handleIncomingFrames;
         }
 
         private void usersChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -98,7 +98,7 @@ namespace osu.Game.Screens.Play.HUD
                 case NotifyCollectionChangedAction.Remove:
                     foreach (var userId in e.OldItems.OfType<int>())
                     {
-                        streamingClient.StopWatchingUser(userId);
+                        spectatorClient.StopWatchingUser(userId);
 
                         if (UserScores.TryGetValue(userId, out var trackedData))
                             trackedData.MarkUserQuit();
@@ -123,14 +123,14 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.Dispose(isDisposing);
 
-            if (streamingClient != null)
+            if (spectatorClient != null)
             {
                 foreach (var user in playingUsers)
                 {
-                    streamingClient.StopWatchingUser(user);
+                    spectatorClient.StopWatchingUser(user);
                 }
 
-                streamingClient.OnNewFrames -= handleIncomingFrames;
+                spectatorClient.OnNewFrames -= handleIncomingFrames;
             }
         }
 

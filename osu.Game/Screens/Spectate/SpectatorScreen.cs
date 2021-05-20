@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Spectate
         private RulesetStore rulesets { get; set; }
 
         [Resolved]
-        private SpectatorStreamingClient spectatorClient { get; set; }
+        private SpectatorClient spectatorClient { get; set; }
 
         [Resolved]
         private UserLookupCache userLookupCache { get; set; }
