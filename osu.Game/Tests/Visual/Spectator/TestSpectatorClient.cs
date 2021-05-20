@@ -12,7 +12,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Tests.Visual.Spectator
 {
-    public class TestSpectatorStreamingClient : SpectatorStreamingClient
+    public class TestSpectatorClient : SpectatorClient
     {
         public new BindableList<int> PlayingUsers => (BindableList<int>)base.PlayingUsers;
         private readonly ConcurrentDictionary<int, byte> watchingUsers = new ConcurrentDictionary<int, byte>();
@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual.Spectator
         private readonly Dictionary<int, int> userBeatmapDictionary = new Dictionary<int, int>();
         private readonly Dictionary<int, bool> userSentStateDictionary = new Dictionary<int, bool>();
 
-        public TestSpectatorStreamingClient()
+        public TestSpectatorClient()
             : base(new DevelopmentEndpointConfiguration())
         {
         }

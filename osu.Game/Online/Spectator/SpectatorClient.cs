@@ -23,7 +23,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Online.Spectator
 {
-    public class SpectatorStreamingClient : Component, ISpectatorClient
+    public class SpectatorClient : Component, ISpectatorClient
     {
         /// <summary>
         /// The maximum milliseconds between frame bundle sends.
@@ -80,7 +80,7 @@ namespace osu.Game.Online.Spectator
         /// </summary>
         public event Action<int, SpectatorState> OnUserFinishedPlaying;
 
-        public SpectatorStreamingClient(EndpointConfiguration endpoints)
+        public SpectatorClient(EndpointConfiguration endpoints)
         {
             endpoint = endpoints.SpectatorEndpointUrl;
         }
@@ -88,7 +88,7 @@ namespace osu.Game.Online.Spectator
         [BackgroundDependencyLoader]
         private void load(IAPIProvider api)
         {
-            connector = api.GetHubConnector(nameof(SpectatorStreamingClient), endpoint);
+            connector = api.GetHubConnector(nameof(SpectatorClient), endpoint);
 
             if (connector != null)
             {
