@@ -25,8 +25,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double snapStrainMultiplier = 8.625;
         private double flowStrainMultiplier = 18.5;
-        private double hybridStrainMultiplier = 9.5;
-        private double sliderStrainMultiplier = 40;
+        private double hybridStrainMultiplier = 25;
+        private double sliderStrainMultiplier = 100;
         private double totalStrainMultiplier = .1075;
 
         private int curr = 0;
@@ -115,7 +115,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double sliderStrainAt(OsuDifficultyHitObject osuPrevObj, OsuDifficultyHitObject osuCurrObj, OsuDifficultyHitObject osuNextObj)
         {
-            double strain = (Math.Sqrt(osuCurrObj.JumpDistance * osuCurrObj.TravelDistance) + osuCurrObj.TravelDistance) / osuCurrObj.StrainTime;
+            double strain = (osuPrevObj.TravelDistance) / osuPrevObj.StrainTime;
 
             return strain;
         }
@@ -166,10 +166,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
 
                 currStrain *= computeDecay(.75, Math.Max(50, osuCurrObj.StrainTime));// - osuCurrObj.TravelTime));
-                currStrain += snapStrain * snapStrainMultiplier;// * Math.Sqrt(1 + tapSkill.TapStrain / 400);
+                currStrain += 0;//snapStrain * snapStrainMultiplier;// * Math.Sqrt(1 + tapSkill.TapStrain / 400);
                 currStrain += flowStrain * flowStrainMultiplier;// * Math.Sqrt(1 + tapSkill.TapStrain / 150);
-                currStrain += hybridStrain * hybridStrainMultiplier;
+                currStrain += Math.Max(snapStrain * snapStrainMultiplier, hybridStrain * hybridStrainMultiplier);
                 currStrain += sliderStrain * sliderStrainMultiplier;
+
+                // currStrain += Math.Max(snapStrain, hybridStrain) + slider
 
 
                 // Console.WriteLine("C: " + curr);

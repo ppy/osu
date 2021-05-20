@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private int decayExcessThreshold = 500;
 
         private double currentStrain;
-        private double strainMultiplier = 2.275;//3125;
+        private double strainMultiplier = 2.325;//3125;
 
         private double hitWindowGreat;
 
@@ -63,9 +63,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (Previous.Count < 8)
                 return 0;
 
-            for (int i = 4; i < Previous.Count; i++)
+            for (int i = 0; i < Previous.Count; i++)
             {
-                if (i - 4 < averageLength)
+                if (i < averageLength)
                     sumDeltaTime += ((OsuDifficultyHitObject)Previous[i]).StrainTime;
             }
 
@@ -78,20 +78,42 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double specialTransitionCount = 0;
 
             bool firstDeltaSwitch = false;
-            bool lastCountedSwitch = false;
 
             for (int i = 1; i < Previous.Count; i++)
             {
+                double prevDelta = ((OsuDifficultyHitObject)Previous[i - 1]).StrainTime;
+                double currDelta = ((OsuDifficultyHitObject)Previous[i]).StrainTime;
+
+                if (Utils.IsRatioEqual(1.5, prevDelta, currDelta) || Utils.IsRatioEqual(1.5, currDelta, prevDelta))
+                {
+                    if (Previous[i - 1].BaseObject is Slider || Previous[i].BaseObject is Slider)
+                        specialTransitionCount += 50.0 / Math.Sqrt(prevDelta * currDelta);
+                    else
+                        specialTransitionCount += 200.0 / Math.Sqrt(prevDelta * currDelta);
+                }
+
                 if (firstDeltaSwitch)
                 {
-                    if (Utils.IsRatioEqual(1.0, ((OsuDifficultyHitObject)Previous[i - 1]).StrainTime, ((OsuDifficultyHitObject)Previous[i]).StrainTime))
+                    if (Utils.IsRatioEqual(1.0, prevDelta, currDelta))
                     {
-                        islandSize++;
+                        islandSize++; // island is still progressing, count size.
                     }
-                    else if (lastCountedSwitch)
-                        lastCountedSwitch = false;
-                    else if (Utils.IsRatioEqual(1.5, ((OsuDifficultyHitObject)Previous[i - 1]).StrainTime, ((OsuDifficultyHitObject)Previous[i]).StrainTime)
-                              || Utils.IsRatioEqual(1.5, ((OsuDifficultyHitObject)Previous[i - 1]).StrainTime, ((OsuDifficultyHitObject)Previous[i]).StrainTime))
+                    else if (prevDelta > currDelta * 1.25) // we're speeding up
+                    {
+                        if (islandSize > 6)
+                        {
+                            islandTimes[6] = islandTimes[6] + 100.0 / Math.Sqrt(prevDelta * currDelta);
+                            islandSizes[6] = islandSizes[6] + 1;
+                        }
+                        else
+                        {
+                            islandTimes[islandSize] = islandTimes[islandSize] + 100.0 / Math.Sqrt(prevDelta * currDelta);
+                            islandSizes[islandSize] = islandSizes[islandSize] + 1;
+                        }
+
+                        islandSize = 0; // reset and count again, we sped up (usually this could only be if we did a 1/2 -> 1/3 -> 1/4) (or 1/1 -> 1/2 -> 1/4)
+                    }
+                    else // we're not the same or speeding up, must be slowing down.
                     {
                         if (islandSize > 6)
                         {
@@ -103,32 +125,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                             islandTimes[islandSize] = islandTimes[islandSize] + 100.0 / Math.Sqrt(((OsuDifficultyHitObject)Previous[i]).StrainTime * ((OsuDifficultyHitObject)Previous[i - 1]).StrainTime);
                             islandSizes[islandSize] = islandSizes[islandSize] + 1;
                         }
-                        islandSize = 0;
-                        lastCountedSwitch = true;
-                        if (Previous[i - 1].BaseObject is Slider || Previous[i].BaseObject is Slider)
-                            specialTransitionCount += 100.0 / ((OsuDifficultyHitObject)Previous[i]).StrainTime;
-                        else
-                            specialTransitionCount += 200.0 / ((OsuDifficultyHitObject)Previous[i]).StrainTime;
-                        specialTransitionCount++;
-                    }
-                    else
-                    {
-                        if (islandSize > 6)
-                        {
-                            islandTimes[6] = islandTimes[6] + 100.0 / Math.Sqrt(((OsuDifficultyHitObject)Previous[i]).StrainTime * ((OsuDifficultyHitObject)Previous[i - 1]).StrainTime);
-                            islandSizes[6] = islandSizes[6] + 1;
-                        }
-                        else
-                        {
-                            islandTimes[islandSize] = islandTimes[islandSize] + 100.0 / Math.Sqrt(((OsuDifficultyHitObject)Previous[i]).StrainTime * ((OsuDifficultyHitObject)Previous[i - 1]).StrainTime);
-                            islandSizes[islandSize] = islandSizes[islandSize] + 1;
-                        }
-                        islandSize = 0;
-                        lastCountedSwitch = true;
+
+                        firstDeltaSwitch = false; // stop counting island until next speed up.
                     }
                 }
-                else if (!(Utils.IsRatioEqual(1.0, ((OsuDifficultyHitObject)Previous[i - 1]).StrainTime, ((OsuDifficultyHitObject)Previous[i]).StrainTime)))
+                else if (prevDelta >  1.25 * currDelta) // we want to be speeding up.
+                {
+                    // Begin counting island until we slow again.
                     firstDeltaSwitch = true;
+                    islandSize = 0;
+                }
             }
 
             double rhythmComplexitySum = 0.0;
@@ -139,12 +145,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     rhythmComplexitySum += islandTimes[i] / Math.Pow(islandSizes[i], .75);
             }
 
-            // rhythmComplexitySum += Math.Pow(islandSizes[0], .5);
-            // rhythmComplexitySum += Math.Pow(islandSizes[2], .5);
-            // rhythmComplexitySum += Math.Pow(islandSizes[4], .5);
-            // rhythmComplexitySum += Math.Pow(islandSizes[5], .5);
-            // rhythmComplexitySum += Math.Pow(islandSizes[1] + islandSizes[3], .5);
-            // rhythmComplexitySum += Math.Pow(islandSizes[6], .5);
+            // rhythmComplexitySum += islandTimes[0] / Math.Pow(islandSizes[0], .75);
+            // rhythmComplexitySum += islandTimes[2] / Math.Pow(islandSizes[2], .75);
+            // rhythmComplexitySum += islandTimes[4] / Math.Pow(islandSizes[4], .75);
+            // rhythmComplexitySum += islandTimes[5] / Math.Pow(islandSizes[5], .75);
+            // rhythmComplexitySum += (islandSizes[1] + islandSizes[3]) / Math.Pow(islandSizes[1] + islandSizes[3], .75);
+            // rhythmComplexitySum += islandTimes[6] / Math.Pow(islandSizes[6], .75);
 
             int sliderCount = 1;
 
@@ -154,47 +160,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     sliderCount++;
             }
 
-            rhythmComplexitySum /= Math.Sqrt(9 + sliderCount) / 3;
+            // rhythmComplexitySum /= Math.Sqrt(9 + sliderCount) / 3;
 
-            rhythmComplexitySum += specialTransitionCount;
-
-            // rhythmComplexitySum *= 2;
-
-            // for (int i = 0; i < Previous.Count; i++)
-            // {
-            //     if (i > 1 && Math.Abs(((OsuDifficultyHitObject)Previous[i - 1]).StrainTime - ((OsuDifficultyHitObject)Previous[i-2]).StrainTime) > 15)
-            //         deltaTimeDeltaCount += 0.0;
-            //     else if (i != 0 && (Math.Abs(((OsuDifficultyHitObject)Previous[i - 1]).StrainTime * 1.5 - ((OsuDifficultyHitObject)Previous[i]).StrainTime) < 15
-            //                     || Math.Abs(((OsuDifficultyHitObject)Previous[i - 1]).StrainTime - 1.5 * ((OsuDifficultyHitObject)Previous[i]).StrainTime) < 15)
-            //                && !(Previous[i - 1].BaseObject is Slider)
-            //                && !(Previous[i].BaseObject is Slider))
-            //         {
-            //             if (Previous[i - 1].BaseObject is Slider)
-            //                 deltaTimeDeltaCount += 1.5;
-            //             else if (Previous[i].BaseObject is Slider)
-            //                 deltaTimeDeltaCount += 0.75;
-            //             else
-            //                 deltaTimeDeltaCount += 5;
-            //         }
-            //     else if (i != 0 && Math.Abs(((OsuDifficultyHitObject)Previous[i - 1]).StrainTime - ((OsuDifficultyHitObject)Previous[i]).StrainTime) > 15
-            //                && !(Previous[i - 1].BaseObject is Slider)
-            //                && !(Previous[i].BaseObject is Slider))
-            //         {
-            //             if (Previous[i - 1].BaseObject is Slider)
-            //                 deltaTimeDeltaCount += 1;
-            //             else if (Previous[i].BaseObject is Slider)
-            //                 deltaTimeDeltaCount += .5;
-            //             else
-            //                 deltaTimeDeltaCount += 2;
-            //         }
-            // }
+            rhythmComplexitySum += specialTransitionCount / 2;
 
             // Console.WriteLine("Delta: " + avgDeltaTime);
 
             if (75 / avgDeltaTime > 1)
                 strainValue += Math.Pow(75 / avgDeltaTime, 2);
             else
-                strainValue += 75 / avgDeltaTime;
+                strainValue += Math.Pow(75 / avgDeltaTime, 1);
 
             // strainValue += 1.5 / Math.Sqrt(hitWindowGreat);
 
@@ -215,9 +190,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             globalCount++;
 
             // if (rhythmComplexitySum > 1)
-                return currentStrain * (Previous.Count / HistoryLength) * Math.Sqrt(4 + rhythmComplexitySum) / 2;
+                return currentStrain * (Previous.Count / HistoryLength) * (Math.Sqrt(4 + rhythmComplexitySum) / 2);
             // else
-                // return currentStrain;// * (Previous.Count / HistoryLength) * Math.Max(1, Math.Sqrt(3 + rhythmComplexitySum) / 2);
+            //     return currentStrain;// * (Previous.Count / HistoryLength) * Math.Max(1, Math.Sqrt(3 + rhythmComplexitySum) / 2);
         }
 
         public void SetHitWindow(double od, double clockRate)
