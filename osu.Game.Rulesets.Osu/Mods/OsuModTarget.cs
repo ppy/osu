@@ -55,8 +55,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             var osuBeatmap = (OsuBeatmap)beatmap;
             var origHitObjects = osuBeatmap.HitObjects.OrderBy(x => x.StartTime).ToList();
 
-            var hitObjects = new List<OsuHitObject>();
-
             // Only place circles between startTime and endTime
             var startTime = origHitObjects.First().StartTime;
             double endTime;
@@ -74,113 +72,122 @@ namespace osu.Game.Rulesets.Osu.Mods
                     break;
             }
 
-            var comboStarts = origHitObjects.Where(x => x.NewCombo).Select(x => x.StartTime).ToList();
-
-            TimingControlPoint currentTimingPoint = osuBeatmap.ControlPointInfo.TimingPointAt(startTime);
-            var currentTime = currentTimingPoint.Time;
-            int currentCombo = -1;
-            IList<HitSampleInfo> lastSamples = null;
-
-            float direction = MathHelper.TwoPi * RNG.NextSingle();
-            float distance = 40f;
-
-            while (!Precision.AlmostBigger(currentTime, endTime))
-            {
-                // Place a circle
-
-                // Don't place any circles before the start of the first hit object of the map
-                // Don't place any circles from the start of break time to the start of the first hit object after the break
-                if (!Precision.AlmostBigger(startTime, currentTime)
-                    && !osuBeatmap.Breaks.Any(x => Precision.AlmostBigger(currentTime, x.StartTime)
-                    && Precision.AlmostBigger(origHitObjects.First(y => Precision.AlmostBigger(y.StartTime, x.EndTime)).StartTime, currentTime)))
+            // Generate the beats
+            var beats = osuBeatmap.ControlPointInfo.TimingPoints
+                .Where(x => Precision.AlmostBigger(endTime, x.Time))
+                .SelectMany(tp =>
+                {
+                    var tpBeats = new List<double>();
+                    var currentTime = tp.Time;
+                    while (Precision.AlmostBigger(endTime, currentTime) && osuBeatmap.ControlPointInfo.TimingPointAt(currentTime) == tp)
+                    {
+                        tpBeats.Add(currentTime);
+                        currentTime += tp.BeatLength;
+                    }
+                    return tpBeats;
+                })
+                // Remove beats that are before startTime
+                .Where(x => Precision.AlmostBigger(x, startTime))
+                // Remove beats during breaks
+                .Where(x => !osuBeatmap.Breaks.Any(b =>
+                     Precision.AlmostBigger(x, b.StartTime)
+                     && Precision.AlmostBigger(origHitObjects.First(y => Precision.AlmostBigger(y.StartTime, b.EndTime)).StartTime, x)
+                ))
+                .ToList();
+            // Generate a hit circle for each beat
+            var hitObjects = beats
+                // Remove beats that are too close to the next one (e.g. due to timing point changes)
+                .Where((x, idx) =>
+                {
+                    if (idx == beats.Count - 1) return true;
+                    if (Precision.AlmostBigger(osuBeatmap.ControlPointInfo.TimingPointAt(x).BeatLength / 2, beats[idx + 1] - x))
+                        return false;
+                    return true;
+                })
+                .Select(x =>
                 {
                     var newCircle = new HitCircle();
                     newCircle.ApplyDefaults(osuBeatmap.ControlPointInfo, osuBeatmap.BeatmapInfo.BaseDifficulty);
-                    newCircle.StartTime = currentTime;
+                    newCircle.StartTime = x;
+                    return (OsuHitObject)newCircle;
+                }).ToList();
 
-                    // Determine circle position
-                    if (hitObjects.Count == 0)
-                    {
-                        newCircle.Position = new Vector2(RNG.NextSingle(OsuPlayfield.BASE_SIZE.X), RNG.NextSingle(OsuPlayfield.BASE_SIZE.Y));
-                    }
-                    else
-                    {
-                        var relativePos = new Vector2(
+            // Add hit samples to the circles
+            for (int i = 0; i < hitObjects.Count; i++)
+            {
+                var x = hitObjects[i];
+                var samples = getSamplesAtTime(origHitObjects, x.StartTime);
+                if (samples == null)
+                {
+                    if (i > 0)
+                        x.Samples = hitObjects[i - 1].Samples;
+                }
+                else
+                {
+                    x.Samples = samples;
+                }
+            }
+
+            // Process combo numbers
+            // First follow the combo indices in the original beatmap
+            hitObjects.ForEach(x =>
+            {
+                var origObj = origHitObjects.FindLast(y => Precision.AlmostBigger(x.StartTime, y.StartTime));
+                if (origObj == null) x.ComboIndex = 0;
+                else x.ComboIndex = origObj.ComboIndex;
+            });
+            // Then reprocess them to ensure continuity in the combo indices and add indices in current combo
+            var combos = hitObjects.GroupBy(x => x.ComboIndex).ToList();
+            for (int i = 0; i < combos.Count; i++)
+            {
+                var group = combos[i].ToList();
+                group.First().NewCombo = true;
+                group.Last().LastInCombo = true;
+
+                for (int j = 0; j < group.Count; j++)
+                {
+                    var x = group[j];
+                    x.ComboIndex = i;
+                    x.IndexInCurrentCombo = j;
+                }
+            }
+
+            // Position all hit circles
+            var direction = MathHelper.TwoPi * RNG.NextSingle();
+            for (int i = 0; i < hitObjects.Count; i++)
+            {
+                var x = hitObjects[i];
+                if (i == 0)
+                {
+                    x.Position = new Vector2(RNG.NextSingle(OsuPlayfield.BASE_SIZE.X), RNG.NextSingle(OsuPlayfield.BASE_SIZE.Y));
+                }
+                else
+                {
+                    var distance = Math.Min(MAX_DISTANCE, 40f * (float)Math.Pow(1.05, x.ComboIndex));
+                    var relativePos = new Vector2(
                             distance * (float)Math.Cos(direction),
                            distance * (float)Math.Sin(direction)
                         );
-                        relativePos = getRotatedVector(hitObjects.Last().Position, relativePos);
-                        direction = (float)Math.Atan2(relativePos.Y, relativePos.X);
+                    relativePos = getRotatedVector(hitObjects[i - 1].Position, relativePos);
+                    direction = (float)Math.Atan2(relativePos.Y, relativePos.X);
 
-                        var newPosition = Vector2.Add(hitObjects.Last().Position, relativePos);
+                    var newPosition = Vector2.Add(hitObjects[i - 1].Position, relativePos);
 
-                        if (newPosition.Y < 0)
-                            newPosition.Y = 0;
-                        else if (newPosition.Y > OsuPlayfield.BASE_SIZE.Y)
-                            newPosition.Y = OsuPlayfield.BASE_SIZE.Y;
-                        if (newPosition.X < 0)
-                            newPosition.X = 0;
-                        else if (newPosition.X > OsuPlayfield.BASE_SIZE.X)
-                            newPosition.X = OsuPlayfield.BASE_SIZE.X;
+                    if (newPosition.Y < 0)
+                        newPosition.Y = 0;
+                    else if (newPosition.Y > OsuPlayfield.BASE_SIZE.Y)
+                        newPosition.Y = OsuPlayfield.BASE_SIZE.Y;
+                    if (newPosition.X < 0)
+                        newPosition.X = 0;
+                    else if (newPosition.X > OsuPlayfield.BASE_SIZE.X)
+                        newPosition.X = OsuPlayfield.BASE_SIZE.X;
 
-                        newCircle.Position = newPosition;
-                        // Add a random nudge to the direction
-                        direction += distance / MAX_DISTANCE * (RNG.NextSingle() * MathHelper.TwoPi - MathHelper.Pi);
-                    }
+                    x.Position = newPosition;
 
-                    // Determine samples to use
-                    var samples = getSamplesAtTime(origHitObjects, currentTime);
-                    if (samples == null)
-                    {
-                        if (lastSamples != null)
-                            newCircle.Samples = lastSamples;
-                    }
-                    else
-                    {
-                        newCircle.Samples = samples;
-                        lastSamples = samples;
-                    }
-
-                    // Determine combo
-                    if (comboStarts.Count > currentCombo + 1 && !Precision.AlmostBigger(comboStarts[currentCombo + 1], currentTime))
-                    {
-                        currentCombo++;
-                        newCircle.NewCombo = true;
-                        newCircle.IndexInCurrentCombo = 0;
-                        if (hitObjects.Count > 0)
-                            hitObjects.Last().LastInCombo = true;
-
-                        // Increase distance for every combo
-                        distance = Math.Min(distance * 1.05f, MAX_DISTANCE);
-                        // Randomize direction as well
+                    if (x.LastInCombo)
                         direction = MathHelper.TwoPi * RNG.NextSingle();
-                    }
                     else
-                    {
-                        if (hitObjects.Count > 0)
-                            newCircle.IndexInCurrentCombo = hitObjects.Last().IndexInCurrentCombo + 1;
-                    }
-                    newCircle.ComboIndex = currentCombo;
-
-                    // Remove the last circle if it is too close in time to this one
-                    if (hitObjects.Count > 0
-                        && Precision.AlmostBigger(currentTimingPoint.BeatLength / 2, newCircle.StartTime - hitObjects.Last().StartTime))
-                    {
-                        hitObjects.RemoveAt(hitObjects.Count - 1);
-                    }
-
-                    hitObjects.Add(newCircle);
-                }
-
-                // Advance to the next beat and check for timing point changes
-
-                currentTime += currentTimingPoint.BeatLength;
-
-                var newTimingPoint = osuBeatmap.ControlPointInfo.TimingPointAt(currentTime);
-                if (newTimingPoint != currentTimingPoint)
-                {
-                    currentTimingPoint = newTimingPoint;
-                    currentTime = currentTimingPoint.Time;
+                        direction += distance / MAX_DISTANCE * (RNG.NextSingle() * MathHelper.TwoPi - MathHelper.Pi);
                 }
             }
 
@@ -242,6 +249,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 using (drawable.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
                 {
+                    // todo: this doesn't feel quite right yet
                     drawable.ScaleTo(0.4f)
                         .Then().ScaleTo(1.6f, h.TimePreempt * 2);
                     drawable.FadeTo(0.5f)
@@ -367,7 +375,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 InternalChildren = new Drawable[]
                 {
-                    sample = new PausableSkinnableSound(new SampleInfo("spinnerbonus")), // TODO: use another sample?
+                    sample = new PausableSkinnableSound(new SampleInfo("spinnerbonus")), // todo: use another sample?
                 };
             }
 
