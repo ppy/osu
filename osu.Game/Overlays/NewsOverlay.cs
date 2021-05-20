@@ -24,6 +24,8 @@ namespace osu.Game.Overlays
 
         private CancellationTokenSource cancellationToken;
 
+        private bool displayUpdateRequired = true;
+
         public NewsOverlay()
             : base(OverlayColourScheme.Purple, false)
         {
@@ -72,8 +74,6 @@ namespace osu.Game.Overlays
             ShowFrontPage = ShowFrontPage
         };
 
-        private bool displayUpdateRequired = true;
-
         protected override void PopIn()
         {
             base.PopIn();
@@ -107,6 +107,23 @@ namespace osu.Game.Overlays
         {
             article.Value = slug;
             Show();
+        }
+
+        protected void LoadDisplay(Drawable display)
+        {
+            ScrollFlow.ScrollToStart();
+            LoadComponentAsync(display, loaded =>
+            {
+                Child = loaded;
+            }, (cancellationToken = new CancellationTokenSource()).Token);
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            sidebarContainer.Height = DrawHeight;
+            sidebarContainer.Y = Math.Clamp(ScrollFlow.Current - Header.DrawHeight, 0, Math.Max(ScrollFlow.ScrollContent.DrawHeight - DrawHeight - Header.DrawHeight, 0));
         }
 
         private void onArticleChanged(ValueChangedEvent<string> e)
@@ -147,23 +164,6 @@ namespace osu.Game.Overlays
         {
             cancellationToken?.Cancel();
             Loading.Show();
-        }
-
-        protected void LoadDisplay(Drawable display)
-        {
-            ScrollFlow.ScrollToStart();
-            LoadComponentAsync(display, loaded =>
-            {
-                Child = loaded;
-            }, (cancellationToken = new CancellationTokenSource()).Token);
-        }
-
-        protected override void UpdateAfterChildren()
-        {
-            base.UpdateAfterChildren();
-
-            sidebarContainer.Height = DrawHeight;
-            sidebarContainer.Y = Math.Clamp(ScrollFlow.Current - Header.DrawHeight, 0, Math.Max(ScrollFlow.ScrollContent.DrawHeight - DrawHeight - Header.DrawHeight, 0));
         }
 
         protected override void Dispose(bool isDisposing)
