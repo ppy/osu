@@ -33,7 +33,11 @@ namespace osu.Game.Tests.Visual
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
             dependencies.CacheAs(new EditorClock());
+
+            var playable = Beatmap.Value.GetPlayableBeatmap(Beatmap.Value.BeatmapInfo.Ruleset);
+            dependencies.CacheAs(new EditorBeatmap(playable));
 
             return dependencies;
         }

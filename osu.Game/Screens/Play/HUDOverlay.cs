@@ -87,22 +87,10 @@ namespace osu.Game.Screens.Play
                 visibilityContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                    Child = mainComponents = new SkinnableTargetContainer(SkinnableTarget.MainHUDComponents)
                     {
-                        mainComponents = new SkinnableTargetContainer(SkinnableTarget.MainHUDComponents)
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Children = new Drawable[]
-                            {
-                                // still need to be migrated; a bit more involved.
-                                new HitErrorDisplay(this.drawableRuleset?.FirstAvailableHitWindows),
-                            }
-                        },
-                    }
+                        RelativeSizeAxes = Axes.Both,
+                    },
                 },
                 topRightElements = new FillFlowContainer
                 {
