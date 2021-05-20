@@ -28,7 +28,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         public bool AllPlayersLoaded => instances.All(p => p?.PlayerLoaded == true);
 
         [Resolved]
-        private SpectatorStreamingClient spectatorClient { get; set; }
+        private SpectatorClient spectatorClient { get; set; }
 
         [Resolved]
         private MultiplayerClient multiplayerClient { get; set; }
