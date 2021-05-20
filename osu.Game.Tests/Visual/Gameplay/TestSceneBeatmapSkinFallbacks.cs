@@ -9,7 +9,6 @@ using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Lists;
-using osu.Framework.Logging;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Framework.Utils;
