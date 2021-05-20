@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Play.HUD
         private SpectatorStreamingClient streamingClient { get; set; }
 
         [Resolved]
-        private StatefulMultiplayerClient multiplayerClient { get; set; }
+        private MultiplayerClient multiplayerClient { get; set; }
 
         [Resolved]
         private UserLookupCache userLookupCache { get; set; }
