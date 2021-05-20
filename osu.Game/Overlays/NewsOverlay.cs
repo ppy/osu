@@ -68,10 +68,7 @@ namespace osu.Game.Overlays
             article.BindValueChanged(onArticleChanged);
         }
 
-        protected override NewsHeader CreateHeader() => new NewsHeader
-        {
-            ShowFrontPage = ShowFrontPage
-        };
+        protected override NewsHeader CreateHeader() => new NewsHeader { ShowFrontPage = ShowFrontPage };
 
         protected override void PopIn()
         {
@@ -121,12 +118,12 @@ namespace osu.Game.Overlays
             sidebarContainer.Y = Math.Clamp(ScrollFlow.Current - Header.DrawHeight, 0, Math.Max(ScrollFlow.ScrollContent.DrawHeight - DrawHeight - Header.DrawHeight, 0));
         }
 
-        private void onArticleChanged(ValueChangedEvent<string> e)
+        private void onArticleChanged(ValueChangedEvent<string> article)
         {
-            if (e.NewValue == null)
+            if (article.NewValue == null)
                 loadFrontPage();
             else
-                loadArticle(e.NewValue);
+                loadArticle(article.NewValue);
         }
 
         private void loadFrontPage(int year = 0)
