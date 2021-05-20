@@ -238,33 +238,5 @@ namespace osu.Game.Online.Spectator
 
             lastSendTime = Time.Current;
         }
-
-        /// <summary>
-        /// Attempts to retrieve the <see cref="SpectatorState"/> for a currently-playing user.
-        /// </summary>
-        /// <param name="userId">The user.</param>
-        /// <param name="state">The current <see cref="SpectatorState"/> for the user, if they're playing. <c>null</c> if the user is not playing.</param>
-        /// <returns><c>true</c> if successful (the user is playing), <c>false</c> otherwise.</returns>
-        public bool TryGetPlayingUserState(int userId, out SpectatorState state)
-        {
-            return playingUserStates.TryGetValue(userId, out state);
-        }
-
-        /// <summary>
-        /// Bind an action to <see cref="OnUserBeganPlaying"/> with the option of running the bound action once immediately.
-        /// </summary>
-        /// <param name="callback">The action to perform when a user begins playing.</param>
-        /// <param name="runOnceImmediately">Whether the action provided in <paramref name="callback"/> should be run once immediately for all users currently playing.</param>
-        public void BindUserBeganPlaying(Action<int, SpectatorState> callback, bool runOnceImmediately = false)
-        {
-            // The lock is taken before the event is subscribed to to prevent doubling of events.
-            OnUserBeganPlaying += callback;
-
-            if (!runOnceImmediately)
-                return;
-
-            foreach (var (userId, state) in playingUserStates)
-                callback(userId, state);
-        }
     }
 }
