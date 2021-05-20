@@ -22,8 +22,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMultiSpectatorScreen : MultiplayerTestScene
     {
-        [Cached(typeof(SpectatorStreamingClient))]
-        private TestSpectatorStreamingClient streamingClient = new TestSpectatorStreamingClient();
+        [Cached(typeof(SpectatorClient))]
+        private TestSpectatorClient spectatorClient = new TestSpectatorClient();
 
         [Cached(typeof(UserLookupCache))]
         private UserLookupCache lookupCache = new TestUserLookupCache();
@@ -59,14 +59,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("add streaming client", () =>
             {
-                Remove(streamingClient);
-                Add(streamingClient);
+                Remove(spectatorClient);
+                Add(spectatorClient);
             });
 
             AddStep("finish previous gameplay", () =>
             {
                 foreach (var id in playingUserIds)
-                    streamingClient.EndPlay(id, importedBeatmapId);
+                    spectatorClient.EndPlay(id, importedBeatmapId);
                 playingUserIds.Clear();
             });
         }
@@ -87,11 +87,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
             loadSpectateScreen(false);
 
             AddWaitStep("wait a bit", 10);
-            AddStep("load player first_player_id", () => streamingClient.StartPlay(PLAYER_1_ID, importedBeatmapId));
+            AddStep("load player first_player_id", () => spectatorClient.StartPlay(PLAYER_1_ID, importedBeatmapId));
             AddUntilStep("one player added", () => spectatorScreen.ChildrenOfType<Player>().Count() == 1);
 
             AddWaitStep("wait a bit", 10);
-            AddStep("load player second_player_id", () => streamingClient.StartPlay(PLAYER_2_ID, importedBeatmapId));
+            AddStep("load player second_player_id", () => spectatorClient.StartPlay(PLAYER_2_ID, importedBeatmapId));
             AddUntilStep("two players added", () => spectatorScreen.ChildrenOfType<Player>().Count() == 2);
         }
 
@@ -251,7 +251,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 foreach (int id in userIds)
                 {
                     Client.CurrentMatchPlayingUserIds.Add(id);
-                    streamingClient.StartPlay(id, beatmapId ?? importedBeatmapId);
+                    spectatorClient.StartPlay(id, beatmapId ?? importedBeatmapId);
                     playingUserIds.Add(id);
                     nextFrame[id] = 0;
                 }
@@ -262,7 +262,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("end play", () =>
             {
-                streamingClient.EndPlay(userId, beatmapId ?? importedBeatmapId);
+                spectatorClient.EndPlay(userId, beatmapId ?? importedBeatmapId);
                 playingUserIds.Remove(userId);
                 nextFrame.Remove(userId);
             });
@@ -276,7 +276,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 foreach (int id in userIds)
                 {
-                    streamingClient.SendFrames(id, nextFrame[id], count);
+                    spectatorClient.SendFrames(id, nextFrame[id], count);
                     nextFrame[id] += count;
                 }
             });
