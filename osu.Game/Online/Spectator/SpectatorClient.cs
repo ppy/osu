@@ -1,12 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -45,36 +46,37 @@ namespace osu.Game.Online.Spectator
 
         private readonly Dictionary<int, SpectatorState> playingUserStates = new Dictionary<int, SpectatorState>();
 
-        [CanBeNull]
-        private IBeatmap currentBeatmap;
+        private IBeatmap? currentBeatmap;
 
-        [CanBeNull]
-        private Score currentScore;
+        private Score? currentScore;
 
         [Resolved]
-        private IBindable<RulesetInfo> currentRuleset { get; set; }
+        private IBindable<RulesetInfo> currentRuleset { get; set; } = null!;
 
         [Resolved]
-        private IBindable<IReadOnlyList<Mod>> currentMods { get; set; }
+        private IBindable<IReadOnlyList<Mod>> currentMods { get; set; } = null!;
 
         private readonly SpectatorState currentState = new SpectatorState();
 
+        /// <summary>
+        /// Whether the local user is playing.
+        /// </summary>
         protected bool IsPlaying { get; private set; }
 
         /// <summary>
         /// Called whenever new frames arrive from the server.
         /// </summary>
-        public event Action<int, FrameDataBundle> OnNewFrames;
+        public event Action<int, FrameDataBundle>? OnNewFrames;
 
         /// <summary>
         /// Called whenever a user starts a play session, or immediately if the user is being watched and currently in a play session.
         /// </summary>
-        public event Action<int, SpectatorState> OnUserBeganPlaying;
+        public event Action<int, SpectatorState>? OnUserBeganPlaying;
 
         /// <summary>
         /// Called whenever a user finishes a play session.
         /// </summary>
-        public event Action<int, SpectatorState> OnUserFinishedPlaying;
+        public event Action<int, SpectatorState>? OnUserFinishedPlaying;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -215,7 +217,7 @@ namespace osu.Game.Online.Spectator
 
         private double lastSendTime;
 
-        private Task lastSend;
+        private Task? lastSend;
 
         private const int max_pending_frames = 30;
 
