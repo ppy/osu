@@ -127,6 +127,14 @@ namespace osu.Game.Screens.Spectate
                     foreach (var (userId, _) in e.OldItems.AsNonNull())
                         onUserStateRemoved(userId);
                     break;
+
+                case NotifyDictionaryChangedAction.Replace:
+                    foreach (var (userId, _) in e.OldItems.AsNonNull())
+                        onUserStateRemoved(userId);
+
+                    foreach (var (userId, state) in e.NewItems.AsNonNull())
+                        onUserStateAdded(userId, state);
+                    break;
             }
         }
 
