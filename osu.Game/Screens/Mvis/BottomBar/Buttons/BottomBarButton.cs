@@ -177,7 +177,7 @@ namespace osu.Game.Screens.Mvis.BottomBar.Buttons
                 content.Add(ripple);
 
             content.ScaleTo(0.9f, 2000, Easing.OutQuint);
-            ripple.ScaleTo(1.2f, 2000, Easing.OutCirc).FadeIn(2000, Easing.OutCirc);
+            ripple.ScaleTo(1.2f, 3000, Easing.OutCirc).FadeIn(3000, Easing.OutCirc);
             return base.OnMouseDown(e);
         }
 
