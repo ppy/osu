@@ -22,6 +22,8 @@ namespace osu.Game.Overlays
         private readonly Container sidebarContainer;
         private readonly NewsSidebar sidebar;
 
+        private CancellationTokenSource cancellationToken;
+
         public NewsOverlay()
             : base(OverlayColourScheme.Purple, false)
         {
@@ -97,7 +99,7 @@ namespace osu.Game.Overlays
 
         public void ShowYear(int year)
         {
-            showYear(year);
+            loadFrontPage(year);
             Show();
         }
 
@@ -107,32 +109,18 @@ namespace osu.Game.Overlays
             Show();
         }
 
-        private CancellationTokenSource cancellationToken;
-
-        private void showYear(int year)
-        {
-            cancellationToken?.Cancel();
-            Loading.Show();
-
-            loadFrontPage(year);
-        }
-
         private void onArticleChanged(ValueChangedEvent<string> e)
         {
-            cancellationToken?.Cancel();
-            Loading.Show();
-
             if (e.NewValue == null)
-            {
                 loadFrontPage();
-                return;
-            }
-
-            loadArticle(e.NewValue);
+            else
+                loadArticle(e.NewValue);
         }
 
         private void loadFrontPage(int year = 0)
         {
+            beginLoading();
+
             Header.SetFrontPage();
 
             var page = new FrontPageDisplay(year);
@@ -146,11 +134,19 @@ namespace osu.Game.Overlays
 
         private void loadArticle(string article)
         {
+            beginLoading();
+
             Header.SetArticle(article);
 
             // Temporary, should be handled by ArticleDisplay later
             LoadDisplay(Empty());
             Loading.Hide();
+        }
+
+        private void beginLoading()
+        {
+            cancellationToken?.Cancel();
+            Loading.Show();
         }
 
         protected void LoadDisplay(Drawable display)
