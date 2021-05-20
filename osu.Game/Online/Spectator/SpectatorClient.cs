@@ -39,10 +39,10 @@ namespace osu.Game.Online.Spectator
         private readonly List<int> watchingUsers = new List<int>();
 
         public IBindableList<int> PlayingUsers => playingUsers;
-
         private readonly BindableList<int> playingUsers = new BindableList<int>();
 
-        private readonly Dictionary<int, SpectatorState> playingUserStates = new Dictionary<int, SpectatorState>();
+        public IBindableDictionary<int, SpectatorState> PlayingUserStates => playingUserStates;
+        private readonly BindableDictionary<int, SpectatorState> playingUserStates = new BindableDictionary<int, SpectatorState>();
 
         private IBeatmap? currentBeatmap;
 
