@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -60,6 +61,12 @@ namespace osu.Game.Overlays
                 CurrentPath = $"{path.Value}/",
                 Text = response.Markdown,
             });
+        }
+
+        private void showParentPage()
+        {
+            var parentPath = string.Join("/", path.Value.Split('/').SkipLast(1));
+            ShowPage(parentPath);
         }
 
         public void ShowPage(string pagePath = index_path)
