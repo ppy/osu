@@ -86,7 +86,7 @@ namespace osu.Game
         protected IAPIProvider API;
 
         private SpectatorStreamingClient spectatorStreaming;
-        private StatefulMultiplayerClient multiplayerClient;
+        private MultiplayerClient multiplayerClient;
 
         protected MenuCursorContainer MenuCursorContainer;
 
@@ -241,7 +241,7 @@ namespace osu.Game
             dependencies.CacheAs(API ??= new APIAccess(LocalConfig, endpoints, VersionHash));
 
             dependencies.CacheAs(spectatorStreaming = new SpectatorStreamingClient(endpoints));
-            dependencies.CacheAs(multiplayerClient = new MultiplayerClient(endpoints));
+            dependencies.CacheAs(multiplayerClient = new OnlineMultiplayerClient(endpoints));
 
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 
