@@ -82,8 +82,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             };
 
             Add(expectedComponentsAdjustmentContainer);
-            expectedComponentsAdjustmentContainer?.UpdateSubTree();
-            var expectedInfo = expectedComponentsContainer?.CreateSkinnableInfo();
+            expectedComponentsAdjustmentContainer.UpdateSubTree();
+            var expectedInfo = expectedComponentsContainer.CreateSkinnableInfo();
             Remove(expectedComponentsAdjustmentContainer);
 
             return almostEqual(actualInfo, expectedInfo);
