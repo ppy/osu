@@ -16,11 +16,10 @@ namespace osu.Game.Overlays
     {
         private readonly Bindable<string> article = new Bindable<string>(null);
 
-        protected override Container<Drawable> Content => content;
-
-        private readonly Container content;
         private readonly Container sidebarContainer;
         private readonly NewsSidebar sidebar;
+
+        private readonly Container content;
 
         private CancellationTokenSource cancellationToken;
 
@@ -29,7 +28,7 @@ namespace osu.Game.Overlays
         public NewsOverlay()
             : base(OverlayColourScheme.Purple, false)
         {
-            base.Content.Add(new GridContainer
+            Child = new GridContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
@@ -58,7 +57,7 @@ namespace osu.Game.Overlays
                         }
                     }
                 }
-            });
+            };
         }
 
         protected override void LoadComplete()
@@ -112,16 +111,12 @@ namespace osu.Game.Overlays
         protected void LoadDisplay(Drawable display)
         {
             ScrollFlow.ScrollToStart();
-            LoadComponentAsync(display, loaded =>
-            {
-                Child = loaded;
-            }, (cancellationToken = new CancellationTokenSource()).Token);
+            LoadComponentAsync(display, loaded => content.Child = loaded, (cancellationToken = new CancellationTokenSource()).Token);
         }
 
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
-
             sidebarContainer.Height = DrawHeight;
             sidebarContainer.Y = Math.Clamp(ScrollFlow.Current - Header.DrawHeight, 0, Math.Max(ScrollFlow.ScrollContent.DrawHeight - DrawHeight - Header.DrawHeight, 0));
         }
