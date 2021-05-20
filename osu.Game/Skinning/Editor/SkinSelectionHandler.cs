@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Extensions;
 using osu.Game.Graphics.UserInterface;
@@ -38,8 +39,7 @@ namespace osu.Game.Skinning.Editor
             }
             else
             {
-                var selectionQuad = GetSurroundingQuad(SelectedBlueprints.SelectMany(b =>
-                    b.Item.ScreenSpaceDrawQuad.GetVertices().ToArray()));
+                var selectionQuad = getSelectionQuad();
 
                 referenceOrigin ??= selectionQuad.Centre;
 
@@ -63,8 +63,7 @@ namespace osu.Game.Skinning.Editor
 
             adjustScaleFromAnchor(ref scale, anchor);
 
-            var selectionQuad = GetSurroundingQuad(SelectedBlueprints.SelectMany(b =>
-                b.Item.ScreenSpaceDrawQuad.GetVertices().ToArray()));
+            var selectionQuad = getSelectionQuad();
 
             // the selection quad is always upright, so use a rect to make mutating the values easier.
             var adjustedRect = selectionQuad.AABBFloat;
@@ -219,6 +218,13 @@ namespace osu.Game.Skinning.Editor
                 drawable.Position += drawable.OriginPosition - previousOrigin;
             }
         }
+
+        /// <summary>
+        /// A screen-space quad surrounding all selected drawables, accounting for their full displayed size.
+        /// </summary>
+        /// <returns></returns>
+        private Quad getSelectionQuad() =>
+            GetSurroundingQuad(SelectedBlueprints.SelectMany(b => b.Item.ScreenSpaceDrawQuad.GetVertices().ToArray()));
 
         private void applyAnchor(Anchor anchor)
         {
