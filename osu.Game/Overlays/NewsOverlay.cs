@@ -126,7 +126,7 @@ namespace osu.Game.Overlays
                 loadArticle(article.NewValue);
         }
 
-        private void loadFrontPage(int year = 0)
+        private void loadFrontPage(int? year = null)
         {
             beginLoading();
 
