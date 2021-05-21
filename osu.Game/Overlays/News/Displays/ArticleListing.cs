@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 
 namespace osu.Game.Overlays.News.Displays
@@ -19,7 +20,7 @@ namespace osu.Game.Overlays.News.Displays
     /// </summary>
     public class ArticleListing : CompositeDrawable
     {
-        public Action<GetNewsResponse> ResponseReceived;
+        public Action<APINewsSidebar> SidebarMetadataUpdated;
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -98,34 +99,23 @@ namespace osu.Game.Overlays.News.Displays
 
         private CancellationTokenSource cancellationToken;
 
-        private bool initialLoad = true;
-
         private void onSuccess(GetNewsResponse response)
         {
             cancellationToken?.Cancel();
 
+            // only needs to be updated on the initial load, as the content won't change during pagination.
+            if (lastCursor == null)
+                SidebarMetadataUpdated?.Invoke(response.SidebarMetadata);
+
+            // store cursor for next pagination request.
             lastCursor = response.Cursor;
 
-            var flow = new FillFlowContainer<NewsCard>
+            LoadComponentsAsync(response.NewsPosts.Select(p => new NewsCard(p)).ToList(), loaded =>
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Direction = FillDirection.Vertical,
-                Spacing = new Vector2(0, 10),
-                Children = response.NewsPosts.Select(p => new NewsCard(p)).ToList()
-            };
+                content.AddRange(loaded);
 
-            LoadComponentAsync(flow, loaded =>
-            {
-                content.Add(loaded);
                 showMore.IsLoading = false;
-                showMore.Alpha = lastCursor == null ? 0 : 1;
-
-                if (initialLoad)
-                {
-                    ResponseReceived?.Invoke(response);
-                    initialLoad = false;
-                }
+                showMore.Alpha = response.Cursor != null ? 1 : 0;
             }, (cancellationToken = new CancellationTokenSource()).Token);
         }
 

@@ -133,11 +133,11 @@ namespace osu.Game.Overlays
             Header.SetFrontPage();
 
             var page = new ArticleListing(year);
-            page.ResponseReceived += r =>
+            page.SidebarMetadataUpdated += metadata => Schedule(() =>
             {
-                sidebar.Metadata.Value = r.SidebarMetadata;
+                sidebar.Metadata.Value = metadata;
                 Loading.Hide();
-            };
+            });
             LoadDisplay(page);
         }
 
