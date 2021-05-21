@@ -3,7 +3,6 @@
 
 using System;
 using System.Linq;
-using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
@@ -21,7 +20,6 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
-using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -39,13 +37,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
 
         protected override bool HasCustomSteps => true;
-
-        [Test]
-        public void TestEmptyDefaultBeatmapSkinFallsBack()
-        {
-            CreateSkinTest(DefaultLegacySkin.Info, () => new TestWorkingBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo)).Skin);
-            AddAssert("hud from default legacy skin", () => AssertComponentsFromExpectedSource(SkinnableTarget.MainHUDComponents, skinManager.CurrentSkin.Value));
-        }
 
         protected void CreateSkinTest(SkinInfo gameCurrentSkin, Func<ISkin> getBeatmapSkin)
         {
