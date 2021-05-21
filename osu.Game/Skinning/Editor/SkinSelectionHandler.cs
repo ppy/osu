@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Utils;
 using osu.Game.Extensions;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
@@ -37,40 +38,44 @@ namespace osu.Game.Skinning.Editor
 
             adjustScaleFromAnchor(ref scale, anchor);
 
-            var selectionQuad = GetSurroundingQuad(SelectedBlueprints.SelectMany(b =>
-                b.Item.ScreenSpaceDrawQuad.GetVertices().ToArray()));
+            // the selection quad is always upright, so use an AABB rect to make mutating the values easier.
+            var selectionRect = GetSurroundingQuad(SelectedBlueprints.SelectMany(b =>
+                b.Item.ScreenSpaceDrawQuad.GetVertices().ToArray())).AABBFloat;
 
-            // the selection quad is always upright, so use a rect to make mutating the values easier.
-            var adjustedRect = selectionQuad.AABBFloat;
+            // copy to mutate, as we will need to compare to the original later on.
+            var adjustedRect = selectionRect;
 
-            // for now aspect lock scale adjustments that occur at corners.
-            if (!anchor.HasFlagFast(Anchor.x1) && !anchor.HasFlagFast(Anchor.y1))
-                scale.Y = scale.X / selectionQuad.Width * selectionQuad.Height;
+            // first, remove any scale axis we are not interested in.
+            if (anchor.HasFlagFast(Anchor.x1)) scale.X = 0;
+            if (anchor.HasFlagFast(Anchor.y1)) scale.Y = 0;
 
-            if (anchor.HasFlagFast(Anchor.x0))
-            {
-                adjustedRect.X -= scale.X;
-                adjustedRect.Width += scale.X;
-            }
-            else if (anchor.HasFlagFast(Anchor.x2))
-            {
-                adjustedRect.Width += scale.X;
-            }
+            bool shouldAspectLock =
+                // for now aspect lock scale adjustments that occur at corners..
+                (!anchor.HasFlagFast(Anchor.x1) && !anchor.HasFlagFast(Anchor.y1))
+                // ..or if any of the selection have been rotated.
+                // this is to avoid requiring skew logic (which would likely not be the user's expected transform anyway).
+                || SelectedBlueprints.Any(b => !Precision.AlmostEquals(((Drawable)b.Item).Rotation % 90, 0));
 
-            if (anchor.HasFlagFast(Anchor.y0))
+            if (shouldAspectLock)
             {
-                adjustedRect.Y -= scale.Y;
-                adjustedRect.Height += scale.Y;
-            }
-            else if (anchor.HasFlagFast(Anchor.y2))
-            {
-                adjustedRect.Height += scale.Y;
+                if (anchor.HasFlagFast(Anchor.x1))
+                    // if dragging from the horizontal centre, only a vertical component is available.
+                    scale.X = scale.Y / selectionRect.Height * selectionRect.Width;
+                else
+                    // in all other cases (arbitrarily) use the horizontal component for aspect lock.
+                    scale.Y = scale.X / selectionRect.Width * selectionRect.Height;
             }
 
-            // scale adjust should match that of the quad itself.
+            if (anchor.HasFlagFast(Anchor.x0)) adjustedRect.X -= scale.X;
+            if (anchor.HasFlagFast(Anchor.y0)) adjustedRect.Y -= scale.Y;
+
+            adjustedRect.Width += scale.X;
+            adjustedRect.Height += scale.Y;
+
+            // scale adjust applied to each individual item should match that of the quad itself.
             var scaledDelta = new Vector2(
-                adjustedRect.Width / selectionQuad.Width,
-                adjustedRect.Height / selectionQuad.Height
+                adjustedRect.Width / selectionRect.Width,
+                adjustedRect.Height / selectionRect.Height
             );
 
             foreach (var b in SelectedBlueprints)
@@ -82,8 +87,8 @@ namespace osu.Game.Skinning.Editor
 
                 var relativePositionInOriginal =
                     new Vector2(
-                        (screenPosition.X - selectionQuad.TopLeft.X) / selectionQuad.Width,
-                        (screenPosition.Y - selectionQuad.TopLeft.Y) / selectionQuad.Height
+                        (screenPosition.X - selectionRect.TopLeft.X) / selectionRect.Width,
+                        (screenPosition.Y - selectionRect.TopLeft.Y) / selectionRect.Height
                     );
 
                 var newPositionInAdjusted = new Vector2(
