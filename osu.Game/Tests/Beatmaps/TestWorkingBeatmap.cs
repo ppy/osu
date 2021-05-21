@@ -3,9 +3,15 @@
 
 using System.IO;
 using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Skinning;
 using osu.Game.Storyboards;
 
 namespace osu.Game.Tests.Beatmaps
@@ -36,10 +42,23 @@ namespace osu.Game.Tests.Beatmaps
 
         protected override Storyboard GetStoryboard() => storyboard ?? base.GetStoryboard();
 
+        protected override ISkin GetSkin() => new EmptySkin();
+
         public override Stream GetStream(string storagePath) => null;
 
         protected override Texture GetBackground() => null;
 
         protected override Track GetBeatmapTrack() => null;
+
+        private class EmptySkin : ISkin
+        {
+            public Drawable GetDrawableComponent(ISkinComponent component) => null;
+
+            public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => null;
+
+            public ISample GetSample(ISampleInfo sampleInfo) => null;
+
+            public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => null;
+        }
     }
 }
