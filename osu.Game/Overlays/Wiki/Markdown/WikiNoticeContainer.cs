@@ -2,8 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using Markdig.Extensions.Yaml;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Containers.Markdown;
+using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Wiki.Markdown
 {
@@ -30,6 +34,42 @@ namespace osu.Game.Overlays.Wiki.Markdown
                         needsCleanup = true;
                         break;
                 }
+            }
+        }
+
+        private class NoticeBox : Container
+        {
+            [Resolved]
+            private IMarkdownTextFlowComponent parentFlowComponent { get; set; }
+
+            public string Text { get; set; }
+
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider, OsuColour colour)
+            {
+                RelativeSizeAxes = Axes.X;
+                AutoSizeAxes = Axes.Y;
+                MarkdownTextFlowContainer textFlow;
+
+                Children = new Drawable[]
+                {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = colourProvider.Background4,
+                    },
+                    textFlow = parentFlowComponent.CreateTextFlow().With(t =>
+                    {
+                        t.Colour = colour.Orange1;
+                        t.Padding = new MarginPadding
+                        {
+                            Vertical = 10,
+                            Horizontal = 15,
+                        };
+                    })
+                };
+
+                textFlow.AddText(Text);
             }
         }
     }
