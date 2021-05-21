@@ -23,8 +23,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMultiSpectatorLeaderboard : MultiplayerTestScene
     {
-        [Cached(typeof(SpectatorStreamingClient))]
-        private TestSpectatorStreamingClient streamingClient = new TestSpectatorStreamingClient();
+        [Cached(typeof(SpectatorClient))]
+        private TestSpectatorClient spectatorClient = new TestSpectatorClient();
 
         [Cached(typeof(UserLookupCache))]
         private UserLookupCache lookupCache = new TestUserLookupCache();
@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             base.Content.AddRange(new Drawable[]
             {
-                streamingClient,
+                spectatorClient,
                 lookupCache,
                 content = new Container { RelativeSizeAxes = Axes.Both }
             });
@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 foreach (var (userId, clock) in clocks)
                 {
-                    streamingClient.EndPlay(userId, 0);
+                    spectatorClient.EndPlay(userId);
                     clock.CurrentTime = 0;
                 }
             });
@@ -67,7 +67,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("create leaderboard", () =>
             {
                 foreach (var (userId, _) in clocks)
-                    streamingClient.StartPlay(userId, 0);
+                    spectatorClient.StartPlay(userId, 0);
 
                 Beatmap.Value = CreateWorkingBeatmap(Ruleset.Value);
 
@@ -96,10 +96,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 // For player 2, send frames in sets of 10.
                 for (int i = 0; i < 100; i++)
                 {
-                    streamingClient.SendFrames(PLAYER_1_ID, i, 1);
+                    spectatorClient.SendFrames(PLAYER_1_ID, i, 1);
 
                     if (i % 10 == 0)
-                        streamingClient.SendFrames(PLAYER_2_ID, i, 10);
+                        spectatorClient.SendFrames(PLAYER_2_ID, i, 10);
                 }
             });
 
