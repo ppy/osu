@@ -63,7 +63,7 @@ namespace osu.Game.Graphics.UserInterface
                     stateIcon.Alpha = 0;
                 else
                 {
-                    stateIcon.Alpha = 1;
+                    stateIcon.Alpha = state.NewValue != state.OldValue ? 0 : 1;
                     stateIcon.Icon = icon.Value;
                 }
             }
