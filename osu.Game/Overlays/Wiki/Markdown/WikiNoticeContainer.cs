@@ -9,11 +9,28 @@ namespace osu.Game.Overlays.Wiki.Markdown
 {
     public class WikiNoticeContainer : FillFlowContainer
     {
+        private readonly bool isOutdated;
+        private readonly bool needsCleanup;
+
         public WikiNoticeContainer(YamlFrontMatterBlock yamlFrontMatterBlock)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Direction = FillDirection.Vertical;
+
+            foreach (var line in yamlFrontMatterBlock.Lines)
+            {
+                switch (line.ToString())
+                {
+                    case "outdated: true":
+                        isOutdated = true;
+                        break;
+
+                    case "needs_cleanup: true":
+                        needsCleanup = true;
+                        break;
+                }
+            }
         }
     }
 }
