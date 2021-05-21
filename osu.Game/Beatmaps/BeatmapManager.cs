@@ -526,6 +526,7 @@ namespace osu.Game.Beatmaps
             protected override IBeatmap GetBeatmap() => beatmap;
             protected override Texture GetBackground() => null;
             protected override Track GetBeatmapTrack() => null;
+            protected override ISkin GetSkin() => null;
             public override Stream GetStream(string storagePath) => null;
         }
     }
