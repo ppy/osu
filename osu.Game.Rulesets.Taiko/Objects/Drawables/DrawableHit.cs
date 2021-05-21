@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             type.BindTo(HitObject.TypeBindable);
             // this doesn't need to be run inline as RecreatePieces is called by the base call below.
-            type.BindValueChanged(_ => RecreatePieces());
+            type.BindValueChanged(_ => Scheduler.AddOnce(RecreatePieces));
 
             base.OnApply();
         }
