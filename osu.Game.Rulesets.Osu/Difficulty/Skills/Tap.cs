@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     {
         protected override double StarsPerDouble => 1.075;
         protected override int HistoryLength => 16;
-        private int averageLength = 4;
+        private int averageLength = 2;
         private int globalCount;
 
         private int decayExcessThreshold = 500;
@@ -87,9 +87,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 if (Utils.IsRatioEqual(1.5, prevDelta, currDelta) || Utils.IsRatioEqual(1.5, currDelta, prevDelta))
                 {
                     if (Previous[i - 1].BaseObject is Slider || Previous[i].BaseObject is Slider)
-                        specialTransitionCount += 50.0 / Math.Sqrt(prevDelta * currDelta);
+                        specialTransitionCount += 50.0 / Math.Sqrt(prevDelta * currDelta) * ((double)i / HistoryLength);
                     else
-                        specialTransitionCount += 200.0 / Math.Sqrt(prevDelta * currDelta);
+                        specialTransitionCount += 200.0 / Math.Sqrt(prevDelta * currDelta) * ((double)i / HistoryLength);
                 }
 
                 if (firstDeltaSwitch)
@@ -102,12 +102,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     {
                         if (islandSize > 6)
                         {
-                            islandTimes[6] = islandTimes[6] + 100.0 / Math.Sqrt(prevDelta * currDelta);
+                            islandTimes[6] = islandTimes[6] + 100.0 / Math.Sqrt(prevDelta * currDelta) * ((double)i / HistoryLength);
                             islandSizes[6] = islandSizes[6] + 1;
                         }
                         else
                         {
-                            islandTimes[islandSize] = islandTimes[islandSize] + 100.0 / Math.Sqrt(prevDelta * currDelta);
+                            islandTimes[islandSize] = islandTimes[islandSize] + 100.0 / Math.Sqrt(prevDelta * currDelta) * ((double)i / HistoryLength);
                             islandSizes[islandSize] = islandSizes[islandSize] + 1;
                         }
 
@@ -117,12 +117,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     {
                         if (islandSize > 6)
                         {
-                            islandTimes[6] = islandTimes[6] + 100.0 / Math.Sqrt(((OsuDifficultyHitObject)Previous[i]).StrainTime * ((OsuDifficultyHitObject)Previous[i - 1]).StrainTime);
+                            islandTimes[6] = islandTimes[6] + 100.0 / Math.Sqrt(prevDelta * currDelta) * ((double)i / HistoryLength);
                             islandSizes[6] = islandSizes[6] + 1;
                         }
                         else
                         {
-                            islandTimes[islandSize] = islandTimes[islandSize] + 100.0 / Math.Sqrt(((OsuDifficultyHitObject)Previous[i]).StrainTime * ((OsuDifficultyHitObject)Previous[i - 1]).StrainTime);
+                            islandTimes[islandSize] = islandTimes[islandSize] + 100.0 / Math.Sqrt(prevDelta * currDelta) * ((double)i / HistoryLength) ;
                             islandSizes[islandSize] = islandSizes[islandSize] + 1;
                         }
 
@@ -142,7 +142,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             for (int i = 0; i < islandSizes.Length; i++)
             {
                 if (islandSizes[i] != 0)
-                    rhythmComplexitySum += islandTimes[i] / Math.Pow(islandSizes[i], .75);
+                    rhythmComplexitySum += islandTimes[i] / Math.Pow(islandSizes[i], .5);
             }
 
             // rhythmComplexitySum += islandTimes[0] / Math.Pow(islandSizes[0], .75);
@@ -162,8 +162,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             // rhythmComplexitySum /= Math.Sqrt(9 + sliderCount) / 3;
 
-            rhythmComplexitySum += specialTransitionCount / 2;
 
+            rhythmComplexitySum *= 1;
+            rhythmComplexitySum += specialTransitionCount;
             // Console.WriteLine("Delta: " + avgDeltaTime);
 
             if (75 / avgDeltaTime > 1)
