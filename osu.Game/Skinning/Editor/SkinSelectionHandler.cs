@@ -4,19 +4,23 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Extensions;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Compose.Components;
-using osu.Game.Screens.Play.HUD;
 using osuTK;
 
 namespace osu.Game.Skinning.Editor
 {
-    public class SkinSelectionHandler : SelectionHandler<ISkinnableComponent>
+    public class SkinSelectionHandler : SelectionHandler<ISkinnableDrawable>
     {
+        [Resolved]
+        private SkinEditor skinEditor { get; set; }
+
         public override bool HandleRotation(float angle)
         {
             // TODO: this doesn't correctly account for origin/anchor specs being different in a multi-selection.
@@ -37,7 +41,27 @@ namespace osu.Game.Skinning.Editor
             return true;
         }
 
-        public override bool HandleMovement(MoveSelectionEvent<ISkinnableComponent> moveEvent)
+        public override bool HandleFlip(Direction direction)
+        {
+            var selectionQuad = GetSurroundingQuad(SelectedBlueprints.Select(b => b.ScreenSpaceSelectionPoint));
+
+            foreach (var b in SelectedBlueprints)
+            {
+                var drawableItem = (Drawable)b.Item;
+
+                drawableItem.Position =
+                    drawableItem.Parent.ToLocalSpace(GetFlippedPosition(direction, selectionQuad, b.ScreenSpaceSelectionPoint)) - drawableItem.AnchorPosition;
+
+                drawableItem.Scale *= new Vector2(
+                    direction == Direction.Horizontal ? -1 : 1,
+                    direction == Direction.Vertical ? -1 : 1
+                );
+            }
+
+            return true;
+        }
+
+        public override bool HandleMovement(MoveSelectionEvent<ISkinnableDrawable> moveEvent)
         {
             foreach (var c in SelectedBlueprints)
             {
@@ -58,26 +82,25 @@ namespace osu.Game.Skinning.Editor
             SelectionBox.CanReverse = false;
         }
 
-        protected override void DeleteItems(IEnumerable<ISkinnableComponent> items)
-        {
-            foreach (var i in items)
-            {
-                ((Drawable)i).Expire();
-                SelectedItems.Remove(i);
-            }
-        }
+        protected override void DeleteItems(IEnumerable<ISkinnableDrawable> items) =>
+            skinEditor.DeleteItems(items.ToArray());
 
-        protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<ISkinnableComponent>> selection)
+        protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<ISkinnableDrawable>> selection)
         {
             yield return new OsuMenuItem("Anchor")
             {
-                Items = createAnchorItems().ToArray()
+                Items = createAnchorItems(d => d.Anchor, applyAnchor).ToArray()
+            };
+
+            yield return new OsuMenuItem("Origin")
+            {
+                Items = createAnchorItems(d => d.Origin, applyOrigin).ToArray()
             };
 
             foreach (var item in base.GetContextMenuItemsForSelection(selection))
                 yield return item;
 
-            IEnumerable<AnchorMenuItem> createAnchorItems()
+            IEnumerable<TernaryStateMenuItem> createAnchorItems(Func<Drawable, Anchor> checkFunction, Action<Anchor> applyFunction)
             {
                 var displayableAnchors = new[]
                 {
@@ -94,18 +117,36 @@ namespace osu.Game.Skinning.Editor
 
                 return displayableAnchors.Select(a =>
                 {
-                    return new AnchorMenuItem(a, selection, _ => applyAnchor(a))
+                    return new TernaryStateRadioMenuItem(a.ToString(), MenuItemType.Standard, _ => applyFunction(a))
                     {
-                        State = { Value = GetStateFromSelection(selection, c => ((Drawable)c.Item).Anchor == a) }
+                        State = { Value = GetStateFromSelection(selection, c => checkFunction((Drawable)c.Item) == a) }
                     };
                 });
+            }
+        }
+
+        private void applyOrigin(Anchor anchor)
+        {
+            foreach (var item in SelectedItems)
+            {
+                var drawable = (Drawable)item;
+
+                var previousOrigin = drawable.OriginPosition;
+                drawable.Origin = anchor;
+                drawable.Position += drawable.OriginPosition - previousOrigin;
             }
         }
 
         private void applyAnchor(Anchor anchor)
         {
             foreach (var item in SelectedItems)
-                ((Drawable)item).Anchor = anchor;
+            {
+                var drawable = (Drawable)item;
+
+                var previousAnchor = drawable.AnchorPosition;
+                drawable.Anchor = anchor;
+                drawable.Position -= drawable.AnchorPosition - previousAnchor;
+            }
         }
 
         private static void adjustScaleFromAnchor(ref Vector2 scale, Anchor reference)
@@ -117,16 +158,13 @@ namespace osu.Game.Skinning.Editor
             // reverse the scale direction if dragging from top or left.
             if ((reference & Anchor.x0) > 0) scale.X = -scale.X;
             if ((reference & Anchor.y0) > 0) scale.Y = -scale.Y;
-        }
 
-        public class AnchorMenuItem : TernaryStateMenuItem
-        {
-            public AnchorMenuItem(Anchor anchor, IEnumerable<SelectionBlueprint<ISkinnableComponent>> selection, Action<TernaryState> action)
-                : base(anchor.ToString(), getNextState, MenuItemType.Standard, action)
+            // for now aspect lock scale adjustments that occur at corners.
+            if (!reference.HasFlagFast(Anchor.x1) && !reference.HasFlagFast(Anchor.y1))
             {
+                // TODO: temporary implementation - only dragging the corner handles across the X axis changes size.
+                scale.Y = scale.X;
             }
-
-            private static TernaryState getNextState(TernaryState state) => TernaryState.True;
         }
     }
 }

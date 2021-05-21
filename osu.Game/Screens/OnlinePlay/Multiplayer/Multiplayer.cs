@@ -15,13 +15,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
     public class Multiplayer : OnlinePlayScreen
     {
         [Resolved]
-        private StatefulMultiplayerClient client { get; set; }
+        private MultiplayerClient client { get; set; }
 
         public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
 
-            if (client.Room != null)
+            if (client.Room != null && client.LocalUser?.State != MultiplayerUserState.Spectating)
                 client.ChangeState(MultiplayerUserState.Idle);
         }
 

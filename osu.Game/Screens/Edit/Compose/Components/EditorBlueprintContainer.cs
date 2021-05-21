@@ -2,15 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
@@ -24,7 +23,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected readonly HitObjectComposer Composer;
 
-        private readonly BindableList<HitObject> selectedHitObjects = new BindableList<HitObject>();
+        private HitObjectUsageEventBuffer usageEventBuffer;
 
         protected EditorBlueprintContainer(HitObjectComposer composer)
         {
@@ -34,23 +33,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            selectedHitObjects.BindTo(Beatmap.SelectedHitObjects);
-            selectedHitObjects.CollectionChanged += (selectedObjects, args) =>
-            {
-                switch (args.Action)
-                {
-                    case NotifyCollectionChangedAction.Add:
-                        foreach (var o in args.NewItems)
-                            SelectionBlueprints.FirstOrDefault(b => b.Item == o)?.Select();
-                        break;
-
-                    case NotifyCollectionChangedAction.Remove:
-                        foreach (var o in args.OldItems)
-                            SelectionBlueprints.FirstOrDefault(b => b.Item == o)?.Deselect();
-
-                        break;
-                }
-            };
+            SelectedItems.BindTo(Beatmap.SelectedHitObjects);
         }
 
         protected override void LoadComplete()
@@ -65,9 +48,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 foreach (var obj in Composer.HitObjects)
                     AddBlueprintFor(obj.HitObject);
 
-                Composer.Playfield.HitObjectUsageBegan += AddBlueprintFor;
-                Composer.Playfield.HitObjectUsageFinished += RemoveBlueprintFor;
+                usageEventBuffer = new HitObjectUsageEventBuffer(Composer.Playfield);
+                usageEventBuffer.HitObjectUsageBegan += AddBlueprintFor;
+                usageEventBuffer.HitObjectUsageFinished += RemoveBlueprintFor;
+                usageEventBuffer.HitObjectUsageTransferred += TransferBlueprintFor;
             }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            usageEventBuffer?.Update();
         }
 
         protected override IEnumerable<SelectionBlueprint<HitObject>> SortForMovement(IReadOnlyList<SelectionBlueprint<HitObject>> blueprints)
@@ -98,6 +89,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 return;
 
             base.AddBlueprintFor(item);
+        }
+
+        /// <summary>
+        /// Invoked when a <see cref="HitObject"/> has been transferred to another <see cref="DrawableHitObject"/>.
+        /// </summary>
+        /// <param name="hitObject">The hit object which has been assigned to a new drawable.</param>
+        /// <param name="drawableObject">The new drawable that is representing the hit object.</param>
+        protected virtual void TransferBlueprintFor(HitObject hitObject, DrawableHitObject drawableObject)
+        {
         }
 
         protected override void DragOperationCompleted()
@@ -153,11 +153,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 Beatmap.HitObjectRemoved -= RemoveBlueprintFor;
             }
 
-            if (Composer != null)
-            {
-                Composer.Playfield.HitObjectUsageBegan -= AddBlueprintFor;
-                Composer.Playfield.HitObjectUsageFinished -= RemoveBlueprintFor;
-            }
+            usageEventBuffer?.Dispose();
         }
     }
 }

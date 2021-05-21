@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             hitCircle.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = 2 });
 
             Add(drawableObject = new DrawableHitCircle(hitCircle));
-            AddBlueprint(blueprint = new TestBlueprint(drawableObject));
+            AddBlueprint(blueprint = new TestBlueprint(hitCircle), drawableObject);
         });
 
         [Test]
@@ -63,8 +63,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         {
             public new HitCirclePiece CirclePiece => base.CirclePiece;
 
-            public TestBlueprint(DrawableHitCircle drawableCircle)
-                : base(drawableCircle)
+            public TestBlueprint(HitCircle circle)
+                : base(circle)
             {
             }
         }
