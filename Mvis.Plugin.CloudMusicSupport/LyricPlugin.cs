@@ -98,6 +98,7 @@ namespace Mvis.Plugin.CloudMusicSupport
             Name = "歌词";
             Description = "从网易云音乐获取歌词信息";
             Author = "MATRIX-夜翎";
+            Depth = -1;
 
             Flags.AddRange(new[]
             {

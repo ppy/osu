@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Mvis.SideBar.Header
         protected override bool OnHover(HoverEvent e)
         {
             if (!isActive)
-                activeBox.ResizeHeightTo(0.2f, 300, Easing.OutQuint);
+                activeBox.ResizeHeightTo(0.15f, 300, Easing.OutQuint);
 
             return base.OnHover(e);
         }
@@ -82,7 +82,7 @@ namespace osu.Game.Screens.Mvis.SideBar.Header
         public void MakeInActive()
         {
             isActive = false;
-            activeBox.ResizeHeightTo(IsHovered ? 0.2f : 0, 300, Easing.OutQuint);
+            activeBox.ResizeHeightTo(IsHovered ? 0.15f : 0, 300, Easing.OutQuint);
             title.Colour = colourProvider.Highlight1;
         }
     }

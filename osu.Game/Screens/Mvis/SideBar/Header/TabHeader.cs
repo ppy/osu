@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Mvis.SideBar.Header
         {
             colourProvider.HueColour.BindValueChanged(_ =>
             {
-                bgBox.Colour = colourProvider.Background5;
+                bgBox.Colour = colourProvider.Dark5;
                 highLightBox.Colour = colourProvider.Highlight1;
             }, true);
 

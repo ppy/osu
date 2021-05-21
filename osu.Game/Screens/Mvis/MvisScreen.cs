@@ -268,6 +268,7 @@ namespace osu.Game.Screens.Mvis
 
         private IProvideAudioControlPlugin audioControlProvider;
         private readonly OsuMusicControllerWrapper musicControllerWrapper = new OsuMusicControllerWrapper();
+        private SettingsButton songSelectButton;
 
         public float BottombarHeight => (bottomBar?.Height - bottomBar?.Y ?? 0) + 10 + 5;
 
@@ -317,13 +318,13 @@ namespace osu.Game.Screens.Mvis
                             {
                                 Padding = new MarginPadding(0)
                             },
-                            new SettingsButton
+                            songSelectButton = new SettingsButton
                             {
                                 Text = "歌曲选择",
                                 Action = () => this.Push(new MvisSongSelect())
                             }
                         }
-                    },
+                    }
                 },
                 pluginsPage = new SidebarPluginsPage()
             });
@@ -659,6 +660,8 @@ namespace osu.Game.Screens.Mvis
             //切换并设置当前控制插件IsCurrent为true
             audioControlProvider = pacp ?? musicControllerWrapper;
             audioControlProvider.IsCurrent = true;
+
+            songSelectButton.Enabled.Value = audioControlProvider == musicControllerWrapper;
         }
 
         private void setupKeyBindings()
@@ -746,7 +749,7 @@ namespace osu.Game.Screens.Mvis
                 () =>
                 {
                     changeAudioControlProvider(pacp);
-                    onAllow.Invoke();
+                    onAllow?.Invoke();
                 },
                 onDeny));
         }

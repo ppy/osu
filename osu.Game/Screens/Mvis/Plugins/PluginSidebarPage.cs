@@ -6,6 +6,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Online.Placeholders;
 using osu.Game.Screens.Mvis.Plugins.Config;
 using osu.Game.Screens.Mvis.SideBar;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Screens.Mvis.Plugins
@@ -62,7 +63,8 @@ namespace osu.Game.Screens.Mvis.Plugins
                         },
                         new ClickablePlaceholder("请先启用该插件!", FontAwesome.Solid.Plug)
                         {
-                            Action = () => pluginManager?.ActivePlugin(Plugin)
+                            Action = () => pluginManager?.ActivePlugin(Plugin),
+                            Scale = new Vector2(1.25f)
                         }
                     }
                 }
