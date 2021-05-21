@@ -1,6 +1,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Online.Placeholders;
 using osu.Game.Screens.Mvis.Plugins.Config;
@@ -11,7 +12,7 @@ namespace osu.Game.Screens.Mvis.Plugins
 {
     public abstract class PluginSidebarPage : Container, ISidebarContent
     {
-        private readonly ClickablePlaceholder placeholder;
+        private readonly Container placeholder;
         private readonly Container content;
 
         protected override Container<Drawable> Content => content;
@@ -45,17 +46,37 @@ namespace osu.Game.Screens.Mvis.Plugins
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0
                 },
-                placeholder = new ClickablePlaceholder("请先启用该插件!", FontAwesome.Solid.Plug)
+                placeholder = new Container
                 {
-                    Action = () => pluginManager?.ActivePlugin(Plugin)
+                    RelativeSizeAxes = Axes.Both,
+                    RelativePositionAxes = Axes.Both,
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    Children = new Drawable[]
+                    {
+                        bgBox = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre
+                        },
+                        new ClickablePlaceholder("请先启用该插件!", FontAwesome.Solid.Plug)
+                        {
+                            Action = () => pluginManager?.ActivePlugin(Plugin)
+                        }
+                    }
                 }
             };
         }
 
         private DependencyContainer dependencies;
+        private readonly Box bgBox;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+        [Resolved]
+        private CustomColourProvider colourProvider { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -69,12 +90,12 @@ namespace osu.Game.Screens.Mvis.Plugins
                 if (v.NewValue)
                 {
                     content.FadeOut();
-                    placeholder.Show();
+                    placeholder.MoveToY(0, 500, Easing.OutQuint);
                 }
                 else
                 {
                     content.FadeIn(200, Easing.OutQuint);
-                    placeholder.Hide();
+                    placeholder.MoveToY(1, 500, Easing.OutQuint);
                 }
 
                 if (!v.NewValue && !contentInit)
@@ -83,6 +104,16 @@ namespace osu.Game.Screens.Mvis.Plugins
                     contentInit = true;
                 }
             }, true);
+        }
+
+        protected override void LoadComplete()
+        {
+            colourProvider.HueColour.BindValueChanged(_ =>
+            {
+                bgBox.Colour = colourProvider.Background7;
+            }, true);
+
+            base.LoadComplete();
         }
 
         public float ResizeWidth { get; }

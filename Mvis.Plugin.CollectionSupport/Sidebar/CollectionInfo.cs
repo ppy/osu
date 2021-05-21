@@ -154,7 +154,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
 
             colourProvider.HueColour.BindValueChanged(_ =>
             {
-                bgBox?.FadeColour(colourProvider.Background5);
+                bgBox?.FadeColour(colourProvider.Dark6);
             }, true);
 
             collection.BindValueChanged(OnCollectionChanged);
@@ -165,7 +165,7 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
             bgBox = new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Colour = colourProvider.Background5
+                Colour = colourProvider.Dark6
             };
 
             return bgBox;

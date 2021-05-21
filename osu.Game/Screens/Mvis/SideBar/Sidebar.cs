@@ -112,7 +112,7 @@ namespace osu.Game.Screens.Mvis.SideBar
                 defaultImplementation: _ => sidebarBg = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background6,
+                    Colour = colourProvider.Dark5,
                     Depth = float.MaxValue
                 })
             {
@@ -129,7 +129,7 @@ namespace osu.Game.Screens.Mvis.SideBar
 
             colourProvider.HueColour.BindValueChanged(_ =>
             {
-                sidebarBg?.FadeColour(colourProvider.Background6);
+                sidebarBg?.FadeColour(colourProvider.Dark5);
             }, true);
         }
 

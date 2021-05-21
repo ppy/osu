@@ -36,6 +36,7 @@ namespace osu.Game.Screens.Mvis
         public Color4 Background4 => getColour(0.1f, 0.2f);
         public Color4 Background5 => getColour(0.1f, 0.15f);
         public Color4 Background6 => getColour(0.1f, 0.1f);
+        public Color4 Background7 => getColour(0.1f, 0.05f);
         private Color4 getColour(float saturation, float lightness) => Color4.FromHsl(new Vector4(HueColour.Value, saturation, lightness, 1));
         public BindableFloat HueColour = new BindableFloat();
 

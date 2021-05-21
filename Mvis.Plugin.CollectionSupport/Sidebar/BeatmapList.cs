@@ -135,8 +135,8 @@ namespace Mvis.Plugin.CollectionSupport.Sidebar
         private ColourInfo getMaskBoxColour()
         {
             return ColourInfo.GradientVertical(
-                colourProvider.Background5,
-                colourProvider.Background5.Opacity(0));
+                colourProvider.Dark6,
+                colourProvider.Dark6.Opacity(0));
         }
 
         protected override void UpdateAfterChildren()

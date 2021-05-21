@@ -47,8 +47,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
             {
                 bgBox = new Box
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background4
+                    RelativeSizeAxes = Axes.Both
                 },
                 new FillFlowContainer
                 {
@@ -154,7 +153,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
 
             colourProvider.HueColour.BindValueChanged(_ =>
             {
-                bgBox.Colour = colourProvider.Background4;
+                bgBox.Colour = colourProvider.Dark4;
             }, true);
         }
 

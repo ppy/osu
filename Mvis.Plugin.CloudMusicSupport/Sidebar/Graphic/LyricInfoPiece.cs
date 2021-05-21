@@ -41,15 +41,9 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
         {
             var timeSpan = TimeSpan.FromMilliseconds(Value.Time);
 
-            Box bgBox;
             Box fgBox;
             InternalChildren = new Drawable[]
             {
-                bgBox = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background4
-                },
                 new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
@@ -111,7 +105,6 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
 
             colourProvider.HueColour.BindValueChanged(_ =>
             {
-                bgBox.Colour = colourProvider.Background4;
                 fgBox.Colour = colourProvider.Highlight1;
             }, true);
         }
