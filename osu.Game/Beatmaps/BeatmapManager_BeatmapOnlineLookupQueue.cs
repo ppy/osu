@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -83,6 +82,12 @@ namespace osu.Game.Beatmaps
                         beatmap.BeatmapSet.OnlineBeatmapSetID = res.OnlineBeatmapSetID;
                         beatmap.OnlineBeatmapID = res.OnlineBeatmapID;
 
+                        if (beatmap.Metadata != null)
+                            beatmap.Metadata.AuthorID = res.AuthorID;
+
+                        if (beatmap.BeatmapSet.Metadata != null)
+                            beatmap.BeatmapSet.Metadata.AuthorID = res.AuthorID;
+
                         LogForModel(set, $"Online retrieval mapped {beatmap} to {res.OnlineBeatmapSetID} / {res.OnlineBeatmapID}.");
                     }
                 }
@@ -157,7 +162,7 @@ namespace osu.Game.Beatmaps
 
                         using (var cmd = db.CreateCommand())
                         {
-                            cmd.CommandText = "SELECT beatmapset_id, beatmap_id, approved FROM osu_beatmaps WHERE checksum = @MD5Hash OR beatmap_id = @OnlineBeatmapID OR filename = @Path";
+                            cmd.CommandText = "SELECT beatmapset_id, beatmap_id, approved, user_id FROM osu_beatmaps WHERE checksum = @MD5Hash OR beatmap_id = @OnlineBeatmapID OR filename = @Path";
 
                             cmd.Parameters.Add(new SqliteParameter("@MD5Hash", beatmap.MD5Hash));
                             cmd.Parameters.Add(new SqliteParameter("@OnlineBeatmapID", beatmap.OnlineBeatmapID ?? (object)DBNull.Value));
@@ -173,6 +178,12 @@ namespace osu.Game.Beatmaps
                                     beatmap.BeatmapSet.Status = status;
                                     beatmap.BeatmapSet.OnlineBeatmapSetID = reader.GetInt32(0);
                                     beatmap.OnlineBeatmapID = reader.GetInt32(1);
+
+                                    if (beatmap.Metadata != null)
+                                        beatmap.Metadata.AuthorID = reader.GetInt32(3);
+
+                                    if (beatmap.BeatmapSet.Metadata != null)
+                                        beatmap.BeatmapSet.Metadata.AuthorID = reader.GetInt32(3);
 
                                     LogForModel(set, $"Cached local retrieval for {beatmap}.");
                                     return true;
@@ -193,17 +204,6 @@ namespace osu.Game.Beatmaps
             {
                 cacheDownloadRequest?.Dispose();
                 updateScheduler?.Dispose();
-            }
-
-            [Serializable]
-            [SuppressMessage("ReSharper", "InconsistentNaming")]
-            private class CachedOnlineBeatmapLookup
-            {
-                public int approved { get; set; }
-
-                public int? beatmapset_id { get; set; }
-
-                public int? beatmap_id { get; set; }
             }
         }
     }

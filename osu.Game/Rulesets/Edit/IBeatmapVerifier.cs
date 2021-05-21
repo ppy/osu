@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit
@@ -12,6 +11,6 @@ namespace osu.Game.Rulesets.Edit
     /// </summary>
     public interface IBeatmapVerifier
     {
-        public IEnumerable<Issue> Run(IBeatmap playableBeatmap, WorkingBeatmap workingBeatmap);
+        public IEnumerable<Issue> Run(BeatmapVerifierContext context);
     }
 }

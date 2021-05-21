@@ -1,28 +1,22 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using osu.Game.Beatmaps;
-using osu.Game.Replays;
 using osu.Game.Rulesets.EmptyScrolling.Objects;
 using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Rulesets.EmptyScrolling.Replays
 {
-    public class EmptyScrollingAutoGenerator : AutoGenerator
+    public class EmptyScrollingAutoGenerator : AutoGenerator<EmptyScrollingReplayFrame>
     {
-        protected Replay Replay;
-        protected List<ReplayFrame> Frames => Replay.Frames;
-
         public new Beatmap<EmptyScrollingHitObject> Beatmap => (Beatmap<EmptyScrollingHitObject>)base.Beatmap;
 
         public EmptyScrollingAutoGenerator(IBeatmap beatmap)
             : base(beatmap)
         {
-            Replay = new Replay();
         }
 
-        public override Replay Generate()
+        protected override void GenerateFrames()
         {
             Frames.Add(new EmptyScrollingReplayFrame());
 
@@ -34,8 +28,6 @@ namespace osu.Game.Rulesets.EmptyScrolling.Replays
                     // todo: add required inputs and extra frames.
                 });
             }
-
-            return Replay;
         }
     }
 }
