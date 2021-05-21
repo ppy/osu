@@ -54,7 +54,7 @@ namespace osu.Game.Skinning.Editor
                 (!anchor.HasFlagFast(Anchor.x1) && !anchor.HasFlagFast(Anchor.y1))
                 // ..or if any of the selection have been rotated.
                 // this is to avoid requiring skew logic (which would likely not be the user's expected transform anyway).
-                || SelectedBlueprints.Any(b => !Precision.AlmostEquals(((Drawable)b.Item).Rotation % 90, 0));
+                || SelectedBlueprints.Any(b => !Precision.AlmostEquals(((Drawable)b.Item).Rotation, 0));
 
             if (shouldAspectLock)
             {
