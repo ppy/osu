@@ -1,15 +1,16 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
-using Microsoft.AspNetCore.SignalR.Client;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
@@ -23,25 +24,20 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Online.Spectator
 {
-    public class SpectatorStreamingClient : Component, ISpectatorClient
+    public abstract class SpectatorClient : Component, ISpectatorClient
     {
         /// <summary>
         /// The maximum milliseconds between frame bundle sends.
         /// </summary>
         public const double TIME_BETWEEN_SENDS = 200;
 
-        private readonly string endpoint;
-
-        [CanBeNull]
-        private IHubClientConnector connector;
-
-        private readonly IBindable<bool> isConnected = new BindableBool();
-
-        private HubConnection connection => connector?.CurrentConnection;
+        /// <summary>
+        /// Whether the <see cref="SpectatorClient"/> is currently connected.
+        /// This is NOT thread safe and usage should be scheduled.
+        /// </summary>
+        public abstract IBindable<bool> IsConnected { get; }
 
         private readonly List<int> watchingUsers = new List<int>();
-
-        private readonly object userLock = new object();
 
         public IBindableList<int> PlayingUsers => playingUsers;
 
@@ -49,95 +45,68 @@ namespace osu.Game.Online.Spectator
 
         private readonly Dictionary<int, SpectatorState> playingUserStates = new Dictionary<int, SpectatorState>();
 
-        [CanBeNull]
-        private IBeatmap currentBeatmap;
+        private IBeatmap? currentBeatmap;
 
-        [CanBeNull]
-        private Score currentScore;
+        private Score? currentScore;
 
         [Resolved]
-        private IBindable<RulesetInfo> currentRuleset { get; set; }
+        private IBindable<RulesetInfo> currentRuleset { get; set; } = null!;
 
         [Resolved]
-        private IBindable<IReadOnlyList<Mod>> currentMods { get; set; }
+        private IBindable<IReadOnlyList<Mod>> currentMods { get; set; } = null!;
 
         private readonly SpectatorState currentState = new SpectatorState();
 
-        private bool isPlaying;
+        /// <summary>
+        /// Whether the local user is playing.
+        /// </summary>
+        protected bool IsPlaying { get; private set; }
 
         /// <summary>
         /// Called whenever new frames arrive from the server.
         /// </summary>
-        public event Action<int, FrameDataBundle> OnNewFrames;
+        public event Action<int, FrameDataBundle>? OnNewFrames;
 
         /// <summary>
         /// Called whenever a user starts a play session, or immediately if the user is being watched and currently in a play session.
         /// </summary>
-        public event Action<int, SpectatorState> OnUserBeganPlaying;
+        public event Action<int, SpectatorState>? OnUserBeganPlaying;
 
         /// <summary>
         /// Called whenever a user finishes a play session.
         /// </summary>
-        public event Action<int, SpectatorState> OnUserFinishedPlaying;
-
-        public SpectatorStreamingClient(EndpointConfiguration endpoints)
-        {
-            endpoint = endpoints.SpectatorEndpointUrl;
-        }
+        public event Action<int, SpectatorState>? OnUserFinishedPlaying;
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api)
+        private void load()
         {
-            connector = api.GetHubConnector(nameof(SpectatorStreamingClient), endpoint);
-
-            if (connector != null)
+            IsConnected.BindValueChanged(connected => Schedule(() =>
             {
-                connector.ConfigureConnection = connection =>
+                if (connected.NewValue)
                 {
-                    // until strong typed client support is added, each method must be manually bound
-                    // (see https://github.com/dotnet/aspnetcore/issues/15198)
-                    connection.On<int, SpectatorState>(nameof(ISpectatorClient.UserBeganPlaying), ((ISpectatorClient)this).UserBeganPlaying);
-                    connection.On<int, FrameDataBundle>(nameof(ISpectatorClient.UserSentFrames), ((ISpectatorClient)this).UserSentFrames);
-                    connection.On<int, SpectatorState>(nameof(ISpectatorClient.UserFinishedPlaying), ((ISpectatorClient)this).UserFinishedPlaying);
-                };
+                    // get all the users that were previously being watched
+                    int[] users = watchingUsers.ToArray();
+                    watchingUsers.Clear();
 
-                isConnected.BindTo(connector.IsConnected);
-                isConnected.BindValueChanged(connected =>
+                    // resubscribe to watched users.
+                    foreach (var userId in users)
+                        WatchUser(userId);
+
+                    // re-send state in case it wasn't received
+                    if (IsPlaying)
+                        BeginPlayingInternal(currentState);
+                }
+                else
                 {
-                    if (connected.NewValue)
-                    {
-                        // get all the users that were previously being watched
-                        int[] users;
-
-                        lock (userLock)
-                        {
-                            users = watchingUsers.ToArray();
-                            watchingUsers.Clear();
-                        }
-
-                        // resubscribe to watched users.
-                        foreach (var userId in users)
-                            WatchUser(userId);
-
-                        // re-send state in case it wasn't received
-                        if (isPlaying)
-                            beginPlaying();
-                    }
-                    else
-                    {
-                        lock (userLock)
-                        {
-                            playingUsers.Clear();
-                            playingUserStates.Clear();
-                        }
-                    }
-                }, true);
-            }
+                    playingUsers.Clear();
+                    playingUserStates.Clear();
+                }
+            }), true);
         }
 
         Task ISpectatorClient.UserBeganPlaying(int userId, SpectatorState state)
         {
-            lock (userLock)
+            Schedule(() =>
             {
                 if (!playingUsers.Contains(userId))
                     playingUsers.Add(userId);
@@ -147,39 +116,41 @@ namespace osu.Game.Online.Spectator
                 // We don't want the user states to update unless the player is being watched, otherwise calling BindUserBeganPlaying() can lead to double invocations.
                 if (watchingUsers.Contains(userId))
                     playingUserStates[userId] = state;
-            }
 
-            OnUserBeganPlaying?.Invoke(userId, state);
+                OnUserBeganPlaying?.Invoke(userId, state);
+            });
 
             return Task.CompletedTask;
         }
 
         Task ISpectatorClient.UserFinishedPlaying(int userId, SpectatorState state)
         {
-            lock (userLock)
+            Schedule(() =>
             {
                 playingUsers.Remove(userId);
                 playingUserStates.Remove(userId);
-            }
 
-            OnUserFinishedPlaying?.Invoke(userId, state);
+                OnUserFinishedPlaying?.Invoke(userId, state);
+            });
 
             return Task.CompletedTask;
         }
 
         Task ISpectatorClient.UserSentFrames(int userId, FrameDataBundle data)
         {
-            OnNewFrames?.Invoke(userId, data);
+            Schedule(() => OnNewFrames?.Invoke(userId, data));
 
             return Task.CompletedTask;
         }
 
         public void BeginPlaying(GameplayBeatmap beatmap, Score score)
         {
-            if (isPlaying)
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
+            if (IsPlaying)
                 throw new InvalidOperationException($"Cannot invoke {nameof(BeginPlaying)} when already playing");
 
-            isPlaying = true;
+            IsPlaying = true;
 
             // transfer state at point of beginning play
             currentState.BeatmapID = beatmap.BeatmapInfo.OnlineBeatmapID;
@@ -189,69 +160,65 @@ namespace osu.Game.Online.Spectator
             currentBeatmap = beatmap.PlayableBeatmap;
             currentScore = score;
 
-            beginPlaying();
+            BeginPlayingInternal(currentState);
         }
 
-        private void beginPlaying()
-        {
-            Debug.Assert(isPlaying);
-
-            if (!isConnected.Value) return;
-
-            connection.SendAsync(nameof(ISpectatorServer.BeginPlaySession), currentState);
-        }
-
-        public void SendFrames(FrameDataBundle data)
-        {
-            if (!isConnected.Value) return;
-
-            lastSend = connection.SendAsync(nameof(ISpectatorServer.SendFrameData), data);
-        }
+        public void SendFrames(FrameDataBundle data) => lastSend = SendFramesInternal(data);
 
         public void EndPlaying()
         {
-            isPlaying = false;
-            currentBeatmap = null;
-
-            if (!isConnected.Value) return;
-
-            connection.SendAsync(nameof(ISpectatorServer.EndPlaySession), currentState);
-        }
-
-        public virtual void WatchUser(int userId)
-        {
-            lock (userLock)
+            // This method is most commonly called via Dispose(), which is asynchronous.
+            // Todo: This should not be a thing, but requires framework changes.
+            Schedule(() =>
             {
-                if (watchingUsers.Contains(userId))
+                if (!IsPlaying)
                     return;
 
-                watchingUsers.Add(userId);
+                IsPlaying = false;
+                currentBeatmap = null;
 
-                if (!isConnected.Value)
-                    return;
-            }
-
-            connection.SendAsync(nameof(ISpectatorServer.StartWatchingUser), userId);
+                EndPlayingInternal(currentState);
+            });
         }
 
-        public virtual void StopWatchingUser(int userId)
+        public void WatchUser(int userId)
         {
-            lock (userLock)
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
+            if (watchingUsers.Contains(userId))
+                return;
+
+            watchingUsers.Add(userId);
+
+            WatchUserInternal(userId);
+        }
+
+        public void StopWatchingUser(int userId)
+        {
+            // This method is most commonly called via Dispose(), which is asynchronous.
+            // Todo: This should not be a thing, but requires framework changes.
+            Schedule(() =>
             {
                 watchingUsers.Remove(userId);
-
-                if (!isConnected.Value)
-                    return;
-            }
-
-            connection.SendAsync(nameof(ISpectatorServer.EndWatchingUser), userId);
+                StopWatchingUserInternal(userId);
+            });
         }
+
+        protected abstract Task BeginPlayingInternal(SpectatorState state);
+
+        protected abstract Task SendFramesInternal(FrameDataBundle data);
+
+        protected abstract Task EndPlayingInternal(SpectatorState state);
+
+        protected abstract Task WatchUserInternal(int userId);
+
+        protected abstract Task StopWatchingUserInternal(int userId);
 
         private readonly Queue<LegacyReplayFrame> pendingFrames = new Queue<LegacyReplayFrame>();
 
         private double lastSendTime;
 
-        private Task lastSend;
+        private Task? lastSend;
 
         private const int max_pending_frames = 30;
 
@@ -265,6 +232,8 @@ namespace osu.Game.Online.Spectator
 
         public void HandleFrame(ReplayFrame frame)
         {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
             if (frame is IConvertibleReplayFrame convertible)
                 pendingFrames.Enqueue(convertible.ToLegacy(currentBeatmap));
 
@@ -296,8 +265,7 @@ namespace osu.Game.Online.Spectator
         /// <returns><c>true</c> if successful (the user is playing), <c>false</c> otherwise.</returns>
         public bool TryGetPlayingUserState(int userId, out SpectatorState state)
         {
-            lock (userLock)
-                return playingUserStates.TryGetValue(userId, out state);
+            return playingUserStates.TryGetValue(userId, out state);
         }
 
         /// <summary>
@@ -308,16 +276,13 @@ namespace osu.Game.Online.Spectator
         public void BindUserBeganPlaying(Action<int, SpectatorState> callback, bool runOnceImmediately = false)
         {
             // The lock is taken before the event is subscribed to to prevent doubling of events.
-            lock (userLock)
-            {
-                OnUserBeganPlaying += callback;
+            OnUserBeganPlaying += callback;
 
-                if (!runOnceImmediately)
-                    return;
+            if (!runOnceImmediately)
+                return;
 
-                foreach (var (userId, state) in playingUserStates)
-                    callback(userId, state);
-            }
+            foreach (var (userId, state) in playingUserStates)
+                callback(userId, state);
         }
     }
 }

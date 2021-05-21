@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Dashboard
         private FillFlowContainer<PlayingUserPanel> userFlow;
 
         [Resolved]
-        private SpectatorStreamingClient spectatorStreaming { get; set; }
+        private SpectatorClient spectatorClient { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Dashboard
         {
             base.LoadComplete();
 
-            playingUsers.BindTo(spectatorStreaming.PlayingUsers);
+            playingUsers.BindTo(spectatorClient.PlayingUsers);
             playingUsers.BindCollectionChanged(onUsersChanged, true);
         }
 
