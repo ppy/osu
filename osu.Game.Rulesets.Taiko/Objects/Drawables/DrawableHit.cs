@@ -55,16 +55,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             type.BindValueChanged(_ =>
             {
                 updateActionsFromType();
-
-                // will overwrite samples, should only be called on subsequent changes
-                // after the initial application.
-                updateSamplesFromTypeChange();
-
                 RecreatePieces();
-            });
-
-            // action update also has to happen immediately on application.
-            updateActionsFromType();
+            }, true);
 
             base.OnApply();
         }
@@ -90,24 +82,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             base.LoadSamples();
 
             type.Value = getRimSamples().Any() ? HitType.Rim : HitType.Centre;
-        }
-
-        private void updateSamplesFromTypeChange()
-        {
-            var rimSamples = getRimSamples();
-
-            bool isRimType = HitObject.Type == HitType.Rim;
-
-            if (isRimType != rimSamples.Any())
-            {
-                if (isRimType)
-                    HitObject.Samples.Add(new HitSampleInfo(HitSampleInfo.HIT_CLAP));
-                else
-                {
-                    foreach (var sample in rimSamples)
-                        HitObject.Samples.Remove(sample);
-                }
-            }
         }
 
         private void updateActionsFromType()
