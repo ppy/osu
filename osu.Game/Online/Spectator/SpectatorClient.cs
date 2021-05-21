@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
@@ -144,6 +145,8 @@ namespace osu.Game.Online.Spectator
 
         public void BeginPlaying(GameplayBeatmap beatmap, Score score)
         {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
             if (IsPlaying)
                 throw new InvalidOperationException($"Cannot invoke {nameof(BeginPlaying)} when already playing");
 
@@ -172,6 +175,8 @@ namespace osu.Game.Online.Spectator
 
         public void WatchUser(int userId)
         {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
             if (watchingUsers.Contains(userId))
                 return;
 
@@ -219,6 +224,8 @@ namespace osu.Game.Online.Spectator
 
         public void HandleFrame(ReplayFrame frame)
         {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
             if (frame is IConvertibleReplayFrame convertible)
                 pendingFrames.Enqueue(convertible.ToLegacy(currentBeatmap));
 
