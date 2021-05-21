@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             slider.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = 2 });
 
             Add(drawableObject = new DrawableSlider(slider));
-            AddBlueprint(new TestSliderBlueprint(drawableObject));
+            AddBlueprint(new TestSliderBlueprint(slider), drawableObject);
         });
 
         [Test]
@@ -150,23 +150,23 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         private class TestSliderBlueprint : SliderSelectionBlueprint
         {
             public new SliderBodyPiece BodyPiece => base.BodyPiece;
-            public new TestSliderCircleBlueprint HeadBlueprint => (TestSliderCircleBlueprint)base.HeadBlueprint;
-            public new TestSliderCircleBlueprint TailBlueprint => (TestSliderCircleBlueprint)base.TailBlueprint;
+            public new TestSliderCircleOverlay HeadOverlay => (TestSliderCircleOverlay)base.HeadOverlay;
+            public new TestSliderCircleOverlay TailOverlay => (TestSliderCircleOverlay)base.TailOverlay;
             public new PathControlPointVisualiser ControlPointVisualiser => base.ControlPointVisualiser;
 
-            public TestSliderBlueprint(DrawableSlider slider)
+            public TestSliderBlueprint(Slider slider)
                 : base(slider)
             {
             }
 
-            protected override SliderCircleSelectionBlueprint CreateCircleSelectionBlueprint(DrawableSlider slider, SliderPosition position) => new TestSliderCircleBlueprint(slider, position);
+            protected override SliderCircleOverlay CreateCircleOverlay(Slider slider, SliderPosition position) => new TestSliderCircleOverlay(slider, position);
         }
 
-        private class TestSliderCircleBlueprint : SliderCircleSelectionBlueprint
+        private class TestSliderCircleOverlay : SliderCircleOverlay
         {
             public new HitCirclePiece CirclePiece => base.CirclePiece;
 
-            public TestSliderCircleBlueprint(DrawableSlider slider, SliderPosition position)
+            public TestSliderCircleOverlay(Slider slider, SliderPosition position)
                 : base(slider, position)
             {
             }

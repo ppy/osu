@@ -43,10 +43,16 @@ namespace osu.Game.Skinning.Editor
 
         public override bool HandleFlip(Direction direction)
         {
-            // TODO: this is temporary as well.
-            foreach (var c in SelectedBlueprints)
+            var selectionQuad = GetSurroundingQuad(SelectedBlueprints.Select(b => b.ScreenSpaceSelectionPoint));
+
+            foreach (var b in SelectedBlueprints)
             {
-                ((Drawable)c.Item).Scale *= new Vector2(
+                var drawableItem = (Drawable)b.Item;
+
+                drawableItem.Position =
+                    drawableItem.Parent.ToLocalSpace(GetFlippedPosition(direction, selectionQuad, b.ScreenSpaceSelectionPoint)) - drawableItem.AnchorPosition;
+
+                drawableItem.Scale *= new Vector2(
                     direction == Direction.Horizontal ? -1 : 1,
                     direction == Direction.Vertical ? -1 : 1
                 );
@@ -94,7 +100,7 @@ namespace osu.Game.Skinning.Editor
             foreach (var item in base.GetContextMenuItemsForSelection(selection))
                 yield return item;
 
-            IEnumerable<AnchorMenuItem> createAnchorItems(Func<Drawable, Anchor> checkFunction, Action<Anchor> applyFunction)
+            IEnumerable<TernaryStateMenuItem> createAnchorItems(Func<Drawable, Anchor> checkFunction, Action<Anchor> applyFunction)
             {
                 var displayableAnchors = new[]
                 {
@@ -111,7 +117,7 @@ namespace osu.Game.Skinning.Editor
 
                 return displayableAnchors.Select(a =>
                 {
-                    return new AnchorMenuItem(a, selection, _ => applyFunction(a))
+                    return new TernaryStateRadioMenuItem(a.ToString(), MenuItemType.Standard, _ => applyFunction(a))
                     {
                         State = { Value = GetStateFromSelection(selection, c => checkFunction((Drawable)c.Item) == a) }
                     };
@@ -159,16 +165,6 @@ namespace osu.Game.Skinning.Editor
                 // TODO: temporary implementation - only dragging the corner handles across the X axis changes size.
                 scale.Y = scale.X;
             }
-        }
-
-        public class AnchorMenuItem : TernaryStateMenuItem
-        {
-            public AnchorMenuItem(Anchor anchor, IEnumerable<SelectionBlueprint<ISkinnableDrawable>> selection, Action<TernaryState> action)
-                : base(anchor.ToString(), getNextState, MenuItemType.Standard, action)
-            {
-            }
-
-            private static TernaryState getNextState(TernaryState state) => TernaryState.True;
         }
     }
 }

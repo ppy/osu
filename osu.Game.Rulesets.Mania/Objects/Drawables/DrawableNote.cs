@@ -33,31 +33,37 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected virtual ManiaSkinComponents Component => ManiaSkinComponents.Note;
 
-        private readonly Drawable headPiece;
+        private Drawable headPiece;
+
+        public DrawableNote()
+            : this(null)
+        {
+        }
 
         public DrawableNote(Note hitObject)
             : base(hitObject)
         {
-            RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-
-            AddInternal(headPiece = new SkinnableDrawable(new ManiaSkinComponent(Component, hitObject.Column), _ => new DefaultNotePiece())
-            {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y
-            });
         }
 
         [BackgroundDependencyLoader(true)]
         private void load(ManiaRulesetConfigManager rulesetConfig)
         {
             rulesetConfig?.BindWith(ManiaRulesetSetting.TimingBasedNoteColouring, configTimingBasedNoteColouring);
+
+            AddInternal(headPiece = new SkinnableDrawable(new ManiaSkinComponent(Component), _ => new DefaultNotePiece())
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y
+            });
         }
 
         protected override void LoadComplete()
         {
-            HitObject.StartTimeBindable.BindValueChanged(_ => updateSnapColour());
-            configTimingBasedNoteColouring.BindValueChanged(_ => updateSnapColour(), true);
+            base.LoadComplete();
+
+            configTimingBasedNoteColouring.BindValueChanged(_ => updateSnapColour());
+            StartTimeBindable.BindValueChanged(_ => updateSnapColour(), true);
         }
 
         protected override void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)
@@ -102,7 +108,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         private void updateSnapColour()
         {
-            if (beatmap == null) return;
+            if (beatmap == null || HitObject == null) return;
 
             int snapDivisor = beatmap.ControlPointInfo.GetClosestBeatDivisor(HitObject.StartTime);
 

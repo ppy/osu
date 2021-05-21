@@ -350,5 +350,55 @@ namespace osu.Game.Screens.Edit.Compose.Components
             => Enumerable.Empty<MenuItem>();
 
         #endregion
+
+        #region Helper Methods
+
+        /// <summary>
+        /// Given a flip direction, a surrounding quad for all selected objects, and a position,
+        /// will return the flipped position in screen space coordinates.
+        /// </summary>
+        protected static Vector2 GetFlippedPosition(Direction direction, Quad quad, Vector2 position)
+        {
+            var centre = quad.Centre;
+
+            switch (direction)
+            {
+                case Direction.Horizontal:
+                    position.X = centre.X - (position.X - centre.X);
+                    break;
+
+                case Direction.Vertical:
+                    position.Y = centre.Y - (position.Y - centre.Y);
+                    break;
+            }
+
+            return position;
+        }
+
+        /// <summary>
+        /// Returns a quad surrounding the provided points.
+        /// </summary>
+        /// <param name="points">The points to calculate a quad for.</param>
+        protected static Quad GetSurroundingQuad(IEnumerable<Vector2> points)
+        {
+            if (!points.Any())
+                return new Quad();
+
+            Vector2 minPosition = new Vector2(float.MaxValue, float.MaxValue);
+            Vector2 maxPosition = new Vector2(float.MinValue, float.MinValue);
+
+            // Go through all hitobjects to make sure they would remain in the bounds of the editor after movement, before any movement is attempted
+            foreach (var p in points)
+            {
+                minPosition = Vector2.ComponentMin(minPosition, p);
+                maxPosition = Vector2.ComponentMax(maxPosition, p);
+            }
+
+            Vector2 size = maxPosition - minPosition;
+
+            return new Quad(minPosition.X, minPosition.Y, size.X, size.Y);
+        }
+
+        #endregion
     }
 }
