@@ -174,6 +174,9 @@ namespace osu.Game.Online.Spectator
 
         public void EndPlaying()
         {
+            if (!IsPlaying)
+                return;
+
             IsPlaying = false;
             currentBeatmap = null;
 
