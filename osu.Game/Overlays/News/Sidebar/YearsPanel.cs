@@ -81,6 +81,9 @@ namespace osu.Game.Overlays.News.Sidebar
         {
             public int Year { get; }
 
+            [Resolved(canBeNull: true)]
+            private NewsOverlay overlay { get; set; }
+
             private readonly bool isCurrent;
 
             public YearButton(int year, bool isCurrent)
@@ -106,7 +109,11 @@ namespace osu.Game.Overlays.News.Sidebar
             {
                 IdleColour = isCurrent ? Color4.White : colourProvider.Light2;
                 HoverColour = isCurrent ? Color4.White : colourProvider.Light1;
-                Action = () => { }; // Avoid button being disabled since there's no proper action assigned.
+                Action = () =>
+                {
+                    if (!isCurrent)
+                        overlay?.ShowYear(Year);
+                };
             }
         }
     }

@@ -10,5 +10,7 @@ namespace osu.Game.Skinning
         AccuracyCounter,
         HealthDisplay,
         SongProgress,
+        BarHitErrorMeter,
+        ColourHitErrorMeter,
     }
 }

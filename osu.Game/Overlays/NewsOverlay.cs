@@ -1,11 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Threading;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays.News;
 using osu.Game.Overlays.News.Displays;
+using osu.Game.Overlays.News.Sidebar;
 
 namespace osu.Game.Overlays
 {
@@ -13,9 +16,48 @@ namespace osu.Game.Overlays
     {
         private readonly Bindable<string> article = new Bindable<string>(null);
 
+        private readonly Container sidebarContainer;
+        private readonly NewsSidebar sidebar;
+
+        private readonly Container content;
+
+        private CancellationTokenSource cancellationToken;
+
+        private bool displayUpdateRequired = true;
+
         public NewsOverlay()
             : base(OverlayColourScheme.Purple, false)
         {
+            Child = new GridContainer
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                RowDimensions = new[]
+                {
+                    new Dimension(GridSizeMode.AutoSize)
+                },
+                ColumnDimensions = new[]
+                {
+                    new Dimension(GridSizeMode.AutoSize),
+                    new Dimension()
+                },
+                Content = new[]
+                {
+                    new Drawable[]
+                    {
+                        sidebarContainer = new Container
+                        {
+                            AutoSizeAxes = Axes.X,
+                            Child = sidebar = new NewsSidebar()
+                        },
+                        content = new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y
+                        }
+                    }
+                }
+            };
         }
 
         protected override void LoadComplete()
@@ -26,12 +68,7 @@ namespace osu.Game.Overlays
             article.BindValueChanged(onArticleChanged);
         }
 
-        protected override NewsHeader CreateHeader() => new NewsHeader
-        {
-            ShowFrontPage = ShowFrontPage
-        };
-
-        private bool displayUpdateRequired = true;
+        protected override NewsHeader CreateHeader() => new NewsHeader { ShowFrontPage = ShowFrontPage };
 
         protected override void PopIn()
         {
@@ -56,38 +93,69 @@ namespace osu.Game.Overlays
             Show();
         }
 
+        public void ShowYear(int year)
+        {
+            loadFrontPage(year);
+            Show();
+        }
+
         public void ShowArticle(string slug)
         {
             article.Value = slug;
             Show();
         }
 
-        private CancellationTokenSource cancellationToken;
-
-        private void onArticleChanged(ValueChangedEvent<string> e)
-        {
-            cancellationToken?.Cancel();
-            Loading.Show();
-
-            if (e.NewValue == null)
-            {
-                Header.SetFrontPage();
-                LoadDisplay(new FrontPageDisplay());
-                return;
-            }
-
-            Header.SetArticle(e.NewValue);
-            LoadDisplay(Empty());
-        }
-
         protected void LoadDisplay(Drawable display)
         {
             ScrollFlow.ScrollToStart();
-            LoadComponentAsync(display, loaded =>
+            LoadComponentAsync(display, loaded => content.Child = loaded, (cancellationToken = new CancellationTokenSource()).Token);
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+            sidebarContainer.Height = DrawHeight;
+            sidebarContainer.Y = Math.Clamp(ScrollFlow.Current - Header.DrawHeight, 0, Math.Max(ScrollFlow.ScrollContent.DrawHeight - DrawHeight - Header.DrawHeight, 0));
+        }
+
+        private void onArticleChanged(ValueChangedEvent<string> article)
+        {
+            if (article.NewValue == null)
+                loadFrontPage();
+            else
+                loadArticle(article.NewValue);
+        }
+
+        private void loadFrontPage(int? year = null)
+        {
+            beginLoading();
+
+            Header.SetFrontPage();
+
+            var page = new ArticleListing(year);
+            page.SidebarMetadataUpdated += metadata => Schedule(() =>
             {
-                Child = loaded;
+                sidebar.Metadata.Value = metadata;
                 Loading.Hide();
-            }, (cancellationToken = new CancellationTokenSource()).Token);
+            });
+            LoadDisplay(page);
+        }
+
+        private void loadArticle(string article)
+        {
+            beginLoading();
+
+            Header.SetArticle(article);
+
+            // Temporary, should be handled by ArticleDisplay later
+            LoadDisplay(Empty());
+            Loading.Hide();
+        }
+
+        private void beginLoading()
+        {
+            cancellationToken?.Cancel();
+            Loading.Show();
         }
 
         protected override void Dispose(bool isDisposing)
