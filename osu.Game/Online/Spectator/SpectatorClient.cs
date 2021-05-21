@@ -167,13 +167,13 @@ namespace osu.Game.Online.Spectator
 
         public void EndPlaying()
         {
-            if (!IsPlaying)
-                return;
-
             // This method is most commonly called via Dispose(), which is asynchronous.
             // Todo: This should not be a thing, but requires framework changes.
             Schedule(() =>
             {
+                if (!IsPlaying)
+                    return;
+
                 IsPlaying = false;
                 currentBeatmap = null;
 
