@@ -37,6 +37,27 @@ namespace osu.Game.Overlays.Wiki.Markdown
             }
         }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            // Reference : https://github.com/ppy/osu-web/blob/master/resources/views/wiki/_notice.blade.php and https://github.com/ppy/osu-web/blob/master/resources/lang/en/wiki.php
+            // TODO : add notice box for fallback translation, legal translation and outdated translation after implement wiki locale in the future.
+            if (isOutdated)
+            {
+                Add(new NoticeBox
+                {
+                    Text = "The content on this page is incomplete or outdated. If you are able to help out, please consider updating the article!",
+                });
+            }
+            else if (needsCleanup)
+            {
+                Add(new NoticeBox
+                {
+                    Text = "This page does not meet the standards of the osu! wiki and needs to be cleaned up or rewritten. If you are able to help out, please consider updating the article!",
+                });
+            }
+        }
+
         private class NoticeBox : Container
         {
             [Resolved]
