@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
@@ -37,8 +38,6 @@ namespace osu.Game.Online.Spectator
         public abstract IBindable<bool> IsConnected { get; }
 
         private readonly List<int> watchingUsers = new List<int>();
-
-        private readonly object userLock = new object();
 
         public IBindableList<int> PlayingUsers => playingUsers;
 
@@ -81,18 +80,13 @@ namespace osu.Game.Online.Spectator
         [BackgroundDependencyLoader]
         private void load()
         {
-            IsConnected.BindValueChanged(connected =>
+            IsConnected.BindValueChanged(connected => Schedule(() =>
             {
                 if (connected.NewValue)
                 {
                     // get all the users that were previously being watched
-                    int[] users;
-
-                    lock (userLock)
-                    {
-                        users = watchingUsers.ToArray();
-                        watchingUsers.Clear();
-                    }
+                    int[] users = watchingUsers.ToArray();
+                    watchingUsers.Clear();
 
                     // resubscribe to watched users.
                     foreach (var userId in users)
@@ -104,18 +98,15 @@ namespace osu.Game.Online.Spectator
                 }
                 else
                 {
-                    lock (userLock)
-                    {
-                        playingUsers.Clear();
-                        playingUserStates.Clear();
-                    }
+                    playingUsers.Clear();
+                    playingUserStates.Clear();
                 }
-            }, true);
+            }), true);
         }
 
         Task ISpectatorClient.UserBeganPlaying(int userId, SpectatorState state)
         {
-            lock (userLock)
+            Schedule(() =>
             {
                 if (!playingUsers.Contains(userId))
                     playingUsers.Add(userId);
@@ -125,35 +116,37 @@ namespace osu.Game.Online.Spectator
                 // We don't want the user states to update unless the player is being watched, otherwise calling BindUserBeganPlaying() can lead to double invocations.
                 if (watchingUsers.Contains(userId))
                     playingUserStates[userId] = state;
-            }
 
-            OnUserBeganPlaying?.Invoke(userId, state);
+                OnUserBeganPlaying?.Invoke(userId, state);
+            });
 
             return Task.CompletedTask;
         }
 
         Task ISpectatorClient.UserFinishedPlaying(int userId, SpectatorState state)
         {
-            lock (userLock)
+            Schedule(() =>
             {
                 playingUsers.Remove(userId);
                 playingUserStates.Remove(userId);
-            }
 
-            OnUserFinishedPlaying?.Invoke(userId, state);
+                OnUserFinishedPlaying?.Invoke(userId, state);
+            });
 
             return Task.CompletedTask;
         }
 
         Task ISpectatorClient.UserSentFrames(int userId, FrameDataBundle data)
         {
-            OnNewFrames?.Invoke(userId, data);
+            Schedule(() => OnNewFrames?.Invoke(userId, data));
 
             return Task.CompletedTask;
         }
 
         public void BeginPlaying(GameplayBeatmap beatmap, Score score)
         {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
             if (IsPlaying)
                 throw new InvalidOperationException($"Cannot invoke {nameof(BeginPlaying)} when already playing");
 
@@ -177,33 +170,38 @@ namespace osu.Game.Online.Spectator
             if (!IsPlaying)
                 return;
 
-            IsPlaying = false;
-            currentBeatmap = null;
+            // This method is most commonly called via Dispose(), which is asynchronous.
+            // Todo: This should not be a thing, but requires framework changes.
+            Schedule(() =>
+            {
+                IsPlaying = false;
+                currentBeatmap = null;
 
-            EndPlayingInternal(currentState);
+                EndPlayingInternal(currentState);
+            });
         }
 
         public void WatchUser(int userId)
         {
-            lock (userLock)
-            {
-                if (watchingUsers.Contains(userId))
-                    return;
+            Debug.Assert(ThreadSafety.IsUpdateThread);
 
-                watchingUsers.Add(userId);
-            }
+            if (watchingUsers.Contains(userId))
+                return;
+
+            watchingUsers.Add(userId);
 
             WatchUserInternal(userId);
         }
 
         public void StopWatchingUser(int userId)
         {
-            lock (userLock)
+            // This method is most commonly called via Dispose(), which is asynchronous.
+            // Todo: This should not be a thing, but requires framework changes.
+            Schedule(() =>
             {
                 watchingUsers.Remove(userId);
-            }
-
-            StopWatchingUserInternal(userId);
+                StopWatchingUserInternal(userId);
+            });
         }
 
         protected abstract Task BeginPlayingInternal(SpectatorState state);
@@ -234,6 +232,8 @@ namespace osu.Game.Online.Spectator
 
         public void HandleFrame(ReplayFrame frame)
         {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
             if (frame is IConvertibleReplayFrame convertible)
                 pendingFrames.Enqueue(convertible.ToLegacy(currentBeatmap));
 
@@ -265,8 +265,7 @@ namespace osu.Game.Online.Spectator
         /// <returns><c>true</c> if successful (the user is playing), <c>false</c> otherwise.</returns>
         public bool TryGetPlayingUserState(int userId, out SpectatorState state)
         {
-            lock (userLock)
-                return playingUserStates.TryGetValue(userId, out state);
+            return playingUserStates.TryGetValue(userId, out state);
         }
 
         /// <summary>
@@ -277,16 +276,13 @@ namespace osu.Game.Online.Spectator
         public void BindUserBeganPlaying(Action<int, SpectatorState> callback, bool runOnceImmediately = false)
         {
             // The lock is taken before the event is subscribed to to prevent doubling of events.
-            lock (userLock)
-            {
-                OnUserBeganPlaying += callback;
+            OnUserBeganPlaying += callback;
 
-                if (!runOnceImmediately)
-                    return;
+            if (!runOnceImmediately)
+                return;
 
-                foreach (var (userId, state) in playingUserStates)
-                    callback(userId, state);
-            }
+            foreach (var (userId, state) in playingUserStates)
+                callback(userId, state);
         }
     }
 }
