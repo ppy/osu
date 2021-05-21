@@ -58,8 +58,9 @@ namespace osu.Game.Rulesets.Mania.Edit
 
             EditorBeatmap.PerformOnSelection(h =>
             {
-                if (h is ManiaHitObject maniaObj)
-                    maniaObj.Column += columnDelta;
+                maniaPlayfield.Remove(h);
+                ((ManiaHitObject)h).Column += columnDelta;
+                maniaPlayfield.Add(h);
             });
         }
     }

@@ -19,13 +19,18 @@ namespace osu.Game.Overlays.News
         {
             TabControl.AddItem(front_page_string);
 
+            article.BindValueChanged(onArticleChanged, true);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
             Current.BindValueChanged(e =>
             {
                 if (e.NewValue == front_page_string)
                     ShowFrontPage?.Invoke();
             });
-
-            article.BindValueChanged(onArticleChanged, true);
         }
 
         public void SetFrontPage() => article.Value = null;

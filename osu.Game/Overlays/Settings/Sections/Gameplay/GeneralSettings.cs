@@ -73,11 +73,6 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     LabelText = "Always play first combo break sound",
                     Current = config.GetBindable<bool>(OsuSetting.AlwaysPlayFirstComboBreak)
                 },
-                new SettingsEnumDropdown<ScoreMeterType>
-                {
-                    LabelText = "Score meter type",
-                    Current = config.GetBindable<ScoreMeterType>(OsuSetting.ScoreMeter)
-                },
                 new SettingsEnumDropdown<ScoringMode>
                 {
                     LabelText = "Score display mode",

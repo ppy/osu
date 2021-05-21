@@ -15,7 +15,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
     public class Multiplayer : OnlinePlayScreen
     {
         [Resolved]
-        private StatefulMultiplayerClient client { get; set; }
+        private MultiplayerClient client { get; set; }
 
         public override void OnResuming(IScreen last)
         {
