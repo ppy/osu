@@ -19,7 +19,7 @@ using osuTK;
 namespace osu.Game.Skinning.Editor
 {
     [Cached(typeof(SkinEditor))]
-    public class SkinEditor : FocusedOverlayContainer
+    public class SkinEditor : VisibilityContainer
     {
         public const double TRANSITION_DURATION = 500;
 
