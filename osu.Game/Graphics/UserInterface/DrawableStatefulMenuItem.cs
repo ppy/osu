@@ -17,17 +17,19 @@ namespace osu.Game.Graphics.UserInterface
         {
         }
 
-        protected override TextContainer CreateTextContainer() => new ToggleTextContainer(Item);
+        protected override TextContainer CreateTextContainer() => new ToggleTextContainer(Item, CloseMenuOnClick);
 
         private class ToggleTextContainer : TextContainer
         {
             private readonly StatefulMenuItem menuItem;
             private readonly Bindable<object> state;
             private readonly SpriteIcon stateIcon;
+            private readonly bool closeMenuOnClick;
 
-            public ToggleTextContainer(StatefulMenuItem menuItem)
+            public ToggleTextContainer(StatefulMenuItem menuItem, bool closeMenuOnClick)
             {
                 this.menuItem = menuItem;
+                this.closeMenuOnClick = closeMenuOnClick;
 
                 state = menuItem.State.GetBoundCopy();
 
@@ -44,7 +46,10 @@ namespace osu.Game.Graphics.UserInterface
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                state.BindValueChanged(updateState, true);
+                updateState(state.Value);
+
+                if (!closeMenuOnClick)
+                    state.BindValueChanged(updateState);
             }
 
             protected override void Update()
@@ -57,13 +62,18 @@ namespace osu.Game.Graphics.UserInterface
 
             private void updateState(ValueChangedEvent<object> state)
             {
-                var icon = menuItem.GetIconForState(state.NewValue);
+                updateState(state.NewValue);
+            }
+
+            private void updateState(object state)
+            {
+                var icon = menuItem.GetIconForState(state);
 
                 if (icon == null)
                     stateIcon.Alpha = 0;
                 else
                 {
-                    stateIcon.Alpha = state.NewValue != state.OldValue ? 0 : 1;
+                    stateIcon.Alpha = 1;
                     stateIcon.Icon = icon.Value;
                 }
             }
