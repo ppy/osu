@@ -52,13 +52,16 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected override void OnApply()
         {
             type.BindTo(HitObject.TypeBindable);
-            type.BindValueChanged(_ =>
-            {
-                updateActionsFromType();
-                RecreatePieces();
-            }, true);
+            // this doesn't need to be run inline as RecreatePieces is called by the base call below.
+            type.BindValueChanged(_ => RecreatePieces());
 
             base.OnApply();
+        }
+
+        protected override void RecreatePieces()
+        {
+            updateActionsFromType();
+            base.RecreatePieces();
         }
 
         protected override void OnFree()
