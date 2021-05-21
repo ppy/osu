@@ -182,7 +182,7 @@ namespace osu.Game.Skinning.Editor
             foreach (var item in base.GetContextMenuItemsForSelection(selection))
                 yield return item;
 
-            IEnumerable<AnchorMenuItem> createAnchorItems(Func<Drawable, Anchor> checkFunction, Action<Anchor> applyFunction)
+            IEnumerable<TernaryStateMenuItem> createAnchorItems(Func<Drawable, Anchor> checkFunction, Action<Anchor> applyFunction)
             {
                 var displayableAnchors = new[]
                 {
@@ -199,7 +199,7 @@ namespace osu.Game.Skinning.Editor
 
                 return displayableAnchors.Select(a =>
                 {
-                    return new AnchorMenuItem(a, selection, _ => applyFunction(a))
+                    return new TernaryStateRadioMenuItem(a.ToString(), MenuItemType.Standard, _ => applyFunction(a))
                     {
                         State = { Value = GetStateFromSelection(selection, c => checkFunction((Drawable)c.Item) == a) }
                     };
@@ -247,16 +247,6 @@ namespace osu.Game.Skinning.Editor
             // reverse the scale direction if dragging from top or left.
             if ((reference & Anchor.x0) > 0) scale.X = -scale.X;
             if ((reference & Anchor.y0) > 0) scale.Y = -scale.Y;
-        }
-
-        public class AnchorMenuItem : TernaryStateMenuItem
-        {
-            public AnchorMenuItem(Anchor anchor, IEnumerable<SelectionBlueprint<ISkinnableDrawable>> selection, Action<TernaryState> action)
-                : base(anchor.ToString(), getNextState, MenuItemType.Standard, action)
-            {
-            }
-
-            private static TernaryState getNextState(TernaryState state) => TernaryState.True;
         }
     }
 }
