@@ -78,15 +78,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             validActionPressed = pressHandledThisFrame = false;
         }
 
-        private HitSampleInfo[] getRimSamples() => HitObject.Samples.Where(s => s.Name == HitSampleInfo.HIT_CLAP || s.Name == HitSampleInfo.HIT_WHISTLE).ToArray();
-
-        protected override void LoadSamples()
-        {
-            base.LoadSamples();
-
-            type.Value = getRimSamples().Any() ? HitType.Rim : HitType.Centre;
-        }
-
         private void updateActionsFromType()
         {
             HitActions =
