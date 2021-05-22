@@ -111,10 +111,11 @@ namespace osu.Game.Database
         {
             base.OnConfiguring(optionsBuilder);
             optionsBuilder
-                // this is required for the time being due to the way we are querying in places like BeatmapStore.
-                // if we ever move to having consumers file their own .Includes, or get eager loading support, this could be re-enabled.
-                .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.IncludeIgnoredWarning))
-                .UseSqlite(connectionString, sqliteOptions => sqliteOptions.CommandTimeout(10))
+                .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.RowLimitingOperationWithoutOrderByWarning))
+                .UseSqlite(connectionString,
+                    sqliteOptions => sqliteOptions
+                                     .UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)
+                                     .CommandTimeout(10))
                 .UseLoggerFactory(logger.Value);
         }
 
