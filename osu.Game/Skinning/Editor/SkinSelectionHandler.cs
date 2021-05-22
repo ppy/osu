@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Utils;
 using osu.Game.Extensions;
@@ -24,11 +25,26 @@ namespace osu.Game.Skinning.Editor
 
         public override bool HandleRotation(float angle)
         {
-            // TODO: this doesn't correctly account for origin/anchor specs being different in a multi-selection.
-            foreach (var c in SelectedBlueprints)
-                ((Drawable)c.Item).Rotation += angle;
+            if (SelectedBlueprints.Count == 1)
+            {
+                // for single items, rotate around the origin rather than the selection centre.
+                ((Drawable)SelectedBlueprints.First().Item).Rotation += angle;
+            }
+            else
+            {
+                var selectionQuad = getSelectionQuad();
 
-            return base.HandleRotation(angle);
+                foreach (var b in SelectedBlueprints)
+                {
+                    var drawableItem = (Drawable)b.Item;
+
+                    drawableItem.Position = drawableItem.Parent.ToLocalSpace(RotatePointAroundOrigin(b.ScreenSpaceSelectionPoint, selectionQuad.Centre, angle)) - drawableItem.AnchorPosition;
+                    drawableItem.Rotation += angle;
+                }
+            }
+
+            // this isn't always the case but let's be lenient for now.
+            return true;
         }
 
         public override bool HandleScale(Vector2 scale, Anchor anchor)
@@ -39,8 +55,7 @@ namespace osu.Game.Skinning.Editor
             adjustScaleFromAnchor(ref scale, anchor);
 
             // the selection quad is always upright, so use an AABB rect to make mutating the values easier.
-            var selectionRect = GetSurroundingQuad(SelectedBlueprints.SelectMany(b =>
-                b.Item.ScreenSpaceDrawQuad.GetVertices().ToArray())).AABBFloat;
+            var selectionRect = getSelectionQuad().AABBFloat;
 
             // copy to mutate, as we will need to compare to the original later on.
             var adjustedRect = selectionRect;
@@ -198,6 +213,13 @@ namespace osu.Game.Skinning.Editor
                 drawable.Position += drawable.OriginPosition - previousOrigin;
             }
         }
+
+        /// <summary>
+        /// A screen-space quad surrounding all selected drawables, accounting for their full displayed size.
+        /// </summary>
+        /// <returns></returns>
+        private Quad getSelectionQuad() =>
+            GetSurroundingQuad(SelectedBlueprints.SelectMany(b => b.Item.ScreenSpaceDrawQuad.GetVertices().ToArray()));
 
         private void applyAnchor(Anchor anchor)
         {
