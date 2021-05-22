@@ -73,11 +73,6 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     LabelText = "在第一次断连时播放音效",
                     Current = config.GetBindable<bool>(OsuSetting.AlwaysPlayFirstComboBreak)
                 },
-                new SettingsEnumDropdown<ScoreMeterType>
-                {
-                    LabelText = "分数计类型",
-                    Current = config.GetBindable<ScoreMeterType>(OsuSetting.ScoreMeter)
-                },
                 new SettingsEnumDropdown<ScoringMode>
                 {
                     LabelText = "分数显示模式",

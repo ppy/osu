@@ -76,10 +76,10 @@ namespace osu.Game.Rulesets.Taiko.Edit
         protected override IEnumerable<MenuItem> GetContextMenuItemsForSelection(IEnumerable<SelectionBlueprint<HitObject>> selection)
         {
             if (selection.All(s => s.Item is Hit))
-                yield return new TernaryStateMenuItem("咔(Rim)") { State = { BindTarget = selectionRimState } };
+                yield return new TernaryStateToggleMenuItem("咔(Rim)") { State = { BindTarget = selectionRimState } };
 
             if (selection.All(s => s.Item is TaikoHitObject))
-                yield return new TernaryStateMenuItem("大音符(Strong)") { State = { BindTarget = selectionStrongState } };
+                yield return new TernaryStateToggleMenuItem("重音(Strong)") { State = { BindTarget = selectionStrongState } };
 
             foreach (var item in base.GetContextMenuItemsForSelection(selection))
                 yield return item;

@@ -9,12 +9,12 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Edit
 {
-    public abstract class OverlaySelectionBlueprint : SelectionBlueprint<HitObject>
+    public abstract class HitObjectSelectionBlueprint : SelectionBlueprint<HitObject>
     {
         /// <summary>
-        /// The <see cref="DrawableHitObject"/> which this <see cref="OverlaySelectionBlueprint"/> applies to.
+        /// The <see cref="DrawableHitObject"/> which this <see cref="HitObjectSelectionBlueprint"/> applies to.
         /// </summary>
-        public readonly DrawableHitObject DrawableObject;
+        public DrawableHitObject DrawableObject { get; internal set; }
 
         /// <summary>
         /// Whether the blueprint should be shown even when the <see cref="DrawableObject"/> is not alive.
@@ -23,10 +23,9 @@ namespace osu.Game.Rulesets.Edit
 
         protected override bool ShouldBeAlive => (DrawableObject.IsAlive && DrawableObject.IsPresent) || (AlwaysShowWhenSelected && State == SelectionState.Selected);
 
-        protected OverlaySelectionBlueprint(DrawableHitObject drawableObject)
-            : base(drawableObject.HitObject)
+        protected HitObjectSelectionBlueprint(HitObject hitObject)
+            : base(hitObject)
         {
-            DrawableObject = drawableObject;
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => DrawableObject.ReceivePositionalInputAt(screenSpacePos);
@@ -34,5 +33,16 @@ namespace osu.Game.Rulesets.Edit
         public override Vector2 ScreenSpaceSelectionPoint => DrawableObject.ScreenSpaceDrawQuad.Centre;
 
         public override Quad SelectionQuad => DrawableObject.ScreenSpaceDrawQuad;
+    }
+
+    public abstract class HitObjectSelectionBlueprint<T> : HitObjectSelectionBlueprint
+        where T : HitObject
+    {
+        public T HitObject => (T)Item;
+
+        protected HitObjectSelectionBlueprint(T item)
+            : base(item)
+        {
+        }
     }
 }

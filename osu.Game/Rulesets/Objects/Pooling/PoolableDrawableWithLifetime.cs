@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Objects.Pooling
         /// <summary>
         /// The entry holding essential state of this <see cref="PoolableDrawableWithLifetime{TEntry}"/>.
         /// </summary>
-        protected TEntry? Entry { get; private set; }
+        public TEntry? Entry { get; private set; }
 
         /// <summary>
         /// Whether <see cref="Entry"/> is applied to this <see cref="PoolableDrawableWithLifetime{TEntry}"/>.
@@ -26,16 +26,30 @@ namespace osu.Game.Rulesets.Objects.Pooling
         /// </summary>
         protected bool HasEntryApplied { get; private set; }
 
+        // Drawable's lifetime gets out of sync with entry's lifetime if entry's lifetime is modified.
+        // We cannot delegate getter to `Entry.LifetimeStart` because it is incompatible with `LifetimeManagementContainer` due to how lifetime change is detected.
         public override double LifetimeStart
         {
             get => base.LifetimeStart;
-            set => setLifetime(value, LifetimeEnd);
+            set
+            {
+                base.LifetimeStart = value;
+
+                if (Entry != null)
+                    Entry.LifetimeStart = value;
+            }
         }
 
         public override double LifetimeEnd
         {
             get => base.LifetimeEnd;
-            set => setLifetime(LifetimeStart, value);
+            set
+            {
+                base.LifetimeEnd = value;
+
+                if (Entry != null)
+                    Entry.LifetimeEnd = value;
+            }
         }
 
         public override bool RemoveWhenNotAlive => false;
@@ -64,8 +78,10 @@ namespace osu.Game.Rulesets.Objects.Pooling
             if (HasEntryApplied)
                 free();
 
-            setLifetime(entry.LifetimeStart, entry.LifetimeEnd);
             Entry = entry;
+
+            base.LifetimeStart = entry.LifetimeStart;
+            base.LifetimeEnd = entry.LifetimeEnd;
 
             OnApply(entry);
 
@@ -95,18 +111,6 @@ namespace osu.Game.Rulesets.Objects.Pooling
         {
         }
 
-        private void setLifetime(double start, double end)
-        {
-            base.LifetimeStart = start;
-            base.LifetimeEnd = end;
-
-            if (Entry != null)
-            {
-                Entry.LifetimeStart = start;
-                Entry.LifetimeEnd = end;
-            }
-        }
-
         private void free()
         {
             Debug.Assert(Entry != null && HasEntryApplied);
@@ -114,7 +118,8 @@ namespace osu.Game.Rulesets.Objects.Pooling
             OnFree(Entry);
 
             Entry = null;
-            setLifetime(double.MaxValue, double.MaxValue);
+            base.LifetimeStart = double.MinValue;
+            base.LifetimeEnd = double.MaxValue;
 
             HasEntryApplied = false;
         }

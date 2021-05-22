@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using Humanizer;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
-using osu.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -80,8 +79,6 @@ namespace osu.Game.Database
         private readonly Bindable<WeakReference<TModel>> itemRemoved = new Bindable<WeakReference<TModel>>();
 
         public virtual IEnumerable<string> HandledExtensions => new[] { ".zip" };
-
-        public virtual bool SupportsImportFromStable => RuntimeInfo.IsDesktop;
 
         protected readonly FileStore Files;
 
@@ -670,16 +667,6 @@ namespace osu.Game.Database
         #region osu-stable import
 
         /// <summary>
-        /// Set a storage with access to an osu-stable install for import purposes.
-        /// </summary>
-        public Func<StableStorage> GetStableStorage { private get; set; }
-
-        /// <summary>
-        /// Denotes whether an osu-stable installation is present to perform automated imports from.
-        /// </summary>
-        public bool StableInstallationAvailable => GetStableStorage?.Invoke() != null;
-
-        /// <summary>
         /// The relative path from osu-stable's data directory to import items from.
         /// </summary>
         protected virtual string ImportFromStablePath => null;
@@ -700,22 +687,16 @@ namespace osu.Game.Database
         /// <summary>
         /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
         /// </summary>
-        public Task ImportFromStableAsync()
+        public Task ImportFromStableAsync(StableStorage stableStorage)
         {
-            var stableStorage = GetStableStorage?.Invoke();
-
-            if (stableStorage == null)
-            {
-                Logger.Log("找不到osu!stable的安装目录, \n因此导入无法进行!", LoggingTarget.Information, LogLevel.Error);
-                return Task.CompletedTask;
-            }
-
             var storage = PrepareStableStorage(stableStorage);
 
+            // Handle situations like when the user does not have a Skins folder.
             if (!storage.ExistsDirectory(ImportFromStablePath))
             {
-                // This handles situations like when the user does not have a Skins folder
-                Logger.Log($"在 {ImportFromStablePath} 下的osu!stable安装无效, \n因此导入无法进行!", LoggingTarget.Information, LogLevel.Error);
+                string fullPath = storage.GetFullPath(ImportFromStablePath);
+
+                Logger.Log($"在 \"{fullPath}\" 下的osu!stable安装无效, 因此对 {HumanisedModelName} 的导入无法进行!", LoggingTarget.Information, LogLevel.Error);
                 return Task.CompletedTask;
             }
 

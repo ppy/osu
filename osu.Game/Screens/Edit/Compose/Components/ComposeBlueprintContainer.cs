@@ -74,6 +74,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
+        protected override void TransferBlueprintFor(HitObject hitObject, DrawableHitObject drawableObject)
+        {
+            base.TransferBlueprintFor(hitObject, drawableObject);
+
+            var blueprint = (HitObjectSelectionBlueprint)GetBlueprintFor(hitObject);
+            blueprint.DrawableObject = drawableObject;
+        }
+
         protected override bool OnKeyDown(KeyDownEvent e)
         {
             if (e.ControlPressed)
@@ -268,10 +276,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (drawable == null)
                 return null;
 
-            return CreateBlueprintFor(drawable);
+            return CreateHitObjectBlueprintFor(item).With(b => b.DrawableObject = drawable);
         }
 
-        public virtual OverlaySelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject) => null;
+        public virtual HitObjectSelectionBlueprint CreateHitObjectBlueprintFor(HitObject hitObject) => null;
 
         protected override void OnBlueprintAdded(HitObject item)
         {
