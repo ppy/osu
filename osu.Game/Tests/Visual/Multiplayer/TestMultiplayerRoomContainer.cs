@@ -16,7 +16,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         protected override Container<Drawable> Content => content;
         private readonly Container content;
 
-        [Cached(typeof(StatefulMultiplayerClient))]
+        [Cached(typeof(MultiplayerClient))]
         public readonly TestMultiplayerClient Client;
 
         [Cached(typeof(IRoomManager))]
