@@ -38,7 +38,9 @@ namespace osu.Game.Skinning.Editor
                 {
                     var drawableItem = (Drawable)b.Item;
 
-                    drawableItem.Position = drawableItem.Parent.ToLocalSpace(RotatePointAroundOrigin(b.ScreenSpaceSelectionPoint, selectionQuad.Centre, angle)) - drawableItem.AnchorPosition;
+                    var rotatedPosition = RotatePointAroundOrigin(b.ScreenSpaceSelectionPoint, selectionQuad.Centre, angle);
+                    updateDrawablePosition(drawableItem, rotatedPosition);
+
                     drawableItem.Rotation += angle;
                 }
             }
@@ -111,7 +113,7 @@ namespace osu.Game.Skinning.Editor
                     adjustedRect.TopLeft.Y + adjustedRect.Height * relativePositionInOriginal.Y
                 );
 
-                drawableItem.Position = drawableItem.Parent.ToLocalSpace(newPositionInAdjusted) - drawableItem.AnchorPosition;
+                updateDrawablePosition(drawableItem, newPositionInAdjusted);
                 drawableItem.Scale *= scaledDelta;
             }
 
@@ -120,14 +122,15 @@ namespace osu.Game.Skinning.Editor
 
         public override bool HandleFlip(Direction direction)
         {
-            var selectionQuad = GetSurroundingQuad(SelectedBlueprints.Select(b => b.ScreenSpaceSelectionPoint));
+            var selectionQuad = getSelectionQuad();
 
             foreach (var b in SelectedBlueprints)
             {
                 var drawableItem = (Drawable)b.Item;
 
-                drawableItem.Position =
-                    drawableItem.Parent.ToLocalSpace(GetFlippedPosition(direction, selectionQuad, b.ScreenSpaceSelectionPoint)) - drawableItem.AnchorPosition;
+                var flippedPosition = GetFlippedPosition(direction, selectionQuad, b.ScreenSpaceSelectionPoint);
+
+                updateDrawablePosition(drawableItem, flippedPosition);
 
                 drawableItem.Scale *= new Vector2(
                     direction == Direction.Horizontal ? -1 : 1,
@@ -200,6 +203,12 @@ namespace osu.Game.Skinning.Editor
                     };
                 });
             }
+        }
+
+        private static void updateDrawablePosition(Drawable drawable, Vector2 screenSpacePosition)
+        {
+            drawable.Position =
+                drawable.Parent.ToLocalSpace(screenSpacePosition) - drawable.AnchorPosition;
         }
 
         private void applyOrigin(Anchor anchor)
