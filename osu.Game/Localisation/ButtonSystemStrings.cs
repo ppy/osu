@@ -39,6 +39,21 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString Browse => new TranslatableString(getKey(@"browse"), @"browse");
 
+        /// <summary>
+        /// "settings"
+        /// </summary>
+        public static LocalisableString Settings => new TranslatableString(getKey(@"settings"), @"settings");
+
+        /// <summary>
+        /// "back"
+        /// </summary>
+        public static LocalisableString Back => new TranslatableString(getKey(@"back"), @"back");
+
+        /// <summary>
+        /// "exit"
+        /// </summary>
+        public static LocalisableString Exit => new TranslatableString(getKey(@"exit"), @"exit");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

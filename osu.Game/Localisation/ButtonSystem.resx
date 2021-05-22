@@ -76,4 +76,13 @@
   <data name="browse" xml:space="preserve">
     <value>browse</value>
   </data>
+  <data name="settings" xml:space="preserve">
+    <value>settings</value>
+  </data>
+  <data name="back" xml:space="preserve">
+    <value>back</value>
+  </data>
+  <data name="exit" xml:space="preserve">
+    <value>exit</value>
+  </data>
 </root>
