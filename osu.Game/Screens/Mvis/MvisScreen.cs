@@ -381,7 +381,7 @@ namespace osu.Game.Screens.Mvis
                     {
                         skinnableBbBackground = new FullScreenSkinnableComponent("MBottomBar-background",
                             confineMode: ConfineMode.ScaleToFill,
-                            masking: true,
+                            masking: false,
                             defaultImplementation: _ => new PlaceHolder())
                         {
                             Name = "底栏背景图",
