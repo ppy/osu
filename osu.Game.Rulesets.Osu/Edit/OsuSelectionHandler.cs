@@ -225,26 +225,10 @@ namespace osu.Game.Rulesets.Osu.Edit
         private void scaleHitObjects(OsuHitObject[] hitObjects, Anchor reference, Vector2 scale)
         {
             scale = getClampedScale(hitObjects, reference, scale);
-
-            // move the selection before scaling if dragging from top or left anchors.
-            float xOffset = ((reference & Anchor.x0) > 0) ? -scale.X : 0;
-            float yOffset = ((reference & Anchor.y0) > 0) ? -scale.Y : 0;
-
             Quad selectionQuad = getSurroundingQuad(hitObjects);
 
             foreach (var h in hitObjects)
-            {
-                var newPosition = h.Position;
-
-                // guard against no-ops and NaN.
-                if (scale.X != 0 && selectionQuad.Width > 0)
-                    newPosition.X = selectionQuad.TopLeft.X + xOffset + (h.X - selectionQuad.TopLeft.X) / selectionQuad.Width * (selectionQuad.Width + scale.X);
-
-                if (scale.Y != 0 && selectionQuad.Height > 0)
-                    newPosition.Y = selectionQuad.TopLeft.Y + yOffset + (h.Y - selectionQuad.TopLeft.Y) / selectionQuad.Height * (selectionQuad.Height + scale.Y);
-
-                h.Position = newPosition;
-            }
+                h.Position = GetScaledPosition(reference, scale, selectionQuad, h.Position);
         }
 
         private (bool X, bool Y) isQuadInBounds(Quad quad)
