@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 {
     public class OsuDifficultyHitObject : DifficultyHitObject
     {
-        private const int normalized_radius = 52;
+        private const int normalized_radius = 50;
 
         protected new OsuHitObject BaseObject => (OsuHitObject)base.BaseObject;
 
@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// Angle the player has to take to hit this <see cref="OsuDifficultyHitObject"/>.
         /// Calculated as the angle between the circles (current-2, current-1, current).
         /// </summary>
-        public double? Angle { get; private set; }
+        public double Angle { get; private set; }
 
         /// <summary>
         /// Milliseconds elapsed since the start time of the previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 50ms.
@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         {
             double deltaTime = DeltaTime;
             double distance = JumpDistance;
-            double angle = Angle != null ? Angle.Value : 0;
+            double angle = Angle;
 
             angle = Math.Clamp(angle, Math.PI / 6, Math.PI / 2);
             double angleOffset = 10.0 * Math.Sin(1.5 * (Math.PI / 2 - angle));
@@ -105,7 +105,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 float dot = Vector2.Dot(v1, v2);
                 float det = v1.X * v2.Y - v1.Y * v2.X;
 
-                Angle = Math.Abs(Math.Atan2(det, dot));
+                double? angle = Math.Abs(Math.Atan2(det, dot));
+
+                if (angle == null)
+                    Angle = 0;
+                else
+                    Angle = (double) angle;
             }
         }
 

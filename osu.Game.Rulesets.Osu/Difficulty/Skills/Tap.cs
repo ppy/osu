@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private int decayExcessThreshold = 500;
 
         private double currentStrain;
-        private double strainMultiplier = 2.325;//3125;
+        private double strainMultiplier = 2.675;//1.5;//3125;
 
         private double hitWindowGreat;
 
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return decay;
         }
 
-        private double strainValueAt(DifficultyHitObject current)
+        protected override double strainValueAt(DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner || Previous.Count == 0)
                 return 0;
@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     if (Previous[i - 1].BaseObject is Slider || Previous[i].BaseObject is Slider)
                         specialTransitionCount += 50.0 / Math.Sqrt(prevDelta * currDelta) * ((double)i / HistoryLength);
                     else
-                        specialTransitionCount += 200.0 / Math.Sqrt(prevDelta * currDelta) * ((double)i / HistoryLength);
+                        specialTransitionCount += 250.0 / Math.Sqrt(prevDelta * currDelta) * ((double)i / HistoryLength);
                 }
 
                 if (firstDeltaSwitch)
@@ -163,8 +163,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             // rhythmComplexitySum /= Math.Sqrt(9 + sliderCount) / 3;
 
 
-            rhythmComplexitySum *= 1;
             rhythmComplexitySum += specialTransitionCount;
+            rhythmComplexitySum *= .75;
             // Console.WriteLine("Delta: " + avgDeltaTime);
 
             if (75 / avgDeltaTime > 1)
@@ -189,9 +189,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 //  islandSizes[2] + " " + "Quints: " + islandSizes[3] + " " + "Six: " + islandSizes[4] + " " + "Sevens: " + islandSizes[5] + " " + "Plus: " + islandSizes[6]);
 
             globalCount++;
+            // Console.WriteLine(hitWindowGreat);
 
             // if (rhythmComplexitySum > 1)
                 return currentStrain * (Previous.Count / HistoryLength) * (Math.Sqrt(4 + rhythmComplexitySum) / 2);
+
+
             // else
             //     return currentStrain;// * (Previous.Count / HistoryLength) * Math.Max(1, Math.Sqrt(3 + rhythmComplexitySum) / 2);
         }
@@ -203,13 +206,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
                     // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be removed in the future
             hitWindowGreat = (int)(hitWindows.WindowFor(HitResult.Great)) / clockRate;
-        }
-
-        protected override void Process(DifficultyHitObject current)
-        {
-            double strain = strainValueAt(current);
-            AddStrain(strain);
-            // Console.WriteLine(hitWindowGreat);
         }
     }
 }
