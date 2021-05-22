@@ -480,6 +480,7 @@ namespace osu.Game.Database
                 // Dereference the existing file info, since the file model will be removed.
                 if (file.FileInfo != null)
                 {
+                    file.Requery(usage.Context);
                     Files.Dereference(file.FileInfo);
 
                     // This shouldn't be required, but here for safety in case the provided TModel is not being change tracked
