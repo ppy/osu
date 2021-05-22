@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
+using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
@@ -29,9 +30,9 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         private TriangleButton undeleteButton;
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(BeatmapManager beatmaps, ScoreManager scores, SkinManager skins, [CanBeNull] CollectionManager collectionManager, DialogOverlay dialogOverlay)
+        private void load(BeatmapManager beatmaps, ScoreManager scores, SkinManager skins, [CanBeNull] CollectionManager collectionManager, [CanBeNull] StableImportManager stableImportManager, DialogOverlay dialogOverlay)
         {
-            if (beatmaps.SupportsImportFromStable)
+            if (stableImportManager?.SupportsImportFromStable == true)
             {
                 Add(importBeatmapsButton = new SettingsButton
                 {
@@ -39,7 +40,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     Action = () =>
                     {
                         importBeatmapsButton.Enabled.Value = false;
-                        beatmaps.ImportFromStableAsync().ContinueWith(t => Schedule(() => importBeatmapsButton.Enabled.Value = true));
+                        stableImportManager.ImportFromStableAsync(StableContent.Beatmaps).ContinueWith(t => Schedule(() => importBeatmapsButton.Enabled.Value = true));
                     }
                 });
             }
@@ -57,7 +58,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 }
             });
 
-            if (scores.SupportsImportFromStable)
+            if (stableImportManager?.SupportsImportFromStable == true)
             {
                 Add(importScoresButton = new SettingsButton
                 {
@@ -65,7 +66,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     Action = () =>
                     {
                         importScoresButton.Enabled.Value = false;
-                        scores.ImportFromStableAsync().ContinueWith(t => Schedule(() => importScoresButton.Enabled.Value = true));
+                        stableImportManager.ImportFromStableAsync(StableContent.Scores).ContinueWith(t => Schedule(() => importScoresButton.Enabled.Value = true));
                     }
                 });
             }
@@ -83,7 +84,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 }
             });
 
-            if (skins.SupportsImportFromStable)
+            if (stableImportManager?.SupportsImportFromStable == true)
             {
                 Add(importSkinsButton = new SettingsButton
                 {
@@ -91,7 +92,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     Action = () =>
                     {
                         importSkinsButton.Enabled.Value = false;
-                        skins.ImportFromStableAsync().ContinueWith(t => Schedule(() => importSkinsButton.Enabled.Value = true));
+                        stableImportManager.ImportFromStableAsync(StableContent.Skins).ContinueWith(t => Schedule(() => importSkinsButton.Enabled.Value = true));
                     }
                 });
             }
@@ -111,7 +112,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
             if (collectionManager != null)
             {
-                if (collectionManager.SupportsImportFromStable)
+                if (stableImportManager?.SupportsImportFromStable == true)
                 {
                     Add(importCollectionsButton = new SettingsButton
                     {
@@ -119,7 +120,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         Action = () =>
                         {
                             importCollectionsButton.Enabled.Value = false;
-                            collectionManager.ImportFromStableAsync().ContinueWith(t => Schedule(() => importCollectionsButton.Enabled.Value = true));
+                            stableImportManager.ImportFromStableAsync(StableContent.Collections).ContinueWith(t => Schedule(() => importCollectionsButton.Enabled.Value = true));
                         }
                     });
                 }

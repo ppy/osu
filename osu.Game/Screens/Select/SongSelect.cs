@@ -22,7 +22,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Select.Options;
-using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -35,9 +34,9 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Game.Collections;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Scoring;
 using System.Diagnostics;
 using osu.Game.Screens.Play;
+using osu.Game.Database;
 
 namespace osu.Game.Screens.Select
 {
@@ -51,6 +50,8 @@ namespace osu.Game.Screens.Select
         public FilterControl FilterControl { get; private set; }
 
         protected virtual bool ShowFooter => true;
+
+        protected virtual bool DisplayStableImportPrompt => stableImportManager?.SupportsImportFromStable == true;
 
         /// <summary>
         /// Can be null if <see cref="ShowFooter"/> is false.
@@ -84,6 +85,9 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
+        [Resolved(CanBeNull = true)]
+        private StableImportManager stableImportManager { get; set; }
+
         protected ModSelectOverlay ModSelect { get; private set; }
 
         protected Sample SampleConfirm { get; private set; }
@@ -101,7 +105,7 @@ namespace osu.Game.Screens.Select
         private MusicController music { get; set; }
 
         [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, ScoreManager scores, CollectionManager collections, ManageCollectionsDialog manageCollectionsDialog, DifficultyRecommender recommender)
+        private void load(AudioManager audio, DialogOverlay dialog, OsuColour colours, ManageCollectionsDialog manageCollectionsDialog, DifficultyRecommender recommender)
         {
             // initial value transfer is required for FilterControl (it uses our re-cached bindables in its async load for the initial filter).
             transferRulesetValue();
@@ -282,18 +286,12 @@ namespace osu.Game.Screens.Select
             {
                 Schedule(() =>
                 {
-                    // if we have no beatmaps but osu-stable is found, let's prompt the user to import.
-                    if (!beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.Minimal).Any() && beatmaps.StableInstallationAvailable)
+                    // if we have no beatmaps, let's prompt the user to import from over a stable install if he has one.
+                    if (!beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.Minimal).Any() && DisplayStableImportPrompt)
                     {
                         dialogOverlay.Push(new ImportFromStablePopup(() =>
                         {
-                            Task.Run(beatmaps.ImportFromStableAsync)
-                                .ContinueWith(_ =>
-                                {
-                                    Task.Run(scores.ImportFromStableAsync);
-                                    Task.Run(collections.ImportFromStableAsync);
-                                }, TaskContinuationOptions.OnlyOnRanToCompletion);
-                            Task.Run(skins.ImportFromStableAsync);
+                            Task.Run(() => stableImportManager.ImportFromStableAsync(StableContent.All));
                         }));
                     }
                 });
