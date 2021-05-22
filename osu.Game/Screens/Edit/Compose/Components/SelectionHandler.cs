@@ -376,6 +376,26 @@ namespace osu.Game.Screens.Edit.Compose.Components
         }
 
         /// <summary>
+        /// Given a scale vector, a surrounding quad for all selected objects, and a position,
+        /// will return the scaled position in screen space coordinates.
+        /// </summary>
+        protected static Vector2 GetScaledPosition(Anchor reference, Vector2 scale, Quad selectionQuad, Vector2 position)
+        {
+            // adjust the direction of scale depending on which side the user is dragging.
+            float xOffset = ((reference & Anchor.x0) > 0) ? -scale.X : 0;
+            float yOffset = ((reference & Anchor.y0) > 0) ? -scale.Y : 0;
+
+            // guard against no-ops and NaN.
+            if (scale.X != 0 && selectionQuad.Width > 0)
+                position.X = selectionQuad.TopLeft.X + xOffset + (position.X - selectionQuad.TopLeft.X) / selectionQuad.Width * (selectionQuad.Width + scale.X);
+
+            if (scale.Y != 0 && selectionQuad.Height > 0)
+                position.Y = selectionQuad.TopLeft.Y + yOffset + (position.Y - selectionQuad.TopLeft.Y) / selectionQuad.Height * (selectionQuad.Height + scale.Y);
+
+            return position;
+        }
+
+        /// <summary>
         /// Returns a quad surrounding the provided points.
         /// </summary>
         /// <param name="points">The points to calculate a quad for.</param>
